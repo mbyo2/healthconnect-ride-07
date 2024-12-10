@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Star, MapPin, Clock } from "lucide-react";
@@ -26,35 +26,43 @@ export const ProviderCard = ({
 
   return (
     <>
-      <Card className="hover:shadow-lg transition-shadow">
-        <CardHeader className="relative pb-0">
+      <Card className="overflow-hidden">
+        <div className="flex gap-4 p-4">
           <img
             src={image}
             alt={name}
-            className="w-full h-48 object-cover rounded-t-lg"
+            className="w-20 h-20 object-cover rounded-lg"
           />
-          <Badge className="absolute top-4 right-4 bg-primary text-white">
-            {rating} <Star className="ml-1 w-4 h-4 inline" />
-          </Badge>
-        </CardHeader>
-        <CardContent className="pt-4">
-          <h3 className="text-xl font-semibold mb-2">{name}</h3>
-          <p className="text-gray-600 mb-4">{specialty}</p>
-          <div className="flex items-center text-gray-500 mb-2">
-            <MapPin className="w-4 h-4 mr-2" />
-            <span className="text-sm">{location}</span>
+          <div className="flex-1">
+            <div className="flex items-start justify-between">
+              <div>
+                <h3 className="font-semibold">{name}</h3>
+                <p className="text-sm text-gray-600">{specialty}</p>
+              </div>
+              <Badge variant="secondary" className="flex items-center gap-1">
+                {rating} <Star className="w-3 h-3" />
+              </Badge>
+            </div>
+            <div className="mt-2 space-y-1">
+              <div className="flex items-center text-gray-500 text-sm">
+                <MapPin className="w-4 h-4 mr-1" />
+                <span>{location}</span>
+              </div>
+              <div className="flex items-center text-gray-500 text-sm">
+                <Clock className="w-4 h-4 mr-1" />
+                <span>{availability}</span>
+              </div>
+            </div>
           </div>
-          <div className="flex items-center text-gray-500 mb-4">
-            <Clock className="w-4 h-4 mr-2" />
-            <span className="text-sm">{availability}</span>
-          </div>
+        </div>
+        <div className="px-4 pb-4">
           <Button 
-            className="w-full bg-primary hover:bg-primary/90"
+            className="w-full"
             onClick={() => setIsBookingModalOpen(true)}
           >
             Book Appointment
           </Button>
-        </CardContent>
+        </div>
       </Card>
 
       <BookingModal

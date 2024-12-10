@@ -36,40 +36,42 @@ export const ProviderList = () => {
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
 
   return (
-    <div className="container mx-auto px-4 py-12">
-      <div className="flex flex-col space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-3 text-gray-400" />
-            <Input
-              placeholder="Search for healthcare providers..."
-              className="pl-10 py-6"
-            />
-          </div>
-          <div className="flex gap-2 ml-4">
-            <Button
-              variant={viewMode === 'list' ? 'default' : 'outline'}
-              onClick={() => setViewMode('list')}
-              className="flex items-center gap-2"
-            >
-              <List className="h-4 w-4" />
-              List
-            </Button>
-            <Button
-              variant={viewMode === 'map' ? 'default' : 'outline'}
-              onClick={() => setViewMode('map')}
-              className="flex items-center gap-2"
-            >
-              <MapPin className="h-4 w-4" />
-              Map
-            </Button>
-          </div>
+    <div className="min-h-screen">
+      <div className="sticky top-14 z-40 bg-white border-b px-4 py-3 space-y-3">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <Input
+            placeholder="Search for healthcare providers..."
+            className="pl-10"
+          />
         </div>
+        <div className="flex gap-2">
+          <Button
+            variant={viewMode === 'list' ? 'default' : 'outline'}
+            onClick={() => setViewMode('list')}
+            className="flex-1 flex items-center justify-center gap-2"
+          >
+            <List className="h-4 w-4" />
+            List
+          </Button>
+          <Button
+            variant={viewMode === 'map' ? 'default' : 'outline'}
+            onClick={() => setViewMode('map')}
+            className="flex-1 flex items-center justify-center gap-2"
+          >
+            <MapPin className="h-4 w-4" />
+            Map
+          </Button>
+        </div>
+      </div>
 
+      <div className="px-4 py-4">
         {viewMode === 'map' ? (
-          <ProviderMap />
+          <div className="h-[calc(100vh-8.5rem)]">
+            <ProviderMap />
+          </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 gap-4">
             {mockProviders.map((provider, index) => (
               <ProviderCard key={index} {...provider} />
             ))}

@@ -1,13 +1,13 @@
-import { Hero } from "@/components/Hero";
 import { ProviderList } from "@/components/ProviderList";
 import { Header } from "@/components/Header";
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gray-50">
       <Header />
-      <Hero />
-      <ProviderList />
+      <main className="pt-14">
+        <ProviderList />
+      </main>
     </div>
   );
 };

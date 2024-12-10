@@ -1,11 +1,10 @@
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import { Icon, LatLngTuple } from 'leaflet';
+import { Icon } from 'leaflet';
 import { useState } from 'react';
 import { Button } from './ui/button';
 import { BookingModal } from './BookingModal';
 
-// Fix for default marker icon
 const defaultIcon = new Icon({
   iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
@@ -17,7 +16,7 @@ const defaultIcon = new Icon({
 interface Provider {
   id: number;
   name: string;
-  position: LatLngTuple;
+  position: [number, number];
   specialty: string;
   rating: number;
   availability: string;
@@ -54,13 +53,11 @@ export const ProviderMap = () => {
   const [selectedProvider, setSelectedProvider] = useState<Provider | null>(null);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
 
-  const defaultCenter: LatLngTuple = [40.7128, -74.0060];
-
   return (
-    <div className="w-full h-[600px] rounded-lg overflow-hidden shadow-lg">
+    <div className="w-full h-full rounded-lg overflow-hidden shadow-lg">
       <MapContainer 
-        className="h-full w-full"
-        center={defaultCenter}
+        style={{ height: '100%', width: '100%' }}
+        center={[40.7128, -74.0060] as [number, number]}
         zoom={13}
       >
         <TileLayer
@@ -71,6 +68,7 @@ export const ProviderMap = () => {
           <Marker
             key={provider.id}
             position={provider.position}
+            icon={defaultIcon}
             eventHandlers={{
               click: () => setSelectedProvider(provider),
             }}
