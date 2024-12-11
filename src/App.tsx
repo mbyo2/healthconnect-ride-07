@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
+import { BottomNav } from "./components/BottomNav";
 
 const queryClient = new QueryClient();
 
@@ -13,9 +14,16 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-        </Routes>
+        <div className="pb-20"> {/* Add padding to account for bottom nav */}
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/search" element={<Index />} />
+            <Route path="/map" element={<Index />} />
+            <Route path="/appointments" element={<Index />} />
+            <Route path="/profile" element={<Index />} />
+          </Routes>
+        </div>
+        <BottomNav />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
