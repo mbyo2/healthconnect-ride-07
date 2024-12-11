@@ -57,8 +57,9 @@ export const ProviderMap = () => {
     <div className="w-full h-full rounded-lg overflow-hidden shadow-lg">
       <MapContainer 
         style={{ height: '100%', width: '100%' }}
-        center={[40.7128, -74.0060]}
+        center={[40.7128, -74.0060] as [number, number]}
         zoom={13}
+        scrollWheelZoom={false}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -68,6 +69,7 @@ export const ProviderMap = () => {
           <Marker
             key={provider.id}
             position={provider.position}
+            icon={defaultIcon}
             eventHandlers={{
               click: () => setSelectedProvider(provider),
             }}
