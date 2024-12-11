@@ -47,8 +47,8 @@ export const ProviderMap = ({ providers }: ProviderMapProps) => {
   return (
     <div className="w-full h-full rounded-lg overflow-hidden shadow-lg">
       <MapContainer 
-        center={[40.7128, -74.0060]}
-        zoom={13}
+        defaultCenter={[40.7128, -74.0060]}
+        defaultZoom={13}
         scrollWheelZoom={false}
         style={{ height: '100%', width: '100%' }}
       >
@@ -60,6 +60,7 @@ export const ProviderMap = ({ providers }: ProviderMapProps) => {
           <Marker
             key={provider.id}
             position={provider.position}
+            icon={defaultIcon}
             eventHandlers={{
               click: () => setSelectedProvider(provider),
             }}
