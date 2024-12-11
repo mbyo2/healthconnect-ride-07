@@ -3,12 +3,14 @@ import { ProviderList } from "@/components/ProviderList";
 import { Header } from "@/components/Header";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { SymptomCollector } from "@/components/SymptomCollector";
+import { useNavigate } from "react-router-dom";
 
 const Index = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [hasProvidedSymptoms, setHasProvidedSymptoms] = useState(false);
   const [currentSymptoms, setCurrentSymptoms] = useState("");
   const [urgencyLevel, setUrgencyLevel] = useState("");
+  const navigate = useNavigate();
 
   // Simulate initial loading
   useState(() => {
@@ -22,7 +24,8 @@ const Index = () => {
     setCurrentSymptoms(symptoms);
     setUrgencyLevel(urgency);
     setHasProvidedSymptoms(true);
-    console.log("Symptoms:", symptoms, "Urgency:", urgency);
+    // Redirect to map view after symptom collection
+    navigate('/map');
   };
 
   if (isLoading) {
