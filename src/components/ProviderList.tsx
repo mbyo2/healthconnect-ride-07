@@ -2,10 +2,25 @@ import { ProviderCard } from "./ProviderCard";
 import { Input } from "@/components/ui/input";
 import { Search, MapPin, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ProviderMap } from "./ProviderMap";
 
-const mockProviders = [
+interface Provider {
+  name: string;
+  specialty: string;
+  rating: number;
+  location: string;
+  availability: string;
+  image: string;
+  expertise: string[];
+}
+
+interface ProviderListProps {
+  symptoms?: string;
+  urgency?: string;
+}
+
+const mockProviders: Provider[] = [
   {
     name: "Dr. Sarah Johnson",
     specialty: "General Practitioner",
@@ -13,14 +28,16 @@ const mockProviders = [
     location: "Manhattan, NY",
     availability: "Available Today",
     image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=800",
+    expertise: ["General Medicine", "Urgent Care", "Family Medicine"]
   },
   {
     name: "Dr. Michael Chen",
-    specialty: "Pediatrician",
+    specialty: "Emergency Medicine",
     rating: 4.8,
     location: "Brooklyn, NY",
-    availability: "Available Tomorrow",
+    availability: "Available Now",
     image: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&q=80&w=800",
+    expertise: ["Emergency Medicine", "Trauma Care", "Critical Care"]
   },
   {
     name: "Dr. Emily Williams",
@@ -29,11 +46,45 @@ const mockProviders = [
     location: "Queens, NY",
     availability: "Available Today",
     image: "https://images.unsplash.com/photo-1594824476967-48c8b964273f?auto=format&fit=crop&q=80&w=800",
+    expertise: ["Family Medicine", "Pediatrics", "Preventive Care"]
   },
 ];
 
-export const ProviderList = () => {
+export const ProviderList = ({ symptoms = "", urgency = "non-urgent" }: ProviderListProps) => {
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
+  const [filteredProviders, setFilteredProviders] = useState(mockProviders);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  useEffect(() => {
+    // Filter providers based on symptoms and urgency
+    let filtered = [...mockProviders];
+    
+    if (urgency === "emergency") {
+      filtered = filtered.filter(provider => 
+        provider.expertise.includes("Emergency Medicine") || 
+        provider.availability === "Available Now"
+      );
+    }
+
+    if (symptoms) {
+      // Simple keyword matching (in a real app, this would be more sophisticated)
+      filtered = filtered.filter(provider =>
+        provider.expertise.some(exp => 
+          symptoms.toLowerCase().includes(exp.toLowerCase())
+        )
+      );
+    }
+
+    // Apply search term filter
+    if (searchTerm) {
+      filtered = filtered.filter(provider =>
+        provider.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        provider.specialty.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    setFilteredProviders(filtered);
+  }, [symptoms, urgency, searchTerm]);
 
   return (
     <div className="min-h-screen">
@@ -43,6 +94,8 @@ export const ProviderList = () => {
           <Input
             placeholder="Search for healthcare providers..."
             className="pl-10"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
         <div className="flex gap-2">
@@ -68,11 +121,11 @@ export const ProviderList = () => {
       <div className="px-4 py-4">
         {viewMode === 'map' ? (
           <div className="h-[calc(100vh-8.5rem)]">
-            <ProviderMap />
+            <ProviderMap providers={filteredProviders} />
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-4">
-            {mockProviders.map((provider, index) => (
+            {filteredProviders.map((provider, index) => (
               <ProviderCard key={index} {...provider} />
             ))}
           </div>

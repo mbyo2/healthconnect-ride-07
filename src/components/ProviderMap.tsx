@@ -14,62 +14,52 @@ const defaultIcon = new Icon({
 });
 
 interface Provider {
-  id: number;
+  id?: number;
   name: string;
-  position: [number, number];
   specialty: string;
   rating: number;
   availability: string;
+  position?: [number, number];
+  location: string;
+  expertise: string[];
 }
 
-const mockProviderLocations: Provider[] = [
-  { 
-    id: 1, 
-    name: "Dr. Sarah Johnson", 
-    position: [40.7128, -74.0060], 
-    specialty: "General Practitioner",
-    rating: 4.9,
-    availability: "Available Today"
-  },
-  { 
-    id: 2, 
-    name: "Dr. Michael Chen", 
-    position: [40.7580, -73.9855], 
-    specialty: "Pediatrician",
-    rating: 4.8,
-    availability: "Available Tomorrow"
-  },
-  { 
-    id: 3, 
-    name: "Dr. Emily Williams", 
-    position: [40.7829, -73.9654], 
-    specialty: "Family Medicine",
-    rating: 4.7,
-    availability: "Available Today"
-  },
-];
+interface ProviderMapProps {
+  providers: Provider[];
+}
 
-export const ProviderMap = () => {
+const mockLocations: Record<string, [number, number]> = {
+  "Manhattan, NY": [40.7128, -74.0060],
+  "Brooklyn, NY": [40.7580, -73.9855],
+  "Queens, NY": [40.7829, -73.9654],
+};
+
+export const ProviderMap = ({ providers }: ProviderMapProps) => {
   const [selectedProvider, setSelectedProvider] = useState<Provider | null>(null);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+
+  const providersWithLocations = providers.map((provider, index) => ({
+    ...provider,
+    id: index + 1,
+    position: mockLocations[provider.location] || [40.7128, -74.0060],
+  }));
 
   return (
     <div className="w-full h-full rounded-lg overflow-hidden shadow-lg">
       <MapContainer 
-        style={{ height: '100%', width: '100%' }}
-        center={[40.7128, -74.0060] as [number, number]}
+        center={[40.7128, -74.0060]}
         zoom={13}
         scrollWheelZoom={false}
+        style={{ height: '100%', width: '100%' }}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
-        {mockProviderLocations.map((provider) => (
+        {providersWithLocations.map((provider) => (
           <Marker
             key={provider.id}
             position={provider.position}
-            icon={defaultIcon}
             eventHandlers={{
               click: () => setSelectedProvider(provider),
             }}
