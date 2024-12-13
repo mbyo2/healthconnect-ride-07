@@ -9,9 +9,44 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { HealthPersonnelApplicationForm } from "@/components/HealthPersonnelApplicationForm";
 
 const Profile = () => {
-  const isHealthcareProvider = false; // This would come from auth context in a real app
+  const [userRole, setUserRole] = useState<string | null>(null);
+  const [applicationStatus, setApplicationStatus] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+        
+        if (profile) {
+          setUserRole(profile.role);
+          
+          if (profile.role === 'health_personnel') {
+            const { data: application } = await supabase
+              .from('health_personnel_applications')
+              .select('status')
+              .eq('user_id', user.id)
+              .single();
+            
+            setApplicationStatus(application?.status || null);
+          }
+        }
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
+
+  const isHealthcareProvider = userRole === 'health_personnel';
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -48,131 +83,21 @@ const Profile = () => {
           </div>
         </Card>
 
-        <Tabs defaultValue="info" className="w-full">
-          <TabsList className="w-full">
-            <TabsTrigger value="info" className="flex-1">Information</TabsTrigger>
-            {isHealthcareProvider ? (
-              <TabsTrigger value="reviews" className="flex-1">Reviews</TabsTrigger>
-            ) : (
-              <TabsTrigger value="history" className="flex-1">History</TabsTrigger>
-            )}
-          </TabsList>
-          
-          <TabsContent value="info">
-            <Card className="p-4">
-              <div className="space-y-4">
-                {isHealthcareProvider ? (
-                  <>
-                    <div className="flex items-center gap-2">
-                      <Award className="w-5 h-5 text-primary" />
-                      <div>
-                        <h3 className="font-semibold">Experience</h3>
-                        <p className="text-sm text-gray-500">10+ years in Emergency Medicine</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <FileText className="w-5 h-5 text-primary" />
-                      <div>
-                        <h3 className="font-semibold">Specializations</h3>
-                        <p className="text-sm text-gray-500">Emergency Medicine, Trauma Care, Critical Care</p>
-                      </div>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="flex items-center gap-2">
-                      <Heart className="w-5 h-5 text-primary" />
-                      <div>
-                        <h3 className="font-semibold">Health Information</h3>
-                        <p className="text-sm text-gray-500">Blood Type: O+</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Bell className="w-5 h-5 text-primary" />
-                      <div>
-                        <h3 className="font-semibold">Allergies</h3>
-                        <p className="text-sm text-gray-500">None reported</p>
-                      </div>
-                    </div>
-                  </>
-                )}
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-5 h-5 text-primary" />
-                  <div>
-                    <h3 className="font-semibold">Location</h3>
-                    <p className="text-sm text-gray-500">Brooklyn, NY</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Phone className="w-5 h-5 text-primary" />
-                  <div>
-                    <h3 className="font-semibold">Phone</h3>
-                    <p className="text-sm text-gray-500">+1 (555) 123-4567</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Mail className="w-5 h-5 text-primary" />
-                  <div>
-                    <h3 className="font-semibold">Email</h3>
-                    <p className="text-sm text-gray-500">contact@example.com</p>
-                  </div>
-                </div>
-              </div>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value={isHealthcareProvider ? "reviews" : "history"}>
-            <Card className="p-4">
-              {isHealthcareProvider ? (
-                <div className="space-y-4">
-                  {[1, 2, 3].map((review) => (
-                    <div key={review} className="border-b last:border-0 pb-4 last:pb-0">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <Avatar className="w-8 h-8">
-                            <AvatarFallback>P{review}</AvatarFallback>
-                          </Avatar>
-                          <span className="font-semibold">Patient {review}</span>
-                        </div>
-                        <div className="flex items-center">
-                          <Star className="w-4 h-4 fill-yellow-400" />
-                          <span className="ml-1">5.0</span>
-                        </div>
-                      </div>
-                      <p className="mt-2 text-gray-600">
-                        Excellent care and very professional service. Highly recommended!
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {[1, 2, 3].map((appointment) => (
-                    <div key={appointment} className="border-b last:border-0 pb-4 last:pb-0">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h3 className="font-semibold">Dr. Sarah Johnson</h3>
-                          <p className="text-sm text-gray-500">General Checkup</p>
-                        </div>
-                        <Badge>Completed</Badge>
-                      </div>
-                      <div className="mt-2 flex items-center gap-4 text-sm text-gray-500">
-                        <div className="flex items-center gap-1">
-                          <Calendar className="w-4 h-4" />
-                          March 15, 2024
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Clock className="w-4 h-4" />
-                          10:00 AM
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </Card>
-          </TabsContent>
-        </Tabs>
+        {isHealthcareProvider && !applicationStatus && (
+          <div className="mt-6">
+            <h2 className="text-xl font-semibold mb-4">Complete Your Application</h2>
+            <HealthPersonnelApplicationForm />
+          </div>
+        )}
+
+        {applicationStatus && (
+          <Card className="mt-6 p-4">
+            <h3 className="font-semibold">Application Status</h3>
+            <p className="text-gray-600 mt-2">
+              Your application is currently {applicationStatus}
+            </p>
+          </Card>
+        )}
 
         <div className="mt-6 space-y-2">
           <Button variant="outline" className="w-full justify-start gap-2 h-12">

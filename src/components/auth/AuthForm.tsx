@@ -5,21 +5,19 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 
 export const AuthForm = () => {
   const [userType, setUserType] = useState<"patient" | "health_personnel" | null>(
     null
   );
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   // Check if user is already logged in
   supabase.auth.onAuthStateChange((event, session) => {
     if (event === "SIGNED_IN" && session) {
       navigate("/");
-      toast({
-        title: "Welcome!",
+      toast.success("Welcome!", {
         description: "You have successfully signed in.",
       });
     }
@@ -78,6 +76,7 @@ export const AuthForm = () => {
           },
         }}
         providers={[]}
+        redirectTo={`${window.location.origin}/auth/callback`}
         queryParams={{
           options: {
             data: {
