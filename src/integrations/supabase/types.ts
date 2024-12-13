@@ -9,7 +9,93 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      health_personnel_applications: {
+        Row: {
+          created_at: string | null
+          documents_url: string[] | null
+          id: string
+          license_number: string
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          specialty: string
+          status: string
+          updated_at: string | null
+          user_id: string | null
+          years_of_experience: number
+        }
+        Insert: {
+          created_at?: string | null
+          documents_url?: string[] | null
+          id?: string
+          license_number: string
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          specialty: string
+          status?: string
+          updated_at?: string | null
+          user_id?: string | null
+          years_of_experience: number
+        }
+        Update: {
+          created_at?: string | null
+          documents_url?: string[] | null
+          id?: string
+          license_number?: string
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          specialty?: string
+          status?: string
+          updated_at?: string | null
+          user_id?: string | null
+          years_of_experience?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "health_personnel_applications_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "health_personnel_applications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          first_name: string | null
+          id: string
+          last_name: string | null
+          role: Database["public"]["Enums"]["user_role"]
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          first_name?: string | null
+          id: string
+          last_name?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -18,7 +104,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      user_role: "admin" | "health_personnel" | "patient"
     }
     CompositeTypes: {
       [_ in never]: never
