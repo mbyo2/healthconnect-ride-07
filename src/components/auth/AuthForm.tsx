@@ -9,11 +9,14 @@ import { toast } from "sonner";
 export const AuthForm = () => {
   const navigate = useNavigate();
   const [role, setRole] = useState<"patient" | "health_personnel">("patient");
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Check if user is already logged in
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log("Initial session check:", session);
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      console.log("Initial session check:", { session, error });
+      setIsLoading(false);
+      
       if (session) {
         console.log("User already logged in, redirecting to home");
         navigate("/");
@@ -22,11 +25,14 @@ export const AuthForm = () => {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log("Auth state changed:", event, session);
+        console.log("Auth state changed:", { event, session });
+        
         if (event === "SIGNED_IN") {
-          console.log("User signed in successfully");
-          toast.success("Successfully signed in!");
-          navigate("/");
+          if (session?.user) {
+            console.log("User signed in successfully:", session.user);
+            toast.success("Successfully signed in!");
+            navigate("/");
+          }
         } else if (event === "SIGNED_OUT") {
           console.log("User signed out");
         } else if (event === "USER_UPDATED") {
@@ -42,6 +48,10 @@ export const AuthForm = () => {
     console.log("Role selected:", selectedRole);
     setRole(selectedRole);
   };
+
+  if (isLoading) {
+    return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
+  }
 
   return (
     <div className="max-w-md mx-auto p-6">
@@ -90,6 +100,10 @@ export const AuthForm = () => {
               email_label: 'Email',
               password_label: 'Password',
             },
+            sign_up: {
+              email_label: 'Email',
+              password_label: 'Password',
+            }
           },
         }}
         additionalData={{
