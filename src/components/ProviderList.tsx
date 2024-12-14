@@ -19,7 +19,8 @@ const mockProviders: Provider[] = [
     rating: 4.9,
     location: [40.7589, -73.9851], // Manhattan coordinates
     availability: "Available Today",
-    expertise: ["General Medicine", "Urgent Care", "Family Medicine"]
+    expertise: ["General Medicine", "Urgent Care", "Family Medicine"],
+    image: "/placeholder.svg"  // Added image property
   },
   {
     id: "2",
@@ -28,7 +29,8 @@ const mockProviders: Provider[] = [
     rating: 4.8,
     location: [40.6782, -73.9442], // Brooklyn coordinates
     availability: "Available Now",
-    expertise: ["Emergency Medicine", "Trauma Care", "Critical Care"]
+    expertise: ["Emergency Medicine", "Trauma Care", "Critical Care"],
+    image: "/placeholder.svg"  // Added image property
   },
   {
     id: "3",
@@ -37,7 +39,8 @@ const mockProviders: Provider[] = [
     rating: 4.7,
     location: [40.7282, -73.7949], // Queens coordinates
     availability: "Available Today",
-    expertise: ["Family Medicine", "Pediatrics", "Preventive Care"]
+    expertise: ["Family Medicine", "Pediatrics", "Preventive Care"],
+    image: "/placeholder.svg"  // Added image property
   },
 ];
 

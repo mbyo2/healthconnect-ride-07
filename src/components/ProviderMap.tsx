@@ -31,8 +31,8 @@ export const ProviderMap = ({ providers, onProviderSelect }: ProviderMapProps) =
   return (
     <div className="w-full h-[400px] rounded-lg overflow-hidden">
       <MapContainer
-        defaultCenter={center}
-        defaultZoom={12}
+        center={center}
+        zoom={12}
         scrollWheelZoom={false}
         style={{ height: "100%", width: "100%" }}
       >
