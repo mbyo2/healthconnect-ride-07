@@ -11,6 +11,7 @@ import Map from "./pages/Map";
 import Appointments from "./pages/Appointments";
 import Profile from "./pages/Profile";
 import Login from "./pages/Login";
+import AdminDashboard from "./pages/AdminDashboard";
 import { BottomNav } from "./components/BottomNav";
 
 const queryClient = new QueryClient();
@@ -88,6 +89,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Profile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute>
+                  <AdminDashboard />
                 </ProtectedRoute>
               }
             />

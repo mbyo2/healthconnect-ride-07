@@ -1,100 +1,70 @@
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
-import { Icon } from 'leaflet';
-import { useState } from 'react';
-import { Button } from './ui/button';
-import { BookingModal } from './BookingModal';
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
 
-const defaultIcon = new Icon({
-  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
+// Fix for default marker icon
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
+  iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
+  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
 });
 
 interface Provider {
-  id?: number;
+  id: string;
   name: string;
   specialty: string;
+  location: [number, number];
   rating: number;
-  availability: string;
-  position?: [number, number];
-  location: string;
-  expertise: string[];
 }
 
 interface ProviderMapProps {
   providers: Provider[];
+  onProviderSelect?: (provider: Provider) => void;
 }
 
-const mockLocations: Record<string, [number, number]> = {
-  "Manhattan, NY": [40.7128, -74.0060],
-  "Brooklyn, NY": [40.7580, -73.9855],
-  "Queens, NY": [40.7829, -73.9654],
-};
-
-export const ProviderMap = ({ providers }: ProviderMapProps) => {
-  const [selectedProvider, setSelectedProvider] = useState<Provider | null>(null);
-  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
-
-  const providersWithLocations = providers.map((provider, index) => ({
-    ...provider,
-    id: index + 1,
-    position: mockLocations[provider.location] || [40.7128, -74.0060],
-  }));
+export const ProviderMap = ({ providers, onProviderSelect }: ProviderMapProps) => {
+  // Calculate center based on provider locations or use a default
+  const center: [number, number] = providers.length > 0
+    ? providers.reduce(
+        (acc, provider) => [
+          acc[0] + provider.location[0] / providers.length,
+          acc[1] + provider.location[1] / providers.length,
+        ],
+        [0, 0]
+      )
+    : [40.7128, -74.0060]; // Default to NYC coordinates
 
   return (
-    <div className="w-full h-full rounded-lg overflow-hidden shadow-lg">
-      <MapContainer 
-        defaultCenter={[40.7128, -74.0060]}
-        defaultZoom={13}
+    <div className="w-full h-[400px] rounded-lg overflow-hidden">
+      <MapContainer
+        center={center}
+        zoom={12}
         scrollWheelZoom={false}
-        style={{ height: '100%', width: '100%' }}
+        style={{ height: "100%", width: "100%" }}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attributionUrl='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
-        {providersWithLocations.map((provider) => (
+        {providers.map((provider) => (
           <Marker
             key={provider.id}
-            position={provider.position}
+            position={provider.location}
             eventHandlers={{
-              click: () => setSelectedProvider(provider),
+              click: () => onProviderSelect?.(provider),
             }}
           >
             <Popup>
               <div className="p-2">
-                <h3 className="font-semibold">{provider.name}</h3>
-                <p className="text-sm text-gray-600">{provider.specialty}</p>
-                <p className="text-sm text-gray-600">{provider.availability}</p>
-                <p className="text-sm text-gray-600">Rating: {provider.rating}</p>
-                <Button
-                  className="mt-2 w-full"
-                  onClick={() => setIsBookingModalOpen(true)}
-                >
-                  Book Appointment
-                </Button>
+                <h3 className="font-bold">{provider.name}</h3>
+                <p className="text-sm">{provider.specialty}</p>
+                <p className="text-sm">Rating: {provider.rating}/5</p>
               </div>
             </Popup>
           </Marker>
         ))}
       </MapContainer>
-
-      {selectedProvider && (
-        <BookingModal
-          isOpen={isBookingModalOpen}
-          onClose={() => {
-            setIsBookingModalOpen(false);
-            setSelectedProvider(null);
-          }}
-          provider={{
-            name: selectedProvider.name,
-            specialty: selectedProvider.specialty
-          }}
-        />
-      )}
     </div>
   );
 };
