@@ -30,7 +30,7 @@ export const ProviderMap = ({ providers, onProviderSelect }: ProviderMapProps) =
   return (
     <div className="w-full h-[400px] rounded-lg overflow-hidden">
       <MapContainer
-        center={defaultCenter as L.LatLngExpression}
+        center={defaultCenter}
         zoom={12}
         style={{ height: "100%", width: "100%" }}
         scrollWheelZoom={false}
@@ -42,7 +42,7 @@ export const ProviderMap = ({ providers, onProviderSelect }: ProviderMapProps) =
         {providers.map((provider) => (
           <Marker
             key={provider.id}
-            position={provider.location as L.LatLngExpression}
+            position={provider.location}
             eventHandlers={{
               click: () => onProviderSelect?.(provider),
             }}
