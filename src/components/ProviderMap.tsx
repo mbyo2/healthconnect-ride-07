@@ -17,7 +17,7 @@ interface ProviderMapProps {
 }
 
 export const ProviderMap = ({ providers, onProviderSelect }: ProviderMapProps) => {
-  const defaultCenter: L.LatLngExpression = providers.length > 0
+  const defaultCenter = providers.length > 0
     ? providers.reduce(
         (acc, provider) => [
           acc[0] + provider.location[0] / providers.length,
@@ -25,7 +25,7 @@ export const ProviderMap = ({ providers, onProviderSelect }: ProviderMapProps) =
         ],
         [0, 0]
       ) as L.LatLngExpression
-    : [40.7128, -74.0060]; // Default to NYC coordinates
+    : [40.7128, -74.0060] as L.LatLngExpression; // Default to NYC coordinates
 
   return (
     <div className="w-full h-[400px] rounded-lg overflow-hidden">
