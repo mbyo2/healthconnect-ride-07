@@ -11,8 +11,8 @@ interface ProviderCardProps {
   name: string;
   specialty: string;
   rating: number;
-  location: [number, number];  // Changed from string to [number, number]
-  availability: string;
+  location: [number, number];
+  availability?: string;
   image: string;
   price?: string;
   experience?: string;
@@ -24,7 +24,7 @@ export const ProviderCard = ({
   specialty,
   rating,
   location,
-  availability,
+  availability = "Available Today",
   image,
   price = "$100/visit",
   experience = "5+ years",
