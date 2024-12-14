@@ -11,21 +11,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { toast } from "sonner";
+import { Database } from "@/integrations/supabase/types";
 
-interface Application {
-  id: string;
-  user_id: string;
-  license_number: string;
-  specialty: string;
-  years_of_experience: number;
-  status: string;
-  documents_url: string[];
-  created_at: string;
+type Application = Database['public']['Tables']['health_personnel_applications']['Row'] & {
   profile?: {
-    first_name: string;
-    last_name: string;
+    first_name: string | null;
+    last_name: string | null;
   };
-}
+};
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -45,13 +38,13 @@ export default function AdminDashboard() {
       return;
     }
 
-    const { data: profile } = await supabase
+    const { data: profile, error } = await supabase
       .from("profiles")
       .select("role")
       .eq("id", user.id)
       .single();
 
-    if (profile?.role !== "admin") {
+    if (error || !profile || profile.role !== "admin") {
       navigate("/");
       toast.error("Unauthorized access");
       return;
@@ -66,14 +59,13 @@ export default function AdminDashboard() {
       .select(`
         *,
         profile:profiles(first_name, last_name)
-      `)
-      .order("created_at", { ascending: false });
+      `);
 
     if (error) {
       console.error("Error fetching applications:", error);
       toast.error("Failed to load applications");
     } else {
-      setApplications(data || []);
+      setApplications(data as Application[]);
     }
     setLoading(false);
   };
@@ -190,3 +182,4 @@ export default function AdminDashboard() {
     </div>
   );
 }
+};

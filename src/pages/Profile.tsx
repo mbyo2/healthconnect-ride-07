@@ -12,6 +12,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { HealthPersonnelApplicationForm } from "@/components/HealthPersonnelApplicationForm";
+import { Database } from "@/integrations/supabase/types";
+
+type Profile = Database['public']['Tables']['profiles']['Row'];
+type Application = Database['public']['Tables']['health_personnel_applications']['Row'];
 
 const Profile = () => {
   const [userRole, setUserRole] = useState<string | null>(null);
@@ -21,23 +25,25 @@ const Profile = () => {
     const fetchUserProfile = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        const { data: profile } = await supabase
+        const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('role')
           .eq('id', user.id)
           .single();
         
-        if (profile) {
+        if (profile && !profileError) {
           setUserRole(profile.role);
           
           if (profile.role === 'health_personnel') {
-            const { data: application } = await supabase
+            const { data: application, error: applicationError } = await supabase
               .from('health_personnel_applications')
               .select('status')
               .eq('user_id', user.id)
               .single();
             
-            setApplicationStatus(application?.status || null);
+            if (application && !applicationError) {
+              setApplicationStatus(application.status);
+            }
           }
         }
       }

@@ -28,7 +28,7 @@ export const HealthPersonnelApplicationForm = () => {
       }
 
       // Upload documents
-      const documentsUrls = [];
+      const documentsUrls: string[] = [];
       if (formData.documents) {
         for (const file of formData.documents) {
           const { data, error } = await supabase.storage
@@ -36,7 +36,7 @@ export const HealthPersonnelApplicationForm = () => {
             .upload(`${user.id}/${file.name}`, file);
 
           if (error) throw error;
-          documentsUrls.push(data.path);
+          if (data) documentsUrls.push(data.path);
         }
       }
 
@@ -49,6 +49,7 @@ export const HealthPersonnelApplicationForm = () => {
           specialty: formData.specialty,
           years_of_experience: parseInt(formData.yearsOfExperience),
           documents_url: documentsUrls,
+          status: 'pending'
         });
 
       if (error) throw error;

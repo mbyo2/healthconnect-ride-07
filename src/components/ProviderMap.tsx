@@ -24,8 +24,8 @@ export const ProviderMap = ({ providers, onProviderSelect }: ProviderMapProps) =
           acc[1] + provider.location[1] / providers.length,
         ],
         [0, 0]
-      ) as L.LatLngTuple
-    : [40.7128, -74.0060] as L.LatLngTuple; // Default to NYC coordinates
+      ) as [number, number]
+    : [40.7128, -74.0060] as [number, number];
 
   return (
     <div className="w-full h-[400px] rounded-lg overflow-hidden">
@@ -36,13 +36,13 @@ export const ProviderMap = ({ providers, onProviderSelect }: ProviderMapProps) =
         scrollWheelZoom={false}
       >
         <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         {providers.map((provider) => (
           <Marker
             key={provider.id}
-            position={provider.location as L.LatLngTuple}
+            position={provider.location as [number, number]}
             eventHandlers={{
               click: () => onProviderSelect?.(provider),
             }}
