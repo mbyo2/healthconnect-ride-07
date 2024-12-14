@@ -33,6 +33,7 @@ export const ProviderMap = ({ providers, onProviderSelect }: ProviderMapProps) =
         center={defaultCenter}
         zoom={12}
         style={{ height: "100%", width: "100%" }}
+        scrollWheelZoom={false}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
