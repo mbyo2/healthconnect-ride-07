@@ -1,6 +1,7 @@
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
+import { Provider } from "@/types/provider";
 
 // Fix for default marker icon
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -9,14 +10,6 @@ L.Icon.Default.mergeOptions({
   iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
   shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
 });
-
-interface Provider {
-  id: string;
-  name: string;
-  specialty: string;
-  location: [number, number];
-  rating: number;
-}
 
 interface ProviderMapProps {
   providers: Provider[];
@@ -38,8 +31,8 @@ export const ProviderMap = ({ providers, onProviderSelect }: ProviderMapProps) =
   return (
     <div className="w-full h-[400px] rounded-lg overflow-hidden">
       <MapContainer
-        center={center}
-        zoom={12}
+        defaultCenter={center}
+        defaultZoom={12}
         scrollWheelZoom={false}
         style={{ height: "100%", width: "100%" }}
       >

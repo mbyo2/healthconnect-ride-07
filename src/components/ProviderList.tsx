@@ -4,16 +4,7 @@ import { Search, MapPin, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { ProviderMap } from "./ProviderMap";
-
-interface Provider {
-  name: string;
-  specialty: string;
-  rating: number;
-  location: string;
-  availability: string;
-  image: string;
-  expertise: string[];
-}
+import { Provider } from "@/types/provider";
 
 interface ProviderListProps {
   symptoms?: string;
@@ -22,30 +13,30 @@ interface ProviderListProps {
 
 const mockProviders: Provider[] = [
   {
+    id: "1",
     name: "Dr. Sarah Johnson",
     specialty: "General Practitioner",
     rating: 4.9,
-    location: "Manhattan, NY",
+    location: [40.7589, -73.9851], // Manhattan coordinates
     availability: "Available Today",
-    image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=800",
     expertise: ["General Medicine", "Urgent Care", "Family Medicine"]
   },
   {
+    id: "2",
     name: "Dr. Michael Chen",
     specialty: "Emergency Medicine",
     rating: 4.8,
-    location: "Brooklyn, NY",
+    location: [40.6782, -73.9442], // Brooklyn coordinates
     availability: "Available Now",
-    image: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&q=80&w=800",
     expertise: ["Emergency Medicine", "Trauma Care", "Critical Care"]
   },
   {
+    id: "3",
     name: "Dr. Emily Williams",
     specialty: "Family Medicine",
     rating: 4.7,
-    location: "Queens, NY",
+    location: [40.7282, -73.7949], // Queens coordinates
     availability: "Available Today",
-    image: "https://images.unsplash.com/photo-1594824476967-48c8b964273f?auto=format&fit=crop&q=80&w=800",
     expertise: ["Family Medicine", "Pediatrics", "Preventive Care"]
   },
 ];

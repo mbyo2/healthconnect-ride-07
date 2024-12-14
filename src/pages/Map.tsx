@@ -4,29 +4,33 @@ import { ProviderList } from "@/components/ProviderList";
 import { Button } from "@/components/ui/button";
 import { MapPin, List } from "lucide-react";
 import { useState } from "react";
+import { Provider } from "@/types/provider";
 
-const mockProviders = [
+const mockProviders: Provider[] = [
   {
+    id: "1",
     name: "Dr. Sarah Johnson",
     specialty: "General Practitioner",
     rating: 4.9,
-    location: "Manhattan, NY",
+    location: [40.7589, -73.9851], // Manhattan coordinates
     availability: "Available Today",
     expertise: ["General Medicine", "Urgent Care", "Family Medicine"]
   },
   {
+    id: "2",
     name: "Dr. Michael Chen",
     specialty: "Emergency Medicine",
     rating: 4.8,
-    location: "Brooklyn, NY",
+    location: [40.6782, -73.9442], // Brooklyn coordinates
     availability: "Available Now",
     expertise: ["Emergency Medicine", "Trauma Care", "Critical Care"]
   },
   {
+    id: "3",
     name: "Dr. Emily Williams",
     specialty: "Family Medicine",
     rating: 4.7,
-    location: "Queens, NY",
+    location: [40.7282, -73.7949], // Queens coordinates
     availability: "Available Today",
     expertise: ["Family Medicine", "Pediatrics", "Preventive Care"]
   },
