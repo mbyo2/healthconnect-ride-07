@@ -24,8 +24,8 @@ export const ProviderMap = ({ providers, onProviderSelect }: ProviderMapProps) =
           acc[1] + provider.location[1] / providers.length,
         ],
         [0, 0]
-      ) as L.LatLngExpression
-    : [40.7128, -74.0060] as L.LatLngExpression; // Default to NYC coordinates
+      ) as L.LatLngTuple
+    : [40.7128, -74.0060] as L.LatLngTuple; // Default to NYC coordinates
 
   return (
     <div className="w-full h-[400px] rounded-lg overflow-hidden">
@@ -42,7 +42,7 @@ export const ProviderMap = ({ providers, onProviderSelect }: ProviderMapProps) =
         {providers.map((provider) => (
           <Marker
             key={provider.id}
-            position={provider.location as L.LatLngExpression}
+            position={provider.location as L.LatLngTuple}
             eventHandlers={{
               click: () => onProviderSelect?.(provider),
             }}
