@@ -17,14 +17,14 @@ interface ProviderMapProps {
 }
 
 export const ProviderMap = ({ providers, onProviderSelect }: ProviderMapProps) => {
-  const defaultCenter: [number, number] = providers.length > 0
+  const defaultCenter: L.LatLngExpression = providers.length > 0
     ? providers.reduce(
         (acc, provider) => [
           acc[0] + provider.location[0] / providers.length,
           acc[1] + provider.location[1] / providers.length,
         ],
         [0, 0]
-      )
+      ) as L.LatLngExpression
     : [40.7128, -74.0060]; // Default to NYC coordinates
 
   return (
@@ -42,7 +42,7 @@ export const ProviderMap = ({ providers, onProviderSelect }: ProviderMapProps) =
         {providers.map((provider) => (
           <Marker
             key={provider.id}
-            position={provider.location}
+            position={provider.location as L.LatLngExpression}
             eventHandlers={{
               click: () => onProviderSelect?.(provider),
             }}
