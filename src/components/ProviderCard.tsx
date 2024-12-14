@@ -1,20 +1,22 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Star, MapPin, Clock, Stethoscope, Phone, Mail, Calendar } from "lucide-react";
+import { Star, MapPin, Clock, Stethoscope, Calendar } from "lucide-react";
 import { useState } from "react";
 import { BookingModal } from "./BookingModal";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 interface ProviderCardProps {
+  id: string;
   name: string;
   specialty: string;
   rating: number;
-  location: string;
+  location: [number, number];  // Changed from string to [number, number]
   availability: string;
   image: string;
   price?: string;
   experience?: string;
+  expertise?: string[];
 }
 
 export const ProviderCard = ({
@@ -28,6 +30,9 @@ export const ProviderCard = ({
   experience = "5+ years",
 }: ProviderCardProps) => {
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+
+  // Format location for display
+  const locationString = `${location[0].toFixed(2)}°N, ${location[1].toFixed(2)}°W`;
 
   return (
     <>
@@ -55,7 +60,7 @@ export const ProviderCard = ({
               <div className="mt-2 space-y-1">
                 <div className="flex items-center text-gray-500 text-sm">
                   <MapPin className="w-4 h-4 mr-1" />
-                  <span>{location}</span>
+                  <span>{locationString}</span>
                 </div>
                 <div className="flex items-center text-gray-500 text-sm">
                   <Clock className="w-4 h-4 mr-1" />
