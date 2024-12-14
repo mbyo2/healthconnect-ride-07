@@ -6,5 +6,5 @@ export interface Provider {
   location: [number, number];  // [latitude, longitude]
   availability?: string;
   expertise?: string[];
-  image?: string;  // Added image property
+  image: string;  // Made required
 }

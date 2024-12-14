@@ -17,8 +17,7 @@ interface ProviderMapProps {
 }
 
 export const ProviderMap = ({ providers, onProviderSelect }: ProviderMapProps) => {
-  // Calculate center based on provider locations or use a default
-  const center: [number, number] = providers.length > 0
+  const defaultCenter: [number, number] = providers.length > 0
     ? providers.reduce(
         (acc, provider) => [
           acc[0] + provider.location[0] / providers.length,
@@ -31,9 +30,8 @@ export const ProviderMap = ({ providers, onProviderSelect }: ProviderMapProps) =
   return (
     <div className="w-full h-[400px] rounded-lg overflow-hidden">
       <MapContainer
-        center={center}
+        center={defaultCenter}
         zoom={12}
-        scrollWheelZoom={false}
         style={{ height: "100%", width: "100%" }}
       >
         <TileLayer
