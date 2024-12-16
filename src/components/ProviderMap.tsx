@@ -26,7 +26,9 @@ interface ProviderMapProps {
 const MapUpdater = ({ center }: { center: [number, number] }) => {
   const map = useMap();
   useEffect(() => {
-    map.setView(center);
+    if (center) {
+      map.setView(center, 13);
+    }
   }, [center, map]);
   return null;
 };
@@ -144,16 +146,15 @@ export const ProviderMap = ({ providers = [], className = "" }: ProviderMapProps
       </div>
 
       <MapContainer
+        center={mapCenter}
         className={`h-[400px] ${className}`}
         style={{ height: "100%", width: "100%" }}
-        zoom={13}
         scrollWheelZoom={false}
         key={`${mapCenter[0]}-${mapCenter[1]}`}
-        defaultCenter={mapCenter}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attributionUrl='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
         <MapUpdater center={mapCenter} />
         {providers.map((provider, index) => (
