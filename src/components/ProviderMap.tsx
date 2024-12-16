@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { MapPin, Compass } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 // Fix for default marker icons in React Leaflet
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -22,10 +23,10 @@ interface ProviderMapProps {
 }
 
 // Component to handle map center updates
-const MapUpdater = ({ center }: { center: L.LatLngExpression }) => {
+const MapUpdater = ({ center }: { center: [number, number] }) => {
   const map = useMap();
   useEffect(() => {
-    map.setView(center, map.getZoom());
+    map.setView(center);
   }, [center, map]);
   return null;
 };
@@ -34,9 +35,13 @@ export const ProviderMap = ({ providers = [], className = "" }: ProviderMapProps
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const isMobile = useIsMobile();
+  
   // Default to NYC coordinates if no providers
   const defaultPosition: [number, number] = [40.7128, -74.0060];
-  const [mapCenter, setMapCenter] = useState(providers.length > 0 ? providers[0].location : defaultPosition);
+  const [mapCenter, setMapCenter] = useState<[number, number]>(
+    providers.length > 0 ? providers[0].location : defaultPosition
+  );
 
   const handleLocationSearch = async () => {
     if (!searchQuery.trim()) return;
@@ -107,42 +112,48 @@ export const ProviderMap = ({ providers = [], className = "" }: ProviderMapProps
 
   return (
     <div className="space-y-4">
-      <div className="flex gap-2">
-        <div className="flex-1">
+      <div className={`flex ${isMobile ? 'flex-col' : 'flex-row'} gap-2`}>
+        <div className={`${isMobile ? 'w-full' : 'flex-1'}`}>
           <Input
             placeholder="Search location..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleLocationSearch()}
+            className="w-full"
           />
         </div>
-        <Button 
-          onClick={handleLocationSearch}
-          disabled={isLoading}
-        >
-          <MapPin className="h-4 w-4 mr-2" />
-          Search
-        </Button>
-        <Button 
-          variant="outline"
-          onClick={handleUseCurrentLocation}
-          disabled={isLoading}
-        >
-          <Compass className="h-4 w-4 mr-2" />
-          Use My Location
-        </Button>
+        <div className={`${isMobile ? 'grid grid-cols-2' : 'flex'} gap-2`}>
+          <Button 
+            onClick={handleLocationSearch}
+            disabled={isLoading}
+            className="w-full"
+          >
+            <MapPin className="h-4 w-4 mr-2" />
+            Search
+          </Button>
+          <Button 
+            variant="outline"
+            onClick={handleUseCurrentLocation}
+            disabled={isLoading}
+            className="w-full"
+          >
+            <Compass className="h-4 w-4 mr-2" />
+            Use My Location
+          </Button>
+        </div>
       </div>
 
       <MapContainer
         className={`h-[400px] ${className}`}
-        center={mapCenter}
+        style={{ height: "100%", width: "100%" }}
         zoom={13}
         scrollWheelZoom={false}
-        style={{ height: "100%", width: "100%" }}
+        key={`${mapCenter[0]}-${mapCenter[1]}`}
+        defaultCenter={mapCenter}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          attributionUrl='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
         <MapUpdater center={mapCenter} />
         {providers.map((provider, index) => (

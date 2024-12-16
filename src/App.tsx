@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { MobileLayout } from "@/components/layouts/MobileLayout";
 import Index from "./pages/Index";
 import Search from "./pages/Search";
 import Map from "./pages/Map";
@@ -12,7 +13,6 @@ import Appointments from "./pages/Appointments";
 import Profile from "./pages/Profile";
 import Login from "./pages/Login";
 import AdminDashboard from "./pages/AdminDashboard";
-import { BottomNav } from "./components/BottomNav";
 
 const queryClient = new QueryClient();
 
@@ -50,7 +50,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <div className="pb-20">
+        <MobileLayout>
           <Routes>
             <Route
               path="/"
@@ -102,8 +102,7 @@ const App = () => (
             />
             <Route path="/login" element={<Login />} />
           </Routes>
-        </div>
-        <BottomNav />
+        </MobileLayout>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
