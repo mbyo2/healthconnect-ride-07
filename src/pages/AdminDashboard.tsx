@@ -131,7 +131,7 @@ export default function AdminDashboard() {
           {applications.map((app) => (
             <TableRow key={app.id}>
               <TableCell>
-                {app.profile?.first_name} {app.profile?.last_name}
+                {app.profiles?.first_name} {app.profiles?.last_name}
               </TableCell>
               <TableCell>{app.specialty}</TableCell>
               <TableCell>{app.license_number}</TableCell>
@@ -150,7 +150,7 @@ export default function AdminDashboard() {
               <TableCell>
                 <Button 
                   variant="outline" 
-                  onClick={() => viewDocuments(app.documents_url)}
+                  onClick={() => app.documents_url && viewDocuments(app.documents_url)}
                   disabled={!app.documents_url?.length}
                 >
                   View Documents
@@ -182,4 +182,3 @@ export default function AdminDashboard() {
     </div>
   );
 }
-};
