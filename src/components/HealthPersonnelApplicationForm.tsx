@@ -50,7 +50,7 @@ export const HealthPersonnelApplicationForm = () => {
           years_of_experience: parseInt(formData.yearsOfExperience),
           documents_url: documentsUrls,
           status: 'pending'
-        });
+        } as Database['public']['Tables']['health_personnel_applications']['Insert']);
 
       if (error) throw error;
 

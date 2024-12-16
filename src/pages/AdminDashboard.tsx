@@ -14,7 +14,7 @@ import { toast } from "sonner";
 import { Database } from "@/integrations/supabase/types";
 
 type Application = Database['public']['Tables']['health_personnel_applications']['Row'] & {
-  profile?: {
+  profiles?: {
     first_name: string | null;
     last_name: string | null;
   };
@@ -58,7 +58,7 @@ export default function AdminDashboard() {
       .from("health_personnel_applications")
       .select(`
         *,
-        profile:profiles(first_name, last_name)
+        profiles:profiles(first_name, last_name)
       `);
 
     if (error) {
@@ -79,7 +79,7 @@ export default function AdminDashboard() {
         status: newStatus,
         reviewed_by: user?.id,
         reviewed_at: new Date().toISOString()
-      })
+      } as Database['public']['Tables']['health_personnel_applications']['Update'])
       .eq("id", applicationId);
 
     if (error) {
@@ -182,3 +182,4 @@ export default function AdminDashboard() {
     </div>
   );
 }
+};
