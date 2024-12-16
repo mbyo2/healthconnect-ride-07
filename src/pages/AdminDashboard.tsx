@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -10,118 +8,107 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { Database } from "@/integrations/supabase/types";
+import type { Database } from "@/integrations/supabase/types";
 
 type Application = Database['public']['Tables']['health_personnel_applications']['Row'] & {
   profiles?: {
     first_name: string | null;
     last_name: string | null;
-  };
+  } | null;
 };
 
-export default function AdminDashboard() {
-  const navigate = useNavigate();
+const AdminDashboard = () => {
   const [applications, setApplications] = useState<Application[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [userRole, setUserRole] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    checkAdminAccess();
-    fetchApplications();
+    const checkAdminStatus = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", user.id)
+          .single();
+
+        if (profile?.role === "admin") {
+          setIsAdmin(true);
+          fetchApplications();
+        } else {
+          toast.error("Unauthorized access");
+        }
+      }
+    };
+
+    checkAdminStatus();
   }, []);
-
-  const checkAdminAccess = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      navigate("/login");
-      return;
-    }
-
-    const { data: profile, error } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-
-    if (error || !profile || profile.role !== "admin") {
-      navigate("/");
-      toast.error("Unauthorized access");
-      return;
-    }
-
-    setUserRole(profile.role);
-  };
 
   const fetchApplications = async () => {
     const { data, error } = await supabase
       .from("health_personnel_applications")
       .select(`
         *,
-        profiles:profiles(first_name, last_name)
+        profiles:user_id (
+          first_name,
+          last_name
+        )
       `);
 
     if (error) {
       console.error("Error fetching applications:", error);
-      toast.error("Failed to load applications");
-    } else {
-      setApplications(data as Application[]);
+      toast.error("Failed to fetch applications");
+      return;
     }
-    setLoading(false);
+
+    setApplications(data as Application[]);
   };
 
-  const handleStatusUpdate = async (applicationId: string, newStatus: string) => {
+  const handleApplicationStatus = async (
+    applicationId: string,
+    status: string
+  ) => {
     const { data: { user } } = await supabase.auth.getUser();
     
     const { error } = await supabase
       .from("health_personnel_applications")
-      .update({ 
-        status: newStatus,
+      .update({
+        status,
         reviewed_by: user?.id,
-        reviewed_at: new Date().toISOString()
-      } as Database['public']['Tables']['health_personnel_applications']['Update'])
+        reviewed_at: new Date().toISOString(),
+      })
       .eq("id", applicationId);
 
     if (error) {
       console.error("Error updating application:", error);
       toast.error("Failed to update application status");
-    } else {
-      toast.success("Application status updated successfully");
-      fetchApplications();
+      return;
     }
+
+    toast.success(`Application ${status}`);
+    fetchApplications();
   };
 
   const viewDocuments = (urls: string[]) => {
-    urls.forEach(url => {
-      supabase.storage
-        .from("medical_documents")
-        .createSignedUrl(url, 3600)
-        .then(({ data, error }) => {
-          if (error) {
-            console.error("Error creating signed URL:", error);
-            toast.error("Failed to access document");
-          } else if (data?.signedUrl) {
-            window.open(data.signedUrl, "_blank");
-          }
-        });
-    });
+    // Implementation for viewing documents
+    console.log("Viewing documents:", urls);
   };
 
-  if (loading) {
-    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  if (!isAdmin) {
+    return <div>Access denied</div>;
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto py-10">
       <h1 className="text-2xl font-bold mb-6">Health Personnel Applications</h1>
-      
       <Table>
         <TableHeader>
           <TableRow>
             <TableHead>Name</TableHead>
             <TableHead>Specialty</TableHead>
-            <TableHead>License</TableHead>
-            <TableHead>Experience</TableHead>
+            <TableHead>License Number</TableHead>
+            <TableHead>Experience (Years)</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Documents</TableHead>
             <TableHead>Actions</TableHead>
@@ -135,18 +122,8 @@ export default function AdminDashboard() {
               </TableCell>
               <TableCell>{app.specialty}</TableCell>
               <TableCell>{app.license_number}</TableCell>
-              <TableCell>{app.years_of_experience} years</TableCell>
-              <TableCell>
-                <span className={`px-2 py-1 rounded-full text-sm ${
-                  app.status === "approved" 
-                    ? "bg-green-100 text-green-800"
-                    : app.status === "rejected"
-                    ? "bg-red-100 text-red-800"
-                    : "bg-yellow-100 text-yellow-800"
-                }`}>
-                  {app.status}
-                </span>
-              </TableCell>
+              <TableCell>{app.years_of_experience}</TableCell>
+              <TableCell>{app.status}</TableCell>
               <TableCell>
                 <Button 
                   variant="outline" 
@@ -161,14 +138,13 @@ export default function AdminDashboard() {
                   <>
                     <Button
                       variant="default"
-                      className="bg-green-500 hover:bg-green-600"
-                      onClick={() => handleStatusUpdate(app.id, "approved")}
+                      onClick={() => handleApplicationStatus(app.id, "approved")}
                     >
                       Approve
                     </Button>
                     <Button
                       variant="destructive"
-                      onClick={() => handleStatusUpdate(app.id, "rejected")}
+                      onClick={() => handleApplicationStatus(app.id, "rejected")}
                     >
                       Reject
                     </Button>
@@ -181,4 +157,6 @@ export default function AdminDashboard() {
       </Table>
     </div>
   );
-}
+};
+
+export default AdminDashboard;

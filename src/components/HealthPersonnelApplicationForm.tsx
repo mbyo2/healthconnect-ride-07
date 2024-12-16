@@ -1,18 +1,19 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import type { Database } from "@/integrations/supabase/types";
+
+type HealthPersonnelApplication = Database['public']['Tables']['health_personnel_applications']['Insert'];
 
 export const HealthPersonnelApplicationForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
-    licenseNumber: "",
+    license_number: "",
     specialty: "",
-    yearsOfExperience: "",
-    documents: null as File[] | null,
+    years_of_experience: "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -27,106 +28,74 @@ export const HealthPersonnelApplicationForm = () => {
         return;
       }
 
-      // Upload documents
-      const documentsUrls: string[] = [];
-      if (formData.documents) {
-        for (const file of formData.documents) {
-          const { data, error } = await supabase.storage
-            .from("medical_documents")
-            .upload(`${user.id}/${file.name}`, file);
+      const application: HealthPersonnelApplication = {
+        license_number: formData.license_number,
+        specialty: formData.specialty,
+        years_of_experience: parseInt(formData.years_of_experience),
+        user_id: user.id,
+        documents_url: [],
+        status: "pending"
+      };
 
-          if (error) throw error;
-          if (data) documentsUrls.push(data.path);
-        }
-      }
-
-      // Create application
       const { error } = await supabase
         .from("health_personnel_applications")
-        .insert({
-          user_id: user.id,
-          license_number: formData.licenseNumber,
-          specialty: formData.specialty,
-          years_of_experience: parseInt(formData.yearsOfExperience),
-          documents_url: documentsUrls,
-          status: 'pending'
-        } as Database['public']['Tables']['health_personnel_applications']['Insert']);
+        .insert(application);
 
       if (error) throw error;
 
       toast.success("Application submitted successfully!");
+      setFormData({
+        license_number: "",
+        specialty: "",
+        years_of_experience: "",
+      });
     } catch (error) {
       console.error("Error submitting application:", error);
-      toast.error("Failed to submit application. Please try again.");
+      toast.error("Failed to submit application");
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <Card className="p-6 max-w-xl mx-auto">
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="space-y-2">
-          <Label htmlFor="licenseNumber">License Number</Label>
-          <Input
-            id="licenseNumber"
-            required
-            value={formData.licenseNumber}
-            onChange={(e) =>
-              setFormData({ ...formData, licenseNumber: e.target.value })
-            }
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="specialty">Specialty</Label>
-          <Input
-            id="specialty"
-            required
-            value={formData.specialty}
-            onChange={(e) =>
-              setFormData({ ...formData, specialty: e.target.value })
-            }
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="yearsOfExperience">Years of Experience</Label>
-          <Input
-            id="yearsOfExperience"
-            type="number"
-            required
-            min="0"
-            value={formData.yearsOfExperience}
-            onChange={(e) =>
-              setFormData({ ...formData, yearsOfExperience: e.target.value })
-            }
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="documents">Upload Documents</Label>
-          <Input
-            id="documents"
-            type="file"
-            multiple
-            accept=".pdf,.jpg,.jpeg,.png"
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                documents: e.target.files ? Array.from(e.target.files) : null,
-              })
-            }
-          />
-          <p className="text-sm text-gray-500">
-            Upload your medical license and other relevant certifications
-          </p>
-        </div>
-
-        <Button type="submit" disabled={isSubmitting} className="w-full">
-          {isSubmitting ? "Submitting..." : "Submit Application"}
-        </Button>
-      </form>
-    </Card>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <Label htmlFor="license_number">License Number</Label>
+        <Input
+          id="license_number"
+          value={formData.license_number}
+          onChange={(e) =>
+            setFormData({ ...formData, license_number: e.target.value })
+          }
+          required
+        />
+      </div>
+      <div>
+        <Label htmlFor="specialty">Specialty</Label>
+        <Input
+          id="specialty"
+          value={formData.specialty}
+          onChange={(e) =>
+            setFormData({ ...formData, specialty: e.target.value })
+          }
+          required
+        />
+      </div>
+      <div>
+        <Label htmlFor="years_of_experience">Years of Experience</Label>
+        <Input
+          id="years_of_experience"
+          type="number"
+          value={formData.years_of_experience}
+          onChange={(e) =>
+            setFormData({ ...formData, years_of_experience: e.target.value })
+          }
+          required
+        />
+      </div>
+      <Button type="submit" disabled={isSubmitting}>
+        {isSubmitting ? "Submitting..." : "Submit Application"}
+      </Button>
+    </form>
   );
 };
