@@ -17,12 +17,16 @@ interface ProviderMapProps {
 }
 
 export const ProviderMap = ({ providers = [], className = "" }: ProviderMapProps) => {
-  const defaultPosition: L.LatLngExpression = [51.505, -0.09];
+  // Default to NYC coordinates if no providers
+  const defaultPosition: [number, number] = [40.7128, -74.0060];
+  
+  // Use the first provider's location as center if available
+  const center = providers.length > 0 ? providers[0].location : defaultPosition;
 
   return (
     <MapContainer
       className={`h-[400px] ${className}`}
-      center={defaultPosition}
+      center={center}
       zoom={13}
       scrollWheelZoom={false}
       style={{ height: "100%", width: "100%" }}
@@ -34,13 +38,16 @@ export const ProviderMap = ({ providers = [], className = "" }: ProviderMapProps
       {providers.map((provider, index) => (
         <Marker
           key={index}
-          position={[provider.latitude, provider.longitude]}
+          position={provider.location}
         >
           <Popup>
             <div className="p-2">
               <h3 className="font-semibold">{provider.name}</h3>
               <p className="text-sm">{provider.specialty}</p>
-              <p className="text-sm">{provider.address}</p>
+              <p className="text-sm">Rating: {provider.rating}</p>
+              {provider.availability && (
+                <p className="text-sm text-green-600">{provider.availability}</p>
+              )}
             </div>
           </Popup>
         </Marker>
