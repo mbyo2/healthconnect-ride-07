@@ -145,36 +145,37 @@ export const ProviderMap = ({ providers = [], className = "" }: ProviderMapProps
         </div>
       </div>
 
-      <MapContainer
-        center={mapCenter}
-        className={`h-[400px] ${className}`}
-        style={{ height: "100%", width: "100%" }}
-        scrollWheelZoom={false}
-        key={`${mapCenter[0]}-${mapCenter[1]}`}
-      >
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        />
-        <MapUpdater center={mapCenter} />
-        {providers.map((provider, index) => (
-          <Marker
-            key={index}
-            position={provider.location}
-          >
-            <Popup>
-              <div className="p-2">
-                <h3 className="font-semibold">{provider.name}</h3>
-                <p className="text-sm">{provider.specialty}</p>
-                <p className="text-sm">Rating: {provider.rating}</p>
-                {provider.availability && (
-                  <p className="text-sm text-green-600">{provider.availability}</p>
-                )}
-              </div>
-            </Popup>
-          </Marker>
-        ))}
-      </MapContainer>
+      <div style={{ height: "400px", width: "100%" }} className={className}>
+        <MapContainer
+          center={defaultPosition}
+          zoom={13}
+          className="h-full w-full"
+          scrollWheelZoom={false}
+        >
+          <TileLayer
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          />
+          <MapUpdater center={mapCenter} />
+          {providers.map((provider, index) => (
+            <Marker
+              key={index}
+              position={provider.location}
+            >
+              <Popup>
+                <div className="p-2">
+                  <h3 className="font-semibold">{provider.name}</h3>
+                  <p className="text-sm">{provider.specialty}</p>
+                  <p className="text-sm">Rating: {provider.rating}</p>
+                  {provider.availability && (
+                    <p className="text-sm text-green-600">{provider.availability}</p>
+                  )}
+                </div>
+              </Popup>
+            </Marker>
+          ))}
+        </MapContainer>
+      </div>
     </div>
   );
 };
