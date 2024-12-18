@@ -11,8 +11,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import type { Database } from "@/integrations/supabase/types";
+import { Application } from "@/types/application";
 
-type Application = Database['public']['Tables']['health_personnel_applications']['Row'] & {
+type ApplicationRow = Database['public']['Tables']['health_personnel_applications']['Row'] & {
   profiles?: {
     first_name: string | null;
     last_name: string | null;
@@ -62,7 +63,7 @@ const AdminDashboard = () => {
       return;
     }
 
-    setApplications(data as Application[]);
+    setApplications(data as unknown as Application[]);
   };
 
   const handleApplicationStatus = async (

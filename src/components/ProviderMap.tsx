@@ -147,10 +147,10 @@ export const ProviderMap = ({ providers = [], className = "" }: ProviderMapProps
 
       <div style={{ height: "400px", width: "100%" }} className={className}>
         <MapContainer
-          style={{ height: "100%", width: "100%" }}
-          defaultCenter={mapCenter}
+          center={mapCenter}
           zoom={13}
           scrollWheelZoom={false}
+          style={{ height: "100%", width: "100%" }}
         >
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
