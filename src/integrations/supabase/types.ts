@@ -71,28 +71,61 @@ export type Database = {
       }
       profiles: {
         Row: {
+          address: string | null
+          avatar_url: string | null
+          bio: string | null
+          city: string | null
           created_at: string | null
+          date_of_birth: string | null
+          email: string | null
           first_name: string | null
+          gender: string | null
           id: string
+          is_profile_complete: boolean | null
           last_name: string | null
+          phone: string | null
           role: Database["public"]["Enums"]["user_role"]
+          state: string | null
           updated_at: string | null
+          zip_code: string | null
         }
         Insert: {
+          address?: string | null
+          avatar_url?: string | null
+          bio?: string | null
+          city?: string | null
           created_at?: string | null
+          date_of_birth?: string | null
+          email?: string | null
           first_name?: string | null
+          gender?: string | null
           id: string
+          is_profile_complete?: boolean | null
           last_name?: string | null
+          phone?: string | null
           role?: Database["public"]["Enums"]["user_role"]
+          state?: string | null
           updated_at?: string | null
+          zip_code?: string | null
         }
         Update: {
+          address?: string | null
+          avatar_url?: string | null
+          bio?: string | null
+          city?: string | null
           created_at?: string | null
+          date_of_birth?: string | null
+          email?: string | null
           first_name?: string | null
+          gender?: string | null
           id?: string
+          is_profile_complete?: boolean | null
           last_name?: string | null
+          phone?: string | null
           role?: Database["public"]["Enums"]["user_role"]
+          state?: string | null
           updated_at?: string | null
+          zip_code?: string | null
         }
         Relationships: []
       }
