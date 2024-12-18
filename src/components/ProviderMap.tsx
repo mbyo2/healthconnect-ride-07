@@ -23,7 +23,7 @@ interface ProviderMapProps {
 }
 
 // Component to handle map center updates
-const MapUpdater = ({ center }: { center: [number, number] }) => {
+const MapUpdater = ({ center }: { center: L.LatLngExpression }) => {
   const map = useMap();
   useEffect(() => {
     if (center) {
@@ -40,8 +40,8 @@ export const ProviderMap = ({ providers = [], className = "" }: ProviderMapProps
   const isMobile = useIsMobile();
   
   // Default to NYC coordinates if no providers
-  const defaultPosition: [number, number] = [40.7128, -74.0060];
-  const [mapCenter, setMapCenter] = useState<[number, number]>(
+  const defaultPosition: L.LatLngExpression = [40.7128, -74.0060];
+  const [mapCenter, setMapCenter] = useState<L.LatLngExpression>(
     providers.length > 0 ? providers[0].location : defaultPosition
   );
 
@@ -160,7 +160,7 @@ export const ProviderMap = ({ providers = [], className = "" }: ProviderMapProps
           {providers.map((provider, index) => (
             <Marker
               key={index}
-              position={provider.location}
+              position={provider.location as L.LatLngExpression}
             >
               <Popup>
                 <div className="p-2">
