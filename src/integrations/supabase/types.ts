@@ -134,6 +134,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      delete_user: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       insert_applications_for_doctors: {
         Args: Record<PropertyKey, never>
         Returns: undefined
