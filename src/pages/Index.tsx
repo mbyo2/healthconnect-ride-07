@@ -1,31 +1,44 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ProviderList } from "@/components/ProviderList";
-import { Header } from "@/components/Header";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { SymptomCollector } from "@/components/SymptomCollector";
 import { PatientDashboard } from "@/components/patient/PatientDashboard";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [hasProvidedSymptoms, setHasProvidedSymptoms] = useState(false);
   const [currentSymptoms, setCurrentSymptoms] = useState("");
   const [urgencyLevel, setUrgencyLevel] = useState("");
+  const [userRole, setUserRole] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  // Simulate initial loading
-  useState(() => {
-    const timer = setTimeout(() => {
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+        
+        if (profile) {
+          setUserRole(profile.role);
+          console.log("User role:", profile.role);
+        }
+      }
       setIsLoading(false);
-    }, 2000);
-    return () => clearTimeout(timer);
-  });
+    };
+
+    fetchUserRole();
+  }, []);
 
   const handleSymptomsCollected = (symptoms: string, urgency: string) => {
     setCurrentSymptoms(symptoms);
     setUrgencyLevel(urgency);
     setHasProvidedSymptoms(true);
-    // Redirect to map view after symptom collection
     navigate('/map');
   };
 
@@ -33,17 +46,17 @@ const Index = () => {
     return <LoadingScreen />;
   }
 
+  if (userRole === 'health_personnel') {
+    return <PatientDashboard />;
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
       <main className="pt-14">
         {!hasProvidedSymptoms ? (
           <SymptomCollector onComplete={handleSymptomsCollected} />
         ) : (
-          <>
-            <ProviderList symptoms={currentSymptoms} urgency={urgencyLevel} />
-            <PatientDashboard />
-          </>
+          <ProviderList symptoms={currentSymptoms} urgency={urgencyLevel} />
         )}
       </main>
     </div>

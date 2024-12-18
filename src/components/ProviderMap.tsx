@@ -27,7 +27,7 @@ const MapUpdater = ({ center }: { center: L.LatLngExpression }) => {
   const map = useMap();
   useEffect(() => {
     if (center) {
-      map.setView(center, 13);
+      map.setView(center as L.LatLngExpression, 13);
     }
   }, [center, map]);
   return null;
@@ -147,7 +147,7 @@ export const ProviderMap = ({ providers = [], className = "" }: ProviderMapProps
 
       <div style={{ height: "400px", width: "100%" }} className={className}>
         <MapContainer
-          center={mapCenter}
+          defaultCenter={mapCenter}
           zoom={13}
           scrollWheelZoom={false}
           style={{ height: "100%", width: "100%" }}
