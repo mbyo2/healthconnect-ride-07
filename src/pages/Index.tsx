@@ -3,6 +3,7 @@ import { ProviderList } from "@/components/ProviderList";
 import { Header } from "@/components/Header";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { SymptomCollector } from "@/components/SymptomCollector";
+import { PatientDashboard } from "@/components/patient/PatientDashboard";
 import { useNavigate } from "react-router-dom";
 
 const Index = () => {
@@ -39,7 +40,10 @@ const Index = () => {
         {!hasProvidedSymptoms ? (
           <SymptomCollector onComplete={handleSymptomsCollected} />
         ) : (
-          <ProviderList symptoms={currentSymptoms} urgency={urgencyLevel} />
+          <>
+            <ProviderList symptoms={currentSymptoms} urgency={urgencyLevel} />
+            <PatientDashboard />
+          </>
         )}
       </main>
     </div>
