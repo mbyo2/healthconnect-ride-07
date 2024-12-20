@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { ProfileSetup } from "./ProfileSetup";
+import { Card } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export const AuthForm = () => {
   const navigate = useNavigate();
@@ -13,9 +15,9 @@ export const AuthForm = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [showProfileSetup, setShowProfileSetup] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState("signin");
 
   useEffect(() => {
-    // Check if user is already logged in
     supabase.auth.getSession().then(({ data: { session }, error }) => {
       console.log("Initial session check:", { session, error });
       setIsLoading(false);
@@ -68,9 +70,16 @@ export const AuthForm = () => {
     return profile?.is_profile_complete || false;
   };
 
-  const handleRoleSelect = (selectedRole: "patient" | "health_personnel") => {
-    console.log("Role selected:", selectedRole);
-    setRole(selectedRole);
+  const handlePasswordReset = async (email: string) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+
+    if (error) {
+      toast.error(error.message);
+    } else {
+      toast.success("Password reset email sent!");
+    }
   };
 
   const handleDeleteAccount = async () => {
@@ -100,62 +109,76 @@ export const AuthForm = () => {
   }
 
   return (
-    <div className="max-w-md mx-auto p-6">
-      <div className="mb-6 space-y-4">
-        <h2 className="text-2xl font-bold text-center">Sign up as</h2>
-        <div className="flex gap-4">
-          <Button
-            className={`flex-1 ${
-              role === "patient" ? "bg-primary" : "bg-gray-200 text-gray-700"
-            }`}
-            onClick={() => handleRoleSelect("patient")}
-          >
-            Patient
-          </Button>
-          <Button
-            className={`flex-1 ${
-              role === "health_personnel"
-                ? "bg-primary"
-                : "bg-gray-200 text-gray-700"
-            }`}
-            onClick={() => handleRoleSelect("health_personnel")}
-          >
-            Health Personnel
-          </Button>
-        </div>
-      </div>
+    <Card className="w-full max-w-md p-6 space-y-6">
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="signin">Sign In</TabsTrigger>
+          <TabsTrigger value="signup">Sign Up</TabsTrigger>
+        </TabsList>
 
-      <Auth
-        supabaseClient={supabase}
-        appearance={{ 
-          theme: ThemeSupa,
-          style: {
-            button: { background: 'rgb(var(--primary))', color: 'white' },
-            anchor: { color: 'rgb(var(--primary))' },
-          }
-        }}
-        providers={[]}
-        redirectTo={window.location.origin}
-        onlyThirdPartyProviders={false}
-        theme="light"
-        showLinks={true}
-        view="sign_in"
-        localization={{
-          variables: {
-            sign_in: {
-              email_label: 'Email',
-              password_label: 'Password',
-            },
-            sign_up: {
-              email_label: 'Email',
-              password_label: 'Password',
-            }
-          },
-        }}
-        additionalData={{
-          role: role,
-        }}
-      />
+        <TabsContent value="signin" className="space-y-4">
+          <Auth
+            supabaseClient={supabase}
+            appearance={{ 
+              theme: ThemeSupa,
+              style: {
+                button: { background: 'rgb(var(--primary))', color: 'white' },
+                anchor: { color: 'rgb(var(--primary))' },
+              }
+            }}
+            providers={[]}
+            redirectTo={window.location.origin}
+            view={activeTab === "signin" ? "sign_in" : "sign_up"}
+          />
+          <Button
+            variant="ghost"
+            className="w-full"
+            onClick={() => handlePasswordReset(prompt("Enter your email") || "")}
+          >
+            Forgot Password?
+          </Button>
+        </TabsContent>
+
+        <TabsContent value="signup" className="space-y-4">
+          <div className="mb-6 space-y-4">
+            <h2 className="text-2xl font-bold text-center">Sign up as</h2>
+            <div className="flex gap-4">
+              <Button
+                className={`flex-1 ${
+                  role === "patient" ? "bg-primary" : "bg-gray-200 text-gray-700"
+                }`}
+                onClick={() => setRole("patient")}
+              >
+                Patient
+              </Button>
+              <Button
+                className={`flex-1 ${
+                  role === "health_personnel"
+                    ? "bg-primary"
+                    : "bg-gray-200 text-gray-700"
+                }`}
+                onClick={() => setRole("health_personnel")}
+              >
+                Health Personnel
+              </Button>
+            </div>
+          </div>
+
+          <Auth
+            supabaseClient={supabase}
+            appearance={{ 
+              theme: ThemeSupa,
+              style: {
+                button: { background: 'rgb(var(--primary))', color: 'white' },
+                anchor: { color: 'rgb(var(--primary))' },
+              }
+            }}
+            providers={[]}
+            redirectTo={window.location.origin}
+            view="sign_up"
+          />
+        </TabsContent>
+      </Tabs>
 
       {user && (
         <Button
@@ -166,6 +189,6 @@ export const AuthForm = () => {
           Delete Account
         </Button>
       )}
-    </div>
+    </Card>
   );
 };
