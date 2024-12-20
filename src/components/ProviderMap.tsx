@@ -129,8 +129,8 @@ export const ProviderMap = ({ providers = [], className = "" }: ProviderMapProps
 
       <div style={{ height: "400px", width: "100%" }} className={className}>
         <MapContainer
-          center={defaultPosition}
-          zoom={13}
+          defaultCenter={defaultPosition}
+          defaultZoom={13}
           scrollWheelZoom={false}
           style={{ height: "100%", width: "100%" }}
         >
