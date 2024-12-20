@@ -1,8 +1,8 @@
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { Provider } from "@/types/provider";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { MapPin, Compass } from "lucide-react";
@@ -22,17 +22,6 @@ interface ProviderMapProps {
   className?: string;
 }
 
-// Component to handle map center updates
-const MapUpdater = ({ center }: { center: L.LatLngExpression }) => {
-  const map = useMap();
-  useEffect(() => {
-    if (center) {
-      map.setView(center as L.LatLngExpression, 13);
-    }
-  }, [center, map]);
-  return null;
-};
-
 export const ProviderMap = ({ providers = [], className = "" }: ProviderMapProps) => {
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
@@ -41,9 +30,6 @@ export const ProviderMap = ({ providers = [], className = "" }: ProviderMapProps
   
   // Default to NYC coordinates if no providers
   const defaultPosition: L.LatLngExpression = [40.7128, -74.0060];
-  const [mapCenter, setMapCenter] = useState<L.LatLngExpression>(
-    providers.length > 0 ? providers[0].location : defaultPosition
-  );
 
   const handleLocationSearch = async () => {
     if (!searchQuery.trim()) return;
@@ -56,8 +42,6 @@ export const ProviderMap = ({ providers = [], className = "" }: ProviderMapProps
       const data = await response.json();
       
       if (data && data[0]) {
-        const { lat, lon } = data[0];
-        setMapCenter([parseFloat(lat), parseFloat(lon)]);
         toast({
           title: "Location found",
           description: `Showing results near ${data[0].display_name}`,
@@ -93,8 +77,6 @@ export const ProviderMap = ({ providers = [], className = "" }: ProviderMapProps
     setIsLoading(true);
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        const { latitude, longitude } = position.coords;
-        setMapCenter([latitude, longitude]);
         toast({
           title: "Location found",
           description: "Showing results near your current location",
@@ -147,7 +129,7 @@ export const ProviderMap = ({ providers = [], className = "" }: ProviderMapProps
 
       <div style={{ height: "400px", width: "100%" }} className={className}>
         <MapContainer
-          center={mapCenter}
+          defaultCenter={defaultPosition}
           zoom={13}
           scrollWheelZoom={false}
           style={{ height: "100%", width: "100%" }}
@@ -156,7 +138,6 @@ export const ProviderMap = ({ providers = [], className = "" }: ProviderMapProps
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
-          <MapUpdater center={mapCenter} />
           {providers.map((provider, index) => (
             <Marker
               key={index}
