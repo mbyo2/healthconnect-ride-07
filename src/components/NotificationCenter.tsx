@@ -28,9 +28,9 @@ export const NotificationCenter = () => {
           schema: 'public',
           table: 'notifications',
         },
-        (payload) => {
+        (payload: { new: Notification }) => {
           console.log('New notification:', payload);
-          setNotifications((prev) => [...prev, payload.new as Notification]);
+          setNotifications((prev) => [...prev, payload.new]);
           setUnreadCount((prev) => prev + 1);
           toast({
             title: payload.new.title,
@@ -54,15 +54,17 @@ export const NotificationCenter = () => {
       .select('*')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
-      .limit(10);
+      .limit(10) as { data: Notification[] | null, error: any };
 
     if (error) {
       console.error('Error fetching notifications:', error);
       return;
     }
 
-    setNotifications(data);
-    setUnreadCount(data.filter((n: Notification) => !n.read).length);
+    if (data) {
+      setNotifications(data);
+      setUnreadCount(data.filter((n: Notification) => !n.read).length);
+    }
   };
 
   const markAsRead = async (notificationId: string) => {
