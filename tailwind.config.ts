@@ -45,6 +45,12 @@ export default {
           foreground: "hsl(var(--muted-foreground))",
         },
       },
+      backgroundImage: {
+        'grid-pattern': "linear-gradient(to right, #E5E7EB 1px, transparent 1px), linear-gradient(to bottom, #E5E7EB 1px, transparent 1px)",
+      },
+      backgroundSize: {
+        'grid': '24px 24px',
+      },
       keyframes: {
         "accordion-down": {
           from: { height: "0" },
@@ -55,14 +61,25 @@ export default {
           to: { height: "0" },
         },
         fadeIn: {
-          "0%": { opacity: "0" },
-          "100%": { opacity: "1" },
+          "0%": { opacity: "0", transform: "translateY(10px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+        pulse: {
+          '0%, 100%': {
+            opacity: '1',
+            transform: 'scale(1)',
+          },
+          '50%': {
+            opacity: '0.9',
+            transform: 'scale(0.98)',
+          },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         fadeIn: "fadeIn 0.5s ease-out",
+        pulse: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
       },
     },
   },
