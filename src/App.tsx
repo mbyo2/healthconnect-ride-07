@@ -21,13 +21,16 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
   useEffect(() => {
+    console.log("Checking authentication status...");
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log("Session status:", !!session);
       setIsAuthenticated(!!session);
     });
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("Auth state changed:", event, !!session);
       setIsAuthenticated(!!session);
     });
 
@@ -45,35 +48,37 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-          <Route
-            element={
+const App = () => {
+  console.log("App component rendering");
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/*" element={
               <ProtectedRoute>
                 <MobileLayout>
                   <Routes>
-                    <Route path="/" element={<Index />} />
-                    <Route path="/search" element={<Search />} />
-                    <Route path="/map" element={<Map />} />
-                    <Route path="/appointments" element={<Appointments />} />
-                    <Route path="/profile" element={<Profile />} />
-                    <Route path="/admin" element={<AdminDashboard />} />
+                    <Route index element={<Index />} />
+                    <Route path="search" element={<Search />} />
+                    <Route path="map" element={<Map />} />
+                    <Route path="appointments" element={<Appointments />} />
+                    <Route path="profile" element={<Profile />} />
+                    <Route path="admin" element={<AdminDashboard />} />
+                    <Route path="*" element={<Navigate to="/" replace />} />
                   </Routes>
                 </MobileLayout>
               </ProtectedRoute>
-            }
-          />
-        </Routes>
-      </BrowserRouter>
-      <Toaster />
-      <Sonner />
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+            } />
+          </Routes>
+        </BrowserRouter>
+        <Toaster />
+        <Sonner />
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
