@@ -1,21 +1,12 @@
+import React, { useEffect, useRef, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import "leaflet/dist/leaflet.css";
-import L from "leaflet";
 import { Provider } from "@/types/provider";
-import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { MapPin, Compass } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
-
-// Fix for default marker icons in React Leaflet
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: "/marker-icon-2x.png",
-  iconUrl: "/marker-icon.png",
-  shadowUrl: "/marker-shadow.png",
-});
 
 interface ProviderMapProps {
   providers?: Provider[];
@@ -29,7 +20,7 @@ export const ProviderMap = ({ providers = [], className = "" }: ProviderMapProps
   const isMobile = useIsMobile();
   
   // Default to NYC coordinates if no providers
-  const defaultPosition: L.LatLngExpression = [40.7128, -74.0060];
+  const defaultPosition: [number, number] = [40.7128, -74.0060];
 
   const handleLocationSearch = async () => {
     if (!searchQuery.trim()) return;
@@ -129,8 +120,8 @@ export const ProviderMap = ({ providers = [], className = "" }: ProviderMapProps
 
       <div style={{ height: "400px", width: "100%" }} className={className}>
         <MapContainer
-          defaultCenter={defaultPosition}
-          defaultZoom={13}
+          center={defaultPosition}
+          zoom={13}
           scrollWheelZoom={false}
           style={{ height: "100%", width: "100%" }}
         >
@@ -141,7 +132,7 @@ export const ProviderMap = ({ providers = [], className = "" }: ProviderMapProps
           {providers.map((provider, index) => (
             <Marker
               key={index}
-              position={provider.location as L.LatLngExpression}
+              position={provider.location as [number, number]}
             >
               <Popup>
                 <div className="p-2">
