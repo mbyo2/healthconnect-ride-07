@@ -7,17 +7,27 @@ import { Button } from "@/components/ui/button";
 import { MapPin, Compass } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
+import L from 'leaflet';
 
 interface ProviderMapProps {
   providers?: Provider[];
   className?: string;
 }
 
+// Fix for default marker icons in Leaflet with React
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
+
 export const ProviderMap = ({ providers = [], className = "" }: ProviderMapProps) => {
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const isMobile = useIsMobile();
+  const mapRef = useRef<L.Map>(null);
   
   // Default to NYC coordinates if no providers
   const defaultPosition: [number, number] = [40.7128, -74.0060];
@@ -33,6 +43,8 @@ export const ProviderMap = ({ providers = [], className = "" }: ProviderMapProps
       const data = await response.json();
       
       if (data && data[0]) {
+        const { lat, lon } = data[0];
+        mapRef.current?.setView([parseFloat(lat), parseFloat(lon)], 13);
         toast({
           title: "Location found",
           description: `Showing results near ${data[0].display_name}`,
@@ -68,6 +80,8 @@ export const ProviderMap = ({ providers = [], className = "" }: ProviderMapProps
     setIsLoading(true);
     navigator.geolocation.getCurrentPosition(
       (position) => {
+        const { latitude, longitude } = position.coords;
+        mapRef.current?.setView([latitude, longitude], 13);
         toast({
           title: "Location found",
           description: "Showing results near your current location",
@@ -120,19 +134,16 @@ export const ProviderMap = ({ providers = [], className = "" }: ProviderMapProps
 
       <div style={{ height: "400px", width: "100%" }} className={className}>
         <MapContainer
-          center={defaultPosition}
-          zoom={13}
-          scrollWheelZoom={false}
+          ref={mapRef}
           style={{ height: "100%", width: "100%" }}
         >
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
           {providers.map((provider, index) => (
             <Marker
               key={index}
-              position={provider.location as [number, number]}
+              position={provider.location}
             >
               <Popup>
                 <div className="p-2">

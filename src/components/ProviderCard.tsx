@@ -28,6 +28,7 @@ export const ProviderCard = ({
   image,
   price = "$100/visit",
   experience = "5+ years",
+  expertise = [],
 }: ProviderCardProps) => {
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
 
@@ -36,48 +37,62 @@ export const ProviderCard = ({
 
   return (
     <>
-      <Card className="overflow-hidden hover:shadow-lg transition-shadow">
+      <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 bg-white/80 backdrop-blur-sm border-gray-200/80">
         <CardContent className="p-4">
           <div className="flex gap-4">
-            <Avatar className="w-24 h-24">
+            <Avatar className="w-24 h-24 rounded-xl border-2 border-primary/10">
               <AvatarImage src={image} alt={name} className="object-cover" />
-              <AvatarFallback>{name[0]}</AvatarFallback>
+              <AvatarFallback className="bg-primary/5 text-primary font-semibold">
+                {name.split(' ').map(n => n[0]).join('')}
+              </AvatarFallback>
             </Avatar>
             <div className="flex-1">
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="font-semibold text-lg">{name}</h3>
-                  <div className="flex items-center gap-2 text-primary">
+                  <h3 className="font-semibold text-lg bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                    {name}
+                  </h3>
+                  <div className="flex items-center gap-2 text-primary/80">
                     <Stethoscope className="w-4 h-4" />
                     <span className="text-sm">{specialty}</span>
                   </div>
                 </div>
-                <Badge variant="secondary" className="flex items-center gap-1">
-                  {rating} <Star className="w-3 h-3 fill-yellow-400" />
+                <Badge variant="secondary" className="flex items-center gap-1 bg-yellow-50">
+                  {rating} <Star className="w-3 h-3 fill-yellow-400 stroke-yellow-400" />
                 </Badge>
               </div>
               
               <div className="mt-2 space-y-1">
                 <div className="flex items-center text-gray-500 text-sm">
-                  <MapPin className="w-4 h-4 mr-1" />
+                  <MapPin className="w-4 h-4 mr-1 text-primary/60" />
                   <span>{locationString}</span>
                 </div>
                 <div className="flex items-center text-gray-500 text-sm">
-                  <Clock className="w-4 h-4 mr-1" />
+                  <Clock className="w-4 h-4 mr-1 text-primary/60" />
                   <span>{availability}</span>
                 </div>
                 <div className="flex items-center text-gray-500 text-sm">
-                  <Calendar className="w-4 h-4 mr-1" />
+                  <Calendar className="w-4 h-4 mr-1 text-primary/60" />
                   <span>{experience}</span>
                 </div>
               </div>
             </div>
           </div>
           
+          {expertise && expertise.length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-2">
+              {expertise.map((exp, index) => (
+                <Badge key={index} variant="outline" className="bg-primary/5">
+                  {exp}
+                </Badge>
+              ))}
+            </div>
+          )}
+          
           <div className="mt-4 flex items-center justify-between">
             <div className="text-lg font-semibold text-primary">{price}</div>
             <Button 
-              className="bg-primary hover:bg-primary/90"
+              className="bg-primary hover:bg-primary/90 transition-colors"
               onClick={() => setIsBookingModalOpen(true)}
             >
               Book Now
