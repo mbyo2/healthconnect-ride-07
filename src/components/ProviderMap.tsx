@@ -1,6 +1,6 @@
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { Provider } from '@/types/provider';
-import { useRef, useEffect } from 'react';
+import { useRef } from 'react';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
@@ -16,17 +16,6 @@ interface ProviderMapProps {
   providers: Provider[];
 }
 
-// Custom component to handle map center updates
-const MapUpdater = ({ center }: { center: [number, number] }) => {
-  const map = useMap();
-  
-  useEffect(() => {
-    map.setView(center);
-  }, [center, map]);
-  
-  return null;
-};
-
 export const ProviderMap = ({ providers }: ProviderMapProps) => {
   const mapRef = useRef<L.Map>(null);
   const defaultCenter: [number, number] = [40.7128, -74.0060]; // New York coordinates
@@ -34,29 +23,24 @@ export const ProviderMap = ({ providers }: ProviderMapProps) => {
   return (
     <MapContainer
       ref={mapRef}
+      center={defaultCenter}
       className="h-full w-full rounded-lg shadow-lg animate-fade-in"
-      zoom={13}
       style={{ height: '100%', width: '100%' }}
+      scrollWheelZoom={false}
+      zoomControl={true}
+      attributionControl={true}
+      initial={13}
     >
-      <MapUpdater center={defaultCenter} />
       <TileLayer
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       {providers.map((provider, index) => (
         <Marker 
           key={provider.id || index} 
           position={provider.location}
-          icon={L.icon({
-            iconUrl: '/marker-icon.png',
-            iconRetinaUrl: '/marker-icon-2x.png',
-            shadowUrl: '/marker-shadow.png',
-            iconSize: [25, 41],
-            iconAnchor: [12, 41],
-            popupAnchor: [1, -34],
-            shadowSize: [41, 41]
-          })}
         >
-          <Popup className="provider-popup">
+          <Popup>
             <div className="p-2">
               <h3 className="font-bold text-lg">{provider.name}</h3>
               <p className="text-sm text-gray-600">{provider.specialty}</p>

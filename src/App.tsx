@@ -6,7 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { MobileLayout } from "@/components/layouts/MobileLayout";
-import { ThemeProvider } from "@/hooks/use-theme";
+import { ThemeProvider as NextThemesProvider } from "next-themes";
 import Index from "./pages/Index";
 import Search from "./pages/Search";
 import Map from "./pages/Map";
@@ -56,7 +56,7 @@ const App = () => {
   console.log("App component rendering");
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="light" storageKey="app-theme">
+      <NextThemesProvider attribute="class" defaultTheme="light" enableSystem>
         <TooltipProvider>
           <BrowserRouter>
             <Routes>
@@ -86,7 +86,7 @@ const App = () => {
           <Toaster />
           <Sonner />
         </TooltipProvider>
-      </ThemeProvider>
+      </NextThemesProvider>
     </QueryClientProvider>
   );
 };
