@@ -10,10 +10,15 @@ const Login = () => {
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "SIGNED_IN") {
-        console.log("User signed in:", session?.user);
+      console.log("Auth state changed:", event, session);
+      
+      if (event === "SIGNED_IN" && session) {
+        console.log("User signed in successfully:", session.user);
         toast.success("Successfully signed in!");
         navigate("/home");
+      } else if (event === "USER_DELETED") {
+        toast.error("Account deleted");
+        navigate("/login");
       }
     });
 
@@ -32,10 +37,16 @@ const Login = () => {
               style: {
                 button: { background: 'rgb(var(--primary))', color: 'white' },
                 anchor: { color: 'rgb(var(--primary))' },
+                container: { width: '100%' },
+                message: { color: 'rgb(var(--destructive))' }
               },
             }}
             providers={[]}
             redirectTo={`${window.location.origin}/home`}
+            onError={(error) => {
+              console.error("Auth error:", error);
+              toast.error(error.message);
+            }}
           />
         </div>
       </div>
