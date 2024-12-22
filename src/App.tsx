@@ -7,7 +7,6 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { MobileLayout } from "@/components/layouts/MobileLayout";
 import { ThemeProvider } from "@/hooks/use-theme";
-import Landing from "./pages/Landing";
 import Index from "./pages/Index";
 import Search from "./pages/Search";
 import Map from "./pages/Map";
@@ -33,7 +32,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log("Auth state changed:", event, !!session);
+      console.log("Auth state changed:", { event, session });
       setIsAuthenticated(!!session);
     });
 
@@ -61,7 +60,7 @@ const App = () => {
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route path="/reset-password" element={<ResetPassword />} />
-              <Route path="/" element={<Landing />} />
+              <Route path="/" element={<Navigate to="/login" replace />} />
               <Route path="/*" element={
                 <ProtectedRoute>
                   <MobileLayout>
