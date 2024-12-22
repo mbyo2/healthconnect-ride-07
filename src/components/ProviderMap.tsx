@@ -23,8 +23,8 @@ export const ProviderMap = ({ providers }: ProviderMapProps) => {
   return (
     <MapContainer
       ref={mapRef}
-      center={defaultCenter}
-      zoom={13}
+      defaultCenter={defaultCenter}
+      defaultZoom={13}
       className="h-full w-full rounded-lg shadow-lg animate-fade-in"
       style={{ height: '100%', width: '100%' }}
       scrollWheelZoom={false}
@@ -32,7 +32,7 @@ export const ProviderMap = ({ providers }: ProviderMapProps) => {
     >
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        attributionControl={true}
       />
       {providers.map((provider, index) => (
         <Marker 
