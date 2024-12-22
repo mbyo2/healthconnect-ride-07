@@ -26,7 +26,7 @@ export const Header = () => {
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b">
       <div className="px-4">
         <div className="flex items-center justify-between h-16">
-          <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+          <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent animate-fade-in">
             Dokotela
           </h1>
           <div className="flex items-center gap-2">
@@ -34,15 +34,20 @@ export const Header = () => {
               variant="ghost"
               size="icon"
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="rounded-full"
+              className="rounded-full transition-transform hover:scale-110 active:scale-95"
+              aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
             >
-              {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+              {theme === "dark" ? (
+                <Sun className="h-5 w-5 transition-transform animate-fade-in" />
+              ) : (
+                <Moon className="h-5 w-5 transition-transform animate-fade-in" />
+              )}
             </Button>
             <NotificationCenter />
             <Button 
               variant="ghost" 
               size="icon" 
-              className="h-10 w-10 hover:bg-accent" 
+              className="h-10 w-10 hover:bg-accent transition-colors"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
               <Menu className="h-5 w-5" />
@@ -52,11 +57,11 @@ export const Header = () => {
       </div>
 
       {isMenuOpen && (
-        <div className="absolute top-16 left-0 right-0 bg-background/80 backdrop-blur-md border-b shadow-lg animate-in slide-in-from-top">
+        <div className="absolute top-16 left-0 right-0 bg-background/80 backdrop-blur-md border-b shadow-lg animate-in slide-in-from-top duration-300">
           <nav className="max-w-xl mx-auto px-4 py-2 space-y-1">
             <Button
               variant="ghost"
-              className="w-full justify-start text-foreground hover:text-primary hover:bg-accent"
+              className="w-full justify-start text-foreground hover:text-primary hover:bg-accent transition-colors animate-fade-in"
               onClick={() => {
                 navigate("/search");
                 setIsMenuOpen(false);
@@ -66,7 +71,7 @@ export const Header = () => {
             </Button>
             <Button
               variant="ghost"
-              className="w-full justify-start text-foreground hover:text-primary hover:bg-accent"
+              className="w-full justify-start text-foreground hover:text-primary hover:bg-accent transition-colors animate-fade-in"
               onClick={() => {
                 navigate("/profile");
                 setIsMenuOpen(false);
@@ -76,7 +81,7 @@ export const Header = () => {
             </Button>
             <Button
               variant="ghost"
-              className="w-full justify-start text-foreground hover:text-primary hover:bg-accent"
+              className="w-full justify-start text-foreground hover:text-primary hover:bg-accent transition-colors animate-fade-in"
               onClick={() => {
                 navigate("/appointments");
                 setIsMenuOpen(false);
@@ -86,7 +91,7 @@ export const Header = () => {
             </Button>
             <Button
               variant="ghost"
-              className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10"
+              className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10 transition-colors animate-fade-in"
               onClick={() => {
                 handleLogout();
                 setIsMenuOpen(false);
