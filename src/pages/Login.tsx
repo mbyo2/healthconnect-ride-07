@@ -16,9 +16,6 @@ const Login = () => {
         console.log("User signed in successfully:", session.user);
         toast.success("Successfully signed in!");
         navigate("/home");
-      } else if (event === "USER_DELETED") {
-        toast.error("Account deleted");
-        navigate("/login");
       }
     });
 
@@ -43,10 +40,6 @@ const Login = () => {
             }}
             providers={[]}
             redirectTo={`${window.location.origin}/home`}
-            onError={(error) => {
-              console.error("Auth error:", error);
-              toast.error(error.message);
-            }}
           />
         </div>
       </div>
