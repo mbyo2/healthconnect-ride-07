@@ -18,17 +18,16 @@ interface ProviderMapProps {
 
 export const ProviderMap = ({ providers }: ProviderMapProps) => {
   const mapRef = useRef<L.Map>(null);
-  const defaultCenter: [number, number] = [40.7128, -74.0060]; // New York coordinates
+  const defaultPosition: [number, number] = [40.7128, -74.0060]; // New York coordinates
 
   return (
     <MapContainer
       ref={mapRef}
-      center={defaultCenter}
+      center={defaultPosition}
       zoom={13}
       className="h-full w-full rounded-lg shadow-lg animate-fade-in"
       style={{ height: '100%', width: '100%' }}
       scrollWheelZoom={false}
-      zoomControl={true}
     >
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
