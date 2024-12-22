@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { MobileLayout } from "@/components/layouts/MobileLayout";
+import { ThemeProvider } from "@/hooks/use-theme";
 import Landing from "./pages/Landing";
 import Index from "./pages/Index";
 import Search from "./pages/Search";
@@ -15,6 +16,7 @@ import Profile from "./pages/Profile";
 import Login from "./pages/Login";
 import AdminDashboard from "./pages/AdminDashboard";
 import ResetPassword from "./pages/ResetPassword";
+import Healthcare from "./pages/Healthcare";
 
 const queryClient = new QueryClient();
 
@@ -53,32 +55,35 @@ const App = () => {
   console.log("App component rendering");
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/" element={<Landing />} />
-            <Route path="/*" element={
-              <ProtectedRoute>
-                <MobileLayout>
-                  <Routes>
-                    <Route path="/home" element={<Index />} />
-                    <Route path="search" element={<Search />} />
-                    <Route path="map" element={<Map />} />
-                    <Route path="appointments" element={<Appointments />} />
-                    <Route path="profile" element={<Profile />} />
-                    <Route path="admin" element={<AdminDashboard />} />
-                    <Route path="*" element={<Navigate to="/home" replace />} />
-                  </Routes>
-                </MobileLayout>
-              </ProtectedRoute>
-            } />
-          </Routes>
-        </BrowserRouter>
-        <Toaster />
-        <Sonner />
-      </TooltipProvider>
+      <ThemeProvider defaultTheme="light" storageKey="app-theme">
+        <TooltipProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/" element={<Landing />} />
+              <Route path="/*" element={
+                <ProtectedRoute>
+                  <MobileLayout>
+                    <Routes>
+                      <Route path="/home" element={<Index />} />
+                      <Route path="/healthcare" element={<Healthcare />} />
+                      <Route path="search" element={<Search />} />
+                      <Route path="map" element={<Map />} />
+                      <Route path="appointments" element={<Appointments />} />
+                      <Route path="profile" element={<Profile />} />
+                      <Route path="admin" element={<AdminDashboard />} />
+                      <Route path="*" element={<Navigate to="/home" replace />} />
+                    </Routes>
+                  </MobileLayout>
+                </ProtectedRoute>
+              } />
+            </Routes>
+          </BrowserRouter>
+          <Toaster />
+          <Sonner />
+        </TooltipProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 };

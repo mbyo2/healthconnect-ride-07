@@ -13,7 +13,7 @@ export const MobileLayout = ({ children }: MobileLayoutProps) => {
 
   if (!isMobile) {
     return (
-      <div className="flex min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      <div className="flex min-h-screen bg-background">
         <DesktopNav />
         <main className="flex-1 overflow-auto">
           <div className="max-w-7xl mx-auto p-6 space-y-6">
@@ -25,7 +25,7 @@ export const MobileLayout = ({ children }: MobileLayoutProps) => {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="flex flex-col min-h-screen bg-background">
       <Header />
       <main className="flex-1 pt-16 pb-20">
         <div className="max-w-xl mx-auto px-4 space-y-6">

@@ -11,15 +11,20 @@ import {
   ClipboardList,
   Settings,
   LogOut,
+  Heart,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { useTheme } from "@/hooks/use-theme";
 
 export const DesktopNav = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [userRole, setUserRole] = useState<string | null>(null);
+  const { theme, setTheme } = useTheme();
 
   useEffect(() => {
     const fetchUserRole = async () => {
@@ -54,7 +59,8 @@ export const DesktopNav = () => {
   const isActive = (path: string) => location.pathname === path;
 
   const patientLinks = [
-    { path: "/", icon: Home, label: "Home" },
+    { path: "/home", icon: Home, label: "Home" },
+    { path: "/healthcare", icon: Heart, label: "Healthcare" },
     { path: "/search", icon: Search, label: "Find Care" },
     { path: "/map", icon: MapPin, label: "Map" },
     { path: "/appointments", icon: Calendar, label: "Appointments" },
@@ -62,7 +68,8 @@ export const DesktopNav = () => {
   ];
 
   const providerLinks = [
-    { path: "/", icon: Home, label: "Dashboard" },
+    { path: "/home", icon: Home, label: "Dashboard" },
+    { path: "/healthcare", icon: Heart, label: "Healthcare" },
     { path: "/appointments", icon: Calendar, label: "Appointments" },
     { path: "/patients", icon: ClipboardList, label: "My Patients" },
     { path: "/availability", icon: Stethoscope, label: "Availability" },
@@ -73,9 +80,17 @@ export const DesktopNav = () => {
   const links = userRole === 'health_personnel' ? providerLinks : patientLinks;
 
   return (
-    <div className="hidden lg:flex flex-col h-screen w-64 bg-white border-r border-gray-200 p-4">
-      <div className="flex items-center mb-8">
+    <div className="hidden lg:flex flex-col h-screen w-64 bg-background border-r border-border p-4">
+      <div className="flex items-center justify-between mb-8">
         <h1 className="text-2xl font-bold text-primary">Dokotela</h1>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+          className="rounded-full"
+        >
+          {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+        </Button>
       </div>
       
       <nav className="flex-1 space-y-2">
@@ -85,8 +100,8 @@ export const DesktopNav = () => {
             to={link.path}
             className={`flex items-center px-4 py-3 rounded-lg transition-colors ${
               isActive(link.path)
-                ? "bg-primary text-white"
-                : "text-gray-600 hover:bg-gray-100"
+                ? "bg-primary text-primary-foreground"
+                : "text-foreground hover:bg-accent"
             }`}
           >
             <link.icon className="h-5 w-5 mr-3" />
@@ -97,7 +112,7 @@ export const DesktopNav = () => {
 
       <Button
         variant="ghost"
-        className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
+        className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10"
         onClick={handleLogout}
       >
         <LogOut className="h-5 w-5 mr-3" />
