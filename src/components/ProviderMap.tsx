@@ -37,10 +37,18 @@ export const ProviderMap = ({ providers = [], className = "" }: ProviderMapProps
     
     setIsLoading(true);
     try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}`
-      );
+      // Ensure proper URL encoding and formatting
+      const encodedQuery = encodeURIComponent(searchQuery.trim());
+      const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodedQuery}`;
+      console.log('Searching location with URL:', url);
+      
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
+      console.log('Location search response:', data);
       
       if (data && data[0]) {
         const { lat, lon } = data[0];
@@ -57,6 +65,7 @@ export const ProviderMap = ({ providers = [], className = "" }: ProviderMapProps
         });
       }
     } catch (error) {
+      console.error('Location search error:', error);
       toast({
         title: "Error",
         description: "Failed to search location",
@@ -89,6 +98,7 @@ export const ProviderMap = ({ providers = [], className = "" }: ProviderMapProps
         setIsLoading(false);
       },
       (error) => {
+        console.error('Geolocation error:', error);
         toast({
           title: "Error",
           description: error.message || "Failed to get your location",
@@ -135,10 +145,13 @@ export const ProviderMap = ({ providers = [], className = "" }: ProviderMapProps
       <div style={{ height: "400px", width: "100%" }} className={className}>
         <MapContainer
           ref={mapRef}
+          center={defaultPosition}
+          zoom={13}
           style={{ height: "100%", width: "100%" }}
         >
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
           {providers.map((provider, index) => (
             <Marker
