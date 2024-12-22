@@ -9,6 +9,53 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      billing_records: {
+        Row: {
+          amount: number
+          created_at: string | null
+          description: string
+          due_date: string | null
+          id: string
+          paid_date: string | null
+          patient_id: string
+          payment_method: string | null
+          status: string
+          transaction_id: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          description: string
+          due_date?: string | null
+          id?: string
+          paid_date?: string | null
+          patient_id: string
+          payment_method?: string | null
+          status: string
+          transaction_id?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          description?: string
+          due_date?: string | null
+          id?: string
+          paid_date?: string | null
+          patient_id?: string
+          payment_method?: string | null
+          status?: string
+          transaction_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "billing_records_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       emergency_contacts: {
         Row: {
           address: string | null
@@ -50,6 +97,127 @@ export type Database = {
           {
             foreignKeyName: "emergency_contacts_patient_id_fkey"
             columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      family_members: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_dependent: boolean | null
+          member_profile_id: string
+          primary_user_id: string
+          relationship: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_dependent?: boolean | null
+          member_profile_id: string
+          primary_user_id: string
+          relationship: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_dependent?: boolean | null
+          member_profile_id?: string
+          primary_user_id?: string
+          relationship?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_members_member_profile_id_fkey"
+            columns: ["member_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "family_members_primary_user_id_fkey"
+            columns: ["primary_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      health_articles: {
+        Row: {
+          author_id: string | null
+          category: string
+          content: string
+          id: string
+          published_at: string | null
+          tags: string[] | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          author_id?: string | null
+          category: string
+          content: string
+          id?: string
+          published_at?: string | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          author_id?: string | null
+          category?: string
+          content?: string
+          id?: string
+          published_at?: string | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "health_articles_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      health_metrics: {
+        Row: {
+          id: string
+          metric_type: string
+          notes: string | null
+          recorded_at: string | null
+          unit: string
+          user_id: string
+          value: number
+        }
+        Insert: {
+          id?: string
+          metric_type: string
+          notes?: string | null
+          recorded_at?: string | null
+          unit: string
+          user_id: string
+          value: number
+        }
+        Update: {
+          id?: string
+          metric_type?: string
+          notes?: string | null
+          recorded_at?: string | null
+          unit?: string
+          user_id?: string
+          value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "health_metrics_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -160,6 +328,53 @@ export type Database = {
           },
         ]
       }
+      lab_results: {
+        Row: {
+          created_at: string | null
+          document_url: string | null
+          id: string
+          notes: string | null
+          patient_id: string
+          reference_range: string | null
+          result_value: string
+          test_date: string
+          test_name: string
+          unit: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          document_url?: string | null
+          id?: string
+          notes?: string | null
+          patient_id: string
+          reference_range?: string | null
+          result_value: string
+          test_date: string
+          test_name: string
+          unit?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          document_url?: string | null
+          id?: string
+          notes?: string | null
+          patient_id?: string
+          reference_range?: string | null
+          result_value?: string
+          test_date?: string
+          test_name?: string
+          unit?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lab_results_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       medical_records: {
         Row: {
           created_at: string | null
@@ -192,6 +407,53 @@ export type Database = {
           {
             foreignKeyName: "medical_records_patient_id_fkey"
             columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      medication_reminders: {
+        Row: {
+          active: boolean | null
+          created_at: string | null
+          dosage: string
+          end_date: string | null
+          frequency: string
+          id: string
+          medication_name: string
+          reminder_time: string[]
+          start_date: string
+          user_id: string
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string | null
+          dosage: string
+          end_date?: string | null
+          frequency: string
+          id?: string
+          medication_name: string
+          reminder_time: string[]
+          start_date: string
+          user_id: string
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string | null
+          dosage?: string
+          end_date?: string | null
+          frequency?: string
+          id?: string
+          medication_name?: string
+          reminder_time?: string[]
+          start_date?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medication_reminders_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -393,6 +655,104 @@ export type Database = {
           zip_code?: string | null
         }
         Relationships: []
+      }
+      vaccination_records: {
+        Row: {
+          administered_by: string | null
+          administered_date: string
+          batch_number: string | null
+          created_at: string | null
+          dose_number: number
+          id: string
+          next_due_date: string | null
+          notes: string | null
+          patient_id: string
+          vaccine_name: string
+        }
+        Insert: {
+          administered_by?: string | null
+          administered_date: string
+          batch_number?: string | null
+          created_at?: string | null
+          dose_number: number
+          id?: string
+          next_due_date?: string | null
+          notes?: string | null
+          patient_id: string
+          vaccine_name: string
+        }
+        Update: {
+          administered_by?: string | null
+          administered_date?: string
+          batch_number?: string | null
+          created_at?: string | null
+          dose_number?: number
+          id?: string
+          next_due_date?: string | null
+          notes?: string | null
+          patient_id?: string
+          vaccine_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vaccination_records_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      video_consultations: {
+        Row: {
+          created_at: string | null
+          id: string
+          meeting_url: string | null
+          notes: string | null
+          patient_id: string
+          provider_id: string
+          scheduled_end: string
+          scheduled_start: string
+          status: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          meeting_url?: string | null
+          notes?: string | null
+          patient_id: string
+          provider_id: string
+          scheduled_end: string
+          scheduled_start: string
+          status: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          meeting_url?: string | null
+          notes?: string | null
+          patient_id?: string
+          provider_id?: string
+          scheduled_end?: string
+          scheduled_start?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_consultations_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "video_consultations_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

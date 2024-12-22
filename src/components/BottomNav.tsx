@@ -1,76 +1,80 @@
-import { Home, Search, Calendar, User, MapPin, Stethoscope, ClipboardList, Heart } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { cn } from "@/lib/utils";
+import { Home, Search, Calendar, MessageSquare, Video } from "lucide-react";
 
 export const BottomNav = () => {
   const location = useLocation();
-  const [userRole, setUserRole] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchUserRole = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', user.id)
-          .single();
-        
-        if (profile) {
-          setUserRole(profile.role);
-        }
-      }
-    };
-
-    fetchUserRole();
-  }, []);
-
+  
   const isActive = (path: string) => location.pathname === path;
 
-  const patientNav = [
-    { path: "/home", icon: Home, label: "Home" },
-    { path: "/healthcare", icon: Heart, label: "Healthcare" },
-    { path: "/search", icon: Search, label: "Search" },
-    { path: "/map", icon: MapPin, label: "Map" },
-    { path: "/profile", icon: User, label: "Profile" },
-  ];
-
-  const providerNav = [
-    { path: "/home", icon: Home, label: "Home" },
-    { path: "/healthcare", icon: Heart, label: "Healthcare" },
-    { path: "/appointments", icon: Calendar, label: "Bookings" },
-    { path: "/patients", icon: ClipboardList, label: "Patients" },
-    { path: "/availability", icon: Stethoscope, label: "Schedule" },
-    { path: "/profile", icon: User, label: "Profile" },
-  ];
-
-  const navItems = userRole === 'health_personnel' ? providerNav : patientNav;
-
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-background/80 backdrop-blur-md border-t px-4 py-2 z-50">
-      <div className="flex justify-between items-center max-w-xl mx-auto">
-        {navItems.map((item) => (
-          <Link
-            key={item.path}
-            to={item.path}
-            className={`flex flex-col items-center transition-colors ${
-              isActive(item.path)
-                ? "text-primary"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            <item.icon className={`h-6 w-6 transition-transform ${
-              isActive(item.path) ? "scale-110" : ""
-            }`} />
-            <span className={`text-xs mt-1 transition-opacity ${
-              isActive(item.path) ? "opacity-100" : "opacity-70"
-            }`}>
-              {item.label}
-            </span>
-          </Link>
-        ))}
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-t">
+      <div className="flex items-center justify-around h-16">
+        <Link
+          to="/home"
+          className={cn(
+            "flex flex-col items-center gap-1 text-xs transition-colors",
+            isActive("/home")
+              ? "text-primary"
+              : "text-muted-foreground hover:text-primary"
+          )}
+        >
+          <Home className="h-5 w-5" />
+          Home
+        </Link>
+        
+        <Link
+          to="/search"
+          className={cn(
+            "flex flex-col items-center gap-1 text-xs transition-colors",
+            isActive("/search")
+              ? "text-primary"
+              : "text-muted-foreground hover:text-primary"
+          )}
+        >
+          <Search className="h-5 w-5" />
+          Search
+        </Link>
+
+        <Link
+          to="/appointments"
+          className={cn(
+            "flex flex-col items-center gap-1 text-xs transition-colors",
+            isActive("/appointments")
+              ? "text-primary"
+              : "text-muted-foreground hover:text-primary"
+          )}
+        >
+          <Calendar className="h-5 w-5" />
+          Appointments
+        </Link>
+
+        <Link
+          to="/chat"
+          className={cn(
+            "flex flex-col items-center gap-1 text-xs transition-colors",
+            isActive("/chat")
+              ? "text-primary"
+              : "text-muted-foreground hover:text-primary"
+          )}
+        >
+          <MessageSquare className="h-5 w-5" />
+          Chat
+        </Link>
+
+        <Link
+          to="/video-consultations"
+          className={cn(
+            "flex flex-col items-center gap-1 text-xs transition-colors",
+            isActive("/video-consultations")
+              ? "text-primary"
+              : "text-muted-foreground hover:text-primary"
+          )}
+        >
+          <Video className="h-5 w-5" />
+          Video
+        </Link>
       </div>
-    </div>
+    </nav>
   );
 };
