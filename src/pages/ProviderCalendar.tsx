@@ -48,9 +48,15 @@ const ProviderCalendar = () => {
 
   const fetchAvailability = async () => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error("No authenticated user");
+      }
+
       const { data, error } = await supabase
         .from("provider_availability")
         .select("*")
+        .eq('provider_id', user.id)
         .order("day_of_week");
 
       if (error) throw error;
@@ -65,13 +71,17 @@ const ProviderCalendar = () => {
 
   const addAvailability = async () => {
     try {
-      const { error } = await supabase.from("provider_availability").insert([
-        {
-          day_of_week: parseInt(newAvailability.day_of_week),
-          start_time: newAvailability.start_time,
-          end_time: newAvailability.end_time,
-        },
-      ]);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error("No authenticated user");
+      }
+
+      const { error } = await supabase.from("provider_availability").insert({
+        provider_id: user.id,
+        day_of_week: parseInt(newAvailability.day_of_week),
+        start_time: newAvailability.start_time,
+        end_time: newAvailability.end_time,
+      });
 
       if (error) throw error;
       toast.success("Availability added successfully");
