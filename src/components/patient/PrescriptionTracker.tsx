@@ -2,194 +2,196 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Pill } from "lucide-react";
-import { toast } from "sonner";
-
-interface Prescription {
-  id: string;
-  medication_name: string;
-  dosage: string;
-  frequency: string;
-  prescribed_by: string;
-  prescribed_date: string;
-  end_date?: string;
-  notes?: string;
-}
+import { useToast } from "@/components/ui/use-toast";
+import { Plus, X } from "lucide-react";
 
 export const PrescriptionTracker = () => {
-  const [prescriptions, setPrescriptions] = useState<Prescription[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
+  const [medications, setMedications] = useState<any[]>([]);
+  const [newMedication, setNewMedication] = useState({
     medication_name: "",
     dosage: "",
     frequency: "",
-    prescribed_by: "",
-    prescribed_date: "",
-    end_date: "",
-    notes: "",
+    reminder_time: ["09:00"],
   });
+  const { toast } = useToast();
 
   useEffect(() => {
-    fetchPrescriptions();
+    fetchMedications();
+    setupRealtimeSubscription();
   }, []);
 
-  const fetchPrescriptions = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+  const setupRealtimeSubscription = () => {
+    const channel = supabase
+      .channel('medication-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'medication_reminders'
+        },
+        (payload) => {
+          console.log('New medication reminder:', payload);
+          setMedications(current => [...current, payload.new]);
+        }
+      )
+      .subscribe();
 
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  };
+
+  const fetchMedications = async () => {
+    try {
       const { data, error } = await supabase
-        .from('prescriptions')
+        .from('medication_reminders')
         .select('*')
-        .eq('patient_id', user.id)
-        .order('prescribed_date', { ascending: false });
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setPrescriptions(data || []);
-    } catch (error: any) {
-      toast.error(error.message);
+      setMedications(data || []);
+    } catch (error) {
+      console.error('Error fetching medications:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch medications",
+        variant: "destructive",
+      });
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
+  const addMedication = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("No user found");
-
-      const { error } = await supabase
-        .from('prescriptions')
-        .insert({
-          ...formData,
-          patient_id: user.id,
-        });
+      const { data, error } = await supabase
+        .from('medication_reminders')
+        .insert([
+          {
+            ...newMedication,
+            user_id: (await supabase.auth.getUser()).data.user?.id,
+          }
+        ])
+        .select()
+        .single();
 
       if (error) throw error;
 
-      toast.success("Prescription added successfully!");
-      setFormData({
+      toast({
+        title: "Success",
+        description: "Medication reminder added successfully",
+      });
+
+      setNewMedication({
         medication_name: "",
         dosage: "",
         frequency: "",
-        prescribed_by: "",
-        prescribed_date: "",
-        end_date: "",
-        notes: "",
+        reminder_time: ["09:00"],
       });
-      fetchPrescriptions();
-    } catch (error: any) {
-      toast.error(error.message);
-    } finally {
-      setLoading(false);
+    } catch (error) {
+      console.error('Error adding medication:', error);
+      toast({
+        title: "Error",
+        description: "Failed to add medication reminder",
+        variant: "destructive",
+      });
     }
   };
 
+  const addReminderTime = () => {
+    setNewMedication(prev => ({
+      ...prev,
+      reminder_time: [...prev.reminder_time, "09:00"],
+    }));
+  };
+
+  const removeReminderTime = (index: number) => {
+    setNewMedication(prev => ({
+      ...prev,
+      reminder_time: prev.reminder_time.filter((_, i) => i !== index),
+    }));
+  };
+
+  const updateReminderTime = (index: number, value: string) => {
+    setNewMedication(prev => ({
+      ...prev,
+      reminder_time: prev.reminder_time.map((time, i) => i === index ? value : time),
+    }));
+  };
+
   return (
-    <div className="p-4">
-      <div className="flex items-center gap-2 mb-4">
-        <Pill className="h-5 w-5" />
-        <h2 className="text-xl font-semibold">Prescription Tracker</h2>
+    <div className="space-y-6">
+      <div className="bg-white p-6 rounded-lg shadow-sm space-y-4">
+        <h3 className="text-lg font-semibold">Add New Medication</h3>
+        <div className="space-y-4">
+          <Input
+            placeholder="Medication Name"
+            value={newMedication.medication_name}
+            onChange={(e) => setNewMedication(prev => ({ ...prev, medication_name: e.target.value }))}
+          />
+          <Input
+            placeholder="Dosage (e.g., 10mg)"
+            value={newMedication.dosage}
+            onChange={(e) => setNewMedication(prev => ({ ...prev, dosage: e.target.value }))}
+          />
+          <Input
+            placeholder="Frequency (e.g., twice daily)"
+            value={newMedication.frequency}
+            onChange={(e) => setNewMedication(prev => ({ ...prev, frequency: e.target.value }))}
+          />
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Reminder Times</label>
+            {newMedication.reminder_time.map((time, index) => (
+              <div key={index} className="flex gap-2">
+                <Input
+                  type="time"
+                  value={time}
+                  onChange={(e) => updateReminderTime(index, e.target.value)}
+                />
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => removeReminderTime(index)}
+                  disabled={newMedication.reminder_time.length === 1}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={addReminderTime}
+              className="w-full"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Time
+            </Button>
+          </div>
+          <Button onClick={addMedication} className="w-full">
+            Add Medication
+          </Button>
+        </div>
       </div>
 
       <div className="space-y-4">
-        {prescriptions.map((prescription) => (
-          <div key={prescription.id} className="border p-4 rounded-lg">
-            <h3 className="font-semibold">{prescription.medication_name}</h3>
-            <div className="grid grid-cols-2 gap-2 mt-2 text-sm">
-              <p><strong>Dosage:</strong> {prescription.dosage}</p>
-              <p><strong>Frequency:</strong> {prescription.frequency}</p>
-              <p><strong>Prescribed By:</strong> {prescription.prescribed_by}</p>
-              <p><strong>Prescribed Date:</strong> {prescription.prescribed_date}</p>
-              {prescription.end_date && (
-                <p><strong>End Date:</strong> {prescription.end_date}</p>
-              )}
+        <h3 className="text-lg font-semibold">Your Medications</h3>
+        {medications.map((med) => (
+          <div key={med.id} className="bg-white p-4 rounded-lg shadow-sm">
+            <h4 className="font-medium">{med.medication_name}</h4>
+            <p className="text-sm text-gray-600">Dosage: {med.dosage}</p>
+            <p className="text-sm text-gray-600">Frequency: {med.frequency}</p>
+            <div className="mt-2">
+              <p className="text-sm font-medium">Reminder Times:</p>
+              <div className="flex flex-wrap gap-2 mt-1">
+                {med.reminder_time.map((time: string, index: number) => (
+                  <span key={index} className="text-sm bg-gray-100 px-2 py-1 rounded">
+                    {time}
+                  </span>
+                ))}
+              </div>
             </div>
-            {prescription.notes && (
-              <p className="mt-2 text-sm text-gray-600">
-                <strong>Notes:</strong> {prescription.notes}
-              </p>
-            )}
           </div>
         ))}
-
-        <form onSubmit={handleSubmit} className="border-t pt-4 mt-4 space-y-4">
-          <div>
-            <Label htmlFor="medication_name">Medication Name</Label>
-            <Input
-              id="medication_name"
-              value={formData.medication_name}
-              onChange={(e) => setFormData({ ...formData, medication_name: e.target.value })}
-              required
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="dosage">Dosage</Label>
-            <Input
-              id="dosage"
-              value={formData.dosage}
-              onChange={(e) => setFormData({ ...formData, dosage: e.target.value })}
-              required
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="frequency">Frequency</Label>
-            <Input
-              id="frequency"
-              value={formData.frequency}
-              onChange={(e) => setFormData({ ...formData, frequency: e.target.value })}
-              required
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="prescribed_by">Prescribed By</Label>
-            <Input
-              id="prescribed_by"
-              value={formData.prescribed_by}
-              onChange={(e) => setFormData({ ...formData, prescribed_by: e.target.value })}
-              required
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="prescribed_date">Prescribed Date</Label>
-            <Input
-              id="prescribed_date"
-              type="date"
-              value={formData.prescribed_date}
-              onChange={(e) => setFormData({ ...formData, prescribed_date: e.target.value })}
-              required
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="end_date">End Date (Optional)</Label>
-            <Input
-              id="end_date"
-              type="date"
-              value={formData.end_date}
-              onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="notes">Notes (Optional)</Label>
-            <Input
-              id="notes"
-              value={formData.notes}
-              onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-            />
-          </div>
-
-          <Button type="submit" disabled={loading}>
-            {loading ? "Adding..." : "Add Prescription"}
-          </Button>
-        </form>
       </div>
     </div>
   );
