@@ -16,6 +16,11 @@ const Login = () => {
         console.log("User signed in successfully:", session.user);
         toast.success("Successfully signed in!");
         navigate("/home");
+      } else if (event === "SIGNED_OUT") {
+        console.log("User signed out");
+      } else if (event === "USER_DELETED") {
+        console.log("User deleted");
+        navigate("/login");
       }
     });
 
