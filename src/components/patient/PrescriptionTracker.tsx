@@ -12,6 +12,7 @@ export const PrescriptionTracker = () => {
     dosage: "",
     frequency: "",
     reminder_time: ["09:00"],
+    start_date: new Date().toISOString().split('T')[0], // Add start_date field
   });
   const { toast } = useToast();
 
@@ -86,6 +87,7 @@ export const PrescriptionTracker = () => {
         dosage: "",
         frequency: "",
         reminder_time: ["09:00"],
+        start_date: new Date().toISOString().split('T')[0],
       });
     } catch (error) {
       console.error('Error adding medication:', error);
@@ -138,6 +140,11 @@ export const PrescriptionTracker = () => {
             value={newMedication.frequency}
             onChange={(e) => setNewMedication(prev => ({ ...prev, frequency: e.target.value }))}
           />
+          <Input
+            type="date"
+            value={newMedication.start_date}
+            onChange={(e) => setNewMedication(prev => ({ ...prev, start_date: e.target.value }))}
+          />
           <div className="space-y-2">
             <label className="text-sm font-medium">Reminder Times</label>
             {newMedication.reminder_time.map((time, index) => (
@@ -180,6 +187,7 @@ export const PrescriptionTracker = () => {
             <h4 className="font-medium">{med.medication_name}</h4>
             <p className="text-sm text-gray-600">Dosage: {med.dosage}</p>
             <p className="text-sm text-gray-600">Frequency: {med.frequency}</p>
+            <p className="text-sm text-gray-600">Start Date: {new Date(med.start_date).toLocaleDateString()}</p>
             <div className="mt-2">
               <p className="text-sm font-medium">Reminder Times:</p>
               <div className="flex flex-wrap gap-2 mt-1">
