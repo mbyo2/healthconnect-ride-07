@@ -56,6 +56,38 @@ export type Database = {
           },
         ]
       }
+      digital_signatures: {
+        Row: {
+          created_at: string | null
+          document_type: string
+          id: string
+          provider_id: string
+          signature_data: string
+        }
+        Insert: {
+          created_at?: string | null
+          document_type: string
+          id?: string
+          provider_id: string
+          signature_data: string
+        }
+        Update: {
+          created_at?: string | null
+          document_type?: string
+          id?: string
+          provider_id?: string
+          signature_data?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "digital_signatures_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       emergency_contacts: {
         Row: {
           address: string | null
@@ -546,6 +578,57 @@ export type Database = {
           },
         ]
       }
+      patient_queue: {
+        Row: {
+          check_in_time: string | null
+          created_at: string | null
+          estimated_duration: number | null
+          id: string
+          notes: string | null
+          patient_id: string
+          priority: number | null
+          provider_id: string
+          status: string
+        }
+        Insert: {
+          check_in_time?: string | null
+          created_at?: string | null
+          estimated_duration?: number | null
+          id?: string
+          notes?: string | null
+          patient_id: string
+          priority?: number | null
+          provider_id: string
+          status: string
+        }
+        Update: {
+          check_in_time?: string | null
+          created_at?: string | null
+          estimated_duration?: number | null
+          id?: string
+          notes?: string | null
+          patient_id?: string
+          priority?: number | null
+          provider_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "patient_queue_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "patient_queue_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       prescriptions: {
         Row: {
           created_at: string | null
@@ -655,6 +738,41 @@ export type Database = {
           zip_code?: string | null
         }
         Relationships: []
+      }
+      provider_availability: {
+        Row: {
+          created_at: string | null
+          day_of_week: number
+          end_time: string
+          id: string
+          provider_id: string
+          start_time: string
+        }
+        Insert: {
+          created_at?: string | null
+          day_of_week: number
+          end_time: string
+          id?: string
+          provider_id: string
+          start_time: string
+        }
+        Update: {
+          created_at?: string | null
+          day_of_week?: number
+          end_time?: string
+          id?: string
+          provider_id?: string
+          start_time?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "provider_availability_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       symptoms_diary: {
         Row: {

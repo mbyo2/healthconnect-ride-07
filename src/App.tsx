@@ -18,6 +18,7 @@ import ResetPassword from "./pages/ResetPassword";
 import Healthcare from "./pages/Healthcare";
 import Chat from "./pages/Chat";
 import VideoConsultations from "./pages/VideoConsultations";
+import ProviderCalendar from "./pages/ProviderCalendar";
 
 const queryClient = new QueryClient();
 
@@ -76,6 +77,7 @@ const App = () => {
                       <Route path="video-consultations" element={<VideoConsultations />} />
                       <Route path="profile" element={<Profile />} />
                       <Route path="admin" element={<AdminDashboard />} />
+                      <Route path="calendar" element={<ProviderCalendar />} />
                       <Route path="*" element={<Navigate to="/home" replace />} />
                     </Routes>
                   </MobileLayout>

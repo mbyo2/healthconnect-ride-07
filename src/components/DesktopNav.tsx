@@ -69,10 +69,9 @@ export const DesktopNav = () => {
 
   const providerLinks = [
     { path: "/home", icon: Home, label: "Dashboard" },
-    { path: "/healthcare", icon: Heart, label: "Healthcare" },
-    { path: "/appointments", icon: Calendar, label: "Appointments" },
-    { path: "/patients", icon: ClipboardList, label: "My Patients" },
-    { path: "/availability", icon: Stethoscope, label: "Availability" },
+    { path: "/calendar", icon: Calendar, label: "Calendar" },
+    { path: "/appointments", icon: ClipboardList, label: "Appointments" },
+    { path: "/patients", icon: Stethoscope, label: "My Patients" },
     { path: "/profile", icon: User, label: "Profile" },
     { path: "/settings", icon: Settings, label: "Settings" },
   ];
