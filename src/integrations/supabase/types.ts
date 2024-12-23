@@ -656,6 +656,47 @@ export type Database = {
         }
         Relationships: []
       }
+      symptoms_diary: {
+        Row: {
+          created_at: string | null
+          date: string
+          id: string
+          notes: string | null
+          patient_id: string
+          severity: string
+          symptoms: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          date?: string
+          id?: string
+          notes?: string | null
+          patient_id: string
+          severity: string
+          symptoms: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          date?: string
+          id?: string
+          notes?: string | null
+          patient_id?: string
+          severity?: string
+          symptoms?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "symptoms_diary_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vaccination_records: {
         Row: {
           administered_by: string | null

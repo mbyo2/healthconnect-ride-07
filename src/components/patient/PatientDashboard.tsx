@@ -4,19 +4,29 @@ import { InsuranceForm } from "./InsuranceForm";
 import { ChatWindow } from "../chat/ChatWindow";
 import { EmergencyContacts } from "./EmergencyContacts";
 import { PrescriptionTracker } from "./PrescriptionTracker";
+import { SymptomsDiary } from "./SymptomsDiary";
+import { HealthMetricsChart } from "./HealthMetricsChart";
 
 export const PatientDashboard = () => {
-  const [selectedTab, setSelectedTab] = useState("insurance");
+  const [selectedTab, setSelectedTab] = useState("health");
 
   return (
     <div className="container mx-auto py-6">
       <Tabs value={selectedTab} onValueChange={setSelectedTab}>
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-6">
+          <TabsTrigger value="health">Health Metrics</TabsTrigger>
+          <TabsTrigger value="symptoms">Symptoms</TabsTrigger>
           <TabsTrigger value="insurance">Insurance</TabsTrigger>
           <TabsTrigger value="chat">Chat</TabsTrigger>
-          <TabsTrigger value="emergency">Emergency Contacts</TabsTrigger>
+          <TabsTrigger value="emergency">Emergency</TabsTrigger>
           <TabsTrigger value="prescriptions">Prescriptions</TabsTrigger>
         </TabsList>
+        <TabsContent value="health">
+          <HealthMetricsChart />
+        </TabsContent>
+        <TabsContent value="symptoms">
+          <SymptomsDiary />
+        </TabsContent>
         <TabsContent value="insurance">
           <InsuranceForm />
         </TabsContent>
