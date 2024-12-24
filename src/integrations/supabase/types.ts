@@ -316,6 +316,53 @@ export type Database = {
           },
         ]
       }
+      healthcare_services: {
+        Row: {
+          category: string
+          created_at: string | null
+          description: string | null
+          duration: number | null
+          id: string
+          is_available: boolean | null
+          name: string
+          price: number
+          provider_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          description?: string | null
+          duration?: number | null
+          id?: string
+          is_available?: boolean | null
+          name: string
+          price: number
+          provider_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          description?: string | null
+          duration?: number | null
+          id?: string
+          is_available?: boolean | null
+          name?: string
+          price?: number
+          provider_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "healthcare_services_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       insurance_information: {
         Row: {
           coverage_end_date: string | null
@@ -625,6 +672,70 @@ export type Database = {
             columns: ["provider_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payments: {
+        Row: {
+          amount: number
+          created_at: string | null
+          id: string
+          invoice_number: string | null
+          patient_id: string
+          payment_date: string | null
+          payment_method: string | null
+          provider_id: string
+          service_id: string | null
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          id?: string
+          invoice_number?: string | null
+          patient_id: string
+          payment_date?: string | null
+          payment_method?: string | null
+          provider_id: string
+          service_id?: string | null
+          status?: string
+          updated_at?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          id?: string
+          invoice_number?: string | null
+          patient_id?: string
+          payment_date?: string | null
+          payment_method?: string | null
+          provider_id?: string
+          service_id?: string | null
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_services"
             referencedColumns: ["id"]
           },
         ]

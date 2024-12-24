@@ -1,96 +1,191 @@
 import { ProviderCard } from "./ProviderCard";
 import { Input } from "@/components/ui/input";
-import { Search, MapPin, List } from "lucide-react";
+import { Search, MapPin, List, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { ProviderMap } from "./ProviderMap";
 import { Provider } from "@/types/provider";
+import { SearchFilters } from "@/types/search";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Slider } from "@/components/ui/slider";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 
 interface ProviderListProps {
   symptoms?: string;
   urgency?: string;
 }
 
-const mockProviders: Provider[] = [
-  {
-    id: "1",
-    name: "Dr. Sarah Johnson",
-    specialty: "General Practitioner",
-    rating: 4.9,
-    location: [40.7589, -73.9851], // Manhattan coordinates
-    availability: "Available Today",
-    expertise: ["General Medicine", "Urgent Care", "Family Medicine"],
-    image: "/placeholder.svg"
-  },
-  {
-    id: "2",
-    name: "Dr. Michael Chen",
-    specialty: "Emergency Medicine",
-    rating: 4.8,
-    location: [40.6782, -73.9442], // Brooklyn coordinates
-    availability: "Available Now",
-    expertise: ["Emergency Medicine", "Trauma Care", "Critical Care"],
-    image: "/placeholder.svg"
-  },
-  {
-    id: "3",
-    name: "Dr. Emily Williams",
-    specialty: "Family Medicine",
-    rating: 4.7,
-    location: [40.7282, -73.7949], // Queens coordinates
-    availability: "Available Today",
-    expertise: ["Family Medicine", "Pediatrics", "Preventive Care"],
-    image: "/placeholder.svg"
-  },
+const specialties = [
+  "General Practice",
+  "Emergency Medicine",
+  "Family Medicine",
+  "Pediatrics",
+  "Cardiology",
+  "Dermatology",
 ];
+
+const fetchProviders = async (filters: SearchFilters) => {
+  console.log("Fetching providers with filters:", filters);
+  let query = supabase
+    .from('profiles')
+    .select('*')
+    .eq('role', 'health_personnel');
+
+  // Apply filters
+  if (filters.specialty) {
+    query = query.ilike('specialty', `%${filters.specialty}%`);
+  }
+
+  if (filters.availability === 'now') {
+    // Add availability logic here
+  }
+
+  const { data, error } = await query;
+  
+  if (error) throw error;
+  return data as Provider[];
+};
+
+const fetchHealthcareServices = async () => {
+  const { data, error } = await supabase
+    .from('healthcare_services')
+    .select('*')
+    .eq('is_available', true);
+
+  if (error) throw error;
+  return data;
+};
 
 export const ProviderList = ({ symptoms = "", urgency = "non-urgent" }: ProviderListProps) => {
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
-  const [filteredProviders, setFilteredProviders] = useState(mockProviders);
   const [searchTerm, setSearchTerm] = useState("");
+  const [filters, setFilters] = useState<SearchFilters>({
+    specialty: undefined,
+    availability: undefined,
+    priceRange: { min: 0, max: 500 },
+    rating: undefined,
+    distance: undefined,
+    serviceTypes: [],
+  });
 
-  useEffect(() => {
-    // Filter providers based on symptoms and urgency
-    let filtered = [...mockProviders];
-    
-    if (urgency === "emergency") {
-      filtered = filtered.filter(provider => 
-        provider.expertise.includes("Emergency Medicine") || 
-        provider.availability === "Available Now"
-      );
-    }
+  const { data: providers, isLoading } = useQuery({
+    queryKey: ['providers', filters],
+    queryFn: () => fetchProviders(filters),
+  });
 
-    if (symptoms) {
-      // Simple keyword matching (in a real app, this would be more sophisticated)
-      filtered = filtered.filter(provider =>
-        provider.expertise.some(exp => 
-          symptoms.toLowerCase().includes(exp.toLowerCase())
-        )
-      );
-    }
+  const { data: services } = useQuery({
+    queryKey: ['healthcare-services'],
+    queryFn: fetchHealthcareServices,
+  });
 
-    // Apply search term filter
-    if (searchTerm) {
-      filtered = filtered.filter(provider =>
-        provider.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  const filteredProviders = providers?.filter(provider =>
+    searchTerm
+      ? provider.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         provider.specialty.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    setFilteredProviders(filtered);
-  }, [symptoms, urgency, searchTerm]);
+      : true
+  );
 
   return (
     <div className="min-h-screen">
       <div className="sticky top-14 z-40 bg-white border-b px-4 py-3 space-y-3">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-          <Input
-            placeholder="Search for healthcare providers..."
-            className="pl-10"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+        <div className="flex items-center gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <Input
+              placeholder="Search for healthcare providers..."
+              className="pl-10"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="icon">
+                <Filter className="h-4 w-4" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent>
+              <SheetHeader>
+                <SheetTitle>Filter Providers</SheetTitle>
+              </SheetHeader>
+              <div className="py-4 space-y-6">
+                <div className="space-y-4">
+                  <Label>Specialty</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {specialties.map((specialty) => (
+                      <div key={specialty} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={specialty}
+                          checked={filters.specialty === specialty}
+                          onCheckedChange={(checked) =>
+                            setFilters(prev => ({
+                              ...prev,
+                              specialty: checked ? specialty : undefined
+                            }))
+                          }
+                        />
+                        <label htmlFor={specialty} className="text-sm">
+                          {specialty}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <Label>Price Range</Label>
+                  <Slider
+                    defaultValue={[filters.priceRange?.min || 0]}
+                    max={500}
+                    step={10}
+                    onValueChange={([value]) =>
+                      setFilters(prev => ({
+                        ...prev,
+                        priceRange: { ...prev.priceRange!, min: value }
+                      }))
+                    }
+                  />
+                  <div className="text-sm text-gray-500">
+                    ${filters.priceRange?.min} - ${filters.priceRange?.max}
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <Label>Availability</Label>
+                  <div className="flex gap-2">
+                    <Badge
+                      variant={filters.availability === 'now' ? 'default' : 'outline'}
+                      className="cursor-pointer"
+                      onClick={() =>
+                        setFilters(prev => ({
+                          ...prev,
+                          availability: prev.availability === 'now' ? undefined : 'now'
+                        }))
+                      }
+                    >
+                      Available Now
+                    </Badge>
+                    <Badge
+                      variant={filters.availability === 'today' ? 'default' : 'outline'}
+                      className="cursor-pointer"
+                      onClick={() =>
+                        setFilters(prev => ({
+                          ...prev,
+                          availability: prev.availability === 'today' ? undefined : 'today'
+                        }))
+                      }
+                    >
+                      Available Today
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
         <div className="flex gap-2">
           <Button
@@ -113,15 +208,24 @@ export const ProviderList = ({ symptoms = "", urgency = "non-urgent" }: Provider
       </div>
 
       <div className="px-4 py-4">
-        {viewMode === 'map' ? (
+        {isLoading ? (
+          <div className="flex items-center justify-center h-48">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
+        ) : viewMode === 'map' ? (
           <div className="h-[calc(100vh-8.5rem)]">
-            <ProviderMap providers={filteredProviders} />
+            <ProviderMap providers={filteredProviders || []} />
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-4">
-            {filteredProviders.map((provider, index) => (
-              <ProviderCard key={index} {...provider} />
+            {filteredProviders?.map((provider) => (
+              <ProviderCard key={provider.id} {...provider} />
             ))}
+            {filteredProviders?.length === 0 && (
+              <div className="text-center py-8 text-gray-500">
+                No providers found matching your criteria
+              </div>
+            )}
           </div>
         )}
       </div>
