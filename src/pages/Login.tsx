@@ -18,9 +18,6 @@ const Login = () => {
         navigate("/home");
       } else if (event === "SIGNED_OUT") {
         console.log("User signed out");
-      } else if (event === "USER_DELETED") {
-        console.log("User deleted");
-        navigate("/login");
       }
     });
 
