@@ -47,7 +47,26 @@ const fetchProviders = async (filters: SearchFilters) => {
   const { data, error } = await query;
   
   if (error) throw error;
-  return data as Provider[];
+
+  // Transform profiles into Provider type
+  return (data || []).map(profile => ({
+    id: profile.id,
+    first_name: profile.first_name || '',
+    last_name: profile.last_name || '',
+    specialty: profile.specialty || 'General Practice',
+    rating: 4.5, // Placeholder - you might want to fetch this from a ratings table
+    location: [40.7128, -74.0060], // Placeholder - you might want to add location columns to profiles
+    availability: 'Available Now', // Placeholder
+    expertise: ['General Medicine'],
+    avatar_url: profile.avatar_url,
+    bio: profile.bio,
+    email: profile.email,
+    phone: profile.phone,
+    address: profile.address,
+    city: profile.city,
+    state: profile.state,
+    zip_code: profile.zip_code
+  })) as Provider[];
 };
 
 const fetchHealthcareServices = async () => {
@@ -84,7 +103,7 @@ export const ProviderList = ({ symptoms = "", urgency = "non-urgent" }: Provider
 
   const filteredProviders = providers?.filter(provider =>
     searchTerm
-      ? provider.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      ? provider.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         provider.specialty.toLowerCase().includes(searchTerm.toLowerCase())
       : true
   );

@@ -58,8 +58,8 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <NextThemesProvider attribute="class" defaultTheme="light" enableSystem>
-        <TooltipProvider>
-          <BrowserRouter>
+        <BrowserRouter>
+          <TooltipProvider>
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route path="/reset-password" element={<ResetPassword />} />
@@ -84,10 +84,10 @@ const App = () => {
                 </ProtectedRoute>
               } />
             </Routes>
-          </BrowserRouter>
-          <Toaster />
-          <Sonner />
-        </TooltipProvider>
+            <Toaster />
+            <Sonner />
+          </TooltipProvider>
+        </BrowserRouter>
       </NextThemesProvider>
     </QueryClientProvider>
   );

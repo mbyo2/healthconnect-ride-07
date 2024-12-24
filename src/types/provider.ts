@@ -1,10 +1,18 @@
 export interface Provider {
   id: string;
-  name: string;
-  specialty: string;
-  rating: number;
-  location: [number, number];  // [latitude, longitude]
+  first_name: string;
+  last_name: string;
+  specialty?: string;
+  rating?: number;
+  location?: [number, number];
   availability?: string;
   expertise?: string[];
-  image: string;  // Made required
+  avatar_url?: string;
+  bio?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  zip_code?: string;
 }
