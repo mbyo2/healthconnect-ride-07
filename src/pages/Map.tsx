@@ -9,33 +9,36 @@ import { Provider } from "@/types/provider";
 const mockProviders: Provider[] = [
   {
     id: "1",
-    name: "Dr. Sarah Johnson",
+    first_name: "Sarah",
+    last_name: "Johnson",
     specialty: "General Practitioner",
     rating: 4.9,
-    location: [40.7589, -73.9851], // Manhattan coordinates
+    location: [40.7589, -73.9851],
     availability: "Available Today",
     expertise: ["General Medicine", "Urgent Care", "Family Medicine"],
-    image: "/placeholder.svg"
+    avatar_url: "/placeholder.svg"
   },
   {
     id: "2",
-    name: "Dr. Michael Chen",
+    first_name: "Michael",
+    last_name: "Chen",
     specialty: "Emergency Medicine",
     rating: 4.8,
-    location: [40.6782, -73.9442], // Brooklyn coordinates
+    location: [40.6782, -73.9442],
     availability: "Available Now",
     expertise: ["Emergency Medicine", "Trauma Care", "Critical Care"],
-    image: "/placeholder.svg"
+    avatar_url: "/placeholder.svg"
   },
   {
     id: "3",
-    name: "Dr. Emily Williams",
+    first_name: "Emily",
+    last_name: "Williams",
     specialty: "Family Medicine",
     rating: 4.7,
-    location: [40.7282, -73.7949], // Queens coordinates
+    location: [40.7282, -73.7949],
     availability: "Available Today",
     expertise: ["Family Medicine", "Pediatrics", "Preventive Care"],
-    image: "/placeholder.svg"
+    avatar_url: "/placeholder.svg"
   },
 ];
 

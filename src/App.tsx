@@ -63,7 +63,7 @@ const App = () => {
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route path="/reset-password" element={<ResetPassword />} />
-              <Route path="/" element={<Navigate to="/login" replace />} />
+              <Route path="/" element={<Navigate to="/home" replace />} />
               <Route path="/*" element={
                 <ProtectedRoute>
                   <MobileLayout>

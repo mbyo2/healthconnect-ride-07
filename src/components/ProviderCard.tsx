@@ -5,35 +5,23 @@ import { Star, MapPin, Clock, Stethoscope, Calendar } from "lucide-react";
 import { useState } from "react";
 import { BookingModal } from "./BookingModal";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-
-interface ProviderCardProps {
-  id: string;
-  name: string;
-  specialty: string;
-  rating: number;
-  location: [number, number];
-  availability?: string;
-  image: string;
-  price?: string;
-  experience?: string;
-  expertise?: string[];
-}
+import { Provider } from "@/types/provider";
 
 export const ProviderCard = ({
-  name,
+  first_name,
+  last_name,
   specialty,
   rating,
   location,
   availability = "Available Today",
-  image,
-  price = "$100/visit",
-  experience = "5+ years",
+  avatar_url,
   expertise = [],
-}: ProviderCardProps) => {
+}: Provider) => {
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const name = `${first_name} ${last_name}`;
 
   // Format location for display
-  const locationString = `${location[0].toFixed(2)}°N, ${location[1].toFixed(2)}°W`;
+  const locationString = location ? `${location[0].toFixed(2)}°N, ${location[1].toFixed(2)}°W` : "Location not available";
 
   return (
     <>
@@ -41,9 +29,9 @@ export const ProviderCard = ({
         <CardContent className="p-4">
           <div className="flex gap-4">
             <Avatar className="w-24 h-24 rounded-xl border-2 border-primary/10">
-              <AvatarImage src={image} alt={name} className="object-cover" />
+              <AvatarImage src={avatar_url} alt={name} className="object-cover" />
               <AvatarFallback className="bg-primary/5 text-primary font-semibold">
-                {name.split(' ').map(n => n[0]).join('')}
+                {first_name[0]}{last_name[0]}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1">
@@ -57,9 +45,11 @@ export const ProviderCard = ({
                     <span className="text-sm">{specialty}</span>
                   </div>
                 </div>
-                <Badge variant="secondary" className="flex items-center gap-1 bg-yellow-50">
-                  {rating} <Star className="w-3 h-3 fill-yellow-400 stroke-yellow-400" />
-                </Badge>
+                {rating && (
+                  <Badge variant="secondary" className="flex items-center gap-1 bg-yellow-50">
+                    {rating} <Star className="w-3 h-3 fill-yellow-400 stroke-yellow-400" />
+                  </Badge>
+                )}
               </div>
               
               <div className="mt-2 space-y-1">
@@ -70,10 +60,6 @@ export const ProviderCard = ({
                 <div className="flex items-center text-gray-500 text-sm">
                   <Clock className="w-4 h-4 mr-1 text-primary/60" />
                   <span>{availability}</span>
-                </div>
-                <div className="flex items-center text-gray-500 text-sm">
-                  <Calendar className="w-4 h-4 mr-1 text-primary/60" />
-                  <span>{experience}</span>
                 </div>
               </div>
             </div>
@@ -89,8 +75,7 @@ export const ProviderCard = ({
             </div>
           )}
           
-          <div className="mt-4 flex items-center justify-between">
-            <div className="text-lg font-semibold text-primary">{price}</div>
+          <div className="mt-4 flex items-center justify-end">
             <Button 
               className="bg-primary hover:bg-primary/90 transition-colors"
               onClick={() => setIsBookingModalOpen(true)}
@@ -104,7 +89,7 @@ export const ProviderCard = ({
       <BookingModal
         isOpen={isBookingModalOpen}
         onClose={() => setIsBookingModalOpen(false)}
-        provider={{ name, specialty }}
+        provider={{ name, specialty: specialty || '' }}
       />
     </>
   );
