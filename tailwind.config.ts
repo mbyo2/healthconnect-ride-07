@@ -74,12 +74,22 @@ export default {
             transform: 'scale(0.98)',
           },
         },
+        rotate: {
+          '0%': { transform: 'rotate(0deg)' },
+          '100%': { transform: 'rotate(360deg)' },
+        },
+        "theme-toggle": {
+          "0%": { transform: "scale(0.8) rotate(-180deg)" },
+          "100%": { transform: "scale(1) rotate(0deg)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         fadeIn: "fadeIn 0.5s ease-out",
         pulse: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+        rotate: "rotate 1s linear infinite",
+        "theme-toggle": "theme-toggle 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
       },
     },
   },
