@@ -47,7 +47,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/login" replace />;
   }
 
   return <>{children}</>;
@@ -58,31 +58,34 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <NextThemesProvider attribute="class" defaultTheme="light" enableSystem>
-        <BrowserRouter>
+        <BrowserRouter basename="/">
           <TooltipProvider>
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/" element={<Navigate to="/home" replace />} />
-              <Route path="/*" element={
-                <ProtectedRoute>
-                  <MobileLayout>
-                    <Routes>
-                      <Route path="/home" element={<Index />} />
-                      <Route path="/healthcare" element={<Healthcare />} />
-                      <Route path="search" element={<Search />} />
-                      <Route path="map" element={<Map />} />
-                      <Route path="appointments" element={<Appointments />} />
-                      <Route path="chat" element={<Chat />} />
-                      <Route path="video-consultations" element={<VideoConsultations />} />
-                      <Route path="profile" element={<Profile />} />
-                      <Route path="admin" element={<AdminDashboard />} />
-                      <Route path="calendar" element={<ProviderCalendar />} />
-                      <Route path="*" element={<Navigate to="/home" replace />} />
-                    </Routes>
-                  </MobileLayout>
-                </ProtectedRoute>
-              } />
+              <Route
+                path="/*"
+                element={
+                  <ProtectedRoute>
+                    <MobileLayout>
+                      <Routes>
+                        <Route path="home" element={<Index />} />
+                        <Route path="healthcare" element={<Healthcare />} />
+                        <Route path="search" element={<Search />} />
+                        <Route path="map" element={<Map />} />
+                        <Route path="appointments" element={<Appointments />} />
+                        <Route path="chat" element={<Chat />} />
+                        <Route path="video-consultations" element={<VideoConsultations />} />
+                        <Route path="profile" element={<Profile />} />
+                        <Route path="admin" element={<AdminDashboard />} />
+                        <Route path="calendar" element={<ProviderCalendar />} />
+                        <Route path="*" element={<Navigate to="/home" replace />} />
+                      </Routes>
+                    </MobileLayout>
+                  </ProtectedRoute>
+                }
+              />
             </Routes>
             <Toaster />
             <Sonner />
