@@ -23,18 +23,18 @@ export const Header = () => {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b">
-      <div className="px-4">
+      <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent animate-fade-in">
+          <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent animate-fadeIn">
             Dokotela
           </h1>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <ThemeToggle />
             <NotificationCenter />
             <Button 
               variant="ghost" 
-              size="icon" 
-              className="h-10 w-10 hover:bg-accent transition-colors"
+              size="icon"
+              className="lg:hidden h-10 w-10 hover:bg-accent transition-colors"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
               <Menu className="h-5 w-5" />
@@ -45,10 +45,10 @@ export const Header = () => {
 
       {isMenuOpen && (
         <div className="absolute top-16 left-0 right-0 bg-background/80 backdrop-blur-md border-b shadow-lg animate-in slide-in-from-top duration-300">
-          <nav className="max-w-xl mx-auto px-4 py-2 space-y-1">
+          <nav className="container mx-auto px-4 py-2 space-y-1">
             <Button
               variant="ghost"
-              className="w-full justify-start text-foreground hover:text-primary hover:bg-accent transition-colors animate-fade-in"
+              className="w-full justify-start text-foreground hover:text-primary hover:bg-accent transition-colors animate-fadeIn"
               onClick={() => {
                 navigate("/search");
                 setIsMenuOpen(false);
@@ -58,7 +58,7 @@ export const Header = () => {
             </Button>
             <Button
               variant="ghost"
-              className="w-full justify-start text-foreground hover:text-primary hover:bg-accent transition-colors animate-fade-in"
+              className="w-full justify-start text-foreground hover:text-primary hover:bg-accent transition-colors animate-fadeIn"
               onClick={() => {
                 navigate("/profile");
                 setIsMenuOpen(false);
@@ -68,7 +68,7 @@ export const Header = () => {
             </Button>
             <Button
               variant="ghost"
-              className="w-full justify-start text-foreground hover:text-primary hover:bg-accent transition-colors animate-fade-in"
+              className="w-full justify-start text-foreground hover:text-primary hover:bg-accent transition-colors animate-fadeIn"
               onClick={() => {
                 navigate("/appointments");
                 setIsMenuOpen(false);
@@ -78,7 +78,7 @@ export const Header = () => {
             </Button>
             <Button
               variant="ghost"
-              className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10 transition-colors animate-fade-in"
+              className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10 transition-colors animate-fadeIn"
               onClick={() => {
                 handleLogout();
                 setIsMenuOpen(false);
