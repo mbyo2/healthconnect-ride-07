@@ -4,12 +4,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { Card } from "@/components/ui/card";
+import { Heart } from "lucide-react";
 
 const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if user is already logged in
+    console.log("Checking existing session...");
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
         console.log("User already logged in, redirecting to home");
@@ -22,7 +24,7 @@ const Login = () => {
       
       if (event === "SIGNED_IN" && session) {
         console.log("User signed in successfully:", session.user);
-        toast.success("Successfully signed in!");
+        toast.success("Welcome to your healthcare portal!");
         navigate("/home");
       } else if (event === "SIGNED_OUT") {
         console.log("User signed out");
@@ -38,12 +40,23 @@ const Login = () => {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h1 className="text-2xl font-bold text-center mb-6 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-            Welcome to Dokotela
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted flex items-center justify-center p-4">
+      <div className="w-full max-w-md space-y-8">
+        <div className="text-center space-y-2">
+          <div className="flex justify-center">
+            <div className="bg-primary/10 p-3 rounded-full">
+              <Heart className="h-8 w-8 text-primary" />
+            </div>
+          </div>
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+            Welcome to Your Health Portal
           </h1>
+          <p className="text-muted-foreground">
+            Access your healthcare services securely
+          </p>
+        </div>
+
+        <Card className="p-6 shadow-lg">
           <Auth
             supabaseClient={supabase}
             appearance={{
@@ -66,9 +79,18 @@ const Login = () => {
             providers={[]}
             redirectTo={`${window.location.origin}/home`}
           />
-          <p className="mt-4 text-sm text-gray-500 text-center">
-            By signing in, you agree to our Terms of Service and Privacy Policy
+        </Card>
+
+        <div className="text-center space-y-4">
+          <p className="text-sm text-muted-foreground">
+            Your health information is protected by industry-standard encryption
           </p>
+          <div className="text-xs text-muted-foreground">
+            By signing in, you agree to our{" "}
+            <a href="#" className="text-primary hover:underline">Terms of Service</a>
+            {" "}and{" "}
+            <a href="#" className="text-primary hover:underline">Privacy Policy</a>
+          </div>
         </div>
       </div>
     </div>
