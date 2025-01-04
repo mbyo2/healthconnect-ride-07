@@ -14,16 +14,16 @@ export const ThemeToggle = () => {
 
   return (
     <Button
-      variant="ghost"
+      variant="outline"
       size="icon"
       onClick={toggleTheme}
-      className="rounded-full transition-colors hover:bg-accent relative z-10 h-9 w-9 md:h-10 md:w-10"
+      className="rounded-full w-9 h-9 border-2 hover:bg-accent transition-colors relative z-10"
       aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
     >
       {theme === "dark" ? (
-        <Sun className="h-[1.2rem] w-[1.2rem] md:h-5 md:w-5 animate-theme-toggle text-yellow-500" />
+        <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-yellow-500" />
       ) : (
-        <Moon className="h-[1.2rem] w-[1.2rem] md:h-5 md:w-5 animate-theme-toggle text-slate-900 dark:text-slate-100" />
+        <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-slate-900 dark:text-slate-100" />
       )}
     </Button>
   );

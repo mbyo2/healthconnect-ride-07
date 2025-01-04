@@ -28,7 +28,7 @@ export const Header = () => {
           <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent animate-fadeIn">
             Dokotela
           </h1>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center space-x-4">
             <ThemeToggle />
             <NotificationCenter />
             <Button 
