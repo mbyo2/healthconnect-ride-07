@@ -8,8 +8,8 @@ export interface AppointmentTypes {
     status: 'scheduled' | 'cancelled' | 'completed';
     type: string;
     notes?: string;
-    created_at: string;
-    updated_at: string;
+    created_at?: string;
+    updated_at?: string;
   };
   Insert: {
     id?: string;
@@ -35,20 +35,4 @@ export interface AppointmentTypes {
     created_at?: string;
     updated_at?: string;
   };
-  Relationships: [
-    {
-      foreignKeyName: "appointments_patient_id_fkey";
-      columns: ["patient_id"];
-      isOneToOne: false;
-      referencedRelation: "profiles";
-      referencedColumns: ["id"];
-    },
-    {
-      foreignKeyName: "appointments_provider_id_fkey";
-      columns: ["provider_id"];
-      isOneToOne: false;
-      referencedRelation: "profiles";
-      referencedColumns: ["id"];
-    }
-  ];
 }

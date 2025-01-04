@@ -39,14 +39,17 @@ export const BookingModal = ({ isOpen, onClose, provider }: BookingModalProps) =
     queryKey: ['appointments', provider.id, date?.toISOString()],
     queryFn: async () => {
       if (!date) return [];
-      const { data, error } = await supabase
+      const { data: appointments, error } = await supabase
         .from('appointments')
         .select('*')
         .eq('provider_id', provider.id)
         .eq('date', date.toISOString().split('T')[0]);
       
-      if (error) throw error;
-      return data;
+      if (error) {
+        console.error('Error fetching appointments:', error);
+        return [];
+      }
+      return appointments;
     },
     enabled: !!date && !!provider.id,
   });
