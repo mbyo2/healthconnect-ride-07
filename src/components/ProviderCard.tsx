@@ -8,6 +8,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Provider } from "@/types/provider";
 
 export const ProviderCard = ({
+  id,
   first_name,
   last_name,
   specialty,
@@ -89,7 +90,7 @@ export const ProviderCard = ({
       <BookingModal
         isOpen={isBookingModalOpen}
         onClose={() => setIsBookingModalOpen(false)}
-        provider={{ name, specialty: specialty || '' }}
+        provider={{ id, name, specialty: specialty || '' }}
       />
     </>
   );

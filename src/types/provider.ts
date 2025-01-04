@@ -2,7 +2,7 @@ export interface Provider {
   id: string;
   first_name: string;
   last_name: string;
-  specialty: string;  // Making this required since it's used in filtering
+  specialty: string;
   rating?: number;
   location?: [number, number];
   availability?: string;

@@ -9,4 +9,9 @@ export interface Appointment {
   notes?: string;
   created_at: string;
   updated_at: string;
+  providers?: {
+    first_name: string;
+    last_name: string;
+    specialty: string;
+  };
 }
