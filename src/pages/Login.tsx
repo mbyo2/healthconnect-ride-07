@@ -37,6 +37,11 @@ const Login = () => {
     return () => subscription.unsubscribe();
   }, [navigate]);
 
+  const handleError = (error: Error) => {
+    console.error("Auth error:", error);
+    toast.error(error.message);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -65,10 +70,7 @@ const Login = () => {
             }}
             providers={[]}
             redirectTo={`${window.location.origin}/home`}
-            onError={(error) => {
-              console.error("Auth error:", error);
-              toast.error(error.message);
-            }}
+            onError={handleError}
           />
           <p className="mt-4 text-sm text-gray-500 text-center">
             By signing in, you agree to our Terms of Service and Privacy Policy

@@ -15,4 +15,9 @@ export interface Provider {
   city?: string;
   state?: string;
   zip_code?: string;
+  role?: string;
+  is_profile_complete?: boolean;
+  date_of_birth?: string;
+  gender?: string;
+  created_at?: string;
 }
