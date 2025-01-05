@@ -155,4 +155,4 @@ export const BookingModal = ({ isOpen, onClose, provider }: BookingModalProps) =
       </DialogContent>
     </Dialog>
   );
-});
+};
