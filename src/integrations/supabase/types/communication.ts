@@ -1,4 +1,4 @@
-import { Database } from './generated';
+import { Database } from './database';
 
 export type ChatAttachment = Database['public']['Tables']['chat_attachments']['Row'];
 export type Message = Database['public']['Tables']['messages']['Row'] & {

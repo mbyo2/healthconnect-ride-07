@@ -35,7 +35,7 @@ export const BookingModal = ({ isOpen, onClose, provider }: BookingModalProps) =
   const [timeSlot, setTimeSlot] = useState<string>("");
   const queryClient = useQueryClient();
 
-  const { data: existingAppointments } = useQuery<Appointment[]>({
+  const { data: existingAppointments = [] } = useQuery<Appointment[]>({
     queryKey: ['appointments', provider.id, date?.toISOString()],
     queryFn: async () => {
       if (!date) return [];

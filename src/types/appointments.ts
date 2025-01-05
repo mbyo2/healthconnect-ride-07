@@ -9,17 +9,12 @@ export interface Appointment {
   notes?: string;
   created_at?: string;
   updated_at?: string;
-  provider?: {
-    first_name: string;
-    last_name: string;
-    specialty: string;
-  };
 }
 
 export interface AppointmentWithProvider extends Appointment {
   provider: {
-    first_name: string;
-    last_name: string;
-    specialty: string;
+    first_name: string | null;
+    last_name: string | null;
+    specialty?: string;
   };
 }

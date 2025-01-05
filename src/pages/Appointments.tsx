@@ -9,7 +9,7 @@ import { AppointmentWithProvider } from "@/types/appointments";
 export const AppointmentsPage = () => {
   const queryClient = useQueryClient();
 
-  const { data: appointments, isLoading } = useQuery<AppointmentWithProvider[]>({
+  const { data: appointments = [], isLoading } = useQuery<AppointmentWithProvider[]>({
     queryKey: ['appointments'],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
