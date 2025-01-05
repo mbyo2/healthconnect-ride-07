@@ -7,13 +7,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Calendar } from "@/components/ui/calendar";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Appointment } from "@/integrations/supabase/types";
+import { DateSelector } from "./booking/DateSelector";
+import { TimeSelector } from "./booking/TimeSelector";
+import { Appointment } from "@/types/appointments";
 
 interface BookingModalProps {
   isOpen: boolean;
@@ -35,7 +35,6 @@ export const BookingModal = ({ isOpen, onClose, provider }: BookingModalProps) =
   const [timeSlot, setTimeSlot] = useState<string>("");
   const queryClient = useQueryClient();
 
-  // Fetch existing appointments to check availability
   const { data: existingAppointments } = useQuery<Appointment[]>({
     queryKey: ['appointments', provider.id, date?.toISOString()],
     queryFn: async () => {
@@ -47,12 +46,11 @@ export const BookingModal = ({ isOpen, onClose, provider }: BookingModalProps) =
         .eq('date', date.toISOString().split('T')[0]);
       
       if (error) throw error;
-      return data;
+      return data || [];
     },
     enabled: !!date && !!provider.id,
   });
 
-  // Create appointment mutation
   const createAppointment = useMutation({
     mutationFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -96,7 +94,6 @@ export const BookingModal = ({ isOpen, onClose, provider }: BookingModalProps) =
     createAppointment.mutate();
   };
 
-  // Filter out already booked time slots
   const availableTimeSlots = timeSlots.filter(slot => {
     return !existingAppointments?.some(apt => apt.time === slot);
   });
@@ -111,35 +108,12 @@ export const BookingModal = ({ isOpen, onClose, provider }: BookingModalProps) =
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
-          <div className="grid gap-2">
-            <label className="text-sm font-medium">Select Date</label>
-            <Calendar
-              mode="single"
-              selected={date}
-              onSelect={setDate}
-              className="rounded-md border"
-              disabled={(date) => 
-                date < new Date() || 
-                date.getDay() === 0 || 
-                date.getDay() === 6
-              }
-            />
-          </div>
-          <div className="grid gap-2">
-            <label className="text-sm font-medium">Select Time</label>
-            <Select onValueChange={setTimeSlot} value={timeSlot}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a time slot" />
-              </SelectTrigger>
-              <SelectContent>
-                {availableTimeSlots.map((slot) => (
-                  <SelectItem key={slot} value={slot}>
-                    {slot}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          <DateSelector date={date} onDateSelect={setDate} />
+          <TimeSelector 
+            availableTimeSlots={availableTimeSlots}
+            selectedTime={timeSlot}
+            onTimeSelect={setTimeSlot}
+          />
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>

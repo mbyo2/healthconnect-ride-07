@@ -4,14 +4,7 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Appointment } from "@/integrations/supabase/types";
-
-interface AppointmentWithProvider extends Appointment {
-  provider: {
-    first_name: string;
-    last_name: string;
-  };
-}
+import { AppointmentWithProvider } from "@/types/appointments";
 
 export const AppointmentsPage = () => {
   const queryClient = useQueryClient();
@@ -24,12 +17,15 @@ export const AppointmentsPage = () => {
 
       const { data, error } = await supabase
         .from('appointments')
-        .select('*, provider:profiles(first_name, last_name)')
+        .select(`
+          *,
+          provider:profiles(first_name, last_name)
+        `)
         .eq('patient_id', user.id)
         .order('date', { ascending: true });
 
       if (error) throw error;
-      return data;
+      return data || [];
     }
   });
 
@@ -56,23 +52,21 @@ export const AppointmentsPage = () => {
       <h1 className="text-2xl font-bold mb-4">Your Appointments</h1>
       {isLoading ? (
         <p>Loading...</p>
-      ) : (
-        appointments?.map((appointment) => (
-          <Card key={appointment.id} className="mb-4 p-4">
-            <h2 className="text-lg font-semibold">
-              Dr. {appointment.provider.first_name} {appointment.provider.last_name}
-            </h2>
-            <p>{appointment.type} on {format(new Date(appointment.date), 'MMMM dd, yyyy')} at {appointment.time}</p>
-            <Button
-              variant="destructive"
-              onClick={() => cancelAppointment.mutate(appointment.id)}
-              disabled={appointment.status === 'cancelled'}
-            >
-              Cancel Appointment
-            </Button>
-          </Card>
-        ))
-      )}
+      ) : appointments?.map((appointment) => (
+        <Card key={appointment.id} className="mb-4 p-4">
+          <h2 className="text-lg font-semibold">
+            Dr. {appointment.provider.first_name} {appointment.provider.last_name}
+          </h2>
+          <p>{appointment.type} on {format(new Date(appointment.date), 'MMMM dd, yyyy')} at {appointment.time}</p>
+          <Button
+            variant="destructive"
+            onClick={() => cancelAppointment.mutate(appointment.id)}
+            disabled={appointment.status === 'cancelled'}
+          >
+            Cancel Appointment
+          </Button>
+        </Card>
+      ))}
     </div>
   );
 };
