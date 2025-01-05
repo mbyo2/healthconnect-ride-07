@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Appointment } from "@/integrations/supabase/types";
 
 interface BookingModalProps {
   isOpen: boolean;
@@ -35,21 +36,18 @@ export const BookingModal = ({ isOpen, onClose, provider }: BookingModalProps) =
   const queryClient = useQueryClient();
 
   // Fetch existing appointments to check availability
-  const { data: existingAppointments } = useQuery({
+  const { data: existingAppointments } = useQuery<Appointment[]>({
     queryKey: ['appointments', provider.id, date?.toISOString()],
     queryFn: async () => {
       if (!date) return [];
-      const { data: appointments, error } = await supabase
+      const { data, error } = await supabase
         .from('appointments')
         .select('*')
         .eq('provider_id', provider.id)
         .eq('date', date.toISOString().split('T')[0]);
       
-      if (error) {
-        console.error('Error fetching appointments:', error);
-        return [];
-      }
-      return appointments;
+      if (error) throw error;
+      return data;
     },
     enabled: !!date && !!provider.id,
   });
@@ -157,4 +155,4 @@ export const BookingModal = ({ isOpen, onClose, provider }: BookingModalProps) =
       </DialogContent>
     </Dialog>
   );
-};
+});

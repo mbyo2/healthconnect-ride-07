@@ -1,16 +1,9 @@
 import { Database as GeneratedDatabase } from './generated';
-import { AppointmentTypes } from './appointments';
 
-export interface Database extends GeneratedDatabase {
-  public: {
-    Tables: {
-      appointments: AppointmentTypes;
-    } & GeneratedDatabase['public']['Tables'];
-    Views: GeneratedDatabase['public']['Views'];
-    Functions: GeneratedDatabase['public']['Functions'];
-    Enums: GeneratedDatabase['public']['Enums'];
-    CompositeTypes: GeneratedDatabase['public']['CompositeTypes'];
-  };
-}
+export type Database = GeneratedDatabase;
 
-export type { AppointmentTypes };
+export type Tables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Row'];
+export type Enums<T extends keyof Database['public']['Enums']> = Database['public']['Enums'][T];
+
+export type UserRole = Enums<'user_role'>;
+export type Appointment = Tables<'appointments'>;

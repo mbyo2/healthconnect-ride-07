@@ -2,6 +2,7 @@ import { useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import { Provider } from '@/types/provider';
 
 // Fix leaflet marker icon issue
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -11,8 +12,13 @@ L.Icon.Default.mergeOptions({
   shadowUrl: '/marker-shadow.png',
 });
 
-export const ProviderMap = ({ providers, onMarkerClick }) => {
-  const mapRef = useRef();
+interface ProviderMapProps {
+  providers: Provider[];
+  onMarkerClick: (provider: Provider) => void;
+}
+
+export const ProviderMap = ({ providers, onMarkerClick }: ProviderMapProps) => {
+  const mapRef = useRef<L.Map>();
   const defaultPosition: [number, number] = [51.505, -0.09];
 
   return (
@@ -20,8 +26,8 @@ export const ProviderMap = ({ providers, onMarkerClick }) => {
       ref={mapRef}
       style={{ height: '400px', width: '100%' }}
       className="rounded-lg border"
-      center={defaultPosition}
-      zoom={13}
+      defaultCenter={defaultPosition}
+      defaultZoom={13}
       scrollWheelZoom={false}
     >
       <TileLayer
@@ -31,14 +37,14 @@ export const ProviderMap = ({ providers, onMarkerClick }) => {
       {providers.map((provider) => (
         <Marker
           key={provider.id}
-          position={[provider.latitude || defaultPosition[0], provider.longitude || defaultPosition[1]]}
+          position={[provider.location?.[0] || defaultPosition[0], provider.location?.[1] || defaultPosition[1]]}
           eventHandlers={{
             click: () => onMarkerClick(provider),
           }}
         >
           <Popup>
             <div className="p-2">
-              <h3 className="font-semibold">{provider.name}</h3>
+              <h3 className="font-semibold">{provider.first_name} {provider.last_name}</h3>
               <p className="text-sm text-gray-600">{provider.specialty}</p>
             </div>
           </Popup>

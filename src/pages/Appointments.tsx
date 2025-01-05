@@ -4,25 +4,32 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { AppointmentTypes } from "@/integrations/supabase/types/appointments";
+import { Appointment } from "@/integrations/supabase/types";
+
+interface AppointmentWithProvider extends Appointment {
+  provider: {
+    first_name: string;
+    last_name: string;
+  };
+}
 
 export const AppointmentsPage = () => {
   const queryClient = useQueryClient();
 
-  const { data: appointments, isLoading } = useQuery({
+  const { data: appointments, isLoading } = useQuery<AppointmentWithProvider[]>({
     queryKey: ['appointments'],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('User not authenticated');
 
-      const { data: appointments, error } = await supabase
+      const { data, error } = await supabase
         .from('appointments')
-        .select('*, provider:profiles(*)')
+        .select('*, provider:profiles(first_name, last_name)')
         .eq('patient_id', user.id)
         .order('date', { ascending: true });
 
       if (error) throw error;
-      return appointments as (AppointmentTypes['Row'] & { provider: any })[];
+      return data;
     }
   });
 
@@ -53,12 +60,13 @@ export const AppointmentsPage = () => {
         appointments?.map((appointment) => (
           <Card key={appointment.id} className="mb-4 p-4">
             <h2 className="text-lg font-semibold">
-              {appointment.provider.first_name} {appointment.provider.last_name}
+              Dr. {appointment.provider.first_name} {appointment.provider.last_name}
             </h2>
             <p>{appointment.type} on {format(new Date(appointment.date), 'MMMM dd, yyyy')} at {appointment.time}</p>
             <Button
               variant="destructive"
               onClick={() => cancelAppointment.mutate(appointment.id)}
+              disabled={appointment.status === 'cancelled'}
             >
               Cancel Appointment
             </Button>
