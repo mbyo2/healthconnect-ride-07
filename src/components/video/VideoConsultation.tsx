@@ -11,22 +11,10 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-
-interface Consultation {
-  id: string;
-  provider_id: string;
-  scheduled_start: string;
-  scheduled_end: string;
-  status: string;
-  meeting_url: string | null;
-  provider: {
-    first_name: string | null;
-    last_name: string | null;
-  };
-}
+import { VideoCall } from "@/types/communication";
 
 export const VideoConsultation = () => {
-  const [consultations, setConsultations] = useState<Consultation[]>([]);
+  const [consultations, setConsultations] = useState<VideoCall[]>([]);
   const [loading, setLoading] = useState(true);
   const [date, setDate] = useState<Date | undefined>(new Date());
 
@@ -39,12 +27,7 @@ export const VideoConsultation = () => {
         const { data, error } = await supabase
           .from('video_consultations')
           .select(`
-            id,
-            provider_id,
-            scheduled_start,
-            scheduled_end,
-            status,
-            meeting_url,
+            *,
             provider:profiles!video_consultations_provider_id_fkey(
               first_name,
               last_name
@@ -63,6 +46,22 @@ export const VideoConsultation = () => {
     };
 
     fetchConsultations();
+
+    // Subscribe to consultation updates
+    const channel = supabase
+      .channel('video_consultations')
+      .on('postgres_changes', 
+        { event: '*', schema: 'public', table: 'video_consultations' },
+        (payload) => {
+          console.log('Video consultation update:', payload);
+          fetchConsultations();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const joinMeeting = (meetingUrl: string) => {
