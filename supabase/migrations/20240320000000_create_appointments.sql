@@ -1,49 +1,41 @@
-create table if not exists public.appointments (
-    id uuid default gen_random_uuid() primary key,
-    patient_id uuid references auth.users(id) on delete cascade not null,
-    provider_id uuid references auth.users(id) on delete cascade not null,
-    date date not null,
-    time text not null,
-    status text not null default 'scheduled',
-    type text not null,
-    notes text,
-    created_at timestamp with time zone default timezone('utc'::text, now()) not null,
-    updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+-- Create appointments table
+CREATE TABLE IF NOT EXISTS public.appointments (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    patient_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    provider_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    date DATE NOT NULL,
+    time TIME NOT NULL,
+    status VARCHAR(20) DEFAULT 'scheduled' CHECK (status IN ('scheduled', 'cancelled', 'completed')),
+    type VARCHAR(100) NOT NULL,
+    notes TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW())
 );
 
 -- Add RLS policies
-alter table public.appointments enable row level security;
+ALTER TABLE public.appointments ENABLE ROW LEVEL SECURITY;
 
--- Patients can view their own appointments
-create policy "Users can view own appointments"
-    on appointments for select
-    using (auth.uid() = patient_id);
+CREATE POLICY "Users can view their own appointments"
+    ON public.appointments
+    FOR SELECT
+    USING (
+        auth.uid() = patient_id 
+        OR 
+        auth.uid() = provider_id
+    );
 
--- Providers can view appointments where they are the provider
-create policy "Providers can view their appointments"
-    on appointments for select
-    using (auth.uid() = provider_id);
+CREATE POLICY "Users can create their own appointments"
+    ON public.appointments
+    FOR INSERT
+    WITH CHECK (
+        auth.uid() = patient_id
+    );
 
--- Patients can create appointments
-create policy "Users can create appointments"
-    on appointments for insert
-    with check (auth.uid() = patient_id);
-
--- Patients can update their own appointments
-create policy "Users can update own appointments"
-    on appointments for update
-    using (auth.uid() = patient_id);
-
--- Create updated_at trigger
-create or replace function public.handle_updated_at()
-returns trigger as $$
-begin
-    new.updated_at = now();
-    return new;
-end;
-$$ language plpgsql;
-
-create trigger appointments_handle_updated_at
-    before update on public.appointments
-    for each row
-    execute function public.handle_updated_at();
+CREATE POLICY "Users can update their own appointments"
+    ON public.appointments
+    FOR UPDATE
+    USING (
+        auth.uid() = patient_id 
+        OR 
+        auth.uid() = provider_id
+    );
