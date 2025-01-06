@@ -26,4 +26,8 @@ export interface VideoCall {
   scheduled_end: string;
   status: 'scheduled' | 'active' | 'completed' | 'cancelled';
   meeting_url?: string;
+  provider: {
+    first_name: string | null;
+    last_name: string | null;
+  };
 }
