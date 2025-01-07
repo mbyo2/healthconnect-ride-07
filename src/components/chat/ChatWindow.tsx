@@ -1,12 +1,10 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { MessageSquare, Paperclip } from "lucide-react";
+import { MessageSquare } from "lucide-react";
 import { toast } from "sonner";
-import { FileUploader } from "./FileUploader";
 import { Message } from "@/types/communication";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { MessageList } from "./MessageList";
+import { MessageInput } from "./MessageInput";
 
 interface ChatWindowProps {
   providerId: string;
@@ -14,7 +12,6 @@ interface ChatWindowProps {
 
 export const ChatWindow = ({ providerId }: ChatWindowProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -41,7 +38,6 @@ export const ChatWindow = ({ providerId }: ChatWindowProps) => {
 
     fetchMessages();
 
-    // Subscribe to new messages
     const channel = supabase
       .channel('messages')
       .on('postgres_changes', 
@@ -58,10 +54,7 @@ export const ChatWindow = ({ providerId }: ChatWindowProps) => {
     };
   }, [providerId]);
 
-  const sendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newMessage.trim()) return;
-
+  const sendMessage = async (content: string) => {
     setLoading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -70,14 +63,12 @@ export const ChatWindow = ({ providerId }: ChatWindowProps) => {
       const { error } = await supabase
         .from('messages')
         .insert({
-          content: newMessage,
+          content,
           sender_id: user.id,
           receiver_id: providerId,
         });
 
       if (error) throw error;
-
-      setNewMessage("");
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -113,47 +104,13 @@ export const ChatWindow = ({ providerId }: ChatWindowProps) => {
         <h2 className="font-semibold">Chat with Provider</h2>
       </div>
 
-      <ScrollArea className="flex-1 p-4">
-        <div className="space-y-4">
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`p-2 rounded-lg max-w-[80%] ${
-                message.sender_id === providerId
-                  ? "bg-gray-100 ml-auto"
-                  : "bg-blue-100"
-              }`}
-            >
-              <div>{message.content}</div>
-              {message.attachments?.map((attachment) => (
-                <a
-                  key={attachment.id}
-                  href={attachment.file_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-blue-600 hover:underline flex items-center gap-1 mt-1"
-                >
-                  <Paperclip className="h-3 w-3" />
-                  {attachment.file_name}
-                </a>
-              ))}
-            </div>
-          ))}
-        </div>
-      </ScrollArea>
+      <MessageList messages={messages} providerId={providerId} />
 
-      <form onSubmit={sendMessage} className="p-4 border-t flex gap-2">
-        <Input
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          placeholder="Type your message..."
-          disabled={loading}
-        />
-        <FileUploader onUploadComplete={handleFileUpload} />
-        <Button type="submit" disabled={loading}>
-          Send
-        </Button>
-      </form>
+      <MessageInput
+        onSendMessage={sendMessage}
+        onUploadComplete={handleFileUpload}
+        loading={loading}
+      />
     </div>
   );
 };
