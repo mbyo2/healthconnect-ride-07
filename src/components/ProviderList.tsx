@@ -10,7 +10,7 @@ export const ProviderList = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('profiles')
-        .select('*')
+        .select('*, specialty')
         .eq('role', 'health_personnel');
       
       if (error) throw error;
@@ -23,7 +23,8 @@ export const ProviderList = () => {
         bio: profile.bio,
         avatar_url: profile.avatar_url,
         location: [51.505, -0.09], // Default location for demo
-        expertise: ['General Medicine', 'Primary Care']
+        expertise: ['General Medicine', 'Primary Care'],
+        name: `${profile.first_name || ''} ${profile.last_name || ''}` // Add name field
       }));
     }
   });

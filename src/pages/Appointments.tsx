@@ -19,13 +19,17 @@ export const AppointmentsPage = () => {
         .from('appointments')
         .select(`
           *,
-          provider:profiles(first_name, last_name)
+          provider:profiles!appointments_provider_id_fkey (
+            first_name,
+            last_name,
+            specialty
+          )
         `)
         .eq('patient_id', user.id)
         .order('date', { ascending: true });
 
       if (error) throw error;
-      return data || [];
+      return data as AppointmentWithProvider[];
     }
   });
 

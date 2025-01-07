@@ -22,10 +22,10 @@ export const ProviderMap = ({ providers, onMarkerClick }: ProviderMapProps) => {
 
   return (
     <MapContainer
-      ref={mapRef}
+      ref={mapRef as any}
       style={{ height: '400px', width: '100%' }}
       className="rounded-lg border"
-      center={defaultPosition}
+      defaultCenter={defaultPosition}
       zoom={13}
       scrollWheelZoom={false}
     >

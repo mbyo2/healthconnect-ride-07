@@ -20,4 +20,5 @@ export interface Provider {
   date_of_birth?: string;
   gender?: string;
   created_at?: string;
+  name?: string; // Added for ProviderCard
 }
