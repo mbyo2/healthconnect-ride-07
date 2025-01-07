@@ -1,9 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import "https://deno.land/x/xhr@0.1.0/mod.ts";
-
-const DPO_COMPANY_TOKEN = Deno.env.get('DPO_COMPANY_TOKEN');
-const DPO_TEST_URL = "https://secure.3gdirectpay.com/API/v6/";
-const DPO_LIVE_URL = "https://secure.3gdirectpay.com/API/v6/";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -26,41 +22,15 @@ serve(async (req) => {
   }
 
   try {
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+
     const { amount, currency, patientId, providerId, serviceId, redirectUrl } = await req.json() as PaymentRequest;
 
-    // Create payment request to DPO
-    const paymentRequest = {
-      CompanyToken: DPO_COMPANY_TOKEN,
-      Amount: amount,
-      Currency: currency,
-      RedirectURL: redirectUrl,
-      BackURL: redirectUrl,
-      CompanyRefUnique: `PAY-${Date.now()}-${patientId}`,
-      CustomerEmail: "patient@example.com", // You should get this from the patient's profile
-      CustomerFirstName: "Patient", // You should get this from the patient's profile
-      CustomerLastName: "Name", // You should get this from the patient's profile
-      ServiceDescription: "Healthcare Service Payment",
-    };
-
-    console.log('Sending payment request to DPO:', paymentRequest);
-
-    const response = await fetch(`${DPO_TEST_URL}/createToken`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(paymentRequest),
-    });
-
-    const dpoResponse = await response.json();
-    console.log('DPO response:', dpoResponse);
-
-    if (dpoResponse.Result !== '000') {
-      throw new Error(`DPO Error: ${dpoResponse.ResultExplanation}`);
-    }
-
-    // Create payment record in our database
-    const { data: payment, error: paymentError } = await supabase
+    // Create payment record in our database first
+    const { data: payment, error: paymentError } = await supabaseClient
       .from('payments')
       .insert({
         patient_id: patientId,
@@ -69,18 +39,23 @@ serve(async (req) => {
         amount: amount,
         status: 'pending',
         payment_method: 'dpo',
-        invoice_number: paymentRequest.CompanyRefUnique,
+        invoice_number: `PAY-${Date.now()}-${patientId}`,
       })
       .select()
       .single();
 
     if (paymentError) throw paymentError;
 
+    // DPO API integration will be added here once API key is provided
+    // For now, we'll return a mock payment URL
+    const mockPaymentUrl = `https://secure.3gdirectpay.com/payv3.asp?ID=mock-${payment.id}`;
+
+    console.log('Payment record created:', payment);
+
     return new Response(
       JSON.stringify({
         success: true,
-        transToken: dpoResponse.TransToken,
-        paymentUrl: `${DPO_TEST_URL}/paymentPage/${dpoResponse.TransToken}`,
+        paymentUrl: mockPaymentUrl,
         paymentId: payment.id,
       }),
       {
@@ -88,7 +63,7 @@ serve(async (req) => {
       }
     );
   } catch (error) {
-    console.error('Error processing DPO payment:', error);
+    console.error('Error processing payment:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
       {
