@@ -1,4 +1,9 @@
 project_id = "tthzcijscedgxjfnfnky"
 
-[process-dpo-payment]
-verify_jwt = true
+[api]
+enabled = true
+url = "https://tthzcijscedgxjfnfnky.supabase.co/functions/v1"
+
+[[fetch.resources]]
+name = "resend"
+url = "https://api.resend.com"
