@@ -15,6 +15,6 @@ export interface AppointmentWithProvider extends Appointment {
   provider: {
     first_name: string | null;
     last_name: string | null;
-    specialty?: string;
+    specialty?: string | null;
   };
 }

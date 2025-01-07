@@ -1,84 +1,57 @@
-import { Header } from "@/components/Header";
-import { ProviderMap } from "@/components/ProviderMap";
-import { ProviderList } from "@/components/ProviderList";
-import { Button } from "@/components/ui/button";
-import { MapPin, List } from "lucide-react";
-import { useState } from "react";
-import { Provider } from "@/types/provider";
+import { useState } from 'react';
+import { ProviderMap } from '@/components/ProviderMap';
+import { ProviderList } from '@/components/ProviderList';
+import { Provider } from '@/types/provider';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
-const mockProviders: Provider[] = [
-  {
-    id: "1",
-    first_name: "Sarah",
-    last_name: "Johnson",
-    specialty: "General Practitioner",
-    rating: 4.9,
-    location: [40.7589, -73.9851],
-    availability: "Available Today",
-    expertise: ["General Medicine", "Urgent Care", "Family Medicine"],
-    avatar_url: "/placeholder.svg"
-  },
-  {
-    id: "2",
-    first_name: "Michael",
-    last_name: "Chen",
-    specialty: "Emergency Medicine",
-    rating: 4.8,
-    location: [40.6782, -73.9442],
-    availability: "Available Now",
-    expertise: ["Emergency Medicine", "Trauma Care", "Critical Care"],
-    avatar_url: "/placeholder.svg"
-  },
-  {
-    id: "3",
-    first_name: "Emily",
-    last_name: "Williams",
-    specialty: "Family Medicine",
-    rating: 4.7,
-    location: [40.7282, -73.7949],
-    availability: "Available Today",
-    expertise: ["Family Medicine", "Pediatrics", "Preventive Care"],
-    avatar_url: "/placeholder.svg"
-  },
-];
+export const MapPage = () => {
+  const [selectedProvider, setSelectedProvider] = useState<Provider | null>(null);
 
-const Map = () => {
-  const [viewMode, setViewMode] = useState<'map' | 'list'>('map');
+  const { data: providers = [] } = useQuery({
+    queryKey: ['providers'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('role', 'health_personnel');
+      
+      if (error) throw error;
+      
+      return data.map((profile): Provider => ({
+        id: profile.id,
+        first_name: profile.first_name || '',
+        last_name: profile.last_name || '',
+        specialty: profile.specialty || 'General Practice',
+        bio: profile.bio,
+        avatar_url: profile.avatar_url,
+        location: [51.505, -0.09], // Default location for demo
+        expertise: ['General Medicine', 'Primary Care']
+      }));
+    }
+  });
+
+  const handleMarkerClick = (provider: Provider) => {
+    setSelectedProvider(provider);
+    // Additional logic for handling marker click
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header />
-      <main className="pt-14">
-        <div className="p-4">
-          <div className="flex gap-2 mb-4">
-            <Button
-              variant={viewMode === 'map' ? 'default' : 'outline'}
-              onClick={() => setViewMode('map')}
-              className="flex-1 flex items-center justify-center gap-2"
-            >
-              <MapPin className="h-4 w-4" />
-              Map View
-            </Button>
-            <Button
-              variant={viewMode === 'list' ? 'default' : 'outline'}
-              onClick={() => setViewMode('list')}
-              className="flex-1 flex items-center justify-center gap-2"
-            >
-              <List className="h-4 w-4" />
-              List View
-            </Button>
-          </div>
-          {viewMode === 'map' ? (
-            <div className="h-[calc(100vh-8.5rem)]">
-              <ProviderMap providers={mockProviders} />
-            </div>
-          ) : (
-            <ProviderList />
-          )}
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4">Find Healthcare Providers</h1>
+      <div className="grid gap-4 md:grid-cols-2">
+        <div>
+          <ProviderMap 
+            providers={providers} 
+            onMarkerClick={handleMarkerClick}
+          />
         </div>
-      </main>
+        <div>
+          <ProviderList />
+        </div>
+      </div>
     </div>
   );
 };
 
-export default Map;
+export default MapPage;

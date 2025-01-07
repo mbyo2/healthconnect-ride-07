@@ -43,10 +43,11 @@ export const BookingModal = ({ isOpen, onClose, provider }: BookingModalProps) =
         .from('appointments')
         .select('*')
         .eq('provider_id', provider.id)
-        .eq('date', date.toISOString().split('T')[0]);
+        .eq('date', date.toISOString().split('T')[0])
+        .eq('status', 'scheduled');
       
       if (error) throw error;
-      return data || [];
+      return data as Appointment[];
     },
     enabled: !!date && !!provider.id,
   });
@@ -65,7 +66,7 @@ export const BookingModal = ({ isOpen, onClose, provider }: BookingModalProps) =
             patient_id: user.id,
             date: date.toISOString().split('T')[0],
             time: timeSlot,
-            status: 'scheduled',
+            status: 'scheduled' as const,
             type: 'consultation',
           }
         ])
