@@ -1,11 +1,26 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Modal } from "@/components/ui/modal";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@/components/ui/modal";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { sendEmail } from "@/utils/email";
+import { Provider } from "@/types/provider";
 
-export const BookingModal = ({ isOpen, onClose, provider, selectedDate, selectedTime }) => {
+interface BookingModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  provider: Provider;
+  selectedDate?: string;
+  selectedTime?: string;
+}
+
+export const BookingModal = ({ 
+  isOpen, 
+  onClose, 
+  provider, 
+  selectedDate = new Date().toISOString().split('T')[0],
+  selectedTime = "09:00"
+}: BookingModalProps) => {
   const [loading, setLoading] = useState(false);
 
   const handleBookAppointment = async () => {
@@ -22,12 +37,11 @@ export const BookingModal = ({ isOpen, onClose, provider, selectedDate, selected
           date: selectedDate,
           time: selectedTime,
           status: 'scheduled',
-          type: 'general', // Adjust as necessary
+          type: 'general',
         });
 
       if (error) throw error;
 
-      // Send confirmation email
       await sendEmail({
         type: "appointment_reminder",
         to: [user.email!],
@@ -52,17 +66,19 @@ export const BookingModal = ({ isOpen, onClose, provider, selectedDate, selected
   };
 
   return (
-    <Modal open={isOpen} onClose={onClose}>
-      <Modal.Header>Book Appointment</Modal.Header>
-      <Modal.Body>
-        <p>Are you sure you want to book an appointment with Dr. {provider.first_name} {provider.last_name} on {selectedDate} at {selectedTime}?</p>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="outline" onClick={onClose}>Cancel</Button>
-        <Button onClick={handleBookAppointment} disabled={loading}>
-          {loading ? "Booking..." : "Confirm Booking"}
-        </Button>
-      </Modal.Footer>
+    <Modal open={isOpen} onOpenChange={onClose}>
+      <ModalContent>
+        <ModalHeader>Book Appointment</ModalHeader>
+        <ModalBody>
+          <p>Are you sure you want to book an appointment with Dr. {provider.first_name} {provider.last_name} on {selectedDate} at {selectedTime}?</p>
+        </ModalBody>
+        <ModalFooter>
+          <Button variant="outline" onClick={onClose}>Cancel</Button>
+          <Button onClick={handleBookAppointment} disabled={loading}>
+            {loading ? "Booking..." : "Confirm Booking"}
+          </Button>
+        </ModalFooter>
+      </ModalContent>
     </Modal>
   );
 };

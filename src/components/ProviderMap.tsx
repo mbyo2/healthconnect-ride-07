@@ -4,7 +4,6 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { Provider } from '@/types/provider';
 
-// Fix leaflet marker icon issue
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: '/marker-icon-2x.png',
@@ -32,12 +31,12 @@ export const ProviderMap = ({ providers, onMarkerClick }: ProviderMapProps) => {
     >
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        attributionUrl='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       />
       {providers.map((provider) => (
         <Marker
           key={provider.id}
-          position={[provider.location?.[0] || defaultPosition[0], provider.location?.[1] || defaultPosition[1]]}
+          position={provider.location || defaultPosition}
           eventHandlers={{
             click: () => onMarkerClick(provider),
           }}

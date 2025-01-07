@@ -5,7 +5,7 @@ import { Provider } from '@/types/provider';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
-export const MapPage = () => {
+const MapPage = () => {
   const [selectedProvider, setSelectedProvider] = useState<Provider | null>(null);
 
   const { data: providers = [] } = useQuery({
