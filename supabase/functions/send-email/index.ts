@@ -1,4 +1,9 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import {
+  appointmentReminderTemplate,
+  paymentConfirmationTemplate,
+  registrationConfirmationTemplate,
+} from "./templates.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND");
 
@@ -8,11 +13,12 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
+type EmailType = "appointment_reminder" | "payment_confirmation" | "registration_confirmation";
+
 interface EmailRequest {
+  type: EmailType;
   to: string[];
-  subject: string;
-  html: string;
-  from?: string;
+  data: Record<string, any>;
 }
 
 serve(async (req) => {
@@ -23,7 +29,28 @@ serve(async (req) => {
 
   try {
     const emailRequest: EmailRequest = await req.json();
-    console.log("Sending email with request:", emailRequest);
+    console.log("Processing email request:", emailRequest);
+
+    let subject: string;
+    let html: string;
+
+    // Generate email content based on type
+    switch (emailRequest.type) {
+      case "appointment_reminder":
+        subject = "Appointment Reminder";
+        html = appointmentReminderTemplate(emailRequest.data);
+        break;
+      case "payment_confirmation":
+        subject = "Payment Confirmation";
+        html = paymentConfirmationTemplate(emailRequest.data);
+        break;
+      case "registration_confirmation":
+        subject = "Welcome to Dokotela";
+        html = registrationConfirmationTemplate(emailRequest.data);
+        break;
+      default:
+        throw new Error("Invalid email type");
+    }
 
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -32,10 +59,10 @@ serve(async (req) => {
         Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: emailRequest.from || "Healthcare Portal <no-reply@yourdomain.com>",
+        from: "Dokotela <notifications@dokotela.com>",
         to: emailRequest.to,
-        subject: emailRequest.subject,
-        html: emailRequest.html,
+        subject,
+        html,
       }),
     });
 

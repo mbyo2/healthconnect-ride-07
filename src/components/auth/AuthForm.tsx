@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { ProfileSetup } from "./ProfileSetup";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { sendEmail } from "@/utils/email";
 
 export const AuthForm = () => {
   const navigate = useNavigate();
@@ -48,6 +49,18 @@ export const AuthForm = () => {
           console.log("User signed out");
           setUser(null);
           setShowProfileSetup(false);
+        } else if (event === "SIGNED_UP" && session?.user) {
+          try {
+            await sendEmail({
+              type: "registration_confirmation",
+              to: [session.user.email!],
+              data: {
+                first_name: session.user.user_metadata?.first_name || "User",
+              },
+            });
+          } catch (error) {
+            console.error("Error sending welcome email:", error);
+          }
         }
       }
     );

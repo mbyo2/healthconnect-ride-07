@@ -1,133 +1,68 @@
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { useState } from "react";
-import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Modal } from "@/components/ui/modal";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { DateSelector } from "./booking/DateSelector";
-import { TimeSelector } from "./booking/TimeSelector";
-import { Appointment } from "@/types/appointments";
+import { toast } from "sonner";
+import { sendEmail } from "@/utils/email";
 
-interface BookingModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  provider: {
-    id: string;
-    name: string;
-    specialty: string;
-  };
-}
+export const BookingModal = ({ isOpen, onClose, provider, selectedDate, selectedTime }) => {
+  const [loading, setLoading] = useState(false);
 
-const timeSlots = [
-  "09:00 AM", "10:00 AM", "11:00 AM",
-  "02:00 PM", "03:00 PM", "04:00 PM"
-];
-
-export const BookingModal = ({ isOpen, onClose, provider }: BookingModalProps) => {
-  const [date, setDate] = useState<Date | undefined>(undefined);
-  const [timeSlot, setTimeSlot] = useState<string>("");
-  const queryClient = useQueryClient();
-
-  const { data: existingAppointments = [] } = useQuery<Appointment[]>({
-    queryKey: ['appointments', provider.id, date?.toISOString()],
-    queryFn: async () => {
-      if (!date) return [];
-      const { data, error } = await supabase
-        .from('appointments')
-        .select('*')
-        .eq('provider_id', provider.id)
-        .eq('date', date.toISOString().split('T')[0])
-        .eq('status', 'scheduled');
-      
-      if (error) throw error;
-      return data as Appointment[];
-    },
-    enabled: !!date && !!provider.id,
-  });
-
-  const createAppointment = useMutation({
-    mutationFn: async () => {
+  const handleBookAppointment = async () => {
+    setLoading(true);
+    try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('User not authenticated');
-      if (!date || !timeSlot) throw new Error('Please select date and time');
+      if (!user) throw new Error("User not authenticated");
 
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('appointments')
-        .insert([
-          {
-            provider_id: provider.id,
-            patient_id: user.id,
-            date: date.toISOString().split('T')[0],
-            time: timeSlot,
-            status: 'scheduled' as const,
-            type: 'consultation',
-          }
-        ])
-        .select()
-        .single();
+        .insert({
+          patient_id: user.id,
+          provider_id: provider.id,
+          date: selectedDate,
+          time: selectedTime,
+          status: 'scheduled',
+          type: 'general', // Adjust as necessary
+        });
 
       if (error) throw error;
-      return data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['appointments'] });
-      toast.success("Appointment booked successfully!", {
-        description: `Your appointment with ${provider.name} is scheduled for ${date?.toLocaleDateString()} at ${timeSlot}`,
+
+      // Send confirmation email
+      await sendEmail({
+        type: "appointment_reminder",
+        to: [user.email!],
+        data: {
+          date: selectedDate,
+          time: selectedTime,
+          provider: {
+            first_name: provider.first_name,
+            last_name: provider.last_name,
+          },
+        },
       });
+
+      toast.success("Appointment booked successfully!");
       onClose();
-    },
-    onError: (error) => {
-      console.error('Booking error:', error);
-      toast.error("Failed to book appointment", {
-        description: "Please try again later or contact support.",
-      });
-    },
-  });
-
-  const handleBooking = () => {
-    createAppointment.mutate();
+    } catch (error) {
+      console.error("Error booking appointment:", error);
+      toast.error("Failed to book appointment");
+    } finally {
+      setLoading(false);
+    }
   };
-
-  const availableTimeSlots = timeSlots.filter(slot => {
-    return !existingAppointments?.some(apt => apt.time === slot);
-  });
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Book Appointment</DialogTitle>
-          <DialogDescription>
-            Schedule an appointment with {provider.name} - {provider.specialty}
-          </DialogDescription>
-        </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <DateSelector date={date} onDateSelect={setDate} />
-          <TimeSelector 
-            availableTimeSlots={availableTimeSlots}
-            selectedTime={timeSlot}
-            onTimeSelect={setTimeSlot}
-          />
-        </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button 
-            onClick={handleBooking} 
-            disabled={!date || !timeSlot || createAppointment.isPending}
-          >
-            {createAppointment.isPending ? "Booking..." : "Book Appointment"}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+    <Modal open={isOpen} onClose={onClose}>
+      <Modal.Header>Book Appointment</Modal.Header>
+      <Modal.Body>
+        <p>Are you sure you want to book an appointment with Dr. {provider.first_name} {provider.last_name} on {selectedDate} at {selectedTime}?</p>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button variant="outline" onClick={onClose}>Cancel</Button>
+        <Button onClick={handleBookAppointment} disabled={loading}>
+          {loading ? "Booking..." : "Confirm Booking"}
+        </Button>
+      </Modal.Footer>
+    </Modal>
   );
 };
