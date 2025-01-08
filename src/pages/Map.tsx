@@ -25,7 +25,6 @@ const MapPage = () => {
         specialty: profile.specialty || 'General Practice',
         bio: profile.bio,
         avatar_url: profile.avatar_url,
-        location: [51.505, -0.09], // Default location for demo
         expertise: ['General Medicine', 'Primary Care']
       }));
     }
@@ -33,7 +32,6 @@ const MapPage = () => {
 
   const handleMarkerClick = (provider: Provider) => {
     setSelectedProvider(provider);
-    // Additional logic for handling marker click
   };
 
   return (

@@ -1,7 +1,7 @@
 import { SymptomCollector } from '@/components/SymptomCollector';
 import { ProviderList } from '@/components/ProviderList';
 
-export const Index = () => {
+const Index = () => {
   const handleSymptomSubmit = (symptoms: string, urgency: string) => {
     console.log('Symptoms:', symptoms, 'Urgency:', urgency);
   };
@@ -17,3 +17,5 @@ export const Index = () => {
     </div>
   );
 };
+
+export default Index;

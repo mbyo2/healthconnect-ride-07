@@ -5,4 +5,5 @@ export interface Provider {
   specialty?: string;
   bio?: string;
   avatar_url?: string;
+  expertise?: string[];
 }

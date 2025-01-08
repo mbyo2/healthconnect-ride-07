@@ -5,9 +5,10 @@ import 'leaflet/dist/leaflet.css';
 
 interface ProviderMapProps {
   providers: Provider[];
+  onMarkerClick?: (provider: Provider) => void;
 }
 
-export const ProviderMap = ({ providers }: ProviderMapProps) => {
+export const ProviderMap = ({ providers, onMarkerClick }: ProviderMapProps) => {
   const mapRef = useRef(null);
   const defaultPosition: [number, number] = [51.505, -0.09]; // Default to London
 
@@ -16,7 +17,7 @@ export const ProviderMap = ({ providers }: ProviderMapProps) => {
       ref={mapRef}
       style={{ height: '400px', width: '100%' }}
       className="rounded-lg shadow-md"
-      center={defaultPosition}
+      defaultCenter={defaultPosition}
       zoom={13}
       scrollWheelZoom={false}
     >
@@ -24,7 +25,13 @@ export const ProviderMap = ({ providers }: ProviderMapProps) => {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       {providers.map((provider) => (
-        <Marker key={provider.id} position={defaultPosition}>
+        <Marker 
+          key={provider.id} 
+          position={defaultPosition}
+          eventHandlers={{
+            click: () => onMarkerClick?.(provider)
+          }}
+        >
           <Popup>
             <div>
               <h3>Dr. {provider.first_name} {provider.last_name}</h3>
