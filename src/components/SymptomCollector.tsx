@@ -1,58 +1,53 @@
 import { useState } from "react";
-import { Button } from "./ui/button";
-import { Textarea } from "./ui/textarea";
-import { toast } from "sonner";
-import { Card } from "./ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
 
-interface SymptomCollectorProps {
-  onComplete: (symptoms: string, urgency: string) => void;
+export interface SymptomCollectorProps {
+  onSymptomSubmit: (symptoms: string, urgency: string) => void;
 }
 
-export const SymptomCollector = ({ onComplete }: SymptomCollectorProps) => {
+export const SymptomCollector = ({ onSymptomSubmit }: SymptomCollectorProps) => {
   const [symptoms, setSymptoms] = useState("");
-  const [urgency, setUrgency] = useState("non-urgent");
+  const [urgency, setUrgency] = useState("low");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!symptoms.trim()) {
-      toast.error("Please describe your symptoms");
-      return;
-    }
-    onComplete(symptoms, urgency);
+    onSymptomSubmit(symptoms, urgency);
+    setSymptoms("");
+    setUrgency("low");
   };
 
   return (
-    <Card className="p-6 shadow-none">
-      <h2 className="text-2xl font-bold text-primary mb-6">How can we help you today?</h2>
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Describe your symptoms</label>
-          <Textarea
-            placeholder="Please describe what you're experiencing..."
-            value={symptoms}
-            onChange={(e) => setSymptoms(e.target.value)}
-            className="min-h-[120px] resize-none"
-          />
-        </div>
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">How urgent is your condition?</label>
-          <select
-            className="w-full p-3 border rounded-lg bg-white"
-            value={urgency}
-            onChange={(e) => setUrgency(e.target.value)}
-          >
-            <option value="emergency">Emergency - Need immediate attention</option>
-            <option value="urgent">Urgent - Need to be seen today</option>
-            <option value="non-urgent">Non-urgent - Can wait a few days</option>
-          </select>
-        </div>
-        <Button 
-          type="submit" 
-          className="w-full py-6 text-lg font-semibold rounded-xl"
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <label htmlFor="symptoms" className="block text-sm font-medium mb-1">
+          Describe your symptoms
+        </label>
+        <Input
+          id="symptoms"
+          value={symptoms}
+          onChange={(e) => setSymptoms(e.target.value)}
+          placeholder="Enter your symptoms..."
+          required
+        />
+      </div>
+      <div>
+        <label htmlFor="urgency" className="block text-sm font-medium mb-1">
+          Urgency Level
+        </label>
+        <select
+          id="urgency"
+          value={urgency}
+          onChange={(e) => setUrgency(e.target.value)}
+          className="w-full rounded-md border border-input bg-background px-3 py-2"
         >
-          Find Healthcare Providers
-        </Button>
-      </form>
-    </Card>
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+        </select>
+      </div>
+      <Button type="submit">Submit Symptoms</Button>
+    </form>
   );
 };

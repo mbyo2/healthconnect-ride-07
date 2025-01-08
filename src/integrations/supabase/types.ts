@@ -95,6 +95,38 @@ export type Database = {
           },
         ]
       }
+      chat_attachments: {
+        Row: {
+          created_at: string | null
+          file_name: string
+          file_url: string
+          id: string
+          message_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          file_name: string
+          file_url: string
+          id?: string
+          message_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          file_name?: string
+          file_url?: string
+          id?: string
+          message_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_attachments_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       digital_signatures: {
         Row: {
           created_at: string | null
