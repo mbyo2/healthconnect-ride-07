@@ -14,6 +14,7 @@ export const ConsultationList = ({ onJoinMeeting }: ConsultationListProps) => {
   const { data: consultations, isLoading } = useQuery({
     queryKey: ['video-consultations'],
     queryFn: async () => {
+      console.log('Fetching video consultations');
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
@@ -30,7 +31,12 @@ export const ConsultationList = ({ onJoinMeeting }: ConsultationListProps) => {
         .eq('patient_id', user.id)
         .order('scheduled_start', { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching consultations:', error);
+        throw error;
+      }
+      
+      console.log('Fetched consultations:', data);
       return data as VideoConsultationDetails[];
     }
   });
@@ -56,7 +62,7 @@ export const ConsultationList = ({ onJoinMeeting }: ConsultationListProps) => {
                 Status: <span className="font-medium">{consultation.status}</span>
               </p>
             </div>
-            {consultation.url && consultation.status === 'active' && (
+            {consultation.meeting_url && consultation.status === 'active' && (
               <Button 
                 onClick={() => onJoinMeeting(consultation)}
                 className="gap-2"
