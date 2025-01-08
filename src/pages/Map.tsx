@@ -11,12 +11,16 @@ const MapPage = () => {
   const { data: providers = [] } = useQuery({
     queryKey: ['providers'],
     queryFn: async () => {
+      console.log('Fetching providers for map');
       const { data, error } = await supabase
         .from('profiles')
-        .select('*')
+        .select('*, location:provider_locations(*)')
         .eq('role', 'health_personnel');
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching providers for map:', error);
+        throw error;
+      }
       
       return data.map((profile): Provider => ({
         id: profile.id,
@@ -25,12 +29,15 @@ const MapPage = () => {
         specialty: profile.specialty || 'General Practice',
         bio: profile.bio,
         avatar_url: profile.avatar_url,
+        latitude: profile.location?.[0]?.latitude,
+        longitude: profile.location?.[0]?.longitude,
         expertise: ['General Medicine', 'Primary Care']
       }));
     }
   });
 
   const handleMarkerClick = (provider: Provider) => {
+    console.log('Provider selected:', provider);
     setSelectedProvider(provider);
   };
 

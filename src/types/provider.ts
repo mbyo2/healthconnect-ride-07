@@ -6,4 +6,6 @@ export interface Provider {
   bio?: string;
   avatar_url?: string;
   expertise?: string[];
+  latitude?: number;
+  longitude?: number;
 }
