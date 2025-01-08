@@ -8,6 +8,11 @@ interface MessageBubbleProps {
 }
 
 export const MessageBubble = ({ message, isProvider }: MessageBubbleProps) => {
+  if (!message || !message.content) {
+    console.error('Invalid message data:', message);
+    return null;
+  }
+
   return (
     <div
       className={cn(
@@ -15,7 +20,7 @@ export const MessageBubble = ({ message, isProvider }: MessageBubbleProps) => {
         isProvider ? "bg-gray-100 ml-auto" : "bg-blue-100"
       )}
     >
-      <div>{message.content}</div>
+      <div className="break-words">{message.content}</div>
       {message.attachments?.map((attachment) => (
         <FilePreview key={attachment.id} attachment={attachment} />
       ))}
