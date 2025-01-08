@@ -1,36 +1,28 @@
-import { useState } from "react";
-import { useRouter } from "next/router";
-import { Auth } from "@supabase/ui";
-import { supabase } from "@/integrations/supabase/client";
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Auth } from '@supabase/auth-ui-react';
+import { ThemeSupa } from '@supabase/auth-ui-shared';
+import { supabase } from '@/integrations/supabase/client';
+import type { AuthSession } from '@supabase/supabase-js';
 
-const AuthForm = () => {
-  const router = useRouter();
-  const [loading, setLoading] = useState(false);
+export const AuthForm = () => {
+  const navigate = useNavigate();
+  const [session, setSession] = useState<AuthSession | null>(null);
 
-  const handleAuthStateChange = (event: AuthChangeEvent, session: Session | null) => {
-    console.log('Auth state changed:', event, session);
-    
-    if (event === 'SIGNED_IN' || event === 'SIGNED_UP') {
-      // Handle successful sign in/up
-      router.push('/profile-setup');
+  supabase.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN' && session) {
+      setSession(session);
+      navigate('/profile');
     }
-  };
-
-  const { user, error } = Auth.useUser();
+  });
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold">Welcome to the App</h1>
+    <div className="max-w-md mx-auto p-4">
       <Auth
         supabaseClient={supabase}
+        appearance={{ theme: ThemeSupa }}
         providers={['google', 'github']}
-        socialLayout="horizontal"
-        view="sign_in"
-        onAuthStateChange={handleAuthStateChange}
       />
-      {error && <p className="text-red-500">{error.message}</p>}
     </div>
   );
 };
-
-export default AuthForm;
