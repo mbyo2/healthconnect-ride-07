@@ -40,9 +40,9 @@ export const ProviderMap = ({ providers, onMarkerClick }: ProviderMapProps) => {
       ref={mapRef}
       style={{ height: '400px', width: '100%' }}
       className="rounded-lg shadow-md"
-      zoom={13}
+      defaultZoom={13}
       scrollWheelZoom={false}
-      defaultCenter={center}
+      center={center}
     >
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

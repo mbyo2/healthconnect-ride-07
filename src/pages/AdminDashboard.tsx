@@ -47,7 +47,8 @@ const AdminDashboard = () => {
           first_name,
           last_name
         )
-      `);
+      `)
+      .returns<ApplicationWithProfile[]>();
 
     if (error) {
       console.error("Error fetching applications:", error);
@@ -55,7 +56,7 @@ const AdminDashboard = () => {
       return;
     }
 
-    setApplications(data as ApplicationWithProfile[]);
+    setApplications(data || []);
   };
 
   const handleApplicationStatus = async (
