@@ -25,8 +25,8 @@ export const ProviderList = () => {
         specialty: profile.specialty || 'General Practice',
         bio: profile.bio,
         avatar_url: profile.avatar_url,
-        latitude: profile.location?.[0]?.latitude,
-        longitude: profile.location?.[0]?.longitude,
+        latitude: profile.location?.[0]?.latitude ? Number(profile.location[0].latitude) : undefined,
+        longitude: profile.location?.[0]?.longitude ? Number(profile.location[0].longitude) : undefined,
         expertise: ['General Medicine', 'Primary Care']
       }));
     }

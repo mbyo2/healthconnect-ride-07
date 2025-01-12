@@ -974,6 +974,38 @@ export type Database = {
           },
         ]
       }
+      provider_locations: {
+        Row: {
+          created_at: string | null
+          id: string
+          latitude: number
+          longitude: number
+          provider_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          latitude: number
+          longitude: number
+          provider_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          latitude?: number
+          longitude?: number
+          provider_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "provider_locations_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       refunds: {
         Row: {
           amount: number
