@@ -3,6 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { Provider } from '@/types/provider';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import type { LatLngTuple } from 'leaflet';
 
 // Fix Leaflet default marker icon issue
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -19,7 +20,7 @@ interface ProviderMapProps {
 
 export const ProviderMap = ({ providers, onMarkerClick }: ProviderMapProps) => {
   const mapRef = useRef(null);
-  const defaultPosition: [number, number] = [51.505, -0.09]; // Default to London
+  const defaultPosition: LatLngTuple = [51.505, -0.09]; // Default to London
 
   // Calculate center based on providers with locations
   const providersWithLocation = providers.filter(
@@ -28,7 +29,7 @@ export const ProviderMap = ({ providers, onMarkerClick }: ProviderMapProps) => {
       typeof provider.longitude === 'number'
   );
 
-  const center: [number, number] = providersWithLocation.length > 0
+  const center: LatLngTuple = providersWithLocation.length > 0
     ? [
         providersWithLocation.reduce((sum, p) => sum + p.latitude, 0) / providersWithLocation.length,
         providersWithLocation.reduce((sum, p) => sum + p.longitude, 0) / providersWithLocation.length,
@@ -41,7 +42,7 @@ export const ProviderMap = ({ providers, onMarkerClick }: ProviderMapProps) => {
         ref={mapRef}
         style={{ height: '100%', width: '100%' }}
         className="rounded-lg shadow-md"
-        center={center as [number, number]}
+        center={center}
         zoom={13}
         scrollWheelZoom={false}
       >
@@ -52,7 +53,7 @@ export const ProviderMap = ({ providers, onMarkerClick }: ProviderMapProps) => {
         {providersWithLocation.map((provider) => (
           <Marker 
             key={provider.id} 
-            position={[provider.latitude, provider.longitude] as [number, number]}
+            position={[provider.latitude, provider.longitude] as LatLngTuple}
             eventHandlers={{
               click: () => onMarkerClick?.(provider)
             }}
