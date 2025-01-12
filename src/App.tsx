@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { MobileLayout } from "@/components/layouts/MobileLayout";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
+import { LoadingScreen } from "@/components/LoadingScreen";
 import Index from "./pages/Index";
 import Search from "./pages/Search";
 import Map from "./pages/Map";
@@ -52,7 +53,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   if (isAuthenticated === null) {
-    return <MobileLayout isLoading={true} />;
+    return <LoadingScreen />;
   }
 
   if (!isAuthenticated) {

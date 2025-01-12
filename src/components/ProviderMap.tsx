@@ -29,7 +29,7 @@ interface ProviderMapProps {
 
 export const ProviderMap = ({ providers, onProviderSelect }: ProviderMapProps) => {
   const mapRef = useRef(null);
-  const center: LatLngTuple = [37.7749, -122.4194]; // San Francisco coordinates
+  const defaultPosition: LatLngTuple = [37.7749, -122.4194]; // San Francisco coordinates
 
   useEffect(() => {
     // Any map initialization logic can go here
@@ -41,13 +41,13 @@ export const ProviderMap = ({ providers, onProviderSelect }: ProviderMapProps) =
         ref={mapRef}
         style={{ height: "100%", width: "100%" }}
         className="z-0"
-        center={center}
+        center={defaultPosition}
         zoom={13}
         scrollWheelZoom={false}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          attributionUrl='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
         {providers.map((provider) => (
           <Marker

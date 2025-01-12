@@ -1,11 +1,9 @@
 export interface Provider {
   id: string;
-  first_name: string;
-  last_name: string;
-  specialty?: string;
-  bio?: string;
-  avatar_url?: string;
-  expertise?: string[];
-  latitude?: number;
-  longitude?: number;
+  name: string;
+  specialty: string;
+  location: {
+    latitude: number;
+    longitude: number;
+  };
 }
