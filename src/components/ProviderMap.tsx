@@ -28,11 +28,11 @@ export const ProviderMap = ({ providers, onMarkerClick }: ProviderMapProps) => {
       typeof provider.longitude === 'number'
   );
 
-  const center = providersWithLocation.length > 0
+  const center: L.LatLngTuple = providersWithLocation.length > 0
     ? [
         providersWithLocation.reduce((sum, p) => sum + p.latitude, 0) / providersWithLocation.length,
         providersWithLocation.reduce((sum, p) => sum + p.longitude, 0) / providersWithLocation.length,
-      ] as L.LatLngTuple
+      ]
     : defaultPosition;
 
   return (
@@ -46,12 +46,13 @@ export const ProviderMap = ({ providers, onMarkerClick }: ProviderMapProps) => {
         scrollWheelZoom={false}
       >
         <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         {providersWithLocation.map((provider) => (
           <Marker 
             key={provider.id} 
-            position={[provider.latitude, provider.longitude] as L.LatLngTuple}
+            position={[provider.latitude, provider.longitude]}
             eventHandlers={{
               click: () => onMarkerClick?.(provider)
             }}
