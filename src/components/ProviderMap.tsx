@@ -41,7 +41,7 @@ export const ProviderMap = ({ providers, onMarkerClick }: ProviderMapProps) => {
         ref={mapRef}
         style={{ height: '100%', width: '100%' }}
         className="rounded-lg shadow-md"
-        center={center}
+        defaultCenter={center}
         zoom={13}
         scrollWheelZoom={false}
       >
