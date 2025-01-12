@@ -3,6 +3,7 @@ import L from "leaflet";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import type { LatLngTuple } from "leaflet";
+import { Provider } from "@/types/provider";
 
 // Fix Leaflet's default icon issue
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -11,16 +12,6 @@ L.Icon.Default.mergeOptions({
   iconUrl: "/marker-icon.png",
   shadowUrl: "/marker-shadow.png",
 });
-
-interface Provider {
-  id: string;
-  name: string;
-  specialty: string;
-  location: {
-    latitude: number;
-    longitude: number;
-  };
-}
 
 interface ProviderMapProps {
   providers: Provider[];
@@ -41,13 +32,13 @@ export const ProviderMap = ({ providers, onProviderSelect }: ProviderMapProps) =
         ref={mapRef}
         style={{ height: "100%", width: "100%" }}
         className="z-0"
-        center={defaultPosition}
+        defaultCenter={defaultPosition}
         zoom={13}
         scrollWheelZoom={false}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attributionUrl='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
         {providers.map((provider) => (
           <Marker
@@ -59,7 +50,7 @@ export const ProviderMap = ({ providers, onProviderSelect }: ProviderMapProps) =
           >
             <Popup>
               <div className="p-2">
-                <h3 className="font-semibold">{provider.name}</h3>
+                <h3 className="font-semibold">Dr. {provider.first_name} {provider.last_name}</h3>
                 <p className="text-sm text-muted-foreground">{provider.specialty}</p>
               </div>
             </Popup>
