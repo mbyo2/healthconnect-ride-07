@@ -41,22 +41,25 @@ export const ProviderMap = ({ providers, onProviderSelect }: ProviderMapProps) =
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
-        {providers.map((provider) => (
-          <Marker
-            key={provider.id}
-            position={[provider.location.latitude, provider.location.longitude]}
-            eventHandlers={{
-              click: () => onProviderSelect?.(provider),
-            }}
-          >
-            <Popup>
-              <div className="p-2">
-                <h3 className="font-semibold">Dr. {provider.first_name} {provider.last_name}</h3>
-                <p className="text-sm text-muted-foreground">{provider.specialty}</p>
-              </div>
-            </Popup>
-          </Marker>
-        ))}
+        {providers.map((provider) => {
+          const position: LatLngTuple = [provider.location.latitude, provider.location.longitude];
+          return (
+            <Marker
+              key={provider.id}
+              position={position}
+              eventHandlers={{
+                click: () => onProviderSelect?.(provider),
+              }}
+            >
+              <Popup>
+                <div className="p-2">
+                  <h3 className="font-semibold">Dr. {provider.first_name} {provider.last_name}</h3>
+                  <p className="text-sm text-muted-foreground">{provider.specialty}</p>
+                </div>
+              </Popup>
+            </Marker>
+          );
+        })}
       </MapContainer>
     </div>
   );
