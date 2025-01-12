@@ -37,8 +37,15 @@ export const ScheduleManager = () => {
       const { data, error } = await supabase
         .from('appointments')
         .select(`
-          *,
-          patient:profiles(first_name, last_name)
+          id,
+          date,
+          time,
+          status,
+          type,
+          patient:profiles!appointments_patient_id_fkey (
+            first_name,
+            last_name
+          )
         `)
         .eq('provider_id', user.id)
         .eq('date', selectedDate?.toISOString().split('T')[0])

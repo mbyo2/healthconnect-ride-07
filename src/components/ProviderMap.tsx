@@ -45,8 +45,8 @@ export const ProviderMap = ({ providers, onMarkerClick }: ProviderMapProps) => {
       scrollWheelZoom={false}
     >
       <TileLayer
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       {providersWithLocation.map((provider) => (
         <Marker 

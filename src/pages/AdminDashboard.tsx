@@ -10,18 +10,17 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import type { Database } from "@/integrations/supabase/types";
 import { Application } from "@/types/application";
 
-type ApplicationRow = Database['public']['Tables']['health_personnel_applications']['Row'] & {
+interface ApplicationWithProfile extends Application {
   profiles?: {
     first_name: string | null;
     last_name: string | null;
   } | null;
-};
+}
 
 const AdminDashboard = () => {
-  const [applications, setApplications] = useState<Application[]>([]);
+  const [applications, setApplications] = useState<ApplicationWithProfile[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
@@ -63,7 +62,7 @@ const AdminDashboard = () => {
       return;
     }
 
-    setApplications(data as unknown as Application[]);
+    setApplications(data as ApplicationWithProfile[]);
   };
 
   const handleApplicationStatus = async (
