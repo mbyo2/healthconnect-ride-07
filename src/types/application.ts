@@ -12,3 +12,10 @@ export interface Application {
   reviewed_at?: string;
   review_notes?: string;
 }
+
+export interface ApplicationWithProfile extends Application {
+  profiles?: {
+    first_name: string | null;
+    last_name: string | null;
+  } | null;
+}

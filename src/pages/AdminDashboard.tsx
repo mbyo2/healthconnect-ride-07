@@ -10,14 +10,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { Application } from "@/types/application";
-
-interface ApplicationWithProfile extends Application {
-  profiles?: {
-    first_name: string | null;
-    last_name: string | null;
-  } | null;
-}
+import { ApplicationWithProfile } from "@/types/application";
 
 const AdminDashboard = () => {
   const [applications, setApplications] = useState<ApplicationWithProfile[]>([]);
