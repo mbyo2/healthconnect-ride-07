@@ -19,7 +19,7 @@ interface ProviderMapProps {
 
 export const ProviderMap = ({ providers, onMarkerClick }: ProviderMapProps) => {
   const mapRef = useRef(null);
-  const defaultPosition: L.LatLngTuple = [51.505, -0.09]; // Default to London
+  const defaultPosition: [number, number] = [51.505, -0.09]; // Default to London
 
   // Calculate center based on providers with locations
   const providersWithLocation = providers.filter(
@@ -28,7 +28,7 @@ export const ProviderMap = ({ providers, onMarkerClick }: ProviderMapProps) => {
       typeof provider.longitude === 'number'
   );
 
-  const center: L.LatLngTuple = providersWithLocation.length > 0
+  const center: [number, number] = providersWithLocation.length > 0
     ? [
         providersWithLocation.reduce((sum, p) => sum + p.latitude, 0) / providersWithLocation.length,
         providersWithLocation.reduce((sum, p) => sum + p.longitude, 0) / providersWithLocation.length,
@@ -41,7 +41,7 @@ export const ProviderMap = ({ providers, onMarkerClick }: ProviderMapProps) => {
         ref={mapRef}
         style={{ height: '100%', width: '100%' }}
         className="rounded-lg shadow-md"
-        center={center}
+        center={center as [number, number]}
         zoom={13}
         scrollWheelZoom={false}
       >
@@ -52,7 +52,7 @@ export const ProviderMap = ({ providers, onMarkerClick }: ProviderMapProps) => {
         {providersWithLocation.map((provider) => (
           <Marker 
             key={provider.id} 
-            position={[provider.latitude, provider.longitude]}
+            position={[provider.latitude, provider.longitude] as [number, number]}
             eventHandlers={{
               click: () => onMarkerClick?.(provider)
             }}
