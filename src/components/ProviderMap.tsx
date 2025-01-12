@@ -1,48 +1,47 @@
-import { useRef } from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import { Provider } from '@/types/provider';
-import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
-import type { LatLngTuple } from 'leaflet';
+import { useRef, useEffect } from "react";
+import L from "leaflet";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import type { LatLngTuple } from "leaflet";
 
-// Fix Leaflet default marker icon issue
+// Fix Leaflet's default icon issue
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+  iconRetinaUrl: "/marker-icon-2x.png",
+  iconUrl: "/marker-icon.png",
+  shadowUrl: "/marker-shadow.png",
 });
+
+interface Provider {
+  id: string;
+  name: string;
+  specialty: string;
+  location: {
+    latitude: number;
+    longitude: number;
+  };
+}
 
 interface ProviderMapProps {
   providers: Provider[];
-  onMarkerClick?: (provider: Provider) => void;
+  onProviderSelect?: (provider: Provider) => void;
 }
 
-export const ProviderMap = ({ providers, onMarkerClick }: ProviderMapProps) => {
+export const ProviderMap = ({ providers, onProviderSelect }: ProviderMapProps) => {
   const mapRef = useRef(null);
-  const defaultPosition: LatLngTuple = [51.505, -0.09]; // Default to London
+  const defaultCenter: LatLngTuple = [37.7749, -122.4194]; // San Francisco coordinates
 
-  // Calculate center based on providers with locations
-  const providersWithLocation = providers.filter(
-    (provider): provider is Provider & { latitude: number; longitude: number } => 
-      typeof provider.latitude === 'number' && 
-      typeof provider.longitude === 'number'
-  );
-
-  const center: LatLngTuple = providersWithLocation.length > 0
-    ? [
-        providersWithLocation.reduce((sum, p) => sum + p.latitude, 0) / providersWithLocation.length,
-        providersWithLocation.reduce((sum, p) => sum + p.longitude, 0) / providersWithLocation.length,
-      ]
-    : defaultPosition;
+  useEffect(() => {
+    // Any map initialization logic can go here
+  }, []);
 
   return (
-    <div className="w-full h-[400px]">
+    <div className="w-full h-[500px] relative">
       <MapContainer
         ref={mapRef}
-        style={{ height: '100%', width: '100%' }}
-        className="rounded-lg shadow-md"
-        center={center}
+        style={{ height: "100%", width: "100%" }}
+        className="z-0"
+        defaultCenter={defaultCenter}
         zoom={13}
         scrollWheelZoom={false}
       >
@@ -50,22 +49,18 @@ export const ProviderMap = ({ providers, onMarkerClick }: ProviderMapProps) => {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
-        {providersWithLocation.map((provider) => (
-          <Marker 
-            key={provider.id} 
-            position={[provider.latitude, provider.longitude] as LatLngTuple}
+        {providers.map((provider) => (
+          <Marker
+            key={provider.id}
+            position={[provider.location.latitude, provider.location.longitude]}
             eventHandlers={{
-              click: () => onMarkerClick?.(provider)
+              click: () => onProviderSelect?.(provider),
             }}
           >
             <Popup>
               <div className="p-2">
-                <h3 className="font-semibold">
-                  Dr. {provider.first_name} {provider.last_name}
-                </h3>
-                {provider.specialty && (
-                  <p className="text-sm text-gray-600">{provider.specialty}</p>
-                )}
+                <h3 className="font-semibold">{provider.name}</h3>
+                <p className="text-sm text-muted-foreground">{provider.specialty}</p>
               </div>
             </Popup>
           </Marker>
