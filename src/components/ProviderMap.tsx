@@ -32,7 +32,7 @@ export const ProviderMap = ({ providers, onProviderSelect }: ProviderMapProps) =
         ref={mapRef}
         style={{ height: "100%", width: "100%" }}
         className="z-0"
-        center={defaultPosition}
+        center={defaultPosition as [number, number]}
         zoom={13}
         scrollWheelZoom={false}
       >
@@ -43,7 +43,7 @@ export const ProviderMap = ({ providers, onProviderSelect }: ProviderMapProps) =
         {providers.map((provider) => (
           <Marker
             key={provider.id}
-            position={[provider.location.latitude, provider.location.longitude]}
+            position={[provider.location.latitude, provider.location.longitude] as [number, number]}
             eventHandlers={{
               click: () => onProviderSelect?.(provider),
             }}
