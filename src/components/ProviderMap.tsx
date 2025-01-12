@@ -28,11 +28,11 @@ export const ProviderMap = ({ providers, onMarkerClick }: ProviderMapProps) => {
       typeof provider.longitude === 'number'
   );
 
-  const center: L.LatLngTuple = providersWithLocation.length > 0
+  const center = providersWithLocation.length > 0
     ? [
         providersWithLocation.reduce((sum, p) => sum + p.latitude, 0) / providersWithLocation.length,
         providersWithLocation.reduce((sum, p) => sum + p.longitude, 0) / providersWithLocation.length,
-      ]
+      ] as L.LatLngTuple
     : defaultPosition;
 
   return (
@@ -41,7 +41,7 @@ export const ProviderMap = ({ providers, onMarkerClick }: ProviderMapProps) => {
         ref={mapRef}
         style={{ height: '100%', width: '100%' }}
         className="rounded-lg shadow-md"
-        defaultCenter={center}
+        center={center}
         zoom={13}
         scrollWheelZoom={false}
       >
