@@ -1,7 +1,6 @@
 import { useRef, useEffect } from "react";
 import L from "leaflet";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import type { MapContainerProps } from 'react-leaflet';
 import "leaflet/dist/leaflet.css";
 import type { LatLngTuple } from "leaflet";
 import { Provider } from "@/types/provider";
@@ -33,7 +32,7 @@ export const ProviderMap = ({ providers, onProviderSelect }: ProviderMapProps) =
         ref={mapRef}
         style={{ height: "100%", width: "100%" }}
         className="z-0"
-        center={defaultPosition as [number, number]}
+        center={defaultPosition}
         zoom={13}
         scrollWheelZoom={false}
       >
@@ -42,7 +41,7 @@ export const ProviderMap = ({ providers, onProviderSelect }: ProviderMapProps) =
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
         {providers.map((provider) => {
-          const position: [number, number] = [provider.location.latitude, provider.location.longitude];
+          const position: LatLngTuple = [provider.location.latitude, provider.location.longitude];
           return (
             <Marker
               key={provider.id}
