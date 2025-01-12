@@ -1,8 +1,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AvailabilityManager } from "@/components/provider/AvailabilityManager";
-import { PatientRecords } from "@/components/provider/PatientRecords";
-import { PrescriptionWriter } from "@/components/provider/PrescriptionWriter";
 import { ScheduleManager } from "@/components/provider/ScheduleManager";
+import { WaitlistManager } from "@/components/provider/WaitlistManager";
+import { DigitalSignature } from "@/components/provider/DigitalSignature";
 
 const ProviderDashboard = () => {
   return (
@@ -10,27 +9,22 @@ const ProviderDashboard = () => {
       <h1 className="text-3xl font-bold mb-6">Provider Dashboard</h1>
       
       <Tabs defaultValue="schedule" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="schedule">Schedule</TabsTrigger>
-          <TabsTrigger value="availability">Availability</TabsTrigger>
-          <TabsTrigger value="records">Patient Records</TabsTrigger>
-          <TabsTrigger value="prescriptions">Prescriptions</TabsTrigger>
+          <TabsTrigger value="waitlist">Waitlist</TabsTrigger>
+          <TabsTrigger value="signatures">Digital Signatures</TabsTrigger>
         </TabsList>
 
         <TabsContent value="schedule">
           <ScheduleManager />
         </TabsContent>
 
-        <TabsContent value="availability">
-          <AvailabilityManager />
+        <TabsContent value="waitlist">
+          <WaitlistManager />
         </TabsContent>
 
-        <TabsContent value="records">
-          <PatientRecords />
-        </TabsContent>
-
-        <TabsContent value="prescriptions">
-          <PrescriptionWriter />
+        <TabsContent value="signatures">
+          <DigitalSignature />
         </TabsContent>
       </Tabs>
     </div>
