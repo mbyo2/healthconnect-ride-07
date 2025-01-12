@@ -29,7 +29,7 @@ interface ProviderMapProps {
 
 export const ProviderMap = ({ providers, onProviderSelect }: ProviderMapProps) => {
   const mapRef = useRef(null);
-  const defaultCenter: LatLngTuple = [37.7749, -122.4194]; // San Francisco coordinates
+  const center: LatLngTuple = [37.7749, -122.4194]; // San Francisco coordinates
 
   useEffect(() => {
     // Any map initialization logic can go here
@@ -41,7 +41,7 @@ export const ProviderMap = ({ providers, onProviderSelect }: ProviderMapProps) =
         ref={mapRef}
         style={{ height: "100%", width: "100%" }}
         className="z-0"
-        defaultCenter={defaultCenter}
+        center={center}
         zoom={13}
         scrollWheelZoom={false}
       >
