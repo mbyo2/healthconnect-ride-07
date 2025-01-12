@@ -8,20 +8,27 @@ import { Provider } from '@/types/provider';
 const MapPage = () => {
   const [selectedProvider, setSelectedProvider] = useState<Provider | null>(null);
 
-  const { data: providers = [] } = useQuery({
+  const { data: providers = [], isLoading } = useQuery({
     queryKey: ['providers'],
     queryFn: async () => {
-      console.log('Fetching providers for map');
       const { data, error } = await supabase
         .from('profiles')
-        .select('*, location:provider_locations(*)')
+        .select(`
+          id,
+          first_name,
+          last_name,
+          specialty,
+          bio,
+          avatar_url,
+          provider_locations (
+            latitude,
+            longitude
+          )
+        `)
         .eq('role', 'health_personnel');
-      
-      if (error) {
-        console.error('Error fetching providers for map:', error);
-        throw error;
-      }
-      
+
+      if (error) throw error;
+
       return data.map((profile): Provider => ({
         id: profile.id,
         first_name: profile.first_name || '',
@@ -31,30 +38,33 @@ const MapPage = () => {
         avatar_url: profile.avatar_url,
         expertise: ['General Medicine', 'Primary Care'],
         location: {
-          latitude: profile.location?.[0]?.latitude ? Number(profile.location[0].latitude) : 37.7749,
-          longitude: profile.location?.[0]?.longitude ? Number(profile.location[0].longitude) : -122.4194
+          latitude: profile.provider_locations?.[0]?.latitude ? Number(profile.provider_locations[0].latitude) : 37.7749,
+          longitude: profile.provider_locations?.[0]?.longitude ? Number(profile.provider_locations[0].longitude) : -122.4194
         }
       }));
     }
   });
 
-  const handleProviderSelect = (provider: Provider) => {
-    console.log('Provider selected:', provider);
-    setSelectedProvider(provider);
-  };
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Find Healthcare Providers</h1>
-      <div className="grid gap-4 md:grid-cols-2">
-        <div>
-          <ProviderMap 
-            providers={providers} 
-            onProviderSelect={handleProviderSelect}
+    <div className="container mx-auto p-4 space-y-4">
+      <h1 className="text-2xl font-bold">Find Healthcare Providers</h1>
+      <div className="grid lg:grid-cols-2 gap-4">
+        <div className="order-2 lg:order-1">
+          <ProviderList
+            providers={providers}
+            selectedProvider={selectedProvider}
+            onProviderSelect={setSelectedProvider}
           />
         </div>
-        <div>
-          <ProviderList />
+        <div className="order-1 lg:order-2">
+          <ProviderMap
+            providers={providers}
+            onProviderSelect={setSelectedProvider}
+          />
         </div>
       </div>
     </div>

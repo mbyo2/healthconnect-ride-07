@@ -32,7 +32,7 @@ export const ProviderMap = ({ providers, onProviderSelect }: ProviderMapProps) =
         ref={mapRef}
         style={{ height: "100%", width: "100%" }}
         className="z-0"
-        defaultCenter={defaultPosition}
+        center={defaultPosition}
         zoom={13}
         scrollWheelZoom={false}
       >
