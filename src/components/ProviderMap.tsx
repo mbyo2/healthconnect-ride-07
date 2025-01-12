@@ -36,37 +36,39 @@ export const ProviderMap = ({ providers, onMarkerClick }: ProviderMapProps) => {
     : defaultPosition;
 
   return (
-    <MapContainer
-      ref={mapRef}
-      style={{ height: '400px', width: '100%' }}
-      className="rounded-lg shadow-md"
-      center={center as L.LatLngExpression}
-      zoom={13}
-      scrollWheelZoom={false}
-    >
-      <TileLayer
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
-      {providersWithLocation.map((provider) => (
-        <Marker 
-          key={provider.id} 
-          position={[provider.latitude, provider.longitude]}
-          eventHandlers={{
-            click: () => onMarkerClick?.(provider)
-          }}
-        >
-          <Popup>
-            <div className="p-2">
-              <h3 className="font-semibold">
-                Dr. {provider.first_name} {provider.last_name}
-              </h3>
-              {provider.specialty && (
-                <p className="text-sm text-gray-600">{provider.specialty}</p>
-              )}
-            </div>
-          </Popup>
-        </Marker>
-      ))}
-    </MapContainer>
+    <div className="w-full h-[400px]">
+      <MapContainer
+        ref={mapRef}
+        style={{ height: '100%', width: '100%' }}
+        className="rounded-lg shadow-md"
+        center={center}
+        zoom={13}
+        scrollWheelZoom={false}
+      >
+        <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+        {providersWithLocation.map((provider) => (
+          <Marker 
+            key={provider.id} 
+            position={[provider.latitude, provider.longitude]}
+            eventHandlers={{
+              click: () => onMarkerClick?.(provider)
+            }}
+          >
+            <Popup>
+              <div className="p-2">
+                <h3 className="font-semibold">
+                  Dr. {provider.first_name} {provider.last_name}
+                </h3>
+                {provider.specialty && (
+                  <p className="text-sm text-gray-600">{provider.specialty}</p>
+                )}
+              </div>
+            </Popup>
+          </Marker>
+        ))}
+      </MapContainer>
+    </div>
   );
 };
