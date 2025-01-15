@@ -32,13 +32,13 @@ export const ProviderMap = ({ providers, onProviderSelect }: ProviderMapProps) =
         ref={mapRef}
         style={{ height: "100%", width: "100%" }}
         className="z-0"
-        center={defaultPosition}
+        defaultCenter={defaultPosition}
         zoom={13}
         scrollWheelZoom={false}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          attributionControl={true}
         />
         {providers.map((provider) => {
           const position: LatLngTuple = [provider.location.latitude, provider.location.longitude];
