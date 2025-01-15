@@ -15,11 +15,17 @@ export const TimeSelector = ({ availableTimeSlots, selectedTime, onTimeSelect }:
           <SelectValue placeholder="Select a time slot" />
         </SelectTrigger>
         <SelectContent>
-          {availableTimeSlots.map((slot) => (
-            <SelectItem key={slot} value={slot}>
-              {slot}
+          {availableTimeSlots.length > 0 ? (
+            availableTimeSlots.map((slot) => (
+              <SelectItem key={slot} value={slot}>
+                {slot}
+              </SelectItem>
+            ))
+          ) : (
+            <SelectItem value="none" disabled>
+              No available slots
             </SelectItem>
-          ))}
+          )}
         </SelectContent>
       </Select>
     </div>

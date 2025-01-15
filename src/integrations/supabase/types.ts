@@ -13,6 +13,7 @@ export type Database = {
         Row: {
           created_at: string
           date: string
+          duration: number | null
           id: string
           notes: string | null
           patient_id: string
@@ -25,6 +26,7 @@ export type Database = {
         Insert: {
           created_at?: string
           date: string
+          duration?: number | null
           id?: string
           notes?: string | null
           patient_id: string
@@ -37,6 +39,7 @@ export type Database = {
         Update: {
           created_at?: string
           date?: string
+          duration?: number | null
           id?: string
           notes?: string | null
           patient_id?: string
@@ -941,27 +944,39 @@ export type Database = {
       }
       provider_availability: {
         Row: {
+          break_end: string | null
+          break_start: string | null
           created_at: string | null
           day_of_week: number
           end_time: string
           id: string
+          is_recurring: boolean | null
           provider_id: string
+          specific_date: string | null
           start_time: string
         }
         Insert: {
+          break_end?: string | null
+          break_start?: string | null
           created_at?: string | null
           day_of_week: number
           end_time: string
           id?: string
+          is_recurring?: boolean | null
           provider_id: string
+          specific_date?: string | null
           start_time: string
         }
         Update: {
+          break_end?: string | null
+          break_start?: string | null
           created_at?: string | null
           day_of_week?: number
           end_time?: string
           id?: string
+          is_recurring?: boolean | null
           provider_id?: string
+          specific_date?: string | null
           start_time?: string
         }
         Relationships: [
