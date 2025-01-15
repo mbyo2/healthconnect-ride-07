@@ -1,4 +1,5 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Calendar } from "lucide-react";
 
 interface TimeSelectorProps {
   availableTimeSlots: string[];
@@ -10,24 +11,25 @@ export const TimeSelector = ({ availableTimeSlots, selectedTime, onTimeSelect }:
   return (
     <div className="grid gap-2">
       <label className="text-sm font-medium">Select Time</label>
-      <Select onValueChange={onTimeSelect} value={selectedTime}>
-        <SelectTrigger>
-          <SelectValue placeholder="Select a time slot" />
-        </SelectTrigger>
-        <SelectContent>
-          {availableTimeSlots.length > 0 ? (
-            availableTimeSlots.map((slot) => (
+      {availableTimeSlots.length === 0 ? (
+        <div className="text-sm text-muted-foreground flex items-center gap-2 p-4 bg-muted rounded-lg">
+          <Calendar className="w-4 h-4" />
+          <span>No available slots for this date. Please select another date.</span>
+        </div>
+      ) : (
+        <Select onValueChange={onTimeSelect} value={selectedTime}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select a time slot" />
+          </SelectTrigger>
+          <SelectContent>
+            {availableTimeSlots.map((slot) => (
               <SelectItem key={slot} value={slot}>
                 {slot}
               </SelectItem>
-            ))
-          ) : (
-            <SelectItem value="none" disabled>
-              No available slots
-            </SelectItem>
-          )}
-        </SelectContent>
-      </Select>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
     </div>
   );
 };

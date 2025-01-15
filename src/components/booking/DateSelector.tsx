@@ -1,6 +1,7 @@
 import { Calendar } from "@/components/ui/calendar";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 interface DateSelectorProps {
   date: Date | undefined;
@@ -9,7 +10,7 @@ interface DateSelectorProps {
 }
 
 export const DateSelector = ({ date, onDateSelect, providerId }: DateSelectorProps) => {
-  const { data: availableDays } = useQuery({
+  const { data: availableDays, isLoading } = useQuery({
     queryKey: ["providerAvailableDays", providerId],
     queryFn: async () => {
       if (!providerId) return [];
@@ -24,6 +25,10 @@ export const DateSelector = ({ date, onDateSelect, providerId }: DateSelectorPro
     },
     enabled: !!providerId,
   });
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <div className="grid gap-2">
