@@ -1,8 +1,8 @@
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { Heart } from "lucide-react";
