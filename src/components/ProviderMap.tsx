@@ -38,7 +38,7 @@ export const ProviderMap = ({ providers, onProviderSelect }: ProviderMapProps) =
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attributionUrl='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
         {providers.map((provider) => {
           const position: LatLngTuple = [provider.location.latitude, provider.location.longitude];
