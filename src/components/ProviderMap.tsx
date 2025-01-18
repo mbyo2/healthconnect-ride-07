@@ -39,11 +39,9 @@ export const ProviderMap = ({ providers, onProviderSelect }: ProviderMapProps) =
         ref={mapRef}
         style={{ height: "100%", width: "100%" }}
         className="z-0"
-        zoomControl={true}
-        scrollWheelZoom={false}
-        initialZoom={13}
+        zoom={13}
+        center={defaultPosition}
       >
-        <MapInitializer center={defaultPosition} />
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
