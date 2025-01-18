@@ -18,7 +18,7 @@ const Login = () => {
     supabase.auth.getSession().then(({ data: { session }, error }) => {
       if (error) {
         console.error("Error checking session:", error);
-        setError(getErrorMessage(error));
+        setError(error.message);
         return;
       }
       
@@ -43,10 +43,6 @@ const Login = () => {
       } else if (event === "PASSWORD_RECOVERY") {
         console.log("Password recovery event received");
         toast.info("Please check your email for password reset instructions");
-      } else if (event === "USER_DELETED") {
-        console.log("User account deleted");
-        toast.info("Your account has been deleted");
-        navigate("/login");
       } else if (event === "TOKEN_REFRESHED") {
         console.log("Session token refreshed");
       }
@@ -54,21 +50,6 @@ const Login = () => {
 
     return () => subscription.unsubscribe();
   }, [navigate]);
-
-  const getErrorMessage = (error: AuthError): string => {
-    switch (error.message) {
-      case "Invalid login credentials":
-        return "Invalid email or password. Please try again.";
-      case "Email not confirmed":
-        return "Please verify your email address before signing in.";
-      case "User not found":
-        return "No account found with these credentials.";
-      case "Too many requests":
-        return "Too many attempts. Please try again later.";
-      default:
-        return error.message;
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted flex items-center justify-center p-4">
