@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
@@ -6,13 +6,22 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { Heart } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import type { AuthError } from "@supabase/supabase-js";
 
 const Login = () => {
   const navigate = useNavigate();
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     console.log("Checking existing session...");
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      if (error) {
+        console.error("Error checking session:", error);
+        setError(getErrorMessage(error));
+        return;
+      }
+      
       if (session) {
         console.log("User already logged in, redirecting to home");
         navigate("/home");
@@ -28,16 +37,38 @@ const Login = () => {
         navigate("/home");
       } else if (event === "SIGNED_OUT") {
         console.log("User signed out");
+        setError(null);
       } else if (event === "USER_UPDATED") {
         console.log("User updated:", session?.user);
       } else if (event === "PASSWORD_RECOVERY") {
         console.log("Password recovery event received");
         toast.info("Please check your email for password reset instructions");
+      } else if (event === "USER_DELETED") {
+        console.log("User account deleted");
+        toast.info("Your account has been deleted");
+        navigate("/login");
+      } else if (event === "TOKEN_REFRESHED") {
+        console.log("Session token refreshed");
       }
     });
 
     return () => subscription.unsubscribe();
   }, [navigate]);
+
+  const getErrorMessage = (error: AuthError): string => {
+    switch (error.message) {
+      case "Invalid login credentials":
+        return "Invalid email or password. Please try again.";
+      case "Email not confirmed":
+        return "Please verify your email address before signing in.";
+      case "User not found":
+        return "No account found with these credentials.";
+      case "Too many requests":
+        return "Too many attempts. Please try again later.";
+      default:
+        return error.message;
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted flex items-center justify-center p-4">
@@ -55,6 +86,12 @@ const Login = () => {
             Access your healthcare services securely
           </p>
         </div>
+
+        {error && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
 
         <Card className="p-6 shadow-lg">
           <Auth

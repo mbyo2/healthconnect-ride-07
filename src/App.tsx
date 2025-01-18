@@ -9,6 +9,7 @@ import { MobileLayout } from "@/components/layouts/MobileLayout";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { LoadingScreen } from "@/components/LoadingScreen";
+import { toast } from "sonner";
 import Index from "./pages/Index";
 import Search from "./pages/Search";
 import Map from "./pages/Map";
@@ -34,25 +35,53 @@ const queryClient = new QueryClient({
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     console.log("Checking authentication status...");
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log("Session status:", !!session);
-      setIsAuthenticated(!!session);
-    });
+    
+    const checkSession = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error) {
+          console.error("Session check error:", error);
+          toast.error("Authentication error. Please try logging in again.");
+          setIsAuthenticated(false);
+          return;
+        }
+        console.log("Session status:", !!session);
+        setIsAuthenticated(!!session);
+      } catch (error) {
+        console.error("Unexpected error during session check:", error);
+        setIsAuthenticated(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkSession();
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state changed:", { event, session });
-      setIsAuthenticated(!!session);
+      
+      if (event === "SIGNED_OUT" || event === "USER_DELETED") {
+        setIsAuthenticated(false);
+        toast.info("You have been signed out");
+      } else if (event === "SIGNED_IN") {
+        setIsAuthenticated(true);
+      } else if (event === "TOKEN_REFRESHED") {
+        console.log("Session token refreshed");
+      }
+      
+      setIsLoading(false);
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
-  if (isAuthenticated === null) {
+  if (isLoading) {
     return <LoadingScreen />;
   }
 
