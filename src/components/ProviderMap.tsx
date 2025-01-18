@@ -1,9 +1,11 @@
 import { useRef, useEffect } from "react";
 import L from "leaflet";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import type { LatLngTuple } from "leaflet";
 import { Provider } from "@/types/provider";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { LoadingScreen } from "@/components/LoadingScreen";
 
 // Fix Leaflet's default icon issue
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -16,41 +18,58 @@ L.Icon.Default.mergeOptions({
 interface ProviderMapProps {
   providers: Provider[];
   onProviderSelect?: (provider: Provider) => void;
+  isLoading?: boolean;
+  error?: Error | null;
 }
 
-// This component handles map initialization
-const MapInitializer = ({ center }: { center: LatLngTuple }) => {
-  const map = useMap();
-  
-  useEffect(() => {
-    map.setView(center);
-  }, [center, map]);
-  
-  return null;
-};
-
-export const ProviderMap = ({ providers, onProviderSelect }: ProviderMapProps) => {
+export const ProviderMap = ({ 
+  providers, 
+  onProviderSelect,
+  isLoading,
+  error 
+}: ProviderMapProps) => {
   const mapRef = useRef<L.Map>(null);
   const defaultPosition: LatLngTuple = [37.7749, -122.4194]; // San Francisco coordinates
 
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
+
+  if (error) {
+    return (
+      <Alert variant="destructive" className="m-4">
+        <AlertDescription>
+          Error loading map: {error.message}
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
   return (
-    <div className="w-full h-[500px] relative">
+    <div className="w-full h-[500px] relative rounded-lg overflow-hidden shadow-md">
       <MapContainer
         ref={mapRef}
         style={{ height: "100%", width: "100%" }}
         className="z-0"
-        zoom={13}
         center={defaultPosition}
+        zoom={13}
+        scrollWheelZoom={true}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
         {providers.map((provider) => {
+          if (!provider.location?.latitude || !provider.location?.longitude) {
+            console.warn(`Provider ${provider.id} has invalid location data`);
+            return null;
+          }
+
           const position: LatLngTuple = [
             provider.location.latitude,
             provider.location.longitude,
           ];
+
           return (
             <Marker
               key={provider.id}
