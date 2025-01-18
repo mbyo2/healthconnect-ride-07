@@ -39,14 +39,21 @@ export const ProviderMap = ({ providers, onProviderSelect }: ProviderMapProps) =
         ref={mapRef}
         style={{ height: "100%", width: "100%" }}
         className="z-0"
-        zoom={13}
         scrollWheelZoom={false}
+        viewport={{
+          center: defaultPosition,
+          zoom: 13,
+        }}
       >
         <MapInitializer center={defaultPosition} />
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        />
+          attributionControl={true}
+        >
+          <div className="leaflet-attribution">
+            &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors
+          </div>
+        </TileLayer>
         {providers.map((provider) => {
           const position: LatLngTuple = [
             provider.location.latitude,
