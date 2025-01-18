@@ -7,37 +7,56 @@ import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { Heart } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { LoadingScreen } from "@/components/LoadingScreen";
 import type { AuthError } from "@supabase/supabase-js";
 
 const Login = () => {
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   useEffect(() => {
-    console.log("Checking existing session...");
-    supabase.auth.getSession().then(({ data: { session }, error }) => {
-      if (error) {
-        console.error("Error checking session:", error);
-        setError(error.message);
-        return;
+    const checkSession = async () => {
+      try {
+        console.log("Checking existing session...");
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error("Error checking session:", error);
+          setError(error.message);
+          return;
+        }
+        
+        if (session) {
+          console.log("User already logged in, redirecting to home");
+          setIsRedirecting(true);
+          navigate("/home");
+        }
+      } catch (err) {
+        console.error("Unexpected error during session check:", err);
+        setError(err instanceof Error ? err.message : "An unexpected error occurred");
+      } finally {
+        setIsLoading(false);
       }
-      
-      if (session) {
-        console.log("User already logged in, redirecting to home");
-        navigate("/home");
-      }
-    });
+    };
 
+    checkSession();
+  }, [navigate]);
+
+  useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       console.log("Auth state changed:", { event, session });
       
       if (event === "SIGNED_IN" && session) {
         console.log("User signed in successfully:", session.user);
+        setIsRedirecting(true);
         toast.success("Welcome to your healthcare portal!");
         navigate("/home");
       } else if (event === "SIGNED_OUT") {
         console.log("User signed out");
         setError(null);
+        setIsRedirecting(false);
       } else if (event === "USER_UPDATED") {
         console.log("User updated:", session?.user);
       } else if (event === "PASSWORD_RECOVERY") {
@@ -50,6 +69,18 @@ const Login = () => {
 
     return () => subscription.unsubscribe();
   }, [navigate]);
+
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
+
+  if (isRedirecting) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-background to-muted flex items-center justify-center p-4">
+        <LoadingScreen />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted flex items-center justify-center p-4">

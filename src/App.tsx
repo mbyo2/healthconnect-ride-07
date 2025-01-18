@@ -36,6 +36,7 @@ const queryClient = new QueryClient({
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
     console.log("Checking authentication status...");
@@ -65,6 +66,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state changed:", { event, session });
+      setIsTransitioning(true);
       
       if (event === "SIGNED_OUT") {
         setIsAuthenticated(false);
@@ -76,12 +78,13 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
       }
       
       setIsLoading(false);
+      setTimeout(() => setIsTransitioning(false), 500); // Small delay for smooth transition
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
-  if (isLoading) {
+  if (isLoading || isTransitioning) {
     return <LoadingScreen />;
   }
 
