@@ -29,9 +29,36 @@ const Login = () => {
         }
         
         if (session) {
-          console.log("User already logged in, redirecting to home");
+          console.log("User already logged in, checking profile completion...");
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('is_profile_complete, role')
+            .eq('id', session.user.id)
+            .single();
+
+          if (profileError) {
+            console.error("Error fetching profile:", profileError);
+            return;
+          }
+
           setIsRedirecting(true);
-          navigate("/home");
+          
+          if (!profile?.is_profile_complete) {
+            console.log("Profile incomplete, redirecting to setup...");
+            navigate("/profile-setup");
+          } else {
+            console.log("Profile complete, redirecting to appropriate dashboard...");
+            switch (profile.role) {
+              case 'health_personnel':
+                navigate("/provider-dashboard");
+                break;
+              case 'admin':
+                navigate("/admin");
+                break;
+              default:
+                navigate("/home");
+            }
+          }
         }
       } catch (err) {
         console.error("Unexpected error during session check:", err);
@@ -45,25 +72,45 @@ const Login = () => {
   }, [navigate]);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state changed:", { event, session });
       
       if (event === "SIGNED_IN" && session) {
         console.log("User signed in successfully:", session.user);
         setIsRedirecting(true);
-        toast.success("Welcome to your healthcare portal!");
-        navigate("/home");
+        
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('is_profile_complete, role')
+          .eq('id', session.user.id)
+          .single();
+
+        if (profileError) {
+          console.error("Error fetching profile:", profileError);
+          toast.error("Error fetching profile");
+          return;
+        }
+
+        if (!profile?.is_profile_complete) {
+          navigate("/profile-setup");
+          toast.info("Please complete your profile");
+        } else {
+          toast.success("Welcome back!");
+          switch (profile.role) {
+            case 'health_personnel':
+              navigate("/provider-dashboard");
+              break;
+            case 'admin':
+              navigate("/admin");
+              break;
+            default:
+              navigate("/home");
+          }
+        }
       } else if (event === "SIGNED_OUT") {
         console.log("User signed out");
         setError(null);
         setIsRedirecting(false);
-      } else if (event === "USER_UPDATED") {
-        console.log("User updated:", session?.user);
-      } else if (event === "PASSWORD_RECOVERY") {
-        console.log("Password recovery event received");
-        toast.info("Please check your email for password reset instructions");
-      } else if (event === "TOKEN_REFRESHED") {
-        console.log("Session token refreshed");
       }
     });
 
