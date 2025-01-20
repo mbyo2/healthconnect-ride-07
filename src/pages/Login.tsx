@@ -12,9 +12,9 @@ import type { AuthError } from "@supabase/supabase-js";
 
 const Login = () => {
   const navigate = useNavigate();
-  const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isRedirecting, setIsRedirecting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const checkSession = async () => {
@@ -50,7 +50,7 @@ const Login = () => {
             console.log("Profile complete, redirecting to appropriate dashboard...");
             switch (profile.role) {
               case 'health_personnel':
-                navigate("/provider-dashboard");
+                navigate("/calendar");
                 break;
               case 'admin':
                 navigate("/admin");
@@ -98,7 +98,7 @@ const Login = () => {
           toast.success("Welcome back!");
           switch (profile.role) {
             case 'health_personnel':
-              navigate("/provider-dashboard");
+              navigate("/calendar");
               break;
             case 'admin':
               navigate("/admin");
