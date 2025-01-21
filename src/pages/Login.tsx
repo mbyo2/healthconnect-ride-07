@@ -8,7 +8,6 @@ import { Card } from "@/components/ui/card";
 import { Heart } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { LoadingScreen } from "@/components/LoadingScreen";
-import type { AuthError } from "@supabase/supabase-js";
 
 const Login = () => {
   const navigate = useNavigate();

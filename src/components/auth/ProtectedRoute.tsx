@@ -3,21 +3,24 @@ import { Navigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { toast } from "sonner";
+import type { UserRole } from "@/integrations/supabase/types";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  allowedRoles?: string[];
+  allowedRoles?: UserRole[];
 }
 
 export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-  const [userRole, setUserRole] = useState<string | null>(null);
+  const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isProfileComplete, setIsProfileComplete] = useState<boolean | null>(null);
   const location = useLocation();
 
   useEffect(() => {
     const checkAuth = async () => {
       try {
+        console.log("Checking authentication status...");
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
@@ -27,10 +30,12 @@ export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) 
         }
 
         if (!session) {
+          console.log("No active session found");
           setIsAuthenticated(false);
           return;
         }
 
+        console.log("Session found, checking profile...");
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('role, is_profile_complete')
@@ -44,13 +49,14 @@ export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) 
         }
 
         setUserRole(profile.role);
+        setIsProfileComplete(profile.is_profile_complete);
         setIsAuthenticated(true);
 
-        // Redirect to profile setup if profile is not complete
-        if (!profile.is_profile_complete && location.pathname !== '/profile-setup') {
-          toast.info("Please complete your profile first");
-          return <Navigate to="/profile-setup" state={{ from: location }} replace />;
-        }
+        console.log("Auth check complete:", {
+          role: profile.role,
+          isProfileComplete: profile.is_profile_complete
+        });
+
       } catch (error) {
         console.error("Auth check error:", error);
         setIsAuthenticated(false);
@@ -62,9 +68,11 @@ export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) 
     checkAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("Auth state changed:", event);
       if (event === 'SIGNED_OUT') {
         setIsAuthenticated(false);
         setUserRole(null);
+        setIsProfileComplete(null);
       }
     });
 
@@ -76,10 +84,18 @@ export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) 
   }
 
   if (!isAuthenticated) {
+    console.log("User not authenticated, redirecting to login");
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
+  if (!isProfileComplete && location.pathname !== '/profile-setup') {
+    console.log("Profile incomplete, redirecting to setup");
+    toast.info("Please complete your profile first");
+    return <Navigate to="/profile-setup" state={{ from: location }} replace />;
+  }
+
   if (allowedRoles && userRole && !allowedRoles.includes(userRole)) {
+    console.log("User role not allowed:", userRole);
     toast.error("You don't have permission to access this page");
     return <Navigate to="/home" replace />;
   }
