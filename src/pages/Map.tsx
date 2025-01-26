@@ -4,6 +4,7 @@ import { ProviderList } from '@/components/ProviderList';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { Provider, MapProvider } from '@/types/provider';
+import type { LatLngTuple } from 'leaflet';
 
 const MapPage = () => {
   const [selectedProvider, setSelectedProvider] = useState<Provider | null>(null);
