@@ -3,7 +3,7 @@ import { ProviderMap } from '@/components/ProviderMap';
 import { ProviderList } from '@/components/ProviderList';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Provider } from '@/types/provider';
+import type { Provider, MapProvider } from '@/types/provider';
 
 const MapPage = () => {
   const [selectedProvider, setSelectedProvider] = useState<Provider | null>(null);
@@ -45,6 +45,15 @@ const MapPage = () => {
     }
   });
 
+  const mapProviders: MapProvider[] = providers.map(p => ({
+    id: p.id,
+    first_name: p.first_name,
+    last_name: p.last_name,
+    specialty: p.specialty,
+    location: [p.location.latitude, p.location.longitude] as LatLngTuple,
+    rating: 4.5 // This is hardcoded for now, you might want to fetch this from a ratings table
+  }));
+
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -61,10 +70,7 @@ const MapPage = () => {
           />
         </div>
         <div className="order-1 lg:order-2">
-          <ProviderMap
-            providers={providers}
-            onProviderSelect={setSelectedProvider}
-          />
+          <ProviderMap providers={mapProviders} />
         </div>
       </div>
     </div>
