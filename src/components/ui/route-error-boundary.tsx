@@ -1,58 +1,37 @@
-import { useNavigate } from "react-router-dom";
-import { AlertTriangle } from "lucide-react";
-import { Button } from "./button";
+import * as React from 'react';
+import { useRouteError } from 'react-router-dom';
 
-interface RouteErrorBoundaryProps {
+interface ErrorBoundaryProps {
   children: React.ReactNode;
 }
 
-interface ErrorBoundaryState {
-  hasError: boolean;
-  error?: Error;
-}
+export const RouteErrorBoundary: React.FC<ErrorBoundaryProps> = ({ children }) => {
+  const [hasError, setHasError] = React.useState(false);
+  const error = useRouteError();
 
-export class RouteErrorBoundary extends React.Component<RouteErrorBoundaryProps, ErrorBoundaryState> {
-  constructor(props: RouteErrorBoundaryProps) {
-    super(props);
-    this.state = { hasError: false };
-  }
-
-  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
-    return { hasError: true, error };
-  }
-
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error("Route error:", error, errorInfo);
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div className="min-h-screen flex items-center justify-center p-4">
-          <div className="text-center space-y-4">
-            <AlertTriangle className="h-12 w-12 text-destructive mx-auto" />
-            <h1 className="text-2xl font-bold">Something went wrong</h1>
-            <p className="text-muted-foreground">
-              {this.state.error?.message || "An unexpected error occurred"}
-            </p>
-            <div className="space-x-4">
-              <Button
-                onClick={() => window.location.reload()}
-                variant="outline"
-              >
-                Try again
-              </Button>
-              <Button
-                onClick={() => window.location.href = '/'}
-              >
-                Go home
-              </Button>
-            </div>
-          </div>
-        </div>
-      );
+  React.useEffect(() => {
+    if (error) {
+      setHasError(true);
+      console.error('Route error:', error);
     }
+  }, [error]);
 
-    return this.props.children;
+  if (hasError) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] p-4">
+        <h2 className="text-2xl font-bold mb-4">Something went wrong</h2>
+        <p className="text-muted-foreground mb-4">
+          We're sorry, but there was an error loading this page.
+        </p>
+        <button
+          onClick={() => window.location.reload()}
+          className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+        >
+          Try again
+        </button>
+      </div>
+    );
   }
-}
+
+  return <>{children}</>;
+};

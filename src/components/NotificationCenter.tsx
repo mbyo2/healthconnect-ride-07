@@ -10,16 +10,7 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-
-interface Notification {
-  id: string;
-  user_id: string;
-  title: string;
-  message: string;
-  type: 'appointment' | 'message' | 'system';
-  read: boolean;
-  created_at: string;
-}
+import type { Notification } from '@/types/notification';
 
 export const NotificationCenter = () => {
   const queryClient = useQueryClient();
@@ -61,9 +52,7 @@ export const NotificationCenter = () => {
           console.log('New notification:', payload);
           queryClient.invalidateQueries({ queryKey: ['notifications'] });
           
-          // Show toast for new notification
-          toast({
-            title: payload.new.title,
+          toast(payload.new.title, {
             description: payload.new.message,
           });
         }
