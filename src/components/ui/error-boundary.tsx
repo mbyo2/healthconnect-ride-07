@@ -19,14 +19,17 @@ export class ErrorBoundary extends React.Component<Props, State> {
   };
 
   public static getDerivedStateFromError(error: Error): State {
+    console.error("Error caught by boundary:", error);
     return { hasError: true, error };
   }
 
   public componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error("Uncaught error:", error, errorInfo);
+    console.error("Uncaught error:", error);
+    console.error("Error info:", errorInfo);
   }
 
   private handleRetry = () => {
+    console.log("Retrying...");
     this.setState({ hasError: false, error: null });
     window.location.reload();
   };
@@ -38,8 +41,13 @@ export class ErrorBoundary extends React.Component<Props, State> {
           <Alert variant="destructive" className="max-w-lg">
             <AlertTitle>Something went wrong</AlertTitle>
             <AlertDescription className="mt-2">
-              <p className="mb-4">
+              <p className="mb-4 whitespace-pre-wrap">
                 {this.state.error?.message || "An unexpected error occurred."}
+                {this.state.error?.stack && (
+                  <span className="block mt-2 text-xs opacity-75">
+                    {this.state.error.stack}
+                  </span>
+                )}
               </p>
               <Button
                 variant="outline"

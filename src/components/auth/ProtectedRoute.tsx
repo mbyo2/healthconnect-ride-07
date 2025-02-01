@@ -3,7 +3,8 @@ import { Navigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { toast } from "sonner";
-import type { UserRole } from "@/integrations/supabase/types";
+
+type UserRole = 'admin' | 'health_personnel' | 'patient';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -25,13 +26,16 @@ export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) 
         
         if (sessionError) {
           console.error("Session error:", sessionError);
+          toast.error(sessionError.message);
           setIsAuthenticated(false);
+          setIsLoading(false);
           return;
         }
 
         if (!session) {
           console.log("No active session found");
           setIsAuthenticated(false);
+          setIsLoading(false);
           return;
         }
 
@@ -40,15 +44,25 @@ export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) 
           .from('profiles')
           .select('role, is_profile_complete')
           .eq('id', session.user.id)
-          .single();
+          .maybeSingle();
 
         if (profileError) {
           console.error("Profile error:", profileError);
+          toast.error(profileError.message);
           setIsAuthenticated(false);
+          setIsLoading(false);
           return;
         }
 
-        setUserRole(profile.role);
+        if (!profile) {
+          console.log("No profile found");
+          setIsAuthenticated(true);
+          setIsProfileComplete(false);
+          setIsLoading(false);
+          return;
+        }
+
+        setUserRole(profile.role as UserRole);
         setIsProfileComplete(profile.is_profile_complete);
         setIsAuthenticated(true);
 
@@ -59,6 +73,7 @@ export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) 
 
       } catch (error) {
         console.error("Unexpected error during session check:", error);
+        toast.error("Error checking authentication status");
         setIsAuthenticated(false);
       } finally {
         setIsLoading(false);
