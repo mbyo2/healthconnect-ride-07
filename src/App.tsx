@@ -5,9 +5,11 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
+import { RouteErrorBoundary } from "@/components/ui/route-error-boundary";
 import { MobileLayout } from "@/components/layouts/MobileLayout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { LoadingScreen } from "@/components/LoadingScreen";
+import { toast } from "sonner";
 import Login from "./pages/Login";
 import ResetPassword from "./pages/ResetPassword";
 import { ProfileSetup } from "@/components/auth/ProfileSetup";
@@ -28,6 +30,10 @@ const queryClient = new QueryClient({
       retry: 1,
       refetchOnWindowFocus: false,
       staleTime: 5 * 60 * 1000,
+      onError: (error: any) => {
+        console.error('Query error:', error);
+        toast.error(error?.message || 'An error occurred while fetching data');
+      },
     },
   },
 });
@@ -49,7 +55,9 @@ const App = () => {
                 {/* Protected Setup Route */}
                 <Route path="/profile-setup" element={
                   <ProtectedRoute>
-                    <ProfileSetup />
+                    <RouteErrorBoundary>
+                      <ProfileSetup />
+                    </RouteErrorBoundary>
                   </ProtectedRoute>
                 } />
 
@@ -62,28 +70,64 @@ const App = () => {
                     <MobileLayout>
                       <Routes>
                         {/* Common Routes */}
-                        <Route path="home" element={<Index />} />
-                        <Route path="search" element={<Search />} />
-                        <Route path="map" element={<Map />} />
-                        <Route path="profile" element={<Profile />} />
-                        <Route path="chat" element={<Chat />} />
+                        <Route path="home" element={
+                          <RouteErrorBoundary>
+                            <Index />
+                          </RouteErrorBoundary>
+                        } />
+                        <Route path="search" element={
+                          <RouteErrorBoundary>
+                            <Search />
+                          </RouteErrorBoundary>
+                        } />
+                        <Route path="map" element={
+                          <RouteErrorBoundary>
+                            <Map />
+                          </RouteErrorBoundary>
+                        } />
+                        <Route path="profile" element={
+                          <RouteErrorBoundary>
+                            <Profile />
+                          </RouteErrorBoundary>
+                        } />
+                        <Route path="chat" element={
+                          <RouteErrorBoundary>
+                            <Chat />
+                          </RouteErrorBoundary>
+                        } />
                         
                         {/* Patient Routes */}
-                        <Route path="healthcare" element={<Healthcare />} />
-                        <Route path="appointments" element={<Appointments />} />
-                        <Route path="video-consultations" element={<VideoConsultations />} />
+                        <Route path="healthcare" element={
+                          <RouteErrorBoundary>
+                            <Healthcare />
+                          </RouteErrorBoundary>
+                        } />
+                        <Route path="appointments" element={
+                          <RouteErrorBoundary>
+                            <Appointments />
+                          </RouteErrorBoundary>
+                        } />
+                        <Route path="video-consultations" element={
+                          <RouteErrorBoundary>
+                            <VideoConsultations />
+                          </RouteErrorBoundary>
+                        } />
                         
                         {/* Admin Routes */}
                         <Route path="admin" element={
                           <ProtectedRoute allowedRoles={['admin']}>
-                            <AdminDashboard />
+                            <RouteErrorBoundary>
+                              <AdminDashboard />
+                            </RouteErrorBoundary>
                           </ProtectedRoute>
                         } />
                         
                         {/* Provider Routes */}
                         <Route path="calendar" element={
                           <ProtectedRoute allowedRoles={['health_personnel']}>
-                            <ProviderCalendar />
+                            <RouteErrorBoundary>
+                              <ProviderCalendar />
+                            </RouteErrorBoundary>
                           </ProtectedRoute>
                         } />
                         
