@@ -35,14 +35,6 @@ export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) 
           return;
         }
 
-        // Refresh the session to get a new token
-        const { error: refreshError } = await supabase.auth.refreshSession();
-        if (refreshError) {
-          console.error("Session refresh error:", refreshError);
-          setIsAuthenticated(false);
-          return;
-        }
-
         console.log("Session found, checking profile...");
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
@@ -66,7 +58,7 @@ export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) 
         });
 
       } catch (error) {
-        console.error("Auth check error:", error);
+        console.error("Unexpected error during session check:", error);
         setIsAuthenticated(false);
       } finally {
         setIsLoading(false);
