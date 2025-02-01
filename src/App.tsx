@@ -42,38 +42,52 @@ const App = () => {
           <BrowserRouter basename="/">
             <TooltipProvider>
               <Routes>
+                {/* Public Routes */}
                 <Route path="/login" element={<Login />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
+                
+                {/* Protected Setup Route */}
                 <Route path="/profile-setup" element={
                   <ProtectedRoute>
                     <ProfileSetup />
                   </ProtectedRoute>
                 } />
+
+                {/* Default Redirect */}
                 <Route path="/" element={<Navigate to="/home" replace />} />
                 
-                {/* Protected Routes */}
+                {/* Protected Routes with Role-Based Access */}
                 <Route path="/*" element={
                   <ProtectedRoute>
                     <MobileLayout>
                       <Routes>
+                        {/* Common Routes */}
                         <Route path="home" element={<Index />} />
-                        <Route path="healthcare" element={<Healthcare />} />
                         <Route path="search" element={<Search />} />
                         <Route path="map" element={<Map />} />
-                        <Route path="appointments" element={<Appointments />} />
-                        <Route path="chat" element={<Chat />} />
-                        <Route path="video-consultations" element={<VideoConsultations />} />
                         <Route path="profile" element={<Profile />} />
+                        <Route path="chat" element={<Chat />} />
+                        
+                        {/* Patient Routes */}
+                        <Route path="healthcare" element={<Healthcare />} />
+                        <Route path="appointments" element={<Appointments />} />
+                        <Route path="video-consultations" element={<VideoConsultations />} />
+                        
+                        {/* Admin Routes */}
                         <Route path="admin" element={
                           <ProtectedRoute allowedRoles={['admin']}>
                             <AdminDashboard />
                           </ProtectedRoute>
                         } />
+                        
+                        {/* Provider Routes */}
                         <Route path="calendar" element={
                           <ProtectedRoute allowedRoles={['health_personnel']}>
                             <ProviderCalendar />
                           </ProtectedRoute>
                         } />
+                        
+                        {/* Fallback Route */}
                         <Route path="*" element={<Navigate to="/home" replace />} />
                       </Routes>
                     </MobileLayout>
