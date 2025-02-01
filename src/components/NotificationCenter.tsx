@@ -8,17 +8,46 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { supabase } from '@/integrations/supabase/client';
-import { Notification } from '@/types/notification';
-import { useToast } from '@/components/ui/use-toast';
+import { toast } from 'sonner';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+
+interface Notification {
+  id: string;
+  user_id: string;
+  title: string;
+  message: string;
+  type: 'appointment' | 'message' | 'system';
+  read: boolean;
+  created_at: string;
+}
 
 export const NotificationCenter = () => {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const queryClient = useQueryClient();
   const [unreadCount, setUnreadCount] = useState(0);
-  const { toast } = useToast();
+
+  const { data: notifications = [], isLoading } = useQuery({
+    queryKey: ['notifications'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
+
+      const { data, error } = await supabase
+        .from('notifications')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(10);
+
+      if (error) {
+        console.error('Error fetching notifications:', error);
+        throw error;
+      }
+
+      return data as Notification[];
+    },
+  });
 
   useEffect(() => {
-    fetchNotifications();
-    // Subscribe to new notifications
     const channel = supabase
       .channel('notifications')
       .on(
@@ -30,8 +59,9 @@ export const NotificationCenter = () => {
         },
         (payload: { new: Notification }) => {
           console.log('New notification:', payload);
-          setNotifications((prev) => [...prev, payload.new]);
-          setUnreadCount((prev) => prev + 1);
+          queryClient.invalidateQueries({ queryKey: ['notifications'] });
+          
+          // Show toast for new notification
           toast({
             title: payload.new.title,
             description: payload.new.message,
@@ -43,29 +73,11 @@ export const NotificationCenter = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [queryClient]);
 
-  const fetchNotifications = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-
-    const { data, error } = await supabase
-      .from('notifications')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
-      .limit(10) as { data: Notification[] | null, error: any };
-
-    if (error) {
-      console.error('Error fetching notifications:', error);
-      return;
-    }
-
-    if (data) {
-      setNotifications(data);
-      setUnreadCount(data.filter((n: Notification) => !n.read).length);
-    }
-  };
+  useEffect(() => {
+    setUnreadCount(notifications.filter(n => !n.read).length);
+  }, [notifications]);
 
   const markAsRead = async (notificationId: string) => {
     const { error } = await supabase
@@ -75,14 +87,21 @@ export const NotificationCenter = () => {
 
     if (error) {
       console.error('Error marking notification as read:', error);
+      toast.error('Failed to mark notification as read');
       return;
     }
 
-    setNotifications(notifications.map(n => 
-      n.id === notificationId ? { ...n, read: true } : n
-    ));
-    setUnreadCount((prev) => Math.max(0, prev - 1));
+    queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    setUnreadCount(prev => Math.max(0, prev - 1));
   };
+
+  if (isLoading) {
+    return (
+      <Button variant="ghost" size="icon" className="relative animate-pulse">
+        <Bell className="h-5 w-5" />
+      </Button>
+    );
+  }
 
   return (
     <DropdownMenu>
@@ -90,7 +109,7 @@ export const NotificationCenter = () => {
         <Button variant="ghost" size="icon" className="relative">
           <Bell className="h-5 w-5" />
           {unreadCount > 0 && (
-            <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center">
+            <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center animate-in fade-in">
               {unreadCount}
             </span>
           )}
@@ -98,20 +117,20 @@ export const NotificationCenter = () => {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-80">
         {notifications.length === 0 ? (
-          <div className="p-4 text-center text-gray-500">
+          <div className="p-4 text-center text-muted-foreground">
             No notifications
           </div>
         ) : (
           notifications.map((notification) => (
             <DropdownMenuItem
               key={notification.id}
-              className={`p-4 cursor-pointer ${!notification.read ? 'bg-gray-50' : ''}`}
+              className={`p-4 cursor-pointer ${!notification.read ? 'bg-muted' : ''}`}
               onClick={() => markAsRead(notification.id)}
             >
-              <div>
+              <div className="space-y-1">
                 <div className="font-medium">{notification.title}</div>
-                <div className="text-sm text-gray-500">{notification.message}</div>
-                <div className="text-xs text-gray-400 mt-1">
+                <div className="text-sm text-muted-foreground">{notification.message}</div>
+                <div className="text-xs text-muted-foreground">
                   {new Date(notification.created_at).toLocaleString()}
                 </div>
               </div>

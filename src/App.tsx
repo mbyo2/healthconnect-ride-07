@@ -30,9 +30,11 @@ const queryClient = new QueryClient({
       retry: 1,
       refetchOnWindowFocus: false,
       staleTime: 5 * 60 * 1000,
-      onError: (error: any) => {
-        console.error('Query error:', error);
-        toast.error(error?.message || 'An error occurred while fetching data');
+      meta: {
+        onError: (error: any) => {
+          console.error('Query error:', error);
+          toast.error(error?.message || 'An error occurred while fetching data');
+        },
       },
     },
   },

@@ -1,7 +1,11 @@
-import type { Database } from './database';
+import { Database } from './database';
 
-export type Tables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Row'];
-export type Enums<T extends keyof Database['public']['Enums']> = Database['public']['Enums'][T];
+export type Tables = Database['public']['Tables'];
+export type UserRole = 'admin' | 'health_personnel' | 'patient';
 
-export type UserRole = Enums<'user_role'>;
-export type Appointment = Tables<'appointments'>;
+export interface Profile extends Tables['profiles']['Row'] {
+  role: UserRole;
+}
+
+export * from './communication';
+export * from './generated';
