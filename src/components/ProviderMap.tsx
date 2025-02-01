@@ -27,8 +27,8 @@ export const ProviderMap = ({ providers }: ProviderMapProps) => {
         ref={mapRef}
         style={{ height: "100%", width: "100%" }}
         className="z-0"
-        center={defaultPosition}
-        zoom={13}
+        defaultCenter={defaultPosition}
+        defaultZoom={13}
         scrollWheelZoom={true}
       >
         <TileLayer
