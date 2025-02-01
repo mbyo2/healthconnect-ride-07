@@ -27,12 +27,13 @@ export const ProviderMap = ({ providers }: ProviderMapProps) => {
         ref={mapRef}
         style={{ height: "100%", width: "100%" }}
         className="z-0"
-        center={defaultPosition}
-        zoom={13}
+        defaultCenter={defaultPosition}
+        defaultZoom={13}
         scrollWheelZoom={true}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attributionControl={true}
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
         {providers.map((provider) => (

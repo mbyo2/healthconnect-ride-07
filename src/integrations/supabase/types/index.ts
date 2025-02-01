@@ -1,22 +1,11 @@
-import { Database } from './database';
+import type { Database } from './database';
 
-export type Tables = Database['public']['Tables'];
-export type UserRole = 'admin' | 'health_personnel' | 'patient';
+export type Tables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Row'];
+export type Enums = Database['public']['Enums'];
+export type UserRole = Enums['user_role'];
 
-export interface Profile {
-  id: string;
-  first_name?: string;
-  last_name?: string;
-  email?: string;
-  phone?: string;
-  specialty?: string;
-  bio?: string;
-  avatar_url?: string;
-  role: UserRole;
-  created_at?: string;
-  updated_at?: string;
-  is_profile_complete?: boolean;
+export interface Profile extends Tables<'profiles'> {
+  // Additional profile-specific types can be added here
 }
 
-export * from './communication';
-export * from './generated';
+export type { Database };

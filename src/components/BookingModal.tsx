@@ -17,6 +17,7 @@ interface BookingModalProps {
 
 export const BookingModal = ({ isOpen, onClose, provider }: BookingModalProps) => {
   const [showPayment, setShowPayment] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
   const {
     selectedDate,
     setSelectedDate,
@@ -26,6 +27,17 @@ export const BookingModal = ({ isOpen, onClose, provider }: BookingModalProps) =
     availableTimeSlots,
     handleBookAppointment,
   } = useBooking(provider);
+
+  // Get user ID when component mounts
+  useState(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setUserId(user.id);
+      }
+    };
+    getUser();
+  }, []);
 
   const handleConfirmBooking = async () => {
     const success = await handleBookAppointment();
@@ -38,8 +50,6 @@ export const BookingModal = ({ isOpen, onClose, provider }: BookingModalProps) =
     setShowPayment(false);
     onClose();
   };
-
-  const { data: { user } } = await supabase.auth.getUser();
 
   return (
     <>
@@ -77,14 +87,14 @@ export const BookingModal = ({ isOpen, onClose, provider }: BookingModalProps) =
         </ModalContent>
       </Modal>
 
-      {showPayment && (
+      {showPayment && userId && (
         <PaymentModal
           isOpen={showPayment}
           onClose={handlePaymentComplete}
-          amount={provider.consultation_fee || 50} // Default fee if not set
+          amount={provider.consultation_fee || 50}
           serviceId={provider.default_service_id}
           providerId={provider.id}
-          patientId={user?.id}
+          patientId={userId}
         />
       )}
     </>

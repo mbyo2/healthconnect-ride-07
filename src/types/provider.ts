@@ -12,6 +12,8 @@ export interface Provider {
     latitude: number;
     longitude: number;
   };
+  consultation_fee?: number;
+  default_service_id?: string;
 }
 
 export interface MapProvider {
