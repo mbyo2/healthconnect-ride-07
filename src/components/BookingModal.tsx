@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@/components/ui/modal";
 import { DateSelector } from "@/components/booking/DateSelector";
@@ -29,7 +29,7 @@ export const BookingModal = ({ isOpen, onClose, provider }: BookingModalProps) =
   } = useBooking(provider);
 
   // Get user ID when component mounts
-  useState(() => {
+  useEffect(() => {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
