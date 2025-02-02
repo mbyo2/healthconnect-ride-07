@@ -1,51 +1,103 @@
-import { useRef } from "react";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import type { Map as LeafletMap } from "leaflet";
-import "leaflet/dist/leaflet.css";
-import type { LatLngTuple } from "leaflet";
+import React, { useRef, useEffect, useState } from 'react';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { Map as LeafletMap } from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Provider {
   id: string;
   first_name: string;
   last_name: string;
   specialty: string;
-  location: LatLngTuple;
-  rating?: number;
+  latitude: number;
+  longitude: number;
 }
 
-interface ProviderMapProps {
-  providers: Provider[];
-}
-
-export const ProviderMap = ({ providers }: ProviderMapProps) => {
+export const ProviderMap = () => {
   const mapRef = useRef<LeafletMap>(null);
-  const defaultPosition: LatLngTuple = [37.7749, -122.4194]; // San Francisco
+  const [providers, setProviders] = useState<Provider[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetchProviders();
+  }, []);
+
+  const fetchProviders = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('provider_locations')
+        .select(`
+          provider_id,
+          latitude,
+          longitude,
+          profiles:provider_id (
+            first_name,
+            last_name,
+            specialty
+          )
+        `);
+
+      if (error) throw error;
+
+      const formattedProviders = data?.map(item => ({
+        id: item.provider_id,
+        first_name: item.profiles.first_name,
+        last_name: item.profiles.last_name,
+        specialty: item.profiles.specialty,
+        latitude: item.latitude,
+        longitude: item.longitude
+      })) || [];
+
+      setProviders(formattedProviders);
+    } catch (error) {
+      console.error('Error fetching providers:', error);
+      toast.error('Failed to load providers on map');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (isLoading) {
+    return <div>Loading map...</div>;
+  }
 
   return (
-    <div className="h-[500px] w-full rounded-lg overflow-hidden border border-border">
+    <div className="h-[600px] w-full rounded-lg overflow-hidden border">
       <MapContainer
         ref={mapRef}
-        style={{ height: "100%", width: "100%" }}
+        style={{ height: '100%', width: '100%' }}
         className="z-0"
-        center={defaultPosition}
-        zoom={13}
-        scrollWheelZoom={true}
+        defaultCenter={[0, 0]}
+        defaultZoom={2}
+        scrollWheelZoom={false}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
         {providers.map((provider) => (
-          <Marker key={provider.id} position={provider.location}>
+          <Marker 
+            key={provider.id} 
+            position={[provider.latitude, provider.longitude]}
+          >
             <Popup>
               <div className="p-2">
-                <h3 className="font-semibold">{provider.first_name} {provider.last_name}</h3>
+                <h3 className="font-semibold">
+                  Dr. {provider.first_name} {provider.last_name}
+                </h3>
                 <p className="text-sm text-muted-foreground">{provider.specialty}</p>
-                {provider.rating && (
-                  <div className="flex items-center mt-1">
-                    <span className="text-sm">Rating: {provider.rating}/5</span>
-                  </div>
-                )}
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="mt-2 w-full"
+                  onClick={() => {
+                    // Navigate to provider profile or booking
+                    console.log('Clicked provider:', provider.id);
+                  }}
+                >
+                  View Profile
+                </Button>
               </div>
             </Popup>
           </Marker>
