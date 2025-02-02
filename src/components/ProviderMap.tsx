@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import { Map as LeafletMap } from 'leaflet';
+import { Map as LeafletMap, LatLngTuple } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -19,6 +19,7 @@ export const ProviderMap = () => {
   const mapRef = useRef<LeafletMap>(null);
   const [providers, setProviders] = useState<Provider[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const defaultCenter: LatLngTuple = [0, 0];
 
   useEffect(() => {
     fetchProviders();
@@ -60,16 +61,16 @@ export const ProviderMap = () => {
   };
 
   if (isLoading) {
-    return <div>Loading map...</div>;
+    return <div className="text-foreground">Loading map...</div>;
   }
 
   return (
-    <div className="h-[600px] w-full rounded-lg overflow-hidden border">
+    <div className="h-[600px] w-full rounded-lg overflow-hidden border bg-background">
       <MapContainer
         ref={mapRef}
         style={{ height: '100%', width: '100%' }}
         className="z-0"
-        center={[0, 0]}
+        defaultCenter={defaultCenter}
         zoom={2}
         scrollWheelZoom={false}
       >
@@ -83,7 +84,7 @@ export const ProviderMap = () => {
           >
             <Popup>
               <div className="p-2">
-                <h3 className="font-semibold">
+                <h3 className="font-semibold text-foreground">
                   Dr. {provider.first_name} {provider.last_name}
                 </h3>
                 <p className="text-sm text-muted-foreground">{provider.specialty}</p>

@@ -67,15 +67,10 @@ export default {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
-        "theme-toggle": {
-          "0%": { transform: "scale(0.8) rotate(-180deg)" },
-          "100%": { transform: "scale(1) rotate(0deg)" },
-        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "theme-toggle": "theme-toggle 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
       },
     },
   },
