@@ -69,8 +69,8 @@ export const ProviderMap = () => {
         ref={mapRef}
         style={{ height: '100%', width: '100%' }}
         className="z-0"
-        defaultCenter={[0, 0]}
-        defaultZoom={2}
+        center={[0, 0]}
+        zoom={2}
         scrollWheelZoom={false}
       >
         <TileLayer
@@ -92,7 +92,6 @@ export const ProviderMap = () => {
                   size="sm" 
                   className="mt-2 w-full"
                   onClick={() => {
-                    // Navigate to provider profile or booking
                     console.log('Clicked provider:', provider.id);
                   }}
                 >

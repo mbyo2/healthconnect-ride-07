@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { useRouteError } from 'react-router-dom';
 
 interface ErrorBoundaryProps {
   children: React.ReactNode;
@@ -7,14 +6,14 @@ interface ErrorBoundaryProps {
 
 export const RouteErrorBoundary: React.FC<ErrorBoundaryProps> = ({ children }) => {
   const [hasError, setHasError] = React.useState(false);
-  const error = useRouteError();
+  const [error, setError] = React.useState<Error | null>(null);
 
   React.useEffect(() => {
-    if (error) {
+    window.addEventListener('error', (event) => {
       setHasError(true);
-      console.error('Route error:', error);
-    }
-  }, [error]);
+      setError(event.error);
+    });
+  }, []);
 
   if (hasError) {
     return (

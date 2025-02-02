@@ -71,7 +71,7 @@ const MapPage = () => {
           />
         </div>
         <div className="order-1 lg:order-2">
-          <ProviderMap providers={mapProviders} />
+          <ProviderMap />
         </div>
       </div>
     </div>
