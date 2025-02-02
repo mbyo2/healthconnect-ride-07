@@ -70,7 +70,7 @@ export const ProviderMap = () => {
         ref={mapRef}
         style={{ height: '100%', width: '100%' }}
         className="z-0"
-        center={defaultPosition}
+        center={defaultPosition as [number, number]}
         zoom={2}
         scrollWheelZoom={false}
       >
