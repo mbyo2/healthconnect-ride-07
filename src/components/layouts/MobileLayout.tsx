@@ -4,6 +4,7 @@ import { DesktopNav } from "@/components/DesktopNav";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { ReactNode } from "react";
 import { LoadingScreen } from "@/components/LoadingScreen";
+import { SidebarProvider } from "@/components/ui/sidebar";
 
 interface MobileLayoutProps {
   children: ReactNode;
@@ -19,14 +20,16 @@ export const MobileLayout = ({ children, isLoading }: MobileLayoutProps) => {
 
   if (!isMobile) {
     return (
-      <div className="flex min-h-screen bg-background">
-        <DesktopNav />
-        <main className="flex-1 overflow-auto">
-          <div className="container mx-auto px-4 md:px-6 lg:px-8 py-6 space-y-6 max-w-7xl">
-            {children}
-          </div>
-        </main>
-      </div>
+      <SidebarProvider>
+        <div className="flex min-h-screen bg-background">
+          <DesktopNav />
+          <main className="flex-1 overflow-auto">
+            <div className="container mx-auto px-4 md:px-6 lg:px-8 py-6 space-y-6 max-w-7xl">
+              {children}
+            </div>
+          </main>
+        </div>
+      </SidebarProvider>
     );
   }
 

@@ -19,6 +19,18 @@ import { Button } from "./ui/button";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useTheme } from "@/hooks/use-theme";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarFooter,
+} from "@/components/ui/sidebar";
 
 export const DesktopNav = () => {
   const location = useLocation();
@@ -79,44 +91,55 @@ export const DesktopNav = () => {
   const links = userRole === 'health_personnel' ? providerLinks : patientLinks;
 
   return (
-    <div className="hidden lg:flex flex-col h-screen w-64 bg-background border-r border-border p-4">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-bold text-primary">Dokotela</h1>
+    <Sidebar>
+      <SidebarHeader className="p-4">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold text-primary">Dokotela</h1>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            className="rounded-full"
+          >
+            {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+          </Button>
+        </div>
+      </SidebarHeader>
+      
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {links.map((link) => (
+                <SidebarMenuItem key={link.path}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={isActive(link.path)}
+                    tooltip={link.label}
+                  >
+                    <Link to={link.path}>
+                      <link.icon className="h-5 w-5" />
+                      <span>{link.label}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+
+      <SidebarFooter className="p-4">
         <Button
           variant="ghost"
-          size="icon"
-          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-          className="rounded-full"
+          className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10"
+          onClick={handleLogout}
         >
-          {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+          <LogOut className="h-5 w-5 mr-3" />
+          Logout
         </Button>
-      </div>
-      
-      <nav className="flex-1 space-y-2">
-        {links.map((link) => (
-          <Link
-            key={link.path}
-            to={link.path}
-            className={`flex items-center px-4 py-3 rounded-lg transition-colors ${
-              isActive(link.path)
-                ? "bg-primary text-primary-foreground"
-                : "text-foreground hover:bg-accent"
-            }`}
-          >
-            <link.icon className="h-5 w-5 mr-3" />
-            <span>{link.label}</span>
-          </Link>
-        ))}
-      </nav>
-
-      <Button
-        variant="ghost"
-        className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10"
-        onClick={handleLogout}
-      >
-        <LogOut className="h-5 w-5 mr-3" />
-        Logout
-      </Button>
-    </div>
+      </SidebarFooter>
+    </Sidebar>
   );
 };
