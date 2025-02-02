@@ -14,7 +14,7 @@ export const ThemeToggle = () => {
 
   return (
     <Button
-      variant="outline"
+      variant="ghost"
       size="icon"
       onClick={toggleTheme}
       className="relative h-10 w-10 rounded-full border-2 hover:bg-accent transition-colors duration-300"
