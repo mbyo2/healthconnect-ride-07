@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { 
   User, Settings, Bell, Shield, LogOut, 
   Star, MapPin, Phone, Mail, Calendar 
@@ -16,35 +17,49 @@ import { toast } from "sonner";
 type Profile = Database['public']['Tables']['profiles']['Row'];
 
 const Profile = () => {
+  const [userProfile, setUserProfile] = useState<Profile | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [applicationStatus, setApplicationStatus] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUserProfile = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', user.id)
-          .single();
-        
-        if (profile && !profileError) {
-          setUserRole(profile.role);
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        console.log("Current user:", user);
+
+        if (user) {
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', user.id)
+            .single();
           
-          if (profile.role === 'health_personnel') {
-            const { data: application, error: applicationError } = await supabase
-              .from('health_personnel_applications')
-              .select('status')
-              .eq('user_id', user.id)
-              .single();
+          console.log("Fetched profile:", profile);
+          
+          if (profile && !profileError) {
+            setUserProfile(profile);
+            setUserRole(profile.role);
             
-            if (application && !applicationError) {
-              setApplicationStatus(application.status);
+            if (profile.role === 'health_personnel') {
+              const { data: application, error: applicationError } = await supabase
+                .from('health_personnel_applications')
+                .select('status')
+                .eq('user_id', user.id)
+                .single();
+              
+              if (application && !applicationError) {
+                setApplicationStatus(application.status);
+              }
             }
+          } else {
+            console.error("Profile error:", profileError);
+            toast.error("Error fetching profile");
           }
         }
+      } catch (error) {
+        console.error("Error:", error);
+        toast.error("Error fetching user data");
       }
     };
 
@@ -62,13 +77,14 @@ const Profile = () => {
   };
 
   const isHealthcareProvider = userRole === 'health_personnel';
+  const fullName = userProfile ? `${userProfile.first_name || ''} ${userProfile.last_name || ''}`.trim() : 'Loading...';
 
   return (
     <div className="container mx-auto px-4 py-8 bg-background min-h-screen">
       <Card className="p-6 mb-6">
         <div className="flex flex-col md:flex-row items-start gap-6">
           <Avatar className="w-24 h-24">
-            <AvatarImage src="/placeholder.svg" />
+            <AvatarImage src={userProfile?.avatar_url || ""} />
             <AvatarFallback>
               <User className="w-12 h-12" />
             </AvatarFallback>
@@ -77,13 +93,16 @@ const Profile = () => {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <div>
                 <h1 className="text-2xl font-bold text-foreground">
-                  {isHealthcareProvider ? "Dr. Michael Chen" : "John Doe"}
+                  {isHealthcareProvider ? `Dr. ${fullName}` : fullName}
                 </h1>
                 <p className="text-muted-foreground">
-                  {isHealthcareProvider ? "Emergency Medicine" : "Patient"}
+                  {isHealthcareProvider ? userProfile?.specialty || "Healthcare Provider" : "Patient"}
                 </p>
               </div>
-              <Button variant="outline">Edit Profile</Button>
+              <div className="flex items-center gap-2">
+                <ThemeToggle />
+                <Button variant="outline">Edit Profile</Button>
+              </div>
             </div>
             
             {isHealthcareProvider && (
@@ -98,19 +117,27 @@ const Profile = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Mail className="w-4 h-4" />
-                <span>john.doe@example.com</span>
+                <span>{userProfile?.email || 'No email provided'}</span>
               </div>
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Phone className="w-4 h-4" />
-                <span>+1 234 567 890</span>
+                <span>{userProfile?.phone || 'No phone provided'}</span>
               </div>
               <div className="flex items-center gap-2 text-muted-foreground">
                 <MapPin className="w-4 h-4" />
-                <span>San Francisco, CA</span>
+                <span>
+                  {userProfile?.city && userProfile?.state 
+                    ? `${userProfile.city}, ${userProfile.state}`
+                    : 'Location not provided'}
+                </span>
               </div>
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Calendar className="w-4 h-4" />
-                <span>Joined January 2024</span>
+                <span>
+                  {userProfile?.created_at 
+                    ? `Joined ${new Date(userProfile.created_at).toLocaleDateString()}`
+                    : 'Join date unknown'}
+                </span>
               </div>
             </div>
           </div>
