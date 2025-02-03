@@ -125,6 +125,20 @@ export const DesktopNav = () => {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+              {userRole === 'admin' && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={isActive("/admin")}
+                    tooltip="Admin Dashboard"
+                  >
+                    <Link to="/admin">
+                      <Settings className="h-5 w-5" />
+                      <span>Admin Dashboard</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

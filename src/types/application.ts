@@ -1,21 +1,15 @@
-export interface Application {
+export interface ApplicationWithProfile {
   id: string;
   user_id: string;
   license_number: string;
   specialty: string;
   years_of_experience: number;
-  status: 'pending' | 'approved' | 'rejected';
+  status: string;
   documents_url?: string[];
-  created_at?: string;
-  updated_at?: string;
   reviewed_by?: string;
   reviewed_at?: string;
-  review_notes?: string;
-}
-
-export interface ApplicationWithProfile extends Application {
   profiles?: {
     first_name: string | null;
     last_name: string | null;
-  } | null;
+  };
 }
