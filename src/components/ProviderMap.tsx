@@ -30,7 +30,10 @@ function LocationMarker() {
     map.locate().on("locationfound", function (e) {
       console.log('LocationMarker: User location found', e.latlng);
       setPosition([e.latlng.lat, e.latlng.lng]);
-      map.flyTo(e.latlng, map.getZoom());
+      // Only try to flyTo if the map is properly initialized
+      if (map && map.getZoom() !== undefined) {
+        map.flyTo(e.latlng, map.getZoom());
+      }
     });
   }, [map]);
 
@@ -113,15 +116,15 @@ export const ProviderMap = () => {
     <div className={`${isMobile ? 'h-[calc(100vh-4rem)]' : 'h-[calc(100vh-8rem)]'} w-full rounded-lg overflow-hidden border bg-background`}>
       <MapContainer
         ref={mapRef}
-        defaultCenter={userLocation}
-        defaultZoom={DEFAULT_ZOOM}
+        center={userLocation}
+        zoom={DEFAULT_ZOOM}
         className="h-full w-full"
         scrollWheelZoom={true}
         style={{ height: '100%', width: '100%' }}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attributionUrl='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
         <LocationMarker />
         {providers.map((provider) => (
