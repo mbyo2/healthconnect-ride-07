@@ -27,14 +27,24 @@ function LocationMarker() {
 
   useEffect(() => {
     console.log('LocationMarker: Attempting to get user location');
-    map.locate().on("locationfound", function (e) {
+    if (!map) return;
+
+    const onLocationFound = (e: any) => {
       console.log('LocationMarker: User location found', e.latlng);
       setPosition([e.latlng.lat, e.latlng.lng]);
-      // Only try to flyTo if the map is properly initialized
-      if (map && map.getZoom() !== undefined) {
-        map.flyTo(e.latlng, map.getZoom());
-      }
-    });
+      // Wait for map to be ready before flying
+      setTimeout(() => {
+        if (map && typeof map.getZoom() === 'number') {
+          map.flyTo(e.latlng, map.getZoom());
+        }
+      }, 100);
+    };
+
+    map.locate().on("locationfound", onLocationFound);
+
+    return () => {
+      map.off("locationfound", onLocationFound);
+    };
   }, [map]);
 
   return position === null ? null : (
