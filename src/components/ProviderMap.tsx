@@ -5,6 +5,7 @@ import 'leaflet/dist/leaflet.css';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface Provider {
   id: string;
@@ -45,6 +46,7 @@ export const ProviderMap = () => {
   const [providers, setProviders] = useState<Provider[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [userLocation, setUserLocation] = useState<[number, number]>(DEFAULT_COORDINATES);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     // Get user's location
@@ -108,13 +110,14 @@ export const ProviderMap = () => {
   }
 
   return (
-    <div className="h-[calc(100vh-8rem)] w-full rounded-lg overflow-hidden border bg-background">
+    <div className={`${isMobile ? 'h-[calc(100vh-4rem)]' : 'h-[calc(100vh-8rem)]'} w-full rounded-lg overflow-hidden border bg-background`}>
       <MapContainer
         ref={mapRef}
         center={userLocation}
         zoom={DEFAULT_ZOOM}
         className="h-full w-full"
         scrollWheelZoom={true}
+        style={{ height: '100%', width: '100%' }}
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
