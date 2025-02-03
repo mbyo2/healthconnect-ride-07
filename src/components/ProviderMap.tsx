@@ -101,7 +101,7 @@ export const ProviderMap = () => {
     <div className="h-[calc(100vh-8rem)] w-full rounded-lg overflow-hidden border bg-background">
       <MapContainer
         ref={mapRef}
-        center={userLocation}
+        center={userLocation as [number, number]}
         zoom={13}
         className="h-full w-full"
         scrollWheelZoom={true}
