@@ -32,15 +32,21 @@ function LocationMarker() {
     const onLocationFound = (e: any) => {
       console.log('LocationMarker: User location found', e.latlng);
       setPosition([e.latlng.lat, e.latlng.lng]);
-      // Wait for map to be ready before flying
-      setTimeout(() => {
-        if (map && typeof map.getZoom() === 'number') {
-          map.flyTo(e.latlng, map.getZoom());
-        }
-      }, 100);
+      
+      // Ensure map is ready before attempting to fly
+      const currentZoom = map.getZoom();
+      if (currentZoom !== undefined) {
+        map.flyTo([e.latlng.lat, e.latlng.lng], currentZoom);
+      }
     };
 
-    map.locate().on("locationfound", onLocationFound);
+    const locateOptions = {
+      enableHighAccuracy: true,
+      timeout: 5000,
+      maximumAge: 0
+    };
+
+    map.locate(locateOptions).on("locationfound", onLocationFound);
 
     return () => {
       map.off("locationfound", onLocationFound);
