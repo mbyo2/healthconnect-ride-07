@@ -405,6 +405,63 @@ export type Database = {
           },
         ]
       }
+      healthcare_institutions: {
+        Row: {
+          address: string | null
+          city: string | null
+          country: string | null
+          created_at: string | null
+          email: string | null
+          id: string
+          is_verified: boolean | null
+          license_number: string | null
+          name: string
+          operating_hours: Json | null
+          phone: string | null
+          postal_code: string | null
+          state: string | null
+          type: Database["public"]["Enums"]["healthcare_provider_type"]
+          updated_at: string | null
+          website: string | null
+        }
+        Insert: {
+          address?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          is_verified?: boolean | null
+          license_number?: string | null
+          name: string
+          operating_hours?: Json | null
+          phone?: string | null
+          postal_code?: string | null
+          state?: string | null
+          type: Database["public"]["Enums"]["healthcare_provider_type"]
+          updated_at?: string | null
+          website?: string | null
+        }
+        Update: {
+          address?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          is_verified?: boolean | null
+          license_number?: string | null
+          name?: string
+          operating_hours?: Json | null
+          phone?: string | null
+          postal_code?: string | null
+          state?: string | null
+          type?: Database["public"]["Enums"]["healthcare_provider_type"]
+          updated_at?: string | null
+          website?: string | null
+        }
+        Relationships: []
+      }
       healthcare_services: {
         Row: {
           category: string
@@ -445,6 +502,139 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "healthcare_services_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      institution_locations: {
+        Row: {
+          created_at: string | null
+          id: string
+          institution_id: string | null
+          is_primary: boolean | null
+          latitude: number
+          longitude: number
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          institution_id?: string | null
+          is_primary?: boolean | null
+          latitude: number
+          longitude: number
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          institution_id?: string | null
+          is_primary?: boolean | null
+          latitude?: number
+          longitude?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "institution_locations_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      institution_services: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          duration: number | null
+          id: string
+          institution_id: string | null
+          is_available: boolean | null
+          name: string
+          price: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          duration?: number | null
+          id?: string
+          institution_id?: string | null
+          is_available?: boolean | null
+          name: string
+          price?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          duration?: number | null
+          id?: string
+          institution_id?: string | null
+          is_available?: boolean | null
+          name?: string
+          price?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "institution_services_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      institution_staff: {
+        Row: {
+          created_at: string | null
+          department: string | null
+          end_date: string | null
+          id: string
+          institution_id: string | null
+          is_active: boolean | null
+          provider_id: string | null
+          role: string
+          start_date: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          department?: string | null
+          end_date?: string | null
+          id?: string
+          institution_id?: string | null
+          is_active?: boolean | null
+          provider_id?: string | null
+          role: string
+          start_date?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          department?: string | null
+          end_date?: string | null
+          id?: string
+          institution_id?: string | null
+          is_active?: boolean | null
+          provider_id?: string | null
+          role?: string
+          start_date?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "institution_staff_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "institution_staff_provider_id_fkey"
             columns: ["provider_id"]
             isOneToOne: false
             referencedRelation: "profiles"
@@ -1213,6 +1403,14 @@ export type Database = {
       }
     }
     Enums: {
+      healthcare_provider_type:
+        | "doctor"
+        | "nurse"
+        | "hospital"
+        | "clinic"
+        | "pharmacy"
+        | "nursing_home"
+        | "dentist"
       user_role: "admin" | "health_personnel" | "patient"
     }
     CompositeTypes: {
