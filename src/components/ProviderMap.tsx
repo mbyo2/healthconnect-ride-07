@@ -15,13 +15,19 @@ interface Provider {
   longitude: number;
 }
 
+// Default coordinates for Lusaka, Zambia
+const DEFAULT_COORDINATES: [number, number] = [-15.3875, 28.3228];
+const DEFAULT_ZOOM = 13;
+
 // This component updates the map view when user location changes
 function LocationMarker() {
   const [position, setPosition] = useState<[number, number] | null>(null);
   const map = useMap();
 
   useEffect(() => {
+    console.log('LocationMarker: Attempting to get user location');
     map.locate().on("locationfound", function (e) {
+      console.log('LocationMarker: User location found', e.latlng);
       setPosition([e.latlng.lat, e.latlng.lng]);
       map.flyTo(e.latlng, map.getZoom());
     });
@@ -38,19 +44,21 @@ export const ProviderMap = () => {
   const mapRef = useRef<LeafletMap>(null);
   const [providers, setProviders] = useState<Provider[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [userLocation, setUserLocation] = useState<[number, number]>([0, 0]);
+  const [userLocation, setUserLocation] = useState<[number, number]>(DEFAULT_COORDINATES);
 
   useEffect(() => {
     // Get user's location
     if (navigator.geolocation) {
+      console.log('ProviderMap: Requesting user location');
       navigator.geolocation.getCurrentPosition(
         (position) => {
+          console.log('ProviderMap: User location received', position.coords);
           setUserLocation([position.coords.latitude, position.coords.longitude]);
         },
         (error) => {
           console.error('Error getting location:', error);
-          toast.error('Could not get your location. Using default location.');
-          setUserLocation([51.505, -0.09]); // Default to London if geolocation fails
+          toast.error('Could not get your location. Using default location (Lusaka, Zambia).');
+          setUserLocation(DEFAULT_COORDINATES);
         }
       );
     }
@@ -60,6 +68,7 @@ export const ProviderMap = () => {
 
   const fetchProviders = async () => {
     try {
+      console.log('ProviderMap: Fetching providers');
       const { data, error } = await supabase
         .from('provider_locations')
         .select(`
@@ -84,6 +93,7 @@ export const ProviderMap = () => {
         longitude: item.longitude
       })) || [];
 
+      console.log('ProviderMap: Providers fetched successfully', formattedProviders);
       setProviders(formattedProviders);
     } catch (error) {
       console.error('Error fetching providers:', error);
@@ -101,8 +111,8 @@ export const ProviderMap = () => {
     <div className="h-[calc(100vh-8rem)] w-full rounded-lg overflow-hidden border bg-background">
       <MapContainer
         ref={mapRef}
-        center={userLocation as [number, number]}
-        zoom={13}
+        center={userLocation}
+        zoom={DEFAULT_ZOOM}
         className="h-full w-full"
         scrollWheelZoom={true}
       >
