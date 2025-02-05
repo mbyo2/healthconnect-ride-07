@@ -29,16 +29,15 @@ function LocationMarker() {
     console.log('LocationMarker: Attempting to get user location');
     if (!map) return;
 
-    const onLocationFound = (e: any) => {
+    map.locate().on("locationfound", (e: any) => {
       console.log('LocationMarker: User location found', e.latlng);
-      setPosition([e.latlng.lat, e.latlng.lng]);
-      map.flyTo([e.latlng.lat, e.latlng.lng], map.getZoom());
-    };
-
-    map.locate().on("locationfound", onLocationFound);
+      const newPos: [number, number] = [e.latlng.lat, e.latlng.lng];
+      setPosition(newPos);
+      map.setView(newPos, map.getZoom());
+    });
 
     return () => {
-      map.off("locationfound", onLocationFound);
+      map.off("locationfound");
     };
   }, [map]);
 
