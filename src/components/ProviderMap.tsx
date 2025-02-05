@@ -122,8 +122,8 @@ export const ProviderMap = () => {
     <div className={`${isMobile ? 'h-[calc(100vh-4rem)]' : 'h-[calc(100vh-8rem)]'} w-full rounded-lg overflow-hidden border bg-background`}>
       <MapContainer
         ref={mapRef}
-        defaultCenter={userLocation}
-        defaultZoom={DEFAULT_ZOOM}
+        center={userLocation}
+        zoom={DEFAULT_ZOOM}
         className="h-full w-full"
         scrollWheelZoom={true}
         style={{ height: '100%', width: '100%' }}

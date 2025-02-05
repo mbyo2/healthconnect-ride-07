@@ -8,10 +8,11 @@ import { Provider } from "@/types/provider";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { HealthcareProviderType } from "@/types/healthcare";
 
 const Search = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedType, setSelectedType] = useState<string>("");
+  const [selectedType, setSelectedType] = useState<HealthcareProviderType | "">("");
   const isMobile = useIsMobile();
 
   const { data: providers = [], isLoading } = useQuery({
@@ -53,7 +54,6 @@ const Search = () => {
         specialty: profile.specialty || 'General Practice',
         bio: profile.bio,
         avatar_url: profile.avatar_url,
-        provider_type: profile.provider_type,
         expertise: ['General Medicine', 'Primary Care'],
         location: {
           latitude: profile.provider_locations?.[0]?.latitude || -15.3875,
@@ -80,12 +80,12 @@ const Search = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="flex-1"
             />
-            <Select value={selectedType} onValueChange={setSelectedType}>
+            <Select value={selectedType} onValueChange={(value: HealthcareProviderType | "") => setSelectedType(value)}>
               <SelectTrigger className="w-full sm:w-[200px]">
                 <SelectValue placeholder="Provider type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Types</SelectItem>
+                <SelectItem value="all">All Types</SelectItem>
                 <SelectItem value="doctor">Doctors</SelectItem>
                 <SelectItem value="dentist">Dentists</SelectItem>
                 <SelectItem value="nurse">Nurses</SelectItem>

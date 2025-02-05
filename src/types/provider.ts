@@ -1,4 +1,5 @@
 import type { LatLngTuple } from "leaflet";
+import { HealthcareProviderType } from "./healthcare";
 
 export interface Provider {
   id: string;
@@ -8,6 +9,7 @@ export interface Provider {
   bio?: string;
   avatar_url?: string;
   expertise?: string[];
+  provider_type?: HealthcareProviderType;
   location: {
     latitude: number;
     longitude: number;
