@@ -72,7 +72,7 @@ const Search = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="container mx-auto px-4 pt-20 pb-6 space-y-6">
+      <main className="container mx-auto px-4 pt-20 pb-24 space-y-6">
         <div className="flex flex-col space-y-4">
           <h1 className="text-2xl font-bold">Find Healthcare Providers</h1>
           <div className="flex flex-col sm:flex-row gap-4">
@@ -104,13 +104,16 @@ const Search = () => {
         </div>
 
         {isMobile ? (
-          <ProviderList providers={providers} />
+          <div className="space-y-6">
+            <ProviderMap />
+            <ProviderList providers={providers} />
+          </div>
         ) : (
           <div className="grid lg:grid-cols-2 gap-6">
-            <div className="order-2 lg:order-1">
+            <div>
               <ProviderList providers={providers} />
             </div>
-            <div className="order-1 lg:order-2">
+            <div className="sticky top-24">
               <ProviderMap />
             </div>
           </div>

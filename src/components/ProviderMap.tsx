@@ -118,13 +118,13 @@ export const ProviderMap = () => {
   }
 
   return (
-    <div className={`${isMobile ? 'h-[50vh]' : 'h-[calc(100vh-8rem)]'} w-full rounded-lg overflow-hidden border bg-background`}>
+    <div className={`${isMobile ? 'h-[60vh]' : 'h-[calc(100vh-8rem)]'} w-full rounded-lg overflow-hidden border bg-background`}>
       <MapContainer
         ref={mapRef}
         className="h-full w-full"
         style={{ height: '100%', width: '100%' }}
-        defaultCenter={userLocation}
-        defaultZoom={DEFAULT_ZOOM}
+        center={userLocation}
+        zoom={DEFAULT_ZOOM}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
