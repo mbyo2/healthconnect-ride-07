@@ -32,21 +32,10 @@ function LocationMarker() {
     const onLocationFound = (e: any) => {
       console.log('LocationMarker: User location found', e.latlng);
       setPosition([e.latlng.lat, e.latlng.lng]);
-      
-      // Ensure map is ready before attempting to fly
-      const currentZoom = map.getZoom();
-      if (currentZoom !== undefined) {
-        map.flyTo([e.latlng.lat, e.latlng.lng], currentZoom);
-      }
+      map.flyTo([e.latlng.lat, e.latlng.lng], map.getZoom());
     };
 
-    const locateOptions = {
-      enableHighAccuracy: true,
-      timeout: 5000,
-      maximumAge: 0
-    };
-
-    map.locate(locateOptions).on("locationfound", onLocationFound);
+    map.locate().on("locationfound", onLocationFound);
 
     return () => {
       map.off("locationfound", onLocationFound);
@@ -68,7 +57,6 @@ export const ProviderMap = () => {
   const isMobile = useIsMobile();
 
   useEffect(() => {
-    // Get user's location
     if (navigator.geolocation) {
       console.log('ProviderMap: Requesting user location');
       navigator.geolocation.getCurrentPosition(
@@ -91,27 +79,29 @@ export const ProviderMap = () => {
     try {
       console.log('ProviderMap: Fetching providers');
       const { data, error } = await supabase
-        .from('provider_locations')
+        .from('profiles')
         .select(`
-          provider_id,
-          latitude,
-          longitude,
-          profiles:provider_id (
-            first_name,
-            last_name,
-            specialty
+          id,
+          first_name,
+          last_name,
+          specialty,
+          provider_type,
+          provider_locations (
+            latitude,
+            longitude
           )
-        `);
+        `)
+        .eq('role', 'health_personnel');
 
       if (error) throw error;
 
       const formattedProviders = data?.map(item => ({
-        id: item.provider_id,
-        first_name: item.profiles.first_name,
-        last_name: item.profiles.last_name,
-        specialty: item.profiles.specialty,
-        latitude: item.latitude,
-        longitude: item.longitude
+        id: item.id,
+        first_name: item.first_name || '',
+        last_name: item.last_name || '',
+        specialty: item.specialty || '',
+        latitude: item.provider_locations?.[0]?.latitude || DEFAULT_COORDINATES[0],
+        longitude: item.provider_locations?.[0]?.longitude || DEFAULT_COORDINATES[1]
       })) || [];
 
       console.log('ProviderMap: Providers fetched successfully', formattedProviders);
@@ -132,8 +122,8 @@ export const ProviderMap = () => {
     <div className={`${isMobile ? 'h-[calc(100vh-4rem)]' : 'h-[calc(100vh-8rem)]'} w-full rounded-lg overflow-hidden border bg-background`}>
       <MapContainer
         ref={mapRef}
-        center={userLocation}
-        zoom={DEFAULT_ZOOM}
+        defaultCenter={userLocation}
+        defaultZoom={DEFAULT_ZOOM}
         className="h-full w-full"
         scrollWheelZoom={true}
         style={{ height: '100%', width: '100%' }}

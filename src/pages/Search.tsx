@@ -1,14 +1,23 @@
+import { useState } from "react";
 import { ProviderList } from "@/components/ProviderList";
+import { ProviderMap } from "@/components/ProviderMap";
 import { Header } from "@/components/Header";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Provider } from "@/types/provider";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const Search = () => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedType, setSelectedType] = useState<string>("");
+  const isMobile = useIsMobile();
+
   const { data: providers = [], isLoading } = useQuery({
-    queryKey: ['providers'],
+    queryKey: ['providers', searchTerm, selectedType],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('profiles')
         .select(`
           id,
@@ -17,12 +26,23 @@ const Search = () => {
           specialty,
           bio,
           avatar_url,
+          provider_type,
           provider_locations (
             latitude,
             longitude
           )
         `)
         .eq('role', 'health_personnel');
+
+      if (searchTerm) {
+        query = query.or(`first_name.ilike.%${searchTerm}%,last_name.ilike.%${searchTerm}%,specialty.ilike.%${searchTerm}%`);
+      }
+
+      if (selectedType) {
+        query = query.eq('provider_type', selectedType);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
 
@@ -33,10 +53,11 @@ const Search = () => {
         specialty: profile.specialty || 'General Practice',
         bio: profile.bio,
         avatar_url: profile.avatar_url,
+        provider_type: profile.provider_type,
         expertise: ['General Medicine', 'Primary Care'],
         location: {
-          latitude: profile.provider_locations?.[0]?.latitude ? Number(profile.provider_locations[0].latitude) : 37.7749,
-          longitude: profile.provider_locations?.[0]?.longitude ? Number(profile.provider_locations[0].longitude) : -122.4194
+          latitude: profile.provider_locations?.[0]?.latitude || -15.3875,
+          longitude: profile.provider_locations?.[0]?.longitude || 28.3228
         }
       }));
     }
@@ -47,10 +68,48 @@ const Search = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <Header />
-      <main className="pt-14">
-        <ProviderList providers={providers} />
+      <main className="container mx-auto px-4 pt-20 pb-6 space-y-6">
+        <div className="flex flex-col space-y-4">
+          <h1 className="text-2xl font-bold">Find Healthcare Providers</h1>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Input
+              placeholder="Search by name or specialty..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="flex-1"
+            />
+            <Select value={selectedType} onValueChange={setSelectedType}>
+              <SelectTrigger className="w-full sm:w-[200px]">
+                <SelectValue placeholder="Provider type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">All Types</SelectItem>
+                <SelectItem value="doctor">Doctors</SelectItem>
+                <SelectItem value="dentist">Dentists</SelectItem>
+                <SelectItem value="nurse">Nurses</SelectItem>
+                <SelectItem value="pharmacy">Pharmacies</SelectItem>
+                <SelectItem value="hospital">Hospitals</SelectItem>
+                <SelectItem value="clinic">Clinics</SelectItem>
+                <SelectItem value="nursing_home">Nursing Homes</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {isMobile ? (
+          <ProviderList providers={providers} />
+        ) : (
+          <div className="grid lg:grid-cols-2 gap-6">
+            <div className="order-2 lg:order-1">
+              <ProviderList providers={providers} />
+            </div>
+            <div className="order-1 lg:order-2">
+              <ProviderMap />
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );
