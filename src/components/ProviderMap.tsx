@@ -123,12 +123,12 @@ export const ProviderMap = () => {
         ref={mapRef}
         className="h-full w-full"
         style={{ height: '100%', width: '100%' }}
-        center={userLocation}
-        zoom={DEFAULT_ZOOM}
+        defaultCenter={userLocation}
+        defaultZoom={DEFAULT_ZOOM}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          attributionUrl='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
         <LocationMarker />
         {providers.map((provider) => (
