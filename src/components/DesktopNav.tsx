@@ -11,7 +11,6 @@ import {
   ClipboardList,
   Settings,
   LogOut,
-  Heart,
   Sun,
   Moon,
 } from "lucide-react";
@@ -72,7 +71,6 @@ export const DesktopNav = () => {
 
   const patientLinks = [
     { path: "/home", icon: Home, label: "Home" },
-    { path: "/healthcare", icon: Heart, label: "Healthcare" },
     { path: "/search", icon: Search, label: "Find Care" },
     { path: "/map", icon: MapPin, label: "Map" },
     { path: "/appointments", icon: Calendar, label: "Appointments" },

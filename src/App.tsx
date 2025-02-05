@@ -19,7 +19,6 @@ import Map from "./pages/Map";
 import Appointments from "./pages/Appointments";
 import Profile from "./pages/Profile";
 import AdminDashboard from "./pages/AdminDashboard";
-import Healthcare from "./pages/Healthcare";
 import Chat from "./pages/Chat";
 import VideoConsultations from "./pages/VideoConsultations";
 import ProviderCalendar from "./pages/ProviderCalendar";
@@ -99,11 +98,6 @@ const App = () => {
                         } />
                         
                         {/* Patient Routes */}
-                        <Route path="healthcare" element={
-                          <RouteErrorBoundary>
-                            <Healthcare />
-                          </RouteErrorBoundary>
-                        } />
                         <Route path="appointments" element={
                           <RouteErrorBoundary>
                             <Appointments />

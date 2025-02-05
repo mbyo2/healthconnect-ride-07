@@ -122,15 +122,15 @@ export const ProviderMap = () => {
     <div className={`${isMobile ? 'h-[calc(100vh-4rem)]' : 'h-[calc(100vh-8rem)]'} w-full rounded-lg overflow-hidden border bg-background`}>
       <MapContainer
         ref={mapRef}
-        center={userLocation}
-        zoom={DEFAULT_ZOOM}
         className="h-full w-full"
         scrollWheelZoom={true}
         style={{ height: '100%', width: '100%' }}
+        defaultCenter={userLocation}
+        defaultZoom={DEFAULT_ZOOM}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          attributionUrl='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
         <LocationMarker />
         {providers.map((provider) => (
