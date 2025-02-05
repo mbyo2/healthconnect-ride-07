@@ -12,12 +12,13 @@ import { HealthcareProviderType } from "@/types/healthcare";
 
 const Search = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedType, setSelectedType] = useState<HealthcareProviderType | "">("");
+  const [selectedType, setSelectedType] = useState<HealthcareProviderType | null>(null);
   const isMobile = useIsMobile();
 
   const { data: providers = [], isLoading } = useQuery({
     queryKey: ['providers', searchTerm, selectedType],
     queryFn: async () => {
+      console.log('Fetching providers with type:', selectedType);
       let query = supabase
         .from('profiles')
         .select(`
@@ -54,6 +55,7 @@ const Search = () => {
         specialty: profile.specialty || 'General Practice',
         bio: profile.bio,
         avatar_url: profile.avatar_url,
+        provider_type: profile.provider_type,
         expertise: ['General Medicine', 'Primary Care'],
         location: {
           latitude: profile.provider_locations?.[0]?.latitude || -15.3875,
@@ -80,12 +82,15 @@ const Search = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="flex-1"
             />
-            <Select value={selectedType} onValueChange={(value: HealthcareProviderType | "") => setSelectedType(value)}>
+            <Select 
+              value={selectedType || ""} 
+              onValueChange={(value: string) => setSelectedType(value as HealthcareProviderType | null)}
+            >
               <SelectTrigger className="w-full sm:w-[200px]">
                 <SelectValue placeholder="Provider type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
+                <SelectItem value="">All Types</SelectItem>
                 <SelectItem value="doctor">Doctors</SelectItem>
                 <SelectItem value="dentist">Dentists</SelectItem>
                 <SelectItem value="nurse">Nurses</SelectItem>
