@@ -1084,6 +1084,9 @@ export type Database = {
           is_profile_complete: boolean | null
           last_name: string | null
           phone: string | null
+          provider_type:
+            | Database["public"]["Enums"]["healthcare_provider_type"]
+            | null
           role: Database["public"]["Enums"]["user_role"]
           specialty: string | null
           state: string | null
@@ -1104,6 +1107,9 @@ export type Database = {
           is_profile_complete?: boolean | null
           last_name?: string | null
           phone?: string | null
+          provider_type?:
+            | Database["public"]["Enums"]["healthcare_provider_type"]
+            | null
           role?: Database["public"]["Enums"]["user_role"]
           specialty?: string | null
           state?: string | null
@@ -1124,6 +1130,9 @@ export type Database = {
           is_profile_complete?: boolean | null
           last_name?: string | null
           phone?: string | null
+          provider_type?:
+            | Database["public"]["Enums"]["healthcare_provider_type"]
+            | null
           role?: Database["public"]["Enums"]["user_role"]
           specialty?: string | null
           state?: string | null
