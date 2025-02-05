@@ -26,7 +26,7 @@ export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) 
         
         if (sessionError) {
           console.error("Session error:", sessionError);
-          toast.error(sessionError.message);
+          toast.error("Session error. Please log in again.");
           setIsAuthenticated(false);
           setIsLoading(false);
           return;
@@ -39,16 +39,35 @@ export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) 
           return;
         }
 
+        // Refresh session if it exists
+        const { data: { session: refreshedSession }, error: refreshError } = 
+          await supabase.auth.refreshSession();
+        
+        if (refreshError) {
+          console.error("Session refresh error:", refreshError);
+          toast.error("Session expired. Please log in again.");
+          setIsAuthenticated(false);
+          setIsLoading(false);
+          return;
+        }
+
+        if (!refreshedSession) {
+          console.log("Session refresh failed");
+          setIsAuthenticated(false);
+          setIsLoading(false);
+          return;
+        }
+
         console.log("Session found, checking profile...");
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('role, is_profile_complete')
-          .eq('id', session.user.id)
+          .eq('id', refreshedSession.user.id)
           .maybeSingle();
 
         if (profileError) {
           console.error("Profile error:", profileError);
-          toast.error(profileError.message);
+          toast.error("Error loading profile");
           setIsAuthenticated(false);
           setIsLoading(false);
           return;
@@ -82,12 +101,24 @@ export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) 
 
     checkAuth();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state changed:", event);
       if (event === 'SIGNED_OUT') {
         setIsAuthenticated(false);
         setUserRole(null);
         setIsProfileComplete(null);
+      } else if (event === 'SIGNED_IN' && session) {
+        setIsAuthenticated(true);
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role, is_profile_complete')
+          .eq('id', session.user.id)
+          .single();
+        
+        if (profile) {
+          setUserRole(profile.role as UserRole);
+          setIsProfileComplete(profile.is_profile_complete);
+        }
       }
     });
 
