@@ -83,14 +83,14 @@ const Search = () => {
               className="flex-1"
             />
             <Select 
-              value={selectedType || ""} 
-              onValueChange={(value: string) => setSelectedType(value as HealthcareProviderType | null)}
+              value={selectedType || "all"} 
+              onValueChange={(value: string) => setSelectedType(value === "all" ? null : value as HealthcareProviderType)}
             >
               <SelectTrigger className="w-full sm:w-[200px]">
                 <SelectValue placeholder="Provider type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Types</SelectItem>
+                <SelectItem value="all">All Types</SelectItem>
                 <SelectItem value="doctor">Doctors</SelectItem>
                 <SelectItem value="dentist">Dentists</SelectItem>
                 <SelectItem value="nurse">Nurses</SelectItem>
