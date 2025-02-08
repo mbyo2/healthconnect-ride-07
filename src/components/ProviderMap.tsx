@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import { Map as LeafletMap } from 'leaflet';
@@ -123,8 +124,9 @@ export const ProviderMap = () => {
         ref={mapRef}
         className="h-full w-full"
         style={{ height: '100%', width: '100%' }}
-        center={userLocation}
-        zoom={DEFAULT_ZOOM}
+        whenCreated={(map) => {
+          map.setView(userLocation, DEFAULT_ZOOM);
+        }}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
