@@ -349,6 +349,7 @@ export type Database = {
         Row: {
           created_at: string | null
           documents_url: string[] | null
+          experience_level: Database["public"]["Enums"]["experience_level"]
           id: string
           license_number: string
           review_notes: string | null
@@ -363,6 +364,7 @@ export type Database = {
         Insert: {
           created_at?: string | null
           documents_url?: string[] | null
+          experience_level?: Database["public"]["Enums"]["experience_level"]
           id?: string
           license_number: string
           review_notes?: string | null
@@ -377,6 +379,7 @@ export type Database = {
         Update: {
           created_at?: string | null
           documents_url?: string[] | null
+          experience_level?: Database["public"]["Enums"]["experience_level"]
           id?: string
           license_number?: string
           review_notes?: string | null
@@ -1258,6 +1261,30 @@ export type Database = {
           },
         ]
       }
+      service_categories: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          min_experience_level: Database["public"]["Enums"]["experience_level"]
+          name: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          min_experience_level?: Database["public"]["Enums"]["experience_level"]
+          name: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          min_experience_level?: Database["public"]["Enums"]["experience_level"]
+          name?: string
+        }
+        Relationships: []
+      }
       symptoms_diary: {
         Row: {
           created_at: string | null
@@ -1402,6 +1429,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_perform_service: {
+        Args: {
+          provider_id: string
+          service_category_id: string
+        }
+        Returns: boolean
+      }
       delete_user: {
         Args: Record<PropertyKey, never>
         Returns: undefined
@@ -1412,6 +1446,7 @@ export type Database = {
       }
     }
     Enums: {
+      experience_level: "entry" | "intermediate" | "expert"
       healthcare_provider_type:
         | "doctor"
         | "nurse"
