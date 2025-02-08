@@ -119,7 +119,7 @@ export const ProviderMap = () => {
   }
 
   return (
-    <div className={`${isMobile ? 'h-[60vh]' : 'h-[calc(100vh-8rem)]'} w-full rounded-lg overflow-hidden border bg-background`}>
+    <div className={`${isMobile ? 'h-[60vh]' : 'h-[85vh]'} w-full rounded-lg overflow-hidden border bg-background`}>
       <MapContainer
         ref={mapRef}
         className="h-full w-full"
@@ -161,3 +161,4 @@ export const ProviderMap = () => {
     </div>
   );
 };
+
