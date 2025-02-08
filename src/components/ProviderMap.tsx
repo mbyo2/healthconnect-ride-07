@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useQuery } from '@tanstack/react-query';
+import { LoadingScreen } from '@/components/LoadingScreen';
 
 interface Provider {
   id: string;
@@ -45,17 +46,11 @@ function LocationMarker() {
     };
   }, [map]);
 
-  // Memoize the marker to prevent unnecessary re-renders
-  const marker = useMemo(() => {
-    if (!position) return null;
-    return (
-      <Marker position={position}>
-        <Popup>You are here</Popup>
-      </Marker>
-    );
-  }, [position]);
-
-  return marker;
+  return position ? (
+    <Marker position={position}>
+      <Popup>You are here</Popup>
+    </Marker>
+  ) : null;
 }
 
 export const ProviderMap = () => {
@@ -95,7 +90,7 @@ export const ProviderMap = () => {
       })) || []) as Provider[];
     },
     staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
-    cacheTime: 30 * 60 * 1000, // Keep data in cache for 30 minutes
+    gcTime: 30 * 60 * 1000, // Keep data in cache for 30 minutes
   });
 
   useEffect(() => {
@@ -146,7 +141,7 @@ export const ProviderMap = () => {
   );
 
   if (isLoading) {
-    return <div className="text-foreground">Loading map...</div>;
+    return <LoadingScreen />;
   }
 
   return (
@@ -155,8 +150,8 @@ export const ProviderMap = () => {
         ref={mapRef}
         className="h-full w-full"
         style={{ height: '100%', width: '100%' }}
-        center={userLocation}
-        zoom={DEFAULT_ZOOM}
+        defaultCenter={userLocation}
+        defaultZoom={DEFAULT_ZOOM}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -168,3 +163,4 @@ export const ProviderMap = () => {
     </div>
   );
 };
+
