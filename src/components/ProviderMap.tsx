@@ -32,18 +32,20 @@ function LocationMarker() {
     console.log('LocationMarker: Attempting to get user location');
     if (!map) return;
 
-    const handleLocationFound = (e: any) => {
+    map.locate().on("locationfound", function(e: any) {
       console.log('LocationMarker: User location found', e.latlng);
       const newPos: [number, number] = [e.latlng.lat, e.latlng.lng];
       setPosition(newPos);
-      map.setView(newPos, map.getZoom());
-    };
-
-    const locate = map.locate();
-    locate.on("locationfound", handleLocationFound);
+      map.setView(newPos, map.getZoom(), {
+        animate: true
+      });
+    }).on("locationerror", function(e) {
+      console.log('Location error:', e);
+      toast.error('Could not get your location');
+    });
 
     return () => {
-      locate.off("locationfound", handleLocationFound);
+      map.stopLocate();
     };
   }, [map]);
 
@@ -152,8 +154,8 @@ export const ProviderMap = () => {
         ref={mapRef}
         className="h-full w-full"
         style={{ height: '100%', width: '100%' }}
-        defaultCenter={userLocation}
-        defaultZoom={DEFAULT_ZOOM}
+        center={userLocation}
+        zoom={DEFAULT_ZOOM}
         minZoom={3}
         maxZoom={18}
         zoomControl={!isMobile}
@@ -162,9 +164,8 @@ export const ProviderMap = () => {
         attributionControl={true}
       >
         <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          maxZoom={18}
-          minZoom={3}
         />
         <LocationMarker />
         {providerMarkers}
@@ -172,4 +173,3 @@ export const ProviderMap = () => {
     </div>
   );
 };
-
