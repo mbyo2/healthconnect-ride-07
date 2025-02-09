@@ -147,13 +147,13 @@ export const ProviderMap = () => {
   }
 
   return (
-    <div className="fixed inset-0 -z-10">
+    <div className="relative w-full h-[calc(100vh-10rem)] rounded-lg overflow-hidden">
       <MapContainer
         ref={mapRef}
         className="h-full w-full"
         style={{ height: '100%', width: '100%' }}
-        center={userLocation}
-        zoom={DEFAULT_ZOOM}
+        defaultCenter={userLocation}
+        defaultZoom={DEFAULT_ZOOM}
         minZoom={3}
         maxZoom={18}
         zoomControl={!isMobile}
@@ -162,7 +162,6 @@ export const ProviderMap = () => {
         attributionControl={true}
       >
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           maxZoom={18}
           minZoom={3}
@@ -173,3 +172,4 @@ export const ProviderMap = () => {
     </div>
   );
 };
+
