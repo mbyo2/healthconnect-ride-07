@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { ProviderList } from "@/components/ProviderList";
 import ProviderMap from "@/components/ProviderMap";
@@ -73,8 +72,8 @@ const Search = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="container mx-auto px-4 pt-20 pb-24">
-        <div className="flex flex-col space-y-4 mb-6">
+      <main className="container mx-auto px-4 pt-20 pb-24 space-y-6">
+        <div className="flex flex-col space-y-4">
           <h1 className="text-2xl font-bold">Find Healthcare Providers</h1>
           <div className="flex flex-col sm:flex-row gap-4">
             <Input
@@ -110,11 +109,11 @@ const Search = () => {
             <ProviderList providers={providers} />
           </div>
         ) : (
-          <div className="grid lg:grid-cols-2 gap-6 h-[calc(100vh-16rem)]">
-            <div className="overflow-auto">
+          <div className="grid lg:grid-cols-2 gap-6">
+            <div>
               <ProviderList providers={providers} />
             </div>
-            <div className="h-full">
+            <div className="sticky top-24">
               <ProviderMap />
             </div>
           </div>
