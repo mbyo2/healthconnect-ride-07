@@ -39,10 +39,11 @@ function LocationMarker() {
       map.setView(newPos, map.getZoom());
     };
 
-    map.locate().on("locationfound", handleLocationFound);
+    const locate = map.locate();
+    locate.on("locationfound", handleLocationFound);
 
     return () => {
-      map.off("locationfound", handleLocationFound);
+      locate.off("locationfound", handleLocationFound);
     };
   }, [map]);
 
@@ -105,7 +106,8 @@ export const ProviderMap = () => {
           console.error('Error getting location:', error);
           toast.error('Could not get your location. Using default location (Lusaka, Zambia).');
           setUserLocation(DEFAULT_COORDINATES);
-        }
+        },
+        { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
       );
     }
   }, []);
@@ -150,12 +152,20 @@ export const ProviderMap = () => {
         ref={mapRef}
         className="h-full w-full"
         style={{ height: '100%', width: '100%' }}
-        defaultCenter={userLocation}
-        defaultZoom={DEFAULT_ZOOM}
+        center={userLocation}
+        zoom={DEFAULT_ZOOM}
+        minZoom={3}
+        maxZoom={18}
+        zoomControl={!isMobile}
+        scrollWheelZoom={true}
+        doubleClickZoom={true}
+        attributionControl={true}
       >
         <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          maxZoom={18}
+          minZoom={3}
         />
         <LocationMarker />
         {providerMarkers}
@@ -163,4 +173,3 @@ export const ProviderMap = () => {
     </div>
   );
 };
-
