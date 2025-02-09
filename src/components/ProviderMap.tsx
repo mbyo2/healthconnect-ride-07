@@ -130,7 +130,7 @@ export const ProviderMap = () => {
   }
 
   return (
-    <div className="relative w-full h-full min-h-[500px] lg:h-[calc(100vh-12rem)] rounded-lg overflow-hidden border">
+    <div className="relative w-full h-full rounded-lg overflow-hidden border">
       <Button
         variant="secondary"
         className="absolute top-4 right-4 z-[1000]"
@@ -139,7 +139,7 @@ export const ProviderMap = () => {
         Find My Location
       </Button>
       <MapContainer
-        center={center}
+        center={DEFAULT_COORDINATES}
         zoom={DEFAULT_ZOOM}
         className="h-full w-full"
         minZoom={3}
