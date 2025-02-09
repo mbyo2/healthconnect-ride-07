@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ProviderList } from "@/components/ProviderList";
-import { ProviderMap } from "@/components/ProviderMap";
+import ProviderMap from "@/components/ProviderMap";
 import { Header } from "@/components/Header";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";

@@ -1,5 +1,6 @@
+
 import { useState } from 'react';
-import { ProviderMap } from '@/components/ProviderMap';
+import ProviderMap from '@/components/ProviderMap';
 import { ProviderList } from '@/components/ProviderList';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';

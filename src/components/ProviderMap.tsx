@@ -33,7 +33,7 @@ const customIcon = new Icon({
   shadowSize: [41, 41]
 });
 
-const ProviderMap = () => {
+export const ProviderMap = () => {
   const mapRef = useRef<LeafletMap | null>(null);
   const [center] = useState<[number, number]>(DEFAULT_COORDINATES);
   const isMobile = useIsMobile();
@@ -140,8 +140,8 @@ const ProviderMap = () => {
       </Button>
       <MapContainer
         ref={mapRef}
-        center={center}
-        zoom={DEFAULT_ZOOM}
+        defaultCenter={center}
+        defaultZoom={DEFAULT_ZOOM}
         className="h-full w-full"
         minZoom={3}
         maxZoom={18}
@@ -149,9 +149,9 @@ const ProviderMap = () => {
         scrollWheelZoom={true}
       >
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           maxZoom={18}
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
         {providerMarkers}
       </MapContainer>
