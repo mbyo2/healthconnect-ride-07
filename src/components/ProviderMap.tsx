@@ -130,7 +130,7 @@ export const ProviderMap = () => {
   }
 
   return (
-    <div className="relative w-full h-[calc(100vh-10rem)] rounded-lg overflow-hidden border">
+    <div className="relative w-full h-full min-h-[500px] lg:h-[calc(100vh-12rem)] rounded-lg overflow-hidden border">
       <Button
         variant="secondary"
         className="absolute top-4 right-4 z-[1000]"
@@ -139,9 +139,8 @@ export const ProviderMap = () => {
         Find My Location
       </Button>
       <MapContainer
-        ref={mapRef}
-        defaultCenter={center}
-        defaultZoom={DEFAULT_ZOOM}
+        center={center}
+        zoom={DEFAULT_ZOOM}
         className="h-full w-full"
         minZoom={3}
         maxZoom={18}
@@ -150,7 +149,6 @@ export const ProviderMap = () => {
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          maxZoom={18}
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
         {providerMarkers}
