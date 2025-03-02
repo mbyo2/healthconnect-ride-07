@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { InsuranceForm } from "./InsuranceForm";
@@ -7,9 +8,14 @@ import { PrescriptionTracker } from "./PrescriptionTracker";
 import { SymptomsDiary } from "./SymptomsDiary";
 import { HealthMetricsChart } from "./HealthMetricsChart";
 import { MedicalHistory } from "./MedicalHistory";
+import { AppointmentsList } from "./AppointmentsList";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
+import { CalendarPlus } from "lucide-react";
 
 export const PatientDashboard = () => {
   const [selectedTab, setSelectedTab] = useState("health");
+  const navigate = useNavigate();
 
   return (
     <div className="container mx-auto py-6">
@@ -30,10 +36,18 @@ export const PatientDashboard = () => {
           <SymptomsDiary />
         </TabsContent>
         <TabsContent value="appointments">
-          <div className="grid gap-4">
-            <h2 className="text-2xl font-bold">Upcoming Appointments</h2>
-            {/* Appointment scheduling component will be implemented next */}
-            <p className="text-gray-500">No upcoming appointments</p>
+          <div className="grid gap-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-bold">Upcoming Appointments</h2>
+              <Button 
+                onClick={() => navigate("/search")} 
+                className="flex items-center gap-2"
+              >
+                <CalendarPlus className="w-4 h-4" />
+                Book New Appointment
+              </Button>
+            </div>
+            <AppointmentsList />
           </div>
         </TabsContent>
         <TabsContent value="medications">

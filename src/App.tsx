@@ -1,147 +1,77 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
+import React, { useState, useEffect } from "react";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { ThemeProvider } from "@/components/theme-provider";
+import { Landing } from "@/pages/Landing";
+import { Login } from "@/pages/Login";
+import { ResetPassword } from "@/pages/ResetPassword";
+import { ProfileSetup } from "@/pages/ProfileSetup";
+import { Search } from "@/pages/Search";
+import { Map } from "@/pages/Map";
+import { Chat } from "@/pages/Chat";
+import { Profile } from "@/pages/Profile";
+import { Appointments } from "@/pages/Appointments";
+import { ProviderDashboard } from "@/pages/ProviderDashboard";
+import { ProviderCalendar } from "@/pages/ProviderCalendar";
+import { AdminDashboard } from "@/pages/AdminDashboard";
+import { InstitutionRegistration } from "@/pages/InstitutionRegistration";
+import { VideoConsultations } from "@/pages/VideoConsultations";
+import { Healthcare } from "@/pages/Healthcare";
+import { BottomNav } from "@/components/BottomNav";
+import { DesktopNav } from "@/components/DesktopNav";
+import { useSession } from "@/hooks/use-session";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { ThemeProvider as NextThemesProvider } from "next-themes";
-import { ErrorBoundary } from "@/components/ui/error-boundary";
-import { RouteErrorBoundary } from "@/components/ui/route-error-boundary";
-import { MobileLayout } from "@/components/layouts/MobileLayout";
-import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
-import { LoadingScreen } from "@/components/LoadingScreen";
-import { toast } from "sonner";
-import Login from "./pages/Login";
-import ResetPassword from "./pages/ResetPassword";
-import { ProfileSetup } from "@/components/auth/ProfileSetup";
-import Index from "./pages/Index";
-import Search from "./pages/Search";
-import Map from "./pages/Map";
-import Appointments from "./pages/Appointments";
-import Profile from "./pages/Profile";
-import AdminDashboard from "./pages/AdminDashboard";
-import Chat from "./pages/Chat";
-import VideoConsultations from "./pages/VideoConsultations";
-import ProviderCalendar from "./pages/ProviderCalendar";
+import PatientAppointments from "@/pages/PatientAppointments";
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 1,
-      refetchOnWindowFocus: false,
-      staleTime: 5 * 60 * 1000,
-      meta: {
-        onError: (error: any) => {
-          console.error('Query error:', error);
-          toast.error(error?.message || 'An error occurred while fetching data');
-        },
-      },
-    },
-  },
-});
+function App() {
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
+  const location = useLocation();
+  const { session, isLoading } = useSession();
 
-const App = () => {
-  console.log("App component rendering");
-  
+  useEffect(() => {
+    const handleResize = () => {
+      setIsDesktop(window.innerWidth >= 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  const queryClient = new QueryClient();
+
   return (
-    <ErrorBoundary>
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      disableTransitionOnChange
+    >
       <QueryClientProvider client={queryClient}>
-        <NextThemesProvider attribute="class" defaultTheme="light" enableSystem>
-          <BrowserRouter basename="/">
-            <TooltipProvider>
-              <Routes>
-                {/* Public Routes */}
-                <Route path="/login" element={<Login />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
-                
-                {/* Protected Setup Route */}
-                <Route path="/profile-setup" element={
-                  <ProtectedRoute>
-                    <RouteErrorBoundary>
-                      <ProfileSetup />
-                    </RouteErrorBoundary>
-                  </ProtectedRoute>
-                } />
-
-                {/* Default Redirect */}
-                <Route path="/" element={<Navigate to="/home" replace />} />
-                
-                {/* Protected Routes with Role-Based Access */}
-                <Route path="/*" element={
-                  <ProtectedRoute>
-                    <MobileLayout>
-                      <Routes>
-                        {/* Common Routes */}
-                        <Route path="home" element={
-                          <RouteErrorBoundary>
-                            <Index />
-                          </RouteErrorBoundary>
-                        } />
-                        <Route path="search" element={
-                          <RouteErrorBoundary>
-                            <Search />
-                          </RouteErrorBoundary>
-                        } />
-                        <Route path="map" element={
-                          <RouteErrorBoundary>
-                            <Map />
-                          </RouteErrorBoundary>
-                        } />
-                        <Route path="profile" element={
-                          <RouteErrorBoundary>
-                            <Profile />
-                          </RouteErrorBoundary>
-                        } />
-                        <Route path="chat" element={
-                          <RouteErrorBoundary>
-                            <Chat />
-                          </RouteErrorBoundary>
-                        } />
-                        
-                        {/* Patient Routes */}
-                        <Route path="appointments" element={
-                          <RouteErrorBoundary>
-                            <Appointments />
-                          </RouteErrorBoundary>
-                        } />
-                        <Route path="video-consultations" element={
-                          <RouteErrorBoundary>
-                            <VideoConsultations />
-                          </RouteErrorBoundary>
-                        } />
-                        
-                        {/* Admin Routes */}
-                        <Route path="admin" element={
-                          <ProtectedRoute allowedRoles={['admin']}>
-                            <RouteErrorBoundary>
-                              <AdminDashboard />
-                            </RouteErrorBoundary>
-                          </ProtectedRoute>
-                        } />
-                        
-                        {/* Provider Routes */}
-                        <Route path="calendar" element={
-                          <ProtectedRoute allowedRoles={['health_personnel']}>
-                            <RouteErrorBoundary>
-                              <ProviderCalendar />
-                            </RouteErrorBoundary>
-                          </ProtectedRoute>
-                        } />
-                        
-                        {/* Fallback Route */}
-                        <Route path="*" element={<Navigate to="/home" replace />} />
-                      </Routes>
-                    </MobileLayout>
-                  </ProtectedRoute>
-                } />
-              </Routes>
-              <Toaster />
-              <Sonner />
-            </TooltipProvider>
-          </BrowserRouter>
-        </NextThemesProvider>
+      {isDesktop ? <DesktopNav /> : <BottomNav />}
+      <Routes>
+        <Route path="/" element={<Landing />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/profile-setup" element={<ProfileSetup />} />
+        <Route path="/search" element={<Search />} />
+        <Route path="/map" element={<Map />} />
+        <Route path="/chat" element={<Chat />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/appointments" element={<Appointments />} />
+        <Route path="/patient-appointments" element={<PatientAppointments />} />
+        <Route path="/provider-dashboard" element={<ProviderDashboard />} />
+        <Route path="/provider-calendar" element={<ProviderCalendar />} />
+        <Route path="/admin-dashboard" element={<AdminDashboard />} />
+        <Route path="/healthcare-registration" element={<InstitutionRegistration />} />
+        <Route path="/video-consultations" element={<VideoConsultations />} />
+        <Route path="/healthcare" element={<Healthcare />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
       </QueryClientProvider>
-    </ErrorBoundary>
+    </ThemeProvider>
   );
-};
+}
 
 export default App;

@@ -1,80 +1,55 @@
+import { Home, Search, Calendar, MessageSquare, User } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "react-router-dom";
-import { cn } from "@/lib/utils";
-import { Home, Search, Calendar, MessageSquare, Video } from "lucide-react";
+import { useSession } from "@/hooks/use-session";
 
-export const BottomNav = () => {
+export function BottomNav() {
   const location = useLocation();
-  
-  const isActive = (path: string) => location.pathname === path;
+  const { data } = useSession();
+  const role = data?.role;
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-t">
-      <div className="flex items-center justify-around h-16">
-        <Link
-          to="/home"
-          className={cn(
-            "flex flex-col items-center gap-1 text-xs transition-colors",
-            isActive("/home")
-              ? "text-primary"
-              : "text-muted-foreground hover:text-primary"
-          )}
-        >
-          <Home className="h-5 w-5" />
-          Home
-        </Link>
+    <div className="fixed bottom-0 left-0 right-0 border-t bg-background px-3 py-2 z-50 md:hidden">
+      <div className="flex items-center justify-between">
+        <Button variant="ghost" size="icon" asChild>
+          <Link to="/" className={location.pathname === "/" ? "text-primary" : ""}>
+            <Home className="h-6 w-6" />
+          </Link>
+        </Button>
         
-        <Link
-          to="/search"
-          className={cn(
-            "flex flex-col items-center gap-1 text-xs transition-colors",
-            isActive("/search")
-              ? "text-primary"
-              : "text-muted-foreground hover:text-primary"
-          )}
-        >
-          <Search className="h-5 w-5" />
-          Search
-        </Link>
-
-        <Link
-          to="/appointments"
-          className={cn(
-            "flex flex-col items-center gap-1 text-xs transition-colors",
-            isActive("/appointments")
-              ? "text-primary"
-              : "text-muted-foreground hover:text-primary"
-          )}
-        >
-          <Calendar className="h-5 w-5" />
-          Appointments
-        </Link>
-
-        <Link
-          to="/chat"
-          className={cn(
-            "flex flex-col items-center gap-1 text-xs transition-colors",
-            isActive("/chat")
-              ? "text-primary"
-              : "text-muted-foreground hover:text-primary"
-          )}
-        >
-          <MessageSquare className="h-5 w-5" />
-          Chat
-        </Link>
-
-        <Link
-          to="/video-consultations"
-          className={cn(
-            "flex flex-col items-center gap-1 text-xs transition-colors",
-            isActive("/video-consultations")
-              ? "text-primary"
-              : "text-muted-foreground hover:text-primary"
-          )}
-        >
-          <Video className="h-5 w-5" />
-          Video
-        </Link>
+        <Button variant="ghost" size="icon" asChild>
+          <Link to="/search" className={location.pathname === "/search" ? "text-primary" : ""}>
+            <Search className="h-6 w-6" />
+          </Link>
+        </Button>
+        
+        <Button variant="ghost" size="icon" asChild>
+          <Link 
+            to="/appointments" 
+            className={location.pathname.includes("appointment") ? "text-primary" : ""}
+          >
+            <Calendar className="h-6 w-6" />
+          </Link>
+        </Button>
+        
+        <Button variant="ghost" size="icon" asChild>
+          <Link 
+            to="/chat" 
+            className={location.pathname === "/chat" ? "text-primary" : ""}
+          >
+            <MessageSquare className="h-6 w-6" />
+          </Link>
+        </Button>
+        
+        <Button variant="ghost" size="icon" asChild>
+          <Link 
+            to="/profile" 
+            className={location.pathname === "/profile" ? "text-primary" : ""}
+          >
+            <User className="h-6 w-6" />
+          </Link>
+        </Button>
       </div>
-    </nav>
+    </div>
   );
-};
+}

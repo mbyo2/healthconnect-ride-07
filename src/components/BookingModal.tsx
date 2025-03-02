@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@/components/ui/modal";
@@ -8,6 +9,8 @@ import { PaymentModal } from "@/components/payment/PaymentModal";
 import { Provider } from "@/types/provider";
 import { useBooking } from "@/hooks/use-booking";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 interface BookingModalProps {
   isOpen: boolean;
@@ -18,6 +21,8 @@ interface BookingModalProps {
 export const BookingModal = ({ isOpen, onClose, provider }: BookingModalProps) => {
   const [showPayment, setShowPayment] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
+  const navigate = useNavigate();
+  
   const {
     selectedDate,
     setSelectedDate,
@@ -34,10 +39,14 @@ export const BookingModal = ({ isOpen, onClose, provider }: BookingModalProps) =
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         setUserId(user.id);
+      } else {
+        toast.error("You need to be logged in to book an appointment");
+        onClose();
+        navigate("/login");
       }
     };
     getUser();
-  }, []);
+  }, [navigate, onClose]);
 
   const handleConfirmBooking = async () => {
     const success = await handleBookAppointment();
@@ -47,8 +56,10 @@ export const BookingModal = ({ isOpen, onClose, provider }: BookingModalProps) =
   };
 
   const handlePaymentComplete = () => {
+    toast.success("Appointment booked successfully!");
     setShowPayment(false);
     onClose();
+    navigate("/appointments");
   };
 
   return (
