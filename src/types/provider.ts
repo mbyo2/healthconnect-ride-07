@@ -19,6 +19,7 @@ export interface Provider {
   default_service_id?: string;
   rating?: number;
   distance?: number;
+  institution_id?: string;  // Reference to healthcare institution if affiliated
 }
 
 export interface MapProvider {
@@ -29,4 +30,5 @@ export interface MapProvider {
   location: LatLngTuple;
   rating?: number;
   distance?: number;
+  provider_type?: HealthcareProviderType;
 }

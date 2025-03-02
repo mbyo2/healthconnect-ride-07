@@ -5,7 +5,6 @@ import { ThemeProvider } from "./components/theme-provider";
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import ResetPassword from "./pages/ResetPassword";
-import ProfileSetup from "./pages/ProfileSetup";
 import Search from "./pages/Search";
 import Map from "./pages/Map";
 import Chat from "./pages/Chat";
@@ -22,6 +21,8 @@ import ProviderProfile from "./pages/ProviderProfile";
 import { BottomNav } from "./components/BottomNav";
 import { DesktopNav } from "./components/DesktopNav";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ProviderPortal } from "./pages/ProviderPortal";
+import { InstitutionPortal } from "./pages/InstitutionPortal";
 
 function App() {
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
@@ -68,6 +69,8 @@ function App() {
         <Route path="/healthcare-registration" element={<InstitutionRegistration />} />
         <Route path="/video-consultations" element={<VideoConsultations />} />
         <Route path="/healthcare" element={<Healthcare />} />
+        <Route path="/provider-portal" element={<ProviderPortal />} />
+        <Route path="/institution-portal" element={<InstitutionPortal />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       </QueryClientProvider>

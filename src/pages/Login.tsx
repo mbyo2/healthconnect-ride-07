@@ -1,13 +1,15 @@
+
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
-import { Heart } from "lucide-react";
+import { Heart, Building2, User } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { LoadingScreen } from "@/components/LoadingScreen";
+import { Button } from "@/components/ui/button";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -49,10 +51,10 @@ const Login = () => {
             console.log("Profile complete, redirecting to appropriate dashboard...");
             switch (profile.role) {
               case 'health_personnel':
-                navigate("/calendar");
+                navigate("/provider-dashboard");
                 break;
               case 'admin':
-                navigate("/admin");
+                navigate("/admin-dashboard");
                 break;
               default:
                 navigate("/home");
@@ -97,10 +99,10 @@ const Login = () => {
           toast.success("Welcome back!");
           switch (profile.role) {
             case 'health_personnel':
-              navigate("/calendar");
+              navigate("/provider-dashboard");
               break;
             case 'admin':
-              navigate("/admin");
+              navigate("/admin-dashboard");
               break;
             default:
               navigate("/home");
@@ -175,6 +177,22 @@ const Login = () => {
             redirectTo={`${window.location.origin}/home`}
           />
         </Card>
+
+        <div className="grid grid-cols-2 gap-4 mt-6">
+          <Button variant="outline" asChild className="flex flex-col h-auto py-4">
+            <Link to="/provider-portal">
+              <User className="h-5 w-5 mb-2" />
+              <span>Healthcare Provider Portal</span>
+            </Link>
+          </Button>
+          
+          <Button variant="outline" asChild className="flex flex-col h-auto py-4">
+            <Link to="/institution-portal">
+              <Building2 className="h-5 w-5 mb-2" />
+              <span>Institution Portal</span>
+            </Link>
+          </Button>
+        </div>
 
         <div className="text-center space-y-4">
           <p className="text-sm text-muted-foreground">
