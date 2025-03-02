@@ -4,8 +4,7 @@ import ProviderMap from '@/components/ProviderMap';
 import { ProviderList } from '@/components/ProviderList';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import type { Provider, MapProvider } from '@/types/provider';
-import type { LatLngTuple } from 'leaflet';
+import type { Provider } from '@/types/provider';
 
 const MapPage = () => {
   const [selectedProvider, setSelectedProvider] = useState<Provider | null>(null);
@@ -49,15 +48,6 @@ const MapPage = () => {
       }));
     }
   });
-
-  const mapProviders: MapProvider[] = providers.map(p => ({
-    id: p.id,
-    first_name: p.first_name,
-    last_name: p.last_name,
-    specialty: p.specialty,
-    location: p.location ? [p.location.latitude, p.location.longitude] as LatLngTuple : [-15.3875, 28.3228] as LatLngTuple,
-    rating: 4.5 // This is hardcoded for now, you might want to fetch this from a ratings table
-  }));
 
   if (isLoading) {
     return <div>Loading...</div>;

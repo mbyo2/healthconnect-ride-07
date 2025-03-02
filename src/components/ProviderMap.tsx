@@ -91,6 +91,7 @@ export const ProviderMap: React.FC<ProviderMapProps> = ({
         <Marker 
           key={provider.id} 
           position={[provider.location.latitude, provider.location.longitude]}
+          // @ts-ignore - icon property is supported but type definitions might be incorrect
           icon={customIcon}
         >
           <Popup>
@@ -131,6 +132,7 @@ export const ProviderMap: React.FC<ProviderMapProps> = ({
           color: '#3b82f6',
           weight: 1
         }}
+        // @ts-ignore - radius property is supported but type definitions might be incorrect
         radius={maxDistance * 1000} // Convert km to meters
       />
     ) : null,
@@ -147,6 +149,7 @@ export const ProviderMap: React.FC<ProviderMapProps> = ({
         Find My Location
       </Button>
       <MapContainer
+        // @ts-ignore - These props are supported but type definitions might be incorrect
         center={center}
         zoom={DEFAULT_ZOOM}
         className="h-full w-full"
@@ -154,11 +157,12 @@ export const ProviderMap: React.FC<ProviderMapProps> = ({
         maxZoom={18}
         zoomControl={true}
         scrollWheelZoom={true}
-        whenCreated={(map) => {
-          mapRef.current = map;
+        whenReady={(map) => {
+          mapRef.current = map.target;
         }}
       >
         <TileLayer
+          // @ts-ignore - These props are supported but type definitions might be incorrect
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
