@@ -11,7 +11,7 @@ export interface Provider {
   avatar_url?: string;
   expertise?: string[];
   provider_type?: HealthcareProviderType;
-  location: {
+  location?: {
     latitude: number;
     longitude: number;
   };

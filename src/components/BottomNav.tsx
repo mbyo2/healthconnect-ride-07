@@ -1,3 +1,4 @@
+
 import { Home, Search, Calendar, MessageSquare, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "react-router-dom";
@@ -5,8 +6,8 @@ import { useSession } from "@/hooks/use-session";
 
 export function BottomNav() {
   const location = useLocation();
-  const { data } = useSession();
-  const role = data?.role;
+  const { session, user } = useSession();
+  const role = user?.role;
 
   return (
     <div className="fixed bottom-0 left-0 right-0 border-t bg-background px-3 py-2 z-50 md:hidden">

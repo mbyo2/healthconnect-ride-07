@@ -1,11 +1,12 @@
+
 import { Button } from "@/components/ui/button";
 import { useSession } from "@/hooks/use-session";
 import { Link, useLocation } from "react-router-dom";
 
 export function DesktopNav() {
   const location = useLocation();
-  const { data } = useSession();
-  const role = data?.role;
+  const { session, user } = useSession();
+  const role = user?.role;
 
   return (
     <div className="hidden md:flex items-center justify-between py-4">
@@ -64,11 +65,11 @@ export function DesktopNav() {
           )}
         </div>
       
-      {data ? (
+      {session ? (
         <div className="flex items-center gap-4">
           <Link to="/profile">
             <img
-              src={data.avatar_url || "/placeholder.svg"}
+              src={user?.avatar_url || "/placeholder.svg"}
               alt="Avatar"
               className="rounded-full w-8 h-8 object-cover"
             />
