@@ -157,6 +157,7 @@ export const ProviderMap: React.FC<ProviderMapProps> = ({
         maxZoom={18}
         zoomControl={true}
         scrollWheelZoom={true}
+        // @ts-ignore - whenReady is a function that takes map arguments, not a void function
         whenReady={(map) => {
           mapRef.current = map.target;
         }}
