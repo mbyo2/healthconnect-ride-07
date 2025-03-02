@@ -17,6 +17,8 @@ export interface Provider {
   };
   consultation_fee?: number;
   default_service_id?: string;
+  rating?: number;
+  distance?: number;
 }
 
 export interface MapProvider {
@@ -26,4 +28,5 @@ export interface MapProvider {
   specialty: string;
   location: LatLngTuple;
   rating?: number;
+  distance?: number;
 }
