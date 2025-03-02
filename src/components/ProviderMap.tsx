@@ -85,35 +85,38 @@ export const ProviderMap: React.FC<ProviderMapProps> = ({
 
   // Memoize the providers markers to prevent unnecessary re-renders
   const providerMarkers = useMemo(() => 
-    providers.map((provider) => (
-      <Marker 
-        key={provider.id} 
-        position={[provider.location.latitude, provider.location.longitude]}
-        icon={customIcon}
-      >
-        <Popup>
-          <div className="p-2">
-            <h3 className="font-semibold text-foreground">
-              Dr. {provider.first_name} {provider.last_name}
-            </h3>
-            <p className="text-sm text-muted-foreground">{provider.specialty}</p>
-            {provider.distance !== undefined && (
-              <p className="text-xs text-muted-foreground mt-1">
-                Distance: {provider.distance} km
-              </p>
-            )}
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="mt-2 w-full"
-              onClick={() => handleViewProfile(provider.id)}
-            >
-              View Profile
-            </Button>
-          </div>
-        </Popup>
-      </Marker>
-    )),
+    providers.map((provider) => {
+      if (!provider.location) return null;
+      return (
+        <Marker 
+          key={provider.id} 
+          position={[provider.location.latitude, provider.location.longitude]}
+          icon={customIcon}
+        >
+          <Popup>
+            <div className="p-2">
+              <h3 className="font-semibold text-foreground">
+                Dr. {provider.first_name} {provider.last_name}
+              </h3>
+              <p className="text-sm text-muted-foreground">{provider.specialty}</p>
+              {provider.distance !== undefined && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  Distance: {provider.distance} km
+                </p>
+              )}
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="mt-2 w-full"
+                onClick={() => handleViewProfile(provider.id)}
+              >
+                View Profile
+              </Button>
+            </div>
+          </Popup>
+        </Marker>
+      );
+    }),
     [providers, navigate]
   );
 
@@ -122,13 +125,13 @@ export const ProviderMap: React.FC<ProviderMapProps> = ({
     maxDistance && maxDistance < 50 ? (
       <Circle 
         center={center}
-        radius={maxDistance * 1000} // Convert km to meters
         pathOptions={{ 
           fillColor: '#3b82f6',
           fillOpacity: 0.1,
           color: '#3b82f6',
           weight: 1
-        }} 
+        }}
+        radius={maxDistance * 1000} // Convert km to meters
       />
     ) : null,
     [center, maxDistance]
@@ -151,13 +154,13 @@ export const ProviderMap: React.FC<ProviderMapProps> = ({
         maxZoom={18}
         zoomControl={true}
         scrollWheelZoom={true}
-        whenReady={(map) => {
-          mapRef.current = map.target;
+        whenCreated={(map) => {
+          mapRef.current = map;
         }}
       >
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
         <MapUpdater center={center} map={mapRef.current} />
         {distanceCircle}

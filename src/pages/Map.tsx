@@ -39,9 +39,12 @@ const MapPage = () => {
         bio: profile.bio,
         avatar_url: profile.avatar_url,
         expertise: ['General Medicine', 'Primary Care'],
-        location: {
-          latitude: profile.provider_locations?.[0]?.latitude ? Number(profile.provider_locations[0].latitude) : 37.7749,
-          longitude: profile.provider_locations?.[0]?.longitude ? Number(profile.provider_locations[0].longitude) : -122.4194
+        location: profile.provider_locations?.[0] ? {
+          latitude: profile.provider_locations[0].latitude ? Number(profile.provider_locations[0].latitude) : 37.7749,
+          longitude: profile.provider_locations[0].longitude ? Number(profile.provider_locations[0].longitude) : -122.4194
+        } : {
+          latitude: 37.7749,
+          longitude: -122.4194
         }
       }));
     }
@@ -52,7 +55,7 @@ const MapPage = () => {
     first_name: p.first_name,
     last_name: p.last_name,
     specialty: p.specialty,
-    location: [p.location.latitude, p.location.longitude] as LatLngTuple,
+    location: p.location ? [p.location.latitude, p.location.longitude] as LatLngTuple : [-15.3875, 28.3228] as LatLngTuple,
     rating: 4.5 // This is hardcoded for now, you might want to fetch this from a ratings table
   }));
 
@@ -72,7 +75,7 @@ const MapPage = () => {
           />
         </div>
         <div className="order-1 lg:order-2">
-          <ProviderMap />
+          <ProviderMap providers={providers} />
         </div>
       </div>
     </div>

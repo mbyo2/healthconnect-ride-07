@@ -177,11 +177,6 @@ export const InstitutionPortal = () => {
                 providers={[]}
                 view="sign_up"
                 redirectTo={`${window.location.origin}/healthcare-registration`}
-                onSubmit={async (formData) => {
-                  if (formData.email && formData.password) {
-                    handleInstitutionSignUp(formData.email, formData.password);
-                  }
-                }}
               />
             </TabsContent>
           </Tabs>

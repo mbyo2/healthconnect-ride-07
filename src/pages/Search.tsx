@@ -97,10 +97,10 @@ const Search = () => {
 
       // Process providers data and calculate distances
       const processedProviders = data.map((profile): Provider => {
-        const providerLocation = {
-          latitude: profile.provider_locations?.[0]?.latitude || DEFAULT_COORDINATES.latitude,
-          longitude: profile.provider_locations?.[0]?.longitude || DEFAULT_COORDINATES.longitude
-        };
+        const providerLocation = profile.provider_locations?.[0] ? {
+          latitude: Number(profile.provider_locations[0].latitude) || DEFAULT_COORDINATES.latitude,
+          longitude: Number(profile.provider_locations[0].longitude) || DEFAULT_COORDINATES.longitude
+        } : DEFAULT_COORDINATES;
         
         // Calculate distance from user location
         const distance = calculateDistance(
