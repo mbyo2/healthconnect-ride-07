@@ -23,6 +23,7 @@ import { DesktopNav } from "./components/DesktopNav";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ProviderPortal } from "./pages/ProviderPortal";
 import { InstitutionPortal } from "./pages/InstitutionPortal";
+import ProfileSetup from "./pages/ProfileSetup";
 
 function App() {
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);

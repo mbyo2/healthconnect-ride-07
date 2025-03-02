@@ -25,7 +25,7 @@ const ProfileSetup = () => {
     city: "",
     state: "",
     zip_code: "",
-    provider_type: "",
+    provider_type: "doctor", // Default value that matches the allowed types
   });
 
   useEffect(() => {
@@ -65,7 +65,7 @@ const ProfileSetup = () => {
       
       setProfile(data);
       
-      // Pre-fill form data
+      // Pre-fill form data with default provider type that matches allowed values
       setFormData({
         first_name: data.first_name || "",
         last_name: data.last_name || "",
@@ -76,7 +76,7 @@ const ProfileSetup = () => {
         city: data.city || "",
         state: data.state || "",
         zip_code: data.zip_code || "",
-        provider_type: data.provider_type || "",
+        provider_type: data.provider_type || "doctor", // Default to a valid value
       });
       
       setIsLoading(false);
@@ -194,9 +194,11 @@ const ProfileSetup = () => {
                   <SelectContent>
                     <SelectItem value="doctor">Doctor</SelectItem>
                     <SelectItem value="nurse">Nurse</SelectItem>
-                    <SelectItem value="therapist">Therapist</SelectItem>
                     <SelectItem value="dentist">Dentist</SelectItem>
-                    <SelectItem value="pharmacist">Pharmacist</SelectItem>
+                    <SelectItem value="pharmacy">Pharmacist</SelectItem>
+                    <SelectItem value="hospital">Hospital</SelectItem>
+                    <SelectItem value="clinic">Clinic</SelectItem>
+                    <SelectItem value="nursing_home">Nursing Home</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Heart } from "lucide-react";
@@ -17,7 +17,7 @@ export const ProviderPortal = () => {
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useState(() => {
+  useEffect(() => {
     const checkSession = async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
@@ -177,11 +177,6 @@ export const ProviderPortal = () => {
                 providers={[]}
                 view="sign_up"
                 redirectTo={`${window.location.origin}/profile-setup`}
-                onSubmit={async (formData) => {
-                  if (formData.email && formData.password) {
-                    handleProviderSignUp(formData.email, formData.password);
-                  }
-                }}
               />
             </TabsContent>
           </Tabs>
