@@ -1,6 +1,6 @@
 
 import React, { useRef, useEffect, useState, useMemo } from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import { Icon, Map as LeafletMap } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Button } from '@/components/ui/button';
@@ -9,6 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useQuery } from '@tanstack/react-query';
 import { LoadingScreen } from '@/components/LoadingScreen';
+import { useNavigate } from 'react-router-dom';
 
 interface Provider {
   id: string;
@@ -33,10 +34,24 @@ const customIcon = new Icon({
   shadowSize: [41, 41]
 });
 
+// Component to update map view
+const MapUpdater = ({ center, map }: { center: [number, number], map: LeafletMap | null }) => {
+  const leafletMap = useMap();
+  
+  useEffect(() => {
+    if (map) {
+      map.setView(center, DEFAULT_ZOOM);
+    }
+  }, [center, map]);
+  
+  return null;
+};
+
 export const ProviderMap = () => {
   const mapRef = useRef<LeafletMap | null>(null);
-  const [center] = useState<[number, number]>(DEFAULT_COORDINATES);
+  const [center, setCenter] = useState<[number, number]>(DEFAULT_COORDINATES);
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
 
   // Use React Query for caching and better data fetching
   const { data: providers = [], isLoading } = useQuery({
@@ -83,7 +98,7 @@ export const ProviderMap = () => {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
-        mapRef.current?.setView([latitude, longitude], DEFAULT_ZOOM);
+        setCenter([latitude, longitude]);
         toast.success('Location found!');
       },
       (error) => {
@@ -92,6 +107,11 @@ export const ProviderMap = () => {
       },
       { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
     );
+  };
+
+  // Function to handle profile view
+  const handleViewProfile = (providerId: string) => {
+    navigate(`/provider/${providerId}`);
   };
 
   // Memoize the providers markers to prevent unnecessary re-renders
@@ -112,9 +132,7 @@ export const ProviderMap = () => {
               variant="outline" 
               size="sm" 
               className="mt-2 w-full"
-              onClick={() => {
-                console.log('Clicked provider:', provider.id);
-              }}
+              onClick={() => handleViewProfile(provider.id)}
             >
               View Profile
             </Button>
@@ -122,7 +140,7 @@ export const ProviderMap = () => {
         </Popup>
       </Marker>
     )),
-    [providers]
+    [providers, navigate]
   );
 
   if (isLoading) {
@@ -139,18 +157,22 @@ export const ProviderMap = () => {
         Find My Location
       </Button>
       <MapContainer
-        center={center}
+        center={DEFAULT_COORDINATES}
         zoom={DEFAULT_ZOOM}
         className="h-full w-full"
         minZoom={3}
         maxZoom={18}
         zoomControl={!isMobile}
         scrollWheelZoom={true}
+        whenCreated={(map) => {
+          mapRef.current = map;
+        }}
       >
         <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
+        <MapUpdater center={center} map={mapRef.current} />
         {providerMarkers}
       </MapContainer>
     </div>

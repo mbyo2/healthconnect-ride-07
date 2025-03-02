@@ -1,31 +1,31 @@
+
 import React, { useState, useEffect } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
-import { ThemeProvider } from "@/components/theme-provider";
-import { Landing } from "@/pages/Landing";
-import { Login } from "@/pages/Login";
-import { ResetPassword } from "@/pages/ResetPassword";
-import { ProfileSetup } from "@/pages/ProfileSetup";
-import { Search } from "@/pages/Search";
-import { Map } from "@/pages/Map";
-import { Chat } from "@/pages/Chat";
-import { Profile } from "@/pages/Profile";
-import { Appointments } from "@/pages/Appointments";
-import { ProviderDashboard } from "@/pages/ProviderDashboard";
-import { ProviderCalendar } from "@/pages/ProviderCalendar";
-import { AdminDashboard } from "@/pages/AdminDashboard";
-import { InstitutionRegistration } from "@/pages/InstitutionRegistration";
-import { VideoConsultations } from "@/pages/VideoConsultations";
-import { Healthcare } from "@/pages/Healthcare";
-import { BottomNav } from "@/components/BottomNav";
-import { DesktopNav } from "@/components/DesktopNav";
-import { useSession } from "@/hooks/use-session";
+import { ThemeProvider } from "./components/theme-provider";
+import Landing from "./pages/Landing";
+import Login from "./pages/Login";
+import ResetPassword from "./pages/ResetPassword";
+import ProfileSetup from "./pages/ProfileSetup";
+import Search from "./pages/Search";
+import Map from "./pages/Map";
+import Chat from "./pages/Chat";
+import Profile from "./pages/Profile";
+import Appointments from "./pages/Appointments";
+import PatientAppointments from "./pages/PatientAppointments";
+import ProviderDashboard from "./pages/ProviderDashboard";
+import ProviderCalendar from "./pages/ProviderCalendar";
+import AdminDashboard from "./pages/AdminDashboard";
+import InstitutionRegistration from "./pages/InstitutionRegistration";
+import VideoConsultations from "./pages/VideoConsultations";
+import Healthcare from "./pages/Healthcare";
+import ProviderProfile from "./pages/ProviderProfile";
+import { BottomNav } from "./components/BottomNav";
+import { DesktopNav } from "./components/DesktopNav";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import PatientAppointments from "@/pages/PatientAppointments";
 
 function App() {
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
   const location = useLocation();
-  const { session, isLoading } = useSession();
 
   useEffect(() => {
     const handleResize = () => {
@@ -61,6 +61,7 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/appointments" element={<Appointments />} />
         <Route path="/patient-appointments" element={<PatientAppointments />} />
+        <Route path="/provider/:providerId" element={<ProviderProfile />} />
         <Route path="/provider-dashboard" element={<ProviderDashboard />} />
         <Route path="/provider-calendar" element={<ProviderCalendar />} />
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
