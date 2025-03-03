@@ -62,7 +62,9 @@ declare module "react-leaflet" {
     [key: string]: any;
   }
 
-  export interface UseMapResult extends LeafletMap {}
+  export interface UseMapResult extends LeafletMap {
+    setView(center: LatLngExpression, zoom?: number, options?: { animate?: boolean } | boolean): this;
+  }
 
   export function MapContainer(props: MapContainerProps): JSX.Element;
   export function TileLayer(props: TileLayerProps): JSX.Element;

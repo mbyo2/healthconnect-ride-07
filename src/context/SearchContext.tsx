@@ -1,6 +1,5 @@
-
 import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, QueryFunctionContext } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Provider } from '@/types/provider';
 import { HealthcareProviderType } from '@/types/healthcare';
@@ -35,7 +34,6 @@ type SearchContextType = {
 
 const SearchContext = createContext<SearchContextType | undefined>(undefined);
 
-// Calculate distance between two coordinates in kilometers (using Haversine formula)
 const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
   const R = 6371; // Radius of the earth in km
   const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -59,7 +57,6 @@ export const SearchProvider = ({ children }: { children: ReactNode }) => {
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [totalCount, setTotalCount] = useState<number>(0);
 
-  // Get user location from browser if enabled
   React.useEffect(() => {
     if (navigator.geolocation && useUserLocation) {
       navigator.geolocation.getCurrentPosition(
@@ -78,16 +75,17 @@ export const SearchProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [useUserLocation]);
 
-  const fetchProviders = useCallback(async ({ 
-    queryKey, 
-    pageParam = 1 
-  }: { 
-    queryKey: readonly any[]; 
-    pageParam?: number;
-  }) => {
-    const [_, searchTermLocal, typeLocal, distanceLocal, locationLocal, page] = queryKey;
+  const fetchProviders = useCallback(async (context: QueryFunctionContext) => {
+    const { queryKey } = context;
+    const [_, searchTermLocal, typeLocal, distanceLocal, locationLocal, page] = queryKey as [
+      string, 
+      string, 
+      HealthcareProviderType | null, 
+      number, 
+      { latitude: number; longitude: number }, 
+      number
+    ];
     
-    // Count total matches first
     let countQuery = supabase
       .from('profiles')
       .select('id', { count: 'exact' })
@@ -109,7 +107,6 @@ export const SearchProvider = ({ children }: { children: ReactNode }) => {
 
     setTotalCount(count || 0);
 
-    // Fetch actual data
     let query = supabase
       .from('profiles')
       .select(`
@@ -140,14 +137,12 @@ export const SearchProvider = ({ children }: { children: ReactNode }) => {
 
     if (error) throw error;
 
-    // Process providers data and calculate distances
     const processedProviders = data.map((profile): Provider => {
       const providerLocation = profile.provider_locations?.[0] ? {
         latitude: Number(profile.provider_locations[0].latitude) || DEFAULT_COORDINATES.latitude,
         longitude: Number(profile.provider_locations[0].longitude) || DEFAULT_COORDINATES.longitude
       } : DEFAULT_COORDINATES;
       
-      // Calculate distance from user location
       const distance = calculateDistance(
         locationLocal.latitude,
         locationLocal.longitude,
@@ -170,12 +165,10 @@ export const SearchProvider = ({ children }: { children: ReactNode }) => {
       };
     });
 
-    // Filter by distance if maxDistance is set
     const filteredProviders = processedProviders.filter(provider => 
       distanceLocal === 50 || provider.distance <= distanceLocal
     ).sort((a, b) => (a.distance || 999) - (b.distance || 999));
     
-    // Check if there are more pages
     setHasMore(count ? page * PAGE_SIZE < count : false);
     
     return filteredProviders;
