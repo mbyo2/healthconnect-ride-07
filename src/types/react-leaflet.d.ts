@@ -22,7 +22,6 @@ declare module 'react-leaflet' {
     zoomControl?: boolean;
     scrollWheelZoom?: boolean;
     whenReady?: (map: { target: LeafletMap }) => void;
-    whenCreated?: (map: LeafletMap) => void;
     children?: ReactNode;
     [key: string]: any;
   }

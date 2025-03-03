@@ -1,5 +1,5 @@
 
-import React, { useRef, useEffect, useState, useMemo } from 'react';
+import React, { useRef, useEffect, useState, useMemo, useCallback } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from 'react-leaflet';
 import { Icon, Map as LeafletMap } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -12,7 +12,7 @@ import { Provider } from '@/types/provider';
 const DEFAULT_COORDINATES: [number, number] = [-15.3875, 28.3228];
 const DEFAULT_ZOOM = 13;
 
-// Create a custom icon for markers
+// Create a custom icon for markers - memoize to prevent recreating on each render
 const customIcon = new Icon({
   iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
   shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
@@ -23,13 +23,11 @@ const customIcon = new Icon({
 });
 
 // Component to update map view
-const MapUpdater = ({ center, map }: { center: [number, number], map: LeafletMap | null }) => {
-  const leafletMap = useMap();
+const MapUpdater = ({ center }: { center: [number, number] }) => {
+  const map = useMap();
   
   useEffect(() => {
-    if (map) {
-      map.setView(center, DEFAULT_ZOOM);
-    }
+    map.setView(center, DEFAULT_ZOOM);
   }, [center, map]);
   
   return null;
@@ -58,8 +56,8 @@ export const ProviderMap: React.FC<ProviderMapProps> = ({
   }, [userLocation]);
 
   // Function to handle geolocation
-  const getUserLocation = () => {
-    if (!mapRef.current || !navigator.geolocation) {
+  const getUserLocation = useCallback(() => {
+    if (!navigator.geolocation) {
       toast.error('Geolocation is not supported by your browser');
       return;
     }
@@ -76,12 +74,12 @@ export const ProviderMap: React.FC<ProviderMapProps> = ({
       },
       { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
     );
-  };
+  }, []);
 
   // Function to handle profile view
-  const handleViewProfile = (providerId: string) => {
+  const handleViewProfile = useCallback((providerId: string) => {
     navigate(`/provider/${providerId}`);
-  };
+  }, [navigate]);
 
   // Memoize the providers markers to prevent unnecessary re-renders
   const providerMarkers = useMemo(() => 
@@ -117,7 +115,7 @@ export const ProviderMap: React.FC<ProviderMapProps> = ({
         </Marker>
       );
     }),
-    [providers, navigate]
+    [providers, handleViewProfile]
   );
 
   // Create circle to show distance radius
@@ -162,7 +160,7 @@ export const ProviderMap: React.FC<ProviderMapProps> = ({
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
-        <MapUpdater center={center} map={mapRef.current} />
+        <MapUpdater center={center} />
         {distanceCircle}
         {providerMarkers}
       </MapContainer>
