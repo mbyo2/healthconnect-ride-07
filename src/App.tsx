@@ -22,7 +22,6 @@ import VideoConsultations from "./pages/VideoConsultations";
 import Healthcare from "./pages/Healthcare";
 import ProviderProfile from "./pages/ProviderProfile";
 import { BottomNav } from "./components/BottomNav";
-import { DesktopNav } from "./components/DesktopNav";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ProviderPortal } from "./pages/ProviderPortal";
 import { InstitutionPortal } from "./pages/InstitutionPortal";
@@ -54,7 +53,7 @@ function App() {
     >
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          {isDesktop ? <DesktopNav /> : <BottomNav />}
+          {!isDesktop && <BottomNav />}
           <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
