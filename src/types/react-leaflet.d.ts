@@ -1,71 +1,74 @@
 
-import { 
-  Circle as LeafletCircle, 
-  CircleMarker as LeafletCircleMarker,
-  Map as LeafletMap, 
-  Marker as LeafletMarker, 
-  TileLayer as LeafletTileLayer,
-  Popup as LeafletPopup,
-  Path as LeafletPath,
-  PathOptions
-} from 'leaflet';
-import { ReactNode, RefAttributes } from 'react';
+declare module "react-leaflet" {
+  import { ReactNode } from "react";
+  import {
+    Map as LeafletMap,
+    MapOptions,
+    LatLngExpression,
+    LatLngBoundsExpression,
+    PathOptions,
+    CircleMarkerOptions,
+    PolylineOptions,
+    TileLayer as LeafletTileLayer,
+    Marker as LeafletMarker,
+    Circle as LeafletCircle,
+    LayerGroup as LeafletLayerGroup,
+    LatLng,
+  } from "leaflet";
 
-// Extend the existing definitions from react-leaflet
-declare module 'react-leaflet' {
-  export interface MapContainerProps extends RefAttributes<LeafletMap> {
-    center: [number, number];
+  export interface MapContainerProps extends MapOptions {
+    center: LatLngExpression;
     zoom: number;
     className?: string;
-    minZoom?: number;
-    maxZoom?: number;
+    id?: string;
+    style?: React.CSSProperties;
     zoomControl?: boolean;
     scrollWheelZoom?: boolean;
     whenReady?: (map: { target: LeafletMap }) => void;
+    whenCreated?: (map: LeafletMap) => void;
     children?: ReactNode;
     [key: string]: any;
   }
 
-  export interface TileLayerProps extends RefAttributes<LeafletTileLayer> {
+  export interface TileLayerProps {
     url: string;
     attribution?: string;
-    children?: ReactNode;
+    zIndex?: number;
+    opacity?: number;
+    tileSize?: number;
     [key: string]: any;
   }
 
-  export interface MarkerProps extends RefAttributes<LeafletMarker<any>> {
-    position: [number, number];
+  export interface MarkerProps {
+    position: LatLngExpression;
     icon?: any;
-    children?: ReactNode;
+    draggable?: boolean;
+    eventHandlers?: any;
+    zIndexOffset?: number;
+    opacity?: number;
     [key: string]: any;
   }
 
-  export interface CircleProps extends RefAttributes<LeafletCircle<any>> {
-    center: [number, number];
+  export interface CircleProps extends PathOptions {
+    center: LatLngExpression;
     radius: number;
     pathOptions?: PathOptions;
-    children?: ReactNode;
     [key: string]: any;
   }
 
-  export interface PopupProps extends RefAttributes<LeafletPopup> {
-    children?: ReactNode;
+  export interface PopupProps {
+    position?: LatLngExpression;
+    offset?: [number, number];
     [key: string]: any;
   }
 
-  export interface CircleMarkerProps extends RefAttributes<LeafletCircleMarker<any>> {
-    center: [number, number];
-    pathOptions?: PathOptions;
-    radius?: number;
-    children?: ReactNode;
-    [key: string]: any;
-  }
+  export interface UseMapResult extends LeafletMap {}
 
-  export const MapContainer: React.FC<MapContainerProps>;
-  export const TileLayer: React.FC<TileLayerProps>;
-  export const Marker: React.FC<MarkerProps>;
-  export const Popup: React.FC<PopupProps>;
-  export const Circle: React.FC<CircleProps>;
-  export const CircleMarker: React.FC<CircleMarkerProps>;
-  export const useMap: () => LeafletMap;
+  export function MapContainer(props: MapContainerProps): JSX.Element;
+  export function TileLayer(props: TileLayerProps): JSX.Element;
+  export function Marker(props: MarkerProps): JSX.Element;
+  export function Popup(props: PopupProps): JSX.Element;
+  export function Circle(props: CircleProps): JSX.Element;
+  export function LayerGroup(props: any): JSX.Element;
+  export function useMap(): UseMapResult;
 }

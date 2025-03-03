@@ -2,8 +2,10 @@
 import React, { useState, useEffect } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { ThemeProvider } from "./components/theme-provider";
+import { AuthProvider } from "./context/AuthContext";
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
+import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
 import ProfileSetup from "./pages/ProfileSetup";
 import Search from "./pages/Search";
@@ -51,29 +53,32 @@ function App() {
       disableTransitionOnChange
     >
       <QueryClientProvider client={queryClient}>
-      {isDesktop ? <DesktopNav /> : <BottomNav />}
-      <Routes>
-        <Route path="/" element={<Landing />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/profile-setup" element={<ProfileSetup />} />
-        <Route path="/search" element={<Search />} />
-        <Route path="/map" element={<Map />} />
-        <Route path="/chat" element={<Chat />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/appointments" element={<Appointments />} />
-        <Route path="/patient-appointments" element={<PatientAppointments />} />
-        <Route path="/provider/:providerId" element={<ProviderProfile />} />
-        <Route path="/provider-dashboard" element={<ProviderDashboard />} />
-        <Route path="/provider-calendar" element={<ProviderCalendar />} />
-        <Route path="/admin-dashboard" element={<AdminDashboard />} />
-        <Route path="/healthcare-registration" element={<InstitutionRegistration />} />
-        <Route path="/video-consultations" element={<VideoConsultations />} />
-        <Route path="/healthcare" element={<Healthcare />} />
-        <Route path="/provider-portal" element={<ProviderPortal />} />
-        <Route path="/institution-portal" element={<InstitutionPortal />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+        <AuthProvider>
+          {isDesktop ? <DesktopNav /> : <BottomNav />}
+          <Routes>
+            <Route path="/" element={<Landing />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/profile-setup" element={<ProfileSetup />} />
+            <Route path="/search" element={<Search />} />
+            <Route path="/map" element={<Map />} />
+            <Route path="/chat" element={<Chat />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/appointments" element={<Appointments />} />
+            <Route path="/patient-appointments" element={<PatientAppointments />} />
+            <Route path="/provider/:providerId" element={<ProviderProfile />} />
+            <Route path="/provider-dashboard" element={<ProviderDashboard />} />
+            <Route path="/provider-calendar" element={<ProviderCalendar />} />
+            <Route path="/admin-dashboard" element={<AdminDashboard />} />
+            <Route path="/healthcare-registration" element={<InstitutionRegistration />} />
+            <Route path="/video-consultations" element={<VideoConsultations />} />
+            <Route path="/healthcare" element={<Healthcare />} />
+            <Route path="/provider-portal" element={<ProviderPortal />} />
+            <Route path="/institution-portal" element={<InstitutionPortal />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </AuthProvider>
       </QueryClientProvider>
     </ThemeProvider>
   );
