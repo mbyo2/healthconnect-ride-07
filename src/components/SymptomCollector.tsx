@@ -1,12 +1,11 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 
 export interface SymptomCollectorProps {
-  onSymptomSubmit: (symptoms: string, urgency: string) => void;
+  onSymptomSubmit?: (symptoms: string, urgency: string) => void;
 }
 
 export const SymptomCollector = ({ onSymptomSubmit }: SymptomCollectorProps) => {
@@ -35,7 +34,12 @@ export const SymptomCollector = ({ onSymptomSubmit }: SymptomCollectorProps) => 
         return;
       }
 
-      await onSymptomSubmit(symptoms, urgency);
+      if (onSymptomSubmit) {
+        await onSymptomSubmit(symptoms, urgency);
+      } else {
+        console.log("Symptoms submitted:", { symptoms, urgency });
+      }
+      
       setSymptoms("");
       setUrgency("low");
       toast.success("Symptoms submitted successfully");
