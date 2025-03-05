@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -130,8 +131,8 @@ export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) 
   }
 
   if (!isAuthenticated) {
-    console.log("User not authenticated, redirecting to login");
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    console.log("User not authenticated, redirecting to auth");
+    return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 
   if (!isProfileComplete && location.pathname !== '/profile-setup') {
@@ -143,7 +144,7 @@ export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) 
   if (allowedRoles && userRole && !allowedRoles.includes(userRole)) {
     console.log("User role not allowed:", userRole);
     toast.error("You don't have permission to access this page");
-    return <Navigate to="/home" replace />;
+    return <Navigate to="/symptoms" replace />;
   }
 
   return <>{children}</>;

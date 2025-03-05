@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Auth } from "@supabase/auth-ui-react";
@@ -48,17 +47,8 @@ const Login = () => {
             console.log("Profile incomplete, redirecting to setup...");
             navigate("/profile-setup");
           } else {
-            console.log("Profile complete, redirecting to appropriate dashboard...");
-            switch (profile.role) {
-              case 'health_personnel':
-                navigate("/provider-dashboard");
-                break;
-              case 'admin':
-                navigate("/admin-dashboard");
-                break;
-              default:
-                navigate("/home");
-            }
+            console.log("Profile complete, redirecting to symptoms page...");
+            navigate("/symptoms");
           }
         }
       } catch (err) {

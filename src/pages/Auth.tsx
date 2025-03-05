@@ -43,7 +43,7 @@ const Auth = () => {
   // Redirect if already authenticated
   React.useEffect(() => {
     if (isAuthenticated) {
-      navigate("/home");
+      navigate("/symptoms");
     }
   }, [isAuthenticated, navigate]);
 
