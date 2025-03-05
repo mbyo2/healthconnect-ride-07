@@ -82,6 +82,18 @@ export function ThemeProvider({
     return () => media.removeEventListener("change", handleMediaChange);
   }, [theme, enableSystem, attribute]);
 
+  useEffect(() => {
+    // Force refresh theme on initial load
+    const root = window.document.documentElement;
+    const currentTheme = theme === "system" && enableSystem
+      ? window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"
+      : theme;
+      
+    root.classList.remove("light", "dark");
+    root.classList.add(currentTheme);
+    root.setAttribute(attribute, currentTheme);
+  }, []);
+
   const value = {
     theme,
     setTheme: (newTheme: Theme) => {
