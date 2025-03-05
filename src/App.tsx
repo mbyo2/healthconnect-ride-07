@@ -25,6 +25,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ProviderPortal } from "./pages/ProviderPortal";
 import { InstitutionPortal } from "./pages/InstitutionPortal";
 import { VoiceCommandsHelp } from '@/components/VoiceCommandsHelp';
+import { SymptomCollector } from '@/components/SymptomCollector';
 
 function App() {
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
@@ -57,7 +58,10 @@ function App() {
             <div className="flex flex-col min-h-screen">
               <main className="flex-grow pb-16 md:pb-0">
                 <Routes>
-                  <Route path="/" element={<Landing />} />
+                  {/* Redirect root to symptom collector */}
+                  <Route path="/" element={<Navigate to="/symptoms" replace />} />
+                  <Route path="/symptoms" element={<SymptomCollector />} />
+                  <Route path="/landing" element={<Landing />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/reset-password" element={<ResetPassword />} />
@@ -76,7 +80,7 @@ function App() {
                   <Route path="/video-consultations" element={<VideoConsultations />} />
                   <Route path="/provider-portal" element={<ProviderPortal />} />
                   <Route path="/institution-portal" element={<InstitutionPortal />} />
-                  <Route path="*" element={<Navigate to="/" replace />} />
+                  <Route path="*" element={<Navigate to="/symptoms" replace />} />
                 </Routes>
               </main>
               {!isDesktop && <BottomNav />}

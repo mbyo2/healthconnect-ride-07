@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
-// Add type definitions for the Web Speech API
 interface SpeechRecognition extends EventTarget {
   continuous: boolean;
   interimResults: boolean;
@@ -36,7 +35,6 @@ interface SpeechRecognitionAlternative {
   transcript: string;
 }
 
-// Define global types for the Speech API
 declare global {
   interface Window {
     SpeechRecognition?: new () => SpeechRecognition;
@@ -44,9 +42,9 @@ declare global {
   }
 }
 
-// List of supported commands and their descriptions
 export const VOICE_COMMANDS = {
   'go home': 'Navigate to the home page',
+  'symptoms': 'Navigate to the symptom collector',
   'search': 'Navigate to search page',
   'find doctor': 'Navigate to search page filtered for doctors',
   'find healthcare': 'Navigate to search page',
@@ -70,7 +68,6 @@ export const useVoiceCommands = ({ setTheme, theme }: UseVoiceCommandsProps = {}
   const [transcript, setTranscript] = useState('');
   const navigate = useNavigate();
 
-  // Initialize speech recognition
   const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
   const recognition = SpeechRecognitionAPI ? new SpeechRecognitionAPI() : null;
   
@@ -81,14 +78,12 @@ export const useVoiceCommands = ({ setTheme, theme }: UseVoiceCommandsProps = {}
   }
 
   const announceForScreenReader = (message: string) => {
-    // Create an ARIA live region announcement
     const announcement = document.createElement('div');
     announcement.setAttribute('aria-live', 'assertive');
     announcement.setAttribute('class', 'sr-only');
     announcement.textContent = message;
     document.body.appendChild(announcement);
     
-    // Remove it after it's been announced
     setTimeout(() => {
       document.body.removeChild(announcement);
     }, 1000);
@@ -97,10 +92,9 @@ export const useVoiceCommands = ({ setTheme, theme }: UseVoiceCommandsProps = {}
   const executeCommand = useCallback((command: string) => {
     const normalizedCommand = command.toLowerCase().trim();
     
-    // Handle navigation commands
-    if (normalizedCommand === 'go home') {
-      navigate('/');
-      announceForScreenReader('Navigating to home page');
+    if (normalizedCommand === 'go home' || normalizedCommand === 'symptoms') {
+      navigate('/symptoms');
+      announceForScreenReader('Navigating to symptom collector');
       return true;
     }
     
@@ -122,7 +116,6 @@ export const useVoiceCommands = ({ setTheme, theme }: UseVoiceCommandsProps = {}
       return true;
     }
     
-    // Handle theme commands
     if (setTheme && theme) {
       if (normalizedCommand === 'toggle theme') {
         const newTheme = theme === 'dark' ? 'light' : 'dark';
@@ -144,7 +137,6 @@ export const useVoiceCommands = ({ setTheme, theme }: UseVoiceCommandsProps = {}
       }
     }
     
-    // Handle listening control commands
     if (normalizedCommand === 'stop listening') {
       stopListening();
       announceForScreenReader('Voice commands turned off');
@@ -157,7 +149,6 @@ export const useVoiceCommands = ({ setTheme, theme }: UseVoiceCommandsProps = {}
       return true;
     }
     
-    // Handle help command
     if (normalizedCommand === 'help') {
       const helpText = 'Available commands: ' + 
         Object.keys(VOICE_COMMANDS).join(', ');
@@ -208,7 +199,6 @@ export const useVoiceCommands = ({ setTheme, theme }: UseVoiceCommandsProps = {}
     announceForScreenReader('Voice commands deactivated');
   }, [recognition]);
 
-  // Set up event listeners
   useEffect(() => {
     if (!recognition) return;
 
@@ -223,8 +213,6 @@ export const useVoiceCommands = ({ setTheme, theme }: UseVoiceCommandsProps = {}
     };
     
     recognition.onend = () => {
-      // Only restart if we're still in listening mode
-      // This prevents it from restarting after explicit stop
       if (isListening) {
         recognition.start();
       }
