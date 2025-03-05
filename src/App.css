@@ -1,3 +1,4 @@
+
 #root {
   margin: 0 auto;
   width: 100%;
@@ -120,4 +121,101 @@ html, body {
   a {
     padding: 0.25rem;
   }
+}
+
+/* Accessibility styles */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* High contrast mode */
+.high-contrast {
+  --background: 0 0% 100%;
+  --foreground: 0 0% 0%;
+  
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 0%;
+  
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 0%;
+  
+  --primary: 0 0% 0%;
+  --primary-foreground: 0 0% 100%;
+  
+  --secondary: 0 0% 90%;
+  --secondary-foreground: 0 0% 0%;
+  
+  --muted: 0 0% 90%;
+  --muted-foreground: 0 0% 0%;
+  
+  --accent: 0 0% 90%;
+  --accent-foreground: 0 0% 0%;
+  
+  --destructive: 0 100% 30%;
+  --destructive-foreground: 0 0% 100%;
+  
+  --border: 0 0% 0%;
+  --input: 0 0% 0%;
+  --ring: 0 0% 0%;
+}
+
+.high-contrast.dark {
+  --background: 0 0% 0%;
+  --foreground: 0 0% 100%;
+  
+  --card: 0 0% 0%;
+  --card-foreground: 0 0% 100%;
+  
+  --popover: 0 0% 0%;
+  --popover-foreground: 0 0% 100%;
+  
+  --primary: 0 0% 100%;
+  --primary-foreground: 0 0% 0%;
+  
+  --secondary: 0 0% 10%;
+  --secondary-foreground: 0 0% 100%;
+  
+  --muted: 0 0% 10%;
+  --muted-foreground: 0 0% 100%;
+  
+  --accent: 0 0% 10%;
+  --accent-foreground: 0 0% 100%;
+  
+  --destructive: 0 100% 50%;
+  --destructive-foreground: 0 0% 100%;
+  
+  --border: 0 0% 100%;
+  --input: 0 0% 100%;
+  --ring: 0 0% 100%;
+}
+
+.high-contrast a {
+  text-decoration: underline;
+}
+
+.high-contrast:not(.dark) button:not([aria-pressed="true"]) {
+  border: 2px solid black;
+}
+
+.high-contrast.dark button:not([aria-pressed="true"]) {
+  border: 2px solid white;
+}
+
+/* Focus indicators for keyboard navigation */
+*:focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.high-contrast *:focus-visible {
+  outline: 3px solid var(--destructive);
+  outline-offset: 2px;
 }

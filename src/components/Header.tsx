@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -7,6 +6,8 @@ import { useNavigate, Link } from "react-router-dom";
 import { toast } from "sonner";
 import { ThemeToggle } from "./ThemeToggle";
 import { useAuth } from "@/context/AuthContext";
+import { VoiceCommandButton } from '@/components/VoiceCommandButton';
+import { AccessibilityMenu } from '@/components/AccessibilityMenu';
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -108,6 +109,8 @@ export const Header = () => {
               )}
             </div>
             
+            <AccessibilityMenu />
+            <VoiceCommandButton />
             <ThemeToggle />
             {isAuthenticated && <NotificationCenter />}
             <Button 

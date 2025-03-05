@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { ThemeProvider } from "./components/theme-provider";
@@ -24,6 +23,7 @@ import { BottomNav } from "./components/BottomNav";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ProviderPortal } from "./pages/ProviderPortal";
 import { InstitutionPortal } from "./pages/InstitutionPortal";
+import { VoiceCommandsHelp } from '@/components/VoiceCommandsHelp';
 
 function App() {
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
@@ -82,6 +82,7 @@ function App() {
         </AuthProvider>
       </QueryClientProvider>
     </ThemeProvider>
+    <VoiceCommandsHelp />
   );
 }
 
