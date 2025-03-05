@@ -1,8 +1,8 @@
+
 #root {
   margin: 0 auto;
-  text-align: center;
-  min-height: 100vh;
   width: 100%;
+  min-height: 100vh;
 }
 
 @media (min-width: 768px) {
@@ -47,4 +47,45 @@
 
 .read-the-docs {
   color: #888;
+}
+
+/* Add mobile-specific styles */
+@media (max-width: 767px) {
+  .mobile-container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  .mobile-pb {
+    padding-bottom: 5rem; /* Space for bottom nav */
+  }
+}
+
+/* Fix iOS viewport height issue */
+@supports (-webkit-touch-callout: none) {
+  .min-h-screen {
+    min-height: -webkit-fill-available;
+  }
+}
+
+/* Fix overscrolling on iOS */
+html, body {
+  overflow-x: hidden;
+  position: relative;
+  width: 100%;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Improve tap target sizes on mobile */
+@media (max-width: 767px) {
+  button, 
+  input[type="button"],
+  input[type="submit"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  a {
+    padding: 0.25rem;
+  }
 }

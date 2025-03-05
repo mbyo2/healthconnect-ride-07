@@ -1,18 +1,27 @@
 
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { NotificationCenter } from "./NotificationCenter";
 import { useNavigate, Link } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ThemeToggle } from "./ThemeToggle";
 import { useAuth } from "@/context/AuthContext";
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const navigate = useNavigate();
   const { isAuthenticated, user, signOut } = useAuth();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+    
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -24,7 +33,9 @@ export const Header = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b">
+    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      isScrolled ? "bg-background/90 backdrop-blur-md shadow-sm" : "bg-background/50 backdrop-blur-sm"
+    } border-b`}>
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent animate-fadeIn">
@@ -113,11 +124,11 @@ export const Header = () => {
 
       {/* Mobile menu */}
       {isMenuOpen && (
-        <div className="absolute top-16 left-0 right-0 bg-background/80 backdrop-blur-md border-b shadow-lg animate-in slide-in-from-top duration-300 md:hidden">
-          <nav className="container mx-auto px-4 py-2 space-y-1">
+        <div className="absolute top-16 left-0 right-0 bg-background/95 backdrop-blur-md border-b shadow-lg animate-in slide-in-from-top duration-300 md:hidden z-50">
+          <nav className="container mx-auto px-4 py-3 space-y-2 max-h-[calc(100vh-4rem)] overflow-y-auto">
             <Button
               variant="ghost"
-              className="w-full justify-start text-foreground hover:text-primary hover:bg-accent transition-colors animate-fadeIn"
+              className="w-full justify-start text-foreground hover:text-primary hover:bg-accent/50 transition-colors"
               onClick={() => {
                 navigate("/");
                 setIsMenuOpen(false);
@@ -127,7 +138,7 @@ export const Header = () => {
             </Button>
             <Button
               variant="ghost"
-              className="w-full justify-start text-foreground hover:text-primary hover:bg-accent transition-colors animate-fadeIn"
+              className="w-full justify-start text-foreground hover:text-primary hover:bg-accent/50 transition-colors"
               onClick={() => {
                 navigate("/search");
                 setIsMenuOpen(false);
@@ -139,7 +150,7 @@ export const Header = () => {
               <>
                 <Button
                   variant="ghost"
-                  className="w-full justify-start text-foreground hover:text-primary hover:bg-accent transition-colors animate-fadeIn"
+                  className="w-full justify-start text-foreground hover:text-primary hover:bg-accent/50 transition-colors"
                   onClick={() => {
                     navigate("/profile");
                     setIsMenuOpen(false);
@@ -149,7 +160,7 @@ export const Header = () => {
                 </Button>
                 <Button
                   variant="ghost"
-                  className="w-full justify-start text-foreground hover:text-primary hover:bg-accent transition-colors animate-fadeIn"
+                  className="w-full justify-start text-foreground hover:text-primary hover:bg-accent/50 transition-colors"
                   onClick={() => {
                     navigate("/appointments");
                     setIsMenuOpen(false);
@@ -159,7 +170,41 @@ export const Header = () => {
                 </Button>
                 <Button
                   variant="ghost"
-                  className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10 transition-colors animate-fadeIn"
+                  className="w-full justify-start text-foreground hover:text-primary hover:bg-accent/50 transition-colors"
+                  onClick={() => {
+                    navigate("/chat");
+                    setIsMenuOpen(false);
+                  }}
+                >
+                  Messages
+                </Button>
+                {user?.role === "health_personnel" && (
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start text-foreground hover:text-primary hover:bg-accent/50 transition-colors"
+                    onClick={() => {
+                      navigate("/provider-dashboard");
+                      setIsMenuOpen(false);
+                    }}
+                  >
+                    Provider Dashboard
+                  </Button>
+                )}
+                {user?.role === "admin" && (
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start text-foreground hover:text-primary hover:bg-accent/50 transition-colors"
+                    onClick={() => {
+                      navigate("/admin-dashboard");
+                      setIsMenuOpen(false);
+                    }}
+                  >
+                    Admin Dashboard
+                  </Button>
+                )}
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10 transition-colors"
                   onClick={() => {
                     handleLogout();
                     setIsMenuOpen(false);
@@ -172,7 +217,7 @@ export const Header = () => {
               <>
                 <Button
                   variant="ghost"
-                  className="w-full justify-start text-foreground hover:text-primary hover:bg-accent transition-colors animate-fadeIn"
+                  className="w-full justify-start text-foreground hover:text-primary hover:bg-accent/50 transition-colors"
                   onClick={() => {
                     navigate("/auth");
                     setIsMenuOpen(false);
@@ -182,7 +227,7 @@ export const Header = () => {
                 </Button>
                 <Button
                   variant="ghost"
-                  className="w-full justify-start text-foreground hover:text-primary hover:bg-accent transition-colors animate-fadeIn"
+                  className="w-full justify-start text-foreground hover:text-primary hover:bg-accent/50 transition-colors"
                   onClick={() => {
                     navigate("/auth?tab=signup");
                     setIsMenuOpen(false);

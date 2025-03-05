@@ -19,7 +19,6 @@ import ProviderCalendar from "./pages/ProviderCalendar";
 import AdminDashboard from "./pages/AdminDashboard";
 import InstitutionRegistration from "./pages/InstitutionRegistration";
 import VideoConsultations from "./pages/VideoConsultations";
-import Healthcare from "./pages/Healthcare";
 import ProviderProfile from "./pages/ProviderProfile";
 import { BottomNav } from "./components/BottomNav";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -53,30 +52,33 @@ function App() {
     >
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          {!isDesktop && <BottomNav />}
-          <Routes>
-            <Route path="/" element={<Landing />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/profile-setup" element={<ProfileSetup />} />
-            <Route path="/search" element={<Search />} />
-            <Route path="/map" element={<Map />} />
-            <Route path="/chat" element={<Chat />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/appointments" element={<Appointments />} />
-            <Route path="/patient-appointments" element={<PatientAppointments />} />
-            <Route path="/provider/:providerId" element={<ProviderProfile />} />
-            <Route path="/provider-dashboard" element={<ProviderDashboard />} />
-            <Route path="/provider-calendar" element={<ProviderCalendar />} />
-            <Route path="/admin-dashboard" element={<AdminDashboard />} />
-            <Route path="/healthcare-registration" element={<InstitutionRegistration />} />
-            <Route path="/video-consultations" element={<VideoConsultations />} />
-            <Route path="/healthcare" element={<Healthcare />} />
-            <Route path="/provider-portal" element={<ProviderPortal />} />
-            <Route path="/institution-portal" element={<InstitutionPortal />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
+          <div className="flex flex-col min-h-screen">
+            <main className="flex-grow pb-16 md:pb-0">
+              <Routes>
+                <Route path="/" element={<Landing />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
+                <Route path="/profile-setup" element={<ProfileSetup />} />
+                <Route path="/search" element={<Search />} />
+                <Route path="/map" element={<Map />} />
+                <Route path="/chat" element={<Chat />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/appointments" element={<Appointments />} />
+                <Route path="/patient-appointments" element={<PatientAppointments />} />
+                <Route path="/provider/:providerId" element={<ProviderProfile />} />
+                <Route path="/provider-dashboard" element={<ProviderDashboard />} />
+                <Route path="/provider-calendar" element={<ProviderCalendar />} />
+                <Route path="/admin-dashboard" element={<AdminDashboard />} />
+                <Route path="/healthcare-registration" element={<InstitutionRegistration />} />
+                <Route path="/video-consultations" element={<VideoConsultations />} />
+                <Route path="/provider-portal" element={<ProviderPortal />} />
+                <Route path="/institution-portal" element={<InstitutionPortal />} />
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </main>
+            {!isDesktop && <BottomNav />}
+          </div>
         </AuthProvider>
       </QueryClientProvider>
     </ThemeProvider>
