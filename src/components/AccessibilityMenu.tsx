@@ -6,7 +6,7 @@ import {
   PopoverContent,
   PopoverTrigger 
 } from '@/components/ui/popover';
-import { Accessibility, FontSize, Monitor, ZoomIn } from 'lucide-react';
+import { Accessibility, Type, Monitor, ZoomIn } from 'lucide-react';
 import {
   Tooltip,
   TooltipContent,
@@ -70,7 +70,7 @@ export const AccessibilityMenu = () => {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label htmlFor="font-size" className="flex items-center gap-2">
-                <FontSize className="h-4 w-4" />
+                <Type className="h-4 w-4" />
                 Text Size
               </Label>
               <span className="text-sm text-muted-foreground">

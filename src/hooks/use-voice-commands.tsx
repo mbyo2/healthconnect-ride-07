@@ -1,7 +1,48 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+
+// Add type definitions for the Web Speech API
+interface SpeechRecognition extends EventTarget {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  start: () => void;
+  stop: () => void;
+  onresult: ((event: SpeechRecognitionEvent) => void) | null;
+  onerror: ((event: SpeechRecognitionErrorEvent) => void) | null;
+  onend: (() => void) | null;
+}
+
+interface SpeechRecognitionErrorEvent {
+  error: string;
+}
+
+interface SpeechRecognitionEvent {
+  results: SpeechRecognitionResultList;
+}
+
+interface SpeechRecognitionResultList {
+  length: number;
+  [index: number]: SpeechRecognitionResult;
+}
+
+interface SpeechRecognitionResult {
+  isFinal: boolean;
+  [index: number]: SpeechRecognitionAlternative;
+}
+
+interface SpeechRecognitionAlternative {
+  transcript: string;
+}
+
+// Define global types for the Speech API
+declare global {
+  interface Window {
+    SpeechRecognition?: new () => SpeechRecognition;
+    webkitSpeechRecognition?: new () => SpeechRecognition;
+  }
+}
 
 // List of supported commands and their descriptions
 export const VOICE_COMMANDS = {
@@ -30,8 +71,8 @@ export const useVoiceCommands = ({ setTheme, theme }: UseVoiceCommandsProps = {}
   const navigate = useNavigate();
 
   // Initialize speech recognition
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  const recognition = SpeechRecognition ? new SpeechRecognition() : null;
+  const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const recognition = SpeechRecognitionAPI ? new SpeechRecognitionAPI() : null;
   
   if (recognition) {
     recognition.continuous = true;
@@ -128,12 +169,12 @@ export const useVoiceCommands = ({ setTheme, theme }: UseVoiceCommandsProps = {}
     return false;
   }, [navigate, setTheme, theme]);
 
-  const handleResult = useCallback((event: any) => {
-    const transcript = Array.from(event.results)
-      .map((result: any) => result[0].transcript)
+  const handleResult = useCallback((event: SpeechRecognitionEvent) => {
+    const transcriptText = Array.from(event.results)
+      .map((result: SpeechRecognitionResult) => result[0].transcript)
       .join('');
     
-    setTranscript(transcript);
+    setTranscript(transcriptText);
     
     const lastResult = event.results[event.results.length - 1];
     if (lastResult.isFinal) {
@@ -173,7 +214,7 @@ export const useVoiceCommands = ({ setTheme, theme }: UseVoiceCommandsProps = {}
 
     recognition.onresult = handleResult;
     
-    recognition.onerror = (event: any) => {
+    recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
       console.error('Speech recognition error', event.error);
       if (event.error === 'not-allowed') {
         toast.error('Microphone access denied');
