@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -74,6 +75,18 @@ const Profile = () => {
       toast.success("Signed out successfully");
       navigate("/login");
     }
+  };
+
+  const navigateToSettings = () => {
+    navigate("/settings");
+  };
+
+  const navigateToNotifications = () => {
+    navigate("/notifications");
+  };
+
+  const navigateToPrivacySecurity = () => {
+    navigate("/privacy-security");
   };
 
   const isHealthcareProvider = userRole === 'health_personnel';
@@ -161,15 +174,27 @@ const Profile = () => {
       )}
 
       <div className="space-y-2">
-        <Button variant="outline" className="w-full justify-start gap-2 h-12">
+        <Button 
+          variant="outline" 
+          className="w-full justify-start gap-2 h-12"
+          onClick={navigateToSettings}
+        >
           <Settings className="w-5 h-5" />
           <span>Settings</span>
         </Button>
-        <Button variant="outline" className="w-full justify-start gap-2 h-12">
+        <Button 
+          variant="outline" 
+          className="w-full justify-start gap-2 h-12"
+          onClick={navigateToNotifications}
+        >
           <Bell className="w-5 h-5" />
           <span>Notifications</span>
         </Button>
-        <Button variant="outline" className="w-full justify-start gap-2 h-12">
+        <Button 
+          variant="outline" 
+          className="w-full justify-start gap-2 h-12"
+          onClick={navigateToPrivacySecurity}
+        >
           <Shield className="w-5 h-5" />
           <span>Privacy & Security</span>
         </Button>

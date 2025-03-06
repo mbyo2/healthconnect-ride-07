@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { ThemeProvider } from "./components/theme-provider";
@@ -26,6 +27,9 @@ import { InstitutionPortal } from "./pages/InstitutionPortal";
 import { VoiceCommandsHelp } from '@/components/VoiceCommandsHelp';
 import { SymptomCollector } from '@/components/SymptomCollector';
 import { useAuth } from "./context/AuthContext";
+import NotificationsPage from "./pages/NotificationsPage";
+import SettingsPage from "./pages/SettingsPage";
+import PrivacySecurityPage from "./pages/PrivacySecurityPage";
 
 // Auth redirect component
 const AuthRedirect = () => {
@@ -170,6 +174,30 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <VideoConsultations />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/notifications" 
+                  element={
+                    <ProtectedRoute>
+                      <NotificationsPage />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/settings" 
+                  element={
+                    <ProtectedRoute>
+                      <SettingsPage />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/privacy-security" 
+                  element={
+                    <ProtectedRoute>
+                      <PrivacySecurityPage />
                     </ProtectedRoute>
                   } 
                 />
