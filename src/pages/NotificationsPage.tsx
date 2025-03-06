@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { NotificationCenter } from "@/components/NotificationCenter";
 import { useMediaQuery } from "@/hooks/use-media-query";
+import { NotificationSettings, PushSubscription } from "@/types/settings";
 
 const NotificationsPage = () => {
   const [settings, setSettings] = useState({
@@ -27,6 +28,7 @@ const NotificationsPage = () => {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
 
+        // Use a type assertion to tell TypeScript we know what we're getting back
         const { data, error } = await supabase
           .from('notification_settings')
           .select('*')
@@ -39,12 +41,14 @@ const NotificationsPage = () => {
         }
 
         if (data) {
+          // We're now asserting the type of data
+          const typedData = data as NotificationSettings;
           setSettings({
-            emailNotifications: data.email_notifications,
-            appointmentReminders: data.appointment_reminders,
-            messageAlerts: data.message_alerts,
-            systemUpdates: data.system_updates,
-            pushNotifications: data.push_notifications || false,
+            emailNotifications: typedData.email_notifications,
+            appointmentReminders: typedData.appointment_reminders,
+            messageAlerts: typedData.message_alerts,
+            systemUpdates: typedData.system_updates,
+            pushNotifications: typedData.push_notifications || false,
           });
         }
       } catch (error) {
@@ -64,6 +68,7 @@ const NotificationsPage = () => {
         return;
       }
 
+      // Type assertion for the upsert operation
       const { error } = await supabase
         .from('notification_settings')
         .upsert({
@@ -74,7 +79,7 @@ const NotificationsPage = () => {
           system_updates: settings.systemUpdates,
           push_notifications: settings.pushNotifications,
           updated_at: new Date().toISOString(),
-        }, { onConflict: 'user_id' });
+        } as NotificationSettings, { onConflict: 'user_id' });
 
       if (error) {
         console.error('Error saving notification settings:', error);
@@ -132,13 +137,14 @@ const NotificationsPage = () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
+    // Type assertion for the upsert operation
     const { error } = await supabase
       .from('push_subscriptions')
       .upsert({
         user_id: user.id,
         subscription: subscription,
         created_at: new Date().toISOString(),
-      }, { onConflict: 'user_id' });
+      } as PushSubscription, { onConflict: 'user_id' });
 
     if (error) {
       console.error('Error saving push subscription:', error);

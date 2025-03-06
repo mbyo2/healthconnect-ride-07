@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,6 +14,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { UserSettings } from "@/types/settings";
 
 const settingsSchema = z.object({
   language: z.string(),
@@ -59,12 +59,13 @@ const SettingsPage = () => {
         }
 
         if (data) {
+          const typedData = data as UserSettings;
           form.reset({
-            language: data.language || "english",
-            timezone: data.timezone || "UTC",
-            dateFormat: data.date_format || "MM/DD/YYYY",
-            notifications: data.notifications_enabled,
-            accessibility: data.accessibility_mode,
+            language: typedData.language || "english",
+            timezone: typedData.timezone || "UTC",
+            dateFormat: typedData.date_format || "MM/DD/YYYY",
+            notifications: typedData.notifications_enabled,
+            accessibility: typedData.accessibility_mode,
           });
         }
       } catch (error) {
@@ -94,7 +95,7 @@ const SettingsPage = () => {
           notifications_enabled: values.notifications,
           accessibility_mode: values.accessibility,
           updated_at: new Date().toISOString(),
-        }, { onConflict: 'user_id' });
+        } as UserSettings, { onConflict: 'user_id' });
 
       if (error) {
         console.error('Error saving settings:', error);
