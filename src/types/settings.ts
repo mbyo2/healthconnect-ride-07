@@ -32,3 +32,13 @@ export interface UserSettings {
   created_at: string;
   updated_at: string;
 }
+
+// Add PushSubscriptionJSON interface to fix TypeScript errors with the Web Push API
+export interface PushSubscriptionJSON {
+  endpoint?: string;
+  expirationTime?: number | null;
+  keys?: {
+    p256dh: string;
+    auth: string;
+  };
+}

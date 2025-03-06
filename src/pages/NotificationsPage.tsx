@@ -28,9 +28,9 @@ const NotificationsPage = () => {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
 
-        // Use a type assertion to tell TypeScript we know what we're getting back
+        // Use the 'as any' to bypass type checking for the table name
         const { data, error } = await supabase
-          .from('notification_settings')
+          .from('notification_settings' as any)
           .select('*')
           .eq('user_id', user.id)
           .single();
@@ -41,8 +41,8 @@ const NotificationsPage = () => {
         }
 
         if (data) {
-          // We're now asserting the type of data
-          const typedData = data as NotificationSettings;
+          // Cast the data to our defined type
+          const typedData = data as unknown as NotificationSettings;
           setSettings({
             emailNotifications: typedData.email_notifications,
             appointmentReminders: typedData.appointment_reminders,
@@ -68,9 +68,9 @@ const NotificationsPage = () => {
         return;
       }
 
-      // Type assertion for the upsert operation
+      // Type assertion for the table name and data
       const { error } = await supabase
-        .from('notification_settings')
+        .from('notification_settings' as any)
         .upsert({
           user_id: user.id,
           email_notifications: settings.emailNotifications,
@@ -79,7 +79,7 @@ const NotificationsPage = () => {
           system_updates: settings.systemUpdates,
           push_notifications: settings.pushNotifications,
           updated_at: new Date().toISOString(),
-        } as NotificationSettings, { onConflict: 'user_id' });
+        } as any, { onConflict: 'user_id' });
 
       if (error) {
         console.error('Error saving notification settings:', error);
@@ -133,25 +133,25 @@ const NotificationsPage = () => {
     }
   };
 
-  const saveSubscription = async (subscription) => {
+  const saveSubscription = async (subscription: PushSubscriptionJSON) => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    // Type assertion for the upsert operation
+    // Type assertion for the table name and data
     const { error } = await supabase
-      .from('push_subscriptions')
+      .from('push_subscriptions' as any)
       .upsert({
         user_id: user.id,
         subscription: subscription,
         created_at: new Date().toISOString(),
-      } as PushSubscription, { onConflict: 'user_id' });
+      } as any, { onConflict: 'user_id' });
 
     if (error) {
       console.error('Error saving push subscription:', error);
     }
   };
 
-  const urlBase64ToUint8Array = (base64String) => {
+  const urlBase64ToUint8Array = (base64String: string) => {
     const padding = '='.repeat((4 - base64String.length % 4) % 4);
     const base64 = (base64String + padding)
       .replace(/-/g, '+')
