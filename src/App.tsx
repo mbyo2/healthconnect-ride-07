@@ -1,7 +1,5 @@
-
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
-import { ThemeProvider } from "./components/theme-provider";
 import { AuthProvider } from "./context/AuthContext";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import Landing from "./pages/Landing";
@@ -46,15 +44,9 @@ function App() {
 
   return (
     <>
-      <ThemeProvider
-        attribute="class"
-        defaultTheme="system"
-        enableSystem
-        disableTransitionOnChange
-      >
-        <QueryClientProvider client={queryClient}>
-          <AuthProvider>
-            <div className="flex flex-col min-h-screen">
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <div className="flex flex-col min-h-screen">
               <Routes>
                 {/* Public routes - redirect to auth by default */}
                 <Route path="/" element={<AuthRedirect />} />
@@ -210,7 +202,6 @@ function App() {
             <OfflineAlert />
           </AuthProvider>
         </QueryClientProvider>
-      </ThemeProvider>
       <VoiceCommandsHelp />
     </>
   );
