@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Heart, Building2, User } from "lucide-react";
@@ -71,7 +71,7 @@ const Auth = () => {
     try {
       setError(null);
       await signIn(data.email, data.password);
-      navigate("/home");
+      navigate("/symptoms");
     } catch (err: any) {
       setError(err.message || "Failed to sign in");
     }

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { ThemeProvider } from "./components/theme-provider";
@@ -21,7 +20,6 @@ import AdminDashboard from "./pages/AdminDashboard";
 import InstitutionRegistration from "./pages/InstitutionRegistration";
 import VideoConsultations from "./pages/VideoConsultations";
 import ProviderProfile from "./pages/ProviderProfile";
-import { BottomNav } from "./components/BottomNav";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ProviderPortal } from "./pages/ProviderPortal";
 import { InstitutionPortal } from "./pages/InstitutionPortal";
@@ -39,21 +37,6 @@ const AuthRedirect = () => {
 };
 
 function App() {
-  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
-  const location = useLocation();
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsDesktop(window.innerWidth >= 768);
-    };
-
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
-
   const queryClient = new QueryClient();
 
   return (
@@ -67,136 +50,133 @@ function App() {
         <QueryClientProvider client={queryClient}>
           <AuthProvider>
             <div className="flex flex-col min-h-screen">
-              <main className="flex-grow pb-16 md:pb-0">
-                <Routes>
-                  {/* Public routes */}
-                  <Route path="/" element={<AuthRedirect />} />
-                  <Route path="/landing" element={<Landing />} />
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/auth" element={<Auth />} />
-                  <Route path="/reset-password" element={<ResetPassword />} />
-                  <Route path="/provider-portal" element={<ProviderPortal />} />
-                  <Route path="/institution-portal" element={<InstitutionPortal />} />
-                  
-                  {/* Protected routes */}
-                  <Route 
-                    path="/symptoms" 
-                    element={
-                      <ProtectedRoute>
-                        <SymptomCollector />
-                      </ProtectedRoute>
-                    } 
-                  />
-                  <Route 
-                    path="/profile-setup" 
-                    element={
-                      <ProtectedRoute>
-                        <ProfileSetup />
-                      </ProtectedRoute>
-                    } 
-                  />
-                  <Route 
-                    path="/search" 
-                    element={
-                      <ProtectedRoute>
-                        <Search />
-                      </ProtectedRoute>
-                    } 
-                  />
-                  <Route 
-                    path="/map" 
-                    element={
-                      <ProtectedRoute>
-                        <Map />
-                      </ProtectedRoute>
-                    } 
-                  />
-                  <Route 
-                    path="/chat" 
-                    element={
-                      <ProtectedRoute>
-                        <Chat />
-                      </ProtectedRoute>
-                    } 
-                  />
-                  <Route 
-                    path="/profile" 
-                    element={
-                      <ProtectedRoute>
-                        <Profile />
-                      </ProtectedRoute>
-                    } 
-                  />
-                  <Route 
-                    path="/appointments" 
-                    element={
-                      <ProtectedRoute>
-                        <Appointments />
-                      </ProtectedRoute>
-                    } 
-                  />
-                  <Route 
-                    path="/patient-appointments" 
-                    element={
-                      <ProtectedRoute>
-                        <PatientAppointments />
-                      </ProtectedRoute>
-                    } 
-                  />
-                  <Route 
-                    path="/provider/:providerId" 
-                    element={
-                      <ProtectedRoute>
-                        <ProviderProfile />
-                      </ProtectedRoute>
-                    } 
-                  />
-                  <Route 
-                    path="/provider-dashboard" 
-                    element={
-                      <ProtectedRoute allowedRoles={['health_personnel', 'admin']}>
-                        <ProviderDashboard />
-                      </ProtectedRoute>
-                    } 
-                  />
-                  <Route 
-                    path="/provider-calendar" 
-                    element={
-                      <ProtectedRoute allowedRoles={['health_personnel', 'admin']}>
-                        <ProviderCalendar />
-                      </ProtectedRoute>
-                    } 
-                  />
-                  <Route 
-                    path="/admin-dashboard" 
-                    element={
-                      <ProtectedRoute allowedRoles={['admin']}>
-                        <AdminDashboard />
-                      </ProtectedRoute>
-                    } 
-                  />
-                  <Route 
-                    path="/healthcare-registration" 
-                    element={
-                      <ProtectedRoute>
-                        <InstitutionRegistration />
-                      </ProtectedRoute>
-                    } 
-                  />
-                  <Route 
-                    path="/video-consultations" 
-                    element={
-                      <ProtectedRoute>
-                        <VideoConsultations />
-                      </ProtectedRoute>
-                    } 
-                  />
-                  
-                  {/* Catch-all redirect */}
-                  <Route path="*" element={<Navigate to="/" replace />} />
-                </Routes>
-              </main>
-              {!isDesktop && <BottomNav />}
+              <Routes>
+                {/* Public routes - redirect to auth by default */}
+                <Route path="/" element={<AuthRedirect />} />
+                <Route path="/landing" element={<Landing />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
+                <Route path="/provider-portal" element={<ProviderPortal />} />
+                <Route path="/institution-portal" element={<InstitutionPortal />} />
+                
+                {/* Protected routes - all with consistent layout */}
+                <Route 
+                  path="/symptoms" 
+                  element={
+                    <ProtectedRoute>
+                      <SymptomCollector />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/profile-setup" 
+                  element={
+                    <ProtectedRoute>
+                      <ProfileSetup />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/search" 
+                  element={
+                    <ProtectedRoute>
+                      <Search />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/map" 
+                  element={
+                    <ProtectedRoute>
+                      <Map />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/chat" 
+                  element={
+                    <ProtectedRoute>
+                      <Chat />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/profile" 
+                  element={
+                    <ProtectedRoute>
+                      <Profile />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/appointments" 
+                  element={
+                    <ProtectedRoute>
+                      <Appointments />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/patient-appointments" 
+                  element={
+                    <ProtectedRoute>
+                      <PatientAppointments />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/provider/:providerId" 
+                  element={
+                    <ProtectedRoute>
+                      <ProviderProfile />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/provider-dashboard" 
+                  element={
+                    <ProtectedRoute allowedRoles={['health_personnel', 'admin']}>
+                      <ProviderDashboard />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/provider-calendar" 
+                  element={
+                    <ProtectedRoute allowedRoles={['health_personnel', 'admin']}>
+                      <ProviderCalendar />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/admin-dashboard" 
+                  element={
+                    <ProtectedRoute allowedRoles={['admin']}>
+                      <AdminDashboard />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/healthcare-registration" 
+                  element={
+                    <ProtectedRoute>
+                      <InstitutionRegistration />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/video-consultations" 
+                  element={
+                    <ProtectedRoute>
+                      <VideoConsultations />
+                    </ProtectedRoute>
+                  } 
+                />
+                
+                {/* Catch-all redirect */}
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
             </div>
           </AuthProvider>
         </QueryClientProvider>

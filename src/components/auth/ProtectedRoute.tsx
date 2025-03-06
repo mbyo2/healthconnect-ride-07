@@ -4,6 +4,8 @@ import { Navigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { toast } from "sonner";
+import { Header } from "@/components/Header";
+import { BottomNav } from "@/components/BottomNav";
 
 type UserRole = 'admin' | 'health_personnel' | 'patient';
 
@@ -147,5 +149,14 @@ export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) 
     return <Navigate to="/symptoms" replace />;
   }
 
-  return <>{children}</>;
+  // Wrap the content with Header and BottomNav for consistent layout
+  return (
+    <div className="flex flex-col min-h-screen">
+      <Header />
+      <main className="flex-grow pb-16 md:pb-0 pt-16">
+        {children}
+      </main>
+      <BottomNav />
+    </div>
+  );
 };
