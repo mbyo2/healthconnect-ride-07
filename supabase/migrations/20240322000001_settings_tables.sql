@@ -7,6 +7,17 @@ CREATE TABLE IF NOT EXISTS public.notification_settings (
   appointment_reminders BOOLEAN DEFAULT TRUE,
   message_alerts BOOLEAN DEFAULT TRUE,
   system_updates BOOLEAN DEFAULT FALSE,
+  push_notifications BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()),
+  UNIQUE(user_id)
+);
+
+-- Create push subscriptions table
+CREATE TABLE IF NOT EXISTS public.push_subscriptions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  subscription JSONB NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()),
   UNIQUE(user_id)
@@ -44,6 +55,24 @@ CREATE POLICY "Users can update their own notification settings"
   FOR UPDATE
   USING (auth.uid() = user_id);
 
+-- Add RLS policies for push_subscriptions
+ALTER TABLE public.push_subscriptions ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view their own push subscriptions"
+  ON public.push_subscriptions
+  FOR SELECT
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own push subscriptions"
+  ON public.push_subscriptions
+  FOR INSERT
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own push subscriptions"
+  ON public.push_subscriptions
+  FOR UPDATE
+  USING (auth.uid() = user_id);
+
 -- Add RLS policies for user_settings
 ALTER TABLE public.user_settings ENABLE ROW LEVEL SECURITY;
 
@@ -70,5 +99,10 @@ CREATE TRIGGER handle_notification_settings_updated_at
 
 CREATE TRIGGER handle_user_settings_updated_at
   BEFORE UPDATE ON public.user_settings
+  FOR EACH ROW
+  EXECUTE FUNCTION public.handle_updated_at();
+
+CREATE TRIGGER handle_push_subscriptions_updated_at
+  BEFORE UPDATE ON public.push_subscriptions
   FOR EACH ROW
   EXECUTE FUNCTION public.handle_updated_at();

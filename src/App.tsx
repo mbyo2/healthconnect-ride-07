@@ -30,6 +30,7 @@ import { useAuth } from "./context/AuthContext";
 import NotificationsPage from "./pages/NotificationsPage";
 import SettingsPage from "./pages/SettingsPage";
 import PrivacySecurityPage from "./pages/PrivacySecurityPage";
+import { OfflineAlert } from "./components/OfflineAlert";
 
 // Auth redirect component
 const AuthRedirect = () => {
@@ -206,6 +207,7 @@ function App() {
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </div>
+            <OfflineAlert />
           </AuthProvider>
         </QueryClientProvider>
       </ThemeProvider>

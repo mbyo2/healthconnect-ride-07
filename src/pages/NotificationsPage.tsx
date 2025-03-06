@@ -4,10 +4,11 @@ import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Bell, BellOff, Mail, MessageSquare } from "lucide-react";
+import { Bell, BellOff, Mail, MessageSquare, Smartphone } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { NotificationCenter } from "@/components/NotificationCenter";
+import { useMediaQuery } from "@/hooks/use-media-query";
 
 const NotificationsPage = () => {
   const [settings, setSettings] = useState({
@@ -15,8 +16,10 @@ const NotificationsPage = () => {
     appointmentReminders: true,
     messageAlerts: true,
     systemUpdates: false,
+    pushNotifications: false,
   });
   const [isLoading, setIsLoading] = useState(false);
+  const isMobile = useMediaQuery("(max-width: 768px)");
 
   useEffect(() => {
     const fetchNotificationSettings = async () => {
@@ -41,6 +44,7 @@ const NotificationsPage = () => {
             appointmentReminders: data.appointment_reminders,
             messageAlerts: data.message_alerts,
             systemUpdates: data.system_updates,
+            pushNotifications: data.push_notifications || false,
           });
         }
       } catch (error) {
@@ -68,6 +72,7 @@ const NotificationsPage = () => {
           appointment_reminders: settings.appointmentReminders,
           message_alerts: settings.messageAlerts,
           system_updates: settings.systemUpdates,
+          push_notifications: settings.pushNotifications,
           updated_at: new Date().toISOString(),
         }, { onConflict: 'user_id' });
 
@@ -75,6 +80,10 @@ const NotificationsPage = () => {
         console.error('Error saving notification settings:', error);
         toast.error("Failed to save notification settings");
         return;
+      }
+
+      if (settings.pushNotifications) {
+        requestPushPermission();
       }
 
       toast.success("Notification settings saved successfully");
@@ -86,6 +95,71 @@ const NotificationsPage = () => {
     }
   };
 
+  const requestPushPermission = async () => {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+      toast.error("Push notifications are not supported by your browser");
+      return;
+    }
+
+    try {
+      const registration = await navigator.serviceWorker.ready;
+      const permission = await Notification.requestPermission();
+      
+      if (permission === 'granted') {
+        const subscription = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(
+            // This should be your VAPID public key
+            'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U'
+          )
+        });
+        
+        // Save the subscription to your database
+        await saveSubscription(subscription);
+        toast.success("Push notifications enabled");
+      } else {
+        toast.error("Permission for push notifications was denied");
+        setSettings(prev => ({ ...prev, pushNotifications: false }));
+      }
+    } catch (error) {
+      console.error('Error requesting push permission:', error);
+      toast.error("Failed to enable push notifications");
+      setSettings(prev => ({ ...prev, pushNotifications: false }));
+    }
+  };
+
+  const saveSubscription = async (subscription) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { error } = await supabase
+      .from('push_subscriptions')
+      .upsert({
+        user_id: user.id,
+        subscription: subscription,
+        created_at: new Date().toISOString(),
+      }, { onConflict: 'user_id' });
+
+    if (error) {
+      console.error('Error saving push subscription:', error);
+    }
+  };
+
+  const urlBase64ToUint8Array = (base64String) => {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding)
+      .replace(/-/g, '+')
+      .replace(/_/g, '/');
+
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+
+    for (let i = 0; i < rawData.length; ++i) {
+      outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
+  };
+
   return (
     <div className="container mx-auto px-4 py-8 space-y-6">
       <div className="flex items-center justify-between mb-6">
@@ -93,7 +167,7 @@ const NotificationsPage = () => {
         <NotificationCenter />
       </div>
 
-      <Card className="p-6">
+      <Card className="p-4 md:p-6">
         <h2 className="text-xl font-semibold mb-4">Recent Notifications</h2>
         <div className="space-y-4">
           {/* This would be populated from the NotificationCenter component */}
@@ -101,13 +175,13 @@ const NotificationsPage = () => {
         </div>
       </Card>
 
-      <Card className="p-6">
+      <Card className="p-4 md:p-6">
         <h2 className="text-xl font-semibold mb-4">Notification Settings</h2>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <Mail className="h-5 w-5 text-primary" />
-              <Label htmlFor="email-notifications">Email Notifications</Label>
+              <Label htmlFor="email-notifications" className="text-sm md:text-base">Email Notifications</Label>
             </div>
             <Switch
               id="email-notifications"
@@ -119,7 +193,7 @@ const NotificationsPage = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <Bell className="h-5 w-5 text-primary" />
-              <Label htmlFor="appointment-reminders">Appointment Reminders</Label>
+              <Label htmlFor="appointment-reminders" className="text-sm md:text-base">Appointment Reminders</Label>
             </div>
             <Switch
               id="appointment-reminders"
@@ -131,7 +205,7 @@ const NotificationsPage = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <MessageSquare className="h-5 w-5 text-primary" />
-              <Label htmlFor="message-alerts">Message Alerts</Label>
+              <Label htmlFor="message-alerts" className="text-sm md:text-base">Message Alerts</Label>
             </div>
             <Switch
               id="message-alerts"
@@ -143,12 +217,24 @@ const NotificationsPage = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <BellOff className="h-5 w-5 text-primary" />
-              <Label htmlFor="system-updates">System Updates</Label>
+              <Label htmlFor="system-updates" className="text-sm md:text-base">System Updates</Label>
             </div>
             <Switch
               id="system-updates"
               checked={settings.systemUpdates}
               onCheckedChange={(checked) => setSettings({ ...settings, systemUpdates: checked })}
+            />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Smartphone className="h-5 w-5 text-primary" />
+              <Label htmlFor="push-notifications" className="text-sm md:text-base">Push Notifications</Label>
+            </div>
+            <Switch
+              id="push-notifications"
+              checked={settings.pushNotifications}
+              onCheckedChange={(checked) => setSettings({ ...settings, pushNotifications: checked })}
             />
           </div>
         </div>
