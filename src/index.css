@@ -112,6 +112,57 @@
     transform: scale(1.05);
     box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5);
   }
+
+  /* Mobile touch-friendly styles */
+  @media (max-width: 768px) {
+    input, 
+    button, 
+    select, 
+    textarea {
+      font-size: 16px; /* Prevent zoom on input focus on iOS */
+    }
+    
+    button, 
+    a.button,
+    [role="button"],
+    .interactive-element {
+      min-height: 44px; /* Apple's recommended min touch target size */
+      min-width: 44px;
+      padding: 8px 16px;
+    }
+    
+    /* Add active state for better touch feedback */
+    .touch-manipulation {
+      touch-action: manipulation;
+    }
+    
+    /* Improved touch targets */
+    .card, .interactive-card {
+      position: relative;
+    }
+    
+    .card .clickable-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 1;
+    }
+    
+    /* Fix iOS overscroll issues */
+    .prevent-overscroll {
+      overscroll-behavior: none;
+    }
+    
+    /* Fix dropdown positioning on mobile */
+    .dropdown-content {
+      position: fixed;
+      max-height: 50vh;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+  }
 }
 
 /* ... keep existing code */

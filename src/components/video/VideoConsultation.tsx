@@ -7,13 +7,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useNetwork } from "@/hooks/use-network";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Signal, Wifi, WifiOff, Tv } from "lucide-react";
+import { Signal, Wifi, WifiOff, Tv, ArrowLeft } from "lucide-react";
 import { useIsTVDevice } from "@/hooks/use-tv-detection";
+import { useMediaQuery } from "@/hooks/use-media-query";
+import { Button } from "@/components/ui/button";
 
 export const VideoConsultation = () => {
   const [activeConsultation, setActiveConsultation] = useState<VideoConsultationDetails | null>(null);
   const { isOnline, connectionQuality, connectionType } = useNetwork();
   const isTV = useIsTVDevice();
+  const isMobile = useMediaQuery('(max-width: 768px)');
 
   useEffect(() => {
     // Set focus on first focusable element for TV remote navigation
@@ -88,9 +91,25 @@ export const VideoConsultation = () => {
       toast.error("Failed to join meeting: " + error.message);
     }
   };
+  
+  const handleLeaveCall = () => {
+    setActiveConsultation(null);
+  };
 
   return (
-    <div className={`container mx-auto py-6 ${isTV ? 'tv-container p-8' : ''}`}>
+    <div className={`container mx-auto py-6 ${isTV ? 'tv-container p-8' : ''} ${isMobile ? 'px-2 py-4' : ''}`}>
+      {isMobile && activeConsultation && (
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={handleLeaveCall}
+          className="mb-4 -ml-2 flex items-center text-primary"
+        >
+          <ArrowLeft className="h-4 w-4 mr-1" />
+          Back to consultations
+        </Button>
+      )}
+      
       {isTV && !activeConsultation && (
         <div className="tv-indicator mb-6 p-4 flex items-center justify-center bg-blue-100 dark:bg-blue-900 rounded-lg">
           <Tv className="h-6 w-6 mr-3" />
@@ -99,7 +118,7 @@ export const VideoConsultation = () => {
       )}
       
       {!isOnline && (
-        <Alert variant="destructive" className={`mb-4 ${isTV ? 'p-4 text-lg' : ''}`}>
+        <Alert variant="destructive" className={`mb-4 ${isTV ? 'p-4 text-lg' : ''} ${isMobile ? 'p-3' : ''}`}>
           <WifiOff className={isTV ? "h-6 w-6" : "h-4 w-4"} />
           <AlertTitle className={isTV ? "text-xl" : ""}>Connection Lost</AlertTitle>
           <AlertDescription className={isTV ? "text-lg" : ""}>
@@ -109,7 +128,7 @@ export const VideoConsultation = () => {
       )}
       
       {isOnline && connectionQuality === "poor" && (
-        <Alert className={`mb-4 ${isTV ? 'p-4 text-lg' : ''}`}>
+        <Alert className={`mb-4 ${isTV ? 'p-4 text-lg' : ''} ${isMobile ? 'p-3' : ''}`}>
           <Signal className={isTV ? "h-6 w-6" : "h-4 w-4"} />
           <AlertTitle className={isTV ? "text-xl" : ""}>Poor Connection</AlertTitle>
           <AlertDescription className={isTV ? "text-lg" : ""}>
@@ -119,7 +138,10 @@ export const VideoConsultation = () => {
       )}
       
       {activeConsultation?.meeting_url ? (
-        <VideoRoom meetingUrl={activeConsultation.meeting_url} />
+        <VideoRoom 
+          meetingUrl={activeConsultation.meeting_url} 
+          onLeave={handleLeaveCall}
+        />
       ) : (
         <ConsultationList onJoinMeeting={handleJoinMeeting} />
       )}
