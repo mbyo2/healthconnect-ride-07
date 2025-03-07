@@ -1,0 +1,61 @@
+
+/* TV-specific styles for video consultations */
+
+/* Larger fonts for TV viewing distance */
+.daily-video-root {
+  --daily-font-size-base: 20px !important;
+  --daily-control-bar-height: 100px !important;
+}
+
+/* Make buttons larger for remote control navigation */
+.daily-video-root button,
+.daily-video-root [role="button"] {
+  min-height: 60px !important;
+  min-width: 60px !important;
+  margin: 10px !important;
+}
+
+/* Highlight focused elements for remote control navigation */
+.daily-video-root *:focus {
+  outline: 4px solid #3b82f6 !important;
+  outline-offset: 4px !important;
+}
+
+/* Increase participant nameplates size */
+.daily-video-root .daily-nameplate {
+  font-size: 22px !important;
+  padding: 8px 16px !important;
+}
+
+/* Adjust layout for TV aspect ratio */
+.daily-video-root .daily-video-element {
+  border-radius: 16px !important;
+}
+
+/* TV layout optimizations */
+.tv-layout {
+  max-width: 100% !important;
+  padding: 20px !important;
+}
+
+/* Better visibility for controls on TV */
+.daily-video-root .daily-control-bar {
+  background-color: rgba(0, 0, 0, 0.7) !important;
+  border-radius: 16px !important;
+}
+
+/* Make sure icons are visible from a distance */
+.daily-video-root svg {
+  width: 36px !important;
+  height: 36px !important;
+}
+
+/* D-pad navigation styles */
+.daily-video-root [data-dpad-focusable="true"] {
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.daily-video-root [data-dpad-focusable="true"]:focus {
+  transform: scale(1.1);
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5);
+}

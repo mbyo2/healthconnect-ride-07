@@ -80,25 +80,38 @@
   button {
     @apply border border-border hover:bg-accent/80;
   }
-}
-
-/* Animations for UI elements */
-@layer utilities {
-  .animate-fade-in {
-    animation: fadeIn 0.5s ease-out forwards;
+  
+  /* TV specific styles */
+  .tv-device {
+    font-size: 20px; /* Larger base font for TV */
   }
   
-  .animate-slide-up {
-    animation: slideUp 0.5s ease-out forwards;
+  .tv-device button,
+  .tv-device a {
+    min-height: 60px;
+    min-width: 60px;
+    padding: 12px 24px;
+  }
+  
+  .tv-device *:focus {
+    outline: 4px solid hsl(var(--primary));
+    outline-offset: 4px;
+  }
+  
+  .tv-device .container {
+    max-width: 100%;
+    padding: 24px;
+  }
+  
+  /* D-pad navigation for TV */
+  .tv-device [data-dpad-focusable="true"] {
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  
+  .tv-device [data-dpad-focusable="true"]:focus {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5);
   }
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideUp {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
+/* ... keep existing code */

@@ -10,6 +10,7 @@ export interface VideoConsultationDetails {
   notes?: string;
   created_at: string;
   network_optimized?: boolean;
+  tv_mode?: boolean;
   provider: {
     first_name: string;
     last_name: string;
