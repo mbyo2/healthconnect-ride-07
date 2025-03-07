@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
@@ -32,7 +31,7 @@ export const InstitutionPortal = () => {
           console.log("Institution already logged in, checking profile...");
           const { data: profile, error: profileError } = await supabase
             .from('profiles')
-            .select('is_profile_complete, role')
+            .select('is_profile_complete, role, admin_level')
             .eq('id', session.user.id)
             .single();
 
@@ -44,32 +43,21 @@ export const InstitutionPortal = () => {
           setIsRedirecting(true);
           
           // Check if this is a healthcare institution account
-          const { data: institutionCheck, error: instCheckError } = await supabase
+          const { data: institutionCheck } = await supabase
             .from('healthcare_institutions')
-            .select('admin_id')
+            .select('admin_id, is_verified')
             .eq('admin_id', session.user.id)
-            .single();
+            .maybeSingle();
             
-          if (instCheckError && instCheckError.code !== 'PGRST116') {
-            console.error("Error checking institution status:", instCheckError);
+          // If user is a superadmin, redirect to admin dashboard
+          if (profile?.admin_level === 'superadmin') {
+            navigate("/admin-dashboard");
+            return;
           }
             
           if (institutionCheck) {
             // Check if the institution has an approved registration
-            const { data: institution, error: institutionError } = await supabase
-              .from('healthcare_institutions')
-              .select('is_verified')
-              .eq('admin_id', session.user.id)
-              .single();
-              
-            if (institutionError && institutionError.code !== 'PGRST116') {
-              console.error("Error checking institution status:", institutionError);
-              toast.error("Error checking institution status");
-              setIsLoading(false);
-              return;
-            }
-            
-            if (institution?.is_verified) {
+            if (institutionCheck.is_verified) {
               navigate("/institution-dashboard");
             } else {
               // If institution is not verified, redirect to status page

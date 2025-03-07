@@ -69,3 +69,35 @@ BEGIN
   );
 END;
 $$;
+
+-- Function to check if user is a superadmin
+CREATE OR REPLACE FUNCTION public.is_superadmin()
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+  RETURN (
+    SELECT admin_level = 'superadmin'
+    FROM public.profiles
+    WHERE id = auth.uid()
+  );
+END;
+$$;
+
+-- Update RLS policies to give superadmin access to all tables
+-- This function will be used in RLS policies for superadmin override
+CREATE OR REPLACE FUNCTION public.can_access_as_superadmin()
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+  RETURN EXISTS (
+    SELECT 1
+    FROM public.profiles
+    WHERE id = auth.uid()
+    AND admin_level = 'superadmin'
+  );
+END;
+$$;

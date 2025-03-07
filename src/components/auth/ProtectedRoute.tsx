@@ -8,6 +8,7 @@ import { Header } from "@/components/Header";
 import { BottomNav } from "@/components/BottomNav";
 
 type UserRole = 'admin' | 'health_personnel' | 'patient';
+type AdminLevel = 'admin' | 'superadmin' | null;
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -17,6 +18,7 @@ interface ProtectedRouteProps {
 export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [userRole, setUserRole] = useState<UserRole | null>(null);
+  const [adminLevel, setAdminLevel] = useState<AdminLevel>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isProfileComplete, setIsProfileComplete] = useState<boolean | null>(null);
   const location = useLocation();
@@ -64,7 +66,7 @@ export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) 
         console.log("Session found, checking profile...");
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
-          .select('role, is_profile_complete')
+          .select('role, is_profile_complete, admin_level')
           .eq('id', refreshedSession.user.id)
           .maybeSingle();
 
@@ -85,11 +87,13 @@ export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) 
         }
 
         setUserRole(profile.role as UserRole);
+        setAdminLevel(profile.admin_level as AdminLevel);
         setIsProfileComplete(profile.is_profile_complete);
         setIsAuthenticated(true);
 
         console.log("Auth check complete:", {
           role: profile.role,
+          adminLevel: profile.admin_level,
           isProfileComplete: profile.is_profile_complete
         });
 
@@ -109,17 +113,19 @@ export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) 
       if (event === 'SIGNED_OUT') {
         setIsAuthenticated(false);
         setUserRole(null);
+        setAdminLevel(null);
         setIsProfileComplete(null);
       } else if (event === 'SIGNED_IN' && session) {
         setIsAuthenticated(true);
         const { data: profile } = await supabase
           .from('profiles')
-          .select('role, is_profile_complete')
+          .select('role, is_profile_complete, admin_level')
           .eq('id', session.user.id)
           .single();
         
         if (profile) {
           setUserRole(profile.role as UserRole);
+          setAdminLevel(profile.admin_level as AdminLevel);
           setIsProfileComplete(profile.is_profile_complete);
         }
       }
@@ -141,6 +147,20 @@ export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) 
     console.log("Profile incomplete, redirecting to setup");
     toast.info("Please complete your profile first");
     return <Navigate to="/profile-setup" state={{ from: location }} replace />;
+  }
+
+  // Superadmins can access any page
+  if (adminLevel === 'superadmin') {
+    console.log("User is superadmin, allowing access to all pages");
+    return (
+      <div className="flex flex-col min-h-screen">
+        <Header />
+        <main className="flex-grow pb-16 md:pb-0 pt-16">
+          {children}
+        </main>
+        <BottomNav />
+      </div>
+    );
   }
 
   if (allowedRoles && userRole && !allowedRoles.includes(userRole)) {
