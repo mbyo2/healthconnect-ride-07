@@ -43,7 +43,18 @@ export const InstitutionPortal = () => {
 
           setIsRedirecting(true);
           
-          if (profile?.role === 'institution') {
+          // Check if this is a healthcare institution account
+          const { data: institutionCheck, error: instCheckError } = await supabase
+            .from('healthcare_institutions')
+            .select('admin_id')
+            .eq('admin_id', session.user.id)
+            .single();
+            
+          if (instCheckError && instCheckError.code !== 'PGRST116') {
+            console.error("Error checking institution status:", instCheckError);
+          }
+            
+          if (institutionCheck) {
             // Check if the institution has an approved registration
             const { data: institution, error: institutionError } = await supabase
               .from('healthcare_institutions')
