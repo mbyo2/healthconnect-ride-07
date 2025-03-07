@@ -44,10 +44,30 @@ export const ProviderPortal = () => {
           setIsRedirecting(true);
           
           if (profile?.role === 'health_personnel') {
-            if (!profile?.is_profile_complete) {
-              navigate("/profile-setup");
+            // Check if the provider has an approved application
+            const { data: application, error: applicationError } = await supabase
+              .from('health_personnel_applications')
+              .select('status')
+              .eq('user_id', session.user.id)
+              .single();
+              
+            if (applicationError && applicationError.code !== 'PGRST116') {
+              console.error("Error checking application status:", applicationError);
+              toast.error("Error checking application status");
+              setIsLoading(false);
+              return;
+            }
+            
+            if (application?.status === 'approved') {
+              // Only allow approved providers to access the dashboard
+              if (!profile?.is_profile_complete) {
+                navigate("/profile-setup");
+              } else {
+                navigate("/provider-dashboard");
+              }
             } else {
-              navigate("/provider-dashboard");
+              // If application is pending or rejected, redirect to application status page
+              navigate("/application-status");
             }
           } else {
             // Not a health personnel
@@ -120,6 +140,12 @@ export const ProviderPortal = () => {
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
+
+        <Alert className="mb-4">
+          <AlertDescription>
+            <strong>Note:</strong> Healthcare provider accounts require verification by an administrator before you can access all features.
+          </AlertDescription>
+        </Alert>
 
         <Card className="p-6 shadow-lg">
           <Tabs defaultValue="signin">

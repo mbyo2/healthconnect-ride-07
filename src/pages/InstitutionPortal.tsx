@@ -43,15 +43,30 @@ export const InstitutionPortal = () => {
 
           setIsRedirecting(true);
           
-          if (profile?.role === 'admin') {
-            if (!profile?.is_profile_complete) {
-              navigate("/healthcare-registration");
+          if (profile?.role === 'institution') {
+            // Check if the institution has an approved registration
+            const { data: institution, error: institutionError } = await supabase
+              .from('healthcare_institutions')
+              .select('is_verified')
+              .eq('admin_id', session.user.id)
+              .single();
+              
+            if (institutionError && institutionError.code !== 'PGRST116') {
+              console.error("Error checking institution status:", institutionError);
+              toast.error("Error checking institution status");
+              setIsLoading(false);
+              return;
+            }
+            
+            if (institution?.is_verified) {
+              navigate("/institution-dashboard");
             } else {
-              navigate("/admin-dashboard");
+              // If institution is not verified, redirect to status page
+              navigate("/institution-status");
             }
           } else {
             // Not an institution admin
-            toast.error("You don't have institution admin access");
+            toast.error("You don't have institution access");
             navigate("/login");
           }
         }
@@ -65,26 +80,6 @@ export const InstitutionPortal = () => {
 
     checkSession();
   }, [navigate]);
-
-  const handleInstitutionSignUp = async (email: string, password: string) => {
-    try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            role: 'admin',
-          }
-        }
-      });
-
-      if (error) throw error;
-      
-      toast.success("Check your email to confirm your registration");
-    } catch (error: any) {
-      toast.error(error.message);
-    }
-  };
 
   if (isLoading) {
     return <LoadingScreen />;
@@ -111,7 +106,7 @@ export const InstitutionPortal = () => {
             Healthcare Institution Portal
           </h1>
           <p className="text-muted-foreground">
-            Register your hospital, clinic, or pharmacy
+            Manage your healthcare institution and services
           </p>
         </div>
 
@@ -120,6 +115,12 @@ export const InstitutionPortal = () => {
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
+
+        <Alert className="mb-4">
+          <AlertDescription>
+            <strong>Note:</strong> Healthcare institutions require verification by an administrator before all features are accessible.
+          </AlertDescription>
+        </Alert>
 
         <Card className="p-6 shadow-lg">
           <Tabs defaultValue="signin">
@@ -150,7 +151,7 @@ export const InstitutionPortal = () => {
                 }}
                 providers={[]}
                 view="sign_in"
-                redirectTo={`${window.location.origin}/admin-dashboard`}
+                redirectTo={`${window.location.origin}/institution-dashboard`}
               />
             </TabsContent>
             
@@ -176,7 +177,7 @@ export const InstitutionPortal = () => {
                 }}
                 providers={[]}
                 view="sign_up"
-                redirectTo={`${window.location.origin}/healthcare-registration`}
+                redirectTo={`${window.location.origin}/institution-registration`}
               />
             </TabsContent>
           </Tabs>
@@ -184,7 +185,7 @@ export const InstitutionPortal = () => {
 
         <div className="text-center space-y-4">
           <p className="text-sm text-muted-foreground">
-            Hospitals, clinics, and pharmacies can register to manage their profiles and staff
+            Register your hospital, clinic, nursing home, or other healthcare facility
           </p>
           <div className="text-xs text-muted-foreground">
             By signing in, you agree to our{" "}

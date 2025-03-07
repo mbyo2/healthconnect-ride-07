@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
@@ -29,6 +30,9 @@ import NotificationsPage from "./pages/NotificationsPage";
 import SettingsPage from "./pages/SettingsPage";
 import PrivacySecurityPage from "./pages/PrivacySecurityPage";
 import { OfflineAlert } from "./components/OfflineAlert";
+import ApplicationStatus from "./pages/ApplicationStatus";
+import HealthcareApplication from "./pages/HealthcareApplication";
+import InstitutionStatus from "./pages/InstitutionStatus";
 
 // Auth redirect component
 const AuthRedirect = () => {
@@ -71,6 +75,30 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <ProfileSetup />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/application-status" 
+                  element={
+                    <ProtectedRoute>
+                      <ApplicationStatus />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/healthcare-application" 
+                  element={
+                    <ProtectedRoute>
+                      <HealthcareApplication />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/institution-status" 
+                  element={
+                    <ProtectedRoute>
+                      <InstitutionStatus />
                     </ProtectedRoute>
                   } 
                 />
