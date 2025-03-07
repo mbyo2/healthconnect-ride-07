@@ -9,6 +9,7 @@ import { useMediaQuery } from "@/hooks/use-media-query";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Battery, BatteryLow, Tv } from "lucide-react";
 import { NetworkQualityMetrics } from "@/types/video";
+import { useIsTVDevice } from "@/hooks/use-tv-detection";
 
 interface VideoRoomProps {
   meetingUrl: string;
@@ -24,7 +25,7 @@ export const VideoRoom = ({ meetingUrl }: VideoRoomProps) => {
   const iframeContainerRef = useRef<HTMLDivElement>(null);
   const { batteryLevel, isCharging } = useBattery();
   const { connectionQuality, isOnline } = useNetwork();
-  const isTV = useMediaQuery('(min-width: 1920px) and (hover: none)');
+  const isTV = useIsTVDevice();
   const cssFile = isTV ? '/tv-styles.css' : '';
   
   useEffect(() => {
@@ -41,24 +42,17 @@ export const VideoRoom = ({ meetingUrl }: VideoRoomProps) => {
     
     // Create call frame
     const createCallFrame = () => {
-      const dailyConfig = {
-        experimentalChromeVideoMuteLightOff: true,
-      };
-      
       try {
-        // For Android TV, we want a different interface
-        const frameOptions = isTV
-          ? {
-              url: meetingUrl,
-              cssFile,
-              customLayout: true,
-              dailyConfig,
-            }
-          : {
-              url: meetingUrl,
-              cssFile,
-              dailyConfig,
-            };
+        // Configure frame options based on device type
+        const frameOptions: any = {
+          url: meetingUrl,
+          cssFile,
+        };
+        
+        // Add TV-specific options if on a TV device
+        if (isTV) {
+          frameOptions.customLayout = true;
+        }
             
         // Create the call frame
         const frame = DailyIframe.createFrame(
