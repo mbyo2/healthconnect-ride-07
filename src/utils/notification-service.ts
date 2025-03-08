@@ -48,12 +48,12 @@ export async function subscribeToNotifications() {
 
     // Save subscription to database using upsert with type casting for TypeScript
     const { error } = await supabase
-      .from('push_subscriptions')
+      .from('push_subscriptions' as any)
       .upsert({
         user_id: user.id,
         subscription: subscription as unknown as JSON,
         created_at: new Date().toISOString(),
-      }, { onConflict: 'user_id' }) as any;
+      }, { onConflict: 'user_id' });
 
     if (error) {
       console.error('Error saving push subscription:', error);
@@ -88,9 +88,9 @@ export async function unsubscribeFromNotifications() {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         await supabase
-          .from('push_subscriptions')
+          .from('push_subscriptions' as any)
           .delete()
-          .eq('user_id', user.id) as any;
+          .eq('user_id', user.id);
       }
       
       toast.success("Successfully unsubscribed from push notifications");

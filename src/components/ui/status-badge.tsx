@@ -61,7 +61,8 @@ export function StatusBadge({
           return status
         }
         
-        return (data?.status || status) as StatusType
+        // Add explicit type assertion to handle the possibility of data.status being undefined
+        return ((data?.status as StatusType) || status)
       } catch (error) {
         console.error(`Error in status fetch:`, error)
         return status

@@ -869,6 +869,42 @@ export type Database = {
           },
         ]
       }
+      notification_settings: {
+        Row: {
+          appointment_reminders: boolean | null
+          created_at: string | null
+          email_notifications: boolean | null
+          id: string
+          message_alerts: boolean | null
+          push_notifications: boolean | null
+          system_updates: boolean | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          appointment_reminders?: boolean | null
+          created_at?: string | null
+          email_notifications?: boolean | null
+          id?: string
+          message_alerts?: boolean | null
+          push_notifications?: boolean | null
+          system_updates?: boolean | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          appointment_reminders?: boolean | null
+          created_at?: string | null
+          email_notifications?: boolean | null
+          id?: string
+          message_alerts?: boolean | null
+          push_notifications?: boolean | null
+          system_updates?: boolean | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           created_at: string | null
@@ -1228,6 +1264,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      push_subscriptions: {
+        Row: {
+          created_at: string | null
+          id: string
+          subscription: Json
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          subscription: Json
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          subscription?: Json
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       refunds: {
         Row: {

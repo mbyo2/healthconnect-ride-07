@@ -1,321 +1,448 @@
 
-import React, { useEffect, useState } from "react";
-import { Card } from "@/components/ui/card";
+// Implement a notification settings page
+import { useState, useEffect } from "react";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Bell, BellOff, Mail, MessageSquare, Smartphone } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
-import { NotificationCenter } from "@/components/NotificationCenter";
-import { useMediaQuery } from "@/hooks/use-media-query";
+import { LoadingScreen } from "@/components/LoadingScreen";
 import { NotificationSettings } from "@/types/settings";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { subscribeToNotifications, unsubscribeFromNotifications } from "@/utils/notification-service";
 import { StatusBadge, StatusType } from "@/components/ui/status-badge";
+import { subscribeToNotifications, unsubscribeFromNotifications } from "@/utils/notification-service";
 
 const NotificationsPage = () => {
-  const queryClient = useQueryClient();
-  const [settings, setSettings] = useState({
-    emailNotifications: true,
-    appointmentReminders: true,
-    messageAlerts: true,
-    systemUpdates: false,
-    pushNotifications: false,
-  });
-  const [isLoading, setIsLoading] = useState(false);
-  const isMobile = useMediaQuery("(max-width: 768px)");
-
-  // Fetch user's notifications
-  const { data: notifications = [] } = useQuery({
-    queryKey: ['notifications'],
-    queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return [];
-
-      const { data, error } = await supabase
-        .from('notifications')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(10);
-
-      if (error) {
-        console.error('Error fetching notifications:', error);
-        throw error;
-      }
-
-      return data;
-    },
-  });
-  
-  // Fetch user's applications for displaying status with real-time updates
-  const { data: applications = [] } = useQuery({
-    queryKey: ['user-applications'],
-    queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return [];
-
-      const { data, error } = await supabase
-        .from('health_personnel_applications')
-        .select('*')
-        .eq('user_id', user.id);
-
-      if (error) {
-        console.error('Error fetching applications:', error);
-        return [];
-      }
-
-      return data;
-    },
-  });
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(true);
+  const [loadingButtons, setLoadingButtons] = useState(false);
+  const [notificationSettings, setNotificationSettings] = useState<NotificationSettings | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [pushSupported, setPushSupported] = useState(true);
+  const [notificationsGranted, setNotificationsGranted] = useState(false);
+  const [recentNotifications, setRecentNotifications] = useState<any[]>([]);
 
   useEffect(() => {
-    const fetchNotificationSettings = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
+    const checkNotificationPermission = () => {
+      if (!('Notification' in window)) {
+        setPushSupported(false);
+        return;
+      }
 
-        // Cast the query as any to bypass TypeScript error
-        const { data, error } = await (supabase
-          .from('notification_settings')
+      setNotificationsGranted(Notification.permission === 'granted');
+    };
+
+    checkNotificationPermission();
+  }, []);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        setLoading(true);
+        // Get current user
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (!user) {
+          toast({
+            title: "Authentication Error",
+            description: "Please sign in to access this page",
+            variant: "destructive"
+          });
+          return;
+        }
+        
+        setUserId(user.id);
+
+        // Get notification settings
+        const { data: settingsData, error: settingsError } = await supabase
+          .from('notification_settings' as any)
           .select('*')
           .eq('user_id', user.id)
-          .single() as any);
+          .maybeSingle();
 
-        if (error && error.code !== 'PGRST116') {
-          console.error('Error fetching notification settings:', error);
+        if (settingsError && settingsError.code !== 'PGRST116') {
+          console.error("Error fetching notification settings:", settingsError);
+          toast({
+            title: "Error",
+            description: "Failed to load notification settings",
+            variant: "destructive"
+          });
           return;
         }
 
-        if (data) {
-          // Cast the data to our defined type
-          const typedData = data as unknown as NotificationSettings;
-          setSettings({
-            emailNotifications: typedData.email_notifications,
-            appointmentReminders: typedData.appointment_reminders,
-            messageAlerts: typedData.message_alerts,
-            systemUpdates: typedData.system_updates,
-            pushNotifications: typedData.push_notifications || false,
-          });
-        }
-      } catch (error) {
-        console.error('Error:', error);
-      }
-    };
+        // If no settings exist yet, create default settings
+        if (!settingsData) {
+          const { data: newSettings, error: createError } = await supabase
+            .from('notification_settings' as any)
+            .insert({
+              user_id: user.id,
+              email_notifications: true,
+              appointment_reminders: true,
+              message_alerts: true,
+              system_updates: false,
+              push_notifications: false
+            })
+            .select('*')
+            .single();
 
-    fetchNotificationSettings();
-  }, []);
-
-  // Subscribe to real-time notifications
-  useEffect(() => {
-    const subscribeToRealtimeNotifications = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-      
-      const channel = supabase
-        .channel('notifications-realtime')
-        .on(
-          'postgres_changes',
-          {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'notifications',
-            filter: `user_id=eq.${user.id}`
-          },
-          () => {
-            // Invalidate the notifications query to refresh the list
-            queryClient.invalidateQueries({ queryKey: ['notifications'] });
-            
-            // If there's an application status change, refresh the applications
-            queryClient.invalidateQueries({ queryKey: ['user-applications'] });
+          if (createError) {
+            console.error("Error creating notification settings:", createError);
+            toast({
+              title: "Error",
+              description: "Failed to create notification settings",
+              variant: "destructive"
+            });
+            return;
           }
-        )
-        .subscribe();
-        
-      return () => {
-        supabase.removeChannel(channel);
-      };
-    };
-    
-    const unsubscribe = subscribeToRealtimeNotifications();
-    
-    return () => {
-      unsubscribe.then(unsub => unsub && unsub());
-    };
-  }, [queryClient]);
 
-  const handleSaveSettings = async () => {
-    try {
-      setIsLoading(true);
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        toast.error("You must be logged in to save settings");
-        return;
+          setNotificationSettings(newSettings as NotificationSettings);
+        } else {
+          setNotificationSettings(settingsData as NotificationSettings);
+        }
+
+        // Get recent notifications
+        const { data: notificationData, error: notificationError } = await supabase
+          .from('notifications')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(5);
+
+        if (notificationError) {
+          console.error("Error fetching notifications:", notificationError);
+        } else {
+          setRecentNotifications(notificationData || []);
+        }
+
+      } catch (error) {
+        console.error("Error initializing notification page:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load notification settings",
+          variant: "destructive"
+        });
+      } finally {
+        setLoading(false);
       }
+    };
 
-      // Type assertion for the table name and data
-      const { error } = await (supabase
-        .from('notification_settings')
-        .upsert({
-          user_id: user.id,
-          email_notifications: settings.emailNotifications,
-          appointment_reminders: settings.appointmentReminders,
-          message_alerts: settings.messageAlerts,
-          system_updates: settings.systemUpdates,
-          push_notifications: settings.pushNotifications,
-          updated_at: new Date().toISOString(),
-        }, { onConflict: 'user_id' }) as any);
+    fetchUserData();
+  }, [toast]);
+
+  const handleToggleChange = async (setting: keyof NotificationSettings, value: boolean) => {
+    if (!notificationSettings || !userId) return;
+
+    const updatedSettings = {
+      ...notificationSettings,
+      [setting]: value
+    };
+
+    try {
+      const { error } = await supabase
+        .from('notification_settings' as any)
+        .update({ [setting]: value })
+        .eq('user_id', userId);
 
       if (error) {
-        console.error('Error saving notification settings:', error);
-        toast.error("Failed to save notification settings");
+        console.error(`Error updating ${setting}:`, error);
+        toast({
+          title: "Error",
+          description: `Failed to update ${setting.replace(/_/g, ' ')}`,
+          variant: "destructive"
+        });
         return;
       }
 
-      if (settings.pushNotifications) {
-        await subscribeToNotifications();
-      } else {
-        await unsubscribeFromNotifications();
+      // Special case for push notifications which require browser permission
+      if (setting === 'push_notifications' && value === true) {
+        if (Notification.permission !== 'granted') {
+          const permission = await Notification.requestPermission();
+          setNotificationsGranted(permission === 'granted');
+          
+          if (permission !== 'granted') {
+            toast({
+              title: "Permission denied",
+              description: "You need to allow notifications in your browser",
+              variant: "destructive"
+            });
+            
+            // Update the setting back to false since permission was denied
+            await supabase
+              .from('notification_settings' as any)
+              .update({ push_notifications: false })
+              .eq('user_id', userId);
+              
+            updatedSettings.push_notifications = false;
+          } else {
+            // Subscribe to push notifications
+            await handleEnablePushNotifications();
+          }
+        } else {
+          // Permission already granted, subscribe to push notifications
+          await handleEnablePushNotifications();
+        }
       }
 
-      toast.success("Notification settings saved successfully");
+      // If turning off push notifications, unsubscribe
+      if (setting === 'push_notifications' && value === false) {
+        await handleDisablePushNotifications();
+      }
+
+      setNotificationSettings(updatedSettings as NotificationSettings);
+      toast({
+        title: "Settings updated",
+        description: `${setting.replace(/_/g, ' ')} has been ${value ? 'enabled' : 'disabled'}`,
+      });
     } catch (error) {
-      console.error('Error:', error);
-      toast.error("An error occurred while saving settings");
-    } finally {
-      setIsLoading(false);
+      console.error("Error updating settings:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update notification settings",
+        variant: "destructive"
+      });
     }
   };
 
-  return (
-    <div className="container mx-auto px-4 py-8 space-y-6">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Notifications</h1>
-        <NotificationCenter />
-      </div>
+  const handleEnablePushNotifications = async () => {
+    setLoadingButtons(true);
+    try {
+      const success = await subscribeToNotifications();
+      
+      if (!success) {
+        // If subscription failed, update the UI setting back to false
+        if (notificationSettings && userId) {
+          const updatedSettings = {
+            ...notificationSettings,
+            push_notifications: false
+          };
+          
+          await supabase
+            .from('notification_settings' as any)
+            .update({ push_notifications: false })
+            .eq('user_id', userId);
+            
+          setNotificationSettings(updatedSettings as NotificationSettings);
+        }
+      }
+    } finally {
+      setLoadingButtons(false);
+    }
+  };
 
-      <Card className="p-4 md:p-6">
-        <h2 className="text-xl font-semibold mb-4">Recent Notifications</h2>
-        <div className="space-y-4">
-          {notifications.length === 0 ? (
-            <p className="text-muted-foreground">You have no recent notifications.</p>
-          ) : (
-            notifications.map((notification) => (
-              <div key={notification.id} className={`p-4 rounded-lg ${!notification.read ? 'bg-muted' : 'bg-card'} border`}>
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-semibold text-sm md:text-base">{notification.title}</h3>
-                    <p className="text-muted-foreground text-sm mt-1">{notification.message}</p>
-                  </div>
-                  <span className="text-xs text-muted-foreground">
-                    {new Date(notification.created_at).toLocaleString()}
-                  </span>
-                </div>
+  const handleDisablePushNotifications = async () => {
+    setLoadingButtons(true);
+    try {
+      await unsubscribeFromNotifications();
+    } finally {
+      setLoadingButtons(false);
+    }
+  };
+
+  const handleTestNotification = async () => {
+    if (!userId || !notificationSettings?.push_notifications) return;
+
+    try {
+      // Insert a test notification
+      const { error } = await supabase
+        .from('notifications')
+        .insert({
+          user_id: userId,
+          title: "Test Notification",
+          message: "This is a test notification from your settings page.",
+          type: "test",
+          read: false
+        });
+
+      if (error) {
+        console.error("Error sending test notification:", error);
+        toast({
+          title: "Error",
+          description: "Failed to send test notification",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      console.error("Error in test notification:", error);
+      toast({
+        title: "Error",
+        description: "Failed to send test notification",
+        variant: "destructive"
+      });
+    }
+  };
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
+  return (
+    <div className="container mx-auto py-6 space-y-6">
+      <h1 className="text-3xl font-bold">Notification Settings</h1>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Notification Preferences</CardTitle>
+          <CardDescription>
+            Manage how you receive notifications and alerts
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="grid gap-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <Label htmlFor="emailNotifications" className="font-medium">
+                  Email Notifications
+                </Label>
+                <p className="text-sm text-muted-foreground">
+                  Receive updates via email
+                </p>
               </div>
-            ))
+              <Switch
+                id="emailNotifications"
+                checked={notificationSettings?.email_notifications || false}
+                onCheckedChange={(checked) => handleToggleChange('email_notifications', checked)}
+              />
+            </div>
+
+            <Separator />
+
+            <div className="flex items-center justify-between">
+              <div>
+                <Label htmlFor="appointmentReminders" className="font-medium">
+                  Appointment Reminders
+                </Label>
+                <p className="text-sm text-muted-foreground">
+                  Get reminders about upcoming appointments
+                </p>
+              </div>
+              <Switch
+                id="appointmentReminders"
+                checked={notificationSettings?.appointment_reminders || false}
+                onCheckedChange={(checked) => handleToggleChange('appointment_reminders', checked)}
+              />
+            </div>
+
+            <Separator />
+
+            <div className="flex items-center justify-between">
+              <div>
+                <Label htmlFor="messageAlerts" className="font-medium">
+                  Message Alerts
+                </Label>
+                <p className="text-sm text-muted-foreground">
+                  Get notified when you receive new messages
+                </p>
+              </div>
+              <Switch
+                id="messageAlerts"
+                checked={notificationSettings?.message_alerts || false}
+                onCheckedChange={(checked) => handleToggleChange('message_alerts', checked)}
+              />
+            </div>
+
+            <Separator />
+
+            <div className="flex items-center justify-between">
+              <div>
+                <Label htmlFor="systemUpdates" className="font-medium">
+                  System Updates
+                </Label>
+                <p className="text-sm text-muted-foreground">
+                  Receive notifications about system updates and new features
+                </p>
+              </div>
+              <Switch
+                id="systemUpdates"
+                checked={notificationSettings?.system_updates || false}
+                onCheckedChange={(checked) => handleToggleChange('system_updates', checked)}
+              />
+            </div>
+
+            <Separator />
+
+            <div className="flex items-center justify-between">
+              <div>
+                <Label htmlFor="pushNotifications" className="font-medium">
+                  Push Notifications
+                </Label>
+                <p className="text-sm text-muted-foreground">
+                  Receive push notifications in your browser
+                </p>
+                {!pushSupported && (
+                  <p className="text-sm text-destructive mt-1">
+                    Your browser doesn't support push notifications
+                  </p>
+                )}
+              </div>
+              <Switch
+                id="pushNotifications"
+                checked={notificationSettings?.push_notifications || false}
+                onCheckedChange={(checked) => handleToggleChange('push_notifications', checked)}
+                disabled={!pushSupported || loadingButtons}
+              />
+            </div>
+          </div>
+
+          {notificationSettings?.push_notifications && (
+            <div className="mt-4">
+              <Button 
+                variant="outline" 
+                onClick={handleTestNotification}
+                disabled={!notificationsGranted}
+              >
+                Send Test Notification
+              </Button>
+            </div>
           )}
-        </div>
+        </CardContent>
       </Card>
 
-      {applications.length > 0 && (
-        <Card className="p-4 md:p-6">
-          <h2 className="text-xl font-semibold mb-4">Application Status</h2>
-          <div className="space-y-4">
-            {applications.map((application) => (
-              <div key={application.id} className="p-4 rounded-lg border">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <h3 className="font-semibold">Healthcare Application</h3>
-                    <p className="text-muted-foreground text-sm mt-1">
-                      Submitted: {new Date(application.created_at).toLocaleDateString()}
-                    </p>
+      <Card>
+        <CardHeader>
+          <CardTitle>Recent Notifications</CardTitle>
+          <CardDescription>
+            Your most recent notifications
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {recentNotifications.length === 0 ? (
+            <p className="text-center text-muted-foreground py-6">
+              You don't have any notifications yet.
+            </p>
+          ) : (
+            <div className="space-y-4">
+              {recentNotifications.map((notification) => (
+                <div key={notification.id} className="bg-accent/50 p-4 rounded-lg">
+                  <div className="flex justify-between items-start">
+                    <h3 className="font-semibold">{notification.title}</h3>
+                    <StatusBadge 
+                      status={notification.read ? "completed" as StatusType : "pending" as StatusType} 
+                      itemId={notification.id} 
+                      tableName="appointments"
+                      showRealTimeUpdates={false}
+                      className="ml-2 text-xs"
+                    >
+                      {notification.read ? "Read" : "Unread"}
+                    </StatusBadge>
                   </div>
-                  <StatusBadge 
-                    status={application.status as StatusType} 
-                    itemId={application.id} 
-                    tableName="health_personnel_applications"
-                  />
+                  <p className="text-sm mt-1">{notification.message}</p>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    {new Date(notification.created_at).toLocaleString()}
+                  </p>
                 </div>
-              </div>
-            ))}
-          </div>
-        </Card>
-      )}
-
-      <Card className="p-4 md:p-6">
-        <h2 className="text-xl font-semibold mb-4">Notification Settings</h2>
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Mail className="h-5 w-5 text-primary" />
-              <Label htmlFor="email-notifications" className="text-sm md:text-base">Email Notifications</Label>
+              ))}
             </div>
-            <Switch
-              id="email-notifications"
-              checked={settings.emailNotifications}
-              onCheckedChange={(checked) => setSettings({ ...settings, emailNotifications: checked })}
-            />
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Bell className="h-5 w-5 text-primary" />
-              <Label htmlFor="appointment-reminders" className="text-sm md:text-base">Appointment Reminders</Label>
-            </div>
-            <Switch
-              id="appointment-reminders"
-              checked={settings.appointmentReminders}
-              onCheckedChange={(checked) => setSettings({ ...settings, appointmentReminders: checked })}
-            />
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <MessageSquare className="h-5 w-5 text-primary" />
-              <Label htmlFor="message-alerts" className="text-sm md:text-base">Message Alerts</Label>
-            </div>
-            <Switch
-              id="message-alerts"
-              checked={settings.messageAlerts}
-              onCheckedChange={(checked) => setSettings({ ...settings, messageAlerts: checked })}
-            />
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <BellOff className="h-5 w-5 text-primary" />
-              <Label htmlFor="system-updates" className="text-sm md:text-base">System Updates</Label>
-            </div>
-            <Switch
-              id="system-updates"
-              checked={settings.systemUpdates}
-              onCheckedChange={(checked) => setSettings({ ...settings, systemUpdates: checked })}
-            />
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Smartphone className="h-5 w-5 text-primary" />
-              <Label htmlFor="push-notifications" className="text-sm md:text-base">Push Notifications</Label>
-            </div>
-            <Switch
-              id="push-notifications"
-              checked={settings.pushNotifications}
-              onCheckedChange={(checked) => setSettings({ ...settings, pushNotifications: checked })}
-            />
-          </div>
-        </div>
-        <Button 
-          className="mt-6 w-full md:w-auto" 
-          onClick={handleSaveSettings}
-          disabled={isLoading}
-        >
-          {isLoading ? "Saving..." : "Save Settings"}
-        </Button>
+          )}
+        </CardContent>
       </Card>
     </div>
   );
 };
 
-export default NotificationsPage;
+export default () => (
+  <ProtectedRoute>
+    <NotificationsPage />
+  </ProtectedRoute>
+);
