@@ -1,3 +1,4 @@
+
 export type HealthcareProviderType = 
   | 'doctor'
   | 'nurse'
@@ -22,3 +23,37 @@ export interface HealthcareLocation {
     [key: string]: string;
   };
 }
+
+export type SpecialtyType = 
+  | 'General Practice'
+  | 'Cardiology'
+  | 'Neurology'
+  | 'Pediatrics'
+  | 'Orthopedics'
+  | 'Dermatology'
+  | 'Gynecology'
+  | 'Oncology'
+  | 'Psychiatry'
+  | 'Ophthalmology'
+  | 'Family Medicine'
+  | 'Internal Medicine'
+  | 'Emergency Medicine'
+  | 'Radiology'
+  | 'Anesthesiology'
+  | 'Urology'
+  | 'General Dentistry'
+  | 'Orthodontics';
+
+export type InsuranceProvider = 
+  | 'Medicare'
+  | 'Medicaid'
+  | 'Blue Cross'
+  | 'Cigna'
+  | 'UnitedHealthcare'
+  | 'Aetna'
+  | 'Humana'
+  | 'Kaiser Permanente'
+  | 'TRICARE'
+  | 'Other'
+  | 'None';
+

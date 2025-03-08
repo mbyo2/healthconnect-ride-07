@@ -1,6 +1,6 @@
 
 import type { LatLngTuple } from "leaflet";
-import { HealthcareProviderType } from "./healthcare";
+import { HealthcareProviderType, InsuranceProvider } from "./healthcare";
 
 export interface Provider {
   id: string;
@@ -20,6 +20,7 @@ export interface Provider {
   rating?: number;
   distance?: number;
   institution_id?: string;  // Reference to healthcare institution if affiliated
+  accepted_insurances?: InsuranceProvider[];
 }
 
 export interface MapProvider {

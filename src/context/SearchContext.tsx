@@ -1,8 +1,9 @@
+
 import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 import { useQuery, QueryFunctionContext } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Provider } from '@/types/provider';
-import { HealthcareProviderType } from '@/types/healthcare';
+import { HealthcareProviderType, InsuranceProvider, SpecialtyType } from '@/types/healthcare';
 import { toast } from 'sonner';
 
 const DEFAULT_COORDINATES = {
@@ -17,6 +18,10 @@ type SearchContextType = {
   setSearchTerm: (term: string) => void;
   selectedType: HealthcareProviderType | null;
   setSelectedType: (type: HealthcareProviderType | null) => void;
+  selectedSpecialty: SpecialtyType | null;
+  setSelectedSpecialty: (specialty: SpecialtyType | null) => void;
+  selectedInsurance: InsuranceProvider | null;
+  setSelectedInsurance: (insurance: InsuranceProvider | null) => void;
   maxDistance: number;
   setMaxDistance: (distance: number) => void;
   userLocation: { latitude: number; longitude: number };
@@ -50,6 +55,8 @@ const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: numbe
 export const SearchProvider = ({ children }: { children: ReactNode }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState<HealthcareProviderType | null>(null);
+  const [selectedSpecialty, setSelectedSpecialty] = useState<SpecialtyType | null>(null);
+  const [selectedInsurance, setSelectedInsurance] = useState<InsuranceProvider | null>(null);
   const [maxDistance, setMaxDistance] = useState<number>(50);
   const [userLocation, setUserLocation] = useState(DEFAULT_COORDINATES);
   const [useUserLocation, setUseUserLocation] = useState<boolean>(false);
@@ -77,13 +84,15 @@ export const SearchProvider = ({ children }: { children: ReactNode }) => {
 
   const fetchProviders = useCallback(async (context: QueryFunctionContext) => {
     const { queryKey } = context;
-    const [_, searchTermLocal, typeLocal, distanceLocal, locationLocal, page] = queryKey as [
+    const [_, searchTermLocal, typeLocal, distanceLocal, locationLocal, page, specialtyLocal, insuranceLocal] = queryKey as [
       string, 
       string, 
       HealthcareProviderType | null, 
       number, 
       { latitude: number; longitude: number }, 
-      number
+      number,
+      SpecialtyType | null,
+      InsuranceProvider | null
     ];
     
     let countQuery = supabase
@@ -97,6 +106,10 @@ export const SearchProvider = ({ children }: { children: ReactNode }) => {
 
     if (typeLocal) {
       countQuery = countQuery.eq('provider_type', typeLocal);
+    }
+    
+    if (specialtyLocal) {
+      countQuery = countQuery.eq('specialty', specialtyLocal);
     }
     
     const { count, error: countError } = await countQuery;
@@ -117,6 +130,7 @@ export const SearchProvider = ({ children }: { children: ReactNode }) => {
         bio,
         avatar_url,
         provider_type,
+        accepted_insurances,
         provider_locations (
           latitude,
           longitude
@@ -131,6 +145,14 @@ export const SearchProvider = ({ children }: { children: ReactNode }) => {
 
     if (typeLocal) {
       query = query.eq('provider_type', typeLocal);
+    }
+    
+    if (specialtyLocal) {
+      query = query.eq('specialty', specialtyLocal);
+    }
+    
+    if (insuranceLocal) {
+      query = query.contains('accepted_insurances', [insuranceLocal]);
     }
 
     const { data, error } = await query;
@@ -158,6 +180,7 @@ export const SearchProvider = ({ children }: { children: ReactNode }) => {
         bio: profile.bio,
         avatar_url: profile.avatar_url,
         provider_type: profile.provider_type,
+        accepted_insurances: profile.accepted_insurances || [],
         expertise: ['General Medicine', 'Primary Care'],
         location: providerLocation,
         rating: 4.5, // Hardcoded for now
@@ -179,7 +202,7 @@ export const SearchProvider = ({ children }: { children: ReactNode }) => {
     isLoading,
     refetch,
   } = useQuery({
-    queryKey: ['providers', searchTerm, selectedType, maxDistance, userLocation, currentPage],
+    queryKey: ['providers', searchTerm, selectedType, maxDistance, userLocation, currentPage, selectedSpecialty, selectedInsurance],
     queryFn: fetchProviders,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
@@ -202,6 +225,10 @@ export const SearchProvider = ({ children }: { children: ReactNode }) => {
         setSearchTerm,
         selectedType,
         setSelectedType,
+        selectedSpecialty,
+        setSelectedSpecialty,
+        selectedInsurance,
+        setSelectedInsurance,
         maxDistance,
         setMaxDistance,
         userLocation,

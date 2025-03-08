@@ -12,8 +12,14 @@ const Search = () => {
           <h1 className="text-2xl font-bold">Find Healthcare Providers</h1>
           
           <SearchProvider>
-            <SearchFilters />
-            <SearchResults />
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+              <div className="lg:col-span-1">
+                <SearchFilters />
+              </div>
+              <div className="lg:col-span-3">
+                <SearchResults />
+              </div>
+            </div>
           </SearchProvider>
         </div>
       </main>
