@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -6,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { supabase } from '@/integrations/supabase/client';
-import { NotificationSettings } from '@/types/settings';
+import { NotificationSettings, StatusType } from '@/types/settings';
 import { subscribeToNotifications, unsubscribeFromNotifications } from '@/utils/notification-service';
 import { toast } from 'sonner';
 import { StatusBadge } from '@/components/ui/status-badge';

@@ -17,8 +17,8 @@ import { DataTable } from "@/components/ui/data-table";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal, Check, X, AlertTriangle, UserPlus, Building, Users, Activity, Calendar, DollarSign } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { StatusBadge, StatusType } from "@/components/ui/status-badge";
-import { AdminLevel } from "@/types/settings";
+import { StatusBadge } from "@/components/ui/status-badge";
+import { AdminLevel, StatusType } from "@/types/settings";
 
 type Application = {
   id: string;
@@ -511,7 +511,7 @@ const AdminDashboard = () => {
           .from('health_personnel_applications')
           .select(`
             *,
-            profile:user_id (
+            profile:profiles(
               id,
               first_name,
               last_name,
@@ -552,13 +552,26 @@ const AdminDashboard = () => {
           supabase.from('appointments').select('*', { count: 'exact', head: true }),
         ]);
         
-        setApplications(applicationsData ? 
-          applicationsData.map(app => ({
-            ...app,
-            profile: app.profile as UserProfile
-          })) as Application[] : 
-          []
-        );
+        const processedApplications: Application[] = applicationsData ? 
+          applicationsData.map(app => {
+            const profile = app.profile ? 
+              {
+                id: app.profile.id || '',
+                first_name: app.profile.first_name || '',
+                last_name: app.profile.last_name || '',
+                email: app.profile.email || '',
+                role: app.profile.role || '',
+                avatar_url: app.profile.avatar_url || null
+              } as UserProfile 
+              : undefined;
+              
+            return {
+              ...app,
+              profile
+            } as Application;
+          }) : [];
+        
+        setApplications(processedApplications);
         
         setInstitutions(institutionsData ? 
           institutionsData.map(inst => ({ 
@@ -587,7 +600,7 @@ const AdminDashboard = () => {
     
     fetchData();
   }, []);
-  
+
   const handleAddAdmin = async () => {
     try {
       setIsSubmitting(true);

@@ -8,7 +8,8 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { StatusBadge, StatusType } from "@/components/ui/status-badge";
+import { StatusBadge } from "@/components/ui/status-badge";
+import { StatusType } from "@/types/settings";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 
