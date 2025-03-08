@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -557,9 +558,11 @@ const AdminDashboard = () => {
         ]);
         
         const processedApplications: Application[] = applicationsData.map(app => {
+          // Explicitly cast the status string to StatusType
           return {
             ...app,
-            profile: profilesMap[app.user_id] as UserProfile
+            profile: profilesMap[app.user_id] as UserProfile,
+            status: app.status as StatusType
           };
         });
         
