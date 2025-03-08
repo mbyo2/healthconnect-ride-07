@@ -23,10 +23,12 @@ const statusVariants = cva("", {
   },
 })
 
+export type StatusType = "pending" | "approved" | "rejected" | "completed" | "scheduled" | "canceled";
+
 export interface StatusBadgeProps
   extends React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof statusVariants> {
-  status: "pending" | "approved" | "rejected" | "completed" | "scheduled" | "canceled"
+  status: StatusType
   itemId: string
   tableName: "health_personnel_applications" | "healthcare_institutions" | "appointments"
   showRealTimeUpdates?: boolean
@@ -47,18 +49,23 @@ export function StatusBadge({
     queryFn: async () => {
       if (!itemId) return status
       
-      const { data, error } = await supabase
-        .from(tableName)
-        .select('status')
-        .eq('id', itemId)
-        .single()
+      try {
+        const { data, error } = await supabase
+          .from(tableName)
+          .select('status')
+          .eq('id', itemId)
+          .single()
+          
+        if (error) {
+          console.error(`Error fetching ${tableName} status:`, error)
+          return status
+        }
         
-      if (error) {
-        console.error(`Error fetching ${tableName} status:`, error)
+        return (data?.status || status) as StatusType
+      } catch (error) {
+        console.error(`Error in status fetch:`, error)
         return status
       }
-      
-      return data?.status || status
     },
     initialData: status,
     enabled: showRealTimeUpdates && !!itemId
@@ -103,7 +110,7 @@ export function StatusBadge({
 
   return (
     <CustomBadge 
-      className={cn(statusVariants({ status: currentStatus as any }), className)} 
+      className={cn(statusVariants({ status: currentStatus as StatusType }), className)} 
       {...props}
     >
       {statusDisplay[currentStatus as keyof typeof statusDisplay]}

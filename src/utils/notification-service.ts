@@ -1,6 +1,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { PushSubscriptionJSON } from "@/types/settings";
 
 // Function to request notification permission and register for push notifications
 export async function subscribeToNotifications() {
@@ -45,14 +46,14 @@ export async function subscribeToNotifications() {
       return false;
     }
 
-    // Save subscription to database
+    // Save subscription to database using upsert with type casting for TypeScript
     const { error } = await supabase
       .from('push_subscriptions')
       .upsert({
         user_id: user.id,
-        subscription: subscription,
+        subscription: subscription as unknown as JSON,
         created_at: new Date().toISOString(),
-      }, { onConflict: 'user_id' });
+      }, { onConflict: 'user_id' }) as any;
 
     if (error) {
       console.error('Error saving push subscription:', error);
@@ -89,7 +90,7 @@ export async function unsubscribeFromNotifications() {
         await supabase
           .from('push_subscriptions')
           .delete()
-          .eq('user_id', user.id);
+          .eq('user_id', user.id) as any;
       }
       
       toast.success("Successfully unsubscribed from push notifications");

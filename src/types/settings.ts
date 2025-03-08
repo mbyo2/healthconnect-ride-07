@@ -33,6 +33,10 @@ export interface UserSettings {
   updated_at: string;
 }
 
+// Update UserRole and AdminLevel definitions
+export type UserRole = 'admin' | 'health_personnel' | 'patient';
+export type AdminLevel = 'admin' | 'superadmin';
+
 // Add PushSubscriptionJSON interface to fix TypeScript errors with the Web Push API
 export interface PushSubscriptionJSON {
   endpoint?: string;

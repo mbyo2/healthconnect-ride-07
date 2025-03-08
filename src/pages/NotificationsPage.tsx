@@ -9,10 +9,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { NotificationCenter } from "@/components/NotificationCenter";
 import { useMediaQuery } from "@/hooks/use-media-query";
-import { NotificationSettings, PushSubscription } from "@/types/settings";
+import { NotificationSettings } from "@/types/settings";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { subscribeToNotifications, unsubscribeFromNotifications } from "@/utils/notification-service";
-import { StatusBadge } from "@/components/ui/status-badge";
+import { StatusBadge, StatusType } from "@/components/ui/status-badge";
 
 const NotificationsPage = () => {
   const queryClient = useQueryClient();
@@ -76,12 +76,12 @@ const NotificationsPage = () => {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
 
-        // Use the 'as any' to bypass type checking for the table name
-        const { data, error } = await supabase
+        // Cast the query as any to bypass TypeScript error
+        const { data, error } = await (supabase
           .from('notification_settings')
           .select('*')
           .eq('user_id', user.id)
-          .single();
+          .single() as any);
 
         if (error && error.code !== 'PGRST116') {
           console.error('Error fetching notification settings:', error);
@@ -155,7 +155,7 @@ const NotificationsPage = () => {
       }
 
       // Type assertion for the table name and data
-      const { error } = await supabase
+      const { error } = await (supabase
         .from('notification_settings')
         .upsert({
           user_id: user.id,
@@ -165,7 +165,7 @@ const NotificationsPage = () => {
           system_updates: settings.systemUpdates,
           push_notifications: settings.pushNotifications,
           updated_at: new Date().toISOString(),
-        }, { onConflict: 'user_id' });
+        }, { onConflict: 'user_id' }) as any);
 
       if (error) {
         console.error('Error saving notification settings:', error);
@@ -232,7 +232,7 @@ const NotificationsPage = () => {
                     </p>
                   </div>
                   <StatusBadge 
-                    status={application.status} 
+                    status={application.status as StatusType} 
                     itemId={application.id} 
                     tableName="health_personnel_applications"
                   />

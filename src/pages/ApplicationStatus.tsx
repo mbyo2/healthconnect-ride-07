@@ -8,7 +8,7 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { StatusBadge } from "@/components/ui/status-badge";
+import { StatusBadge, StatusType } from "@/components/ui/status-badge";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 
@@ -136,7 +136,7 @@ const ApplicationStatus = () => {
               </h2>
               <div className="flex justify-center">
                 <StatusBadge 
-                  status={application.status} 
+                  status={application.status as StatusType} 
                   itemId={application.id} 
                   tableName="health_personnel_applications"
                   className="text-sm font-medium px-3 py-1"
