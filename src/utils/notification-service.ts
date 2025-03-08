@@ -53,6 +53,7 @@ export async function subscribeToNotifications() {
         user_id: user.id,
         subscription: subscription as unknown as JSON,
         created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
       }, { onConflict: 'user_id' });
 
     if (error) {

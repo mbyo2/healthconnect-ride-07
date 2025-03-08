@@ -24,7 +24,7 @@ import { AdminLevel } from "@/types/settings";
 type Application = {
   id: string;
   user_id: string;
-  status: string;
+  status: StatusType;
   created_at: string;
   specialty: string;
   license_number: string;
@@ -55,7 +55,7 @@ type UserProfile = {
   email: string | null;
   role: string;
   avatar_url: string | null;
-  admin_level?: string;
+  admin_level?: AdminLevel;
 };
 
 // Define columns for applications table
@@ -560,9 +560,14 @@ const AdminDashboard = () => {
           supabase.from('appointments').select('*', { count: 'exact', head: true }),
         ]);
         
-        setApplications(applicationsData || []);
-        setInstitutions(institutionsData || []);
-        setAdmins(adminsData || []);
+        // Cast the data to the correct types
+        setApplications((applicationsData || []) as Application[]);
+        setInstitutions((institutionsData || []).map(inst => ({ 
+          ...inst, 
+          status: inst.is_verified ? 'verified' : 'unverified' 
+        })) as Institution[]);
+        setAdmins((adminsData || []) as UserProfile[]);
+        
         setStats({
           totalUsers: totalUsers || 0,
           totalProviders: totalProviders || 0,
