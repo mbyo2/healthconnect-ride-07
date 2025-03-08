@@ -20,7 +20,6 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { StatusBadge, StatusType } from "@/components/ui/status-badge";
 import { AdminLevel } from "@/types/settings";
 
-// Define types for our data
 type Application = {
   id: string;
   user_id: string;
@@ -58,7 +57,6 @@ type UserProfile = {
   admin_level?: AdminLevel;
 };
 
-// Define columns for applications table
 const applicationColumns: ColumnDef<Application>[] = [
   {
     accessorKey: "profile.first_name",
@@ -107,7 +105,7 @@ const applicationColumns: ColumnDef<Application>[] = [
       const application = row.original;
       const [isReviewOpen, setIsReviewOpen] = useState(false);
       const [reviewNotes, setReviewNotes] = useState(application.review_notes || "");
-      const [newStatus, setNewStatus] = useState(application.status);
+      const [newStatus, setNewStatus] = useState<StatusType>(application.status);
       const [isSubmitting, setIsSubmitting] = useState(false);
 
       const handleReview = async () => {
@@ -125,7 +123,6 @@ const applicationColumns: ColumnDef<Application>[] = [
             
           if (error) throw error;
           
-          // If approved, update the user's role
           if (newStatus === 'approved') {
             const { error: roleError } = await supabase
               .from('profiles')
@@ -135,7 +132,6 @@ const applicationColumns: ColumnDef<Application>[] = [
             if (roleError) throw roleError;
           }
           
-          // Create a notification for the user
           const notificationTitle = 
             newStatus === 'approved' 
               ? 'Application Approved!' 
@@ -201,7 +197,10 @@ const applicationColumns: ColumnDef<Application>[] = [
                   <Label htmlFor="status" className="text-right">
                     Status
                   </Label>
-                  <Select value={newStatus} onValueChange={setNewStatus}>
+                  <Select 
+                    value={newStatus} 
+                    onValueChange={(value: StatusType) => setNewStatus(value)}
+                  >
                     <SelectTrigger className="col-span-3">
                       <SelectValue placeholder="Select status" />
                     </SelectTrigger>
@@ -241,7 +240,6 @@ const applicationColumns: ColumnDef<Application>[] = [
   },
 ];
 
-// Define columns for institutions table
 const institutionColumns: ColumnDef<Institution>[] = [
   {
     accessorKey: "name",
@@ -302,7 +300,6 @@ const institutionColumns: ColumnDef<Institution>[] = [
             
           if (error) throw error;
           
-          // Create a notification for the admin
           if (institution.admin_id) {
             await supabase
               .from('notifications')
@@ -375,7 +372,6 @@ const institutionColumns: ColumnDef<Institution>[] = [
   },
 ];
 
-// Define columns for admins table
 const adminColumns: ColumnDef<UserProfile>[] = [
   {
     accessorKey: "first_name",
@@ -511,7 +507,6 @@ const AdminDashboard = () => {
       try {
         setIsLoading(true);
         
-        // Fetch applications with profiles
         const { data: applicationsData, error: applicationsError } = await supabase
           .from('health_personnel_applications')
           .select(`
@@ -528,7 +523,6 @@ const AdminDashboard = () => {
           
         if (applicationsError) throw applicationsError;
         
-        // Fetch institutions
         const { data: institutionsData, error: institutionsError } = await supabase
           .from('healthcare_institutions')
           .select('*')
@@ -536,7 +530,6 @@ const AdminDashboard = () => {
           
         if (institutionsError) throw institutionsError;
         
-        // Fetch admins
         const { data: adminsData, error: adminsError } = await supabase
           .from('profiles')
           .select('*')
@@ -545,7 +538,6 @@ const AdminDashboard = () => {
           
         if (adminsError) throw adminsError;
         
-        // Fetch stats
         const [
           { count: totalUsers },
           { count: totalProviders },
@@ -560,14 +552,21 @@ const AdminDashboard = () => {
           supabase.from('appointments').select('*', { count: 'exact', head: true }),
         ]);
         
-        // Cast the data to the correct types and add missing properties
-        setApplications((applicationsData || []) as Application[]);
+        setApplications(applicationsData ? 
+          applicationsData.map(app => ({
+            ...app,
+            profile: app.profile as UserProfile
+          })) as Application[] : 
+          []
+        );
         
-        // For institutions, we need to add a status property based on is_verified
-        setInstitutions((institutionsData || []).map(inst => ({ 
-          ...inst, 
-          status: inst.is_verified ? 'verified' : 'unverified' 
-        })) as Institution[]);
+        setInstitutions(institutionsData ? 
+          institutionsData.map(inst => ({ 
+            ...inst, 
+            status: inst.is_verified ? 'verified' : 'unverified' 
+          })) as Institution[] : 
+          []
+        );
         
         setAdmins((adminsData || []) as UserProfile[]);
         
@@ -593,7 +592,6 @@ const AdminDashboard = () => {
     try {
       setIsSubmitting(true);
       
-      // Check if email exists
       const { data: userData, error: userError } = await supabase
         .from('profiles')
         .select('id, role')
@@ -614,7 +612,6 @@ const AdminDashboard = () => {
         return;
       }
       
-      // Update user role to admin
       const { error: updateError } = await supabase
         .from('profiles')
         .update({ 
@@ -629,7 +626,6 @@ const AdminDashboard = () => {
       setIsAddAdminOpen(false);
       setNewAdminEmail("");
       
-      // Refresh admins list
       const { data: adminsData } = await supabase
         .from('profiles')
         .select('*')

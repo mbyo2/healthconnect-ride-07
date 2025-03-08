@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -24,14 +23,15 @@ const NotificationsPage = () => {
     message_alerts: true,
     system_updates: false,
     push_notifications: false,
-    created_at: '',
-    updated_at: ''
+    application_updates: false,
+    marketing_emails: false,
+    payment_notifications: false,
+    chat_notifications: false
   });
   const [activeTab, setActiveTab] = useState('notifications');
   const [pushPermissionStatus, setPushPermissionStatus] = useState<NotificationPermission | 'unsupported'>('default');
 
   useEffect(() => {
-    // Check if browser supports notifications
     if (!('Notification' in window)) {
       setPushPermissionStatus('unsupported');
     } else {
@@ -45,14 +45,12 @@ const NotificationsPage = () => {
     try {
       setIsLoading(true);
       
-      // Get current user
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
         return;
       }
       
-      // Fetch notifications
       const { data: notificationsData, error: notificationsError } = await supabase
         .from('notifications')
         .select('*')
@@ -61,14 +59,12 @@ const NotificationsPage = () => {
         
       if (notificationsError) throw notificationsError;
       
-      // Fetch notification settings
       const { data: settingsData, error: settingsError } = await supabase
         .from('notification_settings' as any)
         .select('*')
         .eq('user_id', user.id)
         .single();
       
-      // Create default settings if none exist
       if (settingsError && settingsError.code === 'PGRST116') {
         const defaultSettings = {
           user_id: user.id,
@@ -76,7 +72,11 @@ const NotificationsPage = () => {
           appointment_reminders: true,
           message_alerts: true,
           system_updates: false,
-          push_notifications: false
+          push_notifications: false,
+          application_updates: false,
+          marketing_emails: false,
+          payment_notifications: false,
+          chat_notifications: false
         };
         
         const { data: newSettings, error: createError } = await supabase
@@ -109,23 +109,18 @@ const NotificationsPage = () => {
     try {
       const newValue = !settings[setting];
       
-      // Special handling for push notifications
       if (setting === 'push_notifications') {
         if (newValue) {
-          // Attempt to subscribe
           const subscribed = await subscribeToNotifications();
           if (!subscribed) return;
         } else {
-          // Attempt to unsubscribe
           const unsubscribed = await unsubscribeFromNotifications();
           if (!unsubscribed) return;
         }
       }
       
-      // Update in-memory state first for a responsive UI
       setSettings({ ...settings, [setting]: newValue });
       
-      // Update in database
       const { error } = await supabase
         .from('notification_settings' as any)
         .update({ [setting]: newValue })
@@ -137,7 +132,6 @@ const NotificationsPage = () => {
     } catch (error) {
       console.error('Error updating notification settings:', error);
       toast.error('Failed to update settings');
-      // Revert the optimistic update
       fetchData();
     }
   };
@@ -151,7 +145,6 @@ const NotificationsPage = () => {
         
       if (error) throw error;
       
-      // Update local state
       setNotifications(notifications.map(notification => 
         notification.id === notificationId ? { ...notification, read: true } : notification
       ));
@@ -170,7 +163,6 @@ const NotificationsPage = () => {
         
       if (error) throw error;
       
-      // Update local state
       setNotifications(notifications.filter(notification => notification.id !== notificationId));
       toast.success('Notification deleted');
     } catch (error) {
@@ -181,7 +173,6 @@ const NotificationsPage = () => {
 
   const markAllAsRead = async () => {
     try {
-      // Get current user
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) return;
@@ -194,7 +185,6 @@ const NotificationsPage = () => {
         
       if (error) throw error;
       
-      // Update local state
       setNotifications(notifications.map(notification => ({ ...notification, read: true })));
       toast.success('All notifications marked as read');
     } catch (error) {
@@ -305,7 +295,7 @@ const NotificationsPage = () => {
                 
                 {notification.type === 'application_update' && notification.data?.applicationId && (
                   <StatusBadge 
-                    status={notification.data.status as StatusType || "pending"} 
+                    status={(notification.data.status as StatusType) || "pending"} 
                     itemId={notification.data.applicationId} 
                     tableName="health_personnel_applications"
                   />

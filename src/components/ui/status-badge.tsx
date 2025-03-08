@@ -6,6 +6,7 @@ import { CustomBadge } from "@/components/ui/custom-badge"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { supabase } from "@/integrations/supabase/client"
 import { useEffect } from "react"
+import { StatusType } from "@/types/settings"
 
 const statusVariants = cva("", {
   variants: {
@@ -22,8 +23,6 @@ const statusVariants = cva("", {
     status: "pending",
   },
 })
-
-export type StatusType = "pending" | "approved" | "rejected" | "completed" | "scheduled" | "canceled";
 
 export interface StatusBadgeProps
   extends React.HTMLAttributes<HTMLDivElement>,
@@ -61,8 +60,8 @@ export function StatusBadge({
           return status
         }
         
-        // Add explicit type assertion to handle response data
-        const responseData = response.data as { status: StatusType } | null
+        // Cast response data to avoid type errors
+        const responseData = response.data as unknown as { status?: StatusType }
         
         if (!responseData || typeof responseData.status === 'undefined') {
           return status
@@ -95,7 +94,7 @@ export function StatusBadge({
         (payload) => {
           // Type assertion for payload to avoid type errors
           const newPayload = payload as any
-          if (newPayload.new.status !== newPayload.old.status) {
+          if (newPayload.new?.status !== newPayload.old?.status) {
             // Invalidate the query to fetch the new status
             queryClient.invalidateQueries({ queryKey: [`${tableName}-status`, itemId] })
           }
