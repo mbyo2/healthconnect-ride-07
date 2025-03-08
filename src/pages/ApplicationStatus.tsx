@@ -8,22 +8,22 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { StatusBadge } from "@/components/ui/status-badge";
+import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
 
 const ApplicationStatus = () => {
-  const [application, setApplication] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchApplicationStatus = async () => {
+  const { data: application, isLoading } = useQuery({
+    queryKey: ['health-personnel-application'],
+    queryFn: async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
         
         if (!user) {
-          setError("You must be logged in to view your application status");
-          setIsLoading(false);
-          return;
+          throw new Error("You must be logged in to view your application status");
         }
         
         const { data, error: fetchError } = await supabase
@@ -34,22 +34,44 @@ const ApplicationStatus = () => {
           
         if (fetchError) {
           console.error("Error fetching application:", fetchError);
-          setError("Failed to fetch application status");
-          setIsLoading(false);
-          return;
+          throw new Error("Failed to fetch application status");
         }
         
-        setApplication(data);
-        setIsLoading(false);
-      } catch (err) {
-        console.error("Unexpected error:", err);
-        setError("An unexpected error occurred");
-        setIsLoading(false);
+        return data;
+      } catch (err: any) {
+        setError(err.message);
+        return null;
       }
-    };
+    }
+  });
+  
+  // Subscribe to real-time notifications for this application
+  useEffect(() => {
+    if (!application) return;
     
-    fetchApplicationStatus();
-  }, []);
+    const channel = supabase
+      .channel('application-notifications')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'notifications',
+          filter: `user_id=eq.${application.user_id}`
+        },
+        (payload) => {
+          // Show toast notification when a new notification is received
+          toast(payload.new.title, {
+            description: payload.new.message,
+          });
+        }
+      )
+      .subscribe();
+      
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [application]);
   
   if (isLoading) {
     return <LoadingScreen />;
@@ -110,9 +132,16 @@ const ApplicationStatus = () => {
             <div className="text-center space-y-4">
               {renderStatusIcon(application.status)}
               <h2 className="text-xl font-semibold">
-                {application.status === 'approved' ? 'Approved' : 
-                 application.status === 'pending' ? 'Under Review' : 'Not Approved'}
+                Application Status:
               </h2>
+              <div className="flex justify-center">
+                <StatusBadge 
+                  status={application.status} 
+                  itemId={application.id} 
+                  tableName="health_personnel_applications"
+                  className="text-sm font-medium px-3 py-1"
+                />
+              </div>
               <p className="text-muted-foreground">
                 {getStatusMessage(application.status)}
               </p>

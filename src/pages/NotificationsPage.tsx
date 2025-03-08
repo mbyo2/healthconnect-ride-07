@@ -10,8 +10,12 @@ import { toast } from "sonner";
 import { NotificationCenter } from "@/components/NotificationCenter";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { NotificationSettings, PushSubscription } from "@/types/settings";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { subscribeToNotifications, unsubscribeFromNotifications } from "@/utils/notification-service";
+import { StatusBadge } from "@/components/ui/status-badge";
 
 const NotificationsPage = () => {
+  const queryClient = useQueryClient();
   const [settings, setSettings] = useState({
     emailNotifications: true,
     appointmentReminders: true,
@@ -22,6 +26,50 @@ const NotificationsPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const isMobile = useMediaQuery("(max-width: 768px)");
 
+  // Fetch user's notifications
+  const { data: notifications = [] } = useQuery({
+    queryKey: ['notifications'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
+
+      const { data, error } = await supabase
+        .from('notifications')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(10);
+
+      if (error) {
+        console.error('Error fetching notifications:', error);
+        throw error;
+      }
+
+      return data;
+    },
+  });
+  
+  // Fetch user's applications for displaying status with real-time updates
+  const { data: applications = [] } = useQuery({
+    queryKey: ['user-applications'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
+
+      const { data, error } = await supabase
+        .from('health_personnel_applications')
+        .select('*')
+        .eq('user_id', user.id);
+
+      if (error) {
+        console.error('Error fetching applications:', error);
+        return [];
+      }
+
+      return data;
+    },
+  });
+
   useEffect(() => {
     const fetchNotificationSettings = async () => {
       try {
@@ -30,7 +78,7 @@ const NotificationsPage = () => {
 
         // Use the 'as any' to bypass type checking for the table name
         const { data, error } = await supabase
-          .from('notification_settings' as any)
+          .from('notification_settings')
           .select('*')
           .eq('user_id', user.id)
           .single();
@@ -59,6 +107,44 @@ const NotificationsPage = () => {
     fetchNotificationSettings();
   }, []);
 
+  // Subscribe to real-time notifications
+  useEffect(() => {
+    const subscribeToRealtimeNotifications = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      
+      const channel = supabase
+        .channel('notifications-realtime')
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'notifications',
+            filter: `user_id=eq.${user.id}`
+          },
+          () => {
+            // Invalidate the notifications query to refresh the list
+            queryClient.invalidateQueries({ queryKey: ['notifications'] });
+            
+            // If there's an application status change, refresh the applications
+            queryClient.invalidateQueries({ queryKey: ['user-applications'] });
+          }
+        )
+        .subscribe();
+        
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    };
+    
+    const unsubscribe = subscribeToRealtimeNotifications();
+    
+    return () => {
+      unsubscribe.then(unsub => unsub && unsub());
+    };
+  }, [queryClient]);
+
   const handleSaveSettings = async () => {
     try {
       setIsLoading(true);
@@ -70,7 +156,7 @@ const NotificationsPage = () => {
 
       // Type assertion for the table name and data
       const { error } = await supabase
-        .from('notification_settings' as any)
+        .from('notification_settings')
         .upsert({
           user_id: user.id,
           email_notifications: settings.emailNotifications,
@@ -79,7 +165,7 @@ const NotificationsPage = () => {
           system_updates: settings.systemUpdates,
           push_notifications: settings.pushNotifications,
           updated_at: new Date().toISOString(),
-        } as any, { onConflict: 'user_id' });
+        }, { onConflict: 'user_id' });
 
       if (error) {
         console.error('Error saving notification settings:', error);
@@ -88,7 +174,9 @@ const NotificationsPage = () => {
       }
 
       if (settings.pushNotifications) {
-        requestPushPermission();
+        await subscribeToNotifications();
+      } else {
+        await unsubscribeFromNotifications();
       }
 
       toast.success("Notification settings saved successfully");
@@ -98,72 +186,6 @@ const NotificationsPage = () => {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const requestPushPermission = async () => {
-    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-      toast.error("Push notifications are not supported by your browser");
-      return;
-    }
-
-    try {
-      const registration = await navigator.serviceWorker.ready;
-      const permission = await Notification.requestPermission();
-      
-      if (permission === 'granted') {
-        const subscription = await registration.pushManager.subscribe({
-          userVisibleOnly: true,
-          applicationServerKey: urlBase64ToUint8Array(
-            // This should be your VAPID public key
-            'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U'
-          )
-        });
-        
-        // Save the subscription to your database
-        await saveSubscription(subscription);
-        toast.success("Push notifications enabled");
-      } else {
-        toast.error("Permission for push notifications was denied");
-        setSettings(prev => ({ ...prev, pushNotifications: false }));
-      }
-    } catch (error) {
-      console.error('Error requesting push permission:', error);
-      toast.error("Failed to enable push notifications");
-      setSettings(prev => ({ ...prev, pushNotifications: false }));
-    }
-  };
-
-  const saveSubscription = async (subscription: PushSubscriptionJSON) => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-
-    // Type assertion for the table name and data
-    const { error } = await supabase
-      .from('push_subscriptions' as any)
-      .upsert({
-        user_id: user.id,
-        subscription: subscription,
-        created_at: new Date().toISOString(),
-      } as any, { onConflict: 'user_id' });
-
-    if (error) {
-      console.error('Error saving push subscription:', error);
-    }
-  };
-
-  const urlBase64ToUint8Array = (base64String: string) => {
-    const padding = '='.repeat((4 - base64String.length % 4) % 4);
-    const base64 = (base64String + padding)
-      .replace(/-/g, '+')
-      .replace(/_/g, '/');
-
-    const rawData = window.atob(base64);
-    const outputArray = new Uint8Array(rawData.length);
-
-    for (let i = 0; i < rawData.length; ++i) {
-      outputArray[i] = rawData.charCodeAt(i);
-    }
-    return outputArray;
   };
 
   return (
@@ -176,10 +198,50 @@ const NotificationsPage = () => {
       <Card className="p-4 md:p-6">
         <h2 className="text-xl font-semibold mb-4">Recent Notifications</h2>
         <div className="space-y-4">
-          {/* This would be populated from the NotificationCenter component */}
-          <p className="text-muted-foreground">Your recent notifications will appear here.</p>
+          {notifications.length === 0 ? (
+            <p className="text-muted-foreground">You have no recent notifications.</p>
+          ) : (
+            notifications.map((notification) => (
+              <div key={notification.id} className={`p-4 rounded-lg ${!notification.read ? 'bg-muted' : 'bg-card'} border`}>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="font-semibold text-sm md:text-base">{notification.title}</h3>
+                    <p className="text-muted-foreground text-sm mt-1">{notification.message}</p>
+                  </div>
+                  <span className="text-xs text-muted-foreground">
+                    {new Date(notification.created_at).toLocaleString()}
+                  </span>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </Card>
+
+      {applications.length > 0 && (
+        <Card className="p-4 md:p-6">
+          <h2 className="text-xl font-semibold mb-4">Application Status</h2>
+          <div className="space-y-4">
+            {applications.map((application) => (
+              <div key={application.id} className="p-4 rounded-lg border">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h3 className="font-semibold">Healthcare Application</h3>
+                    <p className="text-muted-foreground text-sm mt-1">
+                      Submitted: {new Date(application.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <StatusBadge 
+                    status={application.status} 
+                    itemId={application.id} 
+                    tableName="health_personnel_applications"
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
 
       <Card className="p-4 md:p-6">
         <h2 className="text-xl font-semibold mb-4">Notification Settings</h2>
