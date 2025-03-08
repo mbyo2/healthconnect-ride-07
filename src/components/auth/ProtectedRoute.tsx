@@ -86,16 +86,24 @@ export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) 
           return;
         }
 
-        setUserRole(profile.role as UserRole);
-        setAdminLevel(profile.admin_level as AdminLevel);
-        setIsProfileComplete(profile.is_profile_complete);
-        setIsAuthenticated(true);
+        // Check if profile is an object with the expected properties
+        if (profile && typeof profile === 'object') {
+          setUserRole(profile.role as UserRole);
+          setAdminLevel(profile.admin_level as AdminLevel);
+          setIsProfileComplete(profile.is_profile_complete);
+          setIsAuthenticated(true);
 
-        console.log("Auth check complete:", {
-          role: profile.role,
-          adminLevel: profile.admin_level,
-          isProfileComplete: profile.is_profile_complete
-        });
+          console.log("Auth check complete:", {
+            role: profile.role,
+            adminLevel: profile.admin_level,
+            isProfileComplete: profile.is_profile_complete
+          });
+        } else {
+          console.log("Profile data is not in expected format");
+          setIsAuthenticated(true);
+          setIsProfileComplete(false);
+          setIsLoading(false);
+        }
 
       } catch (error) {
         console.error("Unexpected error during session check:", error);
@@ -123,7 +131,8 @@ export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) 
           .eq('id', session.user.id)
           .single();
         
-        if (profile) {
+        // Check if profile is an object with the expected properties
+        if (profile && typeof profile === 'object') {
           setUserRole(profile.role as UserRole);
           setAdminLevel(profile.admin_level as AdminLevel);
           setIsProfileComplete(profile.is_profile_complete);

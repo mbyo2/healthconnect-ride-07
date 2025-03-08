@@ -411,6 +411,7 @@ export type Database = {
       healthcare_institutions: {
         Row: {
           address: string | null
+          admin_id: string | null
           city: string | null
           country: string | null
           created_at: string | null
@@ -429,6 +430,7 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          admin_id?: string | null
           city?: string | null
           country?: string | null
           created_at?: string | null
@@ -447,6 +449,7 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          admin_id?: string | null
           city?: string | null
           country?: string | null
           created_at?: string | null
@@ -1075,6 +1078,7 @@ export type Database = {
       profiles: {
         Row: {
           address: string | null
+          admin_level: Database["public"]["Enums"]["admin_level"] | null
           avatar_url: string | null
           bio: string | null
           city: string | null
@@ -1098,6 +1102,7 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          admin_level?: Database["public"]["Enums"]["admin_level"] | null
           avatar_url?: string | null
           bio?: string | null
           city?: string | null
@@ -1121,6 +1126,7 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          admin_level?: Database["public"]["Enums"]["admin_level"] | null
           avatar_url?: string | null
           bio?: string | null
           city?: string | null
@@ -1446,6 +1452,7 @@ export type Database = {
       }
     }
     Enums: {
+      admin_level: "admin" | "superadmin"
       experience_level: "entry" | "intermediate" | "expert"
       healthcare_provider_type:
         | "doctor"

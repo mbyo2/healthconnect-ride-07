@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
@@ -33,24 +34,25 @@ export const InstitutionPortal = () => {
             .from('profiles')
             .select('is_profile_complete, role, admin_level')
             .eq('id', session.user.id)
-            .single();
+            .maybeSingle();
 
           if (profileError) {
             console.error("Error fetching profile:", profileError);
+            setIsLoading(false);
             return;
           }
 
           setIsRedirecting(true);
           
           // Check if this is a healthcare institution account
-          const { data: institutionCheck } = await supabase
+          const { data: institutionCheck, error: institutionError } = await supabase
             .from('healthcare_institutions')
             .select('admin_id, is_verified')
             .eq('admin_id', session.user.id)
             .maybeSingle();
             
           // If user is a superadmin, redirect to admin dashboard
-          if (profile?.admin_level === 'superadmin') {
+          if (profile && profile.admin_level === 'superadmin') {
             navigate("/admin-dashboard");
             return;
           }

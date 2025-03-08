@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge";
+import { CustomBadge } from "@/components/ui/custom-badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -43,6 +43,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { LoadingScreen } from "@/components/LoadingScreen";
+import { CheckIcon, Cross2Icon, PersonIcon } from "@radix-ui/react-icons";
 
 const AdminDashboard = () => {
   const [personnelApplications, setPersonnelApplications] = useState<any[]>([]);
@@ -51,11 +52,9 @@ const AdminDashboard = () => {
   const [reviewNotes, setReviewNotes] = useState<string>('');
   const [selectedApplicationId, setSelectedApplicationId] = useState<string | null>(null);
 
-  // Function to fetch admin applications
   const fetchAdminApplications = async () => {
     setIsLoading(true);
     try {
-      // Fetch healthcare personnel applications
       const { data: personnelApplications, error: personnelError } = await supabase
         .from('health_personnel_applications')
         .select(`
@@ -76,7 +75,6 @@ const AdminDashboard = () => {
 
       setPersonnelApplications(personnelApplications || []);
 
-      // Fetch institution applications
       const { data: institutions, error: institutionsError } = await supabase
         .from('healthcare_institutions')
         .select('*')
@@ -109,7 +107,7 @@ const AdminDashboard = () => {
       if (error) throw error;
 
       toast.success('Application status updated successfully!');
-      fetchAdminApplications(); // Refresh data
+      fetchAdminApplications();
     } catch (error: any) {
       console.error("Error updating application status:", error);
       toast.error(`Error: ${error.message || "Failed to update status"}`);
@@ -131,7 +129,7 @@ const AdminDashboard = () => {
       if (error) throw error;
 
       toast.success('Institution verification status updated successfully!');
-      fetchAdminApplications(); // Refresh data
+      fetchAdminApplications();
     } catch (error: any) {
       console.error("Error updating institution verification status:", error);
       toast.error(`Error: ${error.message || "Failed to update verification status"}`);
@@ -173,7 +171,7 @@ const AdminDashboard = () => {
                   <TableCell>{application.years_of_experience}</TableCell>
                   <TableCell>{format(new Date(application.created_at), 'PPP')}</TableCell>
                   <TableCell>
-                    <Badge
+                    <CustomBadge
                       variant={
                         application.status === 'pending'
                           ? 'secondary'
@@ -183,7 +181,7 @@ const AdminDashboard = () => {
                       }
                     >
                       {application.status}
-                    </Badge>
+                    </CustomBadge>
                   </TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
@@ -240,9 +238,9 @@ const AdminDashboard = () => {
                   <TableCell>{institution.type}</TableCell>
                   <TableCell>{format(new Date(institution.created_at), 'PPP')}</TableCell>
                   <TableCell>
-                    <Badge variant={institution.is_verified ? 'success' : 'secondary'}>
+                    <CustomBadge variant={institution.is_verified ? 'success' : 'secondary'}>
                       {institution.is_verified ? 'Verified' : 'Pending'}
-                    </Badge>
+                    </CustomBadge>
                   </TableCell>
                   <TableCell className="text-right">
                     <Button
@@ -260,7 +258,6 @@ const AdminDashboard = () => {
         </div>
       </section>
 
-      {/* Dialog for updating application status */}
       <Dialog open={selectedApplicationId !== null} onOpenChange={() => setSelectedApplicationId(null)}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
