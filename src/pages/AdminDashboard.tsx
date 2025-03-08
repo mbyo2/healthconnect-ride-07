@@ -509,19 +509,23 @@ const AdminDashboard = () => {
         
         const { data: applicationsData, error: applicationsError } = await supabase
           .from('health_personnel_applications')
-          .select(`
-            *,
-            profile:profiles(
-              id,
-              first_name,
-              last_name,
-              email,
-              avatar_url
-            )
-          `)
+          .select('*')
           .order('created_at', { ascending: false });
           
         if (applicationsError) throw applicationsError;
+        
+        const userIds = applicationsData.map(app => app.user_id);
+        const { data: profilesData, error: profilesError } = await supabase
+          .from('profiles')
+          .select('id, first_name, last_name, email, role, avatar_url')
+          .in('id', userIds);
+          
+        if (profilesError) throw profilesError;
+        
+        const profilesMap = {};
+        profilesData.forEach(profile => {
+          profilesMap[profile.id] = profile;
+        });
         
         const { data: institutionsData, error: institutionsError } = await supabase
           .from('healthcare_institutions')
@@ -552,24 +556,12 @@ const AdminDashboard = () => {
           supabase.from('appointments').select('*', { count: 'exact', head: true }),
         ]);
         
-        const processedApplications: Application[] = applicationsData ? 
-          applicationsData.map(app => {
-            const profile = app.profile ? 
-              {
-                id: app.profile.id || '',
-                first_name: app.profile.first_name || '',
-                last_name: app.profile.last_name || '',
-                email: app.profile.email || '',
-                role: app.profile.role || '',
-                avatar_url: app.profile.avatar_url || null
-              } as UserProfile 
-              : undefined;
-              
-            return {
-              ...app,
-              profile
-            } as Application;
-          }) : [];
+        const processedApplications: Application[] = applicationsData.map(app => {
+          return {
+            ...app,
+            profile: profilesMap[app.user_id] as UserProfile
+          };
+        });
         
         setApplications(processedApplications);
         
