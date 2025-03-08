@@ -51,7 +51,7 @@ export function StatusBadge({
       
       try {
         const response = await supabase
-          .from(tableName as any)
+          .from(tableName)
           .select('status')
           .eq('id', itemId)
           .single()
@@ -61,12 +61,14 @@ export function StatusBadge({
           return status
         }
         
-        if (!response.data || typeof response.data.status === 'undefined') {
+        // Add explicit type assertion to handle response data
+        const responseData = response.data as { status: StatusType } | null
+        
+        if (!responseData || typeof responseData.status === 'undefined') {
           return status
         }
         
-        // Add explicit type assertion to handle the possibility of data.status being undefined
-        return (response.data.status as StatusType) || status
+        return responseData.status || status
       } catch (error) {
         console.error(`Error in status fetch:`, error)
         return status
@@ -87,11 +89,13 @@ export function StatusBadge({
         {
           event: 'UPDATE',
           schema: 'public',
-          table: tableName as string,
+          table: tableName,
           filter: `id=eq.${itemId}`
         },
         (payload) => {
-          if (payload.new.status !== payload.old.status) {
+          // Type assertion for payload to avoid type errors
+          const newPayload = payload as any
+          if (newPayload.new.status !== newPayload.old.status) {
             // Invalidate the query to fetch the new status
             queryClient.invalidateQueries({ queryKey: [`${tableName}-status`, itemId] })
           }

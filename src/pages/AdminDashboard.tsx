@@ -560,12 +560,15 @@ const AdminDashboard = () => {
           supabase.from('appointments').select('*', { count: 'exact', head: true }),
         ]);
         
-        // Cast the data to the correct types
+        // Cast the data to the correct types and add missing properties
         setApplications((applicationsData || []) as Application[]);
+        
+        // For institutions, we need to add a status property based on is_verified
         setInstitutions((institutionsData || []).map(inst => ({ 
           ...inst, 
           status: inst.is_verified ? 'verified' : 'unverified' 
         })) as Institution[]);
+        
         setAdmins((adminsData || []) as UserProfile[]);
         
         setStats({
