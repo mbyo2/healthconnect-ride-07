@@ -39,3 +39,39 @@ export interface UserSettings {
   created_at?: string;
   updated_at?: string;
 }
+
+export interface PrivacySettings {
+  id: string;
+  user_id: string;
+  share_medical_data_with_providers: boolean;
+  allow_anonymous_data_for_research: boolean;
+  data_retention_period_days: number;
+  show_profile_in_search: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface AuditLogEntry {
+  id: string;
+  user_id: string;
+  action: string;
+  resource_type: string;
+  resource_id: string;
+  timestamp: string;
+  ip_address?: string;
+  user_agent?: string;
+  details?: any;
+}
+
+// Constants for two-factor authentication methods
+export type TwoFactorMethod = "email" | "app" | "sms";
+
+export interface TwoFactorSettings {
+  id: string;
+  user_id: string;
+  is_enabled: boolean;
+  preferred_method: TwoFactorMethod;
+  backup_codes?: string[];
+  created_at?: string;
+  updated_at?: string;
+}
