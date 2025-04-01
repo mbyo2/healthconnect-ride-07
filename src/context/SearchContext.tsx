@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Provider } from '@/types/provider';
 import { HealthcareProviderType, InsuranceProvider, SpecialtyType } from '@/types/healthcare';
 import { toast } from 'sonner';
+import { useAccessibility } from '@/context/AccessibilityContext';
 
 const DEFAULT_COORDINATES = {
   latitude: -15.3875,
@@ -63,6 +64,7 @@ export const SearchProvider = ({ children }: { children: ReactNode }) => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [totalCount, setTotalCount] = useState<number>(0);
+  const { speakContent } = useAccessibility?.() || { speakContent: undefined };
 
   React.useEffect(() => {
     if (navigator.geolocation && useUserLocation) {
@@ -73,14 +75,24 @@ export const SearchProvider = ({ children }: { children: ReactNode }) => {
             longitude: position.coords.longitude
           });
           toast.success("Using your current location for distance calculations");
+          
+          // Provide spoken feedback for blind users
+          if (speakContent) {
+            speakContent("Using your current location for distance calculations");
+          }
         },
         (error) => {
           console.error("Error getting location:", error);
           toast.error("Could not get your location. Using default location.");
+          
+          // Provide spoken feedback for blind users
+          if (speakContent) {
+            speakContent("Could not get your location. Using default location instead.");
+          }
         }
       );
     }
-  }, [useUserLocation]);
+  }, [useUserLocation, speakContent]);
 
   const fetchProviders = useCallback(async (context: QueryFunctionContext) => {
     try {
@@ -171,17 +183,22 @@ export const SearchProvider = ({ children }: { children: ReactNode }) => {
       }
 
       if (!data || data.length === 0) {
+        if (speakContent) {
+          speakContent("No healthcare providers found matching your search criteria.");
+        }
         return [];
       }
 
       const processedProviders = data.map((profile): Provider => {
-        // Check if provider_locations is available and has at least one entry
-        const providerLocation = profile.provider_locations && profile.provider_locations.length > 0 
-          ? {
-              latitude: Number(profile.provider_locations[0].latitude) || DEFAULT_COORDINATES.latitude,
-              longitude: Number(profile.provider_locations[0].longitude) || DEFAULT_COORDINATES.longitude
-            } 
-          : DEFAULT_COORDINATES;
+        // Check if provider_locations is available and has at least one location
+        let providerLocation = DEFAULT_COORDINATES;
+        
+        if (profile.provider_locations && Array.isArray(profile.provider_locations) && profile.provider_locations.length > 0) {
+          providerLocation = {
+            latitude: Number(profile.provider_locations[0].latitude) || DEFAULT_COORDINATES.latitude,
+            longitude: Number(profile.provider_locations[0].longitude) || DEFAULT_COORDINATES.longitude
+          };
+        }
         
         const distance = calculateDistance(
           locationLocal.latitude,
@@ -189,6 +206,18 @@ export const SearchProvider = ({ children }: { children: ReactNode }) => {
           providerLocation.latitude,
           providerLocation.longitude
         );
+
+        // Process accepted_insurances safely, ensuring it's an array
+        let acceptedInsurances: InsuranceProvider[] = [];
+        if (profile.accepted_insurances && Array.isArray(profile.accepted_insurances)) {
+          // Ensure each item is a valid InsuranceProvider
+          acceptedInsurances = profile.accepted_insurances
+            .filter((insurance): insurance is InsuranceProvider => 
+              typeof insurance === 'string' && 
+              ['Medicare', 'Medicaid', 'Blue Cross', 'Cigna', 'UnitedHealthcare', 
+               'Aetna', 'Humana', 'Kaiser Permanente', 'TRICARE', 'Other', 'None'].includes(insurance)
+            );
+        }
 
         return {
           id: profile.id,
@@ -198,7 +227,7 @@ export const SearchProvider = ({ children }: { children: ReactNode }) => {
           bio: profile.bio,
           avatar_url: profile.avatar_url,
           provider_type: profile.provider_type,
-          accepted_insurances: profile.accepted_insurances || [],
+          accepted_insurances: acceptedInsurances,
           expertise: ['General Medicine', 'Primary Care'],
           location: providerLocation,
           rating: 4.5, // Hardcoded for now
@@ -212,13 +241,26 @@ export const SearchProvider = ({ children }: { children: ReactNode }) => {
       
       setHasMore(count ? page * PAGE_SIZE < count : false);
       
+      // Announce results for screen reader users
+      if (speakContent) {
+        speakContent(`Found ${filteredProviders.length} healthcare providers${
+          filteredProviders.length > 0 ? ". Say 'read page' to hear details." : "."
+        }`);
+      }
+      
       return filteredProviders;
     } catch (error) {
       console.error("Fetch providers error:", error);
       toast.error("An error occurred while fetching providers");
+      
+      // Announce error for screen reader users
+      if (speakContent) {
+        speakContent("An error occurred while searching for healthcare providers. Please try again.");
+      }
+      
       return [];
     }
-  }, []);
+  }, [speakContent]);
 
   const { 
     data: providers = [],
@@ -233,13 +275,23 @@ export const SearchProvider = ({ children }: { children: ReactNode }) => {
   const loadMore = useCallback(() => {
     if (!isLoading && hasMore) {
       setCurrentPage(prev => prev + 1);
+      
+      // Announce loading more for screen reader users
+      if (speakContent) {
+        speakContent("Loading more results");
+      }
     }
-  }, [isLoading, hasMore]);
+  }, [isLoading, hasMore, speakContent]);
 
   const refreshProviders = useCallback(() => {
     setCurrentPage(1);
     refetch();
-  }, [refetch]);
+    
+    // Announce refresh for screen reader users
+    if (speakContent) {
+      speakContent("Refreshing search results");
+    }
+  }, [refetch, speakContent]);
 
   return (
     <SearchContext.Provider

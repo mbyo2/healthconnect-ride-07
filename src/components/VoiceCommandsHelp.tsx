@@ -2,20 +2,29 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Mic, X } from 'lucide-react';
+import { Mic, X, MicOff, Volume2 } from 'lucide-react';
 import { useVoiceCommands, VOICE_COMMANDS } from '@/hooks/use-voice-commands';
+import { useAccessibility } from '@/context/AccessibilityContext';
 
 export const VoiceCommandsHelp = () => {
   const [showHelp, setShowHelp] = React.useState(false);
-  const { startListening, isListening } = useVoiceCommands();
+  const { startListening, isListening, speak } = useVoiceCommands();
+  const { isScreenReaderEnabled } = useAccessibility();
   
-  // Only show this component once per session
+  // Show this component for first-time visitors or when screen reader is detected
   React.useEffect(() => {
     const hasSeenVoiceHelp = sessionStorage.getItem('hasSeenVoiceHelp');
-    if (!hasSeenVoiceHelp) {
+    if (!hasSeenVoiceHelp || isScreenReaderEnabled) {
       setShowHelp(true);
+      
+      // If screen reader is detected, provide voice guidance
+      if (isScreenReaderEnabled && speak) {
+        setTimeout(() => {
+          speak('Voice commands are available in this application. Say "start listening" to enable them or "help" to hear available commands.');
+        }, 2000);
+      }
     }
-  }, []);
+  }, [isScreenReaderEnabled, speak]);
   
   const handleDismiss = () => {
     setShowHelp(false);
@@ -25,6 +34,16 @@ export const VoiceCommandsHelp = () => {
   const handleStartListening = () => {
     startListening();
     handleDismiss();
+  };
+  
+  const handleReadCommands = () => {
+    if (speak) {
+      const commandList = Object.entries(VOICE_COMMANDS)
+        .map(([command, description]) => `${command}: ${description}`)
+        .join('. ');
+      
+      speak(`Here are the available voice commands: ${commandList}`);
+    }
   };
   
   if (!showHelp || isListening) return null;
@@ -48,15 +67,17 @@ export const VoiceCommandsHelp = () => {
           </Button>
         </div>
         <p className="text-sm mt-2 text-muted-foreground">
-          This app supports voice navigation. Say commands like "go home", "search", or "find doctor" to navigate.
+          This app supports conversational voice navigation. Say commands like "go home", "search", or "find doctor" to navigate. For blind users, say "read page" to hear page content.
         </p>
         <div className="mt-3 flex justify-end items-center gap-2">
           <Button
             variant="outline"
             size="sm"
-            onClick={handleDismiss}
+            onClick={handleReadCommands}
+            className="gap-1"
           >
-            Not now
+            <Volume2 className="h-4 w-4" />
+            Hear available commands
           </Button>
           <Button
             variant="default"
