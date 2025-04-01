@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -96,28 +97,7 @@ export const useVoiceCommands = ({ setTheme, theme }: UseVoiceCommandsProps = {}
     recognition.lang = 'en-US';
   }
 
-  // Define announceForScreenReader before it's used in other functions
-  const announceForScreenReader = useCallback((message: string) => {
-    // Use accessibility context if available
-    if (screenReaderAnnounce) {
-      screenReaderAnnounce(message, true);
-    } else {
-      // Fallback method
-      const announcement = document.createElement('div');
-      announcement.setAttribute('aria-live', 'assertive');
-      announcement.setAttribute('class', 'sr-only');
-      announcement.textContent = message;
-      document.body.appendChild(announcement);
-      
-      setTimeout(() => {
-        document.body.removeChild(announcement);
-      }, 1000);
-    }
-
-    // Also speak the message aloud
-    speak(message);
-  }, [screenReaderAnnounce, speak]);
-
+  // Define speak function before it's used
   const speak = useCallback((message: string) => {
     if (!window.speechSynthesis) {
       console.error('Speech synthesis not supported');
@@ -152,6 +132,28 @@ export const useVoiceCommands = ({ setTheme, theme }: UseVoiceCommandsProps = {}
       window.speechSynthesis.cancel();
     };
   }, [isListening, recognition]);
+
+  // Define announceForScreenReader after speak is defined
+  const announceForScreenReader = useCallback((message: string) => {
+    // Use accessibility context if available
+    if (screenReaderAnnounce) {
+      screenReaderAnnounce(message, true);
+    } else {
+      // Fallback method
+      const announcement = document.createElement('div');
+      announcement.setAttribute('aria-live', 'assertive');
+      announcement.setAttribute('class', 'sr-only');
+      announcement.textContent = message;
+      document.body.appendChild(announcement);
+      
+      setTimeout(() => {
+        document.body.removeChild(announcement);
+      }, 1000);
+    }
+
+    // Also speak the message aloud
+    speak(message);
+  }, [screenReaderAnnounce, speak]);
 
   const startListening = useCallback(() => {
     if (!recognition) {
@@ -468,9 +470,16 @@ export const useVoiceCommands = ({ setTheme, theme }: UseVoiceCommandsProps = {}
     }
     
     return false;
-  }, [navigate, setTheme, theme, readPageContent, handleSearchCommand, 
-      handleFilterBySpecialty, handleFilterByInsurance, handleSetDistance, 
-      handleUseLocation, announceForScreenReader, searchContext, stopListening, startListening]);
+  }, [
+    navigate, 
+    setTheme, 
+    theme, 
+    readPageContent, 
+    announceForScreenReader, 
+    searchContext, 
+    stopListening, 
+    startListening
+  ]);
 
   const handleResult = useCallback((event: SpeechRecognitionEvent) => {
     const transcriptText = Array.from(event.results)
