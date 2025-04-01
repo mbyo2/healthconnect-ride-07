@@ -86,7 +86,15 @@ export const useVoiceCommands = ({ setTheme, theme }: UseVoiceCommandsProps = {}
   const navigate = useNavigate();
   const accessibility = useAccessibility();
   const { screenReaderAnnounce } = accessibility || { screenReaderAnnounce: () => {} };
-  const searchContext = useSearch?.();
+  
+  // Use try/catch to safely access SearchContext
+  let searchContext;
+  try {
+    searchContext = useSearch();
+  } catch (error) {
+    // SearchContext is not available, searchContext will remain undefined
+    console.log('SearchContext not available in current component tree');
+  }
 
   const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
   const recognition = SpeechRecognitionAPI ? new SpeechRecognitionAPI() : null;
@@ -412,44 +420,46 @@ export const useVoiceCommands = ({ setTheme, theme }: UseVoiceCommandsProps = {}
       return readPageContent();
     }
     
-    // Complex search commands
-    if (normalizedCommand.startsWith('search for ')) {
-      const query = normalizedCommand.replace('search for ', '');
-      return handleSearchCommand(query);
-    }
-    
-    if (normalizedCommand === 'find nearby' || normalizedCommand === 'find near me') {
-      return handleUseLocation(true);
-    }
-    
-    if (normalizedCommand.startsWith('filter by specialty ')) {
-      const specialty = normalizedCommand.replace('filter by specialty ', '');
-      return handleFilterBySpecialty(specialty);
-    }
-    
-    if (normalizedCommand.startsWith('filter by insurance ')) {
-      const insurance = normalizedCommand.replace('filter by insurance ', '');
-      return handleFilterByInsurance(insurance);
-    }
-    
-    if (normalizedCommand.includes('distance')) {
-      return handleSetDistance(normalizedCommand);
-    }
-    
-    if (normalizedCommand === 'use my location') {
-      return handleUseLocation(true);
-    }
-    
-    if (normalizedCommand === 'stop using my location') {
-      return handleUseLocation(false);
-    }
-    
-    // Pagination commands
-    if (normalizedCommand === 'next page' || normalizedCommand === 'next results') {
-      if (searchContext?.loadMore) {
-        searchContext.loadMore();
-        announceForScreenReader('Loading more results');
-        return true;
+    // Complex search commands - only if searchContext is available
+    if (searchContext) {
+      if (normalizedCommand.startsWith('search for ')) {
+        const query = normalizedCommand.replace('search for ', '');
+        return handleSearchCommand(query);
+      }
+      
+      if (normalizedCommand === 'find nearby' || normalizedCommand === 'find near me') {
+        return handleUseLocation(true);
+      }
+      
+      if (normalizedCommand.startsWith('filter by specialty ')) {
+        const specialty = normalizedCommand.replace('filter by specialty ', '');
+        return handleFilterBySpecialty(specialty);
+      }
+      
+      if (normalizedCommand.startsWith('filter by insurance ')) {
+        const insurance = normalizedCommand.replace('filter by insurance ', '');
+        return handleFilterByInsurance(insurance);
+      }
+      
+      if (normalizedCommand.includes('distance')) {
+        return handleSetDistance(normalizedCommand);
+      }
+      
+      if (normalizedCommand === 'use my location') {
+        return handleUseLocation(true);
+      }
+      
+      if (normalizedCommand === 'stop using my location') {
+        return handleUseLocation(false);
+      }
+      
+      // Pagination commands
+      if (normalizedCommand === 'next page' || normalizedCommand === 'next results') {
+        if (searchContext?.loadMore) {
+          searchContext.loadMore();
+          announceForScreenReader('Loading more results');
+          return true;
+        }
       }
     }
     
@@ -478,7 +488,12 @@ export const useVoiceCommands = ({ setTheme, theme }: UseVoiceCommandsProps = {}
     announceForScreenReader, 
     searchContext, 
     stopListening, 
-    startListening
+    startListening,
+    handleSearchCommand,
+    handleFilterBySpecialty,
+    handleFilterByInsurance,
+    handleSetDistance,
+    handleUseLocation
   ]);
 
   const handleResult = useCallback((event: SpeechRecognitionEvent) => {

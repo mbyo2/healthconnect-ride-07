@@ -9,7 +9,8 @@ import { useAccessibility } from '@/context/AccessibilityContext';
 export const VoiceCommandsHelp = () => {
   const [showHelp, setShowHelp] = React.useState(false);
   const { startListening, isListening, speak } = useVoiceCommands();
-  const { isScreenReaderEnabled } = useAccessibility();
+  const accessibility = useAccessibility();
+  const isScreenReaderEnabled = accessibility?.isScreenReaderEnabled || false;
   
   // Show this component for first-time visitors or when screen reader is detected
   React.useEffect(() => {
