@@ -158,7 +158,7 @@ export const SearchProvider = ({ children }: { children: ReactNode }) => {
         query = query.eq('specialty', specialtyLocal);
       }
       
-      if (insuranceLocal) {
+      if (insuranceLocal && insuranceLocal.length > 0) {
         query = query.contains('accepted_insurances', [insuranceLocal]);
       }
 
@@ -170,15 +170,18 @@ export const SearchProvider = ({ children }: { children: ReactNode }) => {
         throw error;
       }
 
-      if (!data) {
+      if (!data || data.length === 0) {
         return [];
       }
 
       const processedProviders = data.map((profile: any): Provider => {
-        const providerLocation = profile.provider_locations?.[0] ? {
-          latitude: Number(profile.provider_locations[0].latitude) || DEFAULT_COORDINATES.latitude,
-          longitude: Number(profile.provider_locations[0].longitude) || DEFAULT_COORDINATES.longitude
-        } : DEFAULT_COORDINATES;
+        // Check if provider_locations is available and has at least one entry
+        const providerLocation = profile.provider_locations && profile.provider_locations.length > 0 
+          ? {
+              latitude: Number(profile.provider_locations[0].latitude) || DEFAULT_COORDINATES.latitude,
+              longitude: Number(profile.provider_locations[0].longitude) || DEFAULT_COORDINATES.longitude
+            } 
+          : DEFAULT_COORDINATES;
         
         const distance = calculateDistance(
           locationLocal.latitude,
