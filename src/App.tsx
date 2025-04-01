@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
@@ -51,9 +50,9 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <div className="flex flex-col min-h-screen">
-              <Routes>
-                {/* Public routes - redirect to auth by default */}
-                <Route path="/" element={<AuthRedirect />} />
+            <Routes>
+              {/* Public routes - redirect to auth by default */}
+              <Route path="/" element={<AuthRedirect />} />
                 <Route path="/landing" element={<Landing />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/auth" element={<Auth />} />
@@ -225,11 +224,11 @@ function App() {
                 
                 {/* Catch-all redirect */}
                 <Route path="*" element={<Navigate to="/" replace />} />
-              </Routes>
-            </div>
-            <OfflineAlert />
-          </AuthProvider>
-        </QueryClientProvider>
+            </Routes>
+          </div>
+          <OfflineAlert />
+        </AuthProvider>
+      </QueryClientProvider>
       <VoiceCommandsHelp />
     </>
   );

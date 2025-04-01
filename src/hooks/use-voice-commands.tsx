@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { useAccessibility } from '@/context/AccessibilityContext';
 import { useSearch } from '@/context/SearchContext';
 
+// Global interface declarations for browser Speech APIs
 interface SpeechRecognition extends EventTarget {
   continuous: boolean;
   interimResults: boolean;
@@ -37,6 +38,7 @@ interface SpeechRecognitionAlternative {
   transcript: string;
 }
 
+// Augment window interface for speech APIs
 declare global {
   interface Window {
     SpeechRecognition?: new () => SpeechRecognition;
@@ -93,6 +95,28 @@ export const useVoiceCommands = ({ setTheme, theme }: UseVoiceCommandsProps = {}
     recognition.interimResults = false;
     recognition.lang = 'en-US';
   }
+
+  // Define announceForScreenReader before it's used in other functions
+  const announceForScreenReader = useCallback((message: string) => {
+    // Use accessibility context if available
+    if (screenReaderAnnounce) {
+      screenReaderAnnounce(message, true);
+    } else {
+      // Fallback method
+      const announcement = document.createElement('div');
+      announcement.setAttribute('aria-live', 'assertive');
+      announcement.setAttribute('class', 'sr-only');
+      announcement.textContent = message;
+      document.body.appendChild(announcement);
+      
+      setTimeout(() => {
+        document.body.removeChild(announcement);
+      }, 1000);
+    }
+
+    // Also speak the message aloud
+    speak(message);
+  }, [screenReaderAnnounce, speak]);
 
   const speak = useCallback((message: string) => {
     if (!window.speechSynthesis) {
@@ -154,27 +178,6 @@ export const useVoiceCommands = ({ setTheme, theme }: UseVoiceCommandsProps = {}
     toast.info('Voice commands deactivated');
     announceForScreenReader('Voice commands deactivated');
   }, [recognition, announceForScreenReader]);
-
-  const announceForScreenReader = (message: string) => {
-    // Use accessibility context if available
-    if (screenReaderAnnounce) {
-      screenReaderAnnounce(message, true);
-    } else {
-      // Fallback method
-      const announcement = document.createElement('div');
-      announcement.setAttribute('aria-live', 'assertive');
-      announcement.setAttribute('class', 'sr-only');
-      announcement.textContent = message;
-      document.body.appendChild(announcement);
-      
-      setTimeout(() => {
-        document.body.removeChild(announcement);
-      }, 1000);
-    }
-
-    // Also speak the message aloud
-    speak(message);
-  };
 
   const readPageContent = useCallback(() => {
     // Get main content
