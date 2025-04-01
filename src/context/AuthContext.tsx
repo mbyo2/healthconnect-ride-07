@@ -3,6 +3,17 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { 
+  signIn as authSignIn, 
+  signUp as authSignUp, 
+  signOut as authSignOut
+} from '@/utils/auth-service';
+import { 
+  verifyTwoFactor as authVerifyTwoFactor, 
+  setupTwoFactor as authSetupTwoFactor, 
+  disableTwoFactor as authDisableTwoFactor 
+} from '@/utils/two-factor-service';
+import { logSecurityEvent as authLogSecurityEvent } from '@/utils/security-service';
 
 type AuthContextType = {
   session: Session | null;
@@ -94,16 +105,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signIn = async (email: string, password: string) => {
     try {
       setIsLoading(true);
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      
-      if (error) throw error;
+      await authSignIn(email, password);
       toast.success('Signed in successfully');
       
       // Log security event
-      await logSecurityEvent('sign_in');
+      await authLogSecurityEvent('sign_in');
     } catch (error: any) {
       toast.error(error.message || 'Error signing in');
       console.error('Error signing in:', error);
@@ -116,19 +122,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signUp = async (email: string, password: string, userData: any) => {
     try {
       setIsLoading(true);
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: userData,
-        },
-      });
-      
-      if (error) throw error;
+      await authSignUp(email, password, userData);
       toast.success('Account created! Please check your email for confirmation');
       
       // Log security event
-      await logSecurityEvent('sign_up');
+      await authLogSecurityEvent('sign_up');
     } catch (error: any) {
       toast.error(error.message || 'Error creating account');
       console.error('Error signing up:', error);
@@ -143,10 +141,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsLoading(true);
       
       // Log security event before signing out
-      await logSecurityEvent('sign_out');
+      await authLogSecurityEvent('sign_out');
       
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+      await authSignOut();
       toast.success('Signed out successfully');
     } catch (error: any) {
       toast.error(error.message || 'Error signing out');
@@ -158,19 +155,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   
   // Two-factor authentication functions
   const verifyTwoFactor = async (code: string): Promise<boolean> => {
-    // This is a placeholder implementation
-    // In a real app, this would validate the 2FA code against the stored secret
     try {
-      // For demo purposes, we're just checking if the code is 6 digits
-      if (!/^\d{6}$/.test(code)) {
-        toast.error('Invalid verification code');
-        return false;
+      const result = await authVerifyTwoFactor(code);
+      
+      if (result) {
+        // Log security event
+        await authLogSecurityEvent('two_factor_verified');
       }
       
-      // Log security event
-      await logSecurityEvent('two_factor_verified');
-      
-      return true;
+      return result;
     } catch (error) {
       console.error('Error verifying 2FA code:', error);
       toast.error('Failed to verify two-factor code');
@@ -179,22 +172,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
   
   const setupTwoFactor = async (): Promise<{ secret: string; backupCodes: string[] }> => {
-    // This is a placeholder implementation
-    // In a real app, this would generate a 2FA secret and QR code URL
     try {
-      // Generate mock secret and backup codes
-      const mockSecret = Math.random().toString(36).substring(2, 15);
-      const mockBackupCodes = Array.from({ length: 10 }, () => 
-        Math.random().toString(36).substring(2, 8).toUpperCase()
-      );
+      const result = await authSetupTwoFactor();
       
       // Log security event
-      await logSecurityEvent('two_factor_setup_initiated');
+      await authLogSecurityEvent('two_factor_setup_initiated');
       
-      return {
-        secret: mockSecret,
-        backupCodes: mockBackupCodes
-      };
+      return result;
     } catch (error) {
       console.error('Error setting up 2FA:', error);
       toast.error('Failed to setup two-factor authentication');
@@ -203,11 +187,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
   
   const disableTwoFactor = async (): Promise<void> => {
-    // This is a placeholder implementation
-    // In a real app, this would disable 2FA on the user's account
     try {
+      await authDisableTwoFactor();
+      
       // Log security event
-      await logSecurityEvent('two_factor_disabled');
+      await authLogSecurityEvent('two_factor_disabled');
       
       toast.success('Two-factor authentication disabled');
     } catch (error) {
@@ -218,29 +202,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
   
   const logSecurityEvent = async (action: string, details?: any): Promise<void> => {
-    // This is a placeholder implementation
-    // In a real app, this would log security events to a database
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return;
-      
-      const eventData = {
-        user_id: session.user.id,
-        action,
-        timestamp: new Date().toISOString(),
-        ip_address: "127.0.0.1", // In a real app, this would be the actual IP
-        user_agent: navigator.userAgent,
-        details
-      };
-      
-      console.log("Security event logged:", eventData);
-      
-      // In a real implementation, this would insert into an audit_logs table
-      // const { error } = await supabase.from('audit_logs').insert(eventData);
-      // if (error) throw error;
-    } catch (error) {
-      console.error('Error logging security event:', error);
-    }
+    await authLogSecurityEvent(action, details);
   };
 
   return (

@@ -1,0 +1,27 @@
+
+// Voice command constants exported for reference
+export const VOICE_COMMANDS = {
+  'go home': 'Navigate to the home page',
+  'symptoms': 'Navigate to the symptom collector',
+  'search': 'Navigate to search page',
+  'find doctor': 'Navigate to search page filtered for doctors',
+  'find healthcare': 'Navigate to search page',
+  'appointments': 'Navigate to appointments page',
+  'profile': 'Navigate to profile page',
+  'toggle theme': 'Switch between light and dark mode',
+  'light mode': 'Switch to light mode',
+  'dark mode': 'Switch to dark mode',
+  'stop listening': 'Turn off voice commands',
+  'start listening': 'Turn on voice commands',
+  'read page': 'Read the current page content aloud',
+  'search for': 'Search for a specific healthcare provider',
+  'find nearby': 'Find healthcare providers near you',
+  'filter by specialty': 'Filter search results by specialty',
+  'filter by insurance': 'Filter search results by insurance',
+  'set distance': 'Set maximum distance for search results',
+  'use my location': 'Use current location for search',
+  'book appointment': 'Book an appointment with selected provider',
+  'next page': 'Go to next page of results',
+  'previous page': 'Go to previous page of results',
+  'help': 'List available commands',
+};
