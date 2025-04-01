@@ -1113,6 +1113,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          accepted_insurances: string[] | null
           address: string | null
           admin_level: Database["public"]["Enums"]["admin_level"] | null
           avatar_url: string | null
@@ -1137,6 +1138,7 @@ export type Database = {
           zip_code: string | null
         }
         Insert: {
+          accepted_insurances?: string[] | null
           address?: string | null
           admin_level?: Database["public"]["Enums"]["admin_level"] | null
           avatar_url?: string | null
@@ -1161,6 +1163,7 @@ export type Database = {
           zip_code?: string | null
         }
         Update: {
+          accepted_insurances?: string[] | null
           address?: string | null
           admin_level?: Database["public"]["Enums"]["admin_level"] | null
           avatar_url?: string | null

@@ -112,9 +112,15 @@ export const SearchProvider = ({ children }: { children: ReactNode }) => {
       countQuery = countQuery.eq('specialty', specialtyLocal);
     }
     
+    if (insuranceLocal) {
+      countQuery = countQuery.contains('accepted_insurances', [insuranceLocal]);
+    }
+
     const { count, error: countError } = await countQuery;
 
     if (countError) {
+      console.error("Count error:", countError);
+      toast.error("Failed to count providers: " + countError.message);
       throw countError;
     }
 
@@ -157,7 +163,11 @@ export const SearchProvider = ({ children }: { children: ReactNode }) => {
 
     const { data, error } = await query;
 
-    if (error) throw error;
+    if (error) {
+      console.error("Query error:", error);
+      toast.error("Failed to fetch providers: " + error.message);
+      throw error;
+    }
 
     const processedProviders = data.map((profile): Provider => {
       const providerLocation = profile.provider_locations?.[0] ? {
