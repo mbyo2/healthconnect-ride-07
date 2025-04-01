@@ -174,7 +174,7 @@ export const SearchProvider = ({ children }: { children: ReactNode }) => {
         return [];
       }
 
-      const processedProviders = data.map((profile: any): Provider => {
+      const processedProviders = data.map((profile): Provider => {
         // Check if provider_locations is available and has at least one entry
         const providerLocation = profile.provider_locations && profile.provider_locations.length > 0 
           ? {
