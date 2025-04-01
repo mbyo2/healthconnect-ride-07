@@ -5,7 +5,7 @@ import { SearchResults } from "@/components/SearchResults";
 import { SearchProvider } from "@/context/SearchContext";
 import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
-import { SpeakerLoud, VolumeX } from "lucide-react";
+import { Volume2, VolumeX } from "lucide-react";
 import { useVoiceCommands } from "@/hooks/use-voice-commands";
 
 const Search = () => {

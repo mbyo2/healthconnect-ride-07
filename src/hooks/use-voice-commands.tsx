@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -82,7 +81,8 @@ export const useVoiceCommands = ({ setTheme, theme }: UseVoiceCommandsProps = {}
   const [transcript, setTranscript] = useState('');
   const [isSpeaking, setIsSpeaking] = useState(false);
   const navigate = useNavigate();
-  const { screenReaderAnnounce } = useAccessibility?.() || { screenReaderAnnounce: () => {} };
+  const accessibility = useAccessibility();
+  const { screenReaderAnnounce } = accessibility || { screenReaderAnnounce: () => {} };
   const searchContext = useSearch?.();
 
   const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -128,6 +128,32 @@ export const useVoiceCommands = ({ setTheme, theme }: UseVoiceCommandsProps = {}
       window.speechSynthesis.cancel();
     };
   }, [isListening, recognition]);
+
+  const startListening = useCallback(() => {
+    if (!recognition) {
+      toast.error('Speech recognition is not supported in this browser');
+      return;
+    }
+    
+    // If speaking, wait until speech is done
+    if (isSpeaking) {
+      window.speechSynthesis?.cancel();
+    }
+    
+    recognition.start();
+    setIsListening(true);
+    toast.success('Voice commands activated');
+    announceForScreenReader('Voice commands activated, I am now listening. Say "help" for available commands.');
+  }, [recognition, isSpeaking, announceForScreenReader]);
+
+  const stopListening = useCallback(() => {
+    if (!recognition) return;
+    
+    recognition.stop();
+    setIsListening(false);
+    toast.info('Voice commands deactivated');
+    announceForScreenReader('Voice commands deactivated');
+  }, [recognition, announceForScreenReader]);
 
   const announceForScreenReader = (message: string) => {
     // Use accessibility context if available
@@ -463,32 +489,6 @@ export const useVoiceCommands = ({ setTheme, theme }: UseVoiceCommandsProps = {}
       }
     }
   }, [executeCommand, speak]);
-
-  const startListening = useCallback(() => {
-    if (!recognition) {
-      toast.error('Speech recognition is not supported in this browser');
-      return;
-    }
-    
-    // If speaking, wait until speech is done
-    if (isSpeaking) {
-      window.speechSynthesis?.cancel();
-    }
-    
-    recognition.start();
-    setIsListening(true);
-    toast.success('Voice commands activated');
-    announceForScreenReader('Voice commands activated, I am now listening. Say "help" for available commands.');
-  }, [recognition, isSpeaking, announceForScreenReader]);
-
-  const stopListening = useCallback(() => {
-    if (!recognition) return;
-    
-    recognition.stop();
-    setIsListening(false);
-    toast.info('Voice commands deactivated');
-    announceForScreenReader('Voice commands deactivated');
-  }, [recognition, announceForScreenReader]);
 
   useEffect(() => {
     if (!recognition) return;
