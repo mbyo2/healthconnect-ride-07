@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
@@ -32,6 +33,7 @@ import { OfflineAlert } from "./components/OfflineAlert";
 import ApplicationStatus from "./pages/ApplicationStatus";
 import HealthcareApplication from "./pages/HealthcareApplication";
 import InstitutionStatus from "./pages/InstitutionStatus";
+import { SearchProvider } from "./context/SearchContext";
 
 // Auth redirect component
 const AuthRedirect = () => {
@@ -229,7 +231,9 @@ function App() {
           <OfflineAlert />
         </AuthProvider>
       </QueryClientProvider>
-      <VoiceCommandsHelp />
+      <SearchProvider>
+        <VoiceCommandsHelp />
+      </SearchProvider>
     </>
   );
 }
