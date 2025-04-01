@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -105,7 +104,7 @@ export const useVoiceCommands = ({ setTheme, theme }: UseVoiceCommandsProps = {}
     recognition.lang = 'en-US';
   }
 
-  // Define speak function before it's used
+  // Define speak function
   const speak = useCallback((message: string) => {
     if (!window.speechSynthesis) {
       console.error('Speech synthesis not supported');
