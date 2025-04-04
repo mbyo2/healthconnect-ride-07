@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { HealthcareProviderType, InsuranceProvider, SpecialtyType } from '@/types/healthcare';
 import type { Provider } from '@/types/provider';
@@ -85,10 +84,16 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     
     return insuranceStrings
       .filter(insurance => {
-        // Only include strings that match valid InsuranceProvider values
-        return Object.values(InsuranceProvider).includes(insurance as InsuranceProvider);
+        // Check if the string is a valid insurance provider value
+        return Object.values(InsuranceProvider).includes(insurance as any);
       })
-      .map(insurance => insurance as InsuranceProvider);
+      .map(insurance => {
+        // Convert string to the corresponding enum value
+        const enumValue = Object.values(InsuranceProvider).find(
+          val => val === insurance
+        );
+        return enumValue || InsuranceProvider.NONE;
+      });
   };
 
   // Fetch providers based on filters

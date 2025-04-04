@@ -44,16 +44,17 @@ export type SpecialtyType =
   | 'General Dentistry'
   | 'Orthodontics';
 
-export type InsuranceProvider = 
-  | 'Medicare'
-  | 'Medicaid'
-  | 'Blue Cross'
-  | 'Cigna'
-  | 'UnitedHealthcare'
-  | 'Aetna'
-  | 'Humana'
-  | 'Kaiser Permanente'
-  | 'TRICARE'
-  | 'Other'
-  | 'None';
-
+// Convert from type to enum so we can use it as a value
+export enum InsuranceProvider {
+  MEDICARE = 'Medicare',
+  MEDICAID = 'Medicaid',
+  BLUE_CROSS = 'Blue Cross',
+  CIGNA = 'Cigna',
+  UNITED_HEALTHCARE = 'UnitedHealthcare',
+  AETNA = 'Aetna',
+  HUMANA = 'Humana',
+  KAISER_PERMANENTE = 'Kaiser Permanente',
+  TRICARE = 'TRICARE',
+  OTHER = 'Other',
+  NONE = 'None'
+}
