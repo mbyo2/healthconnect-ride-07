@@ -1,503 +1,485 @@
 
-import * as React from "react";
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import * as React from 'react';
+import { useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { 
   Dialog, 
   DialogContent, 
   DialogHeader, 
   DialogTitle,
-  DialogTrigger,
   DialogFooter
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 import { 
-  Form, 
-  FormControl, 
-  FormField, 
-  FormItem, 
-  FormLabel, 
-  FormMessage 
-} from "@/components/ui/form";
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from '@/components/ui/table';
+import { Label } from '@/components/ui/label';
+import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from "@/components/ui/select";
-import { DataTable } from "@/components/ui/data-table";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { toast } from "sonner";
-import { LoadingScreen } from "@/components/LoadingScreen";
-import { 
-  Building,
+  AlertCircle,
   Plus,
+  Search,
   Edit,
   Trash2,
-  Phone,
-  Mail,
-} from "lucide-react";
-import { Textarea } from "@/components/ui/textarea";
+  BuildingStorefront
+} from 'lucide-react';
+import { LoadingScreen } from '@/components/LoadingScreen';
+import { useAuth } from '@/context/AuthContext';
 
-const supplierFormSchema = z.object({
-  name: z.string().min(1, "Supplier name is required"),
-  contact_person: z.string().optional(),
-  email: z.string().email("Invalid email address").optional().or(z.literal("")),
-  phone: z.string().optional(),
-  address: z.string().optional(),
-  institution_id: z.string().uuid("Invalid institution ID"),
-});
+interface Supplier {
+  id: string;
+  institution_id: string;
+  name: string;
+  contact_person: string | null;
+  email: string | null;
+  phone: string | null;
+  address: string | null;
+  is_active: boolean;
+}
 
 export const SupplierManagement = () => {
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [selectedSupplier, setSelectedSupplier] = useState<any>(null);
-  const [selectedInstitution, setSelectedInstitution] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState("");
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null);
+  const [supplierToDelete, setSupplierToDelete] = useState<string | null>(null);
   
-  const { data: institutions, isLoading: loadingInstitutions } = useQuery({
-    queryKey: ["healthcare_institutions_for_suppliers"],
+  // Form state
+  const [formData, setFormData] = useState({
+    name: '',
+    contact_person: '',
+    email: '',
+    phone: '',
+    address: ''
+  });
+
+  // Get institution id for the current user
+  const { data: userInstitution, isLoading: loadingInstitution } = useQuery({
+    queryKey: ['userInstitution', user?.id],
     queryFn: async () => {
-      // Fetch institutions where the current user is staff
-      const { data: staffInstitutions, error } = await supabase
-        .from("institution_staff")
-        .select(`
-          institution_id,
-          institution: institution_id (
-            id,
-            name,
-            type
-          )
-        `)
-        .eq("provider_id", (await supabase.auth.getUser()).data.user?.id || "");
-
-      if (error) {
-        throw new Error(`Error fetching institutions: ${error.message}`);
-      }
+      if (!user?.id) return null;
       
-      return staffInstitutions.map(item => item.institution);
-    }
-  });
-
-  const { data: suppliers, isLoading: loadingSuppliers, refetch: refetchSuppliers } = useQuery({
-    queryKey: ["suppliers", selectedInstitution, searchTerm],
-    queryFn: async () => {
-      if (!selectedInstitution) return [];
-      
-      let query = supabase
-        .from("suppliers")
-        .select("*")
-        .eq("institution_id", selectedInstitution);
-        
-      if (searchTerm) {
-        query = query.ilike("name", `%${searchTerm}%`);
-      }
-      
-      const { data, error } = await query;
-
-      if (error) {
-        throw new Error(`Error fetching suppliers: ${error.message}`);
-      }
-      
-      return data;
-    },
-    enabled: !!selectedInstitution
-  });
-  
-  const addForm = useForm<z.infer<typeof supplierFormSchema>>({
-    resolver: zodResolver(supplierFormSchema),
-    defaultValues: {
-      name: "",
-      contact_person: "",
-      email: "",
-      phone: "",
-      address: "",
-      institution_id: "",
-    }
-  });
-  
-  const editForm = useForm<z.infer<typeof supplierFormSchema>>({
-    resolver: zodResolver(supplierFormSchema),
-    defaultValues: {
-      name: "",
-      contact_person: "",
-      email: "",
-      phone: "",
-      address: "",
-      institution_id: "",
-    }
-  });
-
-  React.useEffect(() => {
-    if (institutions && institutions.length > 0 && !selectedInstitution) {
-      setSelectedInstitution(institutions[0].id);
-    }
-  }, [institutions, selectedInstitution]);
-
-  React.useEffect(() => {
-    if (selectedInstitution) {
-      addForm.setValue("institution_id", selectedInstitution);
-    }
-  }, [selectedInstitution, addForm]);
-  
-  React.useEffect(() => {
-    if (selectedSupplier) {
-      editForm.reset({
-        ...selectedSupplier,
-        contact_person: selectedSupplier.contact_person || "",
-        email: selectedSupplier.email || "",
-        phone: selectedSupplier.phone || "",
-        address: selectedSupplier.address || "",
-      });
-    }
-  }, [selectedSupplier, editForm]);
-
-  const handleAddSupplier = async (values: z.infer<typeof supplierFormSchema>) => {
-    try {
       const { data, error } = await supabase
-        .from("suppliers")
-        .insert(values)
-        .select();
+        .from('institution_staff')
+        .select('institution_id')
+        .eq('provider_id', user.id)
+        .eq('is_active', true)
+        .single();
+
+      if (error) {
+        console.error('Error fetching institution:', error);
+        return null;
+      }
       
-      if (error) throw error;
+      return data?.institution_id;
+    },
+  });
+
+  // Fetch suppliers
+  const { data: suppliers, isLoading: loadingSuppliers, refetch } = useQuery({
+    queryKey: ['suppliers', userInstitution],
+    queryFn: async () => {
+      if (!userInstitution) return [];
       
-      toast.success("Supplier added successfully");
-      setIsAddDialogOpen(false);
-      addForm.reset();
-      refetchSuppliers();
-    } catch (error: any) {
-      toast.error(`Error adding supplier: ${error.message}`);
-    }
+      const { data, error } = await supabase
+        .from('suppliers')
+        .select('*')
+        .eq('institution_id', userInstitution)
+        .order('name', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching suppliers:', error);
+        throw new Error(error.message);
+      }
+      
+      return data as Supplier[];
+    },
+    enabled: !!userInstitution,
+  });
+
+  // Handle form input changes
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value
+    });
   };
-  
-  const handleEditSupplier = async (values: z.infer<typeof supplierFormSchema>) => {
+
+  // Handle form submission
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!userInstitution) {
+      toast.error("No institution found for user");
+      return;
+    }
+    
     try {
-      const { error } = await supabase
-        .from("suppliers")
-        .update(values)
-        .eq("id", selectedSupplier.id);
+      if (editingSupplier) {
+        // Update existing supplier
+        const { error } = await supabase
+          .from('suppliers')
+          .update({
+            name: formData.name,
+            contact_person: formData.contact_person || null,
+            email: formData.email || null,
+            phone: formData.phone || null,
+            address: formData.address || null
+          })
+          .eq('id', editingSupplier.id);
+          
+        if (error) throw error;
+        toast.success('Supplier updated successfully');
+      } else {
+        // Create new supplier
+        const { error } = await supabase
+          .from('suppliers')
+          .insert([{
+            institution_id: userInstitution,
+            name: formData.name,
+            contact_person: formData.contact_person || null,
+            email: formData.email || null,
+            phone: formData.phone || null,
+            address: formData.address || null
+          }]);
+          
+        if (error) throw error;
+        toast.success('Supplier added successfully');
+      }
       
-      if (error) throw error;
-      
-      toast.success("Supplier updated successfully");
-      setIsEditDialogOpen(false);
-      setSelectedSupplier(null);
-      refetchSuppliers();
+      // Refresh data and reset form
+      await refetch();
+      resetForm();
+      setIsDialogOpen(false);
     } catch (error: any) {
-      toast.error(`Error updating supplier: ${error.message}`);
+      toast.error(`Error: ${error.message}`);
     }
   };
-  
-  const handleDeleteSupplier = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this supplier?")) return;
+
+  // Handle edit supplier
+  const handleEdit = (supplier: Supplier) => {
+    setEditingSupplier(supplier);
+    setFormData({
+      name: supplier.name,
+      contact_person: supplier.contact_person || '',
+      email: supplier.email || '',
+      phone: supplier.phone || '',
+      address: supplier.address || '',
+    });
+    setIsDialogOpen(true);
+  };
+
+  // Handle delete supplier
+  const handleDelete = async () => {
+    if (!supplierToDelete) return;
     
     try {
       const { error } = await supabase
-        .from("suppliers")
-        .delete()
-        .eq("id", id);
-      
+        .from('suppliers')
+        .update({ is_active: false })
+        .eq('id', supplierToDelete);
+        
       if (error) throw error;
       
-      toast.success("Supplier deleted successfully");
-      refetchSuppliers();
+      toast.success('Supplier deactivated successfully');
+      refetch();
+      setIsDeleteDialogOpen(false);
     } catch (error: any) {
-      toast.error(`Error deleting supplier: ${error.message}`);
+      toast.error(`Error: ${error.message}`);
     }
   };
 
-  const columns = [
-    { header: "Name", accessorKey: "name" },
-    { 
-      header: "Contact Person", 
-      accessorKey: "contact_person",
-      cell: ({ row }: any) => row.original.contact_person || "-"
-    },
-    { 
-      header: "Contact", 
-      cell: ({ row }: any) => (
-        <div className="space-y-1">
-          {row.original.phone && (
-            <div className="flex items-center text-sm">
-              <Phone className="h-3 w-3 mr-1" />
-              <span>{row.original.phone}</span>
-            </div>
-          )}
-          {row.original.email && (
-            <div className="flex items-center text-sm">
-              <Mail className="h-3 w-3 mr-1" />
-              <span>{row.original.email}</span>
-            </div>
-          )}
-          {!row.original.phone && !row.original.email && "-"}
-        </div>
-      )
-    },
-    { 
-      header: "Address", 
-      accessorKey: "address",
-      cell: ({ row }: any) => row.original.address || "-"
-    },
-    {
-      header: "Actions",
-      cell: ({ row }: any) => (
-        <div className="flex space-x-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => {
-              setSelectedSupplier(row.original);
-              setIsEditDialogOpen(true);
-            }}
-          >
-            <Edit className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => handleDeleteSupplier(row.original.id)}
-          >
-            <Trash2 className="h-4 w-4 text-destructive" />
-          </Button>
-        </div>
-      )
-    }
-  ];
+  const confirmDelete = (id: string) => {
+    setSupplierToDelete(id);
+    setIsDeleteDialogOpen(true);
+  };
 
-  if (loadingInstitutions) {
+  // Reset form to default values
+  const resetForm = () => {
+    setFormData({
+      name: '',
+      contact_person: '',
+      email: '',
+      phone: '',
+      address: ''
+    });
+    setEditingSupplier(null);
+  };
+
+  // Filter suppliers based on search
+  const filteredSuppliers = suppliers?.filter(supplier => {
+    if (!searchQuery) return true;
+    
+    const query = searchQuery.toLowerCase();
+    return (
+      supplier.name.toLowerCase().includes(query) ||
+      (supplier.contact_person && supplier.contact_person.toLowerCase().includes(query)) ||
+      (supplier.email && supplier.email.toLowerCase().includes(query))
+    );
+  });
+
+  if (loadingInstitution || loadingSuppliers) {
     return <LoadingScreen />;
   }
-  
-  if (!institutions || institutions.length === 0) {
+
+  if (!userInstitution) {
     return (
-      <div className="text-center py-10">
-        <Building className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-        <h3 className="text-lg font-medium">No Pharmacy Access</h3>
-        <p className="text-muted-foreground mt-2">
-          You don't have access to any pharmacy or hospital inventory systems.
-        </p>
-      </div>
+      <Card className="mb-6">
+        <CardContent className="pt-6">
+          <div className="flex items-center justify-center p-6 text-center">
+            <div>
+              <AlertCircle className="mx-auto h-10 w-10 text-orange-500 mb-4" />
+              <h3 className="text-lg font-medium mb-2">No Institution Association</h3>
+              <p className="text-muted-foreground mb-4">
+                You are not associated with any healthcare institution. 
+                Please contact an administrator to associate your account.
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div className="flex flex-col md:flex-row gap-4 md:items-center">
-          <Select value={selectedInstitution || ''} onValueChange={setSelectedInstitution}>
-            <SelectTrigger className="w-full md:w-[250px]">
-              <SelectValue placeholder="Select institution" />
-            </SelectTrigger>
-            <SelectContent>
-              {institutions.map((institution: any) => (
-                <SelectItem key={institution.id} value={institution.id}>
-                  {institution.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="relative w-full md:w-80">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
+            type="text"
             placeholder="Search suppliers..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full md:w-[300px]"
+            className="pl-8"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
         
-        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="w-full md:w-auto">
-              <Plus className="mr-2 h-4 w-4" />
-              Add Supplier
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-md">
-            <DialogHeader>
-              <DialogTitle>Add New Supplier</DialogTitle>
-            </DialogHeader>
-            <Form {...addForm}>
-              <form onSubmit={addForm.handleSubmit(handleAddSupplier)} className="space-y-4">
-                <FormField
-                  control={addForm.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Supplier Name</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Supplier name" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={addForm.control}
-                  name="contact_person"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Contact Person (Optional)</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Contact person name" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FormField
-                    control={addForm.control}
-                    name="phone"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Phone (Optional)</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Phone number" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={addForm.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email (Optional)</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Email address" type="email" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                
-                <FormField
-                  control={addForm.control}
-                  name="address"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Address (Optional)</FormLabel>
-                      <FormControl>
-                        <Textarea placeholder="Full address" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <DialogFooter>
-                  <Button type="submit">Add Supplier</Button>
-                </DialogFooter>
-              </form>
-            </Form>
-          </DialogContent>
-        </Dialog>
-        
-        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-          <DialogContent className="max-w-md">
-            <DialogHeader>
-              <DialogTitle>Edit Supplier</DialogTitle>
-            </DialogHeader>
-            <Form {...editForm}>
-              <form onSubmit={editForm.handleSubmit(handleEditSupplier)} className="space-y-4">
-                <FormField
-                  control={editForm.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Supplier Name</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Supplier name" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={editForm.control}
-                  name="contact_person"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Contact Person (Optional)</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Contact person name" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FormField
-                    control={editForm.control}
-                    name="phone"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Phone (Optional)</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Phone number" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={editForm.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email (Optional)</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Email address" type="email" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                
-                <FormField
-                  control={editForm.control}
-                  name="address"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Address (Optional)</FormLabel>
-                      <FormControl>
-                        <Textarea placeholder="Full address" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <DialogFooter>
-                  <Button type="submit">Save Changes</Button>
-                </DialogFooter>
-              </form>
-            </Form>
-          </DialogContent>
-        </Dialog>
+        <Button 
+          className="gap-1"
+          onClick={() => {
+            resetForm();
+            setIsDialogOpen(true);
+          }}
+        >
+          <Plus className="h-4 w-4" /> Add Supplier
+        </Button>
       </div>
       
-      {selectedInstitution && (
-        loadingSuppliers ? <LoadingScreen /> : 
-          <DataTable
-            columns={columns}
-            data={suppliers || []}
-          />
-      )}
+      <Card>
+        <CardHeader>
+          <CardTitle>Suppliers Management</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {filteredSuppliers && filteredSuppliers.length > 0 ? (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Supplier</TableHead>
+                    <TableHead>Contact</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Phone</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredSuppliers.filter(s => s.is_active).map((supplier) => (
+                    <TableRow key={supplier.id}>
+                      <TableCell>
+                        <div>
+                          <div className="font-medium">{supplier.name}</div>
+                          {supplier.address && (
+                            <div className="text-sm text-muted-foreground truncate max-w-xs">
+                              {supplier.address}
+                            </div>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {supplier.contact_person || '-'}
+                      </TableCell>
+                      <TableCell>
+                        {supplier.email ? (
+                          <a href={`mailto:${supplier.email}`} className="hover:underline text-primary">
+                            {supplier.email}
+                          </a>
+                        ) : (
+                          '-'
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {supplier.phone ? (
+                          <a href={`tel:${supplier.phone}`} className="hover:underline text-primary">
+                            {supplier.phone}
+                          </a>
+                        ) : (
+                          '-'
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleEdit(supplier)}
+                            title="Edit"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => confirmDelete(supplier.id)}
+                            className="hover:text-red-500"
+                            title="Delete"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          ) : (
+            <div className="text-center p-6">
+              {searchQuery ? (
+                <p className="text-muted-foreground">No suppliers found matching your search.</p>
+              ) : (
+                <div className="flex flex-col items-center gap-2">
+                  <BuildingStorefront className="h-8 w-8 text-muted-foreground" />
+                  <p className="text-muted-foreground">No suppliers added yet.</p>
+                </div>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+      
+      {/* Add/Edit Supplier Dialog */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>{editingSupplier ? 'Edit Supplier' : 'Add Supplier'}</DialogTitle>
+          </DialogHeader>
+          
+          <form onSubmit={handleSubmit}>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="name">Supplier Name *</Label>
+                <Input
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+              
+              <div className="grid gap-2">
+                <Label htmlFor="contact_person">Contact Person</Label>
+                <Input
+                  id="contact_person"
+                  name="contact_person"
+                  value={formData.contact_person}
+                  onChange={handleInputChange}
+                />
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                
+                <div className="grid gap-2">
+                  <Label htmlFor="phone">Phone</Label>
+                  <Input
+                    id="phone"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                  />
+                </div>
+              </div>
+              
+              <div className="grid gap-2">
+                <Label htmlFor="address">Address</Label>
+                <Input
+                  id="address"
+                  name="address"
+                  value={formData.address}
+                  onChange={handleInputChange}
+                />
+              </div>
+            </div>
+            
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  resetForm();
+                  setIsDialogOpen(false);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button type="submit">
+                {editingSupplier ? 'Update' : 'Add'} Supplier
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Deactivate Supplier</DialogTitle>
+          </DialogHeader>
+          
+          <p className="py-4">
+            Are you sure you want to deactivate this supplier? 
+            They will no longer appear in your supplier list but will still be associated with historical records.
+          </p>
+          
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsDeleteDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+            >
+              Deactivate
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

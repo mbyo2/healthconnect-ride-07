@@ -1,118 +1,141 @@
 
-import * as React from "react";
-import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import * as React from 'react';
+import { useState, useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { 
   Dialog, 
   DialogContent, 
   DialogHeader, 
   DialogTitle,
-  DialogTrigger,
   DialogFooter
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 import { 
-  Form, 
-  FormControl, 
-  FormField, 
-  FormItem, 
-  FormLabel, 
-  FormMessage 
-} from "@/components/ui/form";
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from '@/components/ui/table';
 import { 
   Select, 
   SelectContent, 
   SelectItem, 
   SelectTrigger, 
   SelectValue 
-} from "@/components/ui/select";
-import { DataTable } from "@/components/ui/data-table";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { toast } from "sonner";
-import { LoadingScreen } from "@/components/LoadingScreen";
+} from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
+import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 import { 
-  Receipt,
-  ShoppingBasket,
-  TrendingUp,
-  TrendingDown,
-  Plus
-} from "lucide-react";
-import { Textarea } from "@/components/ui/textarea";
-import { format } from "date-fns";
+  AlertCircle,
+  Plus,
+  Search,
+  ArrowDown,
+  ArrowUp,
+  History
+} from 'lucide-react';
+import { LoadingScreen } from '@/components/LoadingScreen';
+import { useAuth } from '@/context/AuthContext';
+import { format } from 'date-fns';
 
-const transactionFormSchema = z.object({
-  medication_inventory_id: z.string().uuid("Please select a medication"),
-  transaction_type: z.string().min(1, "Transaction type is required"),
-  quantity: z.number().min(1, "Quantity must be at least 1"),
-  notes: z.string().optional(),
-  supplier: z.string().optional(),
-  invoice_number: z.string().optional(),
-  unit_price: z.number().optional(),
-});
+interface MedicationInventoryItem {
+  id: string;
+  medication_name: string;
+  dosage: string;
+  quantity_available: number;
+  unit_price: number | null;
+}
+
+interface Transaction {
+  id: string;
+  medication_inventory_id: string;
+  transaction_type: 'purchase' | 'sale' | 'adjustment' | 'return' | 'expired' | 'damaged';
+  quantity: number;
+  transaction_date: string;
+  performed_by: string | null;
+  notes: string | null;
+  unit_price: number | null;
+  supplier: string | null;
+  invoice_number: string | null;
+}
+
+const TRANSACTION_TYPES = ['purchase', 'sale', 'adjustment', 'return', 'expired', 'damaged'];
 
 export const InventoryTransactions = () => {
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [selectedInstitution, setSelectedInstitution] = useState<string | null>(null);
-  const [transactionType, setTransactionType] = useState<string>("purchase");
-  const [dateRange, setDateRange] = useState({
-    from: format(new Date(new Date().setMonth(new Date().getMonth() - 1)), 'yyyy-MM-dd'),
-    to: format(new Date(), 'yyyy-MM-dd')
-  });
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedMedication, setSelectedMedication] = useState<MedicationInventoryItem | null>(null);
   
-  const { data: institutions, isLoading: loadingInstitutions } = useQuery({
-    queryKey: ["healthcare_institutions_for_transactions"],
-    queryFn: async () => {
-      // Fetch institutions where the current user is staff
-      const { data: staffInstitutions, error } = await supabase
-        .from("institution_staff")
-        .select(`
-          institution_id,
-          institution: institution_id (
-            id,
-            name,
-            type
-          )
-        `)
-        .eq("provider_id", (await supabase.auth.getUser()).data.user?.id || "");
-
-      if (error) {
-        throw new Error(`Error fetching institutions: ${error.message}`);
-      }
-      
-      return staffInstitutions.map(item => item.institution);
-    }
+  // Form state
+  const [formData, setFormData] = useState({
+    transaction_type: 'purchase' as Transaction['transaction_type'],
+    quantity: 1,
+    unit_price: '',
+    supplier: '',
+    invoice_number: '',
+    notes: '',
+    transaction_date: format(new Date(), 'yyyy-MM-dd\'T\'HH:mm')
   });
 
-  const { data: medications, isLoading: loadingMedications } = useQuery({
-    queryKey: ["medications_for_transactions", selectedInstitution],
+  // Get institution id for the current user
+  const { data: userInstitution, isLoading: loadingInstitution } = useQuery({
+    queryKey: ['userInstitution', user?.id],
     queryFn: async () => {
-      if (!selectedInstitution) return [];
+      if (!user?.id) return null;
       
       const { data, error } = await supabase
-        .from("medication_inventory")
-        .select("id, medication_name, dosage, quantity_available")
-        .eq("institution_id", selectedInstitution);
+        .from('institution_staff')
+        .select('institution_id')
+        .eq('provider_id', user.id)
+        .eq('is_active', true)
+        .single();
 
       if (error) {
-        throw new Error(`Error fetching medications: ${error.message}`);
+        console.error('Error fetching institution:', error);
+        return null;
       }
       
-      return data;
+      return data?.institution_id;
     },
-    enabled: !!selectedInstitution
   });
 
-  const { data: transactions, isLoading: loadingTransactions, refetch: refetchTransactions } = useQuery({
-    queryKey: ["inventory_transactions", selectedInstitution, dateRange],
+  // Fetch medication inventory
+  const { data: medications, isLoading: loadingMedications } = useQuery({
+    queryKey: ['medicationInventory', userInstitution],
     queryFn: async () => {
-      if (!selectedInstitution) return [];
+      if (!userInstitution) return [];
       
       const { data, error } = await supabase
-        .from("inventory_transactions")
+        .from('medication_inventory')
+        .select('id, medication_name, dosage, quantity_available, unit_price')
+        .eq('institution_id', userInstitution)
+        .order('medication_name', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching medication inventory:', error);
+        throw new Error(error.message);
+      }
+      
+      return data as MedicationInventoryItem[];
+    },
+    enabled: !!userInstitution,
+  });
+
+  // Fetch transactions
+  const { data: transactions, isLoading: loadingTransactions, refetch } = useQuery({
+    queryKey: ['inventoryTransactions', userInstitution],
+    queryFn: async () => {
+      if (!userInstitution) return [];
+      
+      const { data, error } = await supabase
+        .from('inventory_transactions')
         .select(`
           *,
           medication_inventory!inner (
@@ -122,373 +145,382 @@ export const InventoryTransactions = () => {
             institution_id
           )
         `)
-        .gte("transaction_date", `${dateRange.from}T00:00:00`)
-        .lte("transaction_date", `${dateRange.to}T23:59:59`)
-        .eq("medication_inventory.institution_id", selectedInstitution)
-        .order("transaction_date", { ascending: false });
+        .eq('medication_inventory.institution_id', userInstitution)
+        .order('transaction_date', { ascending: false });
 
       if (error) {
-        throw new Error(`Error fetching transactions: ${error.message}`);
+        console.error('Error fetching transactions:', error);
+        throw new Error(error.message);
       }
       
       return data;
     },
-    enabled: !!selectedInstitution
+    enabled: !!userInstitution,
   });
-
-  const form = useForm<z.infer<typeof transactionFormSchema>>({
-    resolver: zodResolver(transactionFormSchema),
-    defaultValues: {
-      medication_inventory_id: "",
-      transaction_type: "purchase",
-      quantity: 1,
-      notes: "",
-      supplier: "",
-      invoice_number: "",
-      unit_price: undefined
-    }
-  });
-
-  useEffect(() => {
-    if (institutions && institutions.length > 0 && !selectedInstitution) {
-      setSelectedInstitution(institutions[0].id);
-    }
-  }, [institutions, selectedInstitution]);
   
+  // Update form when selected medication changes
   useEffect(() => {
-    setTransactionType(form.watch("transaction_type"));
-  }, [form.watch("transaction_type")]);
+    if (selectedMedication && selectedMedication.unit_price) {
+      setFormData(prev => ({
+        ...prev,
+        unit_price: selectedMedication.unit_price?.toString() || ''
+      }));
+    }
+  }, [selectedMedication]);
 
-  const handleAddTransaction = async (values: z.infer<typeof transactionFormSchema>) => {
+  // Handle form input changes
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value
+    });
+  };
+
+  // Handle dropdown changes
+  const handleSelectChange = (name: string, value: string) => {
+    setFormData({
+      ...formData,
+      [name]: value
+    });
+  };
+
+  // Handle form submission
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!selectedMedication) {
+      toast.error("Please select a medication");
+      return;
+    }
+    
+    if (formData.transaction_type !== 'purchase' && 
+        parseInt(formData.quantity as unknown as string) > selectedMedication.quantity_available) {
+      toast.error("Cannot remove more items than available in inventory");
+      return;
+    }
+    
     try {
-      // If it's a sale, make sure there's enough stock
-      if (values.transaction_type === "sale" || values.transaction_type === "expired" || values.transaction_type === "damaged") {
-        const medication = medications?.find(m => m.id === values.medication_inventory_id);
-        if (medication && medication.quantity_available < values.quantity) {
-          toast.error(`Not enough stock. Available: ${medication.quantity_available}`);
-          return;
-        }
-      }
+      const dataToSubmit = {
+        medication_inventory_id: selectedMedication.id,
+        transaction_type: formData.transaction_type,
+        quantity: parseInt(formData.quantity as unknown as string),
+        transaction_date: new Date(formData.transaction_date).toISOString(),
+        performed_by: user?.id || null,
+        notes: formData.notes || null,
+        unit_price: formData.unit_price ? parseFloat(formData.unit_price) : null,
+        supplier: formData.supplier || null,
+        invoice_number: formData.invoice_number || null
+      };
       
-      const { data, error } = await supabase
-        .from("inventory_transactions")
-        .insert({
-          ...values,
-          performed_by: (await supabase.auth.getUser()).data.user?.id
-        })
-        .select();
-      
+      const { error } = await supabase
+        .from('inventory_transactions')
+        .insert([dataToSubmit]);
+        
       if (error) throw error;
       
-      toast.success(`${values.transaction_type.charAt(0).toUpperCase() + values.transaction_type.slice(1)} transaction recorded successfully`);
-      setIsAddDialogOpen(false);
-      form.reset({
-        medication_inventory_id: "",
-        transaction_type: "purchase",
-        quantity: 1,
-        notes: "",
-        supplier: "",
-        invoice_number: "",
-        unit_price: undefined
-      });
-      refetchTransactions();
+      toast.success('Transaction recorded successfully');
+      
+      // Refresh data and reset form
+      await refetch();
+      queryClient.invalidateQueries({ queryKey: ['medicationInventory'] });
+      queryClient.invalidateQueries({ queryKey: ['inventorySummary'] });
+      resetForm();
+      setIsDialogOpen(false);
     } catch (error: any) {
-      toast.error(`Error recording transaction: ${error.message}`);
+      toast.error(`Error: ${error.message}`);
     }
   };
 
-  const getTransactionIcon = (type: string) => {
-    switch (type) {
-      case "purchase":
-        return <ShoppingBasket className="h-4 w-4 text-primary" />;
-      case "sale":
-        return <Receipt className="h-4 w-4 text-orange-500" />;
-      case "adjustment":
-        return <TrendingUp className="h-4 w-4 text-blue-500" />;
-      case "return":
-        return <TrendingDown className="h-4 w-4 text-purple-500" />;
-      case "expired":
-        return <TrendingDown className="h-4 w-4 text-destructive" />;
-      case "damaged":
-        return <TrendingDown className="h-4 w-4 text-destructive" />;
-      default:
-        return <ShoppingBasket className="h-4 w-4" />;
-    }
+  // Reset form to default values
+  const resetForm = () => {
+    setFormData({
+      transaction_type: 'purchase',
+      quantity: 1,
+      unit_price: selectedMedication?.unit_price?.toString() || '',
+      supplier: '',
+      invoice_number: '',
+      notes: '',
+      transaction_date: format(new Date(), 'yyyy-MM-dd\'T\'HH:mm')
+    });
+    setSelectedMedication(null);
   };
 
-  const columns = [
-    { 
-      header: "Type", 
-      accessorKey: "transaction_type",
-      cell: ({ row }: any) => {
-        const type = row.original.transaction_type;
-        return (
-          <div className="flex items-center space-x-2">
-            {getTransactionIcon(type)}
-            <span className="capitalize">{type}</span>
-          </div>
-        );
-      }
-    },
-    { 
-      header: "Medication", 
-      accessorKey: "medication_name", 
-      cell: ({ row }: any) => {
-        return `${row.original.medication_inventory.medication_name} ${row.original.medication_inventory.dosage}`;
-      }
-    },
-    { header: "Quantity", accessorKey: "quantity" },
-    { 
-      header: "Date", 
-      accessorKey: "transaction_date",
-      cell: ({ row }: any) => {
-        return new Date(row.original.transaction_date).toLocaleString();
-      }
-    },
-    { 
-      header: "Price", 
-      accessorKey: "unit_price",
-      cell: ({ row }: any) => {
-        return row.original.unit_price ? 
-          `$${parseFloat(row.original.unit_price).toFixed(2)}` : 
-          "-";
-      }
-    },
-    { 
-      header: "Total", 
-      cell: ({ row }: any) => {
-        return row.original.unit_price ? 
-          `$${(parseFloat(row.original.unit_price) * row.original.quantity).toFixed(2)}` : 
-          "-";
-      }
-    },
-    { header: "Notes", accessorKey: "notes" }
-  ];
+  // Filter transactions based on search
+  const filteredTransactions = transactions?.filter(transaction => {
+    if (!searchQuery) return true;
+    
+    const query = searchQuery.toLowerCase();
+    const medicationItem = transaction.medication_inventory;
+    
+    return (
+      medicationItem.medication_name.toLowerCase().includes(query) ||
+      medicationItem.dosage.toLowerCase().includes(query) ||
+      transaction.transaction_type.toLowerCase().includes(query)
+    );
+  });
 
-  if (loadingInstitutions) {
+  if (loadingInstitution || loadingMedications || loadingTransactions) {
     return <LoadingScreen />;
   }
-  
-  if (!institutions || institutions.length === 0) {
+
+  if (!userInstitution) {
     return (
-      <div className="text-center py-10">
-        <ShoppingBasket className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-        <h3 className="text-lg font-medium">No Pharmacy Access</h3>
-        <p className="text-muted-foreground mt-2">
-          You don't have access to any pharmacy or hospital inventory systems.
-        </p>
-      </div>
+      <Card className="mb-6">
+        <CardContent className="pt-6">
+          <div className="flex items-center justify-center p-6 text-center">
+            <div>
+              <AlertCircle className="mx-auto h-10 w-10 text-orange-500 mb-4" />
+              <h3 className="text-lg font-medium mb-2">No Institution Association</h3>
+              <p className="text-muted-foreground mb-4">
+                You are not associated with any healthcare institution. 
+                Please contact an administrator to associate your account.
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div className="flex flex-col md:flex-row gap-4 md:items-center">
-          <Select value={selectedInstitution || ''} onValueChange={setSelectedInstitution}>
-            <SelectTrigger className="w-full md:w-[250px]">
-              <SelectValue placeholder="Select institution" />
-            </SelectTrigger>
-            <SelectContent>
-              {institutions.map((institution: any) => (
-                <SelectItem key={institution.id} value={institution.id}>
-                  {institution.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          
-          <div className="flex items-center space-x-2">
-            <Input
-              type="date"
-              value={dateRange.from}
-              onChange={(e) => setDateRange({...dateRange, from: e.target.value})}
-              className="w-full md:w-auto"
-            />
-            <span>to</span>
-            <Input
-              type="date"
-              value={dateRange.to}
-              onChange={(e) => setDateRange({...dateRange, to: e.target.value})}
-              className="w-full md:w-auto"
-            />
-          </div>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="relative w-full md:w-80">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="text"
+            placeholder="Search transactions..."
+            className="pl-8"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
         </div>
         
-        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="w-full md:w-auto">
-              <Plus className="mr-2 h-4 w-4" />
-              New Transaction
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-md">
-            <DialogHeader>
-              <DialogTitle>Record New Transaction</DialogTitle>
-            </DialogHeader>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(handleAddTransaction)} className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="transaction_type"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Transaction Type</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select type" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="purchase">Purchase</SelectItem>
-                          <SelectItem value="sale">Sale</SelectItem>
-                          <SelectItem value="adjustment">Adjustment</SelectItem>
-                          <SelectItem value="return">Return</SelectItem>
-                          <SelectItem value="expired">Expired</SelectItem>
-                          <SelectItem value="damaged">Damaged</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="medication_inventory_id"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Medication</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select medication" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {loadingMedications ? (
-                            <SelectItem value="" disabled>Loading...</SelectItem>
-                          ) : (
-                            medications?.map(med => (
-                              <SelectItem key={med.id} value={med.id}>
-                                {med.medication_name} {med.dosage} (Stock: {med.quantity_available})
-                              </SelectItem>
-                            ))
-                          )}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="quantity"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Quantity</FormLabel>
-                      <FormControl>
-                        <Input 
-                          type="number" 
-                          min="1" 
-                          {...field}
-                          onChange={(e) => field.onChange(parseInt(e.target.value))} 
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                {(transactionType === "purchase" || transactionType === "sale" || transactionType === "return") && (
-                  <FormField
-                    control={form.control}
-                    name="unit_price"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Unit Price ($)</FormLabel>
-                        <FormControl>
-                          <Input 
-                            type="number" 
-                            min="0" 
-                            step="0.01" 
-                            placeholder="0.00"
-                            {...field}
-                            value={field.value === undefined ? "" : field.value}
-                            onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                )}
-                
-                {(transactionType === "purchase" || transactionType === "return") && (
-                  <>
-                    <FormField
-                      control={form.control}
-                      name="supplier"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Supplier</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Supplier name" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={form.control}
-                      name="invoice_number"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Invoice Number</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Invoice number" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </>
-                )}
-                
-                <FormField
-                  control={form.control}
-                  name="notes"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Notes (Optional)</FormLabel>
-                      <FormControl>
-                        <Textarea placeholder="Additional notes" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <DialogFooter>
-                  <Button type="submit">Record Transaction</Button>
-                </DialogFooter>
-              </form>
-            </Form>
-          </DialogContent>
-        </Dialog>
+        <Button 
+          className="gap-1"
+          onClick={() => setIsDialogOpen(true)}
+        >
+          <Plus className="h-4 w-4" /> Record Transaction
+        </Button>
       </div>
       
-      {selectedInstitution && (
-        loadingTransactions ? <LoadingScreen /> : 
-          <DataTable
-            columns={columns}
-            data={transactions || []}
-            searchColumn="medication_inventory.medication_name"
-          />
-      )}
+      <Card>
+        <CardHeader>
+          <CardTitle>Inventory Transactions</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {filteredTransactions && filteredTransactions.length > 0 ? (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Medication</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead className="text-right">Quantity</TableHead>
+                    <TableHead className="text-right">Unit Price</TableHead>
+                    <TableHead>Notes</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredTransactions.map((transaction) => (
+                    <TableRow key={transaction.id}>
+                      <TableCell className="whitespace-nowrap">
+                        {format(new Date(transaction.transaction_date), 'MMM dd, yyyy HH:mm')}
+                      </TableCell>
+                      <TableCell>
+                        <div className="font-medium">{transaction.medication_inventory.medication_name}</div>
+                        <div className="text-sm text-muted-foreground">{transaction.medication_inventory.dosage}</div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center">
+                          {transaction.transaction_type === 'purchase' || 
+                           transaction.transaction_type === 'return' ? (
+                            <ArrowDown className="mr-1 h-4 w-4 text-green-500" />
+                          ) : (
+                            <ArrowUp className="mr-1 h-4 w-4 text-amber-500" />
+                          )}
+                          <span className="capitalize">{transaction.transaction_type}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-right font-medium">
+                        {transaction.quantity}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {transaction.unit_price ? `$${transaction.unit_price.toFixed(2)}` : 'N/A'}
+                      </TableCell>
+                      <TableCell className="max-w-[200px] truncate">
+                        {transaction.notes || '-'}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          ) : (
+            <div className="text-center p-6">
+              {searchQuery ? (
+                <p className="text-muted-foreground">No transactions found matching your search.</p>
+              ) : (
+                <div className="flex flex-col items-center gap-2">
+                  <History className="h-8 w-8 text-muted-foreground" />
+                  <p className="text-muted-foreground">No transactions recorded yet.</p>
+                </div>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+      
+      {/* Record Transaction Dialog */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Record Inventory Transaction</DialogTitle>
+          </DialogHeader>
+          
+          <form onSubmit={handleSubmit}>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="medication">Select Medication *</Label>
+                <Select 
+                  value={selectedMedication?.id || ''} 
+                  onValueChange={(value) => {
+                    const med = medications?.find(m => m.id === value);
+                    setSelectedMedication(med || null);
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select medication" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {medications?.map((med) => (
+                      <SelectItem key={med.id} value={med.id}>
+                        {med.medication_name} ({med.dosage}) - Stock: {med.quantity_available}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="transaction_type">Transaction Type *</Label>
+                  <Select 
+                    value={formData.transaction_type} 
+                    onValueChange={(value) => handleSelectChange('transaction_type', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {TRANSACTION_TYPES.map((type) => (
+                        <SelectItem key={type} value={type} className="capitalize">
+                          {type}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="grid gap-2">
+                  <Label htmlFor="quantity">Quantity *</Label>
+                  <Input
+                    id="quantity"
+                    name="quantity"
+                    type="number"
+                    min="1"
+                    value={formData.quantity}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+              </div>
+              
+              <div className="grid gap-2">
+                <Label htmlFor="transaction_date">Date and Time *</Label>
+                <Input
+                  id="transaction_date"
+                  name="transaction_date"
+                  type="datetime-local"
+                  value={formData.transaction_date}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+              
+              {(formData.transaction_type === 'purchase' || formData.transaction_type === 'return') && (
+                <>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="grid gap-2">
+                      <Label htmlFor="supplier">Supplier</Label>
+                      <Input
+                        id="supplier"
+                        name="supplier"
+                        value={formData.supplier}
+                        onChange={handleInputChange}
+                      />
+                    </div>
+                    
+                    <div className="grid gap-2">
+                      <Label htmlFor="invoice_number">Invoice Number</Label>
+                      <Input
+                        id="invoice_number"
+                        name="invoice_number"
+                        value={formData.invoice_number}
+                        onChange={handleInputChange}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="grid gap-2">
+                    <Label htmlFor="unit_price">Unit Price</Label>
+                    <Input
+                      id="unit_price"
+                      name="unit_price"
+                      type="number"
+                      step="0.01"
+                      placeholder="0.00"
+                      value={formData.unit_price}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </>
+              )}
+              
+              <div className="grid gap-2">
+                <Label htmlFor="notes">Notes</Label>
+                <Textarea
+                  id="notes"
+                  name="notes"
+                  placeholder="Additional details about this transaction..."
+                  value={formData.notes}
+                  onChange={handleInputChange}
+                  className="resize-none"
+                  rows={3}
+                />
+              </div>
+            </div>
+            
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  resetForm();
+                  setIsDialogOpen(false);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button type="submit">
+                Record Transaction
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

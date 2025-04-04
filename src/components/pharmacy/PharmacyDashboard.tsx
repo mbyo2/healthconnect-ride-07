@@ -5,14 +5,59 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { Pill, AlertCircle, Package, TrendingDown } from "lucide-react";
 import { LoadingScreen } from "@/components/LoadingScreen";
+import { useAuth } from "@/context/AuthContext";
+
+interface InventorySummary {
+  totalItems: number;
+  lowStock: number;
+  expiringSoon: number;
+}
+
+interface MedicationTransaction {
+  id: string;
+  transaction_date: string;
+  transaction_type: string;
+  quantity: number;
+  medication_inventory: {
+    medication_name: string;
+    dosage: string;
+  };
+}
 
 export const PharmacyDashboard = () => {
-  const { data: inventorySummary, isLoading: loadingInventory } = useQuery({
-    queryKey: ["inventorySummary"],
+  const { user } = useAuth();
+  
+  // Get institution id for the current user
+  const { data: userInstitution, isLoading: loadingInstitution } = useQuery({
+    queryKey: ['userInstitution', user?.id],
     queryFn: async () => {
+      if (!user?.id) return null;
+      
+      const { data, error } = await supabase
+        .from('institution_staff')
+        .select('institution_id')
+        .eq('provider_id', user.id)
+        .eq('is_active', true)
+        .single();
+
+      if (error) {
+        console.error('Error fetching institution:', error);
+        return null;
+      }
+      
+      return data?.institution_id;
+    },
+  });
+
+  const { data: inventorySummary, isLoading: loadingInventory } = useQuery({
+    queryKey: ["inventorySummary", userInstitution],
+    queryFn: async () => {
+      if (!userInstitution) return { totalItems: 0, lowStock: 0, expiringSoon: 0 };
+      
       const { data, error } = await supabase
         .from("medication_inventory")
-        .select("*");
+        .select("*")
+        .eq("institution_id", userInstitution);
 
       if (error) {
         throw new Error(`Error fetching inventory: ${error.message}`);
@@ -28,12 +73,16 @@ export const PharmacyDashboard = () => {
       }).length;
       
       return { totalItems, lowStock, expiringSoon };
-    }
+    },
+    enabled: !!userInstitution,
+    initialData: { totalItems: 0, lowStock: 0, expiringSoon: 0 }
   });
 
   const { data: recentTransactions, isLoading: loadingTransactions } = useQuery({
-    queryKey: ["recentTransactions"],
+    queryKey: ["recentTransactions", userInstitution],
     queryFn: async () => {
+      if (!userInstitution) return [];
+      
       const { data, error } = await supabase
         .from("inventory_transactions")
         .select(`
@@ -41,18 +90,39 @@ export const PharmacyDashboard = () => {
           medication_inventory (medication_name, dosage)
         `)
         .order('transaction_date', { ascending: false })
+        .eq("medication_inventory.institution_id", userInstitution)
         .limit(5);
 
       if (error) {
         throw new Error(`Error fetching transactions: ${error.message}`);
       }
       
-      return data;
-    }
+      return data as MedicationTransaction[];
+    },
+    enabled: !!userInstitution
   });
 
-  if (loadingInventory || loadingTransactions) {
+  if (loadingInventory || loadingTransactions || loadingInstitution) {
     return <LoadingScreen />;
+  }
+
+  if (!userInstitution) {
+    return (
+      <Card>
+        <CardContent className="pt-6">
+          <div className="flex items-center justify-center p-6 text-center">
+            <div>
+              <AlertCircle className="mx-auto h-10 w-10 text-orange-500 mb-4" />
+              <h3 className="text-lg font-medium mb-2">No Institution Association</h3>
+              <p className="text-muted-foreground mb-4">
+                You are not associated with any healthcare institution. 
+                Please contact an administrator to associate your account.
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
   }
 
   return (
@@ -102,7 +172,7 @@ export const PharmacyDashboard = () => {
               {recentTransactions.map((transaction) => (
                 <div key={transaction.id} className="flex items-center justify-between border-b pb-2">
                   <div>
-                    <p className="font-medium">{transaction.medication_inventory.medication_name} {transaction.medication_inventory.dosage}</p>
+                    <p className="font-medium">{transaction.medication_inventory?.medication_name} {transaction.medication_inventory?.dosage}</p>
                     <p className="text-sm text-muted-foreground capitalize">{transaction.transaction_type}</p>
                   </div>
                   <div className="text-right">
