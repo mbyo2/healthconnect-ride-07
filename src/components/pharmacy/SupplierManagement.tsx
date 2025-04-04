@@ -1,455 +1,600 @@
-import * as React from 'react';
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle,
-  DialogFooter
-} from '@/components/ui/dialog';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/components/ui/table';
-import { Label } from '@/components/ui/label';
+import React, { useState, useEffect } from 'react';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button"
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import { Plus, Edit, Trash2, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { 
-  AlertCircle, 
-  Plus, 
-  Search, 
-  Edit, 
-  Trash2,
-  Building 
-} from 'lucide-react';
-import { LoadingScreen } from '@/components/LoadingScreen';
-import { useAuth } from '@/context/AuthContext';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter
+} from "@/components/ui/dialog"
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
+import { z } from "zod"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import { Textarea } from "@/components/ui/textarea"
+import { Checkbox } from "@/components/ui/checkbox"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { MoreHorizontal } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
-// Use Building instead of BuildingStorefront which doesn't exist in lucide-react
+const formSchema = z.object({
+  name: z.string().min(2, {
+    message: "Supplier name must be at least 2 characters.",
+  }),
+  contact_number: z.string().min(10, {
+    message: "Contact number must be at least 10 characters.",
+  }),
+  email: z.string().email({
+    message: "Invalid email address.",
+  }),
+  address: z.string().min(5, {
+    message: "Address must be at least 5 characters.",
+  }),
+  description: z.string().optional(),
+  is_active: z.boolean().default(true),
+})
 
-interface SupplierItem {
+type Supplier = {
   id: string;
+  created_at: string;
   name: string;
-  contact_person: string | null;
-  email: string | null;
-  phone: string | null;
-  address: string | null;
-  is_active: boolean | null;
-}
+  contact_number: string;
+  email: string;
+  address: string;
+  description: string | null;
+  is_active: boolean;
+};
 
-export const SupplierManagement = () => {
-  const { user } = useAuth();
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+const SupplierManagement: React.FC = () => {
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+  const [open, setOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null);
+  const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [editingItem, setEditingItem] = useState<SupplierItem | null>(null);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [itemToDelete, setItemToDelete] = useState<string | null>(null);
-  const [formData, setFormData] = useState({
-    name: '',
-    contact_person: '',
-    email: '',
-    phone: '',
-    address: '',
-    is_active: true,
-  });
+  const [sortColumn, setSortColumn] = useState<keyof Supplier | null>(null);
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
-  // Get institution id for the current user
-  const { data: userInstitution, isLoading: loadingInstitution } = useQuery({
-    queryKey: ['userInstitution', user?.id],
-    queryFn: async () => {
-      if (!user?.id) return null;
-      
-      const { data, error } = await supabase
-        .from('institution_staff')
-        .select('institution_id')
-        .eq('provider_id', user.id)
-        .eq('is_active', true)
-        .single();
-
-      if (error) {
-        console.error('Error fetching institution:', error);
-        return null;
-      }
-      
-      return data?.institution_id;
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      contact_number: "",
+      email: "",
+      address: "",
+      description: "",
+      is_active: true,
     },
-  });
+  })
 
-  // Fetch suppliers
-  const { data: suppliers, isLoading: loadingSuppliers, refetch } = useQuery({
-    queryKey: ['suppliers', userInstitution],
-    queryFn: async () => {
-      if (!userInstitution) return [];
-      
+  const editForm = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      contact_number: "",
+      email: "",
+      address: "",
+      description: "",
+      is_active: true,
+    },
+  })
+
+  const { handleSubmit, reset } = form;
+  const { handleSubmit: handleEditSubmit, reset: resetEditForm, setValue } = editForm;
+
+  useEffect(() => {
+    fetchSuppliers();
+  }, []);
+
+  const fetchSuppliers = async () => {
+    setLoading(true);
+    try {
       const { data, error } = await supabase
         .from('suppliers')
         .select('*')
-        .eq('institution_id', userInstitution)
-        .order('name', { ascending: true });
+        .order(sortColumn || 'created_at', { ascending: sortDirection === 'asc' });
 
       if (error) {
-        console.error('Error fetching suppliers:', error);
-        throw new Error(error.message);
-      }
-      
-      return data as SupplierItem[];
-    },
-    enabled: !!userInstitution,
-  });
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-  };
-
-  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, checked } = e.target;
-    setFormData({
-      ...formData,
-      [name]: checked,
-    });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!userInstitution) {
-      toast.error("No institution found for user");
-      return;
-    }
-    
-    try {
-      const dataToSubmit = {
-        ...formData,
-        institution_id: userInstitution,
-      };
-      
-      if (editingItem) {
-        // Update existing item
-        const { error } = await supabase
-          .from('suppliers')
-          .update(dataToSubmit)
-          .eq('id', editingItem.id);
-          
-        if (error) throw error;
-        toast.success('Supplier updated successfully');
+        console.error("Error fetching suppliers:", error);
+        toast.error("Failed to load suppliers");
       } else {
-        // Create new item
-        const { error } = await supabase
-          .from('suppliers')
-          .insert([dataToSubmit]);
-          
-        if (error) throw error;
-        toast.success('Supplier added successfully');
+        setSuppliers(data || []);
       }
-      
-      // Refresh data and reset form
-      await refetch();
-      resetForm();
-      setIsDialogOpen(false);
-    } catch (error: any) {
-      toast.error(`Error: ${error.message}`);
+    } catch (error) {
+      console.error("Unexpected error:", error);
+      toast.error("Failed to load suppliers");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleEdit = (item: SupplierItem) => {
-    setEditingItem(item);
-    setFormData({
-      name: item.name,
-      contact_person: item.contact_person || '',
-      email: item.email || '',
-      phone: item.phone || '',
-      address: item.address || '',
-      is_active: item.is_active !== null ? item.is_active : true,
-    });
-    setIsDialogOpen(true);
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    setLoading(true);
+    try {
+      const { error } = await supabase
+        .from('suppliers')
+        .insert([values]);
+
+      if (error) {
+        console.error("Error creating supplier:", error);
+        toast.error("Failed to create supplier");
+      } else {
+        toast.success("Supplier created successfully!");
+        setOpen(false);
+        reset();
+        fetchSuppliers();
+      }
+    } catch (error) {
+      console.error("Unexpected error:", error);
+      toast.error("Failed to create supplier");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleDelete = async () => {
-    if (!itemToDelete) return;
-    
+  const onEditSubmit = async (values: z.infer<typeof formSchema>) => {
+    if (!selectedSupplier) return;
+
+    setLoading(true);
+    try {
+      const { error } = await supabase
+        .from('suppliers')
+        .update(values)
+        .eq('id', selectedSupplier.id);
+
+      if (error) {
+        console.error("Error updating supplier:", error);
+        toast.error("Failed to update supplier");
+      } else {
+        toast.success("Supplier updated successfully!");
+        setEditOpen(false);
+        resetEditForm();
+        fetchSuppliers();
+      }
+    } catch (error) {
+      console.error("Unexpected error:", error);
+      toast.error("Failed to update supplier");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    setLoading(true);
     try {
       const { error } = await supabase
         .from('suppliers')
         .delete()
-        .eq('id', itemToDelete);
-        
-      if (error) throw error;
-      
-      toast.success('Supplier deleted successfully');
-      refetch();
-      setIsDeleteDialogOpen(false);
-    } catch (error: any) {
-      toast.error(`Error: ${error.message}`);
+        .eq('id', id);
+
+      if (error) {
+        console.error("Error deleting supplier:", error);
+        toast.error("Failed to delete supplier");
+      } else {
+        toast.success("Supplier deleted successfully!");
+        fetchSuppliers();
+      }
+    } catch (error) {
+      console.error("Unexpected error:", error);
+      toast.error("Failed to delete supplier");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const confirmDelete = (id: string) => {
-    setItemToDelete(id);
-    setIsDeleteDialogOpen(true);
+  const handleEditOpen = (supplier: Supplier) => {
+    setSelectedSupplier(supplier);
+    setValue('name', supplier.name);
+    setValue('contact_number', supplier.contact_number);
+    setValue('email', supplier.email);
+    setValue('address', supplier.address);
+    setValue('description', supplier.description || '');
+    setValue('is_active', supplier.is_active);
+    setEditOpen(true);
   };
 
-  const resetForm = () => {
-    setFormData({
-      name: '',
-      contact_person: '',
-      email: '',
-      phone: '',
-      address: '',
-      is_active: true,
-    });
-    setEditingItem(null);
+  const filteredSuppliers = suppliers.filter(supplier =>
+    supplier.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    supplier.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    supplier.contact_number.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const handleSort = (column: keyof Supplier) => {
+    if (column === sortColumn) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortColumn(column);
+      setSortDirection('asc');
+    }
   };
 
-  const filteredSuppliers = suppliers?.filter(item => {
-    if (!searchQuery) return true;
-    
-    const query = searchQuery.toLowerCase();
-    return (
-      item.name.toLowerCase().includes(query) ||
-      (item.contact_person && item.contact_person.toLowerCase().includes(query)) ||
-      (item.email && item.email.toLowerCase().includes(query)) ||
-      (item.phone && item.phone.toLowerCase().includes(query))
-    );
+  const sortedSuppliers = [...filteredSuppliers].sort((a, b) => {
+    if (!sortColumn) return 0;
+    const aValue = a[sortColumn];
+    const bValue = b[sortColumn];
+
+    if (typeof aValue === 'string' && typeof bValue === 'string') {
+      return sortDirection === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+    } else {
+      if (aValue < bValue) {
+        return sortDirection === 'asc' ? -1 : 1;
+      }
+      if (aValue > bValue) {
+        return sortDirection === 'asc' ? 1 : -1;
+      }
+      return 0;
+    }
   });
 
-  if (loadingInstitution || loadingSuppliers) {
-    return <LoadingScreen />;
-  }
-  
+  const formData = editForm.watch();
+
   return (
-    <div className="space-y-6">
-      {/* Management Controls */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="relative w-full md:w-80">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="text"
-            placeholder="Search suppliers..."
-            className="pl-8"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-        
-        <Button 
-          className="gap-1"
-          onClick={() => {
-            resetForm();
-            setIsDialogOpen(true);
-          }}
-        >
-          <Plus className="h-4 w-4" /> Add Supplier
-        </Button>
-      </div>
-      
-      {/* Suppliers Table */}
+    <div className="container mx-auto py-10">
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <Building className="h-5 w-5" />
-            Suppliers
-          </CardTitle>
+        <CardHeader>
+          <CardTitle>Supplier Management</CardTitle>
+          <CardDescription>Manage your suppliers here.</CardDescription>
         </CardHeader>
-        
         <CardContent>
-          {filteredSuppliers && filteredSuppliers.length > 0 ? (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Contact</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Phone</TableHead>
-                    <TableHead>Address</TableHead>
-                    <TableHead className="text-right">Status</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+          <div className="flex justify-between items-center mb-5">
+            <Input
+              type="text"
+              placeholder="Search suppliers..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="max-w-md"
+            />
+            <Dialog open={open} onOpenChange={setOpen}>
+              <DialogTrigger asChild>
+                <Button variant="default">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Supplier
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>Add Supplier</DialogTitle>
+                  <DialogDescription>
+                    Create a new supplier to manage your inventory.
+                  </DialogDescription>
+                </DialogHeader>
+                <Form {...form}>
+                  <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Supplier Name</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Supplier Name" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="contact_number"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Contact Number</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Contact Number" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Email</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Email" type="email" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="address"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Address</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Address" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="description"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Description</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="Supplier description"
+                              className="resize-none"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="is_active"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-center justify-between rounded-md border p-4">
+                          <div className="space-y-0.5">
+                            <FormLabel>Active</FormLabel>
+                            <FormDescription>
+                              Whether the supplier is currently active.
+                            </FormDescription>
+                          </div>
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                              className="w-5 h-5"
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    <DialogFooter>
+                      <Button type="submit" disabled={loading}>
+                        {loading ? "Loading..." : "Create Supplier"}
+                      </Button>
+                    </DialogFooter>
+                  </form>
+                </Form>
+              </DialogContent>
+            </Dialog>
+          </div>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead onClick={() => handleSort('name')} className="cursor-pointer">
+                    Name
+                    {sortColumn === 'name' && (sortDirection === 'asc' ? ' ▲' : ' ▼')}
+                  </TableHead>
+                  <TableHead onClick={() => handleSort('contact_number')} className="cursor-pointer">
+                    Contact
+                    {sortColumn === 'contact_number' && (sortDirection === 'asc' ? ' ▲' : ' ▼')}
+                  </TableHead>
+                  <TableHead onClick={() => handleSort('email')} className="cursor-pointer">
+                    Email
+                    {sortColumn === 'email' && (sortDirection === 'asc' ? ' ▲' : ' ▼')}
+                  </TableHead>
+                  <TableHead onClick={() => handleSort('address')} className="cursor-pointer">
+                    Address
+                    {sortColumn === 'address' && (sortDirection === 'asc' ? ' ▲' : ' ▼')}
+                  </TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {sortedSuppliers.map((supplier) => (
+                  <TableRow key={supplier.id}>
+                    <TableCell>{supplier.name}</TableCell>
+                    <TableCell>{supplier.contact_number}</TableCell>
+                    <TableCell>{supplier.email}</TableCell>
+                    <TableCell>{supplier.address}</TableCell>
+                    <TableCell>
+                      {supplier.is_active ? (
+                        <Badge variant="outline">Active</Badge>
+                      ) : (
+                        <Badge variant="secondary">Inactive</Badge>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0">
+                            <span className="sr-only">Open menu</span>
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuItem onClick={() => handleEditOpen(supplier)}>
+                            <Edit className="w-4 h-4 mr-2" />
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleDelete(supplier.id)} className="text-destructive">
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
                   </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredSuppliers.map((item) => (
-                    <TableRow key={item.id}>
-                      <TableCell>{item.name}</TableCell>
-                      <TableCell>{item.contact_person}</TableCell>
-                      <TableCell>{item.email}</TableCell>
-                      <TableCell>{item.phone}</TableCell>
-                      <TableCell>{item.address}</TableCell>
-                      <TableCell className="text-right">
-                        {item.is_active ? 'Active' : 'Inactive'}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleEdit(item)}
-                            title="Edit"
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => confirmDelete(item.id)}
-                            className="hover:text-red-500"
-                            title="Delete"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          ) : (
-            <div className="text-center p-6">
-              {searchQuery ? (
-                <p className="text-muted-foreground">No suppliers found matching your search.</p>
-              ) : (
-                <p className="text-muted-foreground">No suppliers added. Add some to get started.</p>
-              )}
-            </div>
-          )}
+                ))}
+                {sortedSuppliers.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-4">
+                      No suppliers found.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
-      
-      {/* Add/Edit Supplier Dialog */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-md">
+
+      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+        <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>{editingItem ? 'Edit Supplier' : 'Add Supplier'}</DialogTitle>
+            <DialogTitle>Edit Supplier</DialogTitle>
+            <DialogDescription>
+              Edit the details of the selected supplier.
+            </DialogDescription>
           </DialogHeader>
-          
-          <form onSubmit={handleSubmit}>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-1 gap-2">
-                <Label htmlFor="name">Name *</Label>
-                <Input
-                  id="name"
+          {selectedSupplier && (
+            <Form {...editForm}>
+              <form onSubmit={handleEditSubmit(onEditSubmit)} className="space-y-4">
+                <FormField
+                  control={editForm.control}
                   name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  required
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Supplier Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Supplier Name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="contact_person">Contact Person</Label>
-                  <Input
-                    id="contact_person"
-                    name="contact_person"
-                    value={formData.contact_person}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                
-                <div className="grid gap-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                  />
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-1 gap-2">
-                <Label htmlFor="phone">Phone</Label>
-                <Input
-                  id="phone"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleInputChange}
+                <FormField
+                  control={editForm.control}
+                  name="contact_number"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Contact Number</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Contact Number" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
-              
-              <div className="grid grid-cols-1 gap-2">
-                <Label htmlFor="address">Address</Label>
-                <Input
-                  id="address"
+                <FormField
+                  control={editForm.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Email" type="email" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={editForm.control}
                   name="address"
-                  value={formData.address}
-                  onChange={handleInputChange}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Address</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Address" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <Input
-                  type="checkbox"
-                  id="is_active"
+                <FormField
+                  control={editForm.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Description</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Supplier description"
+                          className="resize-none"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={editForm.control}
                   name="is_active"
-                  checked={formData.is_active}
-                  onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
-                  className="w-4 h-4"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-md border p-4">
+                      <div className="space-y-0.5">
+                        <FormLabel>Active</FormLabel>
+                        <FormDescription>
+                          Whether the supplier is currently active.
+                        </FormDescription>
+                      </div>
+                      <FormControl>
+                        <Checkbox
+                          id="isActive"
+                          name="isActive"
+                          checked={formData.is_active}
+                          onChange={(e) => setFormData({...formData, is_active: e.target.checked})}
+                          className="w-5 h-5"
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
                 />
-                <Label htmlFor="is_active">Active</Label>
-              </div>
-            </div>
-            
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => {
-                  resetForm();
-                  setIsDialogOpen(false);
-                }}
-              >
-                Cancel
-              </Button>
-              <Button type="submit">
-                {editingItem ? 'Update' : 'Add'} Supplier
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
-      
-      {/* Delete Confirmation Dialog */}
-      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent className="max-w-sm">
-          <DialogHeader>
-            <DialogTitle>Confirm Deletion</DialogTitle>
-          </DialogHeader>
-          
-          <p className="py-4">
-            Are you sure you want to delete this supplier? 
-            This action cannot be undone.
-          </p>
-          
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setIsDeleteDialogOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={handleDelete}
-            >
-              Delete
-            </Button>
-          </DialogFooter>
+                <DialogFooter>
+                  <Button type="submit" disabled={loading}>
+                    {loading ? "Loading..." : "Update Supplier"}
+                  </Button>
+                </DialogFooter>
+              </form>
+            </Form>
+          )}
         </DialogContent>
       </Dialog>
     </div>
   );
 };
+
+export default SupplierManagement;

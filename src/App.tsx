@@ -17,6 +17,7 @@ import PatientAppointments from "./pages/PatientAppointments";
 import ProviderDashboard from "./pages/ProviderDashboard";
 import ProviderCalendar from "./pages/ProviderCalendar";
 import AdminDashboard from "./pages/AdminDashboard";
+import SuperAdminDashboard from "./pages/SuperAdminDashboard";
 import InstitutionRegistration from "./pages/InstitutionRegistration";
 import VideoConsultations from "./pages/VideoConsultations";
 import ProviderProfile from "./pages/ProviderProfile";
@@ -178,6 +179,14 @@ function App() {
               element={
                 <ProtectedRoute allowedRoles={['admin']}>
                   <AdminDashboard />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/superadmin-dashboard" 
+              element={
+                <ProtectedRoute>
+                  <SuperAdminDashboard />
                 </ProtectedRoute>
               } 
             />

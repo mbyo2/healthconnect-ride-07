@@ -6,9 +6,7 @@ import { LoadingScreen } from "@/components/LoadingScreen";
 import { toast } from "sonner";
 import { Header } from "@/components/Header";
 import { BottomNav } from "@/components/BottomNav";
-
-type UserRole = 'admin' | 'health_personnel' | 'patient';
-type AdminLevel = 'admin' | 'superadmin' | null;
+import { UserRole, AdminLevel } from "@/types/user";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -18,7 +16,7 @@ interface ProtectedRouteProps {
 export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [userRole, setUserRole] = useState<UserRole | null>(null);
-  const [adminLevel, setAdminLevel] = useState<AdminLevel>(null);
+  const [adminLevel, setAdminLevel] = useState<AdminLevel | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isProfileComplete, setIsProfileComplete] = useState<boolean | null>(null);
   const location = useLocation();
@@ -156,6 +154,13 @@ export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) 
     console.log("Profile incomplete, redirecting to setup");
     toast.info("Please complete your profile first");
     return <Navigate to="/profile-setup" state={{ from: location }} replace />;
+  }
+
+  // Special case for superadmin dashboard - only superadmins can access
+  if (location.pathname === '/superadmin-dashboard' && adminLevel !== 'superadmin') {
+    console.log("Not a superadmin, redirecting from superadmin dashboard");
+    toast.error("You don't have permission to access this page");
+    return <Navigate to="/" replace />;
   }
 
   // Superadmins can access any page
