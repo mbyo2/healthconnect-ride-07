@@ -1,4 +1,16 @@
 
+// Define SpeechRecognition types to avoid TypeScript errors
+interface SpeechRecognition extends EventTarget {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  start: () => void;
+  stop: () => void;
+  onresult: ((event: SpeechRecognitionEvent) => void) | null;
+  onerror: ((event: SpeechRecognitionErrorEvent) => void) | null;
+  onend: (() => void) | null;
+}
+
 // Helper functions for voice command recognition
 
 // Start the speech recognition
