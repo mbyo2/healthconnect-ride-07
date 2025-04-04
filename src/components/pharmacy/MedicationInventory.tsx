@@ -1,4 +1,3 @@
-
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -43,12 +42,16 @@ import { LoadingScreen } from '@/components/LoadingScreen';
 import { useAuth } from '@/context/AuthContext';
 import { format } from 'date-fns';
 
+// Define the medication type enum to match the database
+type MedicationType = 'tablet' | 'capsule' | 'liquid' | 'injection' | 'cream' | 
+                     'ointment' | 'drops' | 'inhaler' | 'powder' | 'other';
+
 interface MedicationInventoryItem {
   id: string;
   medication_name: string;
   generic_name: string | null;
   dosage: string;
-  medication_type: string;
+  medication_type: MedicationType;
   manufacturer: string | null;
   batch_number: string | null;
   expiry_date: string;
@@ -58,7 +61,7 @@ interface MedicationInventoryItem {
   institution_id: string;
 }
 
-const MEDICATION_TYPES = [
+const MEDICATION_TYPES: MedicationType[] = [
   'tablet', 'capsule', 'liquid', 'injection', 'cream', 
   'ointment', 'drops', 'inhaler', 'powder', 'other'
 ];
@@ -77,7 +80,7 @@ export const MedicationInventory = () => {
     medication_name: '',
     generic_name: '',
     dosage: '',
-    medication_type: 'tablet',
+    medication_type: 'tablet' as MedicationType,
     manufacturer: '',
     batch_number: '',
     expiry_date: format(new Date(), 'yyyy-MM-dd'),
@@ -143,10 +146,19 @@ export const MedicationInventory = () => {
 
   // Handle dropdown changes
   const handleSelectChange = (name: string, value: string) => {
-    setFormData({
-      ...formData,
-      [name]: value
-    });
+    if (name === 'medication_type') {
+      // Ensure it's one of the allowed types
+      const medicationType = value as MedicationType;
+      setFormData({
+        ...formData,
+        [name]: medicationType
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value
+      });
+    }
   };
 
   // Handle form submission
@@ -162,7 +174,8 @@ export const MedicationInventory = () => {
       const dataToSubmit = {
         ...formData,
         institution_id: userInstitution,
-        unit_price: formData.unit_price ? parseFloat(formData.unit_price) : null
+        unit_price: formData.unit_price ? parseFloat(formData.unit_price) : null,
+        medication_type: formData.medication_type as MedicationType
       };
       
       if (editingItem) {
