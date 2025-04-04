@@ -1,7 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 
-export async function createSuperAdmin(email: string, password: string, firstName: string, lastName: string) {
+export async function createAdmin(email: string, password: string, firstName: string, lastName: string) {
   try {
     // Create the user with Supabase auth
     const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -12,7 +12,7 @@ export async function createSuperAdmin(email: string, password: string, firstNam
           first_name: firstName,
           last_name: lastName,
           role: 'admin',
-          admin_level: 'superadmin'
+          admin_level: 'admin'
         }
       }
     });
@@ -27,7 +27,7 @@ export async function createSuperAdmin(email: string, password: string, firstNam
           first_name: firstName,
           last_name: lastName,
           role: 'admin',
-          admin_level: 'superadmin',
+          admin_level: 'admin',
           is_profile_complete: true
         })
         .eq('id', authData.user.id);
@@ -37,7 +37,7 @@ export async function createSuperAdmin(email: string, password: string, firstNam
     
     return { success: true, userId: authData.user?.id };
   } catch (error: any) {
-    console.error("Error creating superadmin:", error);
-    return { success: false, error: error.message || "Failed to create superadmin" };
+    console.error("Error creating admin:", error);
+    return { success: false, error: error.message || "Failed to create admin" };
   }
 }

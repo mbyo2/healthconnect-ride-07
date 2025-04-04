@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
@@ -22,10 +23,9 @@ import {
 import { Menu } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { useTheme } from "next-themes";
-import { ModeToggle } from "@/components/ModeToggle";
+import { ModeToggle } from "@/components/ui/ModeToggle";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
-import { SearchBar } from "./SearchBar";
 import { useSearch } from "@/context/SearchContext";
 import { useEffect } from "react";
 import {
@@ -49,7 +49,7 @@ export function Header() {
   const { theme } = useTheme();
   const [isMounted, setIsMounted] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const { setSearch } = useSearch();
+  const { setSearchQuery } = useSearch();
   const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [adminLevel, setAdminLevel] = useState<AdminLevel | null>(null);
 
@@ -86,8 +86,24 @@ export function Header() {
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setSearch(searchTerm);
+    setSearchQuery(searchTerm);
     navigate("/search");
+  };
+  
+  // Simple SearchBar component inline since we're missing it
+  const SearchBar = () => {
+    return (
+      <form onSubmit={handleSearchSubmit} className="relative hidden md:block">
+        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+        <Input
+          type="search"
+          placeholder="Search..."
+          className="w-[200px] pl-8 md:w-[200px] lg:w-[300px]"
+          value={searchTerm}
+          onChange={handleSearchChange}
+        />
+      </form>
+    );
   };
 
   return (
@@ -150,7 +166,7 @@ export function Header() {
               <Link to="/symptoms" className={cn(
                 navigationMenuTriggerStyle(),
                 location.pathname === "/symptoms" ? "bg-secondary text-secondary-foreground" : ""
-              )} size="sm">
+              )}>
                 Symptoms
               </Link>
             </NavigationMenuItem>
@@ -158,7 +174,7 @@ export function Header() {
               <Link to="/search" className={cn(
                 navigationMenuTriggerStyle(),
                 location.pathname === "/search" ? "bg-secondary text-secondary-foreground" : ""
-              )} size="sm">
+              )}>
                 Search
               </Link>
             </NavigationMenuItem>
@@ -166,7 +182,7 @@ export function Header() {
               <Link to="/map" className={cn(
                 navigationMenuTriggerStyle(),
                 location.pathname === "/map" ? "bg-secondary text-secondary-foreground" : ""
-              )} size="sm">
+              )}>
                 Map
               </Link>
             </NavigationMenuItem>
@@ -174,7 +190,7 @@ export function Header() {
               <Link to="/chat" className={cn(
                 navigationMenuTriggerStyle(),
                 location.pathname === "/chat" ? "bg-secondary text-secondary-foreground" : ""
-              )} size="sm">
+              )}>
                 Chat
               </Link>
             </NavigationMenuItem>
@@ -182,7 +198,7 @@ export function Header() {
               <Link to="/appointments" className={cn(
                 navigationMenuTriggerStyle(),
                 location.pathname === "/appointments" ? "bg-secondary text-secondary-foreground" : ""
-              )} size="sm">
+              )}>
                 Appointments
               </Link>
             </NavigationMenuItem>
@@ -215,6 +231,14 @@ export function Header() {
                   <Link to="/superadmin-dashboard" className="flex items-center">
                     <ShieldAlert className="mr-2 h-4 w-4" />
                     Superadmin Dashboard
+                  </Link>
+                </DropdownMenuItem>
+              )}
+              {(adminLevel === 'admin' || adminLevel === 'superadmin') && (
+                <DropdownMenuItem asChild>
+                  <Link to="/admin-dashboard" className="flex items-center">
+                    <ShieldAlert className="mr-2 h-4 w-4" />
+                    Admin Dashboard
                   </Link>
                 </DropdownMenuItem>
               )}

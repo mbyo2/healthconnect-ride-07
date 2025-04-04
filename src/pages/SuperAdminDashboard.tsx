@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -108,37 +107,34 @@ const SuperAdminDashboard = () => {
       
       // Check if superadmin using RPC
       const { data: canCreate, error: checkError } = await supabase
-        .rpc('can_create_admin');
+        .from('profiles')
+        .select('admin_level')
+        .eq('id', supabase.auth.getUser().then(({ data }) => data.user?.id))
+        .single();
         
       if (checkError) throw checkError;
       
-      if (!canCreate) {
+      if (!canCreate || canCreate.admin_level !== 'superadmin') {
         toast.error("You don't have permission to create admins");
         return;
       }
       
       // Use RPC function to create admin
       const { data: newUserId, error: createError } = await supabase
-        .rpc('create_admin_user', { 
+        .from('profiles')
+        .insert({
           email: newAdminEmail,
           password: newAdminPassword,
-          is_superadmin: false
-        });
+          first_name: newAdminFirstName,
+          last_name: newAdminLastName,
+          role: 'admin',
+          admin_level: 'admin',
+          is_profile_complete: true
+        })
+        .select('id')
+        .single();
         
       if (createError) throw createError;
-      
-      // Update user profile with names
-      if (newUserId) {
-        const { error: updateError } = await supabase
-          .from('profiles')
-          .update({
-            first_name: newAdminFirstName,
-            last_name: newAdminLastName
-          })
-          .eq('id', newUserId);
-          
-        if (updateError) throw updateError;
-      }
       
       toast.success("Admin created successfully");
       setIsAddAdminOpen(false);
