@@ -44,6 +44,7 @@ export type SpecialtyType =
   | 'General Dentistry'
   | 'Orthodontics';
 
+// Ensure the enum is properly exported
 export enum InsuranceProvider {
   MEDICARE = 'Medicare',
   MEDICAID = 'Medicaid',

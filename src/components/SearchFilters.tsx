@@ -106,20 +106,8 @@ export const SearchFilters = () => {
     "Orthodontics"
   ];
 
-  // Use the enum values directly instead of string literals
-  const insuranceProviders = [
-    InsuranceProvider.MEDICARE,
-    InsuranceProvider.MEDICAID,
-    InsuranceProvider.BLUE_CROSS,
-    InsuranceProvider.CIGNA,
-    InsuranceProvider.UNITED_HEALTHCARE,
-    InsuranceProvider.AETNA,
-    InsuranceProvider.HUMANA,
-    InsuranceProvider.KAISER_PERMANENTE,
-    InsuranceProvider.TRICARE,
-    InsuranceProvider.OTHER,
-    InsuranceProvider.NONE
-  ];
+  // Use the enum directly
+  const insuranceProviders = Object.values(InsuranceProvider);
 
   return (
     <div className="bg-card border rounded-lg p-4 shadow-sm space-y-4">
