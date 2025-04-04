@@ -1,3 +1,4 @@
+
 export const appointmentReminderTemplate = (appointment: {
   date: string;
   time: string;
@@ -30,9 +31,9 @@ export const paymentConfirmationTemplate = (payment: {
 export const registrationConfirmationTemplate = (user: {
   first_name: string;
 }) => `
-<h2>Welcome to Dokotela!</h2>
+<h2>Welcome to Doc' O Clock!</h2>
 <p>Dear ${user.first_name},</p>
-<p>Thank you for registering with Dokotela. Your account has been successfully created.</p>
+<p>Thank you for registering with Doc' O Clock. Your account has been successfully created.</p>
 <p>You can now:</p>
 <ul>
   <li>Book appointments with healthcare providers</li>

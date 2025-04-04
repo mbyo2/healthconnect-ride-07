@@ -1,7 +1,7 @@
 
 {
-  "name": "HealthConnect",
-  "short_name": "HealthConnect",
+  "name": "Doc' O Clock",
+  "short_name": "Doc' O Clock",
   "description": "Connect with healthcare providers and manage your appointments",
   "start_url": "/",
   "display": "standalone",

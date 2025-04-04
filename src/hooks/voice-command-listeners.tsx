@@ -11,6 +11,15 @@ interface SpeechRecognition extends EventTarget {
   onend: (() => void) | null;
 }
 
+// Define missing types
+interface SpeechRecognitionEvent {
+  results: SpeechRecognitionResultList;
+}
+
+interface SpeechRecognitionErrorEvent {
+  error: string;
+}
+
 // Helper functions for voice command recognition
 
 // Start the speech recognition

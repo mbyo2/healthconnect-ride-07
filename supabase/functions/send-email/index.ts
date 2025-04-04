@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import {
   appointmentReminderTemplate,
@@ -45,7 +46,7 @@ serve(async (req) => {
         html = paymentConfirmationTemplate(emailRequest.data);
         break;
       case "registration_confirmation":
-        subject = "Welcome to Dokotela";
+        subject = "Welcome to Doc' O Clock";
         html = registrationConfirmationTemplate(emailRequest.data);
         break;
       default:
@@ -59,7 +60,7 @@ serve(async (req) => {
         Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "Dokotela <notifications@dokotela.com>",
+        from: "Doc' O Clock <notifications@docloclock.com>",
         to: emailRequest.to,
         subject,
         html,

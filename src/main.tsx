@@ -24,7 +24,7 @@ registerServiceWorker().then((registration) => {
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="light" storageKey="dokotela-theme">
+      <ThemeProvider defaultTheme="light" storageKey="doc-oclock-theme">
         <AccessibilityProvider>
           <BrowserRouter>
             <App />

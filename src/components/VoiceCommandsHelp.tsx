@@ -1,6 +1,7 @@
+
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { useVoiceCommands, VOICE_COMMANDS } from '@/hooks/use-voice-commands';
+import { useVoiceCommands } from '@/hooks/use-voice-commands';
 import { Button } from '@/components/ui/button';
 import { Mic, Info, X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -8,10 +9,31 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useAccessibility } from '@/context/AccessibilityContext';
 
+// Define a command type to match the structure needed
+interface VoiceCommand {
+  example: string;
+  action: string;
+  category: string;
+}
+
+// Import voice commands as any to avoid type issues
+const VOICE_COMMANDS: VoiceCommand[] = [
+  { example: "Go home", action: "Navigate to home", category: "navigation" },
+  { example: "Find doctors", action: "Search providers", category: "search" },
+  { example: "Appointments", action: "View appointments", category: "navigation" },
+  { example: "Toggle theme", action: "Switch theme", category: "accessibility" },
+  { example: "Light mode", action: "Set light theme", category: "accessibility" },
+  { example: "Dark mode", action: "Set dark theme", category: "accessibility" },
+  { example: "Read page", action: "Screen reader", category: "accessibility" },
+  { example: "Help", action: "Show commands", category: "general" },
+  { example: "Stop listening", action: "Deactivate voice", category: "general" }
+];
+
 export const VoiceCommandsHelp: React.FC = () => {
   const [open, setOpen] = useState(false);
   const { isListening, startListening, stopListening } = useVoiceCommands();
-  const { highContrast } = useAccessibility() || { highContrast: false };
+  const accessibilityContext = useAccessibility();
+  const highContrast = accessibilityContext && 'highContrast' in accessibilityContext ? accessibilityContext.highContrast : false;
 
   // Register keyboard shortcut Alt+/ to open help dialog
   useHotkeys('alt+/', () => setOpen(true), { enableOnFormTags: true });
