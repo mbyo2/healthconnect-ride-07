@@ -1,4 +1,3 @@
-
 import React, { useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -107,7 +106,7 @@ export const SearchFilters = () => {
     "Orthodontics"
   ];
 
-  // Updated to use enum values instead of string literals
+  // Use the enum values directly instead of string literals
   const insuranceProviders = [
     InsuranceProvider.MEDICARE,
     InsuranceProvider.MEDICAID,

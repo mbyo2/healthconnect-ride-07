@@ -44,7 +44,6 @@ export type SpecialtyType =
   | 'General Dentistry'
   | 'Orthodontics';
 
-// Convert from type to enum so we can use it as a value
 export enum InsuranceProvider {
   MEDICARE = 'Medicare',
   MEDICAID = 'Medicaid',
