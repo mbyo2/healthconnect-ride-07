@@ -1,7 +1,7 @@
 
 "use client";
 
-import { createContext, useEffect, useState } from "react";
+import * as React from "react";
 
 type Theme = "dark" | "light" | "system";
 
@@ -24,7 +24,7 @@ const initialState: ThemeProviderState = {
   setTheme: () => null,
 };
 
-export const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
+export const ThemeProviderContext = React.createContext<ThemeProviderState>(initialState);
 
 export function ThemeProvider({
   children,
@@ -34,11 +34,11 @@ export function ThemeProvider({
   disableTransitionOnChange = false,
   attribute = "data-theme",
 }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(
+  const [theme, setTheme] = React.useState<Theme>(
     () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
   );
 
-  useEffect(() => {
+  React.useEffect(() => {
     const root = window.document.documentElement;
 
     if (theme === "system" && enableSystem) {
@@ -64,7 +64,7 @@ export function ThemeProvider({
     root.setAttribute(attribute, theme);
   }, [theme, disableTransitionOnChange, enableSystem, attribute]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const handleMediaChange = (e: MediaQueryListEvent) => {
       if (theme === "system" && enableSystem) {
         const root = window.document.documentElement;
@@ -82,7 +82,7 @@ export function ThemeProvider({
     return () => media.removeEventListener("change", handleMediaChange);
   }, [theme, enableSystem, attribute]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     // Force refresh theme on initial load
     const root = window.document.documentElement;
     const currentTheme = theme === "system" && enableSystem
