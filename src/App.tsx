@@ -34,6 +34,7 @@ import HealthcareApplication from "./pages/HealthcareApplication";
 import InstitutionStatus from "./pages/InstitutionStatus";
 import { SearchProvider } from "./context/SearchContext";
 import Index from "./pages/Index";
+import PharmacyInventory from "./pages/PharmacyInventory";
 
 // Auth redirect component
 const AuthRedirect = () => {
@@ -217,6 +218,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <PrivacySecurityPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/pharmacy-inventory" 
+              element={
+                <ProtectedRoute>
+                  <PharmacyInventory />
                 </ProtectedRoute>
               } 
             />

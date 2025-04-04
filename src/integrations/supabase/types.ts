@@ -692,6 +692,66 @@ export type Database = {
           },
         ]
       }
+      inventory_transactions: {
+        Row: {
+          created_at: string
+          id: string
+          invoice_number: string | null
+          medication_inventory_id: string
+          notes: string | null
+          performed_by: string | null
+          prescription_id: string | null
+          quantity: number
+          supplier: string | null
+          transaction_date: string
+          transaction_type: string
+          unit_price: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          invoice_number?: string | null
+          medication_inventory_id: string
+          notes?: string | null
+          performed_by?: string | null
+          prescription_id?: string | null
+          quantity: number
+          supplier?: string | null
+          transaction_date?: string
+          transaction_type: string
+          unit_price?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          invoice_number?: string | null
+          medication_inventory_id?: string
+          notes?: string | null
+          performed_by?: string | null
+          prescription_id?: string | null
+          quantity?: number
+          supplier?: string | null
+          transaction_date?: string
+          transaction_type?: string
+          unit_price?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_transactions_medication_inventory_id_fkey"
+            columns: ["medication_inventory_id"]
+            isOneToOne: false
+            referencedRelation: "medication_inventory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_transactions_prescription_id_fkey"
+            columns: ["prescription_id"]
+            isOneToOne: false
+            referencedRelation: "prescriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lab_results: {
         Row: {
           created_at: string | null
@@ -773,6 +833,65 @@ export type Database = {
             columns: ["patient_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      medication_inventory: {
+        Row: {
+          batch_number: string | null
+          created_at: string
+          dosage: string
+          expiry_date: string
+          generic_name: string | null
+          id: string
+          institution_id: string
+          manufacturer: string | null
+          medication_name: string
+          medication_type: Database["public"]["Enums"]["medication_type"]
+          minimum_stock_level: number | null
+          quantity_available: number
+          unit_price: number | null
+          updated_at: string
+        }
+        Insert: {
+          batch_number?: string | null
+          created_at?: string
+          dosage: string
+          expiry_date: string
+          generic_name?: string | null
+          id?: string
+          institution_id: string
+          manufacturer?: string | null
+          medication_name: string
+          medication_type: Database["public"]["Enums"]["medication_type"]
+          minimum_stock_level?: number | null
+          quantity_available?: number
+          unit_price?: number | null
+          updated_at?: string
+        }
+        Update: {
+          batch_number?: string | null
+          created_at?: string
+          dosage?: string
+          expiry_date?: string
+          generic_name?: string | null
+          id?: string
+          institution_id?: string
+          manufacturer?: string | null
+          medication_name?: string
+          medication_type?: Database["public"]["Enums"]["medication_type"]
+          minimum_stock_level?: number | null
+          quantity_available?: number
+          unit_price?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medication_inventory_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
             referencedColumns: ["id"]
           },
         ]
@@ -1354,6 +1473,53 @@ export type Database = {
         }
         Relationships: []
       }
+      suppliers: {
+        Row: {
+          address: string | null
+          contact_person: string | null
+          created_at: string
+          email: string | null
+          id: string
+          institution_id: string
+          is_active: boolean | null
+          name: string
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          contact_person?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          institution_id: string
+          is_active?: boolean | null
+          name: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          contact_person?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          institution_id?: string
+          is_active?: boolean | null
+          name?: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "suppliers_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       symptoms_diary: {
         Row: {
           created_at: string | null
@@ -1525,6 +1691,17 @@ export type Database = {
         | "pharmacy"
         | "nursing_home"
         | "dentist"
+      medication_type:
+        | "tablet"
+        | "capsule"
+        | "liquid"
+        | "injection"
+        | "cream"
+        | "ointment"
+        | "drops"
+        | "inhaler"
+        | "powder"
+        | "other"
       user_role: "admin" | "health_personnel" | "patient"
     }
     CompositeTypes: {
