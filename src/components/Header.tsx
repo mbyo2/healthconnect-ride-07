@@ -22,8 +22,8 @@ import {
 } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import { useTheme } from "next-themes";
-import { ModeToggle } from "@/components/ui/ModeToggle";
+import { useTheme } from "@/hooks/use-theme";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { useSearch } from "@/context/SearchContext";
@@ -207,7 +207,7 @@ export function Header() {
         <div className="ml-auto flex items-center space-x-4">
           <SearchBar />
           {isMounted && theme ? (
-            <ModeToggle />
+            <ThemeToggle />
           ) : null}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -250,3 +250,4 @@ export function Header() {
     </header>
   );
 }
+
