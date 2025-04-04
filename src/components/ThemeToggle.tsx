@@ -8,7 +8,7 @@ export const ThemeToggle = () => {
   const { theme, setTheme } = useTheme();
 
   const toggleTheme = () => {
-    // Explicitly toggle between "light" and "dark" themes
+    // Toggle between "light" and "dark" themes
     const newTheme = theme === "dark" ? "light" : "dark";
     setTheme(newTheme);
     toast.success(`${newTheme.charAt(0).toUpperCase() + newTheme.slice(1)} mode activated`);

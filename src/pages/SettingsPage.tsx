@@ -1,17 +1,15 @@
-
 import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Settings, Globe, Moon, Sun, Smartphone } from "lucide-react";
+import { Settings, Moon, Sun } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useTheme } from "@/hooks/use-theme";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -28,7 +26,7 @@ const settingsSchema = z.object({
 type SettingsFormValues = z.infer<typeof settingsSchema>;
 
 const SettingsPage = () => {
-  const { theme, setTheme } = useTheme();
+  const { theme } = useTheme();
   const [isSaving, setIsSaving] = useState(false);
 
   const form = useForm<SettingsFormValues>({
@@ -146,8 +144,7 @@ const SettingsPage = () => {
                 render={({ field }) => (
                   <FormItem className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
-                      <Smartphone className="h-5 w-5" />
-                      <FormLabel>Accessibility Mode</FormLabel>
+                      <Label>Accessibility Mode</Label>
                     </div>
                     <FormControl>
                       <Switch
