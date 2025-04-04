@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -16,7 +17,7 @@ import { MoreHorizontal, UserPlus, ShieldAlert, Users, Settings } from "lucide-r
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { AdminLevel, UserRole } from "@/types/user";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { createSuperAdmin } from "@/utils/createSuperAdmin";
 
 type AdminUser = {
   id: string;
@@ -105,36 +106,25 @@ const SuperAdminDashboard = () => {
     try {
       setIsSubmitting(true);
       
-      // Check if superadmin using RPC
-      const { data: canCreate, error: checkError } = await supabase
-        .from('profiles')
-        .select('admin_level')
-        .eq('id', supabase.auth.getUser().then(({ data }) => data.user?.id))
-        .single();
-        
-      if (checkError) throw checkError;
+      const userData = await supabase.auth.getUser();
+      const userId = userData.data.user?.id;
       
-      if (!canCreate || canCreate.admin_level !== 'superadmin') {
-        toast.error("You don't have permission to create admins");
+      if (!userId) {
+        toast.error("Authentication error");
         return;
       }
       
-      // Use RPC function to create admin
-      const { data: newUserId, error: createError } = await supabase
-        .from('profiles')
-        .insert({
-          email: newAdminEmail,
-          password: newAdminPassword,
-          first_name: newAdminFirstName,
-          last_name: newAdminLastName,
-          role: 'admin',
-          admin_level: 'admin',
-          is_profile_complete: true
-        })
-        .select('id')
-        .single();
-        
-      if (createError) throw createError;
+      // Use our createSuperAdmin utility function
+      const result = await createSuperAdmin(
+        newAdminEmail,
+        newAdminPassword,
+        newAdminFirstName,
+        newAdminLastName
+      );
+      
+      if (!result.success) {
+        throw new Error(result.error || "Failed to create admin");
+      }
       
       toast.success("Admin created successfully");
       setIsAddAdminOpen(false);
