@@ -50,200 +50,202 @@ function App() {
   return (
     <>
       <AuthProvider>
-        <div className="flex flex-col min-h-screen">
-          <Routes>
-            {/* Public routes - redirect to auth by default */}
-            <Route path="/" element={<AuthRedirect />} />
-            <Route path="/landing" element={<Landing />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/provider-portal" element={<ProviderPortal />} />
-            <Route path="/institution-portal" element={<InstitutionPortal />} />
-            
-            {/* Protected routes - all with consistent layout */}
-            <Route 
-              path="/symptoms" 
-              element={
-                <ProtectedRoute>
-                  <SymptomCollector />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/profile-setup" 
-              element={
-                <ProtectedRoute>
-                  <ProfileSetup />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/application-status" 
-              element={
-                <ProtectedRoute>
-                  <ApplicationStatus />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/healthcare-application" 
-              element={
-                <ProtectedRoute>
-                  <HealthcareApplication />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/institution-status" 
-              element={
-                <ProtectedRoute>
-                  <InstitutionStatus />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/search" 
-              element={
-                <ProtectedRoute>
-                  <Search />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/map" 
-              element={
-                <ProtectedRoute>
-                  <Map />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/chat" 
-              element={
-                <ProtectedRoute>
-                  <Chat />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/profile" 
-              element={
-                <ProtectedRoute>
-                  <Profile />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/appointments" 
-              element={
-                <ProtectedRoute>
-                  <Appointments />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/patient-appointments" 
-              element={
-                <ProtectedRoute>
-                  <PatientAppointments />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/provider/:providerId" 
-              element={
-                <ProtectedRoute>
-                  <ProviderProfile />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/provider-dashboard" 
-              element={
-                <ProtectedRoute allowedRoles={['health_personnel', 'admin']}>
-                  <ProviderDashboard />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/provider-calendar" 
-              element={
-                <ProtectedRoute allowedRoles={['health_personnel', 'admin']}>
-                  <ProviderCalendar />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/admin-dashboard" 
-              element={
-                <ProtectedRoute allowedRoles={['admin']}>
-                  <AdminDashboard />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/superadmin-dashboard" 
-              element={
-                <ProtectedRoute>
-                  <SuperAdminDashboard />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/healthcare-registration" 
-              element={
-                <ProtectedRoute>
-                  <InstitutionRegistration />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/video-consultations" 
-              element={
-                <ProtectedRoute>
-                  <VideoConsultations />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/notifications" 
-              element={
-                <ProtectedRoute>
-                  <NotificationsPage />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/settings" 
-              element={
-                <ProtectedRoute>
-                  <SettingsPage />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/privacy-security" 
-              element={
-                <ProtectedRoute>
-                  <PrivacySecurityPage />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/pharmacy-inventory" 
-              element={
-                <ProtectedRoute>
-                  <PharmacyInventory />
-                </ProtectedRoute>
-              } 
-            />
-            
-            {/* Catch-all redirect */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </div>
-        <OfflineAlert />
+        <SearchProvider>
+          <div className="flex flex-col min-h-screen">
+            <Routes>
+              {/* Public routes - redirect to auth by default */}
+              <Route path="/" element={<AuthRedirect />} />
+              <Route path="/landing" element={<Landing />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/provider-portal" element={<ProviderPortal />} />
+              <Route path="/institution-portal" element={<InstitutionPortal />} />
+              
+              {/* Protected routes - all with consistent layout */}
+              <Route 
+                path="/symptoms" 
+                element={
+                  <ProtectedRoute>
+                    <SymptomCollector />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/profile-setup" 
+                element={
+                  <ProtectedRoute>
+                    <ProfileSetup />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/application-status" 
+                element={
+                  <ProtectedRoute>
+                    <ApplicationStatus />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/healthcare-application" 
+                element={
+                  <ProtectedRoute>
+                    <HealthcareApplication />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/institution-status" 
+                element={
+                  <ProtectedRoute>
+                    <InstitutionStatus />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/search" 
+                element={
+                  <ProtectedRoute>
+                    <Search />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/map" 
+                element={
+                  <ProtectedRoute>
+                    <Map />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/chat" 
+                element={
+                  <ProtectedRoute>
+                    <Chat />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/profile" 
+                element={
+                  <ProtectedRoute>
+                    <Profile />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/appointments" 
+                element={
+                  <ProtectedRoute>
+                    <Appointments />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/patient-appointments" 
+                element={
+                  <ProtectedRoute>
+                    <PatientAppointments />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/provider/:providerId" 
+                element={
+                  <ProtectedRoute>
+                    <ProviderProfile />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/provider-dashboard" 
+                element={
+                  <ProtectedRoute allowedRoles={['health_personnel', 'admin']}>
+                    <ProviderDashboard />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/provider-calendar" 
+                element={
+                  <ProtectedRoute allowedRoles={['health_personnel', 'admin']}>
+                    <ProviderCalendar />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/admin-dashboard" 
+                element={
+                  <ProtectedRoute allowedRoles={['admin']}>
+                    <AdminDashboard />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/superadmin-dashboard" 
+                element={
+                  <ProtectedRoute>
+                    <SuperAdminDashboard />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/healthcare-registration" 
+                element={
+                  <ProtectedRoute>
+                    <InstitutionRegistration />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/video-consultations" 
+                element={
+                  <ProtectedRoute>
+                    <VideoConsultations />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/notifications" 
+                element={
+                  <ProtectedRoute>
+                    <NotificationsPage />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/settings" 
+                element={
+                  <ProtectedRoute>
+                    <SettingsPage />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/privacy-security" 
+                element={
+                  <ProtectedRoute>
+                    <PrivacySecurityPage />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/pharmacy-inventory" 
+                element={
+                  <ProtectedRoute>
+                    <PharmacyInventory />
+                  </ProtectedRoute>
+                } 
+              />
+              
+              {/* Catch-all redirect */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </div>
+          <OfflineAlert />
+        </SearchProvider>
       </AuthProvider>
       {/* VoiceCommandsHelp is only wrapped in SearchProvider, not the whole app */}
       <VoiceCommandsHelp />
