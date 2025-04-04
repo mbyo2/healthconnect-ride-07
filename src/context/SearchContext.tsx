@@ -75,6 +75,22 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   }, [useUserLocation]);
 
+  // Function to convert string array to InsuranceProvider array
+  const stringToInsuranceProvider = (
+    insuranceStrings: string[] | null
+  ): InsuranceProvider[] => {
+    if (!insuranceStrings || !Array.isArray(insuranceStrings)) {
+      return [];
+    }
+    
+    return insuranceStrings
+      .filter(insurance => {
+        // Only include strings that match valid InsuranceProvider values
+        return Object.values(InsuranceProvider).includes(insurance as InsuranceProvider);
+      })
+      .map(insurance => insurance as InsuranceProvider);
+  };
+
   // Fetch providers based on filters
   const fetchProviders = async () => {
     setIsLoading(true);
@@ -110,7 +126,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         bio: profile.bio || '',
         provider_type: profile.provider_type || 'doctor',
         avatar_url: profile.avatar_url,
-        accepted_insurances: profile.accepted_insurances || [],
+        accepted_insurances: stringToInsuranceProvider(profile.accepted_insurances),
         expertise: ['General Medicine', 'Primary Care'],
         location: profile.provider_locations?.[0] ? {
           latitude: Number(profile.provider_locations[0].latitude),
