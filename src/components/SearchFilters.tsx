@@ -107,18 +107,19 @@ export const SearchFilters = () => {
     "Orthodontics"
   ];
 
-  const insuranceProviders: InsuranceProvider[] = [
-    "Medicare",
-    "Medicaid", 
-    "Blue Cross",
-    "Cigna",
-    "UnitedHealthcare",
-    "Aetna",
-    "Humana",
-    "Kaiser Permanente",
-    "TRICARE",
-    "Other",
-    "None"
+  // Updated to use enum values instead of string literals
+  const insuranceProviders = [
+    InsuranceProvider.MEDICARE,
+    InsuranceProvider.MEDICAID,
+    InsuranceProvider.BLUE_CROSS,
+    InsuranceProvider.CIGNA,
+    InsuranceProvider.UNITED_HEALTHCARE,
+    InsuranceProvider.AETNA,
+    InsuranceProvider.HUMANA,
+    InsuranceProvider.KAISER_PERMANENTE,
+    InsuranceProvider.TRICARE,
+    InsuranceProvider.OTHER,
+    InsuranceProvider.NONE
   ];
 
   return (
