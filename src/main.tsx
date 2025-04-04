@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import App from './App';
 import './index.css';
 import './App.css';
-import { Toaster } from './components/ui/sonner';
+import { Toaster } from 'sonner';
 import { ThemeProvider } from './hooks/use-theme';
 import { AccessibilityProvider } from './context/AccessibilityContext';
 import { registerServiceWorker } from './utils/service-worker';

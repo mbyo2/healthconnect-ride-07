@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -27,7 +27,6 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { useSearch } from "@/context/SearchContext";
-import { useEffect } from "react";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -250,4 +249,3 @@ export function Header() {
     </header>
   );
 }
-

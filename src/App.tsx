@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
@@ -35,6 +36,7 @@ import InstitutionStatus from "./pages/InstitutionStatus";
 import { SearchProvider } from "./context/SearchContext";
 import Index from "./pages/Index";
 import PharmacyInventory from "./pages/PharmacyInventory";
+import { Header } from "./components/Header";
 
 // Auth redirect component
 const AuthRedirect = () => {
@@ -46,11 +48,16 @@ const AuthRedirect = () => {
 };
 
 function App() {
+  const location = useLocation();
+  const showHeader = !['/landing', '/login', '/auth'].includes(location.pathname);
+  
   return (
-    <>
-      <AuthProvider>
-        <SearchProvider>
-          <div className="flex flex-col min-h-screen">
+    <AuthProvider>
+      <SearchProvider>
+        <div className="flex flex-col min-h-screen">
+          {showHeader && <Header />}
+          
+          <main className="flex-1">
             <Routes>
               {/* Public routes - redirect to auth by default */}
               <Route path="/" element={<AuthRedirect />} />
@@ -66,7 +73,9 @@ function App() {
                 path="/symptoms" 
                 element={
                   <ProtectedRoute>
-                    <SymptomCollector />
+                    <div className="container mx-auto px-4 md:px-6 py-6">
+                      <SymptomCollector />
+                    </div>
                   </ProtectedRoute>
                 } 
               />
@@ -74,7 +83,9 @@ function App() {
                 path="/profile-setup" 
                 element={
                   <ProtectedRoute>
-                    <ProfileSetup />
+                    <div className="container mx-auto px-4 md:px-6 py-6">
+                      <ProfileSetup />
+                    </div>
                   </ProtectedRoute>
                 } 
               />
@@ -82,7 +93,9 @@ function App() {
                 path="/application-status" 
                 element={
                   <ProtectedRoute>
-                    <ApplicationStatus />
+                    <div className="container mx-auto px-4 md:px-6 py-6">
+                      <ApplicationStatus />
+                    </div>
                   </ProtectedRoute>
                 } 
               />
@@ -90,7 +103,9 @@ function App() {
                 path="/healthcare-application" 
                 element={
                   <ProtectedRoute>
-                    <HealthcareApplication />
+                    <div className="container mx-auto px-4 md:px-6 py-6">
+                      <HealthcareApplication />
+                    </div>
                   </ProtectedRoute>
                 } 
               />
@@ -98,7 +113,9 @@ function App() {
                 path="/institution-status" 
                 element={
                   <ProtectedRoute>
-                    <InstitutionStatus />
+                    <div className="container mx-auto px-4 md:px-6 py-6">
+                      <InstitutionStatus />
+                    </div>
                   </ProtectedRoute>
                 } 
               />
@@ -114,7 +131,9 @@ function App() {
                 path="/map" 
                 element={
                   <ProtectedRoute>
-                    <Map />
+                    <div className="container mx-auto px-4 md:px-6 py-6">
+                      <Map />
+                    </div>
                   </ProtectedRoute>
                 } 
               />
@@ -122,7 +141,9 @@ function App() {
                 path="/chat" 
                 element={
                   <ProtectedRoute>
-                    <Chat />
+                    <div className="container mx-auto px-4 md:px-6 py-6">
+                      <Chat />
+                    </div>
                   </ProtectedRoute>
                 } 
               />
@@ -130,7 +151,9 @@ function App() {
                 path="/profile" 
                 element={
                   <ProtectedRoute>
-                    <Profile />
+                    <div className="container mx-auto px-4 md:px-6 py-6">
+                      <Profile />
+                    </div>
                   </ProtectedRoute>
                 } 
               />
@@ -138,7 +161,9 @@ function App() {
                 path="/appointments" 
                 element={
                   <ProtectedRoute>
-                    <Appointments />
+                    <div className="container mx-auto px-4 md:px-6 py-6">
+                      <Appointments />
+                    </div>
                   </ProtectedRoute>
                 } 
               />
@@ -146,7 +171,9 @@ function App() {
                 path="/patient-appointments" 
                 element={
                   <ProtectedRoute>
-                    <PatientAppointments />
+                    <div className="container mx-auto px-4 md:px-6 py-6">
+                      <PatientAppointments />
+                    </div>
                   </ProtectedRoute>
                 } 
               />
@@ -154,7 +181,9 @@ function App() {
                 path="/provider/:providerId" 
                 element={
                   <ProtectedRoute>
-                    <ProviderProfile />
+                    <div className="container mx-auto px-4 md:px-6 py-6">
+                      <ProviderProfile />
+                    </div>
                   </ProtectedRoute>
                 } 
               />
@@ -162,7 +191,9 @@ function App() {
                 path="/provider-dashboard" 
                 element={
                   <ProtectedRoute allowedRoles={['health_personnel', 'admin']}>
-                    <ProviderDashboard />
+                    <div className="container mx-auto px-4 md:px-6 py-6">
+                      <ProviderDashboard />
+                    </div>
                   </ProtectedRoute>
                 } 
               />
@@ -170,7 +201,9 @@ function App() {
                 path="/provider-calendar" 
                 element={
                   <ProtectedRoute allowedRoles={['health_personnel', 'admin']}>
-                    <ProviderCalendar />
+                    <div className="container mx-auto px-4 md:px-6 py-6">
+                      <ProviderCalendar />
+                    </div>
                   </ProtectedRoute>
                 } 
               />
@@ -178,7 +211,9 @@ function App() {
                 path="/admin-dashboard" 
                 element={
                   <ProtectedRoute allowedRoles={['admin']}>
-                    <AdminDashboard />
+                    <div className="container mx-auto px-4 md:px-6 py-6">
+                      <AdminDashboard />
+                    </div>
                   </ProtectedRoute>
                 } 
               />
@@ -186,7 +221,9 @@ function App() {
                 path="/superadmin-dashboard" 
                 element={
                   <ProtectedRoute>
-                    <SuperAdminDashboard />
+                    <div className="container mx-auto px-4 md:px-6 py-6">
+                      <SuperAdminDashboard />
+                    </div>
                   </ProtectedRoute>
                 } 
               />
@@ -194,7 +231,9 @@ function App() {
                 path="/healthcare-registration" 
                 element={
                   <ProtectedRoute>
-                    <InstitutionRegistration />
+                    <div className="container mx-auto px-4 md:px-6 py-6">
+                      <InstitutionRegistration />
+                    </div>
                   </ProtectedRoute>
                 } 
               />
@@ -202,7 +241,9 @@ function App() {
                 path="/video-consultations" 
                 element={
                   <ProtectedRoute>
-                    <VideoConsultations />
+                    <div className="container mx-auto px-4 md:px-6 py-6">
+                      <VideoConsultations />
+                    </div>
                   </ProtectedRoute>
                 } 
               />
@@ -210,7 +251,9 @@ function App() {
                 path="/notifications" 
                 element={
                   <ProtectedRoute>
-                    <NotificationsPage />
+                    <div className="container mx-auto px-4 md:px-6 py-6">
+                      <NotificationsPage />
+                    </div>
                   </ProtectedRoute>
                 } 
               />
@@ -218,7 +261,9 @@ function App() {
                 path="/settings" 
                 element={
                   <ProtectedRoute>
-                    <SettingsPage />
+                    <div className="container mx-auto px-4 md:px-6 py-6">
+                      <SettingsPage />
+                    </div>
                   </ProtectedRoute>
                 } 
               />
@@ -226,7 +271,9 @@ function App() {
                 path="/privacy-security" 
                 element={
                   <ProtectedRoute>
-                    <PrivacySecurityPage />
+                    <div className="container mx-auto px-4 md:px-6 py-6">
+                      <PrivacySecurityPage />
+                    </div>
                   </ProtectedRoute>
                 } 
               />
@@ -234,7 +281,9 @@ function App() {
                 path="/pharmacy-inventory" 
                 element={
                   <ProtectedRoute>
-                    <PharmacyInventory />
+                    <div className="container mx-auto px-4 md:px-6 py-6">
+                      <PharmacyInventory />
+                    </div>
                   </ProtectedRoute>
                 } 
               />
@@ -242,13 +291,12 @@ function App() {
               {/* Catch-all redirect */}
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
-          </div>
+          </main>
           <OfflineAlert />
-        </SearchProvider>
-      </AuthProvider>
-      {/* VoiceCommandsHelp is only wrapped in SearchProvider, not the whole app */}
-      <VoiceCommandsHelp />
-    </>
+        </div>
+        <VoiceCommandsHelp />
+      </SearchProvider>
+    </AuthProvider>
   );
 }
 
