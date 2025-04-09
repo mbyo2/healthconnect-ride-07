@@ -4,78 +4,80 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HealthConnect - Offline</title>
+  <title>Offline - Doc' O Clock</title>
   <style>
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: #f9fafb;
-      color: #374151;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      background: #f9fafb;
+      color: #1f2937;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: 100vh;
+      height: 100vh;
       margin: 0;
       padding: 20px;
       text-align: center;
     }
     .container {
-      max-width: 480px;
-      padding: 32px;
-      background-color: white;
+      max-width: 500px;
+      padding: 40px;
+      background: white;
       border-radius: 12px;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 10px 15px rgba(0, 0, 0, 0.1);
+    }
+    .logo {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 20px;
+      background-color: #f3f4f6;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+    }
+    .logo-text {
+      font-size: 30px;
+      font-weight: bold;
+      color: #4b5563;
     }
     h1 {
+      margin: 0 0 16px;
+      color: #4f46e5;
       font-size: 24px;
-      font-weight: 700;
-      margin-bottom: 16px;
     }
     p {
-      margin-bottom: 24px;
-      line-height: 1.5;
-    }
-    .icon {
-      font-size: 64px;
-      margin-bottom: 24px;
+      margin: 0 0 24px;
+      color: #6b7280;
+      line-height: 1.6;
     }
     .button {
-      display: inline-block;
-      background-color: #2563eb;
+      background-color: #4f46e5;
       color: white;
-      padding: 12px 24px;
+      border: none;
+      padding: 12px 20px;
       border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s;
       text-decoration: none;
-      font-weight: 500;
-      transition: background-color 0.3s;
+      display: inline-block;
     }
     .button:hover {
-      background-color: #1d4ed8;
-    }
-    @media (prefers-color-scheme: dark) {
-      body {
-        background-color: #111827;
-        color: #f9fafb;
-      }
-      .container {
-        background-color: #1f2937;
-      }
-      .button {
-        background-color: #3b82f6;
-      }
-      .button:hover {
-        background-color: #2563eb;
-      }
+      background-color: #4338ca;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="icon">📶</div>
-    <h1>You're offline</h1>
-    <p>It looks like you're currently offline. Some features of HealthConnect require an internet connection. Please check your connection and try again.</p>
-    <p>You can still access some previously loaded content while offline.</p>
-    <a href="/" class="button">Try again</a>
+    <div class="logo">
+      <div class="logo-text">D</div>
+    </div>
+    <h1>You're currently offline</h1>
+    <p>Doc' O Clock needs an internet connection to work properly. Please check your connection and try again.</p>
+    <p>Some features may still work in offline mode, but for the full experience, please reconnect to the internet.</p>
+    <button class="button" onclick="window.location.href='/'">Try again</button>
   </div>
 </body>
 </html>

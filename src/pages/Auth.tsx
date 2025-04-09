@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { Card } from "@/components/ui/card";
@@ -14,6 +13,7 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { toast } from "sonner";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -99,9 +99,10 @@ const Auth = () => {
     try {
       setError(null);
       await signIn(data.email, data.password);
-      navigate("/symptoms");
+      // Navigate is handled by the auth context
     } catch (err: any) {
       setError(err.message || "Failed to sign in");
+      console.error("Login error:", err);
     }
   };
 
@@ -113,9 +114,10 @@ const Auth = () => {
         last_name: data.lastName,
         role: "patient",
       });
-      navigate("/profile-setup");
+      toast.success("Account created! Please verify your email address.");
     } catch (err: any) {
       setError(err.message || "Failed to create account");
+      console.error("Patient signup error:", err);
     }
   };
 
@@ -129,9 +131,10 @@ const Auth = () => {
         specialty: data.specialty,
         license_number: data.licenseNumber,
       });
-      navigate("/profile-setup");
+      toast.success("Account created! Please verify your email address.");
     } catch (err: any) {
       setError(err.message || "Failed to create account");
+      console.error("Provider signup error:", err);
     }
   };
 
@@ -206,6 +209,12 @@ const Auth = () => {
                       </FormItem>
                     )}
                   />
+                  
+                  <div className="text-sm text-right">
+                    <Link to="/reset-password" className="text-primary hover:underline">
+                      Forgot password?
+                    </Link>
+                  </div>
                   
                   <Button 
                     type="submit" 
