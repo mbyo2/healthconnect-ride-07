@@ -14,7 +14,7 @@ const Landing = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted">
       <div className="container mx-auto px-4 py-8 flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Doc' O Clock</h1>
+        <h1 className="text-2xl font-bold">Doc&apos; O Clock</h1>
         <div className="flex gap-4">
           <Button variant="outline" onClick={() => navigate('/login')}>Log In</Button>
           <Button onClick={() => navigate('/auth')}>Sign Up</Button>

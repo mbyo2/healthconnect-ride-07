@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
@@ -39,6 +38,7 @@ import {
 import { cn } from "@/lib/utils";
 import { UserRole, AdminLevel } from "@/types/user";
 import { ShieldAlert } from "lucide-react";
+import { Logo } from "@/components/ui/Logo";
 
 export function Header() {
   const { user, signOut, profile } = useAuth();
@@ -157,7 +157,7 @@ export function Header() {
           </SheetContent>
         </Sheet>
         <Link to="/" className="hidden sm:block font-bold">
-          Healthcare Platform
+          Doc&apos; O Clock
         </Link>
         <NavigationMenu className="hidden sm:block">
           <NavigationMenuList>
