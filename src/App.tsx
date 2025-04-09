@@ -49,7 +49,29 @@ const AuthRedirect = () => {
 
 function App() {
   const location = useLocation();
-  const showHeader = !['/landing', '/login', '/auth'].includes(location.pathname);
+  // Only show header on public routes, ProtectedRoute component will handle its own header
+  const showHeader = !['/landing', '/login', '/auth', '/provider-portal', '/institution-portal', '/reset-password'].includes(location.pathname) 
+    && !location.pathname.startsWith('/symptoms')
+    && !location.pathname.startsWith('/profile')
+    && !location.pathname.startsWith('/search')
+    && !location.pathname.startsWith('/map')
+    && !location.pathname.startsWith('/chat')
+    && !location.pathname.startsWith('/appointments')
+    && !location.pathname.startsWith('/patient-appointments')
+    && !location.pathname.startsWith('/provider')
+    && !location.pathname.startsWith('/provider-dashboard')
+    && !location.pathname.startsWith('/provider-calendar')
+    && !location.pathname.startsWith('/admin-dashboard')
+    && !location.pathname.startsWith('/superadmin-dashboard')
+    && !location.pathname.startsWith('/healthcare-registration')
+    && !location.pathname.startsWith('/video-consultations')
+    && !location.pathname.startsWith('/notifications')
+    && !location.pathname.startsWith('/settings')
+    && !location.pathname.startsWith('/privacy-security')
+    && !location.pathname.startsWith('/pharmacy-inventory')
+    && !location.pathname.startsWith('/application-status')
+    && !location.pathname.startsWith('/healthcare-application')
+    && !location.pathname.startsWith('/institution-status');
   
   return (
     <AuthProvider>

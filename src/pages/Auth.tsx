@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Heart, Building2, User } from "lucide-react";
 import { LoadingScreen } from "@/components/LoadingScreen";
@@ -53,9 +53,11 @@ const Auth = () => {
   const [error, setError] = useState<string | null>(null);
   const [userType, setUserType] = useState<"patient" | "health_personnel">("patient");
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const defaultTab = searchParams.get('tab') === 'signup' ? 'signup' : 'signin';
 
   // Redirect if already authenticated
-  React.useEffect(() => {
+  useEffect(() => {
     if (isAuthenticated) {
       navigate("/symptoms");
     }
@@ -161,7 +163,7 @@ const Auth = () => {
         )}
 
         <Card className="p-6 shadow-lg">
-          <Tabs defaultValue="signin">
+          <Tabs defaultValue={defaultTab}>
             <TabsList className="grid w-full grid-cols-2 mb-4">
               <TabsTrigger value="signin">Sign In</TabsTrigger>
               <TabsTrigger value="signup">Register</TabsTrigger>

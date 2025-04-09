@@ -4,9 +4,9 @@ import { Navigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { toast } from "sonner";
-import { Header } from "@/components/Header";
 import { BottomNav } from "@/components/BottomNav";
 import { UserRole, AdminLevel } from "@/types/user";
+import { Header } from "@/components/Header";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
