@@ -30,7 +30,7 @@
       width: 80px;
       height: 80px;
       margin-bottom: 20px;
-      background-color: #f3f4f6;
+      background-color: #4f46e5;
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -40,7 +40,7 @@
     .logo-text {
       font-size: 30px;
       font-weight: bold;
-      color: #4b5563;
+      color: white;
     }
     h1 {
       margin: 0 0 16px;
@@ -67,6 +67,25 @@
     .button:hover {
       background-color: #4338ca;
     }
+    .available-features {
+      margin-top: 30px;
+      text-align: left;
+      background-color: #f3f4f6;
+      padding: 15px;
+      border-radius: 6px;
+    }
+    .available-features h2 {
+      font-size: 16px;
+      margin: 0 0 10px;
+      color: #374151;
+    }
+    .available-features ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+    .available-features li {
+      margin-bottom: 5px;
+    }
   </style>
 </head>
 <body>
@@ -77,7 +96,34 @@
     <h1>You're currently offline</h1>
     <p>Doc' O Clock needs an internet connection to work properly. Please check your connection and try again.</p>
     <p>Some features may still work in offline mode, but for the full experience, please reconnect to the internet.</p>
-    <button class="button" onclick="window.location.href='/'">Try again</button>
+    <button class="button" onclick="window.location.reload()">Try again</button>
+    
+    <div class="available-features">
+      <h2>Available offline:</h2>
+      <ul>
+        <li>View cached appointments</li>
+        <li>Access saved medical records</li>
+        <li>View stored medication list</li>
+        <li>Emergency contact information</li>
+      </ul>
+    </div>
   </div>
+  
+  <script>
+    // Check connection status periodically and reload when back online
+    window.addEventListener('online', () => {
+      window.location.href = '/';
+    });
+
+    // Attempt to load cached data if available
+    if ('caches' in window) {
+      caches.match('/').then(response => {
+        if (response) {
+          console.log('Found cached data, attempting to restore limited functionality');
+          // Here you could implement logic to load cached data
+        }
+      });
+    }
+  </script>
 </body>
 </html>

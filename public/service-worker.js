@@ -1,3 +1,4 @@
+
 // Cache name with version for updates
 const CACHE_NAME = 'doc-o-clock-cache-v1';
 
@@ -7,7 +8,10 @@ const urlsToCache = [
   '/index.html',
   '/manifest.json',
   '/favicon.ico',
-  '/offline.html'
+  '/logo192.png',
+  '/logo512.png',
+  '/offline.html',
+  '/maskable_icon.png'
 ];
 
 // Install event - cache critical assets
@@ -169,6 +173,48 @@ self.addEventListener('sync', (event) => {
 // Background sync function
 async function syncData() {
   // Read from IndexedDB and sync to server when online
-  // Implementation depends on your app's requirements
   console.log('Performing background sync');
+  
+  try {
+    // Implement your sync logic here
+    // Example: fetch data from IndexedDB and send to server
+    const db = await openDB();
+    const pendingActions = await db.getAll('pendingActions');
+    
+    if (pendingActions && pendingActions.length) {
+      // Process each pending action
+      for (const action of pendingActions) {
+        // Send to server
+        await fetch('/api/sync', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(action)
+        });
+        
+        // Remove from pending actions
+        await db.delete('pendingActions', action.id);
+      }
+    }
+  } catch (error) {
+    console.error('Error in background sync:', error);
+  }
+}
+
+// Helper function to open IndexedDB
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open('docOClockOfflineDB', 1);
+    
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => resolve(request.result);
+    
+    request.onupgradeneeded = (event) => {
+      const db = event.target.result;
+      if (!db.objectStoreNames.contains('pendingActions')) {
+        db.createObjectStore('pendingActions', { keyPath: 'id' });
+      }
+    };
+  });
 }

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { Card } from "@/components/ui/card";
@@ -55,6 +56,7 @@ const Auth = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const defaultTab = searchParams.get('tab') === 'signup' ? 'signup' : 'signin';
+  const [activeTab, setActiveTab] = useState(defaultTab);
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -99,10 +101,12 @@ const Auth = () => {
     try {
       setError(null);
       await signIn(data.email, data.password);
+      toast.success("Signed in successfully!");
       // Navigate is handled by the auth context
     } catch (err: any) {
       setError(err.message || "Failed to sign in");
       console.error("Login error:", err);
+      toast.error(err.message || "Failed to sign in");
     }
   };
 
@@ -118,6 +122,7 @@ const Auth = () => {
     } catch (err: any) {
       setError(err.message || "Failed to create account");
       console.error("Patient signup error:", err);
+      toast.error(err.message || "Failed to create account");
     }
   };
 
@@ -135,6 +140,7 @@ const Auth = () => {
     } catch (err: any) {
       setError(err.message || "Failed to create account");
       console.error("Provider signup error:", err);
+      toast.error(err.message || "Failed to create account");
     }
   };
 
@@ -166,7 +172,7 @@ const Auth = () => {
         )}
 
         <Card className="p-6 shadow-lg">
-          <Tabs defaultValue={defaultTab}>
+          <Tabs defaultValue={defaultTab} value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="grid w-full grid-cols-2 mb-4">
               <TabsTrigger value="signin">Sign In</TabsTrigger>
               <TabsTrigger value="signup">Register</TabsTrigger>

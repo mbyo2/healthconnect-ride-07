@@ -12,7 +12,15 @@ import { AccessibilityProvider } from './context/AccessibilityContext';
 import { registerServiceWorker } from './utils/service-worker';
 
 // Create a client
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 // Register the service worker for offline capabilities and push notifications
 registerServiceWorker().then((registration) => {
@@ -28,7 +36,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <AccessibilityProvider>
           <BrowserRouter>
             <App />
-            <Toaster />
+            <Toaster position="top-right" richColors closeButton />
           </BrowserRouter>
         </AccessibilityProvider>
       </ThemeProvider>

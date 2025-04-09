@@ -1,13 +1,18 @@
 
 {
-  "name": "Doc' O Clock",
+  "name": "Doc' O Clock - Healthcare Services",
   "short_name": "Doc' O Clock",
-  "description": "Healthcare services at your fingertips",
+  "description": "Healthcare services at your fingertips - Book appointments, chat with doctors, and manage your health",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#4f46e5",
   "orientation": "portrait-primary",
+  "scope": "/",
+  "categories": ["health", "medical", "appointments", "healthcare"],
+  "dir": "ltr",
+  "lang": "en-US",
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "favicon.ico",
@@ -17,18 +22,46 @@
     {
       "src": "logo192.png",
       "type": "image/png",
-      "sizes": "192x192"
+      "sizes": "192x192",
+      "purpose": "any"
     },
     {
       "src": "logo512.png",
       "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "512x512",
+      "purpose": "any"
     },
     {
       "src": "maskable_icon.png",
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Book Appointment",
+      "short_name": "Book",
+      "description": "Book a new appointment with a healthcare provider",
+      "url": "/search",
+      "icons": [
+        {
+          "src": "logo192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "My Appointments",
+      "short_name": "Appointments",
+      "description": "View your upcoming appointments",
+      "url": "/appointments",
+      "icons": [
+        {
+          "src": "logo192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ]
 }
