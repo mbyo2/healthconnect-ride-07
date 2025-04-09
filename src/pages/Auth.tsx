@@ -20,24 +20,38 @@ const loginSchema = z.object({
   password: z.string().min(6, { message: "Password must be at least 6 characters" }),
 });
 
-const signupSchema = z.object({
+const patientSignupSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
   password: z.string().min(6, { message: "Password must be at least 6 characters" }),
   confirmPassword: z.string().min(6, { message: "Password must be at least 6 characters" }),
   firstName: z.string().min(2, { message: "First name is required" }),
   lastName: z.string().min(2, { message: "Last name is required" }),
-  role: z.enum(["patient", "health_personnel"]),
+}).refine(data => data.password === data.confirmPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPassword"],
+});
+
+const providerSignupSchema = z.object({
+  email: z.string().email({ message: "Please enter a valid email address" }),
+  password: z.string().min(6, { message: "Password must be at least 6 characters" }),
+  confirmPassword: z.string().min(6, { message: "Password must be at least 6 characters" }),
+  firstName: z.string().min(2, { message: "First name is required" }),
+  lastName: z.string().min(2, { message: "Last name is required" }),
+  specialty: z.string().min(2, { message: "Specialty is required" }),
+  licenseNumber: z.string().min(2, { message: "License number is required" }),
 }).refine(data => data.password === data.confirmPassword, {
   message: "Passwords do not match",
   path: ["confirmPassword"],
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
-type SignupFormValues = z.infer<typeof signupSchema>;
+type PatientSignupFormValues = z.infer<typeof patientSignupSchema>;
+type ProviderSignupFormValues = z.infer<typeof providerSignupSchema>;
 
 const Auth = () => {
   const { signIn, signUp, isLoading, isAuthenticated } = useAuth();
   const [error, setError] = useState<string | null>(null);
+  const [userType, setUserType] = useState<"patient" | "health_personnel">("patient");
   const navigate = useNavigate();
 
   // Redirect if already authenticated
@@ -55,15 +69,27 @@ const Auth = () => {
     },
   });
 
-  const signupForm = useForm<SignupFormValues>({
-    resolver: zodResolver(signupSchema),
+  const patientSignupForm = useForm<PatientSignupFormValues>({
+    resolver: zodResolver(patientSignupSchema),
     defaultValues: {
       email: "",
       password: "",
       confirmPassword: "",
       firstName: "",
       lastName: "",
-      role: "patient",
+    },
+  });
+
+  const providerSignupForm = useForm<ProviderSignupFormValues>({
+    resolver: zodResolver(providerSignupSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+      confirmPassword: "",
+      firstName: "",
+      lastName: "",
+      specialty: "",
+      licenseNumber: "",
     },
   });
 
@@ -77,13 +103,29 @@ const Auth = () => {
     }
   };
 
-  const onSignupSubmit = async (data: SignupFormValues) => {
+  const onPatientSignupSubmit = async (data: PatientSignupFormValues) => {
     try {
       setError(null);
       await signUp(data.email, data.password, {
         first_name: data.firstName,
         last_name: data.lastName,
-        role: data.role,
+        role: "patient",
+      });
+      navigate("/profile-setup");
+    } catch (err: any) {
+      setError(err.message || "Failed to create account");
+    }
+  };
+
+  const onProviderSignupSubmit = async (data: ProviderSignupFormValues) => {
+    try {
+      setError(null);
+      await signUp(data.email, data.password, {
+        first_name: data.firstName,
+        last_name: data.lastName,
+        role: "health_personnel",
+        specialty: data.specialty,
+        license_number: data.licenseNumber,
       });
       navigate("/profile-setup");
     } catch (err: any) {
@@ -105,7 +147,7 @@ const Auth = () => {
             </div>
           </div>
           <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-            Welcome to Your Health Portal
+            Welcome to Doc&apos; O Clock
           </h1>
           <p className="text-muted-foreground">
             Access your healthcare services securely
@@ -175,18 +217,79 @@ const Auth = () => {
             </TabsContent>
             
             <TabsContent value="signup">
-              <Form {...signupForm}>
-                <form onSubmit={signupForm.handleSubmit(onSignupSubmit)} className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
+              <div className="mb-4">
+                <FormLabel>I am a</FormLabel>
+                <div className="grid grid-cols-2 gap-4 mt-1">
+                  <Button
+                    type="button"
+                    variant={userType === "patient" ? "default" : "outline"}
+                    className="flex flex-col h-auto py-4"
+                    onClick={() => setUserType("patient")}
+                  >
+                    <User className="h-5 w-5 mb-2" />
+                    <span>Patient</span>
+                  </Button>
+                  
+                  <Button
+                    type="button"
+                    variant={userType === "health_personnel" ? "default" : "outline"}
+                    className="flex flex-col h-auto py-4"
+                    onClick={() => setUserType("health_personnel")}
+                  >
+                    <Building2 className="h-5 w-5 mb-2" />
+                    <span>Healthcare Provider</span>
+                  </Button>
+                </div>
+              </div>
+
+              {userType === "patient" ? (
+                <Form {...patientSignupForm}>
+                  <form onSubmit={patientSignupForm.handleSubmit(onPatientSignupSubmit)} className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={patientSignupForm.control}
+                        name="firstName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>First Name</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="First name"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={patientSignupForm.control}
+                        name="lastName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Last Name</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="Last name"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    
                     <FormField
-                      control={signupForm.control}
-                      name="firstName"
+                      control={patientSignupForm.control}
+                      name="email"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>First Name</FormLabel>
+                          <FormLabel>Email</FormLabel>
                           <FormControl>
                             <Input
-                              placeholder="First name"
+                              placeholder="Enter your email"
                               {...field}
                             />
                           </FormControl>
@@ -196,14 +299,15 @@ const Auth = () => {
                     />
                     
                     <FormField
-                      control={signupForm.control}
-                      name="lastName"
+                      control={patientSignupForm.control}
+                      name="password"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Last Name</FormLabel>
+                          <FormLabel>Password</FormLabel>
                           <FormControl>
                             <Input
-                              placeholder="Last name"
+                              type="password"
+                              placeholder="Create a password"
                               {...field}
                             />
                           </FormControl>
@@ -211,102 +315,170 @@ const Auth = () => {
                         </FormItem>
                       )}
                     />
-                  </div>
-                  
-                  <FormField
-                    control={signupForm.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Enter your email"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={signupForm.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Password</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="password"
-                            placeholder="Create a password"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={signupForm.control}
-                    name="confirmPassword"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Confirm Password</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="password"
-                            placeholder="Confirm your password"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={signupForm.control}
-                    name="role"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>I am a</FormLabel>
-                        <div className="grid grid-cols-2 gap-4 mt-1">
-                          <Button
-                            type="button"
-                            variant={field.value === "patient" ? "default" : "outline"}
-                            className="flex flex-col h-auto py-4"
-                            onClick={() => signupForm.setValue("role", "patient")}
-                          >
-                            <User className="h-5 w-5 mb-2" />
-                            <span>Patient</span>
-                          </Button>
-                          
-                          <Button
-                            type="button"
-                            variant={field.value === "health_personnel" ? "default" : "outline"}
-                            className="flex flex-col h-auto py-4"
-                            onClick={() => signupForm.setValue("role", "health_personnel")}
-                          >
-                            <Building2 className="h-5 w-5 mb-2" />
-                            <span>Healthcare Provider</span>
-                          </Button>
-                        </div>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <Button 
-                    type="submit" 
-                    className="w-full" 
-                    disabled={isLoading}
-                  >
-                    {isLoading ? "Creating Account..." : "Create Account"}
-                  </Button>
-                </form>
-              </Form>
+                    
+                    <FormField
+                      control={patientSignupForm.control}
+                      name="confirmPassword"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Confirm Password</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="password"
+                              placeholder="Confirm your password"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <Button 
+                      type="submit" 
+                      className="w-full" 
+                      disabled={isLoading}
+                    >
+                      {isLoading ? "Creating Account..." : "Create Patient Account"}
+                    </Button>
+                  </form>
+                </Form>
+              ) : (
+                <Form {...providerSignupForm}>
+                  <form onSubmit={providerSignupForm.handleSubmit(onProviderSignupSubmit)} className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={providerSignupForm.control}
+                        name="firstName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>First Name</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="First name"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={providerSignupForm.control}
+                        name="lastName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Last Name</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="Last name"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    
+                    <FormField
+                      control={providerSignupForm.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Email</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Enter your email"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={providerSignupForm.control}
+                      name="specialty"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Specialty</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Enter your specialty"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={providerSignupForm.control}
+                      name="licenseNumber"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>License Number</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Enter your license number"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={providerSignupForm.control}
+                      name="password"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Password</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="password"
+                              placeholder="Create a password"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={providerSignupForm.control}
+                      name="confirmPassword"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Confirm Password</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="password"
+                              placeholder="Confirm your password"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <Button 
+                      type="submit" 
+                      className="w-full" 
+                      disabled={isLoading}
+                    >
+                      {isLoading ? "Creating Account..." : "Create Provider Account"}
+                    </Button>
+                  </form>
+                </Form>
+              )}
             </TabsContent>
           </Tabs>
         </Card>

@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Auth } from "@supabase/auth-ui-react";
@@ -130,7 +131,7 @@ const Login = () => {
             </div>
           </div>
           <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-            Welcome to Your Health Portal
+            Welcome to Doc&apos; O Clock
           </h1>
           <p className="text-muted-foreground">
             Access your healthcare services securely

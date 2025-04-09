@@ -128,7 +128,7 @@ export const ProviderPortal = () => {
             </div>
           </div>
           <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-            Healthcare Provider Portal
+            Doc&apos; O Clock Healthcare Provider Portal
           </h1>
           <p className="text-muted-foreground">
             Access your provider dashboard and manage appointments
