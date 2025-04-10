@@ -4,126 +4,79 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Offline - Doc' O Clock</title>
+  <title>Doc' O Clock - Offline</title>
+  <link rel="stylesheet" href="/src/index.css"> <!-- Will use cached CSS if available -->
   <style>
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-      background: #f9fafb;
-      color: #1f2937;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: 100vh;
+      min-height: 100vh;
       margin: 0;
       padding: 20px;
       text-align: center;
+      background-color: #f9fafb;
+      color: #1f2937;
     }
     .container {
       max-width: 500px;
-      padding: 40px;
+      padding: 30px;
       background: white;
       border-radius: 12px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 10px 15px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
     }
-    .logo {
-      width: 80px;
-      height: 80px;
+    .icon {
+      font-size: 60px;
       margin-bottom: 20px;
-      background-color: #4f46e5;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 24px;
-    }
-    .logo-text {
-      font-size: 30px;
-      font-weight: bold;
-      color: white;
     }
     h1 {
-      margin: 0 0 16px;
-      color: #4f46e5;
+      margin-bottom: 16px;
       font-size: 24px;
+      font-weight: 600;
     }
     p {
-      margin: 0 0 24px;
-      color: #6b7280;
-      line-height: 1.6;
+      margin-bottom: 24px;
+      color: #4b5563;
     }
-    .button {
+    .btn {
+      display: inline-block;
       background-color: #4f46e5;
       color: white;
-      border: none;
-      padding: 12px 20px;
+      padding: 10px 20px;
       border-radius: 6px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background-color 0.2s;
       text-decoration: none;
-      display: inline-block;
+      font-weight: 500;
+      transition: all 0.2s ease;
     }
-    .button:hover {
+    .btn:hover {
       background-color: #4338ca;
-    }
-    .available-features {
-      margin-top: 30px;
-      text-align: left;
-      background-color: #f3f4f6;
-      padding: 15px;
-      border-radius: 6px;
-    }
-    .available-features h2 {
-      font-size: 16px;
-      margin: 0 0 10px;
-      color: #374151;
-    }
-    .available-features ul {
-      margin: 0;
-      padding-left: 20px;
-    }
-    .available-features li {
-      margin-bottom: 5px;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="logo">
-      <div class="logo-text">D</div>
-    </div>
+    <div class="icon">📶</div>
     <h1>You're currently offline</h1>
-    <p>Doc' O Clock needs an internet connection to work properly. Please check your connection and try again.</p>
-    <p>Some features may still work in offline mode, but for the full experience, please reconnect to the internet.</p>
-    <button class="button" onclick="window.location.reload()">Try again</button>
-    
-    <div class="available-features">
-      <h2>Available offline:</h2>
-      <ul>
-        <li>View cached appointments</li>
-        <li>Access saved medical records</li>
-        <li>View stored medication list</li>
-        <li>Emergency contact information</li>
-      </ul>
-    </div>
+    <p>
+      It seems you're not connected to the internet at the moment. Some features of Doc' O Clock require an active internet connection to work properly.
+    </p>
+    <p>
+      Please check your connection and try again.
+    </p>
+    <a href="/" class="btn">Retry</a>
   </div>
-  
   <script>
-    // Check connection status periodically and reload when back online
+    // Listen for online events
     window.addEventListener('online', () => {
-      window.location.href = '/';
+      window.location.reload();
     });
 
-    // Attempt to load cached data if available
-    if ('caches' in window) {
-      caches.match('/').then(response => {
-        if (response) {
-          console.log('Found cached data, attempting to restore limited functionality');
-          // Here you could implement logic to load cached data
-        }
-      });
-    }
+    document.querySelector('.btn').addEventListener('click', (e) => {
+      e.preventDefault();
+      window.location.reload();
+    });
   </script>
 </body>
 </html>

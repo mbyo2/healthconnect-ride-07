@@ -10,6 +10,7 @@ import { Toaster } from 'sonner';
 import { ThemeProvider } from './hooks/use-theme';
 import { AccessibilityProvider } from './context/AccessibilityContext';
 import { registerServiceWorker } from './utils/service-worker';
+import { AuthProvider } from './context/AuthContext';
 
 // Create a client
 const queryClient = new QueryClient({
@@ -50,10 +51,12 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="light" storageKey="doc-oclock-theme">
         <AccessibilityProvider>
-          <BrowserRouter>
-            <App />
-            <Toaster position="top-right" richColors closeButton />
-          </BrowserRouter>
+          <AuthProvider>
+            <BrowserRouter>
+              <App />
+              <Toaster position="top-right" richColors closeButton />
+            </BrowserRouter>
+          </AuthProvider>
         </AccessibilityProvider>
       </ThemeProvider>
     </QueryClientProvider>

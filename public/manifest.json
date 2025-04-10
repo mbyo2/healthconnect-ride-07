@@ -38,6 +38,22 @@
       "purpose": "maskable"
     }
   ],
+  "screenshots": [
+    {
+      "src": "screenshots/home.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "platform": "wide",
+      "label": "Home screen of Doc' O Clock app"
+    },
+    {
+      "src": "screenshots/appointments.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "platform": "wide",
+      "label": "Appointments screen of Doc' O Clock app"
+    }
+  ],
   "shortcuts": [
     {
       "name": "Book Appointment",
@@ -74,22 +90,6 @@
           "sizes": "192x192"
         }
       ]
-    }
-  ],
-  "screenshots": [
-    {
-      "src": "screenshots/home.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "platform": "wide",
-      "label": "Home screen of Doc' O Clock app"
-    },
-    {
-      "src": "screenshots/appointments.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "platform": "wide",
-      "label": "Appointments screen of Doc' O Clock app"
     }
   ],
   "related_applications": [],

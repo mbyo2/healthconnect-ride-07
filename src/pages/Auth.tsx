@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { Card } from "@/components/ui/card";
@@ -14,6 +15,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -59,10 +61,15 @@ const Auth = () => {
 
   // Redirect if already authenticated
   useEffect(() => {
-    if (isAuthenticated) {
-      navigate("/symptoms");
-    }
-  }, [isAuthenticated, navigate]);
+    const checkAuth = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (data.session) {
+        navigate("/symptoms");
+      }
+    };
+    
+    checkAuth();
+  }, [navigate]);
 
   const loginForm = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -99,9 +106,15 @@ const Auth = () => {
   const onLoginSubmit = async (data: LoginFormValues) => {
     try {
       setError(null);
-      await signIn(data.email, data.password);
+      const { error } = await supabase.auth.signInWithPassword({
+        email: data.email,
+        password: data.password,
+      });
+      
+      if (error) throw error;
+      
       toast.success("Signed in successfully!");
-      // Navigate is handled by the auth context
+      navigate("/symptoms");
     } catch (err: any) {
       setError(err.message || "Failed to sign in");
       console.error("Login error:", err);
@@ -112,12 +125,22 @@ const Auth = () => {
   const onPatientSignupSubmit = async (data: PatientSignupFormValues) => {
     try {
       setError(null);
-      await signUp(data.email, data.password, {
-        first_name: data.firstName,
-        last_name: data.lastName,
-        role: "patient",
+      const { error } = await supabase.auth.signUp({
+        email: data.email,
+        password: data.password,
+        options: {
+          data: {
+            first_name: data.firstName,
+            last_name: data.lastName,
+            role: "patient",
+          },
+        },
       });
+      
+      if (error) throw error;
+      
       toast.success("Account created! Please verify your email address.");
+      setActiveTab("signin");
     } catch (err: any) {
       setError(err.message || "Failed to create account");
       console.error("Patient signup error:", err);
@@ -128,14 +151,24 @@ const Auth = () => {
   const onProviderSignupSubmit = async (data: ProviderSignupFormValues) => {
     try {
       setError(null);
-      await signUp(data.email, data.password, {
-        first_name: data.firstName,
-        last_name: data.lastName,
-        role: "health_personnel",
-        specialty: data.specialty,
-        license_number: data.licenseNumber,
+      const { error } = await supabase.auth.signUp({
+        email: data.email,
+        password: data.password,
+        options: {
+          data: {
+            first_name: data.firstName,
+            last_name: data.lastName,
+            role: "health_personnel",
+            specialty: data.specialty,
+            license_number: data.licenseNumber,
+          },
+        },
       });
+      
+      if (error) throw error;
+      
       toast.success("Account created! Please verify your email address.");
+      setActiveTab("signin");
     } catch (err: any) {
       setError(err.message || "Failed to create account");
       console.error("Provider signup error:", err);
@@ -224,9 +257,9 @@ const Auth = () => {
                   <Button 
                     type="submit" 
                     className="w-full" 
-                    disabled={isLoading}
+                    disabled={loginForm.formState.isSubmitting}
                   >
-                    {isLoading ? "Signing in..." : "Sign In"}
+                    {loginForm.formState.isSubmitting ? "Signing in..." : "Sign In"}
                   </Button>
                 </form>
               </Form>
@@ -353,9 +386,9 @@ const Auth = () => {
                     <Button 
                       type="submit" 
                       className="w-full" 
-                      disabled={isLoading}
+                      disabled={patientSignupForm.formState.isSubmitting}
                     >
-                      {isLoading ? "Creating Account..." : "Create Patient Account"}
+                      {patientSignupForm.formState.isSubmitting ? "Creating Account..." : "Create Patient Account"}
                     </Button>
                   </form>
                 </Form>
@@ -488,9 +521,9 @@ const Auth = () => {
                     <Button 
                       type="submit" 
                       className="w-full" 
-                      disabled={isLoading}
+                      disabled={providerSignupForm.formState.isSubmitting}
                     >
-                      {isLoading ? "Creating Account..." : "Create Provider Account"}
+                      {providerSignupForm.formState.isSubmitting ? "Creating Account..." : "Create Provider Account"}
                     </Button>
                   </form>
                 </Form>

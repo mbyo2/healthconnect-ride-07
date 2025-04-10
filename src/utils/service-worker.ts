@@ -1,4 +1,10 @@
 
+interface ExtendedServiceWorkerRegistration extends ServiceWorkerRegistration {
+  sync?: {
+    register: (tag: string) => Promise<void>;
+  };
+}
+
 export const registerServiceWorker = async () => {
   if ('serviceWorker' in navigator) {
     try {
@@ -90,10 +96,11 @@ export const registerBackgroundSync = async () => {
   if ('serviceWorker' in navigator && 'SyncManager' in window) {
     try {
       const registration = await navigator.serviceWorker.ready;
+      const extendedReg = registration as ExtendedServiceWorkerRegistration;
       
       // Only call sync.register if the API is available
-      if ('sync' in registration) {
-        await (registration as any).sync.register('sync-data');
+      if (extendedReg.sync) {
+        await extendedReg.sync.register('sync-data');
         console.log('Background sync registered!');
         return true;
       } else {
@@ -125,7 +132,6 @@ export const saveForOfflineSync = async (action: any) => {
     
     await store.add(actionWithMeta);
     
-    // Fixed: Use the proper event listener pattern for IDBTransaction
     return new Promise<boolean>((resolve) => {
       tx.oncomplete = () => {
         // Try to trigger sync if we're online
@@ -148,7 +154,7 @@ export const saveForOfflineSync = async (action: any) => {
 };
 
 // Helper function to open the IndexedDB database
-const openDB = async () => {
+const openDB = async (): Promise<IDBDatabase> => {
   return new Promise<IDBDatabase>((resolve, reject) => {
     const request = indexedDB.open('docOClockOfflineDB', 1);
     

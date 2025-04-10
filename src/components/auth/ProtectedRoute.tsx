@@ -4,9 +4,7 @@ import { Navigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { toast } from "sonner";
-import { BottomNav } from "@/components/BottomNav";
 import { UserRole, AdminLevel } from "@/types/user";
-import { Header } from "@/components/Header";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -131,7 +129,6 @@ export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) 
             .eq('id', session.user.id)
             .single();
           
-          // Check if profile is an object with the expected properties
           if (profile && typeof profile === 'object') {
             setUserRole(profile.role as UserRole);
             setAdminLevel(profile.admin_level as AdminLevel);
@@ -169,11 +166,7 @@ export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) 
   // Superadmins can access any page
   if (adminLevel === 'superadmin') {
     console.log("User is superadmin, allowing access to all pages");
-    return (
-      <>
-        {children}
-      </>
-    );
+    return <>{children}</>;
   }
 
   if (allowedRoles && userRole && !allowedRoles.includes(userRole)) {
@@ -182,7 +175,6 @@ export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) 
     return <Navigate to="/symptoms" replace />;
   }
 
-  // Return just the children without wrapping with Header/BottomNav
-  // since these are already handled by the parent App.tsx layout
+  // Return just the children
   return <>{children}</>;
 };
