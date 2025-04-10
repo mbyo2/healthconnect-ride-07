@@ -85,16 +85,21 @@ export const checkIfAppInstalled = () => {
          (window.navigator as any).standalone === true;
 };
 
-// New function to handle background sync registration
+// New function to handle background sync registration with type checking
 export const registerBackgroundSync = async () => {
   if ('serviceWorker' in navigator && 'SyncManager' in window) {
     try {
       const registration = await navigator.serviceWorker.ready;
       
-      // Register sync - will fire when online if currently offline
-      await registration.sync.register('sync-data');
-      console.log('Background sync registered!');
-      return true;
+      // Only call sync.register if the API is available
+      if ('sync' in registration) {
+        await (registration as any).sync.register('sync-data');
+        console.log('Background sync registered!');
+        return true;
+      } else {
+        console.warn('Background Sync API not available in this browser');
+        return false;
+      }
     } catch (error) {
       console.error('Background sync registration failed:', error);
       return false;
@@ -119,14 +124,23 @@ export const saveForOfflineSync = async (action: any) => {
     };
     
     await store.add(actionWithMeta);
-    await tx.complete;
     
-    // Try to trigger sync if we're online
-    if (navigator.onLine) {
-      await registerBackgroundSync();
-    }
-    
-    return true;
+    // Fixed: Use the proper event listener pattern for IDBTransaction
+    return new Promise<boolean>((resolve) => {
+      tx.oncomplete = () => {
+        // Try to trigger sync if we're online
+        if (navigator.onLine) {
+          registerBackgroundSync().then(() => resolve(true));
+        } else {
+          resolve(true);
+        }
+      };
+      
+      tx.onerror = () => {
+        console.error('Transaction error:', tx.error);
+        resolve(false);
+      };
+    });
   } catch (error) {
     console.error('Error saving action for offline sync:', error);
     return false;

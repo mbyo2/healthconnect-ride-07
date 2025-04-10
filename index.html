@@ -42,7 +42,7 @@
     <link rel="preload" href="/favicon.ico" as="image" />
     
     <!-- Security headers -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://*.supabase.co; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.daily.co; font-src 'self'; frame-src 'self' https://*.daily.co https://*.stripe.com;" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://*.supabase.co; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.gpteng.co; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.daily.co; font-src 'self'; frame-src 'self' https://*.daily.co https://*.stripe.com;" />
     <meta http-equiv="X-Content-Type-Options" content="nosniff" />
   </head>
   <body>
@@ -53,6 +53,8 @@
         <p>You need to enable JavaScript to run this app. Doc' O Clock requires JavaScript to provide you with the best healthcare experience.</p>
       </div>
     </noscript>
+    <!-- Required Lovable script tag for enabling the Pick and Edit feature -->
+    <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
     <script type="module" src="/src/main.tsx"></script>
     <script>
       if ('serviceWorker' in navigator) {
