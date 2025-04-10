@@ -14,7 +14,7 @@ import Login from './pages/Login';
 import Search from './pages/Search';
 import Profile from './pages/Profile';
 import Map from './pages/Map';
-import ProtectedRoute from './components/auth/ProtectedRoute';
+import { ProtectedRoute } from './components/auth/ProtectedRoute'; // Fixed import here
 import ProfileSetup from './pages/ProfileSetup';
 import Appointments from './pages/Appointments';
 import Chat from './pages/Chat';
