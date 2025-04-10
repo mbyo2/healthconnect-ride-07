@@ -1,6 +1,6 @@
 
 import * as React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { OfflineAlert } from './components/OfflineAlert';
 import { useNetwork } from './hooks/use-network';
 import { PWAInstallPrompt } from './components/PWAInstallPrompt';
@@ -31,6 +31,15 @@ import { MobileLayout } from './components/layouts/MobileLayout';
 import { useDeviceType } from './hooks/use-device-type';
 import { useIsMobile } from './hooks/use-mobile';
 import { useEffect } from 'react';
+
+// Create a component to handle device-specific landing page
+const LandingPageRouter = () => {
+  const { deviceType } = useDeviceType();
+  const isMobileOrTablet = deviceType === 'mobile' || deviceType === 'tablet';
+
+  // Redirect to Auth for mobile/tablet, show Landing for desktop/TV
+  return isMobileOrTablet ? <Navigate to="/auth" replace /> : <Landing />;
+};
 
 const App = () => {
   const { isOnline } = useNetwork();
@@ -74,7 +83,7 @@ const App = () => {
       {process.env.NODE_ENV === 'development' && <TouchDetector />}
       
       <Routes>
-        <Route path="/" element={<Landing />} />
+        <Route path="/" element={<LandingPageRouter />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/login" element={<Login />} />
         <Route
