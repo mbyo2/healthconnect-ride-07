@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
@@ -37,6 +36,7 @@ import { SearchProvider } from "./context/SearchContext";
 import Index from "./pages/Index";
 import PharmacyInventory from "./pages/PharmacyInventory";
 import { Header } from "./components/Header";
+import { BottomNav } from "./components/BottomNav";
 
 // Auth redirect component
 const AuthRedirect = () => {
@@ -49,274 +49,301 @@ const AuthRedirect = () => {
 
 function App() {
   const location = useLocation();
-  // Only show header on public routes, ProtectedRoute component will handle its own header
-  const showHeader = !['/landing', '/login', '/auth', '/provider-portal', '/institution-portal', '/reset-password'].includes(location.pathname) 
-    && !location.pathname.startsWith('/symptoms')
-    && !location.pathname.startsWith('/profile')
-    && !location.pathname.startsWith('/search')
-    && !location.pathname.startsWith('/map')
-    && !location.pathname.startsWith('/chat')
-    && !location.pathname.startsWith('/appointments')
-    && !location.pathname.startsWith('/patient-appointments')
-    && !location.pathname.startsWith('/provider')
-    && !location.pathname.startsWith('/provider-dashboard')
-    && !location.pathname.startsWith('/provider-calendar')
-    && !location.pathname.startsWith('/admin-dashboard')
-    && !location.pathname.startsWith('/superadmin-dashboard')
-    && !location.pathname.startsWith('/healthcare-registration')
-    && !location.pathname.startsWith('/video-consultations')
-    && !location.pathname.startsWith('/notifications')
-    && !location.pathname.startsWith('/settings')
-    && !location.pathname.startsWith('/privacy-security')
-    && !location.pathname.startsWith('/pharmacy-inventory')
-    && !location.pathname.startsWith('/application-status')
-    && !location.pathname.startsWith('/healthcare-application')
-    && !location.pathname.startsWith('/institution-status');
+  // Only show header and bottom nav on protected routes
+  const isPublicRoute = ['/landing', '/login', '/auth', '/provider-portal', '/institution-portal', '/reset-password'].includes(location.pathname);
   
+  const appLayout = (children: React.ReactNode) => (
+    <>
+      {!isPublicRoute && <Header />}
+      <main className={`flex-grow ${!isPublicRoute ? 'pb-16 md:pb-0 pt-16' : ''}`}>
+        {children}
+      </main>
+      {!isPublicRoute && <BottomNav />}
+      <OfflineAlert />
+    </>
+  );
+
   return (
     <AuthProvider>
       <SearchProvider>
         <div className="flex flex-col min-h-screen">
-          {showHeader && <Header />}
-          
-          <main className="flex-1">
-            <Routes>
-              {/* Public routes - redirect to auth by default */}
-              <Route path="/" element={<AuthRedirect />} />
-              <Route path="/landing" element={<Landing />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/reset-password" element={<ResetPassword />} />
-              <Route path="/provider-portal" element={<ProviderPortal />} />
-              <Route path="/institution-portal" element={<InstitutionPortal />} />
-              
-              {/* Protected routes - all with consistent layout */}
-              <Route 
-                path="/symptoms" 
-                element={
-                  <ProtectedRoute>
+          <Routes>
+            {/* Public routes - redirect to auth by default */}
+            <Route path="/" element={<AuthRedirect />} />
+            <Route path="/landing" element={appLayout(<Landing />)} />
+            <Route path="/login" element={appLayout(<Login />)} />
+            <Route path="/auth" element={appLayout(<Auth />)} />
+            <Route path="/reset-password" element={appLayout(<ResetPassword />)} />
+            <Route path="/provider-portal" element={appLayout(<ProviderPortal />)} />
+            <Route path="/institution-portal" element={appLayout(<InstitutionPortal />)} />
+            
+            {/* Protected routes - all with consistent layout */}
+            <Route 
+              path="/symptoms" 
+              element={
+                <ProtectedRoute>
+                  {appLayout(
                     <div className="container mx-auto px-4 md:px-6 py-6">
                       <SymptomCollector />
                     </div>
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/profile-setup" 
-                element={
-                  <ProtectedRoute>
+                  )}
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/profile-setup" 
+              element={
+                <ProtectedRoute>
+                  {appLayout(
                     <div className="container mx-auto px-4 md:px-6 py-6">
                       <ProfileSetup />
                     </div>
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/application-status" 
-                element={
-                  <ProtectedRoute>
+                  )}
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/application-status" 
+              element={
+                <ProtectedRoute>
+                  {appLayout(
                     <div className="container mx-auto px-4 md:px-6 py-6">
                       <ApplicationStatus />
                     </div>
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/healthcare-application" 
-                element={
-                  <ProtectedRoute>
+                  )}
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/healthcare-application" 
+              element={
+                <ProtectedRoute>
+                  {appLayout(
                     <div className="container mx-auto px-4 md:px-6 py-6">
                       <HealthcareApplication />
                     </div>
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/institution-status" 
-                element={
-                  <ProtectedRoute>
+                  )}
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/institution-status" 
+              element={
+                <ProtectedRoute>
+                  {appLayout(
                     <div className="container mx-auto px-4 md:px-6 py-6">
                       <InstitutionStatus />
                     </div>
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/search" 
-                element={
-                  <ProtectedRoute>
-                    <Search />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/map" 
-                element={
-                  <ProtectedRoute>
+                  )}
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/search" 
+              element={
+                <ProtectedRoute>
+                  {appLayout(<Search />)}
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/map" 
+              element={
+                <ProtectedRoute>
+                  {appLayout(
                     <div className="container mx-auto px-4 md:px-6 py-6">
                       <Map />
                     </div>
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/chat" 
-                element={
-                  <ProtectedRoute>
+                  )}
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/chat" 
+              element={
+                <ProtectedRoute>
+                  {appLayout(
                     <div className="container mx-auto px-4 md:px-6 py-6">
                       <Chat />
                     </div>
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/profile" 
-                element={
-                  <ProtectedRoute>
+                  )}
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/profile" 
+              element={
+                <ProtectedRoute>
+                  {appLayout(
                     <div className="container mx-auto px-4 md:px-6 py-6">
                       <Profile />
                     </div>
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/appointments" 
-                element={
-                  <ProtectedRoute>
+                  )}
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/appointments" 
+              element={
+                <ProtectedRoute>
+                  {appLayout(
                     <div className="container mx-auto px-4 md:px-6 py-6">
                       <Appointments />
                     </div>
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/patient-appointments" 
-                element={
-                  <ProtectedRoute>
+                  )}
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/patient-appointments" 
+              element={
+                <ProtectedRoute>
+                  {appLayout(
                     <div className="container mx-auto px-4 md:px-6 py-6">
                       <PatientAppointments />
                     </div>
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/provider/:providerId" 
-                element={
-                  <ProtectedRoute>
+                  )}
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/provider/:providerId" 
+              element={
+                <ProtectedRoute>
+                  {appLayout(
                     <div className="container mx-auto px-4 md:px-6 py-6">
                       <ProviderProfile />
                     </div>
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/provider-dashboard" 
-                element={
-                  <ProtectedRoute allowedRoles={['health_personnel', 'admin']}>
+                  )}
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/provider-dashboard" 
+              element={
+                <ProtectedRoute allowedRoles={['health_personnel', 'admin']}>
+                  {appLayout(
                     <div className="container mx-auto px-4 md:px-6 py-6">
                       <ProviderDashboard />
                     </div>
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/provider-calendar" 
-                element={
-                  <ProtectedRoute allowedRoles={['health_personnel', 'admin']}>
+                  )}
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/provider-calendar" 
+              element={
+                <ProtectedRoute allowedRoles={['health_personnel', 'admin']}>
+                  {appLayout(
                     <div className="container mx-auto px-4 md:px-6 py-6">
                       <ProviderCalendar />
                     </div>
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/admin-dashboard" 
-                element={
-                  <ProtectedRoute allowedRoles={['admin']}>
+                  )}
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/admin-dashboard" 
+              element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  {appLayout(
                     <div className="container mx-auto px-4 md:px-6 py-6">
                       <AdminDashboard />
                     </div>
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/superadmin-dashboard" 
-                element={
-                  <ProtectedRoute>
+                  )}
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/superadmin-dashboard" 
+              element={
+                <ProtectedRoute>
+                  {appLayout(
                     <div className="container mx-auto px-4 md:px-6 py-6">
                       <SuperAdminDashboard />
                     </div>
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/healthcare-registration" 
-                element={
-                  <ProtectedRoute>
+                  )}
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/healthcare-registration" 
+              element={
+                <ProtectedRoute>
+                  {appLayout(
                     <div className="container mx-auto px-4 md:px-6 py-6">
                       <InstitutionRegistration />
                     </div>
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/video-consultations" 
-                element={
-                  <ProtectedRoute>
+                  )}
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/video-consultations" 
+              element={
+                <ProtectedRoute>
+                  {appLayout(
                     <div className="container mx-auto px-4 md:px-6 py-6">
                       <VideoConsultations />
                     </div>
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/notifications" 
-                element={
-                  <ProtectedRoute>
+                  )}
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/notifications" 
+              element={
+                <ProtectedRoute>
+                  {appLayout(
                     <div className="container mx-auto px-4 md:px-6 py-6">
                       <NotificationsPage />
                     </div>
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/settings" 
-                element={
-                  <ProtectedRoute>
+                  )}
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/settings" 
+              element={
+                <ProtectedRoute>
+                  {appLayout(
                     <div className="container mx-auto px-4 md:px-6 py-6">
                       <SettingsPage />
                     </div>
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/privacy-security" 
-                element={
-                  <ProtectedRoute>
+                  )}
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/privacy-security" 
+              element={
+                <ProtectedRoute>
+                  {appLayout(
                     <div className="container mx-auto px-4 md:px-6 py-6">
                       <PrivacySecurityPage />
                     </div>
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/pharmacy-inventory" 
-                element={
-                  <ProtectedRoute>
+                  )}
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/pharmacy-inventory" 
+              element={
+                <ProtectedRoute>
+                  {appLayout(
                     <div className="container mx-auto px-4 md:px-6 py-6">
                       <PharmacyInventory />
                     </div>
-                  </ProtectedRoute>
-                } 
-              />
-              
-              {/* Catch-all redirect */}
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </main>
-          <OfflineAlert />
+                  )}
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Catch-all redirect */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+          <VoiceCommandsHelp />
         </div>
-        <VoiceCommandsHelp />
       </SearchProvider>
     </AuthProvider>
   );

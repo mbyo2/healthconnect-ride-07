@@ -26,7 +26,23 @@ const queryClient = new QueryClient({
 registerServiceWorker().then((registration) => {
   if (registration) {
     console.info('ServiceWorker registration successful');
+    
+    // Check for updates periodically
+    setInterval(() => {
+      registration.update();
+    }, 1000 * 60 * 60); // Check for updates every hour
   }
+});
+
+// Add offline/online event listeners
+window.addEventListener('online', () => {
+  console.log('App is online');
+  document.dispatchEvent(new CustomEvent('app:online'));
+});
+
+window.addEventListener('offline', () => {
+  console.log('App is offline');
+  document.dispatchEvent(new CustomEvent('app:offline'));
 });
 
 ReactDOM.createRoot(document.getElementById('root')!).render(

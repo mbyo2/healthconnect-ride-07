@@ -23,7 +23,7 @@
       "src": "logo192.png",
       "type": "image/png",
       "sizes": "192x192",
-      "purpose": "any"
+      "purpose": "any maskable"
     },
     {
       "src": "logo512.png",
@@ -62,6 +62,39 @@
           "sizes": "192x192"
         }
       ]
+    },
+    {
+      "name": "Video Consultation",
+      "short_name": "Video",
+      "description": "Join a video consultation with a doctor",
+      "url": "/video-consultations",
+      "icons": [
+        {
+          "src": "logo192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
-  ]
+  ],
+  "screenshots": [
+    {
+      "src": "screenshots/home.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "platform": "wide",
+      "label": "Home screen of Doc' O Clock app"
+    },
+    {
+      "src": "screenshots/appointments.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "platform": "wide",
+      "label": "Appointments screen of Doc' O Clock app"
+    }
+  ],
+  "related_applications": [],
+  "capture_links": "existing-client-navigate",
+  "launch_handler": {
+    "client_mode": ["navigate-existing", "auto"]
+  }
 }

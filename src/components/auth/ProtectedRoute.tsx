@@ -100,7 +100,6 @@ export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) 
           console.log("Profile data is not in expected format");
           setIsAuthenticated(true);
           setIsProfileComplete(false);
-          setIsLoading(false);
         }
 
       } catch (error) {
@@ -123,18 +122,22 @@ export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) 
         setIsProfileComplete(null);
       } else if (event === 'SIGNED_IN' && session) {
         setIsAuthenticated(true);
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('role, is_profile_complete, admin_level')
-          .eq('id', session.user.id)
-          .single();
         
-        // Check if profile is an object with the expected properties
-        if (profile && typeof profile === 'object') {
-          setUserRole(profile.role as UserRole);
-          setAdminLevel(profile.admin_level as AdminLevel);
-          setIsProfileComplete(profile.is_profile_complete);
-        }
+        // Defer fetching profile data to avoid blocking the UI
+        setTimeout(async () => {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('role, is_profile_complete, admin_level')
+            .eq('id', session.user.id)
+            .single();
+          
+          // Check if profile is an object with the expected properties
+          if (profile && typeof profile === 'object') {
+            setUserRole(profile.role as UserRole);
+            setAdminLevel(profile.admin_level as AdminLevel);
+            setIsProfileComplete(profile.is_profile_complete);
+          }
+        }, 0);
       }
     });
 
@@ -167,13 +170,9 @@ export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) 
   if (adminLevel === 'superadmin') {
     console.log("User is superadmin, allowing access to all pages");
     return (
-      <div className="flex flex-col min-h-screen">
-        <Header />
-        <main className="flex-grow pb-16 md:pb-0 pt-16">
-          {children}
-        </main>
-        <BottomNav />
-      </div>
+      <>
+        {children}
+      </>
     );
   }
 
@@ -183,14 +182,7 @@ export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) 
     return <Navigate to="/symptoms" replace />;
   }
 
-  // Wrap the content with Header and BottomNav for consistent layout
-  return (
-    <div className="flex flex-col min-h-screen">
-      <Header />
-      <main className="flex-grow pb-16 md:pb-0 pt-16">
-        {children}
-      </main>
-      <BottomNav />
-    </div>
-  );
+  // Return just the children without wrapping with Header/BottomNav
+  // since these are already handled by the parent App.tsx layout
+  return <>{children}</>;
 };

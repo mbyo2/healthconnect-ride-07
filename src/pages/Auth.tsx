@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { Card } from "@/components/ui/card";
@@ -172,7 +171,7 @@ const Auth = () => {
         )}
 
         <Card className="p-6 shadow-lg">
-          <Tabs defaultValue={defaultTab} value={activeTab} onValueChange={setActiveTab}>
+          <Tabs defaultValue={activeTab} value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="grid w-full grid-cols-2 mb-4">
               <TabsTrigger value="signin">Sign In</TabsTrigger>
               <TabsTrigger value="signup">Register</TabsTrigger>
