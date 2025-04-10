@@ -11,9 +11,13 @@ const ASSETS_TO_CACHE = [
   '/logo192.png',
   '/logo512.png',
   '/maskable_icon.png',
+  '/d0c-icon.svg',
   '/src/main.tsx',
   '/src/index.css'
 ];
+
+// Track failed requests to retry when back online
+const failedRequests = new Map();
 
 // Install event - cache initial assets
 self.addEventListener('install', (event) => {
@@ -52,60 +56,133 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Fetch event - network-first strategy with offline fallback
+// Network first, falling back to cache
+async function networkFirstStrategy(request) {
+  const requestKey = request.url + (request.method || 'GET');
+  
+  try {
+    // Try network first
+    const networkResponse = await fetch(request);
+    
+    if (networkResponse.ok) {
+      // Remove from failed requests if it was there
+      failedRequests.delete(requestKey);
+      
+      // Update cache with fresh response
+      const cache = await caches.open(CACHE_NAME);
+      await cache.put(request, networkResponse.clone());
+      return networkResponse;
+    }
+    
+    throw new Error('Network response was not ok');
+  } catch (error) {
+    console.log('Network request failed, trying cache', request.url);
+    
+    // Store failed request to retry later
+    failedRequests.set(requestKey, request.clone());
+    
+    // Try to get from cache
+    const cachedResponse = await caches.match(request);
+    if (cachedResponse) {
+      return cachedResponse;
+    }
+    
+    // If request mode is navigate, show offline page
+    if (request.mode === 'navigate') {
+      return caches.match(OFFLINE_URL);
+    }
+    
+    // If all fails, return an error response
+    return new Response('Network error occurred', {
+      status: 503,
+      statusText: 'Service Unavailable',
+      headers: new Headers({
+        'Content-Type': 'text/plain'
+      })
+    });
+  }
+}
+
+// Cache first for static assets, network first for API and dynamic content
+async function cacheFirstStrategy(request) {
+  const cachedResponse = await caches.match(request);
+  if (cachedResponse) {
+    return cachedResponse;
+  }
+  
+  try {
+    const networkResponse = await fetch(request);
+    const cache = await caches.open(CACHE_NAME);
+    await cache.put(request, networkResponse.clone());
+    return networkResponse;
+  } catch (error) {
+    console.error('Error fetching and caching:', error);
+    throw error;
+  }
+}
+
+// Fetch event - implement strategy based on request type
 self.addEventListener('fetch', (event) => {
   // Skip cross-origin requests
   if (event.request.method !== 'GET' || !event.request.url.startsWith(self.location.origin)) {
     return;
   }
 
-  event.respondWith(
-    (async () => {
-      try {
-        // Try network first
-        const networkResponse = await fetch(event.request);
-        
-        // Update cache with fresh response
-        const cache = await caches.open(CACHE_NAME);
-        try {
-          // Only cache successful responses and same-origin requests
-          if (networkResponse.ok && event.request.url.startsWith(self.location.origin)) {
-            await cache.put(event.request, networkResponse.clone());
-          }
-        } catch (error) {
-          console.error('Failed to update cache:', error);
-        }
-        
-        return networkResponse;
-      } catch (error) {
-        // Network request failed - try cache
-        console.log('Network request failed, trying cache', event.request.url);
-        const cachedResponse = await caches.match(event.request);
-        
-        if (cachedResponse) {
-          return cachedResponse;
-        }
-        
-        // If the request is for a page, show offline page
-        if (event.request.mode === 'navigate') {
-          const offlineResponse = await caches.match(OFFLINE_URL);
-          if (offlineResponse) {
-            return offlineResponse;
-          }
-        }
-        
-        // If all fails, return an error response
-        return new Response('Network error occurred', {
-          status: 503,
-          statusText: 'Service Unavailable',
-          headers: new Headers({
-            'Content-Type': 'text/plain'
-          })
-        });
-      }
-    })()
-  );
+  const url = new URL(event.request.url);
+  
+  // Use cache first for static assets
+  if (
+    url.pathname.endsWith('.css') ||
+    url.pathname.endsWith('.js') ||
+    url.pathname.endsWith('.jpg') ||
+    url.pathname.endsWith('.png') ||
+    url.pathname.endsWith('.svg') ||
+    url.pathname.endsWith('.ico') ||
+    url.pathname.endsWith('.woff2')
+  ) {
+    event.respondWith(cacheFirstStrategy(event.request));
+    return;
+  }
+  
+  // Use network first for everything else
+  event.respondWith(networkFirstStrategy(event.request));
 });
+
+// Message handling for retrying failed requests
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'RETRY_FAILED_REQUESTS') {
+    retryFailedRequests();
+  }
+});
+
+// Retry failed requests when back online
+async function retryFailedRequests() {
+  if (failedRequests.size === 0) {
+    return;
+  }
+  
+  console.log(`Retrying ${failedRequests.size} failed requests`);
+  
+  // Create a copy to iterate through while potentially modifying the original
+  const requestsToRetry = Array.from(failedRequests.entries());
+  
+  for (const [key, request] of requestsToRetry) {
+    try {
+      const response = await fetch(request);
+      
+      if (response.ok) {
+        console.log('Successfully retried:', key);
+        failedRequests.delete(key);
+        
+        // Update cache with new response
+        const cache = await caches.open(CACHE_NAME);
+        await cache.put(request, response);
+      }
+    } catch (error) {
+      console.log('Retry still failed for:', key);
+    }
+  }
+}
 
 // Background sync for offline actions
 self.addEventListener('sync', (event) => {
@@ -133,7 +210,6 @@ async function syncData() {
     for (const action of actions) {
       try {
         // Process the action based on type
-        // This is where you'd implement API calls for different action types
         console.log('Processing action:', action);
         
         // If successful, delete the action from store
@@ -209,6 +285,11 @@ self.addEventListener('notificationclick', (event) => {
       }
     })
   );
+});
+
+// Track app installation status
+self.addEventListener('appinstalled', (event) => {
+  console.log('App was installed', event);
 });
 
 console.log('Service Worker: Registered');

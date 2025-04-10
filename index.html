@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -36,8 +37,17 @@
     <link rel="apple-touch-startup-image" href="/d0c-icon.svg" />
     <meta name="apple-mobile-web-app-title" content="Doc' O Clock" />
     
+    <!-- Apple splash screens -->
+    <link rel="apple-touch-startup-image" href="/d0c-icon.svg" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)" />
+    <link rel="apple-touch-startup-image" href="/d0c-icon.svg" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)" />
+    
     <!-- Preload key assets -->
     <link rel="preload" href="/d0c-icon.svg" as="image" />
+    
+    <!-- Touch icons for various platforms -->
+    <link rel="icon" type="image/png" sizes="192x192" href="/logo192.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="/logo512.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico" />
     
     <!-- Security headers -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://*.supabase.co; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.gpteng.co; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.daily.co; font-src 'self'; frame-src 'self' https://*.daily.co https://*.stripe.com;" />
@@ -60,37 +70,14 @@
           navigator.serviceWorker.register('/service-worker.js')
             .then(registration => {
               console.log('ServiceWorker registration successful with scope:', registration.scope);
+              // Check for updates every hour
+              setInterval(() => registration.update(), 1000 * 60 * 60);
             })
             .catch(err => {
               console.error('ServiceWorker registration failed:', err);
             });
         });
       }
-      
-      // Add to homescreen prompt
-      let deferredPrompt;
-      window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        // Optionally, show your custom "Add to Home Screen" UI here
-        console.log('App can be installed, showing custom UI');
-        // For example, you might want to show a button or banner
-        const installBtn = document.getElementById('install-button');
-        if (installBtn) {
-          installBtn.style.display = 'block';
-          installBtn.addEventListener('click', () => {
-            deferredPrompt.prompt();
-            deferredPrompt.userChoice.then((choiceResult) => {
-              if (choiceResult.outcome === 'accepted') {
-                console.log('User accepted the install prompt');
-              } else {
-                console.log('User dismissed the install prompt');
-              }
-              deferredPrompt = null;
-            });
-          });
-        }
-      });
     </script>
   </body>
 </html>
