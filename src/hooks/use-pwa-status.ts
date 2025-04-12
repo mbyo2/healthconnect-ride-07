@@ -6,6 +6,7 @@ export function usePwaStatus() {
   const [isInstalled, setIsInstalled] = useState<boolean | null>(null);
   const [isServiceWorkerActive, setIsServiceWorkerActive] = useState<boolean | null>(null);
   const [installPromptEvent, setInstallPromptEvent] = useState<any>(null);
+  const [cachingComplete, setCachingComplete] = useState(false);
 
   useEffect(() => {
     const checkPwaStatus = async () => {
@@ -15,6 +16,17 @@ export function usePwaStatus() {
       // Check service worker status
       const swStatus = await checkServiceWorkerStatus();
       setIsServiceWorkerActive(swStatus);
+      
+      // Check if initial caching is complete
+      if (swStatus && 'caches' in window) {
+        try {
+          const cache = await caches.open('doc-o-clock-cache-v1');
+          const keys = await cache.keys();
+          setCachingComplete(keys.length > 0);
+        } catch (err) {
+          console.error('Error checking cache status:', err);
+        }
+      }
     };
     
     checkPwaStatus();
@@ -31,12 +43,24 @@ export function usePwaStatus() {
       setInstallPromptEvent(null);
     };
     
+    const handleControllerChange = () => {
+      // Service worker has been updated
+      checkPwaStatus();
+    };
+    
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     window.addEventListener('appinstalled', handleAppInstalled);
+    
+    if (navigator.serviceWorker) {
+      navigator.serviceWorker.addEventListener('controllerchange', handleControllerChange);
+    }
     
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
       window.removeEventListener('appinstalled', handleAppInstalled);
+      if (navigator.serviceWorker) {
+        navigator.serviceWorker.removeEventListener('controllerchange', handleControllerChange);
+      }
     };
   }, []);
   
@@ -58,10 +82,23 @@ export function usePwaStatus() {
     return choiceResult.outcome === 'accepted';
   };
   
+  const forceUpdateServiceWorker = async () => {
+    if ('serviceWorker' in navigator) {
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      for (const registration of registrations) {
+        await registration.update();
+      }
+      return true;
+    }
+    return false;
+  };
+  
   return {
     isInstalled,
     isServiceWorkerActive,
     canInstall: !!installPromptEvent,
+    cachingComplete,
     promptInstall,
+    forceUpdateServiceWorker,
   };
 }

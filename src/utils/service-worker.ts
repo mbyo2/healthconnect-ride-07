@@ -3,6 +3,9 @@ interface ExtendedServiceWorkerRegistration extends ServiceWorkerRegistration {
   sync?: {
     register: (tag: string) => Promise<void>;
   };
+  periodicSync?: {
+    register: (tag: string, options: { minInterval: number }) => Promise<void>;
+  };
 }
 
 export const registerServiceWorker = async () => {
@@ -27,6 +30,29 @@ export const registerServiceWorker = async () => {
           });
         }
       });
+      
+      // Set up periodic sync if supported
+      if ('periodicSync' in registration) {
+        const extendedReg = registration as ExtendedServiceWorkerRegistration;
+        
+        // Request permission to use periodic sync
+        if ('permissions' in navigator) {
+          const status = await navigator.permissions.query({
+            name: 'periodic-background-sync' as any,
+          });
+          
+          if (status.state === 'granted' && extendedReg.periodicSync) {
+            try {
+              await extendedReg.periodicSync.register('content-sync', {
+                minInterval: 24 * 60 * 60 * 1000, // once a day
+              });
+              console.log('Periodic sync registered');
+            } catch (error) {
+              console.error('Periodic sync registration failed:', error);
+            }
+          }
+        }
+      }
       
       return registration;
     } catch (error) {
@@ -85,22 +111,19 @@ export const requestNotificationPermission = async () => {
   }
 };
 
-// New function to check if app is installed
 export const checkIfAppInstalled = () => {
   return window.matchMedia('(display-mode: standalone)').matches || 
          (window.navigator as any).standalone === true;
 };
 
-// New function to handle background sync registration with type checking
-export const registerBackgroundSync = async () => {
+export const registerBackgroundSync = async (tag: string = 'sync-data') => {
   if ('serviceWorker' in navigator && 'SyncManager' in window) {
     try {
       const registration = await navigator.serviceWorker.ready;
       const extendedReg = registration as ExtendedServiceWorkerRegistration;
       
-      // Only call sync.register if the API is available
       if (extendedReg.sync) {
-        await extendedReg.sync.register('sync-data');
+        await extendedReg.sync.register(tag);
         console.log('Background sync registered!');
         return true;
       } else {
@@ -116,7 +139,7 @@ export const registerBackgroundSync = async () => {
   return false;
 };
 
-// New function to save data for offline sync later
+// Optimized function to save data for offline sync
 export const saveForOfflineSync = async (action: any) => {
   try {
     const db = await openDB();
@@ -134,7 +157,6 @@ export const saveForOfflineSync = async (action: any) => {
     
     return new Promise<boolean>((resolve) => {
       tx.oncomplete = () => {
-        // Try to trigger sync if we're online
         if (navigator.onLine) {
           registerBackgroundSync().then(() => resolve(true));
         } else {
@@ -151,6 +173,42 @@ export const saveForOfflineSync = async (action: any) => {
     console.error('Error saving action for offline sync:', error);
     return false;
   }
+};
+
+// Updated function to update or reload service worker
+export const updateServiceWorker = async (): Promise<boolean> => {
+  if ('serviceWorker' in navigator) {
+    try {
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      let updated = false;
+      
+      for (const registration of registrations) {
+        await registration.update();
+        updated = true;
+      }
+      
+      return updated;
+    } catch (error) {
+      console.error('Error updating service worker:', error);
+      return false;
+    }
+  }
+  return false;
+};
+
+// Clear all cached data
+export const clearCache = async (): Promise<boolean> => {
+  if ('caches' in window) {
+    try {
+      const cacheNames = await caches.keys();
+      await Promise.all(cacheNames.map(name => caches.delete(name)));
+      return true;
+    } catch (error) {
+      console.error('Error clearing cache:', error);
+      return false;
+    }
+  }
+  return false;
 };
 
 // Helper function to open the IndexedDB database

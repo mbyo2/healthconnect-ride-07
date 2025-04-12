@@ -1,99 +1,107 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
-interface NetworkInfo {
+type NetworkStatus = {
   isOnline: boolean;
-  connectionType: string | null;
-  connectionQuality: 'excellent' | 'good' | 'fair' | 'poor' | null;
-  downlink: number | null;
-  effectiveType: string | null;
-  rtt: number | null;
-}
+  effectiveType: 'slow-2g' | '2g' | '3g' | '4g' | 'unknown';
+  downlink: number;
+  rtt: number;
+  saveData: boolean;
+};
 
 export function useNetwork() {
-  const [networkInfo, setNetworkInfo] = useState<NetworkInfo>({
+  const [networkStatus, setNetworkStatus] = useState<NetworkStatus>({
     isOnline: navigator.onLine,
-    connectionType: null,
-    connectionQuality: null,
-    downlink: null,
-    effectiveType: null,
-    rtt: null,
+    effectiveType: 'unknown',
+    downlink: 0,
+    rtt: 0,
+    saveData: false
   });
   
-  useEffect(() => {
-    const handleOnline = () => updateNetworkInfo(true);
-    const handleOffline = () => updateNetworkInfo(false);
+  const [connectionQuality, setConnectionQuality] = useState<'poor' | 'average' | 'good' | 'excellent' | 'unknown'>('unknown');
+
+  const updateNetworkInfo = useCallback(() => {
+    const connection = (navigator as any).connection || 
+                       (navigator as any).mozConnection || 
+                       (navigator as any).webkitConnection;
     
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-    
-    // Initial network info gathering
-    updateNetworkInfo(navigator.onLine);
-    
-    // Set up connection monitoring if available
-    if ('connection' in navigator) {
-      const connection = (navigator as any).connection;
+    if (connection) {
+      setNetworkStatus({
+        isOnline: navigator.onLine,
+        effectiveType: connection.effectiveType || 'unknown',
+        downlink: connection.downlink || 0,
+        rtt: connection.rtt || 0,
+        saveData: connection.saveData || false
+      });
       
-      if (connection) {
-        const handleConnectionChange = () => {
-          updateNetworkInfo(navigator.onLine);
-        };
-        
-        connection.addEventListener('change', handleConnectionChange);
-        
-        return () => {
-          window.removeEventListener('online', handleOnline);
-          window.removeEventListener('offline', handleOffline);
-          connection.removeEventListener('change', handleConnectionChange);
-        };
+      // Determine connection quality
+      const { effectiveType, downlink, rtt } = connection;
+      
+      if (!effectiveType || effectiveType === 'slow-2g') {
+        setConnectionQuality('poor');
+      } else if (effectiveType === '2g' || (downlink && downlink < 0.5)) {
+        setConnectionQuality('poor');
+      } else if (effectiveType === '3g' || (downlink && downlink < 2)) {
+        setConnectionQuality('average');
+      } else if (effectiveType === '4g' && downlink >= 2 && downlink < 5) {
+        setConnectionQuality('good');
+      } else if (effectiveType === '4g' && downlink >= 5) {
+        setConnectionQuality('excellent');
+      } else {
+        setConnectionQuality('unknown');
       }
+    } else {
+      setNetworkStatus(prev => ({
+        ...prev,
+        isOnline: navigator.onLine
+      }));
     }
-    
-    return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-    };
   }, []);
-  
-  const updateNetworkInfo = (isOnline: boolean) => {
-    let connectionType = null;
-    let downlink = null;
-    let effectiveType = null;
-    let rtt = null;
-    let connectionQuality = null;
+
+  useEffect(() => {
+    updateNetworkInfo();
+
+    // Event listeners for connection changes
+    window.addEventListener('online', updateNetworkInfo);
+    window.addEventListener('offline', updateNetworkInfo);
     
-    // Get connection information if available
-    if ('connection' in navigator) {
-      const connection = (navigator as any).connection;
+    const connection = (navigator as any).connection || 
+                       (navigator as any).mozConnection || 
+                       (navigator as any).webkitConnection;
+                       
+    if (connection) {
+      connection.addEventListener('change', updateNetworkInfo);
+    }
+
+    return () => {
+      window.removeEventListener('online', updateNetworkInfo);
+      window.removeEventListener('offline', updateNetworkInfo);
       
       if (connection) {
-        connectionType = connection.type;
-        downlink = connection.downlink;
-        effectiveType = connection.effectiveType;
-        rtt = connection.rtt;
-        
-        // Determine connection quality based on effective type
-        if (effectiveType === '4g') {
-          connectionQuality = 'excellent';
-        } else if (effectiveType === '3g') {
-          connectionQuality = 'good';
-        } else if (effectiveType === '2g') {
-          connectionQuality = 'fair';
-        } else if (effectiveType === 'slow-2g') {
-          connectionQuality = 'poor';
-        }
+        connection.removeEventListener('change', updateNetworkInfo);
       }
+    };
+  }, [updateNetworkInfo]);
+
+  // Function to retry failed requests when coming back online
+  const retryFailedRequests = useCallback(() => {
+    if (networkStatus.isOnline && 'serviceWorker' in navigator && navigator.serviceWorker.controller) {
+      navigator.serviceWorker.controller.postMessage({
+        type: 'RETRY_FAILED_REQUESTS'
+      });
     }
-    
-    setNetworkInfo({
-      isOnline,
-      connectionType,
-      connectionQuality,
-      downlink,
-      effectiveType,
-      rtt,
-    });
+  }, [networkStatus.isOnline]);
+
+  // Automatically retry requests when coming back online
+  useEffect(() => {
+    if (networkStatus.isOnline) {
+      retryFailedRequests();
+    }
+  }, [networkStatus.isOnline, retryFailedRequests]);
+
+  return { 
+    ...networkStatus, 
+    connectionQuality,
+    retryFailedRequests
   };
-  
-  return networkInfo;
 }
