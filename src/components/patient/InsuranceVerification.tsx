@@ -1,9 +1,11 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { format } from "date-fns";
 import { Shield, AlertTriangle, CheckCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { InsuranceProvider } from "@/types/healthcare";
 
 export const InsuranceVerification = () => {
   const { data: insurance, isLoading } = useQuery({
@@ -45,11 +47,32 @@ export const InsuranceVerification = () => {
     ? new Date(insurance.coverage_end_date) > new Date()
     : true;
 
+  // Determine if the provider is from Zambia
+  const isZambianProvider = Object.values(InsuranceProvider).some(
+    provider => 
+      provider === insurance.provider_name && 
+      [
+        InsuranceProvider.HOLLARD_HEALTH,
+        InsuranceProvider.SANLAM,
+        InsuranceProvider.MADISON,
+        InsuranceProvider.PROFESSIONAL_INSURANCE,
+        InsuranceProvider.UNITURTLE,
+        InsuranceProvider.SES_INTERNATIONAL,
+        InsuranceProvider.NHIMA,
+        InsuranceProvider.PRUDENTIAL
+      ].includes(provider as InsuranceProvider)
+  );
+
   return (
     <Card className="p-6">
       <div className="flex items-center gap-2">
         <Shield className="h-5 w-5 text-primary" />
         <h3 className="font-semibold">Insurance Details</h3>
+        {isZambianProvider && (
+          <Badge variant="outline" className="ml-auto">
+            Zambian Provider
+          </Badge>
+        )}
       </div>
 
       <div className="mt-4 space-y-2">
@@ -95,6 +118,15 @@ export const InsuranceVerification = () => {
             <span className="font-medium">
               {format(new Date(insurance.coverage_end_date), 'PP')}
             </span>
+          </div>
+        )}
+        
+        {/* Show NHIMA-specific information */}
+        {insurance.provider_name === InsuranceProvider.NHIMA && (
+          <div className="mt-4 pt-2 border-t">
+            <p className="text-sm text-gray-600">
+              NHIMA provides equitable access to quality healthcare through the National Health Insurance Scheme (NHIS).
+            </p>
           </div>
         )}
       </div>

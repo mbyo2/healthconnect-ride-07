@@ -1,3 +1,4 @@
+
 import React, { useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,6 +10,8 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  SelectGroup,
+  SelectLabel
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Search, MapPin, FilterX } from "lucide-react";
@@ -106,8 +109,34 @@ export const SearchFilters = () => {
     "Orthodontics"
   ];
 
-  // Use the enum directly
-  const insuranceProviders = Object.values(InsuranceProvider);
+  // Group insurance providers into categories
+  const zambianInsuranceProviders = [
+    InsuranceProvider.HOLLARD_HEALTH,
+    InsuranceProvider.SANLAM,
+    InsuranceProvider.MADISON,
+    InsuranceProvider.PROFESSIONAL_INSURANCE,
+    InsuranceProvider.UNITURTLE,
+    InsuranceProvider.SES_INTERNATIONAL,
+    InsuranceProvider.NHIMA,
+    InsuranceProvider.PRUDENTIAL
+  ];
+
+  const internationalInsuranceProviders = [
+    InsuranceProvider.MEDICARE,
+    InsuranceProvider.MEDICAID,
+    InsuranceProvider.BLUE_CROSS,
+    InsuranceProvider.CIGNA,
+    InsuranceProvider.UNITED_HEALTHCARE,
+    InsuranceProvider.AETNA,
+    InsuranceProvider.HUMANA,
+    InsuranceProvider.KAISER_PERMANENTE,
+    InsuranceProvider.TRICARE
+  ];
+
+  const otherInsuranceProviders = [
+    InsuranceProvider.OTHER,
+    InsuranceProvider.NONE
+  ];
 
   return (
     <div className="bg-card border rounded-lg p-4 shadow-sm space-y-4">
@@ -194,11 +223,33 @@ export const SearchFilters = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="">Any Insurance</SelectItem>
-              {insuranceProviders.map((insurance) => (
-                <SelectItem key={insurance} value={insurance}>
-                  {insurance}
-                </SelectItem>
-              ))}
+              
+              <SelectGroup>
+                <SelectLabel>Zambian Providers</SelectLabel>
+                {zambianInsuranceProviders.map((insurance) => (
+                  <SelectItem key={insurance} value={insurance}>
+                    {insurance}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+              
+              <SelectGroup>
+                <SelectLabel>International Providers</SelectLabel>
+                {internationalInsuranceProviders.map((insurance) => (
+                  <SelectItem key={insurance} value={insurance}>
+                    {insurance}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+              
+              <SelectGroup>
+                <SelectLabel>Other</SelectLabel>
+                {otherInsuranceProviders.map((insurance) => (
+                  <SelectItem key={insurance} value={insurance}>
+                    {insurance}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
             </SelectContent>
           </Select>
         </div>

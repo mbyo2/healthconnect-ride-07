@@ -5,6 +5,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Shield } from "lucide-react";
+import { InsuranceProvider } from "@/types/healthcare";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export const InsuranceForm = () => {
   const [loading, setLoading] = useState(false);
@@ -58,12 +66,45 @@ export const InsuranceForm = () => {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <Label htmlFor="provider_name">Provider Name</Label>
-          <Input
-            id="provider_name"
+          <Select
             value={formData.provider_name}
-            onChange={(e) => setFormData({ ...formData, provider_name: e.target.value })}
-            required
-          />
+            onValueChange={(value) => setFormData({ ...formData, provider_name: value })}
+          >
+            <SelectTrigger id="provider_name" aria-label="Select insurance provider">
+              <SelectValue placeholder="Select Insurance Provider" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="" disabled>Select Insurance Provider</SelectItem>
+              
+              {/* Zambian Insurance Providers Group */}
+              <div className="px-2 py-1.5 text-sm font-semibold">Zambian Providers</div>
+              <SelectItem value={InsuranceProvider.HOLLARD_HEALTH}>{InsuranceProvider.HOLLARD_HEALTH}</SelectItem>
+              <SelectItem value={InsuranceProvider.SANLAM}>{InsuranceProvider.SANLAM}</SelectItem>
+              <SelectItem value={InsuranceProvider.MADISON}>{InsuranceProvider.MADISON}</SelectItem>
+              <SelectItem value={InsuranceProvider.PROFESSIONAL_INSURANCE}>{InsuranceProvider.PROFESSIONAL_INSURANCE}</SelectItem>
+              <SelectItem value={InsuranceProvider.UNITURTLE}>{InsuranceProvider.UNITURTLE}</SelectItem>
+              <SelectItem value={InsuranceProvider.SES_INTERNATIONAL}>{InsuranceProvider.SES_INTERNATIONAL}</SelectItem>
+              <SelectItem value={InsuranceProvider.NHIMA}>{InsuranceProvider.NHIMA}</SelectItem>
+              <SelectItem value={InsuranceProvider.PRUDENTIAL}>{InsuranceProvider.PRUDENTIAL}</SelectItem>
+              
+              {/* International Insurance Providers Group */}
+              <div className="px-2 py-1.5 text-sm font-semibold">International Providers</div>
+              <SelectItem value={InsuranceProvider.MEDICARE}>{InsuranceProvider.MEDICARE}</SelectItem>
+              <SelectItem value={InsuranceProvider.MEDICAID}>{InsuranceProvider.MEDICAID}</SelectItem>
+              <SelectItem value={InsuranceProvider.BLUE_CROSS}>{InsuranceProvider.BLUE_CROSS}</SelectItem>
+              <SelectItem value={InsuranceProvider.CIGNA}>{InsuranceProvider.CIGNA}</SelectItem>
+              <SelectItem value={InsuranceProvider.UNITED_HEALTHCARE}>{InsuranceProvider.UNITED_HEALTHCARE}</SelectItem>
+              <SelectItem value={InsuranceProvider.AETNA}>{InsuranceProvider.AETNA}</SelectItem>
+              <SelectItem value={InsuranceProvider.HUMANA}>{InsuranceProvider.HUMANA}</SelectItem>
+              <SelectItem value={InsuranceProvider.KAISER_PERMANENTE}>{InsuranceProvider.KAISER_PERMANENTE}</SelectItem>
+              <SelectItem value={InsuranceProvider.TRICARE}>{InsuranceProvider.TRICARE}</SelectItem>
+              
+              {/* Other options */}
+              <div className="px-2 py-1.5 text-sm font-semibold">Other</div>
+              <SelectItem value={InsuranceProvider.OTHER}>{InsuranceProvider.OTHER}</SelectItem>
+              <SelectItem value={InsuranceProvider.NONE}>{InsuranceProvider.NONE}</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         <div>

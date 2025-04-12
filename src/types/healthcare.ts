@@ -1,4 +1,3 @@
-
 export type HealthcareProviderType = 
   | 'doctor'
   | 'nurse'
@@ -44,8 +43,9 @@ export type SpecialtyType =
   | 'General Dentistry'
   | 'Orthodontics';
 
-// Ensure the enum is properly exported
+// Updated enum with Zambian insurance providers
 export enum InsuranceProvider {
+  // Global/International providers
   MEDICARE = 'Medicare',
   MEDICAID = 'Medicaid',
   BLUE_CROSS = 'Blue Cross',
@@ -55,6 +55,18 @@ export enum InsuranceProvider {
   HUMANA = 'Humana',
   KAISER_PERMANENTE = 'Kaiser Permanente',
   TRICARE = 'TRICARE',
+  
+  // Zambian insurance providers
+  HOLLARD_HEALTH = 'Hollard Health',
+  SANLAM = 'Sanlam Life Insurance',
+  MADISON = 'Madison General Insurance',
+  PROFESSIONAL_INSURANCE = 'Professional Insurance Corporation Zambia',
+  UNITURTLE = 'Uniturtle Industries Ltd',
+  SES_INTERNATIONAL = 'SES International Health',
+  NHIMA = 'NHIMA',
+  PRUDENTIAL = 'Prudential Life Assurance Zambia',
+  
+  // Other options
   OTHER = 'Other',
   NONE = 'None'
 }
