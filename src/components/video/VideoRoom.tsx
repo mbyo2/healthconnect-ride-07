@@ -1,211 +1,131 @@
-import { useState, useEffect, useRef } from "react";
-import DailyIframe from '@daily-co/daily-js';
-import { Button } from "@/components/ui/button";
+
+import { useEffect, useState } from "react";
+import { DailyIframe } from "@daily-co/daily-js";
 import { VideoControls } from "./VideoControls";
-import { useBattery } from "@/hooks/use-battery";
+import { Button } from "@/components/ui/button";
 import { useNetwork } from "@/hooks/use-network";
-import { useMediaQuery } from "@/hooks/use-media-query";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Battery, BatteryLow, Tv, XCircle } from "lucide-react";
-import { NetworkQualityMetrics } from "@/types/video";
-import { useIsTVDevice } from "@/hooks/use-tv-detection";
+import { useDeviceCapabilities } from "@/hooks/use-device-capabilities";
+import { Card } from "@/components/ui/card";
+import { ArrowLeft, Battery, Signal } from "lucide-react";
 
 interface VideoRoomProps {
   meetingUrl: string;
-  onLeave?: () => void;
+  onLeave: () => void;
 }
 
 export const VideoRoom = ({ meetingUrl, onLeave }: VideoRoomProps) => {
-  const [callFrame, setCallFrame] = useState<any>(null);
+  const [callFrame, setCallFrame] = useState<DailyIframe | null>(null);
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(false);
   const [isScreenSharing, setIsScreenSharing] = useState(false);
-  const [videoQuality, setVideoQuality] = useState<"high" | "medium" | "low">("high");
-  const [networkMetrics, setNetworkMetrics] = useState<NetworkQualityMetrics>({});
-  const [isFullScreen, setIsFullScreen] = useState(false);
-  const iframeContainerRef = useRef<HTMLDivElement>(null);
-  const { batteryLevel, isCharging } = useBattery();
-  const { connectionQuality, isOnline } = useNetwork();
-  const isTV = useIsTVDevice();
-  const isMobile = useMediaQuery('(max-width: 768px)');
-  const cssFile = isTV ? '/tv-styles.css' : '';
-  
-  const toggleFullScreen = () => {
-    if (!document.fullscreenElement) {
-      iframeContainerRef.current?.requestFullscreen().catch(err => {
-        console.error(`Error attempting to enable fullscreen: ${err.message}`);
-      });
-      setIsFullScreen(true);
-    } else {
-      document.exitFullscreen();
-      setIsFullScreen(false);
-    }
-  };
+  const [quality, setQuality] = useState<"high" | "medium" | "low">("high");
+  const { connectionQuality } = useNetwork();
+  const capabilities = useDeviceCapabilities();
   
   useEffect(() => {
-    const handleFullscreenChange = () => {
-      setIsFullScreen(!!document.fullscreenElement);
-    };
-    
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    return () => {
-      document.removeEventListener('fullscreenchange', handleFullscreenChange);
-    };
-  }, []);
-  
-  useEffect(() => {
-    if (!iframeContainerRef.current || !meetingUrl) return;
-    
-    let initialQuality: "high" | "medium" | "low" = "high";
+    // Set initial video quality based on connection
     if (connectionQuality === "poor") {
-      initialQuality = "low";
-    } else if (!isCharging && batteryLevel < 0.2) {
-      initialQuality = "medium";
+      setQuality("low");
+    } else if (connectionQuality === "average") {
+      setQuality("medium");
     }
-    setVideoQuality(initialQuality);
+  }, [connectionQuality]);
+  
+  useEffect(() => {
+    // Initialize meeting
+    if (!meetingUrl) return;
     
-    const createCallFrame = () => {
-      try {
-        const frameOptions: any = {
-          url: meetingUrl,
-          cssFile,
-        };
-        
-        if (isTV) {
-          frameOptions.customLayout = true;
-        }
-            
-        const frame = DailyIframe.createFrame(
-          iframeContainerRef.current as HTMLDivElement,
-          frameOptions
-        );
-        
-        frame
-          .on('joined-meeting', (e: any) => {
-            console.log('Joined meeting', e);
-            applyVideoQuality(frame, initialQuality);
-            
-            if (isTV) {
-              applyTVLayout(frame);
-            }
-            
-            if (isMobile) {
-              applyMobileLayout(frame);
-            }
-          })
-          .on('left-meeting', (e: any) => {
-            console.log('Left meeting', e);
-            if (onLeave) onLeave();
-          })
-          .on('error', (e: any) => console.error('Daily error', e))
-          .on('network-quality-change', (e: any) => {
-            console.log('Network quality changed', e);
-            setNetworkMetrics({
-              downlink: e.downlinkKbps,
-              uplink: e.uplinkKbps,
-              packetLoss: e.packetLoss,
-              quality: mapNetworkQuality(e.threshold)
-            });
-          })
-          .join({ url: meetingUrl });
-        
-        setCallFrame(frame);
-      } catch (error) {
-        console.error('Error creating Daily call frame:', error);
+    const options: any = {
+      url: meetingUrl,
+      showLeaveButton: true,
+      showFullscreenButton: true,
+      iframeStyle: {
+        height: '100%',
+        width: '100%',
+        borderRadius: '8px',
+        border: 'none',
+        backgroundColor: 'black',
       }
     };
     
-    createCallFrame();
+    // Adjust quality settings based on connection
+    if (quality === "low") {
+      options.videoSendSettings = {
+        encoding: { maxBitrate: 150_000, maxFramerate: 15 }
+      };
+      options.videoReceiveSettings = {
+        encoding: { maxBitrate: 150_000, maxFramerate: 15 }
+      };
+    } else if (quality === "medium") {
+      options.videoSendSettings = {
+        encoding: { maxBitrate: 500_000, maxFramerate: 25 }
+      };
+    }
+    
+    // On low battery, reduce quality
+    if (capabilities.battery.level !== null && capabilities.battery.level < 0.2 && !capabilities.battery.charging) {
+      options.videoSendSettings = {
+        encoding: { maxBitrate: 150_000, maxFramerate: 15 }
+      };
+    }
+    
+    try {
+      const dailyFrame = DailyIframe.createFrame(
+        document.getElementById('video-container') as HTMLElement,
+        options
+      );
+      
+      dailyFrame
+        .on('loaded', () => {
+          console.log('Video frame loaded');
+          dailyFrame.join();
+        })
+        .on('joining-meeting', () => {
+          console.log('Joining meeting');
+        })
+        .on('joined-meeting', () => {
+          console.log('Joined meeting');
+        })
+        .on('left-meeting', () => {
+          console.log('Left meeting');
+          onLeave();
+        })
+        .on('participant-updated', (event: any) => {
+          if (event.participant.local) {
+            setIsMuted(event.participant.audio === false);
+            setIsVideoOff(event.participant.video === false);
+            setIsScreenSharing(event.participant.screen === true);
+          }
+        });
+      
+      setCallFrame(dailyFrame);
+    } catch (error) {
+      console.error('Error setting up video call:', error);
+    }
     
     return () => {
       if (callFrame) {
         callFrame.destroy();
       }
     };
-  }, [meetingUrl, isTV, isMobile]);
-  
-  useEffect(() => {
-    if (batteryLevel < 0.15 && !isCharging && videoQuality !== "low") {
-      setVideoQuality("low");
-      if (callFrame) {
-        applyVideoQuality(callFrame, "low");
-      }
-    }
-  }, [batteryLevel, isCharging]);
-  
-  const applyTVLayout = (frame: any) => {
-    frame.updateParticipant('local', {
-      styles: {
-        cam: {
-          width: '20%',
-          height: '20%',
-          right: '2%',
-          top: '2%',
-          borderRadius: '8px',
-        }
-      }
-    });
-    
-    frame.setShowNamesMode('always');
-    frame.setShowParticipantsBar(true);
-  };
-  
-  const applyMobileLayout = (frame: any) => {
-    try {
-      frame.updateParticipant('local', {
-        styles: {
-          cam: {
-            width: '30%',
-            height: '30%',
-            right: '8px',
-            bottom: '8px',
-            borderRadius: '8px',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
-          }
-        }
-      });
-      
-      frame.setShowNamesMode('always');
-      frame.setShowParticipantsBar(false);
-    } catch (error) {
-      console.error('Error applying mobile layout:', error);
-    }
-  };
-  
-  const mapNetworkQuality = (threshold: number): NetworkQualityMetrics["quality"] => {
-    if (threshold > 80) return "excellent";
-    if (threshold > 60) return "good";
-    if (threshold > 40) return "fair";
-    return "poor";
-  };
-  
-  const applyVideoQuality = (frame: any, quality: "high" | "medium" | "low") => {
-    if (!frame) return;
-    
-    try {
-      const qualities = {
-        high: { video: { encodings: { maxBitrate: 2800000, maxFramerate: 30 } } },
-        medium: { video: { encodings: { maxBitrate: 1000000, maxFramerate: 25 } } },
-        low: { video: { encodings: { maxBitrate: 350000, maxFramerate: 15 } } }
-      };
-      
-      frame.updateInputSettings(qualities[quality]);
-      console.log(`Applied ${quality} video quality settings`);
-    } catch (error) {
-      console.error('Error applying video quality settings:', error);
-    }
-  };
+  }, [meetingUrl, quality]);
   
   const handleToggleMute = () => {
     if (!callFrame) return;
-    callFrame.setLocalAudio(!isMuted);
-    setIsMuted(!isMuted);
+    if (isMuted) {
+      callFrame.setLocalAudio(true);
+    } else {
+      callFrame.setLocalAudio(false);
+    }
   };
   
   const handleToggleVideo = () => {
     if (!callFrame) return;
-    callFrame.setLocalVideo(!isVideoOff);
-    setIsVideoOff(!isVideoOff);
+    if (isVideoOff) {
+      callFrame.setLocalVideo(true);
+    } else {
+      callFrame.setLocalVideo(false);
+    }
   };
   
   const handleToggleScreenShare = () => {
@@ -215,87 +135,92 @@ export const VideoRoom = ({ meetingUrl, onLeave }: VideoRoomProps) => {
     } else {
       callFrame.startScreenShare();
     }
-    setIsScreenSharing(!isScreenSharing);
   };
   
-  const handleQualityChange = (quality: "high" | "medium" | "low") => {
-    setVideoQuality(quality);
-    if (callFrame) {
-      applyVideoQuality(callFrame, quality);
+  const handleQualityChange = (newQuality: "high" | "medium" | "low") => {
+    setQuality(newQuality);
+    
+    if (!callFrame) return;
+    
+    if (newQuality === "low") {
+      callFrame.updateSendSettings({
+        video: {
+          encoding: { maxBitrate: 150_000, maxFramerate: 15 }
+        }
+      });
+      callFrame.updateReceiveSettings({
+        video: {
+          encoding: { maxBitrate: 150_000, maxFramerate: 15 }
+        }
+      });
+    } else if (newQuality === "medium") {
+      callFrame.updateSendSettings({
+        video: {
+          encoding: { maxBitrate: 500_000, maxFramerate: 25 }
+        }
+      });
+      callFrame.updateReceiveSettings({
+        video: {
+          encoding: { maxBitrate: 750_000 }
+        }
+      });
+    } else {
+      callFrame.updateSendSettings({
+        video: {
+          encoding: { maxBitrate: 1_200_000, maxFramerate: 30 }
+        }
+      });
+      callFrame.updateReceiveSettings({
+        video: {
+          encoding: { maxBitrate: 2_500_000 }
+        }
+      });
     }
   };
-  
-  const handleLeaveCall = () => {
-    if (callFrame) {
-      callFrame.leave();
-    }
-    if (onLeave) {
-      onLeave();
-    }
-  };
-  
+
   return (
-    <div className={`flex flex-col w-full ${isTV ? 'tv-layout' : ''} ${isMobile ? 'mobile-layout' : ''}`}>
-      {batteryLevel < 0.15 && !isCharging && (
-        <Alert className="mb-4">
-          <BatteryLow className="h-4 w-4" />
-          <AlertTitle>Low Battery</AlertTitle>
-          <AlertDescription>
-            Battery level is low. Video quality has been reduced to save power.
-          </AlertDescription>
-        </Alert>
-      )}
-      
-      {isTV && (
-        <div className="tv-indicator mb-4 flex items-center justify-center p-2 bg-blue-100 dark:bg-blue-900 rounded">
-          <Tv className="h-5 w-5 mr-2" />
-          <span>TV Mode Active - Use remote control for navigation</span>
-        </div>
-      )}
-      
-      <div className={`relative ${isMobile ? 'mb-20' : ''}`}>
-        <div 
-          ref={iframeContainerRef} 
-          className={`w-full h-[75vh] rounded-lg overflow-hidden border border-gray-200 dark:border-gray-800 ${
-            isTV ? 'h-[85vh] tv-video-container' : ''
-          } ${
-            isMobile ? 'h-[60vh] touch-manipulation' : ''
-          }`}
-        ></div>
+    <div className="flex flex-col space-y-4">
+      <Card className="relative h-[60vh] md:h-[70vh] w-full overflow-hidden">
+        <div id="video-container" className="h-full w-full" />
         
-        {isMobile && (
-          <Button 
-            onClick={toggleFullScreen}
-            variant="secondary"
-            size="sm"
-            className="absolute top-2 right-2 z-10 bg-background/80 backdrop-blur-sm"
-          >
-            {isFullScreen ? 'Exit Full Screen' : 'Full Screen'}
-          </Button>
+        {capabilities.battery.level !== null && capabilities.battery.level < 0.15 && !capabilities.battery.charging && (
+          <div className="absolute top-2 left-2 bg-red-500/80 text-white px-3 py-1 rounded-full text-xs flex items-center">
+            <Battery className="h-3 w-3 mr-1" /> Low battery
+          </div>
         )}
         
-        {isMobile && (
-          <Button
-            onClick={handleLeaveCall}
-            variant="destructive"
-            size="sm"
-            className="absolute top-2 left-2 z-10 bg-destructive/90 backdrop-blur-sm"
-          >
-            <XCircle className="h-4 w-4 mr-1" /> Leave
-          </Button>
+        {connectionQuality === "poor" && (
+          <div className="absolute top-2 right-2 bg-yellow-500/80 text-white px-3 py-1 rounded-full text-xs flex items-center">
+            <Signal className="h-3 w-3 mr-1" /> Poor connection
+          </div>
         )}
-      </div>
+      </Card>
       
       <VideoControls
         isMuted={isMuted}
         isVideoOff={isVideoOff}
         isScreenSharing={isScreenSharing}
-        currentQuality={videoQuality}
+        currentQuality={quality}
         onToggleMute={handleToggleMute}
         onToggleVideo={handleToggleVideo}
         onToggleScreenShare={handleToggleScreenShare}
         onQualityChange={handleQualityChange}
       />
+      
+      <Button 
+        variant="destructive" 
+        onClick={() => {
+          if (callFrame) {
+            callFrame.leave();
+          } else {
+            onLeave();
+          }
+        }}
+        className="w-full"
+      >
+        <ArrowLeft className="h-4 w-4 mr-2" />
+        Leave Meeting
+      </Button>
     </div>
   );
 };

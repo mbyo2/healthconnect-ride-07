@@ -1,193 +1,107 @@
 
-# Doc' O Clock Healthcare Application
+# Doc' O Clock - Healthcare App
 
-## Project info
+A comprehensive healthcare application built for Zambian healthcare providers and patients. Features include appointment booking, video consultations, insurance verification, and more.
 
-**URL**: https://lovable.dev/projects/e9305d9f-218d-422e-bf82-990acdce112e
+## Features
 
-## How can I edit this code?
+- User authentication and profile management
+- Healthcare provider search and filtering
+- Appointment scheduling and management
+- Video consultations with healthcare professionals
+- Insurance verification and management
+- Offline support and PWA capabilities
+- Mobile-optimized interface
+- TV interface support
+- Power-saving modes for mobile devices
 
-There are several ways of editing your application.
+## Mobile App Build Instructions
 
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/e9305d9f-218d-422e-bf82-990acdce112e) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-## How to build for mobile (iOS and Android)
-
-This application is configured for easy deployment to mobile platforms using [Capacitor](https://capacitorjs.com/).
+This app can be built as a mobile application for both iOS and Android using Capacitor. Follow these steps to build the mobile version:
 
 ### Prerequisites
 
-- XCode with Command Line Tools (for iOS)
-- Android Studio (for Android)
-- Node.js and npm installed
+- Node.js 16+ and npm
+- Xcode (for iOS builds)
+- Android Studio (for Android builds)
 
-### Building for Mobile
+### Building the Mobile App
 
-1. Clone the repository and install dependencies:
+1. First, clone this repository and install dependencies:
 
-```sh
-git clone <YOUR_GIT_URL>
-cd <YOUR_PROJECT_NAME>
+```bash
+git clone <repository-url>
+cd doc-o-clock
 npm install
 ```
 
-2. Add Capacitor to your project:
+2. Install Capacitor and required dependencies:
 
-```sh
-npm install @capacitor/core @capacitor/cli
-npm install @capacitor/android @capacitor/ios
+```bash
+npm install @capacitor/core @capacitor/cli @capacitor/ios @capacitor/android @capacitor/app @capacitor/splash-screen @capacitor/local-notifications
 ```
 
-3. Initialize Capacitor in your project:
+3. Build the web application:
 
-```sh
-npx cap init Doc-O-Clock io.lovable.docOClock
-```
-
-4. Update capacitor.config.ts with the following configuration:
-
-```typescript
-import { CapacitorConfig } from '@capacitor/cli';
-
-const config: CapacitorConfig = {
-  appId: 'io.lovable.docOClock',
-  appName: 'Doc O Clock',
-  webDir: 'dist',
-  server: {
-    androidScheme: 'https',
-    url: 'https://YOUR_DEPLOYED_URL', // Add your deployed URL when available
-    cleartext: true
-  },
-  plugins: {
-    SplashScreen: {
-      launchShowDuration: 2000,
-      backgroundColor: "#ffffff",
-      showSpinner: true,
-      spinnerColor: "#4CAF50"
-    }
-  }
-};
-
-export default config;
-```
-
-5. Build your web application for production:
-
-```sh
+```bash
 npm run build
 ```
 
-6. Add the native platforms:
+4. Initialize Capacitor with the existing configuration:
 
-```sh
-npx cap add android
-npx cap add ios
-```
-
-7. Sync your web code to the native projects:
-
-```sh
+```bash
 npx cap sync
 ```
 
-### Running on Devices
+### For iOS
 
-#### iOS
+5. Open the iOS project:
 
-```sh
+```bash
 npx cap open ios
 ```
 
-This will open the project in Xcode. From there:
-1. Connect your iOS device
-2. Select your device as the build target
-3. Click the play button to build and run
+6. In Xcode, select your development team and configure signing
+7. Press the Build and Run button to deploy to a simulator or device
 
-#### Android
+### For Android
 
-```sh
+5. Open the Android project:
+
+```bash
 npx cap open android
 ```
 
-This will open the project in Android Studio. From there:
-1. Connect your Android device or start an emulator
-2. Click the "Run" button to build and deploy
+6. In Android Studio, wait for Gradle to sync
+7. Press the Run button to deploy to an emulator or device
 
-### Live Reload During Development
+### Updating the App
 
-For a better development experience, you can enable live reload:
+When making changes to the web code:
 
-```sh
-npm run dev
-npx cap run android -l --external
-# or
-npx cap run ios -l --external
+1. Rebuild the web application:
+
+```bash
+npm run build
 ```
 
-### Building for Production
+2. Update the native projects:
 
-#### Android APK
+```bash
+npx cap sync
+```
 
-1. In Android Studio, select Build > Build Bundle(s) / APK(s) > Build APK(s)
-2. The APK will be generated in `android/app/build/outputs/apk/debug/`
+3. Open and deploy as described above
 
-#### iOS IPA
+## Mobile-Specific Features
 
-1. In Xcode, select Product > Archive
-2. Follow the steps in the organizer window to distribute your app
+- **Offline Mode**: The app functions when network connectivity is limited
+- **Power Saving**: Low-battery detection reduces app resource usage
+- **Device Integration**: Uses native device capabilities like camera and notifications
+- **Biometric Authentication**: Secure login with fingerprint or face recognition when available
+- **Responsive Design**: Adapts to various screen sizes and orientations
+- **TV Mode**: Special interface when run on smart TVs
 
-## What technologies are used for this project?
+## PWA Support
 
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-- Supabase (Authentication and Database)
-- Capacitor (Mobile)
-
-## Progressive Web App Features
-
-This application is configured as a Progressive Web App (PWA) with the following features:
-
-- Offline functionality
-- Installable on home screen
-- Push notifications
-- Background sync
-- Responsive design for all devices
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/e9305d9f-218d-422e-bf82-990acdce112e) and click on Share -> Publish.
-
-## I want to use a custom domain - is that possible?
-
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+This app is also available as a Progressive Web App that can be installed from modern browsers.

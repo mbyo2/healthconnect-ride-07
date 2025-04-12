@@ -1,107 +1,103 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 
-type NetworkStatus = {
+export interface NetworkState {
   isOnline: boolean;
-  effectiveType: 'slow-2g' | '2g' | '3g' | '4g' | 'unknown';
-  downlink: number;
-  rtt: number;
-  saveData: boolean;
-};
+  connectionQuality: 'poor' | 'average' | 'good' | 'excellent' | 'unknown';
+}
 
-export function useNetwork() {
-  const [networkStatus, setNetworkStatus] = useState<NetworkStatus>({
-    isOnline: navigator.onLine,
-    effectiveType: 'unknown',
-    downlink: 0,
-    rtt: 0,
-    saveData: false
-  });
-  
-  const [connectionQuality, setConnectionQuality] = useState<'poor' | 'average' | 'good' | 'excellent' | 'unknown'>('unknown');
-
-  const updateNetworkInfo = useCallback(() => {
-    const connection = (navigator as any).connection || 
-                       (navigator as any).mozConnection || 
-                       (navigator as any).webkitConnection;
-    
-    if (connection) {
-      setNetworkStatus({
-        isOnline: navigator.onLine,
-        effectiveType: connection.effectiveType || 'unknown',
-        downlink: connection.downlink || 0,
-        rtt: connection.rtt || 0,
-        saveData: connection.saveData || false
-      });
-      
-      // Determine connection quality
-      const { effectiveType, downlink, rtt } = connection;
-      
-      if (!effectiveType || effectiveType === 'slow-2g') {
-        setConnectionQuality('poor');
-      } else if (effectiveType === '2g' || (downlink && downlink < 0.5)) {
-        setConnectionQuality('poor');
-      } else if (effectiveType === '3g' || (downlink && downlink < 2)) {
-        setConnectionQuality('average');
-      } else if (effectiveType === '4g' && downlink >= 2 && downlink < 5) {
-        setConnectionQuality('good');
-      } else if (effectiveType === '4g' && downlink >= 5) {
-        setConnectionQuality('excellent');
-      } else {
-        setConnectionQuality('unknown');
-      }
-    } else {
-      setNetworkStatus(prev => ({
-        ...prev,
-        isOnline: navigator.onLine
-      }));
-    }
-  }, []);
+export const useNetwork = (): NetworkState => {
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [connectionQuality, setConnectionQuality] = useState<NetworkState['connectionQuality']>('unknown');
 
   useEffect(() => {
-    updateNetworkInfo();
+    // Network status change handlers
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
 
-    // Event listeners for connection changes
-    window.addEventListener('online', updateNetworkInfo);
-    window.addEventListener('offline', updateNetworkInfo);
-    
-    const connection = (navigator as any).connection || 
-                       (navigator as any).mozConnection || 
-                       (navigator as any).webkitConnection;
-                       
-    if (connection) {
-      connection.addEventListener('change', updateNetworkInfo);
-    }
-
-    return () => {
-      window.removeEventListener('online', updateNetworkInfo);
-      window.removeEventListener('offline', updateNetworkInfo);
-      
-      if (connection) {
-        connection.removeEventListener('change', updateNetworkInfo);
+    // Check connection quality
+    const checkConnectionQuality = async () => {
+      try {
+        // If Network Information API is available (Chrome, Android)
+        if ('connection' in navigator && (navigator as any).connection) {
+          const { effectiveType, downlink, rtt } = (navigator as any).connection;
+          
+          if (effectiveType === 'slow-2g' || effectiveType === '2g') {
+            setConnectionQuality('poor');
+          } else if (effectiveType === '3g') {
+            setConnectionQuality('average');
+          } else if (effectiveType === '4g' && downlink < 5) {
+            setConnectionQuality('good');
+          } else if (effectiveType === '4g' && downlink >= 5) {
+            setConnectionQuality('excellent');
+          }
+          
+          // Also listen for connection changes
+          (navigator as any).connection.addEventListener('change', checkConnectionQuality);
+        } else {
+          // Fall back to ping test if Network Information API not available
+          const startTime = Date.now();
+          const response = await fetch('/favicon.ico', { 
+            method: 'HEAD',
+            cache: 'no-cache',
+          });
+          
+          if (response.ok) {
+            const duration = Date.now() - startTime;
+            
+            if (duration < 100) {
+              setConnectionQuality('excellent');
+            } else if (duration < 300) {
+              setConnectionQuality('good');
+            } else if (duration < 750) {
+              setConnectionQuality('average');
+            } else {
+              setConnectionQuality('poor');
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error checking connection quality:', error);
+        // If online but had an error checking quality, assume average
+        if (isOnline) {
+          setConnectionQuality('average');
+        } else {
+          setConnectionQuality('unknown');
+        }
       }
     };
-  }, [updateNetworkInfo]);
 
-  // Function to retry failed requests when coming back online
-  const retryFailedRequests = useCallback(() => {
-    if (networkStatus.isOnline && 'serviceWorker' in navigator && navigator.serviceWorker.controller) {
-      navigator.serviceWorker.controller.postMessage({
-        type: 'RETRY_FAILED_REQUESTS'
-      });
+    // Add event listeners for online/offline events
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    
+    // Initial check
+    if (isOnline) {
+      checkConnectionQuality();
+      
+      // Periodically check connection quality (every 30 seconds)
+      const intervalId = setInterval(() => {
+        if (navigator.onLine) {
+          checkConnectionQuality();
+        }
+      }, 30000);
+      
+      return () => {
+        clearInterval(intervalId);
+        window.removeEventListener('online', handleOnline);
+        window.removeEventListener('offline', handleOffline);
+        
+        if ('connection' in navigator && (navigator as any).connection) {
+          (navigator as any).connection.removeEventListener('change', checkConnectionQuality);
+        }
+      };
     }
-  }, [networkStatus.isOnline]);
+    
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, [isOnline]);
 
-  // Automatically retry requests when coming back online
-  useEffect(() => {
-    if (networkStatus.isOnline) {
-      retryFailedRequests();
-    }
-  }, [networkStatus.isOnline, retryFailedRequests]);
-
-  return { 
-    ...networkStatus, 
-    connectionQuality,
-    retryFailedRequests
-  };
-}
+  return { isOnline, connectionQuality };
+};

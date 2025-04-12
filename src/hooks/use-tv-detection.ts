@@ -1,52 +1,59 @@
-import { useState, useEffect } from 'react';
-import { useMediaQuery } from './use-media-query';
 
-export function useIsTVDevice() {
-  const [isTV, setIsTV] = useState(false);
-  const isLargeScreen = useMediaQuery('(min-width: 1920px)');
-  const isNonHoverDevice = useMediaQuery('(hover: none)');
-  
+import { useState, useEffect } from 'react';
+
+export const useIsTVDevice = (): boolean => {
+  const [isTV, setIsTV] = useState<boolean>(false);
+
   useEffect(() => {
-    // Helper function to detect Android TV
-    const detectAndroidTV = () => {
-      // User agent detection for Android TV
-      const userAgent = navigator.userAgent.toLowerCase();
-      const isAndroidTV = 
-        userAgent.includes('android tv') || 
-        userAgent.includes('androidtv') || 
-        (userAgent.includes('android') && 
-         (userAgent.includes('smart-tv') || 
-          userAgent.includes('large-screen') || 
-          userAgent.includes('leanback') || 
-          userAgent.includes('gfst')));
+    const checkForTVDevice = () => {
+      // Check for common TV user agent strings
+      const ua = navigator.userAgent.toLowerCase();
       
-      // Other TV platform detections
-      const isTizen = userAgent.includes('tizen');
-      const isWebOS = userAgent.includes('webos') || userAgent.includes('web0s');
-      const isFireTV = userAgent.includes('firetv') || userAgent.includes('fire tv');
+      // Check for TV specific browsers
+      const isTVBrowser = [
+        'tv', 
+        'smart-tv', 
+        'smarttv', 
+        'appletv', 
+        'googletv', 
+        'webos', 
+        'tizen',
+        'vidaa',
+        'netcast',
+        'vizio',
+        'roku'
+      ].some(keyword => ua.includes(keyword));
       
-      // Check for TV specific properties
-      const hasNavigatorTV = 'tv' in navigator;
+      // Check for large screen with no typical mobile/desktop interactions
+      const hasTouchscreen = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+      const isLargeScreen = window.screen.width >= 1280 && window.screen.height >= 720;
+      const hasPointer = window.matchMedia('(pointer:fine)').matches;
+      const hasGamepad = 'getGamepads' in navigator;
       
-      // Combine all TV platform detections
-      return isAndroidTV || isTizen || isWebOS || isFireTV || hasNavigatorTV;
+      // TV devices typically don't have pointer/mouse but may have gamepad or remote control
+      const isProbablyTV = isLargeScreen && 
+                          !hasPointer && 
+                          (!hasTouchscreen || hasGamepad);
+      
+      // Set isTV if either condition is met
+      setIsTV(isTVBrowser || isProbablyTV);
+      
+      // Set special body class for TV mode styling
+      if (isTVBrowser || isProbablyTV) {
+        document.body.classList.add('tv-mode');
+      }
     };
     
-    // Combine media queries with user agent detection
-    const tvDetected = (isLargeScreen && isNonHoverDevice) || detectAndroidTV();
-    setIsTV(tvDetected);
+    // Initial check
+    checkForTVDevice();
     
-    // Add TV class to body if detected
-    if (tvDetected) {
-      document.body.classList.add('tv-device');
-    } else {
-      document.body.classList.remove('tv-device');
-    }
+    // Also check on resize in case of device orientation change
+    window.addEventListener('resize', checkForTVDevice);
     
     return () => {
-      document.body.classList.remove('tv-device');
+      window.removeEventListener('resize', checkForTVDevice);
     };
-  }, [isLargeScreen, isNonHoverDevice]);
-  
+  }, []);
+
   return isTV;
-}
+};
