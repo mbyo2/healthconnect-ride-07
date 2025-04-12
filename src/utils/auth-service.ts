@@ -145,3 +145,64 @@ export const signInWithBiometrics = async () => {
   
   return { success: true, message: 'Biometric authentication successful' };
 };
+
+// Mobile-specific auth helpers
+export const isPlatformCapacitor = () => {
+  return typeof (window as any).Capacitor !== 'undefined';
+};
+
+export const storeAuthInSecureStorage = async (session: Session | null) => {
+  if (!isPlatformCapacitor()) return;
+  
+  try {
+    const { Plugins } = (window as any).Capacitor;
+    if (Plugins.Storage) {
+      if (session) {
+        await Plugins.Storage.set({
+          key: 'auth-session',
+          value: JSON.stringify(session)
+        });
+      } else {
+        await Plugins.Storage.remove({ key: 'auth-session' });
+      }
+    }
+  } catch (error) {
+    console.error('Error storing in secure storage:', error);
+  }
+};
+
+export const getAuthFromSecureStorage = async () => {
+  if (!isPlatformCapacitor()) return null;
+  
+  try {
+    const { Plugins } = (window as any).Capacitor;
+    if (Plugins.Storage) {
+      const { value } = await Plugins.Storage.get({ key: 'auth-session' });
+      return value ? JSON.parse(value) : null;
+    }
+  } catch (error) {
+    console.error('Error retrieving from secure storage:', error);
+  }
+  return null;
+};
+
+export const checkForExistingSession = async () => {
+  // First check secure storage if on a mobile device
+  if (isPlatformCapacitor()) {
+    const storedSession = await getAuthFromSecureStorage();
+    if (storedSession) {
+      // Verify the token is still valid
+      try {
+        const { data, error } = await supabase.auth.getUser(storedSession.access_token);
+        if (!error && data.user) {
+          return storedSession;
+        }
+      } catch (err) {
+        console.error('Error verifying stored session:', err);
+      }
+    }
+  }
+  
+  // Fall back to browser session
+  return getSession();
+};

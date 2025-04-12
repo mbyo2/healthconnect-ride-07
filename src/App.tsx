@@ -12,6 +12,7 @@ import { useIsMobile } from './hooks/use-mobile';
 import { useEffect } from 'react';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { LoadingScreen } from './components/LoadingScreen';
+import { MobileAppWrapper } from './components/MobileAppWrapper';
 
 // Lazy load pages
 const Landing = lazy(() => import('./pages/Landing'));
@@ -80,167 +81,169 @@ const App = () => {
   
   return (
     <>
-      <OfflineAlert />
-      <PWAInstallPrompt />
-      {process.env.NODE_ENV === 'development' && <TouchDetector />}
-      
-      <Suspense fallback={<LoadingScreen />}>
-        <Routes>
-          <Route path="/" element={<LandingPageRouter />} />
-          <Route path="/auth" element={<Auth />} />
-          <Route path="/login" element={<Login />} />
-          <Route
-            path="/home"
-            element={
-              <ProtectedRoute>
+      <MobileAppWrapper>
+        <OfflineAlert />
+        <PWAInstallPrompt />
+        {process.env.NODE_ENV === 'development' && <TouchDetector />}
+        
+        <Suspense fallback={<LoadingScreen />}>
+          <Routes>
+            <Route path="/" element={<LandingPageRouter />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/login" element={<Login />} />
+            <Route
+              path="/home"
+              element={
+                <ProtectedRoute>
+                  <MobileLayout>
+                    <Index />
+                  </MobileLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/search"
+              element={
+                <ProtectedRoute>
+                  <MobileLayout>
+                    <Search />
+                  </MobileLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <MobileLayout>
+                    <Profile />
+                  </MobileLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/map"
+              element={
+                <ProtectedRoute>
+                  <MobileLayout>
+                    <Map />
+                  </MobileLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/profile-setup" element={<ProfileSetup />} />
+            <Route
+              path="/appointments"
+              element={
+                <ProtectedRoute>
+                  <MobileLayout>
+                    <Appointments />
+                  </MobileLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/chat"
+              element={
+                <ProtectedRoute>
+                  <MobileLayout>
+                    <Chat />
+                  </MobileLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/video-consultations"
+              element={
+                <ProtectedRoute>
+                  <MobileLayout>
+                    <VideoConsultations />
+                  </MobileLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/provider/:id"
+              element={
+                <ProtectedRoute>
+                  <MobileLayout>
+                    <ProviderProfile />
+                  </MobileLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/settings"
+              element={
+                <ProtectedRoute>
+                  <MobileLayout>
+                    <Settings />
+                  </MobileLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/appointments/patient"
+              element={
+                <ProtectedRoute>
+                  <MobileLayout>
+                    <PatientAppointments />
+                  </MobileLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/provider/dashboard"
+              element={
+                <ProtectedRoute>
+                  <MobileLayout>
+                    <ProviderDashboard />
+                  </MobileLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/dashboard"
+              element={
+                <ProtectedRoute>
+                  <MobileLayout>
+                    <AdminDashboard />
+                  </MobileLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/super-admin/dashboard"
+              element={
+                <ProtectedRoute>
+                  <MobileLayout>
+                    <SuperAdminDashboard />
+                  </MobileLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/notifications"
+              element={
+                <ProtectedRoute>
+                  <MobileLayout>
+                    <NotificationsPage />
+                  </MobileLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/privacy-security"
+              element={
                 <MobileLayout>
-                  <Index />
+                  <PrivacySecurityPage />
                 </MobileLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/search"
-            element={
-              <ProtectedRoute>
-                <MobileLayout>
-                  <Search />
-                </MobileLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute>
-                <MobileLayout>
-                  <Profile />
-                </MobileLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/map"
-            element={
-              <ProtectedRoute>
-                <MobileLayout>
-                  <Map />
-                </MobileLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route path="/profile-setup" element={<ProfileSetup />} />
-          <Route
-            path="/appointments"
-            element={
-              <ProtectedRoute>
-                <MobileLayout>
-                  <Appointments />
-                </MobileLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/chat"
-            element={
-              <ProtectedRoute>
-                <MobileLayout>
-                  <Chat />
-                </MobileLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/video-consultations"
-            element={
-              <ProtectedRoute>
-                <MobileLayout>
-                  <VideoConsultations />
-                </MobileLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/provider/:id"
-            element={
-              <ProtectedRoute>
-                <MobileLayout>
-                  <ProviderProfile />
-                </MobileLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/settings"
-            element={
-              <ProtectedRoute>
-                <MobileLayout>
-                  <Settings />
-                </MobileLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/appointments/patient"
-            element={
-              <ProtectedRoute>
-                <MobileLayout>
-                  <PatientAppointments />
-                </MobileLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/provider/dashboard"
-            element={
-              <ProtectedRoute>
-                <MobileLayout>
-                  <ProviderDashboard />
-                </MobileLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/dashboard"
-            element={
-              <ProtectedRoute>
-                <MobileLayout>
-                  <AdminDashboard />
-                </MobileLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/super-admin/dashboard"
-            element={
-              <ProtectedRoute>
-                <MobileLayout>
-                  <SuperAdminDashboard />
-                </MobileLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/notifications"
-            element={
-              <ProtectedRoute>
-                <MobileLayout>
-                  <NotificationsPage />
-                </MobileLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/privacy-security"
-            element={
-              <MobileLayout>
-                <PrivacySecurityPage />
-              </MobileLayout>
-            }
-          />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </Suspense>
+              }
+            />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Suspense>
+      </MobileAppWrapper>
     </>
   );
 };

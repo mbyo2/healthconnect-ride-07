@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 
 export const VideoConsultation = () => {
   const [activeConsultation, setActiveConsultation] = useState<VideoConsultationDetails | null>(null);
-  const { isOnline, connectionQuality, connectionType } = useNetwork();
+  const { isOnline, connectionQuality } = useNetwork();
   const isTV = useIsTVDevice();
   const isMobile = useMediaQuery('(max-width: 768px)');
 
@@ -44,16 +44,11 @@ export const VideoConsultation = () => {
       if (!consultation.meeting_url) {
         console.log('Creating new Daily room for consultation:', consultation.id);
         
-        // Inform user about network usage
-        if (connectionType === "cellular") {
-          toast.info("Using cellular data for video call. Data charges may apply.");
-        }
-        
         // Add TV-specific configuration if on a TV device
         const { error } = await supabase.functions.invoke('create-daily-room', {
           body: { 
             consultation_id: consultation.id,
-            optimize_for_network: connectionQuality === "poor" || connectionType === "cellular",
+            optimize_for_network: connectionQuality === "poor",
             tv_mode: isTV
           }
         });

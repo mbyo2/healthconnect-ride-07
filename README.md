@@ -1,4 +1,5 @@
-# Welcome to your Lovable project
+
+# Doc' O Clock Healthcare Application
 
 ## Project info
 
@@ -36,29 +37,152 @@ npm i
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## How to build for mobile (iOS and Android)
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+This application is configured for easy deployment to mobile platforms using [Capacitor](https://capacitorjs.com/).
 
-**Use GitHub Codespaces**
+### Prerequisites
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+- XCode with Command Line Tools (for iOS)
+- Android Studio (for Android)
+- Node.js and npm installed
+
+### Building for Mobile
+
+1. Clone the repository and install dependencies:
+
+```sh
+git clone <YOUR_GIT_URL>
+cd <YOUR_PROJECT_NAME>
+npm install
+```
+
+2. Add Capacitor to your project:
+
+```sh
+npm install @capacitor/core @capacitor/cli
+npm install @capacitor/android @capacitor/ios
+```
+
+3. Initialize Capacitor in your project:
+
+```sh
+npx cap init Doc-O-Clock io.lovable.docOClock
+```
+
+4. Update capacitor.config.ts with the following configuration:
+
+```typescript
+import { CapacitorConfig } from '@capacitor/cli';
+
+const config: CapacitorConfig = {
+  appId: 'io.lovable.docOClock',
+  appName: 'Doc O Clock',
+  webDir: 'dist',
+  server: {
+    androidScheme: 'https',
+    url: 'https://YOUR_DEPLOYED_URL', // Add your deployed URL when available
+    cleartext: true
+  },
+  plugins: {
+    SplashScreen: {
+      launchShowDuration: 2000,
+      backgroundColor: "#ffffff",
+      showSpinner: true,
+      spinnerColor: "#4CAF50"
+    }
+  }
+};
+
+export default config;
+```
+
+5. Build your web application for production:
+
+```sh
+npm run build
+```
+
+6. Add the native platforms:
+
+```sh
+npx cap add android
+npx cap add ios
+```
+
+7. Sync your web code to the native projects:
+
+```sh
+npx cap sync
+```
+
+### Running on Devices
+
+#### iOS
+
+```sh
+npx cap open ios
+```
+
+This will open the project in Xcode. From there:
+1. Connect your iOS device
+2. Select your device as the build target
+3. Click the play button to build and run
+
+#### Android
+
+```sh
+npx cap open android
+```
+
+This will open the project in Android Studio. From there:
+1. Connect your Android device or start an emulator
+2. Click the "Run" button to build and deploy
+
+### Live Reload During Development
+
+For a better development experience, you can enable live reload:
+
+```sh
+npm run dev
+npx cap run android -l --external
+# or
+npx cap run ios -l --external
+```
+
+### Building for Production
+
+#### Android APK
+
+1. In Android Studio, select Build > Build Bundle(s) / APK(s) > Build APK(s)
+2. The APK will be generated in `android/app/build/outputs/apk/debug/`
+
+#### iOS IPA
+
+1. In Xcode, select Product > Archive
+2. Follow the steps in the organizer window to distribute your app
 
 ## What technologies are used for this project?
 
-This project is built with .
+This project is built with:
 
 - Vite
 - TypeScript
 - React
 - shadcn-ui
 - Tailwind CSS
+- Supabase (Authentication and Database)
+- Capacitor (Mobile)
+
+## Progressive Web App Features
+
+This application is configured as a Progressive Web App (PWA) with the following features:
+
+- Offline functionality
+- Installable on home screen
+- Push notifications
+- Background sync
+- Responsive design for all devices
 
 ## How can I deploy this project?
 
