@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from "react";
-import { DailyIframe } from "@daily-co/daily-js";
+import DailyIframe from "@daily-co/daily-js";
 import { VideoControls } from "./VideoControls";
 import { Button } from "@/components/ui/button";
 import { useNetwork } from "@/hooks/use-network";
