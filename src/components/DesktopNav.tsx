@@ -69,7 +69,7 @@ export function DesktopNav() {
         <div className="flex items-center gap-4">
           <Link to="/profile">
             <img
-              src={user?.avatar_url || "/placeholder.svg"}
+              src={"/placeholder.svg"}
               alt="Avatar"
               className="rounded-full w-8 h-8 object-cover"
             />

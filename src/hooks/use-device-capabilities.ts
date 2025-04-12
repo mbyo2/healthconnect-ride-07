@@ -120,8 +120,8 @@ export function useDeviceCapabilities() {
     setCapabilities(prev => ({
       ...prev,
       battery: {
-        level: battery.level,
-        charging: battery.charging,
+        level: battery.batteryLevel,
+        charging: battery.isCharging,
         chargingTime: battery.chargingTime,
         dischargingTime: battery.dischargingTime,
       },

@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 
-interface BatteryInfo {
+export interface BatteryInfo {
   batteryLevel: number;
   isCharging: boolean;
   chargingTime: number | null;

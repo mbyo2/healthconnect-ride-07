@@ -87,20 +87,22 @@ export function MobileAppWrapper({ children }: MobileAppWrapperProps) {
       {children}
       
       {capabilities.isCapacitor && (
-        <style jsx global>{`
-          .low-power-mode {
-            /* Reduce animations */
-            * {
-              transition: none !important;
-              animation: none !important;
+        <style dangerouslySetInnerHTML={{
+          __html: `
+            .low-power-mode {
+              /* Reduce animations */
+              * {
+                transition: none !important;
+                animation: none !important;
+              }
+              /* Use darker colors for OLED screens */
+              .dark {
+                --background: #000000;
+                --card: #0a0a0a;
+              }
             }
-            /* Use darker colors for OLED screens */
-            .dark {
-              --background: #000000;
-              --card: #0a0a0a;
-            }
-          }
-        `}</style>
+          `
+        }} />
       )}
     </div>
   );
