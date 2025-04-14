@@ -8,6 +8,7 @@ import { LoadingScreen } from '@/components/LoadingScreen';
 import Login from '@/pages/Login';
 import CreateAdmin from '@/pages/CreateAdmin';
 import AdminWallet from '@/pages/AdminWallet';
+import NotFound from '@/pages/NotFound';
 import { RouteErrorBoundary } from '@/components/ui/route-error-boundary';
 
 // Create ProtectedRoute component
@@ -54,7 +55,6 @@ const ProviderDashboard = lazy(() => import('@/pages/ProviderDashboard'));
 const ApplicationStatus = lazy(() => import('@/pages/ApplicationStatus'));
 const Appointments = lazy(() => import('@/pages/Appointments'));
 const VideoConsultation = lazy(() => import('@/pages/VideoConsultations'));
-const NotFound = lazy(() => import('@/pages/NotFound').then(module => ({ default: () => <div>Page Not Found</div> })));
 const Wallet = lazy(() => import('./pages/Wallet'));
 const Auth = lazy(() => import('@/pages/Auth'));
 const Landing = lazy(() => import('@/pages/Landing'));

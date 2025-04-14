@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 import { processPayment } from "@/utils/payment";
 import { toast } from "sonner";
 import { LoadingScreen } from "@/components/LoadingScreen";
+import { useAuth } from "@/context/AuthContext";
 
-interface TeleHealthPaymentProps {
+export interface TeleHealthPaymentProps {
   amount: number;
   consultationTitle?: string;
   consultationDuration?: number;
@@ -18,16 +19,17 @@ interface TeleHealthPaymentProps {
 }
 
 export const TeleHealthPayment = ({ 
-  amount, 
-  consultationTitle, 
-  consultationDuration, 
-  patientId, 
+  amount = 50, // Default amount
+  consultationTitle = "General Consultation", 
+  consultationDuration = 30, 
+  patientId,
   providerId, 
   serviceId,
   onSuccess,
   onError
 }: TeleHealthPaymentProps) => {
   const [isLoading, setIsLoading] = useState(false);
+  const { user } = useAuth();
 
   const handlePayment = async () => {
     setIsLoading(true);

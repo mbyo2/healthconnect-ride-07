@@ -12,6 +12,7 @@ export interface PaymentResponse {
   success: boolean;
   paymentId?: string;
   message?: string;
+  paymentUrl?: string; // Add this property to fix the error
   transactionDetails?: {
     amount: number;
     currency: string;

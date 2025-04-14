@@ -18,7 +18,7 @@ export const VideoConsultation = () => {
   const { isOnline, connectionQuality } = useNetwork();
   const isTV = useIsTVDevice();
   const isMobile = useMediaQuery('(max-width: 768px)');
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
 
   useEffect(() => {
     // Set focus on first focusable element for TV remote navigation
@@ -93,6 +93,9 @@ export const VideoConsultation = () => {
     setActiveConsultation(null);
   };
 
+  // Use profile data for user name, falling back to user email
+  const userName = profile?.first_name || user?.email?.split('@')[0] || "User";
+
   return (
     <div className={`container mx-auto py-6 ${isTV ? 'tv-container p-8' : ''} ${isMobile ? 'px-2 py-4' : ''}`}>
       {isMobile && activeConsultation && (
@@ -137,7 +140,7 @@ export const VideoConsultation = () => {
       {activeConsultation?.meeting_url ? (
         <VideoRoom 
           roomUrl={activeConsultation.meeting_url}
-          userName={user?.first_name || user?.email || "User"} 
+          userName={userName} 
           videoQuality={connectionQuality === "poor" ? "low" : "medium"}
           onLeave={handleLeaveCall}
         />

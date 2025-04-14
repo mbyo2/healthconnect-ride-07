@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -22,9 +21,13 @@ const Wallet: React.FC = () => {
     {
       id: '1',
       type: 'card',
-      last4: '4242',
-      expiryDate: '12/25',
-      isDefault: true
+      details: {
+        last4: '4242',
+        expiryMonth: 12,
+        expiryYear: 25
+      },
+      isDefault: true,
+      created_at: new Date().toISOString()
     }
   ]);
   
@@ -86,9 +89,13 @@ const Wallet: React.FC = () => {
       {
         id: `${Date.now()}`,
         type: 'card',
-        last4: '1234',
-        expiryDate: '01/26',
-        isDefault: false
+        details: {
+          last4: '1234',
+          expiryMonth: 1,
+          expiryYear: 26
+        },
+        isDefault: false,
+        created_at: new Date().toISOString()
       }
     ]);
   };
@@ -99,6 +106,7 @@ const Wallet: React.FC = () => {
   
   const handleSetDefaultMethod = (id: string) => {
     setPaymentMethods(paymentMethods.map(method => ({
+      ...method,
       ...method,
       isDefault: method.id === id
     })));
@@ -177,7 +185,17 @@ const Wallet: React.FC = () => {
 
         <TabsContent value="telehealth">
           <div className="grid md:grid-cols-2 gap-6">
-            <TeleHealthPayment />
+            {user && (
+              <TeleHealthPayment 
+                amount={50}
+                consultationTitle="Virtual Doctor Consultation"
+                consultationDuration={30}
+                patientId={user.id}
+                providerId="default-provider-id" // This would normally come from selected provider
+                serviceId="telehealth-consultation" // This would normally be dynamic based on service type
+                onSuccess={() => toast.success("Booking confirmed! Check your appointments.")}
+              />
+            )}
             
             <Card>
               <CardHeader>
