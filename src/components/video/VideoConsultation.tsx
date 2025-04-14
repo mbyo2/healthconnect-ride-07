@@ -94,7 +94,7 @@ export const VideoConsultation = () => {
   };
 
   // Use profile data for user name, falling back to user email
-  const userName = profile?.first_name || user?.email?.split('@')[0] || "User";
+  const userName = profile?.first_name || (user?.email ? user.email.split('@')[0] : "User");
 
   return (
     <div className={`container mx-auto py-6 ${isTV ? 'tv-container p-8' : ''} ${isMobile ? 'px-2 py-4' : ''}`}>

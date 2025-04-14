@@ -69,7 +69,7 @@ const Wallet: React.FC = () => {
   const handleAddFunds = async (amount: number): Promise<void> => {
     if (!user?.id) {
       toast.error("You must be logged in to add funds");
-      return;
+      return Promise.reject(new Error("Not logged in"));
     }
     
     try {

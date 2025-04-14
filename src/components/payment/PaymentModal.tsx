@@ -42,8 +42,12 @@ export const PaymentModal = ({
       if (response.success) {
         toast.success("Payment initiated");
         
-        // Redirect to payment page
-        window.location.href = response.paymentUrl;
+        // Redirect to payment page if URL is available
+        if (response.paymentUrl) {
+          window.location.href = response.paymentUrl;
+        } else {
+          onClose();
+        }
       }
     } catch (error) {
       console.error("Payment failed:", error);
