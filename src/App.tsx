@@ -3,15 +3,22 @@ import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { ThemeProvider } from '@/components/theme-provider';
-import { AuthProvider } from '@/context/AuthContext';
+import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { LoadingScreen } from '@/components/LoadingScreen';
 import Login from '@/pages/Login';
 import CreateAdmin from '@/pages/CreateAdmin';
 import AdminWallet from '@/pages/AdminWallet';
 
 // Create ProtectedRoute component
-const ProtectedRoute = ({ children, adminOnly = false, superAdminOnly = false, providerOnly = false }) => {
-  const { isAuthenticated, user, isLoading } = React.useContext(React.createContext({}));
+interface ProtectedRouteProps {
+  children: React.ReactNode; 
+  adminOnly?: boolean;
+  superAdminOnly?: boolean;
+  providerOnly?: boolean;
+}
+
+const ProtectedRoute = ({ children, adminOnly = false, superAdminOnly = false, providerOnly = false }: ProtectedRouteProps) => {
+  const { isAuthenticated, user, isLoading } = useAuth();
   
   if (isLoading) {
     return <LoadingScreen />;
@@ -33,13 +40,12 @@ const ProtectedRoute = ({ children, adminOnly = false, superAdminOnly = false, p
     return <Navigate to="/" replace />;
   }
   
-  return children;
+  return <>{children}</>;
 };
 
 // Lazy-loaded components
 const Home = lazy(() => import('@/pages/Index'));
 const ProfileSetup = lazy(() => import('@/pages/ProfileSetup'));
-const Symptoms = lazy(() => import('@/pages/Index').then(module => ({ default: module })));
 const ProviderPortal = lazy(() => import('@/pages/ProviderPortal').then(module => ({ default: module.ProviderPortal })));
 const AdminDashboard = lazy(() => import('@/pages/AdminDashboard'));
 const SuperAdminDashboard = lazy(() => import('@/pages/SuperAdminDashboard'));
@@ -66,7 +72,7 @@ function App() {
               <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
               <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
               <Route path="/profile-setup" element={<ProtectedRoute><ProfileSetup /></ProtectedRoute>} />
-              <Route path="/symptoms" element={<ProtectedRoute><Symptoms /></ProtectedRoute>} />
+              <Route path="/symptoms" element={<ProtectedRoute><Home /></ProtectedRoute>} />
               <Route path="/admin-dashboard" element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>} />
               <Route path="/superadmin-dashboard" element={<ProtectedRoute superAdminOnly><SuperAdminDashboard /></ProtectedRoute>} />
               <Route path="/provider-dashboard" element={<ProtectedRoute providerOnly><ProviderDashboard /></ProtectedRoute>} />

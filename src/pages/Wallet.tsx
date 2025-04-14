@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, PlusCircle } from 'lucide-react';
 import { getUserWallet, addFundsToWallet } from '@/services/payment';
+import { TeleHealthPayment } from '@/components/payment/TeleHealthPayment';
 
 const Wallet: React.FC = () => {
   const { isAuthenticated, user } = useAuth();
@@ -126,6 +127,7 @@ const Wallet: React.FC = () => {
         <TabsList>
           <TabsTrigger value="wallet">Wallet</TabsTrigger>
           <TabsTrigger value="payment-methods">Payment Methods</TabsTrigger>
+          <TabsTrigger value="telehealth">Book Telehealth</TabsTrigger>
           {isAdmin && <TabsTrigger value="payment-simulator">Payment Simulator</TabsTrigger>}
         </TabsList>
         
@@ -157,7 +159,7 @@ const Wallet: React.FC = () => {
                     </div>
                     <div className="p-3 grid grid-cols-4">
                       <div className="text-sm">2025-04-13</div>
-                      <div className="text-sm">Ride payment</div>
+                      <div className="text-sm">Consultation payment</div>
                       <div className="text-sm text-red-600">-$25.50</div>
                       <div><span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">Completed</span></div>
                     </div>
@@ -167,6 +169,42 @@ const Wallet: React.FC = () => {
                   <Button variant="ghost" size="sm">
                     View All Transactions
                   </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="telehealth">
+          <div className="grid md:grid-cols-2 gap-6">
+            <TeleHealthPayment />
+            
+            <Card>
+              <CardHeader>
+                <CardTitle>Consultation Information</CardTitle>
+                <CardDescription>
+                  About our telehealth services
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-3">
+                  <h3 className="font-medium">What to Expect</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Our telehealth consultations connect you with licensed healthcare 
+                    professionals through secure video conferencing. You can discuss symptoms, 
+                    receive medical advice, and get prescriptions if necessary.
+                  </p>
+                </div>
+                
+                <div className="space-y-3">
+                  <h3 className="font-medium">Preparation Tips</h3>
+                  <ul className="list-disc list-inside text-sm space-y-1 text-muted-foreground">
+                    <li>Find a quiet, private space with good internet connection</li>
+                    <li>Test your camera and microphone beforehand</li>
+                    <li>Have a list of your current medications ready</li>
+                    <li>Write down any symptoms or questions you want to discuss</li>
+                    <li>Have your ID and insurance information available</li>
+                  </ul>
                 </div>
               </CardContent>
             </Card>

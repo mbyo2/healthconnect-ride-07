@@ -13,6 +13,7 @@ interface PaymentRequest {
   patientId: string;
   providerId: string;
   serviceId: string;
+  redirectUrl?: string;
   paymentMethod?: { 
     type: string; 
     id?: string;
@@ -31,7 +32,7 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const { amount, currency, patientId, providerId, serviceId, paymentMethod } = await req.json() as PaymentRequest;
+    const { amount, currency, patientId, providerId, serviceId, redirectUrl, paymentMethod } = await req.json() as PaymentRequest;
 
     // Generate a unique payment ID
     const paymentId = `PAY-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
@@ -62,6 +63,7 @@ serve(async (req) => {
       JSON.stringify({
         success: true,
         paymentId: payment.id,
+        paymentUrl: redirectUrl || '',
         amount,
         currency
       }),

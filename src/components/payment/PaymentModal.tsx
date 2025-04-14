@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { createPayment, generatePaymentReceipt } from "@/services/payment";
+import { createPayment } from "@/services/payment";
 import { toast } from "sonner";
 import { LoadingScreen } from "@/components/LoadingScreen";
 

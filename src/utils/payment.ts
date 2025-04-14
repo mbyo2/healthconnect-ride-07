@@ -5,7 +5,7 @@ import { toast } from "sonner";
 
 export const processPayment = async (paymentDetails: PaymentRequest): Promise<PaymentResponse> => {
   try {
-    const { data, error } = await supabase.functions.invoke('process-dpo-payment', {
+    const { data, error } = await supabase.functions.invoke('process-payment', {
       body: paymentDetails
     });
 

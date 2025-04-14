@@ -41,16 +41,23 @@ export const generatePaymentReceipt = async (paymentId: string): Promise<void> =
   }
 };
 
+// Simulate a wallet system until we implement a real one
+const mockWallets = new Map();
+
 export const getUserWallet = async (userId: string) => {
   try {
-    const { data, error } = await supabase
-      .from('wallets')
-      .select('*')
-      .eq('user_id', userId)
-      .single();
+    // Simulate getting wallet from database
+    if (!mockWallets.has(userId)) {
+      mockWallets.set(userId, { 
+        id: `wallet-${userId}`,
+        userId,
+        balance: 100,
+        currency: 'USD',
+        updatedAt: new Date().toISOString()
+      });
+    }
     
-    if (error) throw error;
-    return data;
+    return mockWallets.get(userId);
   } catch (error) {
     console.error("Error fetching wallet:", error);
     return null;
@@ -59,45 +66,27 @@ export const getUserWallet = async (userId: string) => {
 
 export const addFundsToWallet = async (userId: string, amount: number) => {
   try {
-    // Get the wallet first
-    const wallet = await getUserWallet(userId);
+    // Get or create wallet
+    let wallet = await getUserWallet(userId);
     
     if (!wallet) {
-      // Create wallet if it doesn't exist
-      const { error: createError } = await supabase
-        .from('wallets')
-        .insert({
-          user_id: userId,
-          balance: amount,
-          currency: 'USD'
-        });
-      
-      if (createError) throw createError;
+      wallet = {
+        id: `wallet-${userId}`,
+        userId,
+        balance: amount,
+        currency: 'USD',
+        updatedAt: new Date().toISOString()
+      };
+      mockWallets.set(userId, wallet);
     } else {
       // Update existing wallet
-      const { error: updateError } = await supabase
-        .from('wallets')
-        .update({ 
-          balance: wallet.balance + amount,
-          updated_at: new Date().toISOString()
-        })
-        .eq('user_id', userId);
-      
-      if (updateError) throw updateError;
+      wallet.balance += amount;
+      wallet.updatedAt = new Date().toISOString();
+      mockWallets.set(userId, wallet);
     }
     
-    // Record transaction
-    const { error: transactionError } = await supabase
-      .from('transactions')
-      .insert({
-        wallet_id: wallet?.id || userId,
-        amount: amount,
-        type: 'deposit',
-        status: 'completed',
-        description: 'Added funds to wallet'
-      });
-    
-    if (transactionError) throw transactionError;
+    // Log transaction
+    console.log(`Added ${amount} to wallet for user ${userId}`);
     
     return true;
   } catch (error) {
