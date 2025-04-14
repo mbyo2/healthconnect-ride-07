@@ -14,7 +14,7 @@ interface VideoRoomProps {
 }
 
 export const VideoRoom = ({ meetingUrl, onLeave }: VideoRoomProps) => {
-  const [callFrame, setCallFrame] = useState<typeof DailyIframe.DailyCall | null>(null);
+  const [callFrame, setCallFrame] = useState<DailyIframe.DailyCall | null>(null);
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(false);
   const [isScreenSharing, setIsScreenSharing] = useState(false);

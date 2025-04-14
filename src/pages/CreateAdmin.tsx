@@ -15,6 +15,10 @@ const CreateAdmin: React.FC = () => {
   const [adminCredentials, setAdminCredentials] = useState<{email: string, password: string} | null>(null);
   const [superAdminCredentials, setSuperAdminCredentials] = useState<{email: string, password: string} | null>(null);
   const { isAuthenticated, user } = useAuth();
+  
+  // Fixed type checking for admin_level
+  const hasAdminPrivileges = isAuthenticated && user && 
+    ('admin_level' in user ? user.admin_level : false);
 
   const handleCreateAdmin = async () => {
     setIsLoadingAdmin(true);
@@ -58,7 +62,7 @@ const CreateAdmin: React.FC = () => {
     }
   };
 
-  if (isAuthenticated && (!user?.admin_level)) {
+  if (isAuthenticated && !hasAdminPrivileges) {
     return (
       <div className="container mx-auto p-4">
         <Card className="max-w-md mx-auto">
@@ -121,7 +125,7 @@ const CreateAdmin: React.FC = () => {
               disabled={isLoadingAdmin || !!adminCredentials}
               className="w-full"
             >
-              {isLoadingAdmin ? <LoadingScreen size="sm" /> : adminCredentials ? 'Admin Created' : 'Create Admin Account'}
+              {isLoadingAdmin ? <LoadingScreen className="h-4 w-4" /> : adminCredentials ? 'Admin Created' : 'Create Admin Account'}
             </Button>
           </CardFooter>
         </Card>
@@ -156,7 +160,7 @@ const CreateAdmin: React.FC = () => {
               disabled={isLoadingSuperAdmin || !!superAdminCredentials}
               className="w-full"
             >
-              {isLoadingSuperAdmin ? <LoadingScreen size="sm" /> : superAdminCredentials ? 'SuperAdmin Created' : 'Create SuperAdmin Account'}
+              {isLoadingSuperAdmin ? <LoadingScreen className="h-4 w-4" /> : superAdminCredentials ? 'SuperAdmin Created' : 'Create SuperAdmin Account'}
             </Button>
           </CardFooter>
         </Card>
