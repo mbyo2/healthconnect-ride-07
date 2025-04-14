@@ -1,17 +1,14 @@
 
-export type UserRole = 'admin' | 'health_personnel' | 'patient' | 'superadmin';
-
+export type UserRole = 'patient' | 'health_personnel' | 'admin' | 'pharmacy';
 export type AdminLevel = 'admin' | 'superadmin' | null;
 
 export interface User {
   id: string;
   email: string;
-  role: UserRole;
+  role?: UserRole;
   admin_level?: AdminLevel;
   first_name?: string;
   last_name?: string;
-  created_at?: string;
   avatar_url?: string;
-  wallet_balance?: number;
-  default_payment_method?: string;
+  phone_number?: string;
 }

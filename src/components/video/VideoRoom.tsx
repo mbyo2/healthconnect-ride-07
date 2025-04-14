@@ -1,254 +1,139 @@
-
-import { useEffect, useState } from "react";
-import DailyIframe from "@daily-co/daily-js";
-import { VideoControls } from "./VideoControls";
+import React, { useState, useEffect, useRef } from 'react';
+import DailyIframe from '@daily-co/daily-js';
 import { Button } from "@/components/ui/button";
-import { useNetwork } from "@/hooks/use-network";
-import { useDeviceCapabilities } from "@/hooks/use-device-capabilities";
-import { Card } from "@/components/ui/card";
-import { ArrowLeft, Battery, Signal } from "lucide-react";
+import { toast } from "sonner";
 
 interface VideoRoomProps {
-  meetingUrl: string;
-  onLeave: () => void;
+  roomUrl: string;
+  userName: string;
+  videoQuality: 'low' | 'medium' | 'high';
 }
 
-export const VideoRoom = ({ meetingUrl, onLeave }: VideoRoomProps) => {
-  const [callFrame, setCallFrame] = useState<ReturnType<typeof DailyIframe.createFrame> | null>(null);
-  const [isMuted, setIsMuted] = useState(false);
-  const [isVideoOff, setIsVideoOff] = useState(false);
-  const [isScreenSharing, setIsScreenSharing] = useState(false);
-  const [quality, setQuality] = useState<"high" | "medium" | "low">("high");
-  const { connectionQuality } = useNetwork();
-  const capabilities = useDeviceCapabilities();
-  
+let callObject: any = null;
+
+export const VideoRoom: React.FC<VideoRoomProps> = ({ roomUrl, userName, videoQuality }) => {
+  const [joined, setJoined] = useState(false);
+  const videoRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
-    // Set initial video quality based on connection
-    if (connectionQuality === "poor") {
-      setQuality("low");
-    } else if (connectionQuality === "average") {
-      setQuality("medium");
-    }
-  }, [connectionQuality]);
-  
-  useEffect(() => {
-    // Initialize meeting
-    if (!meetingUrl) return;
-    
-    const options: any = {
-      url: meetingUrl,
-      showLeaveButton: true,
-      showFullscreenButton: true,
-      iframeStyle: {
-        height: '100%',
-        width: '100%',
-        borderRadius: '8px',
-        border: 'none',
-        backgroundColor: 'black',
+    const initializeCall = async () => {
+      if (!roomUrl || !videoRef.current) return;
+
+      callObject = DailyIframe.createCallObject();
+
+      callObject.on('joined-meeting', () => {
+        setJoined(true);
+      });
+
+      callObject.on('left-meeting', () => {
+        setJoined(false);
+      });
+
+      callObject.join({ url: roomUrl, userName: userName });
+      callObject.setBandwidth({ kbs: 300 });
+      callObject.setUserName(userName);
+      
+      // Set initial video quality
+      setVideoQuality(videoQuality);
+
+      if (videoRef.current) {
+        videoRef.current.appendChild(callObject.createFrame());
       }
     };
+
+    initializeCall();
+
+    return () => {
+      if (callObject) {
+        callObject.destroy();
+        callObject = null;
+      }
+    };
+  }, [roomUrl, userName, videoQuality]);
+
+  // Fix the video quality settings to use the correct property names
+  const setVideoQuality = (quality: 'low' | 'medium' | 'high') => {
+    if (!callObject) return;
     
-    // Adjust quality settings based on connection
-    if (quality === "low") {
-      options.videoSendSettings = {
-        encoding: {
-          maxBitrate: 150000,
-          maxFramerate: 15
-        }
-      };
-      options.videoReceiveSettings = {
-        encoding: {
-          maxBitrate: 150000,
-          maxFramerate: 15
-        }
-      };
-    } else if (quality === "medium") {
-      options.videoSendSettings = {
-        encoding: {
-          maxBitrate: 500000,
-          maxFramerate: 25
-        }
-      };
-    }
-    
-    // On low battery, reduce quality
-    if (capabilities.battery.level !== null && capabilities.battery.level < 0.2 && !capabilities.battery.charging) {
-      options.videoSendSettings = {
-        encoding: {
-          maxBitrate: 150000,
-          maxFramerate: 15
-        }
-      };
-    }
-    
-    try {
-      const dailyFrame = DailyIframe.createFrame(
-        document.getElementById('video-container') as HTMLElement,
-        options
-      );
-      
-      dailyFrame
-        .on('loaded', () => {
-          console.log('Video frame loaded');
-          dailyFrame.join();
-        })
-        .on('joining-meeting', () => {
-          console.log('Joining meeting');
-        })
-        .on('joined-meeting', () => {
-          console.log('Joined meeting');
-        })
-        .on('left-meeting', () => {
-          console.log('Left meeting');
-          onLeave();
-        })
-        .on('participant-updated', (event: any) => {
-          if (event.participant.local) {
-            setIsMuted(event.participant.audio === false);
-            setIsVideoOff(event.participant.video === false);
-            setIsScreenSharing(event.participant.screen === true);
+    // Update based on quality selection
+    switch (quality) {
+      case 'low':
+        callObject.updateSendSettings({
+          video: {
+            // Fix: change 'encoding' to 'encodings'
+            encodings: {
+              maxBitrate: 150000, // 150 kbps
+              maxFramerate: 15,
+            }
           }
         });
-      
-      setCallFrame(dailyFrame);
-    } catch (error) {
-      console.error('Error setting up video call:', error);
-    }
-    
-    return () => {
-      if (callFrame) {
-        callFrame.destroy();
-      }
-    };
-  }, [meetingUrl, quality]);
-  
-  const handleToggleMute = () => {
-    if (!callFrame) return;
-    if (isMuted) {
-      callFrame.setLocalAudio(true);
-    } else {
-      callFrame.setLocalAudio(false);
+        
+        callObject.updateReceiveSettings({
+          video: {
+            // Fix: remove 'maxBitrate' as it's not in DailyVideoReceiveSettingsUpdates
+            // Just set general quality level
+            quality: 'low'
+          }
+        });
+        break;
+        
+      case 'medium':
+        callObject.updateSendSettings({
+          video: {
+            // Fix: change 'encoding' to 'encodings'
+            encodings: {
+              maxBitrate: 500000, // 500 kbps
+              maxFramerate: 25,
+            }
+          }
+        });
+        
+        callObject.updateReceiveSettings({
+          video: {
+            // Fix: remove 'maxBitrate' as it's not in DailyVideoReceiveSettingsUpdates
+            // Just set general quality level
+            quality: 'medium'
+          }
+        });
+        break;
+        
+      case 'high':
+        callObject.updateSendSettings({
+          video: {
+            // Fix: change 'encoding' to 'encodings'
+            encodings: {
+              maxBitrate: 2500000, // 2.5 Mbps
+              maxFramerate: 30,
+            }
+          }
+        });
+        
+        callObject.updateReceiveSettings({
+          video: {
+            // Fix: remove 'maxBitrate' as it's not in DailyVideoReceiveSettingsUpdates
+            // Just set general quality level
+            quality: 'high'
+          }
+        });
+        break;
     }
   };
-  
-  const handleToggleVideo = () => {
-    if (!callFrame) return;
-    if (isVideoOff) {
-      callFrame.setLocalVideo(true);
-    } else {
-      callFrame.setLocalVideo(false);
-    }
-  };
-  
-  const handleToggleScreenShare = () => {
-    if (!callFrame) return;
-    if (isScreenSharing) {
-      callFrame.stopScreenShare();
-    } else {
-      callFrame.startScreenShare();
-    }
-  };
-  
-  const handleQualityChange = (newQuality: "high" | "medium" | "low") => {
-    setQuality(newQuality);
-    
-    if (!callFrame) return;
-    
-    if (newQuality === "low") {
-      callFrame.updateSendSettings({
-        video: {
-          encoding: {
-            maxBitrate: 150000,
-            maxFramerate: 15
-          }
-        }
-      });
-      callFrame.updateReceiveSettings({
-        video: {
-          encoding: {
-            maxBitrate: 150000,
-            maxFramerate: 15
-          }
-        }
-      });
-    } else if (newQuality === "medium") {
-      callFrame.updateSendSettings({
-        video: {
-          encoding: {
-            maxBitrate: 500000,
-            maxFramerate: 25
-          }
-        }
-      });
-      callFrame.updateReceiveSettings({
-        video: {
-          encoding: {
-            maxBitrate: 750000
-          }
-        }
-      });
-    } else {
-      callFrame.updateSendSettings({
-        video: {
-          encoding: {
-            maxBitrate: 1200000,
-            maxFramerate: 30
-          }
-        }
-      });
-      callFrame.updateReceiveSettings({
-        video: {
-          encoding: {
-            maxBitrate: 2500000
-          }
-        }
-      });
+
+  const handleLeave = () => {
+    if (callObject) {
+      callObject.leave();
+      toast.success("You have left the video call.");
     }
   };
 
   return (
-    <div className="flex flex-col space-y-4">
-      <Card className="relative h-[60vh] md:h-[70vh] w-full overflow-hidden">
-        <div id="video-container" className="h-full w-full" />
-        
-        {capabilities.battery.level !== null && capabilities.battery.level < 0.15 && !capabilities.battery.charging && (
-          <div className="absolute top-2 left-2 bg-red-500/80 text-white px-3 py-1 rounded-full text-xs flex items-center">
-            <Battery className="h-3 w-3 mr-1" /> Low battery
-          </div>
-        )}
-        
-        {connectionQuality === "poor" && (
-          <div className="absolute top-2 right-2 bg-yellow-500/80 text-white px-3 py-1 rounded-full text-xs flex items-center">
-            <Signal className="h-3 w-3 mr-1" /> Poor connection
-          </div>
-        )}
-      </Card>
-      
-      <VideoControls
-        isMuted={isMuted}
-        isVideoOff={isVideoOff}
-        isScreenSharing={isScreenSharing}
-        currentQuality={quality}
-        onToggleMute={handleToggleMute}
-        onToggleVideo={handleToggleVideo}
-        onToggleScreenShare={handleToggleScreenShare}
-        onQualityChange={handleQualityChange}
-      />
-      
-      <Button 
-        variant="destructive" 
-        onClick={() => {
-          if (callFrame) {
-            callFrame.leave();
-          } else {
-            onLeave();
-          }
-        }}
-        className="w-full"
-      >
-        <ArrowLeft className="h-4 w-4 mr-2" />
-        Leave Meeting
-      </Button>
+    <div>
+      <div ref={videoRef} style={{ width: '100%', height: '600px' }} />
+      {joined && (
+        <Button onClick={handleLeave} className="mt-4">
+          Leave Call
+        </Button>
+      )}
     </div>
   );
 };

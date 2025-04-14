@@ -5,8 +5,14 @@ import { toast } from "sonner";
 
 export const processPayment = async (paymentDetails: PaymentRequest): Promise<PaymentResponse> => {
   try {
+    // Ensure redirectUrl has a default value if not provided
+    const paymentData = {
+      ...paymentDetails,
+      redirectUrl: paymentDetails.redirectUrl || ""
+    };
+    
     const { data, error } = await supabase.functions.invoke('process-payment', {
-      body: paymentDetails
+      body: paymentData
     });
 
     if (error) throw error;
