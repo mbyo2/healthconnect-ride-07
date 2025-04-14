@@ -1,251 +1,62 @@
+import React, { Suspense, lazy } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from 'sonner';
+import { ThemeProvider } from '@/components/theme-provider';
+import { AuthProvider } from '@/context/AuthContext';
+import { LoadingScreen } from '@/components/LoadingScreen';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
+import Login from '@/pages/Login';
+import Home from '@/pages/Home';
+import CreateAdmin from '@/pages/CreateAdmin';
+import AdminWallet from '@/pages/AdminWallet';
 
-import * as React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
-import { OfflineAlert } from './components/OfflineAlert';
-import { useNetwork } from './hooks/use-network';
-import { PWAInstallPrompt } from './components/PWAInstallPrompt';
-import { TouchDetector } from './components/TouchDetector';
-import { lazy, Suspense } from 'react';
-import { MobileLayout } from './components/layouts/MobileLayout';
-import { useDeviceType } from './hooks/use-device-type';
-import { useIsMobile } from './hooks/use-mobile';
-import { useEffect } from 'react';
-import { ProtectedRoute } from './components/auth/ProtectedRoute';
-import { LoadingScreen } from './components/LoadingScreen';
-import { MobileAppWrapper } from './components/MobileAppWrapper';
+// Lazy-loaded components
+const ProfileSetup = lazy(() => import('@/pages/ProfileSetup'));
+const Symptoms = lazy(() => import('@/pages/Symptoms'));
+const ProviderPortal = lazy(() => import('@/pages/ProviderPortal').then(module => ({ default: module.ProviderPortal })));
+const AdminDashboard = lazy(() => import('@/pages/AdminDashboard'));
+const SuperAdminDashboard = lazy(() => import('@/pages/SuperAdminDashboard'));
+const ProviderDashboard = lazy(() => import('@/pages/ProviderDashboard'));
+const ApplicationStatus = lazy(() => import('@/pages/ApplicationStatus'));
+const Appointments = lazy(() => import('@/pages/Appointments'));
+const VideoConsultation = lazy(() => import('@/pages/VideoConsultation'));
+const NotFound = lazy(() => import('@/pages/NotFound'));
 
-// Lazy load pages
-const Landing = lazy(() => import('./pages/Landing'));
-const Index = lazy(() => import('./pages/Index'));
-const Auth = lazy(() => import('./pages/Auth'));
-const Login = lazy(() => import('./pages/Login'));
-const Search = lazy(() => import('./pages/Search'));
-const Profile = lazy(() => import('./pages/Profile'));
-const Map = lazy(() => import('./pages/Map'));
-const ProfileSetup = lazy(() => import('./pages/ProfileSetup'));
-const Appointments = lazy(() => import('./pages/Appointments'));
-const Chat = lazy(() => import('./pages/Chat'));
-const VideoConsultations = lazy(() => import('./pages/VideoConsultations'));
-const ProviderProfile = lazy(() => import('./pages/ProviderProfile'));
-const Settings = lazy(() => import('./pages/SettingsPage'));
-const PatientAppointments = lazy(() => import('./pages/PatientAppointments'));
-const ProviderDashboard = lazy(() => import('./pages/ProviderDashboard'));
-const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
-const SuperAdminDashboard = lazy(() => import('./pages/SuperAdminDashboard'));
-const NotificationsPage = lazy(() => import('./pages/NotificationsPage'));
-const PrivacySecurityPage = lazy(() => import('./pages/PrivacySecurityPage'));
-
-// Create a component to handle device-specific landing page
-const LandingPageRouter = () => {
-  const { deviceType } = useDeviceType();
-  const isMobileOrTablet = deviceType === 'mobile' || deviceType === 'tablet';
-
-  // Redirect to Auth for mobile/tablet, show Landing for desktop/TV
-  return isMobileOrTablet ? <Navigate to="/auth" replace /> : <Landing />;
-};
-
-const App = () => {
-  const { isOnline } = useNetwork();
-  const { deviceType } = useDeviceType();
-  const isMobile = useIsMobile();
-  
-  // Apply TV device class if on TV
-  useEffect(() => {
-    if (deviceType === 'tv') {
-      document.body.classList.add('tv-device');
-      // Load TV specific styles
-      const linkElement = document.createElement('link');
-      linkElement.rel = 'stylesheet';
-      linkElement.href = '/tv-styles.css';
-      document.head.appendChild(linkElement);
-    } else {
-      document.body.classList.remove('tv-device');
-    }
-    
-    // Add touch-specific attributes for mobile
-    if (deviceType === 'mobile' || deviceType === 'tablet') {
-      document.body.classList.add('touch-device');
-      document.body.classList.add('prevent-overscroll');
-    } else {
-      document.body.classList.remove('touch-device');
-      document.body.classList.remove('prevent-overscroll');
-    }
-    
-    return () => {
-      const tvStylesheet = document.querySelector('link[href="/tv-styles.css"]');
-      if (tvStylesheet) {
-        tvStylesheet.remove();
-      }
-    };
-  }, [deviceType]);
-  
+function App() {
   return (
-    <>
-      <MobileAppWrapper>
-        <OfflineAlert />
-        <PWAInstallPrompt />
-        {process.env.NODE_ENV === 'development' && <TouchDetector />}
-        
-        <Suspense fallback={<LoadingScreen />}>
-          <Routes>
-            <Route path="/" element={<LandingPageRouter />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/login" element={<Login />} />
-            <Route
-              path="/home"
-              element={
-                <ProtectedRoute>
-                  <MobileLayout>
-                    <Index />
-                  </MobileLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/search"
-              element={
-                <ProtectedRoute>
-                  <MobileLayout>
-                    <Search />
-                  </MobileLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/profile"
-              element={
-                <ProtectedRoute>
-                  <MobileLayout>
-                    <Profile />
-                  </MobileLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/map"
-              element={
-                <ProtectedRoute>
-                  <MobileLayout>
-                    <Map />
-                  </MobileLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route path="/profile-setup" element={<ProfileSetup />} />
-            <Route
-              path="/appointments"
-              element={
-                <ProtectedRoute>
-                  <MobileLayout>
-                    <Appointments />
-                  </MobileLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/chat"
-              element={
-                <ProtectedRoute>
-                  <MobileLayout>
-                    <Chat />
-                  </MobileLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/video-consultations"
-              element={
-                <ProtectedRoute>
-                  <MobileLayout>
-                    <VideoConsultations />
-                  </MobileLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/provider/:id"
-              element={
-                <ProtectedRoute>
-                  <MobileLayout>
-                    <ProviderProfile />
-                  </MobileLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/settings"
-              element={
-                <ProtectedRoute>
-                  <MobileLayout>
-                    <Settings />
-                  </MobileLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/appointments/patient"
-              element={
-                <ProtectedRoute>
-                  <MobileLayout>
-                    <PatientAppointments />
-                  </MobileLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/provider/dashboard"
-              element={
-                <ProtectedRoute>
-                  <MobileLayout>
-                    <ProviderDashboard />
-                  </MobileLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/dashboard"
-              element={
-                <ProtectedRoute>
-                  <MobileLayout>
-                    <AdminDashboard />
-                  </MobileLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/super-admin/dashboard"
-              element={
-                <ProtectedRoute>
-                  <MobileLayout>
-                    <SuperAdminDashboard />
-                  </MobileLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/notifications"
-              element={
-                <ProtectedRoute>
-                  <MobileLayout>
-                    <NotificationsPage />
-                  </MobileLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/privacy-security"
-              element={
-                <MobileLayout>
-                  <PrivacySecurityPage />
-                </MobileLayout>
-              }
-            />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </Suspense>
-      </MobileAppWrapper>
-    </>
+    <ThemeProvider defaultTheme="light" storageKey="doc-o-clock-theme">
+      <AuthProvider>
+        <Router>
+          <Suspense fallback={<LoadingScreen />}>
+            <Routes>
+              {/* Public routes */}
+              <Route path="/login" element={<Login />} />
+              <Route path="/provider-portal" element={<ProviderPortal />} />
+              <Route path="/create-admin" element={<CreateAdmin />} />
+              
+              {/* Protected routes */}
+              <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+              <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+              <Route path="/profile-setup" element={<ProtectedRoute><ProfileSetup /></ProtectedRoute>} />
+              <Route path="/symptoms" element={<ProtectedRoute><Symptoms /></ProtectedRoute>} />
+              <Route path="/admin-dashboard" element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>} />
+              <Route path="/superadmin-dashboard" element={<ProtectedRoute superAdminOnly><SuperAdminDashboard /></ProtectedRoute>} />
+              <Route path="/provider-dashboard" element={<ProtectedRoute providerOnly><ProviderDashboard /></ProtectedRoute>} />
+              <Route path="/application-status" element={<ProtectedRoute><ApplicationStatus /></ProtectedRoute>} />
+              <Route path="/appointments" element={<ProtectedRoute><Appointments /></ProtectedRoute>} />
+              <Route path="/video-consultation/:appointmentId" element={<ProtectedRoute><VideoConsultation /></ProtectedRoute>} />
+              <Route path="/admin-wallet" element={<ProtectedRoute adminOnly><AdminWallet /></ProtectedRoute>} />
+              
+              {/* Fallback routes */}
+              <Route path="/404" element={<NotFound />} />
+              <Route path="*" element={<Navigate to="/404" replace />} />
+            </Routes>
+          </Suspense>
+        </Router>
+        <Toaster position="top-right" richColors closeButton />
+      </AuthProvider>
+    </ThemeProvider>
   );
-};
+}
 
 export default App;
