@@ -51,7 +51,7 @@ export const WalletCard = ({
             <Wallet className="h-5 w-5 text-primary" />
             My Wallet
           </CardTitle>
-          {user?.admin_level && (
+          {user && user.admin_level && (
             <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
               Admin Wallet
             </span>

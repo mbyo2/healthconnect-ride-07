@@ -51,21 +51,21 @@ export const VideoRoom = ({ meetingUrl, onLeave }: VideoRoomProps) => {
     // Adjust quality settings based on connection
     if (quality === "low") {
       options.videoSendSettings = {
-        encoding: { maxBitrate: 150_000, maxFramerate: 15 }
+        encodings: [{ maxBitrate: 150000, maxFramerate: 15 }]
       };
       options.videoReceiveSettings = {
-        encoding: { maxBitrate: 150_000, maxFramerate: 15 }
+        encodings: [{ maxBitrate: 150000, maxFramerate: 15 }]
       };
     } else if (quality === "medium") {
       options.videoSendSettings = {
-        encoding: { maxBitrate: 500_000, maxFramerate: 25 }
+        encodings: [{ maxBitrate: 500000, maxFramerate: 25 }]
       };
     }
     
     // On low battery, reduce quality
     if (capabilities.battery.level !== null && capabilities.battery.level < 0.2 && !capabilities.battery.charging) {
       options.videoSendSettings = {
-        encoding: { maxBitrate: 150_000, maxFramerate: 15 }
+        encodings: [{ maxBitrate: 150000, maxFramerate: 15 }]
       };
     }
     
@@ -145,34 +145,34 @@ export const VideoRoom = ({ meetingUrl, onLeave }: VideoRoomProps) => {
     if (newQuality === "low") {
       callFrame.updateSendSettings({
         video: {
-          encoding: { maxBitrate: 150_000, maxFramerate: 15 }
+          encodings: [{ maxBitrate: 150000, maxFramerate: 15 }]
         }
       });
       callFrame.updateReceiveSettings({
         video: {
-          encoding: { maxBitrate: 150_000, maxFramerate: 15 }
+          encodings: [{ maxBitrate: 150000, maxFramerate: 15 }]
         }
       });
     } else if (newQuality === "medium") {
       callFrame.updateSendSettings({
         video: {
-          encoding: { maxBitrate: 500_000, maxFramerate: 25 }
+          encodings: [{ maxBitrate: 500000, maxFramerate: 25 }]
         }
       });
       callFrame.updateReceiveSettings({
         video: {
-          encoding: { maxBitrate: 750_000 }
+          encodings: [{ maxBitrate: 750000 }]
         }
       });
     } else {
       callFrame.updateSendSettings({
         video: {
-          encoding: { maxBitrate: 1_200_000, maxFramerate: 30 }
+          encodings: [{ maxBitrate: 1200000, maxFramerate: 30 }]
         }
       });
       callFrame.updateReceiveSettings({
         video: {
-          encoding: { maxBitrate: 2_500_000 }
+          encodings: [{ maxBitrate: 2500000 }]
         }
       });
     }

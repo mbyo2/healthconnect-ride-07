@@ -12,4 +12,6 @@ export interface User {
   last_name?: string;
   created_at?: string;
   avatar_url?: string;
+  wallet_balance?: number;
+  default_payment_method?: string;
 }

@@ -1,12 +1,13 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { LoadingScreen } from "@/components/LoadingScreen";
 import { setupAdmin, setupSuperAdmin } from '@/utils/setupAdmin';
 import { ChevronLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
+import { LoadingScreen } from '@/components/LoadingScreen';
 
 const CreateAdmin: React.FC = () => {
   const [isLoadingAdmin, setIsLoadingAdmin] = useState(false);
@@ -17,7 +18,7 @@ const CreateAdmin: React.FC = () => {
   
   // Fixed type checking for admin_level
   const hasAdminPrivileges = isAuthenticated && user && 
-    ('admin_level' in user ? user.admin_level : false);
+    ('admin_level' in user ? Boolean(user.admin_level) : false);
 
   const handleCreateAdmin = async () => {
     setIsLoadingAdmin(true);
@@ -124,7 +125,7 @@ const CreateAdmin: React.FC = () => {
               disabled={isLoadingAdmin || !!adminCredentials}
               className="w-full"
             >
-              {isLoadingAdmin ? <LoadingScreen className="h-4 w-4" /> : adminCredentials ? 'Admin Created' : 'Create Admin Account'}
+              {isLoadingAdmin ? <LoadingScreen /> : adminCredentials ? 'Admin Created' : 'Create Admin Account'}
             </Button>
           </CardFooter>
         </Card>
@@ -159,7 +160,7 @@ const CreateAdmin: React.FC = () => {
               disabled={isLoadingSuperAdmin || !!superAdminCredentials}
               className="w-full"
             >
-              {isLoadingSuperAdmin ? <LoadingScreen className="h-4 w-4" /> : superAdminCredentials ? 'SuperAdmin Created' : 'Create SuperAdmin Account'}
+              {isLoadingSuperAdmin ? <LoadingScreen /> : superAdminCredentials ? 'SuperAdmin Created' : 'Create SuperAdmin Account'}
             </Button>
           </CardFooter>
         </Card>

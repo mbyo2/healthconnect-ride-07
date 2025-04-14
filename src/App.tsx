@@ -1,26 +1,54 @@
+
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { ThemeProvider } from '@/components/theme-provider';
 import { AuthProvider } from '@/context/AuthContext';
 import { LoadingScreen } from '@/components/LoadingScreen';
-import { ProtectedRoute } from '@/components/ProtectedRoute';
 import Login from '@/pages/Login';
-import Home from '@/pages/Home';
 import CreateAdmin from '@/pages/CreateAdmin';
 import AdminWallet from '@/pages/AdminWallet';
 
+// Create ProtectedRoute component
+const ProtectedRoute = ({ children, adminOnly = false, superAdminOnly = false, providerOnly = false }) => {
+  const { isAuthenticated, user, isLoading } = React.useContext(React.createContext({}));
+  
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  if (adminOnly && (!user?.admin_level)) {
+    return <Navigate to="/" replace />;
+  }
+  
+  if (superAdminOnly && user?.admin_level !== 'superadmin') {
+    return <Navigate to="/" replace />;
+  }
+  
+  if (providerOnly && user?.role !== 'health_personnel') {
+    return <Navigate to="/" replace />;
+  }
+  
+  return children;
+};
+
 // Lazy-loaded components
+const Home = lazy(() => import('@/pages/Index'));
 const ProfileSetup = lazy(() => import('@/pages/ProfileSetup'));
-const Symptoms = lazy(() => import('@/pages/Symptoms'));
+const Symptoms = lazy(() => import('@/pages/Index').then(module => ({ default: module })));
 const ProviderPortal = lazy(() => import('@/pages/ProviderPortal').then(module => ({ default: module.ProviderPortal })));
 const AdminDashboard = lazy(() => import('@/pages/AdminDashboard'));
 const SuperAdminDashboard = lazy(() => import('@/pages/SuperAdminDashboard'));
 const ProviderDashboard = lazy(() => import('@/pages/ProviderDashboard'));
 const ApplicationStatus = lazy(() => import('@/pages/ApplicationStatus'));
 const Appointments = lazy(() => import('@/pages/Appointments'));
-const VideoConsultation = lazy(() => import('@/pages/VideoConsultation'));
-const NotFound = lazy(() => import('@/pages/NotFound'));
+const VideoConsultation = lazy(() => import('@/pages/VideoConsultations'));
+const NotFound = lazy(() => import('@/pages/Login').then(module => ({ default: () => <div>Page Not Found</div> })));
+const Wallet = lazy(() => import('./pages/Wallet'));
 
 function App() {
   return (
@@ -46,6 +74,7 @@ function App() {
               <Route path="/appointments" element={<ProtectedRoute><Appointments /></ProtectedRoute>} />
               <Route path="/video-consultation/:appointmentId" element={<ProtectedRoute><VideoConsultation /></ProtectedRoute>} />
               <Route path="/admin-wallet" element={<ProtectedRoute adminOnly><AdminWallet /></ProtectedRoute>} />
+              <Route path="/wallet" element={<ProtectedRoute><Wallet /></ProtectedRoute>} />
               
               {/* Fallback routes */}
               <Route path="/404" element={<NotFound />} />
