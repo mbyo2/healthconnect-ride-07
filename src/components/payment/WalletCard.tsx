@@ -8,6 +8,7 @@ import { CreditCard, Wallet, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
 import { User } from '@/types/user';
+import { PaymentMethod } from '@/components/payment/PaymentMethods';
 
 export interface WalletCardProps {
   balance: number;

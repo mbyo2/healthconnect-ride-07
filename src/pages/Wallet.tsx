@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -106,7 +107,6 @@ const Wallet: React.FC = () => {
   
   const handleSetDefaultMethod = (id: string) => {
     setPaymentMethods(paymentMethods.map(method => ({
-      ...method,
       ...method,
       isDefault: method.id === id
     })));

@@ -7,12 +7,18 @@ import { toast } from 'sonner';
 
 export interface PaymentMethod {
   id: string;
-  type: 'card' | 'mobile_money';
-  last4: string;
-  expiryDate?: string;
+  type: 'card' | 'mobile_money' | 'bank_transfer';
+  details: {
+    last4?: string;
+    brand?: string;
+    expiryMonth?: number;
+    expiryYear?: number;
+    provider?: string;
+    accountName?: string;
+    bankName?: string;
+  };
   isDefault: boolean;
-  name?: string;
-  provider?: string;
+  created_at: string;
 }
 
 interface PaymentMethodsProps {
@@ -64,16 +70,16 @@ export const PaymentMethods = ({
                   <div>
                     {method.type === 'card' ? (
                       <>
-                        <p className="text-sm font-medium">•••• {method.last4}</p>
+                        <p className="text-sm font-medium">•••• {method.details.last4}</p>
                         <p className="text-xs text-muted-foreground">
-                          Expires {method.expiryDate}
+                          Expires {method.details.expiryMonth}/{method.details.expiryYear}
                         </p>
                       </>
                     ) : (
                       <>
-                        <p className="text-sm font-medium">{method.name}</p>
+                        <p className="text-sm font-medium">{method.details.accountName || method.details.provider}</p>
                         <p className="text-xs text-muted-foreground">
-                          {method.provider}
+                          {method.details.provider || method.details.bankName}
                         </p>
                       </>
                     )}
