@@ -11,12 +11,14 @@ import { Signal, Wifi, WifiOff, Tv, ArrowLeft } from "lucide-react";
 import { useIsTVDevice } from "@/hooks/use-tv-detection";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/context/AuthContext";
 
 export const VideoConsultation = () => {
   const [activeConsultation, setActiveConsultation] = useState<VideoConsultationDetails | null>(null);
   const { isOnline, connectionQuality } = useNetwork();
   const isTV = useIsTVDevice();
   const isMobile = useMediaQuery('(max-width: 768px)');
+  const { user } = useAuth();
 
   useEffect(() => {
     // Set focus on first focusable element for TV remote navigation
@@ -134,7 +136,9 @@ export const VideoConsultation = () => {
       
       {activeConsultation?.meeting_url ? (
         <VideoRoom 
-          meetingUrl={activeConsultation.meeting_url} 
+          roomUrl={activeConsultation.meeting_url}
+          userName={user?.first_name || user?.email || "User"} 
+          videoQuality={connectionQuality === "poor" ? "low" : "medium"}
           onLeave={handleLeaveCall}
         />
       ) : (

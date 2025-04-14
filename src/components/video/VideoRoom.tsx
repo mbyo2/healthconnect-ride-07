@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import DailyIframe from '@daily-co/daily-js';
 import { Button } from "@/components/ui/button";
@@ -6,12 +7,18 @@ import { toast } from "sonner";
 interface VideoRoomProps {
   roomUrl: string;
   userName: string;
-  videoQuality: 'low' | 'medium' | 'high';
+  videoQuality?: 'low' | 'medium' | 'high';
+  onLeave?: () => void;
 }
 
 let callObject: any = null;
 
-export const VideoRoom: React.FC<VideoRoomProps> = ({ roomUrl, userName, videoQuality }) => {
+export const VideoRoom: React.FC<VideoRoomProps> = ({ 
+  roomUrl, 
+  userName, 
+  videoQuality = 'medium',
+  onLeave 
+}) => {
   const [joined, setJoined] = useState(false);
   const videoRef = useRef<HTMLDivElement>(null);
 
@@ -27,6 +34,9 @@ export const VideoRoom: React.FC<VideoRoomProps> = ({ roomUrl, userName, videoQu
 
       callObject.on('left-meeting', () => {
         setJoined(false);
+        if (onLeave) {
+          onLeave();
+        }
       });
 
       callObject.join({ url: roomUrl, userName: userName });
@@ -49,7 +59,7 @@ export const VideoRoom: React.FC<VideoRoomProps> = ({ roomUrl, userName, videoQu
         callObject = null;
       }
     };
-  }, [roomUrl, userName, videoQuality]);
+  }, [roomUrl, userName, videoQuality, onLeave]);
 
   // Fix the video quality settings to use the correct property names
   const setVideoQuality = (quality: 'low' | 'medium' | 'high') => {
@@ -123,6 +133,9 @@ export const VideoRoom: React.FC<VideoRoomProps> = ({ roomUrl, userName, videoQu
     if (callObject) {
       callObject.leave();
       toast.success("You have left the video call.");
+      if (onLeave) {
+        onLeave();
+      }
     }
   };
 

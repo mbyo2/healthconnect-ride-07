@@ -5,35 +5,57 @@ export interface PaymentRequest {
   patientId: string;
   providerId: string;
   serviceId: string;
-  redirectUrl: string;
+  redirectUrl?: string;
 }
 
 export interface PaymentResponse {
   success: boolean;
-  paymentUrl: string;
-  paymentId: string;
+  paymentId?: string;
+  message?: string;
+  transactionDetails?: {
+    amount: number;
+    currency: string;
+    date: string;
+    method: string;
+  };
 }
 
 export interface RefundRequest {
   paymentId: string;
-  amount: number;
-  reason: string;
+  reason?: string;
+  amount?: number; // If partial refund
+  initiatedBy: string;
 }
 
-export interface Wallet {
-  id: string;
-  userId: string;
-  balance: number;
+export interface WalletBalance {
+  available: number;
+  pending: number;
   currency: string;
-  updatedAt: string;
 }
 
-export interface Transaction {
+export interface WalletTransaction {
   id: string;
-  walletId: string;
-  amount: number;
   type: 'deposit' | 'withdrawal' | 'payment' | 'refund';
-  status: 'pending' | 'completed' | 'failed';
-  description: string;
-  createdAt: string;
+  amount: number;
+  currency: string;
+  created_at: string;
+  status: 'completed' | 'pending' | 'failed';
+  description?: string;
+  metadata?: Record<string, any>;
+}
+
+export interface PaymentMethod {
+  id: string;
+  type: 'card' | 'mobile_money' | 'bank_transfer';
+  details: {
+    last4?: string;
+    brand?: string;
+    expiryMonth?: number;
+    expiryYear?: number;
+    provider?: string;
+    accountName?: string;
+    bankName?: string;
+  };
+  isDefault: boolean;
+  created_at: string;
 }
