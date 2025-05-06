@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,12 +11,16 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, PlusCircle } from 'lucide-react';
 import { getUserWallet, addFundsToWallet } from '@/services/payment';
 import { TeleHealthPayment } from '@/components/payment/TeleHealthPayment';
+import { PaymentHistory } from '@/components/payment/PaymentHistory';
+import { useOfflineMode } from '@/hooks/use-offline-mode';
 
 const Wallet: React.FC = () => {
   const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
   const [balance, setBalance] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
+  const [activeTab, setActiveTab] = useState<string>("wallet");
+  const { isOnline } = useOfflineMode();
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([
     {
       id: '1',
@@ -113,6 +116,13 @@ const Wallet: React.FC = () => {
     toast.success("Default payment method updated");
   };
   
+  const handleTabChange = (value: string) => {
+    if (!isOnline && (value === "payment-history" || value === "telehealth")) {
+      toast.warning("This feature has limited functionality while offline");
+    }
+    setActiveTab(value);
+  };
+
   if (!isAuthenticated) {
     return null; // Will redirect in useEffect
   }
@@ -131,9 +141,16 @@ const Wallet: React.FC = () => {
         </p>
       </div>
       
-      <Tabs defaultValue="wallet" className="space-y-6">
+      {!isOnline && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3 mb-4 flex items-center">
+          <p className="text-sm text-yellow-700">You're offline. Some wallet features are limited.</p>
+        </div>
+      )}
+      
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
         <TabsList>
           <TabsTrigger value="wallet">Wallet</TabsTrigger>
+          <TabsTrigger value="payment-history">Payment History</TabsTrigger>
           <TabsTrigger value="payment-methods">Payment Methods</TabsTrigger>
           <TabsTrigger value="telehealth">Book Telehealth</TabsTrigger>
           {isAdmin && <TabsTrigger value="payment-simulator">Payment Simulator</TabsTrigger>}
@@ -142,45 +159,11 @@ const Wallet: React.FC = () => {
         <TabsContent value="wallet" className="space-y-6">
           <div className="grid md:grid-cols-2 gap-6">
             <WalletCard balance={balance} onAddFunds={handleAddFunds} />
-            
-            <Card>
-              <CardHeader>
-                <CardTitle>Recent Transactions</CardTitle>
-                <CardDescription>
-                  Your recent wallet activity
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="rounded-md border">
-                  <div className="bg-muted/50 p-3 font-medium grid grid-cols-4">
-                    <div>Date</div>
-                    <div>Description</div>
-                    <div>Amount</div>
-                    <div>Status</div>
-                  </div>
-                  <div className="divide-y">
-                    <div className="p-3 grid grid-cols-4">
-                      <div className="text-sm">2025-04-14</div>
-                      <div className="text-sm">Added funds</div>
-                      <div className="text-sm text-green-600">+$50.00</div>
-                      <div><span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">Completed</span></div>
-                    </div>
-                    <div className="p-3 grid grid-cols-4">
-                      <div className="text-sm">2025-04-13</div>
-                      <div className="text-sm">Consultation payment</div>
-                      <div className="text-sm text-red-600">-$25.50</div>
-                      <div><span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">Completed</span></div>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex justify-center">
-                  <Button variant="ghost" size="sm">
-                    View All Transactions
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
           </div>
+        </TabsContent>
+        
+        <TabsContent value="payment-history" className="space-y-6">
+          {user && <PaymentHistory userId={user.id} />}
         </TabsContent>
 
         <TabsContent value="telehealth">
@@ -191,8 +174,8 @@ const Wallet: React.FC = () => {
                 consultationTitle="Virtual Doctor Consultation"
                 consultationDuration={30}
                 patientId={user.id}
-                providerId="default-provider-id" // This would normally come from selected provider
-                serviceId="telehealth-consultation" // This would normally be dynamic based on service type
+                providerId="default-provider-id"
+                serviceId="telehealth-consultation"
                 onSuccess={() => toast.success("Booking confirmed! Check your appointments.")}
               />
             )}

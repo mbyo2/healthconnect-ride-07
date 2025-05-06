@@ -1,8 +1,9 @@
 // Service Worker for Doc' O Clock
 const CACHE_NAME = 'doc-o-clock-cache-v1';
+const DYNAMIC_CACHE_NAME = 'doc-o-clock-dynamic-v1';
 const OFFLINE_URL = '/offline.html';
 
-const ASSETS_TO_CACHE = [
+const CORE_ASSETS_TO_CACHE = [
   '/',
   '/index.html',
   '/offline.html',
@@ -16,6 +17,15 @@ const ASSETS_TO_CACHE = [
   '/src/index.css'
 ];
 
+// Critical routes that should work offline
+const CRITICAL_ROUTES = [
+  '/',
+  '/profile',
+  '/appointments',
+  '/chat',
+  '/wallet'
+];
+
 // Track failed requests to retry when back online
 const failedRequests = new Map();
 
@@ -24,14 +34,28 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     (async () => {
       const cache = await caches.open(CACHE_NAME);
-      console.log('Service Worker: Caching files');
-      await cache.addAll(ASSETS_TO_CACHE);
+      console.log('Service Worker: Caching core files');
+      await cache.addAll(CORE_ASSETS_TO_CACHE);
+      
       // Ensure offline page is cached
       try {
         const offlineResponse = await fetch(OFFLINE_URL);
         await cache.put(OFFLINE_URL, offlineResponse);
       } catch (error) {
         console.error('Failed to cache offline page:', error);
+      }
+      
+      // Try to precache app shell for critical routes
+      try {
+        for (const route of CRITICAL_ROUTES) {
+          if (route === '/') continue; // Already cached above
+          const response = await fetch(route);
+          if (response.ok) {
+            await cache.put(route, response);
+          }
+        }
+      } catch (error) {
+        console.error('Error precaching critical routes:', error);
       }
     })()
   );
@@ -46,7 +70,7 @@ self.addEventListener('activate', (event) => {
       // Clean up old versions of the cache
       const cacheKeys = await caches.keys();
       const deletePromises = cacheKeys
-        .filter((key) => key !== CACHE_NAME)
+        .filter((key) => key !== CACHE_NAME && key !== DYNAMIC_CACHE_NAME)
         .map((key) => caches.delete(key));
       
       await Promise.all(deletePromises);
@@ -79,7 +103,9 @@ async function networkFirstStrategy(request) {
     console.log('Network request failed, trying cache', request.url);
     
     // Store failed request to retry later
-    failedRequests.set(requestKey, request.clone());
+    if (request.method === 'GET') {
+      failedRequests.set(requestKey, request.clone());
+    }
     
     // Try to get from cache
     const cachedResponse = await caches.match(request);
@@ -87,8 +113,20 @@ async function networkFirstStrategy(request) {
       return cachedResponse;
     }
     
-    // If request mode is navigate, show offline page
+    // Check if this is a navigation request for a critical route
     if (request.mode === 'navigate') {
+      const url = new URL(request.url);
+      const pathname = url.pathname;
+      
+      if (CRITICAL_ROUTES.includes(pathname)) {
+        // For critical routes, try to serve the root document
+        const rootResponse = await caches.match('/');
+        if (rootResponse) {
+          return rootResponse;
+        }
+      }
+      
+      // If not a critical route or no root document, show offline page
       return caches.match(OFFLINE_URL);
     }
     
@@ -121,14 +159,42 @@ async function cacheFirstStrategy(request) {
   }
 }
 
+// Special handler for dynamic cached content
+async function dynamicCacheStrategy(request) {
+  // Check for special cache API requests
+  const url = new URL(request.url);
+  
+  if (url.pathname.startsWith('/__cache/')) {
+    try {
+      const cache = await caches.open(DYNAMIC_CACHE_NAME);
+      const cachedResponse = await cache.match(request);
+      
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+    } catch (error) {
+      console.error('Error reading from dynamic cache:', error);
+    }
+  }
+  
+  // Otherwise use network-first as default
+  return networkFirstStrategy(request);
+}
+
 // Fetch event - implement strategy based on request type
 self.addEventListener('fetch', (event) => {
+  const url = new URL(event.request.url);
+  
   // Skip cross-origin requests
-  if (event.request.method !== 'GET' || !event.request.url.startsWith(self.location.origin)) {
+  if (event.request.method !== 'GET' || !url.origin.includes(self.location.origin)) {
     return;
   }
 
-  const url = new URL(event.request.url);
+  // Special handling for dynamic cache API
+  if (url.pathname.startsWith('/__cache/')) {
+    event.respondWith(dynamicCacheStrategy(event.request));
+    return;
+  }
   
   // Use cache first for static assets
   if (
@@ -152,6 +218,8 @@ self.addEventListener('fetch', (event) => {
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'RETRY_FAILED_REQUESTS') {
     retryFailedRequests();
+  } else if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
   }
 });
 
@@ -191,6 +259,13 @@ self.addEventListener('sync', (event) => {
   }
 });
 
+// Periodic sync (if supported) for keeping content fresh
+self.addEventListener('periodicsync', (event) => {
+  if (event.tag === 'content-sync') {
+    event.waitUntil(syncContent());
+  }
+});
+
 // Function to process pending offline actions
 async function syncData() {
   try {
@@ -210,7 +285,22 @@ async function syncData() {
     for (const action of actions) {
       try {
         // Process the action based on type
-        console.log('Processing action:', action);
+        switch (action.type) {
+          case 'CREATE_APPOINTMENT':
+            await processAppointmentAction(action);
+            break;
+          case 'UPDATE_PROFILE':
+            await processProfileAction(action);
+            break;
+          case 'SEND_MESSAGE':
+            await processMessageAction(action);
+            break;
+          case 'PAYMENT_TRANSACTION':
+            await processPaymentAction(action);
+            break;
+          default:
+            console.log('Unknown action type:', action.type);
+        }
         
         // If successful, delete the action from store
         await store.delete(action.id);
@@ -221,6 +311,58 @@ async function syncData() {
     }
   } catch (error) {
     console.error('Error in syncData:', error);
+  }
+}
+
+// Stub functions for different action types
+async function processAppointmentAction(action) {
+  console.log('Processing appointment action:', action);
+  // Implement appointment creation/update logic here
+}
+
+async function processProfileAction(action) {
+  console.log('Processing profile action:', action);
+  // Implement profile update logic here
+}
+
+async function processMessageAction(action) {
+  console.log('Processing message action:', action);
+  // Implement message sending logic here
+}
+
+async function processPaymentAction(action) {
+  console.log('Processing payment action:', action);
+  // Implement payment processing logic here (offline tracking, queuing, etc.)
+}
+
+// Function to periodically sync content
+async function syncContent() {
+  console.log('Periodic content sync started');
+  
+  try {
+    // Update core cached pages
+    await updateCacheForCriticalRoutes();
+    
+    // You could also refresh any API data in dynamic cache here
+    
+    console.log('Periodic content sync completed');
+  } catch (error) {
+    console.error('Error during periodic content sync:', error);
+  }
+}
+
+async function updateCacheForCriticalRoutes() {
+  const cache = await caches.open(CACHE_NAME);
+  
+  for (const route of CRITICAL_ROUTES) {
+    try {
+      const response = await fetch(route);
+      if (response.ok) {
+        await cache.put(route, response);
+      }
+    } catch (error) {
+      console.error(`Error updating cache for ${route}:`, error);
+    }
   }
 }
 
@@ -236,6 +378,9 @@ function openDB() {
       const db = event.target.result;
       if (!db.objectStoreNames.contains('pendingActions')) {
         db.createObjectStore('pendingActions', { keyPath: 'id' });
+      }
+      if (!db.objectStoreNames.contains('offlineData')) {
+        db.createObjectStore('offlineData', { keyPath: 'key' });
       }
     };
   });
@@ -292,4 +437,4 @@ self.addEventListener('appinstalled', (event) => {
   console.log('App was installed', event);
 });
 
-console.log('Service Worker: Registered');
+console.log('Service Worker: Registered (Enhanced Offline Support)');

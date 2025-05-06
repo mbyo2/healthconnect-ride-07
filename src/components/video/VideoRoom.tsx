@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from "react";
 import DailyIframe from '@daily-co/daily-js';
 import { VideoControls } from "./VideoControls";
@@ -67,10 +68,11 @@ export function VideoRoom({ roomUrl, userName, videoQuality = "high", onLeave }:
       roomQuality = "low";
     }
 
+    // Define video quality configurations as arrays for DailyIframe
     const videoConfig = {
-      low: { height: { max: 360 }, frameRate: { max: 15 } },
-      medium: { height: { max: 720 }, frameRate: { max: 24 } },
-      high: { height: { max: 1080 }, frameRate: { max: 30 } }
+      low: [{ height: 360, frameRate: 15 }],
+      medium: [{ height: 720, frameRate: 24 }],
+      high: [{ height: 1080, frameRate: 30 }]
     };
     
     // Create Daily callFrame
@@ -88,12 +90,11 @@ export function VideoRoom({ roomUrl, userName, videoQuality = "high", onLeave }:
           width: '100%',
           height: isMobile ? 'calc(100% - 140px)' : '100%',
           border: 'none',
-          zIndex: '20' // Changed from number 20 to string '20' to match DailyFactoryOptions type
+          zIndex: '20' // Using string to match DailyFactoryOptions type
         },
         dailyConfig: {
-          // Fix experimental properties warning
           experimentalChromeVideoMute: isTV,
-          camSimulcastEncodings: videoConfig[roomQuality],
+          camSimulcastEncodings: videoConfig[roomQuality as keyof typeof videoConfig],
           micQuality: roomQuality === "low" ? "speech-quality" : "speech-plus-quality"
         }
       };
