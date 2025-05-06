@@ -1,7 +1,3 @@
-
-// We need to fix the experimentalChromeVideoMuteLightOff error in VideoRoom.tsx
-// Since we don't have access to the original file, I'll need to re-implement it based on types
-
 import { useState, useEffect, useCallback } from "react";
 import DailyIframe from '@daily-co/daily-js';
 import { VideoControls } from "./VideoControls";
@@ -92,7 +88,7 @@ export function VideoRoom({ roomUrl, userName, videoQuality = "high", onLeave }:
           width: '100%',
           height: isMobile ? 'calc(100% - 140px)' : '100%',
           border: 'none',
-          zIndex: 20
+          zIndex: '20' // Changed from number 20 to string '20' to match DailyFactoryOptions type
         },
         dailyConfig: {
           // Fix experimental properties warning
@@ -142,6 +138,7 @@ export function VideoRoom({ roomUrl, userName, videoQuality = "high", onLeave }:
       handleParticipantsChange, handleNetworkQualityChange, 
       videoQuality, isMobile, isTV, capabilities.network.connectionQuality]);
 
+  
   const handleToggleMute = () => {
     if (!callFrame) return;
     setIsMuted(prev => !prev);
