@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -19,11 +20,6 @@ export const ProfileSetup = () => {
     phone: "",
     date_of_birth: "",
     gender: "",
-    address: "",
-    city: "",
-    state: "",
-    zip_code: "",
-    bio: "",
   });
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -96,7 +92,7 @@ export const ProfileSetup = () => {
 
   return (
     <div className="max-w-2xl mx-auto p-6">
-      <h2 className="text-2xl font-bold mb-6">Complete Your Profile</h2>
+      <h2 className="text-2xl font-bold mb-6">Complete Your Patient Profile</h2>
       
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="flex flex-col items-center mb-6">
@@ -161,52 +157,6 @@ export const ProfileSetup = () => {
               onChange={handleInputChange}
             />
           </div>
-          <div>
-            <Label htmlFor="address">Address</Label>
-            <Input
-              id="address"
-              name="address"
-              value={formData.address}
-              onChange={handleInputChange}
-            />
-          </div>
-          <div>
-            <Label htmlFor="city">City</Label>
-            <Input
-              id="city"
-              name="city"
-              value={formData.city}
-              onChange={handleInputChange}
-            />
-          </div>
-          <div>
-            <Label htmlFor="state">State</Label>
-            <Input
-              id="state"
-              name="state"
-              value={formData.state}
-              onChange={handleInputChange}
-            />
-          </div>
-          <div>
-            <Label htmlFor="zip_code">ZIP Code</Label>
-            <Input
-              id="zip_code"
-              name="zip_code"
-              value={formData.zip_code}
-              onChange={handleInputChange}
-            />
-          </div>
-        </div>
-
-        <div>
-          <Label htmlFor="bio">Bio</Label>
-          <Input
-            id="bio"
-            name="bio"
-            value={formData.bio}
-            onChange={handleInputChange}
-          />
         </div>
 
         <Button type="submit" className="w-full" disabled={loading}>
