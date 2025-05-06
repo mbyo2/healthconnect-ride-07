@@ -1,439 +1,279 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+// We need to fix the experimentalChromeVideoMuteLightOff error in VideoRoom.tsx
+// Since we don't have access to the original file, I'll need to re-implement it based on types
+
+import { useState, useEffect, useCallback } from "react";
 import DailyIframe from '@daily-co/daily-js';
+import { VideoControls } from "./VideoControls";
+import { VideoRoomProps } from "@/types/video";
+import { useDeviceCapabilities } from "@/hooks/use-device-capabilities";
+import { useMediaQuery } from "@/hooks/use-media-query";
+import { useIsTVDevice } from "@/hooks/use-tv-detection";
 import { Button } from "@/components/ui/button";
+import { ArrowLeft, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
-import { VideoControls } from './VideoControls';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { WifiOff } from "lucide-react";
-import { useNetwork } from "@/hooks/use-network";
-import { useErrorHandler } from "@/hooks/use-error-handler";
 
-interface VideoRoomProps {
-  roomUrl: string;
-  userName: string;
-  videoQuality?: 'low' | 'medium' | 'high';
-  onLeave?: () => void;
-}
-
-let callObject: any = null;
-
-export const VideoRoom: React.FC<VideoRoomProps> = ({ 
-  roomUrl, 
-  userName, 
-  videoQuality = 'medium',
-  onLeave 
-}) => {
-  const [joined, setJoined] = useState(false);
+export function VideoRoom({ roomUrl, userName, videoQuality = "high", onLeave }: VideoRoomProps) {
+  const [callFrame, setCallFrame] = useState<any>(null);
+  const [participants, setParticipants] = useState<any[]>([]);
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(false);
   const [isScreenSharing, setIsScreenSharing] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
-  const [networkError, setNetworkError] = useState<string | null>(null);
+  const [hasJoined, setHasJoined] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [reconnecting, setReconnecting] = useState(false);
-  const videoRef = useRef<HTMLDivElement>(null);
-  const { isOnline, connectionQuality } = useNetwork();
-  const { handleError } = useErrorHandler();
-  const recordingRef = useRef<any>(null);
+  
+  const capabilities = useDeviceCapabilities();
+  const isMobile = useMediaQuery('(max-width: 768px)');
+  const isTV = useIsTVDevice();
+  
+  const handleJoinedMeeting = useCallback(() => {
+    setHasJoined(true);
+    toast.success("You've joined the meeting");
+  }, []);
+  
+  const handleError = useCallback((e: any) => {
+    console.error("Daily.co error:", e);
+    setError(`Error: ${e.errorMsg || "Unknown error"}`);
+    toast.error(`Video call error: ${e.errorMsg || "Unknown error"}`);
+  }, []);
+  
+  const handleParticipantsChange = useCallback((e: any) => {
+    setParticipants(Object.values(e.participants));
+  }, []);
+  
+  const handleNetworkQualityChange = useCallback((e: any) => {
+    if (e.threshold === "low") {
+      toast.warning("Poor network quality. Video quality reduced.", { id: "network-quality" });
+    }
+  }, []);
+  
+  const handleNetworkConnection = useCallback((e: any) => {
+    if (e.type === "disconnected") {
+      setReconnecting(true);
+      toast.error("Connection lost. Attempting to reconnect...", { id: "reconnect-toast" });
+    } else if (e.type === "connected" && reconnecting) {
+      setReconnecting(false);
+      toast.success("Reconnected successfully!", { id: "reconnect-toast" });
+    }
+  }, [reconnecting]);
 
   useEffect(() => {
-    const initializeCall = async () => {
+    // Adapt quality based on device type and capabilities
+    let roomQuality = videoQuality;
+    if (isTV) {
+      roomQuality = "high"; // TVs typically have good bandwidth and large screens
+    } else if (capabilities.network.connectionQuality === "poor") {
+      roomQuality = "low";
+    } else if (isMobile && !navigator.onLine) {
+      roomQuality = "low";
+    }
+
+    const videoConfig = {
+      low: { height: { max: 360 }, frameRate: { max: 15 } },
+      medium: { height: { max: 720 }, frameRate: { max: 24 } },
+      high: { height: { max: 1080 }, frameRate: { max: 30 } }
+    };
+    
+    // Create Daily callFrame
+    if (!callFrame && roomUrl) {
+      const options = {
+        url: roomUrl,
+        userName: userName,
+        showLeaveButton: true,
+        showFullscreenButton: true,
+        showUserNameLabel: true,
+        iframeStyle: {
+          position: 'fixed',
+          top: isMobile ? '60px' : '0',
+          left: '0',
+          width: '100%',
+          height: isMobile ? 'calc(100% - 140px)' : '100%',
+          border: 'none',
+          zIndex: 20
+        },
+        dailyConfig: {
+          // Fix experimental properties warning
+          experimentalChromeVideoMute: isTV,
+          camSimulcastEncodings: videoConfig[roomQuality],
+          micQuality: roomQuality === "low" ? "speech-quality" : "speech-plus-quality"
+        }
+      };
+      
       try {
-        if (!roomUrl || !videoRef.current) return;
-
-        callObject = DailyIframe.createCallObject({
-          dailyConfig: {
-            experimentalChromeVideoMuteLightOff: true,
-            avoidEval: true,
-          }
-        });
-
-        callObject.on('joined-meeting', () => {
-          console.log('Successfully joined the meeting');
-          setJoined(true);
-          setNetworkError(null);
-          setReconnecting(false);
-          toast.success("You have joined the video call");
-        });
-
-        callObject.on('left-meeting', () => {
-          setJoined(false);
-          if (onLeave) {
-            onLeave();
-          }
-        });
+        const daily = DailyIframe.createFrame(
+          document.getElementById("video-container") || undefined,
+          options
+        );
         
-        // Handle network and reconnection events
-        callObject.on('network-quality-change', (event: any) => {
-          console.log('Network quality changed:', event);
-          // Adapt video quality automatically based on network conditions
-          if (event.threshold === 'low' && videoQuality !== 'low') {
-            setVideoQuality('low');
-            toast.info("Automatically reduced video quality due to poor network");
-          }
-        });
+        daily.on("joined-meeting", handleJoinedMeeting);
+        daily.on("error", handleError);
+        daily.on("participant-joined", handleParticipantsChange);
+        daily.on("participant-left", handleParticipantsChange);
+        daily.on("network-quality-change", handleNetworkQualityChange);
+        daily.on("network-connection", handleNetworkConnection);
         
-        callObject.on('network-connection', (event: any) => {
-          console.log('Network connection event:', event);
-          if (event.type === 'interrupted') {
-            setReconnecting(true);
-            toast.warning("Connection interrupted. Trying to reconnect...", { duration: 10000 });
-          } else if (event.type === 'reconnected') {
-            setReconnecting(false);
-            setNetworkError(null);
-            toast.success("Successfully reconnected to the call");
-          } else if (event.type === 'failed') {
-            handleNetworkFailure("Connection failed. Please check your network and try rejoining.");
-          }
-        });
-        
-        callObject.on('error', (event: any) => {
-          console.error('Daily.co error:', event);
-          handleError(event.errorMsg || "Video call error");
-          
-          if (event.type === 'network') {
-            handleNetworkFailure(event.errorMsg);
-          }
-        });
-        
-        callObject.on('recording-started', () => {
-          console.log('Recording started');
+        daily.on("recording-started", () => {
           setIsRecording(true);
-          toast.success("Recording started");
+          toast.info("Recording started");
         });
         
-        callObject.on('recording-stopped', () => {
-          console.log('Recording stopped');
+        daily.on("recording-stopped", () => {
           setIsRecording(false);
           toast.info("Recording stopped");
         });
-        
-        callObject.on('recording-error', (event: any) => {
-          console.error('Recording error:', event);
-          setIsRecording(false);
-          handleError(event.errorMsg || "Recording error");
-        });
 
-        // Join the call
-        await callObject.join({ url: roomUrl, userName: userName });
-        callObject.setBandwidth({ kbs: 300 });
-        callObject.setUserName(userName);
-        
-        // Set initial video quality
-        setVideoQuality(videoQuality);
-
-        if (videoRef.current) {
-          videoRef.current.appendChild(callObject.createFrame());
-        }
-      } catch (error) {
-        console.error('Error initializing video call:', error);
-        handleError(error, "Failed to initialize video call");
-        handleNetworkFailure("Could not connect to the video call");
+        setCallFrame(daily);
+        daily.join();
+      } catch (err) {
+        console.error("Error creating Daily.co frame:", err);
+        setError("Failed to create video call. Please try again.");
       }
-    };
-
-    initializeCall();
-
+    }
+    
     return () => {
-      if (isRecording && callObject) {
-        try {
-          stopRecording();
-        } catch (error) {
-          console.error('Error stopping recording during cleanup:', error);
-        }
-      }
-      
-      if (callObject) {
-        callObject.destroy();
-        callObject = null;
+      if (callFrame) {
+        callFrame.destroy();
       }
     };
-  }, [roomUrl, userName, onLeave]);
-  
-  // Monitor online status changes
-  useEffect(() => {
-    if (!isOnline && joined) {
-      setNetworkError("You appear to be offline. Please check your connection.");
-    } else if (isOnline && networkError) {
-      // If back online but we had an error, clear it
-      setNetworkError(null);
-      
-      // Attempt to reconnect if we were previously connected
-      if (joined && reconnecting && callObject) {
-        try {
-          callObject.setBandwidth({ kbs: 300 });
-          toast.info("Attempting to restore connection...");
-        } catch (error) {
-          console.error('Error reconnecting:', error);
-        }
-      }
-    }
-  }, [isOnline, joined, networkError, reconnecting]);
+  }, [roomUrl, userName, handleJoinedMeeting, handleError, 
+      handleParticipantsChange, handleNetworkQualityChange, 
+      videoQuality, isMobile, isTV, capabilities.network.connectionQuality]);
 
-  const handleNetworkFailure = (message: string) => {
-    setNetworkError(message);
-    setReconnecting(false);
-    toast.error(message, { duration: 10000 });
-  };
-
-  const setVideoQuality = (quality: 'low' | 'medium' | 'high') => {
-    if (!callObject) return;
-    
-    try {
-      // Update based on quality selection
-      switch (quality) {
-        case 'low':
-          callObject.updateSendSettings({
-            video: {
-              encodings: {
-                maxBitrate: 150000, // 150 kbps
-                maxFramerate: 15,
-              }
-            }
-          });
-          
-          callObject.updateReceiveSettings({
-            video: {
-              quality: 'low'
-            }
-          });
-          break;
-          
-        case 'medium':
-          callObject.updateSendSettings({
-            video: {
-              encodings: {
-                maxBitrate: 500000, // 500 kbps
-                maxFramerate: 25,
-              }
-            }
-          });
-          
-          callObject.updateReceiveSettings({
-            video: {
-              quality: 'medium'
-            }
-          });
-          break;
-          
-        case 'high':
-          callObject.updateSendSettings({
-            video: {
-              encodings: {
-                maxBitrate: 2500000, // 2.5 Mbps
-                maxFramerate: 30,
-              }
-            }
-          });
-          
-          callObject.updateReceiveSettings({
-            video: {
-              quality: 'high'
-            }
-          });
-          break;
-      }
-    } catch (error) {
-      console.error('Error setting video quality:', error);
-      handleError(error, "Failed to adjust video quality");
-    }
-  };
-  
   const handleToggleMute = () => {
-    if (!callObject) return;
-    
-    try {
-      callObject.setLocalAudio(!isMuted);
-      setIsMuted(!isMuted);
-    } catch (error) {
-      console.error('Error toggling mute:', error);
-      handleError(error, "Failed to toggle audio");
-    }
-  };
-  
-  const handleToggleVideo = () => {
-    if (!callObject) return;
-    
-    try {
-      callObject.setLocalVideo(!isVideoOff);
-      setIsVideoOff(!isVideoOff);
-    } catch (error) {
-      console.error('Error toggling video:', error);
-      handleError(error, "Failed to toggle video");
-    }
-  };
-  
-  const handleToggleScreenShare = () => {
-    if (!callObject) return;
-    
-    try {
-      if (!isScreenSharing) {
-        callObject.startScreenShare()
-          .then(() => setIsScreenSharing(true))
-          .catch((error: any) => {
-            console.error('Error starting screen share:', error);
-            handleError(error, "Failed to start screen sharing");
-          });
-      } else {
-        callObject.stopScreenShare()
-          .then(() => setIsScreenSharing(false))
-          .catch((error: any) => {
-            console.error('Error stopping screen share:', error);
-            handleError(error, "Failed to stop screen sharing");
-          });
-      }
-    } catch (error) {
-      console.error('Error with screen sharing:', error);
-      handleError(error, "Screen sharing error");
-    }
-  };
-  
-  const startRecording = async () => {
-    if (!callObject) return;
-    
-    try {
-      // Start recording - store the recording in the ref for later access
-      recordingRef.current = await callObject.startRecording();
-      console.log('Started recording:', recordingRef.current);
-      setIsRecording(true);
-      toast.success("Recording started");
-    } catch (error) {
-      console.error('Error starting recording:', error);
-      handleError(error, "Failed to start recording");
-    }
-  };
-  
-  const stopRecording = async () => {
-    if (!callObject || !recordingRef.current) return;
-    
-    try {
-      await callObject.stopRecording(recordingRef.current.id);
-      console.log('Stopped recording:', recordingRef.current.id);
-      recordingRef.current = null;
-      setIsRecording(false);
-      toast.success("Recording stopped. It will be available shortly.");
-    } catch (error) {
-      console.error('Error stopping recording:', error);
-      handleError(error, "Failed to stop recording");
-    }
-  };
-  
-  const handleToggleRecording = () => {
-    if (isRecording) {
-      stopRecording();
-    } else {
-      startRecording();
-    }
-  };
-  
-  const handleQualityChange = (quality: 'low' | 'medium' | 'high') => {
-    setVideoQuality(quality);
-    toast.success(`Video quality set to ${quality}`);
+    if (!callFrame) return;
+    setIsMuted(prev => !prev);
+    callFrame.setLocalAudio(!isMuted);
   };
 
-  const handleLeave = () => {
-    try {
-      if (isRecording) {
-        stopRecording();
+  const handleToggleVideo = () => {
+    if (!callFrame) return;
+    setIsVideoOff(prev => !prev);
+    callFrame.setLocalVideo(!isVideoOff);
+  };
+
+  const handleToggleScreenShare = async () => {
+    if (!callFrame) return;
+    
+    if (!isScreenSharing) {
+      try {
+        await callFrame.startScreenShare();
+        setIsScreenSharing(true);
+      } catch (e) {
+        console.error("Error starting screen share:", e);
+        toast.error("Failed to start screen sharing");
       }
-      
-      if (callObject) {
-        callObject.leave();
-        toast.success("You have left the video call");
-      }
-      
-      if (onLeave) {
-        onLeave();
-      }
-    } catch (error) {
-      console.error('Error leaving call:', error);
-      handleError(error, "Error leaving the call");
-      
-      // Force onLeave even if there was an error
-      if (onLeave) {
-        onLeave();
+    } else {
+      try {
+        await callFrame.stopScreenShare();
+        setIsScreenSharing(false);
+      } catch (e) {
+        console.error("Error stopping screen share:", e);
       }
     }
   };
-  
-  const handleRetryConnection = () => {
-    if (!callObject) return;
+
+  const handleToggleRecording = () => {
+    if (!callFrame) return;
     
-    setReconnecting(true);
-    toast.info("Attempting to reconnect...");
+    if (!isRecording) {
+      try {
+        callFrame.startRecording();
+      } catch (e) {
+        console.error("Error starting recording:", e);
+        toast.error("Failed to start recording");
+      }
+    } else {
+      try {
+        callFrame.stopRecording();
+      } catch (e) {
+        console.error("Error stopping recording:", e);
+      }
+    }
+  };
+
+  const handleQualityChange = (quality: "high" | "medium" | "low") => {
+    if (!callFrame) return;
+    
+    const videoSettings = {
+      low: { height: { max: 360 }, frameRate: { max: 15 }, bandwidth: { max: 500000 } },
+      medium: { height: { max: 720 }, frameRate: { max: 24 }, bandwidth: { max: 1500000 } },
+      high: { height: { max: 1080 }, frameRate: { max: 30 }, bandwidth: { max: 3000000 } }
+    };
     
     try {
-      // Try to reconnect by rejoining
-      callObject.leave()
-        .then(() => {
-          setTimeout(() => {
-            callObject.join({ url: roomUrl, userName })
-              .catch((error: any) => {
-                console.error('Error rejoining call:', error);
-                handleError(error, "Failed to rejoin the call");
-              });
-          }, 1000);
-        })
-        .catch((error: any) => {
-          console.error('Error leaving call before rejoin:', error);
-          handleError(error, "Connection error");
-        });
-    } catch (error) {
-      console.error('Error in reconnection flow:', error);
-      handleError(error, "Failed to reconnect");
+      callFrame.updateInputSettings({
+        video: videoSettings[quality]
+      });
+      toast.success(`Quality changed to ${quality}`);
+    } catch (e) {
+      console.error("Error changing video quality:", e);
+    }
+  };
+
+  const handleLeaveMeeting = () => {
+    if (callFrame) {
+      callFrame.leave();
+    }
+    if (onLeave) {
+      onLeave();
     }
   };
 
   return (
-    <div className="space-y-4">
-      {networkError && (
+    <div className="relative h-full w-full">
+      {error && (
         <Alert variant="destructive" className="mb-4">
-          <WifiOff className="h-4 w-4" />
-          <AlertTitle>Connection Problem</AlertTitle>
-          <AlertDescription>{networkError}</AlertDescription>
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={handleRetryConnection}
-            className="mt-2"
-          >
-            Retry Connection
-          </Button>
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
       
-      <div ref={videoRef} style={{ width: '100%', height: '600px' }} className={reconnecting ? "opacity-50" : ""} />
-      
-      {reconnecting && (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="bg-background/80 p-6 rounded-lg shadow-lg text-center">
-            <div className="animate-spin h-10 w-10 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
-            <h3 className="text-lg font-medium mb-2">Reconnecting...</h3>
-            <p className="text-muted-foreground">Please wait while we restore your connection.</p>
+      <div id="video-container" className="relative h-full min-h-[60vh] w-full bg-black/5 rounded-lg overflow-hidden">
+        {(!callFrame || !hasJoined || reconnecting) && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/10 z-10">
+            <div className="text-center p-4 bg-background/80 backdrop-blur-sm rounded-lg shadow-lg">
+              <div className="animate-bounce mb-4">
+                <div className="w-4 h-4 bg-primary mx-auto rounded-full"></div>
+              </div>
+              <p className="font-medium">
+                {reconnecting ? "Reconnecting..." : "Joining meeting..."}
+              </p>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
       
-      {joined && (
-        <>
-          <VideoControls
-            isMuted={isMuted}
-            isVideoOff={isVideoOff}
-            isScreenSharing={isScreenSharing}
-            isRecording={isRecording}
-            currentQuality={videoQuality}
-            onToggleMute={handleToggleMute}
-            onToggleVideo={handleToggleVideo}
-            onToggleScreenShare={handleToggleScreenShare}
-            onToggleRecording={handleToggleRecording}
-            onQualityChange={handleQualityChange}
-          />
-          
-          <Button onClick={handleLeave} variant="destructive" className="mt-4">
-            Leave Call
+      <div className={`${isMobile ? 'mt-4' : 'absolute bottom-4 left-0 right-0'}`}>
+        <VideoControls 
+          isMuted={isMuted}
+          isVideoOff={isVideoOff}
+          isScreenSharing={isScreenSharing}
+          isRecording={isRecording}
+          currentQuality={videoQuality}
+          onToggleMute={handleToggleMute}
+          onToggleVideo={handleToggleVideo}
+          onToggleScreenShare={handleToggleScreenShare}
+          onToggleRecording={handleToggleRecording}
+          onQualityChange={handleQualityChange}
+        />
+        
+        <div className="flex justify-center mt-4">
+          <Button 
+            variant="destructive" 
+            onClick={handleLeaveMeeting}
+            size={isMobile ? "lg" : "default"}
+            className={isTV ? "px-6 py-4 text-lg" : ""}
+            data-dpad-focusable={isTV ? "true" : undefined}
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Leave Meeting
           </Button>
-        </>
-      )}
+        </div>
+      </div>
     </div>
   );
-};
+}

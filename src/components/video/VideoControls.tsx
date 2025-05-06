@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Camera, CameraOff, Mic, MicOff, MonitorUp, BatteryCharging, Signal, Tv, Record } from "lucide-react";
+import { Camera, CameraOff, Mic, MicOff, MonitorUp, BatteryCharging, Signal, Tv, Video } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -103,7 +103,7 @@ export const VideoControls = ({
           className={`${isTV ? "px-6 py-4 text-lg" : ""} ${isMobile ? "h-14 min-w-14" : ""}`}
           data-dpad-focusable={isTV ? "true" : undefined}
         >
-          <Record className={`${isRecording ? "animate-pulse" : ""} ${isTV ? "h-6 w-6 mr-2" : "h-5 w-5"}`} />
+          <Video className={`${isRecording ? "animate-pulse" : ""} ${isTV ? "h-6 w-6 mr-2" : "h-5 w-5"}`} />
           {(isTV || isMobile) && (isRecording ? "Stop Rec" : "Record")}
         </Button>
       )}

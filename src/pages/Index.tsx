@@ -1,18 +1,73 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SymptomCollector } from "@/components/SymptomCollector";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useOnboarding } from "@/components/onboarding/OnboardingProvider";
+import { MobileTouchList } from "@/components/MobileTouchList";
+import { useMediaQuery } from "@/hooks/use-media-query";
 
 export const Index = () => {
   const navigate = useNavigate();
+  const { showFeatureHighlight } = useOnboarding();
+  const isMobile = useMediaQuery('(max-width: 768px)');
   
   const handleSymptomSubmit = (symptoms: string, urgency: string) => {
     console.log("Symptoms submitted:", { symptoms, urgency });
     toast.success("Symptoms recorded successfully");
   };
+
+  useEffect(() => {
+    // Show feature highlights with slight delays between them
+    setTimeout(() => {
+      showFeatureHighlight({
+        id: "home-symptoms",
+        targetSelector: ".symptom-collector",
+        title: "Report Your Symptoms",
+        description: "Track your health by recording symptoms. Your doctor will have this information during appointments.",
+        position: "bottom",
+        showDelay: 800
+      });
+    }, 2000);
+    
+    setTimeout(() => {
+      showFeatureHighlight({
+        id: "home-find-care",
+        targetSelector: ".find-care-button",
+        title: "Find Healthcare",
+        description: "Search for doctors and specialists based on your location and needs.",
+        position: "left",
+        showDelay: 500
+      });
+    }, 4000);
+  }, [showFeatureHighlight]);
+
+  // Quick action buttons with enhanced mobile touch support
+  const quickActions = [
+    {
+      label: "Find Healthcare Providers",
+      icon: <ArrowRight size={16} />,
+      action: () => navigate('/search'),
+      className: "find-care-button"
+    },
+    {
+      label: "Manage Appointments",
+      icon: <ArrowRight size={16} />,
+      action: () => navigate('/appointments')
+    },
+    {
+      label: "Video Consultations",
+      icon: <ArrowRight size={16} />,
+      action: () => navigate('/video-consultation')
+    },
+    {
+      label: "Update Profile",
+      icon: <ArrowRight size={16} />,
+      action: () => navigate('/profile')
+    }
+  ];
 
   return (
     <div className="container mx-auto px-4 md:px-6 py-10 space-y-8">
@@ -22,7 +77,7 @@ export const Index = () => {
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="bg-card rounded-lg shadow-sm p-6 border">
+        <div className="bg-card rounded-lg shadow-sm p-6 border symptom-collector">
           <h2 className="text-xl font-semibold mb-4">Report Symptoms</h2>
           <SymptomCollector onSymptomSubmit={handleSymptomSubmit} />
         </div>
@@ -31,41 +86,37 @@ export const Index = () => {
           <h2 className="text-xl font-semibold mb-2">Quick Actions</h2>
           
           <div className="grid grid-cols-1 gap-4">
-            <Button 
-              onClick={() => navigate('/search')}
-              className="justify-between"
-              variant="outline"
-            >
-              Find Healthcare Providers
-              <ArrowRight size={16} />
-            </Button>
-            
-            <Button 
-              onClick={() => navigate('/appointments')}
-              className="justify-between"
-              variant="outline"
-            >
-              Manage Appointments
-              <ArrowRight size={16} />
-            </Button>
-            
-            <Button 
-              onClick={() => navigate('/map')}
-              className="justify-between"
-              variant="outline"
-            >
-              View Nearby Facilities
-              <ArrowRight size={16} />
-            </Button>
-            
-            <Button 
-              onClick={() => navigate('/profile')}
-              className="justify-between"
-              variant="outline"
-            >
-              Update Profile
-              <ArrowRight size={16} />
-            </Button>
+            {isMobile ? (
+              <MobileTouchList 
+                onItemClick={(index) => quickActions[index].action()}
+                enableSwipe={true}
+                className="space-y-4"
+                itemClassName="touch-manipulation active:bg-accent/20"
+              >
+                {quickActions.map((action, index) => (
+                  <Button 
+                    key={index}
+                    className={`justify-between w-full ${action.className || ""}`}
+                    variant="outline"
+                  >
+                    {action.label}
+                    {action.icon}
+                  </Button>
+                ))}
+              </MobileTouchList>
+            ) : (
+              quickActions.map((action, index) => (
+                <Button 
+                  key={index}
+                  onClick={action.action}
+                  className={`justify-between ${action.className || ""}`}
+                  variant="outline"
+                >
+                  {action.label}
+                  {action.icon}
+                </Button>
+              ))
+            )}
           </div>
         </div>
       </div>

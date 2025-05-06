@@ -1,10 +1,10 @@
-
 import React, { Suspense, lazy } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { ThemeProvider } from '@/components/theme-provider';
 import { useAuth } from '@/context/AuthContext';
 import { LoadingScreen } from '@/components/LoadingScreen';
+import { OnboardingProvider } from '@/components/onboarding/OnboardingProvider';
 import Login from '@/pages/Login';
 import CreateAdmin from '@/pages/CreateAdmin';
 import AdminWallet from '@/pages/AdminWallet';
@@ -62,34 +62,36 @@ const Landing = lazy(() => import('@/pages/Landing'));
 function App() {
   return (
     <ThemeProvider defaultTheme="light" storageKey="doc-o-clock-theme">
-      <Suspense fallback={<LoadingScreen />}>
-        <Routes>
-          {/* Public routes */}
-          <Route path="/" element={<Landing />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/auth" element={<Auth />} />
-          <Route path="/provider-portal" element={<ProviderPortal />} />
-          <Route path="/create-admin" element={<CreateAdmin />} />
-          
-          {/* Protected routes */}
-          <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
-          <Route path="/profile-setup" element={<ProtectedRoute><ProfileSetup /></ProtectedRoute>} />
-          <Route path="/symptoms" element={<ProtectedRoute><Home /></ProtectedRoute>} />
-          <Route path="/admin-dashboard" element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>} />
-          <Route path="/superadmin-dashboard" element={<ProtectedRoute superAdminOnly><SuperAdminDashboard /></ProtectedRoute>} />
-          <Route path="/provider-dashboard" element={<ProtectedRoute providerOnly><ProviderDashboard /></ProtectedRoute>} />
-          <Route path="/application-status" element={<ProtectedRoute><ApplicationStatus /></ProtectedRoute>} />
-          <Route path="/appointments" element={<ProtectedRoute><Appointments /></ProtectedRoute>} />
-          <Route path="/video-consultation/:appointmentId" element={<ProtectedRoute><VideoConsultation /></ProtectedRoute>} />
-          <Route path="/admin-wallet" element={<ProtectedRoute adminOnly><AdminWallet /></ProtectedRoute>} />
-          <Route path="/wallet" element={<ProtectedRoute><Wallet /></ProtectedRoute>} />
-          
-          {/* Fallback routes */}
-          <Route path="/404" element={<NotFound />} />
-          <Route path="*" element={<Navigate to="/404" replace />} />
-        </Routes>
-      </Suspense>
-      <Toaster position="top-right" richColors closeButton />
+      <OnboardingProvider>
+        <Suspense fallback={<LoadingScreen />}>
+          <Routes>
+            {/* Public routes */}
+            <Route path="/" element={<Landing />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/provider-portal" element={<ProviderPortal />} />
+            <Route path="/create-admin" element={<CreateAdmin />} />
+            
+            {/* Protected routes */}
+            <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+            <Route path="/profile-setup" element={<ProtectedRoute><ProfileSetup /></ProtectedRoute>} />
+            <Route path="/symptoms" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+            <Route path="/admin-dashboard" element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>} />
+            <Route path="/superadmin-dashboard" element={<ProtectedRoute superAdminOnly><SuperAdminDashboard /></ProtectedRoute>} />
+            <Route path="/provider-dashboard" element={<ProtectedRoute providerOnly><ProviderDashboard /></ProtectedRoute>} />
+            <Route path="/application-status" element={<ProtectedRoute><ApplicationStatus /></ProtectedRoute>} />
+            <Route path="/appointments" element={<ProtectedRoute><Appointments /></ProtectedRoute>} />
+            <Route path="/video-consultation/:appointmentId" element={<ProtectedRoute><VideoConsultation /></ProtectedRoute>} />
+            <Route path="/admin-wallet" element={<ProtectedRoute adminOnly><AdminWallet /></ProtectedRoute>} />
+            <Route path="/wallet" element={<ProtectedRoute><Wallet /></ProtectedRoute>} />
+            
+            {/* Fallback routes */}
+            <Route path="/404" element={<NotFound />} />
+            <Route path="*" element={<Navigate to="/404" replace />} />
+          </Routes>
+        </Suspense>
+        <Toaster position="top-right" richColors closeButton />
+      </OnboardingProvider>
     </ThemeProvider>
   );
 }
