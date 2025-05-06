@@ -5,13 +5,9 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Video, Calendar, User, Clock } from "lucide-react";
 import { format } from "date-fns";
-import { VideoConsultationDetails } from "@/types/video";
+import { VideoConsultationDetails, ConsultationListProps } from "@/types/video";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { Skeleton } from "@/components/ui/skeleton";
-
-interface ConsultationListProps {
-  onJoinMeeting: (consultation: VideoConsultationDetails) => void;
-}
 
 export const ConsultationList = ({ onJoinMeeting }: ConsultationListProps) => {
   const isMobile = useMediaQuery('(max-width: 768px)');
@@ -97,11 +93,11 @@ export const ConsultationList = ({ onJoinMeeting }: ConsultationListProps) => {
               </div>
               
               <p className={`text-sm capitalize ${isMobile ? 'mt-1' : 'mt-1'}`}>
-                Status: <span className={`font-medium ${consultation.status === 'active' ? 'text-green-600 dark:text-green-400' : ''}`}>{consultation.status}</span>
+                Status: <span className={`font-medium ${consultation.status === 'in-progress' ? 'text-green-600 dark:text-green-400' : ''}`}>{consultation.status}</span>
               </p>
             </div>
             
-            {consultation.meeting_url && consultation.status === 'active' && (
+            {consultation.meeting_url && consultation.status === 'in-progress' && (
               <Button 
                 onClick={() => onJoinMeeting(consultation)}
                 className={`gap-2 ${isMobile ? 'w-full mt-2' : ''}`}
