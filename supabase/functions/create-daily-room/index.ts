@@ -8,6 +8,7 @@ interface RequestData {
   consultation_id: string;
   optimize_for_network?: boolean;
   tv_mode?: boolean;
+  enable_recording?: boolean;
 }
 
 serve(async (req) => {
@@ -17,7 +18,7 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
-    const { consultation_id, optimize_for_network = false, tv_mode = false } = await req.json() as RequestData;
+    const { consultation_id, optimize_for_network = false, tv_mode = false, enable_recording = false } = await req.json() as RequestData;
 
     if (!consultation_id) {
       return new Response(
@@ -59,6 +60,9 @@ serve(async (req) => {
         enable_chat: true,
         start_video_off: false,
         start_audio_off: false,
+        eject_at_room_exp: true,
+        enable_network_ui: true,
+        enable_network_switching: true,
       },
     };
 
@@ -89,6 +93,14 @@ serve(async (req) => {
       };
     }
 
+    // Enable recording if requested
+    if (enable_recording) {
+      roomProperties.properties.enable_recording = "cloud";
+      roomProperties.properties.recording_consent = "required";
+      roomProperties.properties.recording_resolution = optimize_for_network ? "sd" : "hd";
+      roomProperties.properties.recording_available_notification = true;
+    }
+
     const createRoomResponse = await fetch("https://api.daily.co/v1/rooms", {
       method: "POST",
       headers: {
@@ -115,7 +127,8 @@ serve(async (req) => {
       .update({
         meeting_url: room.url,
         network_optimized: optimize_for_network,
-        tv_mode: tv_mode
+        tv_mode: tv_mode,
+        recording_enabled: enable_recording
       })
       .eq("id", consultation_id);
 

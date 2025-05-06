@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Camera, CameraOff, Mic, MicOff, MonitorUp, BatteryCharging, Signal, Tv } from "lucide-react";
+import { Camera, CameraOff, Mic, MicOff, MonitorUp, BatteryCharging, Signal, Tv, Record } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,10 +14,12 @@ interface VideoControlsProps {
   isMuted: boolean;
   isVideoOff: boolean;
   isScreenSharing: boolean;
+  isRecording?: boolean;
   currentQuality?: "high" | "medium" | "low";
   onToggleMute: () => void;
   onToggleVideo: () => void;
   onToggleScreenShare: () => void;
+  onToggleRecording?: () => void;
   onQualityChange?: (quality: "high" | "medium" | "low") => void;
 }
 
@@ -25,10 +27,12 @@ export const VideoControls = ({
   isMuted,
   isVideoOff,
   isScreenSharing,
+  isRecording = false,
   currentQuality = "high",
   onToggleMute,
   onToggleVideo,
   onToggleScreenShare,
+  onToggleRecording,
   onQualityChange,
 }: VideoControlsProps) => {
   const isTV = useIsTVDevice();
@@ -89,6 +93,20 @@ export const VideoControls = ({
         <MonitorUp className={isTV ? "h-6 w-6 mr-2" : "h-5 w-5"} />
         {(isTV || isMobile) && (isScreenSharing ? "Stop Share" : "Share")}
       </Button>
+
+      {onToggleRecording && (
+        <Button
+          variant={isRecording ? "destructive" : "secondary"}
+          size={isTV ? "lg" : isMobile ? "default" : "icon"}
+          onClick={onToggleRecording}
+          title={isRecording ? "Stop recording" : "Record meeting"}
+          className={`${isTV ? "px-6 py-4 text-lg" : ""} ${isMobile ? "h-14 min-w-14" : ""}`}
+          data-dpad-focusable={isTV ? "true" : undefined}
+        >
+          <Record className={`${isRecording ? "animate-pulse" : ""} ${isTV ? "h-6 w-6 mr-2" : "h-5 w-5"}`} />
+          {(isTV || isMobile) && (isRecording ? "Stop Rec" : "Record")}
+        </Button>
+      )}
 
       {onQualityChange && (
         <DropdownMenu>

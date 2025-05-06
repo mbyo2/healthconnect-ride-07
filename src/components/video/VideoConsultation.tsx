@@ -12,13 +12,17 @@ import { useIsTVDevice } from "@/hooks/use-tv-detection";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
+import { useErrorHandler } from "@/hooks/use-error-handler";
 
 export const VideoConsultation = () => {
   const [activeConsultation, setActiveConsultation] = useState<VideoConsultationDetails | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
   const { isOnline, connectionQuality } = useNetwork();
   const isTV = useIsTVDevice();
   const isMobile = useMediaQuery('(max-width: 768px)');
   const { user, profile } = useAuth();
+  const { handleError } = useErrorHandler();
+  const maxRetries = 3;
 
   useEffect(() => {
     // Set focus on first focusable element for TV remote navigation
@@ -46,52 +50,83 @@ export const VideoConsultation = () => {
       if (!consultation.meeting_url) {
         console.log('Creating new Daily room for consultation:', consultation.id);
         
-        // Add TV-specific configuration if on a TV device
-        const { error } = await supabase.functions.invoke('create-daily-room', {
-          body: { 
-            consultation_id: consultation.id,
-            optimize_for_network: connectionQuality === "poor",
-            tv_mode: isTV
+        // Show loading state
+        toast.loading("Setting up your video room...");
+        
+        try {
+          // Add TV-specific configuration if on a TV device
+          const { error } = await supabase.functions.invoke('create-daily-room', {
+            body: { 
+              consultation_id: consultation.id,
+              optimize_for_network: connectionQuality === "poor",
+              tv_mode: isTV,
+              enable_recording: true // Enable recording for this room
+            }
+          });
+
+          if (error) {
+            console.error('Error creating Daily room:', error);
+            throw error;
           }
-        });
 
-        if (error) {
-          console.error('Error creating Daily room:', error);
-          throw error;
+          // Fetch the updated consultation with the new meeting URL
+          const { data: updatedConsultation, error: fetchError } = await supabase
+            .from('video_consultations')
+            .select(`
+              *,
+              provider:profiles!video_consultations_provider_id_fkey(
+                first_name,
+                last_name,
+                specialty
+              )
+            `)
+            .eq('id', consultation.id)
+            .single();
+
+          if (fetchError) {
+            console.error('Error fetching updated consultation:', fetchError);
+            throw fetchError;
+          }
+
+          toast.dismiss();
+          setActiveConsultation(updatedConsultation as VideoConsultationDetails);
+        } catch (error) {
+          toast.dismiss();
+          handleError(error, "Failed to create video room");
+          
+          // Only retry if under max retry count
+          if (retryCount < maxRetries) {
+            toast.info(`Retrying... (${retryCount + 1}/${maxRetries})`);
+            setRetryCount(prev => prev + 1);
+            setTimeout(() => handleJoinMeeting(consultation), 2000);
+          } else {
+            toast.error(`Failed after ${maxRetries} attempts. Please try again later.`);
+            setRetryCount(0);
+          }
         }
-
-        // Fetch the updated consultation with the new meeting URL
-        const { data: updatedConsultation, error: fetchError } = await supabase
-          .from('video_consultations')
-          .select(`
-            *,
-            provider:profiles!video_consultations_provider_id_fkey(
-              first_name,
-              last_name,
-              specialty
-            )
-          `)
-          .eq('id', consultation.id)
-          .single();
-
-        if (fetchError) {
-          console.error('Error fetching updated consultation:', fetchError);
-          throw fetchError;
-        }
-
-        setActiveConsultation(updatedConsultation as VideoConsultationDetails);
       } else {
         setActiveConsultation(consultation);
       }
     } catch (error: any) {
       console.error('Failed to join meeting:', error);
-      toast.error("Failed to join meeting: " + error.message);
+      handleError(error, "Failed to join meeting");
     }
   };
   
   const handleLeaveCall = () => {
     setActiveConsultation(null);
+    setRetryCount(0); // Reset retry counter
   };
+  
+  // When connection is lost during a call
+  useEffect(() => {
+    if (activeConsultation && !isOnline) {
+      toast.error("Connection lost during video call", {
+        duration: 10000,
+        id: "connection-lost-call"
+      });
+    }
+  }, [isOnline, activeConsultation]);
 
   // Use profile data for user name, falling back to user email
   const userName = profile?.first_name || (user?.email ? user.email.split('@')[0] : "User");

@@ -8,6 +8,10 @@ export interface VideoConsultationDetails {
   status: 'scheduled' | 'in-progress' | 'completed' | 'cancelled';
   meeting_url?: string;
   notes?: string;
+  recording_url?: string;
+  recording_id?: string;
+  network_optimized?: boolean;
+  tv_mode?: boolean;
   provider?: {
     first_name: string;
     last_name: string;
