@@ -1,1 +1,63 @@
+
 project_id = "tthzcijscedgxjfnfnky"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "storage", "graphql_public"]
+
+[db]
+port = 54322
+shadow_port = 54320
+major_version = 15
+
+[studio]
+enabled = true
+port = 54323
+api_url = "http://localhost"
+
+[inbucket]
+enabled = true
+port = 54324
+
+[storage]
+enabled = true
+file_storage_backend = "file"
+file_storage_upload_directory = "/tmp/storage"
+
+[auth]
+enabled = true
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["https://localhost:3000"]
+jwt_expiry = 3600
+enable_refresh_token_rotation = true
+refresh_token_reuse_interval = 10
+enable_signup = true
+
+[functions]
+[functions.send-email]
+verify_jwt = true
+
+[functions.create-daily-room]
+verify_jwt = true
+
+[functions.generate-receipt]
+verify_jwt = true
+
+[functions.process-dpo-payment]
+verify_jwt = false
+
+[functions.process-payment]
+verify_jwt = true
+
+[functions.process-refund]
+verify_jwt = true
+
+[functions.send-push]
+verify_jwt = true
+
+[functions.send-reminder]
+verify_jwt = false
+
+[functions.send-appointment-reminder]
+verify_jwt = true

@@ -40,7 +40,9 @@ export function useOfflineMode() {
         const tx = db.transaction('pendingActions', 'readonly');
         const store = tx.objectStore('pendingActions');
         const actions = await store.getAll();
-        setOfflineActions(actions);
+        if (actions) {
+          setOfflineActions(actions);
+        }
       } catch (error) {
         console.error("Error loading offline actions:", error);
       }

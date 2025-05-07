@@ -1,23 +1,27 @@
+
 import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { MobileLayout } from "@/components/MobileLayout";
-import { Home } from "@/pages/Home";
-import { Login } from "@/pages/Login";
-import { Register } from "@/pages/Register";
-import { Profile } from "@/pages/Profile";
-import { Appointments } from "@/pages/Appointments";
-import { Search } from "@/pages/Search";
-import { VideoCall } from "@/pages/VideoCall";
-import { Messages } from "@/pages/Messages";
+import Home from "@/pages/Landing";
+import Login from "@/pages/Login";
+import Register from "@/pages/Register";
+import Profile from "@/pages/Profile";
+import Appointments from "@/pages/Appointments";
+import Search from "@/pages/Search";
+import VideoCall from "@/pages/VideoCall";
+import Messages from "@/pages/Chat";
 import { OnboardingProvider } from "@/components/onboarding/OnboardingProvider";
 import { checkServiceWorkerStatus, registerServiceWorker } from "@/utils/service-worker";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { Toaster } from "@/components/ui/toaster";
-import { AppointmentDetails } from "@/pages/AppointmentDetails";
-import { Wallet } from "@/pages/Wallet";
-import { Providers } from "@/pages/Providers";
+import AppointmentDetails from "@/pages/AppointmentDetails";
+import Wallet from "@/pages/Wallet";
+import Providers from "@/pages/Providers";
 import { OfflineAlert } from "@/components/OfflineAlert";
+import PharmacyInventory from "@/pages/PharmacyInventory";
+import NotificationsPage from "@/pages/NotificationsPage";
+import SettingsPage from "@/pages/SettingsPage";
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -65,6 +69,9 @@ function App() {
                       <Route path="/chat" element={<Messages />} />
                       <Route path="/wallet" element={<Wallet />} />
                       <Route path="/providers" element={<Providers />} />
+                      <Route path="/pharmacy" element={<PharmacyInventory />} />
+                      <Route path="/notifications" element={<NotificationsPage />} />
+                      <Route path="/settings" element={<SettingsPage />} />
                     </Routes>
                   </MobileLayout>
                 }

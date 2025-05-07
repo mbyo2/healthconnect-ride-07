@@ -60,7 +60,7 @@ export async function cacheData<T>(
       const store = tx.objectStore('offlineData');
       const item = await store.get(key);
       
-      if (item && item.timestamp + item.maxAge > Date.now()) {
+      if (item) {
         return { data: item.data, timestamp: item.timestamp };
       }
     } catch (error) {
