@@ -1,233 +1,167 @@
-import * as React from 'react';
-import { Session, User } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
-import { 
-  signIn as authSignIn, 
-  signUp as authSignUp, 
-  signOut as authSignOut
-} from '@/utils/auth-service';
-import { 
-  verifyTwoFactor as authVerifyTwoFactor, 
-  setupTwoFactor as authSetupTwoFactor, 
-  disableTwoFactor as authDisableTwoFactor 
-} from '@/utils/two-factor-service';
-import { logSecurityEvent as authLogSecurityEvent } from '@/utils/security-service';
 
-type AuthContextType = {
-  session: Session | null;
+import React, { createContext, useState, useEffect, useContext } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { Session, User } from '@supabase/supabase-js';
+import { toast } from 'sonner';
+
+interface AuthContextType {
   user: User | null;
+  session: Session | null;
   profile: any | null;
   isLoading: boolean;
-  signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, userData: any) => Promise<void>;
-  signOut: () => Promise<void>;
   isAuthenticated: boolean;
-  verifyTwoFactor: (code: string) => Promise<boolean>;
-  setupTwoFactor: () => Promise<{ secret: string; backupCodes: string[] }>;
-  disableTwoFactor: () => Promise<void>;
-  logSecurityEvent: (action: string, details?: any) => Promise<void>;
-};
+  signIn: (email: string, password: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, userData?: any) => Promise<{ error: any, data: any }>;
+  signOut: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
+}
 
-const AuthContext = React.createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [session, setSession] = React.useState<Session | null>(null);
-  const [user, setUser] = React.useState<User | null>(null);
-  const [profile, setProfile] = React.useState<any | null>(null);
-  const [isLoading, setIsLoading] = React.useState(true);
-  const isAuthenticated = !!session;
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [profile, setProfile] = useState<any | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  React.useEffect(() => {
-    // Check active session
-    const checkSession = async () => {
-      try {
-        const { data, error } = await supabase.auth.getSession();
-        if (error) throw error;
-        
-        setSession(data.session);
-        setUser(data.session?.user || null);
-        
-        if (data.session?.user) {
-          const { data: profileData, error: profileError } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', data.session.user.id)
-            .single();
-            
-          if (profileError && profileError.code !== 'PGRST116') {
-            throw profileError;
-          }
-          
-          setProfile(profileData);
-        }
-      } catch (error) {
-        console.error('Error checking session:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    checkSession();
-    
-    // Listen for auth changes
+  useEffect(() => {
+    // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, newSession) => {
-        console.log('Auth event:', event);
-        setSession(newSession);
-        setUser(newSession?.user || null);
+      (event, currentSession) => {
+        // Only synchronous state updates here
+        setSession(currentSession);
+        setUser(currentSession?.user ?? null);
         
-        if (event === 'SIGNED_IN' && newSession?.user) {
-          const { data: profileData, error: profileError } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', newSession.user.id)
-            .single();
-            
-          if (profileError && profileError.code !== 'PGRST116') {
-            console.error('Error fetching profile:', profileError);
-          }
-          
-          setProfile(profileData);
-          setIsLoading(false);
-        } else if (event === 'SIGNED_OUT') {
+        // Fetch profile in a separate call to avoid auth deadlock
+        if (currentSession?.user) {
+          setTimeout(() => {
+            fetchProfile(currentSession.user.id);
+          }, 0);
+        }
+
+        if (event === 'SIGNED_OUT') {
           setProfile(null);
         }
       }
     );
-    
-    return () => {
-      subscription.unsubscribe();
-    };
+
+    // THEN check for existing session
+    supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
+      setSession(currentSession);
+      setUser(currentSession?.user ?? null);
+      
+      if (currentSession?.user) {
+        fetchProfile(currentSession.user.id);
+      }
+      
+      setIsLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  const signIn = async (email: string, password: string) => {
+  const fetchProfile = async (userId: string) => {
     try {
-      setIsLoading(true);
-      await authSignIn(email, password);
-      toast.success('Signed in successfully');
-      
-      // Log security event
-      await authLogSecurityEvent('sign_in');
-    } catch (error: any) {
-      toast.error(error.message || 'Error signing in');
-      console.error('Error signing in:', error);
-      throw error;
-    } finally {
-      setIsLoading(false);
+      // First try to fetch from patients table (no approval needed)
+      let { data: patientProfile, error: patientError } = await supabase
+        .from('patients')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (patientProfile) {
+        setProfile({
+          ...patientProfile,
+          role: 'patient'
+        });
+        return;
+      }
+
+      // If not a patient, try regular profiles
+      const { data: regularProfile, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (profileError && profileError.code !== 'PGRST116') {
+        console.error('Error fetching profile:', profileError);
+        return;
+      }
+
+      if (regularProfile) {
+        setProfile(regularProfile);
+      }
+    } catch (error) {
+      console.error('Error in fetchProfile:', error);
     }
   };
 
-  const signUp = async (email: string, password: string, userData: any) => {
+  const signIn = async (email: string, password: string) => {
     try {
-      setIsLoading(true);
-      await authSignUp(email, password, userData);
-      toast.success('Account created! Please check your email for confirmation');
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       
-      // Log security event
-      await authLogSecurityEvent('sign_up');
-    } catch (error: any) {
-      toast.error(error.message || 'Error creating account');
-      console.error('Error signing up:', error);
-      throw error;
-    } finally {
-      setIsLoading(false);
+      if (error) {
+        return { error };
+      }
+      
+      return { error: null };
+    } catch (error) {
+      console.error('Error in signIn:', error);
+      return { error };
+    }
+  };
+
+  const signUp = async (email: string, password: string, userData = {}) => {
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { data: userData }
+      });
+
+      if (error) {
+        return { error, data: null };
+      }
+
+      return { data, error: null };
+    } catch (error) {
+      console.error('Error in signUp:', error);
+      return { error, data: null };
     }
   };
 
   const signOut = async () => {
-    try {
-      setIsLoading(true);
-      
-      // Log security event before signing out
-      await authLogSecurityEvent('sign_out');
-      
-      await authSignOut();
-      toast.success('Signed out successfully');
-    } catch (error: any) {
-      toast.error(error.message || 'Error signing out');
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast.error('Error signing out');
       console.error('Error signing out:', error);
-    } finally {
-      setIsLoading(false);
     }
-  };
-  
-  // Two-factor authentication functions
-  const verifyTwoFactor = async (code: string): Promise<boolean> => {
-    try {
-      const result = await authVerifyTwoFactor(code);
-      
-      if (result) {
-        // Log security event
-        await authLogSecurityEvent('two_factor_verified');
-      }
-      
-      return result;
-    } catch (error) {
-      console.error('Error verifying 2FA code:', error);
-      toast.error('Failed to verify two-factor code');
-      return false;
-    }
-  };
-  
-  const setupTwoFactor = async (): Promise<{ secret: string; backupCodes: string[] }> => {
-    try {
-      const result = await authSetupTwoFactor();
-      
-      // Log security event
-      await authLogSecurityEvent('two_factor_setup_initiated');
-      
-      return result;
-    } catch (error) {
-      console.error('Error setting up 2FA:', error);
-      toast.error('Failed to setup two-factor authentication');
-      throw error;
-    }
-  };
-  
-  const disableTwoFactor = async (): Promise<void> => {
-    try {
-      await authDisableTwoFactor();
-      
-      // Log security event
-      await authLogSecurityEvent('two_factor_disabled');
-      
-      toast.success('Two-factor authentication disabled');
-    } catch (error) {
-      console.error('Error disabling 2FA:', error);
-      toast.error('Failed to disable two-factor authentication');
-      throw error;
-    }
-  };
-  
-  const logSecurityEvent = async (action: string, details?: any): Promise<void> => {
-    await authLogSecurityEvent(action, details);
   };
 
-  return (
-    <AuthContext.Provider
-      value={{
-        session,
-        user,
-        profile,
-        isLoading,
-        signIn,
-        signUp,
-        signOut,
-        isAuthenticated,
-        verifyTwoFactor,
-        setupTwoFactor,
-        disableTwoFactor,
-        logSecurityEvent,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
-};
+  const refreshProfile = async () => {
+    if (user) {
+      await fetchProfile(user.id);
+    }
+  };
+
+  const value = {
+    user,
+    session,
+    profile,
+    isLoading,
+    isAuthenticated: !!user,
+    signIn,
+    signUp,
+    signOut,
+    refreshProfile,
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+}
 
 export const useAuth = () => {
-  const context = React.useContext(AuthContext);
+  const context = useContext(AuthContext);
   if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');
   }

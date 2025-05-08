@@ -10,8 +10,35 @@ import { useOfflineMode } from '@/hooks/use-offline-mode';
 import { toast } from 'sonner';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 
+interface SearchFiltersProps {
+  currentFilters: {
+    specialty: string;
+    location: string;
+    availability: string;
+    rating: number;
+    searchTerm: string;
+  };
+  onFilterChange: (newFilters: any) => void;
+}
+
+interface SearchPaginationProps {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (newPage: number) => void;
+}
+
+interface Provider {
+  id: string;
+  first_name: string;
+  last_name: string;
+  specialty: string;
+  location: string;
+  rating: number;
+  availability: string;
+}
+
 const Providers = () => {
-  const [providers, setProviders] = useState<any[]>([]);
+  const [providers, setProviders] = useState<Provider[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalCount, setTotalCount] = useState(0);
   const [page, setPage] = useState(1);
@@ -48,7 +75,9 @@ const Providers = () => {
       }
 
       // Build query
-      let query = supabase.from('providers').select('*', { count: 'exact' });
+      let query = supabase
+        .from('health_personnel')
+        .select('*', { count: 'exact' });
 
       // Apply filters
       if (filters.specialty) {

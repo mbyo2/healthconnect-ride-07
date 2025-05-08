@@ -1,244 +1,170 @@
-export interface CacheOptions {
-  strategy?: 'cache-first' | 'network-first';
-  maxAge?: number; // In milliseconds
-  cacheName?: string;
-}
 
-export const DEFAULT_CACHE_NAME = 'doc-o-clock-dynamic-v1';
-const DEFAULT_MAX_AGE = 24 * 60 * 60 * 1000; // 24 hours by default
+import { toast } from 'sonner';
 
-export async function cacheData<T>(
-  key: string, 
-  fetchFn: () => Promise<T>, 
-  options: CacheOptions = {}
-): Promise<T> {
-  const {
-    strategy = 'network-first',
-    maxAge = DEFAULT_MAX_AGE,
-    cacheName = DEFAULT_CACHE_NAME
-  } = options;
+// Cache keys for different types of data
+export const CACHE_KEYS = {
+  USER_PROFILE: 'user-profile',
+  APPOINTMENTS: 'appointments',
+  PROVIDERS: 'providers',
+  MEDICATIONS: 'medications',
+  PRESCRIPTIONS: 'prescriptions',
+  CHAT_MESSAGES: 'chat-messages',
+  NOTIFICATIONS: 'notifications',
+  PAYMENT_HISTORY: 'payment-history',
+};
 
-  // Helper to store data in the cache
-  const storeInCache = async (data: T) => {
-    try {
-      // Store in both IndexedDB (for good offline support) and Cache API (for service worker)
-      const db = await openOfflineDB();
-      const tx = db.transaction('offlineData', 'readwrite');
-      const store = tx.objectStore('offlineData');
-      
-      const putRequest = store.put({
-        key,
-        data,
-        timestamp: Date.now(),
-        maxAge
-      });
-      
-      await new Promise<void>((resolve, reject) => {
-        putRequest.onsuccess = () => resolve();
-        putRequest.onerror = () => reject(putRequest.error);
-      });
-      
-      // Also store in Cache API for service worker
-      if ('caches' in window) {
-        const cache = await caches.open(cacheName);
-        const response = new Response(JSON.stringify(data), {
-          headers: {
-            'Content-Type': 'application/json',
-            'Cache-Control': `max-age=${Math.floor(maxAge / 1000)}`,
-            'X-Cache-Timestamp': Date.now().toString(),
-            'X-Cache-Key': key
-          }
-        });
-        await cache.put(`/__cache/${encodeURIComponent(key)}`, response);
-      }
-    } catch (error) {
-      console.error('Error storing data in cache:', error);
-    }
-  };
-  
-  // Helper to get data from IndexedDB
-  const getFromIndexedDB = async (): Promise<{ data: T; timestamp: number } | null> => {
-    try {
-      const db = await openOfflineDB();
-      const tx = db.transaction('offlineData', 'readonly');
-      const store = tx.objectStore('offlineData');
-      
-      return new Promise<{ data: T; timestamp: number } | null>((resolve) => {
-        const request = store.get(key);
-        
-        request.onsuccess = () => {
-          if (request.result) {
-            resolve({ 
-              data: request.result.data, 
-              timestamp: request.result.timestamp 
-            });
-          } else {
-            resolve(null);
-          }
-        };
-        
-        request.onerror = () => {
-          console.error('Error getting data from IndexedDB:', request.error);
-          resolve(null);
-        };
-      });
-    } catch (error) {
-      console.error('Error getting data from IndexedDB:', error);
-      return null;
-    }
-  };
-  
-  // Helper to get data from Cache API
-  const getFromCacheAPI = async (): Promise<{ data: T; timestamp: number } | null> => {
-    if ('caches' in window) {
-      try {
-        const cache = await caches.open(cacheName);
-        const response = await cache.match(`/__cache/${encodeURIComponent(key)}`);
-        
-        if (response) {
-          const timestamp = parseInt(response.headers.get('X-Cache-Timestamp') || '0', 10);
-          const maxAgeHeader = parseInt(response.headers.get('Cache-Control')?.split('max-age=')[1] || '0', 10);
-          const actualMaxAge = maxAgeHeader * 1000 || maxAge;
-          
-          if (timestamp + actualMaxAge > Date.now()) {
-            const data = await response.json();
-            return { data, timestamp };
-          }
-        }
-      } catch (error) {
-        console.error('Error getting data from Cache API:', error);
-      }
-    }
-    return null;
-  };
-  
-  if (strategy === 'cache-first') {
-    // Try cache first, then network
-    const cachedData = await getFromIndexedDB() || await getFromCacheAPI();
-    
-    if (cachedData) {
-      // Refresh cache in background if online but don't wait for it
-      if (navigator.onLine) {
-        fetchFn()
-          .then(freshData => storeInCache(freshData))
-          .catch(error => console.error('Background refresh failed:', error));
-      }
-      
-      return cachedData.data;
-    }
-    
-    // If not in cache or expired, fetch from network
-    try {
-      const data = await fetchFn();
-      await storeInCache(data);
-      return data;
-    } catch (error) {
-      throw error;
-    }
-  } else {
-    // Network first, then cache
-    if (navigator.onLine) {
-      try {
-        const data = await fetchFn();
-        await storeInCache(data);
-        return data;
-      } catch (error) {
-        // Fall back to cache on network error
-        const cachedData = await getFromIndexedDB() || await getFromCacheAPI();
-        if (cachedData) {
-          console.info('Network request failed, using cached data from', 
-            new Date(cachedData.timestamp).toLocaleString());
-          return cachedData.data;
-        }
-        throw error;
-      }
-    } else {
-      // If offline, go straight to cache
-      const cachedData = await getFromIndexedDB() || await getFromCacheAPI();
-      
-      if (cachedData) {
-        return cachedData.data;
-      }
-      
-      throw new Error('You are offline and the requested data is not available in the cache');
-    }
-  }
-}
-
-export async function invalidateCache(key: string, cacheName = DEFAULT_CACHE_NAME): Promise<void> {
-  try {
-    // Remove from IndexedDB
-    const db = await openOfflineDB();
-    const tx = db.transaction('offlineData', 'readwrite');
-    const store = tx.objectStore('offlineData');
-    await store.delete(key);
-    
-    // Remove from Cache API
-    if ('caches' in window) {
-      const cache = await caches.open(cacheName);
-      await cache.delete(`/__cache/${encodeURIComponent(key)}`);
-    }
-  } catch (error) {
-    console.error('Error invalidating cache:', error);
-  }
-}
-
-export async function prefetchData<T>(
-  key: string,
-  fetchFn: () => Promise<T>,
-  options: CacheOptions = {}
-): Promise<void> {
-  try {
-    const data = await fetchFn();
-    const {
-      maxAge = DEFAULT_MAX_AGE,
-      cacheName = DEFAULT_CACHE_NAME
-    } = options;
-    
-    // Store in both IndexedDB and Cache API
-    const db = await openOfflineDB();
-    const tx = db.transaction('offlineData', 'readwrite');
-    const store = tx.objectStore('offlineData');
-    
-    await store.put({
-      key,
-      data,
-      timestamp: Date.now(),
-      maxAge
-    });
-    
-    if ('caches' in window) {
-      const cache = await caches.open(cacheName);
-      const response = new Response(JSON.stringify(data), {
-        headers: {
-          'Content-Type': 'application/json',
-          'Cache-Control': `max-age=${Math.floor(maxAge / 1000)}`,
-          'X-Cache-Timestamp': Date.now().toString(),
-          'X-Cache-Key': key
-        }
-      });
-      await cache.put(`/__cache/${encodeURIComponent(key)}`, response);
-    }
-  } catch (error) {
-    console.error('Error prefetching data:', error);
-  }
-}
-
-const openOfflineDB = (): Promise<IDBDatabase> => {
+/**
+ * Opens a connection to the cache database
+ */
+const openCacheDB = (): Promise<IDBDatabase> => {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open('docOClockOfflineDB', 1);
+    const request = indexedDB.open('docOClockCacheDB', 1);
     
     request.onerror = () => reject(request.error);
     request.onsuccess = () => resolve(request.result);
     
     request.onupgradeneeded = (event) => {
       const db = (event.target as IDBOpenDBRequest).result;
-      if (!db.objectStoreNames.contains('pendingActions')) {
-        db.createObjectStore('pendingActions', { keyPath: 'id' });
-      }
-      if (!db.objectStoreNames.contains('offlineData')) {
-        db.createObjectStore('offlineData', { keyPath: 'key' });
+      if (!db.objectStoreNames.contains('cache')) {
+        const store = db.createObjectStore('cache', { keyPath: 'key' });
+        store.createIndex('timestamp', 'timestamp', { unique: false });
       }
     };
   });
+};
+
+/**
+ * Saves data to the cache
+ */
+export const saveToCache = async (key: string, data: any, expirationMinutes = 60): Promise<boolean> => {
+  try {
+    const db = await openCacheDB();
+    const tx = db.transaction('cache', 'readwrite');
+    const store = tx.objectStore('cache');
+    
+    const timestamp = new Date();
+    const expiration = new Date(timestamp.getTime() + (expirationMinutes * 60000));
+    
+    const entry = {
+      key,
+      data,
+      timestamp: timestamp.toISOString(),
+      expiration: expiration.toISOString()
+    };
+    
+    return new Promise<boolean>((resolve) => {
+      const request = store.put(entry);
+      request.onsuccess = () => resolve(true);
+      request.onerror = () => {
+        console.error('Error saving to cache:', request.error);
+        resolve(false);
+      };
+    });
+  } catch (error) {
+    console.error('Cache save error:', error);
+    return false;
+  }
+};
+
+/**
+ * Retrieves data from the cache
+ */
+export const getFromCache = async (key: string): Promise<any> => {
+  try {
+    const db = await openCacheDB();
+    const tx = db.transaction('cache', 'readonly');
+    const store = tx.objectStore('cache');
+    
+    return new Promise((resolve) => {
+      const request = store.get(key);
+      
+      request.onsuccess = () => {
+        const entry = request.result;
+        
+        if (!entry) {
+          resolve(null);
+          return;
+        }
+        
+        // Check if entry is expired
+        const now = new Date();
+        const expiration = new Date(entry.expiration);
+        
+        if (now > expiration) {
+          // Data is expired, remove it from cache
+          const deleteTx = db.transaction('cache', 'readwrite');
+          const deleteStore = deleteTx.objectStore('cache');
+          deleteStore.delete(key);
+          resolve(null);
+          return;
+        }
+        
+        resolve(entry.data);
+      };
+      
+      request.onerror = () => {
+        console.error('Error retrieving from cache:', request.error);
+        resolve(null);
+      };
+    });
+  } catch (error) {
+    console.error('Cache retrieval error:', error);
+    return null;
+  }
+};
+
+/**
+ * Clears expired cache entries
+ */
+export const clearExpiredCache = async (): Promise<void> => {
+  try {
+    const db = await openCacheDB();
+    const tx = db.transaction('cache', 'readwrite');
+    const store = tx.objectStore('cache');
+    const now = new Date().toISOString();
+    
+    const index = store.index('timestamp');
+    const request = index.openCursor();
+    
+    request.onsuccess = (event) => {
+      const cursor = (event.target as IDBRequest).result;
+      if (cursor) {
+        const entry = cursor.value;
+        if (entry.expiration < now) {
+          store.delete(entry.key);
+        }
+        cursor.continue();
+      }
+    };
+  } catch (error) {
+    console.error('Error cleaning cache:', error);
+  }
+};
+
+/**
+ * Clears all cache data
+ */
+export const clearAllCache = async (): Promise<boolean> => {
+  try {
+    const db = await openCacheDB();
+    const tx = db.transaction('cache', 'readwrite');
+    const store = tx.objectStore('cache');
+    
+    return new Promise<boolean>((resolve) => {
+      const request = store.clear();
+      request.onsuccess = () => {
+        toast.success('Cache cleared successfully');
+        resolve(true);
+      };
+      request.onerror = () => {
+        console.error('Error clearing cache:', request.error);
+        toast.error('Failed to clear cache');
+        resolve(false);
+      };
+    });
+  } catch (error) {
+    console.error('Cache clear error:', error);
+    toast.error('Failed to clear cache');
+    return false;
+  }
 };

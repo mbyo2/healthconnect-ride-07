@@ -23,6 +23,8 @@ import PharmacyInventory from "@/pages/PharmacyInventory";
 import NotificationsPage from "@/pages/NotificationsPage";
 import SettingsPage from "@/pages/SettingsPage";
 import Medications from "@/pages/Medications";
+import Testing from "@/pages/Testing";
+import Documentation from "@/pages/Documentation";
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -74,6 +76,8 @@ function App() {
                       <Route path="/medications" element={<Medications />} />
                       <Route path="/notifications" element={<NotificationsPage />} />
                       <Route path="/settings" element={<SettingsPage />} />
+                      <Route path="/testing" element={<Testing />} />
+                      <Route path="/documentation" element={<Documentation />} />
                     </Routes>
                   </MobileLayout>
                 }

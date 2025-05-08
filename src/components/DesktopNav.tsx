@@ -2,90 +2,69 @@
 import { Button } from "@/components/ui/button";
 import { useSession } from "@/hooks/use-session";
 import { Link, useLocation } from "react-router-dom";
+import { DesktopNavigation } from "@/components/navigation/DesktopNavigation";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useAuth } from "@/context/AuthContext";
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuLabel, 
+  DropdownMenuSeparator, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
 
 export function DesktopNav() {
   const location = useLocation();
-  const { session, user } = useSession();
-  const role = user?.role;
-
+  const { user } = useAuth();
+  
   return (
-    <div className="hidden md:flex items-center justify-between py-4">
+    <div className="hidden md:flex items-center justify-between py-4 bg-background sticky top-0 z-50 border-b px-6">
       <Link to="/" className="font-bold text-2xl">
-        HealthLink
+        Doc&apos; O Clock
       </Link>
       
-        <div className="flex items-center gap-6">
-          <Button variant="ghost" asChild>
-            <Link to="/" className={location.pathname === "/" ? "text-primary" : ""}>
-              Home
-            </Link>
-          </Button>
-          
-          <Button variant="ghost" asChild>
-            <Link to="/search" className={location.pathname === "/search" ? "text-primary" : ""}>
-              Find Providers
-            </Link>
-          </Button>
-          
-          <Button variant="ghost" asChild>
-            <Link 
-              to="/appointments" 
-              className={location.pathname.includes("appointment") ? "text-primary" : ""}
-            >
-              Appointments
-            </Link>
-          </Button>
-          
-          <Button variant="ghost" asChild>
-            <Link to="/chat" className={location.pathname === "/chat" ? "text-primary" : ""}>
-              Messages
-            </Link>
-          </Button>
-          
-          {role === "health_personnel" && (
-            <Button variant="ghost" asChild>
-              <Link 
-                to="/provider-dashboard" 
-                className={location.pathname === "/provider-dashboard" ? "text-primary" : ""}
-              >
-                Provider Dashboard
-              </Link>
-            </Button>
-          )}
-          
-          {role === "admin" && (
-            <Button variant="ghost" asChild>
-              <Link 
-                to="/admin-dashboard" 
-                className={location.pathname === "/admin-dashboard" ? "text-primary" : ""}
-              >
-                Admin Dashboard
-              </Link>
-            </Button>
-          )}
-        </div>
+      <DesktopNavigation />
       
-      {session ? (
-        <div className="flex items-center gap-4">
-          <Link to="/profile">
-            <img
-              src={"/placeholder.svg"}
-              alt="Avatar"
-              className="rounded-full w-8 h-8 object-cover"
-            />
-          </Link>
-          <a href="/logout">Logout</a>
-        </div>
-      ) : (
-        <div className="flex items-center gap-4">
-          <Button variant="outline" asChild>
-            <Link to="/login">Login</Link>
-          </Button>
-          <Button asChild>
-            <Link to="/register">Register</Link>
-          </Button>
-        </div>
-      )}
+      <div className="flex items-center gap-4">
+        {user ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 rounded-full p-0">
+                <Avatar>
+                  <AvatarImage src={user?.user_metadata?.avatar_url || ""} />
+                  <AvatarFallback>{user?.email?.[0]?.toUpperCase() || "U"}</AvatarFallback>
+                </Avatar>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <Link to="/profile">Profile</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/settings">Settings</Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <Link to="/login" onClick={() => { /* Handle logout */ }}>
+                  Logout
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : (
+          <div className="flex items-center gap-4">
+            <Button variant="outline" asChild>
+              <Link to="/login">Login</Link>
+            </Button>
+            <Button asChild>
+              <Link to="/register">Register</Link>
+            </Button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

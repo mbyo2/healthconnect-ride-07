@@ -44,7 +44,7 @@ export function useOfflineMode() {
           const request = store.getAll();
           request.onsuccess = () => {
             if (request.result) {
-              setOfflineActions(request.result as OfflineAction[]);
+              setOfflineActions(request.result);
               resolve(request.result as OfflineAction[]);
             } else {
               resolve([]);

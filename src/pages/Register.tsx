@@ -1,6 +1,6 @@
 
 import React from 'react';
-import AuthForm from "@/components/auth/AuthForm";
+import { AuthForm } from "@/components/auth/AuthForm";
 import { Header } from "@/components/Header";
 
 const Register = () => {

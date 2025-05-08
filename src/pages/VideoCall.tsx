@@ -6,6 +6,11 @@ import { LoadingScreen } from '@/components/LoadingScreen';
 import { useAuth } from '@/context/AuthContext';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 
+interface VideoRoomProps {
+  roomId: string;
+  userName: string;
+}
+
 const VideoCall = () => {
   const { roomUrl } = useParams();
   const [loading, setLoading] = useState(true);
@@ -39,7 +44,7 @@ const VideoCall = () => {
       {loading ? (
         <LoadingScreen />
       ) : (
-        <VideoRoom url={roomUrl} userName={userName} />
+        <VideoRoom roomId={roomUrl} userName={userName} />
       )}
     </ProtectedRoute>
   );

@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Auth } from '@supabase/auth-ui-react';
@@ -5,7 +6,11 @@ import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { supabase } from '@/integrations/supabase/client';
 import type { AuthSession } from '@supabase/supabase-js';
 
-export const AuthForm = () => {
+interface AuthFormProps {
+  mode?: 'login' | 'register';
+}
+
+export const AuthForm = ({ mode = 'login' }: AuthFormProps) => {
   const navigate = useNavigate();
   const [session, setSession] = useState<AuthSession | null>(null);
 
@@ -22,6 +27,7 @@ export const AuthForm = () => {
         supabaseClient={supabase}
         appearance={{ theme: ThemeSupa }}
         providers={['google', 'github']}
+        view={mode === 'register' ? 'sign_up' : 'sign_in'}
       />
     </div>
   );
