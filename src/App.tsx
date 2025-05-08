@@ -22,6 +22,7 @@ import { OfflineAlert } from "@/components/OfflineAlert";
 import PharmacyInventory from "@/pages/PharmacyInventory";
 import NotificationsPage from "@/pages/NotificationsPage";
 import SettingsPage from "@/pages/SettingsPage";
+import Medications from "@/pages/Medications";
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -70,6 +71,7 @@ function App() {
                       <Route path="/wallet" element={<Wallet />} />
                       <Route path="/providers" element={<Providers />} />
                       <Route path="/pharmacy" element={<PharmacyInventory />} />
+                      <Route path="/medications" element={<Medications />} />
                       <Route path="/notifications" element={<NotificationsPage />} />
                       <Route path="/settings" element={<SettingsPage />} />
                     </Routes>

@@ -1,4 +1,3 @@
-
 export interface CacheOptions {
   strategy?: 'cache-first' | 'network-first';
   maxAge?: number; // In milliseconds
@@ -27,11 +26,16 @@ export async function cacheData<T>(
       const tx = db.transaction('offlineData', 'readwrite');
       const store = tx.objectStore('offlineData');
       
-      await store.put({
+      const putRequest = store.put({
         key,
         data,
         timestamp: Date.now(),
         maxAge
+      });
+      
+      await new Promise<void>((resolve, reject) => {
+        putRequest.onsuccess = () => resolve();
+        putRequest.onerror = () => reject(putRequest.error);
       });
       
       // Also store in Cache API for service worker
@@ -58,15 +62,30 @@ export async function cacheData<T>(
       const db = await openOfflineDB();
       const tx = db.transaction('offlineData', 'readonly');
       const store = tx.objectStore('offlineData');
-      const item = await store.get(key);
       
-      if (item) {
-        return { data: item.data, timestamp: item.timestamp };
-      }
+      return new Promise<{ data: T; timestamp: number } | null>((resolve) => {
+        const request = store.get(key);
+        
+        request.onsuccess = () => {
+          if (request.result) {
+            resolve({ 
+              data: request.result.data, 
+              timestamp: request.result.timestamp 
+            });
+          } else {
+            resolve(null);
+          }
+        };
+        
+        request.onerror = () => {
+          console.error('Error getting data from IndexedDB:', request.error);
+          resolve(null);
+        };
+      });
     } catch (error) {
       console.error('Error getting data from IndexedDB:', error);
+      return null;
     }
-    return null;
   };
   
   // Helper to get data from Cache API

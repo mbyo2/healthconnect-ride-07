@@ -39,12 +39,25 @@ export function useOfflineMode() {
         const db = await openOfflineDB();
         const tx = db.transaction('pendingActions', 'readonly');
         const store = tx.objectStore('pendingActions');
-        const actions = await store.getAll();
-        if (actions) {
-          setOfflineActions(actions);
-        }
+        
+        return new Promise<OfflineAction[]>((resolve) => {
+          const request = store.getAll();
+          request.onsuccess = () => {
+            if (request.result) {
+              setOfflineActions(request.result as OfflineAction[]);
+              resolve(request.result as OfflineAction[]);
+            } else {
+              resolve([]);
+            }
+          };
+          request.onerror = () => {
+            console.error("Error loading offline actions:", request.error);
+            resolve([]);
+          };
+        });
       } catch (error) {
         console.error("Error loading offline actions:", error);
+        return [];
       }
     };
 
@@ -124,13 +137,19 @@ export function useOfflineMode() {
       const tx = db.transaction('offlineData', 'readwrite');
       const store = tx.objectStore('offlineData');
       
-      await store.put({
-        key,
-        data,
-        timestamp: new Date().toISOString()
+      return new Promise<boolean>((resolve) => {
+        const request = store.put({
+          key,
+          data,
+          timestamp: new Date().toISOString()
+        });
+        
+        request.onsuccess = () => resolve(true);
+        request.onerror = () => {
+          console.error("Error caching data:", request.error);
+          resolve(false);
+        };
       });
-      
-      return true;
     } catch (error) {
       console.error("Error caching data:", error);
       return false;
@@ -143,9 +162,23 @@ export function useOfflineMode() {
       const db = await openOfflineDB();
       const tx = db.transaction('offlineData', 'readonly');
       const store = tx.objectStore('offlineData');
-      const result = await store.get(key);
       
-      return result?.data || null;
+      return new Promise<any>((resolve) => {
+        const request = store.get(key);
+        
+        request.onsuccess = () => {
+          if (request.result) {
+            resolve(request.result.data);
+          } else {
+            resolve(null);
+          }
+        };
+        
+        request.onerror = () => {
+          console.error("Error getting cached data:", request.error);
+          resolve(null);
+        };
+      });
     } catch (error) {
       console.error("Error getting cached data:", error);
       return null;

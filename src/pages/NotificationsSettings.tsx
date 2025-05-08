@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,22 +10,24 @@ import { subscribeToNotifications, unsubscribeFromNotifications } from "@/utils/
 import { NotificationSettings } from "@/types/settings";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const NotificationsSettings = () => {
+const defaultSettings: NotificationSettings = {
+  id: "",
+  user_id: "",
+  email_notifications: true,
+  appointment_reminders: true,
+  application_updates: false,
+  marketing_emails: false,
+  system_updates: true,
+  payment_notifications: true,
+  chat_notifications: true,
+  push_notifications: false,
+  message_alerts: true
+};
+
+const NotificationsSettingsPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [notificationSettings, setNotificationSettings] = useState<NotificationSettings>({
-    id: "",
-    user_id: "",
-    email_notifications: true,
-    appointment_reminders: true,
-    application_updates: false,
-    marketing_emails: false,
-    system_updates: true,
-    payment_notifications: true,
-    chat_notifications: true,
-    push_notifications: false,
-    message_alerts: true
-  });
+  const [notificationSettings, setNotificationSettings] = useState<NotificationSettings>(defaultSettings);
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -46,9 +47,10 @@ const NotificationsSettings = () => {
         }
 
         if (data) {
+          // Ensure all fields are present by merging with defaults
           setNotificationSettings({
-            ...notificationSettings,
-            ...data
+            ...defaultSettings,
+            ...data as NotificationSettings
           });
         } else {
           // Create default settings if none exist
@@ -56,15 +58,7 @@ const NotificationsSettings = () => {
             .from('notification_settings')
             .insert({
               user_id: user.id,
-              email_notifications: true,
-              appointment_reminders: true,
-              application_updates: false,
-              marketing_emails: false,
-              system_updates: true,
-              payment_notifications: true,
-              chat_notifications: true,
-              push_notifications: false,
-              message_alerts: true
+              ...defaultSettings
             })
             .select('*')
             .single();
@@ -72,7 +66,7 @@ const NotificationsSettings = () => {
           if (createError) {
             console.error('Error creating default notification settings:', createError);
           } else if (newSettings) {
-            setNotificationSettings(newSettings);
+            setNotificationSettings(newSettings as NotificationSettings);
           }
         }
       } catch (error) {
@@ -238,4 +232,4 @@ const NotificationsSettings = () => {
   );
 };
 
-export default NotificationsSettings;
+export default NotificationsSettingsPage;
