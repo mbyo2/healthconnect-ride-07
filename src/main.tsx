@@ -11,6 +11,7 @@ import { ThemeProvider } from './hooks/use-theme';
 import { AccessibilityProvider } from './context/AccessibilityContext';
 import { registerServiceWorker } from './utils/service-worker';
 import { AuthProvider } from './context/AuthContext';
+import { initializeMobileFeatures, isNativeMobile } from './utils/mobile/mobile-config';
 
 // Create a client
 const queryClient = new QueryClient({
@@ -22,6 +23,11 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+// Initialize mobile features if running in a native container
+if (isNativeMobile()) {
+  initializeMobileFeatures().catch(console.error);
+}
 
 // Register the service worker for offline capabilities and push notifications
 registerServiceWorker().then((registration) => {

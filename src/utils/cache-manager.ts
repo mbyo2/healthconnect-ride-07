@@ -1,170 +1,107 @@
 
-import { toast } from 'sonner';
+interface CachedData {
+  data: any;
+  timestamp: number;
+}
 
-// Cache keys for different types of data
-export const CACHE_KEYS = {
-  USER_PROFILE: 'user-profile',
-  APPOINTMENTS: 'appointments',
-  PROVIDERS: 'providers',
-  MEDICATIONS: 'medications',
-  PRESCRIPTIONS: 'prescriptions',
-  CHAT_MESSAGES: 'chat-messages',
-  NOTIFICATIONS: 'notifications',
-  PAYMENT_HISTORY: 'payment-history',
-};
-
-/**
- * Opens a connection to the cache database
- */
-const openCacheDB = (): Promise<IDBDatabase> => {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open('docOClockCacheDB', 1);
-    
-    request.onerror = () => reject(request.error);
-    request.onsuccess = () => resolve(request.result);
-    
-    request.onupgradeneeded = (event) => {
-      const db = (event.target as IDBOpenDBRequest).result;
-      if (!db.objectStoreNames.contains('cache')) {
-        const store = db.createObjectStore('cache', { keyPath: 'key' });
-        store.createIndex('timestamp', 'timestamp', { unique: false });
-      }
-    };
-  });
-};
-
-/**
- * Saves data to the cache
- */
-export const saveToCache = async (key: string, data: any, expirationMinutes = 60): Promise<boolean> => {
+export const cacheData = async (key: string, data: any, expirationMinutes = 60): Promise<boolean> => {
   try {
-    const db = await openCacheDB();
-    const tx = db.transaction('cache', 'readwrite');
-    const store = tx.objectStore('cache');
+    const db = await openDB();
+    const tx = db.transaction('cachedData', 'readwrite');
+    const store = tx.objectStore('cachedData');
     
-    const timestamp = new Date();
-    const expiration = new Date(timestamp.getTime() + (expirationMinutes * 60000));
-    
-    const entry = {
-      key,
+    const cachedItem: CachedData = {
       data,
-      timestamp: timestamp.toISOString(),
-      expiration: expiration.toISOString()
+      timestamp: Date.now() + expirationMinutes * 60 * 1000
     };
     
-    return new Promise<boolean>((resolve) => {
-      const request = store.put(entry);
-      request.onsuccess = () => resolve(true);
-      request.onerror = () => {
-        console.error('Error saving to cache:', request.error);
-        resolve(false);
-      };
-    });
+    await store.put(cachedItem, key);
+    return true;
   } catch (error) {
-    console.error('Cache save error:', error);
+    console.error('Error caching data:', error);
     return false;
   }
 };
 
-/**
- * Retrieves data from the cache
- */
-export const getFromCache = async (key: string): Promise<any> => {
+export const getCachedData = async (key: string): Promise<any | null> => {
   try {
-    const db = await openCacheDB();
-    const tx = db.transaction('cache', 'readonly');
-    const store = tx.objectStore('cache');
+    const db = await openDB();
+    const tx = db.transaction('cachedData', 'readonly');
+    const store = tx.objectStore('cachedData');
+    
+    const request = store.get(key);
     
     return new Promise((resolve) => {
-      const request = store.get(key);
-      
       request.onsuccess = () => {
-        const entry = request.result;
+        const cachedItem = request.result as CachedData;
         
-        if (!entry) {
+        if (!cachedItem || Date.now() > cachedItem.timestamp) {
+          // Data doesn't exist or has expired
           resolve(null);
           return;
         }
         
-        // Check if entry is expired
-        const now = new Date();
-        const expiration = new Date(entry.expiration);
-        
-        if (now > expiration) {
-          // Data is expired, remove it from cache
-          const deleteTx = db.transaction('cache', 'readwrite');
-          const deleteStore = deleteTx.objectStore('cache');
-          deleteStore.delete(key);
-          resolve(null);
-          return;
-        }
-        
-        resolve(entry.data);
+        resolve(cachedItem.data);
       };
       
       request.onerror = () => {
-        console.error('Error retrieving from cache:', request.error);
+        console.error('Error retrieving cached data:', request.error);
         resolve(null);
       };
     });
   } catch (error) {
-    console.error('Cache retrieval error:', error);
+    console.error('Error getting cached data:', error);
     return null;
   }
 };
 
-/**
- * Clears expired cache entries
- */
-export const clearExpiredCache = async (): Promise<void> => {
+export const removeCachedData = async (key: string): Promise<boolean> => {
   try {
-    const db = await openCacheDB();
-    const tx = db.transaction('cache', 'readwrite');
-    const store = tx.objectStore('cache');
-    const now = new Date().toISOString();
+    const db = await openDB();
+    const tx = db.transaction('cachedData', 'readwrite');
+    const store = tx.objectStore('cachedData');
     
-    const index = store.index('timestamp');
-    const request = index.openCursor();
-    
-    request.onsuccess = (event) => {
-      const cursor = (event.target as IDBRequest).result;
-      if (cursor) {
-        const entry = cursor.value;
-        if (entry.expiration < now) {
-          store.delete(entry.key);
-        }
-        cursor.continue();
-      }
-    };
+    await store.delete(key);
+    return true;
   } catch (error) {
-    console.error('Error cleaning cache:', error);
+    console.error('Error removing cached data:', error);
+    return false;
   }
 };
 
-/**
- * Clears all cache data
- */
-export const clearAllCache = async (): Promise<boolean> => {
+export const clearCache = async (): Promise<boolean> => {
   try {
-    const db = await openCacheDB();
-    const tx = db.transaction('cache', 'readwrite');
-    const store = tx.objectStore('cache');
+    const db = await openDB();
+    const tx = db.transaction('cachedData', 'readwrite');
+    const store = tx.objectStore('cachedData');
     
-    return new Promise<boolean>((resolve) => {
-      const request = store.clear();
-      request.onsuccess = () => {
-        toast.success('Cache cleared successfully');
-        resolve(true);
-      };
-      request.onerror = () => {
-        console.error('Error clearing cache:', request.error);
-        toast.error('Failed to clear cache');
-        resolve(false);
-      };
-    });
+    await store.clear();
+    return true;
   } catch (error) {
-    console.error('Cache clear error:', error);
-    toast.error('Failed to clear cache');
+    console.error('Error clearing cache:', error);
     return false;
   }
+};
+
+// Helper function to open IndexedDB
+const openDB = (): Promise<IDBDatabase> => {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open('healthCacheDB', 1);
+    
+    request.onerror = () => {
+      reject(request.error);
+    };
+    
+    request.onsuccess = () => {
+      resolve(request.result);
+    };
+    
+    request.onupgradeneeded = (event) => {
+      const db = (event.target as IDBOpenDBRequest).result;
+      
+      if (!db.objectStoreNames.contains('cachedData')) {
+        db.createObjectStore('cachedData');
+      }
+    };
+  });
 };

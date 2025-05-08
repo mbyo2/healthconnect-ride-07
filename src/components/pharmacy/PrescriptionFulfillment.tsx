@@ -201,3 +201,5 @@ export const PrescriptionFulfillment = () => {
     </div>
   );
 };
+
+export default PrescriptionFulfillment;

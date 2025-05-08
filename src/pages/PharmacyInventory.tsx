@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MedicationInventory } from '@/components/pharmacy/MedicationInventory';
 import { InventoryTransactions } from '@/components/pharmacy/InventoryTransactions';
 import SupplierManagement from '@/components/pharmacy/SupplierManagement';
-import PrescriptionFulfillment from '@/components/pharmacy/PrescriptionFulfillment';
+import { PrescriptionFulfillment } from '@/components/pharmacy/PrescriptionFulfillment';
 
 const PharmacyInventory = () => {
   const [activeTab, setActiveTab] = useState('inventory');
