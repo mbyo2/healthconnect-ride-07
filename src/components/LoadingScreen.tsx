@@ -1,3 +1,4 @@
+
 import { Loader2 } from "lucide-react";
 
 export const LoadingScreen = () => {
@@ -8,7 +9,10 @@ export const LoadingScreen = () => {
           <div className="absolute inset-0 rounded-full bg-primary/20 animate-ping" />
           <Loader2 className="h-12 w-12 animate-spin text-primary relative z-10" />
         </div>
-        <p className="text-lg font-medium text-primary/80 animate-pulse">Loading...</p>
+        <p className="text-lg font-medium text-primary/80 animate-pulse">Just a moment please...</p>
+        <p className="text-sm text-muted-foreground max-w-xs text-center">
+          We're preparing your information
+        </p>
       </div>
     </div>
   );

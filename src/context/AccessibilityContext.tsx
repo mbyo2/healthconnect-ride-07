@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 type AccessibilityContextType = {
@@ -9,6 +8,13 @@ type AccessibilityContextType = {
   speakContent: (message: string) => void;
   isSpeaking: boolean;
   stopSpeaking: () => void;
+  increaseTextSize: () => void;
+  decreaseTextSize: () => void;
+  resetTextSize: () => void;
+  textSize: number;
+  enableEasyReading: () => void;
+  disableEasyReading: () => void;
+  isEasyReadingEnabled: boolean;
 };
 
 const AccessibilityContext = createContext<AccessibilityContextType | undefined>(undefined);
@@ -16,7 +22,98 @@ const AccessibilityContext = createContext<AccessibilityContextType | undefined>
 export const AccessibilityProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isScreenReaderEnabled, setScreenReaderEnabled] = useState<boolean>(false);
   const [isSpeaking, setIsSpeaking] = useState<boolean>(false);
+  const [textSize, setTextSize] = useState<number>(
+    parseFloat(localStorage.getItem('accessibility_text_size') || '1')
+  );
+  const [isEasyReadingEnabled, setIsEasyReadingEnabled] = useState<boolean>(
+    localStorage.getItem('accessibility_easy_reading') === 'true'
+  );
   
+  // Apply stored settings on load
+  useEffect(() => {
+    applyTextSize(textSize);
+    if (isEasyReadingEnabled) {
+      document.documentElement.classList.add('easy-reading');
+    }
+  }, [textSize, isEasyReadingEnabled]);
+  
+  // Text size controls
+  const increaseTextSize = useCallback(() => {
+    const newSize = Math.min(textSize + 0.1, 1.5);
+    setTextSize(newSize);
+    localStorage.setItem('accessibility_text_size', newSize.toString());
+    applyTextSize(newSize);
+  }, [textSize]);
+  
+  const decreaseTextSize = useCallback(() => {
+    const newSize = Math.max(textSize - 0.1, 0.8);
+    setTextSize(newSize);
+    localStorage.setItem('accessibility_text_size', newSize.toString());
+    applyTextSize(newSize);
+  }, [textSize]);
+  
+  const resetTextSize = useCallback(() => {
+    setTextSize(1);
+    localStorage.setItem('accessibility_text_size', '1');
+    applyTextSize(1);
+  }, []);
+  
+  const applyTextSize = (size: number) => {
+    document.documentElement.style.fontSize = `${size * 100}%`;
+  };
+  
+  // Easy reading mode for sick patients
+  const enableEasyReading = useCallback(() => {
+    setIsEasyReadingEnabled(true);
+    localStorage.setItem('accessibility_easy_reading', 'true');
+    document.documentElement.classList.add('easy-reading');
+  }, []);
+  
+  const disableEasyReading = useCallback(() => {
+    setIsEasyReadingEnabled(false);
+    localStorage.setItem('accessibility_easy_reading', 'false');
+    document.documentElement.classList.remove('easy-reading');
+  }, []);
+  
+  // Apply easy reading styles
+  useEffect(() => {
+    if (isEasyReadingEnabled) {
+      const style = document.createElement('style');
+      style.id = 'easy-reading-styles';
+      style.textContent = `
+        .easy-reading {
+          --letter-spacing: 0.03em;
+          --line-height: 1.6;
+        }
+        .easy-reading p, 
+        .easy-reading span,
+        .easy-reading div,
+        .easy-reading button {
+          letter-spacing: var(--letter-spacing);
+          line-height: var(--line-height);
+        }
+        .easy-reading button,
+        .easy-reading a {
+          min-height: 48px;
+          min-width: 48px;
+        }
+        .easy-reading input,
+        .easy-reading select,
+        .easy-reading textarea {
+          font-size: 1.1em;
+        }
+      `;
+      document.head.appendChild(style);
+      
+      return () => {
+        const styleElement = document.getElementById('easy-reading-styles');
+        if (styleElement) {
+          document.head.removeChild(styleElement);
+        }
+      };
+    }
+  }, [isEasyReadingEnabled]);
+
   // Detect screen reader
   useEffect(() => {
     // Try to detect if a screen reader is present
@@ -90,7 +187,7 @@ export const AccessibilityProvider: React.FC<{ children: React.ReactNode }> = ({
     window.speechSynthesis.cancel();
     
     const utterance = new SpeechSynthesisUtterance(message);
-    utterance.rate = 1.0;
+    utterance.rate = 0.9; // Slightly slower for better understanding
     utterance.pitch = 1.0;
     utterance.volume = 1.0;
     
@@ -159,11 +256,36 @@ export const AccessibilityProvider: React.FC<{ children: React.ReactNode }> = ({
         e.preventDefault();
         stopSpeaking();
       }
+      
+      // Alt+ and Alt- for text size
+      if (e.altKey && e.key === '=') {
+        e.preventDefault();
+        increaseTextSize();
+        screenReaderAnnounce('Text size increased', false);
+      }
+      
+      if (e.altKey && e.key === '-') {
+        e.preventDefault();
+        decreaseTextSize();
+        screenReaderAnnounce('Text size decreased', false);
+      }
+      
+      // Alt+R for easy reading mode
+      if (e.altKey && e.key === 'r') {
+        e.preventDefault();
+        if (isEasyReadingEnabled) {
+          disableEasyReading();
+          screenReaderAnnounce('Easy reading mode disabled', false);
+        } else {
+          enableEasyReading();
+          screenReaderAnnounce('Easy reading mode enabled', false);
+        }
+      }
     };
     
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [skipToContent, screenReaderAnnounce, speakContent, isScreenReaderEnabled, isSpeaking, stopSpeaking]);
+  }, [skipToContent, screenReaderAnnounce, speakContent, isScreenReaderEnabled, isSpeaking, stopSpeaking, increaseTextSize, decreaseTextSize, isEasyReadingEnabled, enableEasyReading, disableEasyReading]);
   
   return (
     <AccessibilityContext.Provider 
@@ -174,7 +296,14 @@ export const AccessibilityProvider: React.FC<{ children: React.ReactNode }> = ({
         setScreenReaderEnabled,
         speakContent,
         isSpeaking,
-        stopSpeaking
+        stopSpeaking,
+        increaseTextSize,
+        decreaseTextSize,
+        resetTextSize,
+        textSize,
+        enableEasyReading,
+        disableEasyReading,
+        isEasyReadingEnabled
       }}
     >
       {/* Skip to content link - visible on focus */}

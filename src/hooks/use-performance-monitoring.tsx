@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { logAnalyticsEvent } from '@/utils/analytics-service';
 import { logError } from '@/utils/error-logging-service';
@@ -21,6 +20,7 @@ interface PerformanceMetrics {
       timestamp: string;
     };
   };
+  networkSpeed: 'slow' | 'medium' | 'fast' | 'unknown';
 }
 
 // Type augmentation for Performance to include non-standard memory property
@@ -46,7 +46,8 @@ export const usePerformanceMonitoring = (enabled = true) => {
     navigationStart: null,
     resourceLoadTimes: {},
     jsHeapSize: null,
-    routeChangePerformance: {}
+    routeChangePerformance: {},
+    networkSpeed: 'unknown'
   });
 
   const updateMetrics = useCallback((newMetrics: Partial<PerformanceMetrics>) => {
@@ -56,6 +57,43 @@ export const usePerformanceMonitoring = (enabled = true) => {
       logAnalyticsEvent('performance_metrics_updated', newMetrics);
     }
   }, []);
+
+  // Add network speed detection
+  useEffect(() => {
+    if (!enabled || typeof window === 'undefined' || !('connection' in navigator)) {
+      return;
+    }
+
+    try {
+      const connection = (navigator as any).connection;
+      
+      if (connection) {
+        const getNetworkSpeed = () => {
+          if (connection.effectiveType === '4g') {
+            return 'fast';
+          } else if (connection.effectiveType === '3g') {
+            return 'medium';
+          } else {
+            return 'slow';
+          }
+        };
+        
+        updateMetrics({ networkSpeed: getNetworkSpeed() });
+        
+        const updateConnectionSpeed = () => {
+          updateMetrics({ networkSpeed: getNetworkSpeed() });
+        };
+        
+        connection.addEventListener('change', updateConnectionSpeed);
+        
+        return () => {
+          connection.removeEventListener('change', updateConnectionSpeed);
+        };
+      }
+    } catch (error) {
+      console.warn('Network speed detection not supported', error);
+    }
+  }, [enabled, updateMetrics]);
 
   // Measure LCP (Largest Contentful Paint)
   useEffect(() => {
@@ -141,6 +179,32 @@ export const usePerformanceMonitoring = (enabled = true) => {
     }
   }, [enabled, updateMetrics]);
 
+  // Add optimized resource loading priority
+  useEffect(() => {
+    if (!enabled || typeof window === 'undefined') {
+      return;
+    }
+
+    try {
+      // Detect slow connection and optimize resource loading
+      if (metrics.networkSpeed === 'slow') {
+        // Defer non-critical resources
+        document.querySelectorAll('img:not([loading="eager"])').forEach((img: HTMLImageElement) => {
+          img.loading = 'lazy';
+        });
+        
+        // Reduce image quality for slow connections
+        document.querySelectorAll('img[data-src-low]').forEach((img: HTMLImageElement) => {
+          if (img.getAttribute('data-src-low')) {
+            img.src = img.getAttribute('data-src-low') || img.src;
+          }
+        });
+      }
+    } catch (error) {
+      console.warn('Resource optimization error:', error);
+    }
+  }, [enabled, metrics.networkSpeed]);
+
   // Collect basic navigation timing metrics
   useEffect(() => {
     if (!enabled || typeof window === 'undefined' || !window.performance) {
@@ -199,38 +263,59 @@ export const usePerformanceMonitoring = (enabled = true) => {
     }
   }, [enabled, updateMetrics]);
 
-  // Track route changes performance
-  const recordRouteChange = useCallback((route: string) => {
-    const startTime = performance.now();
+  // Add simple performance optimization recommendations
+  const getPerformanceRecommendations = useCallback(() => {
+    const recommendations: string[] = [];
     
-    // Record when route render completes (on next frame)
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        const renderTime = performance.now() - startTime;
-        
-        setMetrics(prev => ({
-          ...prev,
-          routeChangePerformance: {
-            ...prev.routeChangePerformance,
-            [route]: {
-              loadTime: startTime,
-              renderTime: renderTime,
-              timestamp: new Date().toISOString()
-            }
-          }
-        }));
-        
-        logAnalyticsEvent('route_performance', {
-          route,
-          renderTime,
-          timestamp: new Date().toISOString()
-        });
-      });
-    });
-  }, []);
+    if (metrics.firstContentfulPaint && metrics.firstContentfulPaint > 2000) {
+      recommendations.push('Consider using preloading for critical resources to improve load time.');
+    }
+    
+    if (metrics.jsHeapSize && metrics.jsHeapSize > 50000000) {
+      recommendations.push('High memory usage detected. Consider optimizing JavaScript bundle size.');
+    }
+    
+    if (metrics.networkSpeed === 'slow') {
+      recommendations.push('User on slow connection. Consider serving lower-quality images and reducing API calls.');
+    }
+    
+    if (metrics.cumulativeLayoutShift && metrics.cumulativeLayoutShift > 0.1) {
+      recommendations.push('Layout shifts detected. Consider adding width and height attributes to images and other elements.');
+    }
+    
+    return recommendations;
+  }, [metrics]);
 
   return {
     metrics,
-    recordRouteChange
+    recordRouteChange: useCallback((route: string) => {
+      const startTime = performance.now();
+      
+      // Record when route render completes (on next frame)
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          const renderTime = performance.now() - startTime;
+          
+          setMetrics(prev => ({
+            ...prev,
+            routeChangePerformance: {
+              ...prev.routeChangePerformance,
+              [route]: {
+                loadTime: startTime,
+                renderTime: renderTime,
+                timestamp: new Date().toISOString()
+              }
+            }
+          }));
+          
+          logAnalyticsEvent('route_performance', {
+            route,
+            renderTime,
+            timestamp: new Date().toISOString()
+          });
+        });
+      });
+    }, []),
+    getPerformanceRecommendations
   };
 };
