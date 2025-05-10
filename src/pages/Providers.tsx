@@ -1,9 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { Header } from '@/components/Header';
-import { ProviderList } from '@/components/ProviderList';
-import { SearchFilters } from '@/components/SearchFilters';
-import { SearchPagination } from '@/components/SearchPagination';
 import { supabase } from '@/integrations/supabase/client';
 
 // Define Provider interface correctly
@@ -29,6 +26,151 @@ interface FiltersState {
   searchTerm: string;
 }
 
+interface SearchFiltersProps {
+  currentFilters: FiltersState;
+  onFilterChange: (newFilters: FiltersState) => void;
+}
+
+// Define missing component interfaces
+const SearchFilters = ({ currentFilters, onFilterChange }: SearchFiltersProps) => {
+  return (
+    <div className="bg-white p-4 rounded-md shadow mb-4">
+      <h3 className="font-semibold mb-2">Filter Healthcare Providers</h3>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <input
+          type="text"
+          placeholder="Search by name or specialty"
+          className="px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-primary"
+          value={currentFilters.searchTerm}
+          onChange={(e) => onFilterChange({ ...currentFilters, searchTerm: e.target.value })}
+        />
+        
+        <select 
+          className="px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-primary"
+          value={currentFilters.specialty}
+          onChange={(e) => onFilterChange({ ...currentFilters, specialty: e.target.value })}
+        >
+          <option value="">Any Specialty</option>
+          <option value="Cardiology">Cardiology</option>
+          <option value="Dermatology">Dermatology</option>
+          <option value="Pediatrics">Pediatrics</option>
+          <option value="Family Medicine">Family Medicine</option>
+          <option value="Neurology">Neurology</option>
+        </select>
+        
+        <select
+          className="px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-primary"
+          value={currentFilters.rating.toString()}
+          onChange={(e) => onFilterChange({ ...currentFilters, rating: Number(e.target.value) })}
+        >
+          <option value="0">Any Rating</option>
+          <option value="3">3+ Stars</option>
+          <option value="4">4+ Stars</option>
+          <option value="4.5">4.5+ Stars</option>
+        </select>
+      </div>
+    </div>
+  );
+};
+
+interface ProviderListProps {
+  providers: Provider[];
+  loading: boolean;
+}
+
+const ProviderList = ({ providers, loading }: ProviderListProps) => {
+  if (loading) {
+    return <div className="flex justify-center py-12">Loading providers...</div>;
+  }
+  
+  if (providers.length === 0) {
+    return <div className="text-center py-8">No providers match your search criteria</div>;
+  }
+  
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {providers.map(provider => (
+        <div key={provider.id} className="bg-white rounded-lg shadow-md overflow-hidden">
+          <div className="p-4">
+            <div className="flex items-center space-x-4">
+              <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                {provider.avatar_url ? (
+                  <img src={provider.avatar_url} alt={`Dr. ${provider.last_name}`} className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-2xl font-bold text-gray-400">{provider.first_name[0]}{provider.last_name[0]}</span>
+                )}
+              </div>
+              <div>
+                <h3 className="font-semibold">Dr. {provider.first_name} {provider.last_name}</h3>
+                <p className="text-sm text-muted-foreground">{provider.specialty}</p>
+                <div className="flex items-center mt-1">
+                  <span className="text-sm font-medium">{provider.rating.toFixed(1)}</span>
+                  <div className="flex ml-1">
+                    {[...Array(5)].map((_, i) => (
+                      <svg key={i} className={`w-4 h-4 ${i < Math.floor(provider.rating) ? 'text-yellow-400' : 'text-gray-300'}`} fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                      </svg>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <p className="text-sm mt-3 line-clamp-2">{provider.bio || 'No biography available.'}</p>
+            
+            <div className="mt-4 flex justify-between">
+              <button className="text-sm text-blue-600 hover:text-blue-800">View Profile</button>
+              <button className="px-3 py-1 bg-primary text-white text-sm rounded-md hover:bg-primary/90">Book Now</button>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+interface SearchPaginationProps {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+}
+
+const SearchPagination = ({ currentPage, totalPages, onPageChange }: SearchPaginationProps) => {
+  const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+  
+  return (
+    <div className="flex justify-center mt-8">
+      <nav className="flex space-x-1">
+        <button 
+          onClick={() => onPageChange(currentPage - 1)} 
+          disabled={currentPage === 1}
+          className="px-3 py-1 rounded-md bg-gray-100 text-gray-700 disabled:opacity-50"
+        >
+          Previous
+        </button>
+        
+        {pages.map(page => (
+          <button 
+            key={page}
+            onClick={() => onPageChange(page)}
+            className={`px-3 py-1 rounded-md ${currentPage === page ? 'bg-primary text-white' : 'bg-gray-100 text-gray-700'}`}
+          >
+            {page}
+          </button>
+        ))}
+        
+        <button 
+          onClick={() => onPageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className="px-3 py-1 rounded-md bg-gray-100 text-gray-700 disabled:opacity-50"
+        >
+          Next
+        </button>
+      </nav>
+    </div>
+  );
+};
+
 const Providers = () => {
   const [providers, setProviders] = useState<Provider[]>([]);
   const [loading, setLoading] = useState(true);
@@ -53,7 +195,7 @@ const Providers = () => {
       let query = supabase
         .from('profiles')
         .select('*')
-        .eq('role', 'provider');
+        .eq('role', 'provider' as any);
       
       // Apply filters if they exist
       if (filters.specialty) {

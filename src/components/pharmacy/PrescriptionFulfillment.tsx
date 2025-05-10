@@ -56,17 +56,17 @@ export const PrescriptionFulfillment = () => {
     }
   };
 
-  const updatePrescriptionStatus = async (id: string, fulfillment_status: PrescriptionStatus) => {
+  const updatePrescriptionStatus = async (id: string, status: PrescriptionStatus) => {
     try {
       if (!isOnline) {
         await queueOfflineAction({
           type: 'UPDATE_PRESCRIPTION_STATUS',
-          payload: { id, fulfillment_status }
+          payload: { id, status }
         });
         
         // Optimistic UI update
         setPrescriptions(prev => 
-          prev.map(p => p.id === id ? { ...p, fulfillment_status } : p)
+          prev.map(p => p.id === id ? { ...p, fulfillment_status: status } : p)
         );
         
         toast({
@@ -78,19 +78,19 @@ export const PrescriptionFulfillment = () => {
 
       const { error } = await supabase
         .from('prescriptions')
-        .update({ fulfillment_status })
+        .update({ fulfillment_status: status })
         .eq('id', id);
 
       if (error) throw error;
       
       // Update local state
       setPrescriptions(prev => 
-        prev.map(p => p.id === id ? { ...p, fulfillment_status } : p)
+        prev.map(p => p.id === id ? { ...p, fulfillment_status: status } : p)
       );
       
       toast({
         title: "Prescription updated",
-        description: `Status changed to ${fulfillment_status}`,
+        description: `Status changed to ${status}`,
       });
     } catch (error) {
       console.error('Error updating prescription:', error);

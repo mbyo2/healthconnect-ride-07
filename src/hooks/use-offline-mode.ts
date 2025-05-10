@@ -9,10 +9,30 @@ export interface OfflineAction {
   timestamp?: string;
 }
 
+// Map of features and their availability in offline mode
+interface OfflineFeatures {
+  appointments: boolean;
+  prescriptions: boolean;
+  payments: boolean;
+  messages: boolean;
+  profile: boolean;
+  search: boolean;
+}
+
 export const useOfflineMode = () => {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [pendingActions, setPendingActions] = useState<OfflineAction[]>([]);
   const { toast } = useToast();
+
+  // Offline features availability
+  const [offlineFeatures, setOfflineFeatures] = useState<OfflineFeatures>({
+    appointments: true,
+    prescriptions: true,
+    payments: false,
+    messages: false,
+    profile: true,
+    search: false
+  });
 
   // Handle connection status changes
   useEffect(() => {
@@ -60,8 +80,7 @@ export const useOfflineMode = () => {
       const request = store.getAll();
       
       request.onsuccess = () => {
-        const actions = request.result as OfflineAction[];
-        setPendingActions(actions);
+        setPendingActions(request.result as OfflineAction[]);
       };
       
       request.onerror = () => {
@@ -152,6 +171,59 @@ export const useOfflineMode = () => {
     }
   };
 
+  // Cache data for offline use
+  const cacheForOffline = async (key: string, data: any, expirationMinutes = 60): Promise<boolean> => {
+    try {
+      const db = await openOfflineDB();
+      const tx = db.transaction('offlineData', 'readwrite');
+      const store = tx.objectStore('offlineData');
+      
+      const cachedItem = {
+        key,
+        data,
+        timestamp: Date.now() + expirationMinutes * 60 * 1000
+      };
+      
+      await store.put(cachedItem);
+      return true;
+    } catch (error) {
+      console.error('Error caching data for offline use:', error);
+      return false;
+    }
+  };
+
+  // Get cached data
+  const getOfflineCache = async (key: string): Promise<any | null> => {
+    try {
+      const db = await openOfflineDB();
+      const tx = db.transaction('offlineData', 'readonly');
+      const store = tx.objectStore('offlineData');
+      
+      const request = store.get(key);
+      
+      return new Promise((resolve) => {
+        request.onsuccess = () => {
+          const cachedItem = request.result;
+          
+          if (!cachedItem || Date.now() > cachedItem.timestamp) {
+            resolve(null);
+            return;
+          }
+          
+          resolve(cachedItem.data);
+        };
+        
+        request.onerror = () => {
+          console.error('Error retrieving cached data:', request.error);
+          resolve(null);
+        };
+      });
+    } catch (error) {
+      console.error('Error getting cached data:', error);
+      return null;
+    }
+  };
+
   // Open the offline database
   const openOfflineDB = (): Promise<IDBDatabase> => {
     return new Promise((resolve, reject) => {
@@ -172,14 +244,30 @@ export const useOfflineMode = () => {
           const store = db.createObjectStore('pendingActions', { keyPath: 'id' });
           store.createIndex('timestamp', 'timestamp', { unique: false });
         }
+        
+        if (!db.objectStoreNames.contains('offlineData')) {
+          const store = db.createObjectStore('offlineData', { keyPath: 'key' });
+          store.createIndex('timestamp', 'timestamp', { unique: false });
+        }
       };
     });
   };
+
+  // Alias for compatibility
+  const syncOfflineActions = syncPendingActions;
+  const offlineActions = pendingActions;
 
   return {
     isOnline,
     queueOfflineAction,
     pendingActions,
-    syncPendingActions
+    syncPendingActions,
+    // Aliases for existing functionality
+    offlineActions,
+    syncOfflineActions,
+    offlineFeatures,
+    // Caching functions
+    cacheForOffline,
+    getOfflineCache
   };
 };

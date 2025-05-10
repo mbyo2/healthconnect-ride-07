@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from "react";
 import DailyIframe from '@daily-co/daily-js';
 import { VideoControls } from "./VideoControls";
@@ -11,7 +10,7 @@ import { ArrowLeft, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
-export function VideoRoom({ roomUrl, userName, videoQuality = "high", onLeave }: VideoRoomProps) {
+export function VideoRoom({ roomUrl, roomId, userName, videoQuality = "high", onLeave }: VideoRoomProps) {
   const [callFrame, setCallFrame] = useState<any>(null);
   const [participants, setParticipants] = useState<any[]>([]);
   const [isMuted, setIsMuted] = useState(false);
@@ -21,6 +20,9 @@ export function VideoRoom({ roomUrl, userName, videoQuality = "high", onLeave }:
   const [hasJoined, setHasJoined] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [reconnecting, setReconnecting] = useState(false);
+  
+  // Use roomId if passed, otherwise use roomUrl
+  const actualRoomUrl = roomId || roomUrl;
   
   const capabilities = useDeviceCapabilities();
   const isMobile = useMediaQuery('(max-width: 768px)');
@@ -76,9 +78,9 @@ export function VideoRoom({ roomUrl, userName, videoQuality = "high", onLeave }:
     };
     
     // Create Daily callFrame
-    if (!callFrame && roomUrl) {
+    if (!callFrame && actualRoomUrl) {
       const options = {
-        url: roomUrl,
+        url: actualRoomUrl,
         userName: userName,
         showLeaveButton: true,
         showFullscreenButton: true,
@@ -135,7 +137,7 @@ export function VideoRoom({ roomUrl, userName, videoQuality = "high", onLeave }:
         callFrame.destroy();
       }
     };
-  }, [roomUrl, userName, handleJoinedMeeting, handleError, 
+  }, [actualRoomUrl, userName, handleJoinedMeeting, handleError, 
       handleParticipantsChange, handleNetworkQualityChange, 
       videoQuality, isMobile, isTV, capabilities.network.connectionQuality]);
 

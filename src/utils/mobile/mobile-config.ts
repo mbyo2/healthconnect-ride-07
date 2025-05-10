@@ -39,17 +39,45 @@ export const initializeMobileFeatures = async () => {
   if (!isNativeMobile()) return;
   
   try {
-    // Initialize status bar
-    const { StatusBar } = await import('@capacitor/status-bar');
-    await StatusBar.setBackgroundColor({ color: '#ffffff' });
-    
-    // Hide splash screen with fade
+    // Initialize splash screen with fade
     const { SplashScreen } = await import('@capacitor/splash-screen');
     await SplashScreen.hide({
       fadeOutDuration: 500
     });
 
+    // Conditionally initialize status bar if the dependency exists
+    try {
+      if (window.StatusBar || (window as any).cordova?.plugins?.statusbar) {
+        // Set background color using native StatusBar if available
+        const StatusBar = window.StatusBar || (window as any).cordova?.plugins?.statusbar;
+        if (StatusBar) {
+          StatusBar.backgroundColorByHexString('#ffffff');
+          StatusBar.styleDefault();
+        }
+      } else {
+        // Try to use Capacitor Status Bar if available
+        const statusBarModule = await import('@capacitor/status-bar').catch(() => null);
+        if (statusBarModule) {
+          const { StatusBar } = statusBarModule;
+          await StatusBar.setBackgroundColor({ color: '#ffffff' });
+          await StatusBar.setStyle({ style: 'dark' });
+        }
+      }
+    } catch (statusBarError) {
+      console.warn('Status bar plugin not available:', statusBarError);
+    }
   } catch (error) {
     console.error('Error initializing mobile features:', error);
   }
 };
+
+// Add global typings for StatusBar for Cordova compatibility
+declare global {
+  interface Window {
+    StatusBar?: {
+      backgroundColorByHexString: (color: string) => void;
+      styleDefault: () => void;
+      styleLightContent: () => void;
+    };
+  }
+}

@@ -1,4 +1,3 @@
-
 import { useNetwork } from '@/hooks/use-network';
 import { useOfflineMode } from '@/hooks/use-offline-mode';
 import { Wifi, WifiOff, RefreshCcw } from 'lucide-react';
@@ -9,11 +8,21 @@ import { Sheet, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHe
 
 export const OfflineAlert = () => {
   const { isOnline, connectionQuality } = useNetwork();
-  const { offlineActions, syncOfflineActions, offlineFeatures } = useOfflineMode();
+  const { pendingActions: offlineActions, syncPendingActions: syncOfflineActions } = useOfflineMode();
   const [wasOffline, setWasOffline] = useState(false);
   const [showBanner, setShowBanner] = useState(false);
   const [reconnectAttempts, setReconnectAttempts] = useState(0);
   const [syncingInBackground, setSyncingInBackground] = useState(false);
+  
+  // Default offline features
+  const offlineFeatures = {
+    appointments: true,
+    prescriptions: true,
+    payments: false,
+    messages: false,
+    profile: true,
+    search: false
+  };
   
   useEffect(() => {
     if (!isOnline) {

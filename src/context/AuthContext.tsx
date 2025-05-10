@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Session, User } from '@supabase/supabase-js';
@@ -62,12 +61,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const fetchProfile = async (userId: string) => {
     try {
-      // First try to fetch from patients table (no approval needed)
-      let { data: patientProfile, error: patientError } = await supabase
-        .from('patients')
+      // Try to fetch patient profile from profiles table with role = 'patient'
+      const { data: patientProfile, error: patientError } = await supabase
+        .from('profiles')
         .select('*')
         .eq('id', userId)
-        .single();
+        .eq('role', 'patient')
+        .maybeSingle();
 
       if (patientProfile) {
         setProfile({
@@ -77,12 +77,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      // If not a patient, try regular profiles
+      // If not a patient, try regular profiles with other roles
       const { data: regularProfile, error: profileError } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
 
       if (profileError && profileError.code !== 'PGRST116') {
         console.error('Error fetching profile:', profileError);
@@ -91,6 +91,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (regularProfile) {
         setProfile(regularProfile);
+      } else {
+        // If no profile exists at all, create a basic one
+        const { error: createError } = await supabase
+          .from('profiles')
+          .insert({
+            id: userId,
+            role: 'patient',
+            email: user?.email,
+            is_profile_complete: false
+          });
+          
+        if (createError) {
+          console.error('Error creating profile:', createError);
+        } else {
+          // Fetch the newly created profile
+          fetchProfile(userId);
+        }
       }
     } catch (error) {
       console.error('Error in fetchProfile:', error);

@@ -25,21 +25,13 @@ export const PaymentHistory = ({ userId }: { userId: string }) => {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
   const { isOnline } = useNetwork();
-  const { getOfflineCache, cacheForOffline } = useOfflineMode();
   
   useEffect(() => {
     const fetchPayments = async () => {
       setLoading(true);
       
       try {
-        // First try to get from cache for offline support
-        const cachedPayments = await getOfflineCache(`payments-${userId}`);
-        if (cachedPayments && !isOnline) {
-          setPayments(cachedPayments);
-          setLoading(false);
-          return;
-        }
-        
+        // We need to be online to fetch payments
         if (!isOnline) {
           setLoading(false);
           return;
@@ -69,9 +61,6 @@ export const PaymentHistory = ({ userId }: { userId: string }) => {
         }));
         
         setPayments(formattedPayments);
-        
-        // Cache for offline use
-        await cacheForOffline(`payments-${userId}`, formattedPayments);
       } catch (error) {
         console.error('Error fetching payment history:', error);
         toast.error('Failed to load payment history');
@@ -81,7 +70,7 @@ export const PaymentHistory = ({ userId }: { userId: string }) => {
     };
     
     fetchPayments();
-  }, [userId, isOnline, getOfflineCache, cacheForOffline]);
+  }, [userId, isOnline]);
   
   const handleGenerateReceipt = async (paymentId: string) => {
     try {
@@ -148,7 +137,7 @@ export const PaymentHistory = ({ userId }: { userId: string }) => {
         {!isOnline && (
           <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3 mb-4 flex items-center">
             <AlertCircle className="h-5 w-5 text-yellow-500 mr-2 flex-shrink-0" />
-            <p className="text-sm text-yellow-700">You're offline. Showing cached payment history.</p>
+            <p className="text-sm text-yellow-700">You're offline. Payment history is not available.</p>
           </div>
         )}
         
@@ -174,10 +163,10 @@ export const PaymentHistory = ({ userId }: { userId: string }) => {
                     <div className="text-sm">{formatDate(payment.created_at)}</div>
                     <div className="text-sm">{payment.service_name}</div>
                     <div className="text-sm text-right">
-                      {payment.currency.toUpperCase()} {payment.amount.toFixed(2)}
+                      {payment.currency ? payment.currency.toUpperCase() : 'USD'} {payment.amount.toFixed(2)}
                     </div>
                     <div className="hidden md:block text-xs text-center capitalize">
-                      {payment.payment_method}
+                      {payment.payment_method || 'Card'}
                     </div>
                     <div className="flex justify-center">
                       <Badge variant="outline" className={`${getStatusColor(payment.status)} border-none text-xs`}>

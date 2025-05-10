@@ -39,7 +39,7 @@ const VideoCall = () => {
       {loading ? (
         <LoadingScreen />
       ) : (
-        <VideoRoom roomId={roomUrl} userName={userName} />
+        <VideoRoom roomUrl={roomUrl} userName={userName} />
       )}
     </ProtectedRoute>
   );

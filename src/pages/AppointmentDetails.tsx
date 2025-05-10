@@ -12,24 +12,24 @@ import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { useOfflineMode } from '@/hooks/use-offline-mode';
+import { useNetwork } from '@/hooks/use-network';
 
 const AppointmentDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [appointment, setAppointment] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const { isOnline, getOfflineCache, cacheForOffline } = useOfflineMode();
+  const { isOnline } = useOfflineMode();
+  const { isOnline: networkOnline } = useNetwork();
 
   useEffect(() => {
     const fetchAppointmentDetails = async () => {
       try {
-        if (!isOnline) {
-          const cachedData = await getOfflineCache(`appointment-${id}`);
-          if (cachedData) {
-            setAppointment(cachedData);
-            setLoading(false);
-            return;
-          }
+        if (!networkOnline) {
+          // Try to use local state management since offline cache isn't available
+          toast.info("You're offline. Showing limited appointment details.");
+          setLoading(false);
+          return;
         }
 
         const { data, error } = await supabase
@@ -44,11 +44,6 @@ const AppointmentDetails = () => {
         if (error) throw error;
         
         setAppointment(data);
-        
-        // Cache for offline use
-        if (data) {
-          await cacheForOffline(`appointment-${id}`, data);
-        }
       } catch (error) {
         console.error('Error fetching appointment details:', error);
         toast.error('Failed to load appointment details');
@@ -58,7 +53,7 @@ const AppointmentDetails = () => {
     };
 
     fetchAppointmentDetails();
-  }, [id, isOnline]);
+  }, [id, networkOnline]);
 
   const joinVideoCall = () => {
     if (appointment?.video_room_url) {
