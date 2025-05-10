@@ -49,21 +49,67 @@
     <link rel="icon" type="image/png" sizes="512x512" href="/logo512.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico" />
     
-    <!-- Security headers -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://*.supabase.co; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.gpteng.co; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.daily.co; font-src 'self'; frame-src 'self' https://*.daily.co https://*.stripe.com;" />
-    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <!-- Ensure key elements load even if JavaScript fails -->
+    <style>
+      .js-error-fallback {
+        display: none;
+        padding: 20px;
+        text-align: center;
+        font-family: system-ui, -apple-system, sans-serif;
+        max-width: 500px;
+        margin: 100px auto;
+      }
+      .js-error-fallback button {
+        background: #4CAF50;
+        border: none;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-top: 16px;
+      }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Inline loading indicator that shows even if JS fails -->
+      <div style="display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column;">
+        <div style="width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid #4CAF50; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+        <p style="margin-top: 20px; font-family: system-ui, -apple-system, sans-serif;">Loading Doc' O Clock...</p>
+        <style>
+          @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        </style>
+      </div>
+    </div>
+    
+    <!-- Error fallback that is shown if JavaScript fails to execute -->
+    <div class="js-error-fallback">
+      <h2>Unable to load Doc' O Clock</h2>
+      <p>We encountered a problem while loading the application. Please try refreshing the page.</p>
+      <button onclick="window.location.reload()">Refresh Page</button>
+    </div>
+    
     <noscript>
       <div style="padding: 20px; text-align: center; font-family: sans-serif;">
         <h1>JavaScript Required</h1>
         <p>You need to enable JavaScript to run this app. Doc' O Clock requires JavaScript to provide you with the best healthcare experience.</p>
       </div>
     </noscript>
+    
+    <script>
+      // Show error fallback if page doesn't load within 15 seconds
+      setTimeout(function() {
+        if (!window.appLoaded) {
+          document.querySelector('.js-error-fallback').style.display = 'block';
+        }
+      }, 15000);
+    </script>
+    
     <!-- Required Lovable script tag for enabling the Pick and Edit feature -->
     <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
     <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- Service worker registration -->
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
@@ -78,6 +124,9 @@
             });
         });
       }
+      
+      // Mark app as loaded
+      window.appLoaded = true;
     </script>
   </body>
 </html>
