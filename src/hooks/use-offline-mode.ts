@@ -1,13 +1,10 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 
 export interface OfflineAction {
-  id?: string;
+  id: string;  // Single id property
   type: string;
-  // Replace 'payload: any' with specific properties
-  table?: string; // Add the table property
-  id?: string;
+  table?: string;
   data?: any; // For update operations
   timestamp?: string;
 }
@@ -99,7 +96,7 @@ export const useOfflineMode = () => {
     try {
       const actionWithMeta: OfflineAction = {
         ...action,
-        id: crypto.randomUUID(),
+        id: action.id || crypto.randomUUID(),
         timestamp: new Date().toISOString(),
       };
       
@@ -265,7 +262,6 @@ export const useOfflineMode = () => {
     queueOfflineAction,
     pendingActions,
     syncPendingActions,
-    // Make sure these are properly returned
     offlineActions: pendingActions,
     syncOfflineActions: syncPendingActions,
     offlineFeatures,

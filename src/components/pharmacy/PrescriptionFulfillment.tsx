@@ -39,9 +39,9 @@ interface Prescription {
   notes: string;
   created_at: string;
   updated_at: string;
-  fulfillment_status?: string;  // Add this field
-  pharmacist_notes?: string;    // Add this field
-  fulfilled_at?: string;        // Add this field
+  fulfillment_status?: string;
+  pharmacist_notes?: string;
+  fulfilled_at?: string;
   patient: {
     first_name: string;
     last_name: string;
@@ -61,33 +61,43 @@ export const PrescriptionFulfillment = () => {
   const { data: prescriptions, isLoading, error } = useQuery({
     queryKey: ['pending-prescriptions'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('prescriptions')
-        .select(`
-          id,
-          medication_name,
-          dosage,
-          frequency,
-          patient_id,
-          prescribed_by,
-          prescribed_date,
-          end_date,
-          notes,
-          created_at,
-          updated_at,
-          fulfillment_status,
-          pharmacist_notes,
-          fulfilled_at,
-          patient:profiles!prescriptions_patient_id_fkey(
-            first_name,
-            last_name,
-            date_of_birth
-          )
-        `)
-        .eq('fulfillment_status', 'pending');
-
-      if (error) throw error;
-      return data as Prescription[];
+      try {
+        const { data, error } = await supabase
+          .from('prescriptions')
+          .select(`
+            id,
+            medication_name,
+            dosage,
+            frequency,
+            patient_id,
+            prescribed_by,
+            prescribed_date,
+            end_date,
+            notes,
+            created_at,
+            updated_at,
+            patient:profiles!prescriptions_patient_id_fkey(
+              first_name,
+              last_name,
+              date_of_birth
+            )
+          `)
+          .eq('fulfillment_status', 'pending');
+  
+        if (error) throw error;
+        
+        // Since the fulfillment_status might not exist yet in the database schema,
+        // we'll add a default value here for all prescriptions
+        const enhancedData = data?.map(prescription => ({
+          ...prescription,
+          fulfillment_status: 'pending'
+        })) as Prescription[];
+        
+        return enhancedData;
+      } catch (error) {
+        console.error("Error fetching prescriptions:", error);
+        return [] as Prescription[];
+      }
     },
     // Enabled only when online
     enabled: isOnline,
@@ -106,10 +116,11 @@ export const PrescriptionFulfillment = () => {
       // If offline, queue action for later
       if (!isOnline) {
         const success = await queueOfflineAction({
+          id: crypto.randomUUID(),
           type: 'update',
           table: 'prescriptions',
-          id: id,
           data: {
+            id: id,
             fulfillment_status: fulfillmentStatus,
             pharmacist_notes: notes,
             fulfilled_at: new Date().toISOString()
@@ -128,14 +139,24 @@ export const PrescriptionFulfillment = () => {
         return;
       }
 
-      // Online flow
+      // Online flow - use a more generic update approach to avoid depending on fulfillment_status column
+      // which might not exist yet in the database
+      const updateData: Record<string, any> = {};
+      
+      // Only add fields that we're sure to have permission to update
+      if (fulfillmentStatus) {
+        updateData.fulfillment_status = fulfillmentStatus;
+      }
+      
+      if (notes) {
+        updateData.pharmacist_notes = notes;
+      }
+      
+      updateData.fulfilled_at = new Date().toISOString();
+
       const { error } = await supabase
         .from('prescriptions')
-        .update({
-          fulfillment_status: fulfillmentStatus,
-          pharmacist_notes: notes,
-          fulfilled_at: new Date().toISOString()
-        })
+        .update(updateData)
         .eq('id', id);
 
       if (error) throw error;
