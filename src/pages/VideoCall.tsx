@@ -5,6 +5,7 @@ import { VideoRoom } from '@/components/video/VideoRoom';
 import { LoadingScreen } from '@/components/LoadingScreen';
 import { useAuth } from '@/context/AuthContext';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import { logAnalyticsEvent } from '@/utils/analytics-service';
 
 const VideoCall = () => {
   const { roomUrl } = useParams();
@@ -27,8 +28,15 @@ const VideoCall = () => {
       setLoading(false);
     }, 1500);
     
+    // Log analytics event
+    logAnalyticsEvent('video_call_opened', {
+      room: roomUrl,
+      user_id: user?.id,
+      timestamp: new Date().toISOString()
+    });
+    
     return () => clearTimeout(timer);
-  }, [user]);
+  }, [user, roomUrl]);
 
   if (!roomUrl) {
     return <div>Invalid room URL</div>;
@@ -39,7 +47,11 @@ const VideoCall = () => {
       {loading ? (
         <LoadingScreen />
       ) : (
-        <VideoRoom roomUrl={roomUrl} userName={userName} />
+        <VideoRoom 
+          roomUrl={roomUrl} 
+          userName={userName} 
+          onLeave={() => logAnalyticsEvent('video_call_ended', { room: roomUrl })} 
+        />
       )}
     </ProtectedRoute>
   );

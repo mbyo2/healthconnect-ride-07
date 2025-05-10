@@ -12,6 +12,9 @@ import { AccessibilityProvider } from './context/AccessibilityContext';
 import { registerServiceWorker } from './utils/service-worker';
 import { AuthProvider } from './context/AuthContext';
 import { initializeMobileFeatures, isNativeMobile } from './utils/mobile/mobile-config';
+import { initAnalytics } from './utils/analytics-service';
+import { initErrorLogging } from './utils/error-logging-service';
+import { ErrorBoundary } from './components/ui/error-boundary';
 
 // Create a client
 const queryClient = new QueryClient({
@@ -23,6 +26,10 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+// Initialize analytics and error logging
+initAnalytics({ debug: import.meta.env.DEV });
+initErrorLogging({ debug: import.meta.env.DEV });
 
 // Initialize mobile features if running in a native container
 if (isNativeMobile()) {
@@ -54,17 +61,19 @@ window.addEventListener('offline', () => {
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="light" storageKey="doc-oclock-theme">
-        <AccessibilityProvider>
-          <AuthProvider>
-            <BrowserRouter>
-              <App />
-              <Toaster position="top-right" richColors closeButton />
-            </BrowserRouter>
-          </AuthProvider>
-        </AccessibilityProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider defaultTheme="light" storageKey="doc-oclock-theme">
+          <AccessibilityProvider>
+            <AuthProvider>
+              <BrowserRouter>
+                <App />
+                <Toaster position="top-right" richColors closeButton />
+              </BrowserRouter>
+            </AuthProvider>
+          </AccessibilityProvider>
+        </ThemeProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   </React.StrictMode>,
 );
