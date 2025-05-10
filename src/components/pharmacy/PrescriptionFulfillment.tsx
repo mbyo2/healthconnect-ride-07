@@ -1,195 +1,284 @@
 
-import React, { useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
-import { toast } from 'sonner';
-import { logAnalyticsEvent } from '@/utils/analytics-service';
-
-interface PrescriptionItem {
-  id?: string;
-  medication_name?: string;
-  patient_id?: string;
-  dosage?: string;
-  frequency?: string;
-  notes?: string;
-  prescribed_by?: string;
-  prescribed_date?: string;
-  end_date?: string;
-  created_at?: string;
-  updated_at?: string;
-  // Custom properties for fulfillment
-  status?: string;
-}
+import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Loader2, AlertCircle } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { useOfflineMode } from "@/hooks/use-offline-mode";
+import { Textarea } from "../ui/textarea";
+import { logAnalyticsEvent } from "@/utils/analytics-service";
 
 export const PrescriptionFulfillment = () => {
-  const [prescriptions, setPrescriptions] = useState<PrescriptionItem[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [selected, setSelected] = useState<Record<string, boolean>>({});
-  
-  const fetchPrescriptions = async () => {
-    setLoading(true);
-    try {
+  const [fulfillmentStatus, setFulfillmentStatus] = useState("");
+  const [notes, setNotes] = useState("");
+  const [selectedPrescription, setSelectedPrescription] = useState<string | null>(null);
+  const [processingId, setProcessingId] = useState<string | null>(null);
+  const { isOnline, queueOfflineAction } = useOfflineMode();
+  const queryClient = useQueryClient();
+
+  // Query prescriptions that need fulfillment
+  const { data: prescriptions, isLoading, error } = useQuery({
+    queryKey: ['pending-prescriptions'],
+    queryFn: async () => {
       const { data, error } = await supabase
         .from('prescriptions')
-        .select('*')
-        .eq('status', 'pending')
-        .order('created_at', { ascending: false });
-        
+        .select(`
+          id,
+          medication_name,
+          dosage,
+          frequency,
+          patient_id,
+          prescribed_by,
+          prescribed_date,
+          end_date,
+          notes,
+          created_at,
+          updated_at,
+          patient:profiles!prescriptions_patient_id_fkey(
+            first_name,
+            last_name,
+            date_of_birth
+          )
+        `)
+        .eq('fulfillment_status', 'pending');
+
       if (error) throw error;
-      setPrescriptions(data || []);
-      
-      // Log analytics
-      logAnalyticsEvent('prescriptions_fetched', {
-        count: data?.length || 0,
-        status: 'pending'
-      });
-    } catch (error) {
-      console.error('Error fetching prescriptions:', error);
-      toast.error('Failed to fetch prescriptions');
-    } finally {
-      setLoading(false);
-    }
-  };
-  
-  const handleFulfill = async () => {
-    const selectedIds = Object.entries(selected)
-      .filter(([_, isSelected]) => isSelected)
-      .map(([id]) => id);
-      
-    if (selectedIds.length === 0) {
-      toast.warning('No prescriptions selected');
-      return;
-    }
-    
-    setLoading(true);
+      return data;
+    },
+    // Enabled only when online
+    enabled: isOnline,
+  });
+
+  const handleFulfill = async (id: string) => {
     try {
+      setProcessingId(id);
+      
+      // Record analytics
+      logAnalyticsEvent('prescription_fulfillment_started', {
+        prescription_id: id,
+        status: fulfillmentStatus
+      });
+      
+      // If offline, queue action for later
+      if (!isOnline) {
+        const success = await queueOfflineAction({
+          type: 'update',
+          table: 'prescriptions',
+          id: id,
+          data: {
+            fulfillment_status: fulfillmentStatus,
+            pharmacist_notes: notes,
+            fulfilled_at: new Date().toISOString()
+          }
+        });
+        
+        if (success) {
+          toast.success("Prescription fulfillment queued for when you're back online");
+          setSelectedPrescription(null);
+          setFulfillmentStatus("");
+          setNotes("");
+        } else {
+          toast.error("Failed to queue fulfillment action");
+        }
+        setProcessingId(null);
+        return;
+      }
+
+      // Online flow
       const { error } = await supabase
         .from('prescriptions')
-        .update({ status: 'fulfilled' })
-        .in('id', selectedIds);
-        
+        .update({
+          fulfillment_status: fulfillmentStatus,
+          pharmacist_notes: notes,
+          fulfilled_at: new Date().toISOString()
+        })
+        .eq('id', id);
+
       if (error) throw error;
-      
-      toast.success(`${selectedIds.length} prescriptions fulfilled`);
-      setSelected({});
-      fetchPrescriptions();
-      
-      // Log analytics
-      logAnalyticsEvent('prescriptions_fulfilled', {
-        count: selectedIds.length,
-        prescription_ids: selectedIds
+
+      // Log successful fulfillment
+      logAnalyticsEvent('prescription_fulfilled', {
+        prescription_id: id,
+        status: fulfillmentStatus
       });
+      
+      toast.success("Prescription status updated successfully");
+      queryClient.invalidateQueries({ queryKey: ['pending-prescriptions'] });
+      setSelectedPrescription(null);
+      setFulfillmentStatus("");
+      setNotes("");
+      
     } catch (error) {
-      console.error('Error fulfilling prescriptions:', error);
-      toast.error('Failed to fulfill prescriptions');
+      console.error("Error updating prescription:", error);
+      toast.error("Failed to update prescription status");
     } finally {
-      setLoading(false);
+      setProcessingId(null);
     }
   };
-  
-  const toggleSelect = (id: string) => {
-    setSelected(prev => ({
-      ...prev,
-      [id]: !prev[id]
-    }));
-  };
-  
-  const isAllSelected = 
-    prescriptions.length > 0 && 
-    prescriptions.every(p => p.id && selected[p.id]);
-    
-  const toggleSelectAll = () => {
-    if (isAllSelected) {
-      setSelected({});
-    } else {
-      const newSelected: Record<string, boolean> = {};
-      prescriptions.forEach(p => {
-        if (p.id) newSelected[p.id] = true;
-      });
-      setSelected(newSelected);
-    }
-  };
-  
-  // Load prescriptions on component mount
-  React.useEffect(() => {
-    fetchPrescriptions();
-  }, []);
-  
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center p-8">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-4 border border-red-200 rounded-md bg-red-50 text-red-800 flex items-center">
+        <AlertCircle className="h-5 w-5 mr-2" />
+        <span>Failed to load prescriptions. Please try again.</span>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-4">
-      <Card>
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <CardTitle>Pending Prescriptions</CardTitle>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={fetchPrescriptions} 
-              disabled={loading}
-            >
-              Refresh
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          {loading ? (
-            <div className="text-center py-4">Loading prescriptions...</div>
-          ) : prescriptions.length === 0 ? (
-            <div className="text-center py-4 text-muted-foreground">No pending prescriptions</div>
-          ) : (
-            <div className="space-y-2">
-              <div className="flex items-center space-x-2 pb-2 border-b">
-                <Checkbox 
-                  checked={isAllSelected} 
-                  onCheckedChange={toggleSelectAll} 
-                  id="select-all"
-                />
-                <label htmlFor="select-all" className="text-sm font-medium">Select All</label>
-              </div>
-              
-              {prescriptions.map(prescription => (
-                <div 
-                  key={prescription.id} 
-                  className="flex items-start space-x-3 p-3 rounded-md border hover:bg-accent/20"
-                >
-                  <Checkbox 
-                    checked={prescription.id ? selected[prescription.id] : false}
-                    onCheckedChange={() => prescription.id && toggleSelect(prescription.id)}
-                    id={`rx-${prescription.id}`}
-                    className="mt-1"
-                  />
-                  
-                  <div className="flex-1">
-                    <h4 className="font-medium">{prescription.medication_name}</h4>
-                    <div className="text-sm text-muted-foreground space-y-1">
-                      <p>Dosage: {prescription.dosage}</p>
-                      <p>Frequency: {prescription.frequency}</p>
-                      {prescription.notes && <p>Notes: {prescription.notes}</p>}
-                      <p className="text-xs">
-                        Prescribed by Dr. {prescription.prescribed_by} on {" "}
-                        {prescription.prescribed_date && new Date(prescription.prescribed_date).toLocaleDateString()}
-                      </p>
-                    </div>
+    <div className="grid gap-4">
+      <h2 className="text-xl font-bold">Prescription Fulfillment</h2>
+      
+      {!isOnline && (
+        <div className="p-4 mb-4 border border-yellow-200 rounded-md bg-yellow-50 text-yellow-800">
+          You are working offline. Fulfillment actions will be queued for when you're back online.
+        </div>
+      )}
+
+      {prescriptions?.length === 0 ? (
+        <div className="text-center p-8 text-gray-500">
+          No pending prescriptions to fulfill
+        </div>
+      ) : (
+        <>
+          {prescriptions?.map((prescription) => (
+            <Card key={prescription.id} className="overflow-hidden">
+              <CardHeader className="bg-muted/50">
+                <CardTitle className="text-lg flex justify-between">
+                  {prescription.medication_name}
+                  <Badge className="ml-2">{prescription.fulfillment_status || "Pending"}</Badge>
+                </CardTitle>
+                <CardDescription>
+                  For: {prescription.patient.first_name} {prescription.patient.last_name}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pt-4">
+                <div className="grid gap-2">
+                  <div className="flex items-center">
+                    <span className="font-medium">Dosage:</span>
+                    <span className="ml-2">{prescription.dosage}</span>
                   </div>
+                  <div className="flex items-center">
+                    <span className="font-medium">Frequency:</span>
+                    <span className="ml-2">{prescription.frequency}</span>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="font-medium">Prescribed:</span>
+                    <span className="ml-2">
+                      {new Date(prescription.prescribed_date).toLocaleDateString()}
+                    </span>
+                  </div>
+                  {prescription.notes && (
+                    <div className="mt-2">
+                      <span className="font-medium">Doctor's Notes:</span>
+                      <div className="mt-1 p-2 bg-muted rounded-md text-sm">
+                        {prescription.notes}
+                      </div>
+                    </div>
+                  )}
                 </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-        <CardFooter>
-          <Button 
-            onClick={handleFulfill} 
-            disabled={loading || Object.keys(selected).length === 0}
-            className="w-full"
-          >
-            Fulfill Selected Prescriptions
-          </Button>
-        </CardFooter>
-      </Card>
+              </CardContent>
+              <CardFooter className="flex justify-end">
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button 
+                      variant="default"
+                      onClick={() => setSelectedPrescription(prescription.id)}
+                    >
+                      Update Status
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Update Prescription Status</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Update the fulfillment status for {prescription.medication_name}.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    
+                    <div className="grid gap-4 py-4">
+                      <div className="grid gap-2">
+                        <label htmlFor="status">Status</label>
+                        <Select
+                          value={fulfillmentStatus}
+                          onValueChange={setFulfillmentStatus}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select status" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="fulfilled">Fulfilled</SelectItem>
+                            <SelectItem value="partial">Partially Fulfilled</SelectItem>
+                            <SelectItem value="backorder">On Backorder</SelectItem>
+                            <SelectItem value="denied">Denied</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div className="grid gap-2">
+                        <label htmlFor="notes">Notes</label>
+                        <Textarea
+                          id="notes"
+                          value={notes}
+                          onChange={(e) => setNotes(e.target.value)}
+                          placeholder="Enter any notes about this fulfillment"
+                          rows={3}
+                        />
+                      </div>
+                    </div>
+                    
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        disabled={!fulfillmentStatus || processingId === prescription.id}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleFulfill(prescription.id);
+                        }}
+                      >
+                        {processingId === prescription.id ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Processing...
+                          </>
+                        ) : (
+                          "Update Status"
+                        )}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </CardFooter>
+            </Card>
+          ))}
+        </>
+      )}
     </div>
   );
 };
-
-export default PrescriptionFulfillment;

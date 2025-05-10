@@ -99,7 +99,7 @@ export const ConsultationList = ({ onJoinMeeting }: ConsultationListProps) => {
             
             {consultation.meeting_url && consultation.status === 'in-progress' && (
               <Button 
-                onClick={() => onJoinMeeting(consultation)}
+                onClick={() => onJoinMeeting && onJoinMeeting(consultation)}
                 className={`gap-2 ${isMobile ? 'w-full mt-2' : ''}`}
                 size={isMobile ? "lg" : "default"}
               >

@@ -1,6 +1,6 @@
 
 import { useState, useEffect, lazy, Suspense } from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { MobileLayout } from "@/components/MobileLayout";
 import { OnboardingProvider } from "@/components/onboarding/OnboardingProvider";
@@ -10,25 +10,26 @@ import { Toaster } from "@/components/ui/toaster";
 import { OfflineAlert } from "@/components/OfflineAlert";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { logAnalyticsEvent } from "@/utils/analytics-service";
+import { lazyLoadComponent } from "@/utils/code-splitting";
 
-// Lazy-loaded components
-const Home = lazy(() => import("@/pages/Landing"));
-const Login = lazy(() => import("@/pages/Login"));
-const Register = lazy(() => import("@/pages/Register"));
-const Profile = lazy(() => import("@/pages/Profile"));
-const Appointments = lazy(() => import("@/pages/Appointments"));
-const Search = lazy(() => import("@/pages/Search"));
-const VideoCall = lazy(() => import("@/pages/VideoCall"));
-const Messages = lazy(() => import("@/pages/Chat"));
-const AppointmentDetails = lazy(() => import("@/pages/AppointmentDetails"));
-const Wallet = lazy(() => import("@/pages/Wallet"));
-const Providers = lazy(() => import("@/pages/Providers"));
-const PharmacyInventory = lazy(() => import("@/pages/PharmacyInventory"));
-const NotificationsPage = lazy(() => import("@/pages/NotificationsPage"));
-const SettingsPage = lazy(() => import("@/pages/SettingsPage"));
-const Medications = lazy(() => import("@/pages/Medications"));
-const Testing = lazy(() => import("@/pages/Testing"));
-const Documentation = lazy(() => import("@/pages/Documentation"));
+// Lazy-loaded components using the new utility
+const Home = lazyLoadComponent(() => import("@/pages/Landing"));
+const Login = lazyLoadComponent(() => import("@/pages/Login"));
+const Register = lazyLoadComponent(() => import("@/pages/Register"));
+const Profile = lazyLoadComponent(() => import("@/pages/Profile"));
+const Appointments = lazyLoadComponent(() => import("@/pages/Appointments"));
+const Search = lazyLoadComponent(() => import("@/pages/Search"));
+const VideoCall = lazyLoadComponent(() => import("@/pages/VideoCall"));
+const Messages = lazyLoadComponent(() => import("@/pages/Chat"));
+const AppointmentDetails = lazyLoadComponent(() => import("@/pages/AppointmentDetails"));
+const Wallet = lazyLoadComponent(() => import("@/pages/Wallet"));
+const Providers = lazyLoadComponent(() => import("@/pages/Providers"));
+const PharmacyInventory = lazyLoadComponent(() => import("@/pages/PharmacyInventory"));
+const NotificationsPage = lazyLoadComponent(() => import("@/pages/NotificationsPage"));
+const SettingsPage = lazyLoadComponent(() => import("@/pages/SettingsPage"));
+const Medications = lazyLoadComponent(() => import("@/pages/Medications"));
+const Testing = lazyLoadComponent(() => import("@/pages/Testing"));
+const Documentation = lazyLoadComponent(() => import("@/pages/Documentation"));
 
 // Preload critical routes
 if (typeof window !== 'undefined') {
@@ -87,50 +88,46 @@ function App() {
   }, []);
 
   return (
-    <AuthProvider>
-      <OnboardingProvider>
-        <Router>
-          {isLoading ? (
-            <LoadingScreen />
-          ) : (
-            <ErrorBoundary>
-              <Routes>
-                <Route
-                  path="/*"
-                  element={
-                    <MobileLayout isLoading={isLoading}>
-                      <Suspense fallback={<LoadingScreen />}>
-                        <Routes>
-                          <Route path="/" element={<Home />} />
-                          <Route path="/login" element={<Login />} />
-                          <Route path="/register" element={<Register />} />
-                          <Route path="/profile" element={<Profile />} />
-                          <Route path="/appointments" element={<Appointments />} />
-                          <Route path="/appointments/:id" element={<AppointmentDetails />} />
-                          <Route path="/search" element={<Search />} />
-                          <Route path="/video/:roomUrl" element={<VideoCall />} />
-                          <Route path="/chat" element={<Messages />} />
-                          <Route path="/wallet" element={<Wallet />} />
-                          <Route path="/providers" element={<Providers />} />
-                          <Route path="/pharmacy" element={<PharmacyInventory />} />
-                          <Route path="/medications" element={<Medications />} />
-                          <Route path="/notifications" element={<NotificationsPage />} />
-                          <Route path="/settings" element={<SettingsPage />} />
-                          <Route path="/testing" element={<Testing />} />
-                          <Route path="/documentation" element={<Documentation />} />
-                        </Routes>
-                      </Suspense>
-                    </MobileLayout>
-                  }
-                />
-              </Routes>
-            </ErrorBoundary>
-          )}
-          <Toaster />
-          <OfflineAlert />
-        </Router>
-      </OnboardingProvider>
-    </AuthProvider>
+    <OnboardingProvider>
+      {isLoading ? (
+        <LoadingScreen />
+      ) : (
+        <ErrorBoundary>
+          <Routes>
+            <Route
+              path="/*"
+              element={
+                <MobileLayout isLoading={isLoading}>
+                  <Suspense fallback={<LoadingScreen />}>
+                    <Routes>
+                      <Route path="/" element={<Home />} />
+                      <Route path="/login" element={<Login />} />
+                      <Route path="/register" element={<Register />} />
+                      <Route path="/profile" element={<Profile />} />
+                      <Route path="/appointments" element={<Appointments />} />
+                      <Route path="/appointments/:id" element={<AppointmentDetails />} />
+                      <Route path="/search" element={<Search />} />
+                      <Route path="/video/:roomUrl" element={<VideoCall />} />
+                      <Route path="/chat" element={<Messages />} />
+                      <Route path="/wallet" element={<Wallet />} />
+                      <Route path="/providers" element={<Providers />} />
+                      <Route path="/pharmacy" element={<PharmacyInventory />} />
+                      <Route path="/medications" element={<Medications />} />
+                      <Route path="/notifications" element={<NotificationsPage />} />
+                      <Route path="/settings" element={<SettingsPage />} />
+                      <Route path="/testing" element={<Testing />} />
+                      <Route path="/documentation" element={<Documentation />} />
+                    </Routes>
+                  </Suspense>
+                </MobileLayout>
+              }
+            />
+          </Routes>
+        </ErrorBoundary>
+      )}
+      <Toaster />
+      <OfflineAlert />
+    </OnboardingProvider>
   );
 }
 

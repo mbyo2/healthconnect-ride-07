@@ -9,17 +9,26 @@ export interface VideoRoomProps {
 
 export interface VideoConsultationDetails {
   id: string;
-  title: string;
-  provider: string;
-  date: string;
-  time: string;
+  title?: string;
+  provider: {
+    first_name: string;
+    last_name: string;
+    specialty: string;
+  };
+  patient_id: string;
+  provider_id: string;
+  scheduled_start: string;
+  scheduled_end: string;
   status: string;
-  roomUrl?: string;
+  meeting_url?: string;
+  notes?: string;
+  created_at: string;
   duration?: number;
 }
 
 export interface ConsultationListProps {
-  consultations: VideoConsultationDetails[];
+  consultations?: VideoConsultationDetails[];
   loading?: boolean;
   onSelectConsultation?: (consultation: VideoConsultationDetails) => void;
+  onJoinMeeting?: (consultation: VideoConsultationDetails) => void;
 }
