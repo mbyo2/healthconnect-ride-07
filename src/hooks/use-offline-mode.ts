@@ -5,7 +5,10 @@ import { useToast } from '@/components/ui/use-toast';
 export interface OfflineAction {
   id?: string;
   type: string;
-  payload: any;
+  // Replace 'payload: any' with specific properties
+  table?: string; // Add the table property
+  id?: string;
+  data?: any; // For update operations
   timestamp?: string;
 }
 
@@ -262,9 +265,9 @@ export const useOfflineMode = () => {
     queueOfflineAction,
     pendingActions,
     syncPendingActions,
-    // Aliases for existing functionality
-    offlineActions,
-    syncOfflineActions,
+    // Make sure these are properly returned
+    offlineActions: pendingActions,
+    syncOfflineActions: syncPendingActions,
     offlineFeatures,
     // Caching functions
     cacheForOffline,

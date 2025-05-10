@@ -26,12 +26,35 @@ import { useOfflineMode } from "@/hooks/use-offline-mode";
 import { Textarea } from "../ui/textarea";
 import { logAnalyticsEvent } from "@/utils/analytics-service";
 
+// Define interface for prescription data
+interface Prescription {
+  id: string;
+  medication_name: string;
+  dosage: string;
+  frequency: string;
+  patient_id: string;
+  prescribed_by: string;
+  prescribed_date: string;
+  end_date: string;
+  notes: string;
+  created_at: string;
+  updated_at: string;
+  fulfillment_status?: string;  // Add this field
+  pharmacist_notes?: string;    // Add this field
+  fulfilled_at?: string;        // Add this field
+  patient: {
+    first_name: string;
+    last_name: string;
+    date_of_birth: string;
+  };
+}
+
 export const PrescriptionFulfillment = () => {
   const [fulfillmentStatus, setFulfillmentStatus] = useState("");
   const [notes, setNotes] = useState("");
   const [selectedPrescription, setSelectedPrescription] = useState<string | null>(null);
   const [processingId, setProcessingId] = useState<string | null>(null);
-  const { isOnline, queueOfflineAction } = useOfflineMode();
+  const { isOnline, queueOfflineAction, offlineActions, syncOfflineActions, offlineFeatures } = useOfflineMode();
   const queryClient = useQueryClient();
 
   // Query prescriptions that need fulfillment
@@ -52,6 +75,9 @@ export const PrescriptionFulfillment = () => {
           notes,
           created_at,
           updated_at,
+          fulfillment_status,
+          pharmacist_notes,
+          fulfilled_at,
           patient:profiles!prescriptions_patient_id_fkey(
             first_name,
             last_name,
@@ -61,7 +87,7 @@ export const PrescriptionFulfillment = () => {
         .eq('fulfillment_status', 'pending');
 
       if (error) throw error;
-      return data;
+      return data as Prescription[];
     },
     // Enabled only when online
     enabled: isOnline,

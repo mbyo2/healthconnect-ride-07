@@ -23,6 +23,17 @@ interface PerformanceMetrics {
   };
 }
 
+// Type augmentation for Performance to include non-standard memory property
+interface MemoryInfo {
+  jsHeapSizeLimit: number;
+  totalJSHeapSize: number;
+  usedJSHeapSize: number;
+}
+
+interface PerformanceWithMemory extends Performance {
+  memory?: MemoryInfo;
+}
+
 export const usePerformanceMonitoring = (enabled = true) => {
   const [metrics, setMetrics] = useState<PerformanceMetrics>({
     firstPaint: null,
@@ -166,10 +177,11 @@ export const usePerformanceMonitoring = (enabled = true) => {
         });
         updateMetrics({ resourceLoadTimes: resourceTimes });
 
-        // Memory usage if available
-        if (performance.memory) {
+        // Memory usage if available (Chrome only)
+        const perf = performance as PerformanceWithMemory;
+        if (perf.memory) {
           updateMetrics({
-            jsHeapSize: (performance as any).memory.usedJSHeapSize
+            jsHeapSize: perf.memory.usedJSHeapSize
           });
         }
       };
