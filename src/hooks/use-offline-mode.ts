@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 
@@ -129,7 +130,7 @@ export const useOfflineMode = () => {
     for (const action of pendingActions) {
       try {
         await processOfflineAction(action);
-        await removeCompletedAction(action.id as string);
+        await removeCompletedAction(action.id);
       } catch (error) {
         console.error(`Error processing action ${action.type}:`, error);
       }
@@ -253,17 +254,11 @@ export const useOfflineMode = () => {
     });
   };
 
-  // Alias for compatibility
-  const syncOfflineActions = syncPendingActions;
-  const offlineActions = pendingActions;
-
   return {
     isOnline,
     queueOfflineAction,
     pendingActions,
     syncPendingActions,
-    offlineActions: pendingActions,
-    syncOfflineActions: syncPendingActions,
     offlineFeatures,
     // Caching functions
     cacheForOffline,

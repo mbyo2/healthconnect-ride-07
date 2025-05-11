@@ -16,6 +16,7 @@ import { initAnalytics } from './utils/analytics-service';
 import { initErrorLogging } from './utils/error-logging-service';
 import { ErrorBoundary } from './components/ui/error-boundary';
 import { LoadingScreen } from './components/LoadingScreen';
+import { GlobalErrorHandler } from './components/ui/global-error-handler';
 
 // Add a global error handler for uncaught exceptions
 window.addEventListener('error', (event) => {
@@ -52,13 +53,16 @@ function renderErrorFallback(rootElement) {
   });
 }
 
-// Create a client
+// Create an instance of the query client with optimized settings
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 1000 * 60 * 5, // 5 minutes
       retry: 1,
       refetchOnWindowFocus: false,
+      // Add intelligent caching
+      refetchOnMount: true,
+      gcTime: 1000 * 60 * 10, // 10 minutes
     },
   },
 });
@@ -95,9 +99,14 @@ window.addEventListener('offline', () => {
   document.dispatchEvent(new CustomEvent('app:offline'));
 });
 
+// Track render state globally to avoid re-rendering issues
+let hasRendered = false;
+
 // Function to ensure the app actually renders
 function renderApp() {
   try {
+    if (hasRendered) return;
+    
     const rootElement = document.getElementById('root');
     if (!rootElement) {
       console.error("Root element not found!");
@@ -106,25 +115,30 @@ function renderApp() {
     
     ReactDOM.createRoot(rootElement).render(
       <React.StrictMode>
-        <ErrorBoundary>
-          <React.Suspense fallback={<LoadingScreen />}>
-            <QueryClientProvider client={queryClient}>
-              <ThemeProvider defaultTheme="light" storageKey="doc-oclock-theme">
-                <AccessibilityProvider>
-                  <AuthProvider>
-                    <BrowserRouter>
-                      <App />
-                      <Toaster position="top-right" richColors closeButton />
-                    </BrowserRouter>
-                  </AuthProvider>
-                </AccessibilityProvider>
-              </ThemeProvider>
-            </QueryClientProvider>
-          </React.Suspense>
-        </ErrorBoundary>
+        <GlobalErrorHandler>
+          <ErrorBoundary>
+            <React.Suspense fallback={<LoadingScreen />}>
+              <QueryClientProvider client={queryClient}>
+                <ThemeProvider defaultTheme="light" storageKey="doc-oclock-theme">
+                  <AccessibilityProvider>
+                    <AuthProvider>
+                      <BrowserRouter>
+                        <App />
+                        <Toaster position="top-right" richColors closeButton />
+                      </BrowserRouter>
+                    </AuthProvider>
+                  </AccessibilityProvider>
+                </ThemeProvider>
+              </QueryClientProvider>
+            </React.Suspense>
+          </ErrorBoundary>
+        </GlobalErrorHandler>
       </React.StrictMode>
     );
+    
+    hasRendered = true;
     console.log("App rendered successfully");
+    window.appLoaded = true;
   } catch (error) {
     console.error("Failed to render app:", error);
     const rootElement = document.getElementById('root');
@@ -132,5 +146,18 @@ function renderApp() {
   }
 }
 
-// Give a small delay to ensure DOM is fully ready
-setTimeout(renderApp, 0);
+// Render immediately if the DOM is already ready, otherwise wait for it
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', renderApp);
+} else {
+  renderApp();
+}
+
+// Safeguard against potential failures to render
+setTimeout(() => {
+  if (!window.appLoaded) {
+    console.warn('App may not have loaded properly, attempting re-render');
+    hasRendered = false; // Reset the flag
+    renderApp();
+  }
+}, 3000);
