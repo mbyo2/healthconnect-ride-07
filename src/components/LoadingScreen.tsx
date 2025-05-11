@@ -2,6 +2,7 @@
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 interface LoadingScreenProps {
   message?: string;
@@ -10,10 +11,11 @@ interface LoadingScreenProps {
 
 export const LoadingScreen = ({ 
   message = "Just a moment please...", 
-  timeout = 5000 
+  timeout = 3000 // Reduced from 5000 to 3000
 }: LoadingScreenProps) => {
   const [showFallback, setShowFallback] = useState(false);
   const [longWait, setLongWait] = useState(false);
+  const [loadingProgress, setLoadingProgress] = useState(0);
   
   // Show fallback content if loading takes too long
   useEffect(() => {
@@ -23,11 +25,20 @@ export const LoadingScreen = ({
     
     const longWaitTimer = setTimeout(() => {
       setLongWait(true);
-    }, timeout * 2); // Show more serious message after double timeout
+    }, timeout * 1.5); // Reduced multiplier from 2 to 1.5
+    
+    // Create a simulated loading progress
+    const progressInterval = setInterval(() => {
+      setLoadingProgress(prev => {
+        const increment = Math.random() * 15;
+        return Math.min(prev + increment, 95); // Cap at 95% until actually loaded
+      });
+    }, 400);
     
     return () => {
       clearTimeout(fallbackTimer);
       clearTimeout(longWaitTimer);
+      clearInterval(progressInterval);
     };
   }, [timeout]);
 
@@ -35,16 +46,24 @@ export const LoadingScreen = ({
     <div className="fixed inset-0 bg-gradient-to-br from-background to-background/95 backdrop-blur-sm flex flex-col items-center justify-center z-50">
       <div className="flex flex-col items-center gap-4 animate-fadeIn p-6 rounded-lg bg-background/50 shadow-lg max-w-md text-center">
         <div className="relative">
-          <div className="absolute inset-0 rounded-full bg-primary/20 animate-ping" />
-          <Loader2 className="h-12 w-12 animate-spin text-primary relative z-10" />
+          <LoadingSpinner size="lg" className="text-primary" />
         </div>
-        <p className="text-lg font-medium text-primary/80 animate-pulse">{message}</p>
+        <p className="text-lg font-medium text-primary/80">{message}</p>
+        
+        {/* Progress bar for visual feedback */}
+        <div className="w-full bg-muted rounded-full h-2 mt-2">
+          <div 
+            className="bg-primary h-2 rounded-full transition-all duration-300" 
+            style={{ width: `${loadingProgress}%` }} 
+          />
+        </div>
+        
         <p className="text-sm text-muted-foreground max-w-xs text-center">
-          We're preparing your information
+          Loading your information...
         </p>
         
         {showFallback && (
-          <div className="mt-6 text-center">
+          <div className="mt-4 text-center">
             <p className="text-sm text-muted-foreground">
               {longWait 
                 ? "This is taking longer than expected. There might be a problem loading the application."

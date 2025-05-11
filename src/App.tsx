@@ -1,4 +1,3 @@
-
 import { lazy, Suspense, useEffect, useState, useCallback } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
 import { MobileLayout } from "@/components/MobileLayout";
@@ -11,6 +10,7 @@ import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { logAnalyticsEvent } from "@/utils/analytics-service";
 import { MobileAppWrapper } from "@/components/MobileAppWrapper";
 import { lazyLoadComponent } from "@/utils/code-splitting";
+import { SearchProvider } from "@/context/SearchContext";
 
 // Lazy-loaded components using the utility
 const Home = lazyLoadComponent(() => import("@/pages/Landing"));
@@ -62,15 +62,11 @@ function App() {
           userAgent: navigator.userAgent
         });
 
-        // Allow a minimum loading time for a smoother experience
-        const startTime = performance.now();
-        const minLoadTime = 500; // 500ms minimum loading time
+        // Reduced minimum loading time for a faster experience
+        const minLoadTime = 200; // Reduced from 500ms to 200ms
         
-        const remainingTime = Math.max(0, minLoadTime - (performance.now() - startTime));
-        
-        if (remainingTime > 0) {
-          await new Promise(resolve => setTimeout(resolve, remainingTime));
-        }
+        // Wait for a small delay to prevent flashing
+        await new Promise(resolve => setTimeout(resolve, minLoadTime));
         
         setIsLoading(false);
           
@@ -103,49 +99,51 @@ function App() {
         console.warn("Forcing loading complete after timeout");
         setIsLoading(false);
       }
-    }, 5000); // 5 seconds max
+    }, 3000); // Reduced from 5 seconds to 3 seconds max
     
     return () => clearTimeout(timeoutId);
   }, [isLoading]);
 
   return (
     <OnboardingProvider>
-      <MobileAppWrapper>
-        <ErrorBoundary>
-          <Routes>
-            <Route
-              path="/*"
-              element={
-                <MobileLayout isLoading={isLoading}>
-                  <Suspense fallback={<LoadingScreen />}>
-                    <Routes>
-                      <Route path="/" element={<Home />} />
-                      <Route path="/login" element={<Login />} />
-                      <Route path="/register" element={<Register />} />
-                      <Route path="/profile" element={<Profile />} />
-                      <Route path="/appointments" element={<Appointments />} />
-                      <Route path="/appointments/:id" element={<AppointmentDetails />} />
-                      <Route path="/search" element={<Search />} />
-                      <Route path="/video/:roomUrl" element={<VideoCall />} />
-                      <Route path="/chat" element={<Messages />} />
-                      <Route path="/wallet" element={<Wallet />} />
-                      <Route path="/providers" element={<Providers />} />
-                      <Route path="/pharmacy" element={<PharmacyInventory />} />
-                      <Route path="/medications" element={<Medications />} />
-                      <Route path="/notifications" element={<NotificationsPage />} />
-                      <Route path="/settings" element={<SettingsPage />} />
-                      <Route path="/testing" element={<Testing />} />
-                      <Route path="/documentation" element={<Documentation />} />
-                    </Routes>
-                  </Suspense>
-                </MobileLayout>
-              }
-            />
-          </Routes>
-        </ErrorBoundary>
-        <Toaster />
-        <OfflineAlert />
-      </MobileAppWrapper>
+      <SearchProvider>
+        <MobileAppWrapper>
+          <ErrorBoundary>
+            <Routes>
+              <Route
+                path="/*"
+                element={
+                  <MobileLayout isLoading={isLoading}>
+                    <Suspense fallback={<LoadingScreen message="Loading content..." />}>
+                      <Routes>
+                        <Route path="/" element={<Home />} />
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/register" element={<Register />} />
+                        <Route path="/profile" element={<Profile />} />
+                        <Route path="/appointments" element={<Appointments />} />
+                        <Route path="/appointments/:id" element={<AppointmentDetails />} />
+                        <Route path="/search" element={<Search />} />
+                        <Route path="/video/:roomUrl" element={<VideoCall />} />
+                        <Route path="/chat" element={<Messages />} />
+                        <Route path="/wallet" element={<Wallet />} />
+                        <Route path="/providers" element={<Providers />} />
+                        <Route path="/pharmacy" element={<PharmacyInventory />} />
+                        <Route path="/medications" element={<Medications />} />
+                        <Route path="/notifications" element={<NotificationsPage />} />
+                        <Route path="/settings" element={<SettingsPage />} />
+                        <Route path="/testing" element={<Testing />} />
+                        <Route path="/documentation" element={<Documentation />} />
+                      </Routes>
+                    </Suspense>
+                  </MobileLayout>
+                }
+              />
+            </Routes>
+          </ErrorBoundary>
+          <Toaster />
+          <OfflineAlert />
+        </MobileAppWrapper>
+      </SearchProvider>
     </OnboardingProvider>
   );
 }
