@@ -31,7 +31,11 @@ export function DesktopNav() {
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSearchQuery(searchTerm);
-    location.pathname !== "/search" && window.location.href = "/search";
+    
+    // Fixed the invalid assignment syntax
+    if (location.pathname !== "/search") {
+      window.location.href = "/search";
+    }
   };
 
   const handleLogout = async () => {

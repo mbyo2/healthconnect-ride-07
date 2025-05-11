@@ -62,8 +62,7 @@ function App() {
           userAgent: navigator.userAgent
         });
 
-        // Instead of simulating delay, implement a minimum loading time
-        // to prevent flashing of content
+        // Allow a minimum loading time for a smoother experience
         const startTime = performance.now();
         const minLoadTime = 500; // 500ms minimum loading time
         
@@ -87,27 +86,14 @@ function App() {
     };
 
     initializeApp();
-    
-    // Track page views - moved to a separate effect to prevent re-runs
   }, []);
   
-  // Track page views
+  // Track page views in a separate effect to prevent re-runs
   useEffect(() => {
-    const handlePageView = () => {
-      logAnalyticsEvent('page_view', {
-        page: window.location.pathname,
-        referrer: document.referrer
-      });
-    };
-    
-    // Log initial page view
-    handlePageView();
-    
-    // Setup listener for route changes
-    return () => {
-      // This cleanup function will run when the component unmounts
-      // or when the dependencies change (location in this case)
-    };
+    logAnalyticsEvent('page_view', {
+      page: window.location.pathname,
+      referrer: document.referrer
+    });
   }, [location.pathname]); // Only re-run when pathname changes
 
   // Force loading to end after timeout, ensuring the app always renders

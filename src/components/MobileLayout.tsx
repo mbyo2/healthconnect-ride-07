@@ -44,8 +44,8 @@ export const MobileLayout = ({ children, isLoading }: MobileLayoutProps) => {
     return (
       <SidebarProvider>
         <div className="flex min-h-screen bg-background w-full">
+          <DesktopNav />
           <main className="flex-1 overflow-auto">
-            <DesktopNav />
             <div className="container mx-auto px-4 md:px-6 lg:px-8 py-6 space-y-6 max-w-7xl">
               {children}
             </div>
