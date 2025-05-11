@@ -41,6 +41,13 @@ interface Prescription {
   patient_name?: string; // Join field
 }
 
+// Define the fulfillment data structure
+interface FulfillmentData {
+  prescription_id: string;
+  status: 'pending' | 'fulfilled' | 'partially_fulfilled' | 'cancelled';
+  updated_at?: string;
+}
+
 export function PrescriptionFulfillment() {
   const [prescriptions, setPrescriptions] = useState<Prescription[]>([]);
   const [loading, setLoading] = useState(true);
@@ -62,7 +69,8 @@ export function PrescriptionFulfillment() {
             toast({
               title: "Using cached prescription data",
               description: "You're viewing offline data which may not be current",
-              variant: "warning",
+              // Fix the variant
+              variant: "destructive",
             });
             return;
           }
@@ -78,19 +86,18 @@ export function PrescriptionFulfillment() {
           
         if (error) throw error;
 
-        // Also load fulfillment status from a separate table if it exists
-        // or from local storage as a fallback
-        const { data: fulfillmentData, error: fulfillmentError } = await supabase
-          .from('prescription_fulfillments')
-          .select('prescription_id, status');
+        // Load fulfillment data from localStorage since we don't have that table in Supabase yet
+        // In a real app, you would create this table in Supabase
+        const storedFulfillments = localStorage.getItem('prescription_fulfillments');
+        const fulfillmentData = storedFulfillments ? JSON.parse(storedFulfillments) : [];
         
         // Transform the data
         const prescriptionsWithStatus = prescriptionsData.map(prescription => {
           // Find fulfillment status if it exists
           let fulfillmentStatus = 'pending';
           
-          if (!fulfillmentError && fulfillmentData) {
-            const fulfillment = fulfillmentData.find(f => f.prescription_id === prescription.id);
+          if (fulfillmentData && fulfillmentData.length > 0) {
+            const fulfillment = fulfillmentData.find((f: FulfillmentData) => f.prescription_id === prescription.id);
             if (fulfillment) {
               fulfillmentStatus = fulfillment.status;
             }
@@ -166,19 +173,35 @@ export function PrescriptionFulfillment() {
         return;
       }
       
-      // If online, update directly
-      const { error } = await supabase
-        .from('prescription_fulfillments')
-        .upsert(
-          { 
-            prescription_id: prescriptionId, 
-            status: newStatus,
-            updated_at: new Date().toISOString()
-          },
-          { onConflict: 'prescription_id' }
-        );
-
-      if (error) throw error;
+      // Since we don't have the prescription_fulfillments table in Supabase yet,
+      // we'll store the data in localStorage as a temporary solution
+      // In a real app, you should create this table in Supabase
+      const storedFulfillments = localStorage.getItem('prescription_fulfillments');
+      const currentFulfillments = storedFulfillments ? JSON.parse(storedFulfillments) : [];
+      
+      // Find if this prescription already has a status entry
+      const existingFulfillmentIndex = currentFulfillments.findIndex(
+        (f: FulfillmentData) => f.prescription_id === prescriptionId
+      );
+      
+      if (existingFulfillmentIndex >= 0) {
+        // Update existing entry
+        currentFulfillments[existingFulfillmentIndex] = {
+          prescription_id: prescriptionId,
+          status: newStatus,
+          updated_at: new Date().toISOString()
+        };
+      } else {
+        // Add new entry
+        currentFulfillments.push({
+          prescription_id: prescriptionId,
+          status: newStatus,
+          updated_at: new Date().toISOString()
+        });
+      }
+      
+      // Save back to localStorage
+      localStorage.setItem('prescription_fulfillments', JSON.stringify(currentFulfillments));
       
       toast({
         title: "Status updated",

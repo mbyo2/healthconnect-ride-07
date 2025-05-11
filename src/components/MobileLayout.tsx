@@ -2,7 +2,7 @@
 import { Header } from "@/components/Header";
 import { BottomNav } from "@/components/BottomNav";
 import { DesktopNav } from "@/components/DesktopNav";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useDeviceType } from "@/hooks/use-device-type";
 import { ReactNode, useEffect } from "react";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { SidebarProvider } from "@/components/ui/sidebar";
@@ -14,12 +14,12 @@ interface MobileLayoutProps {
 }
 
 export const MobileLayout = ({ children, isLoading }: MobileLayoutProps) => {
-  const isMobile = useIsMobile();
+  const { isMobile, isTablet, isDesktop } = useDeviceType();
   const { showFeatureHighlight } = useOnboarding();
   
   // Show navigation highlights for mobile users
   useEffect(() => {
-    if (isMobile) {
+    if (isMobile || isTablet) {
       // Highlight bottom navigation after a delay
       const timer = setTimeout(() => {
         showFeatureHighlight({
@@ -34,18 +34,18 @@ export const MobileLayout = ({ children, isLoading }: MobileLayoutProps) => {
       
       return () => clearTimeout(timer);
     }
-  }, [isMobile, showFeatureHighlight]);
+  }, [isMobile, isTablet, showFeatureHighlight]);
 
   if (isLoading) {
     return <LoadingScreen />;
   }
 
-  if (!isMobile) {
+  if (isDesktop) {
     return (
       <SidebarProvider>
         <div className="flex min-h-screen bg-background w-full">
-          <DesktopNav />
           <main className="flex-1 overflow-auto">
+            <DesktopNav />
             <div className="container mx-auto px-4 md:px-6 lg:px-8 py-6 space-y-6 max-w-7xl">
               {children}
             </div>

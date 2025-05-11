@@ -4,14 +4,21 @@ import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "react-router-dom";
 import { useSession } from "@/hooks/use-session";
 import { useTouchFeedback } from "@/hooks/use-touch-feedback";
+import { useDeviceType } from "@/hooks/use-device-type";
 
 export function BottomNav() {
   const location = useLocation();
   const { session, user } = useSession();
+  const { isDesktop } = useDeviceType();
   const touchFeedbackProps = useTouchFeedback({ 
     rippleColor: 'var(--primary)', 
     rippleOpacity: 0.15 
   });
+  
+  // Don't render on desktop
+  if (isDesktop) {
+    return null;
+  }
   
   // Define navigation items
   const navItems = [
@@ -60,7 +67,7 @@ export function BottomNav() {
   ];
   
   return (
-    <div className="fixed bottom-0 left-0 right-0 border-t bg-background/95 backdrop-blur-sm px-1 py-2 z-50 md:hidden shadow-lg">
+    <div className="fixed bottom-0 left-0 right-0 border-t bg-background/95 backdrop-blur-sm px-1 py-2 z-50 lg:hidden shadow-lg">
       <div className="flex items-center justify-between overflow-x-auto">
         {navItems.map((item, index) => (
           <Button 

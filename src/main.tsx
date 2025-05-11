@@ -18,6 +18,13 @@ import { ErrorBoundary } from './components/ui/error-boundary';
 import { LoadingScreen } from './components/LoadingScreen';
 import { GlobalErrorHandler } from './components/ui/global-error-handler';
 
+// Extend Window interface to include our custom properties
+declare global {
+  interface Window {
+    appLoaded?: boolean;
+  }
+}
+
 // Add a global error handler for uncaught exceptions
 window.addEventListener('error', (event) => {
   console.error('Uncaught error:', event.error);
