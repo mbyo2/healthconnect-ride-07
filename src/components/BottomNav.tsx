@@ -1,5 +1,5 @@
 
-import { Home, Search, Calendar, MessageSquare, User, BookOpen, CheckSquare } from "lucide-react";
+import { Home, Search, Calendar, MessageSquare, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "react-router-dom";
 import { useSession } from "@/hooks/use-session";
@@ -20,7 +20,7 @@ export function BottomNav() {
     return null;
   }
   
-  // Define navigation items
+  // Define essential navigation items only
   const navItems = [
     {
       to: "/",
@@ -45,18 +45,6 @@ export function BottomNav() {
       label: "Chat",
       icon: <MessageSquare className="h-5 w-5" />,
       active: location.pathname === "/chat"
-    },
-    {
-      to: "/documentation",
-      label: "Docs",
-      icon: <BookOpen className="h-5 w-5" />,
-      active: location.pathname === "/documentation"
-    },
-    {
-      to: "/testing",
-      label: "Testing",
-      icon: <CheckSquare className="h-5 w-5" />,
-      active: location.pathname === "/testing"
     },
     {
       to: "/profile",

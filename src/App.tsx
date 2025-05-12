@@ -1,4 +1,5 @@
-import { lazy, Suspense, useEffect, useState, useCallback } from "react";
+
+import { lazy, Suspense, useEffect, useState } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
 import { MobileLayout } from "@/components/MobileLayout";
 import { OnboardingProvider } from "@/components/onboarding/OnboardingProvider";
@@ -34,7 +35,6 @@ const Documentation = lazyLoadComponent(() => import("@/pages/Documentation"));
 // Preload critical routes for faster initial loading
 if (typeof window !== 'undefined') {
   import("@/pages/Landing");
-  import("@/pages/Login");
 }
 
 function App() {
@@ -62,8 +62,8 @@ function App() {
           userAgent: navigator.userAgent
         });
 
-        // Reduced minimum loading time for a faster experience
-        const minLoadTime = 200; // Reduced from 500ms to 200ms
+        // Minimal loading time for a faster experience
+        const minLoadTime = 100; // Reduced to 100ms for faster startup
         
         // Wait for a small delay to prevent flashing
         await new Promise(resolve => setTimeout(resolve, minLoadTime));
@@ -99,7 +99,7 @@ function App() {
         console.warn("Forcing loading complete after timeout");
         setIsLoading(false);
       }
-    }, 3000); // Reduced from 5 seconds to 3 seconds max
+    }, 2000); // Reduced to 2 seconds max
     
     return () => clearTimeout(timeoutId);
   }, [isLoading]);

@@ -12,11 +12,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { Search } from "lucide-react";
+import { Search, MoreHorizontal } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useSearch } from "@/context/SearchContext";
-import { Home, Calendar, MessageSquare, Settings, BookOpen, CheckSquare } from "lucide-react";
+import { Home, Calendar, MessageSquare, Settings } from "lucide-react";
 
 export function DesktopNav() {
   const location = useLocation();
@@ -32,7 +32,6 @@ export function DesktopNav() {
     e.preventDefault();
     setSearchQuery(searchTerm);
     
-    // Fixed the invalid assignment syntax
     if (location.pathname !== "/search") {
       window.location.href = "/search";
     }
@@ -47,7 +46,8 @@ export function DesktopNav() {
     }
   };
   
-  const navItems = [
+  // Define main essential navigation items
+  const mainNavItems = [
     {
       to: "/",
       label: "Home",
@@ -71,24 +71,22 @@ export function DesktopNav() {
       label: "Messages",
       icon: <MessageSquare className="h-5 w-5 mr-2" />,
       active: location.pathname === "/chat"
-    },
+    }
+  ];
+  
+  // Secondary items for "More" dropdown
+  const secondaryNavItems = [
     {
       to: "/documentation",
-      label: "Documentation",
-      icon: <BookOpen className="h-5 w-5 mr-2" />,
-      active: location.pathname === "/documentation"
+      label: "Documentation"
     },
     {
       to: "/testing",
-      label: "Testing",
-      icon: <CheckSquare className="h-5 w-5 mr-2" />,
-      active: location.pathname === "/testing"
+      label: "Testing"
     },
     {
       to: "/settings",
-      label: "Settings",
-      icon: <Settings className="h-5 w-5 mr-2" />,
-      active: location.pathname === "/settings"
+      label: "Settings"
     }
   ];
   
@@ -101,7 +99,7 @@ export function DesktopNav() {
           </Link>
           
           <div className="hidden lg:flex items-center space-x-1">
-            {navItems.map((item, index) => (
+            {mainNavItems.map((item, index) => (
               <Button 
                 key={index} 
                 variant={item.active ? "default" : "ghost"} 
@@ -114,22 +112,38 @@ export function DesktopNav() {
                 </Link>
               </Button>
             ))}
-
-            {user?.role === "health_personnel" && (
-              <Button variant="ghost" asChild>
-                <Link to="/provider-dashboard">
-                  Provider Dashboard
-                </Link>
-              </Button>
-            )}
             
-            {user?.role === "admin" && (
-              <Button variant="ghost" asChild>
-                <Link to="/admin-dashboard">
-                  Admin Dashboard
-                </Link>
-              </Button>
-            )}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="flex items-center">
+                  <MoreHorizontal className="h-5 w-5 mr-2" />
+                  More
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                {secondaryNavItems.map((item, index) => (
+                  <DropdownMenuItem key={index} asChild>
+                    <Link to={item.to}>{item.label}</Link>
+                  </DropdownMenuItem>
+                ))}
+                
+                {user?.role === "health_personnel" && (
+                  <DropdownMenuItem asChild>
+                    <Link to="/provider-dashboard">
+                      Provider Dashboard
+                    </Link>
+                  </DropdownMenuItem>
+                )}
+                
+                {user?.role === "admin" && (
+                  <DropdownMenuItem asChild>
+                    <Link to="/admin-dashboard">
+                      Admin Dashboard
+                    </Link>
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
         
