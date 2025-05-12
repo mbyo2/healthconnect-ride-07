@@ -1,3 +1,4 @@
+
 import { lazy, Suspense, useEffect, useState } from "react";
 import { Route, Routes, useLocation, Navigate } from "react-router-dom";
 import { MobileLayout } from "@/components/MobileLayout";
@@ -32,7 +33,7 @@ const SettingsPage = lazyLoadComponent(() => import("@/pages/SettingsPage"));
 const Medications = lazyLoadComponent(() => import("@/pages/Medications"));
 const Testing = lazyLoadComponent(() => import("@/pages/Testing"));
 const Documentation = lazyLoadComponent(() => import("@/pages/Documentation"));
-const ProviderPortal = lazyLoadComponent(() => import("@/pages/ProviderPortal"));
+const ProviderPortal = lazyLoadComponent(() => import("@/pages/ProviderPortal").then(module => ({ default: module.ProviderPortal })));
 const ProviderDashboard = lazyLoadComponent(() => import("@/pages/ProviderDashboard"));
 
 // Preload critical routes for faster initial loading

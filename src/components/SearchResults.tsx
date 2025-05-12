@@ -1,5 +1,5 @@
 
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback, memo } from "react";
 import { ProviderList } from "@/components/ProviderList";
 import ProviderMap from "@/components/ProviderMap";
 import { useSearch } from "@/context/SearchContext";
@@ -8,6 +8,9 @@ import { SearchPagination } from "@/components/SearchPagination";
 import { useVoiceCommands } from "@/hooks/use-voice-commands";
 import { Button } from "@/components/ui/button";
 import { Volume2 } from "lucide-react";
+
+// Memoized map component to prevent unnecessary re-renders
+const MemoizedProviderMap = memo(ProviderMap);
 
 export const SearchResults = () => {
   const { providers, isLoading, userLocation, maxDistance, totalCount, searchTerm } = useSearch();
@@ -21,7 +24,8 @@ export const SearchResults = () => {
     }
   }, [isLoading, providers.length, speak, searchTerm, totalCount]);
   
-  const handleReadResults = () => {
+  // Memoized read results handler
+  const handleReadResults = useCallback(() => {
     if (speak && providers.length > 0) {
       const providerSummaries = providers.slice(0, 5).map(provider => 
         `${provider.first_name} ${provider.last_name}, ${provider.specialty}, ${provider.distance} kilometers away`
@@ -31,7 +35,7 @@ export const SearchResults = () => {
     } else if (speak) {
       speak("No healthcare providers found matching your search criteria.");
     }
-  };
+  }, [speak, providers]);
 
   if (isLoading && providers.length === 0) {
     return (
@@ -69,7 +73,7 @@ export const SearchResults = () => {
         )}
       </div>
       
-      <ProviderMap 
+      <MemoizedProviderMap 
         providers={providers} 
         userLocation={userLocation}
         maxDistance={maxDistance}

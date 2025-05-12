@@ -14,37 +14,37 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Search, MoreHorizontal } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useSearch } from "@/context/SearchContext";
 import { Home, Calendar, MessageSquare } from "lucide-react";
 
 export function DesktopNav() {
   const location = useLocation();
-  const { user, signOut } = useAuth();
+  const { user, signOut, profile } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
   const { setSearchQuery } = useSearch();
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
-  };
+  }, []);
 
-  const handleSearchSubmit = (e: React.FormEvent) => {
+  const handleSearchSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault();
     setSearchQuery(searchTerm);
     
     if (location.pathname !== "/search") {
       window.location.href = "/search";
     }
-  };
+  }, [location.pathname, searchTerm, setSearchQuery]);
 
-  const handleLogout = async () => {
+  const handleLogout = useCallback(async () => {
     try {
       await signOut();
       window.location.href = "/login";
     } catch (error) {
       console.error("Error signing out:", error);
     }
-  };
+  }, [signOut]);
   
   // Define main essential navigation items
   const mainNavItems = [
@@ -97,11 +97,13 @@ export function DesktopNav() {
   return (
     <header className="bg-background sticky top-0 z-50 border-b px-6">
       <div className="flex items-center justify-between py-4">
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-8">
+          {/* Logo */}
           <Link to="/" className="font-bold text-2xl">
             Doc&apos; O Clock
           </Link>
           
+          {/* Main navigation */}
           <div className="hidden lg:flex items-center space-x-1">
             {mainNavItems.map((item, index) => (
               <Button 
@@ -136,6 +138,7 @@ export function DesktopNav() {
         </div>
         
         <div className="flex items-center gap-4">
+          {/* Search */}
           <form onSubmit={handleSearchSubmit} className="relative hidden md:block">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
@@ -149,12 +152,13 @@ export function DesktopNav() {
           
           <ThemeToggle />
           
+          {/* User menu */}
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="h-8 w-8 rounded-full p-0">
                   <Avatar>
-                    <AvatarImage src={user?.user_metadata?.avatar_url || ""} alt={user?.email || ""} />
+                    <AvatarImage src={profile?.avatar_url || user?.user_metadata?.avatar_url || ""} alt={user?.email || ""} />
                     <AvatarFallback>{user?.email?.[0]?.toUpperCase() || "U"}</AvatarFallback>
                   </Avatar>
                 </Button>
@@ -168,7 +172,13 @@ export function DesktopNav() {
                 <DropdownMenuItem asChild>
                   <Link to="/settings">Settings</Link>
                 </DropdownMenuItem>
-                {user?.role === "health_personnel" && (
+                <DropdownMenuItem asChild>
+                  <Link to="/documentation">Documentation</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/testing">Testing</Link>
+                </DropdownMenuItem>
+                {profile?.role === "health_personnel" && (
                   <DropdownMenuItem asChild>
                     <Link to="/provider-dashboard">
                       Provider Dashboard
@@ -176,7 +186,7 @@ export function DesktopNav() {
                   </DropdownMenuItem>
                 )}
                 
-                {user?.role === "admin" && (
+                {(profile?.admin_level === "admin" || profile?.admin_level === "superadmin") && (
                   <DropdownMenuItem asChild>
                     <Link to="/admin-dashboard">
                       Admin Dashboard

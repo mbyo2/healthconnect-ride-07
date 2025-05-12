@@ -1,5 +1,5 @@
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 
 type DeviceType = 'mobile' | 'tablet' | 'desktop' | 'tv' | 'unknown';
 
@@ -14,27 +14,28 @@ export function useDeviceType(): {
     typeof window !== 'undefined' ? window.innerWidth : 0
   );
   
+  // Throttle resize handler for better performance
+  const handleResize = useCallback(() => {
+    // Only update if the width change is significant
+    if (Math.abs(window.innerWidth - width) > 50) {
+      setWidth(window.innerWidth);
+    }
+  }, [width]);
+  
   useEffect(() => {
     // Only run on client side
     if (typeof window === 'undefined') return;
     
-    const handleResize = () => {
-      // Throttle resize events to avoid excessive re-renders
-      if (Math.abs(window.innerWidth - width) > 50) {
-        setWidth(window.innerWidth);
-      }
-    };
-    
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [width]);
+  }, [handleResize]);
   
   const deviceData = useMemo(() => {
-    // Initial device type detection
+    // Detect device type
     const detectDeviceType = (): DeviceType => {
       if (typeof window === 'undefined') return 'unknown';
       
-      // First check if we're on a TV
+      // Check if we're on a TV
       if (
         navigator.userAgent.toLowerCase().indexOf('smart-tv') > -1 ||
         navigator.userAgent.toLowerCase().indexOf('tv') > -1 ||
@@ -45,7 +46,7 @@ export function useDeviceType(): {
         return 'tv';
       }
 
-      // Then check for other devices using breakpoints
+      // Check for other devices using breakpoints
       if (width <= 768) {
         return 'mobile';
       } else if (width <= 1024) {

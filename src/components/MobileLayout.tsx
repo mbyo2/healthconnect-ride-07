@@ -6,6 +6,7 @@ import { useDeviceType } from "@/hooks/use-device-type";
 import { ReactNode } from "react";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import { cn } from "@/lib/utils";
 
 interface MobileLayoutProps {
   children: ReactNode;
@@ -37,7 +38,10 @@ export const MobileLayout = ({ children, isLoading }: MobileLayoutProps) => {
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
-      <main className="flex-1 pt-16 pb-20 overflow-x-hidden">
+      <main className={cn(
+        "flex-1 pt-16 pb-14 overflow-x-hidden", 
+        "transition-all duration-200 ease-in-out"
+      )}>
         <div className="container mx-auto px-4 md:px-6 space-y-6">
           {children}
         </div>
