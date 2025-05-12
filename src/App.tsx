@@ -1,6 +1,5 @@
-
 import { lazy, Suspense, useEffect, useState } from "react";
-import { Route, Routes, useLocation } from "react-router-dom";
+import { Route, Routes, useLocation, Navigate } from "react-router-dom";
 import { MobileLayout } from "@/components/MobileLayout";
 import { OnboardingProvider } from "@/components/onboarding/OnboardingProvider";
 import { checkServiceWorkerStatus, registerServiceWorker } from "@/utils/service-worker";
@@ -12,6 +11,8 @@ import { logAnalyticsEvent } from "@/utils/analytics-service";
 import { MobileAppWrapper } from "@/components/MobileAppWrapper";
 import { lazyLoadComponent } from "@/utils/code-splitting";
 import { SearchProvider } from "@/context/SearchContext";
+import { useAuth } from "@/context/AuthContext";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 
 // Lazy-loaded components using the utility
 const Home = lazyLoadComponent(() => import("@/pages/Landing"));
@@ -31,6 +32,8 @@ const SettingsPage = lazyLoadComponent(() => import("@/pages/SettingsPage"));
 const Medications = lazyLoadComponent(() => import("@/pages/Medications"));
 const Testing = lazyLoadComponent(() => import("@/pages/Testing"));
 const Documentation = lazyLoadComponent(() => import("@/pages/Documentation"));
+const ProviderPortal = lazyLoadComponent(() => import("@/pages/ProviderPortal"));
+const ProviderDashboard = lazyLoadComponent(() => import("@/pages/ProviderDashboard"));
 
 // Preload critical routes for faster initial loading
 if (typeof window !== 'undefined') {
@@ -41,6 +44,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [serviceWorkerActive, setServiceWorkerActive] = useState(false);
   const location = useLocation();
+  const { isAuthenticated, user, profile } = useAuth();
 
   // Setup the initialization flow with better error handling
   useEffect(() => {
@@ -119,19 +123,81 @@ function App() {
                         <Route path="/" element={<Home />} />
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />
-                        <Route path="/profile" element={<Profile />} />
-                        <Route path="/appointments" element={<Appointments />} />
-                        <Route path="/appointments/:id" element={<AppointmentDetails />} />
+                        <Route path="/provider-portal" element={<ProviderPortal />} />
+                        
+                        {/* Protected routes */}
+                        <Route path="/profile" element={
+                          <ProtectedRoute>
+                            <Profile />
+                          </ProtectedRoute>
+                        } />
+                        <Route path="/appointments" element={
+                          <ProtectedRoute>
+                            <Appointments />
+                          </ProtectedRoute>
+                        } />
+                        <Route path="/appointments/:id" element={
+                          <ProtectedRoute>
+                            <AppointmentDetails />
+                          </ProtectedRoute>
+                        } />
+                        <Route path="/chat" element={
+                          <ProtectedRoute>
+                            <Messages />
+                          </ProtectedRoute>
+                        } />
+                        
+                        {/* Semi-protected routes */}
                         <Route path="/search" element={<Search />} />
-                        <Route path="/video/:roomUrl" element={<VideoCall />} />
-                        <Route path="/chat" element={<Messages />} />
-                        <Route path="/wallet" element={<Wallet />} />
+                        <Route path="/video/:roomUrl" element={
+                          <ProtectedRoute>
+                            <VideoCall />
+                          </ProtectedRoute>
+                        } />
+                        <Route path="/wallet" element={
+                          <ProtectedRoute>
+                            <Wallet />
+                          </ProtectedRoute>
+                        } />
                         <Route path="/providers" element={<Providers />} />
-                        <Route path="/pharmacy" element={<PharmacyInventory />} />
-                        <Route path="/medications" element={<Medications />} />
-                        <Route path="/notifications" element={<NotificationsPage />} />
-                        <Route path="/settings" element={<SettingsPage />} />
-                        <Route path="/testing" element={<Testing />} />
+                        
+                        {/* Role-specific routes */}
+                        <Route path="/provider-dashboard" element={
+                          <ProtectedRoute>
+                            {profile?.role === 'health_personnel' ? 
+                              <ProviderDashboard /> : 
+                              <Navigate to="/" replace />}
+                          </ProtectedRoute>
+                        } />
+                        <Route path="/pharmacy" element={
+                          <ProtectedRoute>
+                            {profile?.role === 'health_personnel' ? 
+                              <PharmacyInventory /> : 
+                              <Navigate to="/" replace />}
+                          </ProtectedRoute>
+                        } />
+                        
+                        {/* Other protected routes */}
+                        <Route path="/medications" element={
+                          <ProtectedRoute>
+                            <Medications />
+                          </ProtectedRoute>
+                        } />
+                        <Route path="/notifications" element={
+                          <ProtectedRoute>
+                            <NotificationsPage />
+                          </ProtectedRoute>
+                        } />
+                        <Route path="/settings" element={
+                          <ProtectedRoute>
+                            <SettingsPage />
+                          </ProtectedRoute>
+                        } />
+                        <Route path="/testing" element={
+                          <ProtectedRoute>
+                            <Testing />
+                          </ProtectedRoute>
+                        } />
                         <Route path="/documentation" element={<Documentation />} />
                       </Routes>
                     </Suspense>

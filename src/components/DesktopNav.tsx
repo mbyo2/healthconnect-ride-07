@@ -16,7 +16,7 @@ import { Search, MoreHorizontal } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useSearch } from "@/context/SearchContext";
-import { Home, Calendar, MessageSquare, Settings } from "lucide-react";
+import { Home, Calendar, MessageSquare } from "lucide-react";
 
 export function DesktopNav() {
   const location = useLocation();
@@ -77,6 +77,10 @@ export function DesktopNav() {
   // Secondary items for "More" dropdown
   const secondaryNavItems = [
     {
+      to: "/profile",
+      label: "Profile"
+    },
+    {
       to: "/documentation",
       label: "Documentation"
     },
@@ -91,7 +95,7 @@ export function DesktopNav() {
   ];
   
   return (
-    <div className="bg-background sticky top-0 z-50 border-b px-6">
+    <header className="bg-background sticky top-0 z-50 border-b px-6">
       <div className="flex items-center justify-between py-4">
         <div className="flex items-center gap-6">
           <Link to="/" className="font-bold text-2xl">
@@ -126,22 +130,6 @@ export function DesktopNav() {
                     <Link to={item.to}>{item.label}</Link>
                   </DropdownMenuItem>
                 ))}
-                
-                {user?.role === "health_personnel" && (
-                  <DropdownMenuItem asChild>
-                    <Link to="/provider-dashboard">
-                      Provider Dashboard
-                    </Link>
-                  </DropdownMenuItem>
-                )}
-                
-                {user?.role === "admin" && (
-                  <DropdownMenuItem asChild>
-                    <Link to="/admin-dashboard">
-                      Admin Dashboard
-                    </Link>
-                  </DropdownMenuItem>
-                )}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -180,6 +168,21 @@ export function DesktopNav() {
                 <DropdownMenuItem asChild>
                   <Link to="/settings">Settings</Link>
                 </DropdownMenuItem>
+                {user?.role === "health_personnel" && (
+                  <DropdownMenuItem asChild>
+                    <Link to="/provider-dashboard">
+                      Provider Dashboard
+                    </Link>
+                  </DropdownMenuItem>
+                )}
+                
+                {user?.role === "admin" && (
+                  <DropdownMenuItem asChild>
+                    <Link to="/admin-dashboard">
+                      Admin Dashboard
+                    </Link>
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout}>
                   Logout
@@ -198,6 +201,6 @@ export function DesktopNav() {
           )}
         </div>
       </div>
-    </div>
+    </header>
   );
 }
