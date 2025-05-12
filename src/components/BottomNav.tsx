@@ -1,10 +1,20 @@
 
-import { Home, Search, Calendar, MessageSquare, User } from "lucide-react";
+import { Home, Search, Calendar, MessageSquare, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "react-router-dom";
 import { useSession } from "@/hooks/use-session";
 import { useTouchFeedback } from "@/hooks/use-touch-feedback";
 import { useDeviceType } from "@/hooks/use-device-type";
+import { useState } from "react";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export function BottomNav() {
   const location = useLocation();
@@ -20,7 +30,7 @@ export function BottomNav() {
     return null;
   }
   
-  // Define essential navigation items only
+  // Define essential navigation items only - reduced to the most important 4
   const navItems = [
     {
       to: "/",
@@ -45,13 +55,15 @@ export function BottomNav() {
       label: "Chat",
       icon: <MessageSquare className="h-5 w-5" />,
       active: location.pathname === "/chat"
-    },
-    {
-      to: "/profile",
-      label: "Profile",
-      icon: <User className="h-5 w-5" />,
-      active: location.pathname === "/profile"
     }
+  ];
+
+  // Menu items moved to the sheet
+  const menuItems = [
+    { to: "/profile", label: "Profile" },
+    { to: "/testing", label: "Testing" },
+    { to: "/documentation", label: "Documentation" },
+    { to: "/settings", label: "Settings" }
   ];
   
   return (
@@ -72,6 +84,50 @@ export function BottomNav() {
             </Link>
           </Button>
         ))}
+
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button 
+              variant="ghost" 
+              size="icon"
+              className="flex flex-col items-center justify-center gap-1 h-auto py-1 min-w-[3.5rem]"
+              {...touchFeedbackProps}
+            >
+              <Menu className="h-5 w-5 text-muted-foreground" />
+              <span className="text-[9px] text-muted-foreground">Menu</span>
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="right" className="w-[80vw]">
+            <SheetHeader>
+              <SheetTitle>Menu</SheetTitle>
+              <SheetDescription className="flex items-center gap-2">
+                {user && (
+                  <>
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={user?.user_metadata?.avatar_url || ""} />
+                      <AvatarFallback>{user?.email?.[0]?.toUpperCase() || "U"}</AvatarFallback>
+                    </Avatar>
+                    <span>{user.email}</span>
+                  </>
+                )}
+              </SheetDescription>
+            </SheetHeader>
+            <div className="mt-6 space-y-1">
+              {menuItems.map((item, idx) => (
+                <Button 
+                  key={idx}
+                  variant="ghost" 
+                  className="w-full justify-start text-foreground hover:text-primary hover:bg-accent/50 transition-colors"
+                  asChild
+                >
+                  <Link to={item.to}>
+                    {item.label}
+                  </Link>
+                </Button>
+              ))}
+            </div>
+          </SheetContent>
+        </Sheet>
       </div>
     </div>
   );

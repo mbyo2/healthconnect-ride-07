@@ -13,7 +13,7 @@ interface MobileLayoutProps {
 }
 
 export const MobileLayout = ({ children, isLoading }: MobileLayoutProps) => {
-  const { isMobile, isTablet, isDesktop } = useDeviceType();
+  const { isDesktop } = useDeviceType();
   
   if (isLoading) {
     return <LoadingScreen />;
