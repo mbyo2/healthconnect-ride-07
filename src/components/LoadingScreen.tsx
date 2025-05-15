@@ -11,11 +11,12 @@ interface LoadingScreenProps {
 
 export const LoadingScreen = ({ 
   message = "Just a moment please...", 
-  timeout = 3000 // Reduced from 5000 to 3000
+  timeout = 2000 // Reduced from 3000 to 2000
 }: LoadingScreenProps) => {
   const [showFallback, setShowFallback] = useState(false);
   const [longWait, setLongWait] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(0);
+  const [loadingFailed, setLoadingFailed] = useState(false);
   
   // Show fallback content if loading takes too long
   useEffect(() => {
@@ -25,7 +26,11 @@ export const LoadingScreen = ({
     
     const longWaitTimer = setTimeout(() => {
       setLongWait(true);
-    }, timeout * 1.5); // Reduced multiplier from 2 to 1.5
+    }, timeout * 1.5); // Reduced multiplier
+    
+    const failedTimer = setTimeout(() => {
+      setLoadingFailed(true);
+    }, timeout * 3); // Consider loading failed after 3x timeout
     
     // Create a simulated loading progress
     const progressInterval = setInterval(() => {
@@ -38,6 +43,7 @@ export const LoadingScreen = ({
     return () => {
       clearTimeout(fallbackTimer);
       clearTimeout(longWaitTimer);
+      clearTimeout(failedTimer);
       clearInterval(progressInterval);
     };
   }, [timeout]);
@@ -59,35 +65,35 @@ export const LoadingScreen = ({
         </div>
         
         <p className="text-sm text-muted-foreground max-w-xs text-center">
-          Loading your information...
+          {loadingFailed ? "Loading failed" : "Loading your information..."}
         </p>
         
-        {showFallback && (
+        {(showFallback || loadingFailed) && (
           <div className="mt-4 text-center">
             <p className="text-sm text-muted-foreground">
-              {longWait 
-                ? "This is taking longer than expected. There might be a problem loading the application."
-                : "Taking longer than expected? Try refreshing the page."}
+              {loadingFailed 
+                ? "We couldn't load the application. Please try refreshing the page or clearing your cache."
+                : longWait 
+                  ? "This is taking longer than expected. There might be a problem loading the application."
+                  : "Taking longer than expected? Try refreshing the page."}
             </p>
             <div className="mt-4 flex gap-2 justify-center">
               <Button 
                 onClick={() => window.location.reload()}
                 className="px-4 py-2"
-                variant={longWait ? "default" : "outline"}
+                variant={loadingFailed ? "default" : "outline"}
               >
                 Refresh
               </Button>
               
-              {longWait && (
+              {(longWait || loadingFailed) && (
                 <Button
                   variant="outline"
                   onClick={() => {
                     // Clear local storage and reload as a last resort
-                    if (window.confirm("Would you like to clear cached data and reload? This may help resolve the issue.")) {
-                      localStorage.clear();
-                      sessionStorage.clear();
-                      window.location.reload();
-                    }
+                    localStorage.clear();
+                    sessionStorage.clear();
+                    window.location.reload();
                   }}
                 >
                   Clear Cache & Reload

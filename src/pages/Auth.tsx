@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { Card } from "@/components/ui/card";
@@ -51,24 +50,45 @@ type PatientSignupFormValues = z.infer<typeof patientSignupSchema>;
 type ProviderSignupFormValues = z.infer<typeof providerSignupSchema>;
 
 const Auth = () => {
-  const { signIn, signUp, isLoading, isAuthenticated } = useAuth();
+  const { signIn, signUp, isLoading: authLoading, isAuthenticated } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const [userType, setUserType] = useState<"patient" | "health_personnel">("patient");
+  const [localLoading, setLocalLoading] = useState(false);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const defaultTab = searchParams.get('tab') === 'signup' ? 'signup' : 'signin';
   const [activeTab, setActiveTab] = useState(defaultTab);
 
-  // Redirect if already authenticated
+  // Simplified and more robust auth check
   useEffect(() => {
+    let mounted = true;
+    
     const checkAuth = async () => {
-      const { data } = await supabase.auth.getSession();
-      if (data.session) {
-        navigate("/symptoms");
+      try {
+        setLocalLoading(true);
+        const { data, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error("Auth check error:", error);
+          if (mounted) setError(error.message);
+          return;
+        }
+        
+        if (data.session && mounted) {
+          navigate("/symptoms");
+        }
+      } catch (err) {
+        console.error("Unexpected error checking auth:", err);
+      } finally {
+        if (mounted) setLocalLoading(false);
       }
     };
     
     checkAuth();
+    
+    return () => {
+      mounted = false;
+    };
   }, [navigate]);
 
   const loginForm = useForm<LoginFormValues>({
@@ -103,9 +123,11 @@ const Auth = () => {
     },
   });
 
+  // Form submission handlers with improved error handling
   const onLoginSubmit = async (data: LoginFormValues) => {
     try {
       setError(null);
+      setLocalLoading(true);
       const { error } = await supabase.auth.signInWithPassword({
         email: data.email,
         password: data.password,
@@ -119,6 +141,8 @@ const Auth = () => {
       setError(err.message || "Failed to sign in");
       console.error("Login error:", err);
       toast.error(err.message || "Failed to sign in");
+    } finally {
+      setLocalLoading(false);
     }
   };
 
@@ -176,8 +200,14 @@ const Auth = () => {
     }
   };
 
-  if (isLoading) {
-    return <LoadingScreen />;
+  if (authLoading || localLoading) {
+    return <LoadingScreen timeout={2000} />;
+  }
+
+  // If already authenticated, redirect
+  if (isAuthenticated) {
+    navigate("/symptoms");
+    return <LoadingScreen message="Redirecting..." />;
   }
 
   return (
