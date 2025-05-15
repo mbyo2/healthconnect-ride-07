@@ -1,4 +1,3 @@
-// Keep existing imports but add new ones for optimization
 import { lazy, Suspense, useEffect, useState } from "react";
 import { Route, Routes, useLocation, Navigate, useNavigate } from "react-router-dom";
 import { MobileLayout } from "@/components/MobileLayout";
@@ -17,6 +16,7 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { NetworkErrorBoundary } from "@/components/errors/NetworkErrorBoundary";
 import { performanceTracker } from "@/utils/performance-optimizations";
 import { QueryClient } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button"; // Added Button import
 
 // Lazy-loaded components using the utility
 const Home = lazyLoadComponent(() => import("@/pages/Landing"));

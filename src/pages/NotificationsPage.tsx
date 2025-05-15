@@ -1,169 +1,209 @@
 
-import { useState } from "react";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Bell, Check, Clock, MessageSquare, Calendar, AlertTriangle } from "lucide-react";
-import { useNotifications } from "@/hooks/use-notifications";
-import { format, formatDistanceToNow } from "date-fns";
-import { cn } from "@/lib/utils";
-import { Notification } from "@/types/notification";
-import { NetworkErrorBoundary } from "@/components/errors/NetworkErrorBoundary";
+import React, { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { Notification } from '@/types/notification';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
+import { toast } from 'sonner';
+import { formatDistanceToNow } from 'date-fns';
+import { getNotificationIcon } from '@/utils/notification-utils';
+import { cn } from '@/lib/utils';
+import { performanceTracker } from '@/utils/performance-optimizations';
 
 const NotificationsPage = () => {
-  const { notifications = [], isLoading, markAsRead, markAllAsRead } = useNotifications();
-  const [activeTab, setActiveTab] = useState<string>("all");
+  const [selectedTab, setSelectedTab] = useState<'all' | 'unread'>('all');
+  const queryClient = useQueryClient();
   
-  const handleMarkAllAsRead = async () => {
-    await markAllAsRead();
-  };
+  // Performance tracking
+  useEffect(() => {
+    const stopTracking = performanceTracker.trackMetric('notifications_page_render', performance.now());
+    return () => {
+      if (typeof stopTracking === 'function') stopTracking();
+    };
+  }, []);
   
-  const filteredNotifications = notifications.filter(notification => {
-    if (activeTab === "all") return true;
-    if (activeTab === "unread") return !notification.read;
-    return notification.type === activeTab;
+  // Fetch notifications with React Query
+  const { data: notifications = [], isLoading } = useQuery({
+    queryKey: ['notifications'],
+    queryFn: async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (!user) {
+          throw new Error('User not authenticated');
+        }
+        
+        const { data, error } = await supabase
+          .from('notifications')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false });
+          
+        if (error) {
+          throw error;
+        }
+        
+        return data as Notification[];
+      } catch (error) {
+        console.error('Error fetching notifications:', error);
+        return [];
+      }
+    },
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
   
-  const getNotificationIcon = (type: string) => {
-    switch (type) {
-      case 'appointment':
-        return <Calendar className="h-5 w-5 text-blue-600" />;
-      case 'message':
-        return <MessageSquare className="h-5 w-5 text-green-600" />;
-      default:
-        return <AlertTriangle className="h-5 w-5 text-amber-600" />;
-    }
-  };
+  // Mark notification as read mutation
+  const markAsRead = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('notifications')
+        .update({ read: true })
+        .eq('id', id);
+        
+      if (error) throw error;
+      return id;
+    },
+    onMutate: (id) => {
+      // Optimistic update
+      queryClient.setQueryData(['notifications'], (old: Notification[] | undefined) => {
+        if (!old) return [];
+        return old.map(notification => 
+          notification.id === id ? { ...notification, read: true } : notification
+        );
+      });
+    },
+    onError: (error) => {
+      console.error('Error marking notification as read:', error);
+      toast.error('Failed to mark notification as read');
+    },
+  });
+  
+  // Mark all as read mutation
+  const markAllAsRead = useMutation({
+    mutationFn: async () => {
+      // Get the user
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error('User not authenticated');
+      }
+      
+      const { error } = await supabase
+        .from('notifications')
+        .update({ read: true })
+        .eq('user_id', user.id)
+        .eq('read', false);
+        
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('All notifications marked as read');
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    },
+    onError: (error) => {
+      console.error('Error marking all notifications as read:', error);
+      toast.error('Failed to mark all notifications as read');
+    },
+  });
+  
+  // Filter notifications based on selected tab
+  const filteredNotifications = notifications?.filter(notification => 
+    selectedTab === 'all' || (selectedTab === 'unread' && !notification.read)
+  );
+  
+  // Count unread notifications
+  const unreadCount = notifications?.filter(notification => !notification.read).length || 0;
   
   return (
-    <NetworkErrorBoundary>
-      <div className="container mx-auto px-4 py-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-blue-600 mb-1">Notifications</h1>
-            <p className="text-muted-foreground">
-              Stay updated with your appointments, messages, and system alerts
-            </p>
-          </div>
-          
+    <div className="container mx-auto px-4 py-6 max-w-3xl">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-blue-600">Notifications</h1>
+        {unreadCount > 0 && (
           <Button 
             variant="outline" 
-            onClick={handleMarkAllAsRead}
-            disabled={isLoading || !notifications.some(n => !n.read)}
-            className="mt-4 sm:mt-0 border-blue-200 text-blue-600 hover:bg-blue-50"
+            onClick={() => markAllAsRead.mutate()}
+            disabled={markAllAsRead.isPending}
+            className="text-blue-600 border-blue-300 hover:bg-blue-50"
           >
-            <Check className="mr-2 h-4 w-4" />
             Mark all as read
           </Button>
-        </div>
-        
-        <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-4 mb-6">
-            <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="unread">Unread</TabsTrigger>
-            <TabsTrigger value="appointment">Appointments</TabsTrigger>
-            <TabsTrigger value="message">Messages</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value={activeTab} className="mt-0">
-            <div className="space-y-4">
-              {isLoading ? (
-                Array(3).fill(0).map((_, i) => (
-                  <Card key={i} className="border border-blue-100">
-                    <CardHeader className="pb-2">
-                      <div className="flex justify-between">
-                        <Skeleton className="h-6 w-[120px]" />
-                        <Skeleton className="h-4 w-[80px]" />
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <Skeleton className="h-4 w-full mb-2" />
-                      <Skeleton className="h-4 w-3/4" />
-                    </CardContent>
-                  </Card>
-                ))
-              ) : filteredNotifications.length === 0 ? (
-                <Card className="border border-blue-100 bg-blue-50/50">
-                  <CardContent className="py-8 text-center">
-                    <Bell className="mx-auto h-12 w-12 text-blue-300 mb-4" />
-                    <h3 className="text-lg font-medium text-blue-800">No notifications</h3>
-                    <p className="text-muted-foreground">
-                      {activeTab === "all" ? 
-                        "You don't have any notifications yet" : 
-                        `You don't have any ${activeTab === "unread" ? "unread" : activeTab} notifications`}
-                    </p>
-                  </CardContent>
-                </Card>
-              ) : (
-                filteredNotifications.map(notification => (
-                  <NotificationCard 
-                    key={notification.id} 
-                    notification={notification} 
-                    onMarkAsRead={markAsRead}
-                  />
-                ))
-              )}
-            </div>
-          </TabsContent>
-        </Tabs>
+        )}
       </div>
-    </NetworkErrorBoundary>
-  );
-};
+      
+      <div className="flex gap-2 mb-4">
+        <Button
+          variant={selectedTab === 'all' ? "default" : "outline"}
+          onClick={() => setSelectedTab('all')}
+          className={selectedTab === 'all' ? "bg-blue-600 hover:bg-blue-700" : "text-blue-600 hover:bg-blue-50"}
+        >
+          All
+        </Button>
+        <Button
+          variant={selectedTab === 'unread' ? "default" : "outline"}
+          onClick={() => setSelectedTab('unread')}
+          className={selectedTab === 'unread' ? "bg-blue-600 hover:bg-blue-700" : "text-blue-600 hover:bg-blue-50"}
+        >
+          Unread {unreadCount > 0 && <Badge className="ml-1 bg-blue-800">{unreadCount}</Badge>}
+        </Button>
+      </div>
 
-interface NotificationCardProps {
-  notification: Notification;
-  onMarkAsRead: (id: string) => void;
-}
-
-const NotificationCard = ({ notification, onMarkAsRead }: NotificationCardProps) => {
-  const handleMarkAsRead = () => {
-    if (!notification.read) {
-      onMarkAsRead(notification.id);
-    }
-  };
-  
-  const formattedDate = notification.created_at ? 
-    formatDistanceToNow(new Date(notification.created_at), { addSuffix: true }) : '';
-  
-  return (
-    <Card 
-      className={cn(
-        "border transition-colors",
-        notification.read ? 
-          "border-gray-200" : 
-          "border-blue-200 bg-blue-50/50"
-      )}
-    >
-      <CardHeader className="pb-2 flex flex-row items-start justify-between">
-        <div className="flex items-center">
-          {getNotificationIcon(notification.type)}
-          <CardTitle className="text-lg ml-2">
-            {notification.title}
-          </CardTitle>
+      {isLoading ? (
+        <div className="space-y-4">
+          {[1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-24 w-full rounded-lg" />
+          ))}
         </div>
-        <div className="flex items-center text-sm text-muted-foreground">
-          <Clock className="h-3 w-3 mr-1" />
-          {formattedDate}
+      ) : filteredNotifications.length === 0 ? (
+        <Card className="p-6 text-center">
+          <p className="text-gray-500">No {selectedTab === 'unread' ? 'unread ' : ''}notifications</p>
+        </Card>
+      ) : (
+        <div className="space-y-3">
+          {filteredNotifications.map((notification) => {
+            const NotificationIcon = getNotificationIcon(notification.type);
+            return (
+              <Card 
+                key={notification.id}
+                className={cn(
+                  "p-4 cursor-pointer transition-all hover:shadow",
+                  !notification.read ? "border-l-4 border-l-blue-600" : ""
+                )}
+                onClick={() => {
+                  if (!notification.read) {
+                    markAsRead.mutate(notification.id);
+                  }
+                }}
+              >
+                <div className="flex items-start gap-3">
+                  <div className={cn(
+                    "p-2 rounded-full shrink-0",
+                    !notification.read ? "bg-blue-100" : "bg-gray-100"
+                  )}>
+                    <NotificationIcon className={cn(
+                      "h-5 w-5",
+                      !notification.read ? "text-blue-600" : "text-gray-500"
+                    )} />
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-semibold text-blue-700">{notification.title}</div>
+                    <p className="text-sm text-gray-600 mt-1">{notification.message}</p>
+                    <div className="text-xs text-gray-500 mt-2">
+                      {notification.created_at && formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}
+                    </div>
+                  </div>
+                  {!notification.read && (
+                    <Badge className="bg-blue-600">New</Badge>
+                  )}
+                </div>
+              </Card>
+            );
+          })}
         </div>
-      </CardHeader>
-      <CardContent>
-        <p className="text-sm text-gray-600">{notification.message}</p>
-      </CardContent>
-      {!notification.read && (
-        <CardFooter className="pt-0 flex justify-end">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={handleMarkAsRead}
-            className="text-blue-600 hover:text-blue-800 hover:bg-blue-50"
-          >
-            <Check className="h-4 w-4 mr-1" /> Mark as read
-          </Button>
-        </CardFooter>
       )}
-    </Card>
+    </div>
   );
 };
 
