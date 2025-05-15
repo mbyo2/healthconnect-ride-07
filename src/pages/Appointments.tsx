@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -9,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { AppointmentWithProvider } from "@/types/appointments";
 import { useCallback } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Link } from "react-router-dom";
 
 const AppointmentsPage = () => {
   const queryClient = useQueryClient();
