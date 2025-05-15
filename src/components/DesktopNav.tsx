@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { Link, useLocation } from "react-router-dom";
@@ -20,9 +19,14 @@ import { Home, Calendar, MessageSquare } from "lucide-react";
 
 export function DesktopNav() {
   const location = useLocation();
-  const { user, signOut, profile } = useAuth();
+  const { user, signOut, profile, isAuthenticated } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
   const { setSearchQuery } = useSearch();
+
+  // Don't render if not authenticated
+  if (!isAuthenticated) {
+    return null;
+  }
 
   const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);

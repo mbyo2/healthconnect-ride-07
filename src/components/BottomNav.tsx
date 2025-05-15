@@ -5,6 +5,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useSession } from "@/hooks/use-session";
 import { useTouchFeedback } from "@/hooks/use-touch-feedback";
 import { useDeviceType } from "@/hooks/use-device-type";
+import { useAuth } from "@/context/AuthContext";
 import {
   Sheet,
   SheetContent,
@@ -20,13 +21,14 @@ export function BottomNav() {
   const location = useLocation();
   const { session, user } = useSession();
   const { isDesktop } = useDeviceType();
+  const { isAuthenticated } = useAuth();
   const touchFeedbackProps = useTouchFeedback({ 
     rippleColor: 'var(--primary)', 
     rippleOpacity: 0.15 
   });
   
-  // Don't render on desktop
-  if (isDesktop) {
+  // Don't render if not authenticated or on desktop
+  if (!isAuthenticated || isDesktop) {
     return null;
   }
   
