@@ -1,92 +1,108 @@
 
-import { useState, useCallback, useEffect } from "react";
-import { Notification } from "@/types/notification";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery } from "@tanstack/react-query";
-import { toast } from "sonner";
-import { fetchWithRetry } from "@/lib/utils";
+import { useAuth } from "@/context/AuthContext";
+import { useState, useEffect, useCallback } from "react";
+import { Notification } from "@/types/notification";
 
-export function useNotifications() {
-  const [unreadCount, setUnreadCount] = useState(0);
+export const useNotifications = () => {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const [unreadCount, setUnreadCount] = useState<number>(0);
   
-  // Fetch notifications with React Query
-  const {
-    data: notifications = [],
-    isLoading,
-    error,
-    refetch
-  } = useQuery({
-    queryKey: ['notifications'],
+  // Efficiently fetch notifications with proper caching
+  const { data: notifications = [], isLoading, error } = useQuery({
+    queryKey: ['notifications', user?.id],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return [];
+      if (!user?.id) return [];
       
-      try {
-        const { data, error } = await supabase
-          .from('notifications')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false })
-          .limit(50);
-          
-        if (error) throw error;
-        return data as Notification[];
-      } catch (error) {
-        console.error("Failed to fetch notifications:", error);
-        return [];
-      }
+      const { data, error } = await supabase
+        .from('notifications')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+        
+      if (error) throw error;
+      return data as Notification[];
     },
-    staleTime: 30000, // 30 seconds
+    enabled: !!user?.id,
+    staleTime: 60 * 1000, // 1 minute cache before refetching
+    refetchInterval: 30 * 1000, // Poll every 30 seconds for new notifications
   });
-  
+
   // Calculate unread count whenever notifications change
   useEffect(() => {
     if (notifications) {
-      const count = notifications.filter(n => !n.read).length;
-      setUnreadCount(count);
+      const unread = notifications.filter(notif => !notif.read).length;
+      setUnreadCount(unread);
     }
   }, [notifications]);
+
+  // Subscribe to realtime notification updates
+  useEffect(() => {
+    if (!user?.id) return;
+    
+    const channel = supabase
+      .channel('notifications-changes')
+      .on('postgres_changes', 
+        { 
+          event: '*', 
+          schema: 'public', 
+          table: 'notifications',
+          filter: `user_id=eq.${user.id}`
+        }, 
+        () => {
+          // Invalidate the query to trigger a refetch
+          queryClient.invalidateQueries({ queryKey: ['notifications', user.id] });
+        }
+      )
+      .subscribe();
+      
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user?.id, queryClient]);
   
   // Mark notification as read
-  const markAsRead = useCallback(async (id: string) => {
-    try {
-      const { error } = await supabase
-        .from('notifications')
-        .update({ read: true })
-        .eq('id', id);
-        
-      if (error) throw error;
+  const markAsRead = useCallback(async (notificationId: string) => {
+    if (!user?.id) return;
+    
+    await supabase
+      .from('notifications')
+      .update({ read: true })
+      .eq('id', notificationId)
+      .eq('user_id', user.id);
       
-      // Update local state to reflect the change
-      refetch();
-    } catch (error) {
-      console.error("Failed to mark notification as read:", error);
-      toast.error("Failed to mark notification as read");
-    }
-  }, [refetch]);
+    // Optimistic update
+    queryClient.setQueryData(['notifications', user.id], (oldData: Notification[] | undefined) => {
+      if (!oldData) return [];
+      return oldData.map(n => 
+        n.id === notificationId ? { ...n, read: true } : n
+      );
+    });
+    
+    // Update unread count without waiting for refetch
+    setUnreadCount(prev => Math.max(0, prev - 1));
+  }, [user?.id, queryClient]);
   
   // Mark all notifications as read
   const markAllAsRead = useCallback(async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+    if (!user?.id) return;
+    
+    await supabase
+      .from('notifications')
+      .update({ read: true })
+      .eq('user_id', user.id)
+      .eq('read', false);
       
-      const { error } = await supabase
-        .from('notifications')
-        .update({ read: true })
-        .eq('user_id', user.id)
-        .eq('read', false);
-        
-      if (error) throw error;
-      
-      // Update local state to reflect the change
-      refetch();
-      toast.success("All notifications marked as read");
-    } catch (error) {
-      console.error("Failed to mark all notifications as read:", error);
-      toast.error("Failed to update notifications");
-    }
-  }, [refetch]);
+    // Optimistic update
+    queryClient.setQueryData(['notifications', user.id], (oldData: Notification[] | undefined) => {
+      if (!oldData) return [];
+      return oldData.map(n => ({ ...n, read: true }));
+    });
+    
+    setUnreadCount(0);
+  }, [user?.id, queryClient]);
   
   return {
     notifications,
@@ -94,7 +110,6 @@ export function useNotifications() {
     error,
     unreadCount,
     markAsRead,
-    markAllAsRead,
-    refetch
+    markAllAsRead
   };
-}
+};

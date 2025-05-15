@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { useErrorHandler } from "@/hooks/use-error-handler";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
 export const VideoConsultation = () => {
   const [activeConsultation, setActiveConsultation] = useState<VideoConsultationDetails | null>(null);
