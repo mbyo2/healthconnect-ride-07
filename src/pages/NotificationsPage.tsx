@@ -7,7 +7,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/use-toast';
 import { formatDistanceToNow } from 'date-fns';
 import { getNotificationIcon } from '@/utils/notification-utils';
 import { cn } from '@/lib/utils';
@@ -19,9 +19,10 @@ const NotificationsPage = () => {
   
   // Performance tracking
   useEffect(() => {
-    const stopTracking = performanceTracker.trackMetric('notifications_page_render', performance.now());
+    const startTime = performance.now();
     return () => {
-      if (typeof stopTracking === 'function') stopTracking();
+      const duration = performance.now() - startTime;
+      performanceTracker.trackMetric('notifications_page_render', duration);
     };
   }, []);
   
@@ -77,7 +78,11 @@ const NotificationsPage = () => {
     },
     onError: (error) => {
       console.error('Error marking notification as read:', error);
-      toast.error('Failed to mark notification as read');
+      toast({
+        title: "Error",
+        description: "Failed to mark notification as read",
+        variant: "destructive"
+      });
     },
   });
   
@@ -100,12 +105,19 @@ const NotificationsPage = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success('All notifications marked as read');
+      toast({
+        title: "Success",
+        description: "All notifications marked as read",
+      });
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
     },
     onError: (error) => {
       console.error('Error marking all notifications as read:', error);
-      toast.error('Failed to mark all notifications as read');
+      toast({
+        title: "Error",
+        description: "Failed to mark all notifications as read",
+        variant: "destructive"
+      });
     },
   });
   
