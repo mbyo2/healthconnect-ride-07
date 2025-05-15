@@ -16,10 +16,12 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { NetworkErrorBoundary } from "@/components/errors/NetworkErrorBoundary";
 import { performanceTracker } from "@/utils/performance-optimizations";
 import { QueryClient } from "@tanstack/react-query";
-import { Button } from "@/components/ui/button"; // Added Button import
+import { Button } from "@/components/ui/button";
+import { useDeviceType } from "@/hooks/use-device-type";
 
 // Lazy-loaded components using the utility
 const Home = lazyLoadComponent(() => import("@/pages/Landing"));
+const Auth = lazyLoadComponent(() => import("@/pages/Auth"));
 const Login = lazyLoadComponent(() => import("@/pages/Login"));
 const Register = lazyLoadComponent(() => import("@/pages/Register"));
 const Profile = lazyLoadComponent(() => import("@/pages/Profile"));
@@ -42,7 +44,7 @@ const InstitutionRegistration = lazyLoadComponent(() => import("@/pages/Institut
 
 // Preload critical routes for faster initial loading
 if (typeof window !== 'undefined') {
-  const routesToPreload = ['Landing', 'Login'];
+  const routesToPreload = ['Auth', 'Login'];
   
   // Only preload most important routes
   routesToPreload.forEach(route => {
@@ -57,6 +59,7 @@ function App() {
   const navigate = useNavigate();
   const { isAuthenticated, user, profile } = useAuth();
   const [startupTime, setStartupTime] = useState(performance.now());
+  const { isMobile, isTablet } = useDeviceType();
 
   // Optimized initialization flow with performance tracking
   useEffect(() => {
@@ -155,9 +158,15 @@ function App() {
                     <MobileLayout isLoading={isLoading}>
                       <Suspense fallback={<LoadingScreen message="Loading content..." />}>
                         <Routes>
-                          <Route path="/" element={<Home />} />
+                          {/* For mobile/tablet, redirect home to auth page */}
+                          <Route path="/" element={
+                            (isMobile || isTablet) 
+                              ? <Navigate to="/auth" replace /> 
+                              : <Home />
+                          } />
                           <Route path="/login" element={<Login />} />
                           <Route path="/register" element={<Register />} />
+                          <Route path="/auth" element={<Auth />} />
                           <Route path="/provider-portal" element={<ProviderPortal />} />
                           <Route path="/institution-registration" element={<InstitutionRegistration />} />
                           
