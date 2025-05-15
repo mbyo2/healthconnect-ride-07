@@ -79,7 +79,6 @@ const NotificationsPage = () => {
     onError: (error) => {
       console.error('Error marking notification as read:', error);
       toast({
-        title: "Error",
         description: "Failed to mark notification as read",
         variant: "destructive"
       });
@@ -106,7 +105,6 @@ const NotificationsPage = () => {
     },
     onSuccess: () => {
       toast({
-        title: "Success",
         description: "All notifications marked as read",
       });
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
@@ -114,7 +112,6 @@ const NotificationsPage = () => {
     onError: (error) => {
       console.error('Error marking all notifications as read:', error);
       toast({
-        title: "Error",
         description: "Failed to mark all notifications as read",
         variant: "destructive"
       });
