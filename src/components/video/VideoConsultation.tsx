@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { VideoConsultationDetails } from "@/types/video";
 import { ConsultationList } from "./ConsultationList";
 import { VideoRoom } from "./VideoRoom";
@@ -13,10 +13,12 @@ import { useMediaQuery } from "@/hooks/use-media-query";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { useErrorHandler } from "@/hooks/use-error-handler";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const VideoConsultation = () => {
   const [activeConsultation, setActiveConsultation] = useState<VideoConsultationDetails | null>(null);
   const [retryCount, setRetryCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
   const { isOnline, connectionQuality } = useNetwork();
   const isTV = useIsTVDevice();
   const isMobile = useMediaQuery('(max-width: 768px)');
@@ -34,7 +36,7 @@ export const VideoConsultation = () => {
     }
   }, [isTV, activeConsultation]);
 
-  const handleJoinMeeting = async (consultation: VideoConsultationDetails) => {
+  const handleJoinMeeting = useCallback(async (consultation: VideoConsultationDetails) => {
     try {
       // Check for network status before joining
       if (!isOnline) {
@@ -51,6 +53,7 @@ export const VideoConsultation = () => {
         console.log('Creating new Daily room for consultation:', consultation.id);
         
         // Show loading state
+        setIsLoading(true);
         toast.loading("Setting up your video room...");
         
         try {
@@ -89,8 +92,10 @@ export const VideoConsultation = () => {
           }
 
           toast.dismiss();
+          setIsLoading(false);
           setActiveConsultation(updatedConsultation as VideoConsultationDetails);
         } catch (error) {
+          setIsLoading(false);
           toast.dismiss();
           handleError(error, "Failed to create video room");
           
@@ -108,15 +113,16 @@ export const VideoConsultation = () => {
         setActiveConsultation(consultation);
       }
     } catch (error: any) {
+      setIsLoading(false);
       console.error('Failed to join meeting:', error);
       handleError(error, "Failed to join meeting");
     }
-  };
+  }, [isOnline, connectionQuality, isTV, handleError, retryCount, maxRetries]);
   
-  const handleLeaveCall = () => {
+  const handleLeaveCall = useCallback(() => {
     setActiveConsultation(null);
     setRetryCount(0); // Reset retry counter
-  };
+  }, []);
   
   // When connection is lost during a call
   useEffect(() => {
@@ -129,16 +135,24 @@ export const VideoConsultation = () => {
   }, [isOnline, activeConsultation]);
 
   // Use profile data for user name, falling back to user email
-  const userName = profile?.first_name || (user?.email ? user.email.split('@')[0] : "User");
+  const userName = useMemo(() => 
+    profile?.first_name || (user?.email ? user.email.split('@')[0] : "User"), 
+    [profile, user]
+  );
 
   return (
-    <div className={`container mx-auto py-6 ${isTV ? 'tv-container p-8' : ''} ${isMobile ? 'px-2 py-4' : ''}`}>
+    <div className={cn(
+      "container mx-auto py-6",
+      isTV ? 'tv-container p-8' : '',
+      isMobile ? 'px-2 py-4' : '',
+      "transition-all duration-300"
+    )}>
       {isMobile && activeConsultation && (
         <Button 
           variant="ghost" 
           size="sm" 
           onClick={handleLeaveCall}
-          className="mb-4 -ml-2 flex items-center text-primary"
+          className="mb-4 -ml-2 flex items-center text-trust-500"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back to consultations
@@ -146,14 +160,19 @@ export const VideoConsultation = () => {
       )}
       
       {isTV && !activeConsultation && (
-        <div className="tv-indicator mb-6 p-4 flex items-center justify-center bg-blue-100 dark:bg-blue-900 rounded-lg">
-          <Tv className="h-6 w-6 mr-3" />
-          <span className="text-xl">TV Mode Active - Use remote control for navigation</span>
+        <div className="tv-indicator mb-6 p-4 flex items-center justify-center bg-trust-100 dark:bg-trust-900/50 rounded-lg">
+          <Tv className="h-6 w-6 mr-3 text-trust-500" />
+          <span className="text-xl text-trust-700 dark:text-trust-300">TV Mode Active - Use remote control for navigation</span>
         </div>
       )}
       
       {!isOnline && (
-        <Alert variant="destructive" className={`mb-4 ${isTV ? 'p-4 text-lg' : ''} ${isMobile ? 'p-3' : ''}`}>
+        <Alert variant="destructive" className={cn(
+          "mb-4",
+          isTV ? 'p-4 text-lg' : '',
+          isMobile ? 'p-3' : '',
+          "border-red-200 bg-red-50 dark:bg-red-950 dark:border-red-800"
+        )}>
           <WifiOff className={isTV ? "h-6 w-6" : "h-4 w-4"} />
           <AlertTitle className={isTV ? "text-xl" : ""}>Connection Lost</AlertTitle>
           <AlertDescription className={isTV ? "text-lg" : ""}>
@@ -163,7 +182,12 @@ export const VideoConsultation = () => {
       )}
       
       {isOnline && connectionQuality === "poor" && (
-        <Alert className={`mb-4 ${isTV ? 'p-4 text-lg' : ''} ${isMobile ? 'p-3' : ''}`}>
+        <Alert className={cn(
+          "mb-4",
+          isTV ? 'p-4 text-lg' : '',
+          isMobile ? 'p-3' : '',
+          "border-yellow-200 bg-yellow-50 dark:bg-yellow-950 dark:border-yellow-800"
+        )}>
           <Signal className={isTV ? "h-6 w-6" : "h-4 w-4"} />
           <AlertTitle className={isTV ? "text-xl" : ""}>Poor Connection</AlertTitle>
           <AlertDescription className={isTV ? "text-lg" : ""}>
@@ -172,14 +196,31 @@ export const VideoConsultation = () => {
         </Alert>
       )}
       
-      {activeConsultation?.meeting_url ? (
+      {isLoading && (
+        <div className="space-y-4 p-6 bg-card rounded-xl border shadow-soft-blue animate-pulse">
+          <div className="flex items-center space-x-4">
+            <Skeleton className="h-12 w-12 rounded-full bg-trust-100" />
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-[200px] bg-trust-100" />
+              <Skeleton className="h-3 w-[150px] bg-trust-100" />
+            </div>
+          </div>
+          <Skeleton className="h-[200px] w-full rounded-lg bg-trust-100" />
+          <div className="flex justify-center space-x-2">
+            <Skeleton className="h-9 w-24 rounded-md bg-trust-100" />
+            <Skeleton className="h-9 w-24 rounded-md bg-trust-100" />
+          </div>
+        </div>
+      )}
+      
+      {!isLoading && activeConsultation?.meeting_url ? (
         <VideoRoom 
           roomUrl={activeConsultation.meeting_url}
           userName={userName} 
           videoQuality={connectionQuality === "poor" ? "low" : "medium"}
           onLeave={handleLeaveCall}
         />
-      ) : (
+      ) : !isLoading && (
         <ConsultationList onJoinMeeting={handleJoinMeeting} />
       )}
     </div>

@@ -1,11 +1,10 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 210 50% 98%;
     --foreground: 222.2 84% 4.9%;
 
     --card: 0 0% 100%;
@@ -14,7 +13,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 222.2 47.4% 11.2%;
+    --primary: 214 100% 50%;
     --primary-foreground: 210 40% 98%;
 
     --secondary: 210 40% 96.1%;
@@ -23,7 +22,7 @@
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 210 40% 96.1%;
+    --accent: 215 100% 97%;
     --accent-foreground: 222.2 47.4% 11.2%;
 
     --destructive: 0 84.2% 60.2%;
@@ -31,39 +30,39 @@
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --ring: 214 100% 50%;
 
     --radius: 0.5rem;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
+    --background: 222.2 47.4% 11.2%;
     --foreground: 210 40% 98%;
 
-    --card: 222.2 84% 4.9%;
+    --card: 222.2 47.4% 11.2%;
     --card-foreground: 210 40% 98%;
 
-    --popover: 222.2 84% 4.9%;
+    --popover: 222.2 47.4% 11.2%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 210 40% 98%;
+    --primary: 214 100% 70%;
     --primary-foreground: 222.2 47.4% 11.2%;
 
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
 
     --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 70.1%; /* brightened for better visibility */
+    --muted-foreground: 215 20.2% 70.1%;
 
-    --accent: 217.2 32.6% 25%; /* brightened for better visibility */
+    --accent: 217.2 32.6% 25%;
     --accent-foreground: 210 40% 98%;
 
-    --destructive: 0 62.8% 50.6%; /* brightened for better visibility */
+    --destructive: 0 62.8% 50.6%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 217.2 32.6% 30.5%; /* brightened for better visibility */
-    --input: 217.2 32.6% 30.5%; /* brightened for better visibility */
-    --ring: 212.7 26.8% 83.9%;
+    --border: 217.2 32.6% 30.5%;
+    --input: 217.2 32.6% 30.5%;
+    --ring: 214 100% 70%;
   }
 }
 
@@ -165,4 +164,38 @@
   }
 }
 
-/* ... keep existing code */
+/* Add mobile-optimized card styles */
+@layer components {
+  .mobile-card {
+    @apply rounded-xl border border-border/30 bg-card p-4 shadow-soft-blue transition-all duration-200 hover:shadow-card-hover;
+  }
+  
+  .trust-gradient {
+    @apply bg-gradient-to-r from-trust-500 to-trust-600 text-white;
+  }
+  
+  .trust-button {
+    @apply bg-trust-500 text-white hover:bg-trust-600 transition-colors duration-200;
+  }
+  
+  .glass-card {
+    @apply bg-white/80 dark:bg-black/50 backdrop-blur-md border border-white/20 dark:border-white/10 rounded-xl shadow-soft-blue;
+  }
+}
+
+/* Add fade-in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Apply fade-in animation to elements with the class */
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}

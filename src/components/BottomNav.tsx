@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+import { useCallback, useMemo } from "react";
 
 export function BottomNav() {
   const location = useLocation();
@@ -29,8 +30,8 @@ export function BottomNav() {
     return null;
   }
   
-  // Define essential navigation items
-  const navItems = [
+  // Memoize navigation items to prevent unnecessary re-renders
+  const navItems = useMemo(() => [
     {
       to: "/",
       label: "Home",
@@ -55,32 +56,32 @@ export function BottomNav() {
       icon: <MessageSquare className="h-5 w-5" />,
       active: location.pathname === "/chat"
     }
-  ];
+  ], [location.pathname]);
 
-  // Menu items moved to the sheet
-  const menuItems = [
+  // Memoize menu items to prevent unnecessary re-renders
+  const menuItems = useMemo(() => [
     { to: "/profile", label: "Profile" },
     { to: "/testing", label: "Testing" },
     { to: "/documentation", label: "Documentation" },
     { to: "/settings", label: "Settings" }
-  ];
+  ], []);
   
   return (
-    <div className="fixed bottom-0 left-0 right-0 border-t bg-background/95 backdrop-blur-sm z-50 shadow-md">
+    <div className="fixed bottom-0 left-0 right-0 border-t bg-background/95 backdrop-blur-sm z-50 shadow-soft-blue">
       <div className="flex items-center justify-evenly">
         {navItems.map((item, index) => (
           <Link 
             key={index}
             to={item.to}
             className={cn(
-              "flex flex-1 flex-col items-center justify-center py-2",
-              item.active ? "text-primary" : "text-muted-foreground"
+              "flex flex-1 flex-col items-center justify-center py-3",
+              item.active ? "text-trust-500" : "text-muted-foreground"
             )}
             {...touchFeedbackProps}
           >
             <div className={cn(
               "flex flex-col items-center justify-center relative",
-              item.active && "after:content-[''] after:absolute after:-bottom-1 after:w-1.5 after:h-1.5 after:bg-primary after:rounded-full"
+              item.active && "after:content-[''] after:absolute after:-bottom-1 after:w-1.5 after:h-1.5 after:bg-trust-500 after:rounded-full"
             )}>
               {item.icon}
               <span className="text-[10px] font-medium mt-0.5">{item.label}</span>
@@ -91,7 +92,7 @@ export function BottomNav() {
         <Sheet>
           <SheetTrigger asChild>
             <button 
-              className="flex flex-1 flex-col items-center justify-center py-2 text-muted-foreground"
+              className="flex flex-1 flex-col items-center justify-center py-3 text-muted-foreground"
               {...touchFeedbackProps}
             >
               <Menu className="h-5 w-5" />
@@ -100,12 +101,12 @@ export function BottomNav() {
           </SheetTrigger>
           <SheetContent side="right" className="w-[80vw]">
             <SheetHeader>
-              <SheetTitle>Menu</SheetTitle>
+              <SheetTitle className="text-trust-600">Menu</SheetTitle>
               {user && (
                 <div className="flex items-center gap-3 py-3 border-b">
-                  <Avatar className="h-10 w-10">
+                  <Avatar className="h-10 w-10 ring-2 ring-trust-100">
                     <AvatarImage src={user?.user_metadata?.avatar_url || ""} />
-                    <AvatarFallback>{user?.email?.[0]?.toUpperCase() || "U"}</AvatarFallback>
+                    <AvatarFallback className="bg-trust-100 text-trust-600">{user?.email?.[0]?.toUpperCase() || "U"}</AvatarFallback>
                   </Avatar>
                   <div className="flex flex-col">
                     <span className="font-medium">{user.user_metadata?.name || user.email}</span>
@@ -119,7 +120,7 @@ export function BottomNav() {
                 <Button 
                   key={idx}
                   variant="ghost" 
-                  className="w-full justify-start text-foreground hover:text-primary hover:bg-accent/50 transition-colors"
+                  className="w-full justify-start text-foreground hover:text-trust-500 hover:bg-trust-50/50 transition-colors"
                   asChild
                 >
                   <Link to={item.to}>
