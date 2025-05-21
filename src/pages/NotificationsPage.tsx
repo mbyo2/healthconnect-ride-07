@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
-import { toast } from '@/hooks/use-toast';
+import { toast as sonnerToast } from "sonner";
 import { supabase } from '@/integrations/supabase/client';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -53,10 +52,7 @@ export default function NotificationsPage() {
         }
       } catch (error) {
         console.error('Error fetching notifications:', error);
-        toast({
-          title: "Failed to load notifications",
-          variant: "destructive"
-        });
+        sonnerToast.error("Failed to load notifications");
       } finally {
         setIsLoading(false);
       }
@@ -80,16 +76,10 @@ export default function NotificationsPage() {
         )
       );
 
-      toast({
-        title: "Notification marked as read",
-        description: "This notification has been marked as read."
-      });
+      sonnerToast.success("Notification marked as read");
     } catch (error) {
       console.error('Error marking notification as read:', error);
-      toast({
-        title: "Failed to update notification",
-        variant: "destructive"
-      });
+      sonnerToast.error("Failed to update notification");
     }
   };
 
@@ -104,16 +94,10 @@ export default function NotificationsPage() {
 
       setNotifications(prev => prev.filter(notification => notification.id !== id));
       
-      toast({
-        title: "Notification deleted",
-        description: "The notification has been removed."
-      });
+      sonnerToast.success("Notification deleted");
     } catch (error) {
       console.error('Error deleting notification:', error);
-      toast({
-        title: "Failed to delete notification",
-        variant: "destructive"
-      });
+      sonnerToast.error("Failed to delete notification");
     }
   };
 
@@ -124,10 +108,7 @@ export default function NotificationsPage() {
       navigate('/chat');
     }
     
-    toast({
-        title: "Taking you to the related content",
-        description: `Following link from ${notification.title}`
-    });
+    sonnerToast.info(`Following link from ${notification.title}`);
   };
 
   const getIcon = (type: string) => {
@@ -166,16 +147,10 @@ export default function NotificationsPage() {
                 prev.map(notification => ({ ...notification, read: true }))
               );
               
-              toast({
-                title: "All notifications marked as read",
-                description: "All your notifications have been marked as read."
-              });
+              sonnerToast.success("All notifications marked as read");
             } catch (error) {
               console.error('Error marking all as read:', error);
-              toast({
-                title: "Failed to update notifications",
-                variant: "destructive"
-              });
+              sonnerToast.error("Failed to update notifications");
             }
           }}
         >

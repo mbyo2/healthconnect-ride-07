@@ -9,8 +9,12 @@ type ToastProps = {
   variant?: "default" | "destructive";
 };
 
-// Array to store active toasts
-const toasts: string[] = [];
+// Store toast objects instead of just IDs
+interface Toast extends ToastProps {
+  id: string;
+}
+
+const toasts: Toast[] = [];
 
 const useToast = () => {
   const toast = ({ title, description, action, variant }: ToastProps = {}) => {
@@ -19,7 +23,17 @@ const useToast = () => {
       action,
       className: variant === "destructive" ? "bg-destructive" : undefined
     });
-    toasts.push(id.toString());
+    
+    // Store complete toast object
+    const toastObj: Toast = {
+      id: id.toString(),
+      title,
+      description,
+      action,
+      variant
+    };
+    
+    toasts.push(toastObj);
     return id;
   };
 
