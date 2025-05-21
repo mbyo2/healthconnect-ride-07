@@ -41,6 +41,8 @@ const Documentation = lazy(() => import("@/pages/Documentation"));
 const ProviderPortal = lazy(() => import("@/pages/ProviderPortal").then(module => ({ default: module.ProviderPortal })));
 const ProviderDashboard = lazy(() => import("@/pages/ProviderDashboard"));
 const InstitutionRegistration = lazy(() => import("@/pages/InstitutionRegistration"));
+const Terms = lazy(() => import("@/pages/Terms"));
+const Privacy = lazy(() => import("@/pages/Privacy"));
 
 // Preload critical routes for faster initial loading
 if (typeof window !== 'undefined') {
@@ -170,6 +172,10 @@ function App() {
                           <Route path="/auth" element={<Auth />} />
                           <Route path="/provider-portal" element={<ProviderPortal />} />
                           <Route path="/institution-registration" element={<InstitutionRegistration />} />
+                          
+                          {/* Legal pages */}
+                          <Route path="/terms" element={<Terms />} />
+                          <Route path="/privacy" element={<Privacy />} />
                           
                           {/* Protected routes */}
                           <Route path="/profile" element={
