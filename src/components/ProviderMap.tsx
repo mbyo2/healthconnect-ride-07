@@ -35,24 +35,25 @@ const MapUpdater = ({ center }: { center: [number, number] }) => {
 
 interface ProviderMapProps {
   providers?: Provider[];
-  userLocation?: { latitude: number; longitude: number };
+  userLocation?: { latitude: number; longitude: number } | null;
   maxDistance?: number;
 }
 
 export const ProviderMap: React.FC<ProviderMapProps> = ({ 
   providers = [], 
-  userLocation = { latitude: DEFAULT_COORDINATES[0], longitude: DEFAULT_COORDINATES[1] },
+  userLocation = null,
   maxDistance = 50
 }) => {
   const mapRef = useRef<LeafletMap | null>(null);
-  const [center, setCenter] = useState<[number, number]>(
-    [userLocation.latitude, userLocation.longitude]
-  );
+  // Initialize center with DEFAULT_COORDINATES, then update if userLocation is available
+  const [center, setCenter] = useState<[number, number]>(DEFAULT_COORDINATES);
   const navigate = useNavigate();
 
-  // Update center when userLocation changes
+  // Update center when userLocation changes, but only if it's not null
   useEffect(() => {
-    setCenter([userLocation.latitude, userLocation.longitude]);
+    if (userLocation) {
+      setCenter([userLocation.latitude, userLocation.longitude]);
+    }
   }, [userLocation]);
 
   // Function to handle geolocation
@@ -118,9 +119,9 @@ export const ProviderMap: React.FC<ProviderMapProps> = ({
     [providers, handleViewProfile]
   );
 
-  // Create circle to show distance radius
+  // Create circle to show distance radius, only if userLocation exists
   const distanceCircle = useMemo(() => 
-    maxDistance && maxDistance < 50 ? (
+    maxDistance && maxDistance < 50 && userLocation ? (
       <Circle 
         center={center}
         pathOptions={{ 
@@ -132,7 +133,7 @@ export const ProviderMap: React.FC<ProviderMapProps> = ({
         radius={maxDistance * 1000} // Convert km to meters
       />
     ) : null,
-    [center, maxDistance]
+    [center, maxDistance, userLocation]
   );
 
   return (
