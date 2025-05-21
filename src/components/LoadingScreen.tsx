@@ -20,28 +20,33 @@ export const LoadingScreen = ({
   
   // Show fallback content if loading takes too long
   useEffect(() => {
+    let mounted = true;
+    
     const fallbackTimer = setTimeout(() => {
-      setShowFallback(true);
+      if (mounted) setShowFallback(true);
     }, timeout); // Show fallback message after timeout
     
     const longWaitTimer = setTimeout(() => {
-      setLongWait(true);
+      if (mounted) setLongWait(true);
     }, timeout * 1.5); // Show long wait message after 1.5x timeout
     
     const failedTimer = setTimeout(() => {
-      setLoadingFailed(true);
+      if (mounted) setLoadingFailed(true);
     }, timeout * 2.5); // Consider loading failed after 2.5x timeout (reduced)
     
     // Create a simulated loading progress
     const progressInterval = setInterval(() => {
-      setLoadingProgress(prev => {
-        // More aggressive progress increase
-        const increment = Math.random() * 20;
-        return Math.min(prev + increment, 95); // Cap at 95% until actually loaded
-      });
+      if (mounted) {
+        setLoadingProgress(prev => {
+          // More aggressive progress increase
+          const increment = Math.random() * 20;
+          return Math.min(prev + increment, 95); // Cap at 95% until actually loaded
+        });
+      }
     }, 300); // Faster progress updates
     
     return () => {
+      mounted = false;
       clearTimeout(fallbackTimer);
       clearTimeout(longWaitTimer);
       clearTimeout(failedTimer);

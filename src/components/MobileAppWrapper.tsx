@@ -18,20 +18,28 @@ export function MobileAppWrapper({ children }: MobileAppWrapperProps) {
   const { session } = useSession();
   const [lowPowerMode, setLowPowerMode] = useState(false);
   const [hasRequestedPermissions, setHasRequestedPermissions] = useState(false);
+  const [batteryWarningShown, setBatteryWarningShown] = useState(false);
 
-  // App behavior for low battery
+  // App behavior for low battery - with stable dependency array
   useEffect(() => {
-    if (capabilities.battery.level !== null && capabilities.battery.level <= 0.15 && !capabilities.battery.charging) {
+    if (capabilities.battery.level !== null && 
+        capabilities.battery.level <= 0.15 && 
+        !capabilities.battery.charging && 
+        !batteryWarningShown) {
       setLowPowerMode(true);
+      setBatteryWarningShown(true);
       toast.warning("Battery is low. Enabling power saving mode.", {
         duration: 5000,
       });
-    } else if (capabilities.battery.level !== null && (capabilities.battery.level > 0.15 || capabilities.battery.charging)) {
+    } else if (capabilities.battery.level !== null && 
+               (capabilities.battery.level > 0.15 || capabilities.battery.charging) && 
+               batteryWarningShown) {
       setLowPowerMode(false);
+      setBatteryWarningShown(false);
     }
-  }, [capabilities.battery]);
+  }, [capabilities.battery.level, capabilities.battery.charging, batteryWarningShown]);
 
-  // Request necessary permissions when logged in
+  // Request necessary permissions when logged in - with stable dependency array
   useEffect(() => {
     const requestPermissions = async () => {
       if (session && !hasRequestedPermissions && capabilities.isCapacitor) {
@@ -53,7 +61,7 @@ export function MobileAppWrapper({ children }: MobileAppWrapperProps) {
     requestPermissions();
   }, [session, hasRequestedPermissions, capabilities]);
 
-  // Handle app going offline
+  // Handle app going offline - with stable dependency array
   useEffect(() => {
     if (!isOnline) {
       toast.error("You're offline. Some features may be limited.", {

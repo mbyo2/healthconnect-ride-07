@@ -9,7 +9,7 @@ type ToastProps = {
   variant?: "default" | "destructive";
 };
 
-// Store toast objects instead of just IDs
+// Interface for our toast objects
 interface Toast extends ToastProps {
   id: string;
 }
