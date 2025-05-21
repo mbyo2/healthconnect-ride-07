@@ -11,7 +11,7 @@ interface LoadingScreenProps {
 
 export const LoadingScreen = ({ 
   message = "Just a moment please...", 
-  timeout = 2000 // Reduced from 3000 to 2000
+  timeout = 1500 // Reduced timeout for better user experience
 }: LoadingScreenProps) => {
   const [showFallback, setShowFallback] = useState(false);
   const [longWait, setLongWait] = useState(false);
@@ -26,19 +26,20 @@ export const LoadingScreen = ({
     
     const longWaitTimer = setTimeout(() => {
       setLongWait(true);
-    }, timeout * 1.5); // Reduced multiplier
+    }, timeout * 1.5); // Show long wait message after 1.5x timeout
     
     const failedTimer = setTimeout(() => {
       setLoadingFailed(true);
-    }, timeout * 3); // Consider loading failed after 3x timeout
+    }, timeout * 2.5); // Consider loading failed after 2.5x timeout (reduced)
     
     // Create a simulated loading progress
     const progressInterval = setInterval(() => {
       setLoadingProgress(prev => {
-        const increment = Math.random() * 15;
+        // More aggressive progress increase
+        const increment = Math.random() * 20;
         return Math.min(prev + increment, 95); // Cap at 95% until actually loaded
       });
-    }, 400);
+    }, 300); // Faster progress updates
     
     return () => {
       clearTimeout(fallbackTimer);
@@ -47,6 +48,24 @@ export const LoadingScreen = ({
       clearInterval(progressInterval);
     };
   }, [timeout]);
+
+  const handleRefresh = () => {
+    // Clear any potential cached errors
+    sessionStorage.removeItem('auth-error');
+    localStorage.removeItem('loading-error');
+    
+    // Force a hard refresh to clear any caching issues
+    window.location.reload();
+  };
+
+  const handleClearCacheAndReload = () => {
+    // Clear all storage
+    localStorage.clear();
+    sessionStorage.clear();
+    
+    // Force a hard refresh
+    window.location.reload();
+  };
 
   return (
     <div className="fixed inset-0 bg-gradient-to-br from-background to-background/95 backdrop-blur-sm flex flex-col items-center justify-center z-50">
@@ -79,7 +98,7 @@ export const LoadingScreen = ({
             </p>
             <div className="mt-4 flex gap-2 justify-center">
               <Button 
-                onClick={() => window.location.reload()}
+                onClick={handleRefresh}
                 className="px-4 py-2"
                 variant={loadingFailed ? "default" : "outline"}
               >
@@ -89,12 +108,7 @@ export const LoadingScreen = ({
               {(longWait || loadingFailed) && (
                 <Button
                   variant="outline"
-                  onClick={() => {
-                    // Clear local storage and reload as a last resort
-                    localStorage.clear();
-                    sessionStorage.clear();
-                    window.location.reload();
-                  }}
+                  onClick={handleClearCacheAndReload}
                 >
                   Clear Cache & Reload
                 </Button>

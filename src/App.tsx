@@ -19,37 +19,38 @@ import { QueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { useDeviceType } from "@/hooks/use-device-type";
 
-// Lazy-loaded components using the utility
-const Home = lazyLoadComponent(() => import("@/pages/Landing"));
-const Auth = lazyLoadComponent(() => import("@/pages/Auth"));
-const Login = lazyLoadComponent(() => import("@/pages/Login"));
-const Register = lazyLoadComponent(() => import("@/pages/Register"));
-const Profile = lazyLoadComponent(() => import("@/pages/Profile"));
-const Appointments = lazyLoadComponent(() => import("@/pages/Appointments"));
-const Search = lazyLoadComponent(() => import("@/pages/Search"));
-const VideoCall = lazyLoadComponent(() => import("@/pages/VideoCall"));
-const Messages = lazyLoadComponent(() => import("@/pages/Chat"));
-const AppointmentDetails = lazyLoadComponent(() => import("@/pages/AppointmentDetails"));
-const Wallet = lazyLoadComponent(() => import("@/pages/Wallet"));
-const Providers = lazyLoadComponent(() => import("@/pages/Providers"));
-const PharmacyInventory = lazyLoadComponent(() => import("@/pages/PharmacyInventory"));
-const NotificationsPage = lazyLoadComponent(() => import("@/pages/NotificationsPage"));
-const SettingsPage = lazyLoadComponent(() => import("@/pages/SettingsPage"));
-const Medications = lazyLoadComponent(() => import("@/pages/Medications"));
-const Testing = lazyLoadComponent(() => import("@/pages/Testing"));
-const Documentation = lazyLoadComponent(() => import("@/pages/Documentation"));
-const ProviderPortal = lazyLoadComponent(() => import("@/pages/ProviderPortal").then(module => ({ default: module.ProviderPortal })));
-const ProviderDashboard = lazyLoadComponent(() => import("@/pages/ProviderDashboard"));
-const InstitutionRegistration = lazyLoadComponent(() => import("@/pages/InstitutionRegistration"));
+// Lazy-loaded components without dynamic imports
+const Home = lazy(() => import("@/pages/Landing"));
+const Auth = lazy(() => import("@/pages/Auth"));
+const Login = lazy(() => import("@/pages/Login"));
+const Register = lazy(() => import("@/pages/Register"));
+const Profile = lazy(() => import("@/pages/Profile"));
+const Appointments = lazy(() => import("@/pages/Appointments"));
+const Search = lazy(() => import("@/pages/Search"));
+const VideoCall = lazy(() => import("@/pages/VideoCall"));
+const Messages = lazy(() => import("@/pages/Chat"));
+const AppointmentDetails = lazy(() => import("@/pages/AppointmentDetails"));
+const Wallet = lazy(() => import("@/pages/Wallet"));
+const Providers = lazy(() => import("@/pages/Providers"));
+const PharmacyInventory = lazy(() => import("@/pages/PharmacyInventory"));
+const NotificationsPage = lazy(() => import("@/pages/NotificationsPage"));
+const SettingsPage = lazy(() => import("@/pages/SettingsPage"));
+const Medications = lazy(() => import("@/pages/Medications"));
+const Testing = lazy(() => import("@/pages/Testing"));
+const Documentation = lazy(() => import("@/pages/Documentation"));
+const ProviderPortal = lazy(() => import("@/pages/ProviderPortal").then(module => ({ default: module.ProviderPortal })));
+const ProviderDashboard = lazy(() => import("@/pages/ProviderDashboard"));
+const InstitutionRegistration = lazy(() => import("@/pages/InstitutionRegistration"));
 
 // Preload critical routes for faster initial loading
 if (typeof window !== 'undefined') {
   const routesToPreload = ['Auth', 'Login'];
   
   // Only preload most important routes
-  routesToPreload.forEach(route => {
-    import(`@/pages/${route}`).catch(console.error);
-  });
+  Promise.all([
+    import("@/pages/Auth"),
+    import("@/pages/Login")
+  ]).catch(console.error);
 }
 
 function App() {

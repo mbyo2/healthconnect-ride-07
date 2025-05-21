@@ -14,6 +14,7 @@ interface Toast extends ToastProps {
   id: string;
 }
 
+// Use an array to store active toasts
 const toasts: Toast[] = [];
 
 const useToast = () => {
