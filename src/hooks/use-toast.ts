@@ -9,16 +9,21 @@ type ToastProps = {
   variant?: "default" | "destructive";
 };
 
+// Array to store active toasts
+const toasts: string[] = [];
+
 const useToast = () => {
   const toast = ({ title, description, action, variant }: ToastProps = {}) => {
-    return toastFunc(title as string, {
+    const id = toastFunc(title as string, {
       description,
       action,
       className: variant === "destructive" ? "bg-destructive" : undefined
     });
+    toasts.push(id.toString());
+    return id;
   };
 
-  return { toast };
+  return { toast, toasts };
 };
 
 export { useToast, toastFunc as toast };

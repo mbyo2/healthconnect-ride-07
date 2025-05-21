@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -35,10 +35,28 @@ export default function NotificationsPage() {
           throw error;
         }
 
-        setNotifications(data || []);
+        // Ensure the data conforms to the Notification type
+        if (data) {
+          const typedNotifications = data.map(item => ({
+            id: item.id,
+            user_id: item.user_id,
+            title: item.title,
+            message: item.message,
+            type: (item.type === 'appointment' || item.type === 'message' || item.type === 'system') 
+              ? item.type 
+              : 'system', // Default to 'system' if type is invalid
+            read: item.read,
+            created_at: item.created_at
+          })) as Notification[];
+          
+          setNotifications(typedNotifications);
+        }
       } catch (error) {
         console.error('Error fetching notifications:', error);
-        toast.error('Failed to load notifications');
+        toast({
+          title: "Failed to load notifications",
+          variant: "destructive"
+        });
       } finally {
         setIsLoading(false);
       }
@@ -68,7 +86,10 @@ export default function NotificationsPage() {
       });
     } catch (error) {
       console.error('Error marking notification as read:', error);
-      toast.error('Failed to update notification');
+      toast({
+        title: "Failed to update notification",
+        variant: "destructive"
+      });
     }
   };
 
@@ -89,7 +110,10 @@ export default function NotificationsPage() {
       });
     } catch (error) {
       console.error('Error deleting notification:', error);
-      toast.error('Failed to delete notification');
+      toast({
+        title: "Failed to delete notification",
+        variant: "destructive"
+      });
     }
   };
 
@@ -142,10 +166,16 @@ export default function NotificationsPage() {
                 prev.map(notification => ({ ...notification, read: true }))
               );
               
-              toast.success("All notifications marked as read");
+              toast({
+                title: "All notifications marked as read",
+                description: "All your notifications have been marked as read."
+              });
             } catch (error) {
               console.error('Error marking all as read:', error);
-              toast.error('Failed to update notifications');
+              toast({
+                title: "Failed to update notifications",
+                variant: "destructive"
+              });
             }
           }}
         >
