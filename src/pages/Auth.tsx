@@ -568,9 +568,9 @@ const Auth = () => {
           </p>
           <div className="text-xs text-muted-foreground">
             By signing in, you agree to our{" "}
-            <a href="#" className="text-primary hover:underline">Terms of Service</a>
+            <Link to="/terms" className="text-primary hover:underline">Terms of Service</Link>
             {" "}and{" "}
-            <a href="#" className="text-primary hover:underline">Privacy Policy</a>
+            <Link to="/privacy" className="text-primary hover:underline">Privacy Policy</Link>
           </div>
         </div>
       </div>

@@ -1,6 +1,5 @@
-
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Heart } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -214,9 +213,9 @@ export const ProviderPortal = () => {
           </p>
           <div className="text-xs text-muted-foreground">
             By signing in, you agree to our{" "}
-            <a href="#" className="text-primary hover:underline">Terms of Service</a>
+            <Link to="/terms" className="text-primary hover:underline">Terms of Service</Link>
             {" "}and{" "}
-            <a href="#" className="text-primary hover:underline">Privacy Policy</a>
+            <Link to="/privacy" className="text-primary hover:underline">Privacy Policy</Link>
           </div>
         </div>
       </div>
