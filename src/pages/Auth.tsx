@@ -146,59 +146,61 @@ const Auth = () => {
     }
   };
 
-  const onPatientSignupSubmit = async (data: PatientSignupFormValues) => {
-    try {
-      setError(null);
-      const { error } = await supabase.auth.signUp({
-        email: data.email,
-        password: data.password,
-        options: {
-          data: {
-            first_name: data.firstName,
-            last_name: data.lastName,
-            role: "patient",
-          },
+  // Updated patient signup with role
+const onPatientSignupSubmit = async (data: PatientSignupFormValues) => {
+  try {
+    setError(null);
+    const { error } = await supabase.auth.signUp({
+      email: data.email,
+      password: data.password,
+      options: {
+        data: {
+          first_name: data.firstName,
+          last_name: data.lastName,
+          role: "patient",
         },
-      });
-      
-      if (error) throw error;
-      
-      toast.success("Account created! Please verify your email address.");
-      setActiveTab("signin");
-    } catch (err: any) {
-      setError(err.message || "Failed to create account");
-      console.error("Patient signup error:", err);
-      toast.error(err.message || "Failed to create account");
-    }
-  };
+      },
+    });
+    
+    if (error) throw error;
+    
+    toast.success("Account created! Please verify your email address.");
+    setActiveTab("signin");
+  } catch (err: any) {
+    setError(err.message || "Failed to create account");
+    console.error("Patient signup error:", err);
+    toast.error(err.message || "Failed to create account");
+  }
+};
 
-  const onProviderSignupSubmit = async (data: ProviderSignupFormValues) => {
-    try {
-      setError(null);
-      const { error } = await supabase.auth.signUp({
-        email: data.email,
-        password: data.password,
-        options: {
-          data: {
-            first_name: data.firstName,
-            last_name: data.lastName,
-            role: "health_personnel",
-            specialty: data.specialty,
-            license_number: data.licenseNumber,
-          },
+// Updated provider signup with role and professional details
+const onProviderSignupSubmit = async (data: ProviderSignupFormValues) => {
+  try {
+    setError(null);
+    const { error } = await supabase.auth.signUp({
+      email: data.email,
+      password: data.password,
+      options: {
+        data: {
+          first_name: data.firstName,
+          last_name: data.lastName,
+          role: "health_personnel",
+          specialty: data.specialty,
+          license_number: data.licenseNumber,
         },
-      });
-      
-      if (error) throw error;
-      
-      toast.success("Account created! Please verify your email address.");
-      setActiveTab("signin");
-    } catch (err: any) {
-      setError(err.message || "Failed to create account");
-      console.error("Provider signup error:", err);
-      toast.error(err.message || "Failed to create account");
-    }
-  };
+      },
+    });
+    
+    if (error) throw error;
+    
+    toast.success("Account created! Please verify your email address.");
+    setActiveTab("signin");
+  } catch (err: any) {
+    setError(err.message || "Failed to create account");
+    console.error("Provider signup error:", err);
+    toast.error(err.message || "Failed to create account");
+  }
+};
 
   if (authLoading || localLoading) {
     return <LoadingScreen timeout={2000} />;
