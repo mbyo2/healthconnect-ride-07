@@ -20,6 +20,7 @@ import { UserRole, AdminLevel } from "@/types/user";
 import { useDeviceType } from "@/hooks/use-device-type";
 import { useNotifications } from "@/hooks/use-notifications";
 import { cn } from "@/lib/utils";
+import { AppLogo } from "@/components/ui/AppLogo";
 
 export function Header() {
   const { user, signOut, profile } = useAuth();
@@ -67,9 +68,7 @@ export function Header() {
     <header className="bg-background/95 backdrop-blur-md fixed top-0 left-0 right-0 z-50 border-b h-16 shadow-sm">
       <div className="container flex h-full items-center justify-between px-4">
         {/* Logo on the left */}
-        <Link to="/" className="font-bold text-xl text-trust-600">
-          Doc&apos; O Clock
-        </Link>
+        <AppLogo size="sm" />
         
         {/* Actions on the right */}
         <div className="flex items-center gap-3">

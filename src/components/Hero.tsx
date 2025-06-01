@@ -1,8 +1,9 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Shield, Heart, CheckCircle } from 'lucide-react';
+import { Shield, CheckCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { AppLogo } from '@/components/ui/AppLogo';
 
 export const Hero = () => {
   return (
@@ -20,11 +21,9 @@ export const Hero = () => {
           </div>
         </div>
         
-        {/* Main hero content */}
+        {/* Main hero content with logo */}
         <div className="flex justify-center mb-6">
-          <div className="p-6 bg-trust-100 rounded-full">
-            <Heart className="h-16 w-16 text-trust-600" />
-          </div>
+          <AppLogo size="lg" showText={false} className="p-4 bg-trust-100 rounded-full" />
         </div>
         
         <h1 className="text-5xl md:text-7xl font-bold mb-6 text-trust-900 dark:text-trust-100">
