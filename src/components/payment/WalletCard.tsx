@@ -7,7 +7,6 @@ import { Label } from '@/components/ui/label';
 import { CreditCard, Wallet, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
-import { User } from '@/types/user';
 import { PaymentMethod } from '@/components/payment/PaymentMethods';
 
 export interface WalletCardProps {
@@ -23,7 +22,7 @@ export const WalletCard = ({
 }: WalletCardProps) => {
   const [amount, setAmount] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   
   const handleAddFunds = async () => {
     if (!onAddFunds) return;
@@ -53,7 +52,7 @@ export const WalletCard = ({
             <Wallet className="h-5 w-5 text-primary" />
             My Wallet
           </CardTitle>
-          {user && (user as User).admin_level && (
+          {profile?.admin_level && (
             <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
               Admin Wallet
             </span>
