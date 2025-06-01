@@ -1,61 +1,71 @@
 
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Calendar, Search, MessageSquare, FileText, Package, Shield } from 'lucide-react';
+import { Calendar, Search, MessageSquare, FileText, Shield, Users } from 'lucide-react';
 
 export const ServiceHighlights = () => {
   const services = [
     {
-      icon: <Search className="h-8 w-8 text-primary" />,
-      title: "Find Providers",
-      description: "Search and connect with qualified healthcare providers in your area"
+      icon: <Search className="h-8 w-8 text-trust-500" />,
+      title: "Find Trusted Providers",
+      description: "Search verified healthcare providers with patient reviews and credentials"
     },
     {
-      icon: <Calendar className="h-8 w-8 text-primary" />,
-      title: "Easy Scheduling",
-      description: "Book appointments with just a few clicks, available 24/7"
+      icon: <Calendar className="h-8 w-8 text-trust-500" />,
+      title: "Simple Scheduling",
+      description: "Book appointments instantly with real-time availability"
     },
     {
-      icon: <MessageSquare className="h-8 w-8 text-primary" />,
-      title: "Secure Messaging",
-      description: "Communicate securely with your healthcare providers"
+      icon: <MessageSquare className="h-8 w-8 text-trust-500" />,
+      title: "Secure Communication",
+      description: "HIPAA-compliant messaging with your healthcare team"
     },
     {
-      icon: <FileText className="h-8 w-8 text-primary" />,
-      title: "Digital Records",
-      description: "Access your medical records and prescriptions digitally"
+      icon: <FileText className="h-8 w-8 text-trust-500" />,
+      title: "Digital Health Records",
+      description: "Access your complete medical history anytime, anywhere"
     },
     {
-      icon: <Package className="h-8 w-8 text-primary" />,
-      title: "Pharmacy Integration",
-      description: "Manage prescriptions and connect with pharmacies"
+      icon: <Shield className="h-8 w-8 text-trust-500" />,
+      title: "Bank-Level Security",
+      description: "Your health data protected with enterprise-grade encryption"
     },
     {
-      icon: <Shield className="h-8 w-8 text-primary" />,
-      title: "HIPAA Compliant",
-      description: "Your health information is protected with industry-standard security"
+      icon: <Users className="h-8 w-8 text-trust-500" />,
+      title: "24/7 Support",
+      description: "Get help when you need it with our dedicated support team"
     }
   ];
 
   return (
-    <section className="py-16 px-4 bg-muted/50">
+    <section className="py-20 px-4 bg-white dark:bg-background">
       <div className="container mx-auto">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold mb-4">Healthcare Made Simple</h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            Experience seamless healthcare management with our comprehensive platform
+        <div className="text-center mb-16">
+          <h2 className="text-4xl font-bold mb-4 text-trust-900 dark:text-trust-100">
+            Healthcare Made Simple & Secure
+          </h2>
+          <p className="text-trust-700 dark:text-trust-300 max-w-2xl mx-auto text-lg">
+            Everything you need to manage your health in one trusted platform
           </p>
         </div>
         
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {services.map((service, index) => (
-            <Card key={index}>
-              <CardHeader>
-                <div className="mb-2">{service.icon}</div>
-                <CardTitle>{service.title}</CardTitle>
+            <Card key={index} className="trust-card border-0 hover:border-trust-200">
+              <CardHeader className="text-center pb-4">
+                <div className="flex justify-center mb-4">
+                  <div className="p-3 bg-trust-50 dark:bg-trust-900/20 rounded-full">
+                    {service.icon}
+                  </div>
+                </div>
+                <CardTitle className="text-trust-900 dark:text-trust-100 text-xl">
+                  {service.title}
+                </CardTitle>
               </CardHeader>
-              <CardContent>
-                <CardDescription>{service.description}</CardDescription>
+              <CardContent className="text-center">
+                <CardDescription className="text-trust-600 dark:text-trust-400 leading-relaxed">
+                  {service.description}
+                </CardDescription>
               </CardContent>
             </Card>
           ))}

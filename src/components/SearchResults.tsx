@@ -7,16 +7,16 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { SearchPagination } from "@/components/SearchPagination";
 import { useVoiceCommands } from "@/hooks/use-voice-commands";
 import { Button } from "@/components/ui/button";
-import { Volume2 } from "lucide-react";
+import { Volume2, MapPin, List } from "lucide-react";
+import { useState } from "react";
 
-// Memoized map component to prevent unnecessary re-renders
 const MemoizedProviderMap = memo(ProviderMap);
 
 export const SearchResults = () => {
   const { providers, isLoading, userLocation, maxDistance, totalCount, searchTerm } = useSearch();
   const { speak } = useVoiceCommands();
+  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   
-  // Announce search results when loaded
   useEffect(() => {
     if (!isLoading && speak && providers.length > 0) {
       const searchDescription = searchTerm ? `for "${searchTerm}"` : "";
@@ -24,7 +24,6 @@ export const SearchResults = () => {
     }
   }, [isLoading, providers.length, speak, searchTerm, totalCount]);
   
-  // Memoized read results handler
   const handleReadResults = useCallback(() => {
     if (speak && providers.length > 0) {
       const providerSummaries = providers.slice(0, 5).map(provider => 
@@ -39,11 +38,11 @@ export const SearchResults = () => {
 
   if (isLoading && providers.length === 0) {
     return (
-      <div className="space-y-4">
-        <div className="h-[300px] bg-muted rounded-lg animate-pulse" />
-        <div className="space-y-3">
+      <div className="space-y-6">
+        <Skeleton className="h-12 w-full rounded-lg" />
+        <div className="space-y-4">
           {[1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-[140px] w-full rounded-lg" />
+            <Skeleton key={i} className="h-32 w-full rounded-lg" />
           ))}
         </div>
       </div>
@@ -52,36 +51,77 @@ export const SearchResults = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold">
-          {providers.length > 0 
-            ? `${totalCount} Results ${searchTerm ? `for "${searchTerm}"` : ""}`
-            : "No Results Found"}
-        </h2>
+      {/* Header with simple controls */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h2 className="text-2xl font-bold text-trust-900 dark:text-trust-100">
+            {providers.length > 0 
+              ? `${totalCount} Healthcare Providers`
+              : "No Providers Found"}
+          </h2>
+          {searchTerm && (
+            <p className="text-trust-600 dark:text-trust-400 mt-1">
+              Results for "{searchTerm}"
+            </p>
+          )}
+        </div>
         
-        {providers.length > 0 && (
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={handleReadResults}
-            className="flex items-center gap-1"
-            aria-label="Read results aloud"
-          >
-            <Volume2 className="h-4 w-4" />
-            Read Results
-          </Button>
-        )}
+        <div className="flex items-center gap-3">
+          {/* View Toggle */}
+          <div className="flex bg-trust-100 dark:bg-trust-900/20 rounded-lg p-1">
+            <button
+              onClick={() => setViewMode('list')}
+              className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-all ${
+                viewMode === 'list'
+                  ? 'bg-white dark:bg-trust-800 text-trust-700 dark:text-trust-200 shadow-sm'
+                  : 'text-trust-600 dark:text-trust-400 hover:text-trust-700 dark:hover:text-trust-300'
+              }`}
+            >
+              <List className="h-4 w-4" />
+              List
+            </button>
+            <button
+              onClick={() => setViewMode('map')}
+              className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-all ${
+                viewMode === 'map'
+                  ? 'bg-white dark:bg-trust-800 text-trust-700 dark:text-trust-200 shadow-sm'
+                  : 'text-trust-600 dark:text-trust-400 hover:text-trust-700 dark:hover:text-trust-300'
+              }`}
+            >
+              <MapPin className="h-4 w-4" />
+              Map
+            </button>
+          </div>
+          
+          {/* Read Results Button */}
+          {providers.length > 0 && (
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={handleReadResults}
+              className="flex items-center gap-2"
+            >
+              <Volume2 className="h-4 w-4" />
+              Read Results
+            </Button>
+          )}
+        </div>
       </div>
       
-      <MemoizedProviderMap 
-        providers={providers} 
-        userLocation={userLocation}
-        maxDistance={maxDistance}
-      />
+      {/* Content */}
+      {viewMode === 'map' ? (
+        <div className="trust-card p-1 rounded-xl">
+          <MemoizedProviderMap 
+            providers={providers} 
+            userLocation={userLocation}
+            maxDistance={maxDistance}
+          />
+        </div>
+      ) : (
+        <ProviderList providers={providers} />
+      )}
       
-      <ProviderList providers={providers} />
-      
-      <SearchPagination />
+      {providers.length > 0 && <SearchPagination />}
     </div>
   );
 };

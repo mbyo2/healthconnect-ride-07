@@ -1,68 +1,93 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 210 50% 98%;
-    --foreground: 222.2 84% 4.9%;
+    --background: 248 250 252;
+    --foreground: 15 23 42;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 255 255 255;
+    --card-foreground: 15 23 42;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 255 255 255;
+    --popover-foreground: 15 23 42;
 
-    --primary: 214 100% 50%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 59 130 246;
+    --primary-foreground: 255 255 255;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 241 245 249;
+    --secondary-foreground: 15 23 42;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 248 250 252;
+    --muted-foreground: 100 116 139;
 
-    --accent: 215 100% 97%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 219 234 254;
+    --accent-foreground: 30 64 175;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 239 68 68;
+    --destructive-foreground: 255 255 255;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 214 100% 50%;
+    --border: 226 232 240;
+    --input: 226 232 240;
+    --ring: 59 130 246;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
+
+    /* Trust-building blue colors */
+    --trust-50: 239 246 255;
+    --trust-100: 219 234 254;
+    --trust-200: 191 219 254;
+    --trust-300: 147 197 253;
+    --trust-400: 96 165 250;
+    --trust-500: 59 130 246;
+    --trust-600: 37 99 235;
+    --trust-700: 29 78 216;
+    --trust-800: 30 64 175;
+    --trust-900: 30 58 138;
   }
 
   .dark {
-    --background: 222.2 47.4% 11.2%;
-    --foreground: 210 40% 98%;
+    --background: 2 6 23;
+    --foreground: 248 250 252;
 
-    --card: 222.2 47.4% 11.2%;
-    --card-foreground: 210 40% 98%;
+    --card: 15 23 42;
+    --card-foreground: 248 250 252;
 
-    --popover: 222.2 47.4% 11.2%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 15 23 42;
+    --popover-foreground: 248 250 252;
 
-    --primary: 214 100% 70%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 96 165 250;
+    --primary-foreground: 2 6 23;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 30 41 59;
+    --secondary-foreground: 248 250 252;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 70.1%;
+    --muted: 30 41 59;
+    --muted-foreground: 148 163 184;
 
-    --accent: 217.2 32.6% 25%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 30 64 175;
+    --accent-foreground: 219 234 254;
 
-    --destructive: 0 62.8% 50.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 248 113 113;
+    --destructive-foreground: 2 6 23;
 
-    --border: 217.2 32.6% 30.5%;
-    --input: 217.2 32.6% 30.5%;
-    --ring: 214 100% 70%;
+    --border: 51 65 85;
+    --input: 51 65 85;
+    --ring: 96 165 250;
+
+    /* Dark mode trust colors */
+    --trust-50: 30 58 138;
+    --trust-100: 30 64 175;
+    --trust-200: 29 78 216;
+    --trust-300: 37 99 235;
+    --trust-400: 59 130 246;
+    --trust-500: 96 165 250;
+    --trust-600: 147 197 253;
+    --trust-700: 191 219 254;
+    --trust-800: 219 234 254;
+    --trust-900: 239 246 255;
   }
 }
 
@@ -73,129 +98,59 @@
 
   body {
     @apply bg-background text-foreground transition-colors duration-300;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   }
 
-  /* Ensure buttons are always visible */
+  /* Clean, trustworthy button styles */
   button {
-    @apply border border-border hover:bg-accent/80;
+    @apply transition-all duration-200 ease-in-out;
   }
   
-  /* TV specific styles */
-  .tv-device {
-    font-size: 20px; /* Larger base font for TV */
+  /* Trust-building focus states */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-trust-500 ring-offset-2 ring-offset-background;
   }
   
-  .tv-device button,
-  .tv-device a {
-    min-height: 60px;
-    min-width: 60px;
-    padding: 12px 24px;
+  /* Simple, clean card styles */
+  .trust-card {
+    @apply bg-white dark:bg-card border border-trust-200 dark:border-trust-800 rounded-xl shadow-sm hover:shadow-md transition-all duration-200;
   }
   
-  .tv-device *:focus {
-    outline: 4px solid hsl(var(--primary));
-    outline-offset: 4px;
-  }
-  
-  .tv-device .container {
-    max-width: 100%;
-    padding: 24px;
-  }
-  
-  /* D-pad navigation for TV */
-  .tv-device [data-dpad-focusable="true"] {
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-  
-  .tv-device [data-dpad-focusable="true"]:focus {
-    transform: scale(1.05);
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5);
-  }
-
-  /* Mobile touch-friendly styles */
-  @media (max-width: 768px) {
-    input, 
-    button, 
-    select, 
-    textarea {
-      font-size: 16px; /* Prevent zoom on input focus on iOS */
-    }
-    
-    button, 
-    a.button,
-    [role="button"],
-    .interactive-element {
-      min-height: 44px; /* Apple's recommended min touch target size */
-      min-width: 44px;
-      padding: 8px 16px;
-    }
-    
-    /* Add active state for better touch feedback */
-    .touch-manipulation {
-      touch-action: manipulation;
-    }
-    
-    /* Improved touch targets */
-    .card, .interactive-card {
-      position: relative;
-    }
-    
-    .card .clickable-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      z-index: 1;
-    }
-    
-    /* Fix iOS overscroll issues */
-    .prevent-overscroll {
-      overscroll-behavior: none;
-    }
-    
-    /* Fix dropdown positioning on mobile */
-    .dropdown-content {
-      position: fixed;
-      max-height: 50vh;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-    }
-  }
-}
-
-/* Add mobile-optimized card styles */
-@layer components {
-  .mobile-card {
-    @apply rounded-xl border border-border/30 bg-card p-4 shadow-soft-blue transition-all duration-200 hover:shadow-card-hover;
-  }
-  
+  /* Gradient backgrounds for trust */
   .trust-gradient {
-    @apply bg-gradient-to-r from-trust-500 to-trust-600 text-white;
+    @apply bg-gradient-to-r from-trust-500 to-trust-600;
   }
   
-  .trust-button {
-    @apply bg-trust-500 text-white hover:bg-trust-600 transition-colors duration-200;
-  }
-  
-  .glass-card {
-    @apply bg-white/80 dark:bg-black/50 backdrop-blur-md border border-white/20 dark:border-white/10 rounded-xl shadow-soft-blue;
+  .trust-gradient-light {
+    @apply bg-gradient-to-r from-trust-50 to-trust-100;
   }
 }
 
-/* Add fade-in animation */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
+@layer components {
+  .simple-button {
+    @apply inline-flex items-center justify-center rounded-lg px-6 py-3 text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-trust-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  
+  .simple-button-primary {
+    @apply simple-button bg-trust-500 text-white hover:bg-trust-600 shadow-sm hover:shadow-md;
+  }
+  
+  .simple-button-secondary {
+    @apply simple-button bg-white text-trust-700 border border-trust-300 hover:bg-trust-50 dark:bg-card dark:hover:bg-trust-900/20;
+  }
+  
+  .simple-input {
+    @apply w-full rounded-lg border border-trust-200 bg-white px-4 py-3 text-sm transition-colors focus:border-trust-500 focus:outline-none focus:ring-2 focus:ring-trust-500/20 dark:bg-card dark:border-trust-700;
+  }
+  
+  .trust-section {
+    @apply bg-gradient-to-b from-trust-50/30 to-white dark:from-trust-900/10 dark:to-background;
   }
 }
 
-/* Apply fade-in animation to elements with the class */
-.animate-fade-in {
-  animation: fadeIn 0.5s ease-out forwards;
+/* Remove mobile-specific complex styles and keep it simple */
+@media (max-width: 768px) {
+  .simple-touch {
+    @apply min-h-[48px] min-w-[48px] touch-manipulation;
+  }
 }
