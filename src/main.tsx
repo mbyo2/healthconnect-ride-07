@@ -7,7 +7,7 @@ import App from './App';
 import './index.css';
 import './App.css';
 import { Toaster } from 'sonner';
-import { ThemeProvider } from './hooks/use-theme';
+import { ThemeProvider } from './context/ThemeContext';
 import { AccessibilityProvider } from './context/AccessibilityContext';
 import { registerServiceWorker } from './utils/service-worker';
 import { AuthProvider } from './context/AuthContext';
@@ -37,7 +37,7 @@ window.addEventListener('error', (event) => {
 });
 
 // Helper to render error fallback
-function renderErrorFallback(rootElement) {
+function renderErrorFallback(rootElement: HTMLElement) {
   const errorDiv = document.createElement('div');
   errorDiv.style.padding = '20px';
   errorDiv.style.maxWidth = '600px';
@@ -55,7 +55,7 @@ function renderErrorFallback(rootElement) {
   
   rootElement.appendChild(errorDiv);
   
-  document.getElementById('refresh-btn').addEventListener('click', () => {
+  document.getElementById('refresh-btn')?.addEventListener('click', () => {
     window.location.reload();
   });
 }
@@ -128,12 +128,8 @@ function renderApp() {
               <QueryClientProvider client={queryClient}>
                 <ThemeProvider defaultTheme="light" storageKey="doc-oclock-theme">
                   <AccessibilityProvider>
-                    <AuthProvider>
-                      <BrowserRouter>
-                        <App />
-                        <Toaster position="top-right" richColors closeButton />
-                      </BrowserRouter>
-                    </AuthProvider>
+                    <App />
+                    <Toaster position="top-right" richColors closeButton />
                   </AccessibilityProvider>
                 </ThemeProvider>
               </QueryClientProvider>
