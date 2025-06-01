@@ -14,6 +14,7 @@ interface UserRolesContextType {
   isSuperAdmin: boolean;
   isHealthPersonnel: boolean;
   isPatient: boolean;
+  switchRole: (role: UserRole) => void;
   refreshRoles: () => void;
 }
 
@@ -65,6 +66,12 @@ export function UserRolesProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  const switchRole = (role: UserRole) => {
+    if (availableRoles.includes(role)) {
+      setCurrentRole(role);
+    }
+  };
+
   const refreshRoles = () => {
     if (profile) {
       setUserRole(profile.role as UserRole);
@@ -84,6 +91,7 @@ export function UserRolesProvider({ children }: { children: React.ReactNode }) {
     isSuperAdmin,
     isHealthPersonnel,
     isPatient,
+    switchRole,
     refreshRoles,
   };
 

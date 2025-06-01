@@ -1,63 +1,56 @@
 
-import React from "react";
-import { Star } from "lucide-react";
+import React from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Star } from 'lucide-react';
 
 export const Testimonials = () => {
   const testimonials = [
     {
-      quote: "This platform has transformed how I access healthcare. Getting a doctor to visit my home when my child was sick was incredibly convenient.",
-      author: "Sarah Johnson",
-      role: "Parent",
-      rating: 5
-    },
-    {
-      quote: "As someone with a busy schedule, the video consultations have been a lifesaver. Quick, efficient, and just as effective as in-person visits.",
-      author: "Michael Chen",
-      role: "Business Professional",
-      rating: 5
-    },
-    {
-      quote: "The specialist I connected with through this platform provided exceptional care. The entire process was smooth from booking to follow-up.",
-      author: "Elena Rodriguez",
+      name: "Sarah Johnson",
       role: "Patient",
-      rating: 4
+      content: "Doc' O Clock made it so easy to find the right doctor and book my appointment. The platform is user-friendly and secure.",
+      rating: 5
+    },
+    {
+      name: "Dr. Michael Chen",
+      role: "Healthcare Provider",
+      content: "Managing my practice has never been easier. The scheduling system and patient communication tools are excellent.",
+      rating: 5
+    },
+    {
+      name: "Emma Wilson",
+      role: "Patient",
+      content: "I love how I can access all my medical records in one place and communicate with my doctor securely.",
+      rating: 5
     }
   ];
 
   return (
-    <section className="py-20 bg-gradient-to-b from-blue-50/30 to-white">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            What Our Users Say
-          </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Discover how our platform is making healthcare more accessible for people like you.
+    <section className="py-16 px-4">
+      <div className="container mx-auto">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold mb-4">What Our Users Say</h2>
+          <p className="text-muted-foreground">
+            Trusted by thousands of patients and healthcare providers
           </p>
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        
+        <div className="grid md:grid-cols-3 gap-6">
           {testimonials.map((testimonial, index) => (
-            <div 
-              key={index} 
-              className="bg-white p-8 rounded-xl shadow-md border border-gray-100 flex flex-col h-full"
-            >
-              <div className="flex mb-4">
-                {[...Array(5)].map((_, i) => (
-                  <Star 
-                    key={i} 
-                    className={`w-5 h-5 ${i < testimonial.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} 
-                  />
-                ))}
-              </div>
-              <blockquote className="flex-grow">
-                <p className="text-gray-600 italic leading-relaxed mb-4">"{testimonial.quote}"</p>
-              </blockquote>
-              <div className="mt-4 pt-4 border-t border-gray-100">
-                <p className="font-semibold text-gray-800">{testimonial.author}</p>
-                <p className="text-sm text-gray-500">{testimonial.role}</p>
-              </div>
-            </div>
+            <Card key={index}>
+              <CardContent className="p-6">
+                <div className="flex mb-4">
+                  {[...Array(testimonial.rating)].map((_, i) => (
+                    <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                  ))}
+                </div>
+                <p className="text-sm mb-4">"{testimonial.content}"</p>
+                <div>
+                  <p className="font-medium">{testimonial.name}</p>
+                  <p className="text-xs text-muted-foreground">{testimonial.role}</p>
+                </div>
+              </CardContent>
+            </Card>
           ))}
         </div>
       </div>
