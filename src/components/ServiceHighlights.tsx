@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Calendar, Search, MessageSquare, FileText, Shield, Users, Star, Clock } from 'lucide-react';
+import { Calendar, Search, MessageSquare, FileText, Shield, Users, Star, Clock, CheckCircle } from 'lucide-react';
 
 export const ServiceHighlights = () => {
   const services = [
@@ -63,7 +63,7 @@ export const ServiceHighlights = () => {
         
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {services.map((service, index) => (
-            <div key={index} className="service-card">
+            <div key={index} className="service-card group">
               <div className="flex items-start gap-4 mb-4">
                 <div className="p-3 bg-gray-50 rounded-xl group-hover:bg-blue-50 transition-colors duration-200">
                   {service.icon}

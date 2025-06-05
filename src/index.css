@@ -165,9 +165,9 @@
     @apply text-orange-600 font-semibold;
   }
 
-  /* Product/service card */
+  /* Product/service card - removed 'group' from @apply */
   .service-card {
-    @apply modern-card p-6 hover:border-orange-200 transition-all duration-200 group;
+    @apply modern-card p-6 hover:border-orange-200 transition-all duration-200;
   }
 
   .service-card:hover {
