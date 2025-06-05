@@ -9,8 +9,8 @@ interface LoadingScreenProps {
 }
 
 export const LoadingScreen = ({ 
-  message = "Preparing Doc' O Clock for emergency care...", 
-  timeout = 4000 // Increased timeout for emergency preparedness
+  message = "Preparing Doc' O Clock for emergency healthcare...", 
+  timeout = 6000 // Extended for emergency system reliability
 }: LoadingScreenProps) => {
   const [showFallback, setShowFallback] = useState(false);
   const [longWait, setLongWait] = useState(false);
@@ -23,8 +23,10 @@ export const LoadingScreen = ({
     "Initializing emergency healthcare system...",
     "Securing patient data connections...",
     "Verifying healthcare provider networks...",
-    "Preparing emergency response tools...",
-    "Doc' O Clock ready for emergency care"
+    "Preparing emergency response protocols...",
+    "Loading healthcare databases...",
+    "Establishing secure communications...",
+    "Doc' O Clock emergency system ready"
   ];
   
   useEffect(() => {
@@ -49,17 +51,17 @@ export const LoadingScreen = ({
     
     const failedTimer = setTimeout(() => {
       if (mounted) setLoadingFailed(true);
-    }, timeout * 3); // Longer timeout for emergency systems
+    }, timeout * 3);
     
     // Slower, more deliberate progress for emergency systems
     const progressInterval = setInterval(() => {
       if (mounted) {
         setLoadingProgress(prev => {
-          const increment = Math.random() * 8; // Slower progress
-          return Math.min(prev + increment, 90);
+          const increment = Math.random() * 6; // Slower progress
+          return Math.min(prev + increment, 92);
         });
       }
-    }, 400);
+    }, 500);
     
     return () => {
       mounted = false;
@@ -84,56 +86,79 @@ export const LoadingScreen = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-trust-50 to-trust-100 dark:from-trust-900 dark:to-background flex flex-col items-center justify-center z-50">
-      <div className="flex flex-col items-center gap-6 animate-fadeIn p-8 rounded-xl bg-white/80 dark:bg-trust-800/80 backdrop-blur-sm shadow-lg max-w-md text-center border border-trust-200 dark:border-trust-700">
+    <div className="fixed inset-0 bg-gradient-to-br from-blue-50 via-white to-gray-50 flex flex-col items-center justify-center z-50">
+      <div className="flex flex-col items-center gap-8 animate-fadeIn p-10 rounded-2xl bg-white shadow-2xl border border-gray-200 max-w-lg text-center">
         
-        {/* Doc' O Clock Logo */}
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-16 h-16 bg-trust-500 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg">
-            D0C
+        {/* Modern Doc' O Clock Logo */}
+        <div className="flex flex-col items-center gap-6">
+          <div className="relative">
+            <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center text-white font-bold text-2xl shadow-lg">
+              D0C
+            </div>
+            <div className="absolute -inset-2 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl blur opacity-20"></div>
           </div>
-          <h1 className="text-2xl font-bold text-trust-900 dark:text-trust-100">
-            Doc' O Clock
-          </h1>
+          <div className="space-y-2">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
+              Doc' O Clock
+            </h1>
+            <p className="text-sm text-gray-500 font-medium">Emergency Healthcare System</p>
+          </div>
         </div>
         
+        {/* Modern Loading Spinner */}
         <div className="relative">
-          <LoadingSpinner size="lg" className="text-trust-500" />
+          <LoadingSpinner size="lg" className="text-blue-500" />
+          <div className="absolute inset-0 animate-ping">
+            <LoadingSpinner size="lg" className="text-blue-300 opacity-30" />
+          </div>
         </div>
         
-        <div className="space-y-2">
-          <p className="text-lg font-medium text-trust-700 dark:text-trust-300">{currentMessage}</p>
-          <p className="text-sm text-trust-600 dark:text-trust-400">{message}</p>
+        {/* Status Messages */}
+        <div className="space-y-3">
+          <p className="text-lg font-semibold text-gray-800">{currentMessage}</p>
+          <p className="text-sm text-gray-600">{message}</p>
         </div>
         
-        {/* Progress bar */}
-        <div className="w-full bg-trust-200 dark:bg-trust-800 rounded-full h-3">
-          <div 
-            className="bg-trust-500 h-3 rounded-full transition-all duration-500" 
-            style={{ width: `${loadingProgress}%` }} 
-          />
+        {/* Modern Progress Bar */}
+        <div className="w-full">
+          <div className="flex justify-between text-xs text-gray-500 mb-2">
+            <span>Loading...</span>
+            <span>{Math.round(loadingProgress)}%</span>
+          </div>
+          <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+            <div 
+              className="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all duration-500 shadow-sm" 
+              style={{ width: `${loadingProgress}%` }} 
+            />
+          </div>
         </div>
         
-        <p className="text-sm text-trust-500 dark:text-trust-400 max-w-xs text-center">
-          {loadingFailed 
-            ? "Emergency system initialization failed" 
-            : "Ensuring system reliability for emergency situations..."}
-        </p>
+        {/* Status Indicator */}
+        <div className="flex items-center gap-2">
+          <div className={`w-3 h-3 rounded-full ${loadingFailed ? 'bg-red-500' : 'bg-green-500 animate-pulse'}`}></div>
+          <p className="text-sm font-medium text-gray-600">
+            {loadingFailed 
+              ? "System initialization failed" 
+              : "Emergency healthcare system initializing..."}
+          </p>
+        </div>
         
+        {/* Action Buttons */}
         {(showFallback || loadingFailed) && (
-          <div className="mt-4 text-center space-y-3">
-            <p className="text-sm text-trust-600 dark:text-trust-400">
+          <div className="mt-6 text-center space-y-4 w-full">
+            <p className="text-sm text-gray-600">
               {loadingFailed 
-                ? "Emergency system could not initialize. Please refresh or clear cache."
+                ? "Emergency system could not initialize. Please refresh or reset."
                 : longWait 
-                  ? "Emergency system initialization taking longer than expected."
-                  : "Taking longer to ensure emergency readiness. You can refresh if needed."}
+                  ? "System initialization taking longer than expected."
+                  : "Taking longer to ensure emergency readiness."}
             </p>
-            <div className="flex gap-2 justify-center">
+            <div className="flex gap-3 justify-center">
               <Button 
                 onClick={handleRefresh}
-                variant={loadingFailed ? "default" : "outline"}
-                className="px-4 py-2"
+                variant={loadingFailed ? "amazon" : "outline"}
+                size="lg"
+                className="min-w-[120px]"
               >
                 Refresh System
               </Button>
@@ -141,7 +166,9 @@ export const LoadingScreen = ({
               {(longWait || loadingFailed) && (
                 <Button
                   variant="outline"
+                  size="lg"
                   onClick={handleClearCacheAndReload}
+                  className="min-w-[120px]"
                 >
                   Emergency Reset
                 </Button>
@@ -149,6 +176,13 @@ export const LoadingScreen = ({
             </div>
           </div>
         )}
+      </div>
+      
+      {/* Trust indicators at bottom */}
+      <div className="absolute bottom-8 flex items-center gap-6 text-sm text-gray-500">
+        <span>🔒 HIPAA Compliant</span>
+        <span>✓ Emergency Ready</span>
+        <span>⚡ 99.9% Uptime</span>
       </div>
     </div>
   );

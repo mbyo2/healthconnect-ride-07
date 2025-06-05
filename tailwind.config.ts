@@ -16,9 +16,9 @@ export default {
       padding: {
         DEFAULT: "1rem",
         sm: "2rem",
-        lg: "4rem",
-        xl: "5rem",
-        "2xl": "6rem",
+        lg: "3rem",
+        xl: "4rem",
+        "2xl": "5rem",
       },
       screens: {
         sm: "640px",
@@ -63,18 +63,25 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // New trust-inducing blue colors
+        // Modern e-commerce color palette
         trust: {
-          50: "#e6f0ff",
-          100: "#cce0ff",
-          200: "#99c2ff",
-          300: "#66a3ff",
-          400: "#3385ff",
-          500: "#0066ff",
-          600: "#0052cc",
-          700: "#003d99",
-          800: "#002966",
-          900: "#001433",
+          50: "rgb(var(--trust-50))",
+          100: "rgb(var(--trust-100))",
+          200: "rgb(var(--trust-200))",
+          300: "rgb(var(--trust-300))",
+          400: "rgb(var(--trust-400))",
+          500: "rgb(var(--trust-500))",
+          600: "rgb(var(--trust-600))",
+          700: "rgb(var(--trust-700))",
+          800: "rgb(var(--trust-800))",
+          900: "rgb(var(--trust-900))",
+        },
+        // E-commerce specific colors
+        amazon: {
+          orange: "rgb(255, 153, 0)",
+          blue: "rgb(35, 47, 62)",
+          lightBlue: "rgb(0, 113, 227)",
+          gray: "rgb(248, 248, 248)",
         },
       },
       borderRadius: {
@@ -92,43 +99,46 @@ export default {
           to: { height: "0" },
         },
         "fadeIn": {
-          "0%": { opacity: "0", transform: "translateY(10px)" },
+          "0%": { opacity: "0", transform: "translateY(20px)" },
           "100%": { opacity: "1", transform: "translateY(0)" }
         },
-        "pulse-subtle": {
-          "0%, 100%": { opacity: "1" },
-          "50%": { opacity: "0.8" }
+        "slideIn": {
+          "0%": { transform: "translateX(-100%)" },
+          "100%": { transform: "translateX(0)" }
         },
-        "slide-in-bottom": {
-          "0%": { transform: "translateY(20px)", opacity: "0" },
-          "100%": { transform: "translateY(0)", opacity: "1" }
+        "bounceIn": {
+          "0%, 20%, 40%, 60%, 80%": { transform: "translateY(-6px)" },
+          "100%": { transform: "translateY(0)" }
         },
-        "slide-in-left": {
-          "0%": { transform: "translateX(-20px)", opacity: "0" },
-          "100%": { transform: "translateX(0)", opacity: "1" }
-        },
-        "slide-in-right": {
-          "0%": { transform: "translateX(20px)", opacity: "0" },
-          "100%": { transform: "translateX(0)", opacity: "1" }
+        "float": {
+          "0%, 100%": { transform: "translateY(0px)" },
+          "50%": { transform: "translateY(-10px)" }
         }
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "fadeIn": "fadeIn 0.5s ease-out forwards",
-        "pulse-subtle": "pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
-        "slide-in-bottom": "slide-in-bottom 0.5s ease-out forwards",
-        "slide-in-left": "slide-in-left 0.5s ease-out forwards", 
-        "slide-in-right": "slide-in-right 0.5s ease-out forwards"
+        "fadeIn": "fadeIn 0.6s ease-out forwards",
+        "slideIn": "slideIn 0.4s ease-out",
+        "bounceIn": "bounceIn 1s ease-out",
+        "float": "float 3s ease-in-out infinite",
       },
       backgroundImage: {
-        'grid-pattern': "linear-gradient(to right, #f0f0f0 1px, transparent 1px), linear-gradient(to bottom, #f0f0f0 1px, transparent 1px)",
-        'glass-gradient': "linear-gradient(to right bottom, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))",
+        'grid-pattern': "linear-gradient(to right, #f3f4f6 1px, transparent 1px), linear-gradient(to bottom, #f3f4f6 1px, transparent 1px)",
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
       },
       boxShadow: {
-        'glass': '0 4px 30px rgba(0, 0, 0, 0.1)',
-        'soft-blue': '0 4px 15px rgba(0, 102, 255, 0.1)',
-        'card-hover': '0 8px 30px rgba(0, 102, 255, 0.15)',
+        'card': '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
+        'card-hover': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+        'button': '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+        'button-hover': '0 2px 4px 0 rgba(0, 0, 0, 0.1)',
+      },
+      fontFamily: {
+        sans: ['Amazon Ember', 'Helvetica Neue', 'Arial', 'sans-serif'],
+      },
+      spacing: {
+        '18': '4.5rem',
+        '88': '22rem',
       },
       screens: {
         'xs': '480px',

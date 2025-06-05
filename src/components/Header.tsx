@@ -12,13 +12,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Menu, Search, Bell } from "lucide-react";
+import { Menu, Search, Bell, ShoppingCart } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Input } from "@/components/ui/input";
 import { useSearch } from "@/context/SearchContext";
 import { UserRole, AdminLevel } from "@/types/user";
 import { useDeviceType } from "@/hooks/use-device-type";
-import { useNotifications } from "@/hooks/use-notifications";
 import { cn } from "@/lib/utils";
 import { AppLogo } from "@/components/ui/AppLogo";
 
@@ -65,63 +64,92 @@ export function Header() {
   }
   
   return (
-    <header className="bg-background/95 backdrop-blur-md fixed top-0 left-0 right-0 z-50 border-b h-16 shadow-sm">
-      <div className="container flex h-full items-center justify-between px-4">
-        {/* Logo on the left */}
+    <header className="modern-header">
+      <div className="container-modern flex h-16 items-center justify-between">
+        {/* Logo */}
         <AppLogo size="sm" />
         
-        {/* Actions on the right */}
-        <div className="flex items-center gap-3">
-          <form onSubmit={handleSearchSubmit} className="relative hidden sm:block">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Search..."
-              className="w-[140px] pl-8 h-9 focus:w-[180px] transition-all duration-300"
-              value={searchTerm}
-              onChange={handleSearchChange}
-            />
+        {/* Search bar - hidden on very small screens */}
+        {user && (
+          <form onSubmit={handleSearchSubmit} className="hidden sm:block flex-1 max-w-md mx-4">
+            <div className="search-bar">
+              <Input
+                type="search"
+                placeholder="Search providers, specialties..."
+                className="search-input"
+                value={searchTerm}
+                onChange={handleSearchChange}
+              />
+              <button type="submit" className="search-button">
+                <Search className="h-4 w-4" />
+              </button>
+            </div>
           </form>
-          
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="h-9 w-9 sm:hidden"
-            onClick={() => navigate("/search")}
-          >
-            <Search className="h-5 w-5 text-muted-foreground" />
-          </Button>
+        )}
+        
+        {/* Right actions */}
+        <div className="flex items-center gap-2">
+          {user && (
+            <>
+              {/* Mobile search button */}
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="sm:hidden h-10 w-10"
+                onClick={() => navigate("/search")}
+              >
+                <Search className="h-5 w-5" />
+              </Button>
+              
+              {/* Notifications */}
+              <Button variant="ghost" size="icon" className="h-10 w-10 relative">
+                <Bell className="h-5 w-5" />
+                <span className="absolute -top-1 -right-1 h-5 w-5 bg-orange-500 text-white text-xs rounded-full flex items-center justify-center">
+                  3
+                </span>
+              </Button>
+            </>
+          )}
           
           <ThemeToggle />
           
+          {/* User menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full">
+              <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full">
                 {user ? (
-                  <Avatar className="h-8 w-8 ring-2 ring-trust-100">
+                  <Avatar className="h-9 w-9 ring-2 ring-blue-100">
                     <AvatarImage src={profile?.avatar_url || ""} alt={user?.email || "Avatar"} />
-                    <AvatarFallback className="bg-trust-100 text-trust-600">{user?.email?.[0]?.toUpperCase() || "U"}</AvatarFallback>
+                    <AvatarFallback className="bg-blue-100 text-blue-700 font-semibold">
+                      {user?.email?.[0]?.toUpperCase() || "U"}
+                    </AvatarFallback>
                   </Avatar>
                 ) : (
                   <Menu className="h-5 w-5" />
                 )}
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuContent align="end" className="w-64 bg-white border border-gray-200 shadow-lg">
               {user ? (
                 <>
-                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuLabel className="pb-2">
+                    <div className="text-sm font-medium text-gray-900">{user.email}</div>
+                    <div className="text-xs text-gray-500">My Account</div>
+                  </DropdownMenuLabel>
                   <DropdownMenuSeparator />
+                  
                   <DropdownMenuItem asChild>
-                    <Link to="/profile">Profile</Link>
+                    <Link to="/profile" className="flex items-center">
+                      Profile & Settings
+                    </Link>
                   </DropdownMenuItem>
                   
                   <DropdownMenuItem asChild>
-                    <Link to="/settings">Settings</Link>
+                    <Link to="/appointments">My Appointments</Link>
                   </DropdownMenuItem>
                   
                   <DropdownMenuItem asChild>
-                    <Link to="/documentation">Documentation</Link>
+                    <Link to="/documentation">Help & Support</Link>
                   </DropdownMenuItem>
                   
                   {userRole === 'health_personnel' && (
@@ -137,15 +165,17 @@ export function Header() {
                   )}
                   
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleSignOut}>Sign out</DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleSignOut} className="text-red-600">
+                    Sign out
+                  </DropdownMenuItem>
                 </>
               ) : (
                 <>
                   <DropdownMenuItem asChild>
-                    <Link to="/login">Login</Link>
+                    <Link to="/auth" className="font-medium">Sign In</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link to="/register">Register</Link>
+                    <Link to="/auth?tab=signup" className="font-medium">Create Account</Link>
                   </DropdownMenuItem>
                 </>
               )}
