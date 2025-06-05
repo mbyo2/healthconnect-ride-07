@@ -1,4 +1,3 @@
-
 import React, { useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -171,14 +170,13 @@ export const SearchFilters = () => {
             Provider Type
           </Label>
           <Select
-            value={selectedType || ""}
-            onValueChange={(value) => setSelectedType(value as HealthcareProviderType || null)}
+            value={selectedType || undefined}
+            onValueChange={(value) => setSelectedType(value as HealthcareProviderType)}
           >
             <SelectTrigger id="provider-type" aria-label="Select provider type">
               <SelectValue placeholder="All Types" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Types</SelectItem>
               {providerTypes.map((type) => (
                 <SelectItem key={type} value={type}>
                   {type.charAt(0).toUpperCase() + type.slice(1).replace("_", " ")}
@@ -193,14 +191,13 @@ export const SearchFilters = () => {
             Specialty
           </Label>
           <Select
-            value={selectedSpecialty || ""}
-            onValueChange={(value) => setSelectedSpecialty(value as SpecialtyType || null)}
+            value={selectedSpecialty || undefined}
+            onValueChange={(value) => setSelectedSpecialty(value as SpecialtyType)}
           >
             <SelectTrigger id="specialty" aria-label="Select specialty">
               <SelectValue placeholder="Any Specialty" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Any Specialty</SelectItem>
               {specialtyTypes.map((specialty) => (
                 <SelectItem key={specialty} value={specialty}>
                   {specialty}
@@ -215,15 +212,13 @@ export const SearchFilters = () => {
             Insurance
           </Label>
           <Select
-            value={selectedInsurance || ""}
-            onValueChange={(value) => setSelectedInsurance(value as InsuranceProvider || null)}
+            value={selectedInsurance || undefined}
+            onValueChange={(value) => setSelectedInsurance(value as InsuranceProvider)}
           >
             <SelectTrigger id="insurance" aria-label="Select accepted insurance">
               <SelectValue placeholder="Any Insurance" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Any Insurance</SelectItem>
-              
               <SelectGroup>
                 <SelectLabel>Zambian Providers</SelectLabel>
                 {zambianInsuranceProviders.map((insurance) => (
