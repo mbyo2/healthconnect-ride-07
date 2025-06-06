@@ -1,37 +1,70 @@
-
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calendar, Search, MessageSquare, FileText, Shield, Users, Star, Clock, CheckCircle } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 export const ServiceHighlights = () => {
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    totalAppointments: 0,
+    totalMessages: 0,
+    totalProviders: 0
+  });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        // Fetch real statistics from the database
+        const [usersCount, appointmentsCount, messagesCount, providersCount] = await Promise.all([
+          supabase.from('profiles').select('id', { count: 'exact', head: true }),
+          supabase.from('appointments').select('id', { count: 'exact', head: true }),
+          supabase.from('messages').select('id', { count: 'exact', head: true }),
+          supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'health_personnel')
+        ]);
+
+        setStats({
+          totalUsers: usersCount.count || 0,
+          totalAppointments: appointmentsCount.count || 0,
+          totalMessages: messagesCount.count || 0,
+          totalProviders: providersCount.count || 0
+        });
+      } catch (error) {
+        console.error('Error fetching stats:', error);
+        // Keep default values if error occurs
+      }
+    };
+
+    fetchStats();
+  }, []);
+
   const services = [
     {
       icon: <Search className="h-6 w-6 text-blue-600" />,
       title: "Find Trusted Providers",
       description: "Search verified healthcare providers with patient reviews and credentials",
       rating: "4.9/5",
-      users: "15K+ reviews"
+      users: `${stats.totalProviders}+ providers`
     },
     {
       icon: <Calendar className="h-6 w-6 text-green-600" />,
       title: "Simple Scheduling",
       description: "Book appointments instantly with real-time availability",
       rating: "4.8/5", 
-      users: "25K+ bookings"
+      users: `${stats.totalAppointments}+ bookings`
     },
     {
       icon: <MessageSquare className="h-6 w-6 text-purple-600" />,
       title: "Secure Communication",
       description: "HIPAA-compliant messaging with your healthcare team",
       rating: "4.9/5",
-      users: "50K+ messages"
+      users: `${stats.totalMessages}+ messages`
     },
     {
       icon: <FileText className="h-6 w-6 text-indigo-600" />,
       title: "Digital Health Records",
       description: "Access your complete medical history anytime, anywhere",
       rating: "4.7/5",
-      users: "30K+ records"
+      users: `${stats.totalUsers}+ records`
     },
     {
       icon: <Shield className="h-6 w-6 text-red-600" />,
@@ -57,7 +90,7 @@ export const ServiceHighlights = () => {
             Everything You Need for Better Healthcare
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Discover why thousands trust Doc' O Clock for their healthcare needs
+            Discover why {stats.totalUsers > 0 ? `${stats.totalUsers} users` : 'thousands'} trust Doc' O Clock for their healthcare needs
           </p>
         </div>
         

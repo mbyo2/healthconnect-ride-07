@@ -1,79 +1,124 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, Search, MessageSquare, User, FileText, CreditCard, CheckCircle, ArrowRight, Clock } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/context/AuthContext';
 
 export const PatientWorkflow = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [userProfile, setUserProfile] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  const workflowSteps = [
-    {
-      id: 1,
-      title: "Complete Your Profile",
-      description: "Set up your personal and medical information to get personalized care",
-      icon: <User className="h-6 w-6" />,
-      action: () => navigate('/profile-setup'),
-      completed: false,
-      urgent: true,
-      estimatedTime: "5 min"
-    },
-    {
-      id: 2,
-      title: "Report Your Symptoms", 
-      description: "Tell us how you're feeling to get the right care recommendations",
-      icon: <FileText className="h-6 w-6" />,
-      action: () => navigate('/symptoms'),
-      completed: false,
-      urgent: false,
-      estimatedTime: "3 min"
-    },
-    {
-      id: 3,
-      title: "Find Healthcare Providers",
-      description: "Search and discover qualified doctors and specialists near you",
-      icon: <Search className="h-6 w-6" />,
-      action: () => navigate('/search'),
-      completed: false,
-      urgent: false,
-      estimatedTime: "10 min"
-    },
-    {
-      id: 4,
-      title: "Book Your Appointment",
-      description: "Schedule a convenient time with your chosen healthcare provider",
-      icon: <Calendar className="h-6 w-6" />,
-      action: () => navigate('/appointments'),
-      completed: false,
-      urgent: false,
-      estimatedTime: "5 min"
-    },
-    {
-      id: 5,
-      title: "Set Up Payment Methods",
-      description: "Add your payment information for easy billing and transactions",
-      icon: <CreditCard className="h-6 w-6" />,
-      action: () => navigate('/payments'),
-      completed: false,
-      urgent: false,
-      estimatedTime: "7 min"
-    },
-    {
-      id: 6,
-      title: "Connect & Communicate",
-      description: "Chat securely with your healthcare providers and get support",
-      icon: <MessageSquare className="h-6 w-6" />,
-      action: () => navigate('/chat'),
-      completed: false,
-      urgent: false,
-      estimatedTime: "2 min"
-    }
-  ];
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (!user) return;
+      
+      try {
+        const { data: profile, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
 
+        if (error) {
+          console.error('Error fetching profile:', error);
+        } else {
+          setUserProfile(profile);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserProfile();
+  }, [user]);
+
+  const getWorkflowSteps = () => {
+    const isProfileComplete = userProfile?.is_profile_complete || false;
+    
+    return [
+      {
+        id: 1,
+        title: "Complete Your Profile",
+        description: "Set up your personal and medical information to get personalized care",
+        icon: <User className="h-6 w-6" />,
+        action: () => navigate('/profile-setup'),
+        completed: isProfileComplete,
+        urgent: !isProfileComplete,
+        estimatedTime: "5 min"
+      },
+      {
+        id: 2,
+        title: "Report Your Symptoms", 
+        description: "Tell us how you're feeling to get the right care recommendations",
+        icon: <FileText className="h-6 w-6" />,
+        action: () => navigate('/symptoms'),
+        completed: false,
+        urgent: false,
+        estimatedTime: "3 min"
+      },
+      {
+        id: 3,
+        title: "Find Healthcare Providers",
+        description: "Search and discover qualified doctors and specialists near you",
+        icon: <Search className="h-6 w-6" />,
+        action: () => navigate('/search'),
+        completed: false,
+        urgent: false,
+        estimatedTime: "10 min"
+      },
+      {
+        id: 4,
+        title: "Book Your Appointment",
+        description: "Schedule a convenient time with your chosen healthcare provider",
+        icon: <Calendar className="h-6 w-6" />,
+        action: () => navigate('/appointments'),
+        completed: false,
+        urgent: false,
+        estimatedTime: "5 min"
+      },
+      {
+        id: 5,
+        title: "Set Up Payment Methods",
+        description: "Add your payment information for easy billing and transactions",
+        icon: <CreditCard className="h-6 w-6" />,
+        action: () => navigate('/payments'),
+        completed: false,
+        urgent: false,
+        estimatedTime: "7 min"
+      },
+      {
+        id: 6,
+        title: "Connect & Communicate",
+        description: "Chat securely with your healthcare providers and get support",
+        icon: <MessageSquare className="h-6 w-6" />,
+        action: () => navigate('/chat'),
+        completed: false,
+        urgent: false,
+        estimatedTime: "2 min"
+      }
+    ];
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  const workflowSteps = getWorkflowSteps();
   const completedSteps = workflowSteps.filter(step => step.completed).length;
   const progressPercentage = (completedSteps / workflowSteps.length) * 100;
+  const userName = userProfile?.first_name || 'there';
 
   return (
     <div className="space-y-8 max-w-6xl mx-auto">
@@ -84,7 +129,7 @@ export const PatientWorkflow = () => {
           Your Healthcare Journey
         </div>
         <h1 className="text-3xl lg:text-4xl font-bold text-gray-900">
-          Welcome to Doc' O Clock
+          Welcome {userName} to Doc' O Clock
         </h1>
         <p className="text-xl text-gray-600 max-w-2xl mx-auto">
           Follow these simple steps to get the most out of your healthcare experience. 
