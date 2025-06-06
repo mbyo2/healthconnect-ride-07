@@ -2,7 +2,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Notification } from "@/types/notification";
-import { v4 as uuidv4 } from "uuid";
 
 export const fetchNotifications = async (userId: string): Promise<Notification[]> => {
   try {
@@ -12,7 +11,11 @@ export const fetchNotifications = async (userId: string): Promise<Notification[]
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
       
-    if (error) throw error;
+    if (error) {
+      console.error('Error fetching notifications:', error);
+      throw error;
+    }
+    
     return data as Notification[];
   } catch (error) {
     console.error('Error fetching notifications:', error);
@@ -27,9 +30,7 @@ export const createNotification = async (
   type: 'appointment' | 'message' | 'system' = 'system'
 ): Promise<Notification | null> => {
   try {
-    const notificationId = uuidv4();
-    const newNotification: Notification = {
-      id: notificationId,
+    const newNotification = {
       user_id: userId,
       title,
       message,
@@ -38,20 +39,21 @@ export const createNotification = async (
       created_at: new Date().toISOString()
     };
     
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('notifications')
-      .insert(newNotification);
+      .insert(newNotification)
+      .select()
+      .single();
       
-    if (error) throw error;
+    if (error) {
+      console.error('Error creating notification:', error);
+      throw error;
+    }
     
-    // Optionally show a toast for immediate feedback
-    toast(title, {
-      description: message,
-    });
-    
-    return newNotification;
+    return data as Notification;
   } catch (error) {
     console.error('Error creating notification:', error);
+    toast.error("Failed to create notification");
     return null;
   }
 };
@@ -64,7 +66,11 @@ export const markNotificationAsRead = async (notificationId: string, userId: str
       .eq('id', notificationId)
       .eq('user_id', userId);
       
-    if (error) throw error;
+    if (error) {
+      console.error('Error marking notification as read:', error);
+      throw error;
+    }
+    
     return true;
   } catch (error) {
     console.error('Error marking notification as read:', error);
@@ -80,7 +86,11 @@ export const markAllNotificationsAsRead = async (userId: string): Promise<boolea
       .eq('user_id', userId)
       .eq('read', false);
       
-    if (error) throw error;
+    if (error) {
+      console.error('Error marking all notifications as read:', error);
+      throw error;
+    }
+    
     return true;
   } catch (error) {
     console.error('Error marking all notifications as read:', error);
@@ -96,10 +106,58 @@ export const deleteNotification = async (notificationId: string, userId: string)
       .eq('id', notificationId)
       .eq('user_id', userId);
       
-    if (error) throw error;
+    if (error) {
+      console.error('Error deleting notification:', error);
+      throw error;
+    }
+    
     return true;
   } catch (error) {
     console.error('Error deleting notification:', error);
     return false;
   }
+};
+
+// Real-time notification listener
+export const subscribeToNotifications = (userId: string, onNotification: (notification: Notification) => void) => {
+  const channel = supabase
+    .channel('user-notifications')
+    .on(
+      'postgres_changes',
+      {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'notifications',
+        filter: `user_id=eq.${userId}`
+      },
+      (payload) => {
+        const notification = payload.new as Notification;
+        onNotification(notification);
+        
+        // Show toast notification
+        toast(notification.title, {
+          description: notification.message,
+        });
+        
+        // Show browser notification if permission granted
+        if (Notification.permission === 'granted') {
+          const browserNotification = new Notification(notification.title, {
+            body: notification.message,
+            icon: '/favicon.ico'
+          });
+          
+          browserNotification.onclick = () => {
+            window.focus();
+            browserNotification.close();
+          };
+        }
+      }
+    )
+    .subscribe();
+    
+  return {
+    unsubscribe: () => {
+      supabase.removeChannel(channel);
+    }
+  };
 };
