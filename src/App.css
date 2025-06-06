@@ -1,7 +1,10 @@
+
 #root {
   margin: 0 auto;
   width: 100%;
   min-height: 100vh;
+  font-size: 16px;
+  line-height: 1.7;
 }
 
 @media (min-width: 768px) {
@@ -42,105 +45,140 @@
 
 .card {
   padding: 2em;
+  border: 3px solid rgb(var(--high-contrast-border));
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 }
 
 .read-the-docs {
-  color: #888;
+  color: rgb(var(--high-contrast-text));
+  font-weight: 600;
+  font-size: 18px;
 }
 
-/* Add mobile-specific styles */
+/* Enhanced mobile-specific styles */
 @media (max-width: 767px) {
   .mobile-container {
-    padding-left: 1rem;
-    padding-right: 1rem;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
   }
   
   .mobile-pb {
-    padding-bottom: 5rem; /* Space for bottom nav */
+    padding-bottom: 6rem;
+  }
+
+  /* Larger touch targets for better accessibility */
+  button, input, select, textarea, a {
+    min-height: 52px;
+    min-width: 52px;
+    font-size: 18px;
+    font-weight: 600;
   }
 }
 
-/* Ensure buttons are visible in both light and dark modes */
+/* Enhanced button visibility */
+button {
+  color: rgb(var(--high-contrast-text)) !important;
+  border: 3px solid rgb(var(--high-contrast-border)) !important;
+  font-weight: 700 !important;
+  font-size: 18px !important;
+  padding: 12px 20px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+button:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25) !important;
+  transform: translateY(-2px);
+}
+
 .dark button {
-  color: white; /* Ensure text is white in dark mode */
-  border-color: rgba(255, 255, 255, 0.1);
+  color: white !important;
+  border-color: white !important;
 }
 
 .light button {
-  color: rgba(0, 0, 0, 0.9); /* Ensure text is dark in light mode */
+  color: black !important;
+  border-color: black !important;
 }
 
 .dark button:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-.light button:hover {
-  background-color: rgba(0, 0, 0, 0.05);
-}
-
-/* Ensure primary buttons have proper contrast */
-.dark .bg-primary {
-  color: hsl(var(--primary-foreground));
-}
-
-.light .bg-primary {
-  color: hsl(var(--primary-foreground));
-}
-
-/* Fix hover states for better visibility */
-.dark .hover\:bg-accent:hover {
   background-color: rgba(255, 255, 255, 0.15) !important;
 }
 
-.light .hover\:bg-accent:hover {
-  background-color: rgba(0, 0, 0, 0.05) !important;
+.light button:hover {
+  background-color: rgba(0, 0, 0, 0.1) !important;
 }
 
-/* Improve contrast for text in buttons */
-.dark button {
-  color: rgba(255, 255, 255, 0.9);
+/* Enhanced primary buttons */
+.bg-primary {
+  color: white !important;
+  background-color: rgb(var(--primary)) !important;
+  border: 3px solid rgb(var(--high-contrast-border)) !important;
 }
 
-/* Fix button visibility in CTA section for both modes */
-.dark .bg-white.text-blue-700 {
-  background-color: rgba(255, 255, 255, 0.9) !important;
+/* Enhanced hover states */
+.hover\:bg-accent:hover {
+  background-color: rgba(var(--accent), 0.2) !important;
+  border: 3px solid rgb(var(--high-contrast-border)) !important;
+}
+
+/* Enhanced contrast for CTA sections */
+.bg-white.text-blue-700 {
+  background-color: white !important;
   color: #1d4ed8 !important;
+  border: 3px solid black !important;
+  font-weight: 700 !important;
 }
 
-.dark .border-white {
-  border-color: rgba(255, 255, 255, 0.8) !important;
+.dark .bg-white.text-blue-700 {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  color: #1d4ed8 !important;
+  border: 3px solid white !important;
 }
 
-/* Fix iOS viewport height issue */
+.border-white {
+  border: 3px solid white !important;
+}
+
+/* Enhanced viewport handling */
 @supports (-webkit-touch-callout: none) {
   .min-h-screen {
     min-height: -webkit-fill-available;
   }
 }
 
-/* Fix overscrolling on iOS */
 html, body {
   overflow-x: hidden;
   position: relative;
   width: 100%;
   -webkit-overflow-scrolling: touch;
+  font-size: 16px;
+  line-height: 1.7;
 }
 
-/* Improve tap target sizes on mobile */
+/* Enhanced tap targets */
 @media (max-width: 767px) {
   button, 
   input[type="button"],
-  input[type="submit"] {
-    min-height: 44px;
-    min-width: 44px;
+  input[type="submit"],
+  select,
+  textarea {
+    min-height: 52px;
+    min-width: 52px;
+    font-size: 18px;
+    font-weight: 600;
+    border: 3px solid rgb(var(--high-contrast-border));
   }
   
   a {
-    padding: 0.25rem;
+    padding: 8px;
+    min-height: 44px;
+    display: inline-block;
+    font-weight: 600;
+    text-decoration: underline;
   }
 }
 
-/* Accessibility styles */
+/* Enhanced accessibility styles */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -153,86 +191,75 @@ html, body {
   border-width: 0;
 }
 
-/* High contrast mode */
+/* Enhanced high contrast mode */
 .high-contrast {
-  --background: 0 0% 100%;
-  --foreground: 0 0% 0%;
-  
-  --card: 0 0% 100%;
-  --card-foreground: 0 0% 0%;
-  
-  --popover: 0 0% 100%;
-  --popover-foreground: 0 0% 0%;
-  
-  --primary: 0 0% 0%;
-  --primary-foreground: 0 0% 100%;
-  
-  --secondary: 0 0% 90%;
-  --secondary-foreground: 0 0% 0%;
-  
-  --muted: 0 0% 90%;
-  --muted-foreground: 0 0% 0%;
-  
-  --accent: 0 0% 90%;
-  --accent-foreground: 0 0% 0%;
-  
-  --destructive: 0 100% 30%;
-  --destructive-foreground: 0 0% 100%;
-  
-  --border: 0 0% 0%;
-  --input: 0 0% 0%;
-  --ring: 0 0% 0%;
+  --background: 255 255 255;
+  --foreground: 0 0 0;
+  --card: 255 255 255;
+  --card-foreground: 0 0 0;
+  --primary: 0 0 255;
+  --primary-foreground: 255 255 255;
+  --border: 0 0 0;
 }
 
 .high-contrast.dark {
-  --background: 0 0% 0%;
-  --foreground: 0 0% 100%;
-  
-  --card: 0 0% 0%;
-  --card-foreground: 0 0% 100%;
-  
-  --popover: 0 0% 0%;
-  --popover-foreground: 0 0% 100%;
-  
-  --primary: 0 0% 100%;
-  --primary-foreground: 0 0% 0%;
-  
-  --secondary: 0 0% 10%;
-  --secondary-foreground: 0 0% 100%;
-  
-  --muted: 0 0% 10%;
-  --muted-foreground: 0 0% 100%;
-  
-  --accent: 0 0% 10%;
-  --accent-foreground: 0 0% 100%;
-  
-  --destructive: 0 100% 50%;
-  --destructive-foreground: 0 0% 100%;
-  
-  --border: 0 0% 100%;
-  --input: 0 0% 100%;
-  --ring: 0 0% 100%;
+  --background: 0 0 0;
+  --foreground: 255 255 255;
+  --card: 0 0 0;
+  --card-foreground: 255 255 255;
+  --primary: 102 204 255;
+  --primary-foreground: 0 0 0;
+  --border: 255 255 255;
+}
+
+.high-contrast * {
+  border-width: 3px !important;
+  font-weight: 700 !important;
+  font-size: 18px !important;
 }
 
 .high-contrast a {
-  text-decoration: underline;
+  text-decoration: underline !important;
+  font-weight: 700 !important;
 }
 
-.high-contrast:not(.dark) button:not([aria-pressed="true"]) {
-  border: 2px solid black;
+.high-contrast button, 
+.high-contrast input, 
+.high-contrast select, 
+.high-contrast textarea {
+  border: 3px solid black !important;
+  font-size: 18px !important;
+  padding: 12px 16px !important;
+  font-weight: 700 !important;
 }
 
-.high-contrast.dark button:not([aria-pressed="true"]) {
-  border: 2px solid white;
+.high-contrast.dark button, 
+.high-contrast.dark input, 
+.high-contrast.dark select, 
+.high-contrast.dark textarea {
+  border: 3px solid white !important;
 }
 
-/* Focus indicators for keyboard navigation */
+/* Enhanced form validation states */
+.error input, .error textarea, .error select {
+  border: 4px solid #dc2626 !important;
+  background-color: #fef2f2 !important;
+}
+
+.success input, .success textarea, .success select {
+  border: 4px solid #16a34a !important;
+  background-color: #f0fdf4 !important;
+}
+
+/* Enhanced focus indicators */
 *:focus-visible {
-  outline: 3px solid var(--ring);
-  outline-offset: 2px;
+  outline: 4px solid #3b82f6 !important;
+  outline-offset: 4px !important;
+  box-shadow: 0 0 0 4px #3b82f6, 0 0 0 8px white !important;
 }
 
 .high-contrast *:focus-visible {
-  outline: 3px solid var(--destructive);
-  outline-offset: 2px;
+  outline: 4px solid #ff0000 !important;
+  outline-offset: 4px !important;
+  box-shadow: 0 0 0 4px #ff0000, 0 0 0 8px white !important;
 }
