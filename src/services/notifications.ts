@@ -1,9 +1,9 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Notification } from "@/types/notification";
+import type { Notification as NotificationType } from "@/types/notification";
 
-export const fetchNotifications = async (userId: string): Promise<Notification[]> => {
+export const fetchNotifications = async (userId: string): Promise<NotificationType[]> => {
   try {
     const { data, error } = await supabase
       .from('notifications')
@@ -16,7 +16,7 @@ export const fetchNotifications = async (userId: string): Promise<Notification[]
       throw error;
     }
     
-    return data as Notification[];
+    return data as NotificationType[];
   } catch (error) {
     console.error('Error fetching notifications:', error);
     return [];
@@ -28,7 +28,7 @@ export const createNotification = async (
   title: string,
   message: string,
   type: 'appointment' | 'message' | 'system' = 'system'
-): Promise<Notification | null> => {
+): Promise<NotificationType | null> => {
   try {
     const newNotification = {
       user_id: userId,
@@ -50,7 +50,7 @@ export const createNotification = async (
       throw error;
     }
     
-    return data as Notification;
+    return data as NotificationType;
   } catch (error) {
     console.error('Error creating notification:', error);
     toast.error("Failed to create notification");
@@ -119,7 +119,7 @@ export const deleteNotification = async (notificationId: string, userId: string)
 };
 
 // Real-time notification listener
-export const subscribeToNotifications = (userId: string, onNotification: (notification: Notification) => void) => {
+export const subscribeToNotifications = (userId: string, onNotification: (notification: NotificationType) => void) => {
   const channel = supabase
     .channel('user-notifications')
     .on(
@@ -131,7 +131,7 @@ export const subscribeToNotifications = (userId: string, onNotification: (notifi
         filter: `user_id=eq.${userId}`
       },
       (payload) => {
-        const notification = payload.new as Notification;
+        const notification = payload.new as NotificationType;
         onNotification(notification);
         
         // Show toast notification
