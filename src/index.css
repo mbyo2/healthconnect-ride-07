@@ -162,27 +162,26 @@
 
   /* High contrast button styles */
   .btn-primary {
-    @apply bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-4 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl;
-    border: 3px solid rgb(var(--high-contrast-border));
+    @apply bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-4 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl border-2 border-gray-900;
     min-height: 48px;
     font-size: 18px;
   }
 
   .btn-secondary {
-    @apply bg-white hover:bg-gray-100 text-gray-900 font-bold px-8 py-4 rounded-lg transition-all duration-200 border-3 border-gray-900 shadow-lg;
+    @apply bg-white hover:bg-gray-100 text-gray-900 font-bold px-8 py-4 rounded-lg transition-all duration-200 border-2 border-gray-900 shadow-lg;
     min-height: 48px;
     font-size: 18px;
   }
 
   .btn-outline {
-    @apply bg-white hover:bg-gray-50 text-gray-900 font-bold px-8 py-4 rounded-lg transition-all duration-200 border-3 border-gray-900 shadow-lg;
+    @apply bg-white hover:bg-gray-50 text-gray-900 font-bold px-8 py-4 rounded-lg transition-all duration-200 border-2 border-gray-900 shadow-lg;
     min-height: 48px;
     font-size: 18px;
   }
 
   /* Enhanced input styles for better visibility */
   .modern-input {
-    @apply w-full px-6 py-4 text-lg font-medium border-3 border-gray-900 dark:border-white rounded-lg bg-white dark:bg-gray-900 focus:ring-4 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200;
+    @apply w-full px-6 py-4 text-lg font-medium border-2 border-gray-900 dark:border-white rounded-lg bg-white dark:bg-gray-900 focus:ring-4 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200;
     min-height: 52px;
     outline: 2px solid rgb(var(--high-contrast-border));
   }
@@ -220,7 +219,7 @@
   /* Enhanced service cards */
   .service-card {
     @apply modern-card p-8 hover:border-blue-600 transition-all duration-200;
-    border: 3px solid rgb(var(--high-contrast-border));
+    border: 2px solid rgb(var(--high-contrast-border));
   }
 
   .service-card:hover {
@@ -230,7 +229,7 @@
 
   /* Enhanced form elements */
   input, textarea, select {
-    @apply border-3 border-gray-900 dark:border-white bg-white dark:bg-gray-900 text-gray-900 dark:text-white font-medium text-lg;
+    @apply border-2 border-gray-900 dark:border-white bg-white dark:bg-gray-900 text-gray-900 dark:text-white font-medium text-lg;
     min-height: 52px;
     outline: 2px solid rgb(var(--high-contrast-border));
   }
@@ -247,13 +246,13 @@
 
   /* Enhanced dropdowns */
   [role="listbox"], [role="menu"], [role="combobox"] {
-    @apply bg-white dark:bg-gray-900 border-3 border-gray-900 dark:border-white shadow-xl;
+    @apply bg-white dark:bg-gray-900 border-2 border-gray-900 dark:border-white shadow-xl;
     outline: 2px solid rgb(var(--high-contrast-border));
   }
 
   /* Enhanced notifications */
   .notification-item {
-    @apply border-3 border-gray-900 dark:border-white bg-white dark:bg-gray-900 shadow-lg;
+    @apply border-2 border-gray-900 dark:border-white bg-white dark:bg-gray-900 shadow-lg;
     outline: 2px solid rgb(var(--high-contrast-border));
   }
 
@@ -292,7 +291,7 @@
   }
 
   .error-border {
-    @apply border-red-700 dark:border-red-400 border-3;
+    @apply border-red-700 dark:border-red-400 border-2;
   }
 
   /* Enhanced success states */
@@ -301,7 +300,7 @@
   }
 
   .success-border {
-    @apply border-green-700 dark:border-green-400 border-3;
+    @apply border-green-700 dark:border-green-400 border-2;
   }
 }
 
@@ -312,7 +311,7 @@
   }
   
   .mobile-card {
-    @apply rounded-lg border-3 shadow-lg;
+    @apply rounded-lg border-2 shadow-lg;
   }
 
   .btn-mobile {
@@ -375,16 +374,16 @@
 }
 
 .high-contrast * {
-  border-width: 3px !important;
+  border-width: 2px !important;
   font-weight: 700 !important;
 }
 
 .high-contrast button, .high-contrast input, .high-contrast select, .high-contrast textarea {
-  border: 3px solid black !important;
+  border: 2px solid black !important;
   font-size: 18px !important;
   padding: 12px 16px !important;
 }
 
 .high-contrast.dark button, .high-contrast.dark input, .high-contrast.dark select, .high-contrast.dark textarea {
-  border: 3px solid white !important;
+  border: 2px solid white !important;
 }

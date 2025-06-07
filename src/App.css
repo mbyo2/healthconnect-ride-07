@@ -45,7 +45,7 @@
 
 .card {
   padding: 2em;
-  border: 3px solid rgb(var(--high-contrast-border));
+  border: 2px solid rgb(var(--high-contrast-border));
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 }
 
@@ -78,7 +78,7 @@
 /* Enhanced button visibility */
 button {
   color: rgb(var(--high-contrast-text)) !important;
-  border: 3px solid rgb(var(--high-contrast-border)) !important;
+  border: 2px solid rgb(var(--high-contrast-border)) !important;
   font-weight: 700 !important;
   font-size: 18px !important;
   padding: 12px 20px !important;
@@ -112,31 +112,31 @@ button:hover {
 .bg-primary {
   color: white !important;
   background-color: rgb(var(--primary)) !important;
-  border: 3px solid rgb(var(--high-contrast-border)) !important;
+  border: 2px solid rgb(var(--high-contrast-border)) !important;
 }
 
 /* Enhanced hover states */
 .hover\:bg-accent:hover {
   background-color: rgba(var(--accent), 0.2) !important;
-  border: 3px solid rgb(var(--high-contrast-border)) !important;
+  border: 2px solid rgb(var(--high-contrast-border)) !important;
 }
 
 /* Enhanced contrast for CTA sections */
 .bg-white.text-blue-700 {
   background-color: white !important;
   color: #1d4ed8 !important;
-  border: 3px solid black !important;
+  border: 2px solid black !important;
   font-weight: 700 !important;
 }
 
 .dark .bg-white.text-blue-700 {
   background-color: rgba(255, 255, 255, 0.95) !important;
   color: #1d4ed8 !important;
-  border: 3px solid white !important;
+  border: 2px solid white !important;
 }
 
 .border-white {
-  border: 3px solid white !important;
+  border: 2px solid white !important;
 }
 
 /* Enhanced viewport handling */
@@ -166,7 +166,7 @@ html, body {
     min-width: 52px;
     font-size: 18px;
     font-weight: 600;
-    border: 3px solid rgb(var(--high-contrast-border));
+    border: 2px solid rgb(var(--high-contrast-border));
   }
   
   a {
@@ -213,7 +213,7 @@ html, body {
 }
 
 .high-contrast * {
-  border-width: 3px !important;
+  border-width: 2px !important;
   font-weight: 700 !important;
   font-size: 18px !important;
 }
@@ -227,7 +227,7 @@ html, body {
 .high-contrast input, 
 .high-contrast select, 
 .high-contrast textarea {
-  border: 3px solid black !important;
+  border: 2px solid black !important;
   font-size: 18px !important;
   padding: 12px 16px !important;
   font-weight: 700 !important;
@@ -237,7 +237,7 @@ html, body {
 .high-contrast.dark input, 
 .high-contrast.dark select, 
 .high-contrast.dark textarea {
-  border: 3px solid white !important;
+  border: 2px solid white !important;
 }
 
 /* Enhanced form validation states */
