@@ -20,6 +20,7 @@ import { UserRole, AdminLevel } from "@/types/user";
 import { useDeviceType } from "@/hooks/use-device-type";
 import { cn } from "@/lib/utils";
 import { AppLogo } from "@/components/ui/AppLogo";
+import { useNotifications } from "@/hooks/use-notifications";
 
 export function Header() {
   const { user, signOut, profile } = useAuth();
@@ -30,6 +31,7 @@ export function Header() {
   const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [adminLevel, setAdminLevel] = useState<AdminLevel | null>(null);
   const { isDesktop } = useDeviceType();
+  const { unreadCount } = useNotifications();
   
   // Update user role when profile changes
   if (profile?.role !== userRole) {
@@ -67,7 +69,9 @@ export function Header() {
     <header className="modern-header">
       <div className="container-modern flex h-16 items-center justify-between">
         {/* Logo */}
-        <AppLogo size="sm" />
+        <div className="no-underline">
+          <AppLogo size="sm" />
+        </div>
         
         {/* Search bar - hidden on very small screens */}
         {user && (
@@ -104,9 +108,11 @@ export function Header() {
               {/* Notifications */}
               <Button variant="ghost" size="icon" className="h-10 w-10 relative">
                 <Bell className="h-5 w-5" />
-                <span className="absolute -top-1 -right-1 h-5 w-5 bg-orange-500 text-white text-xs rounded-full flex items-center justify-center">
-                  3
-                </span>
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 h-5 w-5 bg-orange-500 text-white text-xs rounded-full flex items-center justify-center">
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </span>
+                )}
               </Button>
             </>
           )}
