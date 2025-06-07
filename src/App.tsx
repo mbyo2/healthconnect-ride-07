@@ -26,6 +26,12 @@ import ApplicationStatus from "./pages/ApplicationStatus";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import Contact from "./pages/Contact";
+import Documentation from "./pages/Documentation";
+import Testing from "./pages/Testing";
+import NotificationsPage from "./pages/NotificationsPage";
+import Chat from "./pages/Chat";
+import Profile from "./pages/Profile";
+import SettingsPage from "./pages/SettingsPage";
 
 function App() {
   return (
@@ -44,6 +50,7 @@ function App() {
                 <Route path="/terms" element={<MobileLayout><Terms /></MobileLayout>} />
                 <Route path="/privacy" element={<MobileLayout><Privacy /></MobileLayout>} />
                 <Route path="/contact" element={<MobileLayout><Contact /></MobileLayout>} />
+                <Route path="/documentation" element={<MobileLayout><Documentation /></MobileLayout>} />
                 
                 {/* Provider portal (custom auth logic inside) */}
                 <Route path="/provider-portal" element={<ProviderPortal />} />
@@ -53,6 +60,26 @@ function App() {
                 <Route 
                   path="/profile-setup" 
                   element={<ProtectedRoute><MobileLayout><ProfileSetup /></MobileLayout></ProtectedRoute>} 
+                />
+                <Route 
+                  path="/profile" 
+                  element={<ProtectedRoute><MobileLayout><Profile /></MobileLayout></ProtectedRoute>} 
+                />
+                <Route 
+                  path="/settings" 
+                  element={<ProtectedRoute><MobileLayout><SettingsPage /></MobileLayout></ProtectedRoute>} 
+                />
+                <Route 
+                  path="/testing" 
+                  element={<ProtectedRoute><MobileLayout><Testing /></MobileLayout></ProtectedRoute>} 
+                />
+                <Route 
+                  path="/notifications" 
+                  element={<ProtectedRoute><MobileLayout><NotificationsPage /></MobileLayout></ProtectedRoute>} 
+                />
+                <Route 
+                  path="/chat" 
+                  element={<ProtectedRoute><MobileLayout><Chat /></MobileLayout></ProtectedRoute>} 
                 />
                 <Route 
                   path="/symptoms" 

@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { Link, useLocation } from "react-router-dom";
@@ -23,11 +24,6 @@ export function DesktopNav() {
   const [searchTerm, setSearchTerm] = useState("");
   const { setSearchQuery } = useSearch();
 
-  // Don't render if not authenticated
-  if (!isAuthenticated) {
-    return null;
-  }
-
   const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
   }, []);
@@ -50,33 +46,39 @@ export function DesktopNav() {
     }
   }, [signOut]);
   
-  // Define main essential navigation items
+  // Define main essential navigation items - show all items regardless of auth status
   const mainNavItems = [
     {
       to: "/",
       label: "Home",
       icon: <Home className="h-5 w-5 mr-2" />,
-      active: location.pathname === "/"
+      active: location.pathname === "/" || location.pathname === "/home"
     },
     {
       to: "/search",
       label: "Find Care",
       icon: <Search className="h-5 w-5 mr-2" />,
       active: location.pathname === "/search"
-    },
-    {
-      to: "/appointments",
-      label: "Appointments",
-      icon: <Calendar className="h-5 w-5 mr-2" />,
-      active: location.pathname.includes("appointment")
-    },
-    {
-      to: "/chat",
-      label: "Messages",
-      icon: <MessageSquare className="h-5 w-5 mr-2" />,
-      active: location.pathname === "/chat"
     }
   ];
+
+  // Add authenticated-only items
+  if (isAuthenticated) {
+    mainNavItems.push(
+      {
+        to: "/appointments",
+        label: "Appointments",
+        icon: <Calendar className="h-5 w-5 mr-2" />,
+        active: location.pathname.includes("appointment")
+      },
+      {
+        to: "/chat",
+        label: "Messages",
+        icon: <MessageSquare className="h-5 w-5 mr-2" />,
+        active: location.pathname === "/chat"
+      }
+    );
+  }
   
   // Secondary items for "More" dropdown
   const secondaryNavItems = [
@@ -103,7 +105,7 @@ export function DesktopNav() {
       <div className="flex items-center justify-between py-4">
         <div className="flex items-center gap-8">
           {/* Logo */}
-          <Link to="/" className="font-bold text-2xl">
+          <Link to="/" className="font-bold text-2xl logo-link">
             Doc&apos; O Clock
           </Link>
           
@@ -157,7 +159,7 @@ export function DesktopNav() {
           <ThemeToggle />
           
           {/* User menu */}
-          {user ? (
+          {isAuthenticated && user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="h-8 w-8 rounded-full p-0">
@@ -209,7 +211,7 @@ export function DesktopNav() {
                 <Link to="/login">Login</Link>
               </Button>
               <Button asChild>
-                <Link to="/register">Register</Link>
+                <Link to="/auth">Register</Link>
               </Button>
             </div>
           )}

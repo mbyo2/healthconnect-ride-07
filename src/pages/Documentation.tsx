@@ -1,204 +1,263 @@
 
-import React, { useState } from 'react';
-import { Header } from "@/components/Header";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { 
+  BookOpen, 
+  Users, 
+  Shield, 
+  Smartphone, 
+  Heart, 
+  Calendar,
+  MessageSquare,
+  Search,
+  CreditCard,
+  Video,
+  FileText,
+  Settings,
+  HelpCircle
+} from "lucide-react";
 
-const Documentation = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [activeTab, setActiveTab] = useState('user');
+export default function Documentation() {
+  const sections = [
+    {
+      title: "Getting Started",
+      icon: <BookOpen className="h-5 w-5" />,
+      items: [
+        "Creating your account",
+        "Setting up your profile",
+        "Understanding user roles",
+        "First appointment booking"
+      ]
+    },
+    {
+      title: "For Patients",
+      icon: <Heart className="h-5 w-5" />,
+      items: [
+        "Finding healthcare providers",
+        "Booking appointments",
+        "Managing medical records",
+        "Using telemedicine",
+        "Payment and insurance"
+      ]
+    },
+    {
+      title: "For Healthcare Providers",
+      icon: <Users className="h-5 w-5" />,
+      items: [
+        "Provider registration",
+        "Managing your schedule",
+        "Patient communication",
+        "Digital prescriptions",
+        "Revenue tracking"
+      ]
+    },
+    {
+      title: "Mobile App",
+      icon: <Smartphone className="h-5 w-5" />,
+      items: [
+        "Installing the mobile app",
+        "Push notifications",
+        "Offline functionality",
+        "Mobile-specific features"
+      ]
+    }
+  ];
 
   const features = [
     {
-      id: 'appointment',
-      title: 'Appointments',
-      description: 'Schedule, manage, and track healthcare appointments',
-      items: [
-        { title: 'Scheduling an appointment', content: 'Select a healthcare provider from the search or providers page. Choose an available date and time slot. Fill in appointment details and confirm your booking.' },
-        { title: 'Canceling appointments', content: 'Navigate to the Appointments page. Find the appointment you wish to cancel. Click the cancel button and confirm your cancellation. Note that some providers may have cancellation policies.' },
-        { title: 'Setting reminders', content: 'When booking or viewing an appointment, enable notifications to receive reminders. You can customize reminder timing in your notification settings.' }
-      ]
+      icon: <Search className="h-6 w-6" />,
+      title: "Provider Search",
+      description: "Find healthcare providers by specialty, location, and availability"
     },
     {
-      id: 'video',
-      title: 'Video Consultations',
-      description: 'Connect with healthcare providers through secure video calls',
-      items: [
-        { title: 'Starting a video consultation', content: 'Make sure you have a camera and microphone enabled on your device. Join the video call 5 minutes before the scheduled time. Grant permission for camera and microphone access when prompted.' },
-        { title: 'Technical requirements', content: 'Supported browsers: Chrome, Firefox, Safari, Edge (latest versions). Minimum internet speed: 1 Mbps upload/download. Camera and microphone access required.' },
-        { title: 'Troubleshooting connection issues', content: 'Refresh the page if video/audio isn\'t working. Check your internet connection. Ensure your camera and microphone are not being used by other applications.' }
-      ]
+      icon: <Calendar className="h-6 w-6" />,
+      title: "Appointment Management",
+      description: "Book, reschedule, and track all your healthcare appointments"
     },
     {
-      id: 'offline',
-      title: 'Offline Access',
-      description: 'Access key features even without internet connection',
-      items: [
-        { title: 'Using the app offline', content: 'Key information is automatically cached for offline access. When offline, you can view previously loaded appointments, medication information, and your profile data.' },
-        { title: 'Syncing when back online', content: 'Changes made while offline are queued for synchronization. When you regain internet connection, the app will automatically sync pending changes.' },
-        { title: 'Limitations in offline mode', content: 'Video consultations, real-time messaging, and new appointment booking require an internet connection. Payment processing is unavailable in offline mode.' }
-      ]
+      icon: <MessageSquare className="h-6 w-6" />,
+      title: "Secure Messaging",
+      description: "Communicate securely with your healthcare providers"
     },
     {
-      id: 'notifications',
-      title: 'Notifications',
-      description: 'Stay informed about appointments, messages, and updates',
-      items: [
-        { title: 'Enabling notifications', content: 'In the Settings page, navigate to Notification Preferences. Enable the types of notifications you wish to receive. Grant notification permissions when prompted by your browser.' },
-        { title: 'Managing notification preferences', content: 'Customize which notifications you receive for appointments, messages, prescription updates, and system announcements.' },
-        { title: 'Troubleshooting notifications', content: 'If you\'re not receiving notifications, check your browser and device settings to ensure notifications are allowed for this website.' }
-      ]
+      icon: <Video className="h-6 w-6" />,
+      title: "Telemedicine",
+      description: "Virtual consultations from the comfort of your home"
     },
     {
-      id: 'payment',
-      title: 'Payments & Billing',
-      description: 'Securely manage payments for healthcare services',
-      items: [
-        { title: 'Payment methods', content: 'Add and manage payment methods in the Wallet section. The system supports credit/debit cards and digital wallets.' },
-        { title: 'Viewing receipts', content: 'Access your payment history in the Wallet section. Download or print receipts for completed payments.' },
-        { title: 'Insurance information', content: 'Add your insurance details in your profile to automatically apply coverage to eligible services.' }
-      ]
+      icon: <CreditCard className="h-6 w-6" />,
+      title: "Payment Processing",
+      description: "Secure payment processing for all healthcare services"
     },
+    {
+      icon: <Shield className="h-6 w-6" />,
+      title: "Privacy & Security",
+      description: "HIPAA-compliant platform ensuring your data is protected"
+    }
   ];
-
-  const devDocs = [
-    {
-      id: 'architecture',
-      title: 'Architecture Overview',
-      content: 'The application is built with React, TypeScript and uses Vite as the build tool. Authentication is handled via Supabase Auth. The UI is built with Shadcn UI components and styled with Tailwind CSS. Data fetching is managed with TanStack Query. The application supports offline capabilities using IndexedDB and a Service Worker.'
-    },
-    {
-      id: 'authentication',
-      title: 'Authentication System',
-      content: 'Authentication is implemented using Supabase Auth. The system supports email/password login, social logins, and email verification. User sessions are managed through the AuthContext provider. User profiles are stored in the "profiles" table and are automatically created on new user registration.'
-    },
-    {
-      id: 'offline',
-      title: 'Offline Support',
-      content: 'Offline support is implemented using a combination of: Service Worker for caching static assets, IndexedDB for storing application data, and a queuing system for offline actions. The useOfflineMode hook provides access to offline functionality throughout the app. When connectivity is restored, queued actions are automatically synchronized.'
-    },
-    {
-      id: 'notifications',
-      title: 'Push Notifications',
-      content: 'Push notifications are implemented using the Web Push API. Notification permissions are requested when users opt-in. Notification preferences are stored in the notification_settings table. Server-sent notifications are processed through Supabase Edge Functions. A background sync mechanism ensures delivery of notifications even when the app is closed.'
-    },
-    {
-      id: 'data-models',
-      title: 'Data Models',
-      content: 'Key data models include: User profiles, Healthcare providers, Appointments, Prescriptions, Medications, Chat messages, Payment records, and Notification settings. All models are defined in TypeScript interfaces and mapped to Supabase tables. The main relationship diagram is available in the project documentation.'
-    },
-    {
-      id: 'ui-components',
-      title: 'UI Component Library',
-      content: 'The UI is built using Shadcn UI components, which are based on Radix UI primitives. Custom components extend this library for domain-specific needs. All components are accessible and responsive by default. Component documentation is available in the components/ directory.'
-    },
-  ];
-
-  const filteredFeatures = searchQuery 
-    ? features.map(category => ({
-        ...category,
-        items: category.items.filter(item => 
-          item.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-          item.content.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-      })).filter(category => category.items.length > 0)
-    : features;
-
-  const filteredDevDocs = searchQuery
-    ? devDocs.filter(doc => 
-        doc.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        doc.content.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : devDocs;
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <main className="container mx-auto px-4 pt-20 pb-24">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold">Documentation</h1>
-          <p className="text-muted-foreground mt-1">
-            Comprehensive guides for users and developers
-          </p>
-          
-          <div className="relative mt-4">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Search documentation..."
-              className="pl-8 w-full max-w-md"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
+    <div className="container mx-auto py-8 space-y-8">
+      {/* Header */}
+      <div className="text-center space-y-4">
+        <h1 className="text-4xl font-bold">Documentation</h1>
+        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          Everything you need to know about using Doc' O Clock - your comprehensive healthcare platform
+        </p>
+        <div className="flex justify-center gap-2">
+          <Badge variant="secondary">Version 2.0</Badge>
+          <Badge variant="outline">Last updated: Dec 2024</Badge>
         </div>
-        
-        <Tabs defaultValue="user" value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="mb-6">
-            <TabsTrigger value="user">User Documentation</TabsTrigger>
-            <TabsTrigger value="developer">Developer Documentation</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="user">
-            {filteredFeatures.length > 0 ? (
-              <div className="space-y-8">
-                {filteredFeatures.map(category => (
-                  <Card key={category.id}>
-                    <CardHeader>
-                      <CardTitle>{category.title}</CardTitle>
-                      <p className="text-muted-foreground">{category.description}</p>
-                    </CardHeader>
-                    <CardContent>
-                      <Accordion type="single" collapsible className="w-full">
-                        {category.items.map((item, index) => (
-                          <AccordionItem key={index} value={`item-${index}`}>
-                            <AccordionTrigger className="text-left">
-                              {item.title}
-                            </AccordionTrigger>
-                            <AccordionContent>
-                              <p className="text-muted-foreground">{item.content}</p>
-                            </AccordionContent>
-                          </AccordionItem>
-                        ))}
-                      </Accordion>
-                    </CardContent>
-                  </Card>
-                ))}
+      </div>
+
+      {/* Quick Start */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <HelpCircle className="h-5 w-5" />
+            Quick Start Guide
+          </CardTitle>
+          <CardDescription>
+            Get up and running with Doc' O Clock in just a few minutes
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid md:grid-cols-3 gap-4">
+            <div className="text-center p-4 border rounded-lg">
+              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                <span className="text-blue-600 font-bold">1</span>
               </div>
-            ) : (
-              <div className="text-center py-12">
-                <p className="text-muted-foreground">No documentation found for "{searchQuery}"</p>
+              <h3 className="font-semibold">Sign Up</h3>
+              <p className="text-sm text-muted-foreground">Create your account and verify your email</p>
+            </div>
+            <div className="text-center p-4 border rounded-lg">
+              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                <span className="text-blue-600 font-bold">2</span>
               </div>
-            )}
-          </TabsContent>
-          
-          <TabsContent value="developer">
-            {filteredDevDocs.length > 0 ? (
-              <div className="space-y-8">
-                {filteredDevDocs.map((doc, index) => (
-                  <Card key={index}>
-                    <CardHeader>
-                      <CardTitle>{doc.title}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-muted-foreground whitespace-pre-line">{doc.content}</p>
-                    </CardContent>
-                  </Card>
-                ))}
+              <h3 className="font-semibold">Complete Profile</h3>
+              <p className="text-sm text-muted-foreground">Add your personal and medical information</p>
+            </div>
+            <div className="text-center p-4 border rounded-lg">
+              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                <span className="text-blue-600 font-bold">3</span>
               </div>
-            ) : (
-              <div className="text-center py-12">
-                <p className="text-muted-foreground">No documentation found for "{searchQuery}"</p>
-              </div>
-            )}
-          </TabsContent>
-        </Tabs>
-      </main>
+              <h3 className="font-semibold">Start Using</h3>
+              <p className="text-sm text-muted-foreground">Find providers and book your first appointment</p>
+            </div>
+          </div>
+          <div className="flex justify-center">
+            <Button>Get Started Now</Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Features Overview */}
+      <div className="space-y-6">
+        <h2 className="text-3xl font-bold text-center">Platform Features</h2>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {features.map((feature, index) => (
+            <Card key={index} className="hover:shadow-md transition-shadow">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-blue-100 rounded-lg">
+                    {feature.icon}
+                  </div>
+                  <CardTitle className="text-lg">{feature.title}</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">{feature.description}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* Documentation Sections */}
+      <div className="space-y-6">
+        <h2 className="text-3xl font-bold text-center">Documentation Sections</h2>
+        <div className="grid md:grid-cols-2 gap-6">
+          {sections.map((section, index) => (
+            <Card key={index} className="hover:shadow-md transition-shadow">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  {section.icon}
+                  {section.title}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2">
+                  {section.items.map((item, itemIndex) => (
+                    <li key={itemIndex} className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
+                      <span className="text-sm">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+                <Button variant="outline" className="w-full mt-4">
+                  View {section.title} Docs
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+
+      {/* API Documentation */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <FileText className="h-5 w-5" />
+            API Documentation
+          </CardTitle>
+          <CardDescription>
+            For developers integrating with our platform
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <h4 className="font-semibold">REST API</h4>
+              <p className="text-sm text-muted-foreground">
+                Complete REST API documentation with examples and authentication guides
+              </p>
+              <Button variant="outline" size="sm">View REST API Docs</Button>
+            </div>
+            <div className="space-y-2">
+              <h4 className="font-semibold">WebHooks</h4>
+              <p className="text-sm text-muted-foreground">
+                Real-time notifications for appointment updates and system events
+              </p>
+              <Button variant="outline" size="sm">View WebHook Docs</Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Support */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Settings className="h-5 w-5" />
+            Need Help?
+          </CardTitle>
+          <CardDescription>
+            Can't find what you're looking for? We're here to help!
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap gap-4">
+            <Button variant="outline">Contact Support</Button>
+            <Button variant="outline">Community Forum</Button>
+            <Button variant="outline">Video Tutorials</Button>
+            <Button variant="outline">FAQ</Button>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
-};
-
-export default Documentation;
+}

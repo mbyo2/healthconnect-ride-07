@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -132,7 +133,7 @@
     line-height: 1.6;
   }
 
-  /* Enhanced link visibility */
+  /* Enhanced link visibility - logo exception */
   a {
     color: rgb(var(--accessible-accent));
     text-decoration: underline;
@@ -140,11 +141,25 @@
     transition: all 0.2s ease;
   }
 
+  /* Remove underline from logo links */
+  .logo-link, .logo-link:hover {
+    text-decoration: none !important;
+    color: inherit !important;
+    background: none !important;
+    padding: 0 !important;
+  }
+
   a:hover {
     text-decoration: none;
     background-color: rgb(var(--accessible-accent) / 0.1);
     padding: 2px 4px;
     border-radius: 4px;
+  }
+
+  /* Ensure logo links don't get hover styles */
+  .logo-link:hover {
+    background: none !important;
+    padding: 0 !important;
   }
 }
 
