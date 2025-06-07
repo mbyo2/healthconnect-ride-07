@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -47,13 +46,13 @@
     --trust-800: 30 64 175;
     --trust-900: 30 58 138;
 
-    /* High contrast colors for accessibility */
-    --high-contrast-text: 0 0 0;
-    --high-contrast-bg: 255 255 255;
-    --high-contrast-border: 0 0 0;
-    --high-contrast-accent: 0 0 255;
-    --high-contrast-error: 204 0 0;
-    --high-contrast-success: 0 128 0;
+    /* Subtle but accessible colors */
+    --subtle-border: 156 163 175;
+    --accessible-text: 31 41 55;
+    --accessible-bg: 255 255 255;
+    --accessible-accent: 37 99 235;
+    --accessible-error: 185 28 28;
+    --accessible-success: 22 163 74;
   }
 
   .dark {
@@ -85,25 +84,13 @@
     --input: 63 63 70;
     --ring: 96 165 250;
 
-    /* Dark mode high contrast adjustments */
-    --trust-50: 30 58 138;
-    --trust-100: 30 64 175;
-    --trust-200: 29 78 216;
-    --trust-300: 37 99 235;
-    --trust-400: 59 130 246;
-    --trust-500: 96 165 250;
-    --trust-600: 147 197 253;
-    --trust-700: 191 219 254;
-    --trust-800: 219 234 254;
-    --trust-900: 239 246 255;
-
-    /* Dark mode high contrast */
-    --high-contrast-text: 255 255 255;
-    --high-contrast-bg: 0 0 0;
-    --high-contrast-border: 255 255 255;
-    --high-contrast-accent: 102 204 255;
-    --high-contrast-error: 255 102 102;
-    --high-contrast-success: 102 255 102;
+    /* Dark mode subtle borders */
+    --subtle-border: 75 85 99;
+    --accessible-text: 229 231 235;
+    --accessible-bg: 17 24 39;
+    --accessible-accent: 147 197 253;
+    --accessible-error: 248 113 113;
+    --accessible-success: 134 239 172;
   }
 }
 
@@ -114,273 +101,286 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Amazon Ember', 'Helvetica Neue', Arial, sans-serif;
-    line-height: 1.7;
+    font-family: 'Inter', 'Amazon Ember', 'Helvetica Neue', Arial, sans-serif;
+    line-height: 1.6;
     font-size: 16px;
     min-height: 100vh;
+    color: rgb(var(--accessible-text));
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1, h2, h3, h4, h5, h5 {
     @apply font-bold;
-    line-height: 1.3;
-    color: rgb(var(--high-contrast-text));
+    line-height: 1.25;
+    color: rgb(var(--accessible-text));
+    letter-spacing: -0.025em;
   }
+
+  h1 { @apply text-3xl md:text-4xl; }
+  h2 { @apply text-2xl md:text-3xl; }
+  h3 { @apply text-xl md:text-2xl; }
 
   /* Enhanced focus states for better visibility */
   *:focus-visible {
-    @apply outline-none ring-4 ring-blue-500 ring-offset-4 ring-offset-background;
-    box-shadow: 0 0 0 4px rgb(59 130 246), 0 0 0 8px rgb(255 255 255);
+    @apply outline-none ring-2 ring-blue-500 ring-offset-2 ring-offset-background;
+    box-shadow: 0 0 0 2px rgb(59 130 246), 0 0 0 4px rgb(255 255 255);
   }
 
-  /* High contrast text for better readability */
+  /* Improved text styling */
   p, span, div, label {
-    color: rgb(var(--high-contrast-text));
-    font-weight: 500;
+    color: rgb(var(--accessible-text));
+    font-weight: 400;
+    line-height: 1.6;
   }
 
   /* Enhanced link visibility */
   a {
-    color: rgb(var(--high-contrast-accent));
+    color: rgb(var(--accessible-accent));
     text-decoration: underline;
-    font-weight: 600;
+    font-weight: 500;
+    transition: all 0.2s ease;
   }
 
   a:hover {
     text-decoration: none;
-    background-color: rgb(var(--high-contrast-accent) / 0.1);
+    background-color: rgb(var(--accessible-accent) / 0.1);
     padding: 2px 4px;
     border-radius: 4px;
   }
 }
 
 @layer components {
-  /* Enhanced card styles for better visibility */
+  /* Modern card styles with subtle borders */
   .modern-card {
-    @apply bg-white dark:bg-gray-900 border-2 border-gray-900 dark:border-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-200;
-    outline: 2px solid rgb(var(--high-contrast-border));
+    @apply bg-white dark:bg-gray-900 rounded-xl shadow-sm hover:shadow-md transition-all duration-200;
+    border: 1px solid rgb(var(--subtle-border));
   }
 
-  /* High contrast button styles */
+  /* Refined button styles */
   .btn-primary {
-    @apply bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-4 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl border-2 border-gray-900;
-    min-height: 48px;
-    font-size: 18px;
+    @apply bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md;
+    border: 1px solid transparent;
+    min-height: 44px;
+    font-size: 16px;
   }
 
   .btn-secondary {
-    @apply bg-white hover:bg-gray-100 text-gray-900 font-bold px-8 py-4 rounded-lg transition-all duration-200 border-2 border-gray-900 shadow-lg;
-    min-height: 48px;
-    font-size: 18px;
+    @apply bg-white hover:bg-gray-50 text-gray-700 font-semibold px-6 py-3 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md;
+    border: 1px solid rgb(var(--subtle-border));
+    min-height: 44px;
+    font-size: 16px;
   }
 
   .btn-outline {
-    @apply bg-white hover:bg-gray-50 text-gray-900 font-bold px-8 py-4 rounded-lg transition-all duration-200 border-2 border-gray-900 shadow-lg;
-    min-height: 48px;
-    font-size: 18px;
+    @apply bg-transparent hover:bg-gray-50 text-gray-700 font-semibold px-6 py-3 rounded-lg transition-all duration-200;
+    border: 1px solid rgb(var(--subtle-border));
+    min-height: 44px;
+    font-size: 16px;
   }
 
-  /* Enhanced input styles for better visibility */
+  /* Refined input styles */
   .modern-input {
-    @apply w-full px-6 py-4 text-lg font-medium border-2 border-gray-900 dark:border-white rounded-lg bg-white dark:bg-gray-900 focus:ring-4 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200;
-    min-height: 52px;
-    outline: 2px solid rgb(var(--high-contrast-border));
+    @apply w-full px-4 py-3 text-base font-normal rounded-lg bg-white dark:bg-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200;
+    border: 1px solid rgb(var(--subtle-border));
+    min-height: 44px;
+    color: rgb(var(--accessible-text));
   }
 
-  /* Enhanced search bar */
+  /* Refined search bar */
   .search-bar {
-    @apply flex items-center bg-white border-4 border-blue-600 rounded-lg overflow-hidden shadow-lg;
-    outline: 2px solid rgb(var(--high-contrast-border));
+    @apply flex items-center bg-white rounded-lg overflow-hidden shadow-sm;
+    border: 1px solid rgb(var(--subtle-border));
   }
 
   .search-input {
-    @apply flex-1 px-6 py-4 text-lg font-medium border-0 focus:ring-0 focus:outline-none;
-    min-height: 52px;
+    @apply flex-1 px-4 py-3 text-base font-normal border-0 focus:ring-0 focus:outline-none;
+    min-height: 44px;
   }
 
   .search-button {
-    @apply bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 font-bold transition-all duration-200;
-    min-height: 52px;
-    font-size: 18px;
+    @apply bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 font-semibold transition-all duration-200;
+    min-height: 44px;
+    font-size: 16px;
   }
 
   /* Enhanced navigation */
   .nav-item {
-    @apply text-gray-900 dark:text-white hover:text-blue-600 font-bold transition-all duration-200 text-lg;
+    @apply text-gray-700 dark:text-gray-200 hover:text-blue-600 font-medium transition-all duration-200;
+    text-decoration: none;
+  }
+
+  .nav-item:hover {
     text-decoration: underline;
   }
 
   .nav-item-active {
-    @apply text-blue-600 font-black text-xl;
-    background-color: rgb(var(--high-contrast-accent) / 0.1);
-    padding: 8px 12px;
+    @apply text-blue-600 font-semibold;
+    background-color: rgb(var(--accessible-accent) / 0.1);
+    padding: 6px 12px;
     border-radius: 8px;
   }
 
-  /* Enhanced service cards */
+  /* Refined service cards */
   .service-card {
-    @apply modern-card p-8 hover:border-blue-600 transition-all duration-200;
-    border: 2px solid rgb(var(--high-contrast-border));
+    @apply modern-card p-6 hover:border-blue-300 transition-all duration-200;
+    border: 1px solid rgb(var(--subtle-border));
   }
 
   .service-card:hover {
-    @apply transform -translate-y-2;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    @apply transform -translate-y-1;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   }
 
   /* Enhanced form elements */
   input, textarea, select {
-    @apply border-2 border-gray-900 dark:border-white bg-white dark:bg-gray-900 text-gray-900 dark:text-white font-medium text-lg;
-    min-height: 52px;
-    outline: 2px solid rgb(var(--high-contrast-border));
+    @apply bg-white dark:bg-gray-900 text-gray-900 dark:text-white font-normal;
+    border: 1px solid rgb(var(--subtle-border));
+    min-height: 44px;
+    border-radius: 8px;
+    padding: 12px 16px;
+    transition: all 0.2s ease;
   }
 
   input:focus, textarea:focus, select:focus {
-    @apply ring-4 ring-blue-500 border-blue-500;
-    box-shadow: 0 0 0 4px rgb(59 130 246);
+    @apply ring-2 ring-blue-500 border-blue-500;
+    box-shadow: 0 0 0 2px rgb(59 130 246 / 0.2);
   }
 
   /* Enhanced labels */
   label {
-    @apply font-bold text-lg text-gray-900 dark:text-white mb-3 block;
+    @apply font-semibold text-gray-700 dark:text-gray-200 mb-2 block;
+    font-size: 14px;
   }
 
-  /* Enhanced dropdowns */
+  /* Refined dropdowns */
   [role="listbox"], [role="menu"], [role="combobox"] {
-    @apply bg-white dark:bg-gray-900 border-2 border-gray-900 dark:border-white shadow-xl;
-    outline: 2px solid rgb(var(--high-contrast-border));
+    @apply bg-white dark:bg-gray-900 shadow-lg rounded-lg;
+    border: 1px solid rgb(var(--subtle-border));
   }
 
   /* Enhanced notifications */
   .notification-item {
-    @apply border-2 border-gray-900 dark:border-white bg-white dark:bg-gray-900 shadow-lg;
-    outline: 2px solid rgb(var(--high-contrast-border));
+    @apply bg-white dark:bg-gray-900 shadow-sm rounded-lg;
+    border: 1px solid rgb(var(--subtle-border));
   }
 
   /* Enhanced breadcrumbs */
   .breadcrumb {
-    @apply flex items-center space-x-3 text-lg font-bold text-gray-900 dark:text-white mb-6;
+    @apply flex items-center space-x-2 text-sm font-medium text-gray-600 dark:text-gray-300 mb-4;
   }
 
   .breadcrumb-item {
-    @apply hover:text-blue-600 transition-colors duration-200 underline;
+    @apply hover:text-blue-600 transition-colors duration-200;
   }
 
-  /* Enhanced header */
+  /* Modern header */
   .modern-header {
-    @apply bg-white dark:bg-gray-900 shadow-lg border-b-4 border-gray-900 dark:border-white sticky top-0 z-50;
+    @apply bg-white/80 dark:bg-gray-900/80 backdrop-blur-md shadow-sm sticky top-0 z-50;
+    border-bottom: 1px solid rgb(var(--subtle-border));
   }
 
-  /* Enhanced footer */
+  /* Modern footer */
   .modern-footer {
-    @apply bg-gray-900 dark:bg-black text-white mt-auto border-t-4 border-gray-900 dark:border-white;
+    @apply bg-gray-50 dark:bg-gray-900 mt-auto;
+    border-top: 1px solid rgb(var(--subtle-border));
   }
 
-  /* Enhanced trust badges */
+  /* Refined trust badges */
   .trust-badge {
-    @apply inline-flex items-center px-4 py-2 rounded-lg text-sm font-bold bg-green-100 text-green-900 border-2 border-green-900;
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-50 text-green-700;
+    border: 1px solid rgb(34 197 94 / 0.2);
   }
 
   /* Enhanced containers */
   .container-modern {
-    @apply max-w-7xl mx-auto px-6 sm:px-8 lg:px-12;
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
   }
 
-  /* Enhanced error states */
+  /* Refined error states */
   .error-text {
-    @apply text-red-700 dark:text-red-400 font-bold text-lg;
+    @apply text-red-600 dark:text-red-400 font-medium;
   }
 
   .error-border {
-    @apply border-red-700 dark:border-red-400 border-2;
+    border: 1px solid rgb(var(--accessible-error));
   }
 
-  /* Enhanced success states */
+  /* Refined success states */
   .success-text {
-    @apply text-green-700 dark:text-green-400 font-bold text-lg;
+    @apply text-green-600 dark:text-green-400 font-medium;
   }
 
   .success-border {
-    @apply border-green-700 dark:border-green-400 border-2;
+    border: 1px solid rgb(var(--accessible-success));
   }
 }
 
 /* Enhanced mobile optimizations */
 @media (max-width: 768px) {
   .mobile-container {
-    @apply px-6;
+    @apply px-4;
   }
   
   .mobile-card {
-    @apply rounded-lg border-2 shadow-lg;
+    @apply rounded-lg shadow-sm;
+    border: 1px solid rgb(var(--subtle-border));
   }
 
   .btn-mobile {
-    @apply w-full py-6 text-xl font-bold;
-    min-height: 60px;
+    @apply w-full py-4 text-lg font-semibold;
+    min-height: 48px;
   }
 
-  /* Larger touch targets for sick patients */
+  /* Larger touch targets for accessibility */
   button, input, select, textarea, a {
-    min-height: 48px;
-    min-width: 48px;
+    min-height: 44px;
+    min-width: 44px;
   }
 }
 
 /* Enhanced loading states */
 .skeleton {
-  @apply animate-pulse bg-gray-300 dark:bg-gray-600;
-  border: 2px solid rgb(var(--high-contrast-border));
+  @apply animate-pulse bg-gray-200 dark:bg-gray-700 rounded;
 }
 
-/* Enhanced scrollbars */
+/* Refined scrollbars */
 .modern-scroll::-webkit-scrollbar {
-  width: 12px;
-  height: 12px;
+  width: 8px;
+  height: 8px;
 }
 
 .modern-scroll::-webkit-scrollbar-track {
-  @apply bg-gray-200 dark:bg-gray-700;
-  border: 2px solid rgb(var(--high-contrast-border));
+  @apply bg-gray-100 dark:bg-gray-800 rounded;
 }
 
 .modern-scroll::-webkit-scrollbar-thumb {
-  @apply bg-gray-600 dark:bg-gray-400 rounded-full;
-  border: 2px solid rgb(var(--high-contrast-border));
+  @apply bg-gray-300 dark:bg-gray-600 rounded;
 }
 
 .modern-scroll::-webkit-scrollbar-thumb:hover {
-  @apply bg-gray-800 dark:bg-gray-200;
+  @apply bg-gray-400 dark:bg-gray-500;
 }
 
-/* High contrast mode overrides */
+/* High contrast mode for accessibility */
 .high-contrast {
-  --background: 255 255 255;
-  --foreground: 0 0 0;
-  --card: 255 255 255;
-  --card-foreground: 0 0 0;
-  --primary: 0 0 255;
-  --primary-foreground: 255 255 255;
-  --border: 0 0 0;
+  --accessible-text: 0 0 0;
+  --accessible-bg: 255 255 255;
+  --subtle-border: 0 0 0;
 }
 
 .high-contrast.dark {
-  --background: 0 0 0;
-  --foreground: 255 255 255;
-  --card: 0 0 0;
-  --card-foreground: 255 255 255;
-  --primary: 102 204 255;
-  --primary-foreground: 0 0 0;
-  --border: 255 255 255;
+  --accessible-text: 255 255 255;
+  --accessible-bg: 0 0 0;
+  --subtle-border: 255 255 255;
 }
 
 .high-contrast * {
   border-width: 2px !important;
-  font-weight: 700 !important;
+  font-weight: 600 !important;
 }
 
 .high-contrast button, .high-contrast input, .high-contrast select, .high-contrast textarea {
   border: 2px solid black !important;
-  font-size: 18px !important;
+  font-size: 16px !important;
   padding: 12px 16px !important;
 }
 
