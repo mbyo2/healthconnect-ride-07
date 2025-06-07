@@ -1,4 +1,3 @@
-
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { MobileLayout } from "./components/MobileLayout";
 import { Toaster } from "sonner";
@@ -32,6 +31,9 @@ import NotificationsPage from "./pages/NotificationsPage";
 import Chat from "./pages/Chat";
 import Profile from "./pages/Profile";
 import SettingsPage from "./pages/SettingsPage";
+import MedicalRecords from "./pages/MedicalRecords";
+import HealthDashboard from "./pages/HealthDashboard";
+import PharmacyInventory from "./pages/PharmacyInventory";
 
 function App() {
   return (
@@ -157,6 +159,24 @@ function App() {
                           <h1 className="text-3xl font-bold">Institution Dashboard</h1>
                           <p className="mt-4">You have access to institution management features.</p>
                         </div>
+                      </MobileLayout>
+                    </RoleProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/medical-records" 
+                  element={<ProtectedRoute><MobileLayout><MedicalRecords /></MobileLayout></ProtectedRoute>} 
+                />
+                <Route 
+                  path="/health-dashboard" 
+                  element={<ProtectedRoute><MobileLayout><HealthDashboard /></MobileLayout></ProtectedRoute>} 
+                />
+                <Route 
+                  path="/pharmacy-inventory" 
+                  element={
+                    <RoleProtectedRoute allowedRoles={['health_personnel']}>
+                      <MobileLayout>
+                        <PharmacyInventory />
                       </MobileLayout>
                     </RoleProtectedRoute>
                   } 
