@@ -1,4 +1,5 @@
 
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -16,84 +17,36 @@ import {
   Moon,
   Footprints
 } from "lucide-react";
+import { getHealthStats, getHealthGoals, getUpcomingAppointments, type HealthStat, type HealthGoal, type UpcomingAppointment } from "@/services/healthMetrics";
+import { useNavigate } from "react-router-dom";
 
 export default function HealthDashboard() {
-  const healthStats = [
-    {
-      title: "Blood Pressure",
-      value: "120/80",
-      unit: "mmHg",
-      status: "Normal",
-      trend: "stable",
-      icon: <Heart className="h-5 w-5" />
-    },
-    {
-      title: "Heart Rate",
-      value: "72",
-      unit: "bpm",
-      status: "Good",
-      trend: "up",
-      icon: <Activity className="h-5 w-5" />
-    },
-    {
-      title: "Weight",
-      value: "165",
-      unit: "lbs",
-      status: "On Track",
-      trend: "down",
-      icon: <Target className="h-5 w-5" />
-    },
-    {
-      title: "Sleep",
-      value: "7.5",
-      unit: "hours",
-      status: "Good",
-      trend: "up",
-      icon: <Moon className="h-5 w-5" />
-    }
-  ];
+  const [healthStats, setHealthStats] = useState<HealthStat[]>([]);
+  const [healthGoals, setHealthGoals] = useState<HealthGoal[]>([]);
+  const [upcomingAppointments, setUpcomingAppointments] = useState<UpcomingAppointment[]>([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
-  const healthGoals = [
-    {
-      title: "Daily Steps",
-      current: 8500,
-      target: 10000,
-      icon: <Footprints className="h-4 w-4" />
-    },
-    {
-      title: "Water Intake",
-      current: 6,
-      target: 8,
-      icon: <Droplets className="h-4 w-4" />
-    },
-    {
-      title: "Exercise Minutes",
-      current: 45,
-      target: 60,
-      icon: <Activity className="h-4 w-4" />
-    },
-    {
-      title: "Fruits & Vegetables",
-      current: 4,
-      target: 5,
-      icon: <Apple className="h-4 w-4" />
-    }
-  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [stats, goals, appointments] = await Promise.all([
+          getHealthStats(),
+          getHealthGoals(),
+          getUpcomingAppointments()
+        ]);
+        setHealthStats(stats);
+        setHealthGoals(goals);
+        setUpcomingAppointments(appointments);
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const upcomingAppointments = [
-    {
-      date: "Dec 15, 2024",
-      time: "2:00 PM",
-      provider: "Dr. Sarah Johnson",
-      type: "Annual Checkup"
-    },
-    {
-      date: "Dec 22, 2024",
-      time: "10:30 AM",
-      provider: "Dr. Michael Chen",
-      type: "Cardiology Follow-up"
-    }
-  ];
+    fetchData();
+  }, []);
 
   const getTrendIcon = (trend: string) => {
     switch (trend) {
@@ -121,6 +74,22 @@ export default function HealthDashboard() {
     }
   };
 
+  const getIconComponent = (iconName: string) => {
+    const icons: Record<string, any> = {
+      Heart, Activity, Target, Moon, Footprints, Droplets, Apple
+    };
+    const IconComponent = icons[iconName] || Activity;
+    return <IconComponent className="h-5 w-5" />;
+  };
+
+  if (loading) {
+    return (
+      <div className="container mx-auto py-8 flex items-center justify-center">
+        <div className="text-center">Loading your health dashboard...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto py-8 space-y-8">
       {/* Header */}
@@ -133,12 +102,12 @@ export default function HealthDashboard() {
 
       {/* Health Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {healthStats.map((stat, index) => (
+        {healthStats.length > 0 ? healthStats.map((stat, index) => (
           <Card key={index}>
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <div className="p-2 bg-blue-100 rounded-lg">
-                  {stat.icon}
+                  {getIconComponent(stat.icon)}
                 </div>
                 {getTrendIcon(stat.trend)}
               </div>
@@ -156,7 +125,11 @@ export default function HealthDashboard() {
               </div>
             </CardContent>
           </Card>
-        ))}
+        )) : (
+          <div className="col-span-full text-center py-8">
+            <p className="text-muted-foreground">No health metrics recorded yet. Start tracking your health!</p>
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -172,11 +145,11 @@ export default function HealthDashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            {healthGoals.map((goal, index) => (
+            {healthGoals.length > 0 ? healthGoals.map((goal, index) => (
               <div key={index} className="space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    {goal.icon}
+                    {getIconComponent(goal.icon)}
                     <span className="font-medium">{goal.title}</span>
                   </div>
                   <span className="text-sm text-muted-foreground">
@@ -185,7 +158,11 @@ export default function HealthDashboard() {
                 </div>
                 <Progress value={(goal.current / goal.target) * 100} className="h-2" />
               </div>
-            ))}
+            )) : (
+              <p className="text-muted-foreground text-center py-4">
+                No health goals set yet. Create your first goal!
+              </p>
+            )}
           </CardContent>
         </Card>
 
@@ -201,7 +178,7 @@ export default function HealthDashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {upcomingAppointments.map((appointment, index) => (
+            {upcomingAppointments.length > 0 ? upcomingAppointments.map((appointment, index) => (
               <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
                 <div>
                   <h3 className="font-semibold">{appointment.type}</h3>
@@ -214,15 +191,23 @@ export default function HealthDashboard() {
                   View Details
                 </Button>
               </div>
-            ))}
-            <Button className="w-full" variant="outline">
+            )) : (
+              <p className="text-muted-foreground text-center py-4">
+                No upcoming appointments scheduled.
+              </p>
+            )}
+            <Button 
+              className="w-full" 
+              variant="outline"
+              onClick={() => navigate('/search')}
+            >
               Schedule New Appointment
             </Button>
           </CardContent>
         </Card>
       </div>
 
-      {/* Quick Actions */}
+      {/* Quick Actions - Responsive Grid */}
       <Card>
         <CardHeader>
           <CardTitle>Quick Actions</CardTitle>
@@ -231,22 +216,38 @@ export default function HealthDashboard() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Button variant="outline" className="justify-start">
-              <Activity className="h-4 w-4 mr-2" />
-              Log Symptoms
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <Button 
+              variant="outline" 
+              className="flex items-center justify-start gap-2 h-auto py-3"
+              onClick={() => navigate('/symptoms')}
+            >
+              <Activity className="h-4 w-4 flex-shrink-0" />
+              <span className="text-left">Log Symptoms</span>
             </Button>
-            <Button variant="outline" className="justify-start">
-              <Heart className="h-4 w-4 mr-2" />
-              Record Vitals
+            <Button 
+              variant="outline" 
+              className="flex items-center justify-start gap-2 h-auto py-3"
+              onClick={() => navigate('/health-dashboard')}
+            >
+              <Heart className="h-4 w-4 flex-shrink-0" />
+              <span className="text-left">Record Vitals</span>
             </Button>
-            <Button variant="outline" className="justify-start">
-              <Calendar className="h-4 w-4 mr-2" />
-              Book Appointment
+            <Button 
+              variant="outline" 
+              className="flex items-center justify-start gap-2 h-auto py-3"
+              onClick={() => navigate('/appointments')}
+            >
+              <Calendar className="h-4 w-4 flex-shrink-0" />
+              <span className="text-left">Book Appointment</span>
             </Button>
-            <Button variant="outline" className="justify-start">
-              <Target className="h-4 w-4 mr-2" />
-              Set New Goal
+            <Button 
+              variant="outline" 
+              className="flex items-center justify-start gap-2 h-auto py-3"
+              onClick={() => navigate('/health-dashboard')}
+            >
+              <Target className="h-4 w-4 flex-shrink-0" />
+              <span className="text-left">Set New Goal</span>
             </Button>
           </div>
         </CardContent>
