@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -6,7 +5,9 @@ import { Badge } from "@/components/ui/badge";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { 
   User, Settings, Bell, Shield, LogOut, 
-  Star, MapPin, Phone, Mail, Calendar 
+  Star, MapPin, Phone, Mail, Calendar,
+  CheckCircle2,
+  AlertCircle
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -14,6 +15,7 @@ import { HealthPersonnelApplicationForm } from "@/components/HealthPersonnelAppl
 import { Database } from "@/integrations/supabase/types";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { useProfileCompletion } from "@/hooks/useProfileCompletion";
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 
@@ -22,6 +24,7 @@ const Profile = () => {
   const [userRole, setUserRole] = useState<string | null>(null);
   const [applicationStatus, setApplicationStatus] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { isProfileComplete, completionPercentage } = useProfileCompletion();
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -89,11 +92,38 @@ const Profile = () => {
     navigate("/privacy-security");
   };
 
+  const navigateToProfileSetup = () => {
+    navigate("/profile-setup");
+  };
+
   const isHealthcareProvider = userRole === 'health_personnel';
   const fullName = userProfile ? `${userProfile.first_name || ''} ${userProfile.last_name || ''}`.trim() : 'Loading...';
 
   return (
     <div className="container mx-auto px-4 py-8 bg-background min-h-screen">
+      {/* Profile Completion Status */}
+      {!isProfileComplete && (
+        <Card className="p-4 mb-6 border-orange-200 bg-orange-50">
+          <div className="flex items-center gap-3">
+            <AlertCircle className="h-5 w-5 text-orange-600" />
+            <div className="flex-1">
+              <h3 className="font-semibold text-orange-800">Complete Your Profile</h3>
+              <p className="text-sm text-orange-700">
+                Your profile is {completionPercentage}% complete. Complete it to access all features.
+              </p>
+            </div>
+            <Button 
+              onClick={navigateToProfileSetup}
+              size="sm"
+              className="bg-orange-600 hover:bg-orange-700"
+            >
+              Complete Now
+            </Button>
+          </div>
+        </Card>
+      )}
+
+      {/* Profile Card */}
       <Card className="p-6 mb-6">
         <div className="flex flex-col md:flex-row items-start gap-6">
           <Avatar className="w-24 h-24">
@@ -105,16 +135,26 @@ const Profile = () => {
           <div className="flex-1 space-y-4">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <div>
-                <h1 className="text-2xl font-bold text-foreground">
-                  {isHealthcareProvider ? `Dr. ${fullName}` : fullName}
-                </h1>
+                <div className="flex items-center gap-2">
+                  <h1 className="text-2xl font-bold text-foreground">
+                    {isHealthcareProvider ? `Dr. ${fullName}` : fullName}
+                  </h1>
+                  {isProfileComplete && (
+                    <CheckCircle2 className="h-5 w-5 text-green-600" />
+                  )}
+                </div>
                 <p className="text-muted-foreground">
                   {isHealthcareProvider ? userProfile?.specialty || "Healthcare Provider" : "Patient"}
                 </p>
               </div>
               <div className="flex items-center gap-2">
                 <ThemeToggle />
-                <Button variant="outline">Edit Profile</Button>
+                <Button 
+                  variant="outline"
+                  onClick={navigateToProfileSetup}
+                >
+                  {isProfileComplete ? 'Edit Profile' : 'Complete Profile'}
+                </Button>
               </div>
             </div>
             
@@ -157,6 +197,7 @@ const Profile = () => {
         </div>
       </Card>
 
+      {/* Healthcare Provider Application */}
       {isHealthcareProvider && !applicationStatus && (
         <Card className="p-6 mb-6">
           <h2 className="text-xl font-semibold mb-4 text-foreground">Complete Your Application</h2>
@@ -173,6 +214,7 @@ const Profile = () => {
         </Card>
       )}
 
+      {/* Action Buttons */}
       <div className="space-y-2">
         <Button 
           variant="outline" 
