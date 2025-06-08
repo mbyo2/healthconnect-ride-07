@@ -32,9 +32,9 @@ export const getMedicalRecords = async (): Promise<MedicalRecord[]> => {
       id: record.id,
       title: record.record_type || 'Medical Record',
       date: record.date,
-      provider: record.provider_name || 'Healthcare Provider',
+      provider: 'Healthcare Provider', // Since provider_name doesn't exist in schema
       type: record.record_type || 'General',
-      status: record.status || 'Complete'
+      status: 'Complete' // Since status doesn't exist in schema, use default
     })) || [];
   } catch (error) {
     console.error('Error fetching medical records:', error);

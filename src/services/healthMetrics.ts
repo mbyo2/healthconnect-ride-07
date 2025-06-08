@@ -57,16 +57,20 @@ export const getHealthGoals = async (): Promise<HealthGoal[]> => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return [];
 
-    const { data: goals } = await supabase
-      .from('health_goals')
+    // Since health_goals table doesn't exist, return mock data based on health metrics
+    const { data: metrics } = await supabase
+      .from('health_metrics')
       .select('*')
-      .eq('user_id', user.id);
+      .eq('user_id', user.id)
+      .order('recorded_at', { ascending: false })
+      .limit(4);
 
-    return goals?.map(goal => ({
-      title: goal.goal_type,
-      current: goal.current_value || 0,
-      target: goal.target_value || 0,
-      icon: getIconForGoalType(goal.goal_type)
+    // Create goals based on existing metrics
+    return metrics?.map(metric => ({
+      title: `${metric.metric_type} Goal`,
+      current: metric.value || 0,
+      target: getTargetForMetricType(metric.metric_type),
+      icon: getIconForGoalType(metric.metric_type)
     })) || [];
   } catch (error) {
     console.error('Error fetching health goals:', error);
@@ -83,18 +87,20 @@ export const getUpcomingAppointments = async (): Promise<UpcomingAppointment[]> 
       .from('appointments')
       .select(`
         *,
-        profiles!appointments_provider_id_fkey(full_name)
+        profiles!appointments_provider_id_fkey(first_name, last_name)
       `)
       .eq('patient_id', user.id)
-      .gte('appointment_date', new Date().toISOString())
-      .order('appointment_date', { ascending: true })
+      .gte('date', new Date().toISOString().split('T')[0])
+      .order('date', { ascending: true })
       .limit(5);
 
     return appointments?.map(apt => ({
-      date: new Date(apt.appointment_date).toLocaleDateString(),
-      time: apt.appointment_time || 'TBD',
-      provider: apt.profiles?.full_name || 'Provider',
-      type: apt.appointment_type || 'Consultation'
+      date: new Date(apt.date).toLocaleDateString(),
+      time: apt.time || 'TBD',
+      provider: apt.profiles?.first_name && apt.profiles?.last_name 
+        ? `${apt.profiles.first_name} ${apt.profiles.last_name}` 
+        : 'Provider',
+      type: apt.type || 'Consultation'
     })) || [];
   } catch (error) {
     console.error('Error fetching appointments:', error);
@@ -118,7 +124,26 @@ const getIconForGoalType = (type: string): string => {
     'steps': 'Footprints',
     'water': 'Droplets',
     'exercise': 'Activity',
-    'nutrition': 'Apple'
+    'nutrition': 'Apple',
+    'blood_pressure': 'Heart',
+    'heart_rate': 'Activity',
+    'weight': 'Target',
+    'sleep': 'Moon',
+    'temperature': 'Thermometer'
   };
   return iconMap[type] || 'Target';
+};
+
+const getTargetForMetricType = (type: string): number => {
+  const targetMap: Record<string, number> = {
+    'steps': 10000,
+    'water': 8,
+    'exercise': 30,
+    'weight': 70,
+    'heart_rate': 80,
+    'blood_pressure': 120,
+    'sleep': 8,
+    'temperature': 37
+  };
+  return targetMap[type] || 100;
 };
