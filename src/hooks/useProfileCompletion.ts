@@ -47,6 +47,13 @@ export const useProfileCompletion = () => {
         .eq('patient_id', user.id)
         .limit(1);
 
+      // Check if user has insurance information
+      const { data: insuranceInfo } = await supabase
+        .from('insurance_information')
+        .select('id')
+        .eq('patient_id', user.id)
+        .limit(1);
+
       // Define workflow steps with completion status
       const steps: WorkflowStep[] = [
         {
@@ -54,16 +61,34 @@ export const useProfileCompletion = () => {
           title: 'Complete Profile',
           description: 'Set up your personal and medical information',
           icon: 'User',
-          route: '/profile',
+          route: '/profile-setup',
           completed: profileComplete,
           required: true
+        },
+        {
+          id: 'insurance',
+          title: 'Add Insurance',
+          description: 'Add your insurance information for coverage verification',
+          icon: 'Shield',
+          route: '/dashboard?tab=insurance',
+          completed: !!insuranceInfo?.length,
+          required: false
+        },
+        {
+          id: 'payment',
+          title: 'Payment Methods',
+          description: 'Add payment methods for appointments and services',
+          icon: 'CreditCard',
+          route: '/wallet?tab=payment-methods',
+          completed: false, // This would need to be checked against a payment_methods table
+          required: false
         },
         {
           id: 'symptoms',
           title: 'Report Symptoms',
           description: 'Track your health by recording symptoms',
           icon: 'Activity',
-          route: '/symptoms',
+          route: '/dashboard?tab=symptoms',
           completed: !!healthMetrics?.length,
           required: false
         },
@@ -73,7 +98,7 @@ export const useProfileCompletion = () => {
           description: 'Search for doctors and specialists near you',
           icon: 'Search',
           route: '/search',
-          completed: false, // This is exploratory, not tracked
+          completed: false,
           required: false
         },
         {
@@ -86,20 +111,11 @@ export const useProfileCompletion = () => {
           required: false
         },
         {
-          id: 'chat',
-          title: 'Chat with Providers',
-          description: 'Communicate with your healthcare team',
-          icon: 'MessageSquare',
-          route: '/chat',
-          completed: false, // This is exploratory, not tracked
-          required: false
-        },
-        {
           id: 'medical-records',
           title: 'Medical Records',
           description: 'Access and manage your health records',
           icon: 'FileText',
-          route: '/medical-records',
+          route: '/dashboard?tab=records',
           completed: !!medicalRecords?.length,
           required: false
         },
@@ -108,17 +124,8 @@ export const useProfileCompletion = () => {
           title: 'Health Dashboard',
           description: 'View your health metrics and progress',
           icon: 'Heart',
-          route: '/health-dashboard',
+          route: '/dashboard?tab=health',
           completed: !!healthMetrics?.length,
-          required: false
-        },
-        {
-          id: 'settings',
-          title: 'Account Settings',
-          description: 'Manage your account preferences',
-          icon: 'Settings',
-          route: '/settings',
-          completed: false, // This is always available
           required: false
         }
       ];
