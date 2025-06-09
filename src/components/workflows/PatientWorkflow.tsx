@@ -15,7 +15,9 @@ import {
   Circle,
   Shield,
   Activity,
-  Sparkles
+  Sparkles,
+  Video,
+  CreditCard
 } from 'lucide-react';
 
 const getIcon = (iconName: string) => {
@@ -25,7 +27,9 @@ const getIcon = (iconName: string) => {
     Search,
     Calendar,
     Heart,
-    Shield
+    Shield,
+    Video,
+    CreditCard
   };
   return icons[iconName as keyof typeof icons] || Circle;
 };
@@ -123,34 +127,34 @@ export const PatientWorkflow = () => {
               <Button
                 variant="outline"
                 className="flex items-center justify-start gap-2 h-auto py-4"
+                onClick={() => handleNavigation('/video-dashboard')}
+              >
+                <Video className="h-5 w-5" />
+                <div className="text-left">
+                  <div className="font-medium">Video Consultation</div>
+                  <div className="text-xs text-muted-foreground">Connect via video call</div>
+                </div>
+              </Button>
+              <Button
+                variant="outline"
+                className="flex items-center justify-start gap-2 h-auto py-4"
+                onClick={() => handleNavigation('/payment-processing')}
+              >
+                <CreditCard className="h-5 w-5" />
+                <div className="text-left">
+                  <div className="font-medium">Payment Setup</div>
+                  <div className="text-xs text-muted-foreground">Secure payment methods</div>
+                </div>
+              </Button>
+              <Button
+                variant="outline"
+                className="flex items-center justify-start gap-2 h-auto py-4"
                 onClick={() => handleNavigation('/symptoms')}
               >
                 <Activity className="h-5 w-5" />
                 <div className="text-left">
                   <div className="font-medium">Track Health</div>
                   <div className="text-xs text-muted-foreground">Log symptoms & metrics</div>
-                </div>
-              </Button>
-              <Button
-                variant="outline"
-                className="flex items-center justify-start gap-2 h-auto py-4"
-                onClick={() => handleNavigation('/search')}
-              >
-                <Search className="h-5 w-5" />
-                <div className="text-left">
-                  <div className="font-medium">Find Providers</div>
-                  <div className="text-xs text-muted-foreground">Discover specialists</div>
-                </div>
-              </Button>
-              <Button
-                variant="outline"
-                className="flex items-center justify-start gap-2 h-auto py-4"
-                onClick={() => handleNavigation('/health-dashboard')}
-              >
-                <Heart className="h-5 w-5" />
-                <div className="text-left">
-                  <div className="font-medium">Health Dashboard</div>
-                  <div className="text-xs text-muted-foreground">View your progress</div>
                 </div>
               </Button>
             </div>

@@ -1,3 +1,4 @@
+
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { MobileLayout } from "./components/MobileLayout";
 import { Toaster } from "sonner";
@@ -35,7 +36,11 @@ import SettingsPage from "./pages/SettingsPage";
 import MedicalRecords from "./pages/MedicalRecords";
 import HealthDashboard from "./pages/HealthDashboard";
 import PharmacyInventory from "./pages/PharmacyInventory";
+import PaymentProcessing from "./pages/PaymentProcessing";
+import VideoConsultations from "./pages/VideoConsultations";
+import VideoCall from "./pages/VideoCall";
 import { PatientDashboard } from "./components/patient/PatientDashboard";
+import { VideoConsultationDashboard } from "./components/video/VideoConsultationDashboard";
 
 function App() {
   return (
@@ -109,6 +114,26 @@ function App() {
                   <Route 
                     path="/appointments" 
                     element={<ProtectedRoute><MobileLayout><Appointments /></MobileLayout></ProtectedRoute>} 
+                  />
+                  
+                  {/* Payment Processing Routes */}
+                  <Route 
+                    path="/payment-processing" 
+                    element={<ProtectedRoute><MobileLayout><PaymentProcessing /></MobileLayout></ProtectedRoute>} 
+                  />
+                  
+                  {/* Video Consultation Routes */}
+                  <Route 
+                    path="/video-consultations" 
+                    element={<ProtectedRoute><MobileLayout><VideoConsultations /></MobileLayout></ProtectedRoute>} 
+                  />
+                  <Route 
+                    path="/video-dashboard" 
+                    element={<ProtectedRoute><MobileLayout><VideoConsultationDashboard /></MobileLayout></ProtectedRoute>} 
+                  />
+                  <Route 
+                    path="/video/:roomUrl" 
+                    element={<ProtectedRoute><VideoCall /></ProtectedRoute>} 
                   />
                   
                   {/* Role-specific routes */}

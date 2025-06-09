@@ -35,7 +35,8 @@ export const useProfileCompletion = () => {
       const [
         { data: appointments },
         { data: healthMetrics },
-        { data: insuranceInfo }
+        { data: insuranceInfo },
+        { data: videoConsultations }
       ] = await Promise.all([
         supabase
           .from('appointments')
@@ -49,6 +50,11 @@ export const useProfileCompletion = () => {
           .limit(1),
         supabase
           .from('insurance_information')
+          .select('id')
+          .eq('patient_id', user.id)
+          .limit(1),
+        supabase
+          .from('video_consultations')
           .select('id')
           .eq('patient_id', user.id)
           .limit(1)
@@ -90,6 +96,24 @@ export const useProfileCompletion = () => {
           icon: 'Calendar',
           route: '/appointments',
           completed: !!appointments?.length,
+          required: false
+        },
+        {
+          id: 'video-consultation',
+          title: 'Video Consultation',
+          description: 'Experience telehealth with video consultations',
+          icon: 'Video',
+          route: '/video-dashboard',
+          completed: !!videoConsultations?.length,
+          required: false
+        },
+        {
+          id: 'payment-setup',
+          title: 'Payment Setup',
+          description: 'Set up secure payment methods for healthcare services',
+          icon: 'CreditCard',
+          route: '/payment-processing',
+          completed: false,
           required: false
         },
         {
