@@ -51,6 +51,14 @@ export const PatientWorkflow = () => {
     );
   }
 
+  const handleNavigation = (route: string) => {
+    try {
+      navigate(route);
+    } catch (error) {
+      console.error('Navigation error:', error);
+    }
+  };
+
   const getButtonText = (step: any) => {
     if (step.id === 'profile') {
       return isProfileComplete ? 'Edit Profile' : 'Complete Profile';
@@ -89,7 +97,6 @@ export const PatientWorkflow = () => {
           </div>
         </div>
 
-        {/* Quick Actions for Completed Setup */}
         <Card className="p-6">
           <CardHeader className="pb-4">
             <div className="flex items-center gap-2">
@@ -105,7 +112,7 @@ export const PatientWorkflow = () => {
               <Button
                 variant="outline"
                 className="flex items-center justify-start gap-2 h-auto py-4"
-                onClick={() => navigate('/appointments')}
+                onClick={() => handleNavigation('/appointments')}
               >
                 <Calendar className="h-5 w-5" />
                 <div className="text-left">
@@ -116,7 +123,7 @@ export const PatientWorkflow = () => {
               <Button
                 variant="outline"
                 className="flex items-center justify-start gap-2 h-auto py-4"
-                onClick={() => navigate('/dashboard?tab=symptoms')}
+                onClick={() => handleNavigation('/symptoms')}
               >
                 <Activity className="h-5 w-5" />
                 <div className="text-left">
@@ -127,7 +134,7 @@ export const PatientWorkflow = () => {
               <Button
                 variant="outline"
                 className="flex items-center justify-start gap-2 h-auto py-4"
-                onClick={() => navigate('/search')}
+                onClick={() => handleNavigation('/search')}
               >
                 <Search className="h-5 w-5" />
                 <div className="text-left">
@@ -138,34 +145,12 @@ export const PatientWorkflow = () => {
               <Button
                 variant="outline"
                 className="flex items-center justify-start gap-2 h-auto py-4"
-                onClick={() => navigate('/health-dashboard')}
+                onClick={() => handleNavigation('/health-dashboard')}
               >
                 <Heart className="h-5 w-5" />
                 <div className="text-left">
                   <div className="font-medium">Health Dashboard</div>
                   <div className="text-xs text-muted-foreground">View your progress</div>
-                </div>
-              </Button>
-              <Button
-                variant="outline"
-                className="flex items-center justify-start gap-2 h-auto py-4"
-                onClick={() => navigate('/dashboard?tab=insurance')}
-              >
-                <Shield className="h-5 w-5" />
-                <div className="text-left">
-                  <div className="font-medium">Insurance Info</div>
-                  <div className="text-xs text-muted-foreground">Manage coverage</div>
-                </div>
-              </Button>
-              <Button
-                variant="outline"
-                className="flex items-center justify-start gap-2 h-auto py-4"
-                onClick={() => navigate('/wallet?tab=payment-methods')}
-              >
-                <Heart className="h-5 w-5" />
-                <div className="text-left">
-                  <div className="font-medium">Payment Methods</div>
-                  <div className="text-xs text-muted-foreground">Manage payments</div>
                 </div>
               </Button>
             </div>
@@ -183,7 +168,6 @@ export const PatientWorkflow = () => {
           Complete these steps to unlock the full potential of your healthcare experience
         </p>
         
-        {/* Progress Overview */}
         <div className="max-w-md mx-auto space-y-2">
           <div className="flex justify-between items-center">
             <span className="text-sm font-medium">Setup Progress</span>
@@ -248,7 +232,7 @@ export const PatientWorkflow = () => {
                   {step.description}
                 </CardDescription>
                 <Button 
-                  onClick={() => navigate(step.route)}
+                  onClick={() => handleNavigation(step.route)}
                   size="sm" 
                   className="w-full"
                   variant={getButtonVariant(step)}

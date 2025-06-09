@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -19,42 +19,42 @@ export const useProfileCompletion = () => {
   const [workflowSteps, setWorkflowSteps] = useState<WorkflowStep[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const checkWorkflowCompletion = async () => {
-    if (!user) return;
+  const checkWorkflowCompletion = useCallback(async () => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
 
     try {
+      setLoading(true);
+      
       // Check profile completion
       const profileComplete = profile?.is_profile_complete || false;
       
-      // Check if user has any appointments
-      const { data: appointments } = await supabase
-        .from('appointments')
-        .select('id')
-        .eq('patient_id', user.id)
-        .limit(1);
+      // Parallel queries for better performance
+      const [
+        { data: appointments },
+        { data: healthMetrics },
+        { data: insuranceInfo }
+      ] = await Promise.all([
+        supabase
+          .from('appointments')
+          .select('id')
+          .eq('patient_id', user.id)
+          .limit(1),
+        supabase
+          .from('health_metrics')
+          .select('id')
+          .eq('user_id', user.id)
+          .limit(1),
+        supabase
+          .from('insurance_information')
+          .select('id')
+          .eq('patient_id', user.id)
+          .limit(1)
+      ]);
 
-      // Check if user has any health metrics
-      const { data: healthMetrics } = await supabase
-        .from('health_metrics')
-        .select('id')
-        .eq('user_id', user.id)
-        .limit(1);
-
-      // Check if user has insurance information
-      const { data: insuranceInfo } = await supabase
-        .from('insurance_information')
-        .select('id')
-        .eq('patient_id', user.id)
-        .limit(1);
-
-      // Check if user has any payments (indicating payment methods are set up)
-      const { data: paymentHistory } = await supabase
-        .from('payments')
-        .select('id')
-        .eq('patient_id', user.id)
-        .limit(1);
-
-      // Define workflow steps with completion status
+      // Define workflow steps
       const steps: WorkflowStep[] = [
         {
           id: 'profile',
@@ -70,7 +70,7 @@ export const useProfileCompletion = () => {
           title: 'Add Insurance',
           description: 'Add your insurance information for coverage verification',
           icon: 'Shield',
-          route: '/dashboard?tab=insurance',
+          route: '/dashboard',
           completed: !!insuranceInfo?.length,
           required: false
         },
@@ -79,7 +79,7 @@ export const useProfileCompletion = () => {
           title: 'Track Health',
           description: 'Start tracking your health by recording symptoms or metrics',
           icon: 'Activity',
-          route: '/dashboard?tab=symptoms',
+          route: '/symptoms',
           completed: !!healthMetrics?.length,
           required: false
         },
@@ -98,7 +98,7 @@ export const useProfileCompletion = () => {
           description: 'Explore and search for healthcare providers near you',
           icon: 'Search',
           route: '/search',
-          completed: false, // This is more of an exploratory step
+          completed: false,
           required: false
         }
       ];
@@ -107,34 +107,35 @@ export const useProfileCompletion = () => {
       setIsProfileComplete(profileComplete);
     } catch (error) {
       console.error('Error checking workflow completion:', error);
+      setWorkflowSteps([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, profile?.is_profile_complete]);
 
   useEffect(() => {
     checkWorkflowCompletion();
-  }, [user, profile]);
+  }, [checkWorkflowCompletion]);
 
-  const getCompletionPercentage = () => {
+  const getCompletionPercentage = useCallback(() => {
     if (workflowSteps.length === 0) return 0;
     const completedSteps = workflowSteps.filter(step => step.completed).length;
     return Math.round((completedSteps / workflowSteps.length) * 100);
-  };
+  }, [workflowSteps]);
 
-  const getNextStep = () => {
+  const getNextStep = useCallback(() => {
     // First check for required steps
     const nextRequired = workflowSteps.find(step => !step.completed && step.required);
     if (nextRequired) return nextRequired;
     
     // Then check for optional steps
     return workflowSteps.find(step => !step.completed && !step.required);
-  };
+  }, [workflowSteps]);
 
-  const isWorkflowComplete = () => {
+  const isWorkflowComplete = useCallback(() => {
     const requiredSteps = workflowSteps.filter(step => step.required);
-    return requiredSteps.every(step => step.completed);
-  };
+    return requiredSteps.length > 0 && requiredSteps.every(step => step.completed);
+  }, [workflowSteps]);
 
   return {
     isProfileComplete,

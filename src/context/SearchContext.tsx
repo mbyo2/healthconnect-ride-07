@@ -12,7 +12,6 @@ type Coordinates = {
 type SearchContextType = {
   searchQuery: string;
   setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
-  // Added properties for SearchFilters
   searchTerm: string;
   setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
   selectedType: HealthcareProviderType | null;
@@ -26,7 +25,6 @@ type SearchContextType = {
   useUserLocation: boolean;
   setUseUserLocation: React.Dispatch<React.SetStateAction<boolean>>;
   refreshProviders: () => void;
-  // Added properties for SearchResults and Pagination
   providers: Provider[];
   isLoading: boolean;
   userLocation: Coordinates;
@@ -39,7 +37,7 @@ type SearchContextType = {
 const SearchContext = createContext<SearchContextType | undefined>(undefined);
 
 export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Initialize all state variables properly
+  // Initialize all state variables in the correct order
   const [searchQuery, setSearchQuery] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState<HealthcareProviderType | null>(null);
@@ -54,7 +52,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
 
-  // Get user location if enabled
+  // Get user location effect
   useEffect(() => {
     if (useUserLocation && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -72,7 +70,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   }, [useUserLocation]);
 
-  // Function to convert string array to InsuranceProvider array
+  // Convert string array to InsuranceProvider array
   const stringToInsuranceProvider = (
     insuranceStrings: string[] | null
   ): InsuranceProvider[] => {
@@ -82,11 +80,9 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     
     return insuranceStrings
       .filter(insurance => {
-        // Check if the string is a valid insurance provider value
         return Object.values(InsuranceProvider).includes(insurance as any);
       })
       .map(insurance => {
-        // Convert string to the corresponding enum value
         const enumValue = Object.values(InsuranceProvider).find(
           val => val === insurance
         );
@@ -94,7 +90,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       });
   };
 
-  // Fetch providers based on filters
+  // Fetch providers function
   const fetchProviders = async () => {
     setIsLoading(true);
     try {
@@ -118,7 +114,10 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         .limit(10)
         .range((currentPage - 1) * 10, currentPage * 10 - 1);
 
-      if (error) throw error;
+      if (error) {
+        console.error("Supabase error:", error);
+        throw error;
+      }
 
       const mappedProviders = data?.map((profile): Provider => ({
         id: profile.id,
@@ -137,7 +136,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           latitude: 37.7749,
           longitude: -122.4194
         },
-        distance: 5 // Mock distance, would be calculated from user location
+        distance: 5
       })) || [];
 
       setProviders(mappedProviders);
@@ -153,7 +152,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   };
 
-  // Initial fetch
+  // Initial fetch effect
   useEffect(() => {
     fetchProviders();
   }, [currentPage]);
