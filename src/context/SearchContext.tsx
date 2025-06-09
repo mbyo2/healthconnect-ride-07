@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { HealthcareProviderType, InsuranceProvider, SpecialtyType } from '@/types/healthcare';
 import type { Provider } from '@/types/provider';
@@ -38,17 +39,14 @@ type SearchContextType = {
 const SearchContext = createContext<SearchContextType | undefined>(undefined);
 
 export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // Initialize all state variables properly
   const [searchQuery, setSearchQuery] = useState('');
-  
-  // Added states for SearchFilters
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState<HealthcareProviderType | null>(null);
   const [selectedSpecialty, setSelectedSpecialty] = useState<SpecialtyType | null>(null);
   const [selectedInsurance, setSelectedInsurance] = useState<InsuranceProvider | null>(null);
   const [maxDistance, setMaxDistance] = useState(50);
   const [useUserLocation, setUseUserLocation] = useState(false);
-  
-  // Added states for SearchResults and Pagination
   const [providers, setProviders] = useState<Provider[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [userLocation, setUserLocation] = useState<Coordinates>(null);
@@ -100,7 +98,6 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const fetchProviders = async () => {
     setIsLoading(true);
     try {
-      // This is a placeholder - in a real app you would fetch from your API/database
       const { data, error, count } = await supabase
         .from('profiles')
         .select(`
@@ -123,7 +120,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
       if (error) throw error;
 
-      const mappedProviders = data.map((profile): Provider => ({
+      const mappedProviders = data?.map((profile): Provider => ({
         id: profile.id,
         first_name: profile.first_name || '',
         last_name: profile.last_name || '',
@@ -141,13 +138,16 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           longitude: -122.4194
         },
         distance: 5 // Mock distance, would be calculated from user location
-      }));
+      })) || [];
 
       setProviders(mappedProviders);
       setTotalCount(count || mappedProviders.length);
       setHasMore((count || 0) > currentPage * 10);
     } catch (error) {
       console.error("Error fetching providers:", error);
+      setProviders([]);
+      setTotalCount(0);
+      setHasMore(false);
     } finally {
       setIsLoading(false);
     }
@@ -167,31 +167,33 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     setCurrentPage(prev => prev + 1);
   };
 
+  const contextValue: SearchContextType = {
+    searchQuery,
+    setSearchQuery,
+    searchTerm,
+    setSearchTerm,
+    selectedType,
+    setSelectedType,
+    selectedSpecialty,
+    setSelectedSpecialty,
+    selectedInsurance,
+    setSelectedInsurance,
+    maxDistance,
+    setMaxDistance,
+    useUserLocation,
+    setUseUserLocation,
+    refreshProviders,
+    providers,
+    isLoading,
+    userLocation,
+    totalCount,
+    currentPage,
+    hasMore,
+    loadMore
+  };
+
   return (
-    <SearchContext.Provider value={{ 
-      searchQuery, 
-      setSearchQuery,
-      searchTerm,
-      setSearchTerm,
-      selectedType,
-      setSelectedType,
-      selectedSpecialty,
-      setSelectedSpecialty,
-      selectedInsurance,
-      setSelectedInsurance,
-      maxDistance,
-      setMaxDistance,
-      useUserLocation,
-      setUseUserLocation,
-      refreshProviders,
-      providers,
-      isLoading,
-      userLocation,
-      totalCount,
-      currentPage,
-      hasMore,
-      loadMore
-    }}>
+    <SearchContext.Provider value={contextValue}>
       {children}
     </SearchContext.Provider>
   );
