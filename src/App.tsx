@@ -34,6 +34,7 @@ import SettingsPage from "./pages/SettingsPage";
 import MedicalRecords from "./pages/MedicalRecords";
 import HealthDashboard from "./pages/HealthDashboard";
 import PharmacyInventory from "./pages/PharmacyInventory";
+import { PatientDashboard } from "./components/patient/PatientDashboard";
 
 function App() {
   return (
@@ -70,6 +71,14 @@ function App() {
                 <Route 
                   path="/settings" 
                   element={<ProtectedRoute><MobileLayout><SettingsPage /></MobileLayout></ProtectedRoute>} 
+                />
+                <Route 
+                  path="/dashboard" 
+                  element={<ProtectedRoute><MobileLayout><div className="container mx-auto py-6"><PatientDashboard /></div></MobileLayout></ProtectedRoute>} 
+                />
+                <Route 
+                  path="/wallet" 
+                  element={<ProtectedRoute><MobileLayout><div className="container mx-auto py-6"><div><h1 className="text-2xl font-bold mb-6">Wallet</h1><p>Payment methods and wallet features coming soon...</p></div></div></MobileLayout></ProtectedRoute>} 
                 />
                 <Route 
                   path="/testing" 

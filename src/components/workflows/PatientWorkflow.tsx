@@ -10,15 +10,11 @@ import {
   Heart, 
   Search, 
   Calendar, 
-  MessageSquare, 
-  FileText, 
-  Settings,
-  Activity,
   User,
   CheckCircle2,
   Circle,
   Shield,
-  CreditCard,
+  Activity,
   Sparkles
 } from 'lucide-react';
 
@@ -28,12 +24,8 @@ const getIcon = (iconName: string) => {
     Activity,
     Search,
     Calendar,
-    MessageSquare,
-    FileText,
     Heart,
-    Settings,
-    Shield,
-    CreditCard
+    Shield
   };
   return icons[iconName as keyof typeof icons] || Circle;
 };
@@ -146,7 +138,7 @@ export const PatientWorkflow = () => {
               <Button
                 variant="outline"
                 className="flex items-center justify-start gap-2 h-auto py-4"
-                onClick={() => navigate('/dashboard?tab=health')}
+                onClick={() => navigate('/health-dashboard')}
               >
                 <Heart className="h-5 w-5" />
                 <div className="text-left">
@@ -154,35 +146,31 @@ export const PatientWorkflow = () => {
                   <div className="text-xs text-muted-foreground">View your progress</div>
                 </div>
               </Button>
+              <Button
+                variant="outline"
+                className="flex items-center justify-start gap-2 h-auto py-4"
+                onClick={() => navigate('/dashboard?tab=insurance')}
+              >
+                <Shield className="h-5 w-5" />
+                <div className="text-left">
+                  <div className="font-medium">Insurance Info</div>
+                  <div className="text-xs text-muted-foreground">Manage coverage</div>
+                </div>
+              </Button>
+              <Button
+                variant="outline"
+                className="flex items-center justify-start gap-2 h-auto py-4"
+                onClick={() => navigate('/wallet?tab=payment-methods')}
+              >
+                <Heart className="h-5 w-5" />
+                <div className="text-left">
+                  <div className="font-medium">Payment Methods</div>
+                  <div className="text-xs text-muted-foreground">Manage payments</div>
+                </div>
+              </Button>
             </div>
           </CardContent>
         </Card>
-
-        {/* Optional steps if any remain */}
-        {workflowSteps.some(step => !step.completed) && (
-          <Card className="p-4 border-blue-200 bg-blue-50/30">
-            <div className="flex items-center gap-3 mb-3">
-              <Circle className="h-5 w-5 text-blue-600" />
-              <h3 className="font-semibold text-blue-800">Optional Steps</h3>
-            </div>
-            <p className="text-sm text-blue-700 mb-3">
-              Complete these optional steps to unlock even more features.
-            </p>
-            <div className="grid gap-2">
-              {workflowSteps.filter(step => !step.completed).map((step) => (
-                <Button
-                  key={step.id}
-                  variant="outline"
-                  size="sm"
-                  className="justify-start"
-                  onClick={() => navigate(step.route)}
-                >
-                  {step.title}
-                </Button>
-              ))}
-            </div>
-          </Card>
-        )}
       </div>
     );
   }

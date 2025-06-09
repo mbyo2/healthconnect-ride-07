@@ -40,13 +40,6 @@ export const useProfileCompletion = () => {
         .eq('user_id', user.id)
         .limit(1);
 
-      // Check if user has any medical records
-      const { data: medicalRecords } = await supabase
-        .from('medical_records')
-        .select('id')
-        .eq('patient_id', user.id)
-        .limit(1);
-
       // Check if user has insurance information
       const { data: insuranceInfo } = await supabase
         .from('insurance_information')
@@ -82,12 +75,12 @@ export const useProfileCompletion = () => {
           required: false
         },
         {
-          id: 'payment',
-          title: 'Payment Methods',
-          description: 'Add payment methods for appointments and services',
-          icon: 'CreditCard',
-          route: '/wallet?tab=payment-methods',
-          completed: !!paymentHistory?.length, // Check if user has made any payments
+          id: 'health-tracking',
+          title: 'Track Health',
+          description: 'Start tracking your health by recording symptoms or metrics',
+          icon: 'Activity',
+          route: '/dashboard?tab=symptoms',
+          completed: !!healthMetrics?.length,
           required: false
         },
         {
@@ -97,15 +90,6 @@ export const useProfileCompletion = () => {
           icon: 'Calendar',
           route: '/appointments',
           completed: !!appointments?.length,
-          required: false
-        },
-        {
-          id: 'symptoms',
-          title: 'Track Health',
-          description: 'Start tracking your health by recording symptoms or metrics',
-          icon: 'Activity',
-          route: '/dashboard?tab=symptoms',
-          completed: !!healthMetrics?.length,
           required: false
         },
         {
