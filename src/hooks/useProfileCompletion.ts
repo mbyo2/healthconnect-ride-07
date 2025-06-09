@@ -54,6 +54,13 @@ export const useProfileCompletion = () => {
         .eq('patient_id', user.id)
         .limit(1);
 
+      // Check if user has any payments (indicating payment methods are set up)
+      const { data: paymentHistory } = await supabase
+        .from('payments')
+        .select('id')
+        .eq('patient_id', user.id)
+        .limit(1);
+
       // Define workflow steps with completion status
       const steps: WorkflowStep[] = [
         {
@@ -80,13 +87,22 @@ export const useProfileCompletion = () => {
           description: 'Add payment methods for appointments and services',
           icon: 'CreditCard',
           route: '/wallet?tab=payment-methods',
-          completed: false, // This would need to be checked against a payment_methods table
+          completed: !!paymentHistory?.length, // Check if user has made any payments
+          required: false
+        },
+        {
+          id: 'appointments',
+          title: 'Book Appointment',
+          description: 'Schedule your first appointment with a healthcare provider',
+          icon: 'Calendar',
+          route: '/appointments',
+          completed: !!appointments?.length,
           required: false
         },
         {
           id: 'symptoms',
-          title: 'Report Symptoms',
-          description: 'Track your health by recording symptoms',
+          title: 'Track Health',
+          description: 'Start tracking your health by recording symptoms or metrics',
           icon: 'Activity',
           route: '/dashboard?tab=symptoms',
           completed: !!healthMetrics?.length,
@@ -94,38 +110,11 @@ export const useProfileCompletion = () => {
         },
         {
           id: 'search',
-          title: 'Find Healthcare',
-          description: 'Search for doctors and specialists near you',
+          title: 'Find Providers',
+          description: 'Explore and search for healthcare providers near you',
           icon: 'Search',
           route: '/search',
-          completed: false,
-          required: false
-        },
-        {
-          id: 'appointments',
-          title: 'Book Appointments',
-          description: 'Schedule appointments with healthcare providers',
-          icon: 'Calendar',
-          route: '/appointments',
-          completed: !!appointments?.length,
-          required: false
-        },
-        {
-          id: 'medical-records',
-          title: 'Medical Records',
-          description: 'Access and manage your health records',
-          icon: 'FileText',
-          route: '/dashboard?tab=records',
-          completed: !!medicalRecords?.length,
-          required: false
-        },
-        {
-          id: 'health-dashboard',
-          title: 'Health Dashboard',
-          description: 'View your health metrics and progress',
-          icon: 'Heart',
-          route: '/dashboard?tab=health',
-          completed: !!healthMetrics?.length,
+          completed: false, // This is more of an exploratory step
           required: false
         }
       ];
@@ -150,8 +139,17 @@ export const useProfileCompletion = () => {
   };
 
   const getNextStep = () => {
-    return workflowSteps.find(step => !step.completed && step.required) || 
-           workflowSteps.find(step => !step.completed);
+    // First check for required steps
+    const nextRequired = workflowSteps.find(step => !step.completed && step.required);
+    if (nextRequired) return nextRequired;
+    
+    // Then check for optional steps
+    return workflowSteps.find(step => !step.completed && !step.required);
+  };
+
+  const isWorkflowComplete = () => {
+    const requiredSteps = workflowSteps.filter(step => step.required);
+    return requiredSteps.every(step => step.completed);
   };
 
   return {
@@ -160,6 +158,7 @@ export const useProfileCompletion = () => {
     loading,
     completionPercentage: getCompletionPercentage(),
     nextStep: getNextStep(),
+    isWorkflowComplete: isWorkflowComplete(),
     refreshCompletion: checkWorkflowCompletion
   };
 };

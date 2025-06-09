@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -94,14 +95,6 @@ const Profile = () => {
 
   const navigateToProfileSetup = () => {
     navigate("/profile-setup");
-  };
-
-  const navigateToInsurance = () => {
-    navigate("/dashboard?tab=insurance");
-  };
-
-  const navigateToPaymentMethods = () => {
-    navigate("/wallet?tab=payment-methods");
   };
 
   const isHealthcareProvider = userRole === 'health_personnel';
@@ -222,69 +215,8 @@ const Profile = () => {
         </Card>
       )}
 
-      {/* Payment and Insurance Quick Setup for Patients */}
-      {userRole === 'patient' && isProfileComplete && (
-        <div className="grid md:grid-cols-2 gap-4 mb-6">
-          <Card className="p-4 border-blue-200 bg-blue-50/30">
-            <div className="flex items-center gap-3 mb-3">
-              <Shield className="h-5 w-5 text-blue-600" />
-              <h3 className="font-semibold text-blue-800">Insurance Information</h3>
-            </div>
-            <p className="text-sm text-blue-700 mb-3">
-              Add your insurance details for coverage verification and streamlined billing.
-            </p>
-            <Button 
-              onClick={navigateToInsurance}
-              size="sm"
-              className="bg-blue-600 hover:bg-blue-700"
-            >
-              Manage Insurance
-            </Button>
-          </Card>
-
-          <Card className="p-4 border-green-200 bg-green-50/30">
-            <div className="flex items-center gap-3 mb-3">
-              <CreditCard className="h-5 w-5 text-green-600" />
-              <h3 className="font-semibold text-green-800">Payment Methods</h3>
-            </div>
-            <p className="text-sm text-green-700 mb-3">
-              Set up payment methods for appointments, consultations, and medical services.
-            </p>
-            <Button 
-              onClick={navigateToPaymentMethods}
-              size="sm"
-              className="bg-green-600 hover:bg-green-700"
-            >
-              Add Payment Method
-            </Button>
-          </Card>
-        </div>
-      )}
-
       {/* Action Buttons */}
       <div className="space-y-2">
-        {/* Add Insurance and Payment buttons for easy access */}
-        {userRole === 'patient' && (
-          <>
-            <Button 
-              variant="outline" 
-              className="w-full justify-start gap-2 h-12"
-              onClick={navigateToInsurance}
-            >
-              <Shield className="w-5 h-5" />
-              <span>Insurance Information</span>
-            </Button>
-            <Button 
-              variant="outline" 
-              className="w-full justify-start gap-2 h-12"
-              onClick={navigateToPaymentMethods}
-            >
-              <CreditCard className="w-5 h-5" />
-              <span>Payment Methods</span>
-            </Button>
-          </>
-        )}
-        
         <Button 
           variant="outline" 
           className="w-full justify-start gap-2 h-12"

@@ -18,7 +18,8 @@ import {
   CheckCircle2,
   Circle,
   Shield,
-  CreditCard
+  CreditCard,
+  Sparkles
 } from 'lucide-react';
 
 const getIcon = (iconName: string) => {
@@ -44,7 +45,8 @@ export const PatientWorkflow = () => {
     workflowSteps, 
     loading, 
     completionPercentage, 
-    nextStep 
+    nextStep,
+    isWorkflowComplete
   } = useProfileCompletion();
 
   if (loading) {
@@ -68,24 +70,135 @@ export const PatientWorkflow = () => {
     if (step.id === 'profile' && !isProfileComplete) {
       return 'default';
     }
-    if ((step.id === 'insurance' || step.id === 'payment') && !step.completed) {
-      return 'default';
-    }
     return step.completed ? 'outline' : 'default';
   };
+
+  // Show completion message if all required steps are done
+  if (isWorkflowComplete) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center space-y-4">
+          <div className="flex justify-center">
+            <div className="p-4 rounded-full bg-green-100">
+              <CheckCircle2 className="h-12 w-12 text-green-600" />
+            </div>
+          </div>
+          <h2 className="text-2xl font-bold">🎉 Welcome to Your Health Journey!</h2>
+          <p className="text-muted-foreground max-w-md mx-auto">
+            Great job! You've completed the essential setup. Now you can take full advantage of all our healthcare features.
+          </p>
+          
+          <div className="max-w-md mx-auto space-y-2">
+            <div className="flex justify-between items-center">
+              <span className="text-sm font-medium">Setup Progress</span>
+              <span className="text-sm text-muted-foreground">{completionPercentage}%</span>
+            </div>
+            <Progress value={completionPercentage} className="h-2" />
+          </div>
+        </div>
+
+        {/* Quick Actions for Completed Setup */}
+        <Card className="p-6">
+          <CardHeader className="pb-4">
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-primary" />
+              <CardTitle className="text-lg">What's Next?</CardTitle>
+            </div>
+            <CardDescription>
+              Explore these popular features to get the most out of your healthcare experience
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <Button
+                variant="outline"
+                className="flex items-center justify-start gap-2 h-auto py-4"
+                onClick={() => navigate('/appointments')}
+              >
+                <Calendar className="h-5 w-5" />
+                <div className="text-left">
+                  <div className="font-medium">Book Appointment</div>
+                  <div className="text-xs text-muted-foreground">Schedule with providers</div>
+                </div>
+              </Button>
+              <Button
+                variant="outline"
+                className="flex items-center justify-start gap-2 h-auto py-4"
+                onClick={() => navigate('/dashboard?tab=symptoms')}
+              >
+                <Activity className="h-5 w-5" />
+                <div className="text-left">
+                  <div className="font-medium">Track Health</div>
+                  <div className="text-xs text-muted-foreground">Log symptoms & metrics</div>
+                </div>
+              </Button>
+              <Button
+                variant="outline"
+                className="flex items-center justify-start gap-2 h-auto py-4"
+                onClick={() => navigate('/search')}
+              >
+                <Search className="h-5 w-5" />
+                <div className="text-left">
+                  <div className="font-medium">Find Providers</div>
+                  <div className="text-xs text-muted-foreground">Discover specialists</div>
+                </div>
+              </Button>
+              <Button
+                variant="outline"
+                className="flex items-center justify-start gap-2 h-auto py-4"
+                onClick={() => navigate('/dashboard?tab=health')}
+              >
+                <Heart className="h-5 w-5" />
+                <div className="text-left">
+                  <div className="font-medium">Health Dashboard</div>
+                  <div className="text-xs text-muted-foreground">View your progress</div>
+                </div>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Optional steps if any remain */}
+        {workflowSteps.some(step => !step.completed) && (
+          <Card className="p-4 border-blue-200 bg-blue-50/30">
+            <div className="flex items-center gap-3 mb-3">
+              <Circle className="h-5 w-5 text-blue-600" />
+              <h3 className="font-semibold text-blue-800">Optional Steps</h3>
+            </div>
+            <p className="text-sm text-blue-700 mb-3">
+              Complete these optional steps to unlock even more features.
+            </p>
+            <div className="grid gap-2">
+              {workflowSteps.filter(step => !step.completed).map((step) => (
+                <Button
+                  key={step.id}
+                  variant="outline"
+                  size="sm"
+                  className="justify-start"
+                  onClick={() => navigate(step.route)}
+                >
+                  {step.title}
+                </Button>
+              ))}
+            </div>
+          </Card>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       <div className="text-center space-y-4">
         <h2 className="text-2xl font-bold">Your Health Journey</h2>
         <p className="text-muted-foreground">
-          Take control of your health with our comprehensive healthcare platform
+          Complete these steps to unlock the full potential of your healthcare experience
         </p>
         
         {/* Progress Overview */}
         <div className="max-w-md mx-auto space-y-2">
           <div className="flex justify-between items-center">
-            <span className="text-sm font-medium">Overall Progress</span>
+            <span className="text-sm font-medium">Setup Progress</span>
             <span className="text-sm text-muted-foreground">{completionPercentage}%</span>
           </div>
           <Progress value={completionPercentage} className="h-2" />
@@ -97,10 +210,10 @@ export const PatientWorkflow = () => {
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {workflowSteps.map((step, index) => {
           const IconComponent = getIcon(step.icon);
-          const isHighlighted = (step.id === 'insurance' || step.id === 'payment') && !step.completed;
+          const isHighlighted = step.id === nextStep?.id;
           
           return (
             <Card 
@@ -108,9 +221,7 @@ export const PatientWorkflow = () => {
               className={`cursor-pointer hover:shadow-md transition-all ${
                 step.completed ? 'border-green-200 bg-green-50/50' : ''
               } ${
-                step.id === 'profile' && !isProfileComplete ? 'border-blue-200 bg-blue-50/50' : ''
-              } ${
-                isHighlighted ? 'border-orange-200 bg-orange-50/50' : ''
+                isHighlighted ? 'border-blue-200 bg-blue-50/50 ring-2 ring-blue-100' : ''
               }`}
             >
               <CardHeader className="pb-3">
@@ -118,11 +229,11 @@ export const PatientWorkflow = () => {
                   <div className="flex items-center space-x-2">
                     <div className={`p-2 rounded-lg ${
                       step.completed ? 'bg-green-500/10' : 
-                      isHighlighted ? 'bg-orange-500/10' : 'bg-blue-500/10'
+                      isHighlighted ? 'bg-blue-500/10' : 'bg-gray-500/10'
                     }`}>
                       <IconComponent className={`h-4 w-4 ${
                         step.completed ? 'text-green-600' : 
-                        isHighlighted ? 'text-orange-600' : 'text-blue-600'
+                        isHighlighted ? 'text-blue-600' : 'text-gray-600'
                       }`} />
                     </div>
                     <CardTitle className="text-sm">{step.title}</CardTitle>
@@ -139,8 +250,8 @@ export const PatientWorkflow = () => {
                   </Badge>
                 )}
                 {isHighlighted && (
-                  <Badge variant="outline" className="w-fit text-xs border-orange-300 text-orange-700">
-                    Important
+                  <Badge variant="outline" className="w-fit text-xs border-blue-300 text-blue-700">
+                    Next Step
                   </Badge>
                 )}
               </CardHeader>
@@ -161,85 +272,6 @@ export const PatientWorkflow = () => {
           );
         })}
       </div>
-
-      {/* Insurance and Payment Quick Setup */}
-      {isProfileComplete && (
-        <div className="grid md:grid-cols-2 gap-4">
-          <Card className="p-4 border-orange-200 bg-orange-50/30">
-            <div className="flex items-center gap-3 mb-3">
-              <Shield className="h-5 w-5 text-orange-600" />
-              <h3 className="font-semibold text-orange-800">Insurance Setup</h3>
-            </div>
-            <p className="text-sm text-orange-700 mb-3">
-              Add your insurance information to verify coverage and streamline payments.
-            </p>
-            <Button 
-              onClick={() => navigate('/dashboard?tab=insurance')}
-              size="sm"
-              className="bg-orange-600 hover:bg-orange-700"
-            >
-              Add Insurance
-            </Button>
-          </Card>
-
-          <Card className="p-4 border-blue-200 bg-blue-50/30">
-            <div className="flex items-center gap-3 mb-3">
-              <CreditCard className="h-5 w-5 text-blue-600" />
-              <h3 className="font-semibold text-blue-800">Payment Methods</h3>
-            </div>
-            <p className="text-sm text-blue-700 mb-3">
-              Set up your preferred payment methods for quick and secure transactions.
-            </p>
-            <Button 
-              onClick={() => navigate('/wallet?tab=payment-methods')}
-              size="sm"
-              className="bg-blue-600 hover:bg-blue-700"
-            >
-              Add Payment Method
-            </Button>
-          </Card>
-        </div>
-      )}
-
-      {/* Quick Actions for Completed Profile */}
-      {isProfileComplete && (
-        <Card className="p-6">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-lg">Quick Actions</CardTitle>
-            <CardDescription>
-              Common tasks to maintain your health
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <Button
-                variant="outline"
-                className="flex items-center justify-start gap-2 h-auto py-3"
-                onClick={() => navigate('/appointments')}
-              >
-                <Calendar className="h-4 w-4" />
-                <span>Book Appointment</span>
-              </Button>
-              <Button
-                variant="outline"
-                className="flex items-center justify-start gap-2 h-auto py-3"
-                onClick={() => navigate('/dashboard?tab=symptoms')}
-              >
-                <Activity className="h-4 w-4" />
-                <span>Log Symptoms</span>
-              </Button>
-              <Button
-                variant="outline"
-                className="flex items-center justify-start gap-2 h-auto py-3"
-                onClick={() => navigate('/search')}
-              >
-                <Search className="h-4 w-4" />
-                <span>Find Provider</span>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 };
