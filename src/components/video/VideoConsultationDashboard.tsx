@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { VideoConsultationBooking } from './VideoConsultationBooking';
@@ -75,6 +74,15 @@ export const VideoConsultationDashboard = () => {
       </div>
     );
   }
+
+  // Add a helper to compute duration in minutes for a consultation
+  const getDurationInMinutes = (consultation: any) => {
+    if (!consultation?.scheduled_start || !consultation?.scheduled_end) return null;
+    const start = new Date(consultation.scheduled_start);
+    const end = new Date(consultation.scheduled_end);
+    // Return difference in minutes
+    return Math.round((end.getTime() - start.getTime()) / (1000 * 60));
+  };
 
   return (
     <div className="container mx-auto py-8">
@@ -193,7 +201,7 @@ export const VideoConsultationDashboard = () => {
                         </div>
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                           <Clock className="h-4 w-4" />
-                          Duration: {consultation.duration} minutes
+                          Duration: {getDurationInMinutes(consultation)} minutes
                         </div>
                       </div>
                       <Badge className={getStatusColor(consultation.status)}>
