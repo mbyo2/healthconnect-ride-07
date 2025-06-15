@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,9 +10,11 @@ import { ConnectionCard } from './ConnectionCard';
 import { PrimaryProviderCard } from './PrimaryProviderCard';
 import { SearchProviders } from './SearchProviders';
 import { useAuth } from '@/context/AuthContext';
-import { Users, UserPlus, Star, Clock, CheckCircle } from 'lucide-react';
+import { Users, UserPlus, Star, Clock, CheckCircle, Search } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export const ConnectionsDashboard = () => {
+  const navigate = useNavigate();
   const { user, profile } = useAuth();
   const {
     connections,
@@ -65,6 +66,17 @@ export const ConnectionsDashboard = () => {
         <p className="text-muted-foreground">
           Manage your connections with healthcare providers and patients
         </p>
+      </div>
+
+      {/* Add marketplace button */}
+      <div className="flex justify-center">
+        <Button
+          onClick={() => navigate('/marketplace-users')}
+          className="flex items-center gap-2"
+        >
+          <Search className="h-4 w-4" />
+          Browse User Marketplace
+        </Button>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">

@@ -1,233 +1,196 @@
+import React, { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { Auth } from '@supabase/auth-ui-react';
+import { ThemeSupa } from '@supabase/auth-ui-shared';
+import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
+import Account from '@/pages/Account';
+import Home from '@/pages/Home';
+import VideoDashboard from '@/pages/VideoDashboard';
+import Appointments from '@/pages/Appointments';
+import HealthcareProfessionals from '@/pages/HealthcareProfessionals';
+import AdminDashboard from '@/pages/AdminDashboard';
+import HealthcareInstitutions from '@/pages/HealthcareInstitutions';
+import Prescriptions from '@/pages/Prescriptions';
+import Symptoms from '@/pages/Symptoms';
+import Connections from '@/pages/Connections';
+import UserRolesProvider from '@/context/UserRolesContext';
+import { ProfileSetup } from '@/components/auth/ProfileSetup';
+import { Chat } from '@/components/chat/Chat';
+import UserMarketplace from "@/pages/UserMarketplace";
 
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import { MobileLayout } from "./components/MobileLayout";
-import { Toaster } from "sonner";
-import { ThemeProvider } from "./context/ThemeContext";
-import { AuthProvider } from "./context/AuthContext";
-import { UserRolesProvider } from "./context/UserRolesContext";
-import { ProtectedRoute } from "./components/auth/ProtectedRoute";
-import { RoleProtectedRoute } from "./components/auth/RoleProtectedRoute";
-import { SearchProvider } from "./context/SearchContext";
-import { AppErrorBoundary } from "./components/ui/app-error-boundary";
+const App = () => {
+  const [isNewUser, setIsNewUser] = useState(false);
+  const session = useSession();
+  const supabase = useSupabaseClient();
 
-// Pages
-import Home from "./pages/Home";
-import Login from "./pages/Login";
-import Auth from "./pages/Auth";
-import ProfileSetup from "./pages/ProfileSetup";
-import SymptomsForm from "./pages/SymptomsForm";
-import SearchPage from "./pages/SearchPage";
-import ProviderDetail from "./pages/ProviderDetail";
-import Appointments from "./pages/Appointments";
-import { ProviderPortal } from "./pages/ProviderPortal";
-import { InstitutionPortal } from "./pages/InstitutionPortal";
-import ProviderDashboard from "./pages/ProviderDashboard";
-import HealthcareApplication from "./pages/HealthcareApplication";
-import ApplicationStatus from "./pages/ApplicationStatus";
-import Terms from "./pages/Terms";
-import Privacy from "./pages/Privacy";
-import Contact from "./pages/Contact";
-import Documentation from "./pages/Documentation";
-import Testing from "./pages/Testing";
-import NotificationsPage from "./pages/NotificationsPage";
-import Chat from "./pages/Chat";
-import Profile from "./pages/Profile";
-import SettingsPage from "./pages/SettingsPage";
-import MedicalRecords from "./pages/MedicalRecords";
-import HealthDashboard from "./pages/HealthDashboard";
-import PharmacyInventory from "./pages/PharmacyInventory";
-import PaymentProcessing from "./pages/PaymentProcessing";
-import VideoConsultations from "./pages/VideoConsultations";
-import VideoCall from "./pages/VideoCall";
-import { PatientDashboard } from "./components/patient/PatientDashboard";
-import { VideoConsultationDashboard } from "./components/video/VideoConsultationDashboard";
+  useEffect(() => {
+    const checkNewUser = async () => {
+      if (session && session.user) {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
 
-function App() {
+        if (error) {
+          console.error("Error fetching profile:", error);
+        }
+
+        if (data && !data.first_name) {
+          setIsNewUser(true);
+        } else {
+          setIsNewUser(false);
+        }
+      } else {
+        setIsNewUser(false);
+      }
+    };
+
+    checkNewUser();
+  }, [session, supabase]);
+
   return (
-    <AppErrorBoundary>
-      <ThemeProvider>
-        <AuthProvider>
-          <UserRolesProvider>
-            <SearchProvider>
-              <Router>
-                <Toaster position="top-center" richColors />
-                <Routes>
-                  {/* Public routes */}
-                  <Route path="/" element={<Navigate to="/home" />} />
-                  <Route path="/home" element={<MobileLayout><Home /></MobileLayout>} />
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/auth" element={<Auth />} />
-                  <Route path="/terms" element={<MobileLayout><Terms /></MobileLayout>} />
-                  <Route path="/privacy" element={<MobileLayout><Privacy /></MobileLayout>} />
-                  <Route path="/contact" element={<MobileLayout><Contact /></MobileLayout>} />
-                  <Route path="/documentation" element={<MobileLayout><Documentation /></MobileLayout>} />
-                  
-                  {/* Provider portal (custom auth logic inside) */}
-                  <Route path="/provider-portal" element={<ProviderPortal />} />
-                  <Route path="/institution-portal" element={<InstitutionPortal />} />
-                  
-                  {/* Protected routes for all authenticated users */}
-                  <Route 
-                    path="/profile-setup" 
-                    element={<ProtectedRoute><MobileLayout><ProfileSetup /></MobileLayout></ProtectedRoute>} 
+    <UserRolesProvider>
+      <Router>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              session && session.user ? (
+                isNewUser ? (
+                  <Navigate to="/profile-setup" replace={true} />
+                ) : (
+                  <Home />
+                )
+              ) : (
+                <div className="container" style={{ padding: '50px 0 100px 0' }}>
+                  <Auth
+                    supabaseClient={supabase}
+                    appearance={{ theme: ThemeSupa }}
+                    providers={['google', 'github']}
+                    redirectTo={`${window.location.origin}/`}
                   />
-                  <Route 
-                    path="/profile" 
-                    element={<ProtectedRoute><MobileLayout><Profile /></MobileLayout></ProtectedRoute>} 
-                  />
-                  <Route 
-                    path="/settings" 
-                    element={<ProtectedRoute><MobileLayout><SettingsPage /></MobileLayout></ProtectedRoute>} 
-                  />
-                  <Route 
-                    path="/dashboard" 
-                    element={<ProtectedRoute><MobileLayout><div className="container mx-auto py-6"><PatientDashboard /></div></MobileLayout></ProtectedRoute>} 
-                  />
-                  <Route 
-                    path="/wallet" 
-                    element={<ProtectedRoute><MobileLayout><div className="container mx-auto py-6"><div><h1 className="text-2xl font-bold mb-6">Wallet</h1><p>Payment methods and wallet features coming soon...</p></div></div></MobileLayout></ProtectedRoute>} 
-                  />
-                  <Route 
-                    path="/testing" 
-                    element={<ProtectedRoute><MobileLayout><Testing /></MobileLayout></ProtectedRoute>} 
-                  />
-                  <Route 
-                    path="/notifications" 
-                    element={<ProtectedRoute><MobileLayout><NotificationsPage /></MobileLayout></ProtectedRoute>} 
-                  />
-                  <Route 
-                    path="/chat" 
-                    element={<ProtectedRoute><MobileLayout><Chat /></MobileLayout></ProtectedRoute>} 
-                  />
-                  <Route 
-                    path="/symptoms" 
-                    element={<ProtectedRoute><MobileLayout><SymptomsForm /></MobileLayout></ProtectedRoute>} 
-                  />
-                  <Route 
-                    path="/search" 
-                    element={<ProtectedRoute><MobileLayout><SearchPage /></MobileLayout></ProtectedRoute>} 
-                  />
-                  <Route 
-                    path="/provider/:id" 
-                    element={<ProtectedRoute><MobileLayout><ProviderDetail /></MobileLayout></ProtectedRoute>} 
-                  />
-                  <Route 
-                    path="/appointments" 
-                    element={<ProtectedRoute><MobileLayout><Appointments /></MobileLayout></ProtectedRoute>} 
-                  />
-                  
-                  {/* Payment Processing Routes */}
-                  <Route 
-                    path="/payment-processing" 
-                    element={<ProtectedRoute><MobileLayout><PaymentProcessing /></MobileLayout></ProtectedRoute>} 
-                  />
-                  
-                  {/* Video Consultation Routes */}
-                  <Route 
-                    path="/video-consultations" 
-                    element={<ProtectedRoute><MobileLayout><VideoConsultations /></MobileLayout></ProtectedRoute>} 
-                  />
-                  <Route 
-                    path="/video-dashboard" 
-                    element={<ProtectedRoute><MobileLayout><VideoConsultationDashboard /></MobileLayout></ProtectedRoute>} 
-                  />
-                  <Route 
-                    path="/video/:roomUrl" 
-                    element={<ProtectedRoute><VideoCall /></ProtectedRoute>} 
-                  />
-                  
-                  {/* Role-specific routes */}
-                  <Route 
-                    path="/provider-dashboard" 
-                    element={
-                      <RoleProtectedRoute allowedRoles={['health_personnel']}>
-                        <MobileLayout>
-                          <ProviderDashboard />
-                        </MobileLayout>
-                      </RoleProtectedRoute>
-                    } 
-                  />
-                  
-                  <Route 
-                    path="/healthcare-application" 
-                    element={
-                      <ProtectedRoute>
-                        <MobileLayout>
-                          <HealthcareApplication />
-                        </MobileLayout>
-                      </ProtectedRoute>
-                    } 
-                  />
-                  
-                  <Route 
-                    path="/application-status" 
-                    element={
-                      <ProtectedRoute>
-                        <MobileLayout>
-                          <ApplicationStatus />
-                        </MobileLayout>
-                      </ProtectedRoute>
-                    } 
-                  />
-                  
-                  {/* Admin routes */}
-                  <Route 
-                    path="/admin-dashboard/*" 
-                    element={
-                      <RoleProtectedRoute allowedRoles={['admin']}>
-                        <MobileLayout>
-                          <div className="container py-8">
-                            <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-                            <p className="mt-4">You have access to admin features.</p>
-                          </div>
-                        </MobileLayout>
-                      </RoleProtectedRoute>
-                    } 
-                  />
-                  
-                  {/* Institution admin routes */}
-                  <Route 
-                    path="/institution-dashboard/*" 
-                    element={
-                      <RoleProtectedRoute allowedRoles={['institution_admin']}>
-                        <MobileLayout>
-                          <div className="container py-8">
-                            <h1 className="text-3xl font-bold">Institution Dashboard</h1>
-                            <p className="mt-4">You have access to institution management features.</p>
-                          </div>
-                        </MobileLayout>
-                      </RoleProtectedRoute>
-                    } 
-                  />
-                  <Route 
-                    path="/medical-records" 
-                    element={<ProtectedRoute><MobileLayout><MedicalRecords /></MobileLayout></ProtectedRoute>} 
-                  />
-                  <Route 
-                    path="/health-dashboard" 
-                    element={<ProtectedRoute><MobileLayout><HealthDashboard /></MobileLayout></ProtectedRoute>} 
-                  />
-                  <Route 
-                    path="/pharmacy-inventory" 
-                    element={
-                      <RoleProtectedRoute allowedRoles={['health_personnel']}>
-                        <MobileLayout>
-                          <PharmacyInventory />
-                        </MobileLayout>
-                      </RoleProtectedRoute>
-                    } 
-                  />
-                  
-                  {/* Catch all route */}
-                  <Route path="*" element={<Navigate to="/home" />} />
-                </Routes>
-              </Router>
-            </SearchProvider>
-          </UserRolesProvider>
-        </AuthProvider>
-      </ThemeProvider>
-    </AppErrorBoundary>
+                </div>
+              )
+            }
+          />
+          <Route
+            path="/account"
+            element={
+              !session ? (
+                <Navigate to="/" replace={true} />
+              ) : (
+                <Account key={session.user.id} session={session} />
+              )
+            }
+          />
+          <Route
+            path="/profile-setup"
+            element={
+              !session ? (
+                <Navigate to="/" replace={true} />
+              ) : (
+                <ProfileSetup session={session} />
+              )
+            }
+          />
+          <Route
+            path="/video-dashboard"
+            element={
+              !session ? (
+                <Navigate to="/" replace={true} />
+              ) : (
+                <VideoDashboard session={session} />
+              )
+            }
+          />
+          <Route
+            path="/appointments"
+            element={
+              !session ? (
+                <Navigate to="/" replace={true} />
+              ) : (
+                <Appointments session={session} />
+              )
+            }
+          />
+           <Route
+            path="/healthcare-professionals"
+            element={
+              !session ? (
+                <Navigate to="/" replace={true} />
+              ) : (
+                <HealthcareProfessionals session={session} />
+              )
+            }
+          />
+          <Route
+            path="/admin-dashboard"
+            element={
+              !session ? (
+                <Navigate to="/" replace={true} />
+              ) : (
+                <AdminDashboard session={session} />
+              )
+            }
+          />
+          <Route
+            path="/healthcare-institutions"
+            element={
+              !session ? (
+                <Navigate to="/" replace={true} />
+              ) : (
+                <HealthcareInstitutions session={session} />
+              )
+            }
+          />
+          <Route
+            path="/prescriptions"
+            element={
+              !session ? (
+                <Navigate to="/" replace={true} />
+              ) : (
+                <Prescriptions session={session} />
+              )
+            }
+          />
+          <Route
+            path="/symptoms"
+            element={
+              !session ? (
+                <Navigate to="/" replace={true} />
+              ) : (
+                <Symptoms session={session} />
+              )
+            }
+          />
+          <Route
+            path="/connections"
+            element={
+              !session ? (
+                <Navigate to="/" replace={true} />
+              ) : (
+                <Connections session={session} />
+              )
+            }
+          />
+          <Route
+            path="/chat/:connectionId"
+            element={
+              !session ? (
+                <Navigate to="/" replace={true} />
+              ) : (
+                <Chat session={session} />
+              )
+            }
+          />
+          
+          <Route path="/marketplace-users" element={<UserMarketplace />} />
+          
+        </Routes>
+      </Router>
+    </UserRolesProvider>
   );
-}
+};
 
 export default App;
