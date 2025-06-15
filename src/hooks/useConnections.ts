@@ -20,10 +20,10 @@ export const useConnections = () => {
         .from('user_connections')
         .select(`
           *,
-          patient:profiles!user_connections_patient_id_fkey(
+          patient:profiles!patient_id(
             id, first_name, last_name, avatar_url, email
           ),
-          provider:profiles!user_connections_provider_id_fkey(
+          provider:profiles!provider_id(
             id, first_name, last_name, avatar_url, specialty, email
           )
         `)
@@ -46,7 +46,7 @@ export const useConnections = () => {
         .from('primary_provider_assignments')
         .select(`
           *,
-          provider:profiles!primary_provider_assignments_provider_id_fkey(
+          provider:profiles!provider_id(
             id, first_name, last_name, avatar_url, specialty, email
           )
         `)
