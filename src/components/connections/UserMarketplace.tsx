@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useConnections } from '@/hooks/useConnections';
-import { useAuth } from '@/context/AuthContext';
+import { useSession } from '@supabase/auth-helpers-react';
 import { 
   Search, 
   MapPin, 
@@ -64,7 +63,7 @@ interface UserWithServices {
 }
 
 export const UserMarketplace = () => {
-  const { user } = useAuth();
+  const session = useSession();
   const { requestConnection, isRequestingConnection } = useConnections();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
@@ -74,7 +73,7 @@ export const UserMarketplace = () => {
   const { data: users, isLoading } = useQuery({
     queryKey: ['marketplace-users', searchTerm, activeTab],
     queryFn: async () => {
-      if (!user) throw new Error('Not authenticated');
+      if (!session?.user) throw new Error('Not authenticated');
 
       let baseQuery = supabase
         .from('profiles')
@@ -91,7 +90,7 @@ export const UserMarketplace = () => {
           city,
           state
         `)
-        .neq('id', user.id);
+        .neq('id', session.user.id);
 
       // Filter by role if specific tab is selected
       if (activeTab !== 'all') {
@@ -162,20 +161,20 @@ export const UserMarketplace = () => {
 
       return combinedUsers;
     },
-    enabled: !!user
+    enabled: !!session?.user
   });
 
   const handleSendConnectionRequest = (targetUserId: string, targetRole: string) => {
-    if (!user) return;
+    if (!session?.user) return;
 
-    const isUserPatient = user.id;
+    const isUserPatient = session.user.id;
     const isTargetProvider = targetRole === 'health_personnel';
 
     requestConnection({
-      patient_id: isTargetProvider ? user.id : targetUserId,
-      provider_id: isTargetProvider ? targetUserId : user.id,
+      patient_id: isTargetProvider ? session.user.id : targetUserId,
+      provider_id: isTargetProvider ? targetUserId : session.user.id,
       connection_type: 'manual',
-      notes: `Connection request from ${user.email}`
+      notes: `Connection request from ${session.user.email}`
     });
   };
 

@@ -1,13 +1,13 @@
 
 import React from 'react';
 import { UserMarketplace } from '@/components/connections/UserMarketplace';
-import { useAuth } from '@/context/AuthContext';
+import { useSession } from '@supabase/auth-helpers-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 const UserMarketplacePage = () => {
-  const { user } = useAuth();
+  const session = useSession();
 
-  if (!user) {
+  if (!session?.user) {
     return (
       <div className="container mx-auto py-8">
         <Card className="max-w-md mx-auto">
