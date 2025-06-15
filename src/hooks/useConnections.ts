@@ -36,10 +36,13 @@ export const useConnections = () => {
       return (data || []).map(conn => {
         let correctedPatient: UserConnection['patient'] = null;
         let correctedProvider: UserConnection['provider'] = null;
+        // Defensive: Only set patient if not null and is valid object
         if (
+          conn &&
           conn.patient !== null &&
           typeof conn.patient === 'object' &&
-          'id' in conn.patient
+          'id' in conn.patient &&
+          (conn.patient as any).id !== null
         ) {
           correctedPatient = conn.patient as {
             id: string;
@@ -49,10 +52,13 @@ export const useConnections = () => {
             email?: string;
           };
         }
+        // Defensive: Only set provider if not null and is valid object
         if (
+          conn &&
           conn.provider !== null &&
           typeof conn.provider === 'object' &&
-          'id' in conn.provider
+          'id' in conn.provider &&
+          (conn.provider as any).id !== null
         ) {
           correctedProvider = conn.provider as {
             id: string;
@@ -98,7 +104,8 @@ export const useConnections = () => {
       if (
         data.provider !== null &&
         typeof data.provider === 'object' &&
-        'id' in data.provider
+        'id' in data.provider &&
+        (data.provider as any).id !== null
       ) {
         correctedProvider = data.provider as {
           id: string;
