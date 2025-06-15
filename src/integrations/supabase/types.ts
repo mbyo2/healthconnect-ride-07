@@ -145,6 +145,50 @@ export type Database = {
           },
         ]
       }
+      delivery_tracking: {
+        Row: {
+          created_at: string | null
+          delivery_time: string | null
+          driver_id: string | null
+          id: string
+          order_id: string
+          pickup_time: string | null
+          status: string
+          tracking_notes: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          delivery_time?: string | null
+          driver_id?: string | null
+          id?: string
+          order_id: string
+          pickup_time?: string | null
+          status?: string
+          tracking_notes?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          delivery_time?: string | null
+          driver_id?: string | null
+          id?: string
+          order_id?: string
+          pickup_time?: string | null
+          status?: string
+          tracking_notes?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "delivery_tracking_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       digital_signatures: {
         Row: {
           created_at: string | null
@@ -799,6 +843,103 @@ export type Database = {
           },
         ]
       }
+      location_updates: {
+        Row: {
+          delivery_id: string
+          id: string
+          latitude: number
+          longitude: number
+          notes: string | null
+          timestamp: string | null
+        }
+        Insert: {
+          delivery_id: string
+          id?: string
+          latitude: number
+          longitude: number
+          notes?: string | null
+          timestamp?: string | null
+        }
+        Update: {
+          delivery_id?: string
+          id?: string
+          latitude?: number
+          longitude?: number
+          notes?: string | null
+          timestamp?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "location_updates_delivery_id_fkey"
+            columns: ["delivery_id"]
+            isOneToOne: false
+            referencedRelation: "delivery_tracking"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      marketplace_products: {
+        Row: {
+          category: string
+          created_at: string | null
+          description: string | null
+          dosage: string
+          generic_name: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean
+          manufacturer: string | null
+          medication_name: string
+          pharmacy_id: string
+          price: number
+          requires_prescription: boolean
+          stock_quantity: number
+          updated_at: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          description?: string | null
+          dosage: string
+          generic_name?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          manufacturer?: string | null
+          medication_name: string
+          pharmacy_id: string
+          price: number
+          requires_prescription?: boolean
+          stock_quantity?: number
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          description?: string | null
+          dosage?: string
+          generic_name?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          manufacturer?: string | null
+          medication_name?: string
+          pharmacy_id?: string
+          price?: number
+          requires_prescription?: boolean
+          stock_quantity?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "marketplace_products_pharmacy_id_fkey"
+            columns: ["pharmacy_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       medical_records: {
         Row: {
           created_at: string | null
@@ -1061,6 +1202,114 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_items: {
+        Row: {
+          created_at: string | null
+          id: string
+          order_id: string
+          product_id: string
+          quantity: number
+          total_price: number
+          unit_price: number
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          order_id: string
+          product_id: string
+          quantity: number
+          total_price: number
+          unit_price: number
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          order_id?: string
+          product_id?: string
+          quantity?: number
+          total_price?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "marketplace_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          actual_delivery_time: string | null
+          created_at: string | null
+          delivery_address: string
+          delivery_instructions: string | null
+          delivery_phone: string
+          estimated_delivery_time: string | null
+          id: string
+          patient_id: string
+          pharmacy_id: string | null
+          prescription_id: string | null
+          status: string
+          total_amount: number
+          updated_at: string | null
+        }
+        Insert: {
+          actual_delivery_time?: string | null
+          created_at?: string | null
+          delivery_address: string
+          delivery_instructions?: string | null
+          delivery_phone: string
+          estimated_delivery_time?: string | null
+          id?: string
+          patient_id: string
+          pharmacy_id?: string | null
+          prescription_id?: string | null
+          status?: string
+          total_amount: number
+          updated_at?: string | null
+        }
+        Update: {
+          actual_delivery_time?: string | null
+          created_at?: string | null
+          delivery_address?: string
+          delivery_instructions?: string | null
+          delivery_phone?: string
+          estimated_delivery_time?: string | null
+          id?: string
+          patient_id?: string
+          pharmacy_id?: string | null
+          prescription_id?: string | null
+          status?: string
+          total_amount?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_pharmacy_id_fkey"
+            columns: ["pharmacy_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_prescription_id_fkey"
+            columns: ["prescription_id"]
+            isOneToOne: false
+            referencedRelation: "prescriptions"
             referencedColumns: ["id"]
           },
         ]

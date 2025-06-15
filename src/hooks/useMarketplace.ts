@@ -16,7 +16,7 @@ export const useMarketplace = () => {
     queryKey: ['marketplace-products'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('marketplace_products')
+        .from('marketplace_products' as any)
         .select(`
           *,
           pharmacy:healthcare_institutions!pharmacy_id(
@@ -38,7 +38,7 @@ export const useMarketplace = () => {
       if (!user) throw new Error('Not authenticated');
 
       const { data, error } = await supabase
-        .from('orders')
+        .from('orders' as any)
         .select(`
           *,
           order_items(*,
@@ -139,7 +139,7 @@ export const useMarketplace = () => {
 
       // Create order
       const { data: order, error: orderError } = await supabase
-        .from('orders')
+        .from('orders' as any)
         .insert({
           patient_id: user.id,
           pharmacy_id: orderData.pharmacy_id,
@@ -165,7 +165,7 @@ export const useMarketplace = () => {
       }));
 
       const { error: itemsError } = await supabase
-        .from('order_items')
+        .from('order_items' as any)
         .insert(orderItems);
 
       if (itemsError) throw itemsError;

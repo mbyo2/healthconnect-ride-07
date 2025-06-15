@@ -17,7 +17,7 @@ export interface UserConnection {
     last_name?: string;
     avatar_url?: string;
     email?: string;
-  };
+  } | null;
   provider?: {
     id: string;
     first_name?: string;
@@ -25,7 +25,7 @@ export interface UserConnection {
     avatar_url?: string;
     specialty?: string;
     email?: string;
-  };
+  } | null;
 }
 
 export interface PrimaryProviderAssignment {
@@ -44,7 +44,7 @@ export interface PrimaryProviderAssignment {
     avatar_url?: string;
     specialty?: string;
     email?: string;
-  };
+  } | null;
 }
 
 export interface ConnectionRequest {

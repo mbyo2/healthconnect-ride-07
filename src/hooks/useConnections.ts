@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -36,10 +37,10 @@ export const useConnections = () => {
         ...conn,
         patient: conn.patient && typeof conn.patient === 'object' && 'id' in conn.patient 
           ? conn.patient 
-          : undefined,
+          : null,
         provider: conn.provider && typeof conn.provider === 'object' && 'id' in conn.provider 
           ? conn.provider 
-          : undefined
+          : null
       })) as UserConnection[];
     },
     enabled: !!user
@@ -71,7 +72,7 @@ export const useConnections = () => {
         ...data,
         provider: data.provider && typeof data.provider === 'object' && 'id' in data.provider 
           ? data.provider 
-          : undefined
+          : null
       } as PrimaryProviderAssignment;
     },
     enabled: !!user
