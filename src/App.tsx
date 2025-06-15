@@ -9,6 +9,7 @@ import Home from '@/pages/Home';
 import Appointments from '@/pages/Appointments';
 import AdminDashboard from '@/pages/AdminDashboard';
 import Connections from '@/pages/Connections';
+import { AuthProvider } from '@/context/AuthContext';
 import { UserRolesProvider } from '@/context/UserRolesContext';
 import { ProfileSetup } from '@/components/auth/ProfileSetup';
 import UserMarketplace from "@/pages/UserMarketplace";
@@ -122,9 +123,11 @@ const AppContent = () => {
 const App = () => {
   return (
     <SessionContextProvider supabaseClient={supabase}>
-      <UserRolesProvider>
-        <AppContent />
-      </UserRolesProvider>
+      <AuthProvider>
+        <UserRolesProvider>
+          <AppContent />
+        </UserRolesProvider>
+      </AuthProvider>
     </SessionContextProvider>
   );
 };
