@@ -9,6 +9,12 @@ import Home from '@/pages/Home';
 import Appointments from '@/pages/Appointments';
 import AdminDashboard from '@/pages/AdminDashboard';
 import Connections from '@/pages/Connections';
+import Chat from '@/pages/Chat';
+import Prescriptions from '@/pages/Prescriptions';
+import Symptoms from '@/pages/Symptoms';
+import HealthcareProfessionals from '@/pages/HealthcareProfessionals';
+import HealthcareInstitutions from '@/pages/HealthcareInstitutions';
+import VideoDashboard from '@/pages/VideoDashboard';
 import { AuthProvider } from '@/context/AuthContext';
 import { UserRolesProvider } from '@/context/UserRolesContext';
 import { ProfileSetup } from '@/components/auth/ProfileSetup';
@@ -111,6 +117,54 @@ const AppContent = () => {
               <Navigate to="/" replace={true} />
             ) : (
               <Connections />
+            )
+          }
+        />
+        <Route
+          path="/chat"
+          element={
+            !session ? (
+              <Navigate to="/" replace={true} />
+            ) : (
+              <Chat />
+            )
+          }
+        />
+        <Route
+          path="/prescriptions"
+          element={
+            !session ? (
+              <Navigate to="/" replace={true} />
+            ) : (
+              <Prescriptions />
+            )
+          }
+        />
+        <Route
+          path="/symptoms"
+          element={
+            !session ? (
+              <Navigate to="/" replace={true} />
+            ) : (
+              <Symptoms />
+            )
+          }
+        />
+        <Route
+          path="/healthcare-professionals"
+          element={<HealthcareProfessionals />}
+        />
+        <Route
+          path="/healthcare-institutions"
+          element={<HealthcareInstitutions />}
+        />
+        <Route
+          path="/video-dashboard"
+          element={
+            !session ? (
+              <Navigate to="/" replace={true} />
+            ) : (
+              <VideoDashboard session={session} />
             )
           }
         />
