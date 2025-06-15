@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -36,10 +35,10 @@ export const useConnections = () => {
       // Transform the data to handle potential query errors and null safety
       return (data || []).map(conn => ({
         ...conn,
-        patient: conn.patient && typeof conn.patient === 'object' && 'id' in conn.patient && conn.patient !== null
+        patient: conn.patient && conn.patient !== null && typeof conn.patient === 'object' && 'id' in conn.patient
           ? conn.patient as { id: string; first_name?: string; last_name?: string; avatar_url?: string; email?: string; }
           : null,
-        provider: conn.provider && typeof conn.provider === 'object' && 'id' in conn.provider && conn.provider !== null
+        provider: conn.provider && conn.provider !== null && typeof conn.provider === 'object' && 'id' in conn.provider
           ? conn.provider as { id: string; first_name?: string; last_name?: string; avatar_url?: string; specialty?: string; email?: string; }
           : null
       })) as UserConnection[];
@@ -71,7 +70,7 @@ export const useConnections = () => {
       // Transform the data to handle potential query errors and null safety
       return {
         ...data,
-        provider: data.provider && typeof data.provider === 'object' && 'id' in data.provider && data.provider !== null
+        provider: data.provider && data.provider !== null && typeof data.provider === 'object' && 'id' in data.provider
           ? data.provider as { id: string; first_name?: string; last_name?: string; avatar_url?: string; specialty?: string; email?: string; }
           : null
       } as PrimaryProviderAssignment;
