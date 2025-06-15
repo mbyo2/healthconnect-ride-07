@@ -34,10 +34,10 @@ export const useConnections = () => {
       // Transform the data to handle potential query errors and null safety
       return (data || []).map(conn => ({
         ...conn,
-        patient: conn.patient && typeof conn.patient === 'object' && 'id' in conn.patient 
+        patient: conn.patient && typeof conn.patient === 'object' && 'id' in conn.patient && conn.patient !== null
           ? conn.patient as { id: string; first_name?: string; last_name?: string; avatar_url?: string; email?: string; }
           : null,
-        provider: conn.provider && typeof conn.provider === 'object' && 'id' in conn.provider 
+        provider: conn.provider && typeof conn.provider === 'object' && 'id' in conn.provider && conn.provider !== null
           ? conn.provider as { id: string; first_name?: string; last_name?: string; avatar_url?: string; specialty?: string; email?: string; }
           : null
       })) as UserConnection[];
@@ -69,7 +69,7 @@ export const useConnections = () => {
       // Transform the data to handle potential query errors and null safety
       return {
         ...data,
-        provider: data.provider && typeof data.provider === 'object' && 'id' in data.provider 
+        provider: data.provider && typeof data.provider === 'object' && 'id' in data.provider && data.provider !== null
           ? data.provider as { id: string; first_name?: string; last_name?: string; avatar_url?: string; specialty?: string; email?: string; }
           : null
       } as PrimaryProviderAssignment;
