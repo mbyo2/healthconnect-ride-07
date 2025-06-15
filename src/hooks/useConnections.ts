@@ -30,7 +30,17 @@ export const useConnections = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data as UserConnection[];
+      
+      // Transform the data to handle potential query errors
+      return (data || []).map(conn => ({
+        ...conn,
+        patient: conn.patient && typeof conn.patient === 'object' && 'id' in conn.patient 
+          ? conn.patient 
+          : undefined,
+        provider: conn.provider && typeof conn.provider === 'object' && 'id' in conn.provider 
+          ? conn.provider 
+          : undefined
+      })) as UserConnection[];
     },
     enabled: !!user
   });
@@ -53,7 +63,16 @@ export const useConnections = () => {
         .maybeSingle();
 
       if (error) throw error;
-      return data as PrimaryProviderAssignment | null;
+      
+      if (!data) return null;
+      
+      // Transform the data to handle potential query errors
+      return {
+        ...data,
+        provider: data.provider && typeof data.provider === 'object' && 'id' in data.provider 
+          ? data.provider 
+          : undefined
+      } as PrimaryProviderAssignment;
     },
     enabled: !!user
   });
