@@ -2,12 +2,13 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/context/AuthContext';
+import { useSession } from '@supabase/auth-helpers-react';
 import { UserConnection, PrimaryProviderAssignment, ConnectionRequest } from '@/types/connections';
 import { toast } from 'sonner';
 
 export const useConnections = () => {
-  const { user } = useAuth();
+  const session = useSession();
+  const user = session?.user;
   const queryClient = useQueryClient();
 
   // Get all connections for current user

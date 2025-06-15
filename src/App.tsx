@@ -74,7 +74,7 @@ const App = () => {
               !session ? (
                 <Navigate to="/" replace={true} />
               ) : (
-                <ProfileSetup session={session} />
+                <ProfileSetup />
               )
             }
           />
