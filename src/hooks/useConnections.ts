@@ -32,7 +32,7 @@ export const useConnections = () => {
 
       if (error) throw error;
       
-      // Transform the data to handle potential query errors
+      // Transform the data to handle potential query errors and null safety
       return (data || []).map(conn => ({
         ...conn,
         patient: conn.patient && typeof conn.patient === 'object' && 'id' in conn.patient 
@@ -67,7 +67,7 @@ export const useConnections = () => {
       
       if (!data) return null;
       
-      // Transform the data to handle potential query errors
+      // Transform the data to handle potential query errors and null safety
       return {
         ...data,
         provider: data.provider && typeof data.provider === 'object' && 'id' in data.provider 
