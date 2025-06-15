@@ -17,7 +17,8 @@ import {
   Activity,
   Sparkles,
   Video,
-  CreditCard
+  CreditCard,
+  Users
 } from 'lucide-react';
 
 const getIcon = (iconName: string) => {
@@ -29,7 +30,8 @@ const getIcon = (iconName: string) => {
     Heart,
     Shield,
     Video,
-    CreditCard
+    CreditCard,
+    Users
   };
   return icons[iconName as keyof typeof icons] || Circle;
 };
@@ -116,6 +118,17 @@ export const PatientWorkflow = () => {
               <Button
                 variant="outline"
                 className="flex items-center justify-start gap-2 h-auto py-4"
+                onClick={() => handleNavigation('/connections')}
+              >
+                <Users className="h-5 w-5" />
+                <div className="text-left">
+                  <div className="font-medium">Connect with Providers</div>
+                  <div className="text-xs text-muted-foreground">Build your healthcare network</div>
+                </div>
+              </Button>
+              <Button
+                variant="outline"
+                className="flex items-center justify-start gap-2 h-auto py-4"
                 onClick={() => handleNavigation('/appointments')}
               >
                 <Calendar className="h-5 w-5" />
@@ -133,17 +146,6 @@ export const PatientWorkflow = () => {
                 <div className="text-left">
                   <div className="font-medium">Video Consultation</div>
                   <div className="text-xs text-muted-foreground">Connect via video call</div>
-                </div>
-              </Button>
-              <Button
-                variant="outline"
-                className="flex items-center justify-start gap-2 h-auto py-4"
-                onClick={() => handleNavigation('/payment-processing')}
-              >
-                <CreditCard className="h-5 w-5" />
-                <div className="text-left">
-                  <div className="font-medium">Payment Setup</div>
-                  <div className="text-xs text-muted-foreground">Secure payment methods</div>
                 </div>
               </Button>
               <Button

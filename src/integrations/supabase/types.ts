@@ -1230,6 +1230,39 @@ export type Database = {
           },
         ]
       }
+      primary_provider_assignments: {
+        Row: {
+          assigned_at: string | null
+          assigned_by: string | null
+          created_at: string | null
+          id: string
+          notes: string | null
+          patient_id: string
+          provider_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          assigned_at?: string | null
+          assigned_by?: string | null
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          patient_id: string
+          provider_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          assigned_at?: string | null
+          assigned_by?: string | null
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          patient_id?: string
+          provider_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           accepted_insurances: string[] | null
@@ -1560,6 +1593,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_connections: {
+        Row: {
+          approved_at: string | null
+          connection_type: string
+          created_at: string | null
+          id: string
+          notes: string | null
+          patient_id: string
+          provider_id: string
+          requested_at: string | null
+          requested_by: string | null
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          approved_at?: string | null
+          connection_type?: string
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          patient_id: string
+          provider_id: string
+          requested_at?: string | null
+          requested_by?: string | null
+          status?: string
+          updated_at?: string | null
+        }
+        Update: {
+          approved_at?: string | null
+          connection_type?: string
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          patient_id?: string
+          provider_id?: string
+          requested_at?: string | null
+          requested_by?: string | null
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       vaccination_records: {
         Row: {

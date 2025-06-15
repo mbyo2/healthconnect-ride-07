@@ -36,7 +36,8 @@ export const useProfileCompletion = () => {
         { data: appointments },
         { data: healthMetrics },
         { data: insuranceInfo },
-        { data: videoConsultations }
+        { data: videoConsultations },
+        { data: connections }
       ] = await Promise.all([
         supabase
           .from('appointments')
@@ -57,6 +58,12 @@ export const useProfileCompletion = () => {
           .from('video_consultations')
           .select('id')
           .eq('patient_id', user.id)
+          .limit(1),
+        supabase
+          .from('user_connections')
+          .select('id')
+          .eq('patient_id', user.id)
+          .eq('status', 'approved')
           .limit(1)
       ]);
 
@@ -78,6 +85,15 @@ export const useProfileCompletion = () => {
           icon: 'Shield',
           route: '/dashboard',
           completed: !!insuranceInfo?.length,
+          required: false
+        },
+        {
+          id: 'connections',
+          title: 'Connect with Providers',
+          description: 'Build your healthcare network by connecting with providers',
+          icon: 'Users',
+          route: '/connections',
+          completed: !!connections?.length,
           required: false
         },
         {
