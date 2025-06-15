@@ -32,43 +32,43 @@ export const useConnections = () => {
 
       if (error) throw error;
 
-      // Transform the data to handle potential query errors and null safety
+      // Fix: Add explicit check that patient and provider are not null before spreading
       return (data || []).map(conn => {
         let correctedPatient: UserConnection['patient'] = null;
         let correctedProvider: UserConnection['provider'] = null;
         if (
           conn &&
-          conn.patient &&
+          conn.patient !== null &&
           typeof conn.patient === 'object' &&
           'id' in conn.patient &&
           (conn.patient as any).id !== null
         ) {
           correctedPatient = {
-            ...(conn.patient ?? {})
-          } as {
-            id: string;
-            first_name?: string;
-            last_name?: string;
-            avatar_url?: string;
-            email?: string;
+            ...(conn.patient as {
+              id: string;
+              first_name?: string;
+              last_name?: string;
+              avatar_url?: string;
+              email?: string;
+            })
           };
         }
         if (
           conn &&
-          conn.provider &&
+          conn.provider !== null &&
           typeof conn.provider === 'object' &&
           'id' in conn.provider &&
           (conn.provider as any).id !== null
         ) {
           correctedProvider = {
-            ...(conn.provider ?? {})
-          } as {
-            id: string;
-            first_name?: string;
-            last_name?: string;
-            avatar_url?: string;
-            specialty?: string;
-            email?: string;
+            ...(conn.provider as {
+              id: string;
+              first_name?: string;
+              last_name?: string;
+              avatar_url?: string;
+              specialty?: string;
+              email?: string;
+            })
           };
         }
         return {
@@ -105,20 +105,20 @@ export const useConnections = () => {
       let correctedProvider: PrimaryProviderAssignment['provider'] = null;
       if (
         data &&
-        data.provider &&
+        data.provider !== null &&
         typeof data.provider === 'object' &&
         'id' in data.provider &&
         (data.provider as any).id !== null
       ) {
         correctedProvider = {
-          ...(data.provider ?? {})
-        } as {
-          id: string;
-          first_name?: string;
-          last_name?: string;
-          avatar_url?: string;
-          specialty?: string;
-          email?: string;
+          ...(data.provider as {
+            id: string;
+            first_name?: string;
+            last_name?: string;
+            avatar_url?: string;
+            specialty?: string;
+            email?: string;
+          })
         };
       }
 
