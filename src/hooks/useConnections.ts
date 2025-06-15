@@ -31,17 +31,44 @@ export const useConnections = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      
+
       // Transform the data to handle potential query errors and null safety
-      return (data || []).map(conn => ({
-        ...conn,
-        patient: conn.patient && conn.patient !== null && typeof conn.patient === 'object' && 'id' in conn.patient
-          ? conn.patient as { id: string; first_name?: string; last_name?: string; avatar_url?: string; email?: string; }
-          : null,
-        provider: conn.provider && conn.provider !== null && typeof conn.provider === 'object' && 'id' in conn.provider
-          ? conn.provider as { id: string; first_name?: string; last_name?: string; avatar_url?: string; specialty?: string; email?: string; }
-          : null
-      })) as UserConnection[];
+      return (data || []).map(conn => {
+        let correctedPatient: UserConnection['patient'] = null;
+        let correctedProvider: UserConnection['provider'] = null;
+        if (
+          conn.patient !== null &&
+          typeof conn.patient === 'object' &&
+          'id' in conn.patient
+        ) {
+          correctedPatient = conn.patient as {
+            id: string;
+            first_name?: string;
+            last_name?: string;
+            avatar_url?: string;
+            email?: string;
+          };
+        }
+        if (
+          conn.provider !== null &&
+          typeof conn.provider === 'object' &&
+          'id' in conn.provider
+        ) {
+          correctedProvider = conn.provider as {
+            id: string;
+            first_name?: string;
+            last_name?: string;
+            avatar_url?: string;
+            specialty?: string;
+            email?: string;
+          };
+        }
+        return {
+          ...conn,
+          patient: correctedPatient,
+          provider: correctedProvider
+        };
+      }) as UserConnection[];
     },
     enabled: !!user
   });
@@ -64,15 +91,28 @@ export const useConnections = () => {
         .maybeSingle();
 
       if (error) throw error;
-      
+
       if (!data) return null;
-      
-      // Transform the data to handle potential query errors and null safety
+
+      let correctedProvider: PrimaryProviderAssignment['provider'] = null;
+      if (
+        data.provider !== null &&
+        typeof data.provider === 'object' &&
+        'id' in data.provider
+      ) {
+        correctedProvider = data.provider as {
+          id: string;
+          first_name?: string;
+          last_name?: string;
+          avatar_url?: string;
+          specialty?: string;
+          email?: string;
+        };
+      }
+
       return {
         ...data,
-        provider: data.provider && data.provider !== null && typeof data.provider === 'object' && 'id' in data.provider
-          ? data.provider as { id: string; first_name?: string; last_name?: string; avatar_url?: string; specialty?: string; email?: string; }
-          : null
+        provider: correctedProvider
       } as PrimaryProviderAssignment;
     },
     enabled: !!user
