@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -37,10 +38,10 @@ export const useConnections = () => {
         let correctedPatient: UserConnection['patient'] = null;
         let correctedProvider: UserConnection['provider'] = null;
         
-        // Type guard for patient with proper null check
-        if (conn.patient && typeof conn.patient === 'object' && conn.patient !== null && 'id' in conn.patient) {
+        // Type guard for patient with comprehensive null check
+        if (conn.patient && typeof conn.patient === 'object' && conn.patient !== null) {
           const patientData = conn.patient as any;
-          if (patientData?.id) {
+          if (patientData && typeof patientData === 'object' && patientData.id) {
             correctedPatient = {
               id: patientData.id,
               first_name: patientData.first_name || undefined,
@@ -51,10 +52,10 @@ export const useConnections = () => {
           }
         }
         
-        // Type guard for provider with proper null check
-        if (conn.provider && typeof conn.provider === 'object' && conn.provider !== null && 'id' in conn.provider) {
+        // Type guard for provider with comprehensive null check
+        if (conn.provider && typeof conn.provider === 'object' && conn.provider !== null) {
           const providerData = conn.provider as any;
-          if (providerData?.id) {
+          if (providerData && typeof providerData === 'object' && providerData.id) {
             correctedProvider = {
               id: providerData.id,
               first_name: providerData.first_name || undefined,
@@ -99,10 +100,10 @@ export const useConnections = () => {
 
       let correctedProvider: PrimaryProviderAssignment['provider'] = null;
       
-      // Type guard for provider with proper null check
-      if (data.provider && typeof data.provider === 'object' && data.provider !== null && 'id' in data.provider) {
+      // Type guard for provider with comprehensive null check
+      if (data.provider && typeof data.provider === 'object' && data.provider !== null) {
         const providerData = data.provider as any;
-        if (providerData?.id) {
+        if (providerData && typeof providerData === 'object' && providerData.id) {
           correctedProvider = {
             id: providerData.id,
             first_name: providerData.first_name || undefined,
