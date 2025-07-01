@@ -37,8 +37,8 @@ export const useConnections = () => {
         let correctedPatient: UserConnection['patient'] = null;
         let correctedProvider: UserConnection['provider'] = null;
         
-        // Type guard for patient
-        if (conn.patient && typeof conn.patient === 'object' && 'id' in conn.patient && conn.patient.id) {
+        // Type guard for patient with proper null check
+        if (conn.patient && typeof conn.patient === 'object' && 'id' in conn.patient && conn.patient.id && conn.patient !== null) {
           const patient = conn.patient as any;
           correctedPatient = {
             id: patient.id,
@@ -49,8 +49,8 @@ export const useConnections = () => {
           };
         }
         
-        // Type guard for provider
-        if (conn.provider && typeof conn.provider === 'object' && 'id' in conn.provider && conn.provider.id) {
+        // Type guard for provider with proper null check
+        if (conn.provider && typeof conn.provider === 'object' && 'id' in conn.provider && conn.provider.id && conn.provider !== null) {
           const provider = conn.provider as any;
           correctedProvider = {
             id: provider.id,
@@ -95,8 +95,8 @@ export const useConnections = () => {
 
       let correctedProvider: PrimaryProviderAssignment['provider'] = null;
       
-      // Type guard for provider
-      if (data.provider && typeof data.provider === 'object' && 'id' in data.provider && data.provider.id) {
+      // Type guard for provider with proper null check
+      if (data.provider && typeof data.provider === 'object' && 'id' in data.provider && data.provider.id && data.provider !== null) {
         const provider = data.provider as any;
         correctedProvider = {
           id: provider.id,
