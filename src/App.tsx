@@ -15,6 +15,12 @@ import Symptoms from '@/pages/Symptoms';
 import HealthcareProfessionals from '@/pages/HealthcareProfessionals';
 import HealthcareInstitutions from '@/pages/HealthcareInstitutions';
 import VideoDashboard from '@/pages/VideoDashboard';
+import Landing from '@/pages/Landing';
+import Profile from '@/pages/Profile';
+import Settings from '@/pages/Settings';
+import SearchPage from '@/pages/SearchPage';
+import Testing from '@/pages/Testing';
+import Documentation from '@/pages/Documentation';
 import { AuthProvider } from '@/context/AuthContext';
 import { UserRolesProvider } from '@/context/UserRolesContext';
 import { ProfileSetup } from '@/components/auth/ProfileSetup';
@@ -59,6 +65,31 @@ const AppContent = () => {
   return (
     <Router>
       <Routes>
+        {/* Public Routes */}
+        <Route path="/landing" element={<Landing />} />
+        <Route path="/healthcare-professionals" element={<HealthcareProfessionals />} />
+        <Route path="/healthcare-institutions" element={<HealthcareInstitutions />} />
+        
+        {/* Auth Route */}
+        <Route
+          path="/auth"
+          element={
+            session && session.user ? (
+              <Navigate to="/" replace={true} />
+            ) : (
+              <div className="container" style={{ padding: '50px 0 100px 0' }}>
+                <Auth
+                  supabaseClient={supabaseClient}
+                  appearance={{ theme: ThemeSupa }}
+                  providers={['google', 'github']}
+                  redirectTo={`${window.location.origin}/`}
+                />
+              </div>
+            )
+          }
+        />
+
+        {/* Main App Route */}
         <Route
           path="/"
           element={
@@ -80,6 +111,8 @@ const AppContent = () => {
             )
           }
         />
+
+        {/* Protected Routes */}
         <Route
           path="/profile-setup"
           element={
@@ -87,6 +120,36 @@ const AppContent = () => {
               <Navigate to="/" replace={true} />
             ) : (
               <ProfileSetup />
+            )
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            !session ? (
+              <Navigate to="/" replace={true} />
+            ) : (
+              <Profile />
+            )
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            !session ? (
+              <Navigate to="/" replace={true} />
+            ) : (
+              <Settings />
+            )
+          }
+        />
+        <Route
+          path="/search"
+          element={
+            !session ? (
+              <Navigate to="/" replace={true} />
+            ) : (
+              <SearchPage />
             )
           }
         />
@@ -151,20 +214,32 @@ const AppContent = () => {
           }
         />
         <Route
-          path="/healthcare-professionals"
-          element={<HealthcareProfessionals />}
-        />
-        <Route
-          path="/healthcare-institutions"
-          element={<HealthcareInstitutions />}
-        />
-        <Route
           path="/video-dashboard"
           element={
             !session ? (
               <Navigate to="/" replace={true} />
             ) : (
               <VideoDashboard session={session} />
+            )
+          }
+        />
+        <Route
+          path="/testing"
+          element={
+            !session ? (
+              <Navigate to="/" replace={true} />
+            ) : (
+              <Testing />
+            )
+          }
+        />
+        <Route
+          path="/documentation"
+          element={
+            !session ? (
+              <Navigate to="/" replace={true} />
+            ) : (
+              <Documentation />
             )
           }
         />

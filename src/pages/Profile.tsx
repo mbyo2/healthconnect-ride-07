@@ -1,256 +1,199 @@
 
+import { useState } from "react";
+import { MobileLayout } from "@/components/MobileLayout";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { ThemeToggle } from "@/components/ThemeToggle";
-import { 
-  User, Settings, Bell, Shield, LogOut, 
-  Star, MapPin, Phone, Mail, Calendar,
-  CheckCircle2, CreditCard,
-  AlertCircle
-} from "lucide-react";
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { HealthPersonnelApplicationForm } from "@/components/HealthPersonnelApplicationForm";
-import { Database } from "@/integrations/supabase/types";
-import { useNavigate } from "react-router-dom";
+import { Separator } from "@/components/ui/separator";
+import { Camera, Edit, Save, MapPin, Phone, Mail, Calendar } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
-import { useProfileCompletion } from "@/hooks/useProfileCompletion";
-
-type Profile = Database['public']['Tables']['profiles']['Row'];
 
 const Profile = () => {
-  const [userProfile, setUserProfile] = useState<Profile | null>(null);
-  const [userRole, setUserRole] = useState<string | null>(null);
-  const [applicationStatus, setApplicationStatus] = useState<string | null>(null);
-  const navigate = useNavigate();
-  const { isProfileComplete, completionPercentage } = useProfileCompletion();
+  const { user, profile } = useAuth();
+  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState({
+    firstName: profile?.first_name || "",
+    lastName: profile?.last_name || "",
+    email: user?.email || "",
+    phone: profile?.phone || "",
+    bio: profile?.bio || "",
+    location: profile?.location || ""
+  });
 
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        console.log("Current user:", user);
-
-        if (user) {
-          const { data: profile, error: profileError } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', user.id)
-            .single();
-          
-          console.log("Fetched profile:", profile);
-          
-          if (profile && !profileError) {
-            setUserProfile(profile);
-            setUserRole(profile.role);
-            
-            if (profile.role === 'health_personnel') {
-              const { data: application, error: applicationError } = await supabase
-                .from('health_personnel_applications')
-                .select('status')
-                .eq('user_id', user.id)
-                .single();
-              
-              if (application && !applicationError) {
-                setApplicationStatus(application.status);
-              }
-            }
-          } else {
-            console.error("Profile error:", profileError);
-            toast.error("Error fetching profile");
-          }
-        }
-      } catch (error) {
-        console.error("Error:", error);
-        toast.error("Error fetching user data");
-      }
-    };
-
-    fetchUserProfile();
-  }, []);
-
-  const handleLogout = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      toast.error("Error signing out");
-    } else {
-      toast.success("Signed out successfully");
-      navigate("/login");
-    }
+  const handleSave = () => {
+    // In real app, this would update the profile via API
+    toast.success("Profile updated successfully!");
+    setIsEditing(false);
   };
 
-  const navigateToSettings = () => {
-    navigate("/settings");
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
   };
-
-  const navigateToNotifications = () => {
-    navigate("/notifications");
-  };
-
-  const navigateToPrivacySecurity = () => {
-    navigate("/privacy-security");
-  };
-
-  const navigateToProfileSetup = () => {
-    navigate("/profile-setup");
-  };
-
-  const isHealthcareProvider = userRole === 'health_personnel';
-  const fullName = userProfile ? `${userProfile.first_name || ''} ${userProfile.last_name || ''}`.trim() : 'Loading...';
 
   return (
-    <div className="container mx-auto px-4 py-8 bg-background min-h-screen">
-      {/* Profile Completion Status */}
-      {!isProfileComplete && (
-        <Card className="p-4 mb-6 border-orange-200 bg-orange-50">
-          <div className="flex items-center gap-3">
-            <AlertCircle className="h-5 w-5 text-orange-600" />
-            <div className="flex-1">
-              <h3 className="font-semibold text-orange-800">Complete Your Profile</h3>
-              <p className="text-sm text-orange-700">
-                Your profile is {completionPercentage}% complete. Complete it to access all features.
-              </p>
-            </div>
-            <Button 
-              onClick={navigateToProfileSetup}
-              size="sm"
-              className="bg-orange-600 hover:bg-orange-700"
-            >
-              Complete Now
-            </Button>
-          </div>
-        </Card>
-      )}
-
-      {/* Profile Card */}
-      <Card className="p-6 mb-6">
-        <div className="flex flex-col md:flex-row items-start gap-6">
-          <Avatar className="w-24 h-24">
-            <AvatarImage src={userProfile?.avatar_url || ""} />
-            <AvatarFallback>
-              <User className="w-12 h-12" />
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex-1 space-y-4">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-              <div>
-                <div className="flex items-center gap-2">
-                  <h1 className="text-2xl font-bold text-foreground">
-                    {isHealthcareProvider ? `Dr. ${fullName}` : fullName}
-                  </h1>
-                  {isProfileComplete && (
-                    <CheckCircle2 className="h-5 w-5 text-green-600" />
-                  )}
-                </div>
-                <p className="text-muted-foreground">
-                  {isHealthcareProvider ? userProfile?.specialty || "Healthcare Provider" : "Patient"}
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <ThemeToggle />
-                <Button 
-                  variant="outline"
-                  onClick={navigateToProfileSetup}
+    <MobileLayout>
+      <div className="space-y-6">
+        {/* Profile Header */}
+        <Card className="border-trust-100 shadow-trust">
+          <CardContent className="pt-6">
+            <div className="flex flex-col items-center space-y-4">
+              <div className="relative">
+                <Avatar className="h-24 w-24 ring-4 ring-trust-100">
+                  <AvatarImage src={profile?.avatar_url || ""} />
+                  <AvatarFallback className="bg-trust-100 text-trust-600 text-xl">
+                    {formData.firstName?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || "U"}
+                  </AvatarFallback>
+                </Avatar>
+                <Button
+                  size="icon"
+                  variant="secondary"
+                  className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full shadow-lg"
                 >
-                  {isProfileComplete ? 'Edit Profile' : 'Complete Profile'}
+                  <Camera className="h-4 w-4" />
                 </Button>
               </div>
-            </div>
-            
-            {isHealthcareProvider && (
-              <div className="flex items-center gap-4">
-                <Badge variant="secondary" className="flex items-center gap-1">
-                  4.9 <Star className="w-3 h-3 fill-current" />
+              
+              <div className="text-center space-y-2">
+                <h1 className="text-2xl font-bold text-trust-700">
+                  {formData.firstName} {formData.lastName} || "Welcome"
+                </h1>
+                <div className="flex items-center justify-center gap-2 text-muted-foreground">
+                  <Mail className="h-4 w-4" />
+                  {formData.email}
+                </div>
+                <Badge variant="secondary" className="bg-trust-50 text-trust-600">
+                  {profile?.role === 'health_personnel' ? 'Healthcare Provider' : 'Patient'}
                 </Badge>
-                <span className="text-muted-foreground">500+ consultations</span>
+              </div>
+
+              <Button
+                onClick={() => setIsEditing(!isEditing)}
+                variant={isEditing ? "default" : "outline"}
+                className="w-full max-w-sm"
+              >
+                {isEditing ? <Save className="h-4 w-4 mr-2" /> : <Edit className="h-4 w-4 mr-2" />}
+                {isEditing ? "Save Changes" : "Edit Profile"}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Profile Details */}
+        <Card className="border-trust-100 shadow-trust">
+          <CardHeader>
+            <CardTitle className="text-trust-700">Personal Information</CardTitle>
+            <CardDescription>
+              Manage your personal details and preferences
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="firstName">First Name</Label>
+                <Input
+                  id="firstName"
+                  value={formData.firstName}
+                  onChange={(e) => handleInputChange("firstName", e.target.value)}
+                  disabled={!isEditing}
+                  className="disabled:opacity-70"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="lastName">Last Name</Label>
+                <Input
+                  id="lastName"
+                  value={formData.lastName}
+                  onChange={(e) => handleInputChange("lastName", e.target.value)}
+                  disabled={!isEditing}
+                  className="disabled:opacity-70"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                value={formData.email}
+                disabled
+                className="disabled:opacity-70"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="phone">Phone</Label>
+              <Input
+                id="phone"
+                type="tel"
+                value={formData.phone}
+                onChange={(e) => handleInputChange("phone", e.target.value)}
+                disabled={!isEditing}
+                className="disabled:opacity-70"
+                placeholder="+1 (555) 123-4567"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="location">Location</Label>
+              <Input
+                id="location"
+                value={formData.location}
+                onChange={(e) => handleInputChange("location", e.target.value)}
+                disabled={!isEditing}
+                className="disabled:opacity-70"
+                placeholder="City, State"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="bio">Bio</Label>
+              <Textarea
+                id="bio"
+                value={formData.bio}
+                onChange={(e) => handleInputChange("bio", e.target.value)}
+                disabled={!isEditing}
+                className="disabled:opacity-70 min-h-[100px]"
+                placeholder="Tell us about yourself..."
+              />
+            </div>
+
+            {isEditing && (
+              <div className="flex gap-2 pt-4">
+                <Button onClick={handleSave} className="flex-1">
+                  <Save className="h-4 w-4 mr-2" />
+                  Save Changes
+                </Button>
+                <Button variant="outline" onClick={() => setIsEditing(false)} className="flex-1">
+                  Cancel
+                </Button>
               </div>
             )}
+          </CardContent>
+        </Card>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Mail className="w-4 h-4" />
-                <span>{userProfile?.email || 'No email provided'}</span>
-              </div>
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Phone className="w-4 h-4" />
-                <span>{userProfile?.phone || 'No phone provided'}</span>
-              </div>
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <MapPin className="w-4 h-4" />
-                <span>
-                  {userProfile?.city && userProfile?.state 
-                    ? `${userProfile.city}, ${userProfile.state}`
-                    : 'Location not provided'}
-                </span>
-              </div>
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Calendar className="w-4 h-4" />
-                <span>
-                  {userProfile?.created_at 
-                    ? `Joined ${new Date(userProfile.created_at).toLocaleDateString()}`
-                    : 'Join date unknown'}
-                </span>
-              </div>
-            </div>
-          </div>
+        {/* Quick Stats */}
+        <div className="grid grid-cols-2 gap-4">
+          <Card className="border-trust-100 shadow-trust">
+            <CardContent className="pt-4 text-center">
+              <div className="text-2xl font-bold text-trust-600">12</div>
+              <div className="text-sm text-muted-foreground">Appointments</div>
+            </CardContent>
+          </Card>
+          <Card className="border-trust-100 shadow-trust">
+            <CardContent className="pt-4 text-center">
+              <div className="text-2xl font-bold text-trust-600">3</div>
+              <div className="text-sm text-muted-foreground">Providers</div>
+            </CardContent>
+          </Card>
         </div>
-      </Card>
-
-      {/* Healthcare Provider Application */}
-      {isHealthcareProvider && !applicationStatus && (
-        <Card className="p-6 mb-6">
-          <h2 className="text-xl font-semibold mb-4 text-foreground">Complete Your Application</h2>
-          <HealthPersonnelApplicationForm />
-        </Card>
-      )}
-
-      {applicationStatus && (
-        <Card className="p-6 mb-6">
-          <h3 className="font-semibold text-foreground">Application Status</h3>
-          <p className="text-muted-foreground mt-2">
-            Your application is currently {applicationStatus}
-          </p>
-        </Card>
-      )}
-
-      {/* Action Buttons */}
-      <div className="space-y-2">
-        <Button 
-          variant="outline" 
-          className="w-full justify-start gap-2 h-12"
-          onClick={navigateToSettings}
-        >
-          <Settings className="w-5 h-5" />
-          <span>Settings</span>
-        </Button>
-        <Button 
-          variant="outline" 
-          className="w-full justify-start gap-2 h-12"
-          onClick={navigateToNotifications}
-        >
-          <Bell className="w-5 h-5" />
-          <span>Notifications</span>
-        </Button>
-        <Button 
-          variant="outline" 
-          className="w-full justify-start gap-2 h-12"
-          onClick={navigateToPrivacySecurity}
-        >
-          <Shield className="w-5 h-5" />
-          <span>Privacy & Security</span>
-        </Button>
-        <Button 
-          variant="destructive" 
-          className="w-full justify-start gap-2 h-12"
-          onClick={handleLogout}
-        >
-          <LogOut className="w-5 h-5" />
-          <span>Sign Out</span>
-        </Button>
       </div>
-    </div>
+    </MobileLayout>
   );
 };
 

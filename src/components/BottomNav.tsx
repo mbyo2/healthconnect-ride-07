@@ -62,71 +62,128 @@ export function BottomNav() {
 
   // Memoize menu items to prevent unnecessary re-renders
   const menuItems = useMemo(() => [
-    { to: "/profile", label: "Profile" },
-    { to: "/testing", label: "Testing" },
-    { to: "/documentation", label: "Documentation" },
-    { to: "/settings", label: "Settings" }
+    { to: "/profile", label: "Profile", description: "Manage your personal information" },
+    { to: "/settings", label: "Settings", description: "App preferences and notifications" },
+    { to: "/prescriptions", label: "Prescriptions", description: "View and manage prescriptions" },
+    { to: "/connections", label: "Connections", description: "Healthcare provider network" },
+    { to: "/symptoms", label: "Symptoms", description: "Track and log symptoms" },
+    { to: "/testing", label: "Testing", description: "App testing and diagnostics" },
+    { to: "/documentation", label: "Documentation", description: "Help and support guides" }
   ], []);
   
   return (
-    <div className="fixed bottom-0 left-0 right-0 border-t bg-background/95 backdrop-blur-sm z-50 shadow-soft-blue">
-      <div className="flex items-center justify-evenly">
+    <div className="fixed bottom-0 left-0 right-0 z-50">
+      {/* Backdrop blur effect */}
+      <div className="absolute inset-0 bg-background/80 backdrop-blur-xl border-t border-trust-100" />
+      
+      {/* Navigation content */}
+      <div className="relative flex items-center justify-evenly h-16 px-2">
         {navItems.map((item, index) => (
           <Link 
             key={index}
             to={item.to}
             className={cn(
-              "flex flex-1 flex-col items-center justify-center py-3",
-              item.active ? "text-trust-500" : "text-muted-foreground"
+              "flex flex-1 flex-col items-center justify-center py-2 px-1 rounded-xl transition-all duration-300 ease-out group relative overflow-hidden",
+              item.active 
+                ? "text-trust-600 scale-105" 
+                : "text-muted-foreground hover:text-trust-500 hover:scale-105"
             )}
             {...touchFeedbackProps}
           >
+            {/* Active indicator background */}
+            {item.active && (
+              <div className="absolute inset-0 bg-trust-50 rounded-xl animate-in fade-in duration-300" />
+            )}
+            
+            {/* Icon container with animation */}
             <div className={cn(
-              "flex flex-col items-center justify-center relative",
-              item.active && "after:content-[''] after:absolute after:-bottom-1 after:w-1.5 after:h-1.5 after:bg-trust-500 after:rounded-full"
+              "relative flex flex-col items-center justify-center space-y-1 transition-transform duration-200",
+              item.active && "transform-gpu"
             )}>
-              {item.icon}
-              <span className="text-[10px] font-medium mt-0.5">{item.label}</span>
+              <div className={cn(
+                "p-1 rounded-lg transition-all duration-200",
+                item.active && "bg-trust-100/50"
+              )}>
+                {item.icon}
+              </div>
+              
+              {/* Label */}
+              <span className="text-[10px] font-medium leading-none tracking-wide">
+                {item.label}
+              </span>
+              
+              {/* Active indicator dot */}
+              {item.active && (
+                <div className="absolute -bottom-2 w-1 h-1 bg-trust-500 rounded-full animate-in zoom-in duration-200" />
+              )}
             </div>
           </Link>
         ))}
 
+        {/* Menu Sheet */}
         <Sheet>
           <SheetTrigger asChild>
             <button 
-              className="flex flex-1 flex-col items-center justify-center py-3 text-muted-foreground"
+              className={cn(
+                "flex flex-1 flex-col items-center justify-center py-2 px-1 rounded-xl transition-all duration-300 ease-out",
+                "text-muted-foreground hover:text-trust-500 hover:scale-105 relative overflow-hidden"
+              )}
               {...touchFeedbackProps}
             >
-              <Menu className="h-5 w-5" />
-              <span className="text-[10px] font-medium mt-0.5">More</span>
+              <div className="flex flex-col items-center justify-center space-y-1">
+                <div className="p-1 rounded-lg">
+                  <Menu className="h-5 w-5" />
+                </div>
+                <span className="text-[10px] font-medium leading-none tracking-wide">More</span>
+              </div>
             </button>
           </SheetTrigger>
-          <SheetContent side="right" className="w-[80vw]">
-            <SheetHeader>
-              <SheetTitle className="text-trust-600">Menu</SheetTitle>
+          
+          <SheetContent 
+            side="right" 
+            className="w-[85vw] bg-background/95 backdrop-blur-xl border-trust-100"
+          >
+            <SheetHeader className="pb-6">
+              <SheetTitle className="text-trust-600 text-xl">Menu</SheetTitle>
               {user && (
-                <div className="flex items-center gap-3 py-3 border-b">
-                  <Avatar className="h-10 w-10 ring-2 ring-trust-100">
+                <div className="flex items-center gap-3 py-4 px-2 bg-trust-50/50 rounded-xl border border-trust-100">
+                  <Avatar className="h-12 w-12 ring-2 ring-trust-200">
                     <AvatarImage src={user?.user_metadata?.avatar_url || ""} />
-                    <AvatarFallback className="bg-trust-100 text-trust-600">{user?.email?.[0]?.toUpperCase() || "U"}</AvatarFallback>
+                    <AvatarFallback className="bg-trust-100 text-trust-600 font-semibold">
+                      {user?.email?.[0]?.toUpperCase() || "U"}
+                    </AvatarFallback>
                   </Avatar>
-                  <div className="flex flex-col">
-                    <span className="font-medium">{user.user_metadata?.name || user.email}</span>
-                    <span className="text-xs text-muted-foreground">{user.email}</span>
+                  <div className="flex flex-col flex-1">
+                    <span className="font-semibold text-trust-700">
+                      {user.user_metadata?.name || user.email?.split('@')[0] || 'User'}
+                    </span>
+                    <span className="text-xs text-muted-foreground truncate">
+                      {user.email}
+                    </span>
                   </div>
                 </div>
               )}
             </SheetHeader>
-            <div className="mt-6 space-y-1">
+            
+            <div className="space-y-2">
               {menuItems.map((item, idx) => (
                 <Button 
                   key={idx}
                   variant="ghost" 
-                  className="w-full justify-start text-foreground hover:text-trust-500 hover:bg-trust-50/50 transition-colors"
+                  className={cn(
+                    "w-full justify-start h-auto p-4 text-left transition-all duration-200",
+                    "hover:bg-trust-50 hover:text-trust-600 hover:scale-[1.02] hover:shadow-sm",
+                    "active:scale-[0.98] group"
+                  )}
                   asChild
                 >
-                  <Link to={item.to}>
-                    {item.label}
+                  <Link to={item.to} className="flex flex-col items-start gap-1">
+                    <span className="font-medium group-hover:text-trust-700">
+                      {item.label}
+                    </span>
+                    <span className="text-xs text-muted-foreground group-hover:text-trust-500">
+                      {item.description}
+                    </span>
                   </Link>
                 </Button>
               ))}
