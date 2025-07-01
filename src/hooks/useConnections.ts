@@ -37,7 +37,7 @@ export const useConnections = () => {
         let correctedPatient: UserConnection['patient'] = null;
         let correctedProvider: UserConnection['provider'] = null;
         
-        if (conn.patient && typeof conn.patient === 'object' && 'id' in conn.patient) {
+        if (conn.patient && typeof conn.patient === 'object' && 'id' in conn.patient && conn.patient.id) {
           correctedPatient = {
             id: conn.patient.id,
             first_name: conn.patient.first_name || undefined,
@@ -47,7 +47,7 @@ export const useConnections = () => {
           };
         }
         
-        if (conn.provider && typeof conn.provider === 'object' && 'id' in conn.provider) {
+        if (conn.provider && typeof conn.provider === 'object' && 'id' in conn.provider && conn.provider.id) {
           correctedProvider = {
             id: conn.provider.id,
             first_name: conn.provider.first_name || undefined,
@@ -91,7 +91,7 @@ export const useConnections = () => {
 
       let correctedProvider: PrimaryProviderAssignment['provider'] = null;
       
-      if (data.provider && typeof data.provider === 'object' && 'id' in data.provider) {
+      if (data.provider && typeof data.provider === 'object' && 'id' in data.provider && data.provider.id) {
         correctedProvider = {
           id: data.provider.id,
           first_name: data.provider.first_name || undefined,
