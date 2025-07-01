@@ -32,29 +32,33 @@ export const useConnections = () => {
 
       if (error) throw error;
 
-      // Fix: Add explicit null checks for patient and provider
+      // Fix: Add explicit null checks and type guards
       return (data || []).map(conn => {
         let correctedPatient: UserConnection['patient'] = null;
         let correctedProvider: UserConnection['provider'] = null;
         
+        // Type guard for patient
         if (conn.patient && typeof conn.patient === 'object' && 'id' in conn.patient && conn.patient.id) {
+          const patient = conn.patient as any;
           correctedPatient = {
-            id: conn.patient.id,
-            first_name: conn.patient.first_name || undefined,
-            last_name: conn.patient.last_name || undefined,
-            avatar_url: conn.patient.avatar_url || undefined,
-            email: conn.patient.email || undefined
+            id: patient.id,
+            first_name: patient.first_name || undefined,
+            last_name: patient.last_name || undefined,
+            avatar_url: patient.avatar_url || undefined,
+            email: patient.email || undefined
           };
         }
         
+        // Type guard for provider
         if (conn.provider && typeof conn.provider === 'object' && 'id' in conn.provider && conn.provider.id) {
+          const provider = conn.provider as any;
           correctedProvider = {
-            id: conn.provider.id,
-            first_name: conn.provider.first_name || undefined,
-            last_name: conn.provider.last_name || undefined,
-            avatar_url: conn.provider.avatar_url || undefined,
-            specialty: conn.provider.specialty || undefined,
-            email: conn.provider.email || undefined
+            id: provider.id,
+            first_name: provider.first_name || undefined,
+            last_name: provider.last_name || undefined,
+            avatar_url: provider.avatar_url || undefined,
+            specialty: provider.specialty || undefined,
+            email: provider.email || undefined
           };
         }
         
@@ -91,14 +95,16 @@ export const useConnections = () => {
 
       let correctedProvider: PrimaryProviderAssignment['provider'] = null;
       
+      // Type guard for provider
       if (data.provider && typeof data.provider === 'object' && 'id' in data.provider && data.provider.id) {
+        const provider = data.provider as any;
         correctedProvider = {
-          id: data.provider.id,
-          first_name: data.provider.first_name || undefined,
-          last_name: data.provider.last_name || undefined,
-          avatar_url: data.provider.avatar_url || undefined,
-          specialty: data.provider.specialty || undefined,
-          email: data.provider.email || undefined
+          id: provider.id,
+          first_name: provider.first_name || undefined,
+          last_name: provider.last_name || undefined,
+          avatar_url: provider.avatar_url || undefined,
+          specialty: provider.specialty || undefined,
+          email: provider.email || undefined
         };
       }
 
@@ -110,6 +116,7 @@ export const useConnections = () => {
     enabled: !!user
   });
 
+  
   // Request connection mutation
   const requestConnectionMutation = useMutation({
     mutationFn: async (request: ConnectionRequest) => {
