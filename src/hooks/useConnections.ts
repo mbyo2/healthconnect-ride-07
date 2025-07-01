@@ -32,45 +32,32 @@ export const useConnections = () => {
 
       if (error) throw error;
 
-      // Fix: Add explicit check that patient and provider are not null before spreading
+      // Fix: Add explicit null checks for patient and provider
       return (data || []).map(conn => {
         let correctedPatient: UserConnection['patient'] = null;
         let correctedProvider: UserConnection['provider'] = null;
-        if (
-          conn &&
-          conn.patient !== null &&
-          typeof conn.patient === 'object' &&
-          'id' in conn.patient &&
-          (conn.patient as any).id !== null
-        ) {
+        
+        if (conn.patient && typeof conn.patient === 'object' && 'id' in conn.patient) {
           correctedPatient = {
-            ...(conn.patient as {
-              id: string;
-              first_name?: string;
-              last_name?: string;
-              avatar_url?: string;
-              email?: string;
-            })
+            id: conn.patient.id,
+            first_name: conn.patient.first_name || undefined,
+            last_name: conn.patient.last_name || undefined,
+            avatar_url: conn.patient.avatar_url || undefined,
+            email: conn.patient.email || undefined
           };
         }
-        if (
-          conn &&
-          conn.provider !== null &&
-          typeof conn.provider === 'object' &&
-          'id' in conn.provider &&
-          (conn.provider as any).id !== null
-        ) {
+        
+        if (conn.provider && typeof conn.provider === 'object' && 'id' in conn.provider) {
           correctedProvider = {
-            ...(conn.provider as {
-              id: string;
-              first_name?: string;
-              last_name?: string;
-              avatar_url?: string;
-              specialty?: string;
-              email?: string;
-            })
+            id: conn.provider.id,
+            first_name: conn.provider.first_name || undefined,
+            last_name: conn.provider.last_name || undefined,
+            avatar_url: conn.provider.avatar_url || undefined,
+            specialty: conn.provider.specialty || undefined,
+            email: conn.provider.email || undefined
           };
         }
+        
         return {
           ...conn,
           patient: correctedPatient,
@@ -103,22 +90,15 @@ export const useConnections = () => {
       if (!data) return null;
 
       let correctedProvider: PrimaryProviderAssignment['provider'] = null;
-      if (
-        data &&
-        data.provider !== null &&
-        typeof data.provider === 'object' &&
-        'id' in data.provider &&
-        (data.provider as any).id !== null
-      ) {
+      
+      if (data.provider && typeof data.provider === 'object' && 'id' in data.provider) {
         correctedProvider = {
-          ...(data.provider as {
-            id: string;
-            first_name?: string;
-            last_name?: string;
-            avatar_url?: string;
-            specialty?: string;
-            email?: string;
-          })
+          id: data.provider.id,
+          first_name: data.provider.first_name || undefined,
+          last_name: data.provider.last_name || undefined,
+          avatar_url: data.provider.avatar_url || undefined,
+          specialty: data.provider.specialty || undefined,
+          email: data.provider.email || undefined
         };
       }
 

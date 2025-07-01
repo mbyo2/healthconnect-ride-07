@@ -69,7 +69,25 @@ export const UserMarketplace = () => {
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('all');
 
-  // Fetch all users with their services and products
+  // Get current user's profile to check their role
+  const { data: currentUserProfile } = useQuery({
+    queryKey: ['current-user-profile', session?.user?.id],
+    queryFn: async () => {
+      if (!session?.user) throw new Error('Not authenticated');
+
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, role')
+        .eq('id', session.user.id)
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!session?.user
+  });
+
+  // Fetch all users with their services and products (excluding patients for patient users)
   const { data: users, isLoading } = useQuery({
     queryKey: ['marketplace-users', searchTerm, activeTab],
     queryFn: async () => {
@@ -92,8 +110,17 @@ export const UserMarketplace = () => {
         `)
         .neq('id', session.user.id);
 
+      // If current user is a patient, exclude other patients for privacy
+      if (currentUserProfile?.role === 'patient') {
+        baseQuery = baseQuery.neq('role', 'patient');
+      }
+
       // Filter by role if specific tab is selected
       if (activeTab !== 'all') {
+        // For patients, don't allow them to select patient tab
+        if (currentUserProfile?.role === 'patient' && activeTab === 'patient') {
+          return [];
+        }
         baseQuery = baseQuery.eq('role', activeTab);
       }
 
@@ -161,14 +188,20 @@ export const UserMarketplace = () => {
 
       return combinedUsers;
     },
-    enabled: !!session?.user
+    enabled: !!session?.user && !!currentUserProfile
   });
 
   const handleSendConnectionRequest = (targetUserId: string, targetRole: string) => {
     if (!session?.user) return;
 
-    const isUserPatient = session.user.id;
+    const isUserPatient = currentUserProfile?.role === 'patient';
     const isTargetProvider = targetRole === 'health_personnel';
+
+    // Prevent patients from connecting to other patients
+    if (isUserPatient && targetRole === 'patient') {
+      toast.error('Cannot connect with other patients for privacy reasons');
+      return;
+    }
 
     requestConnection({
       patient_id: isTargetProvider ? session.user.id : targetUserId,
@@ -194,6 +227,23 @@ export const UserMarketplace = () => {
     }
   };
 
+  // Filter available tabs based on user role
+  const getAvailableTabs = () => {
+    const allTabs = [
+      { id: "all", label: "All Users", count: users?.length || 0 },
+      { id: "health_personnel", label: "Providers", count: users?.filter(u => u.role === 'health_personnel').length || 0 },
+      { id: "patient", label: "Patients", count: users?.filter(u => u.role === 'patient').length || 0 },
+      { id: "admin", label: "Institutions", count: users?.filter(u => u.role === 'admin').length || 0 }
+    ];
+
+    // If current user is patient, remove patient tab
+    if (currentUserProfile?.role === 'patient') {
+      return allTabs.filter(tab => tab.id !== 'patient');
+    }
+
+    return allTabs;
+  };
+
   if (isLoading) {
     return (
       <div className="container mx-auto py-8">
@@ -207,7 +257,7 @@ export const UserMarketplace = () => {
       <div className="text-center">
         <h1 className="text-3xl font-bold mb-2">Healthcare Marketplace</h1>
         <p className="text-muted-foreground">
-          Connect with healthcare providers, patients, and pharmacies
+          Connect with healthcare providers{currentUserProfile?.role !== 'patient' ? ', patients,' : ''} and pharmacies
         </p>
       </div>
 
@@ -224,11 +274,12 @@ export const UserMarketplace = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="all">All Users</TabsTrigger>
-            <TabsTrigger value="health_personnel">Providers</TabsTrigger>
-            <TabsTrigger value="patient">Patients</TabsTrigger>
-            <TabsTrigger value="admin">Institutions</TabsTrigger>
+          <TabsList className={`grid w-full grid-cols-${getAvailableTabs().length}`}>
+            {getAvailableTabs().map((tab) => (
+              <TabsTrigger key={tab.id} value={tab.id}>
+                {tab.label} ({tab.count})
+              </TabsTrigger>
+            ))}
           </TabsList>
         </Tabs>
       </div>
