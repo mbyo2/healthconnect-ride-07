@@ -5,6 +5,7 @@ import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { useSession, useSupabaseClient, SessionContextProvider } from '@supabase/auth-helpers-react';
 import { createClient } from '@supabase/supabase-js';
+import { MobileLayout } from '@/components/MobileLayout';
 import Home from '@/pages/Home';
 import Appointments from '@/pages/Appointments';
 import AdminDashboard from '@/pages/AdminDashboard';
@@ -64,187 +65,198 @@ const AppContent = () => {
 
   return (
     <Router>
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/landing" element={<Landing />} />
-        <Route path="/healthcare-professionals" element={<HealthcareProfessionals />} />
-        <Route path="/healthcare-institutions" element={<HealthcareInstitutions />} />
-        
-        {/* Auth Route */}
-        <Route
-          path="/auth"
-          element={
-            session && session.user ? (
-              <Navigate to="/" replace={true} />
-            ) : (
-              <div className="container" style={{ padding: '50px 0 100px 0' }}>
-                <Auth
-                  supabaseClient={supabaseClient}
-                  appearance={{ theme: ThemeSupa }}
-                  providers={['google', 'github']}
-                  redirectTo={`${window.location.origin}/`}
-                />
-              </div>
-            )
-          }
-        />
-
-        {/* Main App Route */}
-        <Route
-          path="/"
-          element={
-            session && session.user ? (
-              isNewUser ? (
-                <Navigate to="/profile-setup" replace={true} />
+      <MobileLayout>
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/landing" element={<Landing />} />
+          <Route path="/healthcare-professionals" element={<HealthcareProfessionals />} />
+          <Route path="/healthcare-institutions" element={<HealthcareInstitutions />} />
+          
+          {/* Auth Route */}
+          <Route
+            path="/auth"
+            element={
+              session && session.user ? (
+                <Navigate to="/" replace={true} />
               ) : (
-                <Home />
+                <div className="container" style={{ padding: '50px 0 100px 0' }}>
+                  <Auth
+                    supabaseClient={supabaseClient}
+                    appearance={{ theme: ThemeSupa }}
+                    providers={['google', 'github']}
+                    redirectTo={`${window.location.origin}/`}
+                  />
+                </div>
               )
-            ) : (
-              <div className="container" style={{ padding: '50px 0 100px 0' }}>
-                <Auth
-                  supabaseClient={supabaseClient}
-                  appearance={{ theme: ThemeSupa }}
-                  providers={['google', 'github']}
-                  redirectTo={`${window.location.origin}/`}
-                />
-              </div>
-            )
-          }
-        />
+            }
+          />
 
-        {/* Protected Routes */}
-        <Route
-          path="/profile-setup"
-          element={
-            !session ? (
-              <Navigate to="/" replace={true} />
-            ) : (
-              <ProfileSetup />
-            )
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            !session ? (
-              <Navigate to="/" replace={true} />
-            ) : (
-              <Profile />
-            )
-          }
-        />
-        <Route
-          path="/settings"
-          element={
-            !session ? (
-              <Navigate to="/" replace={true} />
-            ) : (
-              <Settings />
-            )
-          }
-        />
-        <Route
-          path="/search"
-          element={
-            !session ? (
-              <Navigate to="/" replace={true} />
-            ) : (
-              <SearchPage />
-            )
-          }
-        />
-        <Route
-          path="/appointments"
-          element={
-            !session ? (
-              <Navigate to="/" replace={true} />
-            ) : (
-              <Appointments />
-            )
-          }
-        />
-        <Route
-          path="/admin-dashboard"
-          element={
-            !session ? (
-              <Navigate to="/" replace={true} />
-            ) : (
-              <AdminDashboard />
-            )
-          }
-        />
-        <Route
-          path="/connections"
-          element={
-            !session ? (
-              <Navigate to="/" replace={true} />
-            ) : (
-              <Connections />
-            )
-          }
-        />
-        <Route
-          path="/chat"
-          element={
-            !session ? (
-              <Navigate to="/" replace={true} />
-            ) : (
-              <Chat />
-            )
-          }
-        />
-        <Route
-          path="/prescriptions"
-          element={
-            !session ? (
-              <Navigate to="/" replace={true} />
-            ) : (
-              <Prescriptions />
-            )
-          }
-        />
-        <Route
-          path="/symptoms"
-          element={
-            !session ? (
-              <Navigate to="/" replace={true} />
-            ) : (
-              <Symptoms />
-            )
-          }
-        />
-        <Route
-          path="/video-dashboard"
-          element={
-            !session ? (
-              <Navigate to="/" replace={true} />
-            ) : (
-              <VideoDashboard session={session} />
-            )
-          }
-        />
-        <Route
-          path="/testing"
-          element={
-            !session ? (
-              <Navigate to="/" replace={true} />
-            ) : (
-              <Testing />
-            )
-          }
-        />
-        <Route
-          path="/documentation"
-          element={
-            !session ? (
-              <Navigate to="/" replace={true} />
-            ) : (
-              <Documentation />
-            )
-          }
-        />
-        <Route path="/marketplace-users" element={<UserMarketplace />} />
-      </Routes>
+          {/* Main App Route */}
+          <Route
+            path="/"
+            element={
+              session && session.user ? (
+                isNewUser ? (
+                  <Navigate to="/profile-setup" replace={true} />
+                ) : (
+                  <Home />
+                )
+              ) : (
+                <div className="container" style={{ padding: '50px 0 100px 0' }}>
+                  <Auth
+                    supabaseClient={supabaseClient}
+                    appearance={{ theme: ThemeSupa }}
+                    providers={['google', 'github']}
+                    redirectTo={`${window.location.origin}/`}
+                  />
+                </div>
+              )
+            }
+          />
+
+          {/* Protected Routes */}
+          <Route
+            path="/profile-setup"
+            element={
+              !session ? (
+                <Navigate to="/" replace={true} />
+              ) : (
+                <ProfileSetup />
+              )
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              !session ? (
+                <Navigate to="/" replace={true} />
+              ) : (
+                <Profile />
+              )
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              !session ? (
+                <Navigate to="/" replace={true} />
+              ) : (
+                <Settings />
+              )
+            }
+          />
+          <Route
+            path="/search"
+            element={
+              !session ? (
+                <Navigate to="/" replace={true} />
+              ) : (
+                <SearchPage />
+              )
+            }
+          />
+          <Route
+            path="/appointments"
+            element={
+              !session ? (
+                <Navigate to="/" replace={true} />
+              ) : (
+                <Appointments />
+              )
+            }
+          />
+          <Route
+            path="/admin-dashboard"
+            element={
+              !session ? (
+                <Navigate to="/" replace={true} />
+              ) : (
+                <AdminDashboard />
+              )
+            }
+          />
+          <Route
+            path="/connections"
+            element={
+              !session ? (
+                <Navigate to="/" replace={true} />
+              ) : (
+                <Connections />
+              )
+            }
+          />
+          <Route
+            path="/chat"
+            element={
+              !session ? (
+                <Navigate to="/" replace={true} />
+              ) : (
+                <Chat />
+              )
+            }
+          />
+          <Route
+            path="/prescriptions"
+            element={
+              !session ? (
+                <Navigate to="/" replace={true} />
+              ) : (
+                <Prescriptions />
+              )
+            }
+          />
+          <Route
+            path="/symptoms"
+            element={
+              !session ? (
+                <Navigate to="/" replace={true} />
+              ) : (
+                <Symptoms />
+              )
+            }
+          />
+          <Route
+            path="/video-dashboard"
+            element={
+              !session ? (
+                <Navigate to="/" replace={true} />
+              ) : (
+                <VideoDashboard session={session} />
+              )
+            }
+          />
+          <Route
+            path="/testing"
+            element={
+              !session ? (
+                <Navigate to="/" replace={true} />
+              ) : (
+                <Testing />
+              )
+            }
+          />
+          <Route
+            path="/documentation"
+            element={
+              !session ? (
+                <Navigate to="/" replace={true} />
+              ) : (
+                <Documentation />
+              )
+            }
+          />
+          <Route
+            path="/marketplace-users"
+            element={
+              !session ? (
+                <Navigate to="/" replace={true} />
+              ) : (
+                <UserMarketplace />
+              )
+            }
+          />
+        </Routes>
+      </MobileLayout>
     </Router>
   );
 };
