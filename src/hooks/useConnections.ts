@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -38,32 +39,30 @@ export const useConnections = () => {
         let correctedProvider: UserConnection['provider'] = null;
         
         // Type guard for patient with proper null check
-        const patientData = conn.patient;
-        if (patientData && typeof patientData === 'object' && 'id' in patientData) {
-          const patient = patientData as any;
-          if (patient.id) {
+        if (conn.patient && typeof conn.patient === 'object' && 'id' in conn.patient) {
+          const patientData = conn.patient as any;
+          if (patientData && patientData.id) {
             correctedPatient = {
-              id: patient.id,
-              first_name: patient.first_name || undefined,
-              last_name: patient.last_name || undefined,
-              avatar_url: patient.avatar_url || undefined,
-              email: patient.email || undefined
+              id: patientData.id,
+              first_name: patientData.first_name || undefined,
+              last_name: patientData.last_name || undefined,
+              avatar_url: patientData.avatar_url || undefined,
+              email: patientData.email || undefined
             };
           }
         }
         
         // Type guard for provider with proper null check
-        const providerData = conn.provider;
-        if (providerData && typeof providerData === 'object' && 'id' in providerData) {
-          const provider = providerData as any;
-          if (provider.id) {
+        if (conn.provider && typeof conn.provider === 'object' && 'id' in conn.provider) {
+          const providerData = conn.provider as any;
+          if (providerData && providerData.id) {
             correctedProvider = {
-              id: provider.id,
-              first_name: provider.first_name || undefined,
-              last_name: provider.last_name || undefined,
-              avatar_url: provider.avatar_url || undefined,
-              specialty: provider.specialty || undefined,
-              email: provider.email || undefined
+              id: providerData.id,
+              first_name: providerData.first_name || undefined,
+              last_name: providerData.last_name || undefined,
+              avatar_url: providerData.avatar_url || undefined,
+              specialty: providerData.specialty || undefined,
+              email: providerData.email || undefined
             };
           }
         }
@@ -102,17 +101,16 @@ export const useConnections = () => {
       let correctedProvider: PrimaryProviderAssignment['provider'] = null;
       
       // Type guard for provider with proper null check
-      const providerData = data.provider;
-      if (providerData && typeof providerData === 'object' && 'id' in providerData) {
-        const provider = providerData as any;
-        if (provider.id) {
+      if (data.provider && typeof data.provider === 'object' && 'id' in data.provider) {
+        const providerData = data.provider as any;
+        if (providerData && providerData.id) {
           correctedProvider = {
-            id: provider.id,
-            first_name: provider.first_name || undefined,
-            last_name: provider.last_name || undefined,
-            avatar_url: provider.avatar_url || undefined,
-            specialty: provider.specialty || undefined,
-            email: provider.email || undefined
+            id: providerData.id,
+            first_name: providerData.first_name || undefined,
+            last_name: providerData.last_name || undefined,
+            avatar_url: providerData.avatar_url || undefined,
+            specialty: providerData.specialty || undefined,
+            email: providerData.email || undefined
           };
         }
       }

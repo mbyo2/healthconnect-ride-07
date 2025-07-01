@@ -2,21 +2,14 @@
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { Link, useLocation } from "react-router-dom";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuLabel, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { Search, MoreHorizontal } from "lucide-react";
+import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useState, useCallback } from "react";
 import { useSearch } from "@/context/SearchContext";
 import { Home, Calendar, MessageSquare, Users, ShoppingCart, Heart, Settings, User } from "lucide-react";
+import { DesktopNavMenu } from "@/components/navigation/DesktopNavMenu";
+import { DesktopUserMenu } from "@/components/navigation/DesktopUserMenu";
 
 export function DesktopNav() {
   const location = useLocation();
@@ -144,27 +137,7 @@ export function DesktopNav() {
               </Button>
             ))}
             
-            {/* Enhanced More dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="flex items-center px-4 py-2 rounded-xl hover:bg-trust-50 hover:text-trust-700">
-                  <MoreHorizontal className="h-5 w-5 mr-2" />
-                  More
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56 bg-white border-trust-200 shadow-xl">
-                <DropdownMenuLabel className="text-trust-700 font-semibold">Quick Access</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                {secondaryNavItems.map((item, index) => (
-                  <DropdownMenuItem key={index} asChild className="hover:bg-trust-50">
-                    <Link to={item.to} className="flex items-center">
-                      {item.icon}
-                      {item.label}
-                    </Link>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <DesktopNavMenu secondaryNavItems={secondaryNavItems} />
           </div>
         </div>
         
@@ -185,71 +158,7 @@ export function DesktopNav() {
           
           {/* Enhanced User menu */}
           {isAuthenticated && user ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-10 w-10 rounded-full p-0 ring-2 ring-trust-200 hover:ring-trust-400">
-                  <Avatar className="h-10 w-10">
-                    <AvatarImage src={profile?.avatar_url || user?.user_metadata?.avatar_url || ""} alt={user?.email || ""} />
-                    <AvatarFallback className="bg-trust-100 text-trust-700 font-bold">
-                      {user?.email?.[0]?.toUpperCase() || "U"}
-                    </AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-64 bg-white border-trust-200 shadow-xl">
-                <DropdownMenuLabel className="pb-2">
-                  <div className="text-sm font-semibold text-trust-700">{user.email}</div>
-                  <div className="text-xs text-muted-foreground">My Account</div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild className="hover:bg-trust-50">
-                  <Link to="/profile" className="flex items-center">
-                    <User className="h-4 w-4 mr-2" />
-                    My Profile
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild className="hover:bg-trust-50">
-                  <Link to="/appointments" className="flex items-center">
-                    <Calendar className="h-4 w-4 mr-2" />
-                    My Appointments
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild className="hover:bg-trust-50">
-                  <Link to="/connections" className="flex items-center">
-                    <Users className="h-4 w-4 mr-2" />
-                    My Providers
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild className="hover:bg-trust-50">
-                  <Link to="/settings" className="flex items-center">
-                    <Settings className="h-4 w-4 mr-2" />
-                    Settings
-                  </Link>
-                </DropdownMenuItem>
-                
-                {profile?.role === "health_personnel" && (
-                  <DropdownMenuItem asChild className="hover:bg-trust-50">
-                    <Link to="/provider-dashboard" className="flex items-center">
-                      <Heart className="h-4 w-4 mr-2" />
-                      Provider Dashboard
-                    </Link>
-                  </DropdownMenuItem>
-                )}
-                
-                {(profile?.admin_level === "admin" || profile?.admin_level === "superadmin") && (
-                  <DropdownMenuItem asChild className="hover:bg-trust-50">
-                    <Link to="/admin-dashboard" className="flex items-center">
-                      <Settings className="h-4 w-4 mr-2" />
-                      Admin Dashboard
-                    </Link>
-                  </DropdownMenuItem>
-                )}
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout} className="text-red-600 hover:bg-red-50">
-                  Sign Out
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <DesktopUserMenu user={user} profile={profile} onLogout={handleLogout} />
           ) : (
             <div className="flex items-center gap-3">
               <Button variant="outline" asChild className="rounded-xl border-trust-200 hover:bg-trust-50">
