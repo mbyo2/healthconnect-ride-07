@@ -24,6 +24,7 @@ import Testing from '@/pages/Testing';
 import Documentation from '@/pages/Documentation';
 import { AuthProvider } from '@/context/AuthContext';
 import { UserRolesProvider } from '@/context/UserRolesContext';
+import { SearchProvider } from '@/context/SearchContext';
 import { ProfileSetup } from '@/components/auth/ProfileSetup';
 import UserMarketplace from "@/pages/UserMarketplace";
 
@@ -266,7 +267,9 @@ const App = () => {
     <SessionContextProvider supabaseClient={supabase}>
       <AuthProvider>
         <UserRolesProvider>
-          <AppContent />
+          <SearchProvider>
+            <AppContent />
+          </SearchProvider>
         </UserRolesProvider>
       </AuthProvider>
     </SessionContextProvider>
