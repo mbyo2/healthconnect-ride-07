@@ -65,8 +65,9 @@ const AppContent = () => {
   }, [session, supabaseClient]);
 
   return (
-    <Router>
-      <MobileLayout>
+    <SearchProvider>
+      <Router>
+        <MobileLayout>
         <Routes>
           {/* Public Routes */}
           <Route path="/landing" element={<Landing />} />
@@ -259,6 +260,7 @@ const AppContent = () => {
         </Routes>
       </MobileLayout>
     </Router>
+    </SearchProvider>
   );
 };
 
@@ -267,9 +269,7 @@ const App = () => {
     <SessionContextProvider supabaseClient={supabase}>
       <AuthProvider>
         <UserRolesProvider>
-          <SearchProvider>
-            <AppContent />
-          </SearchProvider>
+          <AppContent />
         </UserRolesProvider>
       </AuthProvider>
     </SessionContextProvider>
