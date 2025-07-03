@@ -189,6 +189,42 @@ export type Database = {
           },
         ]
       }
+      delivery_zones: {
+        Row: {
+          coordinates: Json
+          created_at: string
+          delivery_fee: number
+          id: string
+          is_active: boolean
+          max_delivery_time: number
+          pharmacy_id: string
+          restrictions: string[] | null
+          zone_name: string
+        }
+        Insert: {
+          coordinates: Json
+          created_at?: string
+          delivery_fee?: number
+          id?: string
+          is_active?: boolean
+          max_delivery_time?: number
+          pharmacy_id: string
+          restrictions?: string[] | null
+          zone_name: string
+        }
+        Update: {
+          coordinates?: Json
+          created_at?: string
+          delivery_fee?: number
+          id?: string
+          is_active?: boolean
+          max_delivery_time?: number
+          pharmacy_id?: string
+          restrictions?: string[] | null
+          zone_name?: string
+        }
+        Relationships: []
+      }
       digital_signatures: {
         Row: {
           created_at: string | null
@@ -267,6 +303,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      emergency_events: {
+        Row: {
+          created_at: string
+          id: string
+          latitude: number | null
+          longitude: number | null
+          message: string | null
+          patient_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          message?: string | null
+          patient_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          message?: string | null
+          patient_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       family_members: {
         Row: {
@@ -1428,6 +1497,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      pharmacy_staff: {
+        Row: {
+          created_at: string
+          hire_date: string
+          id: string
+          is_active: boolean
+          pharmacy_id: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          hire_date?: string
+          id?: string
+          is_active?: boolean
+          pharmacy_id: string
+          role?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          hire_date?: string
+          id?: string
+          is_active?: boolean
+          pharmacy_id?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       prescriptions: {
         Row: {
