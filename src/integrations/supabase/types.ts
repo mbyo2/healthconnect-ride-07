@@ -949,6 +949,7 @@ export type Database = {
       }
       marketplace_products: {
         Row: {
+          can_be_delivered: boolean
           category: string
           created_at: string | null
           description: string | null
@@ -966,6 +967,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          can_be_delivered?: boolean
           category: string
           created_at?: string | null
           description?: string | null
@@ -983,6 +985,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          can_be_delivered?: boolean
           category?: string
           created_at?: string | null
           description?: string | null

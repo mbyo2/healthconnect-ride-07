@@ -27,6 +27,9 @@ import { UserRolesProvider } from '@/context/UserRolesContext';
 import { SearchProvider } from '@/context/SearchContext';
 import { ProfileSetup } from '@/components/auth/ProfileSetup';
 import UserMarketplace from "@/pages/UserMarketplace";
+import Emergency from "@/pages/Emergency";
+import PharmacyPortal from "@/pages/PharmacyPortal";
+import Marketplace from "@/pages/Marketplace";
 
 const supabase = createClient(
   "https://tthzcijscedgxjfnfnky.supabase.co",
@@ -254,6 +257,36 @@ const AppContent = () => {
                 <Navigate to="/" replace={true} />
               ) : (
                 <UserMarketplace />
+              )
+            }
+          />
+          <Route
+            path="/emergency"
+            element={
+              !session ? (
+                <Navigate to="/" replace={true} />
+              ) : (
+                <Emergency />
+              )
+            }
+          />
+          <Route
+            path="/marketplace"
+            element={
+              !session ? (
+                <Navigate to="/" replace={true} />
+              ) : (
+                <Marketplace />
+              )
+            }
+          />
+          <Route
+            path="/pharmacy-portal"
+            element={
+              !session ? (
+                <Navigate to="/" replace={true} />
+              ) : (
+                <PharmacyPortal />
               )
             }
           />

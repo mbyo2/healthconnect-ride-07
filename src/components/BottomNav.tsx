@@ -1,5 +1,5 @@
 
-import { Home, Search, Calendar, MessageSquare, Heart, Users, ShoppingCart } from "lucide-react";
+import { Home, Search, Calendar, MessageSquare, Heart, Users, ShoppingCart, Pill, AlertTriangle } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useSession } from "@/hooks/use-session";
 import { useDeviceType } from "@/hooks/use-device-type";
@@ -55,6 +55,24 @@ export function BottomNav() {
   // Enhanced menu items for comprehensive access
   const menuItems = useMemo(() => [
     { 
+      to: "/emergency", 
+      label: "Emergency Help", 
+      description: "Emergency services and contacts",
+      icon: <AlertTriangle className="h-5 w-5 text-red-600" />
+    },
+    { 
+      to: "/marketplace", 
+      label: "Buy Medicine", 
+      description: "Order medications from pharmacies",
+      icon: <Pill className="h-5 w-5" />
+    },
+    { 
+      to: "/pharmacy-portal", 
+      label: "Pharmacy Portal", 
+      description: "Manage pharmacy (for admins)",
+      icon: <ShoppingCart className="h-5 w-5" />
+    },
+    { 
       to: "/profile", 
       label: "My Profile", 
       description: "Personal information and settings",
@@ -70,7 +88,7 @@ export function BottomNav() {
       to: "/marketplace-users", 
       label: "Find Providers", 
       description: "Browse healthcare marketplace",
-      icon: <ShoppingCart className="h-5 w-5" />
+      icon: <Users className="h-5 w-5" />
     },
     { 
       to: "/prescriptions", 
