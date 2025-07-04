@@ -1201,6 +1201,62 @@ export type Database = {
           },
         ]
       }
+      mobile_money_payments: {
+        Row: {
+          amount: number
+          completed_at: string | null
+          created_at: string
+          external_transaction_id: string | null
+          failure_reason: string | null
+          id: string
+          initiated_at: string
+          payment_id: string | null
+          phone_number: string
+          provider: string
+          status: string
+          transaction_reference: string | null
+          webhook_data: Json | null
+        }
+        Insert: {
+          amount: number
+          completed_at?: string | null
+          created_at?: string
+          external_transaction_id?: string | null
+          failure_reason?: string | null
+          id?: string
+          initiated_at?: string
+          payment_id?: string | null
+          phone_number: string
+          provider: string
+          status?: string
+          transaction_reference?: string | null
+          webhook_data?: Json | null
+        }
+        Update: {
+          amount?: number
+          completed_at?: string | null
+          created_at?: string
+          external_transaction_id?: string | null
+          failure_reason?: string | null
+          id?: string
+          initiated_at?: string
+          payment_id?: string | null
+          phone_number?: string
+          provider?: string
+          status?: string
+          transaction_reference?: string | null
+          webhook_data?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mobile_money_payments_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notification_settings: {
         Row: {
           appointment_reminders: boolean | null
@@ -1500,6 +1556,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      pharmacy_hours: {
+        Row: {
+          close_time: string
+          created_at: string
+          day_of_week: number
+          id: string
+          is_24_hours: boolean
+          is_closed: boolean
+          open_time: string
+          pharmacy_id: string
+        }
+        Insert: {
+          close_time: string
+          created_at?: string
+          day_of_week: number
+          id?: string
+          is_24_hours?: boolean
+          is_closed?: boolean
+          open_time: string
+          pharmacy_id: string
+        }
+        Update: {
+          close_time?: string
+          created_at?: string
+          day_of_week?: number
+          id?: string
+          is_24_hours?: boolean
+          is_closed?: boolean
+          open_time?: string
+          pharmacy_id?: string
+        }
+        Relationships: []
       }
       pharmacy_staff: {
         Row: {
@@ -1854,6 +1943,45 @@ export type Database = {
           id?: string
           min_experience_level?: Database["public"]["Enums"]["experience_level"]
           name?: string
+        }
+        Relationships: []
+      }
+      sms_logs: {
+        Row: {
+          cost: number | null
+          created_at: string
+          id: string
+          message: string
+          patient_id: string | null
+          phone: string
+          provider: string | null
+          response_data: Json | null
+          status: string
+          type: string
+        }
+        Insert: {
+          cost?: number | null
+          created_at?: string
+          id?: string
+          message: string
+          patient_id?: string | null
+          phone: string
+          provider?: string | null
+          response_data?: Json | null
+          status?: string
+          type: string
+        }
+        Update: {
+          cost?: number | null
+          created_at?: string
+          id?: string
+          message?: string
+          patient_id?: string | null
+          phone?: string
+          provider?: string | null
+          response_data?: Json | null
+          status?: string
+          type?: string
         }
         Relationships: []
       }
