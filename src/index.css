@@ -165,6 +165,22 @@
     background: linear-gradient(135deg, rgb(var(--trust-50)) 0%, rgb(var(--trust-100)) 100%);
   }
   
+  /* Success states */
+  .success-glow {
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
+  }
+  
+  /* Enhanced accessibility styles */
+  .high-contrast {
+    filter: contrast(1.5);
+  }
+  
+  .reduced-motion {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
   /* Glass morphism effect */
   .glass {
     background: rgba(255, 255, 255, 0.1);

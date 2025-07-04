@@ -9,10 +9,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowRight, Sparkles, AlertTriangle, Pill, Users, Calendar, MessageSquare, ShoppingCart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useSuccessFeedback } from "@/hooks/use-success-feedback";
 
 const Home = () => {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const { showSuccess } = useSuccessFeedback();
 
   if (isAuthenticated) {
     return (
@@ -46,7 +48,10 @@ const Home = () => {
             <h2 className="text-2xl font-bold mb-4">Quick Access</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
               
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/emergency')}>
+              <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => {
+                navigate('/emergency');
+                showSuccess({ message: "Navigating to Emergency Services" });
+              }}>
                 <CardHeader className="pb-3">
                   <div className="flex items-center gap-2">
                     <AlertTriangle className="h-5 w-5 text-red-600" />

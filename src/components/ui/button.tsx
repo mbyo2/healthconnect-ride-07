@@ -5,25 +5,27 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 touch-manipulation",
   {
     variants: {
       variant: {
-        default: "bg-orange-500 text-white hover:bg-orange-600 shadow-sm hover:shadow-md",
-        destructive: "bg-red-500 text-white hover:bg-red-600 shadow-sm",
-        outline: "border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-400 shadow-sm",
-        secondary: "bg-gray-100 text-gray-900 hover:bg-gray-200 border border-gray-300",
-        ghost: "text-gray-700 hover:bg-gray-100 hover:text-gray-900",
-        link: "text-orange-600 underline-offset-4 hover:underline hover:text-orange-700",
+        default: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm hover:shadow-md",
+        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-sm",
+        outline: "border border-input bg-background text-foreground hover:bg-accent hover:text-accent-foreground shadow-sm",
+        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80 border border-border",
+        ghost: "text-foreground hover:bg-accent hover:text-accent-foreground",
+        link: "text-primary underline-offset-4 hover:underline hover:text-primary/80",
+        success: "bg-green-600 text-white hover:bg-green-700 shadow-sm hover:shadow-md",
+        healthcare: "bg-trust-600 text-white hover:bg-trust-700 shadow-sm hover:shadow-md font-semibold",
         amazon: "bg-orange-400 text-white hover:bg-orange-500 shadow-sm hover:shadow-md font-semibold",
-        ebay: "bg-blue-600 text-white hover:bg-blue-700 shadow-sm hover:shadow-md font-semibold",
       },
       size: {
-        default: "h-11 px-6 py-2.5",
-        sm: "h-9 rounded-md px-4 text-xs",
-        lg: "h-12 rounded-lg px-8 text-base",
-        icon: "h-11 w-11",
-        xl: "h-14 px-10 text-lg rounded-lg",
+        default: "h-11 px-6 py-2.5 min-h-[44px]",
+        sm: "h-9 rounded-md px-4 text-xs min-h-[36px]",
+        lg: "h-12 rounded-lg px-8 text-base min-h-[48px]",
+        icon: "h-11 w-11 min-h-[44px] min-w-[44px]",
+        xl: "h-14 px-10 text-lg rounded-lg min-h-[56px]",
+        touch: "h-12 px-6 py-3 text-base min-h-[48px] min-w-[48px]",
       },
     },
     defaultVariants: {
