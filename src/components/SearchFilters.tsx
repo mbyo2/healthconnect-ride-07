@@ -1,28 +1,16 @@
-import React, { useEffect } from "react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  SelectGroup,
-  SelectLabel
-} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Search, MapPin, FilterX } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useSearch } from "@/context/SearchContext";
-import { HealthcareProviderType, InsuranceProvider, SpecialtyType } from "@/types/healthcare";
-import { useVoiceCommands } from "@/hooks/use-voice-commands";
+import { HealthcareProviderType, SpecialtyType, InsuranceProvider } from "@/types/healthcare";
+import { Filter, MapPin } from "lucide-react";
+import { useState } from "react";
 
 export const SearchFilters = () => {
   const {
-    searchTerm,
-    setSearchTerm,
     selectedType,
     setSelectedType,
     selectedSpecialty,
@@ -33,273 +21,142 @@ export const SearchFilters = () => {
     setMaxDistance,
     useUserLocation,
     setUseUserLocation,
-    refreshProviders,
+    refreshProviders
   } = useSearch();
-  
-  const { speak } = useVoiceCommands();
 
-  const [isFilterChanged, setIsFilterChanged] = React.useState(false);
-  
-  // Detect when any filter changes
-  useEffect(() => {
-    setIsFilterChanged(true);
-  }, [searchTerm, selectedType, selectedSpecialty, selectedInsurance, maxDistance, useUserLocation]);
-  
-  const handleResetFilters = () => {
-    setSearchTerm("");
-    setSelectedType(null);
-    setSelectedSpecialty(null);
-    setSelectedInsurance(null);
-    setMaxDistance(50);
-    setUseUserLocation(false);
-    
-    if (refreshProviders) {
-      refreshProviders();
-    }
-    
-    setIsFilterChanged(false);
-    
-    // Announce filter reset for screen readers
-    if (speak) {
-      speak("Filters have been reset");
-    }
+  const [showFilters, setShowFilters] = useState(false);
+
+  const handleFilterChange = () => {
+    refreshProviders();
   };
-  
-  const handleSearch = () => {
-    if (refreshProviders) {
-      refreshProviders();
-      setIsFilterChanged(false);
-    }
-    
-    // Announce search for screen readers
-    if (speak) {
-      speak(`Searching for ${searchTerm || "all providers"}${selectedType ? ` filtered by type ${selectedType}` : ""}${selectedSpecialty ? ` with specialty ${selectedSpecialty}` : ""}`);
-    }
-  };
-  
-  const providerTypes: HealthcareProviderType[] = [
-    "doctor",
-    "nurse",
-    "hospital",
-    "clinic",
-    "pharmacy",
-    "nursing_home",
-    "dentist",
-  ];
-
-  const specialtyTypes: SpecialtyType[] = [
-    "General Practice",
-    "Cardiology", 
-    "Neurology",
-    "Pediatrics",
-    "Orthopedics",
-    "Dermatology",
-    "Gynecology",
-    "Oncology", 
-    "Psychiatry",
-    "Ophthalmology",
-    "Family Medicine",
-    "Internal Medicine",
-    "Emergency Medicine",
-    "Radiology",
-    "Anesthesiology",
-    "Urology",
-    "General Dentistry",
-    "Orthodontics"
-  ];
-
-  // Group insurance providers into categories
-  const zambianInsuranceProviders = [
-    InsuranceProvider.HOLLARD_HEALTH,
-    InsuranceProvider.SANLAM,
-    InsuranceProvider.MADISON,
-    InsuranceProvider.PROFESSIONAL_INSURANCE,
-    InsuranceProvider.UNITURTLE,
-    InsuranceProvider.SES_INTERNATIONAL,
-    InsuranceProvider.NHIMA,
-    InsuranceProvider.PRUDENTIAL
-  ];
-
-  const internationalInsuranceProviders = [
-    InsuranceProvider.MEDICARE,
-    InsuranceProvider.MEDICAID,
-    InsuranceProvider.BLUE_CROSS,
-    InsuranceProvider.CIGNA,
-    InsuranceProvider.UNITED_HEALTHCARE,
-    InsuranceProvider.AETNA,
-    InsuranceProvider.HUMANA,
-    InsuranceProvider.KAISER_PERMANENTE,
-    InsuranceProvider.TRICARE
-  ];
-
-  const otherInsuranceProviders = [
-    InsuranceProvider.OTHER,
-    InsuranceProvider.NONE
-  ];
 
   return (
-    <div className="bg-card border rounded-lg p-4 shadow-sm space-y-4">
-      <h2 className="text-lg font-medium mb-4">Search Filters</h2>
-      
-      <div className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="search" className="text-sm font-medium">
-            Search
-          </Label>
-          <div className="flex gap-2">
-            <Input
-              id="search"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search by name or specialty"
-              className="flex-1"
-              aria-label="Search by name or specialty"
-            />
-            <Button 
-              onClick={handleSearch} 
-              size="icon"
-              aria-label="Apply search filters"
-            >
-              <Search className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="provider-type" className="text-sm font-medium">
-            Provider Type
-          </Label>
-          <Select
-            value={selectedType || undefined}
-            onValueChange={(value) => setSelectedType(value as HealthcareProviderType)}
-          >
-            <SelectTrigger id="provider-type" aria-label="Select provider type">
-              <SelectValue placeholder="All Types" />
-            </SelectTrigger>
-            <SelectContent>
-              {providerTypes.map((type) => (
-                <SelectItem key={type} value={type}>
-                  {type.charAt(0).toUpperCase() + type.slice(1).replace("_", " ")}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="specialty" className="text-sm font-medium">
-            Specialty
-          </Label>
-          <Select
-            value={selectedSpecialty || undefined}
-            onValueChange={(value) => setSelectedSpecialty(value as SpecialtyType)}
-          >
-            <SelectTrigger id="specialty" aria-label="Select specialty">
-              <SelectValue placeholder="Any Specialty" />
-            </SelectTrigger>
-            <SelectContent>
-              {specialtyTypes.map((specialty) => (
-                <SelectItem key={specialty} value={specialty}>
-                  {specialty}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="insurance" className="text-sm font-medium">
-            Insurance
-          </Label>
-          <Select
-            value={selectedInsurance || undefined}
-            onValueChange={(value) => setSelectedInsurance(value as InsuranceProvider)}
-          >
-            <SelectTrigger id="insurance" aria-label="Select accepted insurance">
-              <SelectValue placeholder="Any Insurance" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>Zambian Providers</SelectLabel>
-                {zambianInsuranceProviders.map((insurance) => (
-                  <SelectItem key={insurance} value={insurance}>
-                    {insurance}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-              
-              <SelectGroup>
-                <SelectLabel>International Providers</SelectLabel>
-                {internationalInsuranceProviders.map((insurance) => (
-                  <SelectItem key={insurance} value={insurance}>
-                    {insurance}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-              
-              <SelectGroup>
-                <SelectLabel>Other</SelectLabel>
-                {otherInsuranceProviders.map((insurance) => (
-                  <SelectItem key={insurance} value={insurance}>
-                    {insurance}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2">
-          <div className="flex justify-between items-center">
-            <Label htmlFor="distance" className="text-sm font-medium">
-              Maximum Distance
-            </Label>
-            <Badge variant="outline">{maxDistance} km</Badge>
-          </div>
-          <Slider
-            id="distance"
-            min={5}
-            max={100}
-            step={5}
-            value={[maxDistance]}
-            onValueChange={(value) => setMaxDistance(value[0])}
-            aria-label={`Set maximum distance to ${maxDistance} kilometers`}
-          />
-        </div>
-
-        <div className="flex items-center justify-between space-x-2">
-          <Label htmlFor="use-location" className="text-sm font-medium cursor-pointer">
-            Use My Location
-          </Label>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setShowFilters(!showFilters)}
+          className="flex items-center gap-2"
+        >
+          <Filter className="h-4 w-4" />
+          Filters
+        </Button>
+        
+        <div className="flex items-center gap-2">
+          <MapPin className="h-4 w-4 text-muted-foreground" />
           <Switch
-            id="use-location"
             checked={useUserLocation}
             onCheckedChange={setUseUserLocation}
-            aria-label={useUserLocation ? "Stop using my location" : "Use my current location"}
           />
-        </div>
-        
-        <div className="pt-2 flex gap-2">
-          <Button
-            variant="outline" 
-            className="w-full" 
-            onClick={handleResetFilters}
-            disabled={!isFilterChanged}
-            aria-label="Reset all filters"
-          >
-            <FilterX className="h-4 w-4 mr-2" />
-            Reset Filters
-          </Button>
-          <Button 
-            className="w-full" 
-            onClick={handleSearch}
-            aria-label="Apply filters and search"
-          >
-            <Search className="h-4 w-4 mr-2" />
-            Search
-          </Button>
+          <Label className="text-sm">Use my location</Label>
         </div>
       </div>
+
+      {showFilters && (
+        <Card>
+          <CardContent className="p-4 space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Provider Type */}
+              <div className="space-y-2">
+                <Label>Provider Type</Label>
+                <Select
+                  value={selectedType || ""}
+                  onValueChange={(value) => {
+                    setSelectedType(value as HealthcareProviderType);
+                    handleFilterChange();
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="All types" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">All types</SelectItem>
+                    <SelectItem value="doctor">Doctor</SelectItem>
+                    <SelectItem value="hospital">Hospital</SelectItem>
+                    <SelectItem value="clinic">Clinic</SelectItem>
+                    <SelectItem value="pharmacy">Pharmacy</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Specialty */}
+              <div className="space-y-2">
+                <Label>Specialty</Label>
+                <Select
+                  value={selectedSpecialty || ""}
+                  onValueChange={(value) => {
+                    setSelectedSpecialty(value as SpecialtyType);
+                    handleFilterChange();
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="All specialties" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">All specialties</SelectItem>
+                    <SelectItem value="cardiology">Cardiology</SelectItem>
+                    <SelectItem value="pediatrics">Pediatrics</SelectItem>
+                    <SelectItem value="general_practice">General Practice</SelectItem>
+                    <SelectItem value="emergency_medicine">Emergency Medicine</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Insurance */}
+              <div className="space-y-2">
+                <Label>Insurance</Label>
+                <Select
+                  value={selectedInsurance || ""}
+                  onValueChange={(value) => {
+                    setSelectedInsurance(value as InsuranceProvider);
+                    handleFilterChange();
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="All insurance" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">All insurance</SelectItem>
+                    <SelectItem value="none">No Insurance</SelectItem>
+                    <SelectItem value="government">Government</SelectItem>
+                    <SelectItem value="private">Private</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Distance Slider */}
+            <div className="space-y-2">
+              <Label>Maximum Distance: {maxDistance} km</Label>
+              <Slider
+                value={[maxDistance]}
+                onValueChange={([value]) => setMaxDistance(value)}
+                onValueCommit={handleFilterChange}
+                max={100}
+                min={1}
+                step={1}
+                className="w-full"
+              />
+            </div>
+
+            {/* Clear Filters */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setSelectedType(null);
+                setSelectedSpecialty(null);
+                setSelectedInsurance(null);
+                setMaxDistance(50);
+                handleFilterChange();
+              }}
+            >
+              Clear all filters
+            </Button>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };

@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,6 +12,8 @@ import { Camera, Edit, Save, MapPin, Phone, Mail, Calendar } from "lucide-react"
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
 import { useSuccessFeedback } from "@/hooks/use-success-feedback";
+import { supabase } from "@/integrations/supabase/client";
+import { ProfileStats } from "@/components/ProfileStats";
 
 const Profile = () => {
   const { user, profile } = useAuth();
@@ -25,10 +28,27 @@ const Profile = () => {
     location: profile?.location || ""
   });
 
-  const handleSave = () => {
-    // In real app, this would update the profile via API
-    showSuccess({ message: "Profile updated successfully!" });
-    setIsEditing(false);
+  const handleSave = async () => {
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+          phone: formData.phone,
+          bio: formData.bio,
+          address: formData.location
+        })
+        .eq('id', user?.id);
+
+      if (error) throw error;
+      
+      showSuccess({ message: "Profile updated successfully!" });
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      toast.error('Failed to update profile');
+    }
   };
 
   const handleInputChange = (field: string, value: string) => {
@@ -177,20 +197,7 @@ const Profile = () => {
       </Card>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-2 gap-4">
-        <Card className="border-trust-100 shadow-trust">
-          <CardContent className="pt-4 text-center">
-            <div className="text-2xl font-bold text-trust-600">12</div>
-            <div className="text-sm text-muted-foreground">Appointments</div>
-          </CardContent>
-        </Card>
-        <Card className="border-trust-100 shadow-trust">
-          <CardContent className="pt-4 text-center">
-            <div className="text-2xl font-bold text-trust-600">3</div>
-            <div className="text-sm text-muted-foreground">Providers</div>
-          </CardContent>
-        </Card>
-      </div>
+      <ProfileStats userId={user?.id} />
     </div>
   );
 };

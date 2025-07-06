@@ -70,7 +70,17 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   }, [useUserLocation]);
 
-  // Convert string array to InsuranceProvider array
+  // Calculate distance between two coordinates in kilometers
+  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+    const R = 6371; // Radius of the Earth in kilometers
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return Math.round(R * c * 100) / 100; // Round to 2 decimal places
+  };
   const stringToInsuranceProvider = (
     insuranceStrings: string[] | null
   ): InsuranceProvider[] => {
@@ -119,6 +129,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         throw error;
       }
 
+      // Remove hardcoded expertise and location fallbacks
       const mappedProviders = data?.map((profile): Provider => ({
         id: profile.id,
         first_name: profile.first_name || '',
@@ -128,15 +139,18 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         provider_type: profile.provider_type || 'doctor',
         avatar_url: profile.avatar_url,
         accepted_insurances: stringToInsuranceProvider(profile.accepted_insurances),
-        expertise: ['General Medicine', 'Primary Care'],
+        expertise: profile.specialty ? [profile.specialty, 'Healthcare'] : ['General Practice'],
         location: profile.provider_locations?.[0] ? {
           latitude: Number(profile.provider_locations[0].latitude),
           longitude: Number(profile.provider_locations[0].longitude)
-        } : {
-          latitude: 37.7749,
-          longitude: -122.4194
-        },
-        distance: 5
+        } : null,
+        distance: userLocation && profile.provider_locations?.[0] ? 
+          calculateDistance(
+            userLocation.latitude,
+            userLocation.longitude,
+            Number(profile.provider_locations[0].latitude),
+            Number(profile.provider_locations[0].longitude)
+          ) : undefined
       })) || [];
 
       setProviders(mappedProviders);
