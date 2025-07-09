@@ -3,6 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { useSuccessFeedback } from '@/hooks/use-success-feedback';
 import { 
   ShieldCheck, 
   Users, 
@@ -16,13 +17,19 @@ import {
 
 export const AdminWorkflow = () => {
   const navigate = useNavigate();
+  const { showSuccess } = useSuccessFeedback();
+  
+  const handleNavigation = (route: string, title: string) => {
+    navigate(route);
+    showSuccess({ message: `Opening ${title}...` });
+  };
 
   const workflowSteps = [
     {
       title: "User Management",
       description: "Manage user accounts, roles, and permissions",
       icon: <Users className="h-5 w-5" />,
-      action: () => navigate('/admin-dashboard/users'),
+      action: () => handleNavigation('/admin-dashboard/users', 'User Management'),
       completed: false
     },
     {
@@ -85,9 +92,9 @@ export const AdminWorkflow = () => {
         </p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
         {workflowSteps.map((step, index) => (
-          <Card key={index} className="cursor-pointer hover:shadow-md transition-shadow">
+          <Card key={index} className="cursor-pointer hover:shadow-md transition-all active:scale-95">
             <CardHeader className="pb-3">
               <div className="flex items-center space-x-2">
                 <div className="p-2 bg-red-500/10 rounded-lg">
@@ -103,7 +110,7 @@ export const AdminWorkflow = () => {
               <Button 
                 onClick={step.action}
                 size="sm" 
-                className="w-full"
+                className="w-full hover:shadow-sm transition-all active:scale-95"
                 variant={step.completed ? "outline" : "default"}
               >
                 Manage

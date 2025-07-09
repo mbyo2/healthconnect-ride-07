@@ -26,10 +26,13 @@ import { AuthProvider } from '@/context/AuthContext';
 import { UserRolesProvider } from '@/context/UserRolesContext';
 import { SearchProvider } from '@/context/SearchContext';
 import { ProfileSetup } from '@/components/auth/ProfileSetup';
+import { RoleProtectedRoute } from '@/components/auth/RoleProtectedRoute';
 import UserMarketplace from "@/pages/UserMarketplace";
 import Emergency from "@/pages/Emergency";
 import PharmacyPortal from "@/pages/PharmacyPortal";
 import Marketplace from "@/pages/Marketplace";
+import ProviderDashboard from "@/pages/ProviderDashboard";
+import SuperAdminDashboard from "@/pages/SuperAdminDashboard";
 
 const supabase = createClient(
   "https://tthzcijscedgxjfnfnky.supabase.co",
@@ -176,7 +179,45 @@ const AppContent = () => {
               !session ? (
                 <Navigate to="/" replace={true} />
               ) : (
-                <AdminDashboard />
+                <RoleProtectedRoute allowedRoles={['admin']}>
+                  <AdminDashboard />
+                </RoleProtectedRoute>
+              )
+            }
+          />
+          <Route
+            path="/provider-dashboard"
+            element={
+              !session ? (
+                <Navigate to="/" replace={true} />
+              ) : (
+                <RoleProtectedRoute allowedRoles={['health_personnel']}>
+                  <ProviderDashboard />
+                </RoleProtectedRoute>
+              )
+            }
+          />
+          <Route
+            path="/super-admin-dashboard"
+            element={
+              !session ? (
+                <Navigate to="/" replace={true} />
+              ) : (
+                <RoleProtectedRoute allowedRoles={['admin']}>
+                  <SuperAdminDashboard />
+                </RoleProtectedRoute>
+              )
+            }
+          />
+          <Route
+            path="/pharmacy-inventory"
+            element={
+              !session ? (
+                <Navigate to="/" replace={true} />
+              ) : (
+                <RoleProtectedRoute allowedRoles={['health_personnel']}>
+                  <PharmacyPortal />
+                </RoleProtectedRoute>
               )
             }
           />
@@ -286,7 +327,9 @@ const AppContent = () => {
               !session ? (
                 <Navigate to="/" replace={true} />
               ) : (
-                <PharmacyPortal />
+                <RoleProtectedRoute allowedRoles={['health_personnel']}>
+                  <PharmacyPortal />
+                </RoleProtectedRoute>
               )
             }
           />

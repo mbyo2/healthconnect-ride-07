@@ -6,6 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
 import { useProfileCompletion } from '@/hooks/useProfileCompletion';
+import { useSuccessFeedback } from '@/hooks/use-success-feedback';
 import { 
   Heart, 
   Search, 
@@ -38,6 +39,7 @@ const getIcon = (iconName: string) => {
 
 export const PatientWorkflow = () => {
   const navigate = useNavigate();
+  const { showSuccess } = useSuccessFeedback();
   const { 
     isProfileComplete, 
     workflowSteps, 
@@ -57,9 +59,12 @@ export const PatientWorkflow = () => {
     );
   }
 
-  const handleNavigation = (route: string) => {
+  const handleNavigation = (route: string, title?: string) => {
     try {
       navigate(route);
+      if (title) {
+        showSuccess({ message: `Opening ${title}...` });
+      }
     } catch (error) {
       console.error('Navigation error:', error);
     }
@@ -115,17 +120,17 @@ export const PatientWorkflow = () => {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <Button
-                variant="outline"
-                className="flex items-center justify-start gap-2 h-auto py-4"
-                onClick={() => handleNavigation('/connections')}
-              >
-                <Users className="h-5 w-5" />
-                <div className="text-left">
-                  <div className="font-medium">Connect with Providers</div>
-                  <div className="text-xs text-muted-foreground">Build your healthcare network</div>
-                </div>
-              </Button>
+                <Button
+                  variant="outline"
+                  className="flex items-center justify-start gap-2 h-auto py-4 hover:bg-accent hover:shadow-sm transition-all active:scale-95"
+                  onClick={() => handleNavigation('/connections', 'Connect with Providers')}
+                >
+                  <Users className="h-5 w-5" />
+                  <div className="text-left">
+                    <div className="font-medium">Connect with Providers</div>
+                    <div className="text-xs text-muted-foreground">Build your healthcare network</div>
+                  </div>
+                </Button>
               <Button
                 variant="outline"
                 className="flex items-center justify-start gap-2 h-auto py-4"
@@ -188,7 +193,7 @@ export const PatientWorkflow = () => {
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         {workflowSteps.map((step, index) => {
           const IconComponent = getIcon(step.icon);
           const isHighlighted = step.id === nextStep?.id;
@@ -196,7 +201,7 @@ export const PatientWorkflow = () => {
           return (
             <Card 
               key={step.id} 
-              className={`cursor-pointer hover:shadow-md transition-all ${
+              className={`cursor-pointer hover:shadow-md transition-all active:scale-95 ${
                 step.completed ? 'border-green-200 bg-green-50/50' : ''
               } ${
                 isHighlighted ? 'border-blue-200 bg-blue-50/50 ring-2 ring-blue-100' : ''
@@ -238,9 +243,9 @@ export const PatientWorkflow = () => {
                   {step.description}
                 </CardDescription>
                 <Button 
-                  onClick={() => handleNavigation(step.route)}
+                  onClick={() => handleNavigation(step.route, step.title)}
                   size="sm" 
-                  className="w-full"
+                  className="w-full hover:shadow-sm transition-all active:scale-95"
                   variant={getButtonVariant(step)}
                 >
                   {getButtonText(step)}
