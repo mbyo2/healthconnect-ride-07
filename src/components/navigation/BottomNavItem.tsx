@@ -21,7 +21,7 @@ export function BottomNavItem({ to, label, icon, active, description }: BottomNa
     <Link 
       to={to}
       className={cn(
-        "flex flex-1 flex-col items-center justify-center py-3 px-2 rounded-2xl transition-all duration-300 ease-out group relative overflow-hidden min-h-[64px]",
+        "flex flex-1 flex-col items-center justify-center py-2 px-1 rounded-xl transition-all duration-300 ease-out group relative overflow-hidden min-h-[52px]",
         active 
           ? "text-trust-600 scale-105 shadow-lg" 
           : "text-muted-foreground hover:text-trust-500 hover:scale-105"
@@ -31,16 +31,16 @@ export function BottomNavItem({ to, label, icon, active, description }: BottomNa
     >
       {/* Enhanced active indicator background */}
       {active && (
-        <div className="absolute inset-0 bg-gradient-to-br from-trust-50 to-trust-100 rounded-2xl animate-in fade-in duration-300 shadow-inner" />
+        <div className="absolute inset-0 bg-gradient-to-br from-trust-50 to-trust-100 rounded-xl animate-in fade-in duration-300 shadow-inner" />
       )}
       
       {/* Icon container with better spacing */}
       <div className={cn(
-        "relative flex flex-col items-center justify-center space-y-2 transition-transform duration-200",
+        "relative flex flex-col items-center justify-center space-y-1 transition-transform duration-200",
         active && "transform-gpu"
       )}>
         <div className={cn(
-          "p-2 rounded-xl transition-all duration-200",
+          "p-1.5 rounded-lg transition-all duration-200",
           active && "bg-trust-100/70 shadow-sm"
         )}>
           {icon}
@@ -48,7 +48,7 @@ export function BottomNavItem({ to, label, icon, active, description }: BottomNa
         
         {/* Enhanced label with better readability */}
         <span className={cn(
-          "text-xs font-semibold leading-tight tracking-wide text-center",
+          "text-[10px] font-medium leading-tight tracking-tight text-center",
           active ? "text-trust-700" : "text-muted-foreground"
         )}>
           {label}
@@ -56,7 +56,7 @@ export function BottomNavItem({ to, label, icon, active, description }: BottomNa
         
         {/* Enhanced active indicator */}
         {active && (
-          <div className="absolute -bottom-1 w-2 h-2 bg-trust-500 rounded-full animate-in zoom-in duration-200 shadow-sm" />
+          <div className="absolute -bottom-0.5 w-1.5 h-1.5 bg-trust-500 rounded-full animate-in zoom-in duration-200 shadow-sm" />
         )}
       </div>
     </Link>

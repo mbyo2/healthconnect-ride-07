@@ -201,8 +201,7 @@ const PharmacyPortal = () => {
     return (
       <ProtectedRoute>
         <div className="min-h-screen bg-background">
-          <Header />
-          <main className="container mx-auto px-4 pt-20 pb-24">
+          <main className="container mx-auto px-4 py-6 space-y-6 max-w-7xl">
             <Card>
               <CardContent className="pt-6">
                 <div className="text-center">
@@ -223,8 +222,7 @@ const PharmacyPortal = () => {
   return (
     <RoleProtectedRoute allowedRoles={['admin']}>
       <div className="min-h-screen bg-background">
-        <Header />
-        <main className="container mx-auto px-4 pt-20 pb-24">
+        <main className="container mx-auto px-4 py-6 space-y-6 max-w-7xl">
           <div className="mb-8">
             <h1 className="text-3xl font-bold mb-2">{pharmacy.name} - Pharmacy Portal</h1>
             <p className="text-muted-foreground">

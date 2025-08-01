@@ -37,17 +37,17 @@ export function BottomNavMenu({ user, menuItems }: BottomNavMenuProps) {
       <SheetTrigger asChild>
         <button 
           className={cn(
-            "flex flex-1 flex-col items-center justify-center py-3 px-2 rounded-2xl transition-all duration-300 ease-out min-h-[64px]",
+            "flex flex-1 flex-col items-center justify-center py-2 px-1 rounded-xl transition-all duration-300 ease-out min-h-[52px]",
             "text-muted-foreground hover:text-trust-500 hover:scale-105 relative overflow-hidden"
           )}
           {...touchFeedbackProps}
           aria-label="More options and settings"
         >
-          <div className="flex flex-col items-center justify-center space-y-2">
-            <div className="p-2 rounded-xl">
-              <Menu className="h-6 w-6" />
+          <div className="flex flex-col items-center justify-center space-y-1">
+            <div className="p-1.5 rounded-lg">
+              <Menu className="h-5 w-5" />
             </div>
-            <span className="text-xs font-semibold leading-tight tracking-wide">More</span>
+            <span className="text-[10px] font-medium leading-tight tracking-tight">More</span>
           </div>
         </button>
       </SheetTrigger>
@@ -84,21 +84,22 @@ export function BottomNavMenu({ user, menuItems }: BottomNavMenuProps) {
               key={idx}
               variant="ghost" 
               className={cn(
-                "w-full justify-start h-auto p-4 text-left transition-all duration-200 rounded-xl",
-                "hover:bg-trust-50 hover:text-trust-700 hover:scale-[1.02] hover:shadow-md",
-                "active:scale-[0.98] group border border-transparent hover:border-trust-200"
+                "w-full justify-start h-auto p-3 text-left transition-all duration-200 rounded-lg",
+                "hover:bg-trust-50 hover:text-trust-700 hover:scale-[1.01] hover:shadow-sm",
+                "active:scale-[0.99] group border border-transparent hover:border-trust-200",
+                "touch-manipulation"
               )}
               asChild
             >
-              <Link to={item.to} className="flex items-center gap-4">
-                <div className="p-2 rounded-lg bg-trust-100 text-trust-600 group-hover:bg-trust-200 transition-colors">
+              <Link to={item.to} className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-trust-100 text-trust-600 group-hover:bg-trust-200 transition-colors flex-shrink-0">
                   {item.icon}
                 </div>
-                <div className="flex flex-col items-start gap-1">
-                  <span className="font-semibold group-hover:text-trust-800 text-base">
+                <div className="flex flex-col items-start gap-0.5 min-w-0">
+                  <span className="font-medium group-hover:text-trust-800 text-sm leading-tight">
                     {item.label}
                   </span>
-                  <span className="text-xs text-muted-foreground group-hover:text-trust-600">
+                  <span className="text-xs text-muted-foreground group-hover:text-trust-600 leading-tight">
                     {item.description}
                   </span>
                 </div>
