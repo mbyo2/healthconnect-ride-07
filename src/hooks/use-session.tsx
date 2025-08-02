@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import type { Session, User } from '@supabase/supabase-js';
 import { toast } from 'sonner';
 import { verifyBiometricSupport } from '@/utils/auth-service';
+import { logSecurityEvent, SecurityEvents, monitorSessionActivity } from '@/utils/security-service';
 
 export const useSession = () => {
   const [session, setSession] = useState<Session | null>(null);
@@ -17,6 +18,7 @@ export const useSession = () => {
   const updateActivity = useCallback(() => {
     setLastActivity(new Date());
     setIsSessionExpired(false);
+    monitorSessionActivity(); // Enhanced security monitoring
   }, []);
 
   // Check if biometrics is supported

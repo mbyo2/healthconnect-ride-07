@@ -3,6 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Upload } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { validateFileUpload } from '@/utils/input-validation';
+import { logSecurityEvent, SecurityEvents, uploadRateLimiter } from '@/utils/security-service';
 
 interface FileUploaderProps {
   onUploadComplete: (fileUrl: string, fileName: string) => void;
@@ -17,19 +19,32 @@ export const FileUploader = ({ onUploadComplete }: FileUploaderProps) => {
       const file = event.target.files?.[0];
       if (!file) return;
 
-      // Validate file type and size
-      const allowedTypes = ['image/jpeg', 'image/png', 'application/pdf', 'text/plain'];
-      const maxSize = 5 * 1024 * 1024; // 5MB
-
-      if (!allowedTypes.includes(file.type)) {
-        toast.error('Invalid file type. Please upload an image, PDF, or text file.');
+      // Rate limiting check
+      if (!uploadRateLimiter('user')) {
+        toast.error('You are uploading files too quickly. Please wait a moment.');
         return;
       }
 
-      if (file.size > maxSize) {
-        toast.error('File is too large. Maximum size is 5MB.');
+      // Enhanced file validation
+      const validation = validateFileUpload(file);
+      if (!validation.valid) {
+        toast.error(validation.error || 'Invalid file');
+        await logSecurityEvent(SecurityEvents.SUSPICIOUS_ACTIVITY, {
+          reason: 'invalid_file_upload',
+          fileName: file.name,
+          fileType: file.type,
+          fileSize: file.size,
+          error: validation.error,
+        });
         return;
       }
+
+      // Log successful file upload attempt
+      await logSecurityEvent(SecurityEvents.FILE_UPLOAD, {
+        fileName: file.name,
+        fileType: file.type,
+        fileSize: file.size,
+      });
 
       const fileExt = file.name.split('.').pop();
       const fileName = `${Math.random()}.${fileExt}`;
