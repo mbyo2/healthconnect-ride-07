@@ -84,33 +84,33 @@ export const AdminWorkflow = () => {
   ];
 
   return (
-    <div className="space-y-6">
-      <div className="text-center">
-        <h2 className="text-2xl font-bold">Admin Control Center</h2>
-        <p className="text-muted-foreground mt-2">
+    <div className="space-y-6 px-4 py-6 max-w-7xl mx-auto">
+      <div className="text-center space-y-2">
+        <h2 className="text-xl md:text-2xl font-bold">Admin Control Center</h2>
+        <p className="text-muted-foreground text-sm md:text-base px-4">
           Manage the platform, users, and ensure smooth operations
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {workflowSteps.map((step, index) => (
-          <Card key={index} className="cursor-pointer hover:shadow-md transition-all active:scale-95">
+          <Card key={index} className="cursor-pointer hover:shadow-md transition-all active:scale-95 touch-manipulation">
             <CardHeader className="pb-3">
-              <div className="flex items-center space-x-2">
-                <div className="p-2 bg-red-500/10 rounded-lg">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-red-500/10 rounded-lg flex-shrink-0">
                   {step.icon}
                 </div>
-                <CardTitle className="text-sm">{step.title}</CardTitle>
+                <CardTitle className="text-sm leading-tight">{step.title}</CardTitle>
               </div>
             </CardHeader>
             <CardContent>
-              <CardDescription className="text-xs mb-3">
+              <CardDescription className="text-xs mb-4 leading-relaxed">
                 {step.description}
               </CardDescription>
               <Button 
                 onClick={step.action}
                 size="sm" 
-                className="w-full hover:shadow-sm transition-all active:scale-95"
+                className="w-full hover:shadow-sm transition-all active:scale-95 touch-manipulation"
                 variant={step.completed ? "outline" : "default"}
               >
                 Manage

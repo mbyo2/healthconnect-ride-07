@@ -37,6 +37,13 @@ export function BottomNav() {
       description: "Find doctors and clinics"
     },
     {
+      to: "/symptoms",
+      label: "Health",
+      icon: <Heart className="h-5 w-5" />,
+      active: location.pathname === "/symptoms",
+      description: "Track symptoms and health"
+    },
+    {
       to: "/chat",
       label: "Chat",
       icon: <MessageSquare className="h-5 w-5" />,
@@ -69,12 +76,6 @@ export function BottomNav() {
       to: "/prescriptions", 
       label: "Prescriptions", 
       description: "View and manage your medications",
-      icon: <Heart className="h-5 w-5" />
-    },
-    { 
-      to: "/symptoms", 
-      label: "Health Tracking", 
-      description: "Track symptoms and health data",
       icon: <Heart className="h-5 w-5" />
     },
     { 

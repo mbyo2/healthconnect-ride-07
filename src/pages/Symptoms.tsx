@@ -49,15 +49,15 @@ const Symptoms = () => {
   };
 
   return (
-    <div className="container mx-auto py-8 space-y-6">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold mb-2">Symptom Tracker</h1>
-        <p className="text-muted-foreground">
+    <div className="container mx-auto px-4 py-6 space-y-6 max-w-7xl">
+      <div className="text-center space-y-2">
+        <h1 className="text-2xl md:text-3xl font-bold">Symptom Tracker</h1>
+        <p className="text-muted-foreground text-sm md:text-base px-4">
           Record your symptoms to help healthcare providers understand your condition
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
         <div className="space-y-6">
           <Card>
             <CardHeader>
@@ -71,18 +71,18 @@ const Symptoms = () => {
                     {category.icon}
                     {category.title}
                   </h4>
-                  <div className="flex flex-wrap gap-2">
-                    {category.symptoms.map((symptom) => (
-                      <Badge
-                        key={symptom}
-                        variant={selectedSymptoms.includes(symptom) ? "default" : "outline"}
-                        className="cursor-pointer"
-                        onClick={() => toggleSymptom(symptom)}
-                      >
-                        {symptom}
-                      </Badge>
-                    ))}
-                  </div>
+                   <div className="flex flex-wrap gap-2">
+                     {category.symptoms.map((symptom) => (
+                       <Badge
+                         key={symptom}
+                         variant={selectedSymptoms.includes(symptom) ? "default" : "outline"}
+                         className="cursor-pointer text-xs md:text-sm px-2 py-1 hover:shadow-sm transition-all touch-manipulation"
+                         onClick={() => toggleSymptom(symptom)}
+                       >
+                         {symptom}
+                       </Badge>
+                     ))}
+                   </div>
                 </div>
               ))}
             </CardContent>
@@ -118,9 +118,13 @@ const Symptoms = () => {
                 />
               </div>
 
-              <Button onClick={handleSubmit} className="w-full">
-                Record Symptoms
-              </Button>
+               <Button 
+                 onClick={handleSubmit} 
+                 className="w-full touch-manipulation hover:shadow-sm transition-all active:scale-95"
+                 size="lg"
+               >
+                 Record Symptoms
+               </Button>
             </CardContent>
           </Card>
 

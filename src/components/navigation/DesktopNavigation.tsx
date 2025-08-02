@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import { Home, Search, Calendar, MessageSquare, Settings, BookOpen, CheckSquare } from "lucide-react";
+import { Home, Search, Calendar, MessageSquare, Settings, BookOpen, CheckSquare, Heart } from "lucide-react";
 
 export const DesktopNavigation = () => {
   const location = useLocation();
@@ -23,6 +23,12 @@ export const DesktopNavigation = () => {
       to: "/appointments",
       label: "Appointments",
       icon: <Calendar className="h-5 w-5 mr-2" />,
+      requireAuth: true,
+    },
+    {
+      to: "/symptoms",
+      label: "Health Tracker",
+      icon: <Heart className="h-5 w-5 mr-2" />,
       requireAuth: true,
     },
     {

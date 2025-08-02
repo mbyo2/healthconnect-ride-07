@@ -119,49 +119,57 @@ export const PatientWorkflow = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3">
                 <Button
                   variant="outline"
-                  className="flex items-center justify-start gap-2 h-auto py-4 hover:bg-accent hover:shadow-sm transition-all active:scale-95"
+                  className="flex items-center justify-start gap-3 h-auto p-4 text-left hover:bg-accent hover:shadow-sm transition-all active:scale-95"
                   onClick={() => handleNavigation('/connections', 'Connect with Providers')}
                 >
-                  <Users className="h-5 w-5" />
-                  <div className="text-left">
-                    <div className="font-medium">Connect with Providers</div>
-                    <div className="text-xs text-muted-foreground">Build your healthcare network</div>
+                  <div className="flex-shrink-0">
+                    <Users className="h-5 w-5 text-primary" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="font-medium text-sm">Connect with Providers</div>
+                    <div className="text-xs text-muted-foreground leading-relaxed">Build your healthcare network</div>
                   </div>
                 </Button>
               <Button
                 variant="outline"
-                className="flex items-center justify-start gap-2 h-auto py-4"
+                className="flex items-center justify-start gap-3 h-auto p-4 text-left hover:bg-accent hover:shadow-sm transition-all active:scale-95"
                 onClick={() => handleNavigation('/appointments')}
               >
-                <Calendar className="h-5 w-5" />
-                <div className="text-left">
-                  <div className="font-medium">Book Appointment</div>
-                  <div className="text-xs text-muted-foreground">Schedule with providers</div>
+                <div className="flex-shrink-0">
+                  <Calendar className="h-5 w-5 text-primary" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="font-medium text-sm">Book Appointment</div>
+                  <div className="text-xs text-muted-foreground leading-relaxed">Schedule with providers</div>
                 </div>
               </Button>
               <Button
                 variant="outline"
-                className="flex items-center justify-start gap-2 h-auto py-4"
+                className="flex items-center justify-start gap-3 h-auto p-4 text-left hover:bg-accent hover:shadow-sm transition-all active:scale-95"
                 onClick={() => handleNavigation('/video-dashboard')}
               >
-                <Video className="h-5 w-5" />
-                <div className="text-left">
-                  <div className="font-medium">Video Consultation</div>
-                  <div className="text-xs text-muted-foreground">Connect via video call</div>
+                <div className="flex-shrink-0">
+                  <Video className="h-5 w-5 text-primary" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="font-medium text-sm">Video Consultation</div>
+                  <div className="text-xs text-muted-foreground leading-relaxed">Connect via video call</div>
                 </div>
               </Button>
               <Button
                 variant="outline"
-                className="flex items-center justify-start gap-2 h-auto py-4"
+                className="flex items-center justify-start gap-3 h-auto p-4 text-left hover:bg-accent hover:shadow-sm transition-all active:scale-95"
                 onClick={() => handleNavigation('/symptoms')}
               >
-                <Activity className="h-5 w-5" />
-                <div className="text-left">
-                  <div className="font-medium">Track Health</div>
-                  <div className="text-xs text-muted-foreground">Log symptoms & metrics</div>
+                <div className="flex-shrink-0">
+                  <Activity className="h-5 w-5 text-primary" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="font-medium text-sm">Track Health</div>
+                  <div className="text-xs text-muted-foreground leading-relaxed">Log symptoms & metrics</div>
                 </div>
               </Button>
             </div>
@@ -193,7 +201,7 @@ export const PatientWorkflow = () => {
         </div>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {workflowSteps.map((step, index) => {
           const IconComponent = getIcon(step.icon);
           const isHighlighted = step.id === nextStep?.id;
@@ -201,7 +209,7 @@ export const PatientWorkflow = () => {
           return (
             <Card 
               key={step.id} 
-              className={`cursor-pointer hover:shadow-md transition-all active:scale-95 ${
+              className={`cursor-pointer hover:shadow-md transition-all active:scale-95 touch-manipulation ${
                 step.completed ? 'border-green-200 bg-green-50/50' : ''
               } ${
                 isHighlighted ? 'border-blue-200 bg-blue-50/50 ring-2 ring-blue-100' : ''
@@ -209,8 +217,8 @@ export const PatientWorkflow = () => {
             >
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <div className={`p-2 rounded-lg ${
+                  <div className="flex items-center space-x-3">
+                    <div className={`p-2 rounded-lg flex-shrink-0 ${
                       step.completed ? 'bg-green-500/10' : 
                       isHighlighted ? 'bg-blue-500/10' : 'bg-gray-500/10'
                     }`}>
@@ -219,13 +227,15 @@ export const PatientWorkflow = () => {
                         isHighlighted ? 'text-blue-600' : 'text-gray-600'
                       }`} />
                     </div>
-                    <CardTitle className="text-sm">{step.title}</CardTitle>
+                    <CardTitle className="text-sm leading-tight">{step.title}</CardTitle>
                   </div>
-                  {step.completed ? (
-                    <CheckCircle2 className="h-4 w-4 text-green-600" />
-                  ) : (
-                    <Circle className="h-4 w-4 text-gray-400" />
-                  )}
+                  <div className="flex-shrink-0">
+                    {step.completed ? (
+                      <CheckCircle2 className="h-4 w-4 text-green-600" />
+                    ) : (
+                      <Circle className="h-4 w-4 text-gray-400" />
+                    )}
+                  </div>
                 </div>
                 {step.required && !step.completed && (
                   <Badge variant="secondary" className="w-fit text-xs">
@@ -239,13 +249,13 @@ export const PatientWorkflow = () => {
                 )}
               </CardHeader>
               <CardContent>
-                <CardDescription className="text-xs mb-3">
+                <CardDescription className="text-xs mb-4 leading-relaxed">
                   {step.description}
                 </CardDescription>
                 <Button 
                   onClick={() => handleNavigation(step.route, step.title)}
                   size="sm" 
-                  className="w-full hover:shadow-sm transition-all active:scale-95"
+                  className="w-full hover:shadow-sm transition-all active:scale-95 touch-manipulation"
                   variant={getButtonVariant(step)}
                 >
                   {getButtonText(step)}
