@@ -33,6 +33,10 @@ import PharmacyPortal from "@/pages/PharmacyPortal";
 import Marketplace from "@/pages/Marketplace";
 import ProviderDashboard from "@/pages/ProviderDashboard";
 import SuperAdminDashboard from "@/pages/SuperAdminDashboard";
+import HealthcareApplication from "@/pages/HealthcareApplication";
+import Terms from "@/pages/Terms";
+import Privacy from "@/pages/Privacy";
+import Contact from "@/pages/Contact";
 
 const supabase = createClient(
   "https://tthzcijscedgxjfnfnky.supabase.co",
@@ -79,6 +83,9 @@ const AppContent = () => {
           <Route path="/landing" element={<Landing />} />
           <Route path="/healthcare-professionals" element={<HealthcareProfessionals />} />
           <Route path="/healthcare-institutions" element={<HealthcareInstitutions />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/contact" element={<Contact />} />
           
           {/* Auth Route */}
           <Route
@@ -333,6 +340,19 @@ const AppContent = () => {
               )
             }
           />
+          <Route
+            path="/healthcare-application"
+            element={
+              !session ? (
+                <Navigate to="/" replace={true} />
+              ) : (
+                <HealthcareApplication />
+              )
+            }
+          />
+          
+          {/* Catch-all route for 404 */}
+          <Route path="*" element={<div className="min-h-screen flex items-center justify-center"><div className="text-center"><h1 className="text-4xl font-bold mb-4">404 - Page Not Found</h1><p className="text-muted-foreground mb-4">The page you're looking for doesn't exist.</p><button onClick={() => window.location.href = '/'} className="px-4 py-2 bg-primary text-primary-foreground rounded-md">Go Home</button></div></div>} />
         </Routes>
       </MobileLayout>
     </Router>

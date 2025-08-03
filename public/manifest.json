@@ -1,8 +1,8 @@
 
 {
-  "name": "Doc' O Clock - Healthcare Services",
+  "name": "Doc' O Clock - Complete Healthcare Platform",
   "short_name": "Doc' O Clock",
-  "description": "Healthcare services at your fingertips - Book appointments, chat with doctors, and manage your health",
+  "description": "Complete healthcare platform connecting patients with doctors, pharmacies, and emergency services. Book appointments, order medications, and access telemedicine services.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
