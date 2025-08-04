@@ -81,11 +81,11 @@ export const ConnectionsDashboard = () => {
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="connections">My Connections</TabsTrigger>
-          <TabsTrigger value="requests">Requests</TabsTrigger>
-          <TabsTrigger value="search">Find Providers</TabsTrigger>
-          <TabsTrigger value="primary">Primary Provider</TabsTrigger>
+          <TabsTrigger value="overview" className="text-xs">Overview</TabsTrigger>
+          <TabsTrigger value="connections" className="text-xs">Connect</TabsTrigger>
+          <TabsTrigger value="requests" className="text-xs">Requests</TabsTrigger>
+          <TabsTrigger value="search" className="text-xs">Find</TabsTrigger>
+          <TabsTrigger value="primary" className="text-xs">Primary</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
