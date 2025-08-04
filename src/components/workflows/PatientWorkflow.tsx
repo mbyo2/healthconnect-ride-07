@@ -122,54 +122,54 @@ export const PatientWorkflow = () => {
             <div className="grid grid-cols-1 gap-3">
                 <Button
                   variant="outline"
-                  className="flex items-center justify-start gap-3 h-auto p-4 text-left hover:bg-accent hover:shadow-sm transition-all active:scale-95"
+                  className="flex items-center justify-start gap-3 h-auto p-3 text-left hover:bg-accent hover:shadow-sm transition-all active:scale-95"
                   onClick={() => handleNavigation('/connections', 'Connect with Providers')}
                 >
                   <div className="flex-shrink-0">
-                    <Users className="h-5 w-5 text-primary" />
+                    <Users className="h-4 w-4 text-primary" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="font-medium text-sm">Connect with Providers</div>
-                    <div className="text-xs text-muted-foreground leading-relaxed">Build your healthcare network</div>
+                    <div className="font-medium text-xs">Connect Providers</div>
+                    <div className="text-xs text-muted-foreground leading-tight">Build network</div>
                   </div>
                 </Button>
               <Button
                 variant="outline"
-                className="flex items-center justify-start gap-3 h-auto p-4 text-left hover:bg-accent hover:shadow-sm transition-all active:scale-95"
+                className="flex items-center justify-start gap-3 h-auto p-3 text-left hover:bg-accent hover:shadow-sm transition-all active:scale-95"
                 onClick={() => handleNavigation('/appointments')}
               >
                 <div className="flex-shrink-0">
-                  <Calendar className="h-5 w-5 text-primary" />
+                  <Calendar className="h-4 w-4 text-primary" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="font-medium text-sm">Book Appointment</div>
-                  <div className="text-xs text-muted-foreground leading-relaxed">Schedule with providers</div>
+                  <div className="font-medium text-xs">Book Appointment</div>
+                  <div className="text-xs text-muted-foreground leading-tight">Schedule care</div>
                 </div>
               </Button>
               <Button
                 variant="outline"
-                className="flex items-center justify-start gap-3 h-auto p-4 text-left hover:bg-accent hover:shadow-sm transition-all active:scale-95"
+                className="flex items-center justify-start gap-3 h-auto p-3 text-left hover:bg-accent hover:shadow-sm transition-all active:scale-95"
                 onClick={() => handleNavigation('/video-dashboard')}
               >
                 <div className="flex-shrink-0">
-                  <Video className="h-5 w-5 text-primary" />
+                  <Video className="h-4 w-4 text-primary" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="font-medium text-sm">Video Consultation</div>
-                  <div className="text-xs text-muted-foreground leading-relaxed">Connect via video call</div>
+                  <div className="font-medium text-xs">Video Consult</div>
+                  <div className="text-xs text-muted-foreground leading-tight">Video calls</div>
                 </div>
               </Button>
               <Button
                 variant="outline"
-                className="flex items-center justify-start gap-3 h-auto p-4 text-left hover:bg-accent hover:shadow-sm transition-all active:scale-95"
+                className="flex items-center justify-start gap-3 h-auto p-3 text-left hover:bg-accent hover:shadow-sm transition-all active:scale-95"
                 onClick={() => handleNavigation('/symptoms')}
               >
                 <div className="flex-shrink-0">
-                  <Activity className="h-5 w-5 text-primary" />
+                  <Activity className="h-4 w-4 text-primary" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="font-medium text-sm">Track Health</div>
-                  <div className="text-xs text-muted-foreground leading-relaxed">Log symptoms & metrics</div>
+                  <div className="font-medium text-xs">Track Health</div>
+                  <div className="text-xs text-muted-foreground leading-tight">Log symptoms</div>
                 </div>
               </Button>
             </div>

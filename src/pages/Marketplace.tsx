@@ -50,21 +50,21 @@ const Marketplace = () => {
     <ProtectedRoute>
       <div className="min-h-screen bg-background">
         <main className="container mx-auto px-4 py-6 space-y-6 max-w-7xl">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2">Pharmacy Marketplace</h1>
-            <p className="text-muted-foreground">
-              Order medications from verified pharmacies with home delivery
+          <div className="mb-6">
+            <h1 className="text-xl md:text-3xl font-bold mb-2">Pharmacy Marketplace</h1>
+            <p className="text-muted-foreground text-sm md:text-base">
+              Order medications from verified pharmacies
             </p>
           </div>
 
           <Tabs defaultValue="products">
             <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="products">Browse Products</TabsTrigger>
-              <TabsTrigger value="cart" className="flex items-center gap-2">
-                <ShoppingCart className="h-4 w-4" />
+              <TabsTrigger value="products" className="text-xs">Browse</TabsTrigger>
+              <TabsTrigger value="cart" className="flex items-center gap-1 text-xs">
+                <ShoppingCart className="h-3 w-3" />
                 Cart ({cart.items.length})
               </TabsTrigger>
-              <TabsTrigger value="orders">My Orders</TabsTrigger>
+              <TabsTrigger value="orders" className="text-xs">Orders</TabsTrigger>
             </TabsList>
 
             <TabsContent value="products" className="space-y-6">

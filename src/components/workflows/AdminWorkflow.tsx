@@ -27,59 +27,67 @@ export const AdminWorkflow = () => {
   const workflowSteps = [
     {
       title: "User Management",
-      description: "Manage user accounts, roles, and permissions",
+      description: "Manage accounts and permissions",
       icon: <Users className="h-5 w-5" />,
       action: () => handleNavigation('/admin-dashboard/users', 'User Management'),
-      completed: false
+      completed: false,
+      route: '/admin-dashboard'
     },
     {
-      title: "Provider Applications",
-      description: "Review and approve healthcare provider applications",
+      title: "Provider Apps",
+      description: "Review healthcare applications",
       icon: <FileCheck className="h-5 w-5" />,
       action: () => navigate('/admin-dashboard/applications'),
-      completed: false
+      completed: false,
+      route: '/admin-dashboard'
     },
     {
-      title: "System Analytics",
-      description: "View platform usage and performance metrics",
+      title: "Analytics",
+      description: "Platform metrics and reports",
       icon: <BarChart3 className="h-5 w-5" />,
       action: () => navigate('/admin-dashboard/analytics'),
-      completed: false
+      completed: false,
+      route: '/admin-dashboard'
     },
     {
-      title: "Financial Management",
-      description: "Manage payments, billing, and financial reports",
+      title: "Financial",
+      description: "Payments and billing reports",
       icon: <CreditCard className="h-5 w-5" />,
       action: () => navigate('/admin-wallet'),
-      completed: false
+      completed: false,
+      route: '/admin-wallet'
     },
     {
-      title: "Institution Management",
-      description: "Manage healthcare institutions and facilities",
+      title: "Institutions",
+      description: "Healthcare facility management",
       icon: <Building2 className="h-5 w-5" />,
       action: () => navigate('/admin-dashboard/institutions'),
-      completed: false
+      completed: false,
+      route: '/admin-dashboard'
     },
     {
       title: "Create Admins",
-      description: "Create new admin and super admin accounts",
+      description: "New admin accounts",
       icon: <UserPlus className="h-5 w-5" />,
       action: () => navigate('/create-admin'),
-      completed: false
+      completed: false,
+      route: '/create-admin'
     },
     {
-      title: "System Settings",
-      description: "Configure platform settings and preferences",
+      title: "Settings",
+      description: "Platform configuration",
       icon: <Settings className="h-5 w-5" />,
       action: () => navigate('/admin-dashboard/settings'),
-      completed: false
+      completed: false,
+      route: '/settings'
     },
     {
-      title: "Security & Compliance",
-      description: "Manage security settings and compliance reports",
+      title: "Security",
+      description: "Security and compliance",
       icon: <ShieldCheck className="h-5 w-5" />,
       action: () => navigate('/admin-dashboard/security'),
-      completed: false
+      completed: false,
+      route: '/admin-dashboard'
     }
   ];
 
@@ -96,21 +104,21 @@ export const AdminWorkflow = () => {
         {workflowSteps.map((step, index) => (
           <Card key={index} className="cursor-pointer hover:shadow-md transition-all active:scale-95 touch-manipulation">
             <CardHeader className="pb-3">
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-2">
                 <div className="p-2 bg-red-500/10 rounded-lg flex-shrink-0">
                   {step.icon}
                 </div>
-                <CardTitle className="text-sm leading-tight">{step.title}</CardTitle>
+                <CardTitle className="text-xs leading-tight">{step.title}</CardTitle>
               </div>
             </CardHeader>
             <CardContent>
-              <CardDescription className="text-xs mb-4 leading-relaxed">
+              <CardDescription className="text-xs mb-3 leading-tight">
                 {step.description}
               </CardDescription>
               <Button 
-                onClick={step.action}
+                onClick={() => handleNavigation(step.route, step.title)}
                 size="sm" 
-                className="w-full hover:shadow-sm transition-all active:scale-95 touch-manipulation"
+                className="w-full hover:shadow-sm transition-all active:scale-95 touch-manipulation text-xs"
                 variant={step.completed ? "outline" : "default"}
               >
                 Manage

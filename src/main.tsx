@@ -7,7 +7,7 @@ import App from './App';
 import './index.css';
 import './App.css';
 import { Toaster } from 'sonner';
-import { ThemeProvider } from './context/ThemeContext';
+import { ThemeProvider } from './hooks/use-theme';
 import { AccessibilityProvider } from './context/AccessibilityContext';
 import { registerServiceWorker } from './utils/service-worker';
 import { AuthProvider } from './context/AuthContext';

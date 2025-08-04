@@ -26,60 +26,68 @@ export const HealthPersonnelWorkflow = () => {
 
   const workflowSteps = [
     {
-      title: "Setup Profile",
-      description: "Complete your professional profile and credentials",
+      title: "Professional Profile",
+      description: "Complete credentials and specializations",
       icon: <Stethoscope className="h-5 w-5" />,
       action: () => handleNavigation('/profile-setup', 'Setup Profile'),
-      completed: false
+      completed: false,
+      route: '/profile-setup'
     },
     {
-      title: "Manage Schedule",
-      description: "Set your availability and working hours",
+      title: "Schedule Management",
+      description: "Set availability and working hours",
       icon: <Calendar className="h-5 w-5" />,
       action: () => navigate('/provider-dashboard'),
-      completed: false
+      completed: false,
+      route: '/provider-dashboard'
     },
     {
       title: "Patient Waitlist",
-      description: "Review and manage patient appointments",
+      description: "Review and manage appointments",
       icon: <Users className="h-5 w-5" />,
       action: () => navigate('/provider-dashboard'),
-      completed: false
+      completed: false,
+      route: '/provider-dashboard'
     },
     {
-      title: "Digital Signatures",
-      description: "Manage prescriptions and digital signatures",
+      title: "Prescriptions",
+      description: "Digital signatures and prescriptions",
       icon: <FileText className="h-5 w-5" />,
       action: () => navigate('/provider-dashboard'),
-      completed: false
+      completed: false,
+      route: '/provider-dashboard'
     },
     {
-      title: "Pharmacy Inventory",
-      description: "Manage medication inventory and supplies",
+      title: "Inventory",
+      description: "Medication and supply management",
       icon: <Package className="h-5 w-5" />,
       action: () => navigate('/pharmacy-inventory'),
-      completed: false
+      completed: false,
+      route: '/pharmacy-inventory'
     },
     {
-      title: "Patient Communication",
-      description: "Chat with patients and provide consultations",
+      title: "Patient Chat",
+      description: "Communicate with patients",
       icon: <MessageSquare className="h-5 w-5" />,
       action: () => navigate('/chat'),
-      completed: false
+      completed: false,
+      route: '/chat'
     },
     {
-      title: "Applications Review",
-      description: "Review healthcare applications and certifications",
+      title: "Applications",
+      description: "Review healthcare applications",
       icon: <ClipboardList className="h-5 w-5" />,
       action: () => navigate('/healthcare-application'),
-      completed: false
+      completed: false,
+      route: '/healthcare-application'
     },
     {
       title: "Settings",
-      description: "Configure practice settings and preferences",
+      description: "Configure practice preferences",
       icon: <Settings className="h-5 w-5" />,
       action: () => navigate('/settings'),
-      completed: false
+      completed: false,
+      route: '/settings'
     }
   ];
 
@@ -96,21 +104,21 @@ export const HealthPersonnelWorkflow = () => {
         {workflowSteps.map((step, index) => (
           <Card key={index} className="cursor-pointer hover:shadow-md transition-all active:scale-95 touch-manipulation">
             <CardHeader className="pb-3">
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-2">
                 <div className="p-2 bg-green-500/10 rounded-lg flex-shrink-0">
                   {step.icon}
                 </div>
-                <CardTitle className="text-sm leading-tight">{step.title}</CardTitle>
+                <CardTitle className="text-xs leading-tight">{step.title}</CardTitle>
               </div>
             </CardHeader>
             <CardContent>
-              <CardDescription className="text-xs mb-4 leading-relaxed">
+              <CardDescription className="text-xs mb-3 leading-tight">
                 {step.description}
               </CardDescription>
               <Button 
-                onClick={step.action}
+                onClick={() => handleNavigation(step.route, step.title)}
                 size="sm" 
-                className="w-full hover:shadow-sm transition-all active:scale-95 touch-manipulation"
+                className="w-full hover:shadow-sm transition-all active:scale-95 touch-manipulation text-xs"
                 variant={step.completed ? "outline" : "default"}
               >
                 {step.completed ? "Manage" : "Setup"}
