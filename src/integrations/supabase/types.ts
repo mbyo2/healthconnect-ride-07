@@ -150,6 +150,197 @@ export type Database = {
           },
         ]
       }
+      comprehensive_health_metrics: {
+        Row: {
+          created_at: string | null
+          device_used: string | null
+          id: string
+          is_patient_entered: boolean | null
+          metric_category: string
+          metric_name: string
+          notes: string | null
+          recorded_at: string | null
+          recorded_by: string | null
+          reference_range_max: number | null
+          reference_range_min: number | null
+          status: string | null
+          trend_direction: string | null
+          unit: string
+          user_id: string
+          value: number
+        }
+        Insert: {
+          created_at?: string | null
+          device_used?: string | null
+          id?: string
+          is_patient_entered?: boolean | null
+          metric_category: string
+          metric_name: string
+          notes?: string | null
+          recorded_at?: string | null
+          recorded_by?: string | null
+          reference_range_max?: number | null
+          reference_range_min?: number | null
+          status?: string | null
+          trend_direction?: string | null
+          unit: string
+          user_id: string
+          value: number
+        }
+        Update: {
+          created_at?: string | null
+          device_used?: string | null
+          id?: string
+          is_patient_entered?: boolean | null
+          metric_category?: string
+          metric_name?: string
+          notes?: string | null
+          recorded_at?: string | null
+          recorded_by?: string | null
+          reference_range_max?: number | null
+          reference_range_min?: number | null
+          status?: string | null
+          trend_direction?: string | null
+          unit?: string
+          user_id?: string
+          value?: number
+        }
+        Relationships: []
+      }
+      comprehensive_medical_records: {
+        Row: {
+          attachments: string[] | null
+          clinical_data: Json | null
+          created_at: string | null
+          description: string | null
+          id: string
+          is_private: boolean | null
+          patient_id: string
+          provider_id: string | null
+          record_type: string
+          severity_level: string | null
+          status: string | null
+          title: string
+          updated_at: string | null
+          visit_date: string
+        }
+        Insert: {
+          attachments?: string[] | null
+          clinical_data?: Json | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_private?: boolean | null
+          patient_id: string
+          provider_id?: string | null
+          record_type: string
+          severity_level?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string | null
+          visit_date: string
+        }
+        Update: {
+          attachments?: string[] | null
+          clinical_data?: Json | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_private?: boolean | null
+          patient_id?: string
+          provider_id?: string | null
+          record_type?: string
+          severity_level?: string | null
+          status?: string | null
+          title?: string
+          updated_at?: string | null
+          visit_date?: string
+        }
+        Relationships: []
+      }
+      comprehensive_prescriptions: {
+        Row: {
+          created_at: string | null
+          digital_signature: string | null
+          dosage: string
+          duration_days: number | null
+          expiry_date: string | null
+          generic_name: string | null
+          id: string
+          indication: string | null
+          instructions: string
+          is_controlled_substance: boolean | null
+          medication_name: string
+          notes: string | null
+          patient_id: string
+          pharmacy_id: string | null
+          prescribed_date: string
+          prescription_number: string | null
+          provider_id: string
+          quantity: number
+          refills_remaining: number | null
+          status: string | null
+          strength: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          digital_signature?: string | null
+          dosage: string
+          duration_days?: number | null
+          expiry_date?: string | null
+          generic_name?: string | null
+          id?: string
+          indication?: string | null
+          instructions: string
+          is_controlled_substance?: boolean | null
+          medication_name: string
+          notes?: string | null
+          patient_id: string
+          pharmacy_id?: string | null
+          prescribed_date?: string
+          prescription_number?: string | null
+          provider_id: string
+          quantity: number
+          refills_remaining?: number | null
+          status?: string | null
+          strength?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          digital_signature?: string | null
+          dosage?: string
+          duration_days?: number | null
+          expiry_date?: string | null
+          generic_name?: string | null
+          id?: string
+          indication?: string | null
+          instructions?: string
+          is_controlled_substance?: boolean | null
+          medication_name?: string
+          notes?: string | null
+          patient_id?: string
+          pharmacy_id?: string | null
+          prescribed_date?: string
+          prescription_number?: string | null
+          provider_id?: string
+          quantity?: number
+          refills_remaining?: number | null
+          status?: string | null
+          strength?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comprehensive_prescriptions_pharmacy_id_fkey"
+            columns: ["pharmacy_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       delivery_tracking: {
         Row: {
           created_at: string | null
@@ -339,6 +530,57 @@ export type Database = {
           patient_id?: string
           status?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      emergency_protocols: {
+        Row: {
+          condition_description: string
+          created_at: string | null
+          emergency_contact_ids: string[] | null
+          emergency_instructions: string
+          emergency_medications: string[] | null
+          healthcare_provider_contact: string | null
+          id: string
+          is_active: boolean | null
+          medications_to_avoid: string[] | null
+          patient_id: string
+          priority_level: number | null
+          protocol_type: string
+          special_considerations: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          condition_description: string
+          created_at?: string | null
+          emergency_contact_ids?: string[] | null
+          emergency_instructions: string
+          emergency_medications?: string[] | null
+          healthcare_provider_contact?: string | null
+          id?: string
+          is_active?: boolean | null
+          medications_to_avoid?: string[] | null
+          patient_id: string
+          priority_level?: number | null
+          protocol_type: string
+          special_considerations?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          condition_description?: string
+          created_at?: string | null
+          emergency_contact_ids?: string[] | null
+          emergency_instructions?: string
+          emergency_medications?: string[] | null
+          healthcare_provider_contact?: string | null
+          id?: string
+          is_active?: boolean | null
+          medications_to_avoid?: string[] | null
+          patient_id?: string
+          priority_level?: number | null
+          protocol_type?: string
+          special_considerations?: string | null
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -806,6 +1048,68 @@ export type Database = {
             columns: ["patient_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      insurance_verifications: {
+        Row: {
+          copay_amount: number | null
+          coverage_details: Json | null
+          coverage_percentage: number | null
+          created_at: string | null
+          deductible_remaining: number | null
+          expiry_date: string | null
+          id: string
+          insurance_info_id: string | null
+          patient_id: string
+          pre_authorization_required: boolean | null
+          updated_at: string | null
+          verification_date: string | null
+          verification_notes: string | null
+          verification_status: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          copay_amount?: number | null
+          coverage_details?: Json | null
+          coverage_percentage?: number | null
+          created_at?: string | null
+          deductible_remaining?: number | null
+          expiry_date?: string | null
+          id?: string
+          insurance_info_id?: string | null
+          patient_id: string
+          pre_authorization_required?: boolean | null
+          updated_at?: string | null
+          verification_date?: string | null
+          verification_notes?: string | null
+          verification_status?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          copay_amount?: number | null
+          coverage_details?: Json | null
+          coverage_percentage?: number | null
+          created_at?: string | null
+          deductible_remaining?: number | null
+          expiry_date?: string | null
+          id?: string
+          insurance_info_id?: string | null
+          patient_id?: string
+          pre_authorization_required?: boolean | null
+          updated_at?: string | null
+          verification_date?: string | null
+          verification_notes?: string | null
+          verification_status?: string | null
+          verified_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "insurance_verifications_insurance_info_id_fkey"
+            columns: ["insurance_info_id"]
+            isOneToOne: false
+            referencedRelation: "insurance_information"
             referencedColumns: ["id"]
           },
         ]
@@ -2147,6 +2451,75 @@ export type Database = {
           requested_by?: string | null
           status?: string
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      user_sessions: {
+        Row: {
+          created_at: string | null
+          expires_at: string
+          id: string
+          ip_address: unknown | null
+          is_active: boolean | null
+          last_activity: string | null
+          session_token: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          expires_at: string
+          id?: string
+          ip_address?: unknown | null
+          is_active?: boolean | null
+          last_activity?: string | null
+          session_token: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          expires_at?: string
+          id?: string
+          ip_address?: unknown | null
+          is_active?: boolean | null
+          last_activity?: string | null
+          session_token?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_two_factor: {
+        Row: {
+          backup_codes: string[]
+          created_at: string | null
+          enabled: boolean | null
+          id: string
+          secret: string
+          updated_at: string | null
+          user_id: string
+          verified_at: string | null
+        }
+        Insert: {
+          backup_codes: string[]
+          created_at?: string | null
+          enabled?: boolean | null
+          id?: string
+          secret: string
+          updated_at?: string | null
+          user_id: string
+          verified_at?: string | null
+        }
+        Update: {
+          backup_codes?: string[]
+          created_at?: string | null
+          enabled?: boolean | null
+          id?: string
+          secret?: string
+          updated_at?: string | null
+          user_id?: string
+          verified_at?: string | null
         }
         Relationships: []
       }
