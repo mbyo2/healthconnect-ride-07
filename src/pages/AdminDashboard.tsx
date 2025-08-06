@@ -16,10 +16,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DataTable } from "@/components/ui/data-table";
 import { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal, Check, X, AlertTriangle, UserPlus, Building, Users, Activity, Calendar, DollarSign } from "lucide-react";
+import { MoreHorizontal, Check, X, AlertTriangle, UserPlus, Building, Users, Activity, Calendar, DollarSign, Database } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { AdminLevel, StatusType } from "@/types/settings";
+import { TestAccountSetup } from "@/components/admin/TestAccountSetup";
 
 type Application = {
   id: string;
@@ -709,6 +710,10 @@ const AdminDashboard = () => {
           <TabsTrigger value="applications">Applications</TabsTrigger>
           <TabsTrigger value="institutions">Institutions</TabsTrigger>
           <TabsTrigger value="admins">Admins</TabsTrigger>
+          <TabsTrigger value="accounts" className="flex items-center gap-2">
+            <Database className="h-4 w-4" />
+            Test Accounts
+          </TabsTrigger>
         </TabsList>
         
         <TabsContent value="overview" className="space-y-6">
@@ -939,6 +944,10 @@ const AdminDashboard = () => {
               />
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="accounts">
+          <TestAccountSetup />
         </TabsContent>
       </Tabs>
     </div>
