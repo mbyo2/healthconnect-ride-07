@@ -78,6 +78,7 @@ const AppContent = () => {
   return (
     <SearchProvider>
       <Router>
+        <SessionManager>
         <MobileLayout>
         <Routes>
           {/* Public Routes */}
@@ -355,8 +356,9 @@ const AppContent = () => {
           {/* Catch-all route for 404 */}
           <Route path="*" element={<div className="min-h-screen flex items-center justify-center"><div className="text-center"><h1 className="text-4xl font-bold mb-4">404 - Page Not Found</h1><p className="text-muted-foreground mb-4">The page you're looking for doesn't exist.</p><button onClick={() => window.location.href = '/'} className="px-4 py-2 bg-primary text-primary-foreground rounded-md">Go Home</button></div></div>} />
         </Routes>
-      </MobileLayout>
-    </Router>
+        </MobileLayout>
+        </SessionManager>
+      </Router>
     </SearchProvider>
   );
 };
@@ -366,9 +368,7 @@ const App = () => {
     <SessionContextProvider supabaseClient={supabase}>
       <AuthProvider>
         <UserRolesProvider>
-          <SessionManager>
-            <AppContent />
-          </SessionManager>
+          <AppContent />
         </UserRolesProvider>
       </AuthProvider>
     </SessionContextProvider>
