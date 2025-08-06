@@ -25,6 +25,7 @@ import Documentation from '@/pages/Documentation';
 import { AuthProvider } from '@/context/AuthContext';
 import { UserRolesProvider } from '@/context/UserRolesContext';
 import { SearchProvider } from '@/context/SearchContext';
+import { SessionManager } from '@/components/auth/SessionManager';
 import { ProfileSetup } from '@/components/auth/ProfileSetup';
 import { RoleProtectedRoute } from '@/components/auth/RoleProtectedRoute';
 import UserMarketplace from "@/pages/UserMarketplace";
@@ -365,7 +366,9 @@ const App = () => {
     <SessionContextProvider supabaseClient={supabase}>
       <AuthProvider>
         <UserRolesProvider>
-          <AppContent />
+          <SessionManager>
+            <AppContent />
+          </SessionManager>
         </UserRolesProvider>
       </AuthProvider>
     </SessionContextProvider>

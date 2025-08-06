@@ -17,6 +17,8 @@ import {
 } from "lucide-react";
 import { getMedicalRecords, getHealthMetrics, type MedicalRecord, type HealthMetric } from "@/services/medicalRecords";
 import { useNavigate } from "react-router-dom";
+import { ComprehensiveMedicalRecords } from "@/components/patient/ComprehensiveMedicalRecords";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 
 export default function MedicalRecords() {
   const [records, setRecords] = useState<MedicalRecord[]>([]);
@@ -80,7 +82,12 @@ export default function MedicalRecords() {
   }
 
   return (
-    <div className="container mx-auto py-8 space-y-8">
+    <ProtectedRoute>
+      <div className="container mx-auto py-8 space-y-8">
+        {/* New Comprehensive Medical Records Section */}
+        <ComprehensiveMedicalRecords />
+        
+        <Separator />
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between">
         <div>
@@ -226,6 +233,7 @@ export default function MedicalRecords() {
           </div>
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </ProtectedRoute>
   );
 }

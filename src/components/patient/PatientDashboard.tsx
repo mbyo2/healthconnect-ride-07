@@ -9,6 +9,10 @@ import { SymptomsDiary } from "./SymptomsDiary";
 import { HealthMetricsChart } from "./HealthMetricsChart";
 import { MedicalHistory } from "./MedicalHistory";
 import { AppointmentsList } from "./AppointmentsList";
+import { ComprehensiveMedicalRecords } from "./ComprehensiveMedicalRecords";
+import { ComprehensivePrescriptions } from "./ComprehensivePrescriptions";
+import { InsuranceVerificationSystem } from "./InsuranceVerificationSystem";
+import { EmergencyProtocols } from "./EmergencyProtocols";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { CalendarPlus, Menu, Mic } from "lucide-react";
@@ -166,16 +170,28 @@ export const PatientDashboard = () => {
             </div>
           </TabsContent>
           <TabsContent value="medications">
-            <PrescriptionTracker />
+            <div className="space-y-6">
+              <ComprehensivePrescriptions />
+              <PrescriptionTracker />
+            </div>
           </TabsContent>
           <TabsContent value="insurance">
-            <InsuranceForm />
+            <div className="space-y-6">
+              <InsuranceVerificationSystem />
+              <InsuranceForm />
+            </div>
           </TabsContent>
           <TabsContent value="emergency">
-            <EmergencyContacts />
+            <div className="space-y-6">
+              <EmergencyProtocols />
+              <EmergencyContacts />
+            </div>
           </TabsContent>
           <TabsContent value="records">
-            <MedicalHistory />
+            <div className="space-y-6">
+              <ComprehensiveMedicalRecords />
+              <MedicalHistory />
+            </div>
           </TabsContent>
         </Tabs>
       )}
