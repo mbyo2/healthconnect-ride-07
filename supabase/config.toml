@@ -61,3 +61,9 @@ verify_jwt = false
 
 [functions.send-appointment-reminder]
 verify_jwt = true
+
+[functions.process-wallet-payment]
+verify_jwt = true
+
+[functions.setup-test-accounts]
+verify_jwt = true

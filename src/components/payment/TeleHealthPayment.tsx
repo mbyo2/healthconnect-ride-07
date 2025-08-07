@@ -1,11 +1,15 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { processPayment } from "@/utils/payment";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { processWalletPayment } from "@/utils/payment";
+import { getUserWallet, checkWalletBalance } from "@/services/payment";
 import { toast } from "sonner";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { useAuth } from "@/context/AuthContext";
+import { Wallet, AlertTriangle, CheckCircle2 } from "lucide-react";
 
 export interface TeleHealthPaymentProps {
   amount: number;
@@ -29,13 +33,42 @@ export const TeleHealthPayment = ({
   onError
 }: TeleHealthPaymentProps) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [walletBalance, setWalletBalance] = useState<number>(0);
+  const [hasEnoughFunds, setHasEnoughFunds] = useState<boolean>(false);
+  const [loadingWallet, setLoadingWallet] = useState(true);
   const { user } = useAuth();
 
+  useEffect(() => {
+    const loadWallet = async () => {
+      if (!user?.id) return;
+      
+      try {
+        const wallet = await getUserWallet(user.id);
+        if (wallet) {
+          setWalletBalance(wallet.balance);
+          setHasEnoughFunds(wallet.balance >= amount);
+        }
+      } catch (error) {
+        console.error('Error loading wallet:', error);
+        toast.error('Failed to load wallet information');
+      } finally {
+        setLoadingWallet(false);
+      }
+    };
+
+    loadWallet();
+  }, [user?.id, amount]);
+
   const handlePayment = async () => {
+    if (!hasEnoughFunds) {
+      toast.error("Insufficient funds. Please add money to your wallet first.");
+      return;
+    }
+
     setIsLoading(true);
     
     try {
-      const result = await processPayment({
+      const result = await processWalletPayment({
         amount,
         currency: "USD",
         patientId,
@@ -45,14 +78,20 @@ export const TeleHealthPayment = ({
       });
       
       if (result.success) {
-        toast.success("Payment processed successfully");
+        toast.success("Payment processed successfully from your wallet");
+        setWalletBalance(result.newBalance || (walletBalance - amount));
+        setHasEnoughFunds((result.newBalance || (walletBalance - amount)) >= amount);
         onSuccess && onSuccess();
       } else {
-        throw new Error("Payment failed");
+        throw new Error(result.message || "Payment failed");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Payment error:", error);
-      toast.error("Failed to process payment. Please try again.");
+      if (error.message?.includes('Insufficient funds')) {
+        toast.error(`Insufficient funds. Available: $${walletBalance}, Required: $${amount}`);
+      } else {
+        toast.error("Failed to process payment. Please try again.");
+      }
       onError && onError(error as Error);
     } finally {
       setIsLoading(false);
@@ -83,6 +122,41 @@ export const TeleHealthPayment = ({
             )}
           </div>
         )}
+
+        {/* Wallet Information */}
+        <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+          <div className="flex items-center gap-2 mb-2">
+            <Wallet className="h-4 w-4 text-blue-600" />
+            <span className="text-sm font-medium text-blue-800">Wallet Balance</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-blue-700">Available:</span>
+            <span className="font-semibold text-blue-800">
+              {loadingWallet ? "Loading..." : `$${walletBalance.toFixed(2)}`}
+            </span>
+          </div>
+        </div>
+
+        {/* Payment Status Alert */}
+        {!loadingWallet && (
+          hasEnoughFunds ? (
+            <Alert className="border-green-200 bg-green-50">
+              <CheckCircle2 className="h-4 w-4 text-green-600" />
+              <AlertDescription className="text-green-800">
+                You have sufficient funds for this consultation.
+              </AlertDescription>
+            </Alert>
+          ) : (
+            <Alert className="border-red-200 bg-red-50">
+              <AlertTriangle className="h-4 w-4 text-red-600" />
+              <AlertDescription className="text-red-800">
+                Insufficient funds. You need ${(amount - walletBalance).toFixed(2)} more.
+                <br />
+                <span className="text-sm">Please add funds to your wallet before proceeding.</span>
+              </AlertDescription>
+            </Alert>
+          )
+        )}
         
         <div className="flex justify-between items-center border-t border-b py-3">
           <span className="text-muted-foreground">Total Amount:</span>
@@ -94,17 +168,30 @@ export const TeleHealthPayment = ({
         <Button 
           className="w-full" 
           onClick={handlePayment}
-          disabled={isLoading}
+          disabled={isLoading || loadingWallet || !hasEnoughFunds}
+          variant={hasEnoughFunds ? "default" : "secondary"}
         >
           {isLoading ? (
             <div className="flex items-center space-x-2">
               <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
               <span>Processing...</span>
             </div>
+          ) : !hasEnoughFunds ? (
+            "Insufficient Funds"
           ) : (
-            "Pay Now"
+            "Pay from Wallet"
           )}
         </Button>
+        
+        {!hasEnoughFunds && !loadingWallet && (
+          <Button 
+            variant="outline" 
+            className="w-full" 
+            onClick={() => window.open('/wallet', '_blank')}
+          >
+            Add Funds to Wallet
+          </Button>
+        )}
       </CardFooter>
     </Card>
   );

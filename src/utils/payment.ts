@@ -23,6 +23,20 @@ export const processPayment = async (paymentDetails: PaymentRequest): Promise<Pa
   }
 };
 
+export const processWalletPayment = async (paymentDetails: PaymentRequest): Promise<PaymentResponse> => {
+  try {
+    const { data, error } = await supabase.functions.invoke('process-wallet-payment', {
+      body: paymentDetails
+    });
+
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error('Error processing wallet payment:', error);
+    throw error;
+  }
+};
+
 export const processRefund = async (refundDetails: RefundRequest): Promise<boolean> => {
   try {
     const { data, error } = await supabase.functions.invoke('process-refund', {

@@ -94,3 +94,33 @@ export const addFundsToWallet = async (userId: string, amount: number) => {
     throw error;
   }
 };
+
+export const checkWalletBalance = async (userId: string, requiredAmount: number): Promise<boolean> => {
+  try {
+    const wallet = await getUserWallet(userId);
+    if (!wallet) return false;
+    return wallet.balance >= requiredAmount;
+  } catch (error) {
+    console.error("Error checking wallet balance:", error);
+    return false;
+  }
+};
+
+export const deductFromWallet = async (userId: string, amount: number): Promise<boolean> => {
+  try {
+    const wallet = await getUserWallet(userId);
+    if (!wallet || wallet.balance < amount) {
+      return false;
+    }
+    
+    wallet.balance -= amount;
+    wallet.updatedAt = new Date().toISOString();
+    mockWallets.set(userId, wallet);
+    
+    console.log(`Deducted ${amount} from wallet for user ${userId}. New balance: ${wallet.balance}`);
+    return true;
+  } catch (error) {
+    console.error("Error deducting from wallet:", error);
+    return false;
+  }
+};

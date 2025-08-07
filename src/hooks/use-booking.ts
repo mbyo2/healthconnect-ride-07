@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { sendEmail } from "@/utils/email";
 import { Provider } from "@/types/provider";
 import { generateTimeSlots, isSlotAvailable } from "@/utils/scheduling";
+import { checkWalletBalance } from "@/services/payment";
 
 export const useBooking = (provider: Provider) => {
   const [selectedDate, setSelectedDate] = useState<Date>();
@@ -63,7 +64,7 @@ export const useBooking = (provider: Provider) => {
       )
     : [];
 
-  const handleBookAppointment = async () => {
+  const handleBookAppointment = async (requirePayment: boolean = true) => {
     if (!selectedDate || !selectedTime) {
       toast.error("Please select a date and time");
       return;
@@ -73,6 +74,18 @@ export const useBooking = (provider: Provider) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("User not authenticated");
+
+      // Check wallet balance if payment is required
+      if (requirePayment) {
+        const consultationFee = provider.consultation_fee || 50;
+        const hasEnoughFunds = await checkWalletBalance(user.id, consultationFee);
+        
+        if (!hasEnoughFunds) {
+          toast.error(`Insufficient funds for this appointment. Fee: $${consultationFee}. Please add funds to your wallet.`);
+          setLoading(false);
+          return false;
+        }
+      }
 
       const { error } = await supabase
         .from("appointments")

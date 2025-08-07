@@ -49,7 +49,7 @@ export const BookingModal = ({ isOpen, onClose, provider }: BookingModalProps) =
   }, [navigate, onClose]);
 
   const handleConfirmBooking = async () => {
-    const success = await handleBookAppointment();
+    const success = await handleBookAppointment(false); // Don't require payment yet
     if (success) {
       setShowPayment(true);
     }

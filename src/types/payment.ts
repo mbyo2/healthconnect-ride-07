@@ -13,6 +13,9 @@ export interface PaymentResponse {
   paymentId?: string;
   message?: string;
   paymentUrl?: string;
+  newBalance?: number;
+  availableBalance?: number;
+  requiredAmount?: number;
   transactionDetails?: {
     amount: number;
     currency: string;
