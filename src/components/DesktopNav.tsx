@@ -87,6 +87,11 @@ export function DesktopNav() {
       icon: <User className="h-4 w-4 mr-2" />
     },
     {
+      to: "/wallet",
+      label: "My Wallet",
+      icon: <ShoppingCart className="h-4 w-4 mr-2" />
+    },
+    {
       to: "/marketplace-users",
       label: "Healthcare Marketplace",
       icon: <ShoppingCart className="h-4 w-4 mr-2" />
@@ -100,6 +105,16 @@ export function DesktopNav() {
       to: "/symptoms",
       label: "Health Tracking",
       icon: <Heart className="h-4 w-4 mr-2" />
+    },
+    {
+      to: "/medical-records",
+      label: "Medical Records",
+      icon: <Heart className="h-4 w-4 mr-2" />
+    },
+    {
+      to: "/video-consultations",
+      label: "Video Consultations",
+      icon: <MessageSquare className="h-4 w-4 mr-2" />
     },
     {
       to: "/settings",
