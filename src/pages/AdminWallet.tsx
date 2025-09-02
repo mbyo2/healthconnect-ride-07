@@ -68,7 +68,7 @@ const AdminWallet: React.FC = () => {
         
         <TabsContent value="wallet" className="space-y-6">
           <div className="grid md:grid-cols-2 gap-6">
-            <WalletCard balance={balance} onAddFunds={handleAddFunds} />
+            <WalletCard />
             
             <Card>
               <CardHeader>

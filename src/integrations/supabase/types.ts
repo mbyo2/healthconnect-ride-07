@@ -2523,6 +2523,33 @@ export type Database = {
         }
         Relationships: []
       }
+      user_wallets: {
+        Row: {
+          balance: number
+          created_at: string
+          currency: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          balance?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          balance?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       vaccination_records: {
         Row: {
           administered_by: string | null
@@ -2621,6 +2648,50 @@ export type Database = {
           },
         ]
       }
+      wallet_transactions: {
+        Row: {
+          amount: number
+          balance_after: number
+          created_at: string
+          created_by: string
+          description: string | null
+          id: string
+          payment_id: string | null
+          transaction_type: string
+          wallet_id: string
+        }
+        Insert: {
+          amount: number
+          balance_after: number
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          id?: string
+          payment_id?: string | null
+          transaction_type: string
+          wallet_id: string
+        }
+        Update: {
+          amount?: number
+          balance_after?: number
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          id?: string
+          payment_id?: string | null
+          transaction_type?: string
+          wallet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wallet_transactions_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "user_wallets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -2645,6 +2716,20 @@ export type Database = {
       insert_applications_for_doctors: {
         Args: Record<PropertyKey, never>
         Returns: undefined
+      }
+      is_institution_staff: {
+        Args: { institution_id: string; user_id: string }
+        Returns: boolean
+      }
+      process_wallet_transaction: {
+        Args: {
+          p_amount: number
+          p_description?: string
+          p_payment_id?: string
+          p_transaction_type: string
+          p_user_id: string
+        }
+        Returns: Json
       }
     }
     Enums: {

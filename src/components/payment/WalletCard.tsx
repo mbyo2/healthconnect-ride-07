@@ -1,123 +1,227 @@
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { useState, useEffect } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { CreditCard, Wallet, Plus } from 'lucide-react';
-import { toast } from 'sonner';
+import { Badge } from '@/components/ui/badge';
+import { Wallet, Plus, History, TrendingUp } from 'lucide-react';
+import { getWalletBalance, addFundsToWallet } from '@/services/payment';
+import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
-import { PaymentMethod } from '@/components/payment/PaymentMethods';
+import { toast } from 'sonner';
 
-export interface WalletCardProps {
-  balance: number;
-  currency?: string;
-  onAddFunds?: (amount: number) => Promise<void>;
+interface WalletTransaction {
+  id: string;
+  transaction_type: string;
+  amount: number;
+  balance_after: number;
+  description: string;
+  created_at: string;
 }
 
-export const WalletCard = ({ 
-  balance, 
-  currency = 'USD', 
-  onAddFunds 
-}: WalletCardProps) => {
-  const [amount, setAmount] = useState<number>(0);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const { user, profile } = useAuth();
-  
-  const handleAddFunds = async () => {
-    if (!onAddFunds) return;
-    if (amount <= 0) {
-      toast.error('Please enter a valid amount');
+export function WalletCard() {
+  const { session, user } = useAuth();
+  const [balance, setBalance] = useState<number>(0);
+  const [transactions, setTransactions] = useState<WalletTransaction[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [addingFunds, setAddingFunds] = useState(false);
+
+  const fetchWalletData = async () => {
+    if (!user?.id) return;
+
+    try {
+      const currentBalance = await getWalletBalance();
+      setBalance(currentBalance);
+
+      if (session) {
+        const { data: transactionData, error } = await supabase
+          .from('wallet_transactions')
+          .select(`
+            id,
+            transaction_type,
+            amount,
+            balance_after,
+            description,
+            created_at
+          `)
+          .eq('created_by', session.user.id)
+          .order('created_at', { ascending: false })
+          .limit(5);
+
+        if (error) {
+          console.error('Error fetching transactions:', error);
+        } else {
+          setTransactions(transactionData || []);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching wallet data:', error);
+      toast.error('Failed to load wallet data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchWalletData();
+  }, [session, user]);
+
+  const handleAddFunds = async (amount: number) => {
+    if (!user?.id) {
+      toast.error('You must be logged in to add funds');
       return;
     }
-    
-    setIsLoading(true);
+
+    setAddingFunds(true);
     try {
-      await onAddFunds(amount);
-      toast.success(`${currency} ${amount} added successfully`);
-      setAmount(0);
+      await addFundsToWallet(user.id, amount);
+      await fetchWalletData(); // Refresh the data
+      toast.success(`$${amount} added to your wallet`);
     } catch (error) {
       console.error('Error adding funds:', error);
       toast.error('Failed to add funds');
     } finally {
-      setIsLoading(false);
+      setAddingFunds(false);
     }
   };
-  
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD'
+    }).format(amount);
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  if (loading) {
+    return (
+      <Card className="w-full">
+        <CardContent className="p-6">
+          <div className="animate-pulse space-y-4">
+            <div className="h-8 bg-gray-200 rounded w-1/3"></div>
+            <div className="h-6 bg-gray-200 rounded w-1/2"></div>
+            <div className="h-4 bg-gray-200 rounded w-full"></div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <Wallet className="h-5 w-5 text-primary" />
-            My Wallet
-          </CardTitle>
-          {profile?.admin_level && (
-            <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-              Admin Wallet
-            </span>
-          )}
-        </div>
-        <CardDescription>Manage your funds and payment methods</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="bg-muted rounded-lg p-4 text-center">
-          <div className="text-sm text-muted-foreground">Available Balance</div>
-          <div className="text-3xl font-bold mt-1">
-            {currency} {balance.toFixed(2)}
+    <div className="space-y-6">
+      <Card className="w-full bg-gradient-to-br from-trust-600 to-trust-700 text-white">
+        <CardHeader className="pb-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Wallet className="h-6 w-6" />
+              <CardTitle className="text-xl">My Wallet</CardTitle>
+            </div>
+            <Badge variant="secondary" className="bg-white/20 text-white">
+              Active
+            </Badge>
           </div>
-        </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="amount">Add Funds</Label>
-          <div className="flex space-x-2">
-            <Input
-              id="amount"
-              type="number"
-              min="0"
-              step="0.01"
-              placeholder="Amount"
-              value={amount || ''}
-              onChange={(e) => setAmount(parseFloat(e.target.value) || 0)}
-            />
-            <Button 
-              onClick={handleAddFunds}
-              disabled={isLoading || amount <= 0}
-              className="whitespace-nowrap"
-            >
-              <Plus className="h-4 w-4 mr-1" />
-              Add Funds
-            </Button>
-          </div>
-        </div>
-        
-        <div className="border-t pt-4">
-          <div className="flex items-center space-x-2 mb-2">
-            <CreditCard className="h-4 w-4 text-muted-foreground" />
-            <h4 className="text-sm font-medium">Payment Methods</h4>
-          </div>
-          
-          <div className="space-y-2">
-            <div className="flex justify-between items-center p-3 border rounded-lg">
-              <div className="flex items-center space-x-2">
-                <div className="h-8 w-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-md"></div>
-                <div>
-                  <p className="text-sm font-medium">**** 4321</p>
-                  <p className="text-xs text-muted-foreground">Expires 12/25</p>
-                </div>
-              </div>
-              <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
-                Default
-              </span>
+          <CardDescription className="text-trust-100">
+            Your healthcare payment wallet
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <div className="space-y-4">
+            <div>
+              <p className="text-trust-200 text-sm">Available Balance</p>
+              <p className="text-3xl font-bold">{formatCurrency(balance)}</p>
             </div>
             
-            <Button variant="outline" size="sm" className="w-full">
-              <Plus className="h-4 w-4 mr-1" />
-              Add Payment Method
-            </Button>
+            <div className="flex space-x-2">
+              <Button 
+                onClick={() => handleAddFunds(25)}
+                disabled={addingFunds}
+                variant="secondary"
+                size="sm"
+                className="bg-white/20 hover:bg-white/30 text-white border-white/30"
+              >
+                <Plus className="h-4 w-4 mr-1" />
+                Add $25
+              </Button>
+              <Button 
+                onClick={() => handleAddFunds(50)}
+                disabled={addingFunds}
+                variant="secondary"
+                size="sm"
+                className="bg-white/20 hover:bg-white/30 text-white border-white/30"
+              >
+                <Plus className="h-4 w-4 mr-1" />
+                Add $50
+              </Button>
+              <Button 
+                onClick={() => handleAddFunds(100)}
+                disabled={addingFunds}
+                variant="secondary"
+                size="sm"
+                className="bg-white/20 hover:bg-white/30 text-white border-white/30"
+              >
+                <Plus className="h-4 w-4 mr-1" />
+                Add $100
+              </Button>
+            </div>
           </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+
+      {/* Recent Transactions */}
+      <Card className="w-full">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <History className="h-5 w-5 text-trust-600" />
+              <CardTitle className="text-lg">Recent Transactions</CardTitle>
+            </div>
+            <TrendingUp className="h-5 w-5 text-trust-600" />
+          </div>
+        </CardHeader>
+        <CardContent>
+          {transactions.length === 0 ? (
+            <p className="text-gray-500 text-center py-4">
+              No transactions yet. Start by adding funds to your wallet!
+            </p>
+          ) : (
+            <div className="space-y-3">
+              {transactions.map((transaction) => (
+                <div key={transaction.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div className="flex-1">
+                    <p className="font-medium text-sm">
+                      {transaction.description || `${transaction.transaction_type} transaction`}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {formatDate(transaction.created_at)}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className={`font-semibold ${
+                      transaction.transaction_type === 'credit' 
+                        ? 'text-green-600' 
+                        : 'text-red-600'
+                    }`}>
+                      {transaction.transaction_type === 'credit' ? '+' : '-'}
+                      {formatCurrency(transaction.amount)}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      Balance: {formatCurrency(transaction.balance_after)}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
-};
+}

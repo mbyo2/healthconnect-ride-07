@@ -15,33 +15,7 @@ interface PaymentRequest {
   redirectUrl?: string;
 }
 
-// Mock wallet system
-const mockWallets = new Map();
-
-const getUserWallet = (userId: string) => {
-  if (!mockWallets.has(userId)) {
-    mockWallets.set(userId, { 
-      id: `wallet-${userId}`,
-      userId,
-      balance: 100,
-      currency: 'USD',
-      updatedAt: new Date().toISOString()
-    });
-  }
-  return mockWallets.get(userId);
-};
-
-const deductFromWallet = (userId: string, amount: number): boolean => {
-  const wallet = getUserWallet(userId);
-  if (wallet.balance < amount) {
-    return false;
-  }
-  
-  wallet.balance -= amount;
-  wallet.updatedAt = new Date().toISOString();
-  mockWallets.set(userId, wallet);
-  return true;
-};
+// Database-backed wallet system using Supabase functions
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -59,34 +33,41 @@ serve(async (req) => {
 
     console.log('Processing wallet payment:', { amount, patientId, providerId, serviceId });
 
-    // Check wallet balance
-    const wallet = getUserWallet(patientId);
-    if (wallet.balance < amount) {
-      return new Response(
-        JSON.stringify({ 
-          success: false, 
-          message: `Insufficient funds. Available: $${wallet.balance}, Required: $${amount}`,
-          availableBalance: wallet.balance,
-          requiredAmount: amount
-        }),
-        {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 400
-        }
-      );
-    }
+    // Process wallet transaction using database function
+    try {
+      const { data: transactionResult, error: transactionError } = await supabaseClient
+        .rpc('process_wallet_transaction', {
+          p_user_id: patientId,
+          p_transaction_type: 'debit',
+          p_amount: amount,
+          p_description: `Payment for service ${serviceId}`,
+          p_payment_id: null // Will be set after payment record creation
+        });
 
-    // Deduct from wallet
-    const deductionSuccess = deductFromWallet(patientId, amount);
-    if (!deductionSuccess) {
-      return new Response(
-        JSON.stringify({ success: false, message: 'Failed to deduct from wallet' }),
-        {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 400
+      if (transactionError) {
+        console.error('Wallet transaction error:', transactionError);
+        
+        // Check if it's an insufficient funds error
+        if (transactionError.message && transactionError.message.includes('Insufficient funds')) {
+          const balanceMatch = transactionError.message.match(/Current balance: ([\d.]+)/);
+          const currentBalance = balanceMatch ? parseFloat(balanceMatch[1]) : 0;
+          
+          return new Response(
+            JSON.stringify({ 
+              success: false, 
+              message: `Insufficient funds. Available: $${currentBalance}, Required: $${amount}`,
+              availableBalance: currentBalance,
+              requiredAmount: amount
+            }),
+            {
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+              status: 400
+            }
+          );
         }
-      );
-    }
+        
+        throw transactionError;
+      }
 
     // Create payment record in database
     const paymentId = `PAY-WALLET-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
@@ -107,34 +88,57 @@ serve(async (req) => {
       .select()
       .single();
 
-    if (paymentError) {
-      console.error('Payment record error:', paymentError);
-      // Rollback wallet deduction
-      const rollbackWallet = getUserWallet(patientId);
-      rollbackWallet.balance += amount;
-      mockWallets.set(patientId, rollbackWallet);
-      throw paymentError;
-    }
+      if (paymentError) {
+        console.error('Payment record error:', paymentError);
+        // Rollback wallet transaction
+        await supabaseClient.rpc('process_wallet_transaction', {
+          p_user_id: patientId,
+          p_transaction_type: 'credit',
+          p_amount: amount,
+          p_description: `Rollback for failed payment ${paymentId}`,
+          p_payment_id: null
+        });
+        throw paymentError;
+      }
+
+      // Update the transaction with payment ID
+      await supabaseClient
+        .from('wallet_transactions')
+        .update({ payment_id: payment.id })
+        .eq('id', transactionResult.transaction_id);
 
     console.log('Wallet payment processed successfully:', payment);
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        paymentId: payment.id,
-        message: 'Payment processed successfully',
-        newBalance: getUserWallet(patientId).balance,
-        transactionDetails: {
-          amount,
-          currency,
-          date: new Date().toISOString(),
-          method: 'wallet'
+      return new Response(
+        JSON.stringify({
+          success: true,
+          paymentId: payment.id,
+          message: 'Payment processed successfully',
+          newBalance: transactionResult.new_balance,
+          transactionDetails: {
+            amount,
+            currency,
+            date: new Date().toISOString(),
+            method: 'wallet'
+          }
+        }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         }
-      }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
-    );
+      );
+    } catch (walletError) {
+      console.error('Wallet transaction failed:', walletError);
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          message: walletError.message || 'Wallet transaction failed'
+        }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400
+        }
+      );
+    }
   } catch (error) {
     console.error('Error processing wallet payment:', error);
     return new Response(

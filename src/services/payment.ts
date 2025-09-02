@@ -41,56 +41,68 @@ export const generatePaymentReceipt = async (paymentId: string): Promise<void> =
   }
 };
 
-// Simulate a wallet system until we implement a real one
-const mockWallets = new Map();
-
+// Database-backed wallet service
 export const getUserWallet = async (userId: string) => {
   try {
-    // Simulate getting wallet from database
-    if (!mockWallets.has(userId)) {
-      mockWallets.set(userId, { 
-        id: `wallet-${userId}`,
-        userId,
-        balance: 100,
-        currency: 'USD',
-        updatedAt: new Date().toISOString()
-      });
+    const { data: wallet, error } = await supabase
+      .from('user_wallets')
+      .select('*')
+      .eq('user_id', userId)
+      .single();
+
+    if (error) {
+      console.error('Error fetching wallet:', error);
+      return null;
     }
-    
-    return mockWallets.get(userId);
+
+    return wallet;
   } catch (error) {
     console.error("Error fetching wallet:", error);
     return null;
   }
 };
 
+export const getWalletBalance = async (): Promise<number> => {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) throw new Error('Not authenticated');
+
+    const { data: wallet, error } = await supabase
+      .from('user_wallets')
+      .select('balance')
+      .eq('user_id', session.user.id)
+      .single();
+
+    if (error) {
+      console.error('Error fetching wallet balance:', error);
+      throw error;
+    }
+
+    return wallet?.balance || 0;
+  } catch (error) {
+    console.error('Failed to get wallet balance:', error);
+    return 0;
+  }
+};
+
 export const addFundsToWallet = async (userId: string, amount: number) => {
   try {
-    // Get or create wallet
-    let wallet = await getUserWallet(userId);
-    
-    if (!wallet) {
-      wallet = {
-        id: `wallet-${userId}`,
-        userId,
-        balance: amount,
-        currency: 'USD',
-        updatedAt: new Date().toISOString()
-      };
-      mockWallets.set(userId, wallet);
-    } else {
-      // Update existing wallet
-      wallet.balance += amount;
-      wallet.updatedAt = new Date().toISOString();
-      mockWallets.set(userId, wallet);
+    const { data, error } = await supabase.rpc('process_wallet_transaction', {
+      p_user_id: userId,
+      p_transaction_type: 'credit',
+      p_amount: amount,
+      p_description: 'Funds added to wallet'
+    });
+
+    if (error) {
+      console.error('Error adding funds to wallet:', error);
+      throw error;
     }
-    
-    // Log transaction
-    console.log(`Added ${amount} to wallet for user ${userId}`);
-    
+
+    console.log('Funds added successfully:', data);
     return true;
   } catch (error) {
-    console.error("Error adding funds:", error);
+    console.error('Failed to add funds to wallet:', error);
     throw error;
   }
 };
@@ -108,16 +120,19 @@ export const checkWalletBalance = async (userId: string, requiredAmount: number)
 
 export const deductFromWallet = async (userId: string, amount: number): Promise<boolean> => {
   try {
-    const wallet = await getUserWallet(userId);
-    if (!wallet || wallet.balance < amount) {
+    const { data, error } = await supabase.rpc('process_wallet_transaction', {
+      p_user_id: userId,
+      p_transaction_type: 'debit',
+      p_amount: amount,
+      p_description: `Payment deduction`
+    });
+
+    if (error) {
+      console.error('Error deducting from wallet:', error);
       return false;
     }
-    
-    wallet.balance -= amount;
-    wallet.updatedAt = new Date().toISOString();
-    mockWallets.set(userId, wallet);
-    
-    console.log(`Deducted ${amount} from wallet for user ${userId}. New balance: ${wallet.balance}`);
+
+    console.log(`Deducted ${amount} from wallet for user ${userId}`);
     return true;
   } catch (error) {
     console.error("Error deducting from wallet:", error);
