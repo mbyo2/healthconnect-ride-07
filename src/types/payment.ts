@@ -6,6 +6,7 @@ export interface PaymentRequest {
   providerId: string;
   serviceId: string;
   redirectUrl?: string;
+  paymentMethod?: 'paypal' | 'wallet';
 }
 
 export interface PaymentResponse {

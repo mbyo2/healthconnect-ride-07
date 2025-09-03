@@ -8,7 +8,8 @@ export const processPayment = async (paymentDetails: PaymentRequest): Promise<Pa
     // Ensure redirectUrl has a default value if not provided
     const paymentData = {
       ...paymentDetails,
-      redirectUrl: paymentDetails.redirectUrl || window.location.origin + "/appointments"
+      redirectUrl: paymentDetails.redirectUrl || window.location.origin + "/payment-success",
+      paymentMethod: paymentDetails.paymentMethod || 'wallet'
     };
     
     const { data, error } = await supabase.functions.invoke('process-payment', {
