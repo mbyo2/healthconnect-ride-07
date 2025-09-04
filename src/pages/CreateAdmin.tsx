@@ -26,10 +26,7 @@ const CreateAdmin: React.FC = () => {
       const result = await setupAdmin();
       
       if (result.success) {
-        toast.success(result.alreadyExists ? 
-          "Admin account already exists" : 
-          "Admin account created successfully"
-        );
+        toast.success("Admin account created successfully");
         setAdminCredentials(result.credentials);
       } else {
         toast.error(`Failed to create admin: ${result.error}`);
@@ -47,10 +44,7 @@ const CreateAdmin: React.FC = () => {
       const result = await setupSuperAdmin();
       
       if (result.success) {
-        toast.success(result.alreadyExists ? 
-          "SuperAdmin account already exists" : 
-          "SuperAdmin account created successfully"
-        );
+        toast.success("SuperAdmin account created successfully");
         setSuperAdminCredentials(result.credentials);
       } else {
         toast.error(`Failed to create superadmin: ${result.error}`);
