@@ -40,6 +40,7 @@ import Privacy from "@/pages/Privacy";
 import Contact from "@/pages/Contact";
 import PaymentSuccess from "@/pages/PaymentSuccess";
 import PaymentCancel from "@/pages/PaymentCancel";
+import CreateAdmin from "@/pages/CreateAdmin";
 
 const supabase = createClient(
   "https://tthzcijscedgxjfnfnky.supabase.co",
@@ -351,6 +352,18 @@ const AppContent = () => {
                 <Navigate to="/" replace={true} />
               ) : (
                 <HealthcareApplication />
+              )
+            }
+          />
+          <Route
+            path="/create-admin"
+            element={
+              !session ? (
+                <Navigate to="/" replace={true} />
+              ) : (
+                <RoleProtectedRoute allowedRoles={['admin']}>
+                  <CreateAdmin />
+                </RoleProtectedRoute>
               )
             }
           />
