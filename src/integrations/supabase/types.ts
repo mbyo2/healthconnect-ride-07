@@ -2721,6 +2721,10 @@ export type Database = {
         Args: { institution_id: string; user_id: string }
         Returns: boolean
       }
+      is_super_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
       process_wallet_transaction: {
         Args: {
           p_amount: number
