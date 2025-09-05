@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TeleHealthPayment } from "./TeleHealthPayment";
 import { PayPalPayment } from "./PayPalPayment";
+import { PaymentBreakdown } from "./PaymentBreakdown";
 import { Wallet, CreditCard } from "lucide-react";
 
 export interface PaymentOptionsProps {
@@ -29,26 +30,30 @@ export const PaymentOptions = (props: PaymentOptionsProps) => {
       </CardHeader>
       
       <CardContent>
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="wallet" className="flex items-center gap-2">
-              <Wallet className="h-4 w-4" />
-              Wallet
-            </TabsTrigger>
-            <TabsTrigger value="paypal" className="flex items-center gap-2">
-              <CreditCard className="h-4 w-4" />
-              PayPal
-            </TabsTrigger>
-          </TabsList>
+        <div className="space-y-4">
+          <PaymentBreakdown amount={props.amount} showDetailed={true} />
           
-          <TabsContent value="wallet" className="mt-4">
-            <TeleHealthPayment {...props} />
-          </TabsContent>
-          
-          <TabsContent value="paypal" className="mt-4">
-            <PayPalPayment {...props} />
-          </TabsContent>
-        </Tabs>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="wallet" className="flex items-center gap-2">
+                <Wallet className="h-4 w-4" />
+                Wallet
+              </TabsTrigger>
+              <TabsTrigger value="paypal" className="flex items-center gap-2">
+                <CreditCard className="h-4 w-4" />
+                PayPal
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="wallet" className="mt-4">
+              <TeleHealthPayment {...props} />
+            </TabsContent>
+            
+            <TabsContent value="paypal" className="mt-4">
+              <PayPalPayment {...props} />
+            </TabsContent>
+          </Tabs>
+        </div>
       </CardContent>
     </Card>
   );

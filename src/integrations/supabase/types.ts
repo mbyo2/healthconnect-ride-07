@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_owner_wallet: {
+        Row: {
+          balance: number
+          created_at: string
+          currency: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          balance?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          balance?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       appointments: {
         Row: {
           created_at: string
@@ -149,6 +173,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      commission_settings: {
+        Row: {
+          commission_percentage: number
+          created_at: string
+          entity_type: string
+          id: string
+          is_active: boolean
+          updated_at: string
+        }
+        Insert: {
+          commission_percentage?: number
+          created_at?: string
+          entity_type: string
+          id?: string
+          is_active?: boolean
+          updated_at?: string
+        }
+        Update: {
+          commission_percentage?: number
+          created_at?: string
+          entity_type?: string
+          id?: string
+          is_active?: boolean
+          updated_at?: string
+        }
+        Relationships: []
       }
       comprehensive_health_metrics: {
         Row: {
@@ -1008,6 +1059,33 @@ export type Database = {
           },
         ]
       }
+      institution_wallets: {
+        Row: {
+          balance: number
+          created_at: string
+          currency: string
+          id: string
+          institution_id: string
+          updated_at: string
+        }
+        Insert: {
+          balance?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          institution_id: string
+          updated_at?: string
+        }
+        Update: {
+          balance?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          institution_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       insurance_information: {
         Row: {
           coverage_end_date: string | null
@@ -1801,6 +1879,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      payment_splits: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          payment_id: string
+          percentage: number
+          processed_at: string | null
+          recipient_id: string
+          recipient_type: string
+          status: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          payment_id: string
+          percentage: number
+          processed_at?: string | null
+          recipient_id: string
+          recipient_type: string
+          status?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          payment_id?: string
+          percentage?: number
+          processed_at?: string | null
+          recipient_id?: string
+          recipient_type?: string
+          status?: string
+        }
+        Relationships: []
       }
       payments: {
         Row: {
@@ -2724,6 +2838,15 @@ export type Database = {
       is_super_admin: {
         Args: Record<PropertyKey, never>
         Returns: boolean
+      }
+      process_payment_with_splits: {
+        Args: {
+          p_institution_id?: string
+          p_payment_id: string
+          p_provider_id: string
+          p_total_amount: number
+        }
+        Returns: Json
       }
       process_wallet_transaction: {
         Args: {

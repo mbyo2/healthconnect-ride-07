@@ -5,6 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { WalletCard } from '@/components/payment/WalletCard';
+import { AppOwnerWalletCard } from '@/components/payment/AppOwnerWalletCard';
+import { CommissionSettings } from '@/components/admin/CommissionSettings';
 import { PaymentSimulator } from '@/components/payment/PaymentSimulator';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
@@ -69,30 +71,33 @@ const AdminWallet: React.FC = () => {
         <TabsContent value="wallet" className="space-y-6">
           <div className="grid md:grid-cols-2 gap-6">
             <WalletCard />
-            
-            <Card>
-              <CardHeader>
-                <CardTitle>Quick Actions</CardTitle>
-                <CardDescription>
-                  Common admin financial operations
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <Button variant="outline" className="w-full justify-start">
-                  Generate Financial Report
-                </Button>
-                <Button variant="outline" className="w-full justify-start">
-                  Process Refund
-                </Button>
-                <Button variant="outline" className="w-full justify-start">
-                  Manage Transaction Settings
-                </Button>
-                <Button variant="outline" className="w-full justify-start">
-                  Approve Pending Transactions
-                </Button>
-              </CardContent>
-            </Card>
+            <AppOwnerWalletCard />
           </div>
+          
+          <CommissionSettings />
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>Quick Actions</CardTitle>
+              <CardDescription>
+                Common admin financial operations
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Button variant="outline" className="w-full justify-start">
+                Generate Financial Report
+              </Button>
+              <Button variant="outline" className="w-full justify-start">
+                Process Refund
+              </Button>
+              <Button variant="outline" className="w-full justify-start">
+                Manage Transaction Settings
+              </Button>
+              <Button variant="outline" className="w-full justify-start">
+                Approve Pending Transactions
+              </Button>
+            </CardContent>
+          </Card>
         </TabsContent>
         
         <TabsContent value="payment-simulator">

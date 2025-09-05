@@ -4,8 +4,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { processWalletPayment } from "@/utils/payment";
-import { getUserWallet, checkWalletBalance } from "@/services/payment";
+import { getUserWallet } from "@/services/payment";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { useAuth } from "@/context/AuthContext";
@@ -43,14 +43,7 @@ export const TeleHealthPayment = ({
       if (!user?.id) return;
       
       try {
-        const wallet = await getUserWallet(user.id);
-        if (wallet) {
-          setWalletBalance(wallet.balance);
-          setHasEnoughFunds(wallet.balance >= amount);
-        }
-      } catch (error) {
-        console.error('Error loading wallet:', error);
-        toast.error('Failed to load wallet information');
+        await loadWalletBalance();
       } finally {
         setLoadingWallet(false);
       }
@@ -58,6 +51,21 @@ export const TeleHealthPayment = ({
 
     loadWallet();
   }, [user?.id, amount]);
+
+  const loadWalletBalance = async () => {
+    if (!user?.id) return;
+    
+    try {
+      const wallet = await getUserWallet(user.id);
+      if (wallet) {
+        setWalletBalance(wallet.balance);
+        setHasEnoughFunds(wallet.balance >= amount);
+      }
+    } catch (error) {
+      console.error('Error loading wallet:', error);
+      toast.error('Failed to load wallet information');
+    }
+  };
 
   const handlePayment = async () => {
     if (!hasEnoughFunds) {
@@ -68,22 +76,30 @@ export const TeleHealthPayment = ({
     setIsLoading(true);
     
     try {
-      const result = await processWalletPayment({
+      const paymentDetails = {
         amount,
         currency: "USD",
         patientId,
         providerId,
         serviceId,
-        redirectUrl: window.location.origin + "/appointments"
+        paymentMethod: 'wallet' as const
+      };
+
+      // Use the new payment function that handles commission splits
+      const { data, error } = await supabase.functions.invoke('process-payment-with-splits', {
+        body: paymentDetails
       });
+
+      if (error) throw error;
       
-      if (result.success) {
-        toast.success("Payment processed successfully from your wallet");
-        setWalletBalance(result.newBalance || (walletBalance - amount));
-        setHasEnoughFunds((result.newBalance || (walletBalance - amount)) >= amount);
+      if (data.success) {
+        // Refresh wallet balance
+        await loadWalletBalance();
+        toast.success("Payment processed successfully with automatic commission distribution!");
         onSuccess && onSuccess();
       } else {
-        throw new Error(result.message || "Payment failed");
+        toast.error(data.error || "Payment failed");
+        onError && onError(new Error(data.error || "Payment failed"));
       }
     } catch (error: any) {
       console.error("Payment error:", error);
