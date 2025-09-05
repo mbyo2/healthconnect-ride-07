@@ -9,8 +9,10 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
+  SheetClose,
 } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Link } from "react-router-dom";
 import { User } from "@supabase/supabase-js";
 
@@ -78,35 +80,38 @@ export function BottomNavMenu({ user, menuItems }: BottomNavMenuProps) {
           )}
         </SheetHeader>
         
-        <div className="space-y-3">
-          {menuItems.map((item, idx) => (
-            <Button 
-              key={idx}
-              variant="ghost" 
-              className={cn(
-                "w-full justify-start h-auto p-3 text-left transition-all duration-200 rounded-lg",
-                "hover:bg-trust-50 hover:text-trust-700 hover:scale-[1.01] hover:shadow-sm",
-                "active:scale-[0.99] group border border-transparent hover:border-trust-200",
-                "touch-manipulation"
-              )}
-              asChild
-            >
-              <Link to={item.to} className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-trust-100 text-trust-600 group-hover:bg-trust-200 transition-colors flex-shrink-0">
-                  {item.icon}
-                </div>
-                <div className="flex flex-col items-start gap-0.5 min-w-0">
-                  <span className="font-medium group-hover:text-trust-800 text-sm leading-tight">
-                    {item.label}
-                  </span>
-                  <span className="text-xs text-muted-foreground group-hover:text-trust-600 leading-tight">
-                    {item.description}
-                  </span>
-                </div>
-              </Link>
-            </Button>
-          ))}
-        </div>
+        <ScrollArea className="flex-1 px-1">
+          <div className="space-y-3 pb-4">
+            {menuItems.map((item, idx) => (
+              <SheetClose key={idx} asChild>
+                <Button 
+                  variant="ghost" 
+                  className={cn(
+                    "w-full justify-start h-auto p-3 text-left transition-all duration-200 rounded-lg",
+                    "hover:bg-trust-50 hover:text-trust-700 hover:scale-[1.01] hover:shadow-sm",
+                    "active:scale-[0.99] group border border-transparent hover:border-trust-200",
+                    "touch-manipulation"
+                  )}
+                  asChild
+                >
+                  <Link to={item.to} className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-trust-100 text-trust-600 group-hover:bg-trust-200 transition-colors flex-shrink-0">
+                      {item.icon}
+                    </div>
+                    <div className="flex flex-col items-start gap-0.5 min-w-0">
+                      <span className="font-medium group-hover:text-trust-800 text-sm leading-tight">
+                        {item.label}
+                      </span>
+                      <span className="text-xs text-muted-foreground group-hover:text-trust-600 leading-tight">
+                        {item.description}
+                      </span>
+                    </div>
+                  </Link>
+                </Button>
+              </SheetClose>
+            ))}
+          </div>
+        </ScrollArea>
       </SheetContent>
     </Sheet>
   );
