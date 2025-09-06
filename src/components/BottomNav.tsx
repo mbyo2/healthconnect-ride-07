@@ -1,5 +1,5 @@
 
-import { Home, Search, Calendar, MessageSquare, Heart, Users, ShoppingCart, Pill, AlertTriangle, User } from "lucide-react";
+import { Home, Search, Calendar, MessageSquare, Heart, Users, ShoppingCart, Pill, AlertTriangle, User, Wallet } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useSession } from "@/hooks/use-session";
 import { useDeviceType } from "@/hooks/use-device-type";
@@ -83,6 +83,12 @@ export function BottomNav() {
       label: "My Providers", 
       description: "Your healthcare provider network",
       icon: <Users className="h-5 w-5" />
+    },
+    { 
+      to: "/wallet", 
+      label: "My Wallet", 
+      description: "Manage finances and payments",
+      icon: <Wallet className="h-5 w-5" />
     },
     { 
       to: "/marketplace-users", 

@@ -42,6 +42,7 @@ import PaymentSuccess from "@/pages/PaymentSuccess";
 import PaymentCancel from "@/pages/PaymentCancel";
 import AdminWallet from "@/pages/AdminWallet";
 import InstitutionWallet from "@/pages/InstitutionWallet";
+import Wallet from "@/pages/Wallet";
 import CreateAdmin from "@/pages/CreateAdmin";
 
 const supabase = createClient(
@@ -358,14 +359,12 @@ const AppContent = () => {
             }
           />
           <Route
-            path="/create-admin"
+            path="/wallet"
             element={
               !session ? (
                 <Navigate to="/" replace={true} />
               ) : (
-                <RoleProtectedRoute allowedRoles={['admin']}>
-                  <CreateAdmin />
-                </RoleProtectedRoute>
+                <Wallet />
               )
             }
           />
@@ -388,6 +387,18 @@ const AppContent = () => {
                 <Navigate to="/" replace={true} />
               ) : (
                 <InstitutionWallet />
+              )
+            }
+          />
+          <Route
+            path="/create-admin"
+            element={
+              !session ? (
+                <Navigate to="/" replace={true} />
+              ) : (
+                <RoleProtectedRoute allowedRoles={['admin']}>
+                  <CreateAdmin />
+                </RoleProtectedRoute>
               )
             }
           />
