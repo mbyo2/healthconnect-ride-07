@@ -87,6 +87,7 @@ export const CommissionSettings = () => {
       case 'app_owner': return 10.00;
       case 'institution': return 15.00;
       case 'health_personnel': return 75.00;
+      case 'pharmacy': return 5.00;
       default: return 0.00;
     }
   };
@@ -96,6 +97,7 @@ export const CommissionSettings = () => {
       case 'app_owner': return 'Platform Fee';
       case 'institution': return 'Institution Commission';
       case 'health_personnel': return 'Provider Commission';
+      case 'pharmacy': return 'Pharmacy Commission';
       default: return entityType;
     }
   };

@@ -1399,6 +1399,42 @@ export type Database = {
           },
         ]
       }
+      marketplace_sales: {
+        Row: {
+          app_owner_commission: number
+          created_at: string | null
+          id: string
+          order_id: string
+          patient_id: string
+          pharmacy_commission: number
+          pharmacy_id: string
+          processed_at: string | null
+          total_amount: number
+        }
+        Insert: {
+          app_owner_commission: number
+          created_at?: string | null
+          id?: string
+          order_id: string
+          patient_id: string
+          pharmacy_commission: number
+          pharmacy_id: string
+          processed_at?: string | null
+          total_amount: number
+        }
+        Update: {
+          app_owner_commission?: number
+          created_at?: string | null
+          id?: string
+          order_id?: string
+          patient_id?: string
+          pharmacy_commission?: number
+          pharmacy_id?: string
+          processed_at?: string | null
+          total_amount?: number
+        }
+        Relationships: []
+      }
       medical_records: {
         Row: {
           created_at: string | null
@@ -2840,12 +2876,20 @@ export type Database = {
         Returns: boolean
       }
       process_payment_with_splits: {
-        Args: {
-          p_institution_id?: string
-          p_payment_id: string
-          p_provider_id: string
-          p_total_amount: number
-        }
+        Args:
+          | {
+              p_institution_id?: string
+              p_payment_id: string
+              p_payment_type?: string
+              p_provider_id: string
+              p_total_amount: number
+            }
+          | {
+              p_institution_id?: string
+              p_payment_id: string
+              p_provider_id: string
+              p_total_amount: number
+            }
         Returns: Json
       }
       process_wallet_transaction: {

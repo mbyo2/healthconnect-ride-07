@@ -14,6 +14,7 @@ interface PaymentWithSplitsRequest {
   serviceId: string;
   institutionId?: string;
   paymentMethod?: 'paypal' | 'wallet';
+  paymentType?: 'consultation' | 'pharmacy';
   redirectUrl?: string;
 }
 
@@ -28,9 +29,9 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const { amount, currency, patientId, providerId, serviceId, institutionId, paymentMethod = 'wallet' }: PaymentWithSplitsRequest = await req.json();
+    const { amount, currency, patientId, providerId, serviceId, institutionId, paymentMethod = 'wallet', paymentType = 'consultation' }: PaymentWithSplitsRequest = await req.json();
 
-    console.log('Processing payment with splits:', { amount, currency, patientId, providerId, serviceId, institutionId, paymentMethod });
+    console.log('Processing payment with splits:', { amount, currency, patientId, providerId, serviceId, institutionId, paymentMethod, paymentType });
 
     // First, deduct from patient's wallet
     const walletResult = await supabase.rpc('process_wallet_transaction', {
@@ -76,7 +77,8 @@ serve(async (req) => {
       p_payment_id: payment.id,
       p_total_amount: amount,
       p_provider_id: providerId,
-      p_institution_id: institutionId || null
+      p_institution_id: institutionId || null,
+      p_payment_type: paymentType
     });
 
     if (splitsError) {
