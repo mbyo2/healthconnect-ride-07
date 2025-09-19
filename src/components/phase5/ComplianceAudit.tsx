@@ -674,3 +674,5 @@ export const ComplianceAudit: React.FC<ComplianceAuditProps> = ({ userRole }) =>
     </div>
   );
 };
+
+export default ComplianceAudit;

@@ -519,3 +519,5 @@ export const Phase5Dashboard: React.FC<Phase5DashboardProps> = ({ patientId, use
     </div>
   );
 };
+
+export default Phase5Dashboard;

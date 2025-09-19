@@ -56,7 +56,7 @@ export function BottomNavMenu({ user, menuItems }: BottomNavMenuProps) {
       
       <SheetContent 
         side="right" 
-        className="w-[90vw] max-w-sm bg-background/98 backdrop-blur-xl border-trust-200 shadow-2xl"
+        className="w-[90vw] max-w-sm bg-background/98 backdrop-blur-xl border-trust-200 shadow-2xl animate-in slide-in-from-right duration-300 ease-out data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right data-[state=closed]:fade-out-0 data-[state=closed]:duration-200"
       >
         <SheetHeader className="pb-6">
           <SheetTitle className="text-trust-600 text-2xl font-bold">Quick Access</SheetTitle>
@@ -89,8 +89,8 @@ export function BottomNavMenu({ user, menuItems }: BottomNavMenuProps) {
                   className={cn(
                     "w-full justify-start h-auto p-3 text-left transition-all duration-200 rounded-lg",
                     "hover:bg-trust-50 hover:text-trust-700 hover:scale-[1.01] hover:shadow-sm",
-                    "active:scale-[0.99] group border border-transparent hover:border-trust-200",
-                    "touch-manipulation"
+                    "active:scale-[0.99] active:bg-trust-100 group border border-transparent hover:border-trust-200",
+                    "touch-manipulation transform-gpu"
                   )}
                   asChild
                 >

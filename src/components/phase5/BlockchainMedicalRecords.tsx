@@ -670,3 +670,5 @@ export const BlockchainMedicalRecords: React.FC<BlockchainMedicalRecordsProps> =
     </div>
   );
 };
+
+export default BlockchainMedicalRecords;

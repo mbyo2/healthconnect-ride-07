@@ -669,3 +669,5 @@ export const AIDiagnosticAssistant: React.FC<AIDiagnosticAssistantProps> = ({
     </div>
   );
 };
+
+export default AIDiagnosticAssistant;

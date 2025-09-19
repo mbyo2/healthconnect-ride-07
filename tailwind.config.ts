@@ -35,6 +35,14 @@ export default {
       },
     },
     extend: {
+      maxWidth: {
+        '8xl': '88rem',
+        '9xl': '96rem',
+      },
+      height: {
+        '18': '4.5rem',
+        '20': '5rem',
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

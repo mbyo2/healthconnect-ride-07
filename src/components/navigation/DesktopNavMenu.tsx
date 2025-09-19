@@ -53,8 +53,8 @@ export function DesktopNavMenu({ secondaryNavItems }: DesktopNavMenuProps) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent 
-        className={`w-56 bg-white border-trust-200 shadow-xl transition-all duration-300 ${
-          open ? "opacity-100 scale-100" : "opacity-0 scale-95"
+        className={`w-56 bg-white border-trust-200 shadow-xl transition-all duration-200 ease-out max-h-96 overflow-y-auto ${
+          open ? "opacity-100 scale-100 animate-in fade-in-0 zoom-in-95" : "opacity-0 scale-95 animate-out fade-out-0 zoom-out-95"
         }`}
       >
         <DropdownMenuLabel className="text-trust-700 font-semibold">Quick Access</DropdownMenuLabel>
@@ -63,17 +63,25 @@ export function DesktopNavMenu({ secondaryNavItems }: DesktopNavMenuProps) {
           <DropdownMenuItem 
             key={index} 
             asChild 
-            className={`hover:bg-trust-50 transition-colors ${
+            className={`hover:bg-trust-50 transition-all duration-200 ${
               location.pathname === item.to ? "bg-trust-50 text-trust-700 font-medium" : ""
             }`}
+            onClick={() => setOpen(false)}
           >
-            <Link to={item.to} className="flex items-center justify-between w-full">
+            <Link 
+              to={item.to} 
+              className="flex items-center justify-between w-full"
+              onClick={() => {
+                // Add dissolving animation before navigation
+                setOpen(false);
+              }}
+            >
               <div className="flex items-center">
                 {item.icon}
                 {item.label}
               </div>
               {item.badge && (
-                <span className={`text-xs px-2 py-1 rounded-full font-medium ${
+                <span className={`text-xs px-2 py-1 rounded-full font-medium transition-all duration-200 ${
                   item.badge === 'NEW' ? 'bg-green-100 text-green-700' :
                   item.badge === 'AI' ? 'bg-blue-100 text-blue-700' :
                   item.badge === 'SECURE' ? 'bg-purple-100 text-purple-700' :

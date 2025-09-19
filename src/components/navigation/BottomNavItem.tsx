@@ -21,7 +21,7 @@ export function BottomNavItem({ to, label, icon, active, description }: BottomNa
     <Link 
       to={to}
       className={cn(
-        "flex flex-1 flex-col items-center justify-center py-2 px-1 rounded-xl transition-all duration-300 ease-out group relative overflow-hidden min-h-[52px]",
+        "flex flex-1 flex-col items-center justify-center py-3 px-2 rounded-xl transition-all duration-300 ease-out group relative overflow-hidden min-h-[56px] min-w-[56px] touch-manipulation",
         active 
           ? "text-trust-600 scale-105 shadow-lg" 
           : "text-muted-foreground hover:text-trust-500 hover:scale-105"

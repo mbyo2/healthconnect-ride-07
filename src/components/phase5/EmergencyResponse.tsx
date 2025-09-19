@@ -666,3 +666,5 @@ export const EmergencyResponse: React.FC<EmergencyResponseProps> = ({ patientId 
     </div>
   );
 };
+
+export default EmergencyResponse;

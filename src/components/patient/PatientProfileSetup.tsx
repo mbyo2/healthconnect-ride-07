@@ -10,12 +10,15 @@ import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Loader2, User, Phone, Calendar, MapPin, Camera } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { AnimatedButton } from "@/components/ui/animated-button";
+import { useFeedbackSystem } from "@/hooks/use-feedback-system";
 
 export const PatientProfileSetup = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [avatar, setAvatar] = useState<File | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const { triggerSuccess, triggerError } = useFeedbackSystem();
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
@@ -94,10 +97,13 @@ export const PatientProfileSetup = () => {
 
       if (error) throw error;
 
+      triggerSuccess("Profile setup completed successfully!");
       toast.success("Profile setup completed successfully!");
       navigate('/');
     } catch (error: any) {
-      toast.error(error.message);
+      const errorMessage = error.message || "Failed to complete profile setup";
+      triggerError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -330,20 +336,14 @@ export const PatientProfileSetup = () => {
               
               {/* Submit Button */}
               <div className="pt-8 border-t border-gray-200">
-                <Button 
+                <AnimatedButton 
                   type="submit" 
                   className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg hover:shadow-xl transition-all duration-200" 
-                  disabled={loading}
+                  loading={loading}
+                  loadingText="Setting up your profile..."
                 >
-                  {loading ? (
-                    <>
-                      <Loader2 className="mr-3 h-5 w-5 animate-spin" />
-                      Setting Up Your Profile...
-                    </>
-                  ) : (
-                    "Complete Profile Setup"
-                  )}
-                </Button>
+                  Complete Profile Setup
+                </AnimatedButton>
                 
                 <p className="text-center text-sm text-gray-600 mt-4">
                   By completing your profile, you agree to our terms of service and privacy policy

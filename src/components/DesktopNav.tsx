@@ -159,8 +159,8 @@ export function DesktopNav() {
   ];
   
   return (
-    <header className="bg-background sticky top-0 z-50 border-b-2 border-trust-100 px-4 md:px-6 lg:px-8 xl:px-10 2xl:px-12 3xl:px-16 4xl:px-20 5xl:px-24 shadow-lg">
-      <div className="container mx-auto flex items-center justify-between py-4 max-w-none">
+    <header className="bg-background sticky top-0 z-50 border-b-2 border-trust-100 px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 shadow-lg">
+      <div className="container mx-auto flex items-center justify-between py-4 max-w-8xl">
         <div className="flex items-center gap-8">
           {/* Enhanced Logo */}
           <Link to="/" className="font-bold text-3xl logo-link text-trust-600 hover:text-trust-700 transition-colors">
@@ -198,7 +198,7 @@ export function DesktopNav() {
             <Input
               type="search"
               placeholder="Find doctors, clinics, specialists..."
-              className="w-[250px] pl-10 md:w-[250px] lg:w-[350px] xl:w-[400px] 2xl:w-[450px] 3xl:w-[500px] 4xl:w-[550px] 5xl:w-[600px] rounded-xl border-trust-200 focus:border-trust-400 focus:ring-trust-200"
+              className="w-[250px] pl-10 md:w-[280px] lg:w-[320px] xl:w-[360px] 2xl:w-[400px] rounded-xl border-trust-200 focus:border-trust-400 focus:ring-trust-200"
               value={searchTerm}
               onChange={handleSearchChange}
             />

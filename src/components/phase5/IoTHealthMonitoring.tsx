@@ -649,3 +649,5 @@ export const IoTHealthMonitoring: React.FC<IoTHealthMonitoringProps> = ({ patien
     </div>
   );
 };
+
+export default IoTHealthMonitoring;

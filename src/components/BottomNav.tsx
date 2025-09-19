@@ -1,5 +1,5 @@
 
-import { Home, Search, Calendar, MessageSquare, Heart, Users, ShoppingCart, Pill, AlertTriangle, User, Wallet } from "lucide-react";
+import { Home, Search, Calendar, MessageSquare, Heart, Users, ShoppingCart, Pill, AlertTriangle, User, Wallet, Brain, Shield, Activity, BarChart3, Zap } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useSession } from "@/hooks/use-session";
 import { useDeviceType } from "@/hooks/use-device-type";
@@ -107,6 +107,43 @@ export function BottomNav() {
       label: "My Profile", 
       description: "Personal information and settings",
       icon: <User className="h-5 w-5" />
+    },
+    // Phase 5 Advanced Healthcare Features
+    { 
+      to: "/phase5-dashboard", 
+      label: "Advanced Healthcare Platform", 
+      description: "Next-gen healthcare technology hub",
+      icon: <Zap className="h-5 w-5 text-blue-600" />
+    },
+    { 
+      to: "/ai-diagnostics", 
+      label: "AI Diagnostic Assistant", 
+      description: "AI-powered symptom analysis and diagnosis",
+      icon: <Brain className="h-5 w-5 text-purple-600" />
+    },
+    { 
+      to: "/blockchain-records", 
+      label: "Blockchain Medical Records", 
+      description: "Secure, decentralized medical data",
+      icon: <Shield className="h-5 w-5 text-green-600" />
+    },
+    { 
+      to: "/iot-monitoring", 
+      label: "IoT Health Monitoring", 
+      description: "Real-time device health tracking",
+      icon: <Activity className="h-5 w-5 text-red-600" />
+    },
+    { 
+      to: "/health-visualization", 
+      label: "Health Data Visualization", 
+      description: "Advanced health analytics and charts",
+      icon: <BarChart3 className="h-5 w-5 text-indigo-600" />
+    },
+    { 
+      to: "/emergency-response", 
+      label: "Emergency Response", 
+      description: "24/7 emergency alert system",
+      icon: <AlertTriangle className="h-5 w-5 text-orange-600" />
     }
   ], []);
   
@@ -116,11 +153,10 @@ export function BottomNav() {
       <div className="absolute inset-0 bg-background/95 backdrop-blur-xl border-t-2 border-trust-200 shadow-2xl" />
       
       {/* Navigation content optimized for mobile */}
-      <div className="relative flex items-center justify-evenly h-16 px-1">
+      <div className="relative flex items-center justify-evenly h-20 px-2">
         {navItems.map((item, index) => (
           <BottomNavItem key={index} {...item} />
         ))}
-
         <BottomNavMenu user={user} menuItems={menuItems} />
       </div>
     </div>

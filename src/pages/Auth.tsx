@@ -15,6 +15,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { AnimatedButton } from "@/components/ui/animated-button";
+import { useFeedbackSystem } from "@/hooks/use-feedback-system";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -49,15 +51,14 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 type PatientSignupFormValues = z.infer<typeof patientSignupSchema>;
 type ProviderSignupFormValues = z.infer<typeof providerSignupSchema>;
 
-const Auth = () => {
-  const { signIn, signUp, isLoading: authLoading, isAuthenticated } = useAuth();
-  const [error, setError] = useState<string | null>(null);
-  const [userType, setUserType] = useState<"patient" | "health_personnel">("patient");
-  const [localLoading, setLocalLoading] = useState(false);
+export const Auth = () => {
+  const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const defaultTab = searchParams.get('tab') === 'signup' ? 'signup' : 'signin';
-  const [activeTab, setActiveTab] = useState(defaultTab);
+  const [error, setError] = useState<string | null>(null);
+  const [localLoading, setLocalLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "signin");
+  const { triggerSuccess, triggerError } = useFeedbackSystem();
 
   // Simplified and more robust auth check
   useEffect(() => {
@@ -135,12 +136,15 @@ const Auth = () => {
       
       if (error) throw error;
       
+      triggerSuccess("Signed in successfully!");
       toast.success("Signed in successfully!");
       navigate("/symptoms");
     } catch (err: any) {
-      setError(err.message || "Failed to sign in");
+      const errorMessage = err.message || "Failed to sign in";
+      setError(errorMessage);
+      triggerError(errorMessage);
       console.error("Login error:", err);
-      toast.error(err.message || "Failed to sign in");
+      toast.error(errorMessage);
     } finally {
       setLocalLoading(false);
     }
@@ -150,6 +154,7 @@ const Auth = () => {
 const onPatientSignupSubmit = async (data: PatientSignupFormValues) => {
   try {
     setError(null);
+    setLocalLoading(true);
     const { error } = await supabase.auth.signUp({
       email: data.email,
       password: data.password,
@@ -164,12 +169,17 @@ const onPatientSignupSubmit = async (data: PatientSignupFormValues) => {
     
     if (error) throw error;
     
+    triggerSuccess("Account created! Please verify your email address.");
     toast.success("Account created! Please verify your email address.");
     setActiveTab("signin");
   } catch (err: any) {
-    setError(err.message || "Failed to create account");
+    const errorMessage = err.message || "Failed to create account";
+    setError(errorMessage);
+    triggerError(errorMessage);
     console.error("Patient signup error:", err);
-    toast.error(err.message || "Failed to create account");
+    toast.error(errorMessage);
+  } finally {
+    setLocalLoading(false);
   }
 };
 
@@ -177,6 +187,7 @@ const onPatientSignupSubmit = async (data: PatientSignupFormValues) => {
 const onProviderSignupSubmit = async (data: ProviderSignupFormValues) => {
   try {
     setError(null);
+    setLocalLoading(true);
     const { error } = await supabase.auth.signUp({
       email: data.email,
       password: data.password,
@@ -193,12 +204,17 @@ const onProviderSignupSubmit = async (data: ProviderSignupFormValues) => {
     
     if (error) throw error;
     
+    triggerSuccess("Account created! Please verify your email address.");
     toast.success("Account created! Please verify your email address.");
     setActiveTab("signin");
   } catch (err: any) {
-    setError(err.message || "Failed to create account");
+    const errorMessage = err.message || "Failed to create account";
+    setError(errorMessage);
+    triggerError(errorMessage);
     console.error("Provider signup error:", err);
-    toast.error(err.message || "Failed to create account");
+    toast.error(errorMessage);
+  } finally {
+    setLocalLoading(false);
   }
 };
 
@@ -286,13 +302,14 @@ const onProviderSignupSubmit = async (data: ProviderSignupFormValues) => {
                     </Link>
                   </div>
                   
-                  <Button 
+                  <AnimatedButton 
                     type="submit" 
                     className="w-full" 
-                    disabled={loginForm.formState.isSubmitting}
+                    loading={loginForm.formState.isSubmitting}
+                    loadingText="Signing in..."
                   >
-                    {loginForm.formState.isSubmitting ? "Signing in..." : "Sign In"}
-                  </Button>
+                    Sign In
+                  </AnimatedButton>
                 </form>
               </Form>
             </TabsContent>
@@ -415,13 +432,14 @@ const onProviderSignupSubmit = async (data: ProviderSignupFormValues) => {
                       )}
                     />
                     
-                    <Button 
+                    <AnimatedButton 
                       type="submit" 
                       className="w-full" 
-                      disabled={patientSignupForm.formState.isSubmitting}
+                      loading={patientSignupForm.formState.isSubmitting}
+                      loadingText="Creating Account..."
                     >
-                      {patientSignupForm.formState.isSubmitting ? "Creating Account..." : "Create Patient Account"}
-                    </Button>
+                      Create Patient Account
+                    </AnimatedButton>
                   </form>
                 </Form>
               ) : (
@@ -550,13 +568,14 @@ const onProviderSignupSubmit = async (data: ProviderSignupFormValues) => {
                       )}
                     />
                     
-                    <Button 
+                    <AnimatedButton 
                       type="submit" 
                       className="w-full" 
-                      disabled={providerSignupForm.formState.isSubmitting}
+                      loading={providerSignupForm.formState.isSubmitting}
+                      loadingText="Creating Account..."
                     >
-                      {providerSignupForm.formState.isSubmitting ? "Creating Account..." : "Create Provider Account"}
-                    </Button>
+                      Create Provider Account
+                    </AnimatedButton>
                   </form>
                 </Form>
               )}

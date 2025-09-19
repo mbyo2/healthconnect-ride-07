@@ -75,17 +75,18 @@ export function Header() {
         
         {/* Search bar - hidden on very small screens */}
         {user && (
-          <form onSubmit={handleSearchSubmit} className="hidden sm:block flex-1 max-w-md mx-4">
-            <div className="search-bar">
+          <form onSubmit={handleSearchSubmit} className="hidden sm:block flex-1 max-w-sm mx-4">
+            <div className="search-bar relative">
               <Input
                 type="search"
                 placeholder="Search providers, specialties..."
-                className="search-input"
+                className="search-input pl-10 pr-4 py-2 w-full rounded-xl border-trust-200 focus:border-trust-400 focus:ring-trust-200"
                 value={searchTerm}
                 onChange={handleSearchChange}
               />
-              <button type="submit" className="search-button">
-                <Search className="h-4 w-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <button type="submit" className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1 rounded-lg hover:bg-trust-50 transition-colors">
+                <Search className="h-4 w-4 text-trust-600" />
               </button>
             </div>
           </form>
@@ -135,7 +136,7 @@ export function Header() {
                 )}
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-64 bg-white border border-gray-200 shadow-lg">
+            <DropdownMenuContent align="end" className="w-64 bg-white border border-gray-200 shadow-lg max-h-96 overflow-y-auto">
               {user ? (
                 <>
                   <DropdownMenuLabel className="pb-2">

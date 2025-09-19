@@ -588,3 +588,5 @@ export const HealthDataVisualization: React.FC<HealthDataVisualizationProps> = (
     </div>
   );
 };
+
+export default HealthDataVisualization;

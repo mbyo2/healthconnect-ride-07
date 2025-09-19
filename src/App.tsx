@@ -10,6 +10,7 @@ import { LoadingScreen } from '@/components/LoadingScreen';
 import { AuthProvider } from '@/context/AuthContext';
 import { UserRolesProvider } from '@/context/UserRolesContext';
 import { SearchProvider } from '@/context/SearchContext';
+import { FeedbackProvider } from '@/context/FeedbackContext';
 import { SessionManager } from '@/components/auth/SessionManager';
 import { ProfileSetup } from '@/components/auth/ProfileSetup';
 import { RoleProtectedRoute } from '@/components/auth/RoleProtectedRoute';
@@ -510,7 +511,9 @@ const App = () => {
     <SessionContextProvider supabaseClient={supabase}>
       <AuthProvider>
         <UserRolesProvider>
-          <AppContent />
+          <FeedbackProvider>
+            <AppContent />
+          </FeedbackProvider>
         </UserRolesProvider>
       </AuthProvider>
     </SessionContextProvider>
