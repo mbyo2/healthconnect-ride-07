@@ -1,4 +1,3 @@
-
 export interface UserConnection {
   id: string;
   patient_id: string;
@@ -53,3 +52,5 @@ export interface ConnectionRequest {
   connection_type: 'manual';
   notes?: string;
 }
+
+// TODO: Implement logic for connection status transitions (pending, approved, rejected, blocked) and update UI accordingly

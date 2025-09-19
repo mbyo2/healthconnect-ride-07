@@ -46,8 +46,8 @@ export function useDeviceType(): {
         return 'tv';
       }
 
-      // Check for other devices using breakpoints
-      if (width <= 768) {
+      // Check for other devices using improved breakpoints
+      if (width <= 640) {
         return 'mobile';
       } else if (width <= 1024) {
         return 'tablet';

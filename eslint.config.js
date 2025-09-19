@@ -23,7 +23,20 @@ export default tseslint.config(
         "warn",
         { allowConstantExport: true },
       ],
-      "@typescript-eslint/no-unused-vars": "off",
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        { 
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_"
+        }
+      ],
+      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/prefer-const": "error",
+      "no-console": ["warn", { allow: ["warn", "error"] }],
+      "react-hooks/exhaustive-deps": "warn",
+      "prefer-const": "error",
+      "no-var": "error",
     },
   }
 );

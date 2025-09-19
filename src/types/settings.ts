@@ -1,4 +1,3 @@
-
 export type AdminLevel = "admin" | "superadmin";
 
 export type StatusType = "pending" | "approved" | "rejected" | "completed" | "scheduled" | "canceled";
@@ -75,3 +74,5 @@ export interface TwoFactorSettings {
   created_at?: string;
   updated_at?: string;
 }
+
+// TODO: Review all status types and ensure transitions are implemented in relevant workflows

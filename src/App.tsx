@@ -1,49 +1,61 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { useSession, useSupabaseClient, SessionContextProvider } from '@supabase/auth-helpers-react';
 import { createClient } from '@supabase/supabase-js';
 import { MobileLayout } from '@/components/MobileLayout';
-import Home from '@/pages/Home';
-import Appointments from '@/pages/Appointments';
-import AdminDashboard from '@/pages/AdminDashboard';
-import Connections from '@/pages/Connections';
-import Chat from '@/pages/Chat';
-import Prescriptions from '@/pages/Prescriptions';
-import Symptoms from '@/pages/Symptoms';
-import HealthcareProfessionals from '@/pages/HealthcareProfessionals';
-import HealthcareInstitutions from '@/pages/HealthcareInstitutions';
-import VideoDashboard from '@/pages/VideoDashboard';
-import Landing from '@/pages/Landing';
-import Profile from '@/pages/Profile';
-import Settings from '@/pages/Settings';
-import SearchPage from '@/pages/SearchPage';
-import Testing from '@/pages/Testing';
-import Documentation from '@/pages/Documentation';
+import { LoadingScreen } from '@/components/LoadingScreen';
 import { AuthProvider } from '@/context/AuthContext';
 import { UserRolesProvider } from '@/context/UserRolesContext';
 import { SearchProvider } from '@/context/SearchContext';
 import { SessionManager } from '@/components/auth/SessionManager';
 import { ProfileSetup } from '@/components/auth/ProfileSetup';
 import { RoleProtectedRoute } from '@/components/auth/RoleProtectedRoute';
-import UserMarketplace from "@/pages/UserMarketplace";
-import Emergency from "@/pages/Emergency";
-import PharmacyPortal from "@/pages/PharmacyPortal";
-import Marketplace from "@/pages/Marketplace";
-import ProviderDashboard from "@/pages/ProviderDashboard";
-import SuperAdminDashboard from "@/pages/SuperAdminDashboard";
-import HealthcareApplication from "@/pages/HealthcareApplication";
-import Terms from "@/pages/Terms";
-import Privacy from "@/pages/Privacy";
-import Contact from "@/pages/Contact";
-import PaymentSuccess from "@/pages/PaymentSuccess";
-import PaymentCancel from "@/pages/PaymentCancel";
-import AdminWallet from "@/pages/AdminWallet";
-import InstitutionWallet from "@/pages/InstitutionWallet";
-import Wallet from "@/pages/Wallet";
-import CreateAdmin from "@/pages/CreateAdmin";
+
+// Lazy load all page components for better performance
+const Home = lazy(() => import('@/pages/Home'));
+const Appointments = lazy(() => import('@/pages/Appointments'));
+const AdminDashboard = lazy(() => import('@/pages/AdminDashboard'));
+const Connections = lazy(() => import('@/pages/Connections'));
+const Chat = lazy(() => import('@/pages/Chat'));
+const Prescriptions = lazy(() => import('@/pages/Prescriptions'));
+const Symptoms = lazy(() => import('@/pages/Symptoms'));
+const HealthcareProfessionals = lazy(() => import('@/pages/HealthcareProfessionals'));
+const HealthcareInstitutions = lazy(() => import('@/pages/HealthcareInstitutions'));
+const VideoDashboard = lazy(() => import('@/pages/VideoDashboard'));
+const Landing = lazy(() => import('@/pages/Landing'));
+const Profile = lazy(() => import('@/pages/Profile'));
+const Settings = lazy(() => import('@/pages/Settings'));
+const SearchPage = lazy(() => import('@/pages/SearchPage'));
+const Testing = lazy(() => import('@/pages/Testing'));
+const Documentation = lazy(() => import('@/pages/Documentation'));
+const UserMarketplace = lazy(() => import('@/pages/UserMarketplace'));
+const Emergency = lazy(() => import('@/pages/Emergency'));
+const PharmacyPortal = lazy(() => import('@/pages/PharmacyPortal'));
+const Marketplace = lazy(() => import('@/pages/Marketplace'));
+const ProviderDashboard = lazy(() => import('@/pages/ProviderDashboard'));
+const SuperAdminDashboard = lazy(() => import('@/pages/SuperAdminDashboard'));
+const HealthcareApplication = lazy(() => import('@/pages/HealthcareApplication'));
+const Terms = lazy(() => import('@/pages/Terms'));
+const Privacy = lazy(() => import('@/pages/Privacy'));
+const Contact = lazy(() => import('@/pages/Contact'));
+const PaymentSuccess = lazy(() => import('@/pages/PaymentSuccess'));
+const PaymentCancel = lazy(() => import('@/pages/PaymentCancel'));
+const AdminWallet = lazy(() => import('@/pages/AdminWallet'));
+const InstitutionWallet = lazy(() => import('@/pages/InstitutionWallet'));
+const Wallet = lazy(() => import('@/pages/Wallet'));
+const CreateAdmin = lazy(() => import('@/pages/CreateAdmin'));
+
+// Phase 5 Advanced Features - Lazy loaded components
+const Phase5Dashboard = lazy(() => import('@/components/phase5/Phase5Dashboard'));
+const AIDiagnosticAssistant = lazy(() => import('@/components/phase5/AIDiagnosticAssistant'));
+const BlockchainMedicalRecords = lazy(() => import('@/components/phase5/BlockchainMedicalRecords'));
+const IoTHealthMonitoring = lazy(() => import('@/components/phase5/IoTHealthMonitoring'));
+const EmergencyResponse = lazy(() => import('@/components/phase5/EmergencyResponse'));
+const HealthDataVisualization = lazy(() => import('@/components/phase5/HealthDataVisualization'));
+const ComplianceAudit = lazy(() => import('@/components/phase5/ComplianceAudit'));
 
 const supabase = createClient(
   "https://tthzcijscedgxjfnfnky.supabase.co",
@@ -86,6 +98,7 @@ const AppContent = () => {
       <Router>
         <SessionManager>
         <MobileLayout>
+        <Suspense fallback={<LoadingScreen />}>
         <Routes>
           {/* Public Routes */}
           <Route path="/landing" element={<Landing />} />
@@ -402,6 +415,80 @@ const AppContent = () => {
               )
             }
           />
+
+          {/* Phase 5 Advanced Healthcare Features */}
+          <Route
+            path="/phase5-dashboard"
+            element={
+              !session ? (
+                <Navigate to="/" replace={true} />
+              ) : (
+                <Phase5Dashboard />
+              )
+            }
+          />
+          <Route
+            path="/ai-diagnostics"
+            element={
+              !session ? (
+                <Navigate to="/" replace={true} />
+              ) : (
+                <AIDiagnosticAssistant />
+              )
+            }
+          />
+          <Route
+            path="/blockchain-records"
+            element={
+              !session ? (
+                <Navigate to="/" replace={true} />
+              ) : (
+                <BlockchainMedicalRecords />
+              )
+            }
+          />
+          <Route
+            path="/iot-monitoring"
+            element={
+              !session ? (
+                <Navigate to="/" replace={true} />
+              ) : (
+                <IoTHealthMonitoring />
+              )
+            }
+          />
+          <Route
+            path="/emergency-response"
+            element={
+              !session ? (
+                <Navigate to="/" replace={true} />
+              ) : (
+                <EmergencyResponse />
+              )
+            }
+          />
+          <Route
+            path="/health-visualization"
+            element={
+              !session ? (
+                <Navigate to="/" replace={true} />
+              ) : (
+                <HealthDataVisualization />
+              )
+            }
+          />
+          <Route
+            path="/compliance-audit"
+            element={
+              !session ? (
+                <Navigate to="/" replace={true} />
+              ) : (
+                <RoleProtectedRoute allowedRoles={['admin', 'health_personnel']}>
+                  <ComplianceAudit />
+                </RoleProtectedRoute>
+              )
+            }
+          />
           
           {/* Payment Routes */}
           <Route path="/payment-success" element={<PaymentSuccess />} />
@@ -410,6 +497,7 @@ const AppContent = () => {
           {/* Catch-all route for 404 */}
           <Route path="*" element={<div className="min-h-screen flex items-center justify-center"><div className="text-center"><h1 className="text-4xl font-bold mb-4">404 - Page Not Found</h1><p className="text-muted-foreground mb-4">The page you're looking for doesn't exist.</p><button onClick={() => window.location.href = '/'} className="px-4 py-2 bg-primary text-primary-foreground rounded-md">Go Home</button></div></div>} />
         </Routes>
+        </Suspense>
         </MobileLayout>
         </SessionManager>
       </Router>

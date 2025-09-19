@@ -1,4 +1,3 @@
-
 export interface PaymentRequest {
   amount: number;
   currency: string;
@@ -17,6 +16,7 @@ export interface PaymentResponse {
   newBalance?: number;
   availableBalance?: number;
   requiredAmount?: number;
+  error?: string;
   transactionDetails?: {
     amount: number;
     currency: string;
@@ -64,3 +64,5 @@ export interface PaymentMethod {
   isDefault: boolean;
   created_at: string;
 }
+
+// TODO: Implement logic to transition payment status from 'pending' to 'completed' or 'failed' in payment workflows

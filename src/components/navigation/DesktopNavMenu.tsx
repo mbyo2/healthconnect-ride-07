@@ -16,6 +16,7 @@ interface NavItemType {
   to: string;
   label: string;
   icon: React.ReactNode;
+  badge?: string;
 }
 
 interface DesktopNavMenuProps {
@@ -66,9 +67,23 @@ export function DesktopNavMenu({ secondaryNavItems }: DesktopNavMenuProps) {
               location.pathname === item.to ? "bg-trust-50 text-trust-700 font-medium" : ""
             }`}
           >
-            <Link to={item.to} className="flex items-center">
-              {item.icon}
-              {item.label}
+            <Link to={item.to} className="flex items-center justify-between w-full">
+              <div className="flex items-center">
+                {item.icon}
+                {item.label}
+              </div>
+              {item.badge && (
+                <span className={`text-xs px-2 py-1 rounded-full font-medium ${
+                  item.badge === 'NEW' ? 'bg-green-100 text-green-700' :
+                  item.badge === 'AI' ? 'bg-blue-100 text-blue-700' :
+                  item.badge === 'SECURE' ? 'bg-purple-100 text-purple-700' :
+                  item.badge === 'LIVE' ? 'bg-red-100 text-red-700' :
+                  item.badge === '24/7' ? 'bg-orange-100 text-orange-700' :
+                  'bg-gray-100 text-gray-700'
+                }`}>
+                  {item.badge}
+                </span>
+              )}
             </Link>
           </DropdownMenuItem>
         ))}

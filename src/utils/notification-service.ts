@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { PushSubscriptionJSON } from "@/types/settings";
@@ -30,13 +29,15 @@ export async function subscribeToNotifications() {
     const registration = await navigator.serviceWorker.ready;
     
     // Subscribe to push notifications
+    const vapidKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
+    if (!vapidKey) {
+      toast.error("VAPID public key is not set in environment variables");
+      return false;
+    }
+    // TODO: Use VAPID public key from environment variables and ensure backend integration for push notifications
     const subscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(
-        // This should be your VAPID public key from environment variables
-        // For now using a placeholder
-        'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U'
-      )
+      applicationServerKey: urlBase64ToUint8Array(vapidKey)
     });
 
     // Save subscription to database
@@ -198,3 +199,7 @@ export async function sendEmailNotification(
     return false;
   }
 }
+
+// TODO: Implement push notifications and reminders for user engagement
+// TODO: Automate workflow status transitions and add real-time updates
+// TODO: Add more environment variables for notification/push services as needed (e.g., VITE_PUSH_API_URL, VITE_NOTIFICATION_SECRET)

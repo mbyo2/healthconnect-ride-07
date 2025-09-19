@@ -1,4 +1,3 @@
-
 export interface MarketplaceProduct {
   id: string;
   pharmacy_id: string;
@@ -87,3 +86,5 @@ export interface CartItem {
   quantity: number;
   subtotal: number;
 }
+
+// TODO: Ensure all marketplace status transitions (pending, confirmed, preparing, etc.) are handled in workflows and reflected in the UI

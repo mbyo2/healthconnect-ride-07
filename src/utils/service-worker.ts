@@ -1,4 +1,3 @@
-
 interface ExtendedServiceWorkerRegistration extends ServiceWorkerRegistration {
   sync?: {
     register: (tag: string) => Promise<void>;
@@ -8,6 +7,12 @@ interface ExtendedServiceWorkerRegistration extends ServiceWorkerRegistration {
   };
 }
 
+// Service Worker Registration
+// This registers the service worker at '/service-worker.js' for offline and PWA support.
+// Make sure only one service worker is registered for the app.
+// Offline page and critical routes are handled in 'public/service-worker.js'.
+// Update notifications are triggered when a new version is available.
+// TODO: Implement user-facing toast/notification when updates are ready.
 export const registerServiceWorker = async () => {
   if ('serviceWorker' in navigator) {
     try {

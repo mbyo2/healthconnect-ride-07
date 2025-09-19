@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -184,3 +183,6 @@ const AdminWallet: React.FC = () => {
 };
 
 export default AdminWallet;
+
+// TODO: Implement redirect logic for unauthenticated/non-admin users
+// TODO: Implement approval flow for pending transactions

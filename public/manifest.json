@@ -1,8 +1,8 @@
 
 {
-  "name": "Doc' O Clock - Complete Healthcare Platform",
-  "short_name": "Doc' O Clock",
-  "description": "Complete healthcare platform connecting patients with doctors, pharmacies, and emergency services. Book appointments, order medications, and access telemedicine services.",
+  "name": "HealthConnect - Complete Healthcare Platform",
+  "short_name": "HealthConnect",
+  "description": "Secure healthcare platform with advanced fraud detection, biometric authentication, and comprehensive medical services. Book appointments, order medications, and access telemedicine services.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

@@ -155,6 +155,41 @@ button:hover {
   }
 }
 
+/* Wide screen optimizations */
+@media (min-width: 1600px) {
+  .container {
+    max-width: 1400px;
+  }
+  
+  .card {
+    padding: 2.5em;
+  }
+  
+  button {
+    padding: 14px 24px !important;
+    font-size: 17px !important;
+  }
+}
+
+@media (min-width: 1920px) {
+  .container {
+    max-width: 1600px;
+  }
+  
+  .card {
+    padding: 3em;
+  }
+  
+  button {
+    padding: 16px 28px !important;
+    font-size: 18px !important;
+  }
+  
+  h1 { font-size: 2.5rem !important; }
+  h2 { font-size: 2rem !important; }
+  h3 { font-size: 1.5rem !important; }
+}
+
 html, body {
   overflow-x: hidden;
   position: relative;

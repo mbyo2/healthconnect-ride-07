@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { Link, useLocation } from "react-router-dom";
@@ -7,7 +6,7 @@ import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useState, useCallback } from "react";
 import { useSearch } from "@/context/SearchContext";
-import { Home, Calendar, MessageSquare, Users, ShoppingCart, Heart, Settings, User } from "lucide-react";
+import { Home, Calendar, MessageSquare, Users, ShoppingCart, Heart, Settings, User, Brain, Shield, Activity, BarChart3, AlertTriangle, Zap } from "lucide-react";
 import { DesktopNavMenu } from "@/components/navigation/DesktopNavMenu";
 import { DesktopUserMenu } from "@/components/navigation/DesktopUserMenu";
 
@@ -79,7 +78,7 @@ export function DesktopNav() {
     );
   }
   
-  // Enhanced secondary items for comprehensive access
+  // Enhanced secondary items for comprehensive access including Phase 5 features
   const secondaryNavItems = [
     {
       to: "/profile",
@@ -116,6 +115,42 @@ export function DesktopNav() {
       label: "Video Consultations",
       icon: <MessageSquare className="h-4 w-4 mr-2" />
     },
+    // Phase 5 Advanced Features
+    {
+      to: "/phase5-dashboard",
+      label: "Advanced Healthcare Platform",
+      icon: <Zap className="h-4 w-4 mr-2" />,
+      badge: "NEW"
+    },
+    {
+      to: "/ai-diagnostics",
+      label: "AI Diagnostic Assistant",
+      icon: <Brain className="h-4 w-4 mr-2" />,
+      badge: "AI"
+    },
+    {
+      to: "/blockchain-records",
+      label: "Blockchain Medical Records",
+      icon: <Shield className="h-4 w-4 mr-2" />,
+      badge: "SECURE"
+    },
+    {
+      to: "/iot-monitoring",
+      label: "IoT Health Monitoring",
+      icon: <Activity className="h-4 w-4 mr-2" />,
+      badge: "LIVE"
+    },
+    {
+      to: "/health-visualization",
+      label: "Health Data Visualization",
+      icon: <BarChart3 className="h-4 w-4 mr-2" />
+    },
+    {
+      to: "/emergency-response",
+      label: "Emergency Response",
+      icon: <AlertTriangle className="h-4 w-4 mr-2" />,
+      badge: "24/7"
+    },
     {
       to: "/settings",
       label: "Settings",
@@ -124,8 +159,8 @@ export function DesktopNav() {
   ];
   
   return (
-    <header className="bg-background sticky top-0 z-50 border-b-2 border-trust-100 px-6 shadow-lg">
-      <div className="flex items-center justify-between py-4">
+    <header className="bg-background sticky top-0 z-50 border-b-2 border-trust-100 px-4 md:px-6 lg:px-8 xl:px-10 2xl:px-12 3xl:px-16 4xl:px-20 5xl:px-24 shadow-lg">
+      <div className="container mx-auto flex items-center justify-between py-4 max-w-none">
         <div className="flex items-center gap-8">
           {/* Enhanced Logo */}
           <Link to="/" className="font-bold text-3xl logo-link text-trust-600 hover:text-trust-700 transition-colors">
@@ -163,7 +198,7 @@ export function DesktopNav() {
             <Input
               type="search"
               placeholder="Find doctors, clinics, specialists..."
-              className="w-[250px] pl-10 md:w-[250px] lg:w-[350px] rounded-xl border-trust-200 focus:border-trust-400 focus:ring-trust-200"
+              className="w-[250px] pl-10 md:w-[250px] lg:w-[350px] xl:w-[400px] 2xl:w-[450px] 3xl:w-[500px] 4xl:w-[550px] 5xl:w-[600px] rounded-xl border-trust-200 focus:border-trust-400 focus:ring-trust-200"
               value={searchTerm}
               onChange={handleSearchChange}
             />
@@ -189,3 +224,6 @@ export function DesktopNav() {
     </header>
   );
 }
+
+// TODO: Add ARIA roles and keyboard navigation for all menu items
+// TODO: Ensure navigation is accessible for screen readers

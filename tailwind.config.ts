@@ -15,10 +15,13 @@ export default {
       center: true,
       padding: {
         DEFAULT: "1rem",
-        sm: "2rem",
-        lg: "3rem",
-        xl: "4rem",
-        "2xl": "5rem",
+        sm: "1.5rem",
+        md: "2rem",
+        lg: "2.5rem",
+        xl: "3rem",
+        "2xl": "3.5rem",
+        "3xl": "4rem",
+        "4xl": "4.5rem",
       },
       screens: {
         sm: "640px",
@@ -26,6 +29,9 @@ export default {
         lg: "1024px",
         xl: "1280px",
         "2xl": "1400px",
+        "3xl": "1600px",
+        "4xl": "1920px",
+        "5xl": "2560px",
       },
     },
     extend: {
@@ -142,6 +148,7 @@ export default {
       },
       screens: {
         'xs': '480px',
+        '5xl': '2560px',
       },
     },
   },

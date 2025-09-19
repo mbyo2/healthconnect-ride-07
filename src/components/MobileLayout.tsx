@@ -1,4 +1,3 @@
-
 import { Header } from "@/components/Header";
 import { BottomNav } from "@/components/BottomNav";
 import { DesktopNav } from "@/components/DesktopNav";
@@ -37,7 +36,7 @@ export const MobileLayout = ({ children, isLoading }: MobileLayoutProps) => {
                 !isAuthenticated && "w-full" // Use full width when no nav is shown
               )}
             >
-              <div className="container mx-auto px-4 md:px-6 lg:px-8 xl:px-12 py-6 space-y-6 max-w-7xl">
+              <div className="container mx-auto px-4 md:px-6 lg:px-8 xl:px-10 2xl:px-12 3xl:px-14 4xl:px-16 5xl:px-18 py-6 space-y-6 max-w-7xl">
                 {children}
               </div>
             </main>
@@ -60,7 +59,7 @@ export const MobileLayout = ({ children, isLoading }: MobileLayoutProps) => {
             "transition-all duration-200 ease-in-out"
           )}
         >
-          <div className="container mx-auto px-4 md:px-6 lg:px-8 xl:px-12 space-y-6 max-w-7xl">
+          <div className="container mx-auto px-4 md:px-6 lg:px-8 xl:px-10 2xl:px-12 3xl:px-14 4xl:px-16 5xl:px-18 space-y-6 max-w-7xl">
             {children}
           </div>
         </main>
@@ -69,4 +68,9 @@ export const MobileLayout = ({ children, isLoading }: MobileLayoutProps) => {
       </div>
     </AccessibilityProvider>
   );
-};
+}
+
+// TODO: Ensure color contrast meets WCAG standards and add focus management for navigation elements
+// TODO: Ensure all interactive elements have ARIA labels and roles
+// TODO: Add keyboard navigation and focus management for accessibility
+// TODO: Improve color contrast and font sizes for readability
