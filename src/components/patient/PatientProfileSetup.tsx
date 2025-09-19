@@ -18,7 +18,7 @@ export const PatientProfileSetup = () => {
   const [loading, setLoading] = useState(false);
   const [avatar, setAvatar] = useState<File | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-  const { triggerSuccess, triggerError } = useFeedbackSystem();
+  const { showSuccess, showError } = useFeedbackSystem();
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
@@ -97,12 +97,12 @@ export const PatientProfileSetup = () => {
 
       if (error) throw error;
 
-      triggerSuccess("Profile setup completed successfully!");
+      showSuccess("Profile setup completed successfully!");
       toast.success("Profile setup completed successfully!");
       navigate('/');
     } catch (error: any) {
       const errorMessage = error.message || "Failed to complete profile setup";
-      triggerError(errorMessage);
+      showError(errorMessage);
       toast.error(errorMessage);
     } finally {
       setLoading(false);

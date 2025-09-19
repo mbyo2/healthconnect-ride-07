@@ -655,6 +655,17 @@ class IoTHealthMonitoring {
     }
   }
 
+  // Get all connected devices
+  getDevices(): IoTDevice[] {
+    return Array.from(this.connectedDevices.values());
+  }
+
+  // Get devices for a specific patient
+  getPatientDevices(patientId: string): IoTDevice[] {
+    return Array.from(this.connectedDevices.values())
+      .filter(device => device.patientId === patientId);
+  }
+
   cleanup(): void {
     // Stop all device streams
     this.deviceStreams.forEach(stream => {

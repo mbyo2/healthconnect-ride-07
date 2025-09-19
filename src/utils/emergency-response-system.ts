@@ -84,6 +84,7 @@ class EmergencyResponseSystem {
   private emergencyContacts: Map<string, EmergencyContact[]> = new Map();
   private medicalProfiles: Map<string, MedicalProfile> = new Map();
   private geolocationWatcher: number | null = null;
+  private currentLocation: { latitude: number; longitude: number; accuracy: number } | null = null;
   private lastKnownLocation: GeolocationPosition | null = null;
 
   constructor() {
@@ -118,7 +119,8 @@ class EmergencyResponseSystem {
         }, {} as Record<string, EmergencyContact[]>);
 
         Object.entries(contactsByPatient).forEach(([patientId, patientContacts]) => {
-          this.emergencyContacts.set(patientId, patientContacts.sort((a, b) => a.priority - b.priority));
+          const sortedContacts = (patientContacts as EmergencyContact[]).sort((a, b) => a.priority - b.priority);
+          this.emergencyContacts.set(patientId, sortedContacts);
         });
       }
 
@@ -635,7 +637,7 @@ class EmergencyResponseSystem {
     }
   }
 
-  async updateAlertStatus(alertId: string, status: EmergencyAlert['status'], responderId?: string): Promise<void> {
+  async updateAlertStatus(alertId: string, status: EmergencyAlert['status'], responderId?: string): Promise<boolean> {
     try {
       const alert = this.activeAlerts.get(alertId);
       if (!alert) {
@@ -666,33 +668,216 @@ class EmergencyResponseSystem {
       }
 
       logger.info('Alert status updated', 'EMERGENCY', { alertId, status });
+      return true;
     } catch (error) {
       errorHandler.handleError(error, 'updateAlertStatus');
+      return false;
     }
   }
 
-  async addEmergencyContact(contact: Omit<EmergencyContact, 'id'>): Promise<EmergencyContact> {
+  async addEmergencyContact(patientId: string, contact: { name: string; phone: string; relationship: string }): Promise<EmergencyContact> {
     try {
       const newContact: EmergencyContact = {
-        ...contact,
-        id: `contact_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+        id: `contact_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        patientId,
+        name: contact.name,
+        relationship: contact.relationship,
+        phone: contact.phone,
+        priority: 1,
+        language: 'en',
+        canReceiveAlerts: true,
+        medicalPowerOfAttorney: false
       };
 
-      await supabase.from('emergency_contacts').insert(newContact);
-
-      const patientContacts = this.emergencyContacts.get(contact.patientId) || [];
-      patientContacts.push(newContact);
-      patientContacts.sort((a, b) => a.priority - b.priority);
-      this.emergencyContacts.set(contact.patientId, patientContacts);
-
-      logger.info('Emergency contact added', 'EMERGENCY', {
-        contactId: newContact.id,
-        patientId: contact.patientId
+      await supabase.from('emergency_contacts').insert({
+        id: newContact.id,
+        patient_id: patientId,
+        name: contact.name,
+        relationship: contact.relationship,
+        phone: contact.phone,
+        priority: 1
       });
+
+      const contacts = this.emergencyContacts.get(patientId) || [];
+      contacts.push(newContact);
+      this.emergencyContacts.set(patientId, contacts);
+
+      logger.info('Emergency contact added', 'EMERGENCY', { contactId: newContact.id });
 
       return newContact;
     } catch (error) {
       errorHandler.handleError(error, 'addEmergencyContact');
+      throw error;
+    }
+  }
+
+  async getEmergencyContacts(patientId: string): Promise<EmergencyContact[]> {
+    try {
+      const { data: contacts } = await supabase
+        .from('emergency_contacts')
+        .select('*')
+        .eq('patient_id', patientId)
+        .order('priority', { ascending: true });
+
+      const emergencyContacts = (contacts || []).map(contact => ({
+        id: contact.id,
+        patientId: contact.patient_id,
+        name: contact.name,
+        relationship: contact.relationship,
+        phone: contact.phone,
+        priority: contact.priority,
+        language: contact.language || 'en',
+        canReceiveAlerts: contact.can_receive_alerts ?? true,
+        medicalPowerOfAttorney: contact.medical_power_of_attorney ?? false
+      }));
+
+      this.emergencyContacts.set(patientId, emergencyContacts);
+      return emergencyContacts;
+    } catch (error) {
+      errorHandler.handleError(error, 'getEmergencyContacts');
+      return [];
+    }
+  }
+
+  async removeEmergencyContact(patientId: string, contactId: string): Promise<boolean> {
+    try {
+      await supabase
+        .from('emergency_contacts')
+        .delete()
+        .eq('id', contactId)
+        .eq('patient_id', patientId);
+
+      const contacts = this.emergencyContacts.get(patientId) || [];
+      const updatedContacts = contacts.filter(contact => contact.id !== contactId);
+      this.emergencyContacts.set(patientId, updatedContacts);
+
+      logger.info('Emergency contact removed', 'EMERGENCY', { contactId });
+      return true;
+    } catch (error) {
+      errorHandler.handleError(error, 'removeEmergencyContact');
+      return false;
+    }
+  }
+
+  async startLocationTracking(patientId: string): Promise<void> {
+    try {
+      if ('geolocation' in navigator) {
+        this.geolocationWatcher = navigator.geolocation.watchPosition(
+          (position) => {
+            const location = {
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+              accuracy: position.coords.accuracy
+            };
+            
+            // Store current location for emergency use
+            this.currentLocation = location;
+            
+            logger.info('Location updated', 'EMERGENCY', { patientId, location });
+          },
+          (error) => {
+            logger.error('Location tracking error', 'EMERGENCY', error);
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 60000
+          }
+        );
+      }
+    } catch (error) {
+      errorHandler.handleError(error, 'startLocationTracking');
+    }
+  }
+
+  async enableFallDetection(patientId: string): Promise<void> {
+    try {
+      if ('DeviceMotionEvent' in window) {
+        // Check if permission is required (iOS 13+)
+        if (typeof (DeviceMotionEvent as any).requestPermission === 'function') {
+          const permission = await (DeviceMotionEvent as any).requestPermission();
+          if (permission === 'granted') {
+            window.addEventListener('devicemotion', (event) => {
+              this.processFallDetection(patientId, event);
+            });
+            logger.info('Fall detection enabled with permission', 'EMERGENCY', { patientId });
+          }
+        } else {
+          // No permission required (Android, older iOS)
+          window.addEventListener('devicemotion', (event) => {
+            this.processFallDetection(patientId, event);
+          });
+          logger.info('Fall detection enabled', 'EMERGENCY', { patientId });
+        }
+      }
+    } catch (error) {
+      errorHandler.handleError(error, 'enableFallDetection');
+    }
+  }
+
+  private processFallDetection(patientId: string, event: DeviceMotionEvent): void {
+    if (event.accelerationIncludingGravity) {
+      const { x, y, z } = event.accelerationIncludingGravity;
+      const acceleration = Math.sqrt(x! * x! + y! * y! + z! * z!);
+      
+      // Simple fall detection algorithm - threshold-based
+      if (acceleration > 25) { // Threshold for potential fall
+        this.createEmergencyAlert(patientId, 'fall', this.currentLocation, {
+          description: 'Potential fall detected by device sensors',
+          symptoms: ['fall_detected'],
+          vitals: { acceleration }
+        });
+      }
+    }
+  }
+
+  async createEmergencyAlert(
+    patientId: string, 
+    type: EmergencyAlert['type'], 
+    location: any, 
+    options: { description?: string; symptoms?: string[]; vitals?: any } = {}
+  ): Promise<EmergencyAlert> {
+    try {
+      const alertId = `alert_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      
+      const alert: EmergencyAlert = {
+        id: alertId,
+        patientId,
+        type,
+        severity: type === 'fall' || type === 'medical' ? 'high' : 'medium',
+        location: location || this.currentLocation || { latitude: 0, longitude: 0, accuracy: 0 },
+        symptoms: options.symptoms || [],
+        description: options.description || `${type} emergency alert`,
+        timestamp: new Date().toISOString(),
+        status: 'active',
+        responders: [],
+        language: 'en',
+        vitals: options.vitals
+      };
+
+      await supabase.from('emergency_alerts').insert({
+        id: alert.id,
+        patient_id: patientId,
+        type: alert.type,
+        severity: alert.severity,
+        location: alert.location,
+        symptoms: alert.symptoms,
+        description: alert.description,
+        timestamp: alert.timestamp,
+        status: alert.status,
+        language: alert.language,
+        vitals: alert.vitals
+      });
+
+      this.activeAlerts.set(alertId, alert);
+      
+      // Notify emergency contacts
+      await this.notifyEmergencyContacts(alert);
+      
+      logger.info('Emergency alert created', 'EMERGENCY', { alertId, type });
+      return alert;
+    } catch (error) {
+      errorHandler.handleError(error, 'createEmergencyAlert');
       throw error;
     }
   }

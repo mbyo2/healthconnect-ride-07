@@ -23,7 +23,7 @@ import { aiDiagnosticAssistant } from '@/utils/ai-diagnostic-assistant';
 import { blockchainMedicalRecords } from '@/utils/blockchain-medical-records';
 import { iotHealthMonitoring } from '@/utils/iot-health-monitoring';
 import { predictiveHealthAnalytics } from '@/utils/predictive-health-analytics';
-import { medicalTranslation } from '@/utils/medical-translation';
+import { MedicalTermTranslation } from '@/utils/medical-translation';
 import { emergencyResponseSystem } from '@/utils/emergency-response-system';
 import { complianceAuditSystem } from '@/utils/compliance-audit-system';
 import { healthDataVisualization } from '@/utils/health-data-visualization';
@@ -79,8 +79,8 @@ export const Phase5Dashboard: React.FC<Phase5DashboardProps> = ({ patientId, use
       setHealthTrends(trends);
 
       // Load IoT devices
-      const devices = await iotHealthMonitoring.getConnectedDevices(patientId);
-      setIotDevices(devices || []);
+      const connectedDevices = iotHealthMonitoring.getDevices();
+      setIotDevices(connectedDevices || []);
 
       // Load compliance status
       if (userRole === 'admin' || userRole === 'doctor') {

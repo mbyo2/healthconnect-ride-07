@@ -472,52 +472,6 @@ class BlockchainMedicalRecords {
     }
   }
 
-  private async validateBlockchainIntegrity(): Promise<boolean> {
-    try {
-      for (let i = 1; i < this.blockchain.length; i++) {
-        const currentBlock = this.blockchain[i];
-        const previousBlock = this.blockchain[i - 1];
-
-        // Validate hash chain
-        if (currentBlock.previousHash !== previousBlock.hash) {
-          logger.error('Blockchain integrity compromised', 'BLOCKCHAIN', {
-            blockId: currentBlock.id,
-            expectedPreviousHash: previousBlock.hash,
-            actualPreviousHash: currentBlock.previousHash
-          });
-          return false;
-        }
-
-        // Validate block hash
-        const calculatedHash = this.calculateHash(
-          currentBlock.id,
-          currentBlock.patientId,
-          JSON.stringify({
-            type: currentBlock.type,
-            providerId: currentBlock.providerId,
-            recordId: currentBlock.recordId,
-            consentId: currentBlock.consentId
-          }),
-          currentBlock.timestamp
-        );
-
-        if (calculatedHash !== currentBlock.hash) {
-          logger.error('Block hash validation failed', 'BLOCKCHAIN', {
-            blockId: currentBlock.id,
-            expectedHash: calculatedHash,
-            actualHash: currentBlock.hash
-          });
-          return false;
-        }
-      }
-
-      logger.info('Blockchain integrity validated', 'BLOCKCHAIN');
-      return true;
-    } catch (error) {
-      logger.error('Blockchain validation failed', 'BLOCKCHAIN', error);
-      return false;
-    }
-  }
 
   async getPatientRecords(patientId: string, requesterId: string): Promise<MedicalRecord[]> {
     try {
@@ -619,6 +573,71 @@ class BlockchainMedicalRecords {
     } catch (error) {
       errorHandler.handleError(error, 'generateComplianceReport');
       return null;
+    }
+  }
+
+  // Additional methods needed by Phase 5 components
+  async getPatientConsents(patientId: string): Promise<ConsentRecord[]> {
+    return this.getConsentHistory(patientId);
+  }
+
+  async getAuditTrail(patientId: string): Promise<AccessLog[]> {
+    return this.getAccessLogs(patientId, patientId);
+  }
+
+  async storeRecord(patientId: string, providerId: string, recordType: string, data: any): Promise<MedicalRecord> {
+    return this.createMedicalRecord(patientId, providerId, recordType as MedicalRecord['recordType'], data);
+  }
+
+  async validateConsent(patientId: string, providerId: string, action: string, dataType?: string): Promise<boolean> {
+    return this.checkConsent(patientId, providerId, action as 'read' | 'write' | 'share' | 'delete', dataType);
+  }
+
+  // Make validateBlockchainIntegrity public
+  public async validateBlockchainIntegrity(): Promise<boolean> {
+    try {
+      for (let i = 1; i < this.blockchain.length; i++) {
+        const currentBlock = this.blockchain[i];
+        const previousBlock = this.blockchain[i - 1];
+
+        // Validate hash chain
+        if (currentBlock.previousHash !== previousBlock.hash) {
+          logger.error('Blockchain integrity compromised', 'BLOCKCHAIN', {
+            blockId: currentBlock.id,
+            expectedPreviousHash: previousBlock.hash,
+            actualPreviousHash: currentBlock.previousHash
+          });
+          return false;
+        }
+
+        // Validate block hash
+        const calculatedHash = this.calculateHash(
+          currentBlock.id,
+          currentBlock.patientId,
+          JSON.stringify({
+            type: currentBlock.type,
+            providerId: currentBlock.providerId,
+            recordId: currentBlock.recordId,
+            consentId: currentBlock.consentId
+          }),
+          currentBlock.timestamp
+        );
+
+        if (calculatedHash !== currentBlock.hash) {
+          logger.error('Block hash validation failed', 'BLOCKCHAIN', {
+            blockId: currentBlock.id,
+            expectedHash: calculatedHash,
+            actualHash: currentBlock.hash
+          });
+          return false;
+        }
+      }
+
+      logger.info('Blockchain integrity validated', 'BLOCKCHAIN');
+      return true;
+    } catch (error) {
+      logger.error('Blockchain validation failed', 'BLOCKCHAIN', error);
+      return false;
     }
   }
 }

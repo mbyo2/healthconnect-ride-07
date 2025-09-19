@@ -52,13 +52,16 @@ type PatientSignupFormValues = z.infer<typeof patientSignupSchema>;
 type ProviderSignupFormValues = z.infer<typeof providerSignupSchema>;
 
 export const Auth = () => {
-  const { user, loading } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [error, setError] = useState<string | null>(null);
   const [localLoading, setLocalLoading] = useState(false);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userType, setUserType] = useState<'patient' | 'health_personnel'>('patient');
   const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "signin");
-  const { triggerSuccess, triggerError } = useFeedbackSystem();
+  const { showSuccess, showError } = useFeedbackSystem();
 
   // Simplified and more robust auth check
   useEffect(() => {
@@ -75,13 +78,17 @@ export const Auth = () => {
           return;
         }
         
-        if (data.session && mounted) {
+        if (data.session?.user) {
+          setIsAuthenticated(true);
           navigate("/symptoms");
         }
       } catch (err) {
         console.error("Unexpected error checking auth:", err);
       } finally {
-        if (mounted) setLocalLoading(false);
+        if (mounted) {
+          setLocalLoading(false);
+          setAuthLoading(false);
+        }
       }
     };
     
@@ -136,13 +143,13 @@ export const Auth = () => {
       
       if (error) throw error;
       
-      triggerSuccess("Signed in successfully!");
+      showSuccess("Signed in successfully!");
       toast.success("Signed in successfully!");
       navigate("/symptoms");
     } catch (err: any) {
       const errorMessage = err.message || "Failed to sign in";
       setError(errorMessage);
-      triggerError(errorMessage);
+      showError(errorMessage);
       console.error("Login error:", err);
       toast.error(errorMessage);
     } finally {
@@ -169,13 +176,13 @@ const onPatientSignupSubmit = async (data: PatientSignupFormValues) => {
     
     if (error) throw error;
     
-    triggerSuccess("Account created! Please verify your email address.");
+    showSuccess("Account created! Please verify your email address.");
     toast.success("Account created! Please verify your email address.");
     setActiveTab("signin");
   } catch (err: any) {
     const errorMessage = err.message || "Failed to create account";
     setError(errorMessage);
-    triggerError(errorMessage);
+    showError(errorMessage);
     console.error("Patient signup error:", err);
     toast.error(errorMessage);
   } finally {
@@ -204,13 +211,13 @@ const onProviderSignupSubmit = async (data: ProviderSignupFormValues) => {
     
     if (error) throw error;
     
-    triggerSuccess("Account created! Please verify your email address.");
+    showSuccess("Account created! Please verify your email address.");
     toast.success("Account created! Please verify your email address.");
     setActiveTab("signin");
   } catch (err: any) {
     const errorMessage = err.message || "Failed to create account";
     setError(errorMessage);
-    triggerError(errorMessage);
+    showError(errorMessage);
     console.error("Provider signup error:", err);
     toast.error(errorMessage);
   } finally {
