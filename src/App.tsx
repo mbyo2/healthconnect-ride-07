@@ -1,6 +1,6 @@
 
-import React, { useEffect, useState, Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import React, { useEffect, useState, Suspense, lazy, useMemo } from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from 'react-router-dom';
 import { useSession, useSupabaseClient, SessionContextProvider } from '@supabase/auth-helpers-react';
 import { createClient } from '@supabase/supabase-js';
 import { MobileLayout } from '@/components/MobileLayout';
@@ -13,6 +13,12 @@ import { AccessibilityProvider } from '@/context/AccessibilityContext';
 import { SessionManager } from '@/components/auth/SessionManager';
 import { ProfileSetup } from '@/components/auth/ProfileSetup';
 import { RoleProtectedRoute } from '@/components/auth/RoleProtectedRoute';
+import { RoleBasedRoute } from '@/components/auth/RoleBasedRoute';
+import { RouteGuard } from '@/components/auth/RouteGuard';
+import { hasRoutePermission, PUBLIC_ROUTES } from '@/utils/rolePermissions';
+import { useAuth } from '@/context/AuthContext';
+import { PreloadManager } from '@/components/performance/PreloadManager';
+import { usePerformance } from '@/hooks/usePerformance';
 
 // Lazy load all page components for better performance
 const Home = lazy(() => import('@/pages/Home'));
@@ -43,6 +49,7 @@ const Privacy = lazy(() => import('@/pages/Privacy'));
 const Contact = lazy(() => import('@/pages/Contact'));
 const PaymentSuccess = lazy(() => import('@/pages/PaymentSuccess'));
 const PaymentCancel = lazy(() => import('@/pages/PaymentCancel'));
+const NotFound = lazy(() => import('@/pages/NotFound'));
 const AdminWallet = lazy(() => import('@/pages/AdminWallet'));
 const InstitutionWallet = lazy(() => import('@/pages/InstitutionWallet'));
 const Wallet = lazy(() => import('@/pages/Wallet'));
@@ -67,6 +74,7 @@ const AppContent = () => {
   const [isNewUser, setIsNewUser] = useState(false);
   const session = useSession();
   const supabaseClient = useSupabaseClient();
+  const { userRole } = useAuth();
 
   useEffect(() => {
     const checkNewUser = async () => {
@@ -98,408 +106,145 @@ const AppContent = () => {
     <SearchProvider>
       <Router>
         <SessionManager>
-        <MobileLayout>
-        <Suspense fallback={<LoadingScreen />}>
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/landing" element={<Landing />} />
-          <Route path="/healthcare-professionals" element={<HealthcareProfessionals />} />
-          <Route path="/healthcare-institutions" element={<HealthcareInstitutions />} />
-          <Route path="/terms" element={<Terms />} />
-          <Route path="/privacy" element={<Privacy />} />
-          <Route path="/contact" element={<Contact />} />
-          
-          {/* Auth Route */}
-          <Route
-            path="/auth"
-            element={
-              session && session.user ? (
-                <Navigate to="/symptoms" replace={true} />
-              ) : (
-                <Auth />
-              )
-            }
-          />
+          <MobileLayout>
+            <Suspense fallback={<LoadingScreen />}>
+              <Routes>
+                {/* Public Routes */}
+                <Route path="/landing" element={<Landing />} />
+                <Route path="/healthcare-professionals" element={<HealthcareProfessionals />} />
+                <Route path="/healthcare-institutions" element={<HealthcareInstitutions />} />
+                <Route path="/terms" element={<Terms />} />
+                <Route path="/privacy" element={<Privacy />} />
+                <Route path="/contact" element={<Contact />} />
+                
+                {/* Auth Route */}
+                <Route
+                  path="/auth"
+                  element={
+                    session && session.user ? (
+                      <Navigate to="/symptoms" replace={true} />
+                    ) : (
+                      <Auth />
+                    )
+                  }
+                />
 
-          {/* Main App Route */}
-          <Route
-            path="/"
-            element={
-              session && session.user ? (
-                isNewUser ? (
-                  <Navigate to="/profile-setup" replace={true} />
-                ) : (
-                  <Navigate to="/symptoms" replace={true} />
-                )
-              ) : (
-                <Navigate to="/auth" replace={true} />
-              )
-            }
-          />
+                {/* Main App Route */}
+                <Route
+                  path="/"
+                  element={
+                    session && session.user ? (
+                      isNewUser ? (
+                        <Navigate to="/profile-setup" replace={true} />
+                      ) : (
+                        <Navigate to="/symptoms" replace={true} />
+                      )
+                    ) : (
+                      <Navigate to="/auth" replace={true} />
+                    )
+                  }
+                />
 
-          {/* Protected Routes */}
-          <Route
-            path="/profile-setup"
-            element={
-              !session ? (
-                <Navigate to="/" replace={true} />
-              ) : (
-                <ProfileSetup />
-              )
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              !session ? (
-                <Navigate to="/" replace={true} />
-              ) : (
-                <Profile />
-              )
-            }
-          />
-          <Route
-            path="/settings"
-            element={
-              !session ? (
-                <Navigate to="/" replace={true} />
-              ) : (
-                <Settings />
-              )
-            }
-          />
-          <Route
-            path="/search"
-            element={
-              !session ? (
-                <Navigate to="/" replace={true} />
-              ) : (
-                <SearchPage />
-              )
-            }
-          />
-          <Route
-            path="/appointments"
-            element={
-              !session ? (
-                <Navigate to="/" replace={true} />
-              ) : (
-                <Appointments />
-              )
-            }
-          />
-          <Route
-            path="/admin-dashboard"
-            element={
-              !session ? (
-                <Navigate to="/" replace={true} />
-              ) : (
-                <RoleProtectedRoute allowedRoles={['admin']}>
-                  <AdminDashboard />
-                </RoleProtectedRoute>
-              )
-            }
-          />
-          <Route
-            path="/provider-dashboard"
-            element={
-              !session ? (
-                <Navigate to="/" replace={true} />
-              ) : (
-                <RoleProtectedRoute allowedRoles={['health_personnel']}>
-                  <ProviderDashboard />
-                </RoleProtectedRoute>
-              )
-            }
-          />
-          <Route
-            path="/super-admin-dashboard"
-            element={
-              !session ? (
-                <Navigate to="/" replace={true} />
-              ) : (
-                <RoleProtectedRoute allowedRoles={['admin']}>
-                  <SuperAdminDashboard />
-                </RoleProtectedRoute>
-              )
-            }
-          />
-          <Route
-            path="/pharmacy-inventory"
-            element={
-              !session ? (
-                <Navigate to="/" replace={true} />
-              ) : (
-                <RoleProtectedRoute allowedRoles={['health_personnel']}>
-                  <PharmacyPortal />
-                </RoleProtectedRoute>
-              )
-            }
-          />
-          <Route
-            path="/connections"
-            element={
-              !session ? (
-                <Navigate to="/" replace={true} />
-              ) : (
-                <Connections />
-              )
-            }
-          />
-          <Route
-            path="/chat"
-            element={
-              !session ? (
-                <Navigate to="/" replace={true} />
-              ) : (
-                <Chat />
-              )
-            }
-          />
-          <Route
-            path="/prescriptions"
-            element={
-              !session ? (
-                <Navigate to="/" replace={true} />
-              ) : (
-                <Prescriptions />
-              )
-            }
-          />
-          <Route
-            path="/symptoms"
-            element={
-              !session ? (
-                <Navigate to="/" replace={true} />
-              ) : (
-                <Symptoms />
-              )
-            }
-          />
-          <Route
-            path="/video-dashboard"
-            element={
-              !session ? (
-                <Navigate to="/" replace={true} />
-              ) : (
-                <VideoDashboard session={session} />
-              )
-            }
-          />
-          <Route
-            path="/testing"
-            element={
-              !session ? (
-                <Navigate to="/" replace={true} />
-              ) : (
-                <Testing />
-              )
-            }
-          />
-          <Route
-            path="/documentation"
-            element={
-              !session ? (
-                <Navigate to="/" replace={true} />
-              ) : (
-                <Documentation />
-              )
-            }
-          />
-          <Route
-            path="/marketplace-users"
-            element={
-              !session ? (
-                <Navigate to="/" replace={true} />
-              ) : (
-                <UserMarketplace />
-              )
-            }
-          />
-          <Route
-            path="/emergency"
-            element={
-              !session ? (
-                <Navigate to="/" replace={true} />
-              ) : (
-                <Emergency />
-              )
-            }
-          />
-          <Route
-            path="/marketplace"
-            element={
-              !session ? (
-                <Navigate to="/" replace={true} />
-              ) : (
-                <Marketplace />
-              )
-            }
-          />
-          <Route
-            path="/pharmacy-portal"
-            element={
-              !session ? (
-                <Navigate to="/" replace={true} />
-              ) : (
-                <RoleProtectedRoute allowedRoles={['health_personnel']}>
-                  <PharmacyPortal />
-                </RoleProtectedRoute>
-              )
-            }
-          />
-          <Route
-            path="/healthcare-application"
-            element={
-              !session ? (
-                <Navigate to="/" replace={true} />
-              ) : (
-                <HealthcareApplication />
-              )
-            }
-          />
-          <Route
-            path="/wallet"
-            element={
-              !session ? (
-                <Navigate to="/" replace={true} />
-              ) : (
-                <Wallet />
-              )
-            }
-          />
-          <Route
-            path="/admin-wallet"
-            element={
-              !session ? (
-                <Navigate to="/" replace={true} />
-              ) : (
-                <RoleProtectedRoute allowedRoles={['admin']}>
-                  <AdminWallet />
-                </RoleProtectedRoute>
-              )
-            }
-          />
-          <Route
-            path="/institution-wallet"
-            element={
-              !session ? (
-                <Navigate to="/" replace={true} />
-              ) : (
-                <InstitutionWallet />
-              )
-            }
-          />
-          <Route
-            path="/create-admin"
-            element={
-              !session ? (
-                <Navigate to="/" replace={true} />
-              ) : (
-                <RoleProtectedRoute allowedRoles={['admin']}>
-                  <CreateAdmin />
-                </RoleProtectedRoute>
-              )
-            }
-          />
+                {/* Protected Routes with Role-Based Access Control */}
+                <Route path="/profile-setup" element={<RouteGuard><ProfileSetup /></RouteGuard>} />
+                <Route path="/profile" element={<RouteGuard><Profile /></RouteGuard>} />
+                <Route path="/settings" element={<RouteGuard><Settings /></RouteGuard>} />
+                <Route path="/search" element={<RouteGuard><SearchPage /></RouteGuard>} />
+                <Route path="/appointments" element={<RouteGuard><Appointments /></RouteGuard>} />
+                <Route path="/admin-dashboard" element={<RouteGuard><AdminDashboard /></RouteGuard>} />
+                <Route path="/provider-dashboard" element={<RouteGuard><ProviderDashboard /></RouteGuard>} />
+                <Route path="/super-admin-dashboard" element={<RouteGuard><SuperAdminDashboard /></RouteGuard>} />
+                <Route path="/pharmacy-inventory" element={<RouteGuard><PharmacyPortal /></RouteGuard>} />
+                <Route path="/connections" element={<RouteGuard><Connections /></RouteGuard>} />
+                <Route path="/chat" element={<RouteGuard><Chat /></RouteGuard>} />
+                <Route path="/prescriptions" element={<RouteGuard><Prescriptions /></RouteGuard>} />
+                <Route path="/symptoms" element={<RouteGuard><Symptoms /></RouteGuard>} />
+                <Route path="/video-dashboard" element={<RouteGuard><VideoDashboard session={session} /></RouteGuard>} />
+                <Route path="/testing" element={<RouteGuard><Testing /></RouteGuard>} />
+                <Route path="/documentation" element={<RouteGuard><Documentation /></RouteGuard>} />
+                <Route path="/marketplace-users" element={<RouteGuard><UserMarketplace /></RouteGuard>} />
+                <Route path="/emergency" element={<RouteGuard><Emergency /></RouteGuard>} />
+                <Route path="/marketplace" element={<RouteGuard><Marketplace /></RouteGuard>} />
+                <Route path="/pharmacy-portal" element={<RouteGuard><PharmacyPortal /></RouteGuard>} />
+                <Route path="/healthcare-application" element={<RouteGuard><HealthcareApplication /></RouteGuard>} />
+                <Route path="/wallet" element={<RouteGuard><Wallet /></RouteGuard>} />
+                <Route path="/admin-wallet" element={<RouteGuard><AdminWallet /></RouteGuard>} />
+                <Route path="/institution-wallet" element={<RouteGuard><InstitutionWallet /></RouteGuard>} />
+                <Route path="/create-admin" element={<RouteGuard><CreateAdmin /></RouteGuard>} />
 
-          {/* Advanced Healthcare Features */}
-          <Route
-            path="/advanced-dashboard"
-            element={
-              !session ? (
-                <Navigate to="/" replace={true} />
-              ) : (
-                <AdvancedDashboard />
-              )
-            }
-          />
-          <Route
-            path="/ai-diagnostics"
-            element={
-              !session ? (
-                <Navigate to="/" replace={true} />
-              ) : (
-                <AIDiagnosticAssistant patientId={session.user.id} />
-              )
-            }
-          />
-          <Route
-            path="/blockchain-records"
-            element={
-              !session ? (
-                <Navigate to="/" replace={true} />
-              ) : (
-                <BlockchainMedicalRecords patientId={session.user.id} userRole="patient" />
-              )
-            }
-          />
-          <Route
-            path="/iot-monitoring"
-            element={
-              !session ? (
-                <Navigate to="/" replace={true} />
-              ) : (
-                <IoTHealthMonitoring patientId={session.user.id} />
-              )
-            }
-          />
-          <Route
-            path="/emergency-response"
-            element={
-              !session ? (
-                <Navigate to="/" replace={true} />
-              ) : (
-                <EmergencyResponse patientId={session.user.id} />
-              )
-            }
-          />
-          <Route
-            path="/health-analytics"
-            element={
-              !session ? (
-                <Navigate to="/" replace={true} />
-              ) : (
-                <HealthDataVisualization patientId={session.user.id} />
-              )
-            }
-          />
-          <Route
-            path="/compliance-audit"
-            element={
-              !session ? (
-                <Navigate to="/" replace={true} />
-              ) : (
-                <RoleProtectedRoute allowedRoles={['admin', 'health_personnel']}>
-                  <ComplianceAudit userRole="admin" />
-                </RoleProtectedRoute>
-              )
-            }
-          />
+                {/* Advanced Healthcare Features */}
+                <Route path="/advanced-dashboard" element={<RouteGuard><AdvancedDashboard /></RouteGuard>} />
+                <Route path="/ai-diagnostics" element={<RouteGuard><AIDiagnosticAssistant patientId={session?.user?.id || ''} /></RouteGuard>} />
+                <Route path="/blockchain-records" element={<RouteGuard><BlockchainMedicalRecords patientId={session?.user?.id || ''} userRole={userRole === 'health_personnel' ? 'doctor' : (userRole as 'patient' | 'doctor' | 'nurse' | 'admin') || 'patient'} /></RouteGuard>} />
+                <Route path="/iot-monitoring" element={<RouteGuard><IoTHealthMonitoring patientId={session?.user?.id || ''} /></RouteGuard>} />
+                <Route path="/emergency-response" element={<RouteGuard><EmergencyResponse patientId={session?.user?.id || ''} /></RouteGuard>} />
+                <Route path="/health-analytics" element={<RouteGuard><HealthDataVisualization patientId={session?.user?.id || ''} /></RouteGuard>} />
+                <Route path="/compliance-audit" element={<RouteGuard><ComplianceAudit userRole={userRole === 'health_personnel' ? 'doctor' : (userRole as 'patient' | 'doctor' | 'nurse' | 'admin') || 'admin'} /></RouteGuard>} />
           
-          {/* Payment Routes */}
-          <Route path="/payment-success" element={<PaymentSuccess />} />
-          <Route path="/payment-cancel" element={<PaymentCancel />} />
-          
-          {/* Catch-all route for 404 */}
-          <Route path="*" element={<div className="min-h-screen flex items-center justify-center"><div className="text-center"><h1 className="text-4xl font-bold mb-4">404 - Page Not Found</h1><p className="text-muted-foreground mb-4">The page you're looking for doesn't exist.</p><button onClick={() => window.location.href = '/'} className="px-4 py-2 bg-primary text-primary-foreground rounded-md">Go Home</button></div></div>} />
-        </Routes>
-        </Suspense>
-        </MobileLayout>
+                {/* Payment Routes */}
+                <Route path="/payment-success" element={<PaymentSuccess />} />
+                <Route path="/payment-cancel" element={<PaymentCancel />} />
+                
+                {/* Catch all route - 404 handler */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Suspense>
+            
+            <SessionManager>
+              <></>
+            </SessionManager>
+          </MobileLayout>
         </SessionManager>
       </Router>
     </SearchProvider>
   );
 };
 
-const App = () => {
+// Performance-optimized App Content Component with PreloadManager
+const AppContentWithPreload: React.FC = React.memo(() => {
+  const location = useLocation();
+  const { mark, measure } = usePerformance();
+  const [userRole, setUserRole] = useState<string>('patient');
+
+  useEffect(() => {
+    mark('app-render-start');
+    return () => {
+      measure('app-render-time', 'app-render-start');
+    };
+  }, [mark, measure]);
+
+  const currentRoute = useMemo(() => location.pathname, [location.pathname]);
+
   return (
-    <SessionContextProvider supabaseClient={supabase}>
+    <>
+      <PreloadManager currentRoute={currentRoute} userRole={userRole} />
+      <AppContent />
+    </>
+  );
+});
+
+AppContentWithPreload.displayName = 'AppContentWithPreload';
+
+// Main App Component with Authentication and Routing
+const App: React.FC = () => {
+  const supabaseClient = useMemo(() => 
+    createClient(
+      import.meta.env.VITE_SUPABASE_URL!,
+      import.meta.env.VITE_SUPABASE_ANON_KEY!
+    ), []
+  );
+
+  return (
+    <SessionContextProvider supabaseClient={supabaseClient}>
       <AuthProvider>
         <UserRolesProvider>
           <FeedbackProvider>
             <AccessibilityProvider>
-              <AppContent />
+              <Router>
+                <div className="App">
+                  <AppContentWithPreload />
+                </div>
+              </Router>
             </AccessibilityProvider>
           </FeedbackProvider>
         </UserRolesProvider>

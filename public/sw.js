@@ -1,10 +1,11 @@
 // HealthConnect Service Worker
 // Provides offline functionality, caching, and background sync
 
-const CACHE_NAME = 'healthconnect-v1.0.0';
-const STATIC_CACHE = 'healthconnect-static-v1';
-const DYNAMIC_CACHE = 'healthconnect-dynamic-v1';
-const API_CACHE = 'healthconnect-api-v1';
+const CACHE_NAME = 'healthconnect-v1.1.0';
+const STATIC_CACHE = 'healthconnect-static-v2';
+const DYNAMIC_CACHE = 'healthconnect-dynamic-v2';
+const API_CACHE = 'healthconnect-api-v2';
+const IMAGE_CACHE = 'healthconnect-images-v1';
 
 // Resources to cache immediately
 const STATIC_ASSETS = [

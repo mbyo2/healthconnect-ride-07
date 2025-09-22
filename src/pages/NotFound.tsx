@@ -2,9 +2,17 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { AlertCircle } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import { getRoleLandingPage } from "@/utils/rolePermissions";
 
 const NotFound = () => {
   const navigate = useNavigate();
+  const { userRole } = useAuth();
+
+  const handleReturnHome = () => {
+    const landingPage = getRoleLandingPage(userRole);
+    navigate(landingPage);
+  };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-background px-4">
@@ -18,7 +26,7 @@ const NotFound = () => {
         <div className="space-y-2">
           <h1 className="text-4xl font-bold">Page Not Found</h1>
           <p className="text-muted-foreground">
-            The page you are looking for doesn't exist or has been moved.
+            The page you are looking for doesn't exist or you don't have permission to access it.
           </p>
         </div>
         
@@ -26,8 +34,8 @@ const NotFound = () => {
           <Button onClick={() => navigate(-1)} variant="outline">
             Go Back
           </Button>
-          <Button onClick={() => navigate("/")}>
-            Return to Home
+          <Button onClick={handleReturnHome}>
+            Return to Dashboard
           </Button>
         </div>
       </div>

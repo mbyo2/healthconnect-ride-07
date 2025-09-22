@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
@@ -7,10 +7,10 @@ interface LoadingScreenProps {
   timeout?: number;
 }
 
-export const LoadingScreen = ({ 
+export const LoadingScreen = React.memo<LoadingScreenProps>(({ 
   message = "Preparing Doc' O Clock for emergency healthcare...", 
   timeout = 6000 // Extended for emergency system reliability
-}: LoadingScreenProps) => {
+}) => {
   const [showFallback, setShowFallback] = useState(false);
   const [longWait, setLongWait] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(0);
@@ -72,17 +72,17 @@ export const LoadingScreen = ({
     };
   }, [timeout]);
 
-  const handleRefresh = () => {
+  const handleRefresh = useCallback(() => {
     sessionStorage.removeItem('auth-error');
     localStorage.removeItem('loading-error');
     window.location.reload();
-  };
+  }, []);
 
-  const handleClearCacheAndReload = () => {
+  const handleClearCacheAndReload = useCallback(() => {
     localStorage.clear();
     sessionStorage.clear();
     window.location.reload();
-  };
+  }, []);
 
   return (
     <div className="fixed inset-0 bg-gradient-to-br from-blue-50 via-white to-gray-50 flex flex-col items-center justify-center z-50">
@@ -188,4 +188,6 @@ export const LoadingScreen = ({
       {/* TODO: Provide instant feedback for all major user actions */}
     </div>
   );
-};
+});
+
+LoadingScreen.displayName = 'LoadingScreen';

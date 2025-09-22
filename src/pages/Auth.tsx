@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { Card } from "@/components/ui/card";
-import { Heart, Building2, User } from "lucide-react";
+import { Heart, Building2, User, MapPin, Search } from "lucide-react";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/context/AuthContext";
@@ -42,6 +42,11 @@ const providerSignupSchema = z.object({
   lastName: z.string().min(2, { message: "Last name is required" }),
   specialty: z.string().min(2, { message: "Specialty is required" }),
   licenseNumber: z.string().min(2, { message: "License number is required" }),
+  address: z.string().min(5, { message: "Address is required" }),
+  city: z.string().min(2, { message: "City is required" }),
+  country: z.string().min(2, { message: "Country is required" }),
+  latitude: z.number().optional(),
+  longitude: z.number().optional(),
 }).refine(data => data.password === data.confirmPassword, {
   message: "Passwords do not match",
   path: ["confirmPassword"],
@@ -62,6 +67,8 @@ export const Auth = () => {
   const [userType, setUserType] = useState<'patient' | 'health_personnel'>('patient');
   const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "signin");
   const { showSuccess, showError } = useFeedbackSystem();
+  const [locationLoading, setLocationLoading] = useState(false);
+  const [currentLocation, setCurrentLocation] = useState<{lat: number, lng: number} | null>(null);
 
   // Simplified and more robust auth check
   useEffect(() => {
@@ -128,8 +135,63 @@ export const Auth = () => {
       lastName: "",
       specialty: "",
       licenseNumber: "",
+      address: "",
+      city: "",
+      country: "",
+      latitude: undefined,
+      longitude: undefined,
     },
   });
+
+  // Location detection function
+  const getCurrentLocation = async () => {
+    setLocationLoading(true);
+    try {
+      if (!navigator.geolocation) {
+        throw new Error('Geolocation is not supported by this browser');
+      }
+
+      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 300000
+        });
+      });
+
+      const { latitude, longitude } = position.coords;
+      setCurrentLocation({ lat: latitude, lng: longitude });
+      
+      // Update form with coordinates
+      providerSignupForm.setValue('latitude', latitude);
+      providerSignupForm.setValue('longitude', longitude);
+
+      // Reverse geocoding to get address
+      try {
+        const response = await fetch(
+          `https://api.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=YOUR_API_KEY`
+        );
+        const data = await response.json();
+        
+        if (data.results && data.results[0]) {
+          const result = data.results[0];
+          providerSignupForm.setValue('address', result.formatted || '');
+          providerSignupForm.setValue('city', result.components.city || result.components.town || '');
+          providerSignupForm.setValue('country', result.components.country || '');
+        }
+      } catch (geocodeError) {
+        console.warn('Reverse geocoding failed:', geocodeError);
+        toast.info('Location detected, please fill in address details manually');
+      }
+
+      toast.success('Location detected successfully');
+    } catch (error: any) {
+      console.error('Location detection failed:', error);
+      toast.error('Failed to detect location. Please enter address manually.');
+    } finally {
+      setLocationLoading(false);
+    }
+  };
 
   // Form submission handlers with improved error handling
   const onLoginSubmit = async (data: LoginFormValues) => {
@@ -190,7 +252,7 @@ const onPatientSignupSubmit = async (data: PatientSignupFormValues) => {
   }
 };
 
-// Updated provider signup with role and professional details
+// Updated provider signup with role, professional details, and location
 const onProviderSignupSubmit = async (data: ProviderSignupFormValues) => {
   try {
     setError(null);
@@ -205,6 +267,11 @@ const onProviderSignupSubmit = async (data: ProviderSignupFormValues) => {
           role: "health_personnel",
           specialty: data.specialty,
           license_number: data.licenseNumber,
+          address: data.address,
+          city: data.city,
+          country: data.country,
+          latitude: data.latitude,
+          longitude: data.longitude,
         },
       },
     });
@@ -236,8 +303,8 @@ const onProviderSignupSubmit = async (data: ProviderSignupFormValues) => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted flex items-center justify-center p-4">
-      <div className="w-full max-w-md space-y-8">
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted flex items-center justify-center p-2 sm:p-4">
+      <div className="w-full max-w-md space-y-4 sm:space-y-8">
         <div className="text-center space-y-2">
           <div className="flex justify-center">
             <div className="bg-primary/10 p-3 rounded-full">
@@ -258,11 +325,11 @@ const onProviderSignupSubmit = async (data: ProviderSignupFormValues) => {
           </Alert>
         )}
 
-        <Card className="p-6 shadow-lg">
+        <Card className="p-4 sm:p-6 shadow-lg">
           <Tabs defaultValue={activeTab} value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-2 mb-4">
-              <TabsTrigger value="signin">Sign In</TabsTrigger>
-              <TabsTrigger value="signup">Register</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 mb-4 h-auto">
+              <TabsTrigger value="signin" className="text-sm py-2">Sign In</TabsTrigger>
+              <TabsTrigger value="signup" className="text-sm py-2">Register</TabsTrigger>
             </TabsList>
             
             <TabsContent value="signin">
@@ -323,26 +390,26 @@ const onProviderSignupSubmit = async (data: ProviderSignupFormValues) => {
             
             <TabsContent value="signup">
               <div className="mb-4">
-                <FormLabel>I am a</FormLabel>
-                <div className="grid grid-cols-2 gap-4 mt-1">
+                <FormLabel className="text-sm font-medium">I am a</FormLabel>
+                <div className="grid grid-cols-2 gap-2 sm:gap-4 mt-2">
                   <Button
                     type="button"
                     variant={userType === "patient" ? "default" : "outline"}
-                    className="flex flex-col h-auto py-4"
+                    className="flex flex-col h-auto py-3 px-2 text-xs sm:text-sm"
                     onClick={() => setUserType("patient")}
                   >
-                    <User className="h-5 w-5 mb-2" />
+                    <User className="h-4 w-4 sm:h-5 sm:w-5 mb-1 sm:mb-2" />
                     <span>Patient</span>
                   </Button>
                   
                   <Button
                     type="button"
                     variant={userType === "health_personnel" ? "default" : "outline"}
-                    className="flex flex-col h-auto py-4"
+                    className="flex flex-col h-auto py-3 px-2 text-xs sm:text-sm"
                     onClick={() => setUserType("health_personnel")}
                   >
-                    <Building2 className="h-5 w-5 mb-2" />
-                    <span>Healthcare Provider</span>
+                    <Building2 className="h-4 w-4 sm:h-5 sm:w-5 mb-1 sm:mb-2" />
+                    <span className="text-center leading-tight">Healthcare Provider</span>
                   </Button>
                 </div>
               </div>
@@ -538,6 +605,91 @@ const onProviderSignupSubmit = async (data: ProviderSignupFormValues) => {
                         </FormItem>
                       )}
                     />
+
+                    {/* Location Section */}
+                    <div className="space-y-4 border-t pt-4">
+                      <div className="flex items-center justify-between">
+                        <FormLabel className="text-base font-medium">Practice Location</FormLabel>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={getCurrentLocation}
+                          disabled={locationLoading}
+                          className="flex items-center gap-2"
+                        >
+                          {locationLoading ? (
+                            <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                          ) : (
+                            <MapPin className="w-4 h-4" />
+                          )}
+                          {locationLoading ? 'Detecting...' : 'Use Current Location'}
+                        </Button>
+                      </div>
+
+                      <FormField
+                        control={providerSignupForm.control}
+                        name="address"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Address</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="Enter practice address"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <FormField
+                          control={providerSignupForm.control}
+                          name="city"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>City</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="City"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={providerSignupForm.control}
+                          name="country"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Country</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="Country"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      {currentLocation && (
+                        <div className="text-sm text-muted-foreground bg-muted/50 p-3 rounded-lg">
+                          <div className="flex items-center gap-2 mb-1">
+                            <MapPin className="w-4 h-4" />
+                            <span className="font-medium">Location Detected</span>
+                          </div>
+                          <p>Lat: {currentLocation.lat.toFixed(6)}, Lng: {currentLocation.lng.toFixed(6)}</p>
+                        </div>
+                      )}
+                    </div>
                     
                     <FormField
                       control={providerSignupForm.control}
