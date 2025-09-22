@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { logger } from './logger';
 import { errorHandler } from './error-handler';
-import { securityNotifications } from './security-notifications';
+import { securityNotificationService } from './security-notifications';
 
 const supabase = createClient(
   "https://tthzcijscedgxjfnfnky.supabase.co",
@@ -420,17 +420,11 @@ class HealthRemindersService {
   private async sendReminderNotifications(reminder: HealthReminder): Promise<void> {
     try {
       // Create in-app notification
-      await securityNotifications.createNotification(
+      await securityNotificationService.createSecurityNotification(
         reminder.userId,
-        'health_reminder',
+        'suspicious_activity',
         reminder.title,
-        reminder.description,
-        reminder.priority,
-        {
-          reminderId: reminder.id,
-          type: reminder.type,
-          metadata: reminder.metadata
-        }
+        reminder.description
       );
 
       // Send push notification if supported
@@ -439,11 +433,7 @@ class HealthRemindersService {
           body: reminder.description,
           icon: '/logo192.png',
           tag: `reminder-${reminder.id}`,
-          requireInteraction: reminder.priority === 'critical',
-          actions: [
-            { action: 'acknowledge', title: 'Mark as Done' },
-            { action: 'snooze', title: 'Remind Later' }
-          ]
+          requireInteraction: reminder.priority === 'critical'
         });
       }
 

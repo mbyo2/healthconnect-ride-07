@@ -108,9 +108,9 @@ export function BottomNav() {
       description: "Personal information and settings",
       icon: <User className="h-5 w-5" />
     },
-    // Phase 5 Advanced Healthcare Features
+    // Advanced Healthcare Features
     { 
-      to: "/phase5-dashboard", 
+      to: "/advanced-dashboard", 
       label: "Advanced Healthcare Platform", 
       description: "Next-gen healthcare technology hub",
       icon: <Zap className="h-5 w-5 text-blue-600" />
@@ -134,8 +134,8 @@ export function BottomNav() {
       icon: <Activity className="h-5 w-5 text-red-600" />
     },
     { 
-      to: "/health-visualization", 
-      label: "Health Data Visualization", 
+      to: "/health-analytics", 
+      label: "Health Data Analytics", 
       description: "Advanced health analytics and charts",
       icon: <BarChart3 className="h-5 w-5 text-indigo-600" />
     },

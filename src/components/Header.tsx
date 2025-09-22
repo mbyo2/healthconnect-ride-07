@@ -136,7 +136,7 @@ export function Header() {
                 )}
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-64 bg-white border border-gray-200 shadow-lg max-h-96 overflow-y-auto">
+            <DropdownMenuContent align="end" className="w-64 bg-white border border-gray-200 shadow-lg max-h-[80vh] overflow-y-auto z-50">
               {user ? (
                 <>
                   <DropdownMenuLabel className="pb-2">

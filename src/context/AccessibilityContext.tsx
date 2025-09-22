@@ -1,5 +1,12 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
+type AccessibilityPreferences = {
+  highContrast: boolean;
+  largeText: boolean;
+  reducedMotion: boolean;
+  screenReader: boolean;
+};
+
 type AccessibilityContextType = {
   screenReaderAnnounce: (message: string, assertive?: boolean) => void;
   skipToContent: () => void;
@@ -15,6 +22,8 @@ type AccessibilityContextType = {
   enableEasyReading: () => void;
   disableEasyReading: () => void;
   isEasyReadingEnabled: boolean;
+  preferences: AccessibilityPreferences;
+  updatePreferences: (prefs: Partial<AccessibilityPreferences>) => void;
 };
 
 const AccessibilityContext = createContext<AccessibilityContextType | undefined>(undefined);
@@ -28,6 +37,12 @@ export const AccessibilityProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isEasyReadingEnabled, setIsEasyReadingEnabled] = useState<boolean>(
     localStorage.getItem('accessibility_easy_reading') === 'true'
   );
+  const [preferences, setPreferences] = useState<AccessibilityPreferences>({
+    highContrast: localStorage.getItem('accessibility_high_contrast') === 'true',
+    largeText: localStorage.getItem('accessibility_large_text') === 'true',
+    reducedMotion: localStorage.getItem('accessibility_reduced_motion') === 'true',
+    screenReader: localStorage.getItem('accessibility_screen_reader') === 'true'
+  });
   
   // Apply stored settings on load
   useEffect(() => {
@@ -73,6 +88,20 @@ export const AccessibilityProvider: React.FC<{ children: React.ReactNode }> = ({
     setIsEasyReadingEnabled(false);
     localStorage.setItem('accessibility_easy_reading', 'false');
     document.documentElement.classList.remove('easy-reading');
+  }, []);
+
+  // Update preferences function
+  const updatePreferences = useCallback((newPrefs: Partial<AccessibilityPreferences>) => {
+    setPreferences(prev => {
+      const updated = { ...prev, ...newPrefs };
+      
+      // Save to localStorage
+      Object.entries(updated).forEach(([key, value]) => {
+        localStorage.setItem(`accessibility_${key.toLowerCase()}`, value.toString());
+      });
+      
+      return updated;
+    });
   }, []);
   
   // Apply easy reading styles
@@ -303,7 +332,9 @@ export const AccessibilityProvider: React.FC<{ children: React.ReactNode }> = ({
         textSize,
         enableEasyReading,
         disableEasyReading,
-        isEasyReadingEnabled
+        isEasyReadingEnabled,
+        preferences,
+        updatePreferences
       }}
     >
       {/* Skip to content link - visible on focus */}

@@ -56,23 +56,23 @@ export function BottomNavMenu({ user, menuItems }: BottomNavMenuProps) {
       
       <SheetContent 
         side="right" 
-        className="w-[90vw] max-w-sm bg-background/98 backdrop-blur-xl border-trust-200 shadow-2xl animate-in slide-in-from-right duration-300 ease-out data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right data-[state=closed]:fade-out-0 data-[state=closed]:duration-200"
+        className="w-[90vw] max-w-sm bg-background/98 backdrop-blur-xl border-trust-200 shadow-2xl animate-in slide-in-from-right duration-300 ease-out data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right data-[state=closed]:fade-out-0 data-[state=closed]:duration-200 flex flex-col h-full"
       >
-        <SheetHeader className="pb-6">
-          <SheetTitle className="text-trust-600 text-2xl font-bold">Quick Access</SheetTitle>
+        <SheetHeader className="pb-4 flex-shrink-0">
+          <SheetTitle className="text-trust-600 text-xl font-bold">Quick Access</SheetTitle>
           {user && (
-            <div className="flex items-center gap-4 py-4 px-3 bg-gradient-to-r from-trust-50 to-trust-100 rounded-2xl border border-trust-200 shadow-sm">
-              <Avatar className="h-14 w-14 ring-2 ring-trust-300 shadow-sm">
+            <div className="flex items-center gap-3 py-3 px-3 bg-gradient-to-r from-trust-50 to-trust-100 rounded-xl border border-trust-200 shadow-sm">
+              <Avatar className="h-12 w-12 ring-2 ring-trust-300 shadow-sm">
                 <AvatarImage src={user?.user_metadata?.avatar_url || ""} />
-                <AvatarFallback className="bg-trust-200 text-trust-700 font-bold text-lg">
+                <AvatarFallback className="bg-trust-200 text-trust-700 font-bold text-base">
                   {user?.email?.[0]?.toUpperCase() || "U"}
                 </AvatarFallback>
               </Avatar>
-              <div className="flex flex-col flex-1">
-                <span className="font-bold text-trust-800 text-lg">
+              <div className="flex flex-col flex-1 min-w-0">
+                <span className="font-bold text-trust-800 text-base truncate">
                   {user.user_metadata?.name || user.email?.split('@')[0] || 'User'}
                 </span>
-                <span className="text-sm text-trust-600 truncate">
+                <span className="text-xs text-trust-600 truncate">
                   {user.email}
                 </span>
               </div>
@@ -80,8 +80,8 @@ export function BottomNavMenu({ user, menuItems }: BottomNavMenuProps) {
           )}
         </SheetHeader>
         
-        <ScrollArea className="flex-1 px-1">
-          <div className="space-y-3 pb-4">
+        <ScrollArea className="flex-1 px-1 overflow-y-auto">
+          <div className="space-y-2 pb-6">
             {menuItems.map((item, idx) => (
               <SheetClose key={idx} asChild>
                 <Button 
@@ -94,11 +94,11 @@ export function BottomNavMenu({ user, menuItems }: BottomNavMenuProps) {
                   )}
                   asChild
                 >
-                  <Link to={item.to} className="flex items-center gap-3">
+                  <Link to={item.to} className="flex items-center gap-3 w-full">
                     <div className="p-2 rounded-lg bg-trust-100 text-trust-600 group-hover:bg-trust-200 transition-colors flex-shrink-0">
                       {item.icon}
                     </div>
-                    <div className="flex flex-col items-start gap-0.5 min-w-0">
+                    <div className="flex flex-col items-start gap-0.5 min-w-0 flex-1">
                       <span className="font-medium group-hover:text-trust-800 text-sm leading-tight">
                         {item.label}
                       </span>

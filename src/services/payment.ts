@@ -376,11 +376,16 @@ export const validateWalletTransaction = async (userId: string, amount: number, 
     // Check for suspicious transaction patterns
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
     
-    const { count: recentCount, error } = await supabase
+    // Simplified query to avoid type instantiation issues
+    const recentTransactionsQuery = await supabase
       .from('wallet_transactions')
-      .select('*', { count: 'exact', head: true })
+      .select('id')
       .eq('user_id', userId)
       .gte('created_at', oneDayAgo);
+    
+    const { data: recentTransactions, error } = recentTransactionsQuery;
+    
+    const recentCount = recentTransactions?.length || 0;
 
     if (error) throw error;
 

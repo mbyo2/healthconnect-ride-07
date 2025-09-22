@@ -25,8 +25,6 @@ import {
   Monitor
 } from 'lucide-react';
 import { iotHealthMonitoring } from '@/utils/iot-health-monitoring';
-import { deviceConnectivityTest, ConnectivityTestResult } from '@/utils/device-connectivity-test';
-import { deviceConnectionManager, DeviceConnectionConfig } from '@/utils/device-connection-manager';
 
 interface IoTHealthMonitoringProps {
   patientId: string;
@@ -77,32 +75,15 @@ export const IoTHealthMonitoring: React.FC<IoTHealthMonitoringProps> = ({ patien
   const [newDeviceType, setNewDeviceType] = useState('heart_rate_monitor');
   const [newDeviceName, setNewDeviceName] = useState('');
   const [realTimeData, setRealTimeData] = useState<Record<string, any>>({});
-  const [connectivityTest, setConnectivityTest] = useState<ConnectivityTestResult | null>(null);
-  const [connectionErrors, setConnectionErrors] = useState<Record<string, string>>({});
-  const [testingConnectivity, setTestingConnectivity] = useState(false);
 
   useEffect(() => {
     loadIoTData();
     startRealTimeMonitoring();
-    runConnectivityTest();
     
     return () => {
       stopRealTimeMonitoring();
-      deviceConnectionManager.cleanup();
     };
   }, [patientId]);
-
-  const runConnectivityTest = async () => {
-    try {
-      setTestingConnectivity(true);
-      const result = await deviceConnectivityTest.runComprehensiveTest();
-      setConnectivityTest(result);
-    } catch (error) {
-      console.error('Connectivity test failed:', error);
-    } finally {
-      setTestingConnectivity(false);
-    }
-  };
 
   const loadIoTData = async () => {
     try {
@@ -205,15 +186,7 @@ export const IoTHealthMonitoring: React.FC<IoTHealthMonitoringProps> = ({ patien
 
     try {
       setLoading(true);
-      setConnectionErrors({});
       
-      // First test device connectivity
-      const canConnect = await deviceConnectivityTest.testSpecificDevice(newDeviceType);
-      if (!canConnect && newDeviceType !== 'simulation') {
-        throw new Error(`Cannot connect to ${newDeviceType}. Please check device compatibility and permissions.`);
-      }
-
-      // Register device in database
       const device = await iotHealthMonitoring.registerDevice({
         name: newDeviceName,
         type: newDeviceType as any,
@@ -226,30 +199,13 @@ export const IoTHealthMonitoring: React.FC<IoTHealthMonitoringProps> = ({ patien
       });
 
       if (device) {
-        // Attempt to connect to the actual device
-        const connectionConfig: DeviceConnectionConfig = {
-          deviceId: device.id,
-          deviceType: newDeviceType,
-          connectionType: newDeviceType === 'simulation' ? 'simulation' : 'bluetooth',
-          retryAttempts: 3,
-          timeout: 10000
-        };
-
-        const connected = await deviceConnectionManager.connectDevice(connectionConfig);
-        if (!connected) {
-          setConnectionErrors(prev => ({
-            ...prev,
-            [device.id]: 'Device registered but connection failed. Check device pairing and try again.'
-          }));
-        }
-
-        alert(connected ? 'Device registered and connected successfully' : 'Device registered but connection failed');
+        alert('Device registered successfully');
         setNewDeviceName('');
         await loadIoTData();
       }
     } catch (error) {
       console.error('Failed to register device:', error);
-      alert(`Failed to register device: ${error.message}`);
+      alert('Failed to register device');
     } finally {
       setLoading(false);
     }
@@ -331,76 +287,12 @@ export const IoTHealthMonitoring: React.FC<IoTHealthMonitoringProps> = ({ patien
 
   return (
     <div className="space-y-6">
-      {/* Connectivity Status Alert */}
-      {connectivityTest && connectivityTest.overall !== 'success' && (
-        <Alert className={connectivityTest.overall === 'failed' ? 'border-red-500 bg-red-50' : 'border-yellow-500 bg-yellow-50'}>
-          <AlertTriangle className="h-4 w-4" />
-          <AlertTitle>
-            {connectivityTest.overall === 'failed' ? 'Device Connectivity Issues Detected' : 'Limited Device Connectivity'}
-          </AlertTitle>
-          <AlertDescription>
-            <div className="space-y-2">
-              {connectivityTest.errors.map((error, index) => (
-                <p key={index} className="text-sm">• {error}</p>
-              ))}
-              {connectivityTest.recommendations.length > 0 && (
-                <div className="mt-2">
-                  <p className="font-medium text-sm">Recommendations:</p>
-                  {connectivityTest.recommendations.map((rec, index) => (
-                    <p key={index} className="text-sm">• {rec}</p>
-                  ))}
-                </div>
-              )}
-            </div>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={runConnectivityTest}
-              disabled={testingConnectivity}
-              className="mt-2"
-            >
-              {testingConnectivity ? 'Testing...' : 'Test Again'}
-            </Button>
-          </AlertDescription>
-        </Alert>
-      )}
-
       {/* Header */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <div className="flex items-center">
-              <Activity className="w-6 h-6 mr-2 text-blue-600" />
-              IoT Health Monitoring
-            </div>
-            <div className="flex items-center space-x-2">
-              {connectivityTest && (
-                <Badge 
-                  className={`${
-                    connectivityTest.overall === 'success' ? 'bg-green-100 text-green-800' :
-                    connectivityTest.overall === 'partial' ? 'bg-yellow-100 text-yellow-800' :
-                    'bg-red-100 text-red-800'
-                  }`}
-                >
-                  {connectivityTest.overall === 'success' ? 'All Systems Ready' :
-                   connectivityTest.overall === 'partial' ? 'Limited Connectivity' :
-                   'Connection Issues'}
-                </Badge>
-              )}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={runConnectivityTest}
-                disabled={testingConnectivity}
-              >
-                {testingConnectivity ? (
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
-                ) : (
-                  <Settings className="w-4 h-4 mr-2" />
-                )}
-                Test Connectivity
-              </Button>
-            </div>
+          <CardTitle className="flex items-center">
+            <Activity className="w-6 h-6 mr-2 text-blue-600" />
+            IoT Health Monitoring
           </CardTitle>
           <CardDescription>
             Real-time health monitoring through connected IoT devices
@@ -524,15 +416,6 @@ export const IoTHealthMonitoring: React.FC<IoTHealthMonitoringProps> = ({ patien
                       </div>
                     )}
 
-                    {connectionErrors[device.id] && (
-                      <Alert className="border-yellow-500 bg-yellow-50 mt-2">
-                        <AlertTriangle className="h-3 w-3" />
-                        <AlertDescription className="text-xs">
-                          {connectionErrors[device.id]}
-                        </AlertDescription>
-                      </Alert>
-                    )}
-
                     <div className="flex space-x-2 mt-4">
                       <Button
                         variant="outline"
@@ -548,30 +431,6 @@ export const IoTHealthMonitoring: React.FC<IoTHealthMonitoringProps> = ({ patien
                         onClick={() => calibrateDevice(device.id)}
                       >
                         Calibrate
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={async () => {
-                          const config: DeviceConnectionConfig = {
-                            deviceId: device.id,
-                            deviceType: device.deviceType,
-                            connectionType: 'bluetooth',
-                            retryAttempts: 1,
-                            timeout: 5000
-                          };
-                          const connected = await deviceConnectionManager.connectDevice(config);
-                          if (connected) {
-                            setConnectionErrors(prev => {
-                              const newErrors = { ...prev };
-                              delete newErrors[device.id];
-                              return newErrors;
-                            });
-                          }
-                        }}
-                      >
-                        <Wifi className="w-3 h-3 mr-1" />
-                        Reconnect
                       </Button>
                     </div>
                   </div>

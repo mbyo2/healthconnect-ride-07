@@ -33,7 +33,7 @@ class AdvancedAccessibilityService {
     focusIndicator: 'default'
   };
 
-  private speechRecognition: SpeechRecognition | null = null;
+  private speechRecognition: any | null = null;
   private speechSynthesis: SpeechSynthesis | null = null;
   private focusTracker: Element | null = null;
 

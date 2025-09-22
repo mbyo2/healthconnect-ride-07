@@ -8,7 +8,7 @@ import {
   TrendingUp, 
   Clock, 
   Download, 
-  Memory, 
+  HardDrive, 
   Network,
   AlertTriangle,
   CheckCircle,
@@ -211,7 +211,7 @@ export const PerformanceDashboard: React.FC = () => {
               <div className="text-xl font-bold">
                 {formatSize(metrics.memoryUsage)}
               </div>
-              <Memory className="h-5 w-5 text-gray-400" />
+              <HardDrive className="h-5 w-5 text-gray-400" />
             </div>
           </CardContent>
         </Card>

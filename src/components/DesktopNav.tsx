@@ -115,9 +115,9 @@ export function DesktopNav() {
       label: "Video Consultations",
       icon: <MessageSquare className="h-4 w-4 mr-2" />
     },
-    // Phase 5 Advanced Features
+    // Advanced Healthcare Features
     {
-      to: "/phase5-dashboard",
+      to: "/advanced-dashboard",
       label: "Advanced Healthcare Platform",
       icon: <Zap className="h-4 w-4 mr-2" />,
       badge: "NEW"
@@ -141,8 +141,8 @@ export function DesktopNav() {
       badge: "LIVE"
     },
     {
-      to: "/health-visualization",
-      label: "Health Data Visualization",
+      to: "/health-analytics",
+      label: "Health Data Analytics",
       icon: <BarChart3 className="h-4 w-4 mr-2" />
     },
     {

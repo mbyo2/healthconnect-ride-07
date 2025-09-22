@@ -1,8 +1,6 @@
 
 import React, { useEffect, useState, Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-import { Auth } from '@supabase/auth-ui-react';
-import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { useSession, useSupabaseClient, SessionContextProvider } from '@supabase/auth-helpers-react';
 import { createClient } from '@supabase/supabase-js';
 import { MobileLayout } from '@/components/MobileLayout';
@@ -11,6 +9,7 @@ import { AuthProvider } from '@/context/AuthContext';
 import { UserRolesProvider } from '@/context/UserRolesContext';
 import { SearchProvider } from '@/context/SearchContext';
 import { FeedbackProvider } from '@/context/FeedbackContext';
+import { AccessibilityProvider } from '@/context/AccessibilityContext';
 import { SessionManager } from '@/components/auth/SessionManager';
 import { ProfileSetup } from '@/components/auth/ProfileSetup';
 import { RoleProtectedRoute } from '@/components/auth/RoleProtectedRoute';
@@ -48,9 +47,10 @@ const AdminWallet = lazy(() => import('@/pages/AdminWallet'));
 const InstitutionWallet = lazy(() => import('@/pages/InstitutionWallet'));
 const Wallet = lazy(() => import('@/pages/Wallet'));
 const CreateAdmin = lazy(() => import('@/pages/CreateAdmin'));
+const Auth = lazy(() => import('@/pages/Auth'));
 
-// Phase 5 Advanced Features - Lazy loaded components
-const Phase5Dashboard = lazy(() => import('@/components/phase5/Phase5Dashboard'));
+// Advanced Healthcare Features - Lazy loaded components
+const AdvancedDashboard = lazy(() => import('@/components/advanced-healthcare/AdvancedDashboard'));
 const AIDiagnosticAssistant = lazy(() => import('@/components/phase5/AIDiagnosticAssistant'));
 const BlockchainMedicalRecords = lazy(() => import('@/components/phase5/BlockchainMedicalRecords'));
 const IoTHealthMonitoring = lazy(() => import('@/components/phase5/IoTHealthMonitoring'));
@@ -114,16 +114,9 @@ const AppContent = () => {
             path="/auth"
             element={
               session && session.user ? (
-                <Navigate to="/" replace={true} />
+                <Navigate to="/symptoms" replace={true} />
               ) : (
-                <div className="container" style={{ padding: '50px 0 100px 0' }}>
-                  <Auth
-                    supabaseClient={supabaseClient}
-                    appearance={{ theme: ThemeSupa }}
-                    providers={['google', 'github']}
-                    redirectTo={`${window.location.origin}/`}
-                  />
-                </div>
+                <Auth />
               )
             }
           />
@@ -136,17 +129,10 @@ const AppContent = () => {
                 isNewUser ? (
                   <Navigate to="/profile-setup" replace={true} />
                 ) : (
-                  <Home />
+                  <Navigate to="/symptoms" replace={true} />
                 )
               ) : (
-                <div className="container" style={{ padding: '50px 0 100px 0' }}>
-                  <Auth
-                    supabaseClient={supabaseClient}
-                    appearance={{ theme: ThemeSupa }}
-                    providers={['google', 'github']}
-                    redirectTo={`${window.location.origin}/`}
-                  />
-                </div>
+                <Navigate to="/auth" replace={true} />
               )
             }
           />
@@ -417,14 +403,14 @@ const AppContent = () => {
             }
           />
 
-          {/* Phase 5 Advanced Healthcare Features */}
+          {/* Advanced Healthcare Features */}
           <Route
-            path="/phase5-dashboard"
+            path="/advanced-dashboard"
             element={
               !session ? (
                 <Navigate to="/" replace={true} />
               ) : (
-                <Phase5Dashboard />
+                <AdvancedDashboard />
               )
             }
           />
@@ -434,7 +420,7 @@ const AppContent = () => {
               !session ? (
                 <Navigate to="/" replace={true} />
               ) : (
-                <AIDiagnosticAssistant />
+                <AIDiagnosticAssistant patientId={session.user.id} />
               )
             }
           />
@@ -444,7 +430,7 @@ const AppContent = () => {
               !session ? (
                 <Navigate to="/" replace={true} />
               ) : (
-                <BlockchainMedicalRecords />
+                <BlockchainMedicalRecords patientId={session.user.id} userRole="patient" />
               )
             }
           />
@@ -454,7 +440,7 @@ const AppContent = () => {
               !session ? (
                 <Navigate to="/" replace={true} />
               ) : (
-                <IoTHealthMonitoring />
+                <IoTHealthMonitoring patientId={session.user.id} />
               )
             }
           />
@@ -464,17 +450,17 @@ const AppContent = () => {
               !session ? (
                 <Navigate to="/" replace={true} />
               ) : (
-                <EmergencyResponse />
+                <EmergencyResponse patientId={session.user.id} />
               )
             }
           />
           <Route
-            path="/health-visualization"
+            path="/health-analytics"
             element={
               !session ? (
                 <Navigate to="/" replace={true} />
               ) : (
-                <HealthDataVisualization />
+                <HealthDataVisualization patientId={session.user.id} />
               )
             }
           />
@@ -485,7 +471,7 @@ const AppContent = () => {
                 <Navigate to="/" replace={true} />
               ) : (
                 <RoleProtectedRoute allowedRoles={['admin', 'health_personnel']}>
-                  <ComplianceAudit />
+                  <ComplianceAudit userRole="admin" />
                 </RoleProtectedRoute>
               )
             }
@@ -512,7 +498,9 @@ const App = () => {
       <AuthProvider>
         <UserRolesProvider>
           <FeedbackProvider>
-            <AppContent />
+            <AccessibilityProvider>
+              <AppContent />
+            </AccessibilityProvider>
           </FeedbackProvider>
         </UserRolesProvider>
       </AuthProvider>

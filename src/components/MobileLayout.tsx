@@ -54,13 +54,16 @@ export const MobileLayout = ({ children, isLoading }: MobileLayoutProps) => {
         <main 
           id="main-content"
           className={cn(
-            "flex-1 pt-16 overflow-x-hidden", 
-            isAuthenticated ? "pb-20" : "pb-0", // Only add bottom padding when nav is present
-            "transition-all duration-200 ease-in-out"
+            "flex-1 pt-16 overflow-y-auto overflow-x-hidden", 
+            isAuthenticated ? "pb-24" : "pb-4", // Extra bottom padding for nav and content visibility
+            "transition-all duration-200 ease-in-out",
+            "min-h-0" // Allow flex child to shrink
           )}
         >
-          <div className="container mx-auto px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 space-y-6 max-w-8xl">
-            {children}
+          <div className="container mx-auto px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 py-6 space-y-6 max-w-8xl min-h-full">
+            <div className="w-full">
+              {children}
+            </div>
           </div>
         </main>
         {isAuthenticated && <BottomNav />}
