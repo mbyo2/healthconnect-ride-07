@@ -1,132 +1,131 @@
-
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/d0c-icon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
-    <meta name="description" content="Complete healthcare platform connecting patients with doctors, pharmacies, and emergency services. Book appointments, order medications, and access telemedicine services." />
-    <meta name="theme-color" content="#4CAF50" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <link rel="apple-touch-icon" href="/d0c-icon.svg" />
-    <link rel="manifest" href="/manifest.json" />
-    <title>Doc' O Clock - Complete Healthcare Platform</title>
-    
-    <!-- Cache control -->
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-    <meta http-equiv="Pragma" content="no-cache" />
-    <meta http-equiv="Expires" content="0" />
-    
-    <!-- Meta tags for SEO -->
-    <meta name="keywords" content="healthcare, doctors, appointments, medical, health, telemedicine" />
-    <meta name="author" content="Doc' O Clock" />
-    
-    <!-- Meta tags for social sharing -->
-    <meta property="og:title" content="Doc' O Clock - Healthcare Services" />
-    <meta property="og:description" content="Access healthcare services anytime, anywhere. Book appointments, chat with doctors, and manage your health." />
-    <meta property="og:image" content="/d0c-icon.svg" />
-    <meta property="og:url" content="https://dococlockapp.com" />
-    <meta property="og:type" content="website" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Doc' O Clock - Healthcare Services" />
-    <meta name="twitter:description" content="Access healthcare services anytime, anywhere" />
-    <meta name="twitter:image" content="/d0c-icon.svg" />
-    
-    <!-- Apple specific meta tags for PWA -->
-    <link rel="apple-touch-startup-image" href="/d0c-icon.svg" />
-    <meta name="apple-mobile-web-app-title" content="Doc' O Clock" />
-    
-    <!-- Apple splash screens -->
-    <link rel="apple-touch-startup-image" href="/d0c-icon.svg" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)" />
-    <link rel="apple-touch-startup-image" href="/d0c-icon.svg" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)" />
-    
-    <!-- Preload key assets -->
-    <link rel="preload" href="/d0c-icon.svg" as="image" />
-    
-    <!-- Touch icons for various platforms -->
-    <link rel="icon" type="image/png" sizes="192x192" href="/logo192.png" />
-    <link rel="icon" type="image/png" sizes="512x512" href="/logo512.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico" />
-    
-    <!-- Ensure key elements load even if JavaScript fails -->
-    <style>
-      .js-error-fallback {
-        display: none;
-        padding: 20px;
-        text-align: center;
-        font-family: system-ui, -apple-system, sans-serif;
-        max-width: 500px;
-        margin: 100px auto;
-      }
-      .js-error-fallback button {
-        background: #4CAF50;
-        border: none;
-        color: white;
-        padding: 8px 16px;
-        border-radius: 4px;
-        cursor: pointer;
-        margin-top: 16px;
-      }
-    </style>
-  </head>
-  <body>
-    <div id="root">
-      <!-- Inline loading indicator that shows even if JS fails -->
-      <div style="display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column;">
-        <div style="width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid #4CAF50; border-radius: 50%; animation: spin 1s linear infinite;"></div>
-        <p style="margin-top: 20px; font-family: system-ui, -apple-system, sans-serif;">Loading Doc' O Clock...</p>
-        <style>
-          @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        </style>
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/d0c-icon.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+  <meta name="description"
+    content="Complete healthcare platform connecting patients with doctors, pharmacies, and emergency services. Book appointments, order medications, and access telemedicine services." />
+  <meta name="theme-color" content="#4CAF50" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="apple-touch-icon" href="/d0c-icon.svg" />
+  <link rel="manifest" href="/manifest.json" />
+  <title>Doc' O Clock - Complete Healthcare Platform</title>
+
+  <!-- Cache control -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+
+  <!-- Meta tags for SEO -->
+  <meta name="keywords" content="healthcare, doctors, appointments, medical, health, telemedicine" />
+  <meta name="author" content="Doc' O Clock" />
+
+  <!-- Meta tags for social sharing -->
+  <meta property="og:title" content="Doc' O Clock - Healthcare Services" />
+  <meta property="og:description"
+    content="Access healthcare services anytime, anywhere. Book appointments, chat with doctors, and manage your health." />
+  <meta property="og:image" content="/d0c-icon.svg" />
+  <meta property="og:url" content="https://dococlockapp.com" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Doc' O Clock - Healthcare Services" />
+  <meta name="twitter:description" content="Access healthcare services anytime, anywhere" />
+  <meta name="twitter:image" content="/d0c-icon.svg" />
+
+  <!-- Apple specific meta tags for PWA -->
+  <link rel="apple-touch-startup-image" href="/d0c-icon.svg" />
+  <meta name="apple-mobile-web-app-title" content="Doc' O Clock" />
+
+  <!-- Apple splash screens -->
+  <link rel="apple-touch-startup-image" href="/d0c-icon.svg"
+    media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)" />
+  <link rel="apple-touch-startup-image" href="/d0c-icon.svg"
+    media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)" />
+
+  <!-- Removed problematic preload that was causing console warnings -->
+
+  <!-- Touch icons for various platforms -->
+  <link rel="icon" type="image/png" sizes="192x192" href="/logo192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="/logo512.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico" />
+
+  <!-- Ensure key elements load even if JavaScript fails -->
+  <style>
+    .js-error-fallback {
+      display: none;
+      padding: 20px;
+      text-align: center;
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 500px;
+      margin: 100px auto;
+    }
+
+    .js-error-fallback button {
+      background: #4CAF50;
+      border: none;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 16px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="root">
+    <!-- Inline loading indicator that shows even if JS fails -->
+    <div style="display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column;">
+      <div
+        style="width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid #4CAF50; border-radius: 50%; animation: spin 1s linear infinite;">
       </div>
-    </div>
-    
-    <!-- Error fallback that is shown if JavaScript fails to execute -->
-    <div class="js-error-fallback">
-      <h2>Unable to load Doc' O Clock</h2>
-      <p>We encountered a problem while loading the application. Please try refreshing the page.</p>
-      <button onclick="window.location.reload()">Refresh Page</button>
-    </div>
-    
-    <noscript>
-      <div style="padding: 20px; text-align: center; font-family: sans-serif;">
-        <h1>JavaScript Required</h1>
-        <p>You need to enable JavaScript to run this app. Doc' O Clock requires JavaScript to provide you with the best healthcare experience.</p>
-      </div>
-    </noscript>
-    
-    <script>
-      // Show error fallback if page doesn't load within 15 seconds
-      setTimeout(function() {
-        if (!window.appLoaded) {
-          document.querySelector('.js-error-fallback').style.display = 'block';
+      <p style="margin-top: 20px; font-family: system-ui, -apple-system, sans-serif;">Loading Doc' O Clock...</p>
+      <style>
+        @keyframes spin {
+          0% {
+            transform: rotate(0deg);
+          }
+
+          100% {
+            transform: rotate(360deg);
+          }
         }
-      }, 15000);
-    </script>
-    
-    <!-- Required Lovable script tag for enabling the Pick and Edit feature -->
-    <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
-    <script type="module" src="/src/main.tsx"></script>
-    
-    <!-- Service worker registration -->
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/service-worker.js')
-            .then(registration => {
-              console.log('ServiceWorker registration successful with scope:', registration.scope);
-              // Check for updates every hour
-              setInterval(() => registration.update(), 1000 * 60 * 60);
-            })
-            .catch(err => {
-              console.error('ServiceWorker registration failed:', err);
-            });
-        });
+      </style>
+    </div>
+  </div>
+
+  <!-- Error fallback that is shown if JavaScript fails to execute -->
+  <div class="js-error-fallback">
+    <h2>Unable to load Doc' O Clock</h2>
+    <p>We encountered a problem while loading the application. Please try refreshing the page.</p>
+    <button onclick="window.location.reload()">Refresh Page</button>
+  </div>
+
+  <noscript>
+    <div style="padding: 20px; text-align: center; font-family: sans-serif;">
+      <h1>JavaScript Required</h1>
+      <p>You need to enable JavaScript to run this app. Doc' O Clock requires JavaScript to provide you with the best
+        healthcare experience.</p>
+    </div>
+  </noscript>
+
+  <script>
+    // Show error fallback if page doesn't load within 15 seconds
+    setTimeout(function () {
+      if (!window.appLoaded) {
+        document.querySelector('.js-error-fallback').style.display = 'block';
       }
-      
-      // Mark app as loaded
-      window.appLoaded = true;
-    </script>
-  </body>
+    }, 15000);
+  </script>
+
+  <!-- Required Lovable script tag for enabling the Pick and Edit feature -->
+  <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
+  <script type="module" src="/src/main.tsx"></script>
+
+  <!-- Service worker registration handled by main.tsx for Netlify compatibility -->
+</body>
+
 </html>

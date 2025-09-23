@@ -6,19 +6,14 @@ import { createClient } from '@supabase/supabase-js';
 import { MobileLayout } from '@/components/MobileLayout';
 import { LoadingScreen } from '@/components/LoadingScreen';
 import { AuthProvider } from '@/context/AuthContext';
-import { UserRolesProvider } from '@/context/UserRolesContext';
+// UserRolesProvider removed - not implemented
 import { SearchProvider } from '@/context/SearchContext';
-import { FeedbackProvider } from '@/context/FeedbackContext';
+// FeedbackProvider removed - not implemented
 import { AccessibilityProvider } from '@/context/AccessibilityContext';
 import { SessionManager } from '@/components/auth/SessionManager';
 import { ProfileSetup } from '@/components/auth/ProfileSetup';
-import { RoleProtectedRoute } from '@/components/auth/RoleProtectedRoute';
-import { RoleBasedRoute } from '@/components/auth/RoleBasedRoute';
 import { RouteGuard } from '@/components/auth/RouteGuard';
-import { hasRoutePermission, PUBLIC_ROUTES } from '@/utils/rolePermissions';
 import { useAuth } from '@/context/AuthContext';
-import { PreloadManager } from '@/components/performance/PreloadManager';
-import { usePerformance } from '@/hooks/usePerformance';
 
 // Lazy load all page components for better performance
 const Home = lazy(() => import('@/pages/Home'));
@@ -65,10 +60,7 @@ const EmergencyResponse = lazy(() => import('@/components/phase5/EmergencyRespon
 const HealthDataVisualization = lazy(() => import('@/components/phase5/HealthDataVisualization'));
 const ComplianceAudit = lazy(() => import('@/components/phase5/ComplianceAudit'));
 
-const supabase = createClient(
-  "https://tthzcijscedgxjfnfnky.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0aHpjaWpzY2VkZ3hqZm5mbmt5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQxMDU3ODgsImV4cCI6MjA0OTY4MTc4OH0.aum1F7Q4Eqrjf-eHkwyYBd9KDoZs2JaxN3l_vFDcWwY"
-);
+// Remove duplicate supabase client - using the one from integrations
 
 const AppContent = () => {
   const [isNewUser, setIsNewUser] = useState(false);
@@ -104,123 +96,99 @@ const AppContent = () => {
 
   return (
     <SearchProvider>
-      <Router>
-        <SessionManager>
-          <MobileLayout>
-            <Suspense fallback={<LoadingScreen />}>
-              <Routes>
-                {/* Public Routes */}
-                <Route path="/landing" element={<Landing />} />
-                <Route path="/healthcare-professionals" element={<HealthcareProfessionals />} />
-                <Route path="/healthcare-institutions" element={<HealthcareInstitutions />} />
-                <Route path="/terms" element={<Terms />} />
-                <Route path="/privacy" element={<Privacy />} />
-                <Route path="/contact" element={<Contact />} />
-                
-                {/* Auth Route */}
-                <Route
-                  path="/auth"
-                  element={
-                    session && session.user ? (
+      <SessionManager>
+        <MobileLayout>
+          <Suspense fallback={<LoadingScreen />}>
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/landing" element={<Landing />} />
+              <Route path="/healthcare-professionals" element={<HealthcareProfessionals />} />
+              <Route path="/healthcare-institutions" element={<HealthcareInstitutions />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/contact" element={<Contact />} />
+              
+              {/* Auth Route */}
+              <Route
+                path="/auth"
+                element={
+                  session && session.user ? (
+                    <Navigate to="/symptoms" replace={true} />
+                  ) : (
+                    <Auth />
+                  )
+                }
+              />
+
+              {/* Main App Route */}
+              <Route
+                path="/"
+                element={
+                  session && session.user ? (
+                    isNewUser ? (
+                      <Navigate to="/profile-setup" replace={true} />
+                    ) : (
                       <Navigate to="/symptoms" replace={true} />
-                    ) : (
-                      <Auth />
                     )
-                  }
-                />
+                  ) : (
+                    <Navigate to="/auth" replace={true} />
+                  )
+                }
+              />
 
-                {/* Main App Route */}
-                <Route
-                  path="/"
-                  element={
-                    session && session.user ? (
-                      isNewUser ? (
-                        <Navigate to="/profile-setup" replace={true} />
-                      ) : (
-                        <Navigate to="/symptoms" replace={true} />
-                      )
-                    ) : (
-                      <Navigate to="/auth" replace={true} />
-                    )
-                  }
-                />
+              {/* Protected Routes with Role-Based Access Control */}
+              <Route path="/profile-setup" element={<RouteGuard><ProfileSetup /></RouteGuard>} />
+              <Route path="/profile" element={<RouteGuard><Profile /></RouteGuard>} />
+              <Route path="/settings" element={<RouteGuard><Settings /></RouteGuard>} />
+              <Route path="/search" element={<RouteGuard><SearchPage /></RouteGuard>} />
+              <Route path="/appointments" element={<RouteGuard><Appointments /></RouteGuard>} />
+              <Route path="/admin-dashboard" element={<RouteGuard><AdminDashboard /></RouteGuard>} />
+              <Route path="/provider-dashboard" element={<RouteGuard><ProviderDashboard /></RouteGuard>} />
+              <Route path="/super-admin-dashboard" element={<RouteGuard><SuperAdminDashboard /></RouteGuard>} />
+              <Route path="/pharmacy-inventory" element={<RouteGuard><PharmacyPortal /></RouteGuard>} />
+              <Route path="/connections" element={<RouteGuard><Connections /></RouteGuard>} />
+              <Route path="/chat" element={<RouteGuard><Chat /></RouteGuard>} />
+              <Route path="/prescriptions" element={<RouteGuard><Prescriptions /></RouteGuard>} />
+              <Route path="/symptoms" element={<RouteGuard><Symptoms /></RouteGuard>} />
+              <Route path="/video-dashboard" element={<RouteGuard><VideoDashboard session={session} /></RouteGuard>} />
+              <Route path="/testing" element={<RouteGuard><Testing /></RouteGuard>} />
+              <Route path="/documentation" element={<RouteGuard><Documentation /></RouteGuard>} />
+              <Route path="/marketplace-users" element={<RouteGuard><UserMarketplace /></RouteGuard>} />
+              <Route path="/emergency" element={<RouteGuard><Emergency /></RouteGuard>} />
+              <Route path="/marketplace" element={<RouteGuard><Marketplace /></RouteGuard>} />
+              <Route path="/pharmacy-portal" element={<RouteGuard><PharmacyPortal /></RouteGuard>} />
+              <Route path="/healthcare-application" element={<RouteGuard><HealthcareApplication /></RouteGuard>} />
+              <Route path="/wallet" element={<RouteGuard><Wallet /></RouteGuard>} />
+              <Route path="/admin-wallet" element={<RouteGuard><AdminWallet /></RouteGuard>} />
+              <Route path="/institution-wallet" element={<RouteGuard><InstitutionWallet /></RouteGuard>} />
+              <Route path="/create-admin" element={<RouteGuard><CreateAdmin /></RouteGuard>} />
 
-                {/* Protected Routes with Role-Based Access Control */}
-                <Route path="/profile-setup" element={<RouteGuard><ProfileSetup /></RouteGuard>} />
-                <Route path="/profile" element={<RouteGuard><Profile /></RouteGuard>} />
-                <Route path="/settings" element={<RouteGuard><Settings /></RouteGuard>} />
-                <Route path="/search" element={<RouteGuard><SearchPage /></RouteGuard>} />
-                <Route path="/appointments" element={<RouteGuard><Appointments /></RouteGuard>} />
-                <Route path="/admin-dashboard" element={<RouteGuard><AdminDashboard /></RouteGuard>} />
-                <Route path="/provider-dashboard" element={<RouteGuard><ProviderDashboard /></RouteGuard>} />
-                <Route path="/super-admin-dashboard" element={<RouteGuard><SuperAdminDashboard /></RouteGuard>} />
-                <Route path="/pharmacy-inventory" element={<RouteGuard><PharmacyPortal /></RouteGuard>} />
-                <Route path="/connections" element={<RouteGuard><Connections /></RouteGuard>} />
-                <Route path="/chat" element={<RouteGuard><Chat /></RouteGuard>} />
-                <Route path="/prescriptions" element={<RouteGuard><Prescriptions /></RouteGuard>} />
-                <Route path="/symptoms" element={<RouteGuard><Symptoms /></RouteGuard>} />
-                <Route path="/video-dashboard" element={<RouteGuard><VideoDashboard session={session} /></RouteGuard>} />
-                <Route path="/testing" element={<RouteGuard><Testing /></RouteGuard>} />
-                <Route path="/documentation" element={<RouteGuard><Documentation /></RouteGuard>} />
-                <Route path="/marketplace-users" element={<RouteGuard><UserMarketplace /></RouteGuard>} />
-                <Route path="/emergency" element={<RouteGuard><Emergency /></RouteGuard>} />
-                <Route path="/marketplace" element={<RouteGuard><Marketplace /></RouteGuard>} />
-                <Route path="/pharmacy-portal" element={<RouteGuard><PharmacyPortal /></RouteGuard>} />
-                <Route path="/healthcare-application" element={<RouteGuard><HealthcareApplication /></RouteGuard>} />
-                <Route path="/wallet" element={<RouteGuard><Wallet /></RouteGuard>} />
-                <Route path="/admin-wallet" element={<RouteGuard><AdminWallet /></RouteGuard>} />
-                <Route path="/institution-wallet" element={<RouteGuard><InstitutionWallet /></RouteGuard>} />
-                <Route path="/create-admin" element={<RouteGuard><CreateAdmin /></RouteGuard>} />
-
-                {/* Advanced Healthcare Features */}
-                <Route path="/advanced-dashboard" element={<RouteGuard><AdvancedDashboard /></RouteGuard>} />
-                <Route path="/ai-diagnostics" element={<RouteGuard><AIDiagnosticAssistant patientId={session?.user?.id || ''} /></RouteGuard>} />
-                <Route path="/blockchain-records" element={<RouteGuard><BlockchainMedicalRecords patientId={session?.user?.id || ''} userRole={userRole === 'health_personnel' ? 'doctor' : (userRole as 'patient' | 'doctor' | 'nurse' | 'admin') || 'patient'} /></RouteGuard>} />
-                <Route path="/iot-monitoring" element={<RouteGuard><IoTHealthMonitoring patientId={session?.user?.id || ''} /></RouteGuard>} />
-                <Route path="/emergency-response" element={<RouteGuard><EmergencyResponse patientId={session?.user?.id || ''} /></RouteGuard>} />
-                <Route path="/health-analytics" element={<RouteGuard><HealthDataVisualization patientId={session?.user?.id || ''} /></RouteGuard>} />
-                <Route path="/compliance-audit" element={<RouteGuard><ComplianceAudit userRole={userRole === 'health_personnel' ? 'doctor' : (userRole as 'patient' | 'doctor' | 'nurse' | 'admin') || 'admin'} /></RouteGuard>} />
-          
-                {/* Payment Routes */}
-                <Route path="/payment-success" element={<PaymentSuccess />} />
-                <Route path="/payment-cancel" element={<PaymentCancel />} />
-                
-                {/* Catch all route - 404 handler */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </Suspense>
-            
-            <SessionManager>
-              <></>
-            </SessionManager>
-          </MobileLayout>
-        </SessionManager>
-      </Router>
+              {/* Advanced Healthcare Features */}
+              <Route path="/advanced-dashboard" element={<RouteGuard><AdvancedDashboard /></RouteGuard>} />
+              <Route path="/ai-diagnostics" element={<RouteGuard><AIDiagnosticAssistant patientId={session?.user?.id || ''} /></RouteGuard>} />
+              <Route path="/blockchain-records" element={<RouteGuard><BlockchainMedicalRecords patientId={session?.user?.id || ''} userRole={userRole === 'health_personnel' ? 'doctor' : (userRole as 'patient' | 'doctor' | 'nurse' | 'admin') || 'patient'} /></RouteGuard>} />
+              <Route path="/iot-monitoring" element={<RouteGuard><IoTHealthMonitoring patientId={session?.user?.id || ''} /></RouteGuard>} />
+              <Route path="/emergency-response" element={<RouteGuard><EmergencyResponse patientId={session?.user?.id || ''} /></RouteGuard>} />
+              <Route path="/health-analytics" element={<RouteGuard><HealthDataVisualization patientId={session?.user?.id || ''} /></RouteGuard>} />
+              <Route path="/compliance-audit" element={<RouteGuard><ComplianceAudit userRole={userRole === 'health_personnel' ? 'doctor' : (userRole as 'patient' | 'doctor' | 'nurse' | 'admin') || 'admin'} /></RouteGuard>} />
+        
+              {/* Payment Routes */}
+              <Route path="/payment-success" element={<PaymentSuccess />} />
+              <Route path="/payment-cancel" element={<PaymentCancel />} />
+              
+              {/* Catch all route - 404 handler */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
+        </MobileLayout>
+      </SessionManager>
     </SearchProvider>
   );
 };
 
-// Performance-optimized App Content Component with PreloadManager
+// Simplified App Content Component without problematic dependencies
 const AppContentWithPreload: React.FC = React.memo(() => {
-  const location = useLocation();
-  const { mark, measure } = usePerformance();
-  const [userRole, setUserRole] = useState<string>('patient');
-
-  useEffect(() => {
-    mark('app-render-start');
-    return () => {
-      measure('app-render-time', 'app-render-start');
-    };
-  }, [mark, measure]);
-
-  const currentRoute = useMemo(() => location.pathname, [location.pathname]);
-
-  return (
-    <>
-      <PreloadManager currentRoute={currentRoute} userRole={userRole} />
-      <AppContent />
-    </>
-  );
+  return <AppContent />;
 });
 
 AppContentWithPreload.displayName = 'AppContentWithPreload';
@@ -237,17 +205,13 @@ const App: React.FC = () => {
   return (
     <SessionContextProvider supabaseClient={supabaseClient}>
       <AuthProvider>
-        <UserRolesProvider>
-          <FeedbackProvider>
-            <AccessibilityProvider>
-              <Router>
-                <div className="App">
-                  <AppContentWithPreload />
-                </div>
-              </Router>
-            </AccessibilityProvider>
-          </FeedbackProvider>
-        </UserRolesProvider>
+        <AccessibilityProvider>
+          <Router>
+            <div className="App">
+              <AppContentWithPreload />
+            </div>
+          </Router>
+        </AccessibilityProvider>
       </AuthProvider>
     </SessionContextProvider>
   );
