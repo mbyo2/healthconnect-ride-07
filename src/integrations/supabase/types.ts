@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_diagnosis_history: {
+        Row: {
+          analysis: string | null
+          created_at: string
+          id: string
+          patient_context: Json | null
+          symptoms: string
+          user_id: string
+        }
+        Insert: {
+          analysis?: string | null
+          created_at?: string
+          id?: string
+          patient_context?: Json | null
+          symptoms: string
+          user_id: string
+        }
+        Update: {
+          analysis?: string | null
+          created_at?: string
+          id?: string
+          patient_context?: Json | null
+          symptoms?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       app_owner_wallet: {
         Row: {
           balance: number
@@ -2863,12 +2890,42 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: Database["public"]["Enums"]["user_role"]
       }
+      get_diagnosis_by_id: {
+        Args: { diagnosis_id: string }
+        Returns: {
+          analysis: string | null
+          created_at: string
+          id: string
+          patient_context: Json | null
+          symptoms: string
+          user_id: string
+        }
+      }
+      get_my_diagnosis_history: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          analysis: string | null
+          created_at: string
+          id: string
+          patient_context: Json | null
+          symptoms: string
+          user_id: string
+        }[]
+      }
       insert_applications_for_doctors: {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      is_institution_admin: {
+        Args: { institution_id: string }
+        Returns: boolean
+      }
       is_institution_staff: {
         Args: { institution_id: string; user_id: string }
+        Returns: boolean
+      }
+      is_institution_staff_member: {
+        Args: { institution_id: string }
         Returns: boolean
       }
       is_super_admin: {
