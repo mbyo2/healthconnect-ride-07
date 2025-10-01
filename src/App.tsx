@@ -44,9 +44,6 @@ const Contact = lazy(() => import('@/pages/Contact'));
 const PaymentSuccess = lazy(() => import('@/pages/PaymentSuccess'));
 const PaymentCancel = lazy(() => import('@/pages/PaymentCancel'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
-const AdminWallet = lazy(() => import('@/pages/AdminWallet'));
-const InstitutionWallet = lazy(() => import('@/pages/InstitutionWallet'));
-const Wallet = lazy(() => import('@/pages/Wallet'));
 const CreateAdmin = lazy(() => import('@/pages/CreateAdmin'));
 const Auth = lazy(() => import('@/pages/Auth'));
 
@@ -147,9 +144,6 @@ const AppContent = () => {
               <Route path="/marketplace" element={<RouteGuard><Marketplace /></RouteGuard>} />
               <Route path="/pharmacy-portal" element={<RouteGuard><PharmacyPortal /></RouteGuard>} />
               <Route path="/healthcare-application" element={<RouteGuard><HealthcareApplication /></RouteGuard>} />
-              <Route path="/wallet" element={<RouteGuard><Wallet /></RouteGuard>} />
-              <Route path="/admin-wallet" element={<RouteGuard><AdminWallet /></RouteGuard>} />
-              <Route path="/institution-wallet" element={<RouteGuard><InstitutionWallet /></RouteGuard>} />
               <Route path="/create-admin" element={<RouteGuard><CreateAdmin /></RouteGuard>} />
          
               {/* Payment Routes */}
