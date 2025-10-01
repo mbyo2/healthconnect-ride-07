@@ -9,11 +9,7 @@ const routeImports = {
   prescriptions: () => import('@/pages/Prescriptions'),
   profile: () => import('@/pages/Profile'),
   settings: () => import('@/pages/Settings'),
-  wallet: () => import('@/pages/Wallet'),
   emergency: () => import('@/pages/Emergency'),
-  aiDiagnostics: () => import('@/components/phase5/AIDiagnosticAssistant'),
-  iotMonitoring: () => import('@/components/phase5/IoTHealthMonitoring'),
-  healthAnalytics: () => import('@/components/phase5/HealthDataVisualization'),
 };
 
 interface PreloadManagerProps {
@@ -56,7 +52,7 @@ const getCriticalRoutes = (currentRoute: string, userRole: string): string[] => 
   
   // Route-specific preloading
   const routeSpecificPreloads: Record<string, string[]> = {
-    '/symptoms': ['appointments', 'chat', 'aiDiagnostics'],
+    '/symptoms': ['appointments', 'chat'],
     '/appointments': ['chat', 'prescriptions', 'wallet'],
     '/chat': ['prescriptions', 'appointments'],
     '/profile': ['settings', 'wallet'],

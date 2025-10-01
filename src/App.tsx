@@ -10,7 +10,6 @@ import { AuthProvider } from '@/context/AuthContext';
 import { SearchProvider } from '@/context/SearchContext';
 // FeedbackProvider removed - not implemented
 import { AccessibilityProvider } from '@/context/AccessibilityContext';
-import { SessionManager } from '@/components/auth/SessionManager';
 import { ProfileSetup } from '@/components/auth/ProfileSetup';
 import { RouteGuard } from '@/components/auth/RouteGuard';
 import { useAuth } from '@/context/AuthContext';
@@ -51,15 +50,6 @@ const Wallet = lazy(() => import('@/pages/Wallet'));
 const CreateAdmin = lazy(() => import('@/pages/CreateAdmin'));
 const Auth = lazy(() => import('@/pages/Auth'));
 
-// Advanced Healthcare Features - Lazy loaded components
-const AdvancedDashboard = lazy(() => import('@/components/advanced-healthcare/AdvancedDashboard'));
-const AIDiagnosticAssistant = lazy(() => import('@/components/phase5/AIDiagnosticAssistant'));
-const BlockchainMedicalRecords = lazy(() => import('@/components/phase5/BlockchainMedicalRecords'));
-const IoTHealthMonitoring = lazy(() => import('@/components/phase5/IoTHealthMonitoring'));
-const EmergencyResponse = lazy(() => import('@/components/phase5/EmergencyResponse'));
-const HealthDataVisualization = lazy(() => import('@/components/phase5/HealthDataVisualization'));
-const ComplianceAudit = lazy(() => import('@/components/phase5/ComplianceAudit'));
-
 // Remove duplicate supabase client - using the one from integrations
 
 const AppContent = () => {
@@ -96,7 +86,6 @@ const AppContent = () => {
 
   return (
     <SearchProvider>
-      <SessionManager>
         <MobileLayout>
           <Suspense fallback={<LoadingScreen />}>
             <Routes>
@@ -162,16 +151,7 @@ const AppContent = () => {
               <Route path="/admin-wallet" element={<RouteGuard><AdminWallet /></RouteGuard>} />
               <Route path="/institution-wallet" element={<RouteGuard><InstitutionWallet /></RouteGuard>} />
               <Route path="/create-admin" element={<RouteGuard><CreateAdmin /></RouteGuard>} />
-
-              {/* Advanced Healthcare Features */}
-              <Route path="/advanced-dashboard" element={<RouteGuard><AdvancedDashboard /></RouteGuard>} />
-              <Route path="/ai-diagnostics" element={<RouteGuard><AIDiagnosticAssistant patientId={session?.user?.id || ''} /></RouteGuard>} />
-              <Route path="/blockchain-records" element={<RouteGuard><BlockchainMedicalRecords patientId={session?.user?.id || ''} userRole={userRole === 'health_personnel' ? 'doctor' : (userRole as 'patient' | 'doctor' | 'nurse' | 'admin') || 'patient'} /></RouteGuard>} />
-              <Route path="/iot-monitoring" element={<RouteGuard><IoTHealthMonitoring patientId={session?.user?.id || ''} /></RouteGuard>} />
-              <Route path="/emergency-response" element={<RouteGuard><EmergencyResponse patientId={session?.user?.id || ''} /></RouteGuard>} />
-              <Route path="/health-analytics" element={<RouteGuard><HealthDataVisualization patientId={session?.user?.id || ''} /></RouteGuard>} />
-              <Route path="/compliance-audit" element={<RouteGuard><ComplianceAudit userRole={userRole === 'health_personnel' ? 'doctor' : (userRole as 'patient' | 'doctor' | 'nurse' | 'admin') || 'admin'} /></RouteGuard>} />
-        
+         
               {/* Payment Routes */}
               <Route path="/payment-success" element={<PaymentSuccess />} />
               <Route path="/payment-cancel" element={<PaymentCancel />} />
@@ -181,7 +161,6 @@ const AppContent = () => {
             </Routes>
           </Suspense>
         </MobileLayout>
-      </SessionManager>
     </SearchProvider>
   );
 };

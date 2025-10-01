@@ -1,7 +1,7 @@
 
 import { Home, Search, Calendar, MessageSquare, Heart, Users, ShoppingCart, Pill, AlertTriangle, User, Wallet, Brain, Shield, Activity, BarChart3, Zap } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
-import { useSession } from "@/hooks/use-session";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useDeviceType } from "@/hooks/use-device-type";
 import { useAuth } from "@/context/AuthContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -11,9 +11,9 @@ import { BottomNavMenu } from "@/components/navigation/BottomNavMenu";
 
 export function BottomNav() {
   const location = useLocation();
-  const { session, user } = useSession();
+  const supabase = useSupabaseClient();
   const { isDesktop } = useDeviceType();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   
   // Don't render if not authenticated or on desktop
   if (!isAuthenticated || isDesktop) {

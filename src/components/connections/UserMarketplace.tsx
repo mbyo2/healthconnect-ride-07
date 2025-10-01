@@ -104,7 +104,7 @@ export const UserMarketplace = () => {
         if (currentUserProfile?.role === 'patient' && activeTab === 'patient') {
           return [];
         }
-        baseQuery = baseQuery.eq('role', activeTab);
+        baseQuery = baseQuery.eq('role', activeTab as 'patient' | 'health_personnel' | 'admin');
       }
 
       // Apply search filter

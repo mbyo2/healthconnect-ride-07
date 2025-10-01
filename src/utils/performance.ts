@@ -267,18 +267,6 @@ export const networkOptimization = {
 
 // React Suspense utilities
 export const suspenseUtils = {
-  // Create suspense boundary with error boundary
-  createSuspenseBoundary: (
-    fallback: React.ReactNode,
-    errorFallback?: React.ReactNode
-  ) => {
-    return ({ children }: { children: React.ReactNode }) => (
-      <React.Suspense fallback={fallback}>
-        {children}
-      </React.Suspense>
-    );
-  },
-
   // Preload component for better UX
   preloadComponent: (componentImport: () => Promise<any>) => {
     let componentPromise: Promise<any> | null = null;
@@ -299,6 +287,3 @@ export const suspenseUtils = {
     };
   },
 };
-
-// Add missing import
-import { useState } from 'react';

@@ -4,13 +4,14 @@ import { useNavigate } from "react-router-dom";
 import { AlertCircle } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { getRoleLandingPage } from "@/utils/rolePermissions";
+import type { UserRole } from "@/types/user";
 
 const NotFound = () => {
   const navigate = useNavigate();
   const { userRole } = useAuth();
 
   const handleReturnHome = () => {
-    const landingPage = getRoleLandingPage(userRole);
+    const landingPage = getRoleLandingPage((userRole || 'patient') as UserRole);
     navigate(landingPage);
   };
 

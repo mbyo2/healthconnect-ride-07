@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from 'react';
 import { useDeviceCapabilities } from '@/hooks/use-device-capabilities';
-import { useSession } from '@/hooks/use-session';
+import { useSupabaseClient, useSession as useSupabaseSession } from '@supabase/auth-helpers-react';
 import { useNetwork } from '@/hooks/use-network';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -15,7 +15,7 @@ interface MobileAppWrapperProps {
 export function MobileAppWrapper({ children }: MobileAppWrapperProps) {
   const capabilities = useDeviceCapabilities();
   const { isOnline } = useNetwork();
-  const { session } = useSession();
+  const session = useSupabaseSession();
   const [lowPowerMode, setLowPowerMode] = useState(false);
   const [hasRequestedPermissions, setHasRequestedPermissions] = useState(false);
   const [batteryWarningShown, setBatteryWarningShown] = useState(false);
