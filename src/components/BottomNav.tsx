@@ -85,12 +85,6 @@ export function BottomNav() {
       icon: <Users className="h-5 w-5" />
     },
     { 
-      to: "/wallet", 
-      label: "My Wallet", 
-      description: "Manage finances and payments",
-      icon: <Wallet className="h-5 w-5" />
-    },
-    { 
       to: "/marketplace-users", 
       label: "Find Providers", 
       description: "Browse healthcare marketplace",

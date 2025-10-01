@@ -86,11 +86,6 @@ export function DesktopNav() {
       icon: <User className="h-4 w-4 mr-2" />
     },
     {
-      to: "/wallet",
-      label: "My Wallet",
-      icon: <ShoppingCart className="h-4 w-4 mr-2" />
-    },
-    {
       to: "/marketplace-users",
       label: "Healthcare Marketplace",
       icon: <ShoppingCart className="h-4 w-4 mr-2" />

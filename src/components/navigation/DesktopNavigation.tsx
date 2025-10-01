@@ -38,12 +38,6 @@ export const DesktopNavigation = () => {
       requireAuth: true,
     },
     {
-      to: "/wallet",
-      label: "Wallet",
-      icon: <Wallet className="h-5 w-5 mr-2" />,
-      requireAuth: true,
-    },
-    {
       to: "/documentation",
       label: "Documentation",
       icon: <BookOpen className="h-5 w-5 mr-2" />,
