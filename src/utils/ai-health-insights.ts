@@ -1,11 +1,6 @@
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/integrations/supabase/client';
 import { logger } from './logger';
 import { errorHandler } from './error-handler';
-
-const supabase = createClient(
-  "https://tthzcijscedgxjfnfnky.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0aHpjaWpzY2VkZ3hqZm5mbmt5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQxMDU3ODgsImV4cCI6MjA0OTY4MTc4OH0.aum1F7Q4Eqrjf-eHkwyYBd9KDoZs2JaxN3l_vFDcWwY"
-);
 
 export interface HealthInsight {
   id: string;
@@ -107,32 +102,31 @@ class AIHealthInsights {
         .from('profiles')
         .select('*')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
 
-      const { data: vitals } = await supabase
-        .from('health_vitals')
+      const { data: medicalRecords } = await supabase
+        .from('comprehensive_medical_records')
         .select('*')
-        .eq('user_id', userId)
-        .order('recorded_at', { ascending: false })
+        .eq('patient_id', userId)
+        .order('visit_date', { ascending: false })
         .limit(30);
 
-      const { data: medications } = await supabase
-        .from('medications')
+      const { data: prescriptions } = await supabase
+        .from('prescriptions')
         .select('*')
-        .eq('user_id', userId)
-        .eq('active', true);
+        .eq('patient_id', userId);
 
       const { data: appointments } = await supabase
         .from('appointments')
         .select('*')
         .eq('patient_id', userId)
-        .order('appointment_date', { ascending: false })
+        .order('date', { ascending: false })
         .limit(10);
 
       return {
         profile,
-        vitals: vitals || [],
-        medications: medications || [],
+        vitals: medicalRecords || [],
+        medications: prescriptions || [],
         appointments: appointments || []
       };
     } catch (error) {
@@ -149,45 +143,71 @@ class AIHealthInsights {
       
       if (!profile || vitals.length === 0) return insights;
 
-      // Cardiovascular risk assessment
-      const cvRisk = this.assessCardiovascularRisk(profile, vitals);
-      if (cvRisk.riskLevel > 0.3) {
-        insights.push({
-          id: `cv-risk-${Date.now()}`,
-          type: 'risk_assessment',
-          title: 'Cardiovascular Risk Assessment',
-          description: `Based on your health data, you have a ${Math.round(cvRisk.riskLevel * 100)}% elevated cardiovascular risk.`,
-          severity: cvRisk.riskLevel > 0.7 ? 'high' : cvRisk.riskLevel > 0.5 ? 'medium' : 'low',
-          confidence: 0.85,
-          actionable: true,
-          recommendations: cvRisk.recommendations,
-          dataPoints: cvRisk.dataPoints,
-          generatedAt: new Date()
-        });
+      // Use MedGemma for AI-powered risk assessment
+      const latestVitals = vitals[0] || {};
+      const { data, error } = await supabase.functions.invoke('medgemma-health-analysis', {
+        body: {
+          analysisType: 'risk_assessment',
+          data: {
+            age: profile.age,
+            gender: profile.gender,
+            vitals: latestVitals,
+            bmi: latestVitals.bmi,
+            bloodPressure: `${latestVitals.systolic_bp}/${latestVitals.diastolic_bp}`,
+            familyHistory: profile.family_history
+          }
+        }
+      });
+
+      if (error) {
+        logger.error('MedGemma risk assessment failed', 'AI_HEALTH', error);
+        return insights;
       }
 
-      // Diabetes risk assessment
-      const diabetesRisk = this.assessDiabetesRisk(profile, vitals);
-      if (diabetesRisk.riskLevel > 0.25) {
-        insights.push({
-          id: `diabetes-risk-${Date.now()}`,
-          type: 'risk_assessment',
-          title: 'Type 2 Diabetes Risk',
-          description: `Your current health indicators suggest a ${Math.round(diabetesRisk.riskLevel * 100)}% risk for developing Type 2 diabetes.`,
-          severity: diabetesRisk.riskLevel > 0.6 ? 'high' : 'medium',
-          confidence: 0.78,
-          actionable: true,
-          recommendations: diabetesRisk.recommendations,
-          dataPoints: diabetesRisk.dataPoints,
-          generatedAt: new Date()
-        });
-      }
+      // Parse MedGemma response and create structured insights
+      const analysis = data.analysis;
+      
+      insights.push({
+        id: `ai-risk-${Date.now()}`,
+        type: 'risk_assessment',
+        title: 'AI-Powered Health Risk Assessment',
+        description: analysis,
+        severity: this.determineSeverityFromAnalysis(analysis),
+        confidence: data.confidence || 0.85,
+        actionable: true,
+        recommendations: this.extractRecommendations(analysis),
+        dataPoints: [`AI Model: ${data.model}`, `Analysis Date: ${data.timestamp}`],
+        generatedAt: new Date()
+      });
 
     } catch (error) {
       logger.error('Error generating risk assessments', 'AI_HEALTH', error);
     }
 
     return insights;
+  }
+
+  private determineSeverityFromAnalysis(analysis: string): 'low' | 'medium' | 'high' | 'critical' {
+    const lowerAnalysis = analysis.toLowerCase();
+    if (lowerAnalysis.includes('critical') || lowerAnalysis.includes('emergency')) return 'critical';
+    if (lowerAnalysis.includes('high risk') || lowerAnalysis.includes('severe')) return 'high';
+    if (lowerAnalysis.includes('moderate') || lowerAnalysis.includes('medium')) return 'medium';
+    return 'low';
+  }
+
+  private extractRecommendations(analysis: string): string[] {
+    // Extract numbered recommendations or bullet points from analysis
+    const recommendations: string[] = [];
+    const lines = analysis.split('\n');
+    
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (/^\d+\./.test(trimmed) || trimmed.startsWith('-') || trimmed.startsWith('•')) {
+        recommendations.push(trimmed.replace(/^[\d\.\-•\s]+/, '').trim());
+      }
+    }
+    
+    return recommendations.length > 0 ? recommendations.slice(0, 5) : ['Consult with your healthcare provider for personalized recommendations'];
   }
 
   private assessCardiovascularRisk(profile: any, vitals: any[]): any {

@@ -46,6 +46,7 @@ const PaymentCancel = lazy(() => import('@/pages/PaymentCancel'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
 const CreateAdmin = lazy(() => import('@/pages/CreateAdmin'));
 const Auth = lazy(() => import('@/pages/Auth'));
+const AIDiagnostics = lazy(() => import('@/pages/AIDiagnostics'));
 
 // Remove duplicate supabase client - using the one from integrations
 
@@ -145,6 +146,7 @@ const AppContent = () => {
               <Route path="/pharmacy-portal" element={<RouteGuard><PharmacyPortal /></RouteGuard>} />
               <Route path="/healthcare-application" element={<RouteGuard><HealthcareApplication /></RouteGuard>} />
               <Route path="/create-admin" element={<RouteGuard><CreateAdmin /></RouteGuard>} />
+              <Route path="/ai-diagnostics" element={<RouteGuard><AIDiagnostics /></RouteGuard>} />
          
               {/* Payment Routes */}
               <Route path="/payment-success" element={<PaymentSuccess />} />
