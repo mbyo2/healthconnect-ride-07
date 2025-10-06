@@ -71,5 +71,5 @@ verify_jwt = true
 [functions.medgemma-health-analysis]
 verify_jwt = true
 
-[functions.medgemma-chat]
+[functions.doc-chat]
 verify_jwt = true

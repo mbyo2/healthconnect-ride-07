@@ -45,8 +45,8 @@ export const MedGemmaChat = () => {
     setIsLoading(true);
 
     try {
-      console.log('Calling medgemma-chat function...');
-      const { data, error } = await supabase.functions.invoke('medgemma-chat', {
+      console.log('Calling doc-chat function...');
+      const { data, error } = await supabase.functions.invoke('doc-chat', {
         body: {
           message: userMessage.content,
           conversationHistory: messages.slice(-10) // Last 10 messages for context
