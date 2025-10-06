@@ -22,7 +22,7 @@ serve(async (req) => {
     const hf = new HfInference(HF_TOKEN);
     
     // Build conversation context
-    const systemPrompt = `You are MedGemma, a knowledgeable medical AI assistant. You provide:
+    const systemPrompt = `You are Doc 0 Clock, a knowledgeable medical AI assistant available 24/7. You provide:
 - Evidence-based medical information
 - Symptom analysis and health guidance
 - Medication information
@@ -41,9 +41,9 @@ CRITICAL: If symptoms suggest emergency (chest pain, difficulty breathing, sever
     // Format conversation history
     let conversationContext = systemPrompt + '\n\n';
     conversationHistory.forEach((msg: any) => {
-      conversationContext += `${msg.role === 'user' ? 'Patient' : 'MedGemma'}: ${msg.content}\n`;
+      conversationContext += `${msg.role === 'user' ? 'Patient' : 'Doc 0 Clock'}: ${msg.content}\n`;
     });
-    conversationContext += `Patient: ${message}\nMedGemma:`;
+    conversationContext += `Patient: ${message}\nDoc 0 Clock:`;
 
     console.log('MedGemma chat request received');
 

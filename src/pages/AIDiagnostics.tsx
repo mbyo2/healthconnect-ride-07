@@ -25,7 +25,7 @@ const AIDiagnostics = () => {
               <div>
                 <h1 className="text-3xl font-bold">AI Diagnostic Assistant</h1>
                 <p className="text-muted-foreground">
-                  Powered by MedGemma - Google's Medical AI
+                  Powered by Doc 0 Clock - Your 24/7 Medical AI
                 </p>
               </div>
             </div>
@@ -92,7 +92,7 @@ const AIDiagnostics = () => {
                 <CardHeader>
                   <CardTitle>Symptom Analysis</CardTitle>
                   <CardDescription>
-                    Describe your symptoms and get an AI-powered analysis from MedGemma
+                    Describe your symptoms and get an AI-powered analysis from Doc 0 Clock
                   </CardDescription>
                 </CardHeader>
                 <CardContent>

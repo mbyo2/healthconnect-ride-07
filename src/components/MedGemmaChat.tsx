@@ -17,7 +17,7 @@ export const MedGemmaChat = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: 'Hello! I\'m MedGemma, your AI medical assistant. I can help you understand symptoms, discuss health concerns, and provide medical information. How can I assist you today?',
+      content: 'Hello! I\'m Doc 0 Clock, your AI medical assistant. I can help you understand symptoms, discuss health concerns, and provide medical information. How can I assist you today?',
       timestamp: new Date()
     }
   ]);
@@ -84,7 +84,7 @@ export const MedGemmaChat = () => {
       <CardHeader className="border-b">
         <CardTitle className="flex items-center gap-2">
           <Bot className="h-5 w-5 text-primary" />
-          MedGemma AI Assistant
+          Doc 0 Clock Assistant
         </CardTitle>
       </CardHeader>
       
@@ -161,7 +161,7 @@ export const MedGemmaChat = () => {
             </Button>
           </div>
           <p className="text-xs text-muted-foreground mt-2">
-            💡 Powered by MedGemma AI - For informational purposes only. Always consult a healthcare professional.
+            💡 Powered by Doc 0 Clock AI - For informational purposes only. Always consult a healthcare professional.
           </p>
         </div>
       </CardContent>

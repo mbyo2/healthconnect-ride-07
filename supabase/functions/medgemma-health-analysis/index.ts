@@ -22,7 +22,7 @@ serve(async (req) => {
     const hf = new HfInference(HF_TOKEN);
     
     let prompt = '';
-    let systemContext = `You are MedGemma, a medical AI assistant. Provide accurate, evidence-based medical insights. 
+    let systemContext = `You are Doc 0 Clock, a medical AI assistant available 24/7. Provide accurate, evidence-based medical insights. 
 Always include:
 1. Clear analysis
 2. Specific recommendations
