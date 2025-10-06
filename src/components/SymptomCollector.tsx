@@ -82,10 +82,10 @@ export const SymptomCollector = ({ onSymptomSubmit }: SymptomCollectorProps) => 
 
   return (
     <div className="space-y-4 w-full max-w-2xl mx-auto">
-      <form onSubmit={handleSubmit} className="space-y-4 p-4">
+      <form onSubmit={handleSubmit} className="space-y-4 p-3 sm:p-4">
         <div>
-          <label htmlFor="symptoms" className="block text-sm font-medium mb-1">
-            Describe your symptoms
+          <label htmlFor="symptoms" className="block text-xs sm:text-sm font-medium mb-1.5 sm:mb-2">
+            Describe your symptoms *
           </label>
           <Input
             id="symptoms"
@@ -97,12 +97,12 @@ export const SymptomCollector = ({ onSymptomSubmit }: SymptomCollectorProps) => 
               }
             }}
             placeholder="Enter your symptoms in detail..."
-            className={errors.symptoms ? "border-destructive" : ""}
+            className={`text-xs sm:text-sm ${errors.symptoms ? "border-destructive" : ""}`}
             disabled={isSubmitting}
             required
           />
           {errors.symptoms && (
-            <p className="text-sm text-destructive mt-1 flex items-center gap-1">
+            <p className="text-xs sm:text-sm text-destructive mt-1 flex items-center gap-1">
               <AlertCircle className="h-3 w-3" />
               {errors.symptoms}
             </p>
@@ -110,14 +110,14 @@ export const SymptomCollector = ({ onSymptomSubmit }: SymptomCollectorProps) => 
         </div>
         
         <div>
-          <label htmlFor="urgency" className="block text-sm font-medium mb-1">
+          <label htmlFor="urgency" className="block text-xs sm:text-sm font-medium mb-1.5 sm:mb-2">
             Urgency Level
           </label>
           <select
             id="urgency"
             value={urgency}
             onChange={(e) => setUrgency(e.target.value)}
-            className="w-full rounded-md border border-input bg-background px-3 py-2"
+            className="w-full rounded-md border border-input bg-background px-3 py-2 text-xs sm:text-sm"
             disabled={isSubmitting}
           >
             <option value="low">Low - Can wait for appointment</option>
@@ -128,12 +128,12 @@ export const SymptomCollector = ({ onSymptomSubmit }: SymptomCollectorProps) => 
         
         <Button 
           type="submit" 
-          className="w-full sm:w-auto"
+          className="w-full sm:w-auto text-xs sm:text-sm"
           disabled={isSubmitting}
         >
           {isSubmitting ? (
             <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <Loader2 className="mr-2 h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
               Analyzing with AI...
             </>
           ) : (
@@ -143,15 +143,15 @@ export const SymptomCollector = ({ onSymptomSubmit }: SymptomCollectorProps) => 
       </form>
 
       {aiAnalysis && (
-        <Card className="border-primary/20">
-          <CardContent className="pt-6">
-            <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
-              <span className="text-primary">🤖</span> MedGemma AI Analysis
+        <Card className="border-primary/20 mx-3 sm:mx-0">
+          <CardContent className="pt-4 sm:pt-6">
+            <h3 className="font-semibold text-base sm:text-lg mb-2 sm:mb-3 flex items-center gap-2">
+              <span className="text-primary">🤖</span> Doc 0 Clock AI Analysis
             </h3>
             <div className="prose prose-sm max-w-none text-foreground">
-              <p className="whitespace-pre-wrap">{aiAnalysis}</p>
+              <p className="whitespace-pre-wrap text-xs sm:text-sm leading-relaxed">{aiAnalysis}</p>
             </div>
-            <div className="mt-4 p-3 bg-muted rounded-md text-xs text-muted-foreground">
+            <div className="mt-3 sm:mt-4 p-2.5 sm:p-3 bg-muted rounded-md text-[10px] sm:text-xs text-muted-foreground leading-relaxed">
               ⚠️ This AI analysis is for informational purposes only and does not constitute medical advice. 
               Always consult with a qualified healthcare professional for medical decisions.
             </div>
