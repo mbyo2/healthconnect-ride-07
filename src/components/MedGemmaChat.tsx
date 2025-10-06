@@ -45,6 +45,7 @@ export const MedGemmaChat = () => {
     setIsLoading(true);
 
     try {
+      console.log('Calling medgemma-chat function...');
       const { data, error } = await supabase.functions.invoke('medgemma-chat', {
         body: {
           message: userMessage.content,
@@ -52,7 +53,16 @@ export const MedGemmaChat = () => {
         }
       });
 
-      if (error) throw error;
+      console.log('Function response:', { data, error });
+
+      if (error) {
+        console.error('Function error:', error);
+        throw new Error(error.message || 'Failed to get response from AI');
+      }
+
+      if (!data || !data.reply) {
+        throw new Error('Invalid response from AI - no reply received');
+      }
 
       const assistantMessage: Message = {
         role: 'assistant',
@@ -63,7 +73,8 @@ export const MedGemmaChat = () => {
       setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
       console.error('Error sending message:', error);
-      toast.error('Failed to get response. Please try again.');
+      const errorMessage = error instanceof Error ? error.message : 'Failed to get response. Please try again.';
+      toast.error(errorMessage);
       
       // Remove the user message if failed
       setMessages(prev => prev.slice(0, -1));
