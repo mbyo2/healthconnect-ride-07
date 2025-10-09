@@ -2631,6 +2631,30 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          granted_at: string | null
+          granted_by: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          granted_at?: string | null
+          granted_by?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          granted_at?: string | null
+          granted_by?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_sessions: {
         Row: {
           created_at: string | null
@@ -2912,6 +2936,17 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_user_role: {
+        Args: { _user_id: string }
+        Returns: Database["public"]["Enums"]["app_role"]
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       insert_applications_for_doctors: {
         Args: Record<PropertyKey, never>
         Returns: undefined
@@ -2962,6 +2997,7 @@ export type Database = {
     }
     Enums: {
       admin_level: "admin" | "superadmin"
+      app_role: "patient" | "health_personnel" | "admin" | "institution_admin"
       experience_level: "entry" | "intermediate" | "expert"
       healthcare_provider_type:
         | "doctor"
@@ -3111,6 +3147,7 @@ export const Constants = {
   public: {
     Enums: {
       admin_level: ["admin", "superadmin"],
+      app_role: ["patient", "health_personnel", "admin", "institution_admin"],
       experience_level: ["entry", "intermediate", "expert"],
       healthcare_provider_type: [
         "doctor",
