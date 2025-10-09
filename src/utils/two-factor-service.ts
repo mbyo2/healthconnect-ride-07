@@ -127,8 +127,7 @@ export const verifyTwoFactor = async (userId: string, code: string): Promise<boo
       await supabase
         .from('user_two_factor')
         .update({ 
-          backup_codes: updatedBackupCodes,
-          last_used: new Date().toISOString()
+          backup_codes: updatedBackupCodes
         })
         .eq('user_id', userId);
 
@@ -140,12 +139,7 @@ export const verifyTwoFactor = async (userId: string, code: string): Promise<boo
     const isValid = verifyTOTP(code, twoFactorData.secret);
 
     if (isValid) {
-      // Update last used timestamp
-      await supabase
-        .from('user_two_factor')
-        .update({ last_used: new Date().toISOString() })
-        .eq('user_id', userId);
-
+      // Update verification timestamp if needed
       logger.info('2FA verified successfully', 'TWO_FACTOR', { userId });
     } else {
       logger.warn('2FA verification failed', 'TWO_FACTOR', { userId });
@@ -229,7 +223,7 @@ export const getTwoFactorStatus = async (userId: string): Promise<TwoFactorStatu
   try {
     const { data, error } = await supabase
       .from('user_two_factor')
-      .select('enabled, backup_codes, last_used')
+      .select('enabled, backup_codes')
       .eq('user_id', userId)
       .single();
 
@@ -240,7 +234,7 @@ export const getTwoFactorStatus = async (userId: string): Promise<TwoFactorStatu
     return {
       enabled: data.enabled || false,
       backupCodesRemaining: data.backup_codes?.length || 0,
-      lastUsed: data.last_used ? new Date(data.last_used) : undefined,
+      lastUsed: undefined
     };
   } catch (error) {
     errorHandler.handleError(error, 'getTwoFactorStatus');
