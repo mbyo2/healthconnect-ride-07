@@ -1,10 +1,9 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { supabase } from '@/integrations/supabase/client';
 import { useSession } from '@supabase/auth-helpers-react';
-import { Header } from "@/components/Header";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -17,20 +16,28 @@ const Register = () => {
   }, [session, navigate]);
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <div className="container mx-auto px-4 pt-20 pb-24">
-        <div className="max-w-md mx-auto">
-          <h1 className="text-2xl font-bold mb-6 text-center">Create Account</h1>
+    <div className="min-h-screen bg-background flex items-center justify-center px-4">
+      <div className="w-full max-w-md">
+        <div className="mb-8 text-center">
+          <h1 className="text-3xl font-bold text-foreground">Create Account</h1>
+          <p className="text-muted-foreground mt-2">Join our healthcare platform</p>
+        </div>
+        <div className="bg-card p-8 rounded-lg shadow-lg border border-border">
           <Auth
             supabaseClient={supabase}
-            appearance={{ theme: ThemeSupa }}
-            providers={['google', 'github']}
+            appearance={{ 
+              theme: ThemeSupa,
+              style: {
+                button: { background: 'hsl(var(--primary))', color: 'hsl(var(--primary-foreground))' },
+                anchor: { color: 'hsl(var(--primary))' },
+              }
+            }}
+            providers={[]}
             view="sign_up"
+            showLinks={true}
             onlyThirdPartyProviders={false}
             magicLink={false}
-            socialLayout="horizontal"
-            redirectTo={`${window.location.origin}/`}
+            redirectTo={`${window.location.origin}/symptoms`}
           />
         </div>
       </div>
