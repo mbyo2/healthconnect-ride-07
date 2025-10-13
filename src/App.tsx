@@ -47,6 +47,10 @@ const NotFound = lazy(() => import('@/pages/NotFound'));
 const CreateAdmin = lazy(() => import('@/pages/CreateAdmin'));
 const Auth = lazy(() => import('@/pages/Auth'));
 const AIDiagnostics = lazy(() => import('@/pages/AIDiagnostics'));
+const Register = lazy(() => import('@/pages/Register'));
+const MedicalRecords = lazy(() => import('@/pages/MedicalRecords'));
+const VideoConsultations = lazy(() => import('@/pages/VideoConsultations'));
+const HealthDashboard = lazy(() => import('@/pages/HealthDashboard'));
 
 // Remove duplicate supabase client - using the one from integrations
 
@@ -94,6 +98,7 @@ const AppContent = () => {
               <Route path="/terms" element={<Terms />} />
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/contact" element={<Contact />} />
+              <Route path="/register" element={<Register />} />
               
               {/* Auth Route */}
               <Route
@@ -147,6 +152,10 @@ const AppContent = () => {
               <Route path="/healthcare-application" element={<RouteGuard><HealthcareApplication /></RouteGuard>} />
               <Route path="/create-admin" element={<RouteGuard><CreateAdmin /></RouteGuard>} />
               <Route path="/ai-diagnostics" element={<RouteGuard><AIDiagnostics /></RouteGuard>} />
+              <Route path="/home" element={<RouteGuard><Home /></RouteGuard>} />
+              <Route path="/medical-records" element={<RouteGuard><MedicalRecords /></RouteGuard>} />
+              <Route path="/video-consultations" element={<RouteGuard><VideoConsultations /></RouteGuard>} />
+              <Route path="/health-dashboard" element={<RouteGuard><HealthDashboard /></RouteGuard>} />
          
               {/* Payment Routes */}
               <Route path="/payment-success" element={<PaymentSuccess />} />
