@@ -100,7 +100,8 @@ const AppContent = () => {
               <Route path="/contact" element={<Contact />} />
               <Route path="/register" element={<Register />} />
               
-              {/* Auth Route */}
+              {/* Auth Routes */}
+              <Route path="/login" element={<Navigate to="/auth" replace />} />
               <Route
                 path="/auth"
                 element={

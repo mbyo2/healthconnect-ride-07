@@ -91,6 +91,7 @@ export const ROLE_LANDING_PAGES = {
 // Public routes that don't require authentication
 export const PUBLIC_ROUTES = [
   '/auth',
+  '/login',
   '/register',
   '/landing',
   '/healthcare-professionals',
