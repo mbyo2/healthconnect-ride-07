@@ -1,10 +1,17 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
+import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+// Input validation schema
+const captureRequestSchema = z.object({
+  paymentId: z.string().min(1, 'Payment ID required').max(100),
+  paypalOrderId: z.string().min(1, 'PayPal order ID required').max(100)
+});
 
 interface PayPalCaptureRequest {
   paymentId: string;
@@ -46,11 +53,23 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const { paymentId, paypalOrderId } = await req.json() as PayPalCaptureRequest;
-
-    if (!paymentId || !paypalOrderId) {
-      throw new Error('Missing required fields: paymentId and paypalOrderId');
+    // Validate input
+    const requestData = await req.json();
+    const validationResult = captureRequestSchema.safeParse(requestData);
+    
+    if (!validationResult.success) {
+      console.error('Validation error:', validationResult.error);
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: 'Invalid request data',
+          details: validationResult.error.errors
+        }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
+
+    const { paymentId, paypalOrderId } = validationResult.data;
 
     // Get payment record
     const { data: payment, error: paymentError } = await supabaseClient

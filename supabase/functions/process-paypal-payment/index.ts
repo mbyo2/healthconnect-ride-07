@@ -1,10 +1,22 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
+import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+// Input validation schema
+const paypalPaymentSchema = z.object({
+  amount: z.number().positive().max(1000000, 'Amount exceeds maximum'),
+  currency: z.enum(['USD', 'EUR', 'GBP', 'KES', 'UGX', 'TZS']),
+  patientId: z.string().uuid('Invalid patient ID'),
+  providerId: z.string().uuid('Invalid provider ID'),
+  serviceId: z.string().max(200, 'Service ID too long'),
+  redirectUrl: z.string().url('Invalid redirect URL'),
+  paymentMethod: z.string().max(50)
+});
 
 interface PayPalPaymentRequest {
   amount: number;
@@ -44,11 +56,30 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const { amount, currency, patientId, providerId, serviceId, redirectUrl } = await req.json() as PayPalPaymentRequest;
+    // Validate input
+    const requestData = await req.json();
+    const validationResult = paypalPaymentSchema.safeParse(requestData);
+    
+    if (!validationResult.success) {
+      console.error('Validation error:', validationResult.error);
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: 'Invalid request data',
+          details: validationResult.error.errors
+        }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
-    // Validate required fields
-    if (!amount || !patientId || !providerId || !serviceId) {
-      throw new Error('Missing required payment fields');
+    const { amount, currency, patientId, providerId, serviceId, redirectUrl } = validationResult.data;
+
+    // Prevent self-payment
+    if (patientId === providerId) {
+      return new Response(
+        JSON.stringify({ success: false, error: 'Cannot process payment to yourself' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     // Create payment record in our database first
