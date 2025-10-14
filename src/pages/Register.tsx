@@ -17,8 +17,8 @@ const Register = () => {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4">
-      <div className="w-full max-w-md">
-        <div className="mb-8 text-center">
+      <div className="w-full max-w-md space-y-8">
+        <div className="text-center">
           <h1 className="text-3xl font-bold text-foreground">Create Account</h1>
           <p className="text-muted-foreground mt-2">Join our healthcare platform</p>
         </div>
@@ -27,15 +27,18 @@ const Register = () => {
             supabaseClient={supabase}
             appearance={{ 
               theme: ThemeSupa,
-              style: {
-                button: { background: 'hsl(var(--primary))', color: 'hsl(var(--primary-foreground))' },
-                anchor: { color: 'hsl(var(--primary))' },
+              variables: {
+                default: {
+                  colors: {
+                    brand: 'hsl(var(--primary))',
+                    brandAccent: 'hsl(var(--primary))',
+                  }
+                }
               }
             }}
             providers={[]}
             view="sign_up"
             showLinks={true}
-            onlyThirdPartyProviders={false}
             magicLink={false}
             redirectTo={`${window.location.origin}/symptoms`}
           />
