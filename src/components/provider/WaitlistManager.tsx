@@ -93,10 +93,10 @@ export const WaitlistManager = () => {
             {waitlist.map((item) => (
               <TableRow key={item.id}>
                 <TableCell>
-                  {item.patient.first_name} {item.patient.last_name}
+                  {item.patient?.first_name ?? 'Unknown'} {item.patient?.last_name ?? ''}
                 </TableCell>
                 <TableCell>
-                  {new Date(item.check_in_time).toLocaleTimeString()}
+                  {item.check_in_time ? new Date(item.check_in_time).toLocaleTimeString() : '—'}
                 </TableCell>
                 <TableCell>
                   <Button

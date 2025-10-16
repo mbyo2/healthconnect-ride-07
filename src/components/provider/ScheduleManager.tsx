@@ -48,7 +48,7 @@ export const ScheduleManager = () => {
           )
         `)
         .eq('provider_id', user.id)
-        .eq('date', selectedDate?.toISOString().split('T')[0])
+        .eq('date', selectedDate ? selectedDate.toISOString().split('T')[0] : undefined)
         .order('time');
 
       if (error) throw error;
@@ -104,7 +104,7 @@ export const ScheduleManager = () => {
                 <TableRow key={appointment.id}>
                   <TableCell>{appointment.time}</TableCell>
                   <TableCell>
-                    {appointment.patient.first_name} {appointment.patient.last_name}
+                    {appointment.patient?.first_name ?? 'Unknown'} {appointment.patient?.last_name ?? ''}
                   </TableCell>
                   <TableCell>{appointment.type}</TableCell>
                   <TableCell>
