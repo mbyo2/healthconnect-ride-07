@@ -87,7 +87,7 @@ export const ProviderPortal = () => {
 
   const handleProviderSignUp = async (email: string, password: string) => {
     try {
-      const { data, error } = await supabase.auth.signUp({
+      const response = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -97,8 +97,11 @@ export const ProviderPortal = () => {
         }
       });
 
-      if (error) throw error;
-      
+      // eslint-disable-next-line no-console
+      console.debug('ProviderPortal signUp response:', response);
+
+      if (response.error) throw response.error;
+
       toast.success("Check your email to confirm your registration");
     } catch (error: any) {
       toast.error(error.message);

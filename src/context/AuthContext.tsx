@@ -133,17 +133,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signUp = async (email: string, password: string, userData = {}) => {
     try {
-      const { data, error } = await supabase.auth.signUp({
+      const response = await supabase.auth.signUp({
         email,
         password,
         options: { data: userData }
       });
 
-      if (error) {
-        return { error, data: null };
+      // eslint-disable-next-line no-console
+      console.debug('AuthContext signUp response:', response);
+
+      if (response.error) {
+        return { error: response.error, data: null };
       }
 
-      return { data, error: null };
+      return { data: response.data, error: null };
     } catch (error) {
       console.error('Error in signUp:', error);
       return { error, data: null };

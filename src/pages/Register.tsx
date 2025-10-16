@@ -37,7 +37,7 @@ const Register = () => {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signUp({
+      const response = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -45,12 +45,23 @@ const Register = () => {
         }
       });
 
-      if (error) throw error;
+      // supabase v2 returns { data, error }
+      // log full response to help debugging in dev
+      // eslint-disable-next-line no-console
+      console.debug('signUp response:', response);
+
+      if (response.error) {
+        // surface richer error information
+        throw response.error;
+      }
 
       toast.success('Account created! Please check your email to verify your account.');
       navigate('/auth');
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to create account');
+    } catch (err: any) {
+      // log for diagnostics and show friendly message
+      // eslint-disable-next-line no-console
+      console.error('Register error:', err);
+      toast.error(err?.message || JSON.stringify(err) || 'Failed to create account');
     } finally {
       setLoading(false);
     }

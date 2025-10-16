@@ -224,7 +224,7 @@ const onPatientSignupSubmit = async (data: PatientSignupFormValues) => {
   try {
     setError(null);
     setLocalLoading(true);
-    const { error } = await supabase.auth.signUp({
+    const response = await supabase.auth.signUp({
       email: data.email,
       password: data.password,
       options: {
@@ -235,16 +235,20 @@ const onPatientSignupSubmit = async (data: PatientSignupFormValues) => {
         },
       },
     });
-    
-    if (error) throw error;
-    
+
+    // eslint-disable-next-line no-console
+    console.debug('patient signUp response:', response);
+
+    if (response.error) throw response.error;
+
     showSuccess("Account created! Please verify your email address.");
     toast.success("Account created! Please verify your email address.");
     setActiveTab("signin");
   } catch (err: any) {
-    const errorMessage = err.message || "Failed to create account";
+    const errorMessage = err?.message || "Failed to create account";
     setError(errorMessage);
     showError(errorMessage);
+    // eslint-disable-next-line no-console
     console.error("Patient signup error:", err);
     toast.error(errorMessage);
   } finally {
@@ -257,7 +261,7 @@ const onProviderSignupSubmit = async (data: ProviderSignupFormValues) => {
   try {
     setError(null);
     setLocalLoading(true);
-    const { error } = await supabase.auth.signUp({
+    const response = await supabase.auth.signUp({
       email: data.email,
       password: data.password,
       options: {
@@ -275,16 +279,20 @@ const onProviderSignupSubmit = async (data: ProviderSignupFormValues) => {
         },
       },
     });
-    
-    if (error) throw error;
-    
+
+    // eslint-disable-next-line no-console
+    console.debug('provider signUp response:', response);
+
+    if (response.error) throw response.error;
+
     showSuccess("Account created! Please verify your email address.");
     toast.success("Account created! Please verify your email address.");
     setActiveTab("signin");
   } catch (err: any) {
-    const errorMessage = err.message || "Failed to create account";
+    const errorMessage = err?.message || "Failed to create account";
     setError(errorMessage);
     showError(errorMessage);
+    // eslint-disable-next-line no-console
     console.error("Provider signup error:", err);
     toast.error(errorMessage);
   } finally {

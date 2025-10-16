@@ -92,7 +92,7 @@ export const AuthForm = ({ mode = 'login' }: AuthFormProps) => {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signUp({
+      const response = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -100,10 +100,15 @@ export const AuthForm = ({ mode = 'login' }: AuthFormProps) => {
         }
       });
 
-      if (error) throw error;
+      // eslint-disable-next-line no-console
+      console.debug('AuthForm signUp response:', response);
+
+      if (response.error) throw response.error;
 
       toast.success('Account created! Please check your email to verify your account.');
     } catch (error: any) {
+      // eslint-disable-next-line no-console
+      console.error('AuthForm register error:', error);
       toast.error(error.message || 'Failed to create account');
     } finally {
       setLoading(false);

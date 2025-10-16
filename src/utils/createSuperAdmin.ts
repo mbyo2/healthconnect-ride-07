@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 export async function createSuperAdmin(email: string, password: string, firstName: string, lastName: string) {
   try {
     // Create the user with Supabase auth
-    const { data: authData, error: authError } = await supabase.auth.signUp({
+    const response = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -16,11 +16,14 @@ export async function createSuperAdmin(email: string, password: string, firstNam
         }
       }
     });
-      
-    if (authError) throw authError;
-    
+
+    // eslint-disable-next-line no-console
+    console.debug('createSuperAdmin signUp response:', response);
+
+    if (response.error) throw response.error;
+
     // Update user profile with names and admin level
-    if (authData.user) {
+    if (response.data?.user) {
       const { error: updateError } = await supabase
         .from('profiles')
         .update({
@@ -30,12 +33,12 @@ export async function createSuperAdmin(email: string, password: string, firstNam
           admin_level: 'superadmin',
           is_profile_complete: true
         })
-        .eq('id', authData.user.id);
+        .eq('id', response.data.user.id);
         
       if (updateError) throw updateError;
     }
     
-    return { success: true, userId: authData.user?.id };
+    return { success: true, userId: response.data.user?.id };
   } catch (error: any) {
     console.error("Error creating superadmin:", error);
     return { success: false, error: error.message || "Failed to create superadmin" };
