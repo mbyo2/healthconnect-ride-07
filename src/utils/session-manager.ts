@@ -1,6 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { errorHandler } from './error-handler';
 import { logger } from './logger';
+import { safeLocalGet, safeLocalSet, safeCryptoUUID } from './storage';
 
 export interface SessionInfo {
   id: string;
@@ -38,15 +39,7 @@ class SessionManager {
   async createSession(userId: string): Promise<string> {
     // TEMPORARILY DISABLED - Returns mock session ID
     logger.info('Session creation temporarily disabled', 'SESSION', { userId });
-    try {
-      if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
-        return crypto.randomUUID();
-      }
-    } catch (err) {
-      // Fall back to a safe string
-    }
-
-    return `${Date.now()}-${Math.random()}`;
+    return safeCryptoUUID();
   }
 
   async validateSession(sessionId: string): Promise<boolean> {
@@ -97,12 +90,12 @@ class SessionManager {
     events.forEach(event => {
       document.addEventListener(event, this.throttle(() => {
         try {
-          const sessionId = typeof localStorage !== 'undefined' ? localStorage.getItem('current-session-id') : null;
+          const sessionId = safeLocalGet('current-session-id');
           if (sessionId) {
             this.updateSessionActivity(sessionId);
           }
         } catch (err) {
-          // localStorage may be blocked (e.g., private browsing) — ignore
+          // safeLocalGet already handles warnings
         }
       }, this.ACTIVITY_UPDATE_INTERVAL), true);
     });
@@ -122,15 +115,7 @@ class SessionManager {
   }
 
   private generateSessionId(): string {
-    try {
-      if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
-        return crypto.randomUUID();
-      }
-    } catch (err) {
-      // ignore and fallback
-    }
-
-    return `${Date.now()}-${Math.random()}`;
+    return safeCryptoUUID();
   }
 
   private getDeviceInfo(): { device: string; location: string } {

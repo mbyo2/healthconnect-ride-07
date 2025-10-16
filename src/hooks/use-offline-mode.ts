@@ -1,6 +1,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useToast } from '@/components/ui/use-toast';
+import { openIndexedDB, safeCryptoUUID } from '@/utils/storage';
 
 export interface OfflineAction {
   id: string;  // Single id property
@@ -74,7 +75,7 @@ export const useOfflineMode = () => {
   // Load pending actions from IndexedDB (resilient to environments where IndexedDB is blocked)
   const loadPendingActions = async () => {
     try {
-      const db = await openOfflineDB();
+  const db = await openIndexedDB('offlineActionsDB', 1);
       if (!db) {
         // IndexedDB unavailable (e.g., Safari private mode) - silently continue with empty pending actions
         setPendingActions([]);
@@ -104,11 +105,11 @@ export const useOfflineMode = () => {
     try {
       const actionWithMeta: OfflineAction = {
         ...action,
-        id: action.id || (typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`),
+        id: action.id || safeCryptoUUID(),
         timestamp: new Date().toISOString(),
       };
       
-      const db = await openOfflineDB();
+      const db = await openIndexedDB('offlineActionsDB', 1);
       if (!db) {
         // IndexedDB unavailable - fall back to in-memory queue
         setPendingActions(prev => [...prev, actionWithMeta]);
@@ -174,7 +175,7 @@ export const useOfflineMode = () => {
   // Remove an action after it's been processed
   const removeCompletedAction = async (actionId: string) => {
     try {
-      const db = await openOfflineDB();
+      const db = await openIndexedDB('offlineActionsDB', 1);
       if (!db) {
         // If no DB, just remove from in-memory queue
         setPendingActions(prev => prev.filter(a => a.id !== actionId));
@@ -194,7 +195,7 @@ export const useOfflineMode = () => {
   // Cache data for offline use
   const cacheForOffline = async (key: string, data: any, expirationMinutes = 60): Promise<boolean> => {
     try {
-      const db = await openOfflineDB();
+      const db = await openIndexedDB('offlineActionsDB', 1);
       if (!db) {
         // IndexedDB unavailable - skip caching but don't fail
         return false;
@@ -220,7 +221,7 @@ export const useOfflineMode = () => {
   // Get cached data
   const getOfflineCache = async (key: string): Promise<any | null> => {
     try {
-      const db = await openOfflineDB();
+      const db = await openIndexedDB('offlineActionsDB', 1);
       if (!db) return null;
 
       const tx = db.transaction('offlineData', 'readonly');

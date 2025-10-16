@@ -20,6 +20,7 @@ import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
 import { useOfflineMode } from '@/hooks/use-offline-mode';
+import { safeLocalGet, safeLocalSet, safeCryptoUUID } from '@/utils/storage';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Loader2, AlertTriangle, Pill } from 'lucide-react';
 
@@ -88,8 +89,8 @@ export function PrescriptionFulfillment() {
 
         // Load fulfillment data from localStorage since we don't have that table in Supabase yet
         // In a real app, you would create this table in Supabase
-        const storedFulfillments = localStorage.getItem('prescription_fulfillments');
-        const fulfillmentData = storedFulfillments ? JSON.parse(storedFulfillments) : [];
+  const storedFulfillments = safeLocalGet('prescription_fulfillments');
+  const fulfillmentData = storedFulfillments ? JSON.parse(storedFulfillments) : [];
         
         // Transform the data
         const prescriptionsWithStatus = prescriptionsData.map(prescription => {
@@ -157,7 +158,7 @@ export function PrescriptionFulfillment() {
       // If offline, queue the update for later
       if (!isOnline) {
         await queueOfflineAction({
-          id: (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`,
+          id: safeCryptoUUID(),
           type: 'UPDATE_PRESCRIPTION_STATUS',
           table: 'prescription_fulfillments',
           data: { 
@@ -178,7 +179,7 @@ export function PrescriptionFulfillment() {
       // In a real app, you should create this table in Supabase
       let currentFulfillments: any[] = [];
       try {
-        const storedFulfillments = typeof localStorage !== 'undefined' ? localStorage.getItem('prescription_fulfillments') : null;
+        const storedFulfillments = safeLocalGet('prescription_fulfillments');
         currentFulfillments = storedFulfillments ? JSON.parse(storedFulfillments) : [];
       } catch (err) {
         console.warn('Unable to read prescription_fulfillments from localStorage:', err);
@@ -208,9 +209,7 @@ export function PrescriptionFulfillment() {
       
       // Save back to localStorage
       try {
-        if (typeof localStorage !== 'undefined') {
-          localStorage.setItem('prescription_fulfillments', JSON.stringify(currentFulfillments));
-        }
+        safeLocalSet('prescription_fulfillments', JSON.stringify(currentFulfillments));
       } catch (err) {
         console.warn('Unable to persist prescription_fulfillments to localStorage:', err);
       }
@@ -335,7 +334,7 @@ export function PrescriptionFulfillment() {
               <Select 
                 value={prescription.fulfillment_status || 'pending'} 
                 onValueChange={(value) => updateFulfillmentStatus(prescription.id, value)}
-                disabled={!isOnline && !localStorage.getItem('offlineModePrescriptionUpdatesEnabled')}
+                disabled={!isOnline && !safeLocalGet('offlineModePrescriptionUpdatesEnabled')}
               >
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="Status" />

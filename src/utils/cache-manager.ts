@@ -1,4 +1,6 @@
 
+import { openIndexedDB } from './storage';
+
 interface CachedData {
   data: any;
   timestamp: number;
@@ -6,7 +8,7 @@ interface CachedData {
 
 export const cacheData = async (key: string, data: any, expirationMinutes = 60): Promise<boolean> => {
   try {
-    const db = await openDB();
+  const db = await openIndexedDB('healthCacheDB', 1);
     if (!db) return false;
     const tx = db.transaction('cachedData', 'readwrite');
     const store = tx.objectStore('cachedData');
@@ -26,7 +28,7 @@ export const cacheData = async (key: string, data: any, expirationMinutes = 60):
 
 export const getCachedData = async (key: string): Promise<any | null> => {
   try {
-    const db = await openDB();
+  const db = await openIndexedDB('healthCacheDB', 1);
     if (!db) return null;
     const tx = db.transaction('cachedData', 'readonly');
     const store = tx.objectStore('cachedData');
@@ -59,8 +61,8 @@ export const getCachedData = async (key: string): Promise<any | null> => {
 
 export const removeCachedData = async (key: string): Promise<boolean> => {
   try {
-    const db = await openDB();
-    if (!db) return false;
+  const db = await openIndexedDB('healthCacheDB', 1);
+  if (!db) return false;
     const tx = db.transaction('cachedData', 'readwrite');
     const store = tx.objectStore('cachedData');
     
@@ -74,8 +76,8 @@ export const removeCachedData = async (key: string): Promise<boolean> => {
 
 export const clearCache = async (): Promise<boolean> => {
   try {
-    const db = await openDB();
-    if (!db) return false;
+  const db = await openIndexedDB('healthCacheDB', 1);
+  if (!db) return false;
     const tx = db.transaction('cachedData', 'readwrite');
     const store = tx.objectStore('cachedData');
     
@@ -87,36 +89,4 @@ export const clearCache = async (): Promise<boolean> => {
   }
 };
 
-// Helper function to open IndexedDB. Returns null when unavailable/blocked.
-const openDB = (): Promise<IDBDatabase | null> => {
-  return new Promise((resolve) => {
-    try {
-      if (typeof indexedDB === 'undefined' || indexedDB === null) {
-        resolve(null);
-        return;
-      }
-
-      const request = indexedDB.open('healthCacheDB', 1);
-
-      request.onerror = () => {
-        console.warn('IndexedDB open error (cache-manager):', request.error);
-        resolve(null);
-      };
-
-      request.onsuccess = () => {
-        resolve(request.result);
-      };
-
-      request.onupgradeneeded = (event) => {
-        const db = (event.target as IDBOpenDBRequest).result;
-
-        if (!db.objectStoreNames.contains('cachedData')) {
-          db.createObjectStore('cachedData');
-        }
-      };
-    } catch (err) {
-      console.warn('IndexedDB unavailable (cache-manager):', err);
-      resolve(null);
-    }
-  });
-};
+// openIndexedDB is used from src/utils/storage

@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { safeLocalRemove, safeLocalClear, safeSessionRemove, safeSessionClear } from '@/utils/storage';
 
 interface LoadingScreenProps {
   message?: string;
@@ -73,34 +74,14 @@ export const LoadingScreen = React.memo<LoadingScreenProps>(({
   }, [timeout]);
 
   const handleRefresh = useCallback(() => {
-    try {
-      if (typeof sessionStorage !== 'undefined') sessionStorage.removeItem('auth-error');
-    } catch (err) {
-      // ignore
-    }
-
-    try {
-      if (typeof localStorage !== 'undefined') localStorage.removeItem('loading-error');
-    } catch (err) {
-      // ignore
-    }
-
+    safeSessionRemove('auth-error');
+    safeLocalRemove('loading-error');
     window.location.reload();
   }, []);
 
   const handleClearCacheAndReload = useCallback(() => {
-    try {
-      if (typeof localStorage !== 'undefined') localStorage.clear();
-    } catch (err) {
-      // ignore
-    }
-
-    try {
-      if (typeof sessionStorage !== 'undefined') sessionStorage.clear();
-    } catch (err) {
-      // ignore
-    }
-
+    safeLocalClear();
+    safeSessionClear();
     window.location.reload();
   }, []);
 

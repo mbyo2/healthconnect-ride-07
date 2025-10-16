@@ -14,6 +14,8 @@ export interface LogEntry {
   userId?: string;
 }
 
+import { safeLocalGet, safeLocalSet, safeLocalRemove } from './storage';
+
 export class Logger {
   private static instance: Logger;
   private logs: LogEntry[] = [];
@@ -108,15 +110,13 @@ export class Logger {
     // For now, just store for potential batch upload
     if (typeof window !== 'undefined') {
       try {
-        const storedLogs = (typeof localStorage !== 'undefined' ? localStorage.getItem('app_logs') : null) || '[]';
-        const logs = JSON.parse(storedLogs);
+        const storedLogs = safeLocalGet('app_logs') || '[]';
+        const logs = JSON.parse(storedLogs as string);
         logs.push(entry);
-        
+
         // Keep only last 100 logs in localStorage
         const trimmedLogs = logs.slice(-100);
-        if (typeof localStorage !== 'undefined') {
-          localStorage.setItem('app_logs', JSON.stringify(trimmedLogs));
-        }
+        safeLocalSet('app_logs', JSON.stringify(trimmedLogs));
       } catch (err) {
         // localStorage may be unavailable/blocked; ignore
         console.warn('Unable to persist logs to localStorage:', err);
@@ -142,7 +142,7 @@ export class Logger {
     this.logs = [];
     if (typeof window !== 'undefined') {
       try {
-        if (typeof localStorage !== 'undefined') localStorage.removeItem('app_logs');
+        safeLocalRemove('app_logs');
       } catch (err) {
         // ignore
       }
