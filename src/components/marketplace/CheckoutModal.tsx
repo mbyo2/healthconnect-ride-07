@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,6 +11,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { DeliveryCalculator } from './DeliveryCalculator';
+import { toast } from 'sonner';
 
 interface CheckoutModalProps {
   isOpen: boolean;
@@ -72,11 +73,30 @@ export const CheckoutModal = ({
     return acc;
   }, [] as any[]);
 
+  // Auto-select pharmacy if there's only one
+  useEffect(() => {
+    if (pharmacies.length === 1 && !formData.pharmacy_id) {
+      setFormData(prev => ({ ...prev, pharmacy_id: pharmacies[0].id }));
+    }
+  }, [pharmacies]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!safeCart.items || safeCart.items.length === 0) {
+      toast.error('Your cart is empty');
+      return;
+    }
+
     if (requiresPrescription && !formData.prescription_id) {
-      alert('Please select a prescription for prescription medications');
+      toast.error('Please select a prescription for prescription medications');
+      return;
+    }
+
+    // Basic phone validation (very permissive)
+    const phone = (formData.delivery_phone || '').replace(/[^0-9+]/g, '');
+    if (phone.length < 7) {
+      toast.error('Please enter a valid phone number');
       return;
     }
 
