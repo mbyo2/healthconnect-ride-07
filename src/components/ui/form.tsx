@@ -20,10 +20,12 @@ type FormFieldContextValue<
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
 > = {
   name: TName
+  control?: any
 }
 
-const FormFieldContext = React.createContext<FormFieldContextValue>(
-  {} as FormFieldContextValue
+// Default to undefined so we can detect missing provider and give clearer errors
+const FormFieldContext = React.createContext<FormFieldContextValue | undefined>(
+  undefined
 )
 
 const FormField = <
@@ -33,7 +35,7 @@ const FormField = <
   ...props
 }: ControllerProps<TFieldValues, TName>) => {
   return (
-    <FormFieldContext.Provider value={{ name: props.name }}>
+    <FormFieldContext.Provider value={{ name: props.name, control: (props as any).control }}>
       <Controller {...props} />
     </FormFieldContext.Provider>
   )
@@ -42,13 +44,64 @@ const FormField = <
 const useFormField = () => {
   const fieldContext = React.useContext(FormFieldContext)
   const itemContext = React.useContext(FormItemContext)
-  const { getFieldState, formState } = useFormContext()
+
+  // If contexts are missing, return safe defaults and warn instead of crashing
+  if (!fieldContext || !itemContext) {
+    // eslint-disable-next-line no-console
+    console.warn('[ui/form] Form context missing. Make sure your fields are wrapped with <Form>, <FormItem> and <FormField>. Falling back to safe defaults.')
+
+    const fallbackId = React.useId()
+    const fallbackState = {
+      invalid: false,
+      isTouched: false,
+      isDirty: false,
+      error: undefined,
+    }
+
+    return {
+      id: fallbackId,
+      name: fieldContext?.name ?? ('unknown' as any),
+      formItemId: `${fallbackId}-form-item`,
+      formDescriptionId: `${fallbackId}-form-item-description`,
+      formMessageId: `${fallbackId}-form-item-message`,
+      ...fallbackState,
+    }
+  }
+
+  // Guard useFormContext: if the component is not wrapped with FormProvider this
+  // can throw or return undefined depending on react-hook-form version/build.
+  let formContext: any
+  try {
+    formContext = useFormContext()
+  } catch (err) {
+    formContext = undefined
+  }
+
+  if (!formContext || typeof formContext.getFieldState !== 'function') {
+    // eslint-disable-next-line no-console
+    console.warn('[ui/form] useFormContext is not available. Returning empty field state to avoid crash.')
+
+    const fallbackId = React.useId()
+    const fallbackState = {
+      invalid: false,
+      isTouched: false,
+      isDirty: false,
+      error: undefined,
+    }
+
+    return {
+      id: fallbackId,
+      name: fieldContext.name,
+      formItemId: `${fallbackId}-form-item`,
+      formDescriptionId: `${fallbackId}-form-item-description`,
+      formMessageId: `${fallbackId}-form-item-message`,
+      ...fallbackState,
+    }
+  }
+
+  const { getFieldState, formState } = formContext
 
   const fieldState = getFieldState(fieldContext.name, formState)
-
-  if (!fieldContext) {
-    throw new Error("useFormField should be used within <FormField>")
-  }
 
   const { id } = itemContext
 
@@ -66,8 +119,8 @@ type FormItemContextValue = {
   id: string
 }
 
-const FormItemContext = React.createContext<FormItemContextValue>(
-  {} as FormItemContextValue
+const FormItemContext = React.createContext<FormItemContextValue | undefined>(
+  undefined
 )
 
 const FormItem = React.forwardRef<
