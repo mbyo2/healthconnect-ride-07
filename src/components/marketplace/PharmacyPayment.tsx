@@ -21,12 +21,12 @@ export const PharmacyPayment = ({ order, onPaymentSuccess }: PharmacyPaymentProp
     try {
       const { data, error } = await supabase.functions.invoke('process-payment-with-splits', {
         body: {
-          amount: order.total_amount,
+          amount: order?.total_amount ?? 0,
           currency: 'USD',
-          patientId: order.patient_id,
-          providerId: order.pharmacy_id, // Pharmacy as provider
-          serviceId: order.id,
-          institutionId: order.pharmacy_id,
+          patientId: order?.patient_id,
+          providerId: order?.pharmacy_id, // Pharmacy as provider
+          serviceId: order?.id,
+          institutionId: order?.pharmacy_id,
           paymentMethod: 'wallet',
           paymentType: 'pharmacy'
         }
@@ -34,11 +34,12 @@ export const PharmacyPayment = ({ order, onPaymentSuccess }: PharmacyPaymentProp
 
       if (error) throw error;
 
-      if (data.success) {
+      if (data && (data as any).success) {
         toast.success('Payment processed successfully!');
         onPaymentSuccess();
       } else {
-        throw new Error(data.error || 'Payment failed');
+        const msg = (data && (data as any).error) || 'Payment failed';
+        throw new Error(msg);
       }
     } catch (error) {
       console.error('Payment error:', error);
@@ -64,7 +65,7 @@ export const PharmacyPayment = ({ order, onPaymentSuccess }: PharmacyPaymentProp
         <div className="space-y-2">
           <div className="flex justify-between">
             <span>Order Total:</span>
-            <span className="font-medium">${order.total_amount.toFixed(2)}</span>
+            <span className="font-medium">${(order?.total_amount ?? 0).toFixed(2)}</span>
           </div>
           <div className="flex justify-between text-sm text-muted-foreground">
             <span>Pharmacy Commission (5%):</span>

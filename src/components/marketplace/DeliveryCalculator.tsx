@@ -68,20 +68,21 @@ export const DeliveryCalculator = ({ product, quantity, onDeliverySelect }: Deli
       'Schedule drugs',
       'Injectable medications'
     ];
-    
+    const category = (product.category || '').toString();
     return !restrictedCategories.some(cat => 
-      product.category.toLowerCase().includes(cat.toLowerCase())
+      category.toLowerCase().includes(cat.toLowerCase())
     );
   };
 
   const getRestrictionReason = (product: MarketplaceProduct): string => {
-    if (product.category.toLowerCase().includes('controlled')) {
+    const category = (product.category || '').toString();
+    if (category.toLowerCase().includes('controlled')) {
       return 'Controlled substances require in-person pickup under Zambian law';
     }
-    if (product.category.toLowerCase().includes('injectable')) {
+    if (category.toLowerCase().includes('injectable')) {
       return 'Injectable medications require pharmacy administration';
     }
-    if (product.category.toLowerCase().includes('narcotic')) {
+    if (category.toLowerCase().includes('narcotic')) {
       return 'Narcotic medications require in-person verification';
     }
     return 'This medication requires pharmacy pickup';
