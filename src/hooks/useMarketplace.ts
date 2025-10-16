@@ -1,15 +1,33 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { MarketplaceProduct, Order, Cart, CartItem } from '@/types/marketplace';
 import { toast } from 'sonner';
+import { safeLocalGet, safeLocalSet, safeLocalRemove } from '@/utils/storage';
 
 export const useMarketplace = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [cart, setCart] = useState<Cart>({ items: [], total: 0 });
+
+  // Load persisted cart from localStorage (resilient to blocked storage)
+  useEffect(() => {
+    try {
+      const raw = safeLocalGet('hc_cart_v1');
+      if (raw) {
+        const parsed = JSON.parse(raw) as Cart;
+        // Basic shape check
+        if (parsed && Array.isArray(parsed.items)) {
+          setCart(parsed);
+        }
+      }
+    } catch (err) {
+      // Ignore parse errors or storage issues
+      console.warn('Failed to load persisted cart:', err);
+    }
+  }, []);
 
   // Get all marketplace products
   const { data: products = [], isLoading: productsLoading } = useQuery({
@@ -75,7 +93,9 @@ export const useMarketplace = () => {
       }
 
       const total = newItems.reduce((sum, item) => sum + item.subtotal, 0);
-      return { items: newItems, total };
+      const newCart = { items: newItems, total };
+      try { safeLocalSet('hc_cart_v1', JSON.stringify(newCart)); } catch (e) { /* ignore */ }
+      return newCart;
     });
 
     toast.success(`${product.medication_name} added to cart`);
@@ -86,7 +106,9 @@ export const useMarketplace = () => {
     setCart(prev => {
       const newItems = prev.items.filter(item => item.product.id !== productId);
       const total = newItems.reduce((sum, item) => sum + item.subtotal, 0);
-      return { items: newItems, total };
+      const newCart = { items: newItems, total };
+      try { safeLocalSet('hc_cart_v1', JSON.stringify(newCart)); } catch (e) { /* ignore */ }
+      return newCart;
     });
   };
 
@@ -110,13 +132,16 @@ export const useMarketplace = () => {
       });
 
       const total = newItems.reduce((sum, item) => sum + item.subtotal, 0);
-      return { items: newItems, total };
+      const newCart = { items: newItems, total };
+      try { safeLocalSet('hc_cart_v1', JSON.stringify(newCart)); } catch (e) { /* ignore */ }
+      return newCart;
     });
   };
 
   // Clear cart
   const clearCart = () => {
     setCart({ items: [], total: 0 });
+    try { safeLocalRemove('hc_cart_v1'); } catch (e) { /* ignore */ }
   };
 
   // Place order mutation
