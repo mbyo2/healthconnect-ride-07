@@ -254,45 +254,7 @@ export const useOfflineMode = () => {
 
   // Open the offline database. Return null if IndexedDB is unavailable or blocked (e.g., Safari private mode)
   const openOfflineDB = (): Promise<IDBDatabase | null> => {
-    return new Promise((resolve, reject) => {
-      try {
-        if (typeof indexedDB === 'undefined' || indexedDB === null) {
-          // IndexedDB not available in this environment
-          resolve(null);
-          return;
-        }
-
-        const request = indexedDB.open('offlineActionsDB', 1);
-
-        request.onerror = () => {
-          // Some browsers throw a SecurityError (The operation is insecure) when IndexedDB is disabled.
-          // Resolve with null so callers can handle the absence of IndexedDB gracefully.
-          console.warn('IndexedDB open error:', request.error);
-          resolve(null);
-        };
-
-        request.onsuccess = () => {
-          resolve(request.result);
-        };
-
-        request.onupgradeneeded = (event) => {
-          const db = (event.target as IDBOpenDBRequest).result;
-
-          if (!db.objectStoreNames.contains('pendingActions')) {
-            const store = db.createObjectStore('pendingActions', { keyPath: 'id' });
-            store.createIndex('timestamp', 'timestamp', { unique: false });
-          }
-
-          if (!db.objectStoreNames.contains('offlineData')) {
-            const store = db.createObjectStore('offlineData', { keyPath: 'key' });
-            store.createIndex('timestamp', 'timestamp', { unique: false });
-          }
-        };
-      } catch (err) {
-        console.warn('IndexedDB unavailable or blocked:', err);
-        resolve(null);
-      }
-    });
+    return openIndexedDB('offlineActionsDB', 1);
   };
 
   return {

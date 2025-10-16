@@ -90,7 +90,12 @@ export function PrescriptionFulfillment() {
         // Load fulfillment data from localStorage since we don't have that table in Supabase yet
         // In a real app, you would create this table in Supabase
   const storedFulfillments = safeLocalGet('prescription_fulfillments');
-  const fulfillmentData = storedFulfillments ? JSON.parse(storedFulfillments) : [];
+  let fulfillmentData: any[] = [];
+  try {
+    fulfillmentData = storedFulfillments ? JSON.parse(storedFulfillments) : [];
+  } catch (e) {
+    fulfillmentData = [];
+  }
         
         // Transform the data
         const prescriptionsWithStatus = prescriptionsData.map(prescription => {
@@ -182,7 +187,7 @@ export function PrescriptionFulfillment() {
         const storedFulfillments = safeLocalGet('prescription_fulfillments');
         currentFulfillments = storedFulfillments ? JSON.parse(storedFulfillments) : [];
       } catch (err) {
-        console.warn('Unable to read prescription_fulfillments from localStorage:', err);
+        console.warn('Unable to read prescription_fulfillments from safe storage:', err);
         currentFulfillments = [];
       }
       

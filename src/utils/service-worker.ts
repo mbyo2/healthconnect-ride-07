@@ -1,3 +1,5 @@
+import { openIndexedDB, safeLocalGet, safeLocalSet } from '@/utils/storage';
+
 interface ExtendedServiceWorkerRegistration extends ServiceWorkerRegistration {
   sync?: {
     register: (tag: string) => Promise<void>;
@@ -147,33 +149,48 @@ export const registerBackgroundSync = async (tag: string = 'sync-data') => {
 // Optimized function to save data for offline sync
 export const saveForOfflineSync = async (action: any) => {
   try {
-    const db = await openDB();
-    const tx = db.transaction('pendingActions', 'readwrite');
-    const store = tx.objectStore('pendingActions');
-    
-    // Add unique ID and timestamp
-    const actionWithMeta = {
-      ...action,
-      id: Date.now().toString(),
-      timestamp: new Date().toISOString()
-    };
-    
-    await store.add(actionWithMeta);
-    
-    return new Promise<boolean>((resolve) => {
-      tx.oncomplete = () => {
-        if (navigator.onLine) {
-          registerBackgroundSync().then(() => resolve(true));
-        } else {
-          resolve(true);
-        }
+    // Try IndexedDB first using the safe wrapper
+    const db = await openIndexedDB('docOClockOfflineDB', 1);
+    if (db) {
+      const tx = db.transaction('pendingActions', 'readwrite');
+      const store = tx.objectStore('pendingActions');
+
+      // Add unique ID and timestamp
+      const actionWithMeta = {
+        ...action,
+        id: Date.now().toString(),
+        timestamp: new Date().toISOString()
       };
-      
-      tx.onerror = () => {
-        console.error('Transaction error:', tx.error);
-        resolve(false);
-      };
-    });
+
+      await store.add(actionWithMeta);
+
+      return new Promise<boolean>((resolve) => {
+        tx.oncomplete = () => {
+          if (navigator.onLine) {
+            registerBackgroundSync().then(() => resolve(true));
+          } else {
+            resolve(true);
+          }
+        };
+
+        tx.onerror = () => {
+          console.error('Transaction error:', tx.error);
+          resolve(false);
+        };
+      });
+    }
+
+    // Fallback: persist to safe local storage queue when IndexedDB unavailable
+    try {
+      const raw = safeLocalGet('offline_pending_actions') || '[]';
+      const queue = JSON.parse(raw);
+      queue.push({ ...action, id: Date.now().toString(), timestamp: new Date().toISOString() });
+      safeLocalSet('offline_pending_actions', JSON.stringify(queue));
+      return true;
+    } catch (err) {
+      console.error('Failed to persist offline action to fallback storage:', err);
+      return false;
+    }
   } catch (error) {
     console.error('Error saving action for offline sync:', error);
     return false;
@@ -218,17 +235,21 @@ export const clearCache = async (): Promise<boolean> => {
 
 // Helper function to open the IndexedDB database
 const openDB = async (): Promise<IDBDatabase> => {
-  return new Promise<IDBDatabase>((resolve, reject) => {
-    const request = indexedDB.open('docOClockOfflineDB', 1);
-    
-    request.onerror = () => reject(request.error);
-    request.onsuccess = () => resolve(request.result);
-    
-    request.onupgradeneeded = (event) => {
-      const db = (event.target as IDBOpenDBRequest).result;
-      if (!db.objectStoreNames.contains('pendingActions')) {
-        db.createObjectStore('pendingActions', { keyPath: 'id' });
-      }
-    };
-  });
+  // Use the safe helper; callers should handle null if IndexedDB is not available
+  const db = await openIndexedDB('docOClockOfflineDB', 1);
+  if (!db) throw new Error('IndexedDB unavailable');
+  // Ensure object store exists (safe check; may be noop)
+  try {
+    if (!db.objectStoreNames.contains('pendingActions')) {
+      const version = db.version + 1;
+      db.close();
+      // Re-open to trigger upgrade
+      const upgraded = await openIndexedDB('docOClockOfflineDB', version);
+      return upgraded as IDBDatabase;
+    }
+  } catch (err) {
+    // Ignore upgrade errors — caller will handle absence
+  }
+
+  return db;
 };

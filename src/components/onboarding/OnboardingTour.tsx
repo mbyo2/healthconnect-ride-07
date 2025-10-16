@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from 'react';
+import { safeLocalGet, safeLocalSet } from '@/utils/storage';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   X,
@@ -71,7 +72,7 @@ export function OnboardingTour({ onComplete }: { onComplete?: () => void }) {
 
   useEffect(() => {
     // Check if user has seen the tour before
-    const hasSeenTour = localStorage.getItem('hasCompletedOnboarding');
+  const hasSeenTour = safeLocalGet('hasCompletedOnboarding');
     if (!hasSeenTour) {
       // Delay opening to allow page to load fully
       const timer = setTimeout(() => {
@@ -105,7 +106,12 @@ export function OnboardingTour({ onComplete }: { onComplete?: () => void }) {
 
   const handleComplete = () => {
     setOpen(false);
-    localStorage.setItem('hasCompletedOnboarding', 'true');
+    try {
+      // Use safe storage helper — storage may be blocked in some browsers
+      safeLocalSet('hasCompletedOnboarding', 'true');
+    } catch (e) {
+      // ignore
+    }
     if (onComplete) onComplete();
   };
 

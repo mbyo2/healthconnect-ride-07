@@ -1,3 +1,4 @@
+import { safeLocalSet } from './storage';
 import { logger } from './logger';
 import { errorHandler } from './error-handler';
 
@@ -435,8 +436,12 @@ class AdvancedAccessibilityService {
     this.preferences = { ...this.preferences, ...newPreferences };
     this.updateAccessibilityClasses();
     
-    // Store preferences
-    localStorage.setItem('accessibility-preferences', JSON.stringify(this.preferences));
+    // Store preferences (safe wrapper)
+    try {
+      safeLocalSet('accessibility-preferences', JSON.stringify(this.preferences));
+    } catch (e) {
+      // ignore storage errors
+    }
     
     this.announceToScreenReader('Accessibility preferences updated');
     logger.info('Accessibility preferences updated', 'ACCESSIBILITY', this.preferences);

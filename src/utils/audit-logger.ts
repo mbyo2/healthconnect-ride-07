@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { errorHandler } from './error-handler';
 import { logger } from './logger';
+import { safeLocalGet, safeLocalSet } from './storage';
 
 const supabase = createClient(
   "https://tthzcijscedgxjfnfnky.supabase.co",
@@ -60,6 +61,8 @@ class AuditLogger {
 
   private initializeAuditLogger(): void {
     try {
+      if (typeof window === 'undefined') return;
+
       // Start periodic flushing
       this.flushInterval = setInterval(() => {
         this.flushEvents();
@@ -203,11 +206,15 @@ class AuditLogger {
   }
 
   private getCurrentSessionId(): string {
-    return localStorage.getItem('current-session-id') || 'unknown';
+    try {
+      return (safeLocalGet('current-session-id') as string) || 'unknown';
+    } catch (e) {
+      return 'unknown';
+    }
   }
 
   private getDeviceInfo(): string {
-    const userAgent = navigator.userAgent;
+    const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent : '';
     if (/Mobile|Android|iPhone|iPad/.test(userAgent)) {
       return 'Mobile Device';
     } else if (/Tablet/.test(userAgent)) {

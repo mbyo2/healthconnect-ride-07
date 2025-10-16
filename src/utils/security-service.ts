@@ -1,6 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { createRateLimiter } from './input-validation';
+import { safeLocalGet, safeLocalSet } from './storage';
 
 // Enhanced security service with real audit logging
 export const logSecurityEvent = async (action: string, details?: any): Promise<void> => {
@@ -53,7 +54,7 @@ export const SecurityEvents = {
 
 // Enhanced session monitoring
 export const monitorSessionActivity = () => {
-  const lastActivity = localStorage.getItem('lastActivity');
+  const lastActivity = safeLocalGet('lastActivity');
   const sessionTimeout = 30 * 60 * 1000; // 30 minutes
   
   if (lastActivity && Date.now() - parseInt(lastActivity) > sessionTimeout) {
@@ -63,13 +64,18 @@ export const monitorSessionActivity = () => {
     });
   }
   
-  localStorage.setItem('lastActivity', Date.now().toString());
+  safeLocalSet('lastActivity', Date.now().toString());
 };
 
 // Detect suspicious patterns
 export const detectSuspiciousActivity = (action: string, context?: any): boolean => {
   // Check for rapid successive actions
-  const recentActions = JSON.parse(localStorage.getItem('recentActions') || '[]');
+  let recentActions: number[] = [];
+  try {
+    recentActions = JSON.parse(safeLocalGet('recentActions') || '[]');
+  } catch (e) {
+    recentActions = [];
+  }
   const now = Date.now();
   const fiveMinutesAgo = now - 5 * 60 * 1000;
   
@@ -78,7 +84,7 @@ export const detectSuspiciousActivity = (action: string, context?: any): boolean
   
   // Add current action
   recentActionsFiltered.push(now);
-  localStorage.setItem('recentActions', JSON.stringify(recentActionsFiltered));
+  safeLocalSet('recentActions', JSON.stringify(recentActionsFiltered));
   
   // Flag if more than 20 actions in 5 minutes
   if (recentActionsFiltered.length > 20) {

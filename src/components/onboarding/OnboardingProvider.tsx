@@ -1,5 +1,6 @@
 
 import { createContext, useContext, useState, useEffect } from 'react';
+import { safeLocalGet, safeLocalSet } from '@/utils/storage';
 import { useLocation } from 'react-router-dom';
 import { OnboardingTour } from './OnboardingTour';
 import { FeatureHighlight } from './FeatureHighlight';
@@ -34,11 +35,16 @@ export const useOnboarding = () => {
 export function OnboardingProvider({ children }: { children: React.ReactNode }) {
   const [activeFeatureHighlight, setActiveFeatureHighlight] = useState<FeatureHighlightProps | null>(null);
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState<boolean>(
-    localStorage.getItem('hasCompletedOnboarding') === 'true'
+    safeLocalGet('hasCompletedOnboarding') === 'true'
   );
-  const [completedFeatures, setCompletedFeatures] = useState<string[]>(
-    JSON.parse(localStorage.getItem('completedFeatures') || '[]')
-  );
+  const [completedFeatures, setCompletedFeatures] = useState<string[]>(() => {
+    try {
+      const raw = safeLocalGet('completedFeatures') || '[]';
+      return JSON.parse(raw);
+    } catch (e) {
+      return [];
+    }
+  });
   const location = useLocation();
 
   useEffect(() => {
@@ -57,13 +63,13 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     if (!completedFeatures.includes(featureId)) {
       const updatedFeatures = [...completedFeatures, featureId];
       setCompletedFeatures(updatedFeatures);
-      localStorage.setItem('completedFeatures', JSON.stringify(updatedFeatures));
+      safeLocalSet('completedFeatures', JSON.stringify(updatedFeatures));
     }
   };
 
   const completeOnboarding = () => {
     setHasCompletedOnboarding(true);
-    localStorage.setItem('hasCompletedOnboarding', 'true');
+    safeLocalSet('hasCompletedOnboarding', 'true');
   };
 
   const dismissFeatureHighlight = () => {

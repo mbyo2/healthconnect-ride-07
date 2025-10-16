@@ -204,7 +204,8 @@ export const ProviderPortal = () => {
                 }}
                 providers={[]}
                 view="sign_up"
-                redirectTo={`${window.location.origin}/profile-setup`}
+                // include role in redirect so profile setup can create a profile for providers
+                redirectTo={`${window.location.origin}/profile-setup?role=health_personnel`}
               />
             </TabsContent>
           </Tabs>

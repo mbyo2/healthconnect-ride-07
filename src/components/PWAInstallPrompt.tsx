@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { checkIfAppInstalled } from '@/utils/service-worker';
+import { safeLocalGet, safeLocalSet } from '@/utils/storage';
 import { X } from 'lucide-react';
 
 type BeforeInstallPromptEvent = Event & {
@@ -31,7 +32,7 @@ export function PWAInstallPrompt() {
     };
 
     // Check if user has previously dismissed
-    const hasUserDismissed = localStorage.getItem('pwa-install-dismissed');
+    const hasUserDismissed = safeLocalGet('pwa-install-dismissed');
     if (hasUserDismissed) {
       setIsDismissed(true);
     }
@@ -64,7 +65,7 @@ export function PWAInstallPrompt() {
 
   const handleDismiss = () => {
     setIsDismissed(true);
-    localStorage.setItem('pwa-install-dismissed', 'true');
+     safeLocalSet('pwa-install-dismissed', 'true');
   };
 
   if (isAppInstalled || isDismissed || !installPrompt) {

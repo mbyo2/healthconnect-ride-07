@@ -20,6 +20,8 @@ export interface ErrorReport {
   sessionId?: string;
 }
 
+import { safeLocalGet } from './storage';
+
 // Configuration with sensible defaults
 const config = {
   captureConsoleErrors: true,
@@ -121,12 +123,12 @@ export function logError(
       severity,
       metadata: {
         ...metadata,
-        userAgent: navigator.userAgent,
-        url: window.location.href,
+        userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
+        url: typeof window !== 'undefined' ? window.location.href : '',
         // Add browser and device info
         screen: {
-          width: window.innerWidth,
-          height: window.innerHeight
+          width: typeof window !== 'undefined' ? window.innerWidth : 0,
+          height: typeof window !== 'undefined' ? window.innerHeight : 0
         }
       },
       timestamp: new Date().toISOString(),
@@ -136,7 +138,7 @@ export function logError(
     // Add user ID if available and allowed
     if (config.includeUserInfo) {
       try {
-        const userIdFromStorage = localStorage.getItem('userId');
+        const userIdFromStorage = safeLocalGet('userId');
         if (userIdFromStorage) {
           errorReport.userId = userIdFromStorage;
         }

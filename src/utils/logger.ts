@@ -119,7 +119,7 @@ export class Logger {
         safeLocalSet('app_logs', JSON.stringify(trimmedLogs));
       } catch (err) {
         // localStorage may be unavailable/blocked; ignore
-        console.warn('Unable to persist logs to localStorage:', err);
+        console.warn('Unable to persist logs to safeLocal storage:', err);
       }
     }
   }

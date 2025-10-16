@@ -31,19 +31,49 @@ const ProfileSetup = () => {
           return;
         }
         
+        // Ensure a profile row exists for the user. If not, create one using the role
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
-          .select('role')
+          .select('*')
           .eq('id', session.user.id)
-          .single();
-        
+          .maybeSingle();
+
         if (profileError) {
           console.error("Error fetching profile:", profileError);
           toast.error("Failed to fetch profile data");
-          return;
+          // proceed with fallback
         }
-        
-        setUserRole(profile.role);
+
+        // If no profile exists create one. Prefer role from URL (?role=...) then user metadata
+        let roleFromQuery: string | null = null;
+        try {
+          const params = new URLSearchParams(window.location.search);
+          roleFromQuery = params.get('role');
+        } catch (e) {
+          // ignore
+        }
+
+        const inferredRole = roleFromQuery || (session.user?.user_metadata as any)?.role || (profile && profile.role) || 'patient';
+
+        if (!profile) {
+          try {
+            const insert = await supabase.from('profiles').insert({
+              id: session.user.id,
+              email: session.user.email,
+              role: inferredRole,
+            });
+            if (insert.error) {
+              console.warn('Failed to create profile row:', insert.error);
+            }
+            setUserRole(inferredRole);
+          } catch (err) {
+            console.error('Error creating profile row:', err);
+            setUserRole(inferredRole);
+          }
+        } else {
+          setUserRole(profile.role || inferredRole);
+        }
+
         setIsLoading(false);
       } catch (err) {
         console.error("Unexpected error during role check:", err);

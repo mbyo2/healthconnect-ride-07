@@ -9,7 +9,8 @@
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "vitest",
+  "test": "vitest",
+  "test:smoke": "vitest run --threads=1 src/tests/marketplace.smoke.test.ts",
     "postbuild": "echo 'Build completed successfully for Netlify'"
   },
   "dependencies": {

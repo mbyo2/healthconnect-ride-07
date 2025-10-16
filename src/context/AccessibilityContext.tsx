@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { safeLocalGet, safeLocalSet } from '@/utils/storage';
 
 type AccessibilityPreferences = {
   highContrast: boolean;
@@ -32,16 +33,16 @@ export const AccessibilityProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isScreenReaderEnabled, setScreenReaderEnabled] = useState<boolean>(false);
   const [isSpeaking, setIsSpeaking] = useState<boolean>(false);
   const [textSize, setTextSize] = useState<number>(
-    parseFloat(localStorage.getItem('accessibility_text_size') || '1')
+    parseFloat((safeLocalGet('accessibility_text_size') as string) || '1')
   );
   const [isEasyReadingEnabled, setIsEasyReadingEnabled] = useState<boolean>(
-    localStorage.getItem('accessibility_easy_reading') === 'true'
+    safeLocalGet('accessibility_easy_reading') === 'true'
   );
   const [preferences, setPreferences] = useState<AccessibilityPreferences>({
-    highContrast: localStorage.getItem('accessibility_high_contrast') === 'true',
-    largeText: localStorage.getItem('accessibility_large_text') === 'true',
-    reducedMotion: localStorage.getItem('accessibility_reduced_motion') === 'true',
-    screenReader: localStorage.getItem('accessibility_screen_reader') === 'true'
+    highContrast: safeLocalGet('accessibility_high_contrast') === 'true',
+    largeText: safeLocalGet('accessibility_large_text') === 'true',
+    reducedMotion: safeLocalGet('accessibility_reduced_motion') === 'true',
+    screenReader: safeLocalGet('accessibility_screen_reader') === 'true'
   });
   
   // Apply stored settings on load
@@ -56,20 +57,20 @@ export const AccessibilityProvider: React.FC<{ children: React.ReactNode }> = ({
   const increaseTextSize = useCallback(() => {
     const newSize = Math.min(textSize + 0.1, 1.5);
     setTextSize(newSize);
-    localStorage.setItem('accessibility_text_size', newSize.toString());
+    safeLocalSet('accessibility_text_size', newSize.toString());
     applyTextSize(newSize);
   }, [textSize]);
   
   const decreaseTextSize = useCallback(() => {
     const newSize = Math.max(textSize - 0.1, 0.8);
     setTextSize(newSize);
-    localStorage.setItem('accessibility_text_size', newSize.toString());
+    safeLocalSet('accessibility_text_size', newSize.toString());
     applyTextSize(newSize);
   }, [textSize]);
   
   const resetTextSize = useCallback(() => {
     setTextSize(1);
-    localStorage.setItem('accessibility_text_size', '1');
+    safeLocalSet('accessibility_text_size', '1');
     applyTextSize(1);
   }, []);
   
@@ -80,13 +81,13 @@ export const AccessibilityProvider: React.FC<{ children: React.ReactNode }> = ({
   // Easy reading mode for sick patients
   const enableEasyReading = useCallback(() => {
     setIsEasyReadingEnabled(true);
-    localStorage.setItem('accessibility_easy_reading', 'true');
+    safeLocalSet('accessibility_easy_reading', 'true');
     document.documentElement.classList.add('easy-reading');
   }, []);
   
   const disableEasyReading = useCallback(() => {
     setIsEasyReadingEnabled(false);
-    localStorage.setItem('accessibility_easy_reading', 'false');
+    safeLocalSet('accessibility_easy_reading', 'false');
     document.documentElement.classList.remove('easy-reading');
   }, []);
 
@@ -97,7 +98,7 @@ export const AccessibilityProvider: React.FC<{ children: React.ReactNode }> = ({
       
       // Save to localStorage
       Object.entries(updated).forEach(([key, value]) => {
-        localStorage.setItem(`accessibility_${key.toLowerCase()}`, value.toString());
+        safeLocalSet(`accessibility_${key.toLowerCase()}`, value.toString());
       });
       
       return updated;

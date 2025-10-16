@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { CalendarPlus, Menu, Mic } from "lucide-react";
 import { usePerformanceMonitoring } from "@/hooks/use-performance-monitoring";
+import { safeLocalGet, safeLocalSet } from '@/utils/storage';
 import { LoadingScreen } from "../LoadingScreen";
 import { useOfflineMode } from "@/hooks/use-offline-mode";
 import { toast } from "sonner";
@@ -52,7 +53,7 @@ export const PatientDashboard = () => {
   }, [isOnline]);
 
   // Simplified view for very sick patients or slow connections
-  const isSimplifiedMode = metrics.networkSpeed === 'slow' || localStorage.getItem('simplifiedMode') === 'true';
+  const isSimplifiedMode = metrics.networkSpeed === 'slow' || safeLocalGet('simplifiedMode') === 'true';
 
   if (isLoading) {
     return <LoadingScreen />;
@@ -72,9 +73,9 @@ export const PatientDashboard = () => {
           <Button 
             variant="outline" 
             size="sm"
-            onClick={() => {
-              const current = localStorage.getItem('simplifiedMode') === 'true';
-              localStorage.setItem('simplifiedMode', (!current).toString());
+              onClick={() => {
+              const current = safeLocalGet('simplifiedMode') === 'true';
+              safeLocalSet('simplifiedMode', (!current).toString());
               window.location.reload();
             }}
           >
