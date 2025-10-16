@@ -19,8 +19,8 @@ export const ProductCard = ({ product, onAddToCart }: ProductCardProps) => {
           <div className="flex items-center gap-2">
             <Pill className="h-5 w-5 text-blue-600" />
             <div>
-              <CardTitle className="text-lg">{product.medication_name}</CardTitle>
-              {product.generic_name && (
+              <CardTitle className="text-lg">{product?.medication_name ?? 'Unknown medication'}</CardTitle>
+              {product?.generic_name && (
                 <p className="text-sm text-muted-foreground">{product.generic_name}</p>
               )}
             </div>
@@ -38,22 +38,22 @@ export const ProductCard = ({ product, onAddToCart }: ProductCardProps) => {
         <div className="space-y-2 flex-1">
           <div className="flex justify-between items-center">
             <span className="text-sm text-muted-foreground">Dosage:</span>
-            <span className="font-medium">{product.dosage}</span>
+            <span className="font-medium">{product?.dosage ?? '-'}</span>
           </div>
           
           <div className="flex justify-between items-center">
             <span className="text-sm text-muted-foreground">Price:</span>
-            <span className="text-lg font-bold text-green-600">K{product.price}</span>
+            <span className="text-lg font-bold text-green-600">K{product?.price ?? '0.00'}</span>
           </div>
           
           <div className="flex justify-between items-center">
             <span className="text-sm text-muted-foreground">In Stock:</span>
-            <span className={`font-medium ${product.stock_quantity > 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {product.stock_quantity} units
+            <span className={`font-medium ${(product?.stock_quantity ?? 0) > 0 ? 'text-green-600' : 'text-red-600'}`}>
+              {(product?.stock_quantity ?? 0)} units
             </span>
           </div>
 
-          {product.pharmacy && (
+          {product?.pharmacy && (
             <div className="text-sm text-muted-foreground">
               <strong>Pharmacy:</strong> {product.pharmacy.name}
             </div>
@@ -67,11 +67,11 @@ export const ProductCard = ({ product, onAddToCart }: ProductCardProps) => {
         <div className="mt-4 pt-4 border-t">
           <Button 
             onClick={() => onAddToCart(product)}
-            disabled={product.stock_quantity === 0}
+            disabled={(product?.stock_quantity ?? 0) === 0}
             className="w-full flex items-center gap-2"
           >
             <ShoppingCart className="h-4 w-4" />
-            {product.stock_quantity > 0 ? 'Add to Cart' : 'Out of Stock'}
+            {(product?.stock_quantity ?? 0) > 0 ? 'Add to Cart' : 'Out of Stock'}
           </Button>
         </div>
       </CardContent>

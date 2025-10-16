@@ -42,7 +42,8 @@ export const CheckoutModal = ({
     prescription_id: ''
   });
 
-  const requiresPrescription = cart.items.some(item => item.product.requires_prescription);
+  const safeCart = cart ?? { items: [], total: 0 };
+  const requiresPrescription = (safeCart.items || []).some(item => item.product?.requires_prescription);
 
   // Get user's prescriptions
   const { data: prescriptions } = useQuery({
@@ -63,9 +64,10 @@ export const CheckoutModal = ({
   });
 
   // Get unique pharmacies from cart items
-  const pharmacies = cart.items.reduce((acc, item) => {
-    if (item.product.pharmacy && !acc.find(p => p.id === item.product.pharmacy!.id)) {
-      acc.push(item.product.pharmacy);
+  const pharmacies = (safeCart.items || []).reduce((acc, item) => {
+    const pharmacy = item.product?.pharmacy;
+    if (pharmacy && !acc.find((p: any) => p.id === pharmacy.id)) {
+      acc.push(pharmacy);
     }
     return acc;
   }, [] as any[]);
@@ -99,13 +101,13 @@ export const CheckoutModal = ({
               <SelectTrigger>
                 <SelectValue placeholder="Choose pharmacy" />
               </SelectTrigger>
-              <SelectContent>
-                {pharmacies.map((pharmacy) => (
+                <SelectContent>
+                {(pharmacies || []).map((pharmacy) => (
                   <SelectItem key={pharmacy.id} value={pharmacy.id}>
                     {pharmacy.name}
                   </SelectItem>
                 ))}
-              </SelectContent>
+                </SelectContent>
             </Select>
           </div>
 
@@ -121,7 +123,7 @@ export const CheckoutModal = ({
                   <SelectValue placeholder="Choose prescription" />
                 </SelectTrigger>
                 <SelectContent>
-                  {prescriptions?.map((prescription) => (
+                  {((prescriptions as any[]) || []).map((prescription) => (
                     <SelectItem key={prescription.id} value={prescription.id}>
                       {prescription.medication_name} - {prescription.dosage}
                     </SelectItem>
@@ -168,8 +170,8 @@ export const CheckoutModal = ({
             <Button type="button" variant="outline" onClick={onClose} className="flex-1">
               Cancel
             </Button>
-            <Button type="submit" disabled={isLoading} className="flex-1">
-              {isLoading ? 'Placing Order...' : `Place Order (K${cart.total.toFixed(2)})`}
+            <Button type="submit" disabled={isLoading || !formData.pharmacy_id} className="flex-1">
+              {isLoading ? 'Placing Order...' : `Place Order (K${(safeCart?.total ?? 0).toFixed(2)})`}
             </Button>
           </div>
         </form>

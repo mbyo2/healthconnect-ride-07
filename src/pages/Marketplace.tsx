@@ -28,14 +28,14 @@ const Marketplace = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [showCheckout, setShowCheckout] = useState(false);
 
-  const filteredProducts = products?.filter(product => {
-    const matchesSearch = product.medication_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.generic_name?.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredProducts = (products || []).filter(product => {
+    const matchesSearch = (product.medication_name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (product.generic_name || '').toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
-  const categories = [...new Set(products?.map(p => p.category) || [])];
+  const categories = [...new Set((products || []).map(p => p.category || 'Uncategorized'))];
 
   const handleCheckout = () => {
     setShowCheckout(true);
@@ -60,9 +60,9 @@ const Marketplace = () => {
           <Tabs defaultValue="products">
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="products" className="text-xs">Browse</TabsTrigger>
-              <TabsTrigger value="cart" className="flex items-center gap-1 text-xs">
+                <TabsTrigger value="cart" className="flex items-center gap-1 text-xs">
                 <ShoppingCart className="h-3 w-3" />
-                Cart ({cart.items.length})
+                Cart ({cart?.items?.length ?? 0})
               </TabsTrigger>
               <TabsTrigger value="orders" className="text-xs">Orders</TabsTrigger>
             </TabsList>

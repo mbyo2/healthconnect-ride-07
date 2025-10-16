@@ -12,7 +12,7 @@ export const useMarketplace = () => {
   const [cart, setCart] = useState<Cart>({ items: [], total: 0 });
 
   // Get all marketplace products
-  const { data: products, isLoading: productsLoading } = useQuery({
+  const { data: products = [], isLoading: productsLoading } = useQuery({
     queryKey: ['marketplace-products'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -32,7 +32,7 @@ export const useMarketplace = () => {
   });
 
   // Get user's orders
-  const { data: orders, isLoading: ordersLoading } = useQuery({
+  const { data: orders = [], isLoading: ordersLoading } = useQuery({
     queryKey: ['user-orders', user?.id],
     queryFn: async () => {
       if (!user) throw new Error('Not authenticated');

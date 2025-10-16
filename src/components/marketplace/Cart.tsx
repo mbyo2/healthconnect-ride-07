@@ -22,7 +22,9 @@ export const Cart = ({
   onCheckout,
   isLoading = false 
 }: CartProps) => {
-  if (cart.items.length === 0) {
+  const safeCart = cart ?? { items: [], total: 0 };
+
+  if (!safeCart.items || safeCart.items.length === 0) {
     return (
       <Card>
         <CardContent className="py-8 text-center">
@@ -33,19 +35,19 @@ export const Cart = ({
     );
   }
 
-  const requiresPrescription = cart.items.some(item => item.product.requires_prescription);
+  const requiresPrescription = safeCart.items.some(item => item.product?.requires_prescription);
 
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <ShoppingCart className="h-5 w-5" />
-          Shopping Cart ({cart.items.length} items)
+          Shopping Cart ({safeCart.items.length} items)
         </CardTitle>
       </CardHeader>
       
       <CardContent className="space-y-4">
-        {cart.items.map((item) => (
+  {safeCart.items.map((item) => (
           <div key={item.product.id} className="flex items-center gap-4 p-4 border rounded-lg">
             <div className="flex-1">
               <h4 className="font-semibold">{item.product.medication_name}</h4>
@@ -85,7 +87,7 @@ export const Cart = ({
             </div>
             
             <div className="text-right">
-              <p className="font-semibold">K{item.subtotal.toFixed(2)}</p>
+              <p className="font-semibold">K{(item.subtotal ?? 0).toFixed(2)}</p>
               <Button
                 size="sm"
                 variant="ghost"
@@ -109,7 +111,7 @@ export const Cart = ({
         <div className="border-t pt-4">
           <div className="flex justify-between items-center mb-4">
             <span className="text-lg font-semibold">Total:</span>
-            <span className="text-xl font-bold text-green-600">K{cart.total.toFixed(2)}</span>
+            <span className="text-xl font-bold text-green-600">K{(safeCart.total ?? 0).toFixed(2)}</span>
           </div>
           
           <Button 
