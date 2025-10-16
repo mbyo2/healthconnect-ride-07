@@ -71,10 +71,16 @@ export const useOfflineMode = () => {
     };
   }, [pendingActions.length]);
 
-  // Load pending actions from IndexedDB
+  // Load pending actions from IndexedDB (resilient to environments where IndexedDB is blocked)
   const loadPendingActions = async () => {
     try {
       const db = await openOfflineDB();
+      if (!db) {
+        // IndexedDB unavailable (e.g., Safari private mode) - silently continue with empty pending actions
+        setPendingActions([]);
+        return;
+      }
+
       const tx = db.transaction('pendingActions', 'readonly');
       const store = tx.objectStore('pendingActions');
       
@@ -89,6 +95,7 @@ export const useOfflineMode = () => {
       };
     } catch (error) {
       console.error('Error loading pending actions from IndexedDB:', error);
+      setPendingActions([]);
     }
   };
 
@@ -97,11 +104,17 @@ export const useOfflineMode = () => {
     try {
       const actionWithMeta: OfflineAction = {
         ...action,
-        id: action.id || crypto.randomUUID(),
+        id: action.id || (typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`),
         timestamp: new Date().toISOString(),
       };
       
       const db = await openOfflineDB();
+      if (!db) {
+        // IndexedDB unavailable - fall back to in-memory queue
+        setPendingActions(prev => [...prev, actionWithMeta]);
+        return true;
+      }
+
       const tx = db.transaction('pendingActions', 'readwrite');
       const store = tx.objectStore('pendingActions');
       
@@ -162,6 +175,12 @@ export const useOfflineMode = () => {
   const removeCompletedAction = async (actionId: string) => {
     try {
       const db = await openOfflineDB();
+      if (!db) {
+        // If no DB, just remove from in-memory queue
+        setPendingActions(prev => prev.filter(a => a.id !== actionId));
+        return;
+      }
+
       const tx = db.transaction('pendingActions', 'readwrite');
       const store = tx.objectStore('pendingActions');
       
@@ -176,6 +195,11 @@ export const useOfflineMode = () => {
   const cacheForOffline = async (key: string, data: any, expirationMinutes = 60): Promise<boolean> => {
     try {
       const db = await openOfflineDB();
+      if (!db) {
+        // IndexedDB unavailable - skip caching but don't fail
+        return false;
+      }
+
       const tx = db.transaction('offlineData', 'readwrite');
       const store = tx.objectStore('offlineData');
       
@@ -197,6 +221,8 @@ export const useOfflineMode = () => {
   const getOfflineCache = async (key: string): Promise<any | null> => {
     try {
       const db = await openOfflineDB();
+      if (!db) return null;
+
       const tx = db.transaction('offlineData', 'readonly');
       const store = tx.objectStore('offlineData');
       
@@ -225,32 +251,46 @@ export const useOfflineMode = () => {
     }
   };
 
-  // Open the offline database
-  const openOfflineDB = (): Promise<IDBDatabase> => {
+  // Open the offline database. Return null if IndexedDB is unavailable or blocked (e.g., Safari private mode)
+  const openOfflineDB = (): Promise<IDBDatabase | null> => {
     return new Promise((resolve, reject) => {
-      const request = indexedDB.open('offlineActionsDB', 1);
-      
-      request.onerror = () => {
-        reject(request.error);
-      };
-      
-      request.onsuccess = () => {
-        resolve(request.result);
-      };
-      
-      request.onupgradeneeded = (event) => {
-        const db = (event.target as IDBOpenDBRequest).result;
-        
-        if (!db.objectStoreNames.contains('pendingActions')) {
-          const store = db.createObjectStore('pendingActions', { keyPath: 'id' });
-          store.createIndex('timestamp', 'timestamp', { unique: false });
+      try {
+        if (typeof indexedDB === 'undefined' || indexedDB === null) {
+          // IndexedDB not available in this environment
+          resolve(null);
+          return;
         }
-        
-        if (!db.objectStoreNames.contains('offlineData')) {
-          const store = db.createObjectStore('offlineData', { keyPath: 'key' });
-          store.createIndex('timestamp', 'timestamp', { unique: false });
-        }
-      };
+
+        const request = indexedDB.open('offlineActionsDB', 1);
+
+        request.onerror = () => {
+          // Some browsers throw a SecurityError (The operation is insecure) when IndexedDB is disabled.
+          // Resolve with null so callers can handle the absence of IndexedDB gracefully.
+          console.warn('IndexedDB open error:', request.error);
+          resolve(null);
+        };
+
+        request.onsuccess = () => {
+          resolve(request.result);
+        };
+
+        request.onupgradeneeded = (event) => {
+          const db = (event.target as IDBOpenDBRequest).result;
+
+          if (!db.objectStoreNames.contains('pendingActions')) {
+            const store = db.createObjectStore('pendingActions', { keyPath: 'id' });
+            store.createIndex('timestamp', 'timestamp', { unique: false });
+          }
+
+          if (!db.objectStoreNames.contains('offlineData')) {
+            const store = db.createObjectStore('offlineData', { keyPath: 'key' });
+            store.createIndex('timestamp', 'timestamp', { unique: false });
+          }
+        };
+      } catch (err) {
+        console.warn('IndexedDB unavailable or blocked:', err);
+        resolve(null);
+      }
     });
   };
 

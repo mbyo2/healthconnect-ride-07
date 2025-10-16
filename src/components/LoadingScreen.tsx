@@ -73,14 +73,34 @@ export const LoadingScreen = React.memo<LoadingScreenProps>(({
   }, [timeout]);
 
   const handleRefresh = useCallback(() => {
-    sessionStorage.removeItem('auth-error');
-    localStorage.removeItem('loading-error');
+    try {
+      if (typeof sessionStorage !== 'undefined') sessionStorage.removeItem('auth-error');
+    } catch (err) {
+      // ignore
+    }
+
+    try {
+      if (typeof localStorage !== 'undefined') localStorage.removeItem('loading-error');
+    } catch (err) {
+      // ignore
+    }
+
     window.location.reload();
   }, []);
 
   const handleClearCacheAndReload = useCallback(() => {
-    localStorage.clear();
-    sessionStorage.clear();
+    try {
+      if (typeof localStorage !== 'undefined') localStorage.clear();
+    } catch (err) {
+      // ignore
+    }
+
+    try {
+      if (typeof sessionStorage !== 'undefined') sessionStorage.clear();
+    } catch (err) {
+      // ignore
+    }
+
     window.location.reload();
   }, []);
 

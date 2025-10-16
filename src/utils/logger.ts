@@ -107,13 +107,20 @@ export class Logger {
     // In production, integrate with services like LogRocket, Datadog, etc.
     // For now, just store for potential batch upload
     if (typeof window !== 'undefined') {
-      const storedLogs = localStorage.getItem('app_logs') || '[]';
-      const logs = JSON.parse(storedLogs);
-      logs.push(entry);
-      
-      // Keep only last 100 logs in localStorage
-      const trimmedLogs = logs.slice(-100);
-      localStorage.setItem('app_logs', JSON.stringify(trimmedLogs));
+      try {
+        const storedLogs = (typeof localStorage !== 'undefined' ? localStorage.getItem('app_logs') : null) || '[]';
+        const logs = JSON.parse(storedLogs);
+        logs.push(entry);
+        
+        // Keep only last 100 logs in localStorage
+        const trimmedLogs = logs.slice(-100);
+        if (typeof localStorage !== 'undefined') {
+          localStorage.setItem('app_logs', JSON.stringify(trimmedLogs));
+        }
+      } catch (err) {
+        // localStorage may be unavailable/blocked; ignore
+        console.warn('Unable to persist logs to localStorage:', err);
+      }
     }
   }
 
@@ -134,7 +141,11 @@ export class Logger {
   public clearLogs(): void {
     this.logs = [];
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('app_logs');
+      try {
+        if (typeof localStorage !== 'undefined') localStorage.removeItem('app_logs');
+      } catch (err) {
+        // ignore
+      }
     }
   }
 

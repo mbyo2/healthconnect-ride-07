@@ -38,7 +38,15 @@ class SessionManager {
   async createSession(userId: string): Promise<string> {
     // TEMPORARILY DISABLED - Returns mock session ID
     logger.info('Session creation temporarily disabled', 'SESSION', { userId });
-    return crypto.randomUUID();
+    try {
+      if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+        return crypto.randomUUID();
+      }
+    } catch (err) {
+      // Fall back to a safe string
+    }
+
+    return `${Date.now()}-${Math.random()}`;
   }
 
   async validateSession(sessionId: string): Promise<boolean> {
@@ -88,9 +96,13 @@ class SessionManager {
     
     events.forEach(event => {
       document.addEventListener(event, this.throttle(() => {
-        const sessionId = localStorage.getItem('current-session-id');
-        if (sessionId) {
-          this.updateSessionActivity(sessionId);
+        try {
+          const sessionId = typeof localStorage !== 'undefined' ? localStorage.getItem('current-session-id') : null;
+          if (sessionId) {
+            this.updateSessionActivity(sessionId);
+          }
+        } catch (err) {
+          // localStorage may be blocked (e.g., private browsing) — ignore
         }
       }, this.ACTIVITY_UPDATE_INTERVAL), true);
     });
@@ -110,7 +122,15 @@ class SessionManager {
   }
 
   private generateSessionId(): string {
-    return crypto.randomUUID();
+    try {
+      if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+        return crypto.randomUUID();
+      }
+    } catch (err) {
+      // ignore and fallback
+    }
+
+    return `${Date.now()}-${Math.random()}`;
   }
 
   private getDeviceInfo(): { device: string; location: string } {

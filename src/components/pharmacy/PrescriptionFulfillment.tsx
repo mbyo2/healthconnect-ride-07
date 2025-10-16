@@ -157,7 +157,7 @@ export function PrescriptionFulfillment() {
       // If offline, queue the update for later
       if (!isOnline) {
         await queueOfflineAction({
-          id: crypto.randomUUID(),
+          id: (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`,
           type: 'UPDATE_PRESCRIPTION_STATUS',
           table: 'prescription_fulfillments',
           data: { 
@@ -176,8 +176,14 @@ export function PrescriptionFulfillment() {
       // Since we don't have the prescription_fulfillments table in Supabase yet,
       // we'll store the data in localStorage as a temporary solution
       // In a real app, you should create this table in Supabase
-      const storedFulfillments = localStorage.getItem('prescription_fulfillments');
-      const currentFulfillments = storedFulfillments ? JSON.parse(storedFulfillments) : [];
+      let currentFulfillments: any[] = [];
+      try {
+        const storedFulfillments = typeof localStorage !== 'undefined' ? localStorage.getItem('prescription_fulfillments') : null;
+        currentFulfillments = storedFulfillments ? JSON.parse(storedFulfillments) : [];
+      } catch (err) {
+        console.warn('Unable to read prescription_fulfillments from localStorage:', err);
+        currentFulfillments = [];
+      }
       
       // Find if this prescription already has a status entry
       const existingFulfillmentIndex = currentFulfillments.findIndex(
@@ -201,7 +207,13 @@ export function PrescriptionFulfillment() {
       }
       
       // Save back to localStorage
-      localStorage.setItem('prescription_fulfillments', JSON.stringify(currentFulfillments));
+      try {
+        if (typeof localStorage !== 'undefined') {
+          localStorage.setItem('prescription_fulfillments', JSON.stringify(currentFulfillments));
+        }
+      } catch (err) {
+        console.warn('Unable to persist prescription_fulfillments to localStorage:', err);
+      }
       
       toast({
         title: "Status updated",
