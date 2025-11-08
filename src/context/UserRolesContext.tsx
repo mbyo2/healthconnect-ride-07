@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
 import { UserRole, AdminLevel } from '@/types/user';
+import { supabase } from '@/integrations/supabase/client';
 
 interface UserRolesContextType {
   userRole: UserRole | null;
@@ -16,6 +17,7 @@ interface UserRolesContextType {
   isPatient: boolean;
   switchRole: (role: UserRole) => void;
   refreshRoles: () => void;
+  checkRole: (role: UserRole) => Promise<boolean>;
 }
 
 const UserRolesContext = createContext<UserRolesContextType | undefined>(undefined);
@@ -25,46 +27,82 @@ export function UserRolesProvider({ children }: { children: React.ReactNode }) {
   const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [adminLevel, setAdminLevel] = useState<AdminLevel | null>(null);
   const [currentRole, setCurrentRole] = useState<UserRole | null>(null);
+  const [availableRoles, setAvailableRoles] = useState<UserRole[]>([]);
 
   useEffect(() => {
-    if (profile) {
-      setUserRole(profile.role as UserRole);
-      setAdminLevel(profile.admin_level as AdminLevel);
-      setCurrentRole(profile.role as UserRole);
-    } else {
-      setUserRole(null);
-      setAdminLevel(null);
-      setCurrentRole(null);
-    }
-  }, [profile]);
+    const fetchRoles = async () => {
+      if (user && profile) {
+        // Fetch all roles for the user from user_roles table
+        const { data: rolesData, error } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user.id);
+
+        if (error) {
+          console.error('Error fetching roles:', error);
+          // Fallback to profile role
+          const fallbackRole = profile.role as UserRole;
+          setUserRole(fallbackRole);
+          setCurrentRole(fallbackRole);
+          setAvailableRoles(fallbackRole ? [fallbackRole] : []);
+        } else if (rolesData && rolesData.length > 0) {
+          const roles = rolesData.map(r => r.role as UserRole);
+          setAvailableRoles(roles);
+          
+          // Set primary role (admin > institution_admin > health_personnel > patient)
+          const primaryRole = roles.find(r => r === 'admin') ||
+                             roles.find(r => r === 'institution_admin') ||
+                             roles.find(r => r === 'health_personnel') ||
+                             roles.find(r => r === 'patient') ||
+                             roles[0];
+          
+          setUserRole(primaryRole);
+          setCurrentRole(primaryRole);
+        }
+
+        // Check admin status using secure function
+        const { data: isAdminData } = await supabase
+          .rpc('is_admin', { _user_id: user.id });
+        
+        if (isAdminData) {
+          setAdminLevel('admin');
+        } else {
+          setAdminLevel(profile.admin_level as AdminLevel);
+        }
+      } else {
+        setUserRole(null);
+        setAdminLevel(null);
+        setCurrentRole(null);
+        setAvailableRoles([]);
+      }
+    };
+
+    fetchRoles();
+  }, [profile, user]);
 
   const hasRole = (roles: UserRole[]): boolean => {
-    return userRole ? roles.includes(userRole) : false;
+    return roles.some(role => availableRoles.includes(role));
   };
 
   const hasAdminLevel = (levels: AdminLevel[]): boolean => {
     return adminLevel ? levels.includes(adminLevel) : false;
   };
 
+  const checkRole = async (role: UserRole): Promise<boolean> => {
+    if (!user) return false;
+    const { data, error } = await supabase
+      .rpc('has_role', { _user_id: user.id, _role: role });
+    if (error) {
+      console.error('Error checking role:', error);
+      return false;
+    }
+    return data || false;
+  };
+
   const isAdmin = adminLevel === 'admin' || adminLevel === 'superadmin';
   const isSuperAdmin = adminLevel === 'superadmin';
-  const isHealthPersonnel = userRole === 'health_personnel';
-  const isPatient = userRole === 'patient';
-
-  // Calculate available roles based on user permissions
-  const availableRoles: UserRole[] = [];
-  if (userRole) {
-    availableRoles.push('patient'); // Everyone can view patient role
-    if (isHealthPersonnel) {
-      availableRoles.push('health_personnel');
-    }
-    if (isAdmin) {
-      availableRoles.push('admin');
-    }
-    if (userRole === 'institution_admin') {
-      availableRoles.push('institution_admin');
-    }
-  }
+  const isHealthPersonnel = availableRoles.includes('health_personnel');
+  const isPatient = availableRoles.includes('patient');
 
   const switchRole = (role: UserRole) => {
     if (availableRoles.includes(role)) {
@@ -72,11 +110,20 @@ export function UserRolesProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const refreshRoles = () => {
-    if (profile) {
-      setUserRole(profile.role as UserRole);
-      setAdminLevel(profile.admin_level as AdminLevel);
-      setCurrentRole(profile.role as UserRole);
+  const refreshRoles = async () => {
+    if (user) {
+      const { data: rolesData } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id);
+      
+      if (rolesData && rolesData.length > 0) {
+        const roles = rolesData.map(r => r.role as UserRole);
+        setAvailableRoles(roles);
+        const primaryRole = roles[0] as UserRole;
+        setUserRole(primaryRole);
+        setCurrentRole(primaryRole);
+      }
     }
   };
 
@@ -93,6 +140,7 @@ export function UserRolesProvider({ children }: { children: React.ReactNode }) {
     isPatient,
     switchRole,
     refreshRoles,
+    checkRole,
   };
 
   return (

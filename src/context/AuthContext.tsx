@@ -63,24 +63,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const fetchProfile = async (userId: string) => {
     try {
-      // Try to fetch patient profile from profiles table with role = 'patient'
-      const { data: patientProfile, error: patientError } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .eq('role', 'patient')
-        .maybeSingle();
-
-      if (patientProfile) {
-        setProfile({
-          ...patientProfile,
-          role: 'patient'
-        });
-        return;
-      }
-
-      // If not a patient, try regular profiles with other roles
-      const { data: regularProfile, error: profileError } = await supabase
+      // Fetch profile from profiles table
+      const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
@@ -91,15 +75,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      if (regularProfile) {
-        setProfile(regularProfile);
+      // Fetch user's primary role from user_roles table using secure function
+      const { data: roleData, error: roleError } = await supabase
+        .rpc('get_user_role', { _user_id: userId });
+
+      if (roleError) {
+        console.error('Error fetching role:', roleError);
+      }
+
+      if (profileData) {
+        setProfile({
+          ...profileData,
+          role: roleData || 'patient', // Use role from user_roles table
+        });
       } else {
-        // If no profile exists at all, create a basic one
+        // If no profile exists, create a basic one
         const { error: createError } = await supabase
           .from('profiles')
           .insert({
             id: userId,
-            role: 'patient',
             email: user?.email,
             is_profile_complete: false
           });
