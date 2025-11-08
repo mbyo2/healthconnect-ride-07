@@ -1,26 +1,67 @@
+import { useState, useEffect } from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { UserManagement } from '@/components/admin/UserManagement';
+import { SecurityAuditLogs } from '@/components/admin/SecurityAuditLogs';
+import { TestAccountSetup } from '@/components/admin/TestAccountSetup';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Shield, Users, Activity } from 'lucide-react';
 
-import React, { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { supabase } from "@/integrations/supabase/client";
-import { LoadingScreen } from "@/components/LoadingScreen";
-import { toast } from "sonner";
-import { useNavigate } from "react-router-dom";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { DataTable } from "@/components/ui/data-table";
-import { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal, Check, X, AlertTriangle, UserPlus, Building, Users, Activity, Calendar, DollarSign, Database } from "lucide-react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { StatusBadge } from "@/components/ui/status-badge";
-import { AdminLevel, StatusType } from "@/types/settings";
-import { TestAccountSetup } from "@/components/admin/TestAccountSetup";
+const AdminDashboard = () => {
+  return (
+    <div className="container mx-auto p-6 space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Admin Dashboard</h1>
+          <p className="text-muted-foreground">
+            Manage users, roles, and monitor security events
+          </p>
+        </div>
+        <Shield className="h-12 w-12 text-primary" />
+      </div>
+
+      <Tabs defaultValue="users" className="space-y-4">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="users" className="flex items-center gap-2">
+            <Users className="h-4 w-4" />
+            User Management
+          </TabsTrigger>
+          <TabsTrigger value="audit" className="flex items-center gap-2">
+            <Activity className="h-4 w-4" />
+            Audit Logs
+          </TabsTrigger>
+          <TabsTrigger value="test" className="flex items-center gap-2">
+            <Shield className="h-4 w-4" />
+            Test Accounts
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="users" className="space-y-4">
+          <UserManagement />
+        </TabsContent>
+
+        <TabsContent value="audit" className="space-y-4">
+          <SecurityAuditLogs />
+        </TabsContent>
+
+        <TabsContent value="test" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Test Account Setup</CardTitle>
+              <CardDescription>
+                Create test accounts for development and testing
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <TestAccountSetup />
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+};
+
+export default AdminDashboard;
 
 type Application = {
   id: string;

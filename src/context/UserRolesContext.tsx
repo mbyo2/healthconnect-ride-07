@@ -58,16 +58,15 @@ export function UserRolesProvider({ children }: { children: React.ReactNode }) {
           
           setUserRole(primaryRole);
           setCurrentRole(primaryRole);
-        }
 
-        // Check admin status using secure function
-        const { data: isAdminData } = await supabase
-          .rpc('is_admin', { _user_id: user.id });
-        
-        if (isAdminData) {
-          setAdminLevel('admin');
-        } else {
-          setAdminLevel(profile.admin_level as AdminLevel);
+          // Check admin status by looking at roles
+          const isAdminRole = roles.includes('admin');
+          
+          if (isAdminRole) {
+            setAdminLevel('admin');
+          } else {
+            setAdminLevel(profile.admin_level as AdminLevel);
+          }
         }
       } else {
         setUserRole(null);
