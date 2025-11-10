@@ -10,13 +10,13 @@ interface RouteGuardProps {
 }
 
 export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
-  const { user, loading } = useAuth();
-  const { availableRoles } = useUserRoles();
+  const { user, loading: authLoading } = useAuth();
+  const { availableRoles, loading: rolesLoading } = useUserRoles();
   const location = useLocation();
   const currentPath = location.pathname;
 
-  // Show loading while auth is being determined
-  if (loading) {
+  // Show loading while auth or roles are being determined
+  if (authLoading || rolesLoading) {
     return <LoadingScreen message="Checking permissions..." />;
   }
 

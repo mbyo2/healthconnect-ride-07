@@ -10,6 +10,7 @@ interface UserRolesContextType {
   currentRole: UserRole | null;
   primaryRole: UserRole | null;
   availableRoles: UserRole[];
+  loading: boolean;
   hasRole: (roles: UserRole[]) => boolean;
   hasAdminLevel: (levels: AdminLevel[]) => boolean;
   isAdmin: boolean;
@@ -29,10 +30,12 @@ export function UserRolesProvider({ children }: { children: React.ReactNode }) {
   const [adminLevel, setAdminLevel] = useState<AdminLevel | null>(null);
   const [currentRole, setCurrentRole] = useState<UserRole | null>(null);
   const [availableRoles, setAvailableRoles] = useState<UserRole[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchRoles = async () => {
       if (user && profile) {
+        setLoading(true);
         // Fetch all roles for the user from user_roles table
         const { data: rolesData, error } = await supabase
           .from('user_roles')
@@ -68,12 +71,20 @@ export function UserRolesProvider({ children }: { children: React.ReactNode }) {
           } else {
             setAdminLevel(profile.admin_level as AdminLevel);
           }
+        } else {
+          // No roles in user_roles table, use profile role as fallback
+          const fallbackRole = profile.role as UserRole;
+          setUserRole(fallbackRole);
+          setCurrentRole(fallbackRole);
+          setAvailableRoles(fallbackRole ? [fallbackRole] : []);
         }
+        setLoading(false);
       } else {
         setUserRole(null);
         setAdminLevel(null);
         setCurrentRole(null);
         setAvailableRoles([]);
+        setLoading(false);
       }
     };
 
@@ -133,6 +144,7 @@ export function UserRolesProvider({ children }: { children: React.ReactNode }) {
     currentRole,
     primaryRole: userRole,
     availableRoles,
+    loading,
     hasRole,
     hasAdminLevel,
     isAdmin,
