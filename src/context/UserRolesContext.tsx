@@ -8,6 +8,7 @@ interface UserRolesContextType {
   userRole: UserRole | null;
   adminLevel: AdminLevel | null;
   currentRole: UserRole | null;
+  primaryRole: UserRole | null;
   availableRoles: UserRole[];
   hasRole: (roles: UserRole[]) => boolean;
   hasAdminLevel: (levels: AdminLevel[]) => boolean;
@@ -130,6 +131,7 @@ export function UserRolesProvider({ children }: { children: React.ReactNode }) {
     userRole,
     adminLevel,
     currentRole,
+    primaryRole: userRole,
     availableRoles,
     hasRole,
     hasAdminLevel,

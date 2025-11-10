@@ -2,16 +2,15 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { AlertCircle } from "lucide-react";
-import { useAuth } from "@/context/AuthContext";
+import { useUserRoles } from "@/context/UserRolesContext";
 import { getRoleLandingPage } from "@/utils/rolePermissions";
-import { UserRole } from "@/utils/rolePermissions";
 
 const NotFound = () => {
   const navigate = useNavigate();
-  const { userRole } = useAuth();
+  const { availableRoles } = useUserRoles();
 
   const handleReturnHome = () => {
-    const landingPage = getRoleLandingPage((userRole || 'patient') as UserRole);
+    const landingPage = getRoleLandingPage(availableRoles.length > 0 ? availableRoles : null);
     navigate(landingPage);
   };
 

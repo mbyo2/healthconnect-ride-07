@@ -1,7 +1,8 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
-import { hasRoutePermission, getRoleLandingPage, PUBLIC_ROUTES, UserRole } from '@/utils/rolePermissions';
+import { useUserRoles } from '@/context/UserRolesContext';
+import { hasRoutePermission, getRoleLandingPage, PUBLIC_ROUTES } from '@/utils/rolePermissions';
 import { LoadingScreen } from '@/components/LoadingScreen';
 
 interface RouteGuardProps {
@@ -9,7 +10,8 @@ interface RouteGuardProps {
 }
 
 export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
-  const { user, userRole, loading } = useAuth();
+  const { user, loading } = useAuth();
+  const { availableRoles } = useUserRoles();
   const location = useLocation();
   const currentPath = location.pathname;
 
@@ -29,9 +31,9 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
   }
 
   // Check if user has permission to access this route
-  if (!hasRoutePermission(userRole as UserRole, currentPath)) {
+  if (!hasRoutePermission(availableRoles, currentPath)) {
     // Redirect to appropriate dashboard based on role
-    const landingPage = getRoleLandingPage(userRole as UserRole);
+    const landingPage = getRoleLandingPage(availableRoles);
     return <Navigate to={landingPage} replace />;
   }
 

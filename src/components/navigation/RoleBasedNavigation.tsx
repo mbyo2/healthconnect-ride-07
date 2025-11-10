@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { useAuth } from '@/context/AuthContext';
-import { getRoleNavigation, UserRole } from '@/utils/rolePermissions';
+import { useUserRoles } from '@/context/UserRolesContext';
+import { getRoleNavigation } from '@/utils/rolePermissions';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import * as Icons from 'lucide-react';
@@ -15,9 +15,9 @@ export const RoleBasedNavigation: React.FC<RoleBasedNavigationProps> = ({
   className, 
   variant = 'desktop' 
 }) => {
-  const { userRole } = useAuth();
+  const { availableRoles } = useUserRoles();
   const location = useLocation();
-  const navigation = getRoleNavigation(userRole as UserRole);
+  const navigation = getRoleNavigation(availableRoles);
 
   const getIcon = (iconName: string) => {
     const IconComponent = Icons[iconName as keyof typeof Icons] as React.ComponentType<any>;
