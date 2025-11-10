@@ -6,7 +6,7 @@ import { createClient } from '@supabase/supabase-js';
 import { MobileLayout } from '@/components/MobileLayout';
 import { LoadingScreen } from '@/components/LoadingScreen';
 import { AuthProvider } from '@/context/AuthContext';
-// UserRolesProvider removed - not implemented
+import { UserRolesProvider } from '@/context/UserRolesContext';
 import { SearchProvider } from '@/context/SearchContext';
 // FeedbackProvider removed - not implemented
 import { AccessibilityProvider } from '@/context/AccessibilityContext';
@@ -190,13 +190,15 @@ const App: React.FC = () => {
   return (
     <SessionContextProvider supabaseClient={supabaseClient}>
       <AuthProvider>
-        <AccessibilityProvider>
-          <Router>
-            <div className="App">
-              <AppContentWithPreload />
-            </div>
-          </Router>
-        </AccessibilityProvider>
+        <UserRolesProvider>
+          <AccessibilityProvider>
+            <Router>
+              <div className="App">
+                <AppContentWithPreload />
+              </div>
+            </Router>
+          </AccessibilityProvider>
+        </UserRolesProvider>
       </AuthProvider>
     </SessionContextProvider>
   );
