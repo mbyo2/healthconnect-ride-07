@@ -2414,7 +2414,7 @@ export type Database = {
           event_data: Json | null
           event_type: string
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           user_agent: string | null
           user_id: string | null
         }
@@ -2423,7 +2423,7 @@ export type Database = {
           event_data?: Json | null
           event_type: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           user_agent?: string | null
           user_id?: string | null
         }
@@ -2432,7 +2432,7 @@ export type Database = {
           event_data?: Json | null
           event_type?: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           user_agent?: string | null
           user_id?: string | null
         }
@@ -2660,7 +2660,7 @@ export type Database = {
           created_at: string | null
           expires_at: string
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           is_active: boolean | null
           last_activity: string | null
           session_token: string
@@ -2671,7 +2671,7 @@ export type Database = {
           created_at?: string | null
           expires_at: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           is_active?: boolean | null
           last_activity?: string | null
           session_token: string
@@ -2682,7 +2682,7 @@ export type Database = {
           created_at?: string | null
           expires_at?: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           is_active?: boolean | null
           last_activity?: string | null
           session_token?: string
@@ -2902,16 +2902,13 @@ export type Database = {
         Args: { provider_id: string; service_category_id: string }
         Returns: boolean
       }
-      delete_user: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      delete_user: { Args: never; Returns: undefined }
       get_current_user_admin_level: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: Database["public"]["Enums"]["admin_level"]
       }
       get_current_user_role: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: Database["public"]["Enums"]["user_role"]
       }
       get_diagnosis_by_id: {
@@ -2924,9 +2921,15 @@ export type Database = {
           symptoms: string
           user_id: string
         }
+        SetofOptions: {
+          from: "*"
+          to: "ai_diagnosis_history"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       get_my_diagnosis_history: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           analysis: string | null
           created_at: string
@@ -2935,6 +2938,12 @@ export type Database = {
           symptoms: string
           user_id: string
         }[]
+        SetofOptions: {
+          from: "*"
+          to: "ai_diagnosis_history"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       get_user_role: {
         Args: { _user_id: string }
@@ -2947,10 +2956,7 @@ export type Database = {
         }
         Returns: boolean
       }
-      insert_applications_for_doctors: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      insert_applications_for_doctors: { Args: never; Returns: undefined }
       is_institution_admin: {
         Args: { institution_id: string }
         Returns: boolean
@@ -2963,27 +2969,27 @@ export type Database = {
         Args: { institution_id: string }
         Returns: boolean
       }
-      is_super_admin: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
-      process_payment_with_splits: {
-        Args:
-          | {
+      is_super_admin: { Args: never; Returns: boolean }
+      process_payment_with_splits:
+        | {
+            Args: {
               p_institution_id?: string
               p_payment_id: string
               p_payment_type?: string
               p_provider_id: string
               p_total_amount: number
             }
-          | {
+            Returns: Json
+          }
+        | {
+            Args: {
               p_institution_id?: string
               p_payment_id: string
               p_provider_id: string
               p_total_amount: number
             }
-        Returns: Json
-      }
+            Returns: Json
+          }
       process_wallet_transaction: {
         Args: {
           p_amount: number
@@ -2997,7 +3003,13 @@ export type Database = {
     }
     Enums: {
       admin_level: "admin" | "superadmin"
-      app_role: "patient" | "health_personnel" | "admin" | "institution_admin"
+      app_role:
+        | "patient"
+        | "health_personnel"
+        | "admin"
+        | "institution_admin"
+        | "pharmacy"
+        | "institution_staff"
       experience_level: "entry" | "intermediate" | "expert"
       healthcare_provider_type:
         | "doctor"
@@ -3147,7 +3159,14 @@ export const Constants = {
   public: {
     Enums: {
       admin_level: ["admin", "superadmin"],
-      app_role: ["patient", "health_personnel", "admin", "institution_admin"],
+      app_role: [
+        "patient",
+        "health_personnel",
+        "admin",
+        "institution_admin",
+        "pharmacy",
+        "institution_staff",
+      ],
       experience_level: ["entry", "intermediate", "expert"],
       healthcare_provider_type: [
         "doctor",
