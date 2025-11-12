@@ -122,6 +122,60 @@ export type Database = {
           },
         ]
       }
+      audit_logs: {
+        Row: {
+          action: string
+          category: string
+          created_at: string | null
+          details: Json | null
+          device_info: string | null
+          id: string
+          ip_address: string | null
+          outcome: string
+          resource: string
+          resource_id: string | null
+          session_id: string | null
+          severity: string
+          timestamp: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          action: string
+          category: string
+          created_at?: string | null
+          details?: Json | null
+          device_info?: string | null
+          id?: string
+          ip_address?: string | null
+          outcome: string
+          resource: string
+          resource_id?: string | null
+          session_id?: string | null
+          severity: string
+          timestamp?: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          action?: string
+          category?: string
+          created_at?: string | null
+          details?: Json | null
+          device_info?: string | null
+          id?: string
+          ip_address?: string | null
+          outcome?: string
+          resource?: string
+          resource_id?: string | null
+          session_id?: string | null
+          severity?: string
+          timestamp?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       billing_records: {
         Row: {
           amount: number
@@ -2438,6 +2492,48 @@ export type Database = {
         }
         Relationships: []
       }
+      security_events: {
+        Row: {
+          created_at: string | null
+          event_data: Json | null
+          id: string
+          ip_address: string | null
+          resolved: boolean | null
+          resolved_at: string | null
+          resolved_by: string | null
+          severity: string
+          type: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          event_data?: Json | null
+          id?: string
+          ip_address?: string | null
+          resolved?: boolean | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity: string
+          type: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          event_data?: Json | null
+          id?: string
+          ip_address?: string | null
+          resolved?: boolean | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+          type?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       service_categories: {
         Row: {
           created_at: string | null
@@ -2658,33 +2754,39 @@ export type Database = {
       user_sessions: {
         Row: {
           created_at: string | null
+          device_info: string | null
           expires_at: string
           id: string
           ip_address: unknown
           is_active: boolean | null
           last_activity: string | null
+          location: string | null
           session_token: string
           user_agent: string | null
           user_id: string
         }
         Insert: {
           created_at?: string | null
+          device_info?: string | null
           expires_at: string
           id?: string
           ip_address?: unknown
           is_active?: boolean | null
           last_activity?: string | null
+          location?: string | null
           session_token: string
           user_agent?: string | null
           user_id: string
         }
         Update: {
           created_at?: string | null
+          device_info?: string | null
           expires_at?: string
           id?: string
           ip_address?: unknown
           is_active?: boolean | null
           last_activity?: string | null
+          location?: string | null
           session_token?: string
           user_agent?: string | null
           user_id?: string
