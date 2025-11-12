@@ -2,7 +2,7 @@
 import React, { useEffect, useState, Suspense, lazy, useMemo } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from 'react-router-dom';
 import { useSession, useSupabaseClient, SessionContextProvider } from '@supabase/auth-helpers-react';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/integrations/supabase/client';
 import { MobileLayout } from '@/components/MobileLayout';
 import { LoadingScreen } from '@/components/LoadingScreen';
 import { AuthProvider } from '@/context/AuthContext';
@@ -180,15 +180,8 @@ AppContentWithPreload.displayName = 'AppContentWithPreload';
 
 // Main App Component with Authentication and Routing
 const App: React.FC = () => {
-  const supabaseClient = useMemo(() => 
-    createClient(
-      import.meta.env.VITE_SUPABASE_URL!,
-      import.meta.env.VITE_SUPABASE_ANON_KEY!
-    ), []
-  );
-
   return (
-    <SessionContextProvider supabaseClient={supabaseClient}>
+    <SessionContextProvider supabaseClient={supabase}>
       <AuthProvider>
         <UserRolesProvider>
           <AccessibilityProvider>
