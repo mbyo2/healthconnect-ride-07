@@ -758,6 +758,51 @@ export type Database = {
           },
         ]
       }
+      fraud_alerts: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          metadata: Json | null
+          resolution: string | null
+          resolved: boolean
+          resolved_at: string | null
+          risk_score: number
+          severity: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          id?: string
+          metadata?: Json | null
+          resolution?: string | null
+          resolved?: boolean
+          resolved_at?: string | null
+          risk_score?: number
+          severity: string
+          type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          metadata?: Json | null
+          resolution?: string | null
+          resolved?: boolean
+          resolved_at?: string | null
+          risk_score?: number
+          severity?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       health_articles: {
         Row: {
           author_id: string | null
@@ -899,6 +944,60 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      health_reminders: {
+        Row: {
+          created_at: string
+          custom_schedule: Json | null
+          description: string | null
+          frequency: string
+          id: string
+          is_active: boolean
+          last_triggered: string | null
+          metadata: Json | null
+          next_trigger: string
+          priority: string
+          scheduled_time: string
+          title: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          custom_schedule?: Json | null
+          description?: string | null
+          frequency: string
+          id?: string
+          is_active?: boolean
+          last_triggered?: string | null
+          metadata?: Json | null
+          next_trigger: string
+          priority?: string
+          scheduled_time: string
+          title: string
+          type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          custom_schedule?: Json | null
+          description?: string | null
+          frequency?: string
+          id?: string
+          is_active?: boolean
+          last_triggered?: string | null
+          metadata?: Json | null
+          next_trigger?: string
+          priority?: string
+          scheduled_time?: string
+          title?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       healthcare_institutions: {
         Row: {
@@ -1553,6 +1652,69 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      medication_alerts: {
+        Row: {
+          adherence_tracking: boolean
+          created_at: string
+          dosage: string
+          end_date: string | null
+          frequency: string
+          id: string
+          interactions: string[] | null
+          is_active: boolean
+          last_taken: string | null
+          medication_id: string | null
+          medication_name: string
+          missed_doses: number
+          side_effects_to_watch: string[] | null
+          start_date: string
+          times: string[] | null
+          total_doses: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          adherence_tracking?: boolean
+          created_at?: string
+          dosage: string
+          end_date?: string | null
+          frequency: string
+          id?: string
+          interactions?: string[] | null
+          is_active?: boolean
+          last_taken?: string | null
+          medication_id?: string | null
+          medication_name: string
+          missed_doses?: number
+          side_effects_to_watch?: string[] | null
+          start_date: string
+          times?: string[] | null
+          total_doses?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          adherence_tracking?: boolean
+          created_at?: string
+          dosage?: string
+          end_date?: string | null
+          frequency?: string
+          id?: string
+          interactions?: string[] | null
+          is_active?: boolean
+          last_taken?: string | null
+          medication_id?: string | null
+          medication_name?: string
+          missed_doses?: number
+          side_effects_to_watch?: string[] | null
+          start_date?: string
+          times?: string[] | null
+          total_doses?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       medication_inventory: {
         Row: {
@@ -2462,6 +2624,36 @@ export type Database = {
           },
         ]
       }
+      reminder_notifications: {
+        Row: {
+          acknowledged: boolean
+          acknowledged_at: string | null
+          created_at: string
+          id: string
+          notification_type: string
+          reminder_id: string
+          user_id: string
+        }
+        Insert: {
+          acknowledged?: boolean
+          acknowledged_at?: string | null
+          created_at?: string
+          id?: string
+          notification_type: string
+          reminder_id: string
+          user_id: string
+        }
+        Update: {
+          acknowledged?: boolean
+          acknowledged_at?: string | null
+          created_at?: string
+          id?: string
+          notification_type?: string
+          reminder_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       security_audit_log: {
         Row: {
           created_at: string | null
@@ -2502,6 +2694,7 @@ export type Database = {
           resolved_at: string | null
           resolved_by: string | null
           severity: string
+          timestamp: string | null
           type: string
           user_agent: string | null
           user_id: string | null
@@ -2515,6 +2708,7 @@ export type Database = {
           resolved_at?: string | null
           resolved_by?: string | null
           severity: string
+          timestamp?: string | null
           type: string
           user_agent?: string | null
           user_id?: string | null
@@ -2528,6 +2722,7 @@ export type Database = {
           resolved_at?: string | null
           resolved_by?: string | null
           severity?: string
+          timestamp?: string | null
           type?: string
           user_agent?: string | null
           user_id?: string | null
