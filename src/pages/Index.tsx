@@ -8,11 +8,21 @@ import { useNavigate } from "react-router-dom";
 import { useOnboarding } from "@/components/onboarding/OnboardingProvider";
 import { MobileTouchList } from "@/components/MobileTouchList";
 import { useMediaQuery } from "@/hooks/use-media-query";
+import { useRoleDashboard } from "@/hooks/useRoleDashboard";
+import { LoadingScreen } from "@/components/LoadingScreen";
 
 export const Index = () => {
   const navigate = useNavigate();
   const { showFeatureHighlight } = useOnboarding();
   const isMobile = useMediaQuery('(max-width: 768px)');
+  
+  // Automatically redirect authenticated users to their role-based dashboard
+  const { isLoading, shouldRedirect } = useRoleDashboard({ redirectOnAuth: true });
+  
+  // Show loading while checking authentication and roles
+  if (isLoading || shouldRedirect) {
+    return <LoadingScreen message="Loading your dashboard..." />;
+  }
   
   const handleSymptomSubmit = (symptoms: string, urgency: string) => {
     console.log("Symptoms submitted:", { symptoms, urgency });
