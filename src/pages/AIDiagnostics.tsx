@@ -1,9 +1,10 @@
 import { Helmet } from "react-helmet";
 import { MedGemmaChat } from "@/components/MedGemmaChat";
 import { SymptomCollector } from "@/components/SymptomCollector";
+import { AIDiagnosisHistory } from "@/components/AIDiagnosisHistory";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Brain, MessageSquare, ClipboardList, Shield } from "lucide-react";
+import { Brain, MessageSquare, ClipboardList, Shield, History } from "lucide-react";
 
 const AIDiagnostics = () => {
   return (
@@ -32,7 +33,7 @@ const AIDiagnostics = () => {
           </div>
 
           {/* Feature Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm sm:text-base flex items-center gap-2">
@@ -42,7 +43,7 @@ const AIDiagnostics = () => {
               </CardHeader>
               <CardContent>
                 <p className="text-xs sm:text-sm text-muted-foreground">
-                  Have natural conversations about your health concerns
+                  Chat & upload medical images for analysis
                 </p>
               </CardContent>
             </Card>
@@ -56,12 +57,26 @@ const AIDiagnostics = () => {
               </CardHeader>
               <CardContent>
                 <p className="text-xs sm:text-sm text-muted-foreground">
-                  Get detailed analysis of your symptoms with AI
+                  Get detailed analysis of your symptoms
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="sm:col-span-2 md:col-span-1">
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm sm:text-base flex items-center gap-2">
+                  <History className="h-4 w-4 text-primary" />
+                  History
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-xs sm:text-sm text-muted-foreground">
+                  View your past AI consultations
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm sm:text-base flex items-center gap-2">
                   <Shield className="h-4 w-4 text-primary" />
@@ -70,7 +85,7 @@ const AIDiagnostics = () => {
               </CardHeader>
               <CardContent>
                 <p className="text-xs sm:text-sm text-muted-foreground">
-                  Recommendations based on medical research and guidelines
+                  Based on medical research & guidelines
                 </p>
               </CardContent>
             </Card>
@@ -78,9 +93,10 @@ const AIDiagnostics = () => {
 
           {/* Main Content */}
           <Tabs defaultValue="chat" className="w-full">
-            <TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
+            <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-3">
               <TabsTrigger value="chat" className="text-xs sm:text-sm">AI Chat</TabsTrigger>
               <TabsTrigger value="symptoms" className="text-xs sm:text-sm">Symptom Checker</TabsTrigger>
+              <TabsTrigger value="history" className="text-xs sm:text-sm">History</TabsTrigger>
             </TabsList>
 
             <TabsContent value="chat" className="mt-6">
@@ -99,6 +115,10 @@ const AIDiagnostics = () => {
                   <SymptomCollector />
                 </CardContent>
               </Card>
+            </TabsContent>
+
+            <TabsContent value="history" className="mt-4 sm:mt-6">
+              <AIDiagnosisHistory />
             </TabsContent>
           </Tabs>
 
