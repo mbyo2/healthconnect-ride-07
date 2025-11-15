@@ -4,26 +4,29 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2, Send, Bot, User } from 'lucide-react';
+import { Loader2, Send, Bot, User, Image as ImageIcon, X } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Message {
   role: 'user' | 'assistant';
   content: string;
   timestamp: Date;
+  image?: string; // base64 image data
 }
 
 export const MedGemmaChat = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: 'Hello! I\'m Doc 0 Clock, your AI medical assistant. I can help you understand symptoms, discuss health concerns, and provide medical information. How can I assist you today?',
+      content: 'Hello! I\'m Doc 0 Clock, your AI medical assistant. I can help you understand symptoms, discuss health concerns, and provide medical information. You can also upload medical images (lab results, X-rays, scans) for analysis. How can I assist you today?',
       timestamp: new Date()
     }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -31,25 +34,56 @@ export const MedGemmaChat = () => {
     }
   }, [messages]);
 
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file');
+      return;
+    }
+
+    // Validate file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('Image must be less than 10MB');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const base64 = e.target?.result as string;
+      setSelectedImage(base64);
+    };
+    reader.readAsDataURL(file);
+  };
+
   const sendMessage = async () => {
-    if (!input.trim() || isLoading) return;
+    if ((!input.trim() && !selectedImage) || isLoading) return;
 
     const userMessage: Message = {
       role: 'user',
-      content: input.trim(),
-      timestamp: new Date()
+      content: input.trim() || 'Please analyze this medical image',
+      timestamp: new Date(),
+      image: selectedImage || undefined
     };
 
     setMessages(prev => [...prev, userMessage]);
     setInput('');
+    const imageToSend = selectedImage;
+    setSelectedImage(null);
     setIsLoading(true);
 
     try {
-      console.log('Calling doc-chat function...');
+      console.log('Calling doc-chat function with image:', !!imageToSend);
       const { data, error } = await supabase.functions.invoke('doc-chat', {
         body: {
           message: userMessage.content,
-          conversationHistory: messages.slice(-10) // Last 10 messages for context
+          image: imageToSend,
+          conversationHistory: messages.slice(-10).map(m => ({
+            role: m.role,
+            content: m.content
+          }))
         }
       });
 
@@ -122,6 +156,13 @@ export const MedGemmaChat = () => {
                       : 'bg-muted'
                   }`}
                 >
+                  {message.image && (
+                    <img 
+                      src={message.image} 
+                      alt="Medical image" 
+                      className="rounded-lg mb-2 max-w-full h-auto max-h-48 object-contain"
+                    />
+                  )}
                   <p className="text-xs sm:text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>
                   <span className="text-[10px] sm:text-xs opacity-70 mt-1 block">
                     {message.timestamp.toLocaleTimeString()}
@@ -150,18 +191,51 @@ export const MedGemmaChat = () => {
         </ScrollArea>
 
         <div className="border-t p-3 sm:p-4">
+          {selectedImage && (
+            <div className="mb-2 relative inline-block">
+              <img 
+                src={selectedImage} 
+                alt="Selected" 
+                className="rounded-lg max-h-20 object-contain border border-border"
+              />
+              <Button
+                size="icon"
+                variant="destructive"
+                className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
+                onClick={() => setSelectedImage(null)}
+              >
+                <X className="h-3 w-3" />
+              </Button>
+            </div>
+          )}
           <div className="flex gap-2">
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleImageSelect}
+              accept="image/*"
+              className="hidden"
+            />
+            <Button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isLoading}
+              size="icon"
+              variant="outline"
+              className="flex-shrink-0"
+            >
+              <ImageIcon className="h-4 w-4" />
+            </Button>
             <Input
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="Ask me about your health..."
+              placeholder={selectedImage ? "Describe what you want to know about this image..." : "Ask me about your health..."}
               disabled={isLoading}
               className="flex-1 text-xs sm:text-sm"
             />
             <Button
               onClick={sendMessage}
-              disabled={isLoading || !input.trim()}
+              disabled={isLoading || (!input.trim() && !selectedImage)}
               size="icon"
               className="flex-shrink-0"
             >
