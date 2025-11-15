@@ -9,6 +9,7 @@ const corsHeaders = {
 // Input validation schema
 const chatRequestSchema = z.object({
   message: z.string().min(1, 'Message cannot be empty').max(2000, 'Message too long'),
+  image: z.string().optional(), // base64 image data
   conversationHistory: z.array(z.object({
     role: z.enum(['user', 'assistant', 'system']),
     content: z.string().max(2000)
@@ -36,20 +37,28 @@ serve(async (req) => {
       );
     }
 
-    const { message, conversationHistory } = validationResult.data;
+    const { message, image, conversationHistory } = validationResult.data;
     
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {
       throw new Error('LOVABLE_API_KEY not configured');
     }
 
-    // Build conversation context
+    // Build conversation context with enhanced medical image analysis capabilities
     const systemPrompt = `You are Doc 0 Clock, a knowledgeable medical AI assistant available 24/7. You provide:
 - Evidence-based medical information
 - Symptom analysis and health guidance
+- Medical image interpretation (X-rays, lab results, scans, reports)
 - Medication information
 - Preventive care recommendations
 - Mental health support
+
+When analyzing medical images:
+1. Identify the type of medical image/document
+2. List observable findings in clear, understandable terms
+3. Explain what these findings might indicate
+4. Note any abnormalities or areas of concern
+5. Recommend appropriate follow-up actions
 
 Always:
 1. Be empathetic and supportive
@@ -58,21 +67,44 @@ Always:
 4. Include disclaimers about not replacing professional medical advice
 5. Ask clarifying questions when needed
 
-CRITICAL: If symptoms suggest emergency (chest pain, difficulty breathing, severe bleeding, loss of consciousness), immediately advise to call emergency services.`;
+CRITICAL: 
+- If symptoms or images suggest emergency conditions, immediately advise to seek emergency care
+- Always emphasize that image analysis should be confirmed by a licensed medical professional
+- For lab results, provide context on normal ranges and what deviations might mean`;
 
-    // Format conversation history
+    // Format conversation history with multi-modal support
     const messages = [
       { role: 'system', content: systemPrompt },
       ...conversationHistory.map((msg: any) => ({
         role: msg.role,
         content: msg.content
-      })),
-      { role: 'user', content: message }
+      }))
     ];
+
+    // Add user message with image if provided
+    if (image) {
+      messages.push({
+        role: 'user',
+        content: [
+          {
+            type: 'text',
+            text: message
+          },
+          {
+            type: 'image_url',
+            image_url: {
+              url: image
+            }
+          }
+        ]
+      });
+    } else {
+      messages.push({ role: 'user', content: message });
+    }
 
     console.log('Calling Lovable AI...');
 
-    // Call Lovable AI Gateway
+    // Call Lovable AI Gateway with vision-capable model
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -80,10 +112,10 @@ CRITICAL: If symptoms suggest emergency (chest pain, difficulty breathing, sever
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
+        model: 'google/gemini-2.5-flash', // Supports both text and vision
         messages,
         temperature: 0.4,
-        max_tokens: 800,
+        max_tokens: 1200, // Increased for detailed image analysis
       }),
     });
 
