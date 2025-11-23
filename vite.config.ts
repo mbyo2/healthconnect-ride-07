@@ -5,14 +5,48 @@ import path from "path";
 import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
+/// <reference types="vite/client" />
+
 export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
+    // In production, CORS is handled by Netlify
+    cors: mode === 'production' ? false : {
+      origin: [
+        'http://localhost:8080',
+        'https://dokota.netlify.app',
+        'https://*.netlify.app',
+        'https://tthzcijscedgxjfnfnky.supabase.co'
+      ],
+      credentials: true
+    },
+    // Only use proxy in development
+    proxy: mode === 'production' ? undefined : {
+      '/auth/v1': {
+        target: 'https://tthzcijscedgxjfnfnky.supabase.co',
+        changeOrigin: true,
+        rewrite: (path: string) => path.replace(/^\/auth\/v1/, '/auth/v1'),
+        secure: false
+      },
+      '/rest/v1': {
+        target: 'https://tthzcijscedgxjfnfnky.supabase.co',
+        changeOrigin: true,
+        rewrite: (path: string) => path.replace(/^\/rest\/v1/, '/rest/v1'),
+        secure: false
+      }
+    },
     // Optimize HMR
     hmr: {
       overlay: false,
     },
+    // Add security headers
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
+      'Access-Control-Allow-Headers': 'X-Requested-With, Content-Type, Authorization',
+      'Access-Control-Allow-Credentials': 'true'
+    }
   },
   plugins: [
     react(),

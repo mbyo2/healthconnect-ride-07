@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 
 export interface HealthStat {
@@ -24,54 +23,133 @@ export interface UpcomingAppointment {
   type: string;
 }
 
+// Fetch the most recent health metrics for the user and map them to HealthStat entries
 export const getHealthStats = async (): Promise<HealthStat[]> => {
   try {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return [];
 
-    // Fetch latest health metrics from database
     const { data: metrics } = await supabase
-      .from('health_metrics')
+      .from('daily_health_metrics')
       .select('*')
       .eq('user_id', user.id)
-      .order('recorded_at', { ascending: false })
-      .limit(10);
+      .order('date', { ascending: false })
+      .limit(1);
 
-    // Transform database data to health stats format
-    return metrics?.map(metric => ({
-      title: metric.metric_type,
-      value: metric.value.toString(),
-      unit: metric.unit || '',
-      status: "Normal",
-      trend: "stable" as const,
-      icon: getIconForMetricType(metric.metric_type)
-    })) || [];
+    if (!metrics || metrics.length === 0) return [];
+    const metric = metrics[0];
+
+    const stats: HealthStat[] = [];
+    if (metric.steps !== undefined) {
+      stats.push({
+        title: 'Steps',
+        value: metric.steps.toString(),
+        unit: 'steps',
+        status: 'Normal',
+        trend: 'stable',
+        icon: getIconForMetricType('steps')
+      });
+    }
+    if (metric.calories_burned !== undefined) {
+      stats.push({
+        title: 'Calories Burned',
+        value: metric.calories_burned.toString(),
+        unit: 'kcal',
+        status: 'Normal',
+        trend: 'stable',
+        icon: getIconForMetricType('calories')
+      });
+    }
+    if (metric.distance !== undefined) {
+      stats.push({
+        title: 'Distance',
+        value: metric.distance.toString(),
+        unit: 'km',
+        status: 'Normal',
+        trend: 'stable',
+        icon: getIconForMetricType('distance')
+      });
+    }
+    if (metric.active_minutes !== undefined) {
+      stats.push({
+        title: 'Active Minutes',
+        value: metric.active_minutes.toString(),
+        unit: 'min',
+        status: 'Normal',
+        trend: 'stable',
+        icon: getIconForMetricType('active_minutes')
+      });
+    }
+    if (metric.sleep_hours !== undefined) {
+      stats.push({
+        title: 'Sleep Hours',
+        value: metric.sleep_hours.toString(),
+        unit: 'h',
+        status: 'Normal',
+        trend: 'stable',
+        icon: getIconForMetricType('sleep')
+      });
+    }
+    if (metric.water_intake !== undefined) {
+      stats.push({
+        title: 'Water Intake',
+        value: metric.water_intake.toString(),
+        unit: 'L',
+        status: 'Normal',
+        trend: 'stable',
+        icon: getIconForMetricType('water')
+      });
+    }
+    return stats;
   } catch (error) {
     console.error('Error fetching health stats:', error);
     return [];
   }
 };
 
+// Generate mock health goals based on the latest health metrics
 export const getHealthGoals = async (): Promise<HealthGoal[]> => {
   try {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return [];
 
-    // Since health_goals table doesn't exist, return mock data based on health metrics
     const { data: metrics } = await supabase
-      .from('health_metrics')
+      .from('daily_health_metrics')
       .select('*')
       .eq('user_id', user.id)
-      .order('recorded_at', { ascending: false })
-      .limit(4);
+      .order('date', { ascending: false })
+      .limit(1);
 
-    // Create goals based on existing metrics
-    return metrics?.map(metric => ({
-      title: `${metric.metric_type} Goal`,
-      current: metric.value || 0,
-      target: getTargetForMetricType(metric.metric_type),
-      icon: getIconForGoalType(metric.metric_type)
-    })) || [];
+    if (!metrics || metrics.length === 0) return [];
+    const metric = metrics[0];
+
+    const goals: HealthGoal[] = [];
+    if (metric.steps !== undefined) {
+      goals.push({
+        title: 'Steps Goal',
+        current: metric.steps,
+        target: getTargetForMetricType('steps'),
+        icon: getIconForGoalType('steps')
+      });
+    }
+    if (metric.water_intake !== undefined) {
+      goals.push({
+        title: 'Water Intake Goal',
+        current: metric.water_intake,
+        target: getTargetForMetricType('water'),
+        icon: getIconForGoalType('water')
+      });
+    }
+    if (metric.active_minutes !== undefined) {
+      goals.push({
+        title: 'Active Minutes Goal',
+        current: metric.active_minutes,
+        target: getTargetForMetricType('exercise'),
+        icon: getIconForGoalType('exercise')
+      });
+    }
+    // Add more goals as needed based on available columns
+    return goals;
   } catch (error) {
     console.error('Error fetching health goals:', error);
     return [];
@@ -97,8 +175,8 @@ export const getUpcomingAppointments = async (): Promise<UpcomingAppointment[]> 
     return appointments?.map(apt => ({
       date: new Date(apt.date).toLocaleDateString(),
       time: apt.time || 'TBD',
-      provider: apt.profiles?.first_name && apt.profiles?.last_name 
-        ? `${apt.profiles.first_name} ${apt.profiles.last_name}` 
+      provider: apt.profiles?.first_name && apt.profiles?.last_name
+        ? `${apt.profiles.first_name} ${apt.profiles.last_name}`
         : 'Provider',
       type: apt.type || 'Consultation'
     })) || [];
@@ -114,7 +192,12 @@ const getIconForMetricType = (type: string): string => {
     'heart_rate': 'Activity',
     'weight': 'Target',
     'sleep': 'Moon',
-    'temperature': 'Thermometer'
+    'temperature': 'Thermometer',
+    'steps': 'Footprints',
+    'calories': 'Fire',
+    'distance': 'MapPin',
+    'active_minutes': 'Activity',
+    'water': 'Droplets'
   };
   return iconMap[type] || 'Activity';
 };

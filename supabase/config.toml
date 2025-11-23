@@ -22,8 +22,6 @@ port = 54324
 
 [storage]
 enabled = true
-file_storage_backend = "file"
-file_storage_upload_directory = "/tmp/storage"
 
 [auth]
 enabled = true

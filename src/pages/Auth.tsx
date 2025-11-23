@@ -193,26 +193,62 @@ export const Auth = () => {
     }
   };
 
-  // Form submission handlers with improved error handling
+  // Form submission handlers with improved error handling and logging
   const onLoginSubmit = async (data: LoginFormValues) => {
     try {
       setError(null);
       setLocalLoading(true);
-      const { error } = await supabase.auth.signInWithPassword({
+      
+      console.log('Attempting to sign in with:', data.email);
+      
+      const { data: authData, error } = await supabase.auth.signInWithPassword({
         email: data.email,
         password: data.password,
       });
       
-      if (error) throw error;
+      if (error) {
+        console.error('Authentication error details:', {
+          status: error.status,
+          name: error.name,
+          code: error.code,
+          message: error.message,
+        });
+        throw error;
+      }
+      
+      console.log('Auth response:', {
+        session: !!authData.session,
+        user: authData.user?.id ? 'User ID: ' + authData.user.id : 'No user',
+        expiresAt: authData.session?.expires_at,
+      });
       
       showSuccess("Signed in successfully!");
       toast.success("Signed in successfully!");
-      navigate("/symptoms");
+      
+      // Small delay to ensure session is properly set
+      setTimeout(() => {
+        navigate("/symptoms");
+      }, 500);
+      
     } catch (err: any) {
-      const errorMessage = err.message || "Failed to sign in";
+      let errorMessage = 'Failed to sign in';
+      
+      if (err.status === 400) {
+        errorMessage = 'Invalid email or password';
+      } else if (err.message?.includes('network')) {
+        errorMessage = 'Network error. Please check your connection.';
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+      
+      console.error('Login error details:', {
+        error: err,
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+      });
+      
       setError(errorMessage);
       showError(errorMessage);
-      console.error("Login error:", err);
       toast.error(errorMessage);
     } finally {
       setLocalLoading(false);

@@ -23,7 +23,7 @@ export function DesktopNav() {
   const handleSearchSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault();
     setSearchQuery(searchTerm);
-    
+
     if (location.pathname !== "/search") {
       window.location.href = "/search";
     }
@@ -37,7 +37,7 @@ export function DesktopNav() {
       console.error("Error signing out:", error);
     }
   }, [signOut]);
-  
+
   // Enhanced main navigation items for better user experience
   const mainNavItems = [
     {
@@ -77,7 +77,7 @@ export function DesktopNav() {
       }
     );
   }
-  
+
   // Enhanced secondary items for comprehensive access including Phase 5 features
   const secondaryNavItems = [
     {
@@ -152,65 +152,81 @@ export function DesktopNav() {
       icon: <Settings className="h-4 w-4 mr-2" />
     }
   ];
-  
+
   return (
-    <header className="bg-background sticky top-0 z-50 border-b-2 border-trust-100 px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 shadow-lg">
+    <header
+      className="bg-background sticky top-0 z-50 border-b-2 border-trust-100 px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 shadow-lg"
+      role="banner"
+    >
       <div className="container mx-auto flex items-center justify-between py-4 max-w-8xl">
         <div className="flex items-center gap-8">
           {/* Enhanced Logo */}
-          <Link to="/" className="font-bold text-3xl logo-link text-trust-600 hover:text-trust-700 transition-colors">
+          <Link
+            to="/"
+            className="font-bold text-3xl logo-link text-trust-600 hover:text-trust-700 transition-colors"
+            aria-label="HealthConnect Home"
+          >
             Doc&apos; O Clock
           </Link>
-          
-          {/* Main navigation with enhanced visibility */}
-          <div className="hidden lg:flex items-center space-x-2">
+
+          {/* Main navigation with enhanced visibility and accessibility */}
+          <nav className="hidden lg:flex items-center space-x-2" role="navigation" aria-label="Main navigation">
             {mainNavItems.map((item, index) => (
-              <Button 
-                key={index} 
-                variant={item.active ? "default" : "ghost"} 
+              <Button
+                key={index}
+                variant={item.active ? "default" : "ghost"}
                 asChild
-                className={`flex items-center px-4 py-2 rounded-xl transition-all duration-200 ${
-                  item.active 
-                    ? "bg-trust-600 text-white shadow-lg" 
+                className={`flex items-center px-4 py-2 rounded-xl transition-all duration-200 ${item.active
+                    ? "bg-trust-600 text-white shadow-lg"
                     : "hover:bg-trust-50 hover:text-trust-700"
-                }`}
+                  }`}
               >
-                <Link to={item.to}>
+                <Link
+                  to={item.to}
+                  aria-label={item.label}
+                  aria-current={item.active ? "page" : undefined}
+                >
                   {item.icon}
                   {item.label}
                 </Link>
               </Button>
             ))}
-            
+
             <DesktopNavMenu secondaryNavItems={secondaryNavItems} />
-          </div>
+          </nav>
         </div>
-        
+
         <div className="flex items-center gap-4">
-          {/* Enhanced Search */}
-          <form onSubmit={handleSearchSubmit} className="relative hidden md:block">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+          {/* Enhanced Search with accessibility */}
+          <form
+            onSubmit={handleSearchSubmit}
+            className="relative hidden md:block"
+            role="search"
+            aria-label="Search for healthcare providers"
+          >
+            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" aria-hidden="true" />
             <Input
               type="search"
               placeholder="Find doctors, clinics, specialists..."
               className="w-[250px] pl-10 md:w-[280px] lg:w-[320px] xl:w-[360px] 2xl:w-[400px] rounded-xl border-trust-200 focus:border-trust-400 focus:ring-trust-200"
               value={searchTerm}
               onChange={handleSearchChange}
+              aria-label="Search for doctors, clinics, or specialists"
             />
           </form>
-          
+
           <ThemeToggle />
-          
-          {/* Enhanced User menu */}
+
+          {/* Enhanced User menu with accessibility */}
           {isAuthenticated && user ? (
             <DesktopUserMenu user={user} profile={profile} onLogout={handleLogout} />
           ) : (
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3" role="group" aria-label="Authentication actions">
               <Button variant="outline" asChild className="rounded-xl border-trust-200 hover:bg-trust-50">
-                <Link to="/auth">Sign In</Link>
+                <Link to="/auth" aria-label="Sign in to your account">Sign In</Link>
               </Button>
               <Button asChild className="rounded-xl bg-trust-600 hover:bg-trust-700">
-                <Link to="/auth">Get Started</Link>
+                <Link to="/auth" aria-label="Create a new account">Get Started</Link>
               </Button>
             </div>
           )}
@@ -219,6 +235,3 @@ export function DesktopNav() {
     </header>
   );
 }
-
-// TODO: Add ARIA roles and keyboard navigation for all menu items
-// TODO: Ensure navigation is accessible for screen readers

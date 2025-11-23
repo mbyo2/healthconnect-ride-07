@@ -13,7 +13,7 @@ export async function subscribeToNotifications() {
 
     // Request permission
     const permission = await Notification.requestPermission();
-    
+
     if (permission !== 'granted') {
       toast.error("Notification permission denied");
       return false;
@@ -27,14 +27,16 @@ export async function subscribeToNotifications() {
 
     // Register service worker if not already registered
     const registration = await navigator.serviceWorker.ready;
-    
+
     // Subscribe to push notifications
+    // VAPID (Voluntary Application Server Identification) keys are used for web push authentication
     const vapidKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
     if (!vapidKey) {
-      toast.error("VAPID public key is not set in environment variables");
+      console.warn("VAPID public key is not set. Please add VITE_VAPID_PUBLIC_KEY to your environment variables.");
+      toast.error("Push notifications are not configured. Please contact support.");
       return false;
     }
-    // TODO: Use VAPID public key from environment variables and ensure backend integration for push notifications
+
     const subscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
       applicationServerKey: urlBase64ToUint8Array(vapidKey)
@@ -77,14 +79,14 @@ export async function unsubscribeFromNotifications() {
   try {
     const registration = await navigator.serviceWorker.ready;
     const subscription = await registration.pushManager.getSubscription();
-    
+
     if (!subscription) {
       return true;
     }
-    
+
     // Unsubscribe from push manager
     const unsubscribed = await subscription.unsubscribe();
-    
+
     if (unsubscribed) {
       // Remove subscription from database
       const { data: { user } } = await supabase.auth.getUser();
@@ -94,11 +96,11 @@ export async function unsubscribeFromNotifications() {
           .delete()
           .eq('user_id', user.id);
       }
-      
+
       toast.success("Successfully unsubscribed from push notifications");
       return true;
     }
-    
+
     return false;
   } catch (error) {
     console.error('Error unsubscribing from push notifications:', error);
@@ -121,14 +123,14 @@ function urlBase64ToUint8Array(base64String: string) {
   for (let i = 0; i < rawData.length; ++i) {
     outputArray[i] = rawData.charCodeAt(i);
   }
-  
+
   return outputArray;
 }
 
 // Function to listen for real-time notifications
 export function listenForNotifications(userId: string, onNotification?: (notification: any) => void) {
-  if (!userId) return { unsubscribe: () => {} };
-  
+  if (!userId) return { unsubscribe: () => { } };
+
   const channel = supabase
     .channel('user-notifications')
     .on(
@@ -144,19 +146,19 @@ export function listenForNotifications(userId: string, onNotification?: (notific
         toast(payload.new.title, {
           description: payload.new.message,
         });
-        
+
         // Call onNotification callback if provided
         if (onNotification) {
           onNotification(payload.new);
         }
-        
+
         // Show browser notification if permission granted
         if (Notification.permission === 'granted') {
           const notification = new Notification(payload.new.title, {
             body: payload.new.message,
             icon: '/favicon.ico'
           });
-          
+
           notification.onclick = () => {
             window.focus();
             notification.close();
@@ -165,7 +167,7 @@ export function listenForNotifications(userId: string, onNotification?: (notific
       }
     )
     .subscribe();
-    
+
   return {
     unsubscribe: () => {
       supabase.removeChannel(channel);
@@ -175,24 +177,24 @@ export function listenForNotifications(userId: string, onNotification?: (notific
 
 // Function to send an email notification
 export async function sendEmailNotification(
-  toEmail: string, 
+  toEmail: string,
   type: 'appointment_reminder' | 'payment_confirmation' | 'registration_confirmation',
   data: Record<string, any>
 ) {
   try {
     const response = await supabase.functions.invoke('send-email', {
-      body: { 
+      body: {
         type,
         to: [toEmail],
         data
       }
     });
-    
+
     if (response.error) {
       console.error('Error sending email:', response.error);
       return false;
     }
-    
+
     return true;
   } catch (error) {
     console.error('Error sending email notification:', error);
@@ -200,6 +202,8 @@ export async function sendEmailNotification(
   }
 }
 
-// TODO: Implement push notifications and reminders for user engagement
-// TODO: Automate workflow status transitions and add real-time updates
-// TODO: Add more environment variables for notification/push services as needed (e.g., VITE_PUSH_API_URL, VITE_NOTIFICATION_SECRET)
+// Implementation Notes:
+// - Push notifications require a service worker to be registered
+// - VAPID keys must be configured in environment variables (VITE_VAPID_PUBLIC_KEY)
+// - Backend integration is needed for sending push notifications via Supabase Edge Functions
+// - The push_subscriptions table should exist in Supabase to store user subscriptions

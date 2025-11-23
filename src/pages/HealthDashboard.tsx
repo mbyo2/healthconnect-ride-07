@@ -4,9 +4,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { 
-  Heart, 
-  Activity, 
+import {
+  Heart,
+  Activity,
   Calendar,
   TrendingUp,
   TrendingDown,
@@ -19,6 +19,9 @@ import {
 } from "lucide-react";
 import { getHealthStats, getHealthGoals, getUpcomingAppointments, type HealthStat, type HealthGoal, type UpcomingAppointment } from "@/services/healthMetrics";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { useGamification } from "@/hooks/useGamification";
+import { Trophy, Award } from "lucide-react";
 
 export default function HealthDashboard() {
   const [healthStats, setHealthStats] = useState<HealthStat[]>([]);
@@ -196,8 +199,8 @@ export default function HealthDashboard() {
                 No upcoming appointments scheduled.
               </p>
             )}
-            <Button 
-              className="w-full" 
+            <Button
+              className="w-full"
               variant="outline"
               onClick={() => navigate('/search')}
             >
@@ -217,32 +220,32 @@ export default function HealthDashboard() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="flex items-center justify-start gap-2 h-auto py-3"
               onClick={() => navigate('/symptoms')}
             >
               <Activity className="h-4 w-4 flex-shrink-0" />
               <span className="text-left">Log Symptoms</span>
             </Button>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="flex items-center justify-start gap-2 h-auto py-3"
               onClick={() => navigate('/health-dashboard')}
             >
               <Heart className="h-4 w-4 flex-shrink-0" />
               <span className="text-left">Record Vitals</span>
             </Button>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="flex items-center justify-start gap-2 h-auto py-3"
               onClick={() => navigate('/appointments')}
             >
               <Calendar className="h-4 w-4 flex-shrink-0" />
               <span className="text-left">Book Appointment</span>
             </Button>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="flex items-center justify-start gap-2 h-auto py-3"
               onClick={() => navigate('/health-dashboard')}
             >
@@ -250,6 +253,67 @@ export default function HealthDashboard() {
               <span className="text-left">Set New Goal</span>
             </Button>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Gamification / Achievements */}
+      <GamificationSection />
+    </div>
+  );
+}
+
+function GamificationSection() {
+  const { user } = useAuth();
+  const { badges, achievements } = useGamification(user?.id);
+
+  if (!user) return null;
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Trophy className="h-5 w-5 text-yellow-500" />
+            Your Badges
+          </CardTitle>
+          <CardDescription>Earn badges by staying healthy</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap gap-2">
+            {badges.length > 0 ? badges.map((userBadge) => (
+              <div key={userBadge.id} className="flex flex-col items-center p-2 border rounded-lg bg-yellow-50/50" title={userBadge.badge.description}>
+                <div className="p-2 bg-yellow-100 rounded-full mb-1">
+                  <Award className="h-4 w-4 text-yellow-600" />
+                </div>
+                <span className="text-xs font-medium">{userBadge.badge.name}</span>
+              </div>
+            )) : (
+              <p className="text-sm text-muted-foreground">No badges earned yet. Keep tracking!</p>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Target className="h-5 w-5 text-blue-500" />
+            Achievements
+          </CardTitle>
+          <CardDescription>Progress towards milestones</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {achievements.length > 0 ? achievements.map((achievement) => (
+            <div key={achievement.id} className="space-y-1">
+              <div className="flex justify-between text-sm">
+                <span className="font-medium capitalize">{achievement.achievement_type.replace('_', ' ')}</span>
+                <span className="text-muted-foreground">{achievement.progress}/{achievement.target}</span>
+              </div>
+              <Progress value={(achievement.progress / achievement.target) * 100} className="h-2" />
+            </div>
+          )) : (
+            <p className="text-sm text-muted-foreground">No active achievements.</p>
+          )}
         </CardContent>
       </Card>
     </div>
