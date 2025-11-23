@@ -75,22 +75,70 @@ export const MedGemmaChat = () => {
     setIsLoading(true);
 
     try {
-      console.log('Calling doc-chat function with image:', !!imageToSend);
-      const { data, error } = await supabase.functions.invoke('doc-chat', {
-        body: {
-          message: userMessage.content,
-          image: imageToSend,
-          conversationHistory: messages.slice(-10).map(m => ({
-            role: m.role,
-            content: m.content
-          }))
-        }
-      });
+      console.log('Attempting AI chat with fallback system...');
 
-      console.log('Function response:', { data, error });
+      // Three-tier fallback: medgemma-chat → doc-chat → med-ai
+      let data, error;
+      let functionUsed = '';
+
+      // Try 1: medgemma-chat (Hugging Face MedGemma)
+      try {
+        console.log('Trying medgemma-chat...');
+        const response = await supabase.functions.invoke('medgemma-chat', {
+          body: {
+            message: userMessage.content,
+            conversationHistory: messages.slice(-10).map(m => ({
+              role: m.role,
+              content: m.content
+            }))
+          }
+        });
+        data = response.data;
+        error = response.error;
+        functionUsed = 'medgemma-chat';
+
+        if (error) throw new Error('medgemma-chat failed');
+      } catch (medgemmaError) {
+        // Try 2: doc-chat (Lovable AI)
+        console.log('medgemma-chat failed, trying doc-chat...');
+        try {
+          const docChatResponse = await supabase.functions.invoke('doc-chat', {
+            body: {
+              message: userMessage.content,
+              image: imageToSend,
+              conversationHistory: messages.slice(-10).map(m => ({
+                role: m.role,
+                content: m.content
+              }))
+            }
+          });
+          data = docChatResponse.data;
+          error = docChatResponse.error;
+          functionUsed = 'doc-chat';
+
+          if (error) throw new Error('doc-chat failed');
+        } catch (docChatError) {
+          // Try 3: med-ai (final fallback)
+          console.log('doc-chat failed, trying med-ai...');
+          const medAiResponse = await supabase.functions.invoke('med-ai', {
+            body: {
+              message: userMessage.content,
+              conversationHistory: messages.slice(-10).map(m => ({
+                role: m.role,
+                content: m.content
+              }))
+            }
+          });
+          data = medAiResponse.data;
+          error = medAiResponse.error;
+          functionUsed = 'med-ai';
+        }
+      }
+
+      console.log(`${functionUsed} response:`, { data, error });
 
       if (error) {
-        console.error('Function error:', error);
+        console.error('All AI functions failed:', error);
         throw new Error(error.message || 'Failed to get response from AI');
       }
 
@@ -109,7 +157,7 @@ export const MedGemmaChat = () => {
       console.error('Error sending message:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to get response. Please try again.';
       toast.error(errorMessage);
-      
+
       // Remove the user message if failed
       setMessages(prev => prev.slice(0, -1));
     } finally {
@@ -132,34 +180,32 @@ export const MedGemmaChat = () => {
           Doc 0 Clock Assistant
         </CardTitle>
       </CardHeader>
-      
+
       <CardContent className="flex-1 flex flex-col p-0 min-h-0">
         <ScrollArea className="flex-1 p-3 sm:p-4" ref={scrollRef}>
           <div className="space-y-3 sm:space-y-4">
             {messages.map((message, index) => (
               <div
                 key={index}
-                className={`flex gap-2 sm:gap-3 ${
-                  message.role === 'user' ? 'justify-end' : 'justify-start'
-                }`}
+                className={`flex gap-2 sm:gap-3 ${message.role === 'user' ? 'justify-end' : 'justify-start'
+                  }`}
               >
                 {message.role === 'assistant' && (
                   <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
                     <Bot className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
                   </div>
                 )}
-                
+
                 <div
-                  className={`max-w-[85%] sm:max-w-[80%] rounded-lg p-2.5 sm:p-3 ${
-                    message.role === 'user'
+                  className={`max-w-[85%] sm:max-w-[80%] rounded-lg p-2.5 sm:p-3 ${message.role === 'user'
                       ? 'bg-primary text-primary-foreground'
                       : 'bg-muted'
-                  }`}
+                    }`}
                 >
                   {message.image && (
-                    <img 
-                      src={message.image} 
-                      alt="Medical image" 
+                    <img
+                      src={message.image}
+                      alt="Medical image"
                       className="rounded-lg mb-2 max-w-full h-auto max-h-48 object-contain"
                     />
                   )}
@@ -176,7 +222,7 @@ export const MedGemmaChat = () => {
                 )}
               </div>
             ))}
-            
+
             {isLoading && (
               <div className="flex gap-2 sm:gap-3 justify-start">
                 <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary/10 flex items-center justify-center">
@@ -193,9 +239,9 @@ export const MedGemmaChat = () => {
         <div className="border-t p-3 sm:p-4">
           {selectedImage && (
             <div className="mb-2 relative inline-block">
-              <img 
-                src={selectedImage} 
-                alt="Selected" 
+              <img
+                src={selectedImage}
+                alt="Selected"
                 className="rounded-lg max-h-20 object-contain border border-border"
               />
               <Button
