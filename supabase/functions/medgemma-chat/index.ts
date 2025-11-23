@@ -4,7 +4,7 @@ import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-requested-with',
 };
 
 // Input validation schema
@@ -25,11 +25,11 @@ serve(async (req) => {
     // Validate input
     const requestData = await req.json();
     const validationResult = chatRequestSchema.safeParse(requestData);
-    
+
     if (!validationResult.success) {
       console.error('Validation error:', validationResult.error);
       return new Response(
-        JSON.stringify({ 
+        JSON.stringify({
           error: 'Invalid request data',
           details: validationResult.error.errors
         }),
@@ -38,14 +38,14 @@ serve(async (req) => {
     }
 
     const { message, conversationHistory } = validationResult.data;
-    
+
     const HF_TOKEN = Deno.env.get('HF_TOKEN');
     if (!HF_TOKEN) {
       throw new Error('HF_TOKEN not configured');
     }
 
     const hf = new HfInference(HF_TOKEN);
-    
+
     // Build conversation context
     const systemPrompt = `You are Doc 0 Clock, a knowledgeable medical AI assistant available 24/7. You provide:
 - Evidence-based medical information
@@ -90,28 +90,28 @@ CRITICAL: If symptoms suggest emergency (chest pain, difficulty breathing, sever
     console.log('MedGemma chat response generated');
 
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         reply,
         timestamp: new Date().toISOString(),
         model: 'medgemma-7b'
       }),
-      { 
+      {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200 
+        status: 200
       }
     );
 
   } catch (error) {
     console.error('Error in MedGemma chat:', error);
-    
+
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         error: error instanceof Error ? error.message : 'Unknown error occurred',
         details: error instanceof Error ? error.stack : undefined
       }),
-      { 
+      {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500 
+        status: 500
       }
     );
   }

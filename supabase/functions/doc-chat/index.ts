@@ -4,7 +4,7 @@ import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-requested-with',
 };
 
 // Input validation schema
@@ -26,11 +26,11 @@ serve(async (req) => {
     // Validate input
     const requestData = await req.json();
     const validationResult = chatRequestSchema.safeParse(requestData);
-    
+
     if (!validationResult.success) {
       console.error('Validation error:', validationResult.error);
       return new Response(
-        JSON.stringify({ 
+        JSON.stringify({
           error: 'Invalid request data',
           details: validationResult.error.errors
         }),
@@ -39,7 +39,7 @@ serve(async (req) => {
     }
 
     const { message, image, conversationHistory } = validationResult.data;
-    
+
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {
       throw new Error('LOVABLE_API_KEY not configured');
@@ -143,7 +143,7 @@ CRITICAL:
 
         // Extract user ID from auth
         const { data: { user } } = await supabaseClient.auth.getUser();
-        
+
         if (user) {
           // Save to ai_diagnosis_history
           await supabaseClient
@@ -154,7 +154,7 @@ CRITICAL:
               analysis: reply,
               patient_context: image ? { has_image: true } : null
             });
-          
+
           console.log('Diagnosis history saved');
         }
       }
@@ -164,28 +164,28 @@ CRITICAL:
     }
 
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         reply,
         timestamp: new Date().toISOString(),
         model: 'gemini-2.5-flash'
       }),
-      { 
+      {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200 
+        status: 200
       }
     );
 
   } catch (error) {
     console.error('Error in Doc 0 Clock chat:', error);
-    
+
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         error: error instanceof Error ? error.message : 'Unknown error occurred',
         details: error instanceof Error ? error.stack : undefined
       }),
-      { 
+      {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500 
+        status: 500
       }
     );
   }
