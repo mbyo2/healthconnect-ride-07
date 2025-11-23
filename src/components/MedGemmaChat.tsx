@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { supabase } from '@/integrations/supabase/client';
@@ -198,8 +198,8 @@ export const MedGemmaChat = () => {
 
                 <div
                   className={`max-w-[85%] sm:max-w-[80%] rounded-lg p-2.5 sm:p-3 ${message.role === 'user'
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-muted'
                     }`}
                 >
                   {message.image && (
@@ -254,7 +254,7 @@ export const MedGemmaChat = () => {
               </Button>
             </div>
           )}
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-end">
             <input
               type="file"
               ref={fileInputRef}
@@ -267,28 +267,38 @@ export const MedGemmaChat = () => {
               disabled={isLoading}
               size="icon"
               variant="outline"
-              className="flex-shrink-0"
+              className="flex-shrink-0 h-10 w-10"
             >
-              <ImageIcon className="h-4 w-4" />
+              <ImageIcon className="h-5 w-5" />
             </Button>
-            <Input
+            <Textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder={selectedImage ? "Describe what you want to know about this image..." : "Ask me about your health..."}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  sendMessage();
+                }
+              }}
+              placeholder={selectedImage ? "Describe what you want to know about this image..." : "Type a message..."}
               disabled={isLoading}
-              className="flex-1 text-xs sm:text-sm"
+              className="flex-1 text-sm resize-none min-h-[40px] max-h-[120px] rounded-3xl px-4 py-2.5 bg-muted/50 border-muted focus-visible:ring-1"
+              rows={1}
+              style={{
+                height: 'auto',
+                overflowY: input.split('\n').length > 3 ? 'auto' : 'hidden'
+              }}
             />
             <Button
               onClick={sendMessage}
               disabled={isLoading || (!input.trim() && !selectedImage)}
               size="icon"
-              className="flex-shrink-0"
+              className="flex-shrink-0 h-10 w-10 rounded-full bg-primary hover:bg-primary/90"
             >
               {isLoading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="h-5 w-5 animate-spin" />
               ) : (
-                <Send className="h-4 w-4" />
+                <Send className="h-5 w-5" />
               )}
             </Button>
           </div>
