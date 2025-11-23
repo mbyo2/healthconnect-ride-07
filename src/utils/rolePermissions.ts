@@ -156,7 +156,7 @@ export const PUBLIC_ROUTES = [
 // Check if a user has permission to access a route (supports multiple roles)
 export const hasRoutePermission = (userRoles: UserRole[] | null, route: string): boolean => {
   if (!userRoles || userRoles.length === 0) return PUBLIC_ROUTES.includes(route);
-  
+
   // Check if any of the user's roles has permission for this route
   return userRoles.some(role => ROLE_PERMISSIONS[role]?.includes(route) || false);
 };
@@ -176,14 +176,14 @@ export const hasAnyRole = (userRoles: UserRole[] | null, roles: UserRole[]): boo
 // Get the appropriate landing page based on user's primary role
 export const getRoleLandingPage = (userRoles: UserRole[] | null): string => {
   if (!userRoles || userRoles.length === 0) return '/auth';
-  
+
   // Priority order: admin > institution_admin > health_personnel > pharmacy > patient
   if (userRoles.includes(USER_ROLES.ADMIN)) return '/admin-dashboard';
   if (userRoles.includes(USER_ROLES.INSTITUTION_ADMIN)) return '/institution-portal';
   if (userRoles.includes(USER_ROLES.HEALTH_PERSONNEL)) return '/provider-dashboard';
   if (userRoles.includes(USER_ROLES.PHARMACY)) return '/pharmacy-portal';
   if (userRoles.includes(USER_ROLES.PATIENT)) return '/symptoms';
-  
+
   return '/';
 };
 
@@ -206,25 +206,36 @@ export const getRoleNavigation = (userRoles: UserRole[] | null) => {
     { path: '/emergency', label: 'Emergency', icon: 'AlertTriangle', roles: ['patient', 'health_personnel'] },
     { path: '/connections', label: 'My Providers', icon: 'Users', roles: ['patient'] },
     { path: '/medical-records', label: 'Medical Records', icon: 'FileText', roles: ['patient', 'health_personnel'] },
-    
+    { path: '/marketplace-users', label: 'Healthcare Marketplace', icon: 'ShoppingCart', roles: ['patient'] },
+    { path: '/video-consultations', label: 'Video Consultations', icon: 'Video', roles: ['patient', 'health_personnel'] },
+    { path: '/health-dashboard', label: 'Health Dashboard', icon: 'LayoutDashboard', roles: ['patient'] },
+
+    // Advanced Healthcare Features (Available to all authenticated users)
+    { path: '/advanced-dashboard', label: 'Advanced Dashboard', icon: 'Zap', roles: ['patient', 'health_personnel', 'admin'] },
+    { path: '/ai-diagnostics', label: 'AI Diagnostics', icon: 'Brain', roles: ['patient', 'health_personnel', 'admin'] },
+    { path: '/blockchain-records', label: 'Blockchain Records', icon: 'Shield', roles: ['patient', 'health_personnel', 'admin'] },
+    { path: '/iot-monitoring', label: 'IoT Monitoring', icon: 'Activity', roles: ['patient', 'health_personnel', 'admin'] },
+    { path: '/health-analytics', label: 'Health Analytics', icon: 'BarChart3', roles: ['patient', 'health_personnel', 'admin'] },
+    { path: '/emergency-response', label: 'Emergency Response', icon: 'AlertTriangle', roles: ['patient', 'health_personnel', 'admin'] },
+
     // Provider routes
     { path: '/provider-dashboard', label: 'Dashboard', icon: 'LayoutDashboard', roles: ['health_personnel'] },
     { path: '/provider-portal', label: 'Provider Portal', icon: 'Building2', roles: ['health_personnel'] },
-    
+
     // Pharmacy routes
     { path: '/pharmacy-portal', label: 'Pharmacy Portal', icon: 'Building2', roles: ['pharmacy', 'health_personnel'] },
     { path: '/pharmacy-inventory', label: 'Inventory', icon: 'Package', roles: ['pharmacy'] },
-    
+
     // Institution routes
     { path: '/institution-portal', label: 'Institution Portal', icon: 'Building', roles: ['institution_admin', 'institution_staff'] },
-    
+
     // Admin routes
     { path: '/admin-dashboard', label: 'Admin Dashboard', icon: 'LayoutDashboard', roles: ['admin'] },
     { path: '/super-admin-dashboard', label: 'Super Admin', icon: 'Shield', roles: ['admin'] },
     { path: '/create-admin', label: 'Create Admin', icon: 'UserPlus', roles: ['admin'] },
     { path: '/admin-wallet', label: 'Admin Wallet', icon: 'Wallet', roles: ['admin'] },
     { path: '/compliance-audit', label: 'Compliance', icon: 'FileCheck', roles: ['admin', 'health_personnel'] },
-    
+
     ...baseNavigation
   ];
 
@@ -233,7 +244,7 @@ export const getRoleNavigation = (userRoles: UserRole[] | null) => {
   }
 
   // Filter navigation items based on user's roles
-  return allNavigationItems.filter(item => 
+  return allNavigationItems.filter(item =>
     item.roles.some(role => userRoles.includes(role as UserRole))
   );
 };
