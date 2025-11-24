@@ -44,11 +44,11 @@ const AdvancedDashboard = () => {
                         </h1>
                         <p className="text-muted-foreground mt-1">Here's your health overview for today</p>
                     </div>
-                    <div className="flex gap-3">
-                        <Button asChild variant="outline">
+                    <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+                        <Button asChild variant="outline" className="w-full sm:w-auto">
                             <Link to="/appointments">View All Appointments</Link>
                         </Button>
-                        <Button asChild>
+                        <Button asChild className="w-full sm:w-auto">
                             <Link to="/emergency">Emergency</Link>
                         </Button>
                     </div>
@@ -85,13 +85,13 @@ const AdvancedDashboard = () => {
                         </CardHeader>
                         <CardContent className="space-y-4">
                             {upcomingAppointments.map((apt) => (
-                                <div key={apt.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent transition-colors">
+                                <div key={apt.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg hover:bg-accent transition-colors gap-3">
                                     <div className="flex-1">
                                         <h4 className="font-semibold">{apt.doctor}</h4>
                                         <p className="text-sm text-muted-foreground">{apt.specialty}</p>
                                         <p className="text-sm mt-1">{apt.date} at {apt.time}</p>
                                     </div>
-                                    <div className="flex items-center gap-3">
+                                    <div className="flex items-center gap-3 self-start sm:self-auto">
                                         <span className={`px-3 py-1 rounded-full text-xs font-medium ${apt.status === 'confirmed' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
                                             }`}>
                                             {apt.status}
@@ -147,8 +147,8 @@ const AdvancedDashboard = () => {
                                     <p className="text-2xl font-bold mt-1">{metric.value}</p>
                                     <div className="flex items-center gap-2 mt-2">
                                         <span className={`text-sm font-medium ${metric.status === 'normal' || metric.status === 'good' || metric.status === 'improving'
-                                                ? 'text-green-600'
-                                                : 'text-red-600'
+                                            ? 'text-green-600'
+                                            : 'text-red-600'
                                             }`}>
                                             {metric.trend}
                                         </span>

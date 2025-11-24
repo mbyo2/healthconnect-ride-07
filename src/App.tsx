@@ -58,6 +58,8 @@ const BlockchainRecords = lazy(() => import('@/pages/BlockchainRecords'));
 const IoTMonitoring = lazy(() => import('@/pages/IoTMonitoring'));
 const HealthAnalytics = lazy(() => import('@/pages/HealthAnalytics'));
 const EmergencyResponse = lazy(() => import('@/pages/EmergencyResponse'));
+const PharmacyManagement = lazy(() => import('@/pages/PharmacyManagement'));
+const HospitalManagement = lazy(() => import('@/pages/HospitalManagement'));
 
 // Remove duplicate supabase client - using the one from integrations
 
@@ -172,6 +174,10 @@ const AppContent = () => {
             <Route path="/iot-monitoring" element={<RouteGuard><IoTMonitoring /></RouteGuard>} />
             <Route path="/health-analytics" element={<RouteGuard><HealthAnalytics /></RouteGuard>} />
             <Route path="/emergency-response" element={<RouteGuard><EmergencyResponse /></RouteGuard>} />
+
+            {/* Management Systems */}
+            <Route path="/pharmacy-management" element={<RouteGuard><PharmacyManagement /></RouteGuard>} />
+            <Route path="/hospital-management" element={<RouteGuard><HospitalManagement /></RouteGuard>} />
 
             {/* Payment Routes */}
             <Route path="/payment-success" element={<PaymentSuccess />} />

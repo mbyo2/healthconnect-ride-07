@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
@@ -12,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Menu, Search, Bell, ShoppingCart } from "lucide-react";
+import { Menu, Search, Bell } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Input } from "@/components/ui/input";
 import { useSearch } from "@/context/SearchContext";
@@ -32,8 +31,8 @@ export function Header() {
   const [adminLevel, setAdminLevel] = useState<AdminLevel | null>(null);
   const { isDesktop } = useDeviceType();
   const { unreadCount } = useNotifications();
-  
-  // Update user role when profile changes
+
+  // Sync role info
   if (profile?.role !== userRole) {
     setUserRole(profile?.role as UserRole);
     setAdminLevel(profile?.admin_level as AdminLevel);
@@ -59,21 +58,18 @@ export function Header() {
       navigate("/search");
     }
   }, [location.pathname, navigate, searchTerm, setSearchQuery]);
-  
-  // Only render on mobile, desktop uses DesktopNav
-  if (isDesktop) {
-    return null;
-  }
-  
+
+  // Render only on mobile (desktop uses separate nav)
+  if (isDesktop) return null;
+
   return (
     <header className="modern-header">
-      <div className="container-modern flex h-16 items-center justify-between">
+      <div className="container-modern flex h-16 items-center justify-between px-4 md:px-6 lg:px-8">
         {/* Logo */}
         <div className="no-underline">
           <AppLogo size="sm" />
         </div>
-        
-        {/* Search bar - hidden on very small screens */}
+        {/* Search bar */}
         {user && (
           <form onSubmit={handleSearchSubmit} className="hidden sm:block flex-1 max-w-sm mx-4">
             <div className="search-bar relative">
@@ -91,39 +87,30 @@ export function Header() {
             </div>
           </form>
         )}
-        
         {/* Right actions */}
         <div className="flex items-center gap-2">
           {user && (
             <>
               {/* Mobile search button */}
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="sm:hidden h-10 w-10"
-                onClick={() => navigate("/search")}
-              >
+              <Button variant="ghost" size="touch" className="sm:hidden h-10 w-10" onClick={() => navigate("/search")}>
                 <Search className="h-5 w-5" />
               </Button>
-              
               {/* Notifications */}
-              <Button variant="ghost" size="icon" className="h-10 w-10 relative">
+              <Button variant="ghost" size="touch" className="h-10 w-10 relative">
                 <Bell className="h-5 w-5" />
                 {unreadCount > 0 && (
                   <span className="absolute -top-1 -right-1 h-5 w-5 bg-orange-500 text-white text-xs rounded-full flex items-center justify-center">
-                    {unreadCount > 99 ? '99+' : unreadCount}
+                    {unreadCount > 99 ? "99+" : unreadCount}
                   </span>
                 )}
               </Button>
             </>
           )}
-          
           <ThemeToggle />
-          
           {/* User menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full">
+              <Button variant="ghost" size="touch" className="h-10 w-10 rounded-full">
                 {user ? (
                   <Avatar className="h-9 w-9 ring-2 ring-blue-100">
                     <AvatarImage src={profile?.avatar_url || ""} alt={user?.email || "Avatar"} />
@@ -144,37 +131,27 @@ export function Header() {
                     <div className="text-xs text-gray-500">My Account</div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  
                   <DropdownMenuItem asChild>
-                    <Link to="/profile" className="flex items-center">
-                      Profile & Settings
-                    </Link>
+                    <Link to="/profile" className="flex items-center">Profile &amp; Settings</Link>
                   </DropdownMenuItem>
-                  
                   <DropdownMenuItem asChild>
                     <Link to="/appointments">My Appointments</Link>
                   </DropdownMenuItem>
-                  
                   <DropdownMenuItem asChild>
-                    <Link to="/documentation">Help & Support</Link>
+                    <Link to="/documentation">Help &amp; Support</Link>
                   </DropdownMenuItem>
-                  
-                  {userRole === 'health_personnel' && (
+                  {userRole === "health_personnel" && (
                     <DropdownMenuItem asChild>
                       <Link to="/provider-dashboard">Provider Dashboard</Link>
                     </DropdownMenuItem>
                   )}
-                  
-                  {(adminLevel === 'admin' || adminLevel === 'superadmin') && (
+                  {(adminLevel === "admin" || adminLevel === "superadmin") && (
                     <DropdownMenuItem asChild>
                       <Link to="/admin-dashboard">Admin Dashboard</Link>
                     </DropdownMenuItem>
                   )}
-                  
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleSignOut} className="text-red-600">
-                    Sign out
-                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleSignOut} className="text-red-600">Sign out</DropdownMenuItem>
                 </>
               ) : (
                 <>

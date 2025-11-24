@@ -20,20 +20,21 @@ const Home = () => {
     return (
       <div className="min-h-screen bg-gray-50">
         {/* Welcome Banner */}
-        <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white py-6">
-          <div className="container-modern">
-            <div className="flex items-center justify-between">
+        <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white py-6 md:py-8">
+          <div className="container-modern px-4 md:px-6 lg:px-8">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <Sparkles className="h-5 w-5" />
-                  <span className="text-sm font-medium">Welcome back!</span>
+                  <Sparkles className="h-4 w-4 md:h-5 md:w-5" />
+                  <span className="text-xs md:text-sm font-medium">Welcome back!</span>
                 </div>
-                <h1 className="text-2xl font-bold">Your Healthcare Dashboard</h1>
-                <p className="text-blue-100">Continue your healthcare journey</p>
+                <h1 className="text-xl md:text-2xl lg:text-3xl font-bold">Your Healthcare Dashboard</h1>
+                <p className="text-blue-100 text-sm md:text-base">Continue your healthcare journey</p>
               </div>
-              <Button 
-                variant="outline" 
-                className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+              <Button
+                variant="outline"
+                size="default"
+                className="bg-white/10 border-white/20 text-white hover:bg-white/20 w-full sm:w-auto min-h-[44px]"
                 onClick={() => navigate('/emergency')}
               >
                 Emergency Help
@@ -41,13 +42,13 @@ const Home = () => {
             </div>
           </div>
         </div>
-        
+
         {/* Quick Access Cards */}
-        <div className="container-modern py-8">
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold mb-4">Quick Access</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-              
+        <div className="container-modern px-4 md:px-6 lg:px-8 py-6 md:py-8">
+          <div className="mb-6 md:mb-8">
+            <h2 className="text-xl md:text-2xl font-bold mb-4">Quick Access</h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6 md:mb-8">
+
               <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => {
                 navigate('/emergency');
                 showSuccess({ message: "Navigating to Emergency Services" });
@@ -101,7 +102,7 @@ const Home = () => {
 
             </div>
           </div>
-          
+
           <RoleBasedWorkflow />
         </div>
       </div>
