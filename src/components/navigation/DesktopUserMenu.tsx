@@ -1,13 +1,13 @@
 
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuLabel, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User, Calendar, Users, Settings, Heart } from "lucide-react";
@@ -38,7 +38,7 @@ export function DesktopUserMenu({ user, profile, onLogout }: DesktopUserMenuProp
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-64 bg-white border-trust-200 shadow-xl">
+      <DropdownMenuContent align="end" className="w-64 bg-white border-trust-200 shadow-xl z-50">
         <DropdownMenuLabel className="pb-2">
           <div className="text-sm font-semibold text-trust-700">{user.email}</div>
           <div className="text-xs text-muted-foreground">My Account</div>
@@ -68,7 +68,7 @@ export function DesktopUserMenu({ user, profile, onLogout }: DesktopUserMenuProp
             Settings
           </Link>
         </DropdownMenuItem>
-        
+
         {profile?.role === "health_personnel" && (
           <DropdownMenuItem asChild className="hover:bg-trust-50">
             <Link to="/provider-dashboard" className="flex items-center">
@@ -77,7 +77,7 @@ export function DesktopUserMenu({ user, profile, onLogout }: DesktopUserMenuProp
             </Link>
           </DropdownMenuItem>
         )}
-        
+
         {(profile?.admin_level === "admin" || profile?.admin_level === "superadmin") && (
           <DropdownMenuItem asChild className="hover:bg-trust-50">
             <Link to="/admin-dashboard" className="flex items-center">

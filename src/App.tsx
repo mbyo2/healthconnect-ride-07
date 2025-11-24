@@ -130,7 +130,7 @@ const AppContent = () => {
                   isNewUser ? (
                     <Navigate to="/onboarding" replace={true} />
                   ) : (
-                    <Navigate to="/symptoms" replace={true} />
+                    <Navigate to="/home" replace={true} />
                   )
                 ) : (
                   <Navigate to="/auth" replace={true} />

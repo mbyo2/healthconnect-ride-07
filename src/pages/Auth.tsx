@@ -68,26 +68,26 @@ export const Auth = () => {
   const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "signin");
   const { showSuccess, showError } = useFeedbackSystem();
   const [locationLoading, setLocationLoading] = useState(false);
-  const [currentLocation, setCurrentLocation] = useState<{lat: number, lng: number} | null>(null);
+  const [currentLocation, setCurrentLocation] = useState<{ lat: number, lng: number } | null>(null);
 
   // Simplified and more robust auth check
   useEffect(() => {
     let mounted = true;
-    
+
     const checkAuth = async () => {
       try {
         setLocalLoading(true);
         const { data, error } = await supabase.auth.getSession();
-        
+
         if (error) {
           console.error("Auth check error:", error);
           if (mounted) setError(error.message);
           return;
         }
-        
+
         if (data.session?.user) {
           setIsAuthenticated(true);
-          navigate("/symptoms");
+          navigate("/home");
         }
       } catch (err) {
         console.error("Unexpected error checking auth:", err);
@@ -98,9 +98,9 @@ export const Auth = () => {
         }
       }
     };
-    
+
     checkAuth();
-    
+
     return () => {
       mounted = false;
     };
@@ -161,7 +161,7 @@ export const Auth = () => {
 
       const { latitude, longitude } = position.coords;
       setCurrentLocation({ lat: latitude, lng: longitude });
-      
+
       // Update form with coordinates
       providerSignupForm.setValue('latitude', latitude);
       providerSignupForm.setValue('longitude', longitude);
@@ -172,7 +172,7 @@ export const Auth = () => {
           `https://api.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=YOUR_API_KEY`
         );
         const data = await response.json();
-        
+
         if (data.results && data.results[0]) {
           const result = data.results[0];
           providerSignupForm.setValue('address', result.formatted || '');
@@ -198,14 +198,14 @@ export const Auth = () => {
     try {
       setError(null);
       setLocalLoading(true);
-      
+
       console.log('Attempting to sign in with:', data.email);
-      
+
       const { data: authData, error } = await supabase.auth.signInWithPassword({
         email: data.email,
         password: data.password,
       });
-      
+
       if (error) {
         console.error('Authentication error details:', {
           status: error.status,
@@ -215,24 +215,24 @@ export const Auth = () => {
         });
         throw error;
       }
-      
+
       console.log('Auth response:', {
         session: !!authData.session,
         user: authData.user?.id ? 'User ID: ' + authData.user.id : 'No user',
         expiresAt: authData.session?.expires_at,
       });
-      
+
       showSuccess("Signed in successfully!");
       toast.success("Signed in successfully!");
-      
+
       // Small delay to ensure session is properly set
       setTimeout(() => {
-        navigate("/symptoms");
+        navigate("/home");
       }, 500);
-      
+
     } catch (err: any) {
       let errorMessage = 'Failed to sign in';
-      
+
       if (err.status === 400) {
         errorMessage = 'Invalid email or password';
       } else if (err.message?.includes('network')) {
@@ -240,13 +240,13 @@ export const Auth = () => {
       } else if (err.message) {
         errorMessage = err.message;
       }
-      
+
       console.error('Login error details:', {
         error: err,
         timestamp: new Date().toISOString(),
         url: window.location.href,
       });
-      
+
       setError(errorMessage);
       showError(errorMessage);
       toast.error(errorMessage);
@@ -256,85 +256,85 @@ export const Auth = () => {
   };
 
   // Updated patient signup with role
-const onPatientSignupSubmit = async (data: PatientSignupFormValues) => {
-  try {
-    setError(null);
-    setLocalLoading(true);
-    const response = await supabase.auth.signUp({
-      email: data.email,
-      password: data.password,
-      options: {
-        data: {
-          first_name: data.firstName,
-          last_name: data.lastName,
-          role: "patient",
+  const onPatientSignupSubmit = async (data: PatientSignupFormValues) => {
+    try {
+      setError(null);
+      setLocalLoading(true);
+      const response = await supabase.auth.signUp({
+        email: data.email,
+        password: data.password,
+        options: {
+          data: {
+            first_name: data.firstName,
+            last_name: data.lastName,
+            role: "patient",
+          },
         },
-      },
-    });
+      });
 
-    // eslint-disable-next-line no-console
-    console.debug('patient signUp response:', response);
+      // eslint-disable-next-line no-console
+      console.debug('patient signUp response:', response);
 
-    if (response.error) throw response.error;
+      if (response.error) throw response.error;
 
-    showSuccess("Account created! Please verify your email address.");
-    toast.success("Account created! Please verify your email address.");
-    setActiveTab("signin");
-  } catch (err: any) {
-    const errorMessage = err?.message || "Failed to create account";
-    setError(errorMessage);
-    showError(errorMessage);
-    // eslint-disable-next-line no-console
-    console.error("Patient signup error:", err);
-    toast.error(errorMessage);
-  } finally {
-    setLocalLoading(false);
-  }
-};
+      showSuccess("Account created! Please verify your email address.");
+      toast.success("Account created! Please verify your email address.");
+      setActiveTab("signin");
+    } catch (err: any) {
+      const errorMessage = err?.message || "Failed to create account";
+      setError(errorMessage);
+      showError(errorMessage);
+      // eslint-disable-next-line no-console
+      console.error("Patient signup error:", err);
+      toast.error(errorMessage);
+    } finally {
+      setLocalLoading(false);
+    }
+  };
 
-// Updated provider signup with role, professional details, and location
-const onProviderSignupSubmit = async (data: ProviderSignupFormValues) => {
-  try {
-    setError(null);
-    setLocalLoading(true);
-    const response = await supabase.auth.signUp({
-      email: data.email,
-      password: data.password,
-      options: {
-        data: {
-          first_name: data.firstName,
-          last_name: data.lastName,
-          role: "health_personnel",
-          specialty: data.specialty,
-          license_number: data.licenseNumber,
-          address: data.address,
-          city: data.city,
-          country: data.country,
-          latitude: data.latitude,
-          longitude: data.longitude,
+  // Updated provider signup with role, professional details, and location
+  const onProviderSignupSubmit = async (data: ProviderSignupFormValues) => {
+    try {
+      setError(null);
+      setLocalLoading(true);
+      const response = await supabase.auth.signUp({
+        email: data.email,
+        password: data.password,
+        options: {
+          data: {
+            first_name: data.firstName,
+            last_name: data.lastName,
+            role: "health_personnel",
+            specialty: data.specialty,
+            license_number: data.licenseNumber,
+            address: data.address,
+            city: data.city,
+            country: data.country,
+            latitude: data.latitude,
+            longitude: data.longitude,
+          },
         },
-      },
-    });
+      });
 
-    // eslint-disable-next-line no-console
-    console.debug('provider signUp response:', response);
+      // eslint-disable-next-line no-console
+      console.debug('provider signUp response:', response);
 
-    if (response.error) throw response.error;
+      if (response.error) throw response.error;
 
-    showSuccess("Account created! Please verify your email address.");
-    toast.success("Account created! Please verify your email address.");
-    setActiveTab("signin");
-  } catch (err: any) {
-    const errorMessage = err?.message || "Failed to create account";
-    setError(errorMessage);
-    showError(errorMessage);
-    // eslint-disable-next-line no-console
-    console.error("Provider signup error:", err);
-    toast.error(errorMessage);
-  } finally {
-    setLocalLoading(false);
-  }
-};
+      showSuccess("Account created! Please verify your email address.");
+      toast.success("Account created! Please verify your email address.");
+      setActiveTab("signin");
+    } catch (err: any) {
+      const errorMessage = err?.message || "Failed to create account";
+      setError(errorMessage);
+      showError(errorMessage);
+      // eslint-disable-next-line no-console
+      console.error("Provider signup error:", err);
+      toast.error(errorMessage);
+    } finally {
+      setLocalLoading(false);
+    }
+  };
 
   if (authLoading || localLoading) {
     return <LoadingScreen timeout={2000} />;
@@ -342,7 +342,7 @@ const onProviderSignupSubmit = async (data: ProviderSignupFormValues) => {
 
   // If already authenticated, redirect
   if (isAuthenticated) {
-    navigate("/symptoms");
+    navigate("/home");
     return <LoadingScreen message="Redirecting..." />;
   }
 
@@ -375,7 +375,7 @@ const onProviderSignupSubmit = async (data: ProviderSignupFormValues) => {
               <TabsTrigger value="signin" className="text-sm py-2">Sign In</TabsTrigger>
               <TabsTrigger value="signup" className="text-sm py-2">Register</TabsTrigger>
             </TabsList>
-            
+
             <TabsContent value="signin">
               <Form {...loginForm}>
                 <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
@@ -395,7 +395,7 @@ const onProviderSignupSubmit = async (data: ProviderSignupFormValues) => {
                       </FormItem>
                     )}
                   />
-                  
+
                   <FormField
                     control={loginForm.control}
                     name="password"
@@ -413,16 +413,16 @@ const onProviderSignupSubmit = async (data: ProviderSignupFormValues) => {
                       </FormItem>
                     )}
                   />
-                  
+
                   <div className="text-sm text-right">
                     <Link to="/reset-password" className="text-primary hover:underline">
                       Forgot password?
                     </Link>
                   </div>
-                  
-                  <AnimatedButton 
-                    type="submit" 
-                    className="w-full" 
+
+                  <AnimatedButton
+                    type="submit"
+                    className="w-full"
                     loading={loginForm.formState.isSubmitting}
                     loadingText="Signing in..."
                   >
@@ -431,7 +431,7 @@ const onProviderSignupSubmit = async (data: ProviderSignupFormValues) => {
                 </form>
               </Form>
             </TabsContent>
-            
+
             <TabsContent value="signup">
               <div className="mb-4">
                 <FormLabel className="text-sm font-medium">I am a</FormLabel>
@@ -445,7 +445,7 @@ const onProviderSignupSubmit = async (data: ProviderSignupFormValues) => {
                     <User className="h-4 w-4 sm:h-5 sm:w-5 mb-1 sm:mb-2" />
                     <span>Patient</span>
                   </Button>
-                  
+
                   <Button
                     type="button"
                     variant={userType === "health_personnel" ? "default" : "outline"}
@@ -478,7 +478,7 @@ const onProviderSignupSubmit = async (data: ProviderSignupFormValues) => {
                           </FormItem>
                         )}
                       />
-                      
+
                       <FormField
                         control={patientSignupForm.control}
                         name="lastName"
@@ -496,7 +496,7 @@ const onProviderSignupSubmit = async (data: ProviderSignupFormValues) => {
                         )}
                       />
                     </div>
-                    
+
                     <FormField
                       control={patientSignupForm.control}
                       name="email"
@@ -513,7 +513,7 @@ const onProviderSignupSubmit = async (data: ProviderSignupFormValues) => {
                         </FormItem>
                       )}
                     />
-                    
+
                     <FormField
                       control={patientSignupForm.control}
                       name="password"
@@ -531,7 +531,7 @@ const onProviderSignupSubmit = async (data: ProviderSignupFormValues) => {
                         </FormItem>
                       )}
                     />
-                    
+
                     <FormField
                       control={patientSignupForm.control}
                       name="confirmPassword"
@@ -549,10 +549,10 @@ const onProviderSignupSubmit = async (data: ProviderSignupFormValues) => {
                         </FormItem>
                       )}
                     />
-                    
-                    <AnimatedButton 
-                      type="submit" 
-                      className="w-full" 
+
+                    <AnimatedButton
+                      type="submit"
+                      className="w-full"
                       loading={patientSignupForm.formState.isSubmitting}
                       loadingText="Creating Account..."
                     >
@@ -580,7 +580,7 @@ const onProviderSignupSubmit = async (data: ProviderSignupFormValues) => {
                           </FormItem>
                         )}
                       />
-                      
+
                       <FormField
                         control={providerSignupForm.control}
                         name="lastName"
@@ -598,7 +598,7 @@ const onProviderSignupSubmit = async (data: ProviderSignupFormValues) => {
                         )}
                       />
                     </div>
-                    
+
                     <FormField
                       control={providerSignupForm.control}
                       name="email"
@@ -734,7 +734,7 @@ const onProviderSignupSubmit = async (data: ProviderSignupFormValues) => {
                         </div>
                       )}
                     </div>
-                    
+
                     <FormField
                       control={providerSignupForm.control}
                       name="password"
@@ -752,7 +752,7 @@ const onProviderSignupSubmit = async (data: ProviderSignupFormValues) => {
                         </FormItem>
                       )}
                     />
-                    
+
                     <FormField
                       control={providerSignupForm.control}
                       name="confirmPassword"
@@ -770,10 +770,10 @@ const onProviderSignupSubmit = async (data: ProviderSignupFormValues) => {
                         </FormItem>
                       )}
                     />
-                    
-                    <AnimatedButton 
-                      type="submit" 
-                      className="w-full" 
+
+                    <AnimatedButton
+                      type="submit"
+                      className="w-full"
                       loading={providerSignupForm.formState.isSubmitting}
                       loadingText="Creating Account..."
                     >

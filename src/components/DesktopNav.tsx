@@ -9,6 +9,7 @@ import { useSearch } from "@/context/SearchContext";
 import { Home, Calendar, MessageSquare, Users, ShoppingCart, Heart, Settings, User, Brain, Shield, Activity, BarChart3, AlertTriangle, Zap } from "lucide-react";
 import { DesktopNavMenu } from "@/components/navigation/DesktopNavMenu";
 import { DesktopUserMenu } from "@/components/navigation/DesktopUserMenu";
+import { AppLogo } from "@/components/ui/AppLogo";
 
 export function DesktopNav() {
   const location = useLocation();
@@ -32,6 +33,7 @@ export function DesktopNav() {
   const handleLogout = useCallback(async () => {
     try {
       await signOut();
+      // Use window.location.href to ensure a full state reset, but point to /auth
       window.location.href = "/auth";
     } catch (error) {
       console.error("Error signing out:", error);
@@ -174,13 +176,7 @@ export function DesktopNav() {
       <div className="container mx-auto flex items-center justify-between py-4 max-w-8xl">
         <div className="flex items-center gap-8">
           {/* Enhanced Logo */}
-          <Link
-            to="/"
-            className="font-bold text-3xl logo-link text-trust-600 hover:text-trust-700 transition-colors"
-            aria-label="HealthConnect Home"
-          >
-            Doc&apos; O Clock
-          </Link>
+          <AppLogo size="lg" className="mr-4" />
 
           {/* Main navigation with enhanced visibility and accessibility */}
           <nav className="hidden lg:flex items-center space-x-2" role="navigation" aria-label="Main navigation">
