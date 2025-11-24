@@ -146,6 +146,19 @@ export function DesktopNav() {
       icon: <AlertTriangle className="h-4 w-4 mr-2" />,
       badge: "24/7"
     },
+    // Management Systems
+    {
+      to: "/pharmacy-management",
+      label: "Pharmacy Management",
+      icon: <ShoppingCart className="h-4 w-4 mr-2" />,
+      badge: "PMS"
+    },
+    {
+      to: "/hospital-management",
+      label: "Hospital Management",
+      icon: <Activity className="h-4 w-4 mr-2" />,
+      badge: "HMS"
+    },
     {
       to: "/settings",
       label: "Settings",
@@ -177,8 +190,8 @@ export function DesktopNav() {
                 variant={item.active ? "default" : "ghost"}
                 asChild
                 className={`flex items-center px-4 py-2 rounded-xl transition-all duration-200 ${item.active
-                    ? "bg-trust-600 text-white shadow-lg"
-                    : "hover:bg-trust-50 hover:text-trust-700"
+                  ? "bg-trust-600 text-white shadow-lg"
+                  : "hover:bg-trust-50 hover:text-trust-700"
                   }`}
               >
                 <Link
