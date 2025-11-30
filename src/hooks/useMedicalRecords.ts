@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { generateMockRecordHash } from '@/utils/medical-records';
 
 export interface MedicalRecord {
     id: string;
@@ -32,7 +33,9 @@ export function useMedicalRecords(userId: string | undefined) {
                 .order('date', { ascending: false });
 
             if (error) throw error;
-            setRecords((data as any) || []);
+
+            const typedData = (data || []) as unknown as MedicalRecord[];
+            setRecords(typedData);
         } catch (error) {
             console.error('Error fetching medical records:', error);
             toast.error('Failed to load medical records');
@@ -44,9 +47,6 @@ export function useMedicalRecords(userId: string | undefined) {
     const addRecord = async (record: Omit<MedicalRecord, 'id' | 'created_at' | 'verified' | 'hash'>) => {
         if (!userId) return;
 
-        // Simulate blockchain hash generation
-        const mockHash = '0x' + Array(64).fill(0).map(() => Math.floor(Math.random() * 16).toString(16)).join('');
-
         try {
             const { data, error } = await supabase
                 .from('medical_records' as any)
@@ -54,7 +54,7 @@ export function useMedicalRecords(userId: string | undefined) {
                     patient_id: userId,
                     ...record,
                     record_type: record.category, // Map category to record_type
-                    hash: mockHash,
+                    hash: generateMockRecordHash(),
                     verified: true,
                     shared_with: []
                 })
@@ -63,7 +63,8 @@ export function useMedicalRecords(userId: string | undefined) {
 
             if (error) throw error;
 
-            setRecords([data, ...records]);
+            const typedRecord = data as unknown as MedicalRecord;
+            setRecords([typedRecord, ...records]);
             toast.success('Record added and verified on blockchain');
             return data;
         } catch (error) {

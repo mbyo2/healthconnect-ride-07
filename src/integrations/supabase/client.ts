@@ -5,12 +5,11 @@ import type { Database } from './types';
 // In production, these will be set via environment variables in Netlify
 const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
-// Use production Supabase URL for both local and production
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || "https://tthzcijscedgxjfnfnky.supabase.co";
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0aHpjaWpzY2VkZ3hqZm5mbmt5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQxMDU3ODgsImV4cCI6MjA0OTY4MTc4OH0.aum1F7Q4Eqrjf-eHkwyYBd9KDoZs2JaxN3l_vFDcWwY";
+// Use Supabase URL and key from environment variables only
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 // Log the environment for debugging
-console.log('Supabase URL:', SUPABASE_URL);
 console.log('Running in', isLocalhost ? 'local' : 'production', 'mode');
 
 // Validate environment variables
@@ -42,6 +41,6 @@ export const supabase = createClient<Database>(
 
 // Log the Supabase URL and key prefix for debugging
 if (import.meta.env.DEV) {
-  console.log('Supabase URL:', SUPABASE_URL);
-  console.log('Supabase Key Prefix:', SUPABASE_ANON_KEY?.substring(0, 10) + '...');
+  console.log('Supabase URL configured:', Boolean(SUPABASE_URL));
+  console.log('Supabase Key configured:', Boolean(SUPABASE_ANON_KEY));
 }

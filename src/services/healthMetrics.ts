@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { METRIC_ICON_MAP, GOAL_ICON_MAP, METRIC_TARGET_MAP } from "@/config/healthMetrics";
 
 export interface HealthStat {
   title: string;
@@ -187,46 +188,13 @@ export const getUpcomingAppointments = async (): Promise<UpcomingAppointment[]> 
 };
 
 const getIconForMetricType = (type: string): string => {
-  const iconMap: Record<string, string> = {
-    'blood_pressure': 'Heart',
-    'heart_rate': 'Activity',
-    'weight': 'Target',
-    'sleep': 'Moon',
-    'temperature': 'Thermometer',
-    'steps': 'Footprints',
-    'calories': 'Fire',
-    'distance': 'MapPin',
-    'active_minutes': 'Activity',
-    'water': 'Droplets'
-  };
-  return iconMap[type] || 'Activity';
+  return METRIC_ICON_MAP[type] || 'Activity';
 };
 
 const getIconForGoalType = (type: string): string => {
-  const iconMap: Record<string, string> = {
-    'steps': 'Footprints',
-    'water': 'Droplets',
-    'exercise': 'Activity',
-    'nutrition': 'Apple',
-    'blood_pressure': 'Heart',
-    'heart_rate': 'Activity',
-    'weight': 'Target',
-    'sleep': 'Moon',
-    'temperature': 'Thermometer'
-  };
-  return iconMap[type] || 'Target';
+  return GOAL_ICON_MAP[type] || 'Target';
 };
 
 const getTargetForMetricType = (type: string): number => {
-  const targetMap: Record<string, number> = {
-    'steps': 10000,
-    'water': 8,
-    'exercise': 30,
-    'weight': 70,
-    'heart_rate': 80,
-    'blood_pressure': 120,
-    'sleep': 8,
-    'temperature': 37
-  };
-  return targetMap[type] || 100;
+  return METRIC_TARGET_MAP[type] || 100;
 };

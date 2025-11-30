@@ -1,8 +1,8 @@
-
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { HealthcareProviderType, InsuranceProvider, SpecialtyType } from '@/types/healthcare';
 import type { Provider } from '@/types/provider';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/context/AuthContext';
 
 type Coordinates = {
   latitude: number;
@@ -37,7 +37,7 @@ type SearchContextType = {
 const SearchContext = createContext<SearchContextType | undefined>(undefined);
 
 export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Initialize all state variables in the correct order
+  // State variables
   const [searchQuery, setSearchQuery] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState<HealthcareProviderType | null>(null);
@@ -52,55 +52,50 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
 
+  const { user } = useAuth();
+
   // Get user location effect
   useEffect(() => {
     if (useUserLocation && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (position) => {
+        position => {
           setUserLocation({
             latitude: position.coords.latitude,
-            longitude: position.coords.longitude
+            longitude: position.coords.longitude,
           });
         },
-        (error) => {
-          console.error("Error getting location:", error);
+        error => {
+          console.error('Error getting location:', error);
           setUseUserLocation(false);
         }
       );
     }
   }, [useUserLocation]);
 
-  // Calculate distance between two coordinates in kilometers
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
-    const R = 6371; // Radius of the Earth in kilometers
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-      Math.sin(dLon/2) * Math.sin(dLon/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    return Math.round(R * c * 100) / 100; // Round to 2 decimal places
+    const R = 6371; // km
+    const dLat = ((lat2 - lat1) * Math.PI) / 180;
+    const dLon = ((lon2 - lon1) * Math.PI) / 180;
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return Math.round(R * c * 100) / 100;
   };
-  const stringToInsuranceProvider = (
-    insuranceStrings: string[] | null
-  ): InsuranceProvider[] => {
-    if (!insuranceStrings || !Array.isArray(insuranceStrings)) {
-      return [];
-    }
-    
+
+  const stringToInsuranceProvider = (insuranceStrings: string[] | null): InsuranceProvider[] => {
+    if (!insuranceStrings || !Array.isArray(insuranceStrings)) return [];
     return insuranceStrings
-      .filter(insurance => {
-        return Object.values(InsuranceProvider).includes(insurance as any);
-      })
-      .map(insurance => {
-        const enumValue = Object.values(InsuranceProvider).find(
-          val => val === insurance
-        );
-        return enumValue || InsuranceProvider.NONE;
+      .filter(ins => Object.values(InsuranceProvider).includes(ins as any))
+      .map(ins => {
+        const found = Object.values(InsuranceProvider).find(val => val === ins);
+        return (found as InsuranceProvider) ?? InsuranceProvider.NONE;
       });
   };
 
-  // Fetch providers function
   const fetchProviders = async () => {
     setIsLoading(true);
     try {
@@ -125,39 +120,59 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         .range((currentPage - 1) * 10, currentPage * 10 - 1);
 
       if (error) {
-        console.error("Supabase error:", error);
+        console.error('Supabase error:', error);
         throw error;
       }
 
-      // Remove hardcoded expertise and location fallbacks
-      const mappedProviders = data?.map((profile): Provider => ({
+      const mappedProviders: Provider[] = (data ?? []).map(profile => ({
         id: profile.id,
-        first_name: profile.first_name || '',
-        last_name: profile.last_name || '',
-        specialty: profile.specialty || 'General Practice',
-        bio: profile.bio || '',
-        provider_type: profile.provider_type || 'doctor',
+        first_name: profile.first_name ?? '',
+        last_name: profile.last_name ?? '',
+        specialty: profile.specialty ?? 'General Practice',
+        bio: profile.bio ?? '',
+        provider_type: profile.provider_type ?? 'doctor',
         avatar_url: profile.avatar_url,
         accepted_insurances: stringToInsuranceProvider(profile.accepted_insurances),
         expertise: profile.specialty ? [profile.specialty, 'Healthcare'] : ['General Practice'],
-        location: profile.provider_locations?.[0] ? {
-          latitude: Number(profile.provider_locations[0].latitude),
-          longitude: Number(profile.provider_locations[0].longitude)
-        } : null,
-        distance: userLocation && profile.provider_locations?.[0] ? 
-          calculateDistance(
-            userLocation.latitude,
-            userLocation.longitude,
-            Number(profile.provider_locations[0].latitude),
-            Number(profile.provider_locations[0].longitude)
-          ) : undefined
-      })) || [];
+        location: profile.provider_locations?.[0]
+          ? {
+            latitude: Number(profile.provider_locations[0].latitude),
+            longitude: Number(profile.provider_locations[0].longitude),
+          }
+          : null,
+        distance:
+          userLocation && profile.provider_locations?.[0]
+            ? calculateDistance(
+              userLocation.latitude,
+              userLocation.longitude,
+              Number(profile.provider_locations[0].latitude),
+              Number(profile.provider_locations[0].longitude)
+            )
+            : undefined,
+      }));
 
       setProviders(mappedProviders);
       setTotalCount(count || mappedProviders.length);
       setHasMore((count || 0) > currentPage * 10);
-    } catch (error) {
-      console.error("Error fetching providers:", error);
+
+      // Log search action
+      if (user?.id) {
+        await supabase.from('audit_logs').insert({
+          user_id: user.id,
+          action: 'search',
+          resource: 'provider',
+          resource_id: null,
+          details: { query: searchQuery },
+          ip_address: null,
+          user_agent: navigator.userAgent,
+          severity: 'info',
+          category: 'data_access',
+          outcome: 'success',
+          timestamp: new Date().toISOString(),
+        });
+      }
+    } catch (err) {
+      console.error('Error fetching providers:', err);
       setProviders([]);
       setTotalCount(0);
       setHasMore(false);
@@ -165,11 +180,6 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       setIsLoading(false);
     }
   };
-
-  // Initial fetch effect
-  useEffect(() => {
-    fetchProviders();
-  }, [currentPage]);
 
   const refreshProviders = () => {
     setCurrentPage(1);
@@ -179,6 +189,12 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const loadMore = () => {
     setCurrentPage(prev => prev + 1);
   };
+
+  // Refetch when page changes
+  useEffect(() => {
+    fetchProviders();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage]);
 
   const contextValue: SearchContextType = {
     searchQuery,
@@ -202,14 +218,10 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     totalCount,
     currentPage,
     hasMore,
-    loadMore
+    loadMore,
   };
 
-  return (
-    <SearchContext.Provider value={contextValue}>
-      {children}
-    </SearchContext.Provider>
-  );
+  return <SearchContext.Provider value={contextValue}>{children}</SearchContext.Provider>;
 };
 
 export const useSearch = () => {

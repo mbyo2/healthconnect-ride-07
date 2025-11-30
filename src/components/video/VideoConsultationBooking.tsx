@@ -9,6 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Badge } from '@/components/ui/badge';
+import { useQuery } from '@tanstack/react-query';
+import { TIME_SLOTS, CONSULTATION_TYPES } from '@/config/videoConsultations';
 import { CalendarIcon, Clock, Video, User, DollarSign } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
@@ -28,24 +30,29 @@ export const VideoConsultationBooking = ({ onBookingComplete }: VideoConsultatio
   const [notes, setNotes] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const timeSlots = [
-    '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
-    '14:00', '14:30', '15:00', '15:30', '16:00', '16:30',
-    '17:00', '17:30'
-  ];
+  const { data: providers = [], isLoading: isLoadingProviders } = useQuery({
+    queryKey: ['video-consultation-providers'],
+    queryFn: async () => {
+      if (!user) return [];
 
-  const consultationTypes = [
-    { id: 'general', name: 'General Consultation', duration: 30, price: 50 },
-    { id: 'follow-up', name: 'Follow-up Visit', duration: 15, price: 30 },
-    { id: 'specialist', name: 'Specialist Consultation', duration: 45, price: 80 },
-    { id: 'emergency', name: 'Emergency Consultation', duration: 20, price: 100 }
-  ];
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name, specialty')
+        .eq('role', 'health_personnel');
 
-  const mockProviders = [
-    { id: '1', name: 'Dr. Sarah Johnson', specialty: 'Cardiology', avatar: null },
-    { id: '2', name: 'Dr. Michael Chen', specialty: 'Pediatrics', avatar: null },
-    { id: '3', name: 'Dr. Emma Wilson', specialty: 'Dermatology', avatar: null }
-  ];
+      if (error) {
+        console.error('Error fetching providers for video consultation:', error);
+        throw error;
+      }
+
+      return data || [];
+    },
+    enabled: !!user,
+  });
+
+  const timeSlots = TIME_SLOTS;
+
+  const consultationTypes = CONSULTATION_TYPES;
 
   const handleBookConsultation = async () => {
     if (!user || !selectedDate || !selectedTime || !selectedProvider || !consultationType) {
@@ -57,7 +64,7 @@ export const VideoConsultationBooking = ({ onBookingComplete }: VideoConsultatio
 
     try {
       const consultationData = consultationTypes.find(type => type.id === consultationType);
-      const provider = mockProviders.find(p => p.id === selectedProvider);
+      const provider = providers.find((p: any) => p.id === selectedProvider);
       
       if (!consultationData || !provider) {
         throw new Error('Invalid consultation type or provider');
@@ -77,7 +84,7 @@ export const VideoConsultationBooking = ({ onBookingComplete }: VideoConsultatio
         .insert({
           patient_id: user.id,
           provider_id: selectedProvider,
-          title: `${consultationData.name} with ${provider.name}`,
+          title: `${consultationData.name} with ${provider.first_name || ''} ${provider.last_name || ''}`.trim(),
           scheduled_start: startDateTime.toISOString(),
           scheduled_end: endDateTime.toISOString(),
           status: 'scheduled',
@@ -172,14 +179,15 @@ export const VideoConsultationBooking = ({ onBookingComplete }: VideoConsultatio
           <Label>Healthcare Provider</Label>
           <Select value={selectedProvider} onValueChange={setSelectedProvider}>
             <SelectTrigger>
-              <SelectValue placeholder="Select a provider" />
+              <SelectValue placeholder={isLoadingProviders ? 'Loading providers...' : 'Select a provider'} />
             </SelectTrigger>
             <SelectContent>
-              {mockProviders.map((provider) => (
+              {providers.map((provider: any) => (
                 <SelectItem key={provider.id} value={provider.id}>
                   <div className="flex items-center gap-2">
                     <User className="h-4 w-4" />
-                    {provider.name} - {provider.specialty}
+                    {provider.first_name} {provider.last_name}
+                    {provider.specialty ? ` - ${provider.specialty}` : ''}
                   </div>
                 </SelectItem>
               ))}

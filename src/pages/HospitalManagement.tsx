@@ -1,21 +1,24 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import {
-    Building2, Bed, Users, FileText, Calendar,
-    Plus, Activity, DollarSign, AlertCircle
+    Building2,
+    Bed,
+    Users,
+    DollarSign,
+    Activity,
+    Plus,
 } from 'lucide-react';
 
 const HospitalManagement = () => {
     const { user } = useAuth();
 
-    // Get hospital info
+    // Hospital info
     const { data: hospital } = useQuery({
         queryKey: ['hospital', user?.id],
         queryFn: async () => {
@@ -27,10 +30,10 @@ const HospitalManagement = () => {
                 .single();
             return data;
         },
-        enabled: !!user
+        enabled: !!user,
     });
 
-    // Get departments
+    // Departments
     const { data: departments } = useQuery({
         queryKey: ['hospital-departments', hospital?.id],
         queryFn: async () => {
@@ -41,10 +44,10 @@ const HospitalManagement = () => {
                 .order('name');
             return data || [];
         },
-        enabled: !!hospital
+        enabled: !!hospital,
     });
 
-    // Get beds
+    // Beds
     const { data: beds } = useQuery({
         queryKey: ['hospital-beds', hospital?.id],
         queryFn: async () => {
@@ -54,10 +57,10 @@ const HospitalManagement = () => {
                 .eq('hospital_id', hospital?.id);
             return data || [];
         },
-        enabled: !!hospital
+        enabled: !!hospital,
     });
 
-    // Get active admissions
+    // Admissions
     const { data: admissions } = useQuery({
         queryKey: ['hospital-admissions', hospital?.id],
         queryFn: async () => {
@@ -69,13 +72,13 @@ const HospitalManagement = () => {
                 .order('admission_date', { ascending: false });
             return data || [];
         },
-        enabled: !!hospital
+        enabled: !!hospital,
     });
 
-    // Calculate stats
+    // Stats
     const totalBeds = beds?.length || 0;
-    const occupiedBeds = beds?.filter(b => b.status === 'occupied').length || 0;
-    const availableBeds = beds?.filter(b => b.status === 'available').length || 0;
+    const occupiedBeds = beds?.filter((b) => b.status === 'occupied').length || 0;
+    const availableBeds = beds?.filter((b) => b.status === 'available').length || 0;
     const occupancyRate = totalBeds > 0 ? ((occupiedBeds / totalBeds) * 100).toFixed(1) : 0;
 
     if (!hospital) {
@@ -98,7 +101,9 @@ const HospitalManagement = () => {
         <div className="container mx-auto p-4 md:p-6 space-y-6">
             {/* Header */}
             <div>
-                <h1 className="text-2xl md:text-3xl font-bold mb-2">{hospital.name} - HMS</h1>
+                <h1 className="text-2xl md:text-3xl font-bold mb-2">
+                    {hospital.name} - HMS
+                </h1>
                 <p className="text-muted-foreground">Hospital Management System</p>
             </div>
 
@@ -107,34 +112,35 @@ const HospitalManagement = () => {
                 <Card>
                     <CardHeader className="pb-3">
                         <CardTitle className="text-sm font-medium flex items-center gap-2">
-                            <Bed className="h-4 w-4" />
-                            Total Beds
+                            <Bed className="h-4 w-4" /> Total Beds
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{totalBeds}</div>
-                        <p className="text-xs text-muted-foreground">Across {departments?.length || 0} departments</p>
+                        <p className="text-xs text-muted-foreground">
+                            Across {departments?.length || 0} departments
+                        </p>
                     </CardContent>
                 </Card>
 
                 <Card>
                     <CardHeader className="pb-3">
                         <CardTitle className="text-sm font-medium flex items-center gap-2">
-                            <Activity className="h-4 w-4 text-green-500" />
-                            Occupancy Rate
+                            <Activity className="h-4 w-4 text-green-500" /> Occupancy Rate
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold text-green-500">{occupancyRate}%</div>
-                        <p className="text-xs text-muted-foreground">{occupiedBeds} occupied, {availableBeds} available</p>
+                        <p className="text-xs text-muted-foreground">
+                            {occupiedBeds} occupied, {availableBeds} available
+                        </p>
                     </CardContent>
                 </Card>
 
                 <Card>
                     <CardHeader className="pb-3">
                         <CardTitle className="text-sm font-medium flex items-center gap-2">
-                            <Users className="h-4 w-4" />
-                            Active Patients
+                            <Users className="h-4 w-4" /> Active Patients
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -145,8 +151,7 @@ const HospitalManagement = () => {
                 <Card>
                     <CardHeader className="pb-3">
                         <CardTitle className="text-sm font-medium flex items-center gap-2">
-                            <Building2 className="h-4 w-4" />
-                            Departments
+                            <Building2 className="h-4 w-4" /> Departments
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -180,7 +185,10 @@ const HospitalManagement = () => {
                             {admissions && admissions.length > 0 ? (
                                 <div className="space-y-2">
                                     {admissions.map((admission) => (
-                                        <div key={admission.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg hover:bg-accent transition-colors gap-3">
+                                        <div
+                                            key={admission.id}
+                                            className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg hover:bg-accent transition-colors gap-3"
+                                        >
                                             <div className="flex-1">
                                                 <div className="flex items-center gap-2 mb-1">
                                                     <h4 className="font-semibold">
@@ -192,13 +200,19 @@ const HospitalManagement = () => {
                                                     Admission #{admission.admission_number}
                                                 </p>
                                                 <div className="flex items-center gap-4 mt-2 text-sm">
-                                                    <span>Department: <strong>{admission.department?.name}</strong></span>
+                                                    <span>
+                                                        Department: <strong>{admission.department?.name}</strong>
+                                                    </span>
                                                     <span>Admitted: {new Date(admission.admission_date).toLocaleDateString()}</span>
                                                 </div>
                                             </div>
                                             <div className="flex gap-2">
-                                                <Button variant="outline" size="sm">View Details</Button>
-                                                <Button variant="outline" size="sm">Discharge</Button>
+                                                <Button variant="outline" size="sm">
+                                                    View Details
+                                                </Button>
+                                                <Button variant="outline" size="sm">
+                                                    Discharge
+                                                </Button>
                                             </div>
                                         </div>
                                     ))}
@@ -214,7 +228,7 @@ const HospitalManagement = () => {
                 </TabsContent>
 
                 {/* Beds Tab */}
-                <TabsContent value="beds">
+                <TabsContent value="beds" className="space-y-4">
                     <Card>
                         <CardHeader>
                             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -229,18 +243,25 @@ const HospitalManagement = () => {
                             {beds && beds.length > 0 ? (
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                     {beds.map((bed) => (
-                                        <Card key={bed.id} className={
-                                            bed.status === 'available' ? 'border-green-200' :
-                                                bed.status === 'occupied' ? 'border-blue-200' :
-                                                    'border-gray-200'
-                                        }>
+                                        <Card
+                                            key={bed.id}
+                                            className={
+                                                bed.status === 'available'
+                                                    ? 'border-green-200'
+                                                    : bed.status === 'occupied'
+                                                        ? 'border-blue-200'
+                                                        : 'border-gray-200'
+                                            }
+                                        >
                                             <CardHeader className="pb-3">
                                                 <div className="flex items-center justify-between">
                                                     <CardTitle className="text-sm">Bed {bed.bed_number}</CardTitle>
                                                     <Badge variant={
-                                                        bed.status === 'available' ? 'default' :
-                                                            bed.status === 'occupied' ? 'secondary' :
-                                                                'outline'
+                                                        bed.status === 'available'
+                                                            ? 'default'
+                                                            : bed.status === 'occupied'
+                                                                ? 'secondary'
+                                                                : 'outline'
                                                     }>
                                                         {bed.status}
                                                     </Badge>
@@ -267,7 +288,7 @@ const HospitalManagement = () => {
                 </TabsContent>
 
                 {/* Departments Tab */}
-                <TabsContent value="departments">
+                <TabsContent value="departments" className="space-y-4">
                     <Card>
                         <CardHeader>
                             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -307,7 +328,7 @@ const HospitalManagement = () => {
                 </TabsContent>
 
                 {/* Billing Tab */}
-                <TabsContent value="billing">
+                <TabsContent value="billing" className="space-y-4">
                     <Card>
                         <CardHeader>
                             <CardTitle>Billing & Invoices</CardTitle>
@@ -315,9 +336,7 @@ const HospitalManagement = () => {
                         <CardContent>
                             <div className="text-center py-12">
                                 <DollarSign className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-                                <p className="text-muted-foreground">
-                                    Billing system coming soon
-                                </p>
+                                <p className="text-muted-foreground">Billing system coming soon</p>
                             </div>
                         </CardContent>
                     </Card>

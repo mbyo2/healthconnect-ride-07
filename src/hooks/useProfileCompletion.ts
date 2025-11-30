@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -24,50 +23,27 @@ export const useProfileCompletion = () => {
       setLoading(false);
       return;
     }
-
     try {
       setLoading(true);
-      
-      // Check profile completion
       const profileComplete = profile?.is_profile_complete || false;
-      
-      // Parallel queries for better performance
       const [
         { data: appointments },
         { data: healthMetrics },
         { data: insuranceInfo },
         { data: videoConsultations },
-        { data: connections }
+        { data: connections },
+        { data: wallets },
+        { data: searchLogs }
       ] = await Promise.all([
-        supabase
-          .from('appointments')
-          .select('id')
-          .eq('patient_id', user.id)
-          .limit(1),
-        supabase
-          .from('health_metrics')
-          .select('id')
-          .eq('user_id', user.id)
-          .limit(1),
-        supabase
-          .from('insurance_information')
-          .select('id')
-          .eq('patient_id', user.id)
-          .limit(1),
-        supabase
-          .from('video_consultations')
-          .select('id')
-          .eq('patient_id', user.id)
-          .limit(1),
-        supabase
-          .from('user_connections')
-          .select('id')
-          .eq('patient_id', user.id)
-          .eq('status', 'approved')
-          .limit(1)
+        supabase.from('appointments').select('id').eq('patient_id', user.id).limit(1),
+        supabase.from('health_metrics').select('id').eq('user_id', user.id).limit(1),
+        supabase.from('insurance_information').select('id').eq('patient_id', user.id).limit(1),
+        supabase.from('video_consultations').select('id').eq('patient_id', user.id).limit(1),
+        supabase.from('user_connections').select('id').eq('patient_id', user.id).eq('status', 'approved').limit(1),
+        supabase.from('user_wallets').select('id').eq('user_id', user.id).limit(1),
+        supabase.from('audit_logs').select('id').eq('user_id', user.id).eq('action', 'search').limit(1)
       ]);
 
-      // Define workflow steps
       const steps: WorkflowStep[] = [
         {
           id: 'profile',
@@ -128,8 +104,8 @@ export const useProfileCompletion = () => {
           title: 'Payment Setup',
           description: 'Set up secure payment methods for healthcare services',
           icon: 'CreditCard',
-          route: '/payment-processing',
-          completed: false,
+          route: '/settings',
+          completed: !!wallets?.length,
           required: false
         },
         {
@@ -138,7 +114,7 @@ export const useProfileCompletion = () => {
           description: 'Explore and search for healthcare providers near you',
           icon: 'Search',
           route: '/search',
-          completed: false,
+          completed: !!searchLogs?.length,
           required: false
         }
       ];
@@ -164,11 +140,8 @@ export const useProfileCompletion = () => {
   }, [workflowSteps]);
 
   const getNextStep = useCallback(() => {
-    // First check for required steps
     const nextRequired = workflowSteps.find(step => !step.completed && step.required);
     if (nextRequired) return nextRequired;
-    
-    // Then check for optional steps
     return workflowSteps.find(step => !step.completed && !step.required);
   }, [workflowSteps]);
 
