@@ -44,7 +44,9 @@ serve(async (req) => {
       throw new Error('HF_TOKEN not configured');
     }
 
-    const hf = new HfInference(HF_TOKEN);
+    const hf = new HfInference(HF_TOKEN, {
+      baseUrl: 'https://router.huggingface.co'
+    });
 
     // Build conversation context
     const systemPrompt = `You are Doc 0 Clock, a knowledgeable medical AI assistant available 24/7. You provide:
