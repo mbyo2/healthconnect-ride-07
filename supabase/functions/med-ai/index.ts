@@ -36,13 +36,20 @@ serve(async (req) => {
             );
         }
 
-        const { message, conversationHistory } = validationResult.data;
+    const { message, conversationHistory } = validationResult.data;
 
-        // Get OpenAI API key from environment
-        const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
-        if (!OPENAI_API_KEY) {
-            throw new Error('OPENAI_API_KEY not configured');
-        }
+    // Get OpenAI API key from environment
+    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+    if (!OPENAI_API_KEY) {
+      console.error('OPENAI_API_KEY not configured');
+      return new Response(
+        JSON.stringify({
+          error: 'OPENAI_API_KEY not configured. Please configure it in Supabase Edge Functions settings.',
+          fallback: true
+        }),
+        { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
         // Build conversation context
         const systemPrompt = `You are Doc 0 Clock, a knowledgeable medical AI assistant available 24/7. You provide:
