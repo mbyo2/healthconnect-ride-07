@@ -69,7 +69,7 @@ const PharmacyManagement = () => {
         return daysUntilExpiry <= 30 && daysUntilExpiry > 0;
     }) || [];
 
-    const todayRevenue = todaySales?.reduce((sum, sale) => sum + parseFloat(sale.total_amount || 0), 0) || 0;
+    const todayRevenue = todaySales?.reduce((sum, sale) => sum + (Number(sale.total_amount) || 0), 0) || 0;
 
     if (!pharmacy) {
         return (
@@ -308,7 +308,7 @@ const PharmacyManagement = () => {
                                                 </p>
                                             </div>
                                             <div className="text-right">
-                                                <p className="font-bold">K{parseFloat(sale.total_amount).toFixed(2)}</p>
+                                                <p className="font-bold">K{Number(sale.total_amount).toFixed(2)}</p>
                                                 <Badge>{sale.payment_method}</Badge>
                                             </div>
                                         </div>

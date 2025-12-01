@@ -218,12 +218,25 @@ const PharmacyPortal = () => {
       </ProtectedRoute>
     );
   }
+
+  return (
+    <RoleProtectedRoute allowedRoles={['institution_admin', 'admin']}>
+      <div className="min-h-screen bg-background">
+        <main className="container mx-auto px-4 py-6 space-y-6 max-w-7xl">
+          <div className="flex justify-between items-center">
+            <h1 className="text-3xl font-bold">{pharmacy?.name || 'Pharmacy'} Portal</h1>
+          </div>
+
+          <Tabs defaultValue="products" className="w-full">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="products">Products</TabsTrigger>
+              <TabsTrigger value="add-product">Add Product</TabsTrigger>
               <TabsTrigger value="delivery">Delivery Zones</TabsTrigger>
               <TabsTrigger value="orders">Orders</TabsTrigger>
-            </TabsList >
+            </TabsList>
 
-  {/* Products Tab */ }
-  < TabsContent value = "products" >
+            {/* Products Tab */}
+            <TabsContent value="products">
     <Card>
       <CardHeader>
         <CardTitle>Your Products ({products?.length || 0})</CardTitle>
@@ -272,10 +285,10 @@ const PharmacyPortal = () => {
         )}
       </CardContent>
     </Card>
-            </TabsContent >
+            </TabsContent>
 
-  {/* Add Product Tab */ }
-  < TabsContent value = "add-product" >
+            {/* Add Product Tab */}
+            <TabsContent value="add-product">
     <Card>
       <CardHeader>
         <CardTitle>Add New Product</CardTitle>
@@ -499,10 +512,10 @@ const PharmacyPortal = () => {
         </CardContent>
       </Card>
     </div>
-            </TabsContent >
+            </TabsContent>
 
-  {/* Orders Tab */ }
-  < TabsContent value = "orders" >
+            {/* Orders Tab */}
+            <TabsContent value="orders">
     <Card>
       <CardHeader>
         <CardTitle>Recent Orders</CardTitle>
@@ -514,11 +527,11 @@ const PharmacyPortal = () => {
         </div>
       </CardContent>
     </Card>
-            </TabsContent >
-          </Tabs >
-        </main >
-      </div >
-    </RoleProtectedRoute >
+            </TabsContent>
+          </Tabs>
+        </main>
+      </div>
+    </RoleProtectedRoute>
   );
 };
 
