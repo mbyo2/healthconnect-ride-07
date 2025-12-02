@@ -85,18 +85,20 @@ export const MedGemmaChat = () => {
     setIsLoading(true);
 
     try {
-      console.log('Attempting AI chat with fallback system...');
+      console.log('Attempting AI chat...');
 
-      // Three-tier fallback: medgemma-chat → doc-chat → med-ai
+      // Primary: doc-chat (Lovable AI - supports images)
+      // Fallback: medgemma-chat (text-only)
       let data, error;
       let functionUsed = '';
 
-      // Try 1: medgemma-chat (Hugging Face MedGemma)
+      // Use doc-chat as primary (supports images and is more reliable)
       try {
-        console.log('Trying medgemma-chat...');
-        const response = await supabase.functions.invoke('medgemma-chat', {
+        console.log('Calling doc-chat (primary)...');
+        const response = await supabase.functions.invoke('doc-chat', {
           body: {
             message: userMessage.content,
+            image: imageToSend || null,
             conversationHistory: messages.slice(-10).map(m => ({
               role: m.role,
               content: m.content
@@ -105,32 +107,14 @@ export const MedGemmaChat = () => {
         });
         data = response.data;
         error = response.error;
-        functionUsed = 'medgemma-chat';
+        functionUsed = 'doc-chat';
 
-        if (error) throw new Error('medgemma-chat failed');
-      } catch (medgemmaError) {
-        // Try 2: doc-chat (Lovable AI)
-        console.log('medgemma-chat failed, trying doc-chat...');
+        if (error || !data?.reply) throw new Error('doc-chat failed');
+      } catch (docChatError) {
+        // Fallback to medgemma-chat (text-only, no image support)
+        console.log('doc-chat failed, trying medgemma-chat fallback...');
         try {
-          const docChatResponse = await supabase.functions.invoke('doc-chat', {
-            body: {
-              message: userMessage.content,
-              image: imageToSend,
-              conversationHistory: messages.slice(-10).map(m => ({
-                role: m.role,
-                content: m.content
-              }))
-            }
-          });
-          data = docChatResponse.data;
-          error = docChatResponse.error;
-          functionUsed = 'doc-chat';
-
-          if (error) throw new Error('doc-chat failed');
-        } catch (docChatError) {
-          // Try 3: med-ai (final fallback)
-          console.log('doc-chat failed, trying med-ai...');
-          const medAiResponse = await supabase.functions.invoke('med-ai', {
+          const medgemmaResponse = await supabase.functions.invoke('medgemma-chat', {
             body: {
               message: userMessage.content,
               conversationHistory: messages.slice(-10).map(m => ({
@@ -139,9 +123,12 @@ export const MedGemmaChat = () => {
               }))
             }
           });
-          data = medAiResponse.data;
-          error = medAiResponse.error;
-          functionUsed = 'med-ai';
+          data = medgemmaResponse.data;
+          error = medgemmaResponse.error;
+          functionUsed = 'medgemma-chat';
+        } catch (medgemmaError) {
+          console.error('All AI functions failed');
+          throw new Error('Unable to connect to AI assistant. Please try again.');
         }
       }
 
