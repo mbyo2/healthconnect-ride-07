@@ -140,8 +140,8 @@ const IoTMonitoring = () => {
                                 </div>
                                 <p className="text-sm text-muted-foreground">Blood Pressure</p>
                                 <p className="text-3xl font-bold mt-1">
-                                    {vitalSigns && 'bloodPressure' in vitalSigns && typeof vitalSigns.bloodPressure === 'string'
-                                        ? vitalSigns.bloodPressure
+                                    {vitalSigns?.blood_pressure 
+                                        ? `${vitalSigns.blood_pressure.systolic}/${vitalSigns.blood_pressure.diastolic}`
                                         : '--/--'}
                                 </p>
                                 <p className="text-xs text-muted-foreground">mmHg</p>
