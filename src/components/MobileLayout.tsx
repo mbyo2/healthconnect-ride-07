@@ -2,13 +2,14 @@ import { Header } from "@/components/Header";
 import { BottomNav } from "@/components/BottomNav";
 import { DesktopNav } from "@/components/DesktopNav";
 import { useDeviceType } from "@/hooks/use-device-type";
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
 import { AccessibilityMenu } from "@/components/AccessibilityMenu";
 import { AccessibilityProvider } from "@/context/AccessibilityContext";
+import { useLocation } from "react-router-dom";
 
 interface MobileLayoutProps {
   children: ReactNode;
@@ -18,6 +19,15 @@ interface MobileLayoutProps {
 export const MobileLayout = ({ children, isLoading }: MobileLayoutProps) => {
   const { isDesktop } = useDeviceType();
   const { isAuthenticated } = useAuth();
+  const location = useLocation();
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  
+  // Smooth page transition effect
+  useEffect(() => {
+    setIsTransitioning(true);
+    const timer = setTimeout(() => setIsTransitioning(false), 150);
+    return () => clearTimeout(timer);
+  }, [location.pathname]);
   
   if (isLoading) {
     return <LoadingScreen />;
@@ -32,11 +42,12 @@ export const MobileLayout = ({ children, isLoading }: MobileLayoutProps) => {
             <main 
               id="main-content"
               className={cn(
-                "flex-1 overflow-auto",
-                !isAuthenticated && "w-full" // Use full width when no nav is shown
+                "flex-1 overflow-auto transition-opacity duration-150 ease-out",
+                !isAuthenticated && "w-full",
+                isTransitioning ? "opacity-95" : "opacity-100"
               )}
             >
-              <div className="container mx-auto px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 py-6 space-y-6 max-w-8xl">
+              <div className="container mx-auto px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 py-6 space-y-6 max-w-8xl animate-in fade-in duration-200">
                 {children}
               </div>
             </main>
@@ -55,12 +66,13 @@ export const MobileLayout = ({ children, isLoading }: MobileLayoutProps) => {
           id="main-content"
           className={cn(
             "flex-1 pt-16 overflow-y-auto overflow-x-hidden", 
-            isAuthenticated ? "pb-24" : "pb-4", // Extra bottom padding for nav and content visibility
-            "transition-all duration-200 ease-in-out",
-            "min-h-0" // Allow flex child to shrink
+            isAuthenticated ? "pb-24" : "pb-4",
+            "transition-all duration-150 ease-out",
+            "min-h-0",
+            isTransitioning ? "opacity-95" : "opacity-100"
           )}
         >
-          <div className="container mx-auto px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 py-6 space-y-6 max-w-8xl min-h-full">
+          <div className="container mx-auto px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 py-6 space-y-6 max-w-8xl min-h-full animate-in fade-in slide-in-from-bottom-1 duration-200">
             <div className="w-full">
               {children}
             </div>
