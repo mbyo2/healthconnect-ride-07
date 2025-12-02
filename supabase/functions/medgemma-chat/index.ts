@@ -1,5 +1,4 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { HfInference } from "https://esm.sh/@huggingface/inference@2.3.2";
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
 
 const corsHeaders = {
@@ -39,14 +38,18 @@ serve(async (req) => {
 
     const { message, conversationHistory } = validationResult.data;
 
-    const HF_TOKEN = Deno.env.get('HF_TOKEN');
-    if (!HF_TOKEN) {
-      throw new Error('HF_TOKEN not configured');
+    // Use Lovable AI Gateway instead of HuggingFace (which has deprecated API)
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    if (!LOVABLE_API_KEY) {
+      console.error('LOVABLE_API_KEY not configured');
+      return new Response(
+        JSON.stringify({
+          error: 'LOVABLE_API_KEY not configured',
+          fallback: true
+        }),
+        { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
-
-    const hf = new HfInference(HF_TOKEN, {
-      baseUrl: 'https://router.huggingface.co'
-    });
 
     // Build conversation context
     const systemPrompt = `You are Doc 0 Clock, a knowledgeable medical AI assistant available 24/7. You provide:
@@ -65,29 +68,49 @@ Always:
 
 CRITICAL: If symptoms suggest emergency (chest pain, difficulty breathing, severe bleeding, loss of consciousness), immediately advise to call emergency services.`;
 
-    // Format conversation history
-    let conversationContext = systemPrompt + '\n\n';
-    conversationHistory.forEach((msg: any) => {
-      conversationContext += `${msg.role === 'user' ? 'Patient' : 'Doc 0 Clock'}: ${msg.content}\n`;
-    });
-    conversationContext += `Patient: ${message}\nDoc 0 Clock:`;
+    // Format conversation for API
+    const messages = [
+      { role: 'system', content: systemPrompt },
+      ...conversationHistory.map((msg: any) => ({
+        role: msg.role,
+        content: msg.content
+      })),
+      { role: 'user', content: message }
+    ];
 
-    console.log('MedGemma chat request received');
+    console.log('MedGemma chat request received, calling Lovable AI...');
 
-    // Call MedGemma
-    const response = await hf.textGeneration({
-      model: 'google/medgemma-7b',
-      inputs: conversationContext,
-      parameters: {
-        max_new_tokens: 800,
-        temperature: 0.4,
-        top_p: 0.9,
-        return_full_text: false,
-        stop: ['\nPatient:', '\nUser:']
+    // Call Lovable AI Gateway
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+        'Content-Type': 'application/json',
       },
+      body: JSON.stringify({
+        model: 'google/gemini-2.5-flash',
+        messages,
+        temperature: 0.4,
+        max_tokens: 800,
+      }),
     });
 
-    const reply = response.generated_text.trim();
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Lovable AI error:', response.status, errorText);
+      
+      if (response.status === 429) {
+        return new Response(
+          JSON.stringify({ error: 'Rate limit exceeded. Please try again later.' }),
+          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      
+      throw new Error(`AI gateway error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const reply = data.choices[0].message.content;
 
     console.log('MedGemma chat response generated');
 
@@ -95,7 +118,7 @@ CRITICAL: If symptoms suggest emergency (chest pain, difficulty breathing, sever
       JSON.stringify({
         reply,
         timestamp: new Date().toISOString(),
-        model: 'medgemma-7b'
+        model: 'gemini-2.5-flash'
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
