@@ -13,6 +13,7 @@ import { AccessibilityProvider } from '@/context/AccessibilityContext';
 import { ProfileSetup } from '@/components/auth/ProfileSetup';
 import { RouteGuard } from '@/components/auth/RouteGuard';
 import { useAuth } from '@/context/AuthContext';
+import { useRoutePrefetch, useInitializePrefetch } from '@/hooks/use-route-prefetch';
 
 // Lazy load all page components for better performance
 const Home = lazy(() => import('@/pages/Home'));
@@ -192,9 +193,20 @@ const AppContent = () => {
   );
 };
 
+// Route prefetch wrapper component
+const RoutePrefetchWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  useRoutePrefetch();
+  useInitializePrefetch();
+  return <>{children}</>;
+};
+
 // Simplified App Content Component without problematic dependencies
 const AppContentWithPreload: React.FC = React.memo(() => {
-  return <AppContent />;
+  return (
+    <RoutePrefetchWrapper>
+      <AppContent />
+    </RoutePrefetchWrapper>
+  );
 });
 
 AppContentWithPreload.displayName = 'AppContentWithPreload';
