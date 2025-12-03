@@ -4,14 +4,16 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2, Send, Bot, User, Image as ImageIcon, X, Paperclip } from 'lucide-react';
+import { Loader2, Send, Bot, User, X, Paperclip, Lightbulb } from 'lucide-react';
 import { toast } from 'sonner';
+import { ClinicalDecisionCard, ClinicalDecision, parseClinicalDecisions, ClinicalAction } from './ai/ClinicalDecisionCard';
 
 interface Message {
   role: 'user' | 'assistant';
   content: string;
   timestamp: Date;
-  image?: string; // base64 image data
+  image?: string;
+  decisions?: ClinicalDecision[];
 }
 
 export const MedGemmaChat = () => {
@@ -143,10 +145,14 @@ export const MedGemmaChat = () => {
         throw new Error('Invalid response from AI - no reply received');
       }
 
+      // Parse clinical decisions from AI response
+      const decisions = parseClinicalDecisions(data.reply);
+
       const assistantMessage: Message = {
         role: 'assistant',
         content: data.reply,
-        timestamp: new Date()
+        timestamp: new Date(),
+        decisions: decisions.length > 0 ? decisions : undefined
       };
 
       setMessages(prev => [...prev, assistantMessage]);
@@ -199,25 +205,44 @@ export const MedGemmaChat = () => {
                   </div>
                 )}
 
-                <div
-                  className={`max-w-[85%] sm:max-w-[75%] rounded-2xl p-3 sm:p-4 shadow-sm ${message.role === 'user'
-                    ? 'bg-primary text-primary-foreground rounded-br-sm'
-                    : 'bg-card border rounded-bl-sm'
-                    }`}
-                >
-                  {message.image && (
-                    <div className="rounded-xl mb-3 overflow-hidden border-2 border-primary/20">
-                      <img
-                        src={message.image}
-                        alt="Medical image"
-                        className="w-full h-auto max-h-64 object-contain bg-muted/50"
-                      />
+                <div className="max-w-[85%] sm:max-w-[80%] space-y-2">
+                  <div
+                    className={`rounded-2xl p-3 sm:p-4 shadow-sm ${message.role === 'user'
+                      ? 'bg-primary text-primary-foreground rounded-br-sm'
+                      : 'bg-card border rounded-bl-sm'
+                      }`}
+                  >
+                    {message.image && (
+                      <div className="rounded-xl mb-3 overflow-hidden border-2 border-primary/20">
+                        <img
+                          src={message.image}
+                          alt="Medical image"
+                          className="w-full h-auto max-h-64 object-contain bg-muted/50"
+                        />
+                      </div>
+                    )}
+                    <p className="text-sm sm:text-base whitespace-pre-wrap leading-relaxed">{message.content}</p>
+                    <span className="text-xs opacity-60 mt-2 block">
+                      {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                  
+                  {/* Clinical Decision Cards */}
+                  {message.decisions && message.decisions.length > 0 && (
+                    <div className="space-y-2 mt-3">
+                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                        <Lightbulb className="h-3 w-3" />
+                        <span>AI-Triggered Recommendations</span>
+                      </div>
+                      {message.decisions.map((decision, idx) => (
+                        <ClinicalDecisionCard 
+                          key={idx} 
+                          decision={decision}
+                          compact={message.decisions && message.decisions.length > 1}
+                        />
+                      ))}
                     </div>
                   )}
-                  <p className="text-sm sm:text-base whitespace-pre-wrap leading-relaxed">{message.content}</p>
-                  <span className="text-xs opacity-60 mt-2 block">
-                    {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </span>
                 </div>
 
                 {message.role === 'user' && (
