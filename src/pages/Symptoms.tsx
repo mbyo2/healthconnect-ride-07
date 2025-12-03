@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -37,13 +37,13 @@ const Symptoms = () => {
     }
   ];
 
-  const toggleSymptom = (symptom: string) => {
+  const toggleSymptom = useCallback((symptom: string) => {
     setSelectedSymptoms(prev => 
       prev.includes(symptom) 
         ? prev.filter(s => s !== symptom)
         : [...prev, symptom]
     );
-  };
+  }, []);
 
   const handleSubmit = () => {
     if (selectedSymptoms.length === 0) {
