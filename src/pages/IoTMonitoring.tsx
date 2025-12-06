@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Activity, Smartphone, Watch, Heart, Thermometer, Droplet, Zap, Plus, Settings, TrendingUp, AlertCircle, CheckCircle2, Battery } from 'lucide-react';
+import { Activity, Smartphone, Watch, Heart, Thermometer, Droplet, Zap, Plus, Settings, TrendingUp, AlertCircle, CheckCircle2, Battery, Bot, ArrowRight } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useIoT } from '@/hooks/useIoT';
-import { useAuth } from '@/hooks/useAuth'; // Assuming this exists, or we get user from context
+import { useAuth } from '@/hooks/useAuth';
 import { IoTDevice } from '@/types/iot';
+import { AIInsightsWidget } from '@/components/ai/AIInsightsWidget';
+import { useNavigate } from 'react-router-dom';
 
 const IoTMonitoring = () => {
+    const navigate = useNavigate();
     const { user } = useAuth();
     const { devices, vitalSigns, alerts, loading, addDevice } = useIoT(user?.id);
     const [selectedDevice, setSelectedDevice] = useState<string | null>(null);
@@ -232,6 +235,16 @@ const IoTMonitoring = () => {
                     </Card>
                 </div>
 
+                {/* AI Insights Section */}
+                <AIInsightsWidget 
+                    context="iot" 
+                    data={{ 
+                        devices: devices.length,
+                        vitalSigns,
+                        alertCount: alerts.length 
+                    }} 
+                />
+
                 {/* Device Pairing Guide */}
                 <Card className="border-blue-200 bg-blue-50/50">
                     <CardContent className="p-6">
@@ -244,10 +257,16 @@ const IoTMonitoring = () => {
                                 <p className="text-sm text-muted-foreground mt-1">
                                     Pair your fitness trackers, smartwatches, and health monitors to get comprehensive health insights.
                                 </p>
-                                <Button className="mt-3">
-                                    <Plus className="w-4 h-4 mr-2" />
-                                    Pair New Device
-                                </Button>
+                                <div className="flex gap-3 mt-3">
+                                    <Button>
+                                        <Plus className="w-4 h-4 mr-2" />
+                                        Pair New Device
+                                    </Button>
+                                    <Button variant="outline" onClick={() => navigate('/ai-diagnostics')}>
+                                        <Bot className="w-4 h-4 mr-2" />
+                                        AI Analysis
+                                    </Button>
+                                </div>
                             </div>
                         </div>
                     </CardContent>

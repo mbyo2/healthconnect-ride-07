@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { InsuranceForm } from "./InsuranceForm";
@@ -14,14 +13,16 @@ import { ComprehensivePrescriptions } from "./ComprehensivePrescriptions";
 import { InsuranceVerificationSystem } from "./InsuranceVerificationSystem";
 import { EmergencyProtocols } from "./EmergencyProtocols";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import { CalendarPlus, Menu, Mic } from "lucide-react";
+import { CalendarPlus, Menu, Mic, Bot, Sparkles, ArrowRight, Brain } from "lucide-react";
 import { usePerformanceMonitoring } from "@/hooks/use-performance-monitoring";
 import { safeLocalGet, safeLocalSet } from '@/utils/storage';
 import { LoadingScreen } from "../LoadingScreen";
 import { useOfflineMode } from "@/hooks/use-offline-mode";
 import { toast } from "sonner";
 import { VoiceCommandButton } from "../VoiceCommandButton";
+import { AIInsightsWidget } from "../ai/AIInsightsWidget";
 
 export const PatientDashboard = () => {
   const [selectedTab, setSelectedTab] = useState("health");
@@ -60,9 +61,9 @@ export const PatientDashboard = () => {
   }
 
   return (
-    <div className="container mx-auto py-6">
+    <div className="container mx-auto py-6 space-y-6">
       {/* Patient-friendly header with large buttons and simplified navigation */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between">
         <h1 className="text-2xl md:text-3xl font-bold">Your Health Dashboard</h1>
         
         <div className="flex gap-3">
@@ -84,8 +85,33 @@ export const PatientDashboard = () => {
         </div>
       </div>
 
+      {/* AI Health Assistant Banner */}
+      <Card className="border-primary/30 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5">
+        <CardContent className="p-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <div className="p-3 rounded-full bg-primary/20 flex-shrink-0">
+              <Brain className="h-6 w-6 text-primary" />
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                <h3 className="font-semibold">Doc 0 Clock AI Assistant</h3>
+                <Sparkles className="h-4 w-4 text-primary" />
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Get instant health guidance, symptom analysis, and personalized recommendations 24/7.
+              </p>
+            </div>
+            <Button onClick={() => navigate('/ai-diagnostics')} className="w-full sm:w-auto gap-2">
+              <Bot className="h-4 w-4" />
+              Chat with AI
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       {!isOnline && (
-        <div className="mb-6 p-3 bg-amber-50 border border-amber-200 rounded-md text-amber-800">
+        <div className="p-3 bg-amber-50 border border-amber-200 rounded-md text-amber-800">
           <p className="font-medium">You're currently offline</p>
           <p className="text-sm">Some features may be limited, but you can still access your key health information</p>
         </div>
@@ -112,20 +138,20 @@ export const PatientDashboard = () => {
               Appointments
             </Button>
             <Button 
+              onClick={() => navigate("/ai-diagnostics")} 
+              className="h-24 text-lg flex flex-col items-center justify-center border-primary/50"
+              variant="outline"
+            >
+              <span className="text-2xl mb-2">🤖</span>
+              AI Assistant
+            </Button>
+            <Button 
               onClick={() => setSelectedTab("emergency")} 
               className="h-24 text-lg flex flex-col items-center justify-center"
               variant="outline"
             >
               <span className="text-2xl mb-2">🚨</span>
               Emergency
-            </Button>
-            <Button 
-              onClick={() => setSelectedTab("health")} 
-              className="h-24 text-lg flex flex-col items-center justify-center"
-              variant="outline"
-            >
-              <span className="text-2xl mb-2">📊</span>
-              Health
             </Button>
           </div>
           
@@ -138,8 +164,12 @@ export const PatientDashboard = () => {
       ) : (
         // Standard tabs interface
         <Tabs value={selectedTab} onValueChange={setSelectedTab}>
-          <TabsList className="grid w-full grid-cols-7">
-            <TabsTrigger value="health">Health Metrics</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-8">
+            <TabsTrigger value="health">Health</TabsTrigger>
+            <TabsTrigger value="ai" className="flex items-center gap-1">
+              <Bot className="h-3 w-3" />
+              AI
+            </TabsTrigger>
             <TabsTrigger value="symptoms">Symptoms</TabsTrigger>
             <TabsTrigger value="appointments">Appointments</TabsTrigger>
             <TabsTrigger value="medications">Medications</TabsTrigger>
@@ -150,6 +180,27 @@ export const PatientDashboard = () => {
           
           <TabsContent value="health">
             <HealthMetricsChart />
+          </TabsContent>
+          <TabsContent value="ai">
+            <div className="space-y-6">
+              <AIInsightsWidget context="health" />
+              <Card className="p-6">
+                <div className="text-center space-y-4">
+                  <div className="p-4 rounded-full bg-primary/10 w-fit mx-auto">
+                    <Brain className="h-12 w-12 text-primary" />
+                  </div>
+                  <h3 className="text-xl font-semibold">Full AI Health Assistant</h3>
+                  <p className="text-muted-foreground max-w-md mx-auto">
+                    Chat with our AI, upload medical images for analysis, get symptom assessments, and receive personalized health recommendations.
+                  </p>
+                  <Button onClick={() => navigate('/ai-diagnostics')} size="lg" className="gap-2">
+                    <Bot className="h-5 w-5" />
+                    Open AI Chat
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </Card>
+            </div>
           </TabsContent>
           <TabsContent value="symptoms">
             <SymptomsDiary />

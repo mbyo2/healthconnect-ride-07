@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,13 +14,17 @@ import {
   Apple,
   Droplets,
   Moon,
-  Footprints
+  Footprints,
+  Bot,
+  Sparkles,
+  ArrowRight
 } from "lucide-react";
 import { getHealthStats, getHealthGoals, getUpcomingAppointments, type HealthStat, type HealthGoal, type UpcomingAppointment } from "@/services/healthMetrics";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useGamification } from "@/hooks/useGamification";
 import { Trophy, Award } from "lucide-react";
+import { AIInsightsWidget } from "@/components/ai/AIInsightsWidget";
 
 export default function HealthDashboard() {
   const [healthStats, setHealthStats] = useState<HealthStat[]>([]);
@@ -96,12 +99,28 @@ export default function HealthDashboard() {
   return (
     <div className="container mx-auto py-8 space-y-8">
       {/* Header */}
-      <div className="text-center">
-        <h1 className="text-3xl font-bold">Health Dashboard</h1>
-        <p className="text-muted-foreground mt-2">
-          Monitor your health metrics and track your wellness goals
-        </p>
+      <div className="flex flex-col md:flex-row md:items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Health Dashboard</h1>
+          <p className="text-muted-foreground mt-2">
+            Monitor your health metrics and track your wellness goals
+          </p>
+        </div>
+        <Button onClick={() => navigate('/ai-diagnostics')} className="mt-4 md:mt-0 gap-2">
+          <Bot className="h-4 w-4" />
+          AI Health Assistant
+          <Sparkles className="h-3 w-3" />
+        </Button>
       </div>
+
+      {/* AI Insights Widget */}
+      <AIInsightsWidget 
+        context="health" 
+        data={{ 
+          stats: healthStats, 
+          goals: healthGoals 
+        }} 
+      />
 
       {/* Health Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
