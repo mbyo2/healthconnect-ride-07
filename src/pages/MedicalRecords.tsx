@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,12 +12,15 @@ import {
   Heart,
   Activity,
   ClipboardList,
-  Pill
+  Pill,
+  Bot,
+  Sparkles
 } from "lucide-react";
 import { getMedicalRecords, getHealthMetrics, type MedicalRecord, type HealthMetric } from "@/services/medicalRecords";
 import { useNavigate } from "react-router-dom";
 import { ComprehensiveMedicalRecords } from "@/components/patient/ComprehensiveMedicalRecords";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { AIInsightsWidget } from "@/components/ai/AIInsightsWidget";
 
 export default function MedicalRecords() {
   const [records, setRecords] = useState<MedicalRecord[]>([]);
@@ -84,29 +86,43 @@ export default function MedicalRecords() {
   return (
     <ProtectedRoute>
       <div className="container mx-auto py-8 space-y-8">
-        {/* New Comprehensive Medical Records Section */}
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold">Medical Records</h1>
+            <p className="text-muted-foreground mt-2">
+              Access and manage your complete health information
+            </p>
+          </div>
+          <div className="flex gap-2 mt-4 md:mt-0">
+            <Button variant="outline" onClick={() => navigate('/ai-diagnostics')}>
+              <Bot className="h-4 w-4 mr-2" />
+              AI Analysis
+            </Button>
+            <Button variant="outline">
+              <Upload className="h-4 w-4 mr-2" />
+              Upload
+            </Button>
+            <Button>
+              <Download className="h-4 w-4 mr-2" />
+              Export
+            </Button>
+          </div>
+        </div>
+
+        {/* AI Insights for Medical Records */}
+        <AIInsightsWidget 
+          context="records" 
+          data={{ 
+            recordCount: records.length,
+            metricsCount: healthMetrics.length 
+          }} 
+        />
+
+        {/* Comprehensive Medical Records Section */}
         <ComprehensiveMedicalRecords />
         
         <Separator />
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Medical Records</h1>
-          <p className="text-muted-foreground mt-2">
-            Access and manage your complete health information
-          </p>
-        </div>
-        <div className="flex gap-2 mt-4 md:mt-0">
-          <Button variant="outline">
-            <Upload className="h-4 w-4 mr-2" />
-            Upload Record
-          </Button>
-          <Button>
-            <Download className="h-4 w-4 mr-2" />
-            Export All
-          </Button>
-        </div>
-      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Recent Records */}
