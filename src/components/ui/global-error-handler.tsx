@@ -62,7 +62,9 @@ export function GlobalErrorHandler({ children }: GlobalErrorHandlerProps) {
         // This helps avoid spamming the user with technical errors
         if (!errorMessage.includes('NetworkError') && 
             !errorMessage.includes('AbortError') &&
-            !errorMessage.includes('Failed to fetch')) {
+            !errorMessage.includes('Failed to fetch') &&
+            !errorMessage.includes('operation is insecure') &&
+            !errorMessage.includes('The operation is insecure')) {
           toast.error('Something went wrong', {
             description: 'We encountered an issue and our team has been notified.',
             duration: 5000,
