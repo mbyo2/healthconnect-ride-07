@@ -4266,6 +4266,10 @@ export type Database = {
         Returns: boolean
       }
       insert_applications_for_doctors: { Args: never; Returns: undefined }
+      is_admin_via_profiles: {
+        Args: { check_user_id: string }
+        Returns: boolean
+      }
       is_institution_admin: {
         Args: { institution_id: string }
         Returns: boolean

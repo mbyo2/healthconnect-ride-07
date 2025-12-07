@@ -38,8 +38,8 @@ export const MobileLayout = ({ children, isLoading }: MobileLayoutProps) => {
       <AccessibilityProvider>
         <SidebarProvider>
           <div className="flex flex-col min-h-screen bg-background w-full">
-            {isAuthenticated && <DesktopNav />}
-            <main 
+            <DesktopNav />
+            <main
               id="main-content"
               className={cn(
                 "flex-1 overflow-auto transition-opacity duration-150 ease-out",
