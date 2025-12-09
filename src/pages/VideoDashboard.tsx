@@ -4,11 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Video, Calendar, Users, Phone } from 'lucide-react';
 
-interface VideoDashboardProps {
-  session: any;
-}
-
-const VideoDashboard: React.FC<VideoDashboardProps> = ({ session }) => {
+const VideoDashboard: React.FC = () => {
   return (
     <div className="container mx-auto py-8 space-y-6">
       <div className="text-center">
