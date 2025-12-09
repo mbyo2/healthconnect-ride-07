@@ -4,12 +4,24 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+    "authorization, x-client-info, apikey, content-type, x-cron-secret",
 };
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
+  }
+
+  // Validate cron secret for authentication
+  const cronSecret = req.headers.get("x-cron-secret");
+  const expectedSecret = Deno.env.get("CRON_SECRET");
+  
+  if (!cronSecret || cronSecret !== expectedSecret) {
+    console.log("Unauthorized request attempt - invalid or missing cron secret");
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 401,
+    });
   }
 
   try {
@@ -35,21 +47,26 @@ serve(async (req) => {
 
     if (error) throw error;
 
+    let remindersProcessed = 0;
+    
     // Send email reminders
-    for (const appointment of appointments) {
-      const patientEmail = appointment.profiles.email;
+    for (const appointment of appointments || []) {
+      const patientEmail = appointment.profiles?.email;
       if (!patientEmail) continue;
 
-      // Send email using your preferred email service
-      // For this example, we'll just log it
-      console.log(`Sending reminder to ${patientEmail} for appointment on ${appointment.appointment_date}`);
+      // TODO: Integrate with actual email service (e.g., Resend)
+      // For now, just count processed reminders without logging sensitive data
+      remindersProcessed++;
     }
 
-    return new Response(JSON.stringify({ success: true }), {
+    console.log(`Processed ${remindersProcessed} appointment reminders`);
+
+    return new Response(JSON.stringify({ success: true, processed: remindersProcessed }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
   } catch (error) {
+    console.error("Error processing reminders:", error.message);
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 400,
