@@ -205,9 +205,9 @@ export const MedGemmaChat = () => {
                   </div>
                 )}
 
-                <div className="max-w-[85%] sm:max-w-[80%] space-y-2">
+                <div className="max-w-[75%] sm:max-w-[70%] space-y-2 overflow-hidden">
                   <div
-                    className={`rounded-2xl p-3 sm:p-4 shadow-sm ${message.role === 'user'
+                    className={`rounded-2xl p-3 sm:p-4 shadow-sm overflow-hidden ${message.role === 'user'
                       ? 'bg-primary text-primary-foreground rounded-br-sm'
                       : 'bg-card border rounded-bl-sm'
                       }`}
@@ -221,7 +221,7 @@ export const MedGemmaChat = () => {
                         />
                       </div>
                     )}
-                    <p className="text-sm sm:text-base whitespace-pre-wrap leading-relaxed">{message.content}</p>
+                    <p className="text-sm sm:text-base whitespace-pre-wrap leading-relaxed break-words overflow-wrap-anywhere">{message.content}</p>
                     <span className="text-xs opacity-60 mt-2 block">
                       {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </span>
