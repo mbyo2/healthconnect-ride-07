@@ -1,18 +1,13 @@
 
 import React, { useEffect, useState, Suspense, lazy, useMemo } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from 'react-router-dom';
-import { useSession, useSupabaseClient, SessionContextProvider } from '@supabase/auth-helpers-react';
-import { supabase } from '@/integrations/supabase/client';
 import { MobileLayout } from '@/components/MobileLayout';
 import { LoadingScreen } from '@/components/LoadingScreen';
-import { AuthProvider } from '@/context/AuthContext';
+import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { UserRolesProvider } from '@/context/UserRolesContext';
 import { SearchProvider } from '@/context/SearchContext';
-// FeedbackProvider removed - not implemented
 import { AccessibilityProvider } from '@/context/AccessibilityContext';
-import { ProfileSetup } from '@/components/auth/ProfileSetup';
 import { RouteGuard } from '@/components/auth/RouteGuard';
-import { useAuth } from '@/context/AuthContext';
 import { useRoutePrefetch, useInitializePrefetch } from '@/hooks/use-route-prefetch';
 
 // Lazy load all page components for better performance
@@ -62,39 +57,18 @@ const EmergencyResponse = lazy(() => import('@/pages/EmergencyResponse'));
 const PharmacyManagement = lazy(() => import('@/pages/PharmacyManagement'));
 const HospitalManagement = lazy(() => import('@/pages/HospitalManagement'));
 
-// Remove duplicate supabase client - using the one from integrations
-
 const AppContent = () => {
   const [isNewUser, setIsNewUser] = useState(false);
-  const session = useSession();
-  const supabaseClient = useSupabaseClient();
-  const { userRole } = useAuth();
+  const { user, session, isLoading, profile } = useAuth();
 
   useEffect(() => {
-    const checkNewUser = async () => {
-      if (session && session.user) {
-        const { data, error } = await supabaseClient
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single();
-
-        if (error) {
-          console.error("Error fetching profile:", error);
-        }
-
-        if (data && !data.first_name) {
-          setIsNewUser(true);
-        } else {
-          setIsNewUser(false);
-        }
-      } else {
-        setIsNewUser(false);
-      }
-    };
-
-    checkNewUser();
-  }, [session, supabaseClient]);
+    // Check if user needs onboarding based on profile data
+    if (profile && !profile.first_name) {
+      setIsNewUser(true);
+    } else {
+      setIsNewUser(false);
+    }
+  }, [profile]);
 
   return (
     <SearchProvider>
@@ -115,8 +89,10 @@ const AppContent = () => {
             <Route
               path="/auth"
               element={
-                session && session.user ? (
-                  <Navigate to="/symptoms" replace={true} />
+                isLoading ? (
+                  <LoadingScreen />
+                ) : user ? (
+                  <Navigate to="/home" replace={true} />
                 ) : (
                   <Auth />
                 )
@@ -127,7 +103,9 @@ const AppContent = () => {
             <Route
               path="/"
               element={
-                session && session.user ? (
+                isLoading ? (
+                  <LoadingScreen />
+                ) : user ? (
                   isNewUser ? (
                     <Navigate to="/onboarding" replace={true} />
                   ) : (
@@ -154,7 +132,7 @@ const AppContent = () => {
             <Route path="/chat" element={<RouteGuard><Chat /></RouteGuard>} />
             <Route path="/prescriptions" element={<RouteGuard><Prescriptions /></RouteGuard>} />
             <Route path="/symptoms" element={<RouteGuard><Symptoms /></RouteGuard>} />
-            <Route path="/video-dashboard" element={<RouteGuard><VideoDashboard session={session} /></RouteGuard>} />
+            <Route path="/video-dashboard" element={<RouteGuard><VideoDashboard /></RouteGuard>} />
             <Route path="/testing" element={<RouteGuard><Testing /></RouteGuard>} />
             <Route path="/documentation" element={<RouteGuard><Documentation /></RouteGuard>} />
             <Route path="/marketplace-users" element={<RouteGuard><UserMarketplace /></RouteGuard>} />
@@ -214,19 +192,17 @@ AppContentWithPreload.displayName = 'AppContentWithPreload';
 // Main App Component with Authentication and Routing
 const App: React.FC = () => {
   return (
-    <SessionContextProvider supabaseClient={supabase}>
-      <AuthProvider>
-        <UserRolesProvider>
-          <AccessibilityProvider>
-            <Router>
-              <div className="App">
-                <AppContentWithPreload />
-              </div>
-            </Router>
-          </AccessibilityProvider>
-        </UserRolesProvider>
-      </AuthProvider>
-    </SessionContextProvider>
+    <AuthProvider>
+      <UserRolesProvider>
+        <AccessibilityProvider>
+          <Router>
+            <div className="App">
+              <AppContentWithPreload />
+            </div>
+          </Router>
+        </AccessibilityProvider>
+      </UserRolesProvider>
+    </AuthProvider>
   );
 };
 
