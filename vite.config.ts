@@ -126,11 +126,13 @@ export default defineConfig(({ mode }) => ({
       'clsx',
       'tailwind-merge',
       'date-fns',
+      'date-fns',
       'sonner',
+      'leaflet',
+      'react-leaflet',
     ],
     exclude: [
       // Exclude large libraries that should be loaded on demand
-      'leaflet',
       'recharts',
     ],
     force: true, // Force re-optimization to fix potential issues

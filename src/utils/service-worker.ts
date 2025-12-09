@@ -1,4 +1,5 @@
 import { openIndexedDB, safeLocalGet, safeLocalSet } from '@/utils/storage';
+import { toast } from 'sonner';
 
 interface ExtendedServiceWorkerRegistration extends ServiceWorkerRegistration {
   sync?: {
@@ -14,7 +15,6 @@ interface ExtendedServiceWorkerRegistration extends ServiceWorkerRegistration {
 // Make sure only one service worker is registered for the app.
 // Offline page and critical routes are handled in 'public/service-worker.js'.
 // Update notifications are triggered when a new version is available.
-// TODO: Implement user-facing toast/notification when updates are ready.
 export const registerServiceWorker = async () => {
   if ('serviceWorker' in navigator) {
     try {
@@ -23,7 +23,7 @@ export const registerServiceWorker = async () => {
         updateViaCache: 'none'
       });
       console.info('ServiceWorker registration successful with scope:', registration.scope);
-      
+
       // Check for updates
       registration.addEventListener('updatefound', () => {
         const newWorker = registration.installing;
@@ -32,22 +32,29 @@ export const registerServiceWorker = async () => {
             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
               // New content is available, show notification to user
               console.log('New version available! Ready to update.');
-              // You could trigger a toast notification here
+              toast.info('New update available!', {
+                description: 'Reload to get the latest version',
+                action: {
+                  label: 'Reload',
+                  onClick: () => window.location.reload()
+                },
+                duration: Infinity
+              });
             }
           });
         }
       });
-      
+
       // Set up periodic sync if supported
       if ('periodicSync' in registration) {
         const extendedReg = registration as ExtendedServiceWorkerRegistration;
-        
+
         // Request permission to use periodic sync
         if ('permissions' in navigator) {
           const status = await navigator.permissions.query({
             name: 'periodic-background-sync' as any,
           });
-          
+
           if (status.state === 'granted' && extendedReg.periodicSync) {
             try {
               await extendedReg.periodicSync.register('content-sync', {
@@ -60,7 +67,7 @@ export const registerServiceWorker = async () => {
           }
         }
       }
-      
+
       return registration;
     } catch (error) {
       console.error('ServiceWorker registration failed:', error);
@@ -68,7 +75,7 @@ export const registerServiceWorker = async () => {
   } else {
     console.info('ServiceWorker is not supported in this browser');
   }
-  
+
   return null;
 };
 
@@ -83,7 +90,7 @@ export const unregisterServiceWorker = async () => {
       console.error('ServiceWorker unregistration failed:', error);
     }
   }
-  
+
   return false;
 };
 
@@ -92,7 +99,7 @@ export const checkServiceWorkerStatus = async () => {
     const registrations = await navigator.serviceWorker.getRegistrations();
     return registrations.length > 0;
   }
-  
+
   return false;
 };
 
@@ -100,7 +107,7 @@ export const checkNotificationPermission = () => {
   if (!('Notification' in window)) {
     return 'unsupported';
   }
-  
+
   return Notification.permission;
 };
 
@@ -108,7 +115,7 @@ export const requestNotificationPermission = async () => {
   if (!('Notification' in window)) {
     return 'unsupported';
   }
-  
+
   try {
     const permission = await Notification.requestPermission();
     return permission;
@@ -119,8 +126,8 @@ export const requestNotificationPermission = async () => {
 };
 
 export const checkIfAppInstalled = () => {
-  return window.matchMedia('(display-mode: standalone)').matches || 
-         (window.navigator as any).standalone === true;
+  return window.matchMedia('(display-mode: standalone)').matches ||
+    (window.navigator as any).standalone === true;
 };
 
 export const registerBackgroundSync = async (tag: string = 'sync-data') => {
@@ -128,7 +135,7 @@ export const registerBackgroundSync = async (tag: string = 'sync-data') => {
     try {
       const registration = await navigator.serviceWorker.ready;
       const extendedReg = registration as ExtendedServiceWorkerRegistration;
-      
+
       if (extendedReg.sync) {
         await extendedReg.sync.register(tag);
         console.log('Background sync registered!');
@@ -142,7 +149,7 @@ export const registerBackgroundSync = async (tag: string = 'sync-data') => {
       return false;
     }
   }
-  
+
   return false;
 };
 
@@ -203,12 +210,12 @@ export const updateServiceWorker = async (): Promise<boolean> => {
     try {
       const registrations = await navigator.serviceWorker.getRegistrations();
       let updated = false;
-      
+
       for (const registration of registrations) {
         await registration.update();
         updated = true;
       }
-      
+
       return updated;
     } catch (error) {
       console.error('Error updating service worker:', error);

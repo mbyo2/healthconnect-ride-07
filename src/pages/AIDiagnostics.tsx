@@ -33,8 +33,8 @@ const AIDiagnostics = () => {
           </div>
 
           {/* Feature Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-            <Card>
+          <div className="flex overflow-x-auto pb-4 gap-3 sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:gap-4 sm:pb-0 snap-x">
+            <Card className="min-w-[240px] sm:min-w-0 snap-center">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm sm:text-base flex items-center gap-2">
                   <MessageSquare className="h-4 w-4 text-primary" />
@@ -48,7 +48,7 @@ const AIDiagnostics = () => {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="min-w-[240px] sm:min-w-0 snap-center">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm sm:text-base flex items-center gap-2">
                   <ClipboardList className="h-4 w-4 text-primary" />
@@ -62,7 +62,7 @@ const AIDiagnostics = () => {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="min-w-[240px] sm:min-w-0 snap-center">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm sm:text-base flex items-center gap-2">
                   <History className="h-4 w-4 text-primary" />
@@ -76,7 +76,7 @@ const AIDiagnostics = () => {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="min-w-[240px] sm:min-w-0 snap-center">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm sm:text-base flex items-center gap-2">
                   <Shield className="h-4 w-4 text-primary" />

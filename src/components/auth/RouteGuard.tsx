@@ -15,7 +15,6 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const currentPath = location.pathname;
-  const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
     // Only run checks after loading is complete
@@ -23,7 +22,6 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
 
     // Allow access to public routes
     if (PUBLIC_ROUTES.includes(currentPath)) {
-      setIsChecking(false);
       return;
     }
 
@@ -38,19 +36,30 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
       // Redirect to appropriate dashboard based on role
       const landingPage = getRoleLandingPage(availableRoles);
       navigate(landingPage, { replace: true });
-      return;
     }
-
-    // All checks passed
-    setIsChecking(false);
   }, [user, availableRoles, authLoading, rolesLoading, currentPath, navigate, location]);
 
-  // Show loading while auth or roles are being determined
-  if (authLoading || rolesLoading || isChecking) {
+  // Show loading ONLY while initial auth/roles are loading
+  if (authLoading || rolesLoading) {
     return <LoadingScreen message="Checking permissions..." />;
   }
 
-  // If all checks pass, render the component
+  // For public routes, render immediately
+  if (PUBLIC_ROUTES.includes(currentPath)) {
+    return <>{children}</>;
+  }
+
+  // If not authenticated, render nothing (useEffect will redirect)
+  if (!user) {
+    return null;
+  }
+
+  // If authenticated but no permission, render nothing (useEffect will redirect)
+  if (!hasRoutePermission(availableRoles, currentPath)) {
+    return null;
+  }
+
+  // If all checks pass, render the component immediately
   return <>{children}</>;
 };
 

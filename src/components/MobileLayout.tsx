@@ -20,14 +20,14 @@ export const MobileLayout = ({ children, isLoading }: MobileLayoutProps) => {
   const { isAuthenticated } = useAuth();
   const location = useLocation();
   const [isTransitioning, setIsTransitioning] = useState(false);
-  
+
   // Smooth page transition effect
   useEffect(() => {
     setIsTransitioning(true);
     const timer = setTimeout(() => setIsTransitioning(false), 150);
     return () => clearTimeout(timer);
   }, [location.pathname]);
-  
+
   if (isLoading) {
     return <LoadingScreen />;
   }
@@ -58,10 +58,12 @@ export const MobileLayout = ({ children, isLoading }: MobileLayoutProps) => {
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
-      <main 
+      <main
         id="main-content"
+        role="main"
+        aria-label="Main Content"
         className={cn(
-          "flex-1 pt-16 overflow-y-auto overflow-x-hidden", 
+          "flex-1 pt-16 overflow-y-auto overflow-x-hidden",
           isAuthenticated ? "pb-24" : "pb-4",
           "transition-all duration-150 ease-out",
           "min-h-0",
@@ -80,7 +82,4 @@ export const MobileLayout = ({ children, isLoading }: MobileLayoutProps) => {
   );
 }
 
-// TODO: Ensure color contrast meets WCAG standards and add focus management for navigation elements
-// TODO: Ensure all interactive elements have ARIA labels and roles
-// TODO: Add keyboard navigation and focus management for accessibility
-// TODO: Improve color contrast and font sizes for readability
+

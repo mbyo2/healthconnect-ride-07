@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -10,12 +10,16 @@ import { Home, Calendar, MessageSquare, Users, ShoppingCart, Heart, Settings, Us
 import { DesktopNavMenu } from "@/components/navigation/DesktopNavMenu";
 import { DesktopUserMenu } from "@/components/navigation/DesktopUserMenu";
 import { AppLogo } from "@/components/ui/AppLogo";
+import { useUserRoles } from "@/context/UserRolesContext";
+import { hasRoutePermission } from "@/utils/rolePermissions";
 
 export function DesktopNav() {
   const location = useLocation();
   const { user, signOut, profile, isAuthenticated } = useAuth();
+  const { availableRoles } = useUserRoles();
   const [searchTerm, setSearchTerm] = useState("");
   const { setSearchQuery } = useSearch();
+  const navigate = useNavigate();
 
   const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -26,19 +30,18 @@ export function DesktopNav() {
     setSearchQuery(searchTerm);
 
     if (location.pathname !== "/search") {
-      window.location.href = "/search";
+      navigate('/search');
     }
-  }, [location.pathname, searchTerm, setSearchQuery]);
+  }, [location.pathname, searchTerm, setSearchQuery, navigate]);
 
   const handleLogout = useCallback(async () => {
     try {
       await signOut();
-      // Use window.location.href to ensure a full state reset, but point to /auth
-      window.location.href = "/auth";
+      navigate('/auth', { replace: true });
     } catch (error) {
       console.error("Error signing out:", error);
     }
-  }, [signOut]);
+  }, [signOut, navigate]);
 
   // Enhanced main navigation items for better user experience
   const mainNavItems = [
@@ -162,6 +165,12 @@ export function DesktopNav() {
       badge: "HMS"
     },
     {
+      to: "/lab-management",
+      label: "Lab Management",
+      icon: <Activity className="h-4 w-4 mr-2" />,
+      badge: "LMS"
+    },
+    {
       to: "/settings",
       label: "Settings",
       icon: <Settings className="h-4 w-4 mr-2" />
@@ -201,7 +210,7 @@ export function DesktopNav() {
               </Button>
             ))}
 
-            <DesktopNavMenu secondaryNavItems={secondaryNavItems} />
+            <DesktopNavMenu secondaryNavItems={secondaryNavItems.filter(item => hasRoutePermission(availableRoles, item.to))} />
           </nav>
         </div>
 

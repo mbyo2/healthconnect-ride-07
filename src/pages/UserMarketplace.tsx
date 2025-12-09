@@ -1,13 +1,21 @@
 
 import React from 'react';
 import { UserMarketplace } from '@/components/connections/UserMarketplace';
-import { useSession } from '@supabase/auth-helpers-react';
+import { useAuth } from '@/context/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 const UserMarketplacePage = () => {
-  const session = useSession();
+  const { user, isLoading } = useAuth();
 
-  if (!session?.user) {
+  if (isLoading) {
+    return (
+      <div className="container mx-auto py-8 flex justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
     return (
       <div className="container mx-auto py-8">
         <Card className="max-w-md mx-auto">

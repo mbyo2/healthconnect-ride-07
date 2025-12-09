@@ -272,22 +272,87 @@ const PharmacyManagement = () => {
 
                 {/* POS Tab */}
                 <TabsContent value="pos">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Point of Sale</CardTitle>
-                            <CardDescription>Process sales transactions</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-center py-12">
-                                <ShoppingCart className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-                                <h3 className="text-lg font-medium mb-2">POS System</h3>
-                                <p className="text-muted-foreground mb-4">
-                                    Full POS interface coming soon
-                                </p>
-                                <Button>Start New Sale</Button>
-                            </div>
-                        </CardContent>
-                    </Card>
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        {/* Product Selection */}
+                        <Card className="lg:col-span-2">
+                            <CardHeader>
+                                <CardTitle>Select Products</CardTitle>
+                                <div className="relative mt-2">
+                                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                                    <Input
+                                        placeholder="Search products by name or code..."
+                                        className="pl-8"
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                    />
+                                </div>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[500px] overflow-y-auto pr-2">
+                                    {inventory
+                                        ?.filter(item =>
+                                            item.quantity > 0 &&
+                                            (item.product_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                                item.product_code.toLowerCase().includes(searchTerm.toLowerCase()))
+                                        )
+                                        .map((item) => (
+                                            <div
+                                                key={item.id}
+                                                className="p-4 border rounded-lg cursor-pointer hover:bg-accent transition-colors flex justify-between items-center"
+                                                onClick={() => {
+                                                    // Add to cart logic would go here
+                                                    // For now we'll just show a toast
+                                                    // toast.success(`Added ${item.product_name} to cart`);
+                                                }}
+                                            >
+                                                <div>
+                                                    <h4 className="font-semibold">{item.product_name}</h4>
+                                                    <p className="text-xs text-muted-foreground">{item.product_code}</p>
+                                                    <p className="text-sm font-medium mt-1">K{item.unit_price}</p>
+                                                </div>
+                                                <Button size="sm" variant="secondary">Add</Button>
+                                            </div>
+                                        ))}
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        {/* Cart */}
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2">
+                                    <ShoppingCart className="h-5 w-5" />
+                                    Current Sale
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="flex flex-col h-[500px]">
+                                <div className="flex-1 space-y-4 overflow-y-auto mb-4">
+                                    {/* Mock Cart Items */}
+                                    <div className="text-center text-muted-foreground py-8">
+                                        Cart is empty
+                                    </div>
+                                </div>
+
+                                <div className="space-y-4 border-t pt-4">
+                                    <div className="flex justify-between text-sm">
+                                        <span>Subtotal</span>
+                                        <span>K0.00</span>
+                                    </div>
+                                    <div className="flex justify-between text-sm">
+                                        <span>Tax (16%)</span>
+                                        <span>K0.00</span>
+                                    </div>
+                                    <div className="flex justify-between font-bold text-lg">
+                                        <span>Total</span>
+                                        <span>K0.00</span>
+                                    </div>
+                                    <Button className="w-full" size="lg" disabled>
+                                        Complete Sale
+                                    </Button>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
                 </TabsContent>
 
                 {/* Sales Tab */}

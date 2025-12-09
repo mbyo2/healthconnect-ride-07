@@ -68,6 +68,13 @@ export function DesktopUserMenu({ user, profile, onLogout }: DesktopUserMenuProp
             Settings
           </Link>
         </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild className="hover:bg-trust-50">
+          <Link to="/profile" className="flex items-center font-medium">
+            <User className="h-4 w-4 mr-2" />
+            My Account
+          </Link>
+        </DropdownMenuItem>
 
         {profile?.role === "health_personnel" && (
           <DropdownMenuItem asChild className="hover:bg-trust-50">
@@ -87,7 +94,13 @@ export function DesktopUserMenu({ user, profile, onLogout }: DesktopUserMenuProp
           </DropdownMenuItem>
         )}
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={onLogout} className="text-red-600 hover:bg-red-50">
+        <DropdownMenuItem
+          onSelect={(e) => {
+            e.preventDefault();
+            onLogout();
+          }}
+          className="text-red-600 hover:bg-red-50 cursor-pointer"
+        >
           Sign Out
         </DropdownMenuItem>
       </DropdownMenuContent>

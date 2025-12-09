@@ -75,6 +75,20 @@ const HospitalManagement = () => {
         enabled: !!hospital,
     });
 
+    // Invoices (table will be created by migration)
+    const { data: invoices } = useQuery({
+        queryKey: ['hospital-invoices', hospital?.id],
+        queryFn: async () => {
+            const { data } = await (supabase as any)
+                .from('hospital_invoices')
+                .select('*, patient:profiles!patient_id(first_name, last_name)')
+                .eq('hospital_id', hospital?.id)
+                .order('invoice_date', { ascending: false });
+            return data || [];
+        },
+        enabled: !!hospital,
+    });
+
     // Stats
     const totalBeds = beds?.length || 0;
     const occupiedBeds = beds?.filter((b) => b.status === 'occupied').length || 0;
@@ -331,12 +345,45 @@ const HospitalManagement = () => {
                 <TabsContent value="billing" className="space-y-4">
                     <Card>
                         <CardHeader>
-                            <CardTitle>Billing & Invoices</CardTitle>
+                            <div className="flex items-center justify-between">
+                                <CardTitle>Billing & Invoices</CardTitle>
+                                <Button>
+                                    <Plus className="h-4 w-4 mr-2" />
+                                    Generate Invoice
+                                </Button>
+                            </div>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-center py-12">
-                                <DollarSign className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-                                <p className="text-muted-foreground">Billing system coming soon</p>
+                            <div className="space-y-4">
+                                {invoices && invoices.length > 0 ? (
+                                    invoices.map((invoice: any) => (
+                                        <div key={invoice.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent transition-colors">
+                                            <div>
+                                                <div className="flex items-center gap-2">
+                                                    <h4 className="font-semibold">{invoice.invoice_number}</h4>
+                                                    <Badge variant={
+                                                        invoice.payment_status === 'paid' ? 'default' :
+                                                            invoice.payment_status === 'overdue' ? 'destructive' : 'outline'
+                                                    }>
+                                                        {invoice.payment_status}
+                                                    </Badge>
+                                                </div>
+                                                <p className="text-sm text-muted-foreground mt-1">
+                                                    Patient: {invoice.patient?.first_name} {invoice.patient?.last_name} • Date: {new Date(invoice.invoice_date).toLocaleDateString()}
+                                                </p>
+                                            </div>
+                                            <div className="text-right">
+                                                <p className="font-bold text-lg">K{invoice.total_amount}</p>
+                                                <Button variant="ghost" size="sm">View</Button>
+                                            </div>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="text-center py-8">
+                                        <DollarSign className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                                        <p className="text-muted-foreground">No invoices found</p>
+                                    </div>
+                                )}
                             </div>
                         </CardContent>
                     </Card>

@@ -64,22 +64,22 @@ class AIHealthInsights {
 
       // Get user health data
       const healthData = await this.getUserHealthData(userId);
-      
+
       // Generate insights
       const insights: HealthInsight[] = [];
-      
+
       // Risk assessment insights
       const riskInsights = await this.generateRiskAssessments(healthData);
       insights.push(...riskInsights);
-      
+
       // Trend analysis insights
       const trendInsights = await this.generateTrendAnalysis(healthData);
       insights.push(...trendInsights);
-      
+
       // Preventive care insights
       const preventiveInsights = await this.generatePreventiveCareInsights(healthData);
       insights.push(...preventiveInsights);
-      
+
       // Medication optimization
       const medicationInsights = await this.generateMedicationInsights(healthData);
       insights.push(...medicationInsights);
@@ -137,10 +137,10 @@ class AIHealthInsights {
 
   private async generateRiskAssessments(healthData: any): Promise<HealthInsight[]> {
     const insights: HealthInsight[] = [];
-    
+
     try {
       const { profile, vitals } = healthData;
-      
+
       if (!profile || vitals.length === 0) return insights;
 
       // Use MedGemma for AI-powered risk assessment
@@ -166,7 +166,7 @@ class AIHealthInsights {
 
       // Parse MedGemma response and create structured insights
       const analysis = data.analysis;
-      
+
       insights.push({
         id: `ai-risk-${Date.now()}`,
         type: 'risk_assessment',
@@ -199,14 +199,14 @@ class AIHealthInsights {
     // Extract numbered recommendations or bullet points from analysis
     const recommendations: string[] = [];
     const lines = analysis.split('\n');
-    
+
     for (const line of lines) {
       const trimmed = line.trim();
       if (/^\d+\./.test(trimmed) || trimmed.startsWith('-') || trimmed.startsWith('•')) {
         recommendations.push(trimmed.replace(/^[\d\.\-•\s]+/, '').trim());
       }
     }
-    
+
     return recommendations.length > 0 ? recommendations.slice(0, 5) : ['Consult with your healthcare provider for personalized recommendations'];
   }
 
@@ -214,7 +214,7 @@ class AIHealthInsights {
     const latestVitals = vitals[0] || {};
     const age = profile.age || 30;
     const gender = profile.gender || 'unknown';
-    
+
     let riskScore = 0;
     const dataPoints: string[] = [];
     const recommendations: string[] = [];
@@ -226,7 +226,7 @@ class AIHealthInsights {
     // Blood pressure
     const systolic = latestVitals.systolic_bp || 120;
     const diastolic = latestVitals.diastolic_bp || 80;
-    
+
     if (systolic > 140 || diastolic > 90) {
       riskScore += 0.25;
       dataPoints.push(`High blood pressure: ${systolic}/${diastolic} mmHg`);
@@ -305,10 +305,10 @@ class AIHealthInsights {
 
   private async generateTrendAnalysis(healthData: any): Promise<HealthInsight[]> {
     const insights: HealthInsight[] = [];
-    
+
     try {
       const { vitals } = healthData;
-      
+
       if (vitals.length < 3) return insights;
 
       // Weight trend analysis
@@ -366,7 +366,7 @@ class AIHealthInsights {
 
     const change = ((recentAvg - olderAvg) / olderAvg) * 100;
     const direction = change > 0 ? 'increasing' : 'decreasing';
-    
+
     // Calculate significance based on consistency of trend
     const significance = Math.min(Math.abs(change) / 10, 1.0);
 
@@ -380,7 +380,7 @@ class AIHealthInsights {
 
   private getWeightRecommendations(trend: any): string[] {
     const recommendations: string[] = [];
-    
+
     if (trend.direction === 'increasing' && trend.change > 5) {
       recommendations.push('Consider consulting with a nutritionist');
       recommendations.push('Increase physical activity gradually');
@@ -397,7 +397,7 @@ class AIHealthInsights {
 
   private getBPRecommendations(trend: any): string[] {
     const recommendations: string[] = [];
-    
+
     if (trend.direction === 'increasing') {
       recommendations.push('Monitor blood pressure more frequently');
       recommendations.push('Reduce sodium intake');
@@ -413,10 +413,10 @@ class AIHealthInsights {
 
   private async generatePreventiveCareInsights(healthData: any): Promise<HealthInsight[]> {
     const insights: HealthInsight[] = [];
-    
+
     try {
       const { profile, appointments } = healthData;
-      
+
       if (!profile) return insights;
 
       const age = profile.age || 30;
@@ -468,12 +468,12 @@ class AIHealthInsights {
   }
 
   private getLastCheckupDate(appointments: any[]): Date | null {
-    const checkups = appointments.filter(apt => 
+    const checkups = appointments.filter(apt =>
       apt.type === 'checkup' || apt.type === 'physical' || apt.notes?.includes('annual')
     );
-    
+
     if (checkups.length === 0) return null;
-    
+
     return new Date(checkups[0].appointment_date);
   }
 
@@ -516,10 +516,10 @@ class AIHealthInsights {
 
   private async generateMedicationInsights(healthData: any): Promise<HealthInsight[]> {
     const insights: HealthInsight[] = [];
-    
+
     try {
       const { medications, vitals } = healthData;
-      
+
       if (!medications || medications.length === 0) return insights;
 
       // Medication adherence analysis
@@ -569,11 +569,11 @@ class AIHealthInsights {
 
   private analyzeMedicationAdherence(medications: any[]): string[] {
     const recommendations: string[] = [];
-    
-    const complexRegimens = medications.filter(med => 
+
+    const complexRegimens = medications.filter(med =>
       med.frequency === 'multiple_daily' || med.instructions?.includes('with food')
     );
-    
+
     if (complexRegimens.length > 2) {
       recommendations.push('Consider pill organizer for complex medication schedule');
       recommendations.push('Set medication reminders on your phone');
@@ -590,14 +590,14 @@ class AIHealthInsights {
   private checkDrugInteractions(medications: any[]): string[] {
     // Simplified interaction checking - in production, use comprehensive drug database
     const interactions: string[] = [];
-    
+
     const drugNames = medications.map(med => med.name?.toLowerCase() || '');
-    
+
     // Common interaction patterns
     if (drugNames.includes('warfarin') && drugNames.some(name => name.includes('aspirin'))) {
       interactions.push('Warfarin + Aspirin: Increased bleeding risk');
     }
-    
+
     if (drugNames.includes('metformin') && drugNames.includes('furosemide')) {
       interactions.push('Metformin + Furosemide: Monitor kidney function');
     }
@@ -609,14 +609,14 @@ class AIHealthInsights {
     try {
       const healthData = await this.getUserHealthData(userId);
       const insights = await this.generateHealthInsights(userId);
-      
+
       // Calculate category scores
       const cardiovascular = this.calculateCardiovascularScore(healthData);
       const metabolic = this.calculateMetabolicScore(healthData);
       const mental = this.calculateMentalHealthScore(healthData);
       const lifestyle = this.calculateLifestyleScore(healthData);
       const preventive = this.calculatePreventiveScore(healthData, insights);
-      
+
       const overall = Math.round(
         (cardiovascular + metabolic + mental + lifestyle + preventive) / 5
       );
@@ -660,7 +660,7 @@ class AIHealthInsights {
     // Blood pressure scoring
     const systolic = latest.systolic_bp || 120;
     const diastolic = latest.diastolic_bp || 80;
-    
+
     if (systolic > 140 || diastolic > 90) score -= 30;
     else if (systolic > 130 || diastolic > 85) score -= 15;
 
@@ -694,8 +694,21 @@ class AIHealthInsights {
   }
 
   private calculateMentalHealthScore(healthData: any): number {
-    // Simplified mental health scoring - would integrate with mental health assessments
-    return 75; // Placeholder
+    const { profile, vitals } = healthData;
+    let score = 80; // Base score
+
+    // Adjust based on sleep if available (simulated check as sleep isn't in base vitals interface yet)
+    const latestVitals = vitals[0] || {};
+    if (latestVitals.sleep_hours) {
+      if (latestVitals.sleep_hours < 6) score -= 10;
+      else if (latestVitals.sleep_hours >= 7) score += 5;
+    }
+
+    // Adjust based on stress/activity (simulated)
+    if (profile?.stress_level === 'high') score -= 15;
+    if (profile?.exercise_frequency === 'regular') score += 5;
+
+    return Math.min(Math.max(score, 0), 100);
   }
 
   private calculateLifestyleScore(healthData: any): number {
@@ -722,13 +735,47 @@ class AIHealthInsights {
   }
 
   private calculateHealthTrends(healthData: any): HealthTrend[] {
-    // Simplified trend calculation
-    return [];
+    const { vitals } = healthData;
+    const trends: HealthTrend[] = [];
+
+    if (!vitals || vitals.length < 2) return trends;
+
+    // Weight trend
+    const weightTrend = this.analyzeTrend(vitals, 'weight');
+    if (weightTrend.significance > 0) {
+      trends.push({
+        metric: 'Weight',
+        trend: weightTrend.direction === 'increasing' ? 'declining' : weightTrend.direction === 'decreasing' ? 'improving' : 'stable', // Assuming weight loss is generally good/improving for this context, logic can be refined
+        changePercent: Math.abs(weightTrend.change),
+        timeframe: weightTrend.timeframe,
+        predictions: {
+          shortTerm: weightTrend.direction === 'increasing' ? 'Likely to increase' : 'Likely to decrease',
+          longTerm: 'Maintain current habits'
+        }
+      });
+    }
+
+    // Heart Rate trend
+    const hrTrend = this.analyzeTrend(vitals, 'heart_rate');
+    if (hrTrend.significance > 0) {
+      trends.push({
+        metric: 'Heart Rate',
+        trend: hrTrend.direction === 'increasing' ? 'declining' : 'improving', // Lower resting HR is generally better
+        changePercent: Math.abs(hrTrend.change),
+        timeframe: hrTrend.timeframe,
+        predictions: {
+          shortTerm: 'Stable',
+          longTerm: 'Monitor regularly'
+        }
+      });
+    }
+
+    return trends;
   }
 
   private identifyRiskFactors(healthData: any, insights: HealthInsight[]): RiskFactor[] {
     const riskFactors: RiskFactor[] = [];
-    
+
     insights.filter(i => i.type === 'risk_assessment').forEach(insight => {
       riskFactors.push({
         factor: insight.title,

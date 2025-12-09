@@ -176,7 +176,7 @@ export const MedGemmaChat = () => {
   };
 
   return (
-    <Card className="w-full h-[calc(100vh-8rem)] sm:h-[600px] md:h-[700px] flex flex-col shadow-lg border-2">
+    <Card className="w-full h-[calc(100dvh-14rem)] sm:h-[600px] md:h-[700px] flex flex-col shadow-lg border-2">
       <CardHeader className="border-b py-3 sm:py-4 bg-gradient-to-r from-primary/5 to-primary/10">
         <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
           <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary/20 flex items-center justify-center">
@@ -226,7 +226,7 @@ export const MedGemmaChat = () => {
                       {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </span>
                   </div>
-                  
+
                   {/* Clinical Decision Cards */}
                   {message.decisions && message.decisions.length > 0 && (
                     <div className="space-y-2 mt-3">
@@ -235,8 +235,8 @@ export const MedGemmaChat = () => {
                         <span>AI-Triggered Recommendations</span>
                       </div>
                       {message.decisions.map((decision, idx) => (
-                        <ClinicalDecisionCard 
-                          key={idx} 
+                        <ClinicalDecisionCard
+                          key={idx}
                           decision={decision}
                           compact={message.decisions && message.decisions.length > 1}
                         />
@@ -291,7 +291,7 @@ export const MedGemmaChat = () => {
               </Button>
             </div>
           )}
-          
+
           <div className="flex gap-2 items-end">
             <input
               type="file"
@@ -300,7 +300,7 @@ export const MedGemmaChat = () => {
               accept="image/*"
               className="hidden"
             />
-            
+
             {/* Image Upload Button with Label */}
             <Button
               onClick={() => fileInputRef.current?.click()}
@@ -317,7 +317,7 @@ export const MedGemmaChat = () => {
                 )}
               </div>
             </Button>
-            
+
             <div className="flex-1 relative">
               <Textarea
                 ref={textareaRef}
@@ -343,7 +343,7 @@ export const MedGemmaChat = () => {
               </Button>
             </div>
           </div>
-          
+
           <div className="mt-3 flex items-center gap-2">
             <div className="flex-1">
               <p className="text-xs text-muted-foreground leading-relaxed">

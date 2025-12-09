@@ -56,6 +56,7 @@ const HealthAnalytics = lazy(() => import('@/pages/HealthAnalytics'));
 const EmergencyResponse = lazy(() => import('@/pages/EmergencyResponse'));
 const PharmacyManagement = lazy(() => import('@/pages/PharmacyManagement'));
 const HospitalManagement = lazy(() => import('@/pages/HospitalManagement'));
+const LabManagement = lazy(() => import('@/pages/LabManagement'));
 
 const AppContent = () => {
   const [isNewUser, setIsNewUser] = useState(false);
@@ -157,6 +158,7 @@ const AppContent = () => {
             {/* Management Systems */}
             <Route path="/pharmacy-management" element={<RouteGuard><PharmacyManagement /></RouteGuard>} />
             <Route path="/hospital-management" element={<RouteGuard><HospitalManagement /></RouteGuard>} />
+            <Route path="/lab-management" element={<RouteGuard><LabManagement /></RouteGuard>} />
 
             {/* Payment Routes */}
             <Route path="/payment-success" element={<PaymentSuccess />} />

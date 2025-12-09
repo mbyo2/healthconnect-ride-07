@@ -52,20 +52,20 @@ export function UserRolesProvider({ children }: { children: React.ReactNode }) {
         } else if (rolesData && rolesData.length > 0) {
           const roles = rolesData.map(r => r.role as UserRole);
           setAvailableRoles(roles);
-          
+
           // Set primary role (admin > institution_admin > health_personnel > patient)
           const primaryRole = roles.find(r => r === 'admin') ||
-                             roles.find(r => r === 'institution_admin') ||
-                             roles.find(r => r === 'health_personnel') ||
-                             roles.find(r => r === 'patient') ||
-                             roles[0];
-          
+            roles.find(r => r === 'institution_admin') ||
+            roles.find(r => r === 'health_personnel') ||
+            roles.find(r => r === 'patient') ||
+            roles[0];
+
           setUserRole(primaryRole);
           setCurrentRole(primaryRole);
 
           // Check admin status by looking at roles
           const isAdminRole = roles.includes('admin');
-          
+
           if (isAdminRole) {
             setAdminLevel('admin');
           } else {
@@ -110,8 +110,8 @@ export function UserRolesProvider({ children }: { children: React.ReactNode }) {
     return data || false;
   };
 
-  const isAdmin = adminLevel === 'admin' || adminLevel === 'superadmin';
-  const isSuperAdmin = adminLevel === 'superadmin';
+  const isAdmin = adminLevel === 'admin' || adminLevel === 'superadmin' || availableRoles.includes('admin') || availableRoles.includes('super_admin');
+  const isSuperAdmin = adminLevel === 'superadmin' || availableRoles.includes('super_admin');
   const isHealthPersonnel = availableRoles.includes('health_personnel');
   const isPatient = availableRoles.includes('patient');
 
@@ -127,7 +127,7 @@ export function UserRolesProvider({ children }: { children: React.ReactNode }) {
         .from('user_roles')
         .select('role')
         .eq('user_id', user.id);
-      
+
       if (rolesData && rolesData.length > 0) {
         const roles = rolesData.map(r => r.role as UserRole);
         setAvailableRoles(roles);

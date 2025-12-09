@@ -5,7 +5,10 @@ export const USER_ROLES = {
   PHARMACY: 'pharmacy',
   INSTITUTION_ADMIN: 'institution_admin',
   INSTITUTION_STAFF: 'institution_staff',
-  ADMIN: 'admin'
+  ADMIN: 'admin',
+  LAB: 'lab',
+  SUPER_ADMIN: 'super_admin',
+  SUPPORT: 'support'
 } as const;
 
 export type UserRole = typeof USER_ROLES[keyof typeof USER_ROLES];
@@ -69,6 +72,7 @@ export const ROLE_PERMISSIONS = {
     '/search',
     '/medical-records',
     '/healthcare-application',
+    '/lab-management',
     '/payment-success',
     '/payment-cancel'
   ],
@@ -86,6 +90,17 @@ export const ROLE_PERMISSIONS = {
     '/payment-success',
     '/payment-cancel'
   ],
+  [USER_ROLES.LAB]: [
+    '/',
+    '/lab-management',
+    '/profile',
+    '/settings',
+    '/wallet',
+    '/map',
+    '/search',
+    '/payment-success',
+    '/payment-cancel'
+  ],
   [USER_ROLES.INSTITUTION_ADMIN]: [
     '/',
     '/institution-portal',
@@ -97,6 +112,7 @@ export const ROLE_PERMISSIONS = {
     '/map',
     '/search',
     '/healthcare-institutions',
+    '/hospital-management',
     '/payment-success',
     '/payment-cancel'
   ],
@@ -109,6 +125,7 @@ export const ROLE_PERMISSIONS = {
     '/settings',
     '/map',
     '/search',
+    '/hospital-management',
     '/payment-success',
     '/payment-cancel'
   ],
@@ -128,6 +145,67 @@ export const ROLE_PERMISSIONS = {
     '/map',
     '/search',
     '/healthcare-application',
+    '/hospital-management',
+    '/pharmacy-management',
+    '/lab-management',
+    '/payment-success',
+    '/payment-cancel'
+  ],
+  [USER_ROLES.SUPPORT]: [
+    '/',
+    '/admin-dashboard',
+    '/chat',
+    '/profile',
+    '/settings',
+    '/search',
+    '/healthcare-application',
+    '/payment-success',
+    '/payment-cancel'
+  ],
+  [USER_ROLES.SUPER_ADMIN]: [
+    '/',
+    '/symptoms',
+    '/appointments',
+    '/chat',
+    '/prescriptions',
+    '/profile',
+    '/settings',
+    '/wallet',
+    '/emergency',
+    '/healthcare-professionals',
+    '/healthcare-institutions',
+    '/connections',
+    '/ai-diagnostics',
+    '/iot-monitoring',
+    '/health-analytics',
+    '/telemedicine',
+    '/blockchain-records',
+    '/ar-anatomy',
+    '/mental-health',
+    '/genomic-analysis',
+    '/smart-contracts',
+    '/quantum-encryption',
+    '/map',
+    '/search',
+    '/medical-records',
+    '/video-consultations',
+    '/health-dashboard',
+    '/marketplace-users',
+    '/marketplace',
+    '/provider-dashboard',
+    '/provider-portal',
+    '/pharmacy-portal',
+    '/pharmacy-inventory',
+    '/compliance-audit',
+    '/healthcare-application',
+    '/lab-management',
+    '/institution-portal',
+    '/hospital-management',
+    '/pharmacy-management',
+    '/admin-dashboard',
+    '/super-admin-dashboard',
+    '/admin-wallet',
+    '/create-admin',
     '/payment-success',
     '/payment-cancel'
   ]
@@ -137,7 +215,12 @@ export const ROLE_PERMISSIONS = {
 export const ROLE_LANDING_PAGES = {
   [USER_ROLES.PATIENT]: '/symptoms',
   [USER_ROLES.HEALTH_PERSONNEL]: '/provider-dashboard',
-  [USER_ROLES.ADMIN]: '/admin-dashboard'
+  [USER_ROLES.ADMIN]: '/admin-dashboard',
+  [USER_ROLES.LAB]: '/lab-management',
+  [USER_ROLES.PHARMACY]: '/pharmacy-portal',
+  [USER_ROLES.INSTITUTION_ADMIN]: '/institution-portal',
+  [USER_ROLES.SUPER_ADMIN]: '/super-admin-dashboard',
+  [USER_ROLES.SUPPORT]: '/admin-dashboard'
 };
 
 // Public routes that don't require authentication

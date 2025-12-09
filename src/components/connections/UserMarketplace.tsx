@@ -93,18 +93,12 @@ export const UserMarketplace = () => {
         `)
         .neq('id', session.user.id);
 
-      // If current user is a patient, exclude other patients for privacy
-      if (currentUserProfile?.role === 'patient') {
-        baseQuery = baseQuery.neq('role', 'patient');
-      }
+      // Always exclude patients from the marketplace view
+      baseQuery = baseQuery.neq('role', 'patient');
 
       // Filter by role if specific tab is selected
       if (activeTab !== 'all') {
-        // For patients, don't allow them to select patient tab
-        if (currentUserProfile?.role === 'patient' && activeTab === 'patient') {
-          return [];
-        }
-        baseQuery = baseQuery.eq('role', activeTab as 'patient' | 'health_personnel' | 'admin');
+        baseQuery = baseQuery.eq('role', activeTab as 'health_personnel' | 'admin');
       }
 
       // Apply search filter
@@ -157,7 +151,7 @@ export const UserMarketplace = () => {
       const combinedUsers: UserWithServices[] = profilesData?.map(profile => {
         const userServices = servicesData.filter(s => s.provider_id === profile.id);
         const userInstitution = institutions?.find(i => i.admin_id === profile.id);
-        const institutionProducts = userInstitution 
+        const institutionProducts = userInstitution
           ? products?.filter(p => p.pharmacy_id === userInstitution.id) || []
           : [];
 
@@ -177,14 +171,7 @@ export const UserMarketplace = () => {
   const handleSendConnectionRequest = (targetUserId: string, targetRole: string) => {
     if (!session?.user) return;
 
-    const isUserPatient = currentUserProfile?.role === 'patient';
     const isTargetProvider = targetRole === 'health_personnel';
-
-    // Prevent patients from connecting to other patients
-    if (isUserPatient && targetRole === 'patient') {
-      toast.error('Cannot connect with other patients for privacy reasons');
-      return;
-    }
 
     requestConnection({
       patient_id: isTargetProvider ? session.user.id : targetUserId,
@@ -196,19 +183,11 @@ export const UserMarketplace = () => {
 
   // Filter available tabs based on user role
   const getAvailableTabs = () => {
-    const allTabs = [
-      { id: "all", label: "All Users", count: users?.length || 0 },
-      { id: "health_personnel", label: "Providers", count: users?.filter(u => u.role === 'health_personnel').length || 0 },
-      { id: "patient", label: "Patients", count: users?.filter(u => u.role === 'patient').length || 0 },
+    return [
+      { id: "all", label: "All Providers", count: users?.length || 0 },
+      { id: "health_personnel", label: "Doctors & Specialists", count: users?.filter(u => u.role === 'health_personnel').length || 0 },
       { id: "admin", label: "Institutions", count: users?.filter(u => u.role === 'admin').length || 0 }
     ];
-
-    // If current user is patient, remove patient tab
-    if (currentUserProfile?.role === 'patient') {
-      return allTabs.filter(tab => tab.id !== 'patient');
-    }
-
-    return allTabs;
   };
 
   if (isLoading) {
@@ -254,9 +233,9 @@ export const UserMarketplace = () => {
       {/* Users Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {users?.map((user) => (
-          <UserCard 
-            key={user.id} 
-            user={user} 
+          <UserCard
+            key={user.id}
+            user={user}
             onConnect={handleSendConnectionRequest}
             isConnecting={isRequestingConnection}
           />

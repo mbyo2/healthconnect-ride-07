@@ -10,11 +10,13 @@ import { useAuth } from '@/hooks/useAuth';
 import { IoTDevice } from '@/types/iot';
 import { AIInsightsWidget } from '@/components/ai/AIInsightsWidget';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 const IoTMonitoring = () => {
     const navigate = useNavigate();
     const { user } = useAuth();
-    const { devices, vitalSigns, alerts, loading, addDevice } = useIoT(user?.id);
+    const { devices, vitalSigns, alerts, loading, addDevice, scanAndConnectDevice, isScanning } = useIoT(user?.id);
     const [selectedDevice, setSelectedDevice] = useState<string | null>(null);
 
     // Helper to get icon for device type
@@ -28,17 +30,27 @@ const IoTMonitoring = () => {
         }
     };
 
-    // Mock trend data for chart (since we only fetch latest vital sign in hook for now)
-    // In a full implementation, we'd fetch history
-    const heartRateData = [
-        { time: '00:00', value: 68 },
-        { time: '04:00', value: 65 },
-        { time: '08:00', value: 75 },
-        { time: '12:00', value: 82 },
-        { time: '16:00', value: 78 },
-        { time: '20:00', value: 72 },
-        { time: '24:00', value: 70 },
-    ];
+    // Fetch historical heart rate data
+    const { data: heartRateData } = useQuery({
+        queryKey: ['heart-rate-history', user?.id],
+        queryFn: async () => {
+            const { data } = await supabase
+                .from('vital_signs')
+                .select('heart_rate, recorded_at')
+                .eq('user_id', user?.id)
+                .order('recorded_at', { ascending: true })
+                .limit(24); // Last 24 readings
+
+            if (!data) return [];
+
+            return data.map(record => ({
+                time: new Date(record.recorded_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                value: record.heart_rate
+            }));
+        },
+        enabled: !!user,
+        initialData: []
+    });
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-background via-blue-50/20 to-background p-4 md:p-6 lg:p-8">
@@ -57,6 +69,23 @@ const IoTMonitoring = () => {
                             <Settings className="w-4 h-4 mr-2" />
                             Device Settings
                         </Button>
+                        <Button
+                            variant="secondary"
+                            onClick={scanAndConnectDevice}
+                            disabled={isScanning}
+                        >
+                            {isScanning ? (
+                                <>
+                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2"></div>
+                                    Scanning...
+                                </>
+                            ) : (
+                                <>
+                                    <Zap className="w-4 h-4 mr-2" />
+                                    Scan for Device
+                                </>
+                            )}
+                        </Button>
                         <Button onClick={() => addDevice({
                             device_name: 'New Device',
                             device_type: 'fitness_tracker',
@@ -65,7 +94,7 @@ const IoTMonitoring = () => {
                             battery_level: 100
                         })}>
                             <Plus className="w-4 h-4 mr-2" />
-                            Add Device
+                            Add Mock Device
                         </Button>
                     </div>
                 </div>
@@ -143,7 +172,7 @@ const IoTMonitoring = () => {
                                 </div>
                                 <p className="text-sm text-muted-foreground">Blood Pressure</p>
                                 <p className="text-3xl font-bold mt-1">
-                                    {vitalSigns?.blood_pressure 
+                                    {vitalSigns?.blood_pressure
                                         ? `${vitalSigns.blood_pressure.systolic}/${vitalSigns.blood_pressure.diastolic}`
                                         : '--/--'}
                                 </p>
@@ -236,13 +265,13 @@ const IoTMonitoring = () => {
                 </div>
 
                 {/* AI Insights Section */}
-                <AIInsightsWidget 
-                    context="iot" 
-                    data={{ 
+                <AIInsightsWidget
+                    context="iot"
+                    data={{
                         devices: devices.length,
                         vitalSigns,
-                        alertCount: alerts.length 
-                    }} 
+                        alertCount: alerts.length
+                    }}
                 />
 
                 {/* Device Pairing Guide */}

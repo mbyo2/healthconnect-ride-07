@@ -11,9 +11,9 @@ interface Provider {
   specialty: string;
   bio: string;
   avatar_url: string;
-  location: { 
-    latitude: number; 
-    longitude: number; 
+  location: {
+    latitude: number;
+    longitude: number;
   };
   rating: number;
 }
@@ -44,8 +44,8 @@ const SearchFilters = ({ currentFilters, onFilterChange }: SearchFiltersProps) =
           value={currentFilters.searchTerm}
           onChange={(e) => onFilterChange({ ...currentFilters, searchTerm: e.target.value })}
         />
-        
-        <select 
+
+        <select
           className="px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-primary"
           value={currentFilters.specialty}
           onChange={(e) => onFilterChange({ ...currentFilters, specialty: e.target.value })}
@@ -57,7 +57,7 @@ const SearchFilters = ({ currentFilters, onFilterChange }: SearchFiltersProps) =
           <option value="Family Medicine">Family Medicine</option>
           <option value="Neurology">Neurology</option>
         </select>
-        
+
         <select
           className="px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-primary"
           value={currentFilters.rating.toString()}
@@ -82,11 +82,11 @@ const ProviderList = ({ providers, loading }: ProviderListProps) => {
   if (loading) {
     return <div className="flex justify-center py-12">Loading providers...</div>;
   }
-  
+
   if (providers.length === 0) {
     return <div className="text-center py-8">No providers match your search criteria</div>;
   }
-  
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {providers.map(provider => (
@@ -115,9 +115,9 @@ const ProviderList = ({ providers, loading }: ProviderListProps) => {
                 </div>
               </div>
             </div>
-            
+
             <p className="text-sm mt-3 line-clamp-2">{provider.bio || 'No biography available.'}</p>
-            
+
             <div className="mt-4 flex justify-between">
               <button className="text-sm text-blue-600 hover:text-blue-800">View Profile</button>
               <button className="px-3 py-1 bg-primary text-white text-sm rounded-md hover:bg-primary/90">Book Now</button>
@@ -137,20 +137,20 @@ interface SearchPaginationProps {
 
 const SearchPagination = ({ currentPage, totalPages, onPageChange }: SearchPaginationProps) => {
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
-  
+
   return (
     <div className="flex justify-center mt-8">
       <nav className="flex space-x-1">
-        <button 
-          onClick={() => onPageChange(currentPage - 1)} 
+        <button
+          onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
           className="px-3 py-1 rounded-md bg-gray-100 text-gray-700 disabled:opacity-50"
         >
           Previous
         </button>
-        
+
         {pages.map(page => (
-          <button 
+          <button
             key={page}
             onClick={() => onPageChange(page)}
             className={`px-3 py-1 rounded-md ${currentPage === page ? 'bg-primary text-white' : 'bg-gray-100 text-gray-700'}`}
@@ -158,8 +158,8 @@ const SearchPagination = ({ currentPage, totalPages, onPageChange }: SearchPagin
             {page}
           </button>
         ))}
-        
-        <button 
+
+        <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
           className="px-3 py-1 rounded-md bg-gray-100 text-gray-700 disabled:opacity-50"
@@ -196,50 +196,51 @@ const Providers = () => {
         .from('profiles')
         .select('*')
         .eq('role', 'provider' as any);
-      
+
       // Apply filters if they exist
       if (filters.specialty) {
         query = query.eq('specialty', filters.specialty);
       }
-      
+
       if (filters.rating > 0) {
         query = query.gte('rating', filters.rating);
       }
-      
+
       if (filters.searchTerm) {
         query = query.or(
           `first_name.ilike.%${filters.searchTerm}%,last_name.ilike.%${filters.searchTerm}%,specialty.ilike.%${filters.searchTerm}%`
         );
       }
-      
+
       // Add pagination
       const from = (currentPage - 1) * 10;
       const to = from + 9;
       query = query.range(from, to);
-      
+
       // Execute query
       const { data, error, count } = await query;
-      
+
       if (error) throw error;
-      
+
       // Process and set provider data
       if (data && Array.isArray(data)) {
-        const formattedProviders = data.map(provider => ({
+        // Cast to any to access potential extra fields not in the generated type
+        const formattedProviders = (data as any[]).map(provider => ({
           id: provider.id,
           first_name: provider.first_name || '',
           last_name: provider.last_name || '',
-          specialty: provider.specialty || '',
+          specialty: provider.specialty || 'General Practice',
           bio: provider.bio || '',
           avatar_url: provider.avatar_url || '',
-          location: { 
-            latitude: 0, // These would come from a join or separate query in reality
-            longitude: 0
+          location: {
+            latitude: provider.latitude || 0,
+            longitude: provider.longitude || 0
           },
-          rating: 4.5 // Placeholder rating
+          rating: provider.rating || 0
         }));
-        
+
         setProviders(formattedProviders);
-        
+
         // Calculate total pages
         if (count) {
           setTotalPages(Math.ceil(count / 10));
@@ -266,22 +267,22 @@ const Providers = () => {
       <Header />
       <main className="container mx-auto px-4 pt-20 pb-24">
         <h1 className="text-2xl font-bold mb-6">Healthcare Providers</h1>
-        
+
         <div className="mb-6">
-          <SearchFilters 
+          <SearchFilters
             currentFilters={filters}
             onFilterChange={handleFilterChange}
           />
         </div>
-        
+
         <div className="mb-6">
-          <ProviderList 
-            providers={providers} 
-            loading={loading} 
+          <ProviderList
+            providers={providers}
+            loading={loading}
           />
         </div>
-        
-        <SearchPagination 
+
+        <SearchPagination
           currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={handlePageChange}
