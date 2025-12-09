@@ -43,7 +43,7 @@ verify_jwt = true
 verify_jwt = true
 
 [functions.process-dpo-payment]
-verify_jwt = false
+verify_jwt = true
 
 [functions.process-payment]
 verify_jwt = true
