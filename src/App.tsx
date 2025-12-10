@@ -58,6 +58,10 @@ const PharmacyManagement = lazy(() => import('@/pages/PharmacyManagement'));
 const HospitalManagement = lazy(() => import('@/pages/HospitalManagement'));
 const LabManagement = lazy(() => import('@/pages/LabManagement'));
 const Map = lazy(() => import('@/pages/Map'));
+const NotificationsPage = lazy(() => import('@/pages/NotificationsPage'));
+const PrivacySecurityPage = lazy(() => import('@/pages/PrivacySecurityPage'));
+const Medications = lazy(() => import('@/pages/Medications'));
+const ProviderCalendar = lazy(() => import('@/pages/ProviderCalendar'));
 
 const AppContent = () => {
   const [isNewUser, setIsNewUser] = useState(false);
@@ -161,6 +165,14 @@ const AppContent = () => {
             <Route path="/pharmacy-management" element={<RouteGuard><PharmacyManagement /></RouteGuard>} />
             <Route path="/hospital-management" element={<RouteGuard><HospitalManagement /></RouteGuard>} />
             <Route path="/lab-management" element={<RouteGuard><LabManagement /></RouteGuard>} />
+
+            {/* Additional User Pages */}
+            <Route path="/notifications" element={<RouteGuard><NotificationsPage /></RouteGuard>} />
+            <Route path="/privacy-security" element={<RouteGuard><PrivacySecurityPage /></RouteGuard>} />
+            <Route path="/medications" element={<RouteGuard><Medications /></RouteGuard>} />
+            <Route path="/provider-calendar" element={<RouteGuard><ProviderCalendar /></RouteGuard>} />
+            <Route path="/healthcare-professionals" element={<RouteGuard><HealthcareProfessionals /></RouteGuard>} />
+            <Route path="/healthcare-institutions" element={<RouteGuard><HealthcareInstitutions /></RouteGuard>} />
 
             {/* Payment Routes */}
             <Route path="/payment-success" element={<PaymentSuccess />} />

@@ -45,6 +45,10 @@ export const ROLE_PERMISSIONS = {
     '/health-dashboard',
     '/marketplace-users',
     '/marketplace',
+    '/notifications',
+    '/privacy-security',
+    '/medications',
+    '/provider-calendar',
     '/payment-success',
     '/payment-cancel'
   ],
@@ -73,6 +77,10 @@ export const ROLE_PERMISSIONS = {
     '/medical-records',
     '/healthcare-application',
     '/lab-management',
+    '/notifications',
+    '/privacy-security',
+    '/medications',
+    '/provider-calendar',
     '/payment-success',
     '/payment-cancel'
   ],
@@ -87,6 +95,8 @@ export const ROLE_PERMISSIONS = {
     '/marketplace',
     '/map',
     '/search',
+    '/notifications',
+    '/medications',
     '/payment-success',
     '/payment-cancel'
   ],
@@ -98,6 +108,7 @@ export const ROLE_PERMISSIONS = {
     '/wallet',
     '/map',
     '/search',
+    '/notifications',
     '/payment-success',
     '/payment-cancel'
   ],
