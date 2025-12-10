@@ -62,6 +62,11 @@ const NotificationsPage = lazy(() => import('@/pages/NotificationsPage'));
 const PrivacySecurityPage = lazy(() => import('@/pages/PrivacySecurityPage'));
 const Medications = lazy(() => import('@/pages/Medications'));
 const ProviderCalendar = lazy(() => import('@/pages/ProviderCalendar'));
+const ApplicationStatus = lazy(() => import('@/pages/ApplicationStatus'));
+const InstitutionPortal = lazy(() => import('@/pages/InstitutionPortal'));
+const InstitutionRegistration = lazy(() => import('@/pages/InstitutionRegistration'));
+const InstitutionStatus = lazy(() => import('@/pages/InstitutionStatus'));
+const AppointmentDetails = lazy(() => import('@/pages/AppointmentDetails'));
 
 const AppContent = () => {
   const [isNewUser, setIsNewUser] = useState(false);
@@ -173,6 +178,13 @@ const AppContent = () => {
             <Route path="/provider-calendar" element={<RouteGuard><ProviderCalendar /></RouteGuard>} />
             <Route path="/healthcare-professionals" element={<RouteGuard><HealthcareProfessionals /></RouteGuard>} />
             <Route path="/healthcare-institutions" element={<RouteGuard><HealthcareInstitutions /></RouteGuard>} />
+
+            {/* Institution & Application Management */}
+            <Route path="/application-status" element={<RouteGuard><ApplicationStatus /></RouteGuard>} />
+            <Route path="/institution-portal" element={<RouteGuard><InstitutionPortal /></RouteGuard>} />
+            <Route path="/institution-registration" element={<RouteGuard><InstitutionRegistration /></RouteGuard>} />
+            <Route path="/institution-status" element={<RouteGuard><InstitutionStatus /></RouteGuard>} />
+            <Route path="/appointments/:id" element={<RouteGuard><AppointmentDetails /></RouteGuard>} />
 
             {/* Payment Routes */}
             <Route path="/payment-success" element={<PaymentSuccess />} />

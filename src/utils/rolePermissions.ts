@@ -81,6 +81,7 @@ export const ROLE_PERMISSIONS = {
     '/privacy-security',
     '/medications',
     '/provider-calendar',
+    '/application-status',
     '/payment-success',
     '/payment-cancel'
   ],
@@ -124,6 +125,9 @@ export const ROLE_PERMISSIONS = {
     '/search',
     '/healthcare-institutions',
     '/hospital-management',
+    '/institution-portal',
+    '/institution-registration',
+    '/institution-status',
     '/payment-success',
     '/payment-cancel'
   ],
