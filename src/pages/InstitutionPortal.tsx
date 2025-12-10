@@ -21,13 +21,13 @@ export const InstitutionPortal = () => {
     const checkSession = async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
-        
+
         if (error) {
           console.error("Error checking session:", error);
           setError(error.message);
           return;
         }
-        
+
         if (session) {
           console.log("Institution already logged in, checking profile...");
           const { data: profile, error: profileError } = await supabase
@@ -43,20 +43,20 @@ export const InstitutionPortal = () => {
           }
 
           setIsRedirecting(true);
-          
+
           // Check if this is a healthcare institution account
           const { data: institutionCheck, error: institutionError } = await supabase
             .from('healthcare_institutions')
             .select('admin_id, is_verified')
             .eq('admin_id', session.user.id)
             .maybeSingle();
-            
+
           // If user is a superadmin, redirect to admin dashboard
           if (profile && profile.admin_level === 'superadmin') {
             navigate("/admin-dashboard");
             return;
           }
-            
+
           if (institutionCheck) {
             // Check if the institution has an approved registration
             if (institutionCheck.is_verified) {
@@ -129,7 +129,7 @@ export const InstitutionPortal = () => {
               <TabsTrigger value="signin">Sign In</TabsTrigger>
               <TabsTrigger value="signup">Register</TabsTrigger>
             </TabsList>
-            
+
             <TabsContent value="signin">
               <Auth
                 supabaseClient={supabase}
@@ -140,13 +140,13 @@ export const InstitutionPortal = () => {
                     anchor: { color: 'rgb(var(--primary))' },
                     container: { width: '100%' },
                     message: { color: 'rgb(var(--destructive))' },
-                    input: { 
+                    input: {
                       borderRadius: '0.375rem',
-                      backgroundColor: 'white' 
+                      backgroundColor: 'white'
                     },
-                    label: { 
+                    label: {
                       color: 'rgb(var(--foreground))',
-                      fontSize: '0.875rem' 
+                      fontSize: '0.875rem'
                     }
                   },
                 }}
@@ -155,7 +155,7 @@ export const InstitutionPortal = () => {
                 redirectTo={`${window.location.origin}/institution-dashboard`}
               />
             </TabsContent>
-            
+
             <TabsContent value="signup">
               <Auth
                 supabaseClient={supabase}
@@ -166,13 +166,13 @@ export const InstitutionPortal = () => {
                     anchor: { color: 'rgb(var(--primary))' },
                     container: { width: '100%' },
                     message: { color: 'rgb(var(--destructive))' },
-                    input: { 
+                    input: {
                       borderRadius: '0.375rem',
-                      backgroundColor: 'white' 
+                      backgroundColor: 'white'
                     },
-                    label: { 
+                    label: {
                       color: 'rgb(var(--foreground))',
-                      fontSize: '0.875rem' 
+                      fontSize: '0.875rem'
                     }
                   },
                 }}
@@ -199,3 +199,5 @@ export const InstitutionPortal = () => {
     </div>
   );
 };
+
+export default InstitutionPortal;
