@@ -17,12 +17,39 @@ if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
   console.error('Missing Supabase environment variables. Please check your .env file.');
 }
 
+// Custom storage adapter to handle "insecure operation" errors in production
+const customStorageAdapter = {
+  getItem: (key: string): string | null => {
+    try {
+      return localStorage.getItem(key);
+    } catch (error) {
+      console.warn('Storage access blocked:', error);
+      return null;
+    }
+  },
+  setItem: (key: string, value: string): void => {
+    try {
+      localStorage.setItem(key, value);
+    } catch (error) {
+      console.warn('Storage write blocked:', error);
+    }
+  },
+  removeItem: (key: string): void => {
+    try {
+      localStorage.removeItem(key);
+    } catch (error) {
+      console.warn('Storage removal blocked:', error);
+    }
+  },
+};
+
 // Create a single supabase client for interacting with your database
 export const supabase = createClient<Database>(
   SUPABASE_URL,
   SUPABASE_ANON_KEY,
   {
     auth: {
+      storage: customStorageAdapter,
       autoRefreshToken: true,
       persistSession: true,
       detectSessionInUrl: true,
