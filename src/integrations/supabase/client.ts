@@ -17,28 +17,48 @@ if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
   console.error('Missing Supabase environment variables. Please check your .env file.');
 }
 
+// Check if storage is available
+const isStorageAvailable = () => {
+  try {
+    const test = '__storage_test__';
+    localStorage.setItem(test, test);
+    localStorage.removeItem(test);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+const storageAvailable = isStorageAvailable();
+
 // Custom storage adapter to handle "insecure operation" errors in production
 const customStorageAdapter = {
   getItem: (key: string): string | null => {
+    if (!storageAvailable) return null;
     try {
       return localStorage.getItem(key);
     } catch (error) {
-      console.warn('Storage access blocked:', error);
+      // Silently fail - don't log in production to avoid console spam
+      if (isLocalhost) console.warn('Storage access blocked:', error);
       return null;
     }
   },
   setItem: (key: string, value: string): void => {
+    if (!storageAvailable) return;
     try {
       localStorage.setItem(key, value);
     } catch (error) {
-      console.warn('Storage write blocked:', error);
+      // Silently fail - don't log in production
+      if (isLocalhost) console.warn('Storage write blocked:', error);
     }
   },
   removeItem: (key: string): void => {
+    if (!storageAvailable) return;
     try {
       localStorage.removeItem(key);
     } catch (error) {
-      console.warn('Storage removal blocked:', error);
+      // Silently fail - don't log in production
+      if (isLocalhost) console.warn('Storage removal blocked:', error);
     }
   },
 };
