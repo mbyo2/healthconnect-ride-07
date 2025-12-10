@@ -102,7 +102,7 @@ export function UserRolesProvider({ children }: { children: React.ReactNode }) {
   const checkRole = async (role: UserRole): Promise<boolean> => {
     if (!user) return false;
     const { data, error } = await supabase
-      .rpc('has_role', { _user_id: user.id, _role: role });
+      .rpc('has_role', { _user_id: user.id, _role: role as any });
     if (error) {
       console.error('Error checking role:', error);
       return false;
