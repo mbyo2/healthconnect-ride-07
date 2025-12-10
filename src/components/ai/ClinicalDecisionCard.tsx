@@ -1,14 +1,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-  AlertTriangle, 
-  CheckCircle2, 
-  Clock, 
-  Phone, 
-  Calendar, 
-  Pill, 
-  FileText, 
+import {
+  AlertTriangle,
+  CheckCircle2,
+  Clock,
+  Phone,
+  Calendar,
+  Pill,
+  FileText,
   Stethoscope,
   Activity,
   ArrowRight
@@ -95,7 +95,7 @@ export const ClinicalDecisionCard = ({ decision, onActionClick, compact = false 
     if (onActionClick) {
       onActionClick(action);
     }
-    
+
     if (action.route) {
       navigate(action.route);
     }
@@ -147,12 +147,12 @@ export const ClinicalDecisionCard = ({ decision, onActionClick, compact = false 
       </CardHeader>
       <CardContent className="p-4 space-y-4">
         <p className="text-sm text-muted-foreground">{decision.description}</p>
-        
+
         {decision.confidence > 0 && (
           <div className="flex items-center gap-2">
             <span className="text-xs text-muted-foreground">Confidence:</span>
             <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
-              <div 
+              <div
                 className={`h-full ${config.bgColor.replace('/10', '')}`}
                 style={{ width: `${decision.confidence * 100}%` }}
               />
@@ -183,7 +183,7 @@ export const ClinicalDecisionCard = ({ decision, onActionClick, compact = false 
                         <span className="block text-xs opacity-70">{action.details}</span>
                       )}
                     </div>
-                    <Badge 
+                    <Badge
                       variant={action.priority === 'high' ? 'destructive' : 'secondary'}
                       className="text-xs"
                     >
@@ -203,7 +203,7 @@ export const ClinicalDecisionCard = ({ decision, onActionClick, compact = false 
 // Helper to parse AI response and extract clinical decisions
 export const parseClinicalDecisions = (aiResponse: string): ClinicalDecision[] => {
   const decisions: ClinicalDecision[] = [];
-  
+
   // Check for emergency indicators
   const emergencyKeywords = ['emergency', 'call 911', 'immediately', 'life-threatening', 'urgent care'];
   const urgentKeywords = ['within 24 hours', 'see a doctor soon', 'schedule appointment', 'consult'];
@@ -237,7 +237,7 @@ export const parseClinicalDecisions = (aiResponse: string): ClinicalDecision[] =
       timeframe: 'Within 24-48 hours',
       actions: [
         { id: 'book-appointment', label: 'Book Appointment', type: 'schedule', route: '/appointments', priority: 'high' },
-        { id: 'find-provider', label: 'Find Healthcare Provider', type: 'navigate', route: '/providers', priority: 'medium' },
+        { id: 'find-provider', label: 'Find Healthcare Provider', type: 'navigate', route: '/marketplace-users', priority: 'medium' },
         { id: 'video-consult', label: 'Start Video Consultation', type: 'navigate', route: '/video-consultations', priority: 'medium', details: 'Connect with a doctor now' }
       ]
     });
