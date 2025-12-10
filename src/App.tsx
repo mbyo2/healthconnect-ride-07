@@ -57,6 +57,7 @@ const EmergencyResponse = lazy(() => import('@/pages/EmergencyResponse'));
 const PharmacyManagement = lazy(() => import('@/pages/PharmacyManagement'));
 const HospitalManagement = lazy(() => import('@/pages/HospitalManagement'));
 const LabManagement = lazy(() => import('@/pages/LabManagement'));
+const Map = lazy(() => import('@/pages/Map'));
 
 const AppContent = () => {
   const [isNewUser, setIsNewUser] = useState(false);
@@ -138,6 +139,7 @@ const AppContent = () => {
             <Route path="/documentation" element={<RouteGuard><Documentation /></RouteGuard>} />
             <Route path="/marketplace-users" element={<RouteGuard><UserMarketplace /></RouteGuard>} />
             <Route path="/emergency" element={<RouteGuard><Emergency /></RouteGuard>} />
+            <Route path="/map" element={<RouteGuard><Map /></RouteGuard>} />
             <Route path="/marketplace" element={<RouteGuard><Marketplace /></RouteGuard>} />
             <Route path="/pharmacy-portal" element={<RouteGuard><PharmacyPortal /></RouteGuard>} />
             <Route path="/healthcare-application" element={<RouteGuard><HealthcareApplication /></RouteGuard>} />
