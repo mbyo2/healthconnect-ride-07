@@ -18,11 +18,6 @@ export function BottomNav() {
   const { isAuthenticated, user } = useAuth();
   const { availableRoles } = useUserRoles();
 
-  // Don't render if not authenticated or on desktop
-  if (!isAuthenticated || isDesktop) {
-    return null;
-  }
-
   // Optimized navigation items for mobile
   const navItems = useMemo(() => [
     {
@@ -161,6 +156,11 @@ export function BottomNav() {
   const filteredMenuItems = useMemo(() => {
     return menuItems.filter(item => hasRoutePermission(availableRoles, item.to));
   }, [menuItems, availableRoles]);
+
+  // Don't render if not authenticated or on desktop - AFTER all hooks
+  if (!isAuthenticated || isDesktop) {
+    return null;
+  }
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 safe-area-pb">
