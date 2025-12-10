@@ -33,7 +33,7 @@ const LabManagement = () => {
             // In a real scenario, we'd fetch from 'lab_requests' table
             // For now, we'll try to fetch from a hypothetical table or return mock data if it fails
             try {
-                const { data, error } = await supabase
+                const { data, error } = await (supabase as any)
                     .from('lab_requests')
                     .select('*, patient:profiles!patient_id(first_name, last_name), test:lab_tests(name, code, category)')
                     .order('created_at', { ascending: false });
