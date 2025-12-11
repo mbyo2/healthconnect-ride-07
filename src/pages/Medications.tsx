@@ -132,7 +132,7 @@ const Medications = () => {
 
   const activeMedications = filteredMedications.filter((m) => m.is_active);
   const inactiveMedications = filteredMedications.filter((m) => !m.is_active);
-  const needsRefillS soon = medications.filter((m) => {
+  const needsRefillSoon = medications.filter((m) => {
     if (!m.refill_date || !m.is_active) return false;
     const daysUntilRefill = Math.floor(
       (new Date(m.refill_date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
