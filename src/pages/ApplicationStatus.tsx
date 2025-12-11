@@ -1,180 +1,200 @@
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { FileText, CheckCircle2, Clock, AlertCircle, Download } from 'lucide-react';
+import { toast } from 'sonner';
+import { format } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
 
-import { useState, useEffect } from "react";
-import { Card } from "@/components/ui/card";
-import { LoadingScreen } from "@/components/LoadingScreen";
-import { supabase } from "@/integrations/supabase/client";
-import { Check, Clock, XCircle, AlertTriangle } from "lucide-react";
-import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
-import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { StatusBadge } from "@/components/ui/status-badge";
-import { StatusType } from "@/types/settings";
-import { toast } from "sonner";
-import { useQuery } from "@tanstack/react-query";
+interface Application {
+  id: string;
+  application_type: string;
+  status: 'pending' | 'under_review' | 'approved' | 'rejected';
+  submitted_at: string;
+  reviewed_at?: string;
+  notes?: string;
+}
 
 const ApplicationStatus = () => {
-  const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
   const navigate = useNavigate();
+  const [applications, setApplications] = useState<Application[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const { data: application, isLoading } = useQuery({
-    queryKey: ['health-personnel-application'],
-    queryFn: async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        
-        if (!user) {
-          throw new Error("You must be logged in to view your application status");
-        }
-        
-        const { data, error: fetchError } = await supabase
-          .from('health_personnel_applications')
-          .select('*')
-          .eq('user_id', user.id)
-          .maybeSingle();
-          
-        if (fetchError) {
-          console.error("Error fetching application:", fetchError);
-          throw new Error("Failed to fetch application status");
-        }
-        
-        return data;
-      } catch (err: any) {
-        setError(err.message);
-        return null;
-      }
-    }
-  });
-  
-  // Subscribe to real-time notifications for this application
   useEffect(() => {
-    if (!application) return;
-    
-    const channel = supabase
-      .channel('application-notifications')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'notifications',
-          filter: `user_id=eq.${application.user_id}`
-        },
-        (payload) => {
-          // Show toast notification when a new notification is received
-          toast(payload.new.title, {
-            description: payload.new.message,
-          });
-        }
-      )
-      .subscribe();
-      
-    return () => {
-      supabase.removeChannel(channel);
+    fetchApplications();
+  }, [user]);
+
+  const fetchApplications = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('applications')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('submitted_at', { ascending: false });
+
+      if (error) throw error;
+      setApplications(data || []);
+    } catch (error) {
+      console.error('Error fetching applications:', error);
+      toast.error('Failed to load applications');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'approved':
+        return <CheckCircle2 className="h-5 w-5 text-green-500" />;
+      case 'rejected':
+        return <AlertCircle className="h-5 w-5 text-red-500" />;
+      case 'under_review':
+        return <Clock className="h-5 w-5 text-blue-500" />;
+      default:
+        return <Clock className="h-5 w-5 text-yellow-500" />;
+    }
+  };
+
+  const getStatusBadge = (status: string) => {
+    const variants: Record<string, any> = {
+      pending: 'secondary',
+      under_review: 'default',
+      approved: 'default',
+      rejected: 'destructive',
     };
-  }, [application]);
-  
-  if (isLoading) {
-    return <LoadingScreen />;
-  }
-  
-  const renderStatusIcon = (status: string) => {
-    switch (status) {
-      case 'approved':
-        return <Check className="h-16 w-16 text-green-500" />;
-      case 'pending':
-        return <Clock className="h-16 w-16 text-amber-500" />;
-      case 'rejected':
-        return <XCircle className="h-16 w-16 text-red-500" />;
-      default:
-        return <AlertTriangle className="h-16 w-16 text-gray-500" />;
-    }
+
+    return (
+      <Badge variant={variants[status] || 'outline'}>
+        {status.replace('_', ' ').toUpperCase()}
+      </Badge>
+    );
   };
-  
-  const getStatusMessage = (status: string) => {
-    switch (status) {
-      case 'approved':
-        return "Your application has been approved! You can now access the provider dashboard.";
-      case 'pending':
-        return "Your application is currently under review. We'll notify you once a decision has been made.";
-      case 'rejected':
-        return "Your application was not approved. Please review the feedback below.";
-      default:
-        return "No application found. Please submit an application to become a healthcare provider.";
-    }
-  };
-  
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted p-4 md:p-8">
-      <div className="max-w-lg mx-auto">
-        <h1 className="text-2xl font-bold text-center mb-6">
-          Application Status
-        </h1>
-        
-        {error && (
-          <Alert variant="destructive" className="mb-4">
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
-        
-        <Card className="p-6 shadow-lg">
-          {!application ? (
-            <div className="text-center space-y-4">
-              <AlertTriangle className="h-16 w-16 text-amber-500 mx-auto" />
-              <h2 className="text-xl font-semibold">No Application Found</h2>
-              <p className="text-muted-foreground">
-                You haven't submitted an application yet. Please complete an application to become a healthcare provider.
-              </p>
-              <Button onClick={() => navigate("/healthcare-application")} className="mt-4">
-                Submit Application
-              </Button>
-            </div>
-          ) : (
-            <div className="text-center space-y-4">
-              {renderStatusIcon(application.status)}
-              <h2 className="text-xl font-semibold">
-                Application Status:
-              </h2>
-              <div className="flex justify-center">
-                <StatusBadge 
-                  status={application.status as StatusType} 
-                  itemId={application.id} 
-                  tableName="health_personnel_applications"
-                  className="text-sm font-medium px-3 py-1"
-                />
-              </div>
-              <p className="text-muted-foreground">
-                {getStatusMessage(application.status)}
-              </p>
-              
-              {application.status === 'approved' && (
-                <Button onClick={() => navigate("/provider-dashboard")} className="mt-4">
-                  Go to Dashboard
-                </Button>
-              )}
-              
-              {application.status === 'rejected' && application.review_notes && (
-                <div className="mt-4 bg-muted p-4 rounded-md text-left">
-                  <h3 className="font-medium mb-2">Feedback:</h3>
-                  <p>{application.review_notes}</p>
-                </div>
-              )}
-              
-              {application.status === 'rejected' && (
-                <Button onClick={() => navigate("/healthcare-application")} className="mt-4">
-                  Submit New Application
-                </Button>
-              )}
-            </div>
-          )}
-        </Card>
+
+  if (loading) {
+    return (
+      <div className="container mx-auto p-4 md:p-6 flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
+    );
+  }
+
+  return (
+    <div className="container mx-auto p-4 md:p-6 space-y-6">
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-3">
+          <FileText className="h-8 w-8 text-primary" />
+          My Applications
+        </h1>
+        <p className="text-muted-foreground">
+          Track the status of your submitted applications
+        </p>
+      </div>
+
+      {/* Applications List */}
+      {applications.length === 0 ? (
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <FileText className="h-16 w-16 text-muted-foreground mb-4" />
+            <h2 className="text-xl font-semibold mb-2">No Applications</h2>
+            <p className="text-muted-foreground text-center mb-6">
+              You haven't submitted any applications yet.
+            </p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="space-y-4">
+          {applications.map((application) => (
+            <Card key={application.id}>
+              <CardHeader>
+                <div className="flex items-start justify-between">
+                  <div className="flex items-start gap-3">
+                    {getStatusIcon(application.status)}
+                    <div>
+                      <CardTitle className="text-lg capitalize">
+                        {application.application_type.replace('_', ' ')}
+                      </CardTitle>
+                      <CardDescription>
+                        Submitted {format(new Date(application.submitted_at), 'PPP')}
+                      </CardDescription>
+                    </div>
+                  </div>
+                  {getStatusBadge(application.status)}
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {application.reviewed_at && (
+                  <div>
+                    <p className="text-sm text-muted-foreground">Reviewed On</p>
+                    <p className="text-sm font-medium">
+                      {format(new Date(application.reviewed_at), 'PPP')}
+                    </p>
+                  </div>
+                )}
+
+                {application.notes && (
+                  <div>
+                    <p className="text-sm text-muted-foreground">Notes</p>
+                    <p className="text-sm">{application.notes}</p>
+                  </div>
+                )}
+
+                {/* Status-specific messages */}
+                {application.status === 'pending' && (
+                  <div className="flex items-start gap-2 p-3 rounded-lg bg-yellow-50 dark:bg-yellow-950/20 text-sm">
+                    <Clock className="h-4 w-4 text-yellow-600 mt-0.5 flex-shrink-0" />
+                    <p className="text-yellow-900 dark:text-yellow-100">
+                      Your application is awaiting review. You'll be notified once it's processed.
+                    </p>
+                  </div>
+                )}
+
+                {application.status === 'under_review' && (
+                  <div className="flex items-start gap-2 p-3 rounded-lg bg-blue-50 dark:bg-blue-950/20 text-sm">
+                    <Clock className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                    <p className="text-blue-900 dark:text-blue-100">
+                      Your application is currently under review. This typically takes 3-5 business days.
+                    </p>
+                  </div>
+                )}
+
+                {application.status === 'approved' && (
+                  <div className="flex items-start gap-2 p-3 rounded-lg bg-green-50 dark:bg-green-950/20 text-sm">
+                    <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                    <p className="text-green-900 dark:text-green-100">
+                      Your application has been approved! Check your email for next steps.
+                    </p>
+                  </div>
+                )}
+
+                {application.status === 'rejected' && (
+                  <div className="flex items-start gap-2 p-3 rounded-lg bg-red-50 dark:bg-red-950/20 text-sm">
+                    <AlertCircle className="h-4 w-4 text-red-600 mt-0.5 flex-shrink-0" />
+                    <p className="text-red-900 dark:text-red-100">
+                      Your application was not approved. Please review the notes above for details.
+                    </p>
+                  </div>
+                )}
+
+                <div className="flex gap-2">
+                  <Button size="sm" variant="outline">
+                    <Download className="h-4 w-4 mr-2" />
+                    Download Application
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
 
-export default () => (
-  <ProtectedRoute>
-    <ApplicationStatus />
-  </ProtectedRoute>
-);
+export default ApplicationStatus;

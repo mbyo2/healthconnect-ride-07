@@ -1,118 +1,323 @@
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
+import { Building2, CheckCircle2, Clock, XCircle, AlertCircle, FileText, Upload, Mail } from 'lucide-react';
+import { toast } from 'sonner';
+import { format } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
 
-import { useState, useEffect } from "react";
-import { Card } from "@/components/ui/card";
-import { LoadingScreen } from "@/components/LoadingScreen";
-import { supabase } from "@/integrations/supabase/client";
-import { Check, Clock, XCircle, AlertTriangle } from "lucide-react";
-import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
-import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+interface InstitutionApplication {
+  id: string;
+  institution_name: string;
+  institution_type: string;
+  status: 'pending' | 'under_review' | 'approved' | 'rejected';
+  submitted_at: string;
+  reviewed_at?: string;
+  reviewer_notes?: string;
+  documents_complete: boolean;
+  verification_complete: boolean;
+  payment_complete: boolean;
+}
 
 const InstitutionStatus = () => {
-  const [institution, setInstitution] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
   const navigate = useNavigate();
+  const [application, setApplication] = useState<InstitutionApplication | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchInstitutionStatus = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        
-        if (!user) {
-          setError("You must be logged in to view your institution status");
-          setIsLoading(false);
-          return;
-        }
-        
-        const { data, error: fetchError } = await supabase
-          .from('healthcare_institutions')
-          .select('*')
-          .eq('admin_id', user.id)
-          .maybeSingle();
-          
-        if (fetchError) {
-          console.error("Error fetching institution:", fetchError);
-          setError("Failed to fetch institution status");
-          setIsLoading(false);
-          return;
-        }
-        
-        setInstitution(data);
-        setIsLoading(false);
-      } catch (err) {
-        console.error("Unexpected error:", err);
-        setError("An unexpected error occurred");
-        setIsLoading(false);
-      }
+    fetchApplication();
+  }, [user]);
+
+  const fetchApplication = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('institution_applications')
+        .select('*')
+        .eq('applicant_id', user.id)
+        .order('submitted_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (error && error.code !== 'PGRST116') throw error;
+      setApplication(data);
+    } catch (error) {
+      console.error('Error fetching application:', error);
+      toast.error('Failed to load application status');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'approved':
+        return <CheckCircle2 className="h-6 w-6 text-green-500" />;
+      case 'rejected':
+        return <XCircle className="h-6 w-6 text-red-500" />;
+      case 'under_review':
+        return <Clock className="h-6 w-6 text-blue-500" />;
+      default:
+        return <AlertCircle className="h-6 w-6 text-yellow-500" />;
+    }
+  };
+
+  const getStatusBadge = (status: string) => {
+    const variants: Record<string, any> = {
+      pending: 'secondary',
+      under_review: 'default',
+      approved: 'default',
+      rejected: 'destructive',
     };
-    
-    fetchInstitutionStatus();
-  }, []);
-  
-  if (isLoading) {
-    return <LoadingScreen />;
+
+    return (
+      <Badge variant={variants[status] || 'outline'} className="text-sm">
+        {status.replace('_', ' ').toUpperCase()}
+      </Badge>
+    );
+  };
+
+  const calculateProgress = () => {
+    if (!application) return 0;
+
+    let progress = 0;
+    if (application.documents_complete) progress += 33;
+    if (application.verification_complete) progress += 33;
+    if (application.payment_complete) progress += 34;
+
+    return progress;
+  };
+
+  if (loading) {
+    return (
+      <div className="container mx-auto p-4 md:p-6 flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
   }
-  
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted p-4 md:p-8">
-      <div className="max-w-lg mx-auto">
-        <h1 className="text-2xl font-bold text-center mb-6">
-          Institution Status
-        </h1>
-        
-        {error && (
-          <Alert variant="destructive" className="mb-4">
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
-        
-        <Card className="p-6 shadow-lg">
-          {!institution ? (
-            <div className="text-center space-y-4">
-              <AlertTriangle className="h-16 w-16 text-amber-500 mx-auto" />
-              <h2 className="text-xl font-semibold">No Institution Found</h2>
-              <p className="text-muted-foreground">
-                You haven't registered an institution yet. Please complete the registration process.
-              </p>
-              <Button onClick={() => navigate("/institution-registration")} className="mt-4">
-                Register Institution
-              </Button>
-            </div>
-          ) : (
-            <div className="text-center space-y-4">
-              {institution.is_verified ? (
-                <Check className="h-16 w-16 text-green-500 mx-auto" />
-              ) : (
-                <Clock className="h-16 w-16 text-amber-500 mx-auto" />
-              )}
-              
-              <h2 className="text-xl font-semibold">
-                {institution.is_verified ? 'Verified' : 'Verification Pending'}
-              </h2>
-              
-              <p className="text-muted-foreground">
-                {institution.is_verified 
-                  ? "Your institution has been verified! You can now access all features."
-                  : "Your institution is pending verification. We'll notify you once it's approved."}
-              </p>
-              
-              {institution.is_verified && (
-                <Button onClick={() => navigate("/institution-dashboard")} className="mt-4">
-                  Go to Dashboard
-                </Button>
-              )}
-            </div>
-          )}
+
+  if (!application) {
+    return (
+      <div className="container mx-auto p-4 md:p-6">
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <Building2 className="h-16 w-16 text-muted-foreground mb-4" />
+            <h2 className="text-xl font-semibold mb-2">No Application Found</h2>
+            <p className="text-muted-foreground mb-6 text-center">
+              You haven't submitted an institution registration application yet.
+            </p>
+            <Button onClick={() => navigate('/institution-registration')}>
+              Start Registration
+            </Button>
+          </CardContent>
         </Card>
       </div>
+    );
+  }
+
+  return (
+    <div className="container mx-auto p-4 md:p-6 space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-3">
+            <Building2 className="h-8 w-8 text-primary" />
+            Institution Application Status
+          </h1>
+          <p className="text-muted-foreground">{application.institution_name}</p>
+        </div>
+        {getStatusBadge(application.status)}
+      </div>
+
+      {/* Status Overview */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            {getStatusIcon(application.status)}
+            Application Progress
+          </CardTitle>
+          <CardDescription>
+            Track the progress of your institution registration
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <div className="flex justify-between text-sm mb-2">
+              <span>Overall Progress</span>
+              <span className="font-medium">{calculateProgress()}%</span>
+            </div>
+            <Progress value={calculateProgress()} className="h-2" />
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-4 mt-6">
+            <div className="flex items-start gap-3 p-3 rounded-lg border">
+              <FileText
+                className={`h-5 w-5 mt-0.5 ${application.documents_complete ? 'text-green-500' : 'text-muted-foreground'
+                  }`}
+              />
+              <div>
+                <p className="font-medium text-sm">Documents</p>
+                <p className="text-xs text-muted-foreground">
+                  {application.documents_complete ? 'Complete' : 'Pending'}
+                </p>
+              </div>
+              {application.documents_complete && (
+                <CheckCircle2 className="h-4 w-4 text-green-500 ml-auto" />
+              )}
+            </div>
+
+            <div className="flex items-start gap-3 p-3 rounded-lg border">
+              <CheckCircle2
+                className={`h-5 w-5 mt-0.5 ${application.verification_complete ? 'text-green-500' : 'text-muted-foreground'
+                  }`}
+              />
+              <div>
+                <p className="font-medium text-sm">Verification</p>
+                <p className="text-xs text-muted-foreground">
+                  {application.verification_complete ? 'Complete' : 'In Progress'}
+                </p>
+              </div>
+              {application.verification_complete && (
+                <CheckCircle2 className="h-4 w-4 text-green-500 ml-auto" />
+              )}
+            </div>
+
+            <div className="flex items-start gap-3 p-3 rounded-lg border">
+              <Upload
+                className={`h-5 w-5 mt-0.5 ${application.payment_complete ? 'text-green-500' : 'text-muted-foreground'
+                  }`}
+              />
+              <div>
+                <p className="font-medium text-sm">Payment</p>
+                <p className="text-xs text-muted-foreground">
+                  {application.payment_complete ? 'Complete' : 'Pending'}
+                </p>
+              </div>
+              {application.payment_complete && (
+                <CheckCircle2 className="h-4 w-4 text-green-500 ml-auto" />
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Application Details */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Application Details</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <p className="text-sm text-muted-foreground">Institution Name</p>
+              <p className="font-medium">{application.institution_name}</p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Institution Type</p>
+              <p className="font-medium capitalize">{application.institution_type}</p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Submitted On</p>
+              <p className="font-medium">
+                {format(new Date(application.submitted_at), 'PPP')}
+              </p>
+            </div>
+            {application.reviewed_at && (
+              <div>
+                <p className="text-sm text-muted-foreground">Reviewed On</p>
+                <p className="font-medium">
+                  {format(new Date(application.reviewed_at), 'PPP')}
+                </p>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Reviewer Notes */}
+      {application.reviewer_notes && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Mail className="h-5 w-5" />
+              Reviewer Notes
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm whitespace-pre-wrap">{application.reviewer_notes}</p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Next Steps */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Next Steps</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {application.status === 'pending' && (
+            <div className="flex items-start gap-3 p-3 rounded-lg bg-yellow-50 dark:bg-yellow-950/20">
+              <Clock className="h-5 w-5 text-yellow-600 mt-0.5" />
+              <div>
+                <p className="font-medium text-sm">Awaiting Review</p>
+                <p className="text-xs text-muted-foreground">
+                  Your application is in queue for review. You'll be notified once it's being processed.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {application.status === 'under_review' && (
+            <div className="flex items-start gap-3 p-3 rounded-lg bg-blue-50 dark:bg-blue-950/20">
+              <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5" />
+              <div>
+                <p className="font-medium text-sm">Under Review</p>
+                <p className="text-xs text-muted-foreground">
+                  Our team is currently reviewing your application. This typically takes 3-5 business days.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {application.status === 'approved' && (
+            <div className="flex items-start gap-3 p-3 rounded-lg bg-green-50 dark:bg-green-950/20">
+              <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5" />
+              <div>
+                <p className="font-medium text-sm">Application Approved!</p>
+                <p className="text-xs text-muted-foreground mb-3">
+                  Congratulations! Your institution has been approved. You can now access the institution portal.
+                </p>
+                <Button size="sm" onClick={() => navigate('/institution-portal')}>
+                  Go to Portal
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {application.status === 'rejected' && (
+            <div className="flex items-start gap-3 p-3 rounded-lg bg-red-50 dark:bg-red-950/20">
+              <XCircle className="h-5 w-5 text-red-600 mt-0.5" />
+              <div>
+                <p className="font-medium text-sm">Application Rejected</p>
+                <p className="text-xs text-muted-foreground mb-3">
+                  Unfortunately, your application was not approved. Please review the reviewer notes above and consider reapplying.
+                </p>
+                <Button size="sm" variant="outline" onClick={() => navigate('/institution-registration')}>
+                  Start New Application
+                </Button>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };
 
-export default () => (
-  <ProtectedRoute>
-    <InstitutionStatus />
-  </ProtectedRoute>
-);
+export default InstitutionStatus;
