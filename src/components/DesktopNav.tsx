@@ -10,6 +10,7 @@ import { Home, Calendar, MessageSquare, Users, ShoppingCart, Heart, Settings, Us
 import { DesktopNavMenu } from "@/components/navigation/DesktopNavMenu";
 import { DesktopUserMenu } from "@/components/navigation/DesktopUserMenu";
 import { AppLogo } from "@/components/ui/AppLogo";
+import { NotificationBell } from "@/components/NotificationBell";
 import { useUserRoles } from "@/context/UserRolesContext";
 import { hasRoutePermission } from "@/utils/rolePermissions";
 
@@ -234,6 +235,9 @@ export function DesktopNav() {
           </form>
 
           <ThemeToggle />
+
+          {/* Notification Bell */}
+          {isAuthenticated && <NotificationBell />}
 
           {/* Enhanced User menu with accessibility */}
           {isAuthenticated && user ? (
