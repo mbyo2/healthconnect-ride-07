@@ -151,6 +151,10 @@ export const Auth = () => {
         throw new Error('Geolocation is not supported by this browser');
       }
 
+      if (!window.isSecureContext) {
+        throw new Error('Geolocation requires a secure context (HTTPS)');
+      }
+
       const position = await new Promise<GeolocationPosition>((resolve, reject) => {
         navigator.geolocation.getCurrentPosition(resolve, reject, {
           enableHighAccuracy: true,
@@ -187,7 +191,7 @@ export const Auth = () => {
       toast.success('Location detected successfully');
     } catch (error: any) {
       console.error('Location detection failed:', error);
-      toast.error('Failed to detect location. Please enter address manually.');
+      toast.error(error.message || 'Failed to detect location. Please enter address manually.');
     } finally {
       setLocationLoading(false);
     }

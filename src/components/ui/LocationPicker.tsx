@@ -40,6 +40,10 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
         throw new Error('Geolocation is not supported by this browser');
       }
 
+      if (!window.isSecureContext) {
+        throw new Error('Geolocation requires a secure context (HTTPS)');
+      }
+
       const position = await new Promise<GeolocationPosition>((resolve, reject) => {
         navigator.geolocation.getCurrentPosition(
           resolve,
@@ -53,14 +57,14 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
       });
 
       const { latitude, longitude } = position.coords;
-      
+
       // Reverse geocoding using a free service
       try {
         const response = await fetch(
           `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`
         );
         const data = await response.json();
-        
+
         if (data && data.display_name) {
           const locationData: LocationData = {
             address: data.display_name,
@@ -69,7 +73,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
             latitude,
             longitude
           };
-          
+
           setCurrentLocation(locationData);
           onLocationSelect(locationData);
           toast.success('Location detected successfully');
@@ -85,14 +89,14 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
           latitude,
           longitude
         };
-        
+
         setCurrentLocation(locationData);
         onLocationSelect(locationData);
         toast.info('Location detected. Please fill in address details manually.');
       }
     } catch (error: any) {
       console.error('Location detection failed:', error);
-      toast.error('Failed to detect location. Please search or enter manually.');
+      toast.error(error.message || 'Failed to detect location. Please search or enter manually.');
     } finally {
       setLoading(false);
     }
@@ -101,14 +105,14 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
   // Search for locations
   const searchLocations = useCallback(async (query: string) => {
     if (!query.trim()) return;
-    
+
     setLoading(true);
     try {
       const response = await fetch(
         `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&addressdetails=1&limit=5`
       );
       const data = await response.json();
-      
+
       const results: LocationData[] = data.map((item: any) => ({
         address: item.display_name,
         city: item.address?.city || item.address?.town || item.address?.village || '',
@@ -116,7 +120,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
         latitude: parseFloat(item.lat),
         longitude: parseFloat(item.lon)
       }));
-      
+
       setSearchResults(results);
     } catch (error) {
       console.error('Search failed:', error);

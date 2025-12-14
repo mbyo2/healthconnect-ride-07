@@ -80,7 +80,7 @@ export function useDeviceCapabilities() {
         navigator.maxTouchPoints > 0 ||
         (navigator as any).msMaxTouchPoints > 0
       );
-      
+
       setCapabilities(prev => ({
         ...prev,
         hasTouchscreen,
@@ -153,11 +153,25 @@ export function useDeviceCapabilities() {
           return true;
         }
         case 'geolocation': {
+          if (!window.isSecureContext) {
+            console.warn('Geolocation requires a secure context (HTTPS)');
+            return false;
+          }
           return new Promise<boolean>((resolve) => {
-            navigator.geolocation.getCurrentPosition(
-              () => resolve(true),
-              () => resolve(false)
-            );
+            try {
+              navigator.geolocation.getCurrentPosition(
+                () => resolve(true),
+                () => resolve(false),
+                {
+                  enableHighAccuracy: false,
+                  timeout: 5000,
+                  maximumAge: 0
+                }
+              );
+            } catch (error) {
+              console.error('Geolocation error:', error);
+              resolve(false);
+            }
           });
         }
         case 'notifications': {
