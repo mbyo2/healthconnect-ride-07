@@ -56,19 +56,32 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   // Get user location effect
   useEffect(() => {
-    if (useUserLocation && navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        position => {
-          setUserLocation({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-          });
-        },
-        error => {
-          console.error('Error getting location:', error);
-          setUseUserLocation(false);
-        }
-      );
+    if (useUserLocation && navigator.geolocation && window.isSecureContext) {
+      try {
+        navigator.geolocation.getCurrentPosition(
+          position => {
+            setUserLocation({
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+            });
+          },
+          error => {
+            console.error('Error getting location:', error);
+            setUseUserLocation(false);
+          },
+          {
+            enableHighAccuracy: false,
+            timeout: 5000,
+            maximumAge: 0
+          }
+        );
+      } catch (error) {
+        console.error('Geolocation error:', error);
+        setUseUserLocation(false);
+      }
+    } else if (useUserLocation && !window.isSecureContext) {
+      console.warn('Geolocation requires a secure context (HTTPS)');
+      setUseUserLocation(false);
     }
   }, [useUserLocation]);
 
