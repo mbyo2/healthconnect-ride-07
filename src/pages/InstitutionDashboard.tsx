@@ -53,7 +53,7 @@ export const InstitutionDashboard = () => {
                     </h1>
                     <p className="text-muted-foreground capitalize">{institution.type} Dashboard</p>
                 </div>
-                <Button variant="outline" onClick={() => navigate("/settings")}>
+                <Button variant="outline" onClick={() => navigate("/institution/settings")}>
                     <Settings className="h-4 w-4 mr-2" />
                     Settings
                 </Button>

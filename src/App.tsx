@@ -71,6 +71,7 @@ const InstitutionPersonnel = lazy(() => import('@/pages/InstitutionPersonnel'));
 const InstitutionPatients = lazy(() => import('@/pages/InstitutionPatients'));
 const InstitutionReports = lazy(() => import('@/pages/InstitutionReports'));
 const InstitutionAppointments = lazy(() => import('@/pages/InstitutionAppointments'));
+const InstitutionSettings = lazy(() => import('@/pages/InstitutionSettings'));
 const AppointmentDetails = lazy(() => import('@/pages/AppointmentDetails'));
 
 const AppContent = () => {
@@ -194,6 +195,7 @@ const AppContent = () => {
             <Route path="/institution/patients" element={<RouteGuard><InstitutionPatients /></RouteGuard>} />
             <Route path="/institution/reports" element={<RouteGuard><InstitutionReports /></RouteGuard>} />
             <Route path="/institution/appointments" element={<RouteGuard><InstitutionAppointments /></RouteGuard>} />
+            <Route path="/institution/settings" element={<RouteGuard><InstitutionSettings /></RouteGuard>} />
             <Route path="/appointments/:id" element={<RouteGuard><AppointmentDetails /></RouteGuard>} />
 
             {/* Payment Routes */}

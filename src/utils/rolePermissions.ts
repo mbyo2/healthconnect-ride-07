@@ -133,6 +133,7 @@ export const ROLE_PERMISSIONS = {
     '/institution/patients',
     '/institution/reports',
     '/institution/appointments',
+    '/institution/settings',
     '/payment-success',
     '/payment-cancel'
   ],
