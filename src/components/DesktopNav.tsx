@@ -183,10 +183,10 @@ export function DesktopNav() {
       className="bg-background sticky top-0 z-50 border-b-2 border-trust-100 px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 shadow-lg"
       role="banner"
     >
-      <div className="container mx-auto flex items-center justify-between py-4 max-w-8xl">
+      <div className="container mx-auto flex items-center justify-between py-2 max-w-8xl">
         <div className="flex items-center gap-8">
           {/* Enhanced Logo */}
-          <AppLogo size="lg" className="mr-4" />
+          <AppLogo size="md" className="mr-4" />
 
           {/* Main navigation with enhanced visibility and accessibility */}
           <nav className="hidden lg:flex items-center space-x-2" role="navigation" aria-label="Main navigation">
