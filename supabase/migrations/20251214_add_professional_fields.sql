@@ -1,0 +1,9 @@
+
+-- Add fields for healthcare professionals to profiles table
+ALTER TABLE IF EXISTS public.profiles
+ADD COLUMN IF NOT EXISTS is_verified BOOLEAN DEFAULT FALSE,
+ADD COLUMN IF NOT EXISTS rating NUMERIC DEFAULT 0,
+ADD COLUMN IF NOT EXISTS reviews_count INTEGER DEFAULT 0,
+ADD COLUMN IF NOT EXISTS years_experience INTEGER DEFAULT 0,
+ADD COLUMN IF NOT EXISTS accepting_patients BOOLEAN DEFAULT TRUE,
+ADD COLUMN IF NOT EXISTS location TEXT;

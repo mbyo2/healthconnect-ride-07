@@ -1,5 +1,5 @@
 
-import { Home, Search, Calendar, MessageSquare, Heart, Users, ShoppingCart, Pill, AlertTriangle, User, Wallet, Brain, Shield, Activity, BarChart3, Zap, Settings } from "lucide-react";
+import { Home, Search, Calendar, MessageSquare, Heart, Users, ShoppingCart, Pill, AlertTriangle, User, Wallet, Brain, Shield, Activity, BarChart3, Zap, Settings, Building2 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useDeviceType } from "@/hooks/use-device-type";
@@ -87,6 +87,18 @@ export function BottomNav() {
       label: "Find Providers",
       description: "Browse healthcare marketplace",
       icon: <Users className="h-5 w-5" />
+    },
+    {
+      to: "/healthcare-institutions",
+      label: "Institutions",
+      description: "Find hospitals and clinics",
+      icon: <Building2 className="h-5 w-5" />
+    },
+    {
+      to: "/healthcare-professionals",
+      label: "Doctors",
+      description: "Find healthcare professionals",
+      icon: <User className="h-5 w-5" />
     },
     {
       to: "/pharmacy-portal",

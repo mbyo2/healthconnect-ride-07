@@ -128,6 +128,11 @@ export const ROLE_PERMISSIONS = {
     '/institution-portal',
     '/institution-registration',
     '/institution-status',
+    '/institution-dashboard',
+    '/institution/personnel',
+    '/institution/patients',
+    '/institution/reports',
+    '/institution/appointments',
     '/payment-success',
     '/payment-cancel'
   ],
@@ -141,6 +146,10 @@ export const ROLE_PERMISSIONS = {
     '/map',
     '/search',
     '/hospital-management',
+    '/institution-dashboard',
+    '/institution/patients',
+    '/institution/reports',
+    '/institution/appointments',
     '/payment-success',
     '/payment-cancel'
   ],

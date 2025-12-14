@@ -27,13 +27,13 @@ const PrivacySecurityPage = () => {
   const [verificationCode, setVerificationCode] = useState("");
   const [showBackupCodes, setShowBackupCodes] = useState(false);
   const [backupCodes, setBackupCodes] = useState<string[]>([]);
-  
+
   // Privacy settings
   const [shareMedicalData, setShareMedicalData] = useState(true);
   const [allowResearchUsage, setAllowResearchUsage] = useState(false);
   const [showInSearch, setShowInSearch] = useState(true);
   const [dataRetentionPeriod, setDataRetentionPeriod] = useState("365");
-  
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -41,22 +41,48 @@ const PrivacySecurityPage = () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
-        
-        // In a real implementation, these would be fetched from a Supabase table
-        // For now, we're using dummy data
-        setIsTwoFactorEnabled(false);
-        setTwoFactorMethod("app");
-        setShareMedicalData(true);
-        setAllowResearchUsage(false);
-        setShowInSearch(true);
-        setDataRetentionPeriod("365");
+
+        // Fetch profile settings
+        const { data: profile, error } = await supabase
+          .from('profiles')
+          .select('share_medical_data, allow_research_usage, show_in_search, data_retention_period')
+          .eq('id', user.id)
+          .single();
+
+        if (profile) {
+          setShareMedicalData(profile.share_medical_data ?? true);
+          setAllowResearchUsage(profile.allow_research_usage ?? false);
+          setShowInSearch(profile.show_in_search ?? true);
+          setDataRetentionPeriod(profile.data_retention_period ?? "365");
+        }
+
+        // Fetch audit logs
+        fetchAuditLogs();
       } catch (error) {
         console.error("Error fetching security settings:", error);
       }
     };
-    
+
     fetchSecuritySettings();
   }, []);
+
+  const [auditLogs, setAuditLogs] = useState<any[]>([]);
+
+  const fetchAuditLogs = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { data, error } = await supabase
+      .from('audit_logs')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(5);
+
+    if (data) {
+      setAuditLogs(data);
+    }
+  };
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,7 +106,7 @@ const PrivacySecurityPage = () => {
         setCurrentPassword("");
         setNewPassword("");
         setConfirmPassword("");
-        
+
         // Log the password change action
         logSecurityAction("password_changed", "auth", "");
       }
@@ -95,16 +121,16 @@ const PrivacySecurityPage = () => {
   const toggleTwoFactor = async () => {
     try {
       setIsLoading(true);
-      
+
       if (!isTwoFactorEnabled) {
         // In a real implementation, this would initiate the 2FA setup process
         // For demo purposes, we're simulating success
-        
+
         // Generate mock backup codes
-        const mockBackupCodes = Array.from({ length: 10 }, () => 
+        const mockBackupCodes = Array.from({ length: 10 }, () =>
           Math.random().toString(36).substring(2, 8).toUpperCase()
         );
-        
+
         setBackupCodes(mockBackupCodes);
         setShowBackupCodes(true);
         setIsVerifying(true);
@@ -114,7 +140,7 @@ const PrivacySecurityPage = () => {
         setShowBackupCodes(false);
         setBackupCodes([]);
         toast.success("Two-factor authentication disabled");
-        
+
         // Log the 2FA disable action
         logSecurityAction("2fa_disabled", "auth", "");
       }
@@ -125,29 +151,41 @@ const PrivacySecurityPage = () => {
       setIsLoading(false);
     }
   };
-  
+
   const verifyTwoFactorSetup = () => {
     // In a real implementation, this would verify the code against the authenticator app
     if (verificationCode.length === 6) {
       setIsTwoFactorEnabled(true);
       setIsVerifying(false);
       toast.success("Two-factor authentication enabled");
-      
+
       // Log the 2FA enable action
       logSecurityAction("2fa_enabled", "auth", "");
     } else {
       toast.error("Invalid verification code");
     }
   };
-  
+
   const updatePrivacySettings = async () => {
     try {
       setIsLoading(true);
-      
-      // In a real implementation, this would update a Supabase table
-      // For demo purposes, we're simulating success
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          share_medical_data: shareMedicalData,
+          allow_research_usage: allowResearchUsage,
+          show_in_search: showInSearch,
+          data_retention_period: dataRetentionPeriod
+        })
+        .eq('id', user.id);
+
+      if (error) throw error;
+
       toast.success("Privacy settings updated");
-      
+
       // Log the privacy settings update
       logSecurityAction("privacy_settings_updated", "privacy", "");
     } catch (error) {
@@ -157,7 +195,7 @@ const PrivacySecurityPage = () => {
       setIsLoading(false);
     }
   };
-  
+
   const handleDeleteAccount = async () => {
     // This is a placeholder. In a real app, this would need a confirmation modal
     const confirmed = window.confirm(
@@ -167,18 +205,18 @@ const PrivacySecurityPage = () => {
     if (confirmed) {
       try {
         setIsLoading(true);
-        
+
         // In a real implementation, this would call a Supabase Edge Function
         // that handles the full account deletion process safely
         const { error } = await supabase.rpc('delete_user');
-        
+
         if (error) {
           throw error;
         }
-        
+
         // Log the account deletion action
         logSecurityAction("account_deleted", "user", "");
-        
+
         // Sign out the user after account deletion
         await supabase.auth.signOut();
         toast.success("Your account has been deleted");
@@ -191,12 +229,22 @@ const PrivacySecurityPage = () => {
       }
     }
   };
-  
+
   const logSecurityAction = async (action: string, resourceType: string, resourceId: string) => {
     try {
-      // In a real implementation, this would insert a record into an audit_logs table
-      // For demo purposes, we're just logging to console
-      console.log("Security action logged:", { action, resourceType, resourceId, timestamp: new Date().toISOString() });
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      await supabase.from('audit_logs').insert({
+        user_id: user.id,
+        action,
+        resource_type: resourceType,
+        resource_id: resourceId,
+        user_agent: navigator.userAgent
+      });
+
+      // Refresh logs
+      fetchAuditLogs();
     } catch (error) {
       console.error("Error logging security action:", error);
     }
@@ -214,7 +262,7 @@ const PrivacySecurityPage = () => {
           <TabsTrigger value="security">Security</TabsTrigger>
           <TabsTrigger value="privacy">Privacy</TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="security" className="space-y-6">
           <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4">Change Password</h2>
@@ -288,13 +336,13 @@ const PrivacySecurityPage = () => {
 
           <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4">Two-Factor Authentication</h2>
-            
+
             {isVerifying ? (
               <div className="space-y-4">
                 <p className="text-sm text-muted-foreground">
                   Setup your authenticator app using the codes provided and enter the verification code.
                 </p>
-                
+
                 {showBackupCodes && (
                   <div className="mt-4">
                     <Label>Backup Codes</Label>
@@ -310,7 +358,7 @@ const PrivacySecurityPage = () => {
                     </p>
                   </div>
                 )}
-                
+
                 <div>
                   <Label htmlFor="verification-code">Verification Code</Label>
                   <Input
@@ -322,7 +370,7 @@ const PrivacySecurityPage = () => {
                     maxLength={6}
                   />
                 </div>
-                
+
                 <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
                   <Button onClick={verifyTwoFactorSetup} disabled={verificationCode.length !== 6 || isLoading}>
                     {isLoading ? "Verifying..." : "Verify"}
@@ -349,7 +397,7 @@ const PrivacySecurityPage = () => {
                     disabled={isLoading}
                   />
                 </div>
-                
+
                 {isTwoFactorEnabled && (
                   <div className="pt-2">
                     <Label htmlFor="2fa-method">Authentication Method</Label>
@@ -369,53 +417,54 @@ const PrivacySecurityPage = () => {
                     </Select>
                   </div>
                 )}
-                
+
                 <p className="text-sm text-muted-foreground">
                   Protect your account with an additional layer of security by requiring a one-time code when you sign in.
                 </p>
               </div>
             )}
           </Card>
-          
+
           <Card className="p-6">
             <div className="flex items-center space-x-2 mb-4">
               <Activity className="h-5 w-5" />
               <h2 className="text-xl font-semibold">Security Audit Log</h2>
             </div>
-            
+
             <p className="text-sm text-muted-foreground mb-4">
-              We keep track of important security-related actions on your account. 
+              We keep track of important security-related actions on your account.
               This helps us protect your account and respond to any potential security incidents.
             </p>
-            
+
             <ul className="space-y-2 text-sm">
-              <li className="flex items-start justify-between p-2 bg-muted rounded-md">
-                <div>
-                  <p className="font-medium">Password Changed</p>
-                  <p className="text-xs text-muted-foreground">Your account password was updated</p>
-                </div>
-                <span className="text-xs text-muted-foreground">2 days ago</span>
-              </li>
-              <li className="flex items-start justify-between p-2 bg-muted rounded-md">
-                <div>
-                  <p className="font-medium">New Login</p>
-                  <p className="text-xs text-muted-foreground">New login from Chrome on Windows</p>
-                </div>
-                <span className="text-xs text-muted-foreground">5 days ago</span>
-              </li>
+              {auditLogs.length > 0 ? (
+                auditLogs.map((log) => (
+                  <li key={log.id} className="flex items-start justify-between p-2 bg-muted rounded-md">
+                    <div>
+                      <p className="font-medium capitalize">{log.action.replace(/_/g, ' ')}</p>
+                      <p className="text-xs text-muted-foreground">{log.resource_type}</p>
+                    </div>
+                    <span className="text-xs text-muted-foreground">
+                      {new Date(log.created_at).toLocaleDateString()}
+                    </span>
+                  </li>
+                ))
+              ) : (
+                <li className="text-center text-muted-foreground py-4">No logs found</li>
+              )}
             </ul>
-            
+
             <Button variant="outline" className="mt-4 w-full">View Full Security Log</Button>
           </Card>
         </TabsContent>
-        
+
         <TabsContent value="privacy" className="space-y-6">
           <Card className="p-6">
             <div className="flex items-center space-x-2 mb-4">
               <Lock className="h-5 w-5" />
               <h2 className="text-xl font-semibold">Medical Data Privacy</h2>
             </div>
-            
+
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -428,9 +477,9 @@ const PrivacySecurityPage = () => {
                   onCheckedChange={setShareMedicalData}
                 />
               </div>
-              
+
               <Separator />
-              
+
               <div className="flex items-center justify-between">
                 <div>
                   <Label htmlFor="research-usage" className="mb-1 block">Allow Anonymous Data for Research</Label>
@@ -442,9 +491,9 @@ const PrivacySecurityPage = () => {
                   onCheckedChange={setAllowResearchUsage}
                 />
               </div>
-              
+
               <Separator />
-              
+
               <div className="flex items-center justify-between">
                 <div>
                   <Label htmlFor="profile-search" className="mb-1 block">Show Profile in Provider Search</Label>
@@ -456,9 +505,9 @@ const PrivacySecurityPage = () => {
                   onCheckedChange={setShowInSearch}
                 />
               </div>
-              
+
               <Separator />
-              
+
               <div>
                 <Label htmlFor="data-retention" className="mb-1 block">Data Retention Period</Label>
                 <p className="text-xs text-muted-foreground mb-2">Choose how long to keep your data after account closure</p>
@@ -477,19 +526,19 @@ const PrivacySecurityPage = () => {
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <Button onClick={updatePrivacySettings} disabled={isLoading} className="w-full">
                 {isLoading ? "Saving..." : "Save Privacy Settings"}
               </Button>
             </div>
           </Card>
-          
+
           <Card className="p-6">
             <div className="flex items-center space-x-2 mb-4">
               <FileText className="h-5 w-5" />
               <h2 className="text-xl font-semibold">Data Requests</h2>
             </div>
-            
+
             <div className="space-y-4">
               <div>
                 <h3 className="font-medium mb-1">Request Data Export</h3>
@@ -498,9 +547,9 @@ const PrivacySecurityPage = () => {
                 </p>
                 <Button variant="outline">Request Data Export</Button>
               </div>
-              
+
               <Separator />
-              
+
               <div>
                 <h3 className="font-medium mb-1">Right to be Forgotten</h3>
                 <p className="text-sm text-muted-foreground mb-2">
@@ -510,18 +559,18 @@ const PrivacySecurityPage = () => {
               </div>
             </div>
           </Card>
-          
+
           <Card className="p-6 border-red-200">
             <div className="space-y-4">
               <div className="flex items-center space-x-2 text-red-500">
                 <AlertTriangle className="h-5 w-5" />
                 <h2 className="text-xl font-semibold">Danger Zone</h2>
               </div>
-              
+
               <p className="text-sm text-muted-foreground">
                 Permanently delete your account and all of your content. This action cannot be undone.
               </p>
-              
+
               <Button
                 variant="destructive"
                 onClick={handleDeleteAccount}

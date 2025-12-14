@@ -66,6 +66,11 @@ const ApplicationStatus = lazy(() => import('@/pages/ApplicationStatus'));
 const InstitutionPortal = lazy(() => import('@/pages/InstitutionPortal'));
 const InstitutionRegistration = lazy(() => import('@/pages/InstitutionRegistration'));
 const InstitutionStatus = lazy(() => import('@/pages/InstitutionStatus'));
+const InstitutionDashboard = lazy(() => import('@/pages/InstitutionDashboard'));
+const InstitutionPersonnel = lazy(() => import('@/pages/InstitutionPersonnel'));
+const InstitutionPatients = lazy(() => import('@/pages/InstitutionPatients'));
+const InstitutionReports = lazy(() => import('@/pages/InstitutionReports'));
+const InstitutionAppointments = lazy(() => import('@/pages/InstitutionAppointments'));
 const AppointmentDetails = lazy(() => import('@/pages/AppointmentDetails'));
 
 const AppContent = () => {
@@ -184,6 +189,11 @@ const AppContent = () => {
             <Route path="/institution-portal" element={<RouteGuard><InstitutionPortal /></RouteGuard>} />
             <Route path="/institution-registration" element={<RouteGuard><InstitutionRegistration /></RouteGuard>} />
             <Route path="/institution-status" element={<RouteGuard><InstitutionStatus /></RouteGuard>} />
+            <Route path="/institution-dashboard" element={<RouteGuard><InstitutionDashboard /></RouteGuard>} />
+            <Route path="/institution/personnel" element={<RouteGuard><InstitutionPersonnel /></RouteGuard>} />
+            <Route path="/institution/patients" element={<RouteGuard><InstitutionPatients /></RouteGuard>} />
+            <Route path="/institution/reports" element={<RouteGuard><InstitutionReports /></RouteGuard>} />
+            <Route path="/institution/appointments" element={<RouteGuard><InstitutionAppointments /></RouteGuard>} />
             <Route path="/appointments/:id" element={<RouteGuard><AppointmentDetails /></RouteGuard>} />
 
             {/* Payment Routes */}

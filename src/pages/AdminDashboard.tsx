@@ -5,6 +5,9 @@ import { TestAccountSetup } from '@/components/admin/TestAccountSetup';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Shield, Users, Activity } from 'lucide-react';
 
+import { InstitutionApplications } from '@/components/admin/InstitutionApplications';
+import { Building2 } from 'lucide-react';
+
 const AdminDashboard = () => {
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -19,10 +22,14 @@ const AdminDashboard = () => {
       </div>
 
       <Tabs defaultValue="users" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="users" className="flex items-center gap-2">
             <Users className="h-4 w-4" />
             User Management
+          </TabsTrigger>
+          <TabsTrigger value="applications" className="flex items-center gap-2">
+            <Building2 className="h-4 w-4" />
+            Applications
           </TabsTrigger>
           <TabsTrigger value="audit" className="flex items-center gap-2">
             <Activity className="h-4 w-4" />
@@ -36,6 +43,10 @@ const AdminDashboard = () => {
 
         <TabsContent value="users" className="space-y-4">
           <UserManagement />
+        </TabsContent>
+
+        <TabsContent value="applications" className="space-y-4">
+          <InstitutionApplications />
         </TabsContent>
 
         <TabsContent value="audit" className="space-y-4">

@@ -1,28 +1,40 @@
-import React, { useEffect, useState } from 'react';
-import { Helmet } from 'react-helmet';
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Building, MapPin, Phone, Clock, Users, Loader2, Mail } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Building2, MapPin, Star, Phone, Search } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Institution {
   id: string;
   name: string;
-  type: string;
-  address?: string;
-  city?: string;
-  state?: string;
-  country?: string;
+  institution_type: string;
+  location?: string;
+  rating?: number;
+  reviews_count?: number;
   phone?: string;
   email?: string;
-  is_verified: boolean;
+  services?: string[];
+  accepting_patients: boolean;
 }
 
 const HealthcareInstitutions = () => {
   const [institutions, setInstitutions] = useState<Institution[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [typeFilter, setTypeFilter] = useState('all');
+
+  const institutionTypes = [
+    'Hospital',
+    'Clinic',
+    'Laboratory',
+    'Pharmacy',
+    'Mental Health Center',
+    'Rehabilitation Center',
+  ];
 
   useEffect(() => {
     fetchInstitutions();
@@ -30,132 +42,183 @@ const HealthcareInstitutions = () => {
 
   const fetchInstitutions = async () => {
     try {
-      setIsLoading(true);
       const { data, error } = await supabase
         .from('healthcare_institutions')
         .select('*')
         .eq('is_verified', true)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(50);
 
       if (error) throw error;
-      setInstitutions(data || []);
+
+      // Map database fields to component interface
+      const mappedData = (data || []).map((item: any) => ({
+        id: item.id,
+        name: item.name,
+        institution_type: item.type,
+        location: item.address,
+        phone: item.phone,
+        email: item.email,
+        // Default values for missing fields
+        rating: 0,
+        reviews_count: 0,
+        services: [],
+        accepting_patients: true
+      }));
+
+      setInstitutions(mappedData);
     } catch (error) {
       console.error('Error fetching institutions:', error);
       toast.error('Failed to load healthcare institutions');
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
+  const filteredInstitutions = institutions.filter((inst) => {
+    const matchesSearch =
+      inst.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      inst.location?.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesType = typeFilter === 'all' || inst.institution_type === typeFilter;
+
+    return matchesSearch && matchesType;
+  });
+
   return (
-    <>
-      <Helmet>
-        <title>Healthcare Institutions | Doc' O Clock</title>
-        <meta name="description" content="Discover hospitals, clinics, and healthcare facilities near you in Zambia" />
-      </Helmet>
+    <div className="container mx-auto p-4 md:p-6 space-y-6">
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-3">
+          <Building2 className="h-8 w-8 text-primary" />
+          Healthcare Institutions
+        </h1>
+        <p className="text-muted-foreground">
+          Find verified hospitals, clinics, and healthcare facilities
+        </p>
+      </div>
 
-      <div className="container mx-auto py-4 sm:py-8 space-y-4 sm:space-y-6 px-4">
-        <div className="text-center">
-          <h1 className="text-2xl sm:text-3xl font-bold mb-2">Healthcare Institutions</h1>
-          <p className="text-sm sm:text-base text-muted-foreground">
-            Discover hospitals, clinics, and healthcare facilities near you
-          </p>
-        </div>
+      {/* Filters */}
+      <Card>
+        <CardContent className="pt-6 space-y-4">
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search by name or location..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
 
-        {isLoading ? (
-          <div className="flex justify-center items-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <Select value={typeFilter} onValueChange={setTypeFilter}>
+              <SelectTrigger>
+                <SelectValue placeholder="All Types" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Types</SelectItem>
+                {institutionTypes.map((type) => (
+                  <SelectItem key={type} value={type}>
+                    {type}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-        ) : institutions.length === 0 ? (
-          <Card className="text-center py-12">
-            <CardContent>
-              <Building className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-              <p className="text-lg font-medium mb-2">No Healthcare Institutions Found</p>
-              <p className="text-sm text-muted-foreground">
-                Check back later as more institutions join our platform
-              </p>
+        </CardContent>
+      </Card>
+
+      {/* Results */}
+      <div className="grid md:grid-cols-2 gap-4">
+        {loading ? (
+          <div className="col-span-full flex justify-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
+        ) : filteredInstitutions.length === 0 ? (
+          <Card className="col-span-full">
+            <CardContent className="flex flex-col items-center justify-center py-12">
+              <Building2 className="h-16 w-16 text-muted-foreground mb-4" />
+              <p className="text-muted-foreground">No institutions found</p>
             </CardContent>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-            {institutions.map((institution) => {
-              const location = [institution.address, institution.city, institution.state, institution.country]
-                .filter(Boolean)
-                .join(', ') || 'Location not specified';
-              
-              return (
-                <Card key={institution.id} className="hover:shadow-lg transition-shadow">
-                  <CardHeader>
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex items-start gap-3 flex-1 min-w-0">
-                        <Building className="h-8 w-8 text-primary flex-shrink-0 mt-1" />
-                        <div className="flex-1 min-w-0">
-                          <CardTitle className="text-lg sm:text-xl mb-1 break-words">{institution.name}</CardTitle>
-                          <CardDescription className="flex flex-wrap items-center gap-2">
-                            <Badge variant="outline" className="text-xs">{institution.type}</Badge>
-                            {institution.is_verified && (
-                              <Badge className="bg-green-100 text-green-800 border-green-200 text-xs">
-                                Verified
-                              </Badge>
-                            )}
-                          </CardDescription>
-                        </div>
-                      </div>
+          filteredInstitutions.map((inst) => (
+            <Card key={inst.id} className="hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="flex items-start justify-between">
+                  <div className="flex items-start gap-3">
+                    <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                      <Building2 className="h-6 w-6 text-primary" />
                     </div>
-                  </CardHeader>
-
-                  <CardContent className="space-y-3 sm:space-y-4">
-                    <div className="flex items-start gap-2 text-xs sm:text-sm text-muted-foreground">
-                      <MapPin className="h-4 w-4 flex-shrink-0 mt-0.5" />
-                      <span className="break-words">{location}</span>
+                    <div>
+                      <CardTitle className="text-lg">{inst.name}</CardTitle>
+                      <CardDescription>{inst.institution_type}</CardDescription>
                     </div>
+                  </div>
+                  {inst.accepting_patients && (
+                    <Badge variant="default" className="text-xs">
+                      Accepting
+                    </Badge>
+                  )}
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {inst.location && (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <MapPin className="h-4 w-4 flex-shrink-0" />
+                    {inst.location}
+                  </div>
+                )}
 
-                    {institution.phone && (
-                      <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
-                        <Phone className="h-4 w-4 flex-shrink-0" />
-                        <a href={`tel:${institution.phone}`} className="hover:text-primary">
-                          {institution.phone}
-                        </a>
-                      </div>
+                {inst.phone && (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Phone className="h-4 w-4 flex-shrink-0" />
+                    {inst.phone}
+                  </div>
+                )}
+
+                {inst.rating && (
+                  <div className="flex items-center gap-2">
+                    <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                    <span className="font-medium">{inst.rating.toFixed(1)}</span>
+                    {inst.reviews_count && (
+                      <span className="text-sm text-muted-foreground">
+                        ({inst.reviews_count} reviews)
+                      </span>
                     )}
+                  </div>
+                )}
 
-                    {institution.email && (
-                      <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
-                        <Mail className="h-4 w-4 flex-shrink-0" />
-                        <a href={`mailto:${institution.email}`} className="hover:text-primary truncate">
-                          {institution.email}
-                        </a>
-                      </div>
+                {inst.services && inst.services.length > 0 && (
+                  <div className="flex flex-wrap gap-1">
+                    {inst.services.slice(0, 3).map((service, i) => (
+                      <Badge key={i} variant="secondary" className="text-xs">
+                        {service}
+                      </Badge>
+                    ))}
+                    {inst.services.length > 3 && (
+                      <Badge variant="outline" className="text-xs">
+                        +{inst.services.length - 3} more
+                      </Badge>
                     )}
+                  </div>
+                )}
 
-                    <div className="flex flex-col sm:flex-row gap-2 pt-2">
-                      <Button size="sm" className="flex-1 text-xs sm:text-sm">
-                        View Details
-                      </Button>
-                      <Button 
-                        size="sm" 
-                        variant="outline"
-                        className="text-xs sm:text-sm"
-                        onClick={() => {
-                          if (institution.address) {
-                            const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`;
-                            window.open(mapUrl, '_blank');
-                          } else {
-                            toast.error('Location not available');
-                          }
-                        }}
-                      >
-                        Get Directions
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
+                <div className="flex gap-2 pt-2">
+                  <Button size="sm" className="flex-1">
+                    View Details
+                  </Button>
+                  <Button size="sm" variant="outline">
+                    Contact
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))
         )}
       </div>
-    </>
+    </div>
   );
 };
 

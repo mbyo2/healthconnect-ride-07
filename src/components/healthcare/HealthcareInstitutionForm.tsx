@@ -82,27 +82,49 @@ export const HealthcareInstitutionForm = () => {
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      
+
       if (!user) {
         toast.error("You must be logged in to register an institution");
         return;
       }
 
-      const institution: HealthcareInstitution = {
+      // 1. Create the institution record (unverified)
+      const institution = {
         ...formData,
         type: formData.type as any,
+        admin_id: user.id,
         is_verified: false,
         operating_hours: {}
       };
 
-      const { error } = await supabase
+      const { error: institutionError } = await supabase
         .from("healthcare_institutions")
         .insert(institution);
 
-      if (error) throw error;
+      if (institutionError) throw institutionError;
+
+      // 2. Create the application record
+      const application = {
+        applicant_id: user.id,
+        institution_name: formData.name,
+        institution_type: formData.type,
+        status: 'pending',
+        documents_complete: false,
+        verification_complete: false,
+        payment_complete: false
+      };
+
+      const { error: applicationError } = await supabase
+        .from("institution_applications")
+        .insert(application);
+
+      if (applicationError) {
+        console.error("Error creating application record:", applicationError);
+        throw applicationError;
+      }
 
       toast.success("Institution registered successfully! Awaiting verification.");
-      navigate("/dashboard");
+      navigate("/institution-status");
     } catch (error: any) {
       console.error("Error registering institution:", error);
       toast.error(error.message || "Failed to register institution");
@@ -114,7 +136,7 @@ export const HealthcareInstitutionForm = () => {
   return (
     <form onSubmit={handleSubmit} className="space-y-6 w-full max-w-2xl mx-auto p-6">
       <h2 className="text-2xl font-bold">Register Healthcare Institution</h2>
-      
+
       <div className="space-y-4">
         <div>
           <Label htmlFor="name">Institution Name</Label>
@@ -287,8 +309,8 @@ export const HealthcareInstitutionForm = () => {
         </div>
       </div>
 
-      <Button 
-        type="submit" 
+      <Button
+        type="submit"
         className="w-full"
         disabled={isSubmitting}
       >
@@ -301,6 +323,6 @@ export const HealthcareInstitutionForm = () => {
           "Register Institution"
         )}
       </Button>
-    </form>
+    </form >
   );
 };
