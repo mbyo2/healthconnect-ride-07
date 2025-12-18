@@ -205,10 +205,12 @@ export const parseClinicalDecisions = (aiResponse: string): ClinicalDecision[] =
   const decisions: ClinicalDecision[] = [];
 
   // Check for emergency indicators
-  const emergencyKeywords = ['emergency', 'call 911', 'immediately', 'life-threatening', 'urgent care'];
-  const urgentKeywords = ['within 24 hours', 'see a doctor soon', 'schedule appointment', 'consult'];
-  const preventiveKeywords = ['screening', 'vaccination', 'checkup', 'prevention'];
-  const monitoringKeywords = ['monitor', 'track', 'watch for', 'observe'];
+  const emergencyKeywords = ['emergency', 'call 911', 'immediately', 'life-threatening', 'urgent care', 'severe pain', 'difficulty breathing', 'chest pain'];
+  const urgentKeywords = ['within 24 hours', 'see a doctor soon', 'schedule appointment', 'consult', 'persistent', 'worsening'];
+  const preventiveKeywords = ['screening', 'vaccination', 'checkup', 'prevention', 'routine check', 'healthy lifestyle'];
+  const monitoringKeywords = ['monitor', 'track', 'watch for', 'observe', 'daily', 'regularly'];
+  const medicationKeywords = ['medicine', 'prescription', 'pill', 'pharmacy', 'drug', 'medication', 'dosage', 'antibiotic'];
+  const labKeywords = ['lab', 'test', 'blood work', 'results', 'scan', 'x-ray', 'mri', 'ultrasound'];
 
   const lowerResponse = aiResponse.toLowerCase();
 
@@ -218,11 +220,39 @@ export const parseClinicalDecisions = (aiResponse: string): ClinicalDecision[] =
       type: 'emergency',
       title: 'Seek Emergency Care',
       description: 'Based on the symptoms described, immediate medical attention may be required.',
-      confidence: 0.9,
+      confidence: 0.95,
       timeframe: 'Immediately',
       actions: [
         { id: 'call-emergency', label: 'Call Emergency Services', type: 'call', priority: 'high', details: 'Dial emergency number' },
         { id: 'find-er', label: 'Find Nearest ER', type: 'navigate', route: '/map', priority: 'high' }
+      ]
+    });
+  }
+
+  // Medication/Pharmacy detection
+  if (medicationKeywords.some(k => lowerResponse.includes(k))) {
+    decisions.push({
+      type: 'routine',
+      title: 'Medication & Pharmacy',
+      description: 'You can manage your prescriptions or order medications through our marketplace.',
+      confidence: 0.85,
+      actions: [
+        { id: 'buy-medicine', label: 'Order Medications', type: 'navigate', route: '/marketplace', priority: 'high' },
+        { id: 'view-meds', label: 'My Medications', type: 'navigate', route: '/medications', priority: 'medium' }
+      ]
+    });
+  }
+
+  // Lab/Test detection
+  if (labKeywords.some(k => lowerResponse.includes(k))) {
+    decisions.push({
+      type: 'monitoring',
+      title: 'Lab Tests & Results',
+      description: 'View your lab results or schedule new diagnostic tests.',
+      confidence: 0.8,
+      actions: [
+        { id: 'view-records', label: 'Medical Records', type: 'navigate', route: '/medical-records', priority: 'high' },
+        { id: 'lab-mgmt', label: 'Lab Management', type: 'navigate', route: '/lab-management', priority: 'medium' }
       ]
     });
   }
@@ -252,7 +282,7 @@ export const parseClinicalDecisions = (aiResponse: string): ClinicalDecision[] =
       confidence: 0.75,
       actions: [
         { id: 'schedule-screening', label: 'Schedule Health Screening', type: 'schedule', route: '/appointments', priority: 'medium' },
-        { id: 'view-records', label: 'Review Medical Records', type: 'navigate', route: '/medical-records', priority: 'low' }
+        { id: 'view-records-prev', label: 'Review Medical Records', type: 'navigate', route: '/medical-records', priority: 'low' }
       ]
     });
   }
@@ -273,7 +303,7 @@ export const parseClinicalDecisions = (aiResponse: string): ClinicalDecision[] =
   }
 
   // Default routine recommendation if no other triggers
-  if (decisions.length === 0 && aiResponse.length > 100) {
+  if (decisions.length === 0 && aiResponse.length > 50) {
     decisions.push({
       type: 'routine',
       title: 'Follow-Up Recommended',

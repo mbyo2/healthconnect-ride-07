@@ -106,61 +106,49 @@ export function Header() {
                 )}
               </Button>
             </DropdownMenuTrigger>
-            {user ? (
-              <Avatar className="h-9 w-9 ring-2 ring-blue-100">
-                <AvatarImage src={profile?.avatar_url || ""} alt={user?.email || "Avatar"} />
-                <AvatarFallback className="bg-blue-100 text-blue-700 font-semibold">
-                  {user?.email?.[0]?.toUpperCase() || "U"}
-                </AvatarFallback>
-              </Avatar>
-            ) : (
-              <Menu className="h-5 w-5" />
-            )}
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-64 bg-white border border-gray-200 shadow-lg max-h-[80vh] overflow-y-auto z-50">
-          {user ? (
-            <>
-              <DropdownMenuLabel className="pb-2">
-                <div className="text-sm font-medium text-gray-900">{user.email}</div>
-                <div className="text-xs text-gray-500">My Account</div>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
-                <Link to="/profile" className="flex items-center">Profile &amp; Settings</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/appointments">My Appointments</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/documentation">Help &amp; Support</Link>
-              </DropdownMenuItem>
-              {userRole === "health_personnel" && (
-                <DropdownMenuItem asChild>
-                  <Link to="/provider-dashboard">Provider Dashboard</Link>
-                </DropdownMenuItem>
+            <DropdownMenuContent align="end" className="w-64 bg-white border border-gray-200 shadow-lg max-h-[80vh] overflow-y-auto z-50">
+              {user ? (
+                <>
+                  <DropdownMenuLabel className="pb-2">
+                    <div className="text-sm font-medium text-gray-900">{user.email}</div>
+                    <div className="text-xs text-gray-500">My Account</div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/profile" className="flex items-center">Profile &amp; Settings</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/appointments">My Appointments</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/documentation">Help &amp; Support</Link>
+                  </DropdownMenuItem>
+                  {userRole === "health_personnel" && (
+                    <DropdownMenuItem asChild>
+                      <Link to="/provider-dashboard">Provider Dashboard</Link>
+                    </DropdownMenuItem>
+                  )}
+                  {(adminLevel === "admin" || adminLevel === "superadmin") && (
+                    <DropdownMenuItem asChild>
+                      <Link to="/admin-dashboard">Admin Dashboard</Link>
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleSignOut} className="text-red-600">Sign out</DropdownMenuItem>
+                </>
+              ) : (
+                <>
+                  <DropdownMenuItem asChild>
+                    <Link to="/auth" className="font-medium">Sign In</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/auth?tab=signup" className="font-medium">Create Account</Link>
+                  </DropdownMenuItem>
+                </>
               )}
-              {(adminLevel === "admin" || adminLevel === "superadmin") && (
-                <DropdownMenuItem asChild>
-                  <Link to="/admin-dashboard">Admin Dashboard</Link>
-                </DropdownMenuItem>
-              )}
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleSignOut} className="text-red-600">Sign out</DropdownMenuItem>
-            </>
-          ) : (
-            <>
-              <DropdownMenuItem asChild>
-                <Link to="/auth" className="font-medium">Sign In</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/auth?tab=signup" className="font-medium">Create Account</Link>
-              </DropdownMenuItem>
-            </>
-          )}
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div >
     </header >
   );

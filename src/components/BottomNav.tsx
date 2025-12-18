@@ -36,7 +36,7 @@ export function BottomNav() {
     },
     {
       to: "/symptoms",
-      label: "Health",
+      label: "Symptoms",
       icon: <Heart className="h-5 w-5" />,
       active: location.pathname === "/symptoms",
       description: "Track symptoms and health"
