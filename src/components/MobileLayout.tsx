@@ -21,10 +21,10 @@ export const MobileLayout = ({ children, isLoading }: MobileLayoutProps) => {
   const location = useLocation();
   const [isTransitioning, setIsTransitioning] = useState(false);
 
-  // Smooth page transition effect
+  // Snappier page transition effect
   useEffect(() => {
     setIsTransitioning(true);
-    const timer = setTimeout(() => setIsTransitioning(false), 150);
+    const timer = setTimeout(() => setIsTransitioning(false), 100);
     return () => clearTimeout(timer);
   }, [location.pathname]);
 
@@ -40,12 +40,12 @@ export const MobileLayout = ({ children, isLoading }: MobileLayoutProps) => {
           <main
             id="main-content"
             className={cn(
-              "flex-1 overflow-auto transition-opacity duration-150 ease-out",
+              "flex-1 overflow-auto transition-opacity duration-100 ease-out",
               !isAuthenticated && "w-full",
-              isTransitioning ? "opacity-95" : "opacity-100"
+              isTransitioning ? "opacity-98" : "opacity-100"
             )}
           >
-            <div className="container mx-auto px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 py-6 space-y-6 max-w-8xl animate-in fade-in duration-200">
+            <div className="container mx-auto px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 py-6 space-y-6 max-w-8xl animate-in fade-in duration-150">
               {children}
             </div>
           </main>
@@ -64,13 +64,13 @@ export const MobileLayout = ({ children, isLoading }: MobileLayoutProps) => {
         aria-label="Main Content"
         className={cn(
           "flex-1 pt-16 overflow-y-auto overflow-x-hidden",
-          isAuthenticated ? "pb-24" : "pb-4",
-          "transition-all duration-150 ease-out",
+          isAuthenticated ? "pb-24" : "pb-6",
+          "transition-all duration-100 ease-out",
           "min-h-0",
-          isTransitioning ? "opacity-95" : "opacity-100"
+          isTransitioning ? "opacity-98" : "opacity-100"
         )}
       >
-        <div className="container mx-auto px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 py-6 space-y-6 max-w-8xl min-h-full animate-in fade-in slide-in-from-bottom-1 duration-200">
+        <div className="container mx-auto px-4 py-4 space-y-6 max-w-8xl min-h-full animate-in fade-in slide-in-from-bottom-2 duration-150">
           <div className="w-full">
             {children}
           </div>

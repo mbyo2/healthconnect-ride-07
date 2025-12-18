@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface Notification {
     id: string;
@@ -63,6 +64,12 @@ export const useNotifications = () => {
                     const newNotification = payload.new as Notification;
                     setNotifications((prev) => [newNotification, ...prev.slice(0, 9)]);
                     setUnreadCount((prev) => prev + 1);
+
+                    // Show real-time toast
+                    toast.info(newNotification.title, {
+                        description: newNotification.message,
+                        duration: 5000,
+                    });
                 }
             )
             .on(

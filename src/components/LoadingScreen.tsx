@@ -39,7 +39,7 @@ export const LoadingScreen = React.memo<LoadingScreenProps>(({
         messageIndex++;
         setCurrentMessage(emergencyMessages[messageIndex]);
       }
-    }, 400); // Faster message cycling
+    }, 300); // Even faster message cycling
 
     const fallbackTimer = setTimeout(() => {
       if (mounted) setShowFallback(true);
@@ -53,15 +53,15 @@ export const LoadingScreen = React.memo<LoadingScreenProps>(({
       if (mounted) setLoadingFailed(true);
     }, timeout * 3);
 
-    // Slower, more deliberate progress for emergency systems
+    // Faster progress for emergency systems
     const progressInterval = setInterval(() => {
       if (mounted) {
         setLoadingProgress(prev => {
-          const increment = Math.random() * 15; // Faster progress
-          return Math.min(prev + increment, 98);
+          const increment = Math.random() * 20; // Faster progress
+          return Math.min(prev + increment, 99);
         });
       }
-    }, 200); // More frequent updates
+    }, 150); // More frequent updates
 
     return () => {
       mounted = false;

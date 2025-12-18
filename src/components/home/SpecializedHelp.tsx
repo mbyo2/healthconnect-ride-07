@@ -23,7 +23,7 @@ export const SpecializedHelp = () => {
                 {categories.map((category) => (
                     <Card
                         key={category.id}
-                        className="w-28 h-28 flex-shrink-0 cursor-pointer hover:shadow-md transition-all border-none shadow-sm"
+                        className="w-28 h-28 flex-shrink-0 cursor-pointer hover:shadow-lg transition-all duration-300 border-none shadow-sm hover:-translate-y-1 active:scale-95 group"
                         onClick={() => {
                             if (category.id === 'emergency') {
                                 navigate('/emergency');
@@ -32,11 +32,11 @@ export const SpecializedHelp = () => {
                             }
                         }}
                     >
-                        <CardContent className={`p-0 h-full flex flex-col items-center justify-center gap-3 rounded-xl ${category.color}`}>
-                            <div className="p-2 bg-white rounded-full shadow-sm">
+                        <CardContent className={`p-0 h-full flex flex-col items-center justify-center gap-3 rounded-xl transition-colors duration-300 ${category.color} group-hover:bg-opacity-80`}>
+                            <div className="p-2.5 bg-white rounded-2xl shadow-sm group-hover:shadow-md transition-all duration-300 group-hover:scale-110">
                                 {category.icon}
                             </div>
-                            <span className="text-[10px] font-bold text-gray-700 text-center px-2 leading-tight">
+                            <span className="text-[10px] font-extrabold text-gray-700 text-center px-2 leading-tight tracking-tight">
                                 {category.name}
                             </span>
                         </CardContent>

@@ -70,47 +70,56 @@ export const WalletCard = () => {
     };
 
     return (
-        <Card className="bg-gradient-to-br from-blue-600 to-indigo-700 text-white border-none shadow-xl overflow-hidden relative">
-            <div className="absolute top-0 right-0 p-4 opacity-10">
+        <Card className="group bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-700 text-white border-none shadow-2xl overflow-hidden relative transition-all duration-500 hover:shadow-blue-500/20 hover:-translate-y-1 active:scale-[0.98]">
+            {/* Animated background glow */}
+            <div className="absolute -top-24 -right-24 w-64 h-64 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-colors duration-700" />
+            <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-blue-400/20 rounded-full blur-2xl" />
+
+            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity duration-500 group-hover:scale-110 transform">
                 <Wallet className="h-24 w-24" />
             </div>
 
-            <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium flex items-center gap-2 opacity-90">
-                    <Wallet className="h-4 w-4" />
+            <CardHeader className="pb-2 relative z-10">
+                <CardTitle className="text-xs font-bold flex items-center gap-2 opacity-80 uppercase tracking-widest">
+                    <Wallet className="h-3.5 w-3.5" />
                     My Wallet Balance
                 </CardTitle>
             </CardHeader>
 
-            <CardContent>
-                <div className="flex flex-col gap-4">
+            <CardContent className="relative z-10">
+                <div className="flex flex-col gap-5">
                     <div>
-                        <div className="text-3xl font-bold">
+                        <div className="text-4xl font-black tracking-tight">
                             {isLoading ? (
-                                <span className="animate-pulse opacity-50">---</span>
+                                <div className="h-10 w-32 bg-white/20 animate-pulse rounded-lg relative overflow-hidden">
+                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
+                                </div>
                             ) : (
                                 `$${balance?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
                             )}
                         </div>
-                        <p className="text-xs text-blue-100 mt-1">Available for consultations & medicine</p>
+                        <p className="text-[10px] md:text-xs text-blue-100/80 mt-1.5 font-medium flex items-center gap-1">
+                            <ArrowUpRight className="h-3 w-3" />
+                            Available for consultations & medicine
+                        </p>
                     </div>
 
-                    <div className="flex gap-2 mt-2">
+                    <div className="flex gap-3 mt-1">
                         <Button
                             size="sm"
-                            className="bg-white text-blue-600 hover:bg-blue-50 flex-1 font-bold"
+                            className="bg-white text-blue-600 hover:bg-blue-50 flex-1 font-bold shadow-lg shadow-blue-900/20 transition-all active:scale-95"
                             onClick={handleTopUp}
                         >
-                            <Plus className="h-4 w-4 mr-1" />
+                            <Plus className="h-4 w-4 mr-1.5" />
                             Top Up
                         </Button>
                         <Button
                             size="sm"
                             variant="outline"
-                            className="bg-blue-500/20 border-blue-400/30 text-white hover:bg-blue-500/40 flex-1"
+                            className="bg-white/10 backdrop-blur-md border-white/20 text-white hover:bg-white/20 flex-1 font-semibold transition-all active:scale-95"
                             onClick={() => toast.info("Transaction history coming soon!")}
                         >
-                            <History className="h-4 w-4 mr-1" />
+                            <History className="h-4 w-4 mr-1.5" />
                             History
                         </Button>
                     </div>
