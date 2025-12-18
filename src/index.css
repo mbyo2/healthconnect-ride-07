@@ -1,15 +1,20 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* Global scrolling improvements */
-html, body {
+html,
+body {
   height: 100%;
   overflow-x: hidden;
   scroll-behavior: smooth;
   -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  /* Fluid typography: scales from 14px to 18px based on viewport width */
+  font-size: clamp(14px, 0.8vw + 12px, 18px);
 }
 
 #root {
@@ -77,7 +82,7 @@ html, body {
     --input: 220 13% 91%;
     --ring: 262.1 83.3% 57.8%;
     --radius: 0.75rem;
-    
+
     /* Trust-building blue color system */
     --trust-50: 239, 246, 255;
     --trust-100: 219, 234, 254;
@@ -118,6 +123,7 @@ html, body {
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
@@ -126,119 +132,121 @@ html, body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
-  
+
   html {
     scroll-behavior: smooth;
   }
 }
 
 @layer components {
+
   /* Modern header styles */
   .modern-header {
     @apply sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-trust-100;
     box-shadow: 0 1px 3px rgba(59, 130, 246, 0.05);
   }
-  
+
   .container-modern {
     @apply container mx-auto px-4;
   }
-  
+
   /* Enhanced search bar */
   .search-bar {
     @apply relative flex items-center;
   }
-  
+
   .search-input {
     @apply pr-10 border-trust-200 focus:border-trust-400 focus:ring-trust-200;
   }
-  
+
   .search-button {
     @apply absolute right-2 p-2 text-muted-foreground hover:text-trust-600 transition-colors;
   }
-  
+
   /* Logo link hover effect */
   .logo-link {
     @apply cursor-pointer transition-all duration-200 hover:scale-105;
   }
-  
+
   /* Trust shadow utilities */
   .shadow-trust {
     box-shadow: 0 1px 3px rgba(59, 130, 246, 0.08), 0 1px 2px rgba(59, 130, 246, 0.04);
   }
-  
+
   .shadow-trust-lg {
     box-shadow: 0 4px 6px rgba(59, 130, 246, 0.1), 0 2px 4px rgba(59, 130, 246, 0.06);
   }
-  
+
   /* Enhanced focus states */
   .focus-trust {
     @apply focus:outline-none focus:ring-2 focus:ring-trust-500 focus:ring-offset-2;
   }
-  
+
   /* Smooth transitions for interactive elements */
   .interactive {
     @apply transition-all duration-200 ease-out;
   }
-  
+
   .interactive:hover {
     @apply transform-gpu scale-[1.02];
   }
-  
+
   .interactive:active {
     @apply scale-[0.98];
   }
 }
 
 @layer utilities {
+
   /* Animation utilities */
   .animate-slide-up {
     animation: slideUp 0.3s ease-out;
   }
-  
+
   .animate-slide-down {
     animation: slideDown 0.3s ease-out;
   }
-  
+
   .animate-fade-in-up {
     animation: fadeInUp 0.5s ease-out;
   }
-  
+
   .animate-scale-in {
     animation: scaleIn 0.2s ease-out;
   }
-  
+
   /* Custom gradient backgrounds */
   .bg-gradient-trust {
     background: linear-gradient(135deg, rgb(var(--trust-500)) 0%, rgb(var(--trust-600)) 100%);
   }
-  
+
   .bg-gradient-trust-light {
     background: linear-gradient(135deg, rgb(var(--trust-50)) 0%, rgb(var(--trust-100)) 100%);
   }
-  
+
   /* Success states */
   .success-glow {
     box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
   }
-  
+
   /* Enhanced accessibility styles */
   .high-contrast {
     filter: contrast(1.5);
   }
-  
+
   .reduced-motion {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-  
+
   /* Glass morphism effect */
   .glass {
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.2);
   }
-  
+
   .glass-dark {
     background: rgba(0, 0, 0, 0.1);
     backdrop-filter: blur(10px);
@@ -252,6 +260,7 @@ html, body {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -263,6 +272,7 @@ html, body {
     opacity: 0;
     transform: translateY(-20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -274,6 +284,7 @@ html, body {
     opacity: 0;
     transform: translateY(30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -285,6 +296,7 @@ html, body {
     opacity: 0;
     transform: scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
@@ -296,23 +308,43 @@ html, body {
   .container-modern {
     @apply px-3;
   }
-  
+
   /* Enhance touch targets */
-  button, [role="button"], input, select, textarea {
+  button,
+  [role="button"],
+  input,
+  select,
+  textarea {
     @apply min-h-[44px];
   }
-  
+
   /* Responsive text sizing */
-  h1 { @apply text-xl sm:text-2xl md:text-3xl; }
-  h2 { @apply text-lg sm:text-xl md:text-2xl; }
-  h3 { @apply text-base sm:text-lg md:text-xl; }
-  
+  h1 {
+    @apply text-xl sm:text-2xl md:text-3xl;
+    font-size: clamp(1.25rem, 4vw + 1rem, 2.25rem);
+  }
+
+  h2 {
+    @apply text-lg sm:text-xl md:text-2xl;
+    font-size: clamp(1.125rem, 3vw + 0.875rem, 1.875rem);
+  }
+
+  h3 {
+    @apply text-base sm:text-lg md:text-xl;
+    font-size: clamp(1rem, 2vw + 0.75rem, 1.5rem);
+  }
+
   /* Card spacing optimization */
-  .card { @apply p-3 sm:p-4 md:p-6; }
-  
+  .card {
+    @apply p-3 sm:p-4 md:p-6;
+  }
+
   /* Button text sizing */
-  .btn { @apply text-sm sm:text-base; }
-  
+  .btn {
+    @apply text-sm sm:text-base;
+    font-size: clamp(0.875rem, 1vw + 0.75rem, 1rem);
+  }
+
   /* Smooth scrolling on mobile */
   * {
     -webkit-overflow-scrolling: touch;
@@ -324,15 +356,25 @@ html, body {
   .container-modern {
     @apply px-8;
   }
-  
+
   /* Enhanced spacing for wide screens */
-  .card { @apply p-8 lg:p-10; }
-  
+  .card {
+    @apply p-8 lg:p-10;
+  }
+
   /* Better text scaling */
-  h1 { @apply text-4xl lg:text-5xl; }
-  h2 { @apply text-3xl lg:text-4xl; }
-  h3 { @apply text-2xl lg:text-3xl; }
-  
+  h1 {
+    @apply text-4xl lg:text-5xl;
+  }
+
+  h2 {
+    @apply text-3xl lg:text-4xl;
+  }
+
+  h3 {
+    @apply text-2xl lg:text-3xl;
+  }
+
   /* Enhanced interactive elements */
   .interactive:hover {
     @apply transform-gpu scale-[1.01];
@@ -343,14 +385,24 @@ html, body {
   .container-modern {
     @apply px-12;
   }
-  
+
   /* Ultra-wide screen optimizations */
-  .card { @apply p-10 lg:p-12; }
-  
+  .card {
+    @apply p-10 lg:p-12;
+  }
+
   /* Optimal text sizing for large displays */
-  h1 { @apply text-5xl lg:text-6xl; }
-  h2 { @apply text-4xl lg:text-5xl; }
-  h3 { @apply text-3xl lg:text-4xl; }
+  h1 {
+    @apply text-5xl lg:text-6xl;
+  }
+
+  h2 {
+    @apply text-4xl lg:text-5xl;
+  }
+
+  h3 {
+    @apply text-3xl lg:text-4xl;
+  }
 }
 
 /* Dark mode enhancements */
@@ -376,7 +428,7 @@ html, body {
   .trust-600 {
     @apply text-black;
   }
-  
+
   .dark .trust-600 {
     @apply text-white;
   }

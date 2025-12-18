@@ -238,7 +238,7 @@ export const ROLE_PERMISSIONS = {
 
 // Default landing pages for each role
 export const ROLE_LANDING_PAGES = {
-  [USER_ROLES.PATIENT]: '/symptoms',
+  [USER_ROLES.PATIENT]: '/home',
   [USER_ROLES.HEALTH_PERSONNEL]: '/provider-dashboard',
   [USER_ROLES.ADMIN]: '/admin-dashboard',
   [USER_ROLES.LAB]: '/lab-management',
@@ -290,7 +290,7 @@ export const getRoleLandingPage = (userRoles: UserRole[] | null): string => {
   if (userRoles.includes(USER_ROLES.INSTITUTION_ADMIN)) return '/institution-portal';
   if (userRoles.includes(USER_ROLES.HEALTH_PERSONNEL)) return '/provider-dashboard';
   if (userRoles.includes(USER_ROLES.PHARMACY)) return '/pharmacy-portal';
-  if (userRoles.includes(USER_ROLES.PATIENT)) return '/symptoms';
+  if (userRoles.includes(USER_ROLES.PATIENT)) return '/home';
 
   return '/';
 };

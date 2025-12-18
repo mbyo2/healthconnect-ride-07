@@ -108,7 +108,7 @@ export const ClinicalDecisionCard = ({ decision, onActionClick, compact = false 
           <Icon className={`h-4 w-4 ${config.color} mt-0.5`} />
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium">{decision.title}</p>
-            <p className="text-xs text-muted-foreground truncate">{decision.description}</p>
+            <p className="text-xs text-muted-foreground line-clamp-2">{decision.description}</p>
           </div>
           {decision.actions.length > 0 && (
             <Button
@@ -133,12 +133,12 @@ export const ClinicalDecisionCard = ({ decision, onActionClick, compact = false 
             <Icon className={`h-5 w-5 ${config.color}`} />
             <span>{decision.title}</span>
           </div>
-          <div className="flex items-center gap-2">
-            <Badge variant={config.badge} className="capitalize">
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge variant={config.badge} className="capitalize shrink-0">
               {decision.type}
             </Badge>
             {decision.timeframe && (
-              <Badge variant="outline" className="text-xs">
+              <Badge variant="outline" className="text-xs shrink-0">
                 {decision.timeframe}
               </Badge>
             )}
@@ -146,7 +146,7 @@ export const ClinicalDecisionCard = ({ decision, onActionClick, compact = false 
         </CardTitle>
       </CardHeader>
       <CardContent className="p-4 space-y-4">
-        <p className="text-sm text-muted-foreground">{decision.description}</p>
+        <p className="text-sm text-muted-foreground whitespace-pre-wrap break-words">{decision.description}</p>
 
         {decision.confidence > 0 && (
           <div className="flex items-center gap-2">
@@ -185,7 +185,7 @@ export const ClinicalDecisionCard = ({ decision, onActionClick, compact = false 
                     </div>
                     <Badge
                       variant={action.priority === 'high' ? 'destructive' : 'secondary'}
-                      className="text-xs"
+                      className="text-xs shrink-0"
                     >
                       {action.priority}
                     </Badge>

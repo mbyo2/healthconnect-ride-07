@@ -38,7 +38,7 @@ export function DesktopUserMenu({ user, profile, onLogout }: DesktopUserMenuProp
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-64 bg-white border-trust-200 shadow-xl z-50">
+      <DropdownMenuContent align="end" className="w-64 bg-white border-trust-200 shadow-xl z-50 max-h-[80vh] overflow-y-auto">
         <DropdownMenuLabel className="pb-2">
           <div className="text-sm font-semibold text-trust-700">{user.email}</div>
           <div className="text-xs text-muted-foreground">My Account</div>
@@ -69,12 +69,6 @@ export function DesktopUserMenu({ user, profile, onLogout }: DesktopUserMenuProp
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem asChild className="hover:bg-trust-50">
-          <Link to="/profile" className="flex items-center font-medium">
-            <User className="h-4 w-4 mr-2" />
-            My Account
-          </Link>
-        </DropdownMenuItem>
 
         {profile?.role === "health_personnel" && (
           <DropdownMenuItem asChild className="hover:bg-trust-50">

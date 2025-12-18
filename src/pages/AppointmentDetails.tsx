@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
-import { Calendar, Clock, User, MapPin, Phone, Mail, Video, FileText, X, Edit } from 'lucide-react';
+import { Calendar, Clock, User, MapPin, Phone, Mail, Video, FileText, X, Edit, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -48,10 +48,44 @@ const AppointmentDetails = () => {
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [cancelReason, setCancelReason] = useState('');
   const [showRescheduleDialog, setShowRescheduleDialog] = useState(false);
+  const [availableSlots, setAvailableSlots] = useState<any[]>([]);
+  const [selectedSlotId, setSelectedSlotId] = useState<string>('');
+  const [fetchingSlots, setFetchingSlots] = useState(false);
+  const [rescheduling, setRescheduling] = useState(false);
 
   useEffect(() => {
     fetchAppointment();
   }, [id]);
+
+  useEffect(() => {
+    if (showRescheduleDialog && appointment?.provider_id) {
+      fetchAvailableSlots();
+    }
+  }, [showRescheduleDialog, appointment?.provider_id]);
+
+  const fetchAvailableSlots = async () => {
+    if (!appointment?.provider_id) return;
+    setFetchingSlots(true);
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const { data, error } = await supabase
+        .from('provider_time_slots')
+        .select('*')
+        .eq('provider_id', appointment.provider_id)
+        .eq('status', 'available')
+        .gte('date', today)
+        .order('date', { ascending: true })
+        .order('start_time', { ascending: true });
+
+      if (error) throw error;
+      setAvailableSlots(data || []);
+    } catch (error) {
+      console.error('Error fetching slots:', error);
+      toast.error('Failed to load available time slots');
+    } finally {
+      setFetchingSlots(false);
+    }
+  };
 
   const fetchAppointment = async () => {
     if (!id) return;
@@ -96,6 +130,52 @@ const AppointmentDetails = () => {
     } catch (error) {
       console.error('Error updating notes:', error);
       toast.error('Failed to update notes');
+    }
+  };
+
+  const rescheduleAppointment = async () => {
+    if (!id || !selectedSlotId) {
+      toast.error('Please select a new time slot');
+      return;
+    }
+
+    setRescheduling(true);
+    try {
+      // 1. Update the appointment
+      const { error: updateError } = await supabase
+        .from('appointments')
+        .update({
+          time_slot_id: selectedSlotId,
+          status: 'scheduled' // Reset status if it was something else
+        })
+        .eq('id', id);
+
+      if (updateError) throw updateError;
+
+      // 2. Mark the new slot as booked
+      const { error: slotError } = await supabase
+        .from('provider_time_slots')
+        .update({ status: 'booked' })
+        .eq('id', selectedSlotId);
+
+      if (slotError) throw slotError;
+
+      // 3. Mark the old slot as available (if it exists)
+      if (appointment.time_slot_id) {
+        await supabase
+          .from('provider_time_slots')
+          .update({ status: 'available' })
+          .eq('id', appointment.time_slot_id);
+      }
+
+      toast.success('Appointment rescheduled successfully');
+      setShowRescheduleDialog(false);
+      fetchAppointment();
+    } catch (error) {
+      console.error('Error rescheduling:', error);
+      toast.error('Failed to reschedule appointment');
+    } finally {
+      setRescheduling(false);
     }
   };
 
@@ -352,21 +432,52 @@ const AppointmentDetails = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Reschedule Dialog Placeholder */}
+      {/* Reschedule Dialog */}
       <Dialog open={showRescheduleDialog} onOpenChange={setShowRescheduleDialog}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Reschedule Appointment</DialogTitle>
             <DialogDescription>
-              Select a new date and time for this appointment.
+              Select a new date and time for your appointment with Dr. {appointment.provider.last_name}.
             </DialogDescription>
           </DialogHeader>
-          <div className="py-4 text-center text-muted-foreground">
-            Rescheduling feature coming soon
+          <div className="py-4 space-y-4">
+            {fetchingSlots ? (
+              <div className="flex justify-center py-8">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            ) : availableSlots.length > 0 ? (
+              <div className="space-y-2">
+                <Label>Available Slots</Label>
+                <Select value={selectedSlotId} onValueChange={setSelectedSlotId}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a new time slot" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableSlots.map((slot) => (
+                      <SelectItem key={slot.id} value={slot.id}>
+                        {format(new Date(slot.date), 'MMM d')} at {slot.start_time}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                No available slots found for this provider.
+              </div>
+            )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowRescheduleDialog(false)}>
-              Close
+              Cancel
+            </Button>
+            <Button
+              onClick={rescheduleAppointment}
+              disabled={!selectedSlotId || rescheduling}
+            >
+              {rescheduling && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Confirm Reschedule
             </Button>
           </DialogFooter>
         </DialogContent>

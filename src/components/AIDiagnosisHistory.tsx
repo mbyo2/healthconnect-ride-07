@@ -119,9 +119,7 @@ export const AIDiagnosisHistory = () => {
                   <div>
                     <p className="text-xs font-semibold text-muted-foreground mb-1">AI Analysis:</p>
                     <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                      {record.analysis.length > 200 
-                        ? `${record.analysis.substring(0, 200)}...` 
-                        : record.analysis}
+                      {record.analysis}
                     </p>
                   </div>
                 </CardContent>

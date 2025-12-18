@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { toast } from 'sonner';
+import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -15,6 +17,8 @@ import {
 const PharmacyManagement = () => {
     const { user } = useAuth();
     const [searchTerm, setSearchTerm] = useState('');
+    const [cart, setCart] = useState<any[]>([]);
+    const [isProcessing, setIsProcessing] = useState(false);
 
     // Get pharmacy info
     const { data: pharmacy } = useQuery({
@@ -70,6 +74,75 @@ const PharmacyManagement = () => {
     }) || [];
 
     const todayRevenue = todaySales?.reduce((sum, sale) => sum + (Number(sale.total_amount) || 0), 0) || 0;
+
+    const addToCart = (item: any) => {
+        setCart(prev => {
+            const existing = prev.find(i => i.id === item.id);
+            if (existing) {
+                return prev.map(i => i.id === item.id ? { ...i, cartQuantity: i.cartQuantity + 1 } : i);
+            }
+            return [...prev, { ...item, cartQuantity: 1 }];
+        });
+        toast.success(`Added ${item.product_name} to cart`);
+    };
+
+    const removeFromCart = (id: string) => {
+        setCart(prev => prev.filter(item => item.id !== id));
+    };
+
+    const updateCartQuantity = (id: string, quantity: number) => {
+        if (quantity <= 0) {
+            removeFromCart(id);
+            return;
+        }
+        setCart(prev => prev.map(item => item.id === id ? { ...item, cartQuantity: quantity } : item));
+    };
+
+    const cartSubtotal = cart.reduce((sum, item) => sum + (item.unit_price * item.cartQuantity), 0);
+    const cartTax = cartSubtotal * 0.16;
+    const cartTotal = cartSubtotal + cartTax;
+
+    const completeSale = async () => {
+        if (cart.length === 0 || !pharmacy) return;
+        setIsProcessing(true);
+        try {
+            const transactionId = `TXN-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+
+            // 1. Create sale record
+            const { error: saleError } = await supabase
+                .from('pharmacy_sales')
+                .insert({
+                    pharmacy_id: pharmacy.id,
+                    transaction_id: transactionId,
+                    items: cart,
+                    subtotal: cartSubtotal,
+                    tax: cartTax,
+                    total_amount: cartTotal,
+                    payment_method: 'cash', // Default for now
+                    payment_status: 'completed'
+                });
+
+            if (saleError) throw saleError;
+
+            // 2. Update inventory
+            for (const item of cart) {
+                const { error: invError } = await supabase
+                    .from('pharmacy_inventory')
+                    .update({ quantity: item.quantity - item.cartQuantity })
+                    .eq('id', item.id);
+
+                if (invError) throw invError;
+            }
+
+            toast.success('Sale completed successfully');
+            setCart([]);
+        } catch (error) {
+            console.error('Error completing sale:', error);
+            toast.error('Failed to complete sale');
+        } finally {
+            setIsProcessing(false);
+        }
+    };
 
     if (!pharmacy) {
         return (
@@ -299,11 +372,7 @@ const PharmacyManagement = () => {
                                             <div
                                                 key={item.id}
                                                 className="p-4 border rounded-lg cursor-pointer hover:bg-accent transition-colors flex justify-between items-center"
-                                                onClick={() => {
-                                                    // Add to cart logic would go here
-                                                    // For now we'll just show a toast
-                                                    // toast.success(`Added ${item.product_name} to cart`);
-                                                }}
+                                                onClick={() => addToCart(item)}
                                             >
                                                 <div>
                                                     <h4 className="font-semibold">{item.product_name}</h4>
@@ -327,26 +396,57 @@ const PharmacyManagement = () => {
                             </CardHeader>
                             <CardContent className="flex flex-col h-[500px]">
                                 <div className="flex-1 space-y-4 overflow-y-auto mb-4">
-                                    {/* Mock Cart Items */}
-                                    <div className="text-center text-muted-foreground py-8">
-                                        Cart is empty
-                                    </div>
+                                    {cart.length > 0 ? (
+                                        cart.map((item) => (
+                                            <div key={item.id} className="flex justify-between items-center p-2 border-b">
+                                                <div className="flex-1">
+                                                    <p className="text-sm font-medium">{item.product_name}</p>
+                                                    <p className="text-xs text-muted-foreground">K{item.unit_price} x {item.cartQuantity}</p>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <Button
+                                                        size="icon"
+                                                        variant="ghost"
+                                                        className="h-6 w-6"
+                                                        onClick={() => updateCartQuantity(item.id, item.cartQuantity - 1)}
+                                                    >-</Button>
+                                                    <span className="text-sm">{item.cartQuantity}</span>
+                                                    <Button
+                                                        size="icon"
+                                                        variant="ghost"
+                                                        className="h-6 w-6"
+                                                        onClick={() => updateCartQuantity(item.id, item.cartQuantity + 1)}
+                                                    >+</Button>
+                                                </div>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className="text-center text-muted-foreground py-8">
+                                            Cart is empty
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="space-y-4 border-t pt-4">
                                     <div className="flex justify-between text-sm">
                                         <span>Subtotal</span>
-                                        <span>K0.00</span>
+                                        <span>K{cartSubtotal.toFixed(2)}</span>
                                     </div>
                                     <div className="flex justify-between text-sm">
                                         <span>Tax (16%)</span>
-                                        <span>K0.00</span>
+                                        <span>K{cartTax.toFixed(2)}</span>
                                     </div>
                                     <div className="flex justify-between font-bold text-lg">
                                         <span>Total</span>
-                                        <span>K0.00</span>
+                                        <span>K{cartTotal.toFixed(2)}</span>
                                     </div>
-                                    <Button className="w-full" size="lg" disabled>
+                                    <Button
+                                        className="w-full"
+                                        size="lg"
+                                        disabled={cart.length === 0 || isProcessing}
+                                        onClick={completeSale}
+                                    >
+                                        {isProcessing && <Package className="mr-2 h-4 w-4 animate-spin" />}
                                         Complete Sale
                                     </Button>
                                 </div>
@@ -396,11 +496,18 @@ const PharmacyManagement = () => {
                             <CardTitle>Reports & Analytics</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-center py-12">
-                                <TrendingUp className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-                                <p className="text-muted-foreground">
-                                    Detailed reports and analytics coming soon
-                                </p>
+                            <div className="h-[300px] w-full mt-4">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <BarChart data={todaySales?.map(s => ({
+                                        name: new Date(s.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                                        amount: Number(s.total_amount)
+                                    })) || []}>
+                                        <XAxis dataKey="name" fontSize={12} tickLine={false} axisLine={false} />
+                                        <YAxis fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `K${value}`} />
+                                        <Tooltip />
+                                        <Bar dataKey="amount" fill="currentColor" radius={[4, 4, 0, 0]} className="fill-primary" />
+                                    </BarChart>
+                                </ResponsiveContainer>
                             </div>
                         </CardContent>
                     </Card>

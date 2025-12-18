@@ -16,7 +16,8 @@ import {
     CheckCircle2,
     AlertCircle,
     FileText,
-    Microscope
+    Microscope,
+    Loader2
 } from 'lucide-react';
 import { LabRequest, LabTest, LabTestStatus } from '@/types/lab';
 import { toast } from 'sonner';
@@ -24,28 +25,55 @@ import { toast } from 'sonner';
 const LabManagement = () => {
     const { user } = useAuth();
     const [searchTerm, setSearchTerm] = useState('');
+    const [selectedRequest, setSelectedRequest] = useState<LabRequest | null>(null);
+    const [resultSummary, setResultSummary] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const queryClient = useQueryClient();
 
     // Fetch Lab Requests
     const { data: requests, isLoading } = useQuery({
         queryKey: ['lab-requests'],
         queryFn: async () => {
-            // In a real scenario, we'd fetch from 'lab_requests' table
-            // For now, we'll try to fetch from a hypothetical table or return mock data if it fails
             try {
-                const { data, error } = await (supabase as any)
-                    .from('lab_requests')
-                    .select('*, patient:profiles!patient_id(first_name, last_name), test:lab_tests(name, code, category)')
+                const { data, error } = await supabase
+                    .from('lab_tests')
+                    .select('*, patient:profiles!patient_id(first_name, last_name), provider:profiles!ordered_by(first_name, last_name)')
                     .order('created_at', { ascending: false });
 
                 if (error) throw error;
-                return data as LabRequest[];
+                return data as any[];
             } catch (e) {
                 console.log('Using mock lab data as table might not exist yet');
-                return MOCK_REQUESTS as unknown as LabRequest[];
+                return MOCK_REQUESTS as any[];
             }
         }
     });
+
+    const submitResult = async () => {
+        if (!selectedRequest || !resultSummary) return;
+        setIsSubmitting(true);
+        try {
+            const { error } = await supabase
+                .from('lab_tests')
+                .update({
+                    result_summary: resultSummary,
+                    status: 'completed',
+                    results_date: new Date().toISOString()
+                })
+                .eq('id', selectedRequest.id);
+
+            if (error) throw error;
+            toast.success('Results submitted successfully');
+            setSelectedRequest(null);
+            setResultSummary('');
+            queryClient.invalidateQueries({ queryKey: ['lab-requests'] });
+        } catch (error) {
+            console.error('Error submitting results:', error);
+            toast.error('Failed to submit results');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
 
     // Stats
     const pendingRequests = requests?.filter(r => r.status === 'pending') || [];
@@ -185,7 +213,11 @@ const LabManagement = () => {
                                                 </Button>
                                             )}
                                             {request.status === 'in_progress' && (
-                                                <Button size="sm" variant="secondary">
+                                                <Button
+                                                    size="sm"
+                                                    variant="secondary"
+                                                    onClick={() => setSelectedRequest(request)}
+                                                >
                                                     Enter Result
                                                 </Button>
                                             )}
@@ -211,13 +243,44 @@ const LabManagement = () => {
                             <CardDescription>Enter and verify test results</CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-center py-12">
-                                <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                                <h3 className="text-lg font-medium">Select a request to enter results</h3>
-                                <p className="text-muted-foreground mt-2">
-                                    Go to the Requests tab and click "Enter Result" on an in-progress test.
-                                </p>
-                            </div>
+                            {selectedRequest ? (
+                                <div className="space-y-4">
+                                    <div className="p-4 bg-accent/50 rounded-lg">
+                                        <h4 className="font-semibold">{selectedRequest.test_type || (selectedRequest as any).test?.name}</h4>
+                                        <p className="text-sm">Patient: {selectedRequest.patient?.first_name} {selectedRequest.patient?.last_name}</p>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium">Result Summary</label>
+                                        <textarea
+                                            className="w-full min-h-[150px] p-3 rounded-md border bg-background"
+                                            placeholder="Enter detailed test results and findings..."
+                                            value={resultSummary}
+                                            onChange={(e) => setResultSummary(e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="flex gap-3">
+                                        <Button
+                                            variant="outline"
+                                            onClick={() => setSelectedRequest(null)}
+                                        >Cancel</Button>
+                                        <Button
+                                            onClick={submitResult}
+                                            disabled={!resultSummary || isSubmitting}
+                                        >
+                                            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                            Submit Results
+                                        </Button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="text-center py-12">
+                                    <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                                    <h3 className="text-lg font-medium">Select a request to enter results</h3>
+                                    <p className="text-muted-foreground mt-2">
+                                        Go to the Requests tab and click "Enter Result" on an in-progress test.
+                                    </p>
+                                </div>
+                            )}
                         </CardContent>
                     </Card>
                 </TabsContent>

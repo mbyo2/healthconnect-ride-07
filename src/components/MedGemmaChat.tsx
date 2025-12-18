@@ -191,7 +191,7 @@ export const MedGemmaChat = () => {
 
       <CardContent className="flex-1 flex flex-col p-0 min-h-0">
         {/* Messages Area - WhatsApp style */}
-        <ScrollArea className="flex-1 p-4 sm:p-6 bg-gradient-to-b from-muted/30 to-background" ref={scrollRef}>
+        <ScrollArea className="flex-1 p-3 sm:p-6 bg-gradient-to-b from-muted/30 to-background overflow-x-hidden" ref={scrollRef}>
           <div className="space-y-4 sm:space-y-5">
             {messages.map((message, index) => (
               <div
@@ -205,7 +205,7 @@ export const MedGemmaChat = () => {
                   </div>
                 )}
 
-                <div className="max-w-[85%] sm:max-w-[80%] space-y-2 min-w-0">
+                <div className="max-w-[80%] sm:max-w-[75%] space-y-2 min-w-0">
                   <div
                     className={`rounded-2xl p-3 sm:p-4 shadow-sm ${message.role === 'user'
                       ? 'bg-primary text-primary-foreground rounded-br-sm'
@@ -221,7 +221,7 @@ export const MedGemmaChat = () => {
                         />
                       </div>
                     )}
-                    <p className="text-sm sm:text-base whitespace-pre-wrap leading-relaxed break-words" style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>{message.content}</p>
+                    <p className="text-sm sm:text-base whitespace-pre-wrap leading-relaxed break-words overflow-hidden" style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>{message.content}</p>
                     <span className="text-xs opacity-60 mt-2 block">
                       {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </span>

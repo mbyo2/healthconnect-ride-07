@@ -1,4 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { toast } from 'sonner';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Loader2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -75,19 +81,57 @@ const HospitalManagement = () => {
         enabled: !!hospital,
     });
 
-    // Invoices (table will be created by migration)
-    const { data: invoices } = useQuery({
-        queryKey: ['hospital-invoices', hospital?.id],
+    // Billing (using hospital_billing table from migration)
+    const { data: invoices, refetch: refetchInvoices } = useQuery({
+        queryKey: ['hospital-billing', hospital?.id],
         queryFn: async () => {
-            const { data } = await (supabase as any)
-                .from('hospital_invoices')
+            const { data } = await supabase
+                .from('hospital_billing')
                 .select('*, patient:profiles!patient_id(first_name, last_name)')
                 .eq('hospital_id', hospital?.id)
-                .order('invoice_date', { ascending: false });
+                .order('created_at', { ascending: false });
             return data || [];
         },
         enabled: !!hospital,
     });
+
+    const [showInvoiceDialog, setShowInvoiceDialog] = useState(false);
+    const [selectedPatientId, setSelectedPatientId] = useState('');
+    const [invoiceAmount, setInvoiceAmount] = useState('');
+    const [invoiceDescription, setInvoiceDescription] = useState('');
+    const [isGenerating, setIsGenerating] = useState(false);
+
+    const generateInvoice = async () => {
+        if (!hospital || !selectedPatientId || !invoiceAmount) return;
+        setIsGenerating(true);
+        try {
+            const invoiceNumber = `INV-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
+            const { error } = await supabase
+                .from('hospital_billing')
+                .insert({
+                    hospital_id: hospital.id,
+                    patient_id: selectedPatientId,
+                    invoice_number: invoiceNumber,
+                    total_amount: Number(invoiceAmount),
+                    items: [{ description: invoiceDescription, amount: Number(invoiceAmount) }],
+                    payment_status: 'pending',
+                    due_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // 7 days from now
+                });
+
+            if (error) throw error;
+            toast.success('Invoice generated successfully');
+            setShowInvoiceDialog(false);
+            setSelectedPatientId('');
+            setInvoiceAmount('');
+            setInvoiceDescription('');
+            refetchInvoices();
+        } catch (error) {
+            console.error('Error generating invoice:', error);
+            toast.error('Failed to generate invoice');
+        } finally {
+            setIsGenerating(false);
+        }
+    };
 
     // Stats
     const totalBeds = beds?.length || 0;
@@ -347,7 +391,7 @@ const HospitalManagement = () => {
                         <CardHeader>
                             <div className="flex items-center justify-between">
                                 <CardTitle>Billing & Invoices</CardTitle>
-                                <Button>
+                                <Button onClick={() => setShowInvoiceDialog(true)}>
                                     <Plus className="h-4 w-4 mr-2" />
                                     Generate Invoice
                                 </Button>
@@ -369,7 +413,7 @@ const HospitalManagement = () => {
                                                     </Badge>
                                                 </div>
                                                 <p className="text-sm text-muted-foreground mt-1">
-                                                    Patient: {invoice.patient?.first_name} {invoice.patient?.last_name} • Date: {new Date(invoice.invoice_date).toLocaleDateString()}
+                                                    Patient: {invoice.patient?.first_name} {invoice.patient?.last_name} • Date: {new Date(invoice.created_at).toLocaleDateString()}
                                                 </p>
                                             </div>
                                             <div className="text-right">
@@ -389,6 +433,56 @@ const HospitalManagement = () => {
                     </Card>
                 </TabsContent>
             </Tabs>
+            {/* Generate Invoice Dialog */}
+            <Dialog open={showInvoiceDialog} onOpenChange={setShowInvoiceDialog}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Generate New Invoice</DialogTitle>
+                        <DialogDescription>Create a billing record for a patient.</DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                        <div className="space-y-2">
+                            <Label>Patient</Label>
+                            <Select value={selectedPatientId} onValueChange={setSelectedPatientId}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select patient" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {admissions?.map(a => (
+                                        <SelectItem key={a.patient_id} value={a.patient_id}>
+                                            {a.patient?.first_name} {a.patient?.last_name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Amount (K)</Label>
+                            <Input
+                                type="number"
+                                placeholder="0.00"
+                                value={invoiceAmount}
+                                onChange={(e) => setInvoiceAmount(e.target.value)}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Description</Label>
+                            <Input
+                                placeholder="Consultation, Lab tests, etc."
+                                value={invoiceDescription}
+                                onChange={(e) => setInvoiceDescription(e.target.value)}
+                            />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setShowInvoiceDialog(false)}>Cancel</Button>
+                        <Button onClick={generateInvoice} disabled={!selectedPatientId || !invoiceAmount || isGenerating}>
+                            {isGenerating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            Generate
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 };
