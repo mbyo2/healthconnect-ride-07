@@ -16,7 +16,37 @@ interface Message {
   decisions?: ClinicalDecision[];
 }
 
-export const MedGemmaChat = () => {
+const LinkifiedText = ({ text }: { text: string }) => {
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  const parts = text.split(urlRegex);
+
+  return (
+    <>
+      {parts.map((part, i) => {
+        if (part.match(urlRegex)) {
+          return (
+            <a
+              key={i}
+              href={part}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-500 underline break-all hover:text-blue-600 transition-colors"
+            >
+              {part}
+            </a>
+          );
+        }
+        return part;
+      })}
+    </>
+  );
+};
+
+interface MedGemmaChatProps {
+  onActionClick?: (action: ClinicalAction) => void;
+}
+
+export const MedGemmaChat = ({ onActionClick }: MedGemmaChatProps) => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
@@ -221,7 +251,9 @@ export const MedGemmaChat = () => {
                         />
                       </div>
                     )}
-                    <p className="text-sm sm:text-base whitespace-pre-wrap leading-relaxed break-words overflow-hidden" style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>{message.content}</p>
+                    <p className="text-sm sm:text-base whitespace-pre-wrap leading-relaxed break-words overflow-hidden" style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                      <LinkifiedText text={message.content} />
+                    </p>
                     <span className="text-xs opacity-60 mt-2 block">
                       {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </span>
@@ -239,6 +271,7 @@ export const MedGemmaChat = () => {
                           key={idx}
                           decision={decision}
                           compact={message.decisions && message.decisions.length > 1}
+                          onActionClick={onActionClick}
                         />
                       ))}
                     </div>

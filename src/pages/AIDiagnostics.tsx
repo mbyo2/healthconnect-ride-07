@@ -6,7 +6,19 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Brain, MessageSquare, ClipboardList, Shield, History } from "lucide-react";
 
+import { useState } from "react";
+import { ClinicalAction } from "@/components/ai/ClinicalDecisionCard";
+
 const AIDiagnostics = () => {
+  const [activeTab, setActiveTab] = useState("chat");
+
+  const handleActionClick = (action: ClinicalAction) => {
+    if (action.route === 'tab:history') {
+      setActiveTab("history");
+    } else if (action.route === 'tab:symptoms') {
+      setActiveTab("symptoms");
+    }
+  };
   return (
     <>
       <Helmet>
@@ -34,7 +46,10 @@ const AIDiagnostics = () => {
 
           {/* Feature Cards */}
           <div className="flex overflow-x-auto pb-4 gap-3 sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:gap-4 sm:pb-0 snap-x">
-            <Card className="min-w-[240px] sm:min-w-0 snap-center">
+            <Card
+              className="min-w-[240px] sm:min-w-0 snap-center cursor-pointer hover:bg-accent/50 transition-colors"
+              onClick={() => setActiveTab("chat")}
+            >
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm sm:text-base flex items-center gap-2">
                   <MessageSquare className="h-4 w-4 text-primary" />
@@ -48,7 +63,10 @@ const AIDiagnostics = () => {
               </CardContent>
             </Card>
 
-            <Card className="min-w-[240px] sm:min-w-0 snap-center">
+            <Card
+              className="min-w-[240px] sm:min-w-0 snap-center cursor-pointer hover:bg-accent/50 transition-colors"
+              onClick={() => setActiveTab("symptoms")}
+            >
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm sm:text-base flex items-center gap-2">
                   <ClipboardList className="h-4 w-4 text-primary" />
@@ -62,7 +80,10 @@ const AIDiagnostics = () => {
               </CardContent>
             </Card>
 
-            <Card className="min-w-[240px] sm:min-w-0 snap-center">
+            <Card
+              className="min-w-[240px] sm:min-w-0 snap-center cursor-pointer hover:bg-accent/50 transition-colors"
+              onClick={() => setActiveTab("history")}
+            >
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm sm:text-base flex items-center gap-2">
                   <History className="h-4 w-4 text-primary" />
@@ -92,7 +113,7 @@ const AIDiagnostics = () => {
           </div>
 
           {/* Main Content */}
-          <Tabs defaultValue="chat" className="w-full">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-3">
               <TabsTrigger value="chat" className="text-xs sm:text-sm">AI Chat</TabsTrigger>
               <TabsTrigger value="symptoms" className="text-xs sm:text-sm">Symptom Checker</TabsTrigger>
@@ -100,7 +121,7 @@ const AIDiagnostics = () => {
             </TabsList>
 
             <TabsContent value="chat" className="mt-3 sm:mt-6">
-              <MedGemmaChat />
+              <MedGemmaChat onActionClick={handleActionClick} />
             </TabsContent>
 
             <TabsContent value="symptoms" className="mt-4 sm:mt-6">

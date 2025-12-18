@@ -92,11 +92,23 @@ export const ClinicalDecisionCard = ({ decision, onActionClick, compact = false 
   const Icon = config.icon;
 
   const handleActionClick = (action: ClinicalAction) => {
+    console.log('AI Action clicked:', action);
+
     if (onActionClick) {
       onActionClick(action);
     }
 
+    if (action.type === 'call') {
+      window.location.href = `tel:${action.details || '911'}`;
+      return;
+    }
+
     if (action.route) {
+      // If it's an external link (starts with http)
+      if (action.route.startsWith('http')) {
+        window.open(action.route, '_blank');
+        return;
+      }
       navigate(action.route);
     }
   };
@@ -117,7 +129,7 @@ export const ClinicalDecisionCard = ({ decision, onActionClick, compact = false 
               className="h-7 px-2"
               onClick={() => handleActionClick(decision.actions[0])}
             >
-              <ArrowRight className="h-3 w-3" />
+              <ArrowRight className="h-4 w-4" />
             </Button>
           )}
         </div>
@@ -306,12 +318,13 @@ export const parseClinicalDecisions = (aiResponse: string): ClinicalDecision[] =
   if (decisions.length === 0 && aiResponse.length > 50) {
     decisions.push({
       type: 'routine',
-      title: 'Follow-Up Recommended',
-      description: 'Consider these follow-up actions based on your inquiry.',
+      title: 'Next Steps',
+      description: 'Based on our conversation, here are some helpful next steps.',
       confidence: 0.6,
       actions: [
-        { id: 'save-history', label: 'View Diagnosis History', type: 'navigate', route: '/ai-diagnostics', priority: 'low' },
-        { id: 'chat-more', label: 'Continue Consultation', type: 'navigate', route: '/chat', priority: 'low' }
+        { id: 'view-history', label: 'View My History', type: 'navigate', route: 'tab:history', priority: 'medium' },
+        { id: 'book-app', label: 'Book Appointment', type: 'navigate', route: '/appointments', priority: 'medium' },
+        { id: 'go-home', label: 'Back to Home', type: 'navigate', route: '/home', priority: 'low' }
       ]
     });
   }
