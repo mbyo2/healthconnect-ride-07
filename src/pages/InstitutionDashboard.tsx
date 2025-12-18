@@ -12,31 +12,95 @@ export const InstitutionDashboard = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
-    const [institution, setInstitution] = useState<any>(null);
+    const [counts, setCounts] = useState({
+        personnel: 0,
+        appointments: 0,
+        patients: 0,
+        reports: 0
+    });
 
     useEffect(() => {
-        const fetchInstitution = async () => {
+        const fetchInstitutionAndCounts = async () => {
             if (!user) return;
 
             try {
-                const { data, error } = await supabase
+                // 1. Fetch Institution
+                const { data: inst, error: instError } = await supabase
                     .from('healthcare_institutions')
                     .select('*')
                     .eq('admin_id', user.id)
                     .single();
 
-                if (error) throw error;
-                setInstitution(data);
+                if (instError) throw instError;
+                setInstitution(inst);
+
+                // 2. Fetch Counts
+                // Personnel Count
+                const { count: personnelCount } = await supabase
+                    .from('institution_personnel')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('institution_id', inst.id);
+
+                // Get Personnel IDs for subsequent queries
+                const { data: personnelData } = await supabase
+                    .from('institution_personnel')
+                    .select('user_id')
+                    .eq('institution_id', inst.id);
+
+                const providerIds = personnelData?.map(p => p.user_id) || [];
+
+                // Appointment Count
+                let appointmentCount = 0;
+                if (providerIds.length > 0) {
+                    const { count: apptCount } = await supabase
+                        .from('appointments')
+                        .select('*', { count: 'exact', head: true })
+                        .in('provider_id', providerIds);
+                    appointmentCount = apptCount || 0;
+                }
+
+                // Patient Count (Unique patients from admissions and appointments)
+                const { data: admissions } = await supabase
+                    .from('hospital_admissions')
+                    .select('patient_id')
+                    .eq('hospital_id', inst.id);
+
+                let patientAppts: any[] = [];
+                if (providerIds.length > 0) {
+                    const { data: appts } = await supabase
+                        .from('appointments')
+                        .select('patient_id')
+                        .in('provider_id', providerIds);
+                    patientAppts = appts || [];
+                }
+
+                const uniquePatientIds = new Set([
+                    ...(admissions?.map(a => a.patient_id) || []),
+                    ...(patientAppts.map(a => a.patient_id) || [])
+                ]);
+
+                // Report Count (Audit logs)
+                const { count: reportCount } = await supabase
+                    .from('audit_logs')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('institution_id', inst.id);
+
+                setCounts({
+                    personnel: personnelCount || 0,
+                    appointments: appointmentCount,
+                    patients: uniquePatientIds.size,
+                    reports: reportCount || 0
+                });
+
             } catch (error) {
-                console.error("Error fetching institution:", error);
-                // If not found or error, maybe redirect to portal
+                console.error("Error fetching dashboard data:", error);
                 navigate("/institution-portal");
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchInstitution();
+        fetchInstitutionAndCounts();
     }, [user, navigate]);
 
     if (loading) return <LoadingScreen />;
@@ -66,7 +130,7 @@ export const InstitutionDashboard = () => {
                         <Users className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">--</div>
+                        <div className="text-2xl font-bold">{counts.personnel}</div>
                         <p className="text-xs text-muted-foreground">Manage staff and roles</p>
                     </CardContent>
                 </Card>
@@ -77,7 +141,7 @@ export const InstitutionDashboard = () => {
                         <Calendar className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">--</div>
+                        <div className="text-2xl font-bold">{counts.appointments}</div>
                         <p className="text-xs text-muted-foreground">View and schedule</p>
                     </CardContent>
                 </Card>
@@ -88,7 +152,7 @@ export const InstitutionDashboard = () => {
                         <Activity className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">--</div>
+                        <div className="text-2xl font-bold">{counts.patients}</div>
                         <p className="text-xs text-muted-foreground">Patient records</p>
                     </CardContent>
                 </Card>
@@ -99,7 +163,7 @@ export const InstitutionDashboard = () => {
                         <FileText className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">--</div>
+                        <div className="text-2xl font-bold">{counts.reports}</div>
                         <p className="text-xs text-muted-foreground">Analytics and logs</p>
                     </CardContent>
                 </Card>

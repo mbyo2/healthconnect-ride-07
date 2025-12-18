@@ -194,8 +194,8 @@ const AppContent = () => {
             <Route path="/appointments/:id" element={<RouteGuard><AppointmentDetails /></RouteGuard>} />
 
             {/* Payment Routes */}
-            <Route path="/payment-success" element={<PaymentSuccess />} />
-            <Route path="/payment-cancel" element={<PaymentCancel />} />
+            <Route path="/payment-success" element={<RouteGuard><PaymentSuccess /></RouteGuard>} />
+            <Route path="/payment-cancel" element={<RouteGuard><PaymentCancel /></RouteGuard>} />
 
             {/* Catch all route - 404 handler */}
             <Route path="*" element={<NotFound />} />

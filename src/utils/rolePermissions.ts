@@ -229,6 +229,7 @@ export const ROLE_PERMISSIONS = {
     '/home',
     '/onboarding',
     '/admin-dashboard',
+    '/super-admin-dashboard',
     '/chat',
     '/profile',
     '/settings',
@@ -370,15 +371,15 @@ export const getRoleLandingPage = (userRoles: UserRole[] | null): string => {
 // Get navigation items based on user's roles (supports multiple roles)
 export const getRoleNavigation = (userRoles: UserRole[] | null) => {
   const baseNavigation = [
-    { path: '/profile', label: 'Profile', icon: 'User', roles: ['patient', 'health_personnel', 'pharmacy', 'institution_admin', 'admin'] },
-    { path: '/settings', label: 'Settings', icon: 'Settings', roles: ['patient', 'health_personnel', 'pharmacy', 'institution_admin', 'admin'] }
+    { path: '/profile', label: 'Profile', icon: 'User', roles: ['patient', 'health_personnel', 'pharmacy', 'institution_admin', 'institution_staff', 'admin', 'lab', 'super_admin', 'support'] },
+    { path: '/settings', label: 'Settings', icon: 'Settings', roles: ['patient', 'health_personnel', 'pharmacy', 'institution_admin', 'institution_staff', 'admin', 'lab', 'super_admin', 'support'] }
   ];
 
   const allNavigationItems = [
     // Patient routes
     { path: '/symptoms', label: 'Symptoms', icon: 'Heart', roles: ['patient', 'super_admin'] },
-    { path: '/appointments', label: 'Appointments', icon: 'Calendar', roles: ['patient', 'health_personnel', 'super_admin'] },
-    { path: '/chat', label: 'Messages', icon: 'MessageCircle', roles: ['patient', 'health_personnel', 'admin', 'super_admin'] },
+    { path: '/appointments', label: 'Appointments', icon: 'Calendar', roles: ['patient', 'health_personnel', 'institution_admin', 'institution_staff', 'super_admin'] },
+    { path: '/chat', label: 'Messages', icon: 'MessageCircle', roles: ['patient', 'health_personnel', 'admin', 'institution_admin', 'institution_staff', 'super_admin'] },
     { path: '/prescriptions', label: 'Prescriptions', icon: 'Pill', roles: ['patient', 'health_personnel', 'pharmacy', 'super_admin'] },
     { path: '/healthcare-professionals', label: 'Find Providers', icon: 'Search', roles: ['patient', 'super_admin'] },
     { path: '/map', label: 'Map', icon: 'MapPin', roles: ['patient', 'health_personnel', 'admin', 'super_admin'] },
@@ -408,14 +409,18 @@ export const getRoleNavigation = (userRoles: UserRole[] | null) => {
 
     // Institution routes
     { path: '/institution-portal', label: 'Institution Portal', icon: 'Building', roles: ['institution_admin', 'institution_staff', 'super_admin'] },
+    { path: '/institution-dashboard', label: 'Institution Dashboard', icon: 'LayoutDashboard', roles: ['institution_admin', 'institution_staff', 'super_admin'] },
+    { path: '/institution/patients', label: 'Patients', icon: 'Users', roles: ['institution_admin', 'institution_staff', 'super_admin'] },
+    { path: '/institution/reports', label: 'Reports', icon: 'BarChart', roles: ['institution_admin', 'institution_staff', 'super_admin'] },
+    { path: '/institution/appointments', label: 'Appointments', icon: 'Calendar', roles: ['institution_admin', 'institution_staff', 'super_admin'] },
 
     // Admin routes
-    { path: '/admin-dashboard', label: 'Admin Dashboard', icon: 'LayoutDashboard', roles: ['admin', 'super_admin'] },
-    { path: '/super-admin-dashboard', label: 'Super Admin', icon: 'Shield', roles: ['admin', 'super_admin'] },
+    { path: '/admin-dashboard', label: 'Admin Dashboard', icon: 'LayoutDashboard', roles: ['admin', 'support', 'super_admin'] },
+    { path: '/super-admin-dashboard', label: 'Super Admin', icon: 'Shield', roles: ['admin', 'support', 'super_admin'] },
     { path: '/create-admin', label: 'Create Admin', icon: 'UserPlus', roles: ['admin', 'super_admin'] },
     { path: '/admin-wallet', label: 'Admin Wallet', icon: 'Wallet', roles: ['admin', 'super_admin'] },
     { path: '/compliance-audit', label: 'Compliance', icon: 'FileCheck', roles: ['admin', 'health_personnel', 'super_admin'] },
-    { path: '/hospital-management', label: 'Hospital Management', icon: 'Building', roles: ['admin', 'institution_admin', 'health_personnel', 'super_admin'] },
+    { path: '/hospital-management', label: 'Hospital Management', icon: 'Building', roles: ['admin', 'institution_admin', 'institution_staff', 'health_personnel', 'super_admin'] },
     { path: '/pharmacy-management', label: 'Pharmacy Management', icon: 'Pill', roles: ['admin', 'pharmacy', 'health_personnel', 'super_admin'] },
     { path: '/lab-management', label: 'Lab Management', icon: 'FlaskConical', roles: ['admin', 'lab', 'health_personnel', 'super_admin'] },
 
@@ -424,6 +429,11 @@ export const getRoleNavigation = (userRoles: UserRole[] | null) => {
 
   if (!userRoles || userRoles.length === 0) {
     return baseNavigation;
+  }
+
+  // Super admin gets everything
+  if (userRoles.includes(USER_ROLES.SUPER_ADMIN)) {
+    return allNavigationItems;
   }
 
   // Filter navigation items based on user's roles
