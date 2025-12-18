@@ -17,8 +17,11 @@ export type UserRole = typeof USER_ROLES[keyof typeof USER_ROLES];
 export const ROLE_PERMISSIONS = {
   [USER_ROLES.PATIENT]: [
     '/',
+    '/home',
+    '/onboarding',
     '/symptoms',
     '/appointments',
+    '/appointments/:id',
     '/chat',
     '/prescriptions',
     '/profile',
@@ -29,10 +32,12 @@ export const ROLE_PERMISSIONS = {
     '/healthcare-institutions',
     '/connections',
     '/ai-diagnostics',
+    '/advanced-dashboard',
+    '/blockchain-records',
     '/iot-monitoring',
     '/health-analytics',
+    '/emergency-response',
     '/telemedicine',
-    '/blockchain-records',
     '/ar-anatomy',
     '/mental-health',
     '/genomic-analysis',
@@ -54,9 +59,12 @@ export const ROLE_PERMISSIONS = {
   ],
   [USER_ROLES.HEALTH_PERSONNEL]: [
     '/',
+    '/home',
+    '/onboarding',
     '/provider-dashboard',
     '/provider-portal',
     '/appointments',
+    '/appointments/:id',
     '/chat',
     '/prescriptions',
     '/profile',
@@ -66,29 +74,37 @@ export const ROLE_PERMISSIONS = {
     '/connections',
     '/pharmacy-portal',
     '/pharmacy-inventory',
+    '/pharmacy-management',
+    '/hospital-management',
+    '/lab-management',
     '/ai-diagnostics',
+    '/advanced-dashboard',
+    '/blockchain-records',
     '/iot-monitoring',
     '/health-analytics',
+    '/emergency-response',
     '/telemedicine',
-    '/blockchain-records',
     '/compliance-audit',
     '/map',
     '/search',
     '/medical-records',
     '/healthcare-application',
-    '/lab-management',
     '/notifications',
     '/privacy-security',
     '/medications',
     '/provider-calendar',
     '/application-status',
+    '/video-consultations',
     '/payment-success',
     '/payment-cancel'
   ],
   [USER_ROLES.PHARMACY]: [
     '/',
+    '/home',
+    '/onboarding',
     '/pharmacy-portal',
     '/pharmacy-inventory',
+    '/pharmacy-management',
     '/prescriptions',
     '/profile',
     '/settings',
@@ -97,12 +113,15 @@ export const ROLE_PERMISSIONS = {
     '/map',
     '/search',
     '/notifications',
+    '/privacy-security',
     '/medications',
     '/payment-success',
     '/payment-cancel'
   ],
   [USER_ROLES.LAB]: [
     '/',
+    '/home',
+    '/onboarding',
     '/lab-management',
     '/profile',
     '/settings',
@@ -110,13 +129,18 @@ export const ROLE_PERMISSIONS = {
     '/map',
     '/search',
     '/notifications',
+    '/privacy-security',
+    '/medications',
     '/payment-success',
     '/payment-cancel'
   ],
   [USER_ROLES.INSTITUTION_ADMIN]: [
     '/',
+    '/home',
+    '/onboarding',
     '/institution-portal',
     '/appointments',
+    '/appointments/:id',
     '/chat',
     '/profile',
     '/settings',
@@ -134,13 +158,19 @@ export const ROLE_PERMISSIONS = {
     '/institution/reports',
     '/institution/appointments',
     '/institution/settings',
+    '/notifications',
+    '/privacy-security',
+    '/medications',
     '/payment-success',
     '/payment-cancel'
   ],
   [USER_ROLES.INSTITUTION_STAFF]: [
     '/',
+    '/home',
+    '/onboarding',
     '/institution-portal',
     '/appointments',
+    '/appointments/:id',
     '/chat',
     '/profile',
     '/settings',
@@ -151,14 +181,20 @@ export const ROLE_PERMISSIONS = {
     '/institution/patients',
     '/institution/reports',
     '/institution/appointments',
+    '/notifications',
+    '/privacy-security',
+    '/medications',
     '/payment-success',
     '/payment-cancel'
   ],
   [USER_ROLES.ADMIN]: [
     '/',
+    '/home',
+    '/onboarding',
     '/admin-dashboard',
     '/super-admin-dashboard',
     '/appointments',
+    '/appointments/:id',
     '/chat',
     '/profile',
     '/settings',
@@ -173,24 +209,43 @@ export const ROLE_PERMISSIONS = {
     '/hospital-management',
     '/pharmacy-management',
     '/lab-management',
+    '/ai-diagnostics',
+    '/advanced-dashboard',
+    '/blockchain-records',
+    '/iot-monitoring',
+    '/health-analytics',
+    '/emergency-response',
+    '/notifications',
+    '/privacy-security',
+    '/medications',
+    '/provider-calendar',
+    '/testing',
+    '/documentation',
     '/payment-success',
     '/payment-cancel'
   ],
   [USER_ROLES.SUPPORT]: [
     '/',
+    '/home',
+    '/onboarding',
     '/admin-dashboard',
     '/chat',
     '/profile',
     '/settings',
     '/search',
     '/healthcare-application',
+    '/notifications',
+    '/privacy-security',
     '/payment-success',
     '/payment-cancel'
   ],
   [USER_ROLES.SUPER_ADMIN]: [
     '/',
+    '/home',
+    '/onboarding',
     '/symptoms',
     '/appointments',
+    '/appointments/:id',
     '/chat',
     '/prescriptions',
     '/profile',
@@ -265,8 +320,25 @@ export const PUBLIC_ROUTES = [
 export const hasRoutePermission = (userRoles: UserRole[] | null, route: string): boolean => {
   if (!userRoles || userRoles.length === 0) return PUBLIC_ROUTES.includes(route);
 
+  // Super admin has access to everything
+  if (userRoles.includes(USER_ROLES.SUPER_ADMIN)) return true;
+
   // Check if any of the user's roles has permission for this route
-  return userRoles.some(role => ROLE_PERMISSIONS[role]?.includes(route) || false);
+  return userRoles.some(role => {
+    const permissions = ROLE_PERMISSIONS[role] || [];
+
+    // Exact match
+    if (permissions.includes(route)) return true;
+
+    // Dynamic route match (e.g., /appointments/:id)
+    return permissions.some(p => {
+      if (p.includes(':')) {
+        const pattern = p.split('/:')[0];
+        return route.startsWith(pattern + '/');
+      }
+      return false;
+    });
+  });
 };
 
 // Check if user has a specific role
@@ -304,45 +376,48 @@ export const getRoleNavigation = (userRoles: UserRole[] | null) => {
 
   const allNavigationItems = [
     // Patient routes
-    { path: '/symptoms', label: 'Symptoms', icon: 'Heart', roles: ['patient'] },
-    { path: '/appointments', label: 'Appointments', icon: 'Calendar', roles: ['patient', 'health_personnel'] },
-    { path: '/chat', label: 'Messages', icon: 'MessageCircle', roles: ['patient', 'health_personnel', 'admin'] },
-    { path: '/prescriptions', label: 'Prescriptions', icon: 'Pill', roles: ['patient', 'health_personnel', 'pharmacy'] },
-    { path: '/healthcare-professionals', label: 'Find Providers', icon: 'Search', roles: ['patient'] },
-    { path: '/map', label: 'Map', icon: 'MapPin', roles: ['patient', 'health_personnel', 'admin'] },
-    { path: '/wallet', label: 'Wallet', icon: 'Wallet', roles: ['patient', 'health_personnel'] },
-    { path: '/emergency', label: 'Emergency', icon: 'AlertTriangle', roles: ['patient', 'health_personnel'] },
-    { path: '/connections', label: 'My Providers', icon: 'Users', roles: ['patient'] },
-    { path: '/medical-records', label: 'Medical Records', icon: 'FileText', roles: ['patient', 'health_personnel'] },
-    { path: '/marketplace-users', label: 'Healthcare Marketplace', icon: 'ShoppingCart', roles: ['patient'] },
-    { path: '/video-consultations', label: 'Video Consultations', icon: 'Video', roles: ['patient', 'health_personnel'] },
-    { path: '/health-dashboard', label: 'Health Dashboard', icon: 'LayoutDashboard', roles: ['patient'] },
+    { path: '/symptoms', label: 'Symptoms', icon: 'Heart', roles: ['patient', 'super_admin'] },
+    { path: '/appointments', label: 'Appointments', icon: 'Calendar', roles: ['patient', 'health_personnel', 'super_admin'] },
+    { path: '/chat', label: 'Messages', icon: 'MessageCircle', roles: ['patient', 'health_personnel', 'admin', 'super_admin'] },
+    { path: '/prescriptions', label: 'Prescriptions', icon: 'Pill', roles: ['patient', 'health_personnel', 'pharmacy', 'super_admin'] },
+    { path: '/healthcare-professionals', label: 'Find Providers', icon: 'Search', roles: ['patient', 'super_admin'] },
+    { path: '/map', label: 'Map', icon: 'MapPin', roles: ['patient', 'health_personnel', 'admin', 'super_admin'] },
+    { path: '/wallet', label: 'Wallet', icon: 'Wallet', roles: ['patient', 'health_personnel', 'super_admin'] },
+    { path: '/emergency', label: 'Emergency', icon: 'AlertTriangle', roles: ['patient', 'health_personnel', 'super_admin'] },
+    { path: '/connections', label: 'My Providers', icon: 'Users', roles: ['patient', 'super_admin'] },
+    { path: '/medical-records', label: 'Medical Records', icon: 'FileText', roles: ['patient', 'health_personnel', 'super_admin'] },
+    { path: '/marketplace-users', label: 'Healthcare Marketplace', icon: 'ShoppingCart', roles: ['patient', 'super_admin'] },
+    { path: '/video-consultations', label: 'Video Consultations', icon: 'Video', roles: ['patient', 'health_personnel', 'super_admin'] },
+    { path: '/health-dashboard', label: 'Health Dashboard', icon: 'LayoutDashboard', roles: ['patient', 'super_admin'] },
 
     // Advanced Healthcare Features (Available to all authenticated users)
-    { path: '/advanced-dashboard', label: 'Advanced Dashboard', icon: 'Zap', roles: ['patient', 'health_personnel', 'admin'] },
-    { path: '/ai-diagnostics', label: 'AI Diagnostics', icon: 'Brain', roles: ['patient', 'health_personnel', 'admin'] },
-    { path: '/blockchain-records', label: 'Blockchain Records', icon: 'Shield', roles: ['patient', 'health_personnel', 'admin'] },
-    { path: '/iot-monitoring', label: 'IoT Monitoring', icon: 'Activity', roles: ['patient', 'health_personnel', 'admin'] },
-    { path: '/health-analytics', label: 'Health Analytics', icon: 'BarChart3', roles: ['patient', 'health_personnel', 'admin'] },
-    { path: '/emergency-response', label: 'Emergency Response', icon: 'AlertTriangle', roles: ['patient', 'health_personnel', 'admin'] },
+    { path: '/advanced-dashboard', label: 'Advanced Dashboard', icon: 'Zap', roles: ['patient', 'health_personnel', 'admin', 'super_admin'] },
+    { path: '/ai-diagnostics', label: 'AI Diagnostics', icon: 'Brain', roles: ['patient', 'health_personnel', 'admin', 'super_admin'] },
+    { path: '/blockchain-records', label: 'Blockchain Records', icon: 'Shield', roles: ['patient', 'health_personnel', 'admin', 'super_admin'] },
+    { path: '/iot-monitoring', label: 'IoT Monitoring', icon: 'Activity', roles: ['patient', 'health_personnel', 'admin', 'super_admin'] },
+    { path: '/health-analytics', label: 'Health Analytics', icon: 'BarChart3', roles: ['patient', 'health_personnel', 'admin', 'super_admin'] },
+    { path: '/emergency-response', label: 'Emergency Response', icon: 'AlertTriangle', roles: ['patient', 'health_personnel', 'admin', 'super_admin'] },
 
     // Provider routes
-    { path: '/provider-dashboard', label: 'Dashboard', icon: 'LayoutDashboard', roles: ['health_personnel'] },
-    { path: '/provider-portal', label: 'Provider Portal', icon: 'Building2', roles: ['health_personnel'] },
+    { path: '/provider-dashboard', label: 'Dashboard', icon: 'LayoutDashboard', roles: ['health_personnel', 'super_admin'] },
+    { path: '/provider-portal', label: 'Provider Portal', icon: 'Building2', roles: ['health_personnel', 'super_admin'] },
 
     // Pharmacy routes
-    { path: '/pharmacy-portal', label: 'Pharmacy Portal', icon: 'Building2', roles: ['pharmacy', 'health_personnel'] },
-    { path: '/pharmacy-inventory', label: 'Inventory', icon: 'Package', roles: ['pharmacy'] },
+    { path: '/pharmacy-portal', label: 'Pharmacy Portal', icon: 'Building2', roles: ['pharmacy', 'health_personnel', 'super_admin'] },
+    { path: '/pharmacy-inventory', label: 'Inventory', icon: 'Package', roles: ['pharmacy', 'super_admin'] },
 
     // Institution routes
-    { path: '/institution-portal', label: 'Institution Portal', icon: 'Building', roles: ['institution_admin', 'institution_staff'] },
+    { path: '/institution-portal', label: 'Institution Portal', icon: 'Building', roles: ['institution_admin', 'institution_staff', 'super_admin'] },
 
     // Admin routes
-    { path: '/admin-dashboard', label: 'Admin Dashboard', icon: 'LayoutDashboard', roles: ['admin'] },
-    { path: '/super-admin-dashboard', label: 'Super Admin', icon: 'Shield', roles: ['admin'] },
-    { path: '/create-admin', label: 'Create Admin', icon: 'UserPlus', roles: ['admin'] },
-    { path: '/admin-wallet', label: 'Admin Wallet', icon: 'Wallet', roles: ['admin'] },
-    { path: '/compliance-audit', label: 'Compliance', icon: 'FileCheck', roles: ['admin', 'health_personnel'] },
+    { path: '/admin-dashboard', label: 'Admin Dashboard', icon: 'LayoutDashboard', roles: ['admin', 'super_admin'] },
+    { path: '/super-admin-dashboard', label: 'Super Admin', icon: 'Shield', roles: ['admin', 'super_admin'] },
+    { path: '/create-admin', label: 'Create Admin', icon: 'UserPlus', roles: ['admin', 'super_admin'] },
+    { path: '/admin-wallet', label: 'Admin Wallet', icon: 'Wallet', roles: ['admin', 'super_admin'] },
+    { path: '/compliance-audit', label: 'Compliance', icon: 'FileCheck', roles: ['admin', 'health_personnel', 'super_admin'] },
+    { path: '/hospital-management', label: 'Hospital Management', icon: 'Building', roles: ['admin', 'institution_admin', 'health_personnel', 'super_admin'] },
+    { path: '/pharmacy-management', label: 'Pharmacy Management', icon: 'Pill', roles: ['admin', 'pharmacy', 'health_personnel', 'super_admin'] },
+    { path: '/lab-management', label: 'Lab Management', icon: 'FlaskConical', roles: ['admin', 'lab', 'health_personnel', 'super_admin'] },
 
     ...baseNavigation
   ];
