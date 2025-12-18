@@ -176,11 +176,11 @@ export const MedGemmaChat = () => {
   };
 
   return (
-    <Card className="w-full h-[calc(100dvh-14rem)] sm:h-[600px] md:h-[700px] flex flex-col shadow-lg border-2">
-      <CardHeader className="border-b py-3 sm:py-4 bg-gradient-to-r from-primary/5 to-primary/10">
-        <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary/20 flex items-center justify-center">
-            <Bot className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+    <Card className="w-full h-[calc(100dvh-16rem)] sm:h-[600px] md:h-[700px] flex flex-col shadow-lg border-2">
+      <CardHeader className="border-b py-2 sm:py-4 bg-gradient-to-r from-primary/5 to-primary/10">
+        <CardTitle className="flex items-center gap-2 text-sm sm:text-lg">
+          <div className="w-7 h-7 sm:w-10 sm:h-10 rounded-full bg-primary/20 flex items-center justify-center">
+            <Bot className="h-3.5 w-3.5 sm:h-5 sm:w-5 text-primary" />
           </div>
           <div>
             <div className="font-bold">Doc 0 Clock Assistant</div>

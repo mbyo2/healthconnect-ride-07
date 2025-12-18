@@ -10,7 +10,7 @@ interface LoadingScreenProps {
 
 export const LoadingScreen = React.memo<LoadingScreenProps>(({
   message = "Preparing Doc' O Clock for emergency healthcare...",
-  timeout = 6000 // Extended for emergency system reliability
+  timeout = 3000 // Reduced for faster initial load feel
 }) => {
   const [showFallback, setShowFallback] = useState(false);
   const [longWait, setLongWait] = useState(false);
@@ -39,7 +39,7 @@ export const LoadingScreen = React.memo<LoadingScreenProps>(({
         messageIndex++;
         setCurrentMessage(emergencyMessages[messageIndex]);
       }
-    }, 800);
+    }, 400); // Faster message cycling
 
     const fallbackTimer = setTimeout(() => {
       if (mounted) setShowFallback(true);
@@ -57,11 +57,11 @@ export const LoadingScreen = React.memo<LoadingScreenProps>(({
     const progressInterval = setInterval(() => {
       if (mounted) {
         setLoadingProgress(prev => {
-          const increment = Math.random() * 6; // Slower progress
-          return Math.min(prev + increment, 92);
+          const increment = Math.random() * 15; // Faster progress
+          return Math.min(prev + increment, 98);
         });
       }
-    }, 500);
+    }, 200); // More frequent updates
 
     return () => {
       mounted = false;

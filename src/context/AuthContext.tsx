@@ -32,7 +32,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Only synchronous state updates here
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
-        
+
         // Fetch profile in a separate call to avoid auth deadlock
         if (currentSession?.user) {
           setTimeout(() => {
@@ -47,14 +47,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     );
 
     // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
+    supabase.auth.getSession().then(async ({ data: { session: currentSession } }) => {
       setSession(currentSession);
       setUser(currentSession?.user ?? null);
-      
+
       if (currentSession?.user) {
-        fetchProfile(currentSession.user.id);
+        await fetchProfile(currentSession.user.id);
       }
-      
+
       setIsLoading(false);
     });
 
@@ -97,7 +97,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             email: user?.email,
             is_profile_complete: false
           });
-          
+
         if (createError) {
           console.error('Error creating profile:', createError);
         } else {
@@ -113,11 +113,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signIn = async (email: string, password: string) => {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      
+
       if (error) {
         return { error };
       }
-      
+
       return { error: null };
     } catch (error) {
       console.error('Error in signIn:', error);

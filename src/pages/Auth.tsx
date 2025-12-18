@@ -172,23 +172,25 @@ export const Auth = () => {
 
       // Reverse geocoding to get address
       try {
+        // Use OpenStreetMap Nominatim API (free, no key required for low volume)
+        // instead of OpenCage which requires a key
         const response = await fetch(
-          `https://api.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=YOUR_API_KEY`
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`
         );
         const data = await response.json();
 
-        if (data.results && data.results[0]) {
-          const result = data.results[0];
-          providerSignupForm.setValue('address', result.formatted || '');
-          providerSignupForm.setValue('city', result.components.city || result.components.town || '');
-          providerSignupForm.setValue('country', result.components.country || '');
+        if (data && data.display_name) {
+          providerSignupForm.setValue('address', data.display_name || '');
+          providerSignupForm.setValue('city', data.address?.city || data.address?.town || data.address?.village || '');
+          providerSignupForm.setValue('country', data.address?.country || '');
+          toast.success('Location detected successfully');
+        } else {
+          throw new Error('Could not get address details');
         }
       } catch (geocodeError) {
         console.warn('Reverse geocoding failed:', geocodeError);
         toast.info('Location detected, please fill in address details manually');
       }
-
-      toast.success('Location detected successfully');
     } catch (error: any) {
       console.error('Location detection failed:', error);
       toast.error(error.message || 'Failed to detect location. Please enter address manually.');
@@ -471,7 +473,7 @@ export const Auth = () => {
                         name="firstName"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>First Name</FormLabel>
+                            <FormLabel>First Name <span className="text-red-500">*</span></FormLabel>
                             <FormControl>
                               <Input
                                 placeholder="First name"
@@ -488,7 +490,7 @@ export const Auth = () => {
                         name="lastName"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Last Name</FormLabel>
+                            <FormLabel>Last Name <span className="text-red-500">*</span></FormLabel>
                             <FormControl>
                               <Input
                                 placeholder="Last name"
@@ -506,7 +508,7 @@ export const Auth = () => {
                       name="email"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Email</FormLabel>
+                          <FormLabel>Email <span className="text-red-500">*</span></FormLabel>
                           <FormControl>
                             <Input
                               placeholder="Enter your email"
@@ -523,7 +525,7 @@ export const Auth = () => {
                       name="password"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Password</FormLabel>
+                          <FormLabel>Password <span className="text-red-500">*</span></FormLabel>
                           <FormControl>
                             <Input
                               type="password"
@@ -541,7 +543,7 @@ export const Auth = () => {
                       name="confirmPassword"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Confirm Password</FormLabel>
+                          <FormLabel>Confirm Password <span className="text-red-500">*</span></FormLabel>
                           <FormControl>
                             <Input
                               type="password"
@@ -573,7 +575,7 @@ export const Auth = () => {
                         name="firstName"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>First Name</FormLabel>
+                            <FormLabel>First Name <span className="text-red-500">*</span></FormLabel>
                             <FormControl>
                               <Input
                                 placeholder="First name"
@@ -590,7 +592,7 @@ export const Auth = () => {
                         name="lastName"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Last Name</FormLabel>
+                            <FormLabel>Last Name <span className="text-red-500">*</span></FormLabel>
                             <FormControl>
                               <Input
                                 placeholder="Last name"
@@ -608,7 +610,7 @@ export const Auth = () => {
                       name="email"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Email</FormLabel>
+                          <FormLabel>Email <span className="text-red-500">*</span></FormLabel>
                           <FormControl>
                             <Input
                               placeholder="Enter your email"
@@ -625,7 +627,7 @@ export const Auth = () => {
                       name="specialty"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Specialty</FormLabel>
+                          <FormLabel>Specialty <span className="text-red-500">*</span></FormLabel>
                           <FormControl>
                             <Input
                               placeholder="Enter your specialty"
@@ -642,7 +644,7 @@ export const Auth = () => {
                       name="licenseNumber"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>License Number</FormLabel>
+                          <FormLabel>License Number <span className="text-red-500">*</span></FormLabel>
                           <FormControl>
                             <Input
                               placeholder="Enter your license number"
@@ -680,7 +682,7 @@ export const Auth = () => {
                         name="address"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Address</FormLabel>
+                            <FormLabel>Address <span className="text-red-500">*</span></FormLabel>
                             <FormControl>
                               <Input
                                 placeholder="Enter practice address"
@@ -698,7 +700,7 @@ export const Auth = () => {
                           name="city"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>City</FormLabel>
+                              <FormLabel>City <span className="text-red-500">*</span></FormLabel>
                               <FormControl>
                                 <Input
                                   placeholder="City"
@@ -715,7 +717,7 @@ export const Auth = () => {
                           name="country"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Country</FormLabel>
+                              <FormLabel>Country <span className="text-red-500">*</span></FormLabel>
                               <FormControl>
                                 <Input
                                   placeholder="Country"
@@ -744,7 +746,7 @@ export const Auth = () => {
                       name="password"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Password</FormLabel>
+                          <FormLabel>Password <span className="text-red-500">*</span></FormLabel>
                           <FormControl>
                             <Input
                               type="password"
@@ -762,7 +764,7 @@ export const Auth = () => {
                       name="confirmPassword"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Confirm Password</FormLabel>
+                          <FormLabel>Confirm Password <span className="text-red-500">*</span></FormLabel>
                           <FormControl>
                             <Input
                               type="password"

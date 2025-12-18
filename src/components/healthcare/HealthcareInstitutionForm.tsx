@@ -139,7 +139,7 @@ export const HealthcareInstitutionForm = () => {
 
       <div className="space-y-4">
         <div>
-          <Label htmlFor="name">Institution Name</Label>
+          <Label htmlFor="name">Institution Name <span className="text-red-500">*</span></Label>
           <Input
             id="name"
             value={formData.name}
@@ -157,7 +157,7 @@ export const HealthcareInstitutionForm = () => {
         </div>
 
         <div>
-          <Label htmlFor="type">Institution Type</Label>
+          <Label htmlFor="type">Institution Type <span className="text-red-500">*</span></Label>
           <Select
             value={formData.type}
             onValueChange={(value) => {
@@ -182,7 +182,7 @@ export const HealthcareInstitutionForm = () => {
         </div>
 
         <div>
-          <Label htmlFor="license_number">License Number</Label>
+          <Label htmlFor="license_number">License Number <span className="text-red-500">*</span></Label>
           <Input
             id="license_number"
             value={formData.license_number}
@@ -200,7 +200,7 @@ export const HealthcareInstitutionForm = () => {
         </div>
 
         <div>
-          <Label htmlFor="address">Address</Label>
+          <Label htmlFor="address">Address <span className="text-red-500">*</span></Label>
           <Textarea
             id="address"
             value={formData.address}
@@ -260,7 +260,7 @@ export const HealthcareInstitutionForm = () => {
         </div>
 
         <div>
-          <Label htmlFor="phone">Phone Number</Label>
+          <Label htmlFor="phone">Phone Number <span className="text-red-500">*</span></Label>
           <Input
             id="phone"
             type="tel"
@@ -279,7 +279,7 @@ export const HealthcareInstitutionForm = () => {
         </div>
 
         <div>
-          <Label htmlFor="email">Email</Label>
+          <Label htmlFor="email">Email <span className="text-red-500">*</span></Label>
           <Input
             id="email"
             type="email"

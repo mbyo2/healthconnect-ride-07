@@ -15,8 +15,8 @@ const AIDiagnostics = () => {
         <meta name="keywords" content="AI diagnosis, medical AI, symptom checker, health analysis, MedGemma, medical assistant" />
       </Helmet>
 
-      <div className="container mx-auto px-4 py-4 sm:py-8 max-w-7xl">
-        <div className="space-y-4 sm:space-y-6">
+      <div className="container mx-auto px-4 py-2 sm:py-8 max-w-7xl">
+        <div className="space-y-3 sm:space-y-6">
           {/* Header */}
           <div className="space-y-2">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
@@ -24,8 +24,8 @@ const AIDiagnostics = () => {
                 <Brain className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
               </div>
               <div>
-                <h1 className="text-2xl sm:text-3xl font-bold">AI Diagnostic Assistant</h1>
-                <p className="text-sm sm:text-base text-muted-foreground">
+                <h1 className="text-xl sm:text-3xl font-bold">AI Diagnostic Assistant</h1>
+                <p className="text-xs sm:text-base text-muted-foreground">
                   Powered by Doc 0 Clock - Your 24/7 Medical AI
                 </p>
               </div>
@@ -99,7 +99,7 @@ const AIDiagnostics = () => {
               <TabsTrigger value="history" className="text-xs sm:text-sm">History</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="chat" className="mt-6">
+            <TabsContent value="chat" className="mt-3 sm:mt-6">
               <MedGemmaChat />
             </TabsContent>
 
@@ -127,11 +127,11 @@ const AIDiagnostics = () => {
             <CardContent className="pt-4 sm:pt-6">
               <h3 className="font-semibold mb-2 text-xs sm:text-sm">⚠️ Important Medical Disclaimer</h3>
               <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                This AI assistant is for informational and educational purposes only. It does not provide 
-                medical advice, diagnosis, or treatment. Always seek the advice of your physician or other 
-                qualified health provider with any questions you may have regarding a medical condition. 
-                Never disregard professional medical advice or delay in seeking it because of something you 
-                have read here. If you think you may have a medical emergency, call your doctor or emergency 
+                This AI assistant is for informational and educational purposes only. It does not provide
+                medical advice, diagnosis, or treatment. Always seek the advice of your physician or other
+                qualified health provider with any questions you may have regarding a medical condition.
+                Never disregard professional medical advice or delay in seeking it because of something you
+                have read here. If you think you may have a medical emergency, call your doctor or emergency
                 services immediately.
               </p>
             </CardContent>

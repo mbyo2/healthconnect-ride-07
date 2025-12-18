@@ -75,16 +75,11 @@ const InstitutionSettings = lazy(() => import('@/pages/InstitutionSettings'));
 const AppointmentDetails = lazy(() => import('@/pages/AppointmentDetails'));
 
 const AppContent = () => {
-  const [isNewUser, setIsNewUser] = useState(false);
   const { user, session, isLoading, profile } = useAuth();
 
-  useEffect(() => {
+  const isNewUser = useMemo(() => {
     // Check if user needs onboarding based on profile data
-    if (profile && !profile.first_name) {
-      setIsNewUser(true);
-    } else {
-      setIsNewUser(false);
-    }
+    return !!(profile && !profile.first_name);
   }, [profile]);
 
   return (
