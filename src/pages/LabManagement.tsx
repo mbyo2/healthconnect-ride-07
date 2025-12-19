@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
+import { useCurrency } from "@/hooks/use-currency";
 import {
     FlaskConical,
     ClipboardList,
@@ -21,13 +22,23 @@ import {
 } from 'lucide-react';
 import { LabRequest, LabTest, LabTestStatus } from '@/types/lab';
 import { toast } from 'sonner';
+import { InstitutionInsuranceVerification } from '@/components/institution/InstitutionInsuranceVerification';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const LabManagement = () => {
     const { user } = useAuth();
+    const { formatPrice } = useCurrency();
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedRequest, setSelectedRequest] = useState<LabRequest | null>(null);
     const [resultSummary, setResultSummary] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [showNewRequestDialog, setShowNewRequestDialog] = useState(false);
+    const [selectedPatientId, setSelectedPatientId] = useState('');
+    const [patientSearchTerm, setPatientSearchTerm] = useState('');
+    const [selectedTestType, setSelectedTestType] = useState('');
+    const [selectedVerification, setSelectedVerification] = useState<any>(null);
     const queryClient = useQueryClient();
 
     // Fetch Lab Requests
@@ -48,6 +59,27 @@ const LabManagement = () => {
             }
         }
     });
+
+    // Fetch Patients
+    const { data: patients } = useQuery({
+        queryKey: ['lab-patients'],
+        queryFn: async () => {
+            const { data } = await supabase
+                .from('profiles')
+                .select('id, first_name, last_name, email')
+                .limit(50);
+            return data || [];
+        }
+    });
+
+    // Lab Test Catalog (for selection)
+    const TEST_CATALOG = [
+        { name: 'Complete Blood Count (CBC)', code: 'HEM-001', category: 'Hematology', price: 150 },
+        { name: 'Lipid Profile', code: 'BIO-001', category: 'Biochemistry', price: 200 },
+        { name: 'Liver Function Test', code: 'BIO-002', category: 'Biochemistry', price: 250 },
+        { name: 'Urinalysis', code: 'MIC-001', category: 'Microbiology', price: 80 },
+        { name: 'Thyroid Panel', code: 'IMM-001', category: 'Immunology', price: 300 },
+    ];
 
     const submitResult = async () => {
         if (!selectedRequest || !resultSummary) return;
@@ -70,6 +102,54 @@ const LabManagement = () => {
         } catch (error) {
             console.error('Error submitting results:', error);
             toast.error('Failed to submit results');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const createRequest = async () => {
+        if (!selectedPatientId || !selectedTestType || !user) return;
+        setIsSubmitting(true);
+        try {
+            const test = TEST_CATALOG.find(t => t.name === selectedTestType);
+            const total = test?.price || 0;
+            let balance = total;
+            let insuranceClaimId = null;
+
+            if (selectedVerification) {
+                const coverage = selectedVerification.coverage_percentage || 0;
+                const coveredAmount = (total * coverage) / 100;
+                balance = total - coveredAmount;
+                insuranceClaimId = selectedVerification.id;
+            }
+
+            const { error } = await supabase
+                .from('lab_tests')
+                .insert({
+                    patient_id: selectedPatientId,
+                    ordered_by: user.id,
+                    lab_id: user.id, // Assuming lab tech is the lab_id for now or fetch institution
+                    test_type: selectedTestType,
+                    test_number: `LAB-${Math.random().toString(36).substr(2, 6).toUpperCase()}`,
+                    status: 'pending',
+                    price: total,
+                    total_amount: total,
+                    balance: balance,
+                    insurance_claim_id: insuranceClaimId,
+                    payment_status: balance === 0 ? 'paid' : 'pending'
+                });
+
+            if (error) throw error;
+            toast.success('Lab request created successfully');
+            setShowNewRequestDialog(false);
+            setSelectedPatientId('');
+            setPatientSearchTerm('');
+            setSelectedTestType('');
+            setSelectedVerification(null);
+            queryClient.invalidateQueries({ queryKey: ['lab-requests'] });
+        } catch (error) {
+            console.error('Error creating lab request:', error);
+            toast.error('Failed to create lab request');
         } finally {
             setIsSubmitting(false);
         }
@@ -168,17 +248,96 @@ const LabManagement = () => {
                 <TabsContent value="requests" className="space-y-4">
                     <Card>
                         <CardHeader>
-                            <div className="flex items-center justify-between">
-                                <CardTitle>Test Requests</CardTitle>
-                                <div className="relative w-64">
-                                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                                    <Input
-                                        placeholder="Search patient or test..."
-                                        className="pl-8"
-                                        value={searchTerm}
-                                        onChange={(e) => setSearchTerm(e.target.value)}
-                                    />
-                                </div>
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                                <CardTitle>Lab Requests</CardTitle>
+                                <Dialog open={showNewRequestDialog} onOpenChange={setShowNewRequestDialog}>
+                                    <DialogTrigger asChild>
+                                        <Button>
+                                            <Plus className="h-4 w-4 mr-2" />
+                                            New Request
+                                        </Button>
+                                    </DialogTrigger>
+                                    <DialogContent className="sm:max-w-[500px]">
+                                        <DialogHeader>
+                                            <DialogTitle>Create New Lab Request</DialogTitle>
+                                        </DialogHeader>
+                                        <div className="space-y-4 py-4">
+                                            <div className="space-y-2">
+                                                <Label>Patient</Label>
+                                                <Input
+                                                    placeholder="Search patient..."
+                                                    value={patientSearchTerm}
+                                                    onChange={(e) => setPatientSearchTerm(e.target.value)}
+                                                />
+                                                {patientSearchTerm && !selectedPatientId && (
+                                                    <div className="max-h-32 overflow-y-auto border rounded-md bg-white">
+                                                        {patients?.filter(p =>
+                                                            `${p.first_name} ${p.last_name}`.toLowerCase().includes(patientSearchTerm.toLowerCase())
+                                                        ).map(p => (
+                                                            <div
+                                                                key={p.id}
+                                                                className="p-2 text-sm hover:bg-accent cursor-pointer"
+                                                                onClick={() => {
+                                                                    setSelectedPatientId(p.id);
+                                                                    setPatientSearchTerm(`${p.first_name} ${p.last_name}`);
+                                                                }}
+                                                            >
+                                                                {p.first_name} {p.last_name}
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            <div className="space-y-2">
+                                                <Label>Test Type</Label>
+                                                <Select value={selectedTestType} onValueChange={setSelectedTestType}>
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select test type" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        {TEST_CATALOG.map(test => (
+                                                            <SelectItem key={test.code} value={test.name}>
+                                                                {test.name} ({formatPrice(test.price)})
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+
+                                            {selectedPatientId && (
+                                                <div className="space-y-2">
+                                                    <InstitutionInsuranceVerification
+                                                        patientId={selectedPatientId}
+                                                        onVerified={(v) => setSelectedVerification(v)}
+                                                    />
+                                                    {selectedVerification && (
+                                                        <div className="p-2 bg-green-50 border border-green-200 rounded text-xs text-green-800 flex items-center gap-2">
+                                                            <CheckCircle2 className="h-3 w-3" />
+                                                            <span>Insurance Applied: {selectedVerification.coverage_percentage}%</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                        <DialogFooter>
+                                            <Button variant="outline" onClick={() => setShowNewRequestDialog(false)}>Cancel</Button>
+                                            <Button onClick={createRequest} disabled={!selectedPatientId || !selectedTestType || isSubmitting}>
+                                                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                                Create Request
+                                            </Button>
+                                        </DialogFooter>
+                                    </DialogContent>
+                                </Dialog>
+                            </div>
+                            <div className="flex items-center gap-2 mt-4">
+                                <Search className="h-4 w-4 text-muted-foreground" />
+                                <Input
+                                    placeholder="Search patient or test..."
+                                    className="max-w-sm"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                />
                             </div>
                         </CardHeader>
                         <CardContent>
@@ -299,20 +458,14 @@ const LabManagement = () => {
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-4">
-                                {[
-                                    { name: 'Complete Blood Count (CBC)', code: 'HEM-001', category: 'Hematology', price: 150 },
-                                    { name: 'Lipid Profile', code: 'BIO-001', category: 'Biochemistry', price: 200 },
-                                    { name: 'Liver Function Test', code: 'BIO-002', category: 'Biochemistry', price: 250 },
-                                    { name: 'Urinalysis', code: 'MIC-001', category: 'Microbiology', price: 80 },
-                                    { name: 'Thyroid Panel', code: 'IMM-001', category: 'Immunology', price: 300 },
-                                ].map((test, i) => (
+                                {TEST_CATALOG.map((test, i) => (
                                     <div key={i} className="flex items-center justify-between p-3 border rounded-lg">
                                         <div>
                                             <h4 className="font-medium">{test.name}</h4>
                                             <p className="text-xs text-muted-foreground">{test.code} • {test.category}</p>
                                         </div>
                                         <div className="text-right">
-                                            <p className="font-bold">K{test.price}</p>
+                                            <p className="font-bold">{formatPrice(test.price)}</p>
                                         </div>
                                     </div>
                                 ))}

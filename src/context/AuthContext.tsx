@@ -62,6 +62,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const fetchProfile = async (userId: string) => {
+    if (!userId) return;
+
     try {
       // Fetch profile from profiles table
       const { data: profileData, error: profileError } = await supabase
@@ -86,15 +88,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (profileData) {
         setProfile({
           ...profileData,
-          role: roleData || 'patient', // Use role from user_roles table
+          role: roleData || profileData.role || 'patient', // Use role from user_roles table or fallback to profile role
         });
       } else {
         // If no profile exists, create a basic one
+        // Use the email from the current user object if available
+        const userEmail = (await supabase.auth.getUser()).data.user?.email;
+
         const { error: createError } = await supabase
           .from('profiles')
           .insert({
             id: userId,
-            email: user?.email,
+            email: userEmail,
             is_profile_complete: false
           });
 
@@ -102,7 +107,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           console.error('Error creating profile:', createError);
         } else {
           // Fetch the newly created profile
-          fetchProfile(userId);
+          const { data: newProfile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', userId)
+            .single();
+
+          if (newProfile) {
+            setProfile({
+              ...newProfile,
+              role: roleData || 'patient'
+            });
+          }
         }
       }
     } catch (error) {

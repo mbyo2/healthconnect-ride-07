@@ -9,16 +9,22 @@ import { Input } from '@/components/ui/input';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
+import { useCurrency } from "@/hooks/use-currency";
 import {
     Package, ShoppingCart, TrendingUp, AlertTriangle,
-    Plus, Search, DollarSign, Users, Barcode
+    Plus, Search, DollarSign, Users, Barcode, CheckCircle
 } from 'lucide-react';
+import { InstitutionInsuranceVerification } from '@/components/institution/InstitutionInsuranceVerification';
 
 const PharmacyManagement = () => {
     const { user } = useAuth();
+    const { formatPrice } = useCurrency();
     const [searchTerm, setSearchTerm] = useState('');
     const [cart, setCart] = useState<any[]>([]);
     const [isProcessing, setIsProcessing] = useState(false);
+    const [selectedPatientId, setSelectedPatientId] = useState('');
+    const [selectedVerification, setSelectedVerification] = useState<any>(null);
+    const [patientSearchTerm, setPatientSearchTerm] = useState('');
 
     // Get pharmacy info
     const { data: pharmacy } = useQuery({
@@ -48,7 +54,6 @@ const PharmacyManagement = () => {
         },
         enabled: !!pharmacy
     });
-
     // Get today's sales
     const { data: todaySales } = useQuery({
         queryKey: ['pharmacy-sales-today', pharmacy?.id],
@@ -63,6 +68,18 @@ const PharmacyManagement = () => {
             return data || [];
         },
         enabled: !!pharmacy
+    });
+
+    // Get patients for selection
+    const { data: patients } = useQuery({
+        queryKey: ['pharmacy-patients'],
+        queryFn: async () => {
+            const { data } = await supabase
+                .from('profiles')
+                .select('id, first_name, last_name, email')
+                .limit(50);
+            return data || [];
+        }
     });
 
     // Calculate stats
@@ -108,18 +125,33 @@ const PharmacyManagement = () => {
         try {
             const transactionId = `TXN-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
 
+            const total = cartTotal;
+            let balance = total;
+            let insuranceClaimId = null;
+
+            if (selectedVerification) {
+                const coverage = selectedVerification.coverage_percentage || 0;
+                const coveredAmount = (total * coverage) / 100;
+                balance = total - coveredAmount;
+                insuranceClaimId = selectedVerification.id;
+            }
+
             // 1. Create sale record
             const { error: saleError } = await supabase
                 .from('pharmacy_sales')
                 .insert({
                     pharmacy_id: pharmacy.id,
                     transaction_id: transactionId,
+                    customer_id: selectedPatientId || null,
                     items: cart,
                     subtotal: cartSubtotal,
                     tax: cartTax,
-                    total_amount: cartTotal,
+                    total_amount: total,
+                    balance: balance,
+                    paid_amount: total - balance,
+                    insurance_claim_id: insuranceClaimId,
                     payment_method: 'cash', // Default for now
-                    payment_status: 'completed'
+                    payment_status: balance === 0 ? 'completed' : 'pending'
                 });
 
             if (saleError) throw saleError;
@@ -136,6 +168,8 @@ const PharmacyManagement = () => {
 
             toast.success('Sale completed successfully');
             setCart([]);
+            setSelectedPatientId('');
+            setSelectedVerification(null);
         } catch (error) {
             console.error('Error completing sale:', error);
             toast.error('Failed to complete sale');
@@ -377,7 +411,7 @@ const PharmacyManagement = () => {
                                                 <div>
                                                     <h4 className="font-semibold">{item.product_name}</h4>
                                                     <p className="text-xs text-muted-foreground">{item.product_code}</p>
-                                                    <p className="text-sm font-medium mt-1">K{item.unit_price}</p>
+                                                    <p className="text-sm font-medium mt-1">{formatPrice(item.unit_price)}</p>
                                                 </div>
                                                 <Button size="sm" variant="secondary">Add</Button>
                                             </div>
@@ -401,7 +435,7 @@ const PharmacyManagement = () => {
                                             <div key={item.id} className="flex justify-between items-center p-2 border-b">
                                                 <div className="flex-1">
                                                     <p className="text-sm font-medium">{item.product_name}</p>
-                                                    <p className="text-xs text-muted-foreground">K{item.unit_price} x {item.cartQuantity}</p>
+                                                    <p className="text-xs text-muted-foreground">{formatPrice(item.unit_price)} x {item.cartQuantity}</p>
                                                 </div>
                                                 <div className="flex items-center gap-2">
                                                     <Button
@@ -428,17 +462,62 @@ const PharmacyManagement = () => {
                                 </div>
 
                                 <div className="space-y-4 border-t pt-4">
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-medium text-muted-foreground uppercase">Patient (Optional for Insurance)</label>
+                                        <div className="flex gap-2">
+                                            <Input
+                                                placeholder="Search patient..."
+                                                value={patientSearchTerm}
+                                                onChange={(e) => setPatientSearchTerm(e.target.value)}
+                                                className="h-8 text-sm"
+                                            />
+                                        </div>
+                                        {patientSearchTerm && (
+                                            <div className="max-h-32 overflow-y-auto border rounded-md bg-white">
+                                                {patients?.filter(p =>
+                                                    `${p.first_name} ${p.last_name}`.toLowerCase().includes(patientSearchTerm.toLowerCase())
+                                                ).map(p => (
+                                                    <div
+                                                        key={p.id}
+                                                        className="p-2 text-sm hover:bg-accent cursor-pointer"
+                                                        onClick={() => {
+                                                            setSelectedPatientId(p.id);
+                                                            setPatientSearchTerm(`${p.first_name} ${p.last_name}`);
+                                                        }}
+                                                    >
+                                                        {p.first_name} {p.last_name}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {selectedPatientId && (
+                                        <div className="space-y-2">
+                                            <InstitutionInsuranceVerification
+                                                patientId={selectedPatientId}
+                                                onVerified={(v) => setSelectedVerification(v)}
+                                            />
+                                            {selectedVerification && (
+                                                <div className="p-2 bg-green-50 border border-green-200 rounded text-xs text-green-800 flex items-center gap-2">
+                                                    <CheckCircle className="h-3 w-3" />
+                                                    <span>Insurance Applied: {selectedVerification.coverage_percentage}%</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+
                                     <div className="flex justify-between text-sm">
                                         <span>Subtotal</span>
-                                        <span>K{cartSubtotal.toFixed(2)}</span>
+                                        <span>{formatPrice(cartSubtotal)}</span>
                                     </div>
                                     <div className="flex justify-between text-sm">
                                         <span>Tax (16%)</span>
-                                        <span>K{cartTax.toFixed(2)}</span>
+                                        <span>{formatPrice(cartTax)}</span>
                                     </div>
                                     <div className="flex justify-between font-bold text-lg">
                                         <span>Total</span>
-                                        <span>K{cartTotal.toFixed(2)}</span>
+                                        <span>{formatPrice(cartTotal)}</span>
                                     </div>
                                     <Button
                                         className="w-full"
@@ -473,7 +552,7 @@ const PharmacyManagement = () => {
                                                 </p>
                                             </div>
                                             <div className="text-right">
-                                                <p className="font-bold">K{Number(sale.total_amount).toFixed(2)}</p>
+                                                <p className="font-bold">{formatPrice(Number(sale.total_amount))}</p>
                                                 <Badge>{sale.payment_method}</Badge>
                                             </div>
                                         </div>
@@ -503,7 +582,7 @@ const PharmacyManagement = () => {
                                         amount: Number(s.total_amount)
                                     })) || []}>
                                         <XAxis dataKey="name" fontSize={12} tickLine={false} axisLine={false} />
-                                        <YAxis fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `K${value}`} />
+                                        <YAxis fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => formatPrice(value)} />
                                         <Tooltip />
                                         <Bar dataKey="amount" fill="currentColor" radius={[4, 4, 0, 0]} className="fill-primary" />
                                     </BarChart>

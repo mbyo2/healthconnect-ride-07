@@ -25,7 +25,7 @@ interface UserRolesContextType {
 const UserRolesContext = createContext<UserRolesContextType | undefined>(undefined);
 
 export function UserRolesProvider({ children }: { children: React.ReactNode }) {
-  const { profile, user } = useAuth();
+  const { profile, user, isLoading: authLoading } = useAuth();
   const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [adminLevel, setAdminLevel] = useState<AdminLevel | null>(null);
   const [currentRole, setCurrentRole] = useState<UserRole | null>(null);
@@ -34,52 +34,63 @@ export function UserRolesProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const fetchRoles = async () => {
+      // If we have a user but no profile yet, we should stay in loading state
+      // to avoid RouteGuard seeing empty roles and redirecting.
+      if (user && !profile) {
+        setLoading(true);
+        return;
+      }
+
       if (user && profile) {
         setLoading(true);
-        // Fetch all roles for the user from user_roles table
-        const { data: rolesData, error } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', user.id);
+        try {
+          // Fetch all roles for the user from user_roles table
+          const { data: rolesData, error } = await supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', user.id);
 
-        if (error) {
-          console.error('Error fetching roles:', error);
-          // Fallback to profile role
-          const fallbackRole = profile.role as UserRole;
-          setUserRole(fallbackRole);
-          setCurrentRole(fallbackRole);
-          setAvailableRoles(fallbackRole ? [fallbackRole] : []);
-        } else if (rolesData && rolesData.length > 0) {
-          const roles = rolesData.map(r => r.role as UserRole);
-          setAvailableRoles(roles);
+          if (error) {
+            console.error('Error fetching roles:', error);
+            // Fallback to profile role
+            const fallbackRole = profile.role as UserRole;
+            setUserRole(fallbackRole);
+            setCurrentRole(fallbackRole);
+            setAvailableRoles(fallbackRole ? [fallbackRole] : []);
+          } else if (rolesData && rolesData.length > 0) {
+            const roles = rolesData.map(r => r.role as UserRole);
+            setAvailableRoles(roles);
 
-          // Set primary role (admin > institution_admin > health_personnel > patient)
-          const primaryRole = roles.find(r => r === 'admin') ||
-            roles.find(r => r === 'institution_admin') ||
-            roles.find(r => r === 'health_personnel') ||
-            roles.find(r => r === 'patient') ||
-            roles[0];
+            // Set primary role (admin > institution_admin > health_personnel > patient)
+            const primaryRole = roles.find(r => r === 'admin') ||
+              roles.find(r => r === 'institution_admin') ||
+              roles.find(r => r === 'health_personnel') ||
+              roles.find(r => r === 'patient') ||
+              roles[0];
 
-          setUserRole(primaryRole);
-          setCurrentRole(primaryRole);
+            setUserRole(primaryRole);
+            setCurrentRole(primaryRole);
 
-          // Check admin status by looking at roles
-          const isAdminRole = roles.includes('admin');
+            // Check admin status by looking at roles
+            const isAdminRole = roles.includes('admin');
 
-          if (isAdminRole) {
-            setAdminLevel('admin');
+            if (isAdminRole) {
+              setAdminLevel('admin');
+            } else {
+              setAdminLevel(profile.admin_level as AdminLevel);
+            }
           } else {
-            setAdminLevel(profile.admin_level as AdminLevel);
+            // No roles in user_roles table, use profile role as fallback
+            const fallbackRole = profile.role as UserRole;
+            setUserRole(fallbackRole);
+            setCurrentRole(fallbackRole);
+            setAvailableRoles(fallbackRole ? [fallbackRole] : []);
           }
-        } else {
-          // No roles in user_roles table, use profile role as fallback
-          const fallbackRole = profile.role as UserRole;
-          setUserRole(fallbackRole);
-          setCurrentRole(fallbackRole);
-          setAvailableRoles(fallbackRole ? [fallbackRole] : []);
+        } finally {
+          setLoading(false);
         }
-        setLoading(false);
-      } else {
+      } else if (!user && !authLoading) {
+        // Only stop loading if auth is also done loading and there's no user
         setUserRole(null);
         setAdminLevel(null);
         setCurrentRole(null);
@@ -89,7 +100,7 @@ export function UserRolesProvider({ children }: { children: React.ReactNode }) {
     };
 
     fetchRoles();
-  }, [profile, user]);
+  }, [profile, user, authLoading]);
 
   const hasRole = (roles: UserRole[]): boolean => {
     return roles.some(role => availableRoles.includes(role));

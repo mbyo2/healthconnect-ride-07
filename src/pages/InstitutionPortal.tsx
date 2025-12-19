@@ -66,9 +66,10 @@ export const InstitutionPortal = () => {
               navigate("/institution-status");
             }
           } else {
-            // Not an institution admin
-            toast.error("You don't have institution access");
-            navigate("/login");
+            // Not an institution admin, but we are already on the portal page.
+            // We should stay here so they can see the registration tab or sign in with a different account.
+            console.log("User is authenticated but no institution record found.");
+            setIsRedirecting(false);
           }
         }
       } catch (err) {

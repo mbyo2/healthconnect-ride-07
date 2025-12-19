@@ -12,6 +12,8 @@ import { Badge } from '@/components/ui/badge';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
+import { useCurrency } from "@/hooks/use-currency";
+import { InstitutionInsuranceVerification } from '@/components/institution/InstitutionInsuranceVerification';
 import {
     Building2,
     Bed,
@@ -23,6 +25,7 @@ import {
 
 const HospitalManagement = () => {
     const { user } = useAuth();
+    const { formatPrice, currency } = useCurrency();
 
     // Hospital info
     const { data: hospital } = useQuery({
@@ -100,11 +103,23 @@ const HospitalManagement = () => {
     const [invoiceAmount, setInvoiceAmount] = useState('');
     const [invoiceDescription, setInvoiceDescription] = useState('');
     const [isGenerating, setIsGenerating] = useState(false);
+    const [selectedVerification, setSelectedVerification] = useState<any>(null);
 
     const generateInvoice = async () => {
         if (!hospital || !selectedPatientId || !invoiceAmount) return;
         setIsGenerating(true);
         try {
+            const total = Number(invoiceAmount);
+            let balance = total;
+            let insuranceClaimId = null;
+
+            if (selectedVerification) {
+                const coverage = selectedVerification.coverage_percentage || 0;
+                const coveredAmount = (total * coverage) / 100;
+                balance = total - coveredAmount;
+                insuranceClaimId = selectedVerification.id;
+            }
+
             const invoiceNumber = `INV-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
             const { error } = await supabase
                 .from('hospital_billing')
@@ -112,9 +127,11 @@ const HospitalManagement = () => {
                     hospital_id: hospital.id,
                     patient_id: selectedPatientId,
                     invoice_number: invoiceNumber,
-                    total_amount: Number(invoiceAmount),
-                    items: [{ description: invoiceDescription, amount: Number(invoiceAmount) }],
-                    payment_status: 'pending',
+                    total_amount: total,
+                    balance: balance,
+                    insurance_claim_id: insuranceClaimId,
+                    items: [{ description: invoiceDescription, amount: total }],
+                    payment_status: balance === 0 ? 'paid' : 'pending',
                     due_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // 7 days from now
                 });
 
@@ -124,6 +141,7 @@ const HospitalManagement = () => {
             setSelectedPatientId('');
             setInvoiceAmount('');
             setInvoiceDescription('');
+            setSelectedVerification(null);
             refetchInvoices();
         } catch (error) {
             console.error('Error generating invoice:', error);
@@ -417,7 +435,7 @@ const HospitalManagement = () => {
                                                 </p>
                                             </div>
                                             <div className="text-right">
-                                                <p className="font-bold text-lg">K{invoice.total_amount}</p>
+                                                <p className="font-bold text-lg">{formatPrice(invoice.total_amount)}</p>
                                                 <Button variant="ghost" size="sm">View</Button>
                                             </div>
                                         </div>
@@ -457,7 +475,7 @@ const HospitalManagement = () => {
                             </Select>
                         </div>
                         <div className="space-y-2">
-                            <Label>Amount (K)</Label>
+                            <Label>Amount ({currency === 'USD' ? '$' : 'K'})</Label>
                             <Input
                                 type="number"
                                 placeholder="0.00"
@@ -473,6 +491,24 @@ const HospitalManagement = () => {
                                 onChange={(e) => setInvoiceDescription(e.target.value)}
                             />
                         </div>
+
+                        {selectedPatientId && (
+                            <div className="space-y-4">
+                                <InstitutionInsuranceVerification
+                                    patientId={selectedPatientId}
+                                    onVerified={(v) => setSelectedVerification(v)}
+                                />
+                                {selectedVerification && (
+                                    <div className="p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-800 flex items-center gap-2">
+                                        <CheckCircle className="h-4 w-4" />
+                                        <div>
+                                            <p className="font-semibold">Insurance Applied: {selectedVerification.coverage_percentage}%</p>
+                                            <p>Patient Copay: {formatPrice((Number(invoiceAmount) * (100 - selectedVerification.coverage_percentage)) / 100)}</p>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setShowInvoiceDialog(false)}>Cancel</Button>

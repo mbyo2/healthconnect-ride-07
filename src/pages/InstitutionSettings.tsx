@@ -9,7 +9,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
-import { Loader2, Save } from "lucide-react";
+import { Loader2, Save, ShieldCheck } from "lucide-react";
+import { InsuranceProvider } from "@/types/healthcare";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -23,7 +25,9 @@ const InstitutionSettings = () => {
         address: "",
         phone: "",
         email: "",
-        operating_hours: {} as any
+        currency: "ZMW",
+        operating_hours: {} as any,
+        accepted_insurance_providers: [] as string[]
     });
 
     useEffect(() => {
@@ -55,7 +59,9 @@ const InstitutionSettings = () => {
                 address: data.address || "",
                 phone: data.phone || "",
                 email: data.email || "",
-                operating_hours: hours
+                currency: data.currency || "ZMW",
+                operating_hours: hours,
+                accepted_insurance_providers: data.accepted_insurance_providers || []
             });
         } catch (error) {
             console.error("Error fetching institution:", error);
@@ -82,6 +88,16 @@ const InstitutionSettings = () => {
         }));
     };
 
+    const handleInsuranceToggle = (provider: string) => {
+        setFormData(prev => {
+            const current = prev.accepted_insurance_providers || [];
+            const updated = current.includes(provider)
+                ? current.filter(p => p !== provider)
+                : [...current, provider];
+            return { ...prev, accepted_insurance_providers: updated };
+        });
+    };
+
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
         setSaving(true);
@@ -93,7 +109,9 @@ const InstitutionSettings = () => {
                     address: formData.address,
                     phone: formData.phone,
                     email: formData.email,
-                    operating_hours: formData.operating_hours
+                    currency: formData.currency,
+                    operating_hours: formData.operating_hours,
+                    accepted_insurance_providers: formData.accepted_insurance_providers
                 })
                 .eq('id', institution.id);
 
@@ -131,6 +149,18 @@ const InstitutionSettings = () => {
                             <div className="space-y-2">
                                 <Label htmlFor="email">Email</Label>
                                 <Input id="email" type="email" value={formData.email} onChange={handleChange} required />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="currency">Preferred Currency</Label>
+                                <select
+                                    id="currency"
+                                    value={formData.currency}
+                                    onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
+                                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                >
+                                    <option value="ZMW">Zambian Kwacha (ZMW)</option>
+                                    <option value="USD">US Dollar (USD)</option>
+                                </select>
                             </div>
                         </div>
                         <div className="space-y-2">
@@ -185,6 +215,33 @@ const InstitutionSettings = () => {
                     {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                     Save Changes
                 </Button>
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <ShieldCheck className="h-5 w-5 text-primary" />
+                            Accepted Insurance Providers
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {Object.values(InsuranceProvider).filter(p => p !== InsuranceProvider.NONE).map((provider) => (
+                                <div key={provider} className="flex items-center space-x-2 p-2 border rounded-md hover:bg-accent/50 transition-colors">
+                                    <Checkbox
+                                        id={`provider-${provider}`}
+                                        checked={formData.accepted_insurance_providers.includes(provider)}
+                                        onCheckedChange={() => handleInsuranceToggle(provider)}
+                                    />
+                                    <Label
+                                        htmlFor={`provider-${provider}`}
+                                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                                    >
+                                        {provider}
+                                    </Label>
+                                </div>
+                            ))}
+                        </div>
+                    </CardContent>
+                </Card>
             </form>
         </div>
     );

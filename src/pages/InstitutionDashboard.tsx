@@ -12,6 +12,7 @@ export const InstitutionDashboard = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
+    const [institution, setInstitution] = useState<any>(null);
     const [counts, setCounts] = useState({
         personnel: 0,
         appointments: 0,
@@ -29,9 +30,16 @@ export const InstitutionDashboard = () => {
                     .from('healthcare_institutions')
                     .select('*')
                     .eq('admin_id', user.id)
-                    .single();
+                    .maybeSingle();
 
                 if (instError) throw instError;
+
+                if (!inst) {
+                    setInstitution(null);
+                    setLoading(false);
+                    return;
+                }
+
                 setInstitution(inst);
 
                 // 2. Fetch Counts
@@ -94,7 +102,7 @@ export const InstitutionDashboard = () => {
 
             } catch (error) {
                 console.error("Error fetching dashboard data:", error);
-                navigate("/institution-portal");
+                // Don't navigate away immediately, let the UI handle the null institution state
             } finally {
                 setLoading(false);
             }
@@ -105,7 +113,21 @@ export const InstitutionDashboard = () => {
 
     if (loading) return <LoadingScreen />;
 
-    if (!institution) return null;
+    if (!institution) {
+        return (
+            <div className="container mx-auto p-6 text-center space-y-4">
+                <Building2 className="h-12 w-12 mx-auto text-muted-foreground" />
+                <h2 className="text-2xl font-bold">Institution Not Found</h2>
+                <p className="text-muted-foreground">
+                    We couldn't find an institution associated with your account.
+                    If you haven't registered yet, please visit the portal.
+                </p>
+                <Button onClick={() => navigate("/institution-portal")}>
+                    Go to Institution Portal
+                </Button>
+            </div>
+        );
+    }
 
     return (
         <div className="container mx-auto p-6 space-y-6">
