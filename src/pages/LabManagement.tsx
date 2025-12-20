@@ -54,7 +54,9 @@ const LabManagement = () => {
                 if (error) throw error;
                 return data as any[];
             } catch (e) {
-                console.log('Using mock lab data as table might not exist yet');
+                if (import.meta.env.DEV) {
+                    console.log('Using mock lab data as table might not exist yet');
+                }
                 return MOCK_REQUESTS as any[];
             }
         }

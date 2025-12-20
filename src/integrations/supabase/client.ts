@@ -9,8 +9,10 @@ const isLocalhost = window.location.hostname === 'localhost' || window.location.
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-// Log the environment for debugging
-console.log('Running in', isLocalhost ? 'local' : 'production', 'mode');
+// Log the environment for debugging (development only)
+if (import.meta.env.DEV) {
+  console.log('Running in', isLocalhost ? 'local' : 'production', 'mode');
+}
 
 // Validate environment variables
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
@@ -39,7 +41,9 @@ const customStorageAdapter = {
       return localStorage.getItem(key);
     } catch (error) {
       // Silently fail - don't log in production to avoid console spam
-      if (isLocalhost) console.warn('Storage access blocked:', error);
+      if (import.meta.env.DEV) {
+        console.warn('Storage access blocked:', error);
+      }
       return null;
     }
   },
@@ -49,7 +53,9 @@ const customStorageAdapter = {
       localStorage.setItem(key, value);
     } catch (error) {
       // Silently fail - don't log in production
-      if (isLocalhost) console.warn('Storage write blocked:', error);
+      if (import.meta.env.DEV) {
+        console.warn('Storage write blocked:', error);
+      }
     }
   },
   removeItem: (key: string): void => {
@@ -58,7 +64,9 @@ const customStorageAdapter = {
       localStorage.removeItem(key);
     } catch (error) {
       // Silently fail - don't log in production
-      if (isLocalhost) console.warn('Storage removal blocked:', error);
+      if (import.meta.env.DEV) {
+        console.warn('Storage removal blocked:', error);
+      }
     }
   },
 };
@@ -86,7 +94,7 @@ export const supabase = createClient<Database>(
   }
 );
 
-// Log the Supabase URL and key prefix for debugging
+// Log the Supabase URL and key prefix for debugging (development only)
 if (import.meta.env.DEV) {
   console.log('Supabase URL configured:', Boolean(SUPABASE_URL));
   console.log('Supabase Key configured:', Boolean(SUPABASE_ANON_KEY));

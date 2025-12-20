@@ -19,8 +19,10 @@ declare global {
 
 // Add a global error handler for uncaught exceptions
 window.addEventListener('error', (event) => {
-  console.error('Uncaught error:', event.error);
-  
+  if (import.meta.env.DEV) {
+    console.error('Uncaught error:', event.error);
+  }
+
   const rootElement = document.getElementById('root');
   if (rootElement && !rootElement.hasChildNodes()) {
     renderErrorFallback(rootElement);
@@ -35,7 +37,7 @@ function renderErrorFallback(rootElement: HTMLElement) {
   errorDiv.style.margin = '100px auto';
   errorDiv.style.textAlign = 'center';
   errorDiv.style.fontFamily = 'system-ui, sans-serif';
-  
+
   errorDiv.innerHTML = `
     <div style="display: flex; flex-direction: column; align-items: center; gap: 16px;">
       <div style="width: 48px; height: 48px; background: #3B82F6; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">D0C</div>
@@ -47,9 +49,9 @@ function renderErrorFallback(rootElement: HTMLElement) {
       </button>
     </div>
   `;
-  
+
   rootElement.appendChild(errorDiv);
-  
+
   document.getElementById('refresh-btn')?.addEventListener('click', () => {
     window.location.reload();
   });
@@ -73,22 +75,30 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js')
       .then((registration) => {
-        console.info('ServiceWorker registration successful with scope:', registration.scope);
+        if (import.meta.env.DEV) {
+          console.info('ServiceWorker registration successful with scope:', registration.scope);
+        }
       })
       .catch((error) => {
-        console.log('ServiceWorker registration failed:', error);
+        if (import.meta.env.DEV) {
+          console.log('ServiceWorker registration failed:', error);
+        }
       });
   });
 }
 
 // Add offline/online event listeners
 window.addEventListener('online', () => {
-  console.log('App is online');
+  if (import.meta.env.DEV) {
+    console.log('App is online');
+  }
   document.dispatchEvent(new CustomEvent('app:online'));
 });
 
 window.addEventListener('offline', () => {
-  console.log('App is offline');
+  if (import.meta.env.DEV) {
+    console.log('App is offline');
+  }
   document.dispatchEvent(new CustomEvent('app:offline'));
 });
 
@@ -99,16 +109,16 @@ let hasRendered = false;
 function renderApp() {
   try {
     if (hasRendered) return;
-    
+
     const rootElement = document.getElementById('root');
     if (!rootElement) {
       console.error("Root element not found!");
       return;
     }
-    
+
     // Clear any existing content
     rootElement.innerHTML = '';
-    
+
     ReactDOM.createRoot(rootElement).render(
       <React.StrictMode>
         <ErrorBoundary>
@@ -123,9 +133,11 @@ function renderApp() {
         </ErrorBoundary>
       </React.StrictMode>
     );
-    
+
     hasRendered = true;
-    console.log("Doc' O Clock rendered successfully");
+    if (import.meta.env.DEV) {
+      console.log("Doc' O Clock rendered successfully");
+    }
     window.appLoaded = true;
   } catch (error) {
     console.error("Failed to render app:", error);
@@ -146,7 +158,9 @@ if (document.readyState === 'loading') {
 // Safeguard against potential failures to render
 setTimeout(() => {
   if (!window.appLoaded) {
-    console.warn('App may not have loaded properly, attempting re-render');
+    if (import.meta.env.DEV) {
+      console.warn('App may not have loaded properly, attempting re-render');
+    }
     hasRendered = false;
     renderApp();
   }
