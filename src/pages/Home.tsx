@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sparkles, AlertTriangle, Pill, Users, Calendar } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useSuccessFeedback } from "@/hooks/use-success-feedback";
 import { SpecializedHelp } from "@/components/home/SpecializedHelp";
 import { WalletCard } from "@/components/home/WalletCard";
 
@@ -17,7 +16,6 @@ const Home = () => {
   // All hooks MUST be called before any conditional returns
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
-  const { showSuccess } = useSuccessFeedback();
 
   // Render authenticated view
   if (isAuthenticated) {
@@ -76,10 +74,7 @@ const Home = () => {
             <h2 className="text-xl md:text-2xl font-bold mb-4">Quick Access</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6 md:mb-8">
 
-              <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer border-none shadow-sm bg-white/80 backdrop-blur-sm hover:-translate-y-1 active:scale-95" onClick={() => {
-                navigate('/emergency');
-                showSuccess({ message: "Navigating to Emergency Services" });
-              }}>
+              <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer border-none shadow-sm bg-white/80 backdrop-blur-sm hover:-translate-y-1 active:scale-95" onClick={() => navigate('/emergency')}>
                 <CardHeader className="pb-3">
                   <div className="flex items-center gap-2">
                     <div className="p-2 bg-rose-50 rounded-lg group-hover:bg-rose-100 transition-colors">
