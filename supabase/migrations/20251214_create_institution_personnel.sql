@@ -17,6 +17,7 @@ ALTER TABLE public.institution_personnel ENABLE ROW LEVEL SECURITY;
 
 -- Policies
 -- Institution admins can view their personnel
+DROP POLICY IF EXISTS "Institution admins can view their personnel" ON public.institution_personnel;
 CREATE POLICY "Institution admins can view their personnel" ON public.institution_personnel
     FOR SELECT TO authenticated
     USING (
@@ -28,6 +29,7 @@ CREATE POLICY "Institution admins can view their personnel" ON public.institutio
     );
 
 -- Institution admins can manage their personnel
+DROP POLICY IF EXISTS "Institution admins can manage their personnel" ON public.institution_personnel;
 CREATE POLICY "Institution admins can manage their personnel" ON public.institution_personnel
     FOR ALL TO authenticated
     USING (
@@ -39,6 +41,7 @@ CREATE POLICY "Institution admins can manage their personnel" ON public.institut
     );
 
 -- Personnel can view their own records
+DROP POLICY IF EXISTS "Personnel can view their own records" ON public.institution_personnel;
 CREATE POLICY "Personnel can view their own records" ON public.institution_personnel
     FOR SELECT TO authenticated
     USING (user_id = auth.uid());

@@ -14,10 +14,12 @@ import { SpecializedHelp } from "@/components/home/SpecializedHelp";
 import { WalletCard } from "@/components/home/WalletCard";
 
 const Home = () => {
+  // All hooks MUST be called before any conditional returns
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const { showSuccess } = useSuccessFeedback();
 
+  // Render authenticated view
   if (isAuthenticated) {
     return (
       <div className="min-h-screen bg-gray-50/50">
@@ -142,6 +144,7 @@ const Home = () => {
     );
   }
 
+  // Render public landing page
   return (
     <div className="min-h-screen">
       <Hero />
