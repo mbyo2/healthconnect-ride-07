@@ -74,18 +74,17 @@ export function DesktopNav() {
         label: "Messages",
         icon: <MessageSquare className="h-5 w-5 mr-2" />,
         active: location.pathname === "/chat"
-      },
-      {
-        to: "/connections",
-        label: "My Providers",
-        icon: <Users className="h-5 w-5 mr-2" />,
-        active: location.pathname === "/connections"
       }
     );
   }
 
   // Enhanced secondary items for comprehensive access including Phase 5 features
   const secondaryNavItems = [
+    {
+      to: "/connections",
+      label: "My Providers",
+      icon: <Users className="h-4 w-4 mr-2" />
+    },
     {
       to: "/profile",
       label: "My Profile",
@@ -227,7 +226,7 @@ export function DesktopNav() {
             <Input
               type="search"
               placeholder="Find doctors, clinics, specialists..."
-              className="w-[250px] pl-10 md:w-[280px] lg:w-[320px] xl:w-[360px] 2xl:w-[400px] rounded-xl border-trust-200 focus:border-trust-400 focus:ring-trust-200"
+              className="w-[200px] pl-10 md:w-[240px] lg:w-[280px] xl:w-[320px] 2xl:w-[400px] rounded-xl border-trust-200 focus:border-trust-400 focus:ring-trust-200"
               value={searchTerm}
               onChange={handleSearchChange}
               aria-label="Search for doctors, clinics, or specialists"

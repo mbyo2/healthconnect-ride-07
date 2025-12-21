@@ -12,7 +12,8 @@ export async function createSuperAdmin(email: string, password: string, firstNam
           first_name: firstName,
           last_name: lastName,
           role: 'admin',
-          admin_level: 'superadmin'
+          admin_level: 'superadmin',
+          email_confirm: true // Attempt to auto-confirm if triggers allow
         }
       }
     });
@@ -34,10 +35,10 @@ export async function createSuperAdmin(email: string, password: string, firstNam
           is_profile_complete: true
         })
         .eq('id', response.data.user.id);
-        
+
       if (updateError) throw updateError;
     }
-    
+
     return { success: true, userId: response.data.user?.id };
   } catch (error: any) {
     console.error("Error creating superadmin:", error);

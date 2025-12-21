@@ -20,6 +20,7 @@ export async function createSpecificSuperUser() {
             console.log("✅ Superuser created successfully!");
             console.log(`📧 Email: ${SUPERUSER_EMAIL}`);
             console.log(`🔐 Password: ${SUPERUSER_PASSWORD}`);
+            console.log("⚠️ Note: If login fails, check if email confirmation is required by your Supabase project settings.");
             return true;
         } else {
             console.error("❌ Failed to create superuser:", result.error);
