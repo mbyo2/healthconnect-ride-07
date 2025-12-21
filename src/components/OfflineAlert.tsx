@@ -7,13 +7,13 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
 export const OfflineAlert = () => {
-  const { isOnline, connectionQuality } = useNetwork();
+  const { isOnline, connectionQuality, checkConnection } = useNetwork();
   const { pendingActions: offlineActions, syncPendingActions: syncOfflineActions } = useOfflineMode();
   const [wasOffline, setWasOffline] = useState(false);
   const [showBanner, setShowBanner] = useState(false);
   const [reconnectAttempts, setReconnectAttempts] = useState(0);
   const [syncingInBackground, setSyncingInBackground] = useState(false);
-  
+
   // Default offline features
   const offlineFeatures = {
     appointments: true,
@@ -23,7 +23,7 @@ export const OfflineAlert = () => {
     profile: true,
     search: false
   };
-  
+
   useEffect(() => {
     if (!isOnline) {
       setWasOffline(true);
@@ -41,20 +41,20 @@ export const OfflineAlert = () => {
         icon: <Wifi className="h-5 w-5" />
       });
       toast.dismiss('offline-toast');
-      
+
       // If we've reconnected after attempts, show message
       if (reconnectAttempts > 0) {
         toast.info(`Reconnected after ${reconnectAttempts} attempt${reconnectAttempts > 1 ? 's' : ''}`);
         setReconnectAttempts(0);
       }
-      
+
       // If there are offline actions, sync them
       if (offlineActions.length > 0) {
         syncOfflineActionsWithUI();
       }
     }
   }, [isOnline, wasOffline, reconnectAttempts, offlineActions]);
-  
+
   const syncOfflineActionsWithUI = async () => {
     // Show UI for syncing
     setSyncingInBackground(true);
@@ -63,9 +63,9 @@ export const OfflineAlert = () => {
         id: 'sync-toast',
         duration: 3000
       });
-      
+
       await syncOfflineActions();
-      
+
       toast.success("All changes synced successfully", {
         id: 'sync-toast',
       });
@@ -77,35 +77,38 @@ export const OfflineAlert = () => {
       setSyncingInBackground(false);
     }
   };
-  
-  const handleAttemptReconnect = () => {
+
+  const handleAttemptReconnect = async () => {
     setReconnectAttempts(prev => prev + 1);
-    
+
+    toast.loading("Checking connection...", {
+      id: 'reconnect-toast',
+      duration: 2000,
+    });
+
+    // Force a connection check
+    await checkConnection();
+
     // Try to refetch any failed resources
     if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
       navigator.serviceWorker.controller.postMessage({
         type: 'RETRY_FAILED_REQUESTS'
       });
     }
-    
-    toast.loading("Attempting to reconnect...", {
-      id: 'reconnect-toast',
-      duration: 2000,
-    });
   };
-  
+
   const getStatusColor = () => {
     if (!isOnline) return "destructive";
-    
+
     if (connectionQuality === 'poor') {
       return "warning";
     }
     return "success";
   };
-  
+
   const getConnectionText = () => {
     if (!isOnline) return "You're offline";
-    
+
     switch (connectionQuality) {
       case 'poor':
         return "Poor connection";
@@ -119,9 +122,9 @@ export const OfflineAlert = () => {
         return "Connected";
     }
   };
-  
+
   if (isOnline && !showBanner) return null;
-  
+
   return (
     <div className="fixed bottom-16 md:bottom-4 left-0 right-0 flex justify-center z-50 pointer-events-none px-4">
       <Sheet>
@@ -131,10 +134,10 @@ export const OfflineAlert = () => {
             {getConnectionText()}
             {offlineActions.length > 0 && ` • ${offlineActions.length} pending changes`}
           </span>
-          
+
           {!isOnline && (
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               size="sm"
               className="ml-2 bg-transparent border-white/20 hover:bg-white/20 text-white text-xs"
               onClick={handleAttemptReconnect}
@@ -142,10 +145,10 @@ export const OfflineAlert = () => {
               Reconnect
             </Button>
           )}
-          
+
           {isOnline && offlineActions.length > 0 && !syncingInBackground && (
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               size="sm"
               className="ml-2 bg-transparent border-white/20 hover:bg-white/20 text-white text-xs"
               onClick={syncOfflineActionsWithUI}
@@ -153,44 +156,44 @@ export const OfflineAlert = () => {
               Sync now
             </Button>
           )}
-          
+
           <SheetTrigger asChild>
-            <Button 
-              variant="ghost" 
-              size="icon" 
+            <Button
+              variant="ghost"
+              size="icon"
               className="h-6 w-6 rounded-full text-white hover:bg-white/20"
             >
               <span className="sr-only">Offline details</span>
               <span className="text-xs">i</span>
             </Button>
           </SheetTrigger>
-          
-          <button 
-            className="ml-2 text-xs underline" 
+
+          <button
+            className="ml-2 text-xs underline"
             onClick={() => setShowBanner(false)}
             aria-label="Dismiss"
           >
             Dismiss
           </button>
         </div>
-        
+
         <SheetContent side="bottom" className="rounded-t-xl max-h-[70vh]">
           <SheetHeader>
             <SheetTitle className="flex items-center">
-              {isOnline ? 
-                <Wifi className="h-5 w-5 mr-2 text-emerald-500" /> : 
+              {isOnline ?
+                <Wifi className="h-5 w-5 mr-2 text-emerald-500" /> :
                 <WifiOff className="h-5 w-5 mr-2 text-red-500" />
               }
               {isOnline ? "Online Status" : "Offline Mode"}
             </SheetTitle>
             <SheetDescription>
-              {isOnline 
+              {isOnline
                 ? "You're currently online. All features are available."
                 : "You're currently offline. Some features are limited until you reconnect."
               }
             </SheetDescription>
           </SheetHeader>
-          
+
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <h3 className="text-sm font-medium">Available Features</h3>
@@ -206,7 +209,7 @@ export const OfflineAlert = () => {
                 ))}
               </ul>
             </div>
-            
+
             {offlineActions.length > 0 && (
               <div className="space-y-2">
                 <h3 className="text-sm font-medium">Pending Changes</h3>
@@ -232,7 +235,7 @@ export const OfflineAlert = () => {
                 </div>
               </div>
             )}
-            
+
             <div className="space-y-2">
               <h3 className="text-sm font-medium">Connection Information</h3>
               <div className="rounded-md border p-3">
@@ -241,19 +244,19 @@ export const OfflineAlert = () => {
                   <div className="font-medium">
                     {isOnline ? "Online" : "Offline"}
                   </div>
-                  
+
                   <div className="text-muted-foreground">Quality:</div>
                   <div className="font-medium capitalize">
                     {connectionQuality}
                   </div>
-                  
+
                   {isOnline && (
                     <>
                       <div className="text-muted-foreground">Network:</div>
                       <div className="font-medium">
-                        {(navigator as any).connection?.type || 
-                         (navigator as any).connection?.effectiveType || 
-                         "Unknown"}
+                        {(navigator as any).connection?.type ||
+                          (navigator as any).connection?.effectiveType ||
+                          "Unknown"}
                       </div>
                     </>
                   )}
@@ -261,34 +264,34 @@ export const OfflineAlert = () => {
               </div>
             </div>
           </div>
-          
+
           <SheetFooter>
             <SheetClose asChild>
               <Button variant="outline" className="w-full" size="sm">
                 Close
               </Button>
             </SheetClose>
-            
+
             {!isOnline && (
-              <Button 
-                onClick={handleAttemptReconnect} 
-                className="w-full" 
+              <Button
+                onClick={handleAttemptReconnect}
+                className="w-full"
                 size="sm"
               >
                 <RefreshCcw className="h-4 w-4 mr-2" />
                 Try to Reconnect
               </Button>
             )}
-            
+
             {isOnline && offlineActions.length > 0 && (
-              <Button 
-                onClick={syncOfflineActionsWithUI} 
-                className="w-full" 
+              <Button
+                onClick={syncOfflineActionsWithUI}
+                className="w-full"
                 size="sm"
                 disabled={syncingInBackground}
               >
-                {syncingInBackground ? 
-                  "Syncing..." : 
+                {syncingInBackground ?
+                  "Syncing..." :
                   `Sync ${offlineActions.length} Changes`}
               </Button>
             )}
