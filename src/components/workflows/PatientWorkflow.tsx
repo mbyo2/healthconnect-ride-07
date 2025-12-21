@@ -49,16 +49,6 @@ export const PatientWorkflow = React.memo(() => {
     isWorkflowComplete
   } = useProfileCompletion();
 
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold">Loading Your Health Journey...</h2>
-        </div>
-      </div>
-    );
-  }
-
   const handleNavigation = useCallback((route: string, title?: string) => {
     try {
       navigate(route);
@@ -69,6 +59,16 @@ export const PatientWorkflow = React.memo(() => {
       console.error('Navigation error:', error);
     }
   }, [navigate, showSuccess]);
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold">Loading Your Health Journey...</h2>
+        </div>
+      </div>
+    );
+  }
 
   const getButtonText = (step: any) => {
     if (step.id === 'profile') {
@@ -217,10 +217,10 @@ export const PatientWorkflow = React.memo(() => {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
                     <div className={`p-2 rounded-lg flex-shrink-0 ${step.completed ? 'bg-green-500/10' :
-                        isHighlighted ? 'bg-blue-500/10' : 'bg-gray-500/10'
+                      isHighlighted ? 'bg-blue-500/10' : 'bg-gray-500/10'
                       }`}>
                       <IconComponent className={`h-4 w-4 ${step.completed ? 'text-green-600' :
-                          isHighlighted ? 'text-blue-600' : 'text-gray-600'
+                        isHighlighted ? 'text-blue-600' : 'text-gray-600'
                         }`} />
                     </div>
                     <CardTitle className="text-sm leading-tight">{step.title}</CardTitle>
