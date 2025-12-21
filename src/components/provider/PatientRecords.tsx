@@ -36,19 +36,31 @@ export const PatientRecords = () => {
       if (!user) throw new Error("Not authenticated");
 
       const { data, error } = await supabase
-        .from('medical_records')
+        .from('comprehensive_medical_records')
         .select(`
-          *,
-          patient:profiles(first_name, last_name)
+          id,
+          patient_id,
+          record_type,
+          description,
+          visit_date,
+          patient:profiles!comprehensive_medical_records_patient_id_fkey(first_name, last_name)
         `)
-        .order('date', { ascending: false });
+        .order('visit_date', { ascending: false });
 
       if (error) throw error;
-      return data as PatientRecord[];
+
+      return data.map(record => ({
+        id: record.id,
+        patient_id: record.patient_id,
+        record_type: record.record_type,
+        description: record.description,
+        date: record.visit_date,
+        patient: record.patient
+      })) as PatientRecord[];
     }
   });
 
-  const filteredRecords = records?.filter(record => 
+  const filteredRecords = records?.filter(record =>
     record.patient.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     record.patient.last_name.toLowerCase().includes(searchTerm.toLowerCase())
   );

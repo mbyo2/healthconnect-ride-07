@@ -38,7 +38,7 @@ export const ProfileStats = ({ userId }: ProfileStatsProps) => {
 
         // Fetch prescriptions count
         const { count: prescriptionsCount } = await supabase
-          .from('prescriptions')
+          .from('comprehensive_prescriptions')
           .select('*', { count: 'exact', head: true })
           .eq('patient_id', userId);
 

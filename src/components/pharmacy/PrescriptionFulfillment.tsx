@@ -1,14 +1,14 @@
 
 import { useState, useEffect } from 'react';
-import { 
-  Card, 
-  CardContent, 
-  CardHeader, 
+import {
+  Card,
+  CardContent,
+  CardHeader,
   CardTitle,
   CardDescription,
   CardFooter
 } from '@/components/ui/card';
-import { 
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -30,7 +30,7 @@ interface Prescription {
   patient_id: string;
   medication_name: string;
   dosage: string;
-  frequency: string;
+  frequency?: string;
   prescribed_by: string;
   prescribed_date: string;
   end_date?: string;
@@ -60,7 +60,7 @@ export function PrescriptionFulfillment() {
     const loadPrescriptions = async () => {
       try {
         setLoading(true);
-        
+
         // First try to get cached data if offline
         if (!isOnline) {
           const cachedData = await getOfflineCache('pharmacy_prescriptions');
@@ -70,38 +70,37 @@ export function PrescriptionFulfillment() {
             toast({
               title: "Using cached prescription data",
               description: "You're viewing offline data which may not be current",
-              // Fix the variant
               variant: "destructive",
             });
             return;
           }
         }
-        
+
         // Load data from Supabase if online
         const { data: prescriptionsData, error } = await supabase
-          .from('prescriptions')
+          .from('comprehensive_prescriptions')
           .select(`
             *,
-            profiles:patient_id(first_name, last_name)
+            profiles:patient_id(first_name, last_name),
+            provider:provider_id(first_name, last_name)
           `);
-          
+
         if (error) throw error;
 
         // Load fulfillment data from localStorage since we don't have that table in Supabase yet
-        // In a real app, you would create this table in Supabase
-  const storedFulfillments = safeLocalGet('prescription_fulfillments');
-  let fulfillmentData: any[] = [];
-  try {
-    fulfillmentData = storedFulfillments ? JSON.parse(storedFulfillments) : [];
-  } catch (e) {
-    fulfillmentData = [];
-  }
-        
+        const storedFulfillments = safeLocalGet('prescription_fulfillments');
+        let fulfillmentData: any[] = [];
+        try {
+          fulfillmentData = storedFulfillments ? JSON.parse(storedFulfillments) : [];
+        } catch (e) {
+          fulfillmentData = [];
+        }
+
         // Transform the data
-        const prescriptionsWithStatus = prescriptionsData.map(prescription => {
+        const prescriptionsWithStatus = prescriptionsData.map((prescription: any) => {
           // Find fulfillment status if it exists
           let fulfillmentStatus = 'pending';
-          
+
           if (fulfillmentData && fulfillmentData.length > 0) {
             const fulfillment = fulfillmentData.find((f: FulfillmentData) => f.prescription_id === prescription.id);
             if (fulfillment) {
@@ -111,21 +110,28 @@ export function PrescriptionFulfillment() {
             // Fallback to cached data
             fulfillmentStatus = fulfillmentCache[prescription.id] || 'pending';
           }
-          
+
           return {
-            ...prescription,
+            id: prescription.id,
+            patient_id: prescription.patient_id,
+            medication_name: prescription.medication_name,
+            dosage: prescription.dosage,
+            frequency: prescription.instructions, // Map instructions to frequency for display
+            prescribed_by: prescription.provider ? `Dr. ${prescription.provider.first_name} ${prescription.provider.last_name}` : 'Unknown Provider',
+            prescribed_date: prescription.prescribed_date,
+            notes: prescription.notes,
             fulfillment_status: fulfillmentStatus as 'pending' | 'fulfilled' | 'partially_fulfilled' | 'cancelled',
-            patient_name: prescription.profiles ? 
-              `${prescription.profiles.first_name} ${prescription.profiles.last_name}` : 
+            patient_name: prescription.profiles ?
+              `${prescription.profiles.first_name} ${prescription.profiles.last_name}` :
               'Unknown Patient'
           };
         });
-        
+
         setPrescriptions(prescriptionsWithStatus);
-        
+
         // Cache data for offline use
         await cacheForOffline('pharmacy_prescriptions', prescriptionsWithStatus);
-        
+
       } catch (error) {
         console.error('Error loading prescriptions:', error);
         toast({
@@ -146,42 +152,41 @@ export function PrescriptionFulfillment() {
       // First update local state for immediate UI feedback
       setPrescriptions(prev => prev.map(p => {
         if (p.id === prescriptionId) {
-          return { 
-            ...p, 
+          return {
+            ...p,
             fulfillment_status: newStatus as 'pending' | 'fulfilled' | 'partially_fulfilled' | 'cancelled'
           };
         }
         return p;
       }));
-      
+
       // Update cache
       setFulfillmentCache(prev => ({
         ...prev,
         [prescriptionId]: newStatus
       }));
-      
+
       // If offline, queue the update for later
       if (!isOnline) {
         await queueOfflineAction({
           id: safeCryptoUUID(),
           type: 'UPDATE_PRESCRIPTION_STATUS',
           table: 'prescription_fulfillments',
-          data: { 
-            prescription_id: prescriptionId, 
-            status: newStatus 
+          data: {
+            prescription_id: prescriptionId,
+            status: newStatus
           }
         });
-        
+
         toast({
           title: "Status saved offline",
           description: "Change will be synced when connection is restored",
         });
         return;
       }
-      
+
       // Since we don't have the prescription_fulfillments table in Supabase yet,
       // we'll store the data in localStorage as a temporary solution
-      // In a real app, you should create this table in Supabase
       let currentFulfillments: any[] = [];
       try {
         const storedFulfillments = safeLocalGet('prescription_fulfillments');
@@ -190,12 +195,12 @@ export function PrescriptionFulfillment() {
         console.warn('Unable to read prescription_fulfillments from safe storage:', err);
         currentFulfillments = [];
       }
-      
+
       // Find if this prescription already has a status entry
       const existingFulfillmentIndex = currentFulfillments.findIndex(
         (f: FulfillmentData) => f.prescription_id === prescriptionId
       );
-      
+
       if (existingFulfillmentIndex >= 0) {
         // Update existing entry
         currentFulfillments[existingFulfillmentIndex] = {
@@ -211,14 +216,14 @@ export function PrescriptionFulfillment() {
           updated_at: new Date().toISOString()
         });
       }
-      
+
       // Save back to localStorage
       try {
         safeLocalSet('prescription_fulfillments', JSON.stringify(currentFulfillments));
       } catch (err) {
         console.warn('Unable to persist prescription_fulfillments to localStorage:', err);
       }
-      
+
       toast({
         title: "Status updated",
         description: "Prescription status has been updated",
@@ -296,12 +301,12 @@ export function PrescriptionFulfillment() {
                   <CardTitle>{prescription.medication_name}</CardTitle>
                   <CardDescription>Patient: {prescription.patient_name || 'Unknown'}</CardDescription>
                 </div>
-                <Badge 
+                <Badge
                   variant={
-                    prescription.fulfillment_status === 'fulfilled' ? 'default' : 
-                    prescription.fulfillment_status === 'partially_fulfilled' ? 'secondary' : 
-                    prescription.fulfillment_status === 'cancelled' ? 'destructive' : 
-                    'outline'
+                    prescription.fulfillment_status === 'fulfilled' ? 'default' :
+                      prescription.fulfillment_status === 'partially_fulfilled' ? 'secondary' :
+                        prescription.fulfillment_status === 'cancelled' ? 'destructive' :
+                          'outline'
                   }
                 >
                   {prescription.fulfillment_status?.replace('_', ' ') || 'pending'}
@@ -336,8 +341,8 @@ export function PrescriptionFulfillment() {
               )}
             </CardContent>
             <CardFooter className="flex justify-between">
-              <Select 
-                value={prescription.fulfillment_status || 'pending'} 
+              <Select
+                value={prescription.fulfillment_status || 'pending'}
                 onValueChange={(value) => updateFulfillmentStatus(prescription.id, value)}
                 disabled={!isOnline && !safeLocalGet('offlineModePrescriptionUpdatesEnabled')}
               >
@@ -351,7 +356,7 @@ export function PrescriptionFulfillment() {
                   <SelectItem value="cancelled">Cancelled</SelectItem>
                 </SelectContent>
               </Select>
-              
+
               <Button variant="outline" onClick={() => console.log('View details', prescription.id)}>
                 View Details
               </Button>

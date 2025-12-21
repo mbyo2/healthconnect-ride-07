@@ -30,77 +30,94 @@ export const getHealthStats = async (): Promise<HealthStat[]> => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return [];
 
+    // Fetch latest metrics from comprehensive table
     const { data: metrics } = await supabase
-      .from('daily_health_metrics')
+      .from('comprehensive_health_metrics')
       .select('*')
       .eq('user_id', user.id)
-      .order('date', { ascending: false })
-      .limit(1);
+      .eq('metric_category', 'lifestyle')
+      .order('recorded_at', { ascending: false })
+      .limit(20); // Get enough recent records to find one of each type
 
     if (!metrics || metrics.length === 0) return [];
-    const metric = metrics[0];
+
+    // Helper to find latest value for a metric name
+    const getLatestMetric = (name: string) => metrics.find(m => m.metric_name === name);
 
     const stats: HealthStat[] = [];
-    if (metric.steps !== undefined) {
+
+    const steps = getLatestMetric('steps');
+    if (steps) {
       stats.push({
         title: 'Steps',
-        value: metric.steps.toString(),
-        unit: 'steps',
-        status: 'Normal',
-        trend: 'stable',
+        value: steps.value.toString(),
+        unit: steps.unit,
+        status: steps.status || 'Normal',
+        trend: (steps.trend_direction as any) || 'stable',
         icon: getIconForMetricType('steps')
       });
     }
-    if (metric.calories_burned !== undefined) {
+
+    const calories = getLatestMetric('calories_burned');
+    if (calories) {
       stats.push({
         title: 'Calories Burned',
-        value: metric.calories_burned.toString(),
-        unit: 'kcal',
-        status: 'Normal',
-        trend: 'stable',
+        value: calories.value.toString(),
+        unit: calories.unit,
+        status: calories.status || 'Normal',
+        trend: (calories.trend_direction as any) || 'stable',
         icon: getIconForMetricType('calories')
       });
     }
-    if (metric.distance !== undefined) {
+
+    const distance = getLatestMetric('distance');
+    if (distance) {
       stats.push({
         title: 'Distance',
-        value: metric.distance.toString(),
-        unit: 'km',
-        status: 'Normal',
-        trend: 'stable',
+        value: distance.value.toString(),
+        unit: distance.unit,
+        status: distance.status || 'Normal',
+        trend: (distance.trend_direction as any) || 'stable',
         icon: getIconForMetricType('distance')
       });
     }
-    if (metric.active_minutes !== undefined) {
+
+    const activeMinutes = getLatestMetric('active_minutes');
+    if (activeMinutes) {
       stats.push({
         title: 'Active Minutes',
-        value: metric.active_minutes.toString(),
-        unit: 'min',
-        status: 'Normal',
-        trend: 'stable',
+        value: activeMinutes.value.toString(),
+        unit: activeMinutes.unit,
+        status: activeMinutes.status || 'Normal',
+        trend: (activeMinutes.trend_direction as any) || 'stable',
         icon: getIconForMetricType('active_minutes')
       });
     }
-    if (metric.sleep_hours !== undefined) {
+
+    const sleep = getLatestMetric('sleep_hours');
+    if (sleep) {
       stats.push({
         title: 'Sleep Hours',
-        value: metric.sleep_hours.toString(),
-        unit: 'h',
-        status: 'Normal',
-        trend: 'stable',
+        value: sleep.value.toString(),
+        unit: sleep.unit,
+        status: sleep.status || 'Normal',
+        trend: (sleep.trend_direction as any) || 'stable',
         icon: getIconForMetricType('sleep')
       });
     }
-    if (metric.water_intake !== undefined) {
+
+    const water = getLatestMetric('water_intake');
+    if (water) {
       stats.push({
         title: 'Water Intake',
-        value: metric.water_intake.toString(),
-        unit: 'L',
-        status: 'Normal',
-        trend: 'stable',
+        value: water.value.toString(),
+        unit: water.unit,
+        status: water.status || 'Normal',
+        trend: (water.trend_direction as any) || 'stable',
         icon: getIconForMetricType('water')
       });
     }
+
     return stats;
   } catch (error) {
     console.error('Error fetching health stats:', error);
@@ -115,41 +132,48 @@ export const getHealthGoals = async (): Promise<HealthGoal[]> => {
     if (!user) return [];
 
     const { data: metrics } = await supabase
-      .from('daily_health_metrics')
+      .from('comprehensive_health_metrics')
       .select('*')
       .eq('user_id', user.id)
-      .order('date', { ascending: false })
-      .limit(1);
+      .eq('metric_category', 'lifestyle')
+      .order('recorded_at', { ascending: false })
+      .limit(20);
 
     if (!metrics || metrics.length === 0) return [];
-    const metric = metrics[0];
 
+    const getLatestMetric = (name: string) => metrics.find(m => m.metric_name === name);
     const goals: HealthGoal[] = [];
-    if (metric.steps !== undefined) {
+
+    const steps = getLatestMetric('steps');
+    if (steps) {
       goals.push({
         title: 'Steps Goal',
-        current: metric.steps,
+        current: Number(steps.value),
         target: getTargetForMetricType('steps'),
         icon: getIconForGoalType('steps')
       });
     }
-    if (metric.water_intake !== undefined) {
+
+    const water = getLatestMetric('water_intake');
+    if (water) {
       goals.push({
         title: 'Water Intake Goal',
-        current: metric.water_intake,
+        current: Number(water.value),
         target: getTargetForMetricType('water'),
         icon: getIconForGoalType('water')
       });
     }
-    if (metric.active_minutes !== undefined) {
+
+    const activeMinutes = getLatestMetric('active_minutes');
+    if (activeMinutes) {
       goals.push({
         title: 'Active Minutes Goal',
-        current: metric.active_minutes,
+        current: Number(activeMinutes.value),
         target: getTargetForMetricType('exercise'),
         icon: getIconForGoalType('exercise')
       });
     }
-    // Add more goals as needed based on available columns
+
     return goals;
   } catch (error) {
     console.error('Error fetching health goals:', error);

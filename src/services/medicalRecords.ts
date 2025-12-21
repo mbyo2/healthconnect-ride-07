@@ -23,18 +23,25 @@ export const getMedicalRecords = async (): Promise<MedicalRecord[]> => {
     if (!user) return [];
 
     const { data: records } = await supabase
-      .from('medical_records')
-      .select('*')
+      .from('comprehensive_medical_records')
+      .select(`
+        id,
+        title,
+        visit_date,
+        record_type,
+        status,
+        provider:profiles!comprehensive_medical_records_provider_id_fkey(first_name, last_name)
+      `)
       .eq('patient_id', user.id)
-      .order('date', { ascending: false });
+      .order('visit_date', { ascending: false });
 
     return records?.map(record => ({
       id: record.id,
-      title: record.record_type || 'Medical Record',
-      date: record.date,
-      provider: 'Healthcare Provider', // Since provider_name doesn't exist in schema
-      type: record.record_type || 'General',
-      status: 'Complete' // Since status doesn't exist in schema, use default
+      title: record.title,
+      date: record.visit_date,
+      provider: record.provider ? `Dr. ${record.provider.first_name} ${record.provider.last_name}` : 'Healthcare Provider',
+      type: record.record_type,
+      status: record.status || 'Active'
     })) || [];
   } catch (error) {
     console.error('Error fetching medical records:', error);
@@ -48,17 +55,17 @@ export const getHealthMetrics = async (): Promise<HealthMetric[]> => {
     if (!user) return [];
 
     const { data: metrics } = await supabase
-      .from('health_metrics')
+      .from('comprehensive_health_metrics')
       .select('*')
       .eq('user_id', user.id)
       .order('recorded_at', { ascending: false })
       .limit(4);
 
     return metrics?.map(metric => ({
-      label: metric.metric_type,
-      value: `${metric.value} ${metric.unit || ''}`,
+      label: metric.metric_name,
+      value: `${metric.value} ${metric.unit}`,
       date: new Date(metric.recorded_at).toLocaleDateString(),
-      status: 'Normal'
+      status: metric.status || 'Normal'
     })) || [];
   } catch (error) {
     console.error('Error fetching health metrics:', error);

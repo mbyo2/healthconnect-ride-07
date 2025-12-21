@@ -112,7 +112,7 @@ class AIHealthInsights {
         .limit(30);
 
       const { data: prescriptions } = await supabase
-        .from('prescriptions')
+        .from('comprehensive_prescriptions')
         .select('*')
         .eq('patient_id', userId);
 
@@ -571,7 +571,7 @@ class AIHealthInsights {
     const recommendations: string[] = [];
 
     const complexRegimens = medications.filter(med =>
-      med.frequency === 'multiple_daily' || med.instructions?.includes('with food')
+      (med.frequency === 'multiple_daily' || med.instructions?.includes('times daily')) || med.instructions?.includes('with food')
     );
 
     if (complexRegimens.length > 2) {
@@ -591,7 +591,7 @@ class AIHealthInsights {
     // Simplified interaction checking - in production, use comprehensive drug database
     const interactions: string[] = [];
 
-    const drugNames = medications.map(med => med.name?.toLowerCase() || '');
+    const drugNames = medications.map(med => med.medication_name?.toLowerCase() || '');
 
     // Common interaction patterns
     if (drugNames.includes('warfarin') && drugNames.some(name => name.includes('aspirin'))) {

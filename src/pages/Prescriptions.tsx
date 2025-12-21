@@ -5,38 +5,71 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Pill, Calendar, User, Clock, Download } from 'lucide-react';
 
+import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+
 const Prescriptions = () => {
-  const prescriptions = [
-    {
-      id: '1',
-      medication: 'Amoxicillin 500mg',
-      prescriber: 'Dr. Sarah Johnson',
-      dosage: '1 tablet twice daily',
-      duration: '7 days',
-      prescribedDate: '2024-01-15',
-      status: 'active',
-      refillsRemaining: 2
-    },
-    {
-      id: '2',
-      medication: 'Paracetamol 500mg',
-      prescriber: 'Dr. Michael Chen',
-      dosage: '1-2 tablets as needed',
-      duration: 'As needed',
-      prescribedDate: '2024-01-10',
-      status: 'completed',
-      refillsRemaining: 0
+  const { user } = useAuth();
+  const [prescriptions, setPrescriptions] = React.useState<any[]>([]);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    if (user) {
+      fetchPrescriptions();
     }
-  ];
+  }, [user]);
+
+  const fetchPrescriptions = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('comprehensive_prescriptions')
+        .select(`
+          id,
+          medication_name,
+          dosage,
+          duration_days,
+          prescribed_date,
+          status,
+          refills_remaining,
+          instructions,
+          provider:profiles!comprehensive_prescriptions_provider_id_fkey(first_name, last_name)
+        `)
+        .eq('patient_id', user?.id)
+        .order('prescribed_date', { ascending: false });
+
+      if (error) throw error;
+
+      setPrescriptions(data?.map(p => ({
+        id: p.id,
+        medication: p.medication_name,
+        prescriber: p.provider ? `Dr. ${p.provider.first_name} ${p.provider.last_name}` : 'Unknown Provider',
+        dosage: p.dosage,
+        duration: p.duration_days ? `${p.duration_days} days` : 'As directed',
+        prescribedDate: p.prescribed_date,
+        status: p.status || 'active',
+        refillsRemaining: p.refills_remaining || 0,
+        instructions: p.instructions
+      })) || []);
+    } catch (error) {
+      console.error('Error fetching prescriptions:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active': return 'bg-green-100 text-green-800';
       case 'completed': return 'bg-gray-100 text-gray-800';
       case 'expired': return 'bg-red-100 text-red-800';
+      case 'pending': return 'bg-yellow-100 text-yellow-800';
       default: return 'bg-blue-100 text-blue-800';
     }
   };
+
+  if (loading) {
+    return <div className="p-8 text-center">Loading prescriptions...</div>;
+  }
 
   return (
     <div className="container mx-auto py-8 space-y-6">
@@ -74,7 +107,7 @@ const Prescriptions = () => {
                   <h4 className="font-medium text-sm mb-1">Dosage</h4>
                   <p className="text-sm text-muted-foreground">{prescription.dosage}</p>
                 </div>
-                
+
                 <div>
                   <h4 className="font-medium text-sm mb-1">Duration</h4>
                   <p className="text-sm text-muted-foreground">{prescription.duration}</p>
@@ -85,6 +118,13 @@ const Prescriptions = () => {
                   <p className="text-sm text-muted-foreground">{prescription.refillsRemaining}</p>
                 </div>
               </div>
+
+              {prescription.instructions && (
+                <div className="bg-muted/50 p-3 rounded-md">
+                  <h4 className="font-medium text-sm mb-1">Instructions</h4>
+                  <p className="text-sm text-muted-foreground">{prescription.instructions}</p>
+                </div>
+              )}
 
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Calendar className="h-4 w-4" />

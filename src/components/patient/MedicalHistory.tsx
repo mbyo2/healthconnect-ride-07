@@ -27,14 +27,19 @@ export const MedicalHistory = () => {
       if (!user) return;
 
       const { data, error } = await supabase
-        .from('medical_records')
+        .from('comprehensive_medical_records')
         .select('*')
         .eq('patient_id', user.id)
-        .order('date', { ascending: false });
+        .order('visit_date', { ascending: false });
 
       if (error) throw error;
 
-      setRecords(data || []);
+      setRecords(data.map(record => ({
+        id: record.id,
+        record_type: record.record_type,
+        description: record.description,
+        date: record.visit_date
+      })) || []);
     } catch (error) {
       console.error('Error fetching medical records:', error);
       toast({

@@ -21,6 +21,7 @@ export const PrescriptionWriter = () => {
     dosage: "",
     frequency: "",
     duration: "",
+    quantity: "1",
     notes: "",
   });
 
@@ -30,16 +31,26 @@ export const PrescriptionWriter = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
+      // Parse duration to days (simple parsing)
+      const durationDays = parseInt(prescription.duration) || 7;
+
       const { error } = await supabase
-        .from('prescriptions')
+        .from('comprehensive_prescriptions')
         .insert({
-          ...prescription,
-          prescribed_by: user.id,
+          patient_id: prescription.patient_id,
+          medication_name: prescription.medication_name,
+          dosage: `${prescription.dosage} - ${prescription.frequency}`, // Combine for schema compatibility if needed, or just dosage
+          instructions: `${prescription.frequency}. ${prescription.notes}`,
+          duration_days: durationDays,
+          quantity: parseInt(prescription.quantity) || 1,
+          provider_id: user.id,
           prescribed_date: new Date().toISOString(),
+          status: 'active',
+          notes: prescription.notes
         });
 
       if (error) throw error;
-      
+
       toast.success("Prescription created successfully");
       setPrescription({
         patient_id: "",
@@ -47,6 +58,7 @@ export const PrescriptionWriter = () => {
         dosage: "",
         frequency: "",
         duration: "",
+        quantity: "1",
         notes: "",
       });
     } catch (error) {
@@ -58,13 +70,13 @@ export const PrescriptionWriter = () => {
   return (
     <Card className="p-6">
       <h2 className="text-2xl font-semibold mb-6">Write Prescription</h2>
-      
+
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <Label>Patient</Label>
           <Select
             value={prescription.patient_id}
-            onValueChange={(value) => setPrescription({...prescription, patient_id: value})}
+            onValueChange={(value) => setPrescription({ ...prescription, patient_id: value })}
           >
             <SelectTrigger>
               <SelectValue placeholder="Select patient" />
@@ -72,6 +84,7 @@ export const PrescriptionWriter = () => {
             <SelectContent>
               <SelectItem value="1">John Doe</SelectItem>
               <SelectItem value="2">Jane Smith</SelectItem>
+              {/* In a real app, fetch patients from DB */}
             </SelectContent>
           </Select>
         </div>
@@ -80,7 +93,7 @@ export const PrescriptionWriter = () => {
           <Label>Medication Name</Label>
           <Input
             value={prescription.medication_name}
-            onChange={(e) => setPrescription({...prescription, medication_name: e.target.value})}
+            onChange={(e) => setPrescription({ ...prescription, medication_name: e.target.value })}
             placeholder="Enter medication name"
           />
         </div>
@@ -90,7 +103,7 @@ export const PrescriptionWriter = () => {
             <Label>Dosage</Label>
             <Input
               value={prescription.dosage}
-              onChange={(e) => setPrescription({...prescription, dosage: e.target.value})}
+              onChange={(e) => setPrescription({ ...prescription, dosage: e.target.value })}
               placeholder="e.g., 500mg"
             />
           </div>
@@ -98,26 +111,38 @@ export const PrescriptionWriter = () => {
             <Label>Frequency</Label>
             <Input
               value={prescription.frequency}
-              onChange={(e) => setPrescription({...prescription, frequency: e.target.value})}
+              onChange={(e) => setPrescription({ ...prescription, frequency: e.target.value })}
               placeholder="e.g., Twice daily"
             />
           </div>
         </div>
 
-        <div>
-          <Label>Duration</Label>
-          <Input
-            value={prescription.duration}
-            onChange={(e) => setPrescription({...prescription, duration: e.target.value})}
-            placeholder="e.g., 7 days"
-          />
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label>Duration (Days)</Label>
+            <Input
+              value={prescription.duration}
+              onChange={(e) => setPrescription({ ...prescription, duration: e.target.value })}
+              placeholder="e.g., 7"
+              type="number"
+            />
+          </div>
+          <div>
+            <Label>Quantity</Label>
+            <Input
+              value={prescription.quantity}
+              onChange={(e) => setPrescription({ ...prescription, quantity: e.target.value })}
+              placeholder="e.g., 30"
+              type="number"
+            />
+          </div>
         </div>
 
         <div>
-          <Label>Notes</Label>
+          <Label>Notes / Instructions</Label>
           <Textarea
             value={prescription.notes}
-            onChange={(e) => setPrescription({...prescription, notes: e.target.value})}
+            onChange={(e) => setPrescription({ ...prescription, notes: e.target.value })}
             placeholder="Additional instructions or notes"
           />
         </div>

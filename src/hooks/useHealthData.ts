@@ -28,21 +28,19 @@ export function useHealthData(userId: string | undefined, timeRange: string) {
                 default: startDate.setDate(endDate.getDate() - 7);
             }
 
-            // Fetch Health Metrics (Activity, Sleep)
+            // Fetch Health Metrics from comprehensive table (EAV structure)
             const { data: metrics, error: metricsError } = await supabase
-                .from('daily_health_metrics')
+                .from('comprehensive_health_metrics')
                 .select('*')
                 .eq('user_id', userId)
-                .gte('date', startDate.toISOString().split('T')[0])
-                .lte('date', endDate.toISOString().split('T')[0])
-                .order('date', { ascending: true });
+                .eq('metric_category', 'lifestyle')
+                .gte('recorded_at', startDate.toISOString())
+                .lte('recorded_at', endDate.toISOString())
+                .order('recorded_at', { ascending: true });
 
             if (metricsError) throw metricsError;
 
             // Fetch Vital Signs (Heart Rate)
-            // Note: This might be heavy if there are many readings. 
-            // In a real app, we'd use a database function to aggregate.
-            // For now, we'll fetch and aggregate in JS.
             const { data: vitals, error: vitalsError } = await supabase
                 .from('vital_signs')
                 .select('heart_rate, recorded_at')
@@ -64,24 +62,40 @@ export function useHealthData(userId: string | undefined, timeRange: string) {
     };
 
     const processMetrics = (data: any[]) => {
-        // Transform for charts
-        const activity = data.map(d => ({
-            date: new Date(d.date).toLocaleDateString('en-US', { weekday: 'short' }),
-            steps: d.steps,
-            calories: d.calories_burned,
-            distance: d.distance
-        }));
-        setActivityData(activity);
+        // Pivot EAV data to grouped by date
+        const groupedByDate: Record<string, any> = {};
 
-        const sleep = data.map(d => ({
-            date: new Date(d.date).toLocaleDateString('en-US', { weekday: 'short' }),
-            hours: d.sleep_hours,
+        data.forEach(record => {
+            const dateStr = new Date(record.recorded_at).toLocaleDateString('en-US', { weekday: 'short' });
+            if (!groupedByDate[dateStr]) {
+                groupedByDate[dateStr] = { date: dateStr };
+            }
+
+            // Map metric names to chart keys
+            if (record.metric_name === 'steps') groupedByDate[dateStr].steps = Number(record.value);
+            if (record.metric_name === 'calories_burned') groupedByDate[dateStr].calories = Number(record.value);
+            if (record.metric_name === 'distance') groupedByDate[dateStr].distance = Number(record.value);
+            if (record.metric_name === 'sleep_hours') groupedByDate[dateStr].sleep_hours = Number(record.value);
+        });
+
+        const processedData = Object.values(groupedByDate);
+
+        // Transform for charts
+        setActivityData(processedData.map(d => ({
+            date: d.date,
+            steps: d.steps || 0,
+            calories: d.calories || 0,
+            distance: d.distance || 0
+        })));
+
+        setSleepData(processedData.map(d => ({
+            date: d.date,
+            hours: d.sleep_hours || 0,
             // Mock breakdown as we only have total hours in schema
-            deep: d.sleep_hours * 0.2,
-            light: d.sleep_hours * 0.6,
-            rem: d.sleep_hours * 0.2
-        }));
-        setSleepData(sleep);
+            deep: (d.sleep_hours || 0) * 0.2,
+            light: (d.sleep_hours || 0) * 0.6,
+            rem: (d.sleep_hours || 0) * 0.2
+        })));
     };
 
     const processVitals = (data: any[]) => {
