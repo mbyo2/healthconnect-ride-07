@@ -116,6 +116,28 @@ html {
     --border: 215 27.9% 16.9%;
     --input: 215 27.9% 16.9%;
     --ring: 263.4 70% 50.4%;
+
+    /* Dark mode trust palette - inverted for contrast */
+    --trust-50: 15, 23, 42;
+    /* slate-900 */
+    --trust-100: 30, 41, 59;
+    /* slate-800 */
+    --trust-200: 51, 65, 85;
+    /* slate-700 */
+    --trust-300: 71, 85, 105;
+    /* slate-600 */
+    --trust-400: 100, 116, 139;
+    /* slate-500 */
+    --trust-500: 96, 165, 250;
+    /* blue-400 */
+    --trust-600: 147, 197, 253;
+    /* blue-300 */
+    --trust-700: 191, 219, 254;
+    /* blue-200 */
+    --trust-800: 219, 234, 254;
+    /* blue-100 */
+    --trust-900: 239, 246, 255;
+    /* blue-50 */
   }
 }
 
@@ -142,7 +164,7 @@ html {
 
   /* Modern header styles */
   .modern-header {
-    @apply sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-trust-100;
+    @apply sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border;
     box-shadow: 0 1px 3px rgba(59, 130, 246, 0.05);
   }
 

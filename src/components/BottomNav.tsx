@@ -177,7 +177,7 @@ export function BottomNav() {
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 safe-area-pb">
       {/* Enhanced backdrop with better contrast */}
-      <div className="absolute inset-0 bg-background/95 backdrop-blur-xl border-t-2 border-trust-200 shadow-2xl" />
+      <div className="absolute inset-0 bg-background/95 backdrop-blur-xl border-t border-border shadow-2xl" />
 
       {/* Navigation content optimized for mobile */}
       <div className="relative flex items-center justify-evenly h-20 px-2">

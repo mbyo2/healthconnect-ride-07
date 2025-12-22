@@ -106,12 +106,12 @@ export function Header() {
                 )}
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-64 bg-white border border-gray-200 shadow-lg max-h-[80vh] overflow-y-auto z-50">
+            <DropdownMenuContent align="end" className="w-64 bg-popover border border-border shadow-lg max-h-[80vh] overflow-y-auto z-50">
               {user ? (
                 <>
                   <DropdownMenuLabel className="pb-2">
-                    <div className="text-sm font-medium text-gray-900">{user.email}</div>
-                    <div className="text-xs text-gray-500">My Account</div>
+                    <div className="text-sm font-medium text-foreground">{user.email}</div>
+                    <div className="text-xs text-muted-foreground">My Account</div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>

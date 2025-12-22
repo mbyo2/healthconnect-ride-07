@@ -36,7 +36,7 @@ export const WalletHistory = () => {
                     .order('created_at', { ascending: false });
 
                 if (error) throw error;
-                setTransactions(data || []);
+                setTransactions((data as any) || []);
             } catch (error) {
                 console.error('Error fetching transactions:', error);
             } finally {
@@ -54,7 +54,7 @@ export const WalletHistory = () => {
 
     if (isLoading) {
         return (
-            <Card className="border-none shadow-lg bg-white/50 backdrop-blur-sm">
+            <Card className="border border-border shadow-lg bg-card/50 backdrop-blur-sm">
                 <CardHeader>
                     <CardTitle className="text-lg flex items-center gap-2">
                         <Clock className="h-5 w-5 text-blue-500" />
@@ -64,7 +64,7 @@ export const WalletHistory = () => {
                 <CardContent>
                     <div className="space-y-4">
                         {[1, 2, 3].map((i) => (
-                            <div key={i} className="h-16 bg-gray-100 animate-pulse rounded-lg" />
+                            <div key={i} className="h-16 bg-muted animate-pulse rounded-lg" />
                         ))}
                     </div>
                 </CardContent>
@@ -73,7 +73,7 @@ export const WalletHistory = () => {
     }
 
     return (
-        <Card className="border-none shadow-lg bg-white/50 backdrop-blur-sm overflow-hidden">
+        <Card className="border border-border shadow-lg bg-card/50 backdrop-blur-sm overflow-hidden">
             <CardHeader className="pb-4">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <CardTitle className="text-lg flex items-center gap-2">
@@ -84,7 +84,7 @@ export const WalletHistory = () => {
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                         <Input
                             placeholder="Search transactions..."
-                            className="pl-9 bg-white/80 border-gray-200 focus:ring-blue-500"
+                            className="pl-9 bg-background/80 border-border focus:ring-primary"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
@@ -94,23 +94,23 @@ export const WalletHistory = () => {
             <CardContent className="p-0">
                 <ScrollArea className="h-[500px]">
                     {filteredTransactions.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center py-12 text-gray-500">
+                        <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
                             <Clock className="h-12 w-12 opacity-20 mb-4" />
                             <p>No transactions found</p>
                         </div>
                     ) : (
-                        <div className="divide-y divide-gray-100">
+                        <div className="divide-y divide-border">
                             {filteredTransactions.map((transaction) => (
                                 <div
                                     key={transaction.id}
-                                    className="p-4 hover:bg-blue-50/50 transition-colors flex items-center justify-between group"
+                                    className="p-4 hover:bg-primary/5 transition-colors flex items-center justify-between group"
                                 >
                                     <div className="flex items-center gap-4">
                                         <div className={`p-2.5 rounded-xl ${transaction.transaction_type === 'credit'
-                                                ? 'bg-green-100 text-green-600'
-                                                : transaction.transaction_type === 'debit'
-                                                    ? 'bg-red-100 text-red-600'
-                                                    : 'bg-blue-100 text-blue-600'
+                                            ? 'bg-green-100 text-green-600'
+                                            : transaction.transaction_type === 'debit'
+                                                ? 'bg-red-100 text-red-600'
+                                                : 'bg-blue-100 text-blue-600'
                                             }`}>
                                             {transaction.transaction_type === 'credit' ? (
                                                 <ArrowDownLeft className="h-5 w-5" />
@@ -119,10 +119,10 @@ export const WalletHistory = () => {
                                             )}
                                         </div>
                                         <div>
-                                            <p className="font-semibold text-gray-900 group-hover:text-blue-700 transition-colors">
+                                            <p className="font-semibold text-foreground group-hover:text-primary transition-colors">
                                                 {transaction.description || (transaction.transaction_type === 'credit' ? 'Top Up' : 'Payment')}
                                             </p>
-                                            <p className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
+                                            <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
                                                 {format(new Date(transaction.created_at), 'MMM d, yyyy • HH:mm')}
                                             </p>
                                         </div>
@@ -132,7 +132,7 @@ export const WalletHistory = () => {
                                             }`}>
                                             {transaction.transaction_type === 'credit' ? '+' : '-'}${Math.abs(transaction.amount).toFixed(2)}
                                         </p>
-                                        <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">
+                                        <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
                                             Balance: ${transaction.balance_after.toFixed(2)}
                                         </p>
                                     </div>

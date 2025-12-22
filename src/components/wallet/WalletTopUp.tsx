@@ -62,10 +62,10 @@ export const WalletTopUp = () => {
     const quickAmounts = ['10', '20', '50', '100', '200', '500'];
 
     return (
-        <Card className="border-none shadow-lg bg-white/50 backdrop-blur-sm">
+        <Card className="border border-border shadow-lg bg-card/50 backdrop-blur-sm">
             <CardHeader>
-                <CardTitle className="text-xl flex items-center gap-2">
-                    <CreditCard className="h-5 w-5 text-blue-500" />
+                <CardTitle className="text-xl flex items-center gap-2 text-foreground">
+                    <CreditCard className="h-5 w-5 text-primary" />
                     Top Up Wallet
                 </CardTitle>
                 <CardDescription>
@@ -74,15 +74,15 @@ export const WalletTopUp = () => {
             </CardHeader>
             <CardContent className="space-y-6">
                 <div className="space-y-4">
-                    <Label htmlFor="amount" className="text-sm font-semibold text-gray-700">Select or enter amount</Label>
+                    <Label htmlFor="amount" className="text-sm font-semibold text-muted-foreground">Select or enter amount</Label>
                     <div className="grid grid-cols-3 gap-2">
                         {quickAmounts.map((q) => (
                             <Button
                                 key={q}
                                 variant={amount === q ? "default" : "outline"}
                                 className={`h-12 font-bold transition-all ${amount === q
-                                        ? 'bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-200'
-                                        : 'bg-white hover:bg-blue-50 hover:border-blue-200'
+                                    ? 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-md shadow-primary/20'
+                                    : 'bg-secondary hover:bg-secondary/80 border-border'
                                     }`}
                                 onClick={() => setAmount(q)}
                             >
@@ -97,25 +97,25 @@ export const WalletTopUp = () => {
                             id="amount"
                             type="number"
                             placeholder="Enter custom amount"
-                            className="pl-10 h-12 text-lg font-bold border-gray-200 focus:ring-blue-500"
+                            className="pl-10 h-12 text-lg font-bold border-border focus:ring-primary bg-background"
                             value={amount}
                             onChange={(e) => setAmount(e.target.value)}
                         />
                     </div>
                 </div>
 
-                <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 space-y-2">
-                    <div className="flex items-center gap-2 text-blue-700 font-semibold text-sm">
+                <div className="bg-primary/10 p-4 rounded-xl border border-primary/20 space-y-2">
+                    <div className="flex items-center gap-2 text-primary font-semibold text-sm">
                         <ShieldCheck className="h-4 w-4" />
                         Secure Payment
                     </div>
-                    <p className="text-xs text-blue-600 leading-relaxed">
+                    <p className="text-xs text-muted-foreground leading-relaxed">
                         Your payment is processed securely via PayPal. Funds will be available in your wallet immediately after successful payment.
                     </p>
                 </div>
 
                 <Button
-                    className="w-full h-14 text-lg font-bold bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-xl shadow-blue-200 transition-all active:scale-[0.98]"
+                    className="w-full h-14 text-lg font-bold bg-primary text-primary-foreground hover:bg-primary/90 shadow-xl shadow-primary/20 transition-all active:scale-[0.98]"
                     onClick={handleTopUp}
                     disabled={isLoading}
                 >

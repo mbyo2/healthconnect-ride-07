@@ -71,10 +71,10 @@ export const WalletCard = () => {
     };
 
     return (
-        <Card className="group bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-700 text-white border-none shadow-2xl overflow-hidden relative transition-all duration-500 hover:shadow-blue-500/20 hover:-translate-y-1 active:scale-[0.98]">
+        <Card className="group bg-gradient-to-br from-primary via-primary/90 to-primary/80 text-primary-foreground border-none shadow-2xl overflow-hidden relative transition-all duration-500 hover:shadow-primary/20 hover:-translate-y-1 active:scale-[0.98]">
             {/* Animated background glow */}
             <div className="absolute -top-24 -right-24 w-64 h-64 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-colors duration-700" />
-            <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-blue-400/20 rounded-full blur-2xl" />
+            <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-primary-foreground/10 rounded-full blur-2xl" />
 
             <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity duration-500 group-hover:scale-110 transform">
                 <Wallet className="h-24 w-24" />
@@ -99,7 +99,7 @@ export const WalletCard = () => {
                                 `$${balance?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
                             )}
                         </div>
-                        <p className="text-[10px] md:text-xs text-blue-100/80 mt-1.5 font-medium flex items-center gap-1">
+                        <p className="text-[10px] md:text-xs text-primary-foreground/80 mt-1.5 font-medium flex items-center gap-1">
                             <ArrowUpRight className="h-3 w-3" />
                             Available for consultations & medicine
                         </p>
@@ -108,7 +108,7 @@ export const WalletCard = () => {
                     <div className="flex gap-3 mt-1">
                         <Button
                             size="sm"
-                            className="bg-white text-blue-600 hover:bg-blue-50 flex-1 font-bold shadow-lg shadow-blue-900/20 transition-all active:scale-95"
+                            className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 flex-1 font-bold shadow-lg shadow-black/10 transition-all active:scale-95"
                             onClick={handleWalletAction}
                         >
                             <Plus className="h-4 w-4 mr-1.5" />
@@ -117,7 +117,7 @@ export const WalletCard = () => {
                         <Button
                             size="sm"
                             variant="outline"
-                            className="bg-white/10 backdrop-blur-md border-white/20 text-white hover:bg-white/20 flex-1 font-semibold transition-all active:scale-95"
+                            className="bg-primary-foreground/10 backdrop-blur-md border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/20 flex-1 font-semibold transition-all active:scale-95"
                             onClick={handleWalletAction}
                         >
                             <History className="h-4 w-4 mr-1.5" />
