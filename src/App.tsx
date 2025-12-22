@@ -73,6 +73,7 @@ const InstitutionReports = lazy(() => import('@/pages/InstitutionReports'));
 const InstitutionAppointments = lazy(() => import('@/pages/InstitutionAppointments'));
 const InstitutionSettings = lazy(() => import('@/pages/InstitutionSettings'));
 const AppointmentDetails = lazy(() => import('@/pages/AppointmentDetails'));
+const Wallet = lazy(() => import('@/pages/Wallet'));
 
 const AppContent = () => {
   const { user, session, isLoading, profile } = useAuth();
@@ -160,6 +161,7 @@ const AppContent = () => {
             <Route path="/medical-records" element={<RouteGuard><MedicalRecords /></RouteGuard>} />
             <Route path="/video-consultations" element={<RouteGuard><VideoConsultations /></RouteGuard>} />
             <Route path="/health-dashboard" element={<RouteGuard><HealthDashboard /></RouteGuard>} />
+            <Route path="/wallet" element={<RouteGuard><Wallet /></RouteGuard>} />
 
             {/* Advanced Features */}
             <Route path="/advanced-dashboard" element={<RouteGuard><AdvancedDashboard /></RouteGuard>} />

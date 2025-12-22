@@ -1,14 +1,15 @@
-
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Wallet, Plus, ArrowUpRight, History } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 export const WalletCard = () => {
     const { user } = useAuth();
+    const navigate = useNavigate();
     const [balance, setBalance] = useState<number | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -65,8 +66,8 @@ export const WalletCard = () => {
         };
     }, [user]);
 
-    const handleTopUp = () => {
-        toast.info("Top up functionality coming soon!");
+    const handleWalletAction = () => {
+        navigate('/wallet');
     };
 
     return (
@@ -108,7 +109,7 @@ export const WalletCard = () => {
                         <Button
                             size="sm"
                             className="bg-white text-blue-600 hover:bg-blue-50 flex-1 font-bold shadow-lg shadow-blue-900/20 transition-all active:scale-95"
-                            onClick={handleTopUp}
+                            onClick={handleWalletAction}
                         >
                             <Plus className="h-4 w-4 mr-1.5" />
                             Top Up
@@ -117,7 +118,7 @@ export const WalletCard = () => {
                             size="sm"
                             variant="outline"
                             className="bg-white/10 backdrop-blur-md border-white/20 text-white hover:bg-white/20 flex-1 font-semibold transition-all active:scale-95"
-                            onClick={() => toast.info("Transaction history coming soon!")}
+                            onClick={handleWalletAction}
                         >
                             <History className="h-4 w-4 mr-1.5" />
                             History

@@ -2,78 +2,133 @@ import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, ArrowLeft } from "lucide-react";
+import { CheckCircle2, ArrowLeft, Wallet as WalletIcon } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const PaymentSuccess = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
+  const [isWalletTopUp, setIsWalletTopUp] = useState(false);
 
-  const paymentId = searchParams.get('paymentId');
+  const paymentId = searchParams.get('payment_id') || searchParams.get('paymentId');
+  const status = searchParams.get('status');
   const token = searchParams.get('token'); // PayPal token
   const PayerID = searchParams.get('PayerID'); // PayPal payer ID
 
   useEffect(() => {
-    if (token && PayerID) {
-      // PayPal payment completion
-      toast.success("Payment completed successfully!");
-      setIsLoading(false);
-    } else if (paymentId) {
-      // Wallet payment completion
-      toast.success("Payment processed from your wallet!");
-      setIsLoading(false);
-    } else {
-      // No valid payment parameters
-      toast.error("Invalid payment session");
-      navigate("/");
-    }
-  }, [token, PayerID, paymentId, navigate]);
+    const handlePaymentCompletion = async () => {
+      try {
+        if (paymentId && (status === 'success' || status === 'mock_success')) {
+          // PayPal payment completion - need to capture it
+          console.log('Capturing PayPal payment:', paymentId);
+
+          const { data, error } = await supabase.functions.invoke('capture-paypal-payment', {
+            body: {
+              paymentId: paymentId,
+              paypalOrderId: token || 'mock-order-id' // token is the order ID in PayPal return URL
+            }
+          });
+
+          if (error) throw error;
+
+          if (data && data.success) {
+            toast.success("Payment captured successfully!");
+
+            // Check if it was a wallet top-up
+            const { data: paymentData } = await supabase
+              .from('payments')
+              .select('service_id')
+              .eq('id', paymentId)
+              .single();
+
+            if (paymentData?.service_id === 'wallet_topup') {
+              setIsWalletTopUp(true);
+            }
+          } else {
+            throw new Error(data?.error || "Failed to capture payment");
+          }
+        } else if (token && PayerID) {
+          // Legacy PayPal flow
+          toast.success("Payment completed successfully!");
+        } else if (paymentId) {
+          // Wallet payment completion (direct)
+          toast.success("Payment processed successfully!");
+        } else {
+          // No valid payment parameters
+          toast.error("Invalid payment session");
+          navigate("/");
+          return;
+        }
+      } catch (error) {
+        console.error('Payment completion error:', error);
+        toast.error(error instanceof Error ? error.message : "Failed to complete payment");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    handlePaymentCompletion();
+  }, [token, PayerID, paymentId, status, navigate]);
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p>Processing your payment...</p>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center space-y-4">
+          <div className="animate-spin h-12 w-12 border-4 border-blue-600 border-t-transparent rounded-full mx-auto"></div>
+          <p className="text-gray-600 font-medium">Finalizing your payment...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
-            <CheckCircle2 className="h-6 w-6 text-green-600" />
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50">
+      <Card className="w-full max-w-md shadow-2xl border-none">
+        <CardHeader className="text-center pb-2">
+          <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-green-100 animate-bounce">
+            <CheckCircle2 className="h-10 w-10 text-green-600" />
           </div>
-          <CardTitle className="text-green-800">Payment Successful!</CardTitle>
-          <CardDescription>
-            Your consultation payment has been processed successfully.
+          <CardTitle className="text-2xl font-bold text-gray-900">Payment Successful!</CardTitle>
+          <CardDescription className="text-gray-500 mt-2">
+            {isWalletTopUp
+              ? "Your wallet has been topped up successfully."
+              : "Your payment has been processed successfully."}
           </CardDescription>
         </CardHeader>
-        
-        <CardContent className="space-y-4">
-          <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-            <p className="text-sm text-green-800">
-              You will receive a confirmation email shortly with your appointment details.
-              You can also view your upcoming appointments in your dashboard.
+
+        <CardContent className="space-y-6 pt-4">
+          <div className="bg-green-50 p-4 rounded-xl border border-green-100">
+            <p className="text-sm text-green-800 leading-relaxed">
+              {isWalletTopUp
+                ? "The funds are now available in your wallet for consultations and medicine orders."
+                : "You will receive a confirmation shortly. You can view your transaction details in your dashboard."}
             </p>
           </div>
-          
-          <div className="flex flex-col gap-2">
-            <Button 
-              onClick={() => navigate("/appointments")}
-              className="w-full"
-            >
-              View My Appointments
-            </Button>
-            
-            <Button 
-              variant="outline"
+
+          <div className="flex flex-col gap-3">
+            {isWalletTopUp ? (
+              <Button
+                onClick={() => navigate("/wallet")}
+                className="w-full h-12 bg-blue-600 hover:bg-blue-700 font-bold shadow-lg shadow-blue-200"
+              >
+                <WalletIcon className="h-4 w-4 mr-2" />
+                Go to My Wallet
+              </Button>
+            ) : (
+              <Button
+                onClick={() => navigate("/appointments")}
+                className="w-full h-12 bg-blue-600 hover:bg-blue-700 font-bold shadow-lg shadow-blue-200"
+              >
+                View My Appointments
+              </Button>
+            )}
+
+            <Button
+              variant="ghost"
               onClick={() => navigate("/")}
-              className="w-full"
+              className="w-full h-12 text-gray-600 hover:text-gray-900 hover:bg-gray-100"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Home
