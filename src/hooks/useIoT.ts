@@ -241,14 +241,23 @@ export function useIoT(userId: string | undefined) {
       }
 
     } catch (error: any) {
-      console.error('Scanning error:', error);
-      if (error.name !== 'NotFoundError') { // User cancelled
-        toast.error('Failed to connect to device');
+      console.error('[useIoT] Scanning error:', error);
+      if (error.name === 'NotFoundError') {
+        toast.info('Scanning cancelled or no device selected');
+      } else if (error.name === 'SecurityError') {
+        toast.error('Bluetooth security error. Please ensure the site is served over HTTPS.');
+      } else if (error.name === 'NotAllowedError') {
+        toast.error('Bluetooth permission denied by user or browser.');
+      } else if (error.name === 'NotSupportedError') {
+        toast.error('Bluetooth is not supported or disabled on this device.');
+      } else {
+        toast.error(`Failed to connect: ${error.message || 'Unknown error'}`);
       }
     } finally {
       setIsScanning(false);
       toast.dismiss();
     }
+
   }, [userId, addDevice]);
 
   const removeDevice = useCallback(async (deviceId: string) => {

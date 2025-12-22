@@ -5,7 +5,9 @@ export const BLE_SERVICES = {
     HEART_RATE: 'heart_rate',
     BATTERY: 'battery_service',
     HEALTH_THERMOMETER: 'health_thermometer',
-    PULSE_OXIMETER: 'pulse_oximeter' // Note: Standard UUID is 0x1822 but browser support varies
+    PULSE_OXIMETER: 'pulse_oximeter',
+    GLUCOSE: 'glucose',
+    BLOOD_PRESSURE: 'blood_pressure'
 };
 
 // Standard Bluetooth Characteristic UUIDs
@@ -31,24 +33,53 @@ export class BluetoothService {
         }
 
         try {
+            console.log('[BluetoothService] Requesting device...');
             // Request device with filters for common health services
             const device = await navigator.bluetooth.requestDevice({
                 filters: [
                     { services: [BLE_SERVICES.HEART_RATE] },
                     { services: [BLE_SERVICES.BATTERY] },
-                    { services: [BLE_SERVICES.HEALTH_THERMOMETER] }
+                    { services: [BLE_SERVICES.HEALTH_THERMOMETER] },
+                    { services: [BLE_SERVICES.PULSE_OXIMETER] },
+                    { services: [BLE_SERVICES.GLUCOSE] },
+                    { services: [BLE_SERVICES.BLOOD_PRESSURE] }
                 ],
                 optionalServices: [
                     BLE_SERVICES.HEART_RATE,
                     BLE_SERVICES.BATTERY,
-                    BLE_SERVICES.HEALTH_THERMOMETER
+                    BLE_SERVICES.HEALTH_THERMOMETER,
+                    BLE_SERVICES.PULSE_OXIMETER,
+                    BLE_SERVICES.GLUCOSE,
+                    BLE_SERVICES.BLOOD_PRESSURE
                 ]
+            }).catch(async (err) => {
+                // Fallback to acceptAllDevices if filters fail or user cancels
+                if (err.name === 'NotFoundError') {
+                    console.log('[BluetoothService] No devices found with filters, trying acceptAllDevices...');
+                    return await navigator.bluetooth.requestDevice({
+                        acceptAllDevices: true,
+                        optionalServices: [
+                            BLE_SERVICES.HEART_RATE,
+                            BLE_SERVICES.BATTERY,
+                            BLE_SERVICES.HEALTH_THERMOMETER,
+                            BLE_SERVICES.PULSE_OXIMETER,
+                            BLE_SERVICES.GLUCOSE,
+                            BLE_SERVICES.BLOOD_PRESSURE
+                        ]
+                    });
+                }
+                throw err;
             });
 
+            console.log('[BluetoothService] Device selected:', device.name);
             this.device = device;
             return device;
-        } catch (error) {
-            console.error('Error scanning for devices:', error);
+        } catch (error: any) {
+            console.error('[BluetoothService] Error scanning for devices:', {
+                name: error.name,
+                message: error.message,
+                stack: error.stack
+            });
             throw error;
         }
     }
