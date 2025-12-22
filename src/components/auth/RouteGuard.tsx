@@ -27,7 +27,10 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
 
     // Redirect to auth if not authenticated
     if (!user) {
-      navigate('/auth', { replace: true, state: { from: location } });
+      if (currentPath !== '/auth') {
+        console.log(`RouteGuard: Not authenticated, redirecting to /auth from ${currentPath}`);
+        navigate('/auth', { replace: true, state: { from: location } });
+      }
       return;
     }
 
@@ -35,7 +38,19 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
     if (!hasRoutePermission(availableRoles, currentPath)) {
       // Redirect to appropriate dashboard based on role
       const landingPage = getRoleLandingPage(availableRoles);
-      navigate(landingPage, { replace: true });
+
+      if (currentPath !== landingPage) {
+        console.log(`RouteGuard: No permission for ${currentPath}, redirecting to ${landingPage}`);
+        navigate(landingPage, { replace: true });
+      } else {
+        console.warn(`RouteGuard: No permission for ${currentPath} and it is the landing page! Possible loop.`);
+        // If we are stuck on a page we don't have permission for, and it's the landing page,
+        // something is wrong with rolePermissions.ts or availableRoles.
+        // Fallback to home if not already there
+        if (currentPath !== '/') {
+          navigate('/', { replace: true });
+        }
+      }
     }
   }, [user, availableRoles, authLoading, rolesLoading, currentPath, navigate, location]);
 

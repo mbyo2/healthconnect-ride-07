@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { safeLocalRemove, safeLocalClear, safeSessionRemove, safeSessionClear } from '@/utils/storage';
+import { supabase } from "@/integrations/supabase/client";
 
 interface LoadingScreenProps {
   message?: string;
@@ -85,6 +86,18 @@ export const LoadingScreen = React.memo<LoadingScreenProps>(({
     window.location.reload();
   }, []);
 
+  const handleSignOut = useCallback(async () => {
+    try {
+      await supabase.auth.signOut();
+      safeLocalClear();
+      safeSessionClear();
+      window.location.href = '/auth';
+    } catch (error) {
+      console.error('Error signing out from loading screen:', error);
+      window.location.reload();
+    }
+  }, []);
+
   return (
     <div className="fixed inset-0 bg-gradient-to-br from-blue-50 via-white to-gray-50 flex flex-col items-center justify-center z-50">
       <div className="flex flex-col items-center gap-8 animate-fadeIn p-10 rounded-2xl bg-white shadow-2xl border border-gray-200 max-w-lg text-center">
@@ -164,14 +177,26 @@ export const LoadingScreen = React.memo<LoadingScreenProps>(({
               </Button>
 
               {(longWait || loadingFailed) && (
-                <Button
-                  variant="outline"
-                  size="lg"
-                  onClick={handleClearCacheAndReload}
-                  className="min-w-[120px]"
-                >
-                  Emergency Reset
-                </Button>
+                <div className="flex flex-col gap-3 w-full">
+                  <div className="flex gap-3 justify-center">
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      onClick={handleClearCacheAndReload}
+                      className="flex-1"
+                    >
+                      Emergency Reset
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="lg"
+                      onClick={handleSignOut}
+                      className="flex-1 text-red-600 hover:text-red-700 hover:bg-red-50"
+                    >
+                      Sign Out
+                    </Button>
+                  </div>
+                </div>
               )}
             </div>
           </div>

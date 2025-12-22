@@ -33,11 +33,27 @@ export function UserRolesProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let mounted = true;
+    let timeoutId: NodeJS.Timeout;
+
     const fetchRoles = async () => {
       // If we have a user but no profile yet, we should stay in loading state
       // to avoid RouteGuard seeing empty roles and redirecting.
+      // However, we shouldn't hang here forever.
       if (user && !profile) {
         setLoading(true);
+
+        // Safety timeout to prevent hanging forever if profile fetch fails
+        timeoutId = setTimeout(() => {
+          if (mounted && !profile && loading) {
+            console.warn('Profile fetch timed out in UserRolesContext, falling back to patient role');
+            setUserRole('patient');
+            setCurrentRole('patient');
+            setAvailableRoles(['patient']);
+            setLoading(false);
+          }
+        }, 10000); // 10 seconds safety timeout
+
         return;
       }
 
@@ -53,10 +69,10 @@ export function UserRolesProvider({ children }: { children: React.ReactNode }) {
           if (error) {
             console.error('Error fetching roles:', error);
             // Fallback to profile role
-            const fallbackRole = profile.role as UserRole;
+            const fallbackRole = (profile.role || 'patient') as UserRole;
             setUserRole(fallbackRole);
             setCurrentRole(fallbackRole);
-            setAvailableRoles(fallbackRole ? [fallbackRole] : []);
+            setAvailableRoles(fallbackRole ? [fallbackRole] : ['patient']);
           } else if (rolesData && rolesData.length > 0) {
             const roles = rolesData.map(r => r.role as UserRole);
             setAvailableRoles(roles);
@@ -81,11 +97,15 @@ export function UserRolesProvider({ children }: { children: React.ReactNode }) {
             }
           } else {
             // No roles in user_roles table, use profile role as fallback
-            const fallbackRole = profile.role as UserRole;
+            const fallbackRole = (profile.role || 'patient') as UserRole;
             setUserRole(fallbackRole);
             setCurrentRole(fallbackRole);
-            setAvailableRoles(fallbackRole ? [fallbackRole] : []);
+            setAvailableRoles(fallbackRole ? [fallbackRole] : ['patient']);
           }
+        } catch (err) {
+          console.error('Unexpected error in fetchRoles:', err);
+          setAvailableRoles(['patient']);
+          setUserRole('patient');
         } finally {
           setLoading(false);
         }
@@ -100,6 +120,11 @@ export function UserRolesProvider({ children }: { children: React.ReactNode }) {
     };
 
     fetchRoles();
+
+    return () => {
+      mounted = false;
+      if (timeoutId) clearTimeout(timeoutId);
+    };
   }, [profile, user, authLoading]);
 
   const hasRole = (roles: UserRole[]): boolean => {

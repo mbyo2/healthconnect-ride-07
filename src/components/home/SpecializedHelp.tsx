@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
-import { Heart, Activity, Brain, Baby, Bone, Zap, ShieldAlert } from "lucide-react";
+import { Heart, Activity, Brain, Baby, Bone, Zap, ShieldAlert, Smile } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const categories = [
@@ -11,6 +11,7 @@ const categories = [
     { id: 'pediatrics', name: 'Pediatrics', icon: <Baby className="h-6 w-6 text-blue-500" />, color: 'bg-blue-50' },
     { id: 'ortho', name: 'Orthopedics', icon: <Bone className="h-6 w-6 text-amber-500" />, color: 'bg-amber-50' },
     { id: 'neuro', name: 'Neurology', icon: <Activity className="h-6 w-6 text-indigo-500" />, color: 'bg-indigo-50' },
+    { id: 'dental', name: 'Dental Care', icon: <Smile className="h-6 w-6 text-cyan-500" />, color: 'bg-cyan-50' },
     { id: 'emergency', name: 'Emergency', icon: <ShieldAlert className="h-6 w-6 text-rose-500" />, color: 'bg-rose-50' },
 ];
 

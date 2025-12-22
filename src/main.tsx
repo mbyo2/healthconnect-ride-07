@@ -24,13 +24,17 @@ window.addEventListener('error', (event) => {
   }
 
   const rootElement = document.getElementById('root');
-  if (rootElement && !rootElement.hasChildNodes()) {
-    renderErrorFallback(rootElement);
+  // Only render fallback if nothing has been rendered yet
+  if (rootElement && !rootElement.hasChildNodes() && !window.appLoaded) {
+    renderErrorFallback(rootElement, event.error);
   }
 });
 
 // Helper to render error fallback
-function renderErrorFallback(rootElement: HTMLElement) {
+function renderErrorFallback(rootElement: HTMLElement, error?: Error) {
+  // Clear root element first
+  rootElement.innerHTML = '';
+
   const errorDiv = document.createElement('div');
   errorDiv.style.padding = '20px';
   errorDiv.style.maxWidth = '600px';
@@ -39,20 +43,34 @@ function renderErrorFallback(rootElement: HTMLElement) {
   errorDiv.style.fontFamily = 'system-ui, sans-serif';
 
   errorDiv.innerHTML = `
-    <div style="display: flex; flex-direction: column; align-items: center; gap: 16px;">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 16px; background: white; padding: 32px; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);">
       <div style="width: 48px; height: 48px; background: #3B82F6; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">D0C</div>
       <h2 style="margin: 0; color: #1E40AF;">Doc' O Clock</h2>
-      <p style="margin: 0; color: #e11d48;">Unable to load emergency system</p>
-      <p style="margin: 0;">We encountered a problem while loading Doc' O Clock. Please try refreshing the page.</p>
-      <button id="refresh-btn" style="background: #3B82F6; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">
-        Refresh System
-      </button>
+      <p style="margin: 0; color: #e11d48; font-weight: 600;">System Initialization Failed</p>
+      <p style="margin: 0; color: #4b5563;">We encountered a problem while loading the application. This might be due to a temporary connection issue.</p>
+      
+      <div style="display: flex; gap: 12px; width: 100%; margin-top: 8px;">
+        <button id="refresh-btn" style="flex: 1; background: #3B82F6; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-weight: 600;">
+          Try Again
+        </button>
+        <button id="clear-btn" style="flex: 1; background: #f3f4f6; color: #4b5563; border: 1px solid #d1d5db; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-weight: 500;">
+          Clear Cache
+        </button>
+      </div>
+      
+      ${error ? `<details style="margin-top: 16px; text-align: left; width: 100%;"><summary style="font-size: 12px; color: #9ca3af; cursor: pointer;">Error details</summary><pre style="font-size: 10px; color: #ef4444; overflow: auto; margin-top: 8px; background: #f9fafb; padding: 8px; border-radius: 4px; max-height: 150px;">${error.message}\n${error.stack || ''}</pre></details>` : ''}
     </div>
   `;
 
   rootElement.appendChild(errorDiv);
 
   document.getElementById('refresh-btn')?.addEventListener('click', () => {
+    window.location.reload();
+  });
+
+  document.getElementById('clear-btn')?.addEventListener('click', () => {
+    localStorage.clear();
+    sessionStorage.clear();
     window.location.reload();
   });
 }
@@ -156,12 +174,12 @@ if (document.readyState === 'loading') {
 }
 
 // Safeguard against potential failures to render
+// Only attempt ONE re-render after a longer delay
 setTimeout(() => {
-  if (!window.appLoaded) {
+  if (!window.appLoaded && !hasRendered) {
     if (import.meta.env.DEV) {
-      console.warn('App may not have loaded properly, attempting re-render');
+      console.warn('App may not have loaded properly, attempting one-time re-render');
     }
-    hasRendered = false;
     renderApp();
   }
-}, 3000); // Reduced timeout
+}, 5000);

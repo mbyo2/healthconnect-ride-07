@@ -4,6 +4,7 @@ import { Testimonials } from "@/components/Testimonials";
 import { CtaSection } from "@/components/CtaSection";
 import { RoleBasedWorkflow } from "@/components/workflows/RoleBasedWorkflow";
 import { useAuth } from "@/context/AuthContext";
+import { SpecializedHelp } from "@/components/home/SpecializedHelp";
 
 const Home = () => {
   const { isAuthenticated } = useAuth();
@@ -21,6 +22,10 @@ const Home = () => {
   return (
     <div className="min-h-screen">
       <Hero />
+      <div className="container-modern py-12">
+        <h2 className="text-2xl font-bold mb-6 text-gray-900">Specialized Care</h2>
+        <SpecializedHelp />
+      </div>
       <ServiceHighlights />
       <Testimonials />
       <CtaSection />

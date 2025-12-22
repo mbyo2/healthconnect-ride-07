@@ -79,7 +79,8 @@ const AppContent = () => {
 
   const isNewUser = useMemo(() => {
     // Check if user needs onboarding based on profile data
-    return !!(profile && !profile.first_name);
+    // Use is_profile_complete flag for more reliable onboarding detection
+    return profile?.is_profile_complete === false;
   }, [profile]);
 
   return (

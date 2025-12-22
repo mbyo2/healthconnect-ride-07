@@ -61,7 +61,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  const fetchProfile = async (userId: string) => {
+  const fetchProfile = async (userId: string, retryCount = 0) => {
     if (!userId) return;
 
     try {
@@ -73,7 +73,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .maybeSingle();
 
       if (profileError && profileError.code !== 'PGRST116') {
-        console.error('Error fetching profile:', profileError);
+        console.error(`Error fetching profile (attempt ${retryCount + 1}):`, profileError);
+        // Retry with exponential backoff
+        if (retryCount < 3) {
+          setTimeout(() => fetchProfile(userId, retryCount + 1), 1000 * Math.pow(2, retryCount));
+        }
         return;
       }
 
@@ -92,22 +96,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         });
       } else {
         // If no profile exists, create a basic one
-        // Use the email from the current user object if available
-        const userEmail = (await supabase.auth.getUser()).data.user?.email;
+        console.log('No profile found, creating basic profile for:', userId);
+
+        const { data: { user: currentUser } } = await supabase.auth.getUser();
+        const userEmail = currentUser?.email;
 
         const { error: createError } = await supabase
           .from('profiles')
           .insert({
             id: userId,
             email: userEmail,
-            is_profile_complete: false
+            is_profile_complete: false,
+            role: 'patient' // Default role for new profiles
           });
 
         if (createError) {
           console.error('Error creating profile:', createError);
+          // Retry profile creation if it failed
+          if (retryCount < 2) {
+            setTimeout(() => fetchProfile(userId, retryCount + 1), 2000);
+          }
         } else {
           // Fetch the newly created profile
-          const { data: newProfile } = await supabase
+          const { data: newProfile, error: fetchNewError } = await supabase
             .from('profiles')
             .select('*')
             .eq('id', userId)
@@ -118,11 +129,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               ...newProfile,
               role: roleData || 'patient'
             });
+          } else if (fetchNewError) {
+            console.error('Error fetching newly created profile:', fetchNewError);
           }
         }
       }
     } catch (error) {
-      console.error('Error in fetchProfile:', error);
+      console.error('Unexpected error in fetchProfile:', error);
+      if (retryCount < 2) {
+        setTimeout(() => fetchProfile(userId, retryCount + 1), 2000);
+      }
     }
   };
 
