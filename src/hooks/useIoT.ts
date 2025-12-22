@@ -33,13 +33,13 @@ export function useIoT(userId: string | undefined) {
     if (!userId) return;
     try {
       const { data, error } = await supabase
-        .from('iot_devices')
+        .from('iot_devices' as any)
         .select('*')
         .eq('user_id', userId)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setDevices(data as IoTDevice[]);
+      setDevices(data as any as IoTDevice[]);
     } catch (error) {
       console.error('Error fetching devices:', error);
     }
@@ -49,7 +49,7 @@ export function useIoT(userId: string | undefined) {
     if (!userId) return;
     try {
       const { data, error } = await supabase
-        .from('vital_signs')
+        .from('vital_signs' as any)
         .select('*')
         .eq('user_id', userId)
         .order('recorded_at', { ascending: false })
@@ -57,7 +57,7 @@ export function useIoT(userId: string | undefined) {
         .maybeSingle();
 
       if (error) throw error;
-      if (data) setVitalSigns(data as VitalSigns);
+      if (data) setVitalSigns(data as any as VitalSigns);
     } catch (error) {
       console.error('Error fetching vital signs:', error);
     }
@@ -67,7 +67,7 @@ export function useIoT(userId: string | undefined) {
     if (!userId) return;
     try {
       const { data, error } = await supabase
-        .from('device_alerts')
+        .from('device_alerts' as any)
         .select(`
           *,
           device:iot_devices!inner(user_id)
@@ -166,7 +166,7 @@ export function useIoT(userId: string | undefined) {
 
     try {
       const { error } = await supabase
-        .from('iot_devices')
+        .from('iot_devices' as any)
         .insert({
           ...device,
           user_id: userId
@@ -219,7 +219,7 @@ export function useIoT(userId: string | undefined) {
 
           // Persist to DB (throttled in real app, here we just insert)
           // Note: In a real high-frequency scenario, we'd buffer these
-          await supabase.from('vital_signs').insert({
+          await supabase.from('vital_signs' as any).insert({
             user_id: userId,
             heart_rate: hr,
             device_id: device.id,
@@ -254,7 +254,7 @@ export function useIoT(userId: string | undefined) {
   const removeDevice = useCallback(async (deviceId: string) => {
     try {
       const { error } = await supabase
-        .from('iot_devices')
+        .from('iot_devices' as any)
         .delete()
         .eq('id', deviceId);
 
@@ -270,7 +270,7 @@ export function useIoT(userId: string | undefined) {
   const acknowledgeAlert = useCallback(async (alertId: string) => {
     try {
       const { error } = await supabase
-        .from('device_alerts')
+        .from('device_alerts' as any)
         .update({ acknowledged: true, acknowledged_at: new Date().toISOString() })
         .eq('id', alertId);
 

@@ -32,7 +32,7 @@ export const PersonnelManagement = ({ institutionId }: { institutionId: string }
     const fetchPersonnel = async () => {
         try {
             const { data, error } = await supabase
-                .from('institution_personnel')
+                .from('institution_personnel' as any)
                 .select(`
           *,
           profile:profiles(first_name, last_name, email)
@@ -72,7 +72,7 @@ export const PersonnelManagement = ({ institutionId }: { institutionId: string }
 
             // 2. Add to institution
             const { error: addError } = await supabase
-                .from('institution_personnel')
+                .from('institution_personnel' as any)
                 .insert({
                     institution_id: institutionId,
                     user_id: users.id,
@@ -96,7 +96,7 @@ export const PersonnelManagement = ({ institutionId }: { institutionId: string }
     const handleRemovePersonnel = async (id: string) => {
         try {
             const { error } = await supabase
-                .from('institution_personnel')
+                .from('institution_personnel' as any)
                 .delete()
                 .eq('id', id);
 

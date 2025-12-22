@@ -60,7 +60,7 @@ const ProviderCalendar = () => {
       // Fetch time slots for the current week
       const weekEnd = addDays(currentWeekStart, 7);
       const { data: slotsData, error: slotsError } = await supabase
-        .from('provider_time_slots')
+        .from('provider_time_slots' as any)
         .select('*')
         .eq('provider_id', user.id)
         .gte('date', format(currentWeekStart, 'yyyy-MM-dd'))
@@ -74,7 +74,7 @@ const ProviderCalendar = () => {
 
       if (slotIds.length > 0) {
         const { data: apptData, error: apptError } = await supabase
-          .from('appointments')
+          .from('appointments' as any)
           .select(`
             *,
             patient:profiles!patient_id(first_name, last_name)
@@ -109,7 +109,7 @@ const ProviderCalendar = () => {
     if (!user) return;
 
     try {
-      const { error } = await supabase.from('provider_time_slots').insert({
+      const { error } = await supabase.from('provider_time_slots' as any).insert({
         provider_id: user.id,
         ...newSlot,
         is_available: true,
@@ -136,7 +136,7 @@ const ProviderCalendar = () => {
   const toggleSlotAvailability = async (slotId: string, currentAvailability: boolean) => {
     try {
       const { error } = await supabase
-        .from('provider_time_slots')
+        .from('provider_time_slots' as any)
         .update({ is_available: !currentAvailability })
         .eq('id', slotId);
 
@@ -161,7 +161,7 @@ const ProviderCalendar = () => {
     }
 
     try {
-      const { error } = await supabase.from('provider_time_slots').delete().eq('id', slotId);
+      const { error } = await supabase.from('provider_time_slots' as any).delete().eq('id', slotId);
 
       if (error) throw error;
 
@@ -322,12 +322,12 @@ const ProviderCalendar = () => {
                         <div
                           key={`${day.toISOString()}-${time}`}
                           className={`p-1 border-r min-h-[60px] ${slot
-                              ? appointment
-                                ? 'bg-primary/10'
-                                : slot.is_available
-                                  ? 'bg-green-50 hover:bg-green-100'
-                                  : 'bg-red-50'
-                              : 'hover:bg-accent/50'
+                            ? appointment
+                              ? 'bg-primary/10'
+                              : slot.is_available
+                                ? 'bg-green-50 hover:bg-green-100'
+                                : 'bg-red-50'
+                            : 'hover:bg-accent/50'
                             }`}
                         >
                           {slot ? (

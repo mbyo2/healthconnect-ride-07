@@ -4,36 +4,36 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
   DialogTitle,
   DialogFooter
 } from '@/components/ui/dialog';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
 } from '@/components/ui/table';
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
 } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { 
-  AlertCircle, 
-  Plus, 
-  Search, 
-  Edit, 
+import {
+  AlertCircle,
+  Plus,
+  Search,
+  Edit,
   Trash2,
   FileWarning,
   Calendar
@@ -43,8 +43,8 @@ import { useAuth } from '@/context/AuthContext';
 import { format } from 'date-fns';
 
 // Define the medication type enum to match the database
-type MedicationType = 'tablet' | 'capsule' | 'liquid' | 'injection' | 'cream' | 
-                     'ointment' | 'drops' | 'inhaler' | 'powder' | 'other';
+type MedicationType = 'tablet' | 'capsule' | 'liquid' | 'injection' | 'cream' |
+  'ointment' | 'drops' | 'inhaler' | 'powder' | 'other';
 
 interface MedicationInventoryItem {
   id: string;
@@ -62,7 +62,7 @@ interface MedicationInventoryItem {
 }
 
 const MEDICATION_TYPES: MedicationType[] = [
-  'tablet', 'capsule', 'liquid', 'injection', 'cream', 
+  'tablet', 'capsule', 'liquid', 'injection', 'cream',
   'ointment', 'drops', 'inhaler', 'powder', 'other'
 ];
 
@@ -94,9 +94,9 @@ export const MedicationInventory = () => {
     queryKey: ['userInstitution', user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
-      
+
       const { data, error } = await supabase
-        .from('institution_staff')
+        .from('institution_staff' as any)
         .select('institution_id')
         .eq('provider_id', user.id)
         .eq('is_active', true)
@@ -106,7 +106,7 @@ export const MedicationInventory = () => {
         console.error('Error fetching institution:', error);
         return null;
       }
-      
+
       return data?.institution_id;
     },
   });
@@ -116,9 +116,9 @@ export const MedicationInventory = () => {
     queryKey: ['medicationInventory', userInstitution],
     queryFn: async () => {
       if (!userInstitution) return [];
-      
+
       const { data, error } = await supabase
-        .from('medication_inventory')
+        .from('medication_inventory' as any)
         .select('*')
         .eq('institution_id', userInstitution)
         .order('medication_name', { ascending: true });
@@ -127,7 +127,7 @@ export const MedicationInventory = () => {
         console.error('Error fetching medication inventory:', error);
         throw new Error(error.message);
       }
-      
+
       return data as MedicationInventoryItem[];
     },
     enabled: !!userInstitution,
@@ -138,8 +138,8 @@ export const MedicationInventory = () => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: name === 'quantity_available' || name === 'minimum_stock_level' 
-        ? parseInt(value) || 0 
+      [name]: name === 'quantity_available' || name === 'minimum_stock_level'
+        ? parseInt(value) || 0
         : value
     });
   };
@@ -164,12 +164,12 @@ export const MedicationInventory = () => {
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!userInstitution) {
       toast.error("No institution found for user");
       return;
     }
-    
+
     try {
       const dataToSubmit = {
         ...formData,
@@ -177,26 +177,26 @@ export const MedicationInventory = () => {
         unit_price: formData.unit_price ? parseFloat(formData.unit_price) : null,
         medication_type: formData.medication_type as MedicationType
       };
-      
+
       if (editingItem) {
         // Update existing item
         const { error } = await supabase
-          .from('medication_inventory')
+          .from('medication_inventory' as any)
           .update(dataToSubmit)
           .eq('id', editingItem.id);
-          
+
         if (error) throw error;
         toast.success('Medication updated successfully');
       } else {
         // Create new item
         const { error } = await supabase
-          .from('medication_inventory')
+          .from('medication_inventory' as any)
           .insert([dataToSubmit]);
-          
+
         if (error) throw error;
         toast.success('Medication added to inventory');
       }
-      
+
       // Refresh data and reset form
       await refetch();
       resetForm();
@@ -227,15 +227,15 @@ export const MedicationInventory = () => {
   // Handle delete item
   const handleDelete = async () => {
     if (!itemToDelete) return;
-    
+
     try {
       const { error } = await supabase
-        .from('medication_inventory')
+        .from('medication_inventory' as any)
         .delete()
         .eq('id', itemToDelete);
-        
+
       if (error) throw error;
-      
+
       toast.success('Medication deleted successfully');
       refetch();
       setIsDeleteDialogOpen(false);
@@ -269,7 +269,7 @@ export const MedicationInventory = () => {
   // Filter inventory based on search
   const filteredInventory = inventory?.filter(item => {
     if (!searchQuery) return true;
-    
+
     const query = searchQuery.toLowerCase();
     return (
       item.medication_name.toLowerCase().includes(query) ||
@@ -281,12 +281,12 @@ export const MedicationInventory = () => {
 
   // Check for items low in stock
   const lowStockItems = inventory?.filter(item => item.quantity_available <= item.minimum_stock_level) || [];
-  
+
   // Check for items expiring soon (within 90 days)
   const currentDate = new Date();
   const ninetyDaysLater = new Date();
   ninetyDaysLater.setDate(currentDate.getDate() + 90);
-  
+
   const expiringItems = inventory?.filter(item => {
     const expiryDate = new Date(item.expiry_date);
     return expiryDate <= ninetyDaysLater;
@@ -305,7 +305,7 @@ export const MedicationInventory = () => {
               <AlertCircle className="mx-auto h-10 w-10 text-orange-500 mb-4" />
               <h3 className="text-lg font-medium mb-2">No Institution Association</h3>
               <p className="text-muted-foreground mb-4">
-                You are not associated with any healthcare institution. 
+                You are not associated with any healthcare institution.
                 Please contact an administrator to associate your account.
               </p>
             </div>
@@ -335,7 +335,7 @@ export const MedicationInventory = () => {
               </CardContent>
             </Card>
           )}
-          
+
           {expiringItems.length > 0 && (
             <Card className="bg-red-50 dark:bg-red-950 border-red-200 dark:border-red-800">
               <CardHeader className="pb-2">
@@ -353,7 +353,7 @@ export const MedicationInventory = () => {
           )}
         </div>
       )}
-      
+
       {/* Management Controls */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="relative w-full md:w-80">
@@ -366,8 +366,8 @@ export const MedicationInventory = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        
-        <Button 
+
+        <Button
           className="gap-1"
           onClick={() => {
             resetForm();
@@ -377,7 +377,7 @@ export const MedicationInventory = () => {
           <Plus className="h-4 w-4" /> Add Medication
         </Button>
       </div>
-      
+
       {/* Inventory Table */}
       <Card>
         <CardHeader>
@@ -414,11 +414,10 @@ export const MedicationInventory = () => {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex flex-col items-end">
-                          <div className={`font-medium ${
-                            item.quantity_available <= item.minimum_stock_level 
-                              ? 'text-red-500' 
+                          <div className={`font-medium ${item.quantity_available <= item.minimum_stock_level
+                              ? 'text-red-500'
                               : ''
-                          }`}>
+                            }`}>
                             {item.quantity_available}
                           </div>
                           <div className="text-xs text-muted-foreground">
@@ -427,11 +426,10 @@ export const MedicationInventory = () => {
                         </div>
                       </TableCell>
                       <TableCell className="text-right">
-                        <div className={`font-medium ${
-                          new Date(item.expiry_date) <= ninetyDaysLater 
-                            ? 'text-red-500' 
+                        <div className={`font-medium ${new Date(item.expiry_date) <= ninetyDaysLater
+                            ? 'text-red-500'
                             : ''
-                        }`}>
+                          }`}>
                           {format(new Date(item.expiry_date), 'MMM dd, yyyy')}
                         </div>
                       </TableCell>
@@ -475,14 +473,14 @@ export const MedicationInventory = () => {
           )}
         </CardContent>
       </Card>
-      
+
       {/* Add/Edit Medication Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>{editingItem ? 'Edit Medication' : 'Add Medication'}</DialogTitle>
           </DialogHeader>
-          
+
           <form onSubmit={handleSubmit}>
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-1 gap-2">
@@ -495,7 +493,7 @@ export const MedicationInventory = () => {
                   required
                 />
               </div>
-              
+
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
                   <Label htmlFor="dosage">Dosage *</Label>
@@ -508,11 +506,11 @@ export const MedicationInventory = () => {
                     required
                   />
                 </div>
-                
+
                 <div className="grid gap-2">
                   <Label htmlFor="medication_type">Type *</Label>
-                  <Select 
-                    value={formData.medication_type} 
+                  <Select
+                    value={formData.medication_type}
                     onValueChange={(value) => handleSelectChange('medication_type', value)}
                   >
                     <SelectTrigger>
@@ -528,7 +526,7 @@ export const MedicationInventory = () => {
                   </Select>
                 </div>
               </div>
-              
+
               <div className="grid gap-2">
                 <Label htmlFor="generic_name">Generic Name</Label>
                 <Input
@@ -538,7 +536,7 @@ export const MedicationInventory = () => {
                   onChange={handleInputChange}
                 />
               </div>
-              
+
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
                   <Label htmlFor="manufacturer">Manufacturer</Label>
@@ -549,7 +547,7 @@ export const MedicationInventory = () => {
                     onChange={handleInputChange}
                   />
                 </div>
-                
+
                 <div className="grid gap-2">
                   <Label htmlFor="batch_number">Batch Number</Label>
                   <Input
@@ -560,7 +558,7 @@ export const MedicationInventory = () => {
                   />
                 </div>
               </div>
-              
+
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
                   <Label htmlFor="expiry_date">Expiry Date *</Label>
@@ -577,7 +575,7 @@ export const MedicationInventory = () => {
                     />
                   </div>
                 </div>
-                
+
                 <div className="grid gap-2">
                   <Label htmlFor="unit_price">Unit Price</Label>
                   <Input
@@ -591,7 +589,7 @@ export const MedicationInventory = () => {
                   />
                 </div>
               </div>
-              
+
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
                   <Label htmlFor="quantity_available">Quantity Available *</Label>
@@ -604,7 +602,7 @@ export const MedicationInventory = () => {
                     required
                   />
                 </div>
-                
+
                 <div className="grid gap-2">
                   <Label htmlFor="minimum_stock_level">Minimum Stock Level</Label>
                   <Input
@@ -617,7 +615,7 @@ export const MedicationInventory = () => {
                 </div>
               </div>
             </div>
-            
+
             <DialogFooter>
               <Button
                 type="button"
@@ -636,19 +634,19 @@ export const MedicationInventory = () => {
           </form>
         </DialogContent>
       </Dialog>
-      
+
       {/* Delete Confirmation Dialog */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
             <DialogTitle>Confirm Deletion</DialogTitle>
           </DialogHeader>
-          
+
           <p className="py-4">
-            Are you sure you want to delete this medication from the inventory? 
+            Are you sure you want to delete this medication from the inventory?
             This action cannot be undone.
           </p>
-          
+
           <DialogFooter>
             <Button
               variant="outline"

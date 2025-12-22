@@ -98,7 +98,7 @@ export const HealthcareInstitutionForm = () => {
       };
 
       const { error: institutionError } = await supabase
-        .from("healthcare_institutions")
+        .from("healthcare_institutions" as any)
         .insert(institution);
 
       if (institutionError) throw institutionError;
@@ -108,20 +108,14 @@ export const HealthcareInstitutionForm = () => {
         applicant_id: user.id,
         institution_name: formData.name,
         institution_type: formData.type,
-        status: 'pending',
-        documents_complete: false,
-        verification_complete: false,
-        payment_complete: false
+        status: 'pending'
       };
 
-      const { error: applicationError } = await supabase
-        .from("institution_applications")
+      const { error: appError } = await supabase
+        .from('institution_applications' as any)
         .insert(application);
 
-      if (applicationError) {
-        console.error("Error creating application record:", applicationError);
-        throw applicationError;
-      }
+      if (appError) throw appError;
 
       toast.success("Institution registered successfully! Awaiting verification.");
       navigate("/institution-status");
@@ -323,6 +317,8 @@ export const HealthcareInstitutionForm = () => {
           "Register Institution"
         )}
       </Button>
-    </form >
+    </form>
   );
 };
+
+export default HealthcareInstitutionForm;

@@ -128,7 +128,7 @@ export async function retryApiCall<T>(
 // Network status check
 export async function checkNetworkStatus(): Promise<boolean> {
     try {
-        const { data, error } = await supabase.from('profiles').select('id').limit(1);
+        const { data, error } = await supabase.from('profiles' as any).select('id').limit(1);
         return !error;
     } catch {
         return false;

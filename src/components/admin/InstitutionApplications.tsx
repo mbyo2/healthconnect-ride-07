@@ -27,7 +27,7 @@ export const InstitutionApplications = () => {
     const fetchApplications = async () => {
         try {
             const { data, error } = await supabase
-                .from('institution_applications')
+                .from('institution_applications' as any)
                 .select('*')
                 .eq('status', 'pending')
                 .order('submitted_at', { ascending: false });
@@ -51,7 +51,7 @@ export const InstitutionApplications = () => {
         try {
             // 1. Update application status
             const { error: appError } = await supabase
-                .from('institution_applications')
+                .from('institution_applications' as any)
                 .update({ status: 'approved', reviewed_at: new Date().toISOString() })
                 .eq('id', app.id);
 
@@ -60,7 +60,7 @@ export const InstitutionApplications = () => {
             // 2. Update institution verification status
             // We need to find the institution by admin_id (which is applicant_id)
             const { error: instError } = await supabase
-                .from('healthcare_institutions')
+                .from('healthcare_institutions' as any)
                 .update({ is_verified: true })
                 .eq('admin_id', app.applicant_id);
 
@@ -69,17 +69,20 @@ export const InstitutionApplications = () => {
             // 3. Log audit
             const { data: { user } } = await supabase.auth.getUser();
             if (user) {
-                await supabase.from('audit_logs').insert({
+                await supabase.from('audit_logs' as any).insert({
                     user_id: user.id,
                     action: 'approve_institution',
-                    resource_type: 'institution_application',
+                    resource: 'institution_application',
                     resource_id: app.id,
-                    details: { institution_name: app.institution_name }
+                    details: { institution_name: app.institution_name },
+                    category: 'admin_action',
+                    outcome: 'success',
+                    severity: 'info'
                 });
             }
 
             // 4. Send notification
-            await supabase.from('notifications').insert({
+            await supabase.from('notifications' as any).insert({
                 user_id: app.applicant_id,
                 title: 'Institution Application Approved',
                 message: `Your application for ${app.institution_name} has been approved. You can now access the institution portal.`,
@@ -101,14 +104,14 @@ export const InstitutionApplications = () => {
         setProcessingId(app.id);
         try {
             const { error } = await supabase
-                .from('institution_applications')
+                .from('institution_applications' as any)
                 .update({ status: 'rejected', reviewed_at: new Date().toISOString() })
                 .eq('id', app.id);
 
             if (error) throw error;
 
             // Send notification
-            await supabase.from('notifications').insert({
+            await supabase.from('notifications' as any).insert({
                 user_id: app.applicant_id,
                 title: 'Institution Application Rejected',
                 message: `Your application for ${app.institution_name} has been rejected. Please check the status page for more details.`,

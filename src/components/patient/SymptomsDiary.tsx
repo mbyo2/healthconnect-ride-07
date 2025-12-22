@@ -20,7 +20,7 @@ export const SymptomsDiary = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("No user found");
 
-      const { error } = await supabase.from("symptoms_diary").insert({
+      const { error } = await supabase.from("symptoms_diary" as any).insert({
         patient_id: user.id,
         symptoms,
         severity,
@@ -56,7 +56,7 @@ export const SymptomsDiary = () => {
               required
             />
           </div>
-          
+
           <div>
             <label className="text-sm font-medium">Severity</label>
             <Select value={severity} onValueChange={setSeverity} required>

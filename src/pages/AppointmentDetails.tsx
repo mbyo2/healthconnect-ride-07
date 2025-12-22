@@ -36,6 +36,8 @@ interface AppointmentData {
   notes?: string;
   reason?: string;
   type: string;
+  provider_id: string;
+  time_slot_id: string;
 }
 
 const AppointmentDetails = () => {
@@ -69,7 +71,7 @@ const AppointmentDetails = () => {
     try {
       const today = new Date().toISOString().split('T')[0];
       const { data, error } = await supabase
-        .from('provider_time_slots')
+        .from('provider_time_slots' as any)
         .select('*')
         .eq('provider_id', appointment.provider_id)
         .eq('status', 'available')
@@ -92,7 +94,7 @@ const AppointmentDetails = () => {
 
     try {
       const { data, error } = await supabase
-        .from('appointments')
+        .from('appointments' as any)
         .select(`
           *,
           time_slot:provider_time_slots(*),
@@ -119,7 +121,7 @@ const AppointmentDetails = () => {
 
     try {
       const { error } = await supabase
-        .from('appointments')
+        .from('appointments' as any)
         .update({ notes })
         .eq('id', id);
 
@@ -143,7 +145,7 @@ const AppointmentDetails = () => {
     try {
       // 1. Update the appointment
       const { error: updateError } = await supabase
-        .from('appointments')
+        .from('appointments' as any)
         .update({
           time_slot_id: selectedSlotId,
           status: 'scheduled' // Reset status if it was something else
@@ -154,7 +156,7 @@ const AppointmentDetails = () => {
 
       // 2. Mark the new slot as booked
       const { error: slotError } = await supabase
-        .from('provider_time_slots')
+        .from('provider_time_slots' as any)
         .update({ status: 'booked' })
         .eq('id', selectedSlotId);
 
@@ -163,7 +165,7 @@ const AppointmentDetails = () => {
       // 3. Mark the old slot as available (if it exists)
       if (appointment.time_slot_id) {
         await supabase
-          .from('provider_time_slots')
+          .from('provider_time_slots' as any)
           .update({ status: 'available' })
           .eq('id', appointment.time_slot_id);
       }
@@ -187,7 +189,7 @@ const AppointmentDetails = () => {
 
     try {
       const { error } = await supabase
-        .from('appointments')
+        .from('appointments' as any)
         .update({
           status: 'cancelled',
           cancellation_reason: cancelReason,

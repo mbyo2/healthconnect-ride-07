@@ -16,10 +16,10 @@ export const ServiceHighlights = () => {
       try {
         // Fetch real statistics from the database
         const [usersCount, appointmentsCount, messagesCount, providersCount] = await Promise.all([
-          supabase.from('profiles').select('id', { count: 'exact', head: true }),
-          supabase.from('appointments').select('id', { count: 'exact', head: true }),
-          supabase.from('messages').select('id', { count: 'exact', head: true }),
-          supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'health_personnel')
+          supabase.from('profiles' as any).select('id', { count: 'exact', head: true }),
+          supabase.from('appointments' as any).select('id', { count: 'exact', head: true }),
+          supabase.from('messages' as any).select('id', { count: 'exact', head: true }),
+          supabase.from('profiles' as any).select('id', { count: 'exact', head: true }).eq('role', 'health_personnel')
         ]);
 
         setStats({
@@ -49,7 +49,7 @@ export const ServiceHighlights = () => {
       icon: <Calendar className="h-6 w-6 text-green-600" />,
       title: "Simple Scheduling",
       description: "Book appointments instantly with real-time availability",
-      rating: "4.8/5", 
+      rating: "4.8/5",
       users: `${stats.totalAppointments}+ bookings`
     },
     {
@@ -93,7 +93,7 @@ export const ServiceHighlights = () => {
             Discover why {stats.totalUsers > 0 ? `${stats.totalUsers} users` : 'thousands'} trust Doc' O Clock for their healthcare needs
           </p>
         </div>
-        
+
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {services.map((service, index) => (
             <div key={index} className="service-card group">
@@ -108,7 +108,7 @@ export const ServiceHighlights = () => {
                   <p className="text-gray-600 text-sm leading-relaxed mb-3">
                     {service.description}
                   </p>
-                  
+
                   {/* Rating and stats */}
                   <div className="flex items-center justify-between text-xs">
                     <div className="flex items-center gap-1">
@@ -119,16 +119,16 @@ export const ServiceHighlights = () => {
                   </div>
                 </div>
               </div>
-              
+
               {/* Progress indicator */}
               <div className="w-full bg-gray-200 rounded-full h-1 mb-2">
-                <div className="bg-blue-600 h-1 rounded-full" style={{width: `${90 + index * 2}%`}}></div>
+                <div className="bg-blue-600 h-1 rounded-full" style={{ width: `${90 + index * 2}%` }}></div>
               </div>
               <p className="text-xs text-gray-500">Available now</p>
             </div>
           ))}
         </div>
-        
+
         {/* Bottom CTA */}
         <div className="text-center mt-12">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-medium mb-4">

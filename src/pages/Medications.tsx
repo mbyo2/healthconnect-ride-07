@@ -52,14 +52,14 @@ const Medications = () => {
 
     try {
       const { data, error } = await supabase
-        .from('medications')
+        .from('medications' as any)
         .select('*')
         .eq('user_id', user.id)
         .order('is_active', { ascending: false })
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setMedications(data || []);
+      setMedications(data as any || []);
     } catch (error) {
       console.error('Error fetching medications:', error);
       toast.error('Failed to load medications');
@@ -79,7 +79,7 @@ const Medications = () => {
     }
 
     try {
-      const { error } = await supabase.from('medications').insert({
+      const { error } = await supabase.from('medications' as any).insert({
         user_id: user.id,
         ...newMedication,
         is_active: true,
@@ -110,7 +110,7 @@ const Medications = () => {
   const toggleMedicationStatus = async (id: string, currentStatus: boolean) => {
     try {
       const { error } = await supabase
-        .from('medications')
+        .from('medications' as any)
         .update({ is_active: !currentStatus })
         .eq('id', id);
 

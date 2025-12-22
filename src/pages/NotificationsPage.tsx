@@ -34,14 +34,14 @@ const NotificationsPage = () => {
 
     try {
       const { data, error } = await supabase
-        .from('notifications')
+        .from('notifications' as any)
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(50);
 
       if (error) throw error;
-      setNotifications(data || []);
+      setNotifications(data as any || []);
     } catch (error) {
       console.error('Error fetching notifications:', error);
       toast.error('Failed to load notifications');
@@ -83,7 +83,7 @@ const NotificationsPage = () => {
   const markAsRead = async (id: string) => {
     try {
       const { error } = await supabase
-        .from('notifications')
+        .from('notifications' as any)
         .update({ read: true })
         .eq('id', id);
 
@@ -104,7 +104,7 @@ const NotificationsPage = () => {
 
     try {
       const { error } = await supabase
-        .from('notifications')
+        .from('notifications' as any)
         .update({ read: true })
         .eq('user_id', user.id)
         .eq('read', false);
@@ -122,7 +122,7 @@ const NotificationsPage = () => {
   // Delete notification
   const deleteNotification = async (id: string) => {
     try {
-      const { error } = await supabase.from('notifications').delete().eq('id', id);
+      const { error } = await supabase.from('notifications' as any).delete().eq('id', id);
 
       if (error) throw error;
 

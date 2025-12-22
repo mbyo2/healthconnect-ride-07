@@ -113,7 +113,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     setIsLoading(true);
     try {
       const { data, error, count } = await supabase
-        .from('profiles')
+        .from('profiles' as any)
         .select(`
           id,
           first_name,
@@ -137,7 +137,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         throw error;
       }
 
-      const mappedProviders: Provider[] = (data ?? []).map(profile => ({
+      const mappedProviders: Provider[] = (data ?? []).map((profile: any) => ({
         id: profile.id,
         first_name: profile.first_name ?? '',
         last_name: profile.last_name ?? '',
@@ -170,7 +170,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
       // Log search action
       if (user?.id) {
-        await supabase.from('audit_logs').insert({
+        await supabase.from('audit_logs' as any).insert({
           user_id: user.id,
           action: 'search',
           resource: 'provider',

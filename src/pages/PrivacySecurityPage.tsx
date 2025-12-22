@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -44,16 +43,16 @@ const PrivacySecurityPage = () => {
 
         // Fetch profile settings
         const { data: profile, error } = await supabase
-          .from('profiles')
+          .from('profiles' as any)
           .select('share_medical_data, allow_research_usage, show_in_search, data_retention_period')
           .eq('id', user.id)
           .single();
 
         if (profile) {
-          setShareMedicalData(profile.share_medical_data ?? true);
-          setAllowResearchUsage(profile.allow_research_usage ?? false);
-          setShowInSearch(profile.show_in_search ?? true);
-          setDataRetentionPeriod(profile.data_retention_period ?? "365");
+          setShareMedicalData((profile as any).share_medical_data ?? true);
+          setAllowResearchUsage((profile as any).allow_research_usage ?? false);
+          setShowInSearch((profile as any).show_in_search ?? true);
+          setDataRetentionPeriod((profile as any).data_retention_period ?? "365");
         }
 
         // Fetch audit logs
@@ -73,7 +72,7 @@ const PrivacySecurityPage = () => {
     if (!user) return;
 
     const { data, error } = await supabase
-      .from('audit_logs')
+      .from('audit_logs' as any)
       .select('*')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
@@ -173,7 +172,7 @@ const PrivacySecurityPage = () => {
       if (!user) return;
 
       const { error } = await supabase
-        .from('profiles')
+        .from('profiles' as any)
         .update({
           share_medical_data: shareMedicalData,
           allow_research_usage: allowResearchUsage,
@@ -235,12 +234,15 @@ const PrivacySecurityPage = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      await supabase.from('audit_logs').insert({
+      await supabase.from('audit_logs' as any).insert({
         user_id: user.id,
         action,
-        resource_type: resourceType,
+        resource: resourceType,
         resource_id: resourceId,
-        user_agent: navigator.userAgent
+        user_agent: navigator.userAgent,
+        category: 'security',
+        outcome: 'success',
+        severity: 'info'
       });
 
       // Refresh logs
@@ -442,7 +444,7 @@ const PrivacySecurityPage = () => {
                   <li key={log.id} className="flex items-start justify-between p-2 bg-muted rounded-md">
                     <div>
                       <p className="font-medium capitalize">{log.action.replace(/_/g, ' ')}</p>
-                      <p className="text-xs text-muted-foreground">{log.resource_type}</p>
+                      <p className="text-xs text-muted-foreground">{log.resource}</p>
                     </div>
                     <span className="text-xs text-muted-foreground">
                       {new Date(log.created_at).toLocaleDateString()}

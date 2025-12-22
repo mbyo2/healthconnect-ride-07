@@ -17,23 +17,23 @@ const ProfileSetup = () => {
     const checkUserRole = async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
-        
+
         if (error) {
           console.error("Error checking session:", error);
           toast.error("Session error. Please login again.");
           navigate("/login");
           return;
         }
-        
+
         if (!session) {
           console.log("No session found, redirecting to login");
           navigate("/login");
           return;
         }
-        
+
         // Ensure a profile row exists for the user. If not, create one using the role
         const { data: profile, error: profileError } = await supabase
-          .from('profiles')
+          .from('profiles' as any)
           .select('*')
           .eq('id', session.user.id)
           .maybeSingle();
@@ -53,11 +53,11 @@ const ProfileSetup = () => {
           // ignore
         }
 
-        const inferredRole = roleFromQuery || (session.user?.user_metadata as any)?.role || (profile && profile.role) || 'patient';
+        const inferredRole = roleFromQuery || (session.user?.user_metadata as any)?.role || (profile as any)?.role || 'patient';
 
         if (!profile) {
           try {
-            const insert = await supabase.from('profiles').insert({
+            const insert = await supabase.from('profiles' as any).insert({
               id: session.user.id,
               email: session.user.email,
               role: inferredRole,
@@ -71,7 +71,7 @@ const ProfileSetup = () => {
             setUserRole(inferredRole);
           }
         } else {
-          setUserRole(profile.role || inferredRole);
+          setUserRole((profile as any).role || inferredRole);
         }
 
         setIsLoading(false);
@@ -102,19 +102,19 @@ const ProfileSetup = () => {
           <h1 className="text-2xl font-bold text-center mb-6">
             Healthcare Provider Application
           </h1>
-          
+
           <div className="bg-card p-6 rounded-lg shadow-lg mb-6">
             <p className="mb-4">
-              Thank you for your interest in becoming a registered healthcare provider on our platform. 
+              Thank you for your interest in becoming a registered healthcare provider on our platform.
               Please complete the application form below with accurate information.
             </p>
-            
+
             <p className="text-muted-foreground text-sm">
-              <strong>Note:</strong> All applications are reviewed by our administrators. 
+              <strong>Note:</strong> All applications are reviewed by our administrators.
               You will be notified once your application has been processed.
             </p>
           </div>
-          
+
           <HealthPersonnelApplicationForm />
         </div>
       </div>

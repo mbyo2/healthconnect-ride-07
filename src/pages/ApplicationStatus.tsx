@@ -33,13 +33,13 @@ const ApplicationStatus = () => {
 
     try {
       const { data, error } = await supabase
-        .from('applications')
+        .from('applications' as any)
         .select('*')
         .eq('user_id', user.id)
         .order('submitted_at', { ascending: false });
 
       if (error) throw error;
-      setApplications(data || []);
+      setApplications(data as any || []);
     } catch (error) {
       console.error('Error fetching applications:', error);
       toast.error('Failed to load applications');

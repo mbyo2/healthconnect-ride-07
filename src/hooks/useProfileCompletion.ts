@@ -35,13 +35,13 @@ export const useProfileCompletion = () => {
         { data: wallets },
         { data: searchLogs }
       ] = await Promise.all([
-        supabase.from('appointments').select('id').eq('patient_id', user.id).limit(1),
-        supabase.from('health_metrics').select('id').eq('user_id', user.id).limit(1),
-        supabase.from('insurance_information').select('id').eq('patient_id', user.id).limit(1),
-        supabase.from('video_consultations').select('id').eq('patient_id', user.id).limit(1),
-        supabase.from('user_connections').select('id').eq('patient_id', user.id).eq('status', 'approved').limit(1),
-        supabase.from('user_wallets').select('id').eq('user_id', user.id).limit(1),
-        supabase.from('audit_logs').select('id').eq('user_id', user.id).eq('action', 'search').limit(1)
+        supabase.from('appointments' as any).select('id').eq('patient_id', user.id).limit(1),
+        supabase.from('health_metrics' as any).select('id').eq('user_id', user.id).limit(1),
+        supabase.from('insurance_information' as any).select('id').eq('patient_id', user.id).limit(1),
+        supabase.from('video_consultations' as any).select('id').eq('patient_id', user.id).limit(1),
+        supabase.from('user_connections' as any).select('id').eq('patient_id', user.id).eq('status', 'approved').limit(1),
+        supabase.from('user_wallets' as any).select('id').eq('user_id', user.id).limit(1),
+        supabase.from('audit_logs' as any).select('id').eq('user_id', user.id).eq('action', 'search').limit(1)
       ]);
 
       const steps: WorkflowStep[] = [

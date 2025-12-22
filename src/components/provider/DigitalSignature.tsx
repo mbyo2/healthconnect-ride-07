@@ -15,20 +15,20 @@ export const DigitalSignature = () => {
     try {
       setLoading(true);
       const { data: { user } } = await supabase.auth.getUser();
-      
+
       if (!user) {
         toast.error("You must be logged in to create a signature");
         return;
       }
 
-      const { error } = await supabase.from("digital_signatures").insert({
+      const { error } = await supabase.from("digital_signatures" as any).insert({
         provider_id: user.id,
         signature_data: signature,
         document_type: documentType
       });
 
       if (error) throw error;
-      
+
       toast.success("Signature saved successfully");
       setSignature("");
       setDocumentType("");
@@ -43,7 +43,7 @@ export const DigitalSignature = () => {
   return (
     <Card className="p-6 space-y-4">
       <h2 className="text-2xl font-semibold">Digital Signature</h2>
-      
+
       <div className="space-y-4">
         <div>
           <Label htmlFor="documentType">Document Type</Label>
@@ -65,7 +65,7 @@ export const DigitalSignature = () => {
           />
         </div>
 
-        <Button 
+        <Button
           onClick={handleSignatureSubmit}
           disabled={loading || !signature || !documentType}
           className="w-full"
