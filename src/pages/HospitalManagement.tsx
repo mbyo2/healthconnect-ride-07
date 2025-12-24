@@ -203,11 +203,11 @@ const HospitalManagement = () => {
                 <Card>
                     <CardHeader className="pb-3">
                         <CardTitle className="text-sm font-medium flex items-center gap-2">
-                            <Activity className="h-4 w-4 text-green-500 dark:text-green-400" /> Occupancy Rate
+                            <Activity className="h-4 w-4 text-green-600 dark:text-green-400" /> Occupancy Rate
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-green-500 dark:text-green-400">{occupancyRate}%</div>
+                        <div className="text-2xl font-bold text-green-600 dark:text-green-400">{occupancyRate}%</div>
                         <p className="text-xs text-muted-foreground">
                             {occupiedBeds} occupied, {availableBeds} available
                         </p>

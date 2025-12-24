@@ -185,7 +185,7 @@ const LabManagement = () => {
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
                     <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-3">
-                        <Microscope className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+                        <Microscope className="h-8 w-8 text-primary" />
                         Lab Management
                     </h1>
                     <p className="text-muted-foreground">Pathology and Diagnostics Portal</p>
@@ -203,7 +203,7 @@ const LabManagement = () => {
                 <Card>
                     <CardHeader className="pb-3">
                         <CardTitle className="text-sm font-medium flex items-center gap-2">
-                            <Clock className="h-4 w-4 text-yellow-500 dark:text-yellow-400" />
+                            <Clock className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
                             Pending Requests
                         </CardTitle>
                     </CardHeader>
@@ -215,7 +215,7 @@ const LabManagement = () => {
                 <Card>
                     <CardHeader className="pb-3">
                         <CardTitle className="text-sm font-medium flex items-center gap-2">
-                            <FlaskConical className="h-4 w-4 text-blue-500 dark:text-blue-400" />
+                            <FlaskConical className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                             In Progress
                         </CardTitle>
                     </CardHeader>
@@ -227,7 +227,7 @@ const LabManagement = () => {
                 <Card>
                     <CardHeader className="pb-3">
                         <CardTitle className="text-sm font-medium flex items-center gap-2">
-                            <CheckCircle2 className="h-4 w-4 text-green-500 dark:text-green-400" />
+                            <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
                             Completed Today
                         </CardTitle>
                     </CardHeader>
@@ -351,7 +351,7 @@ const LabManagement = () => {
                                 ).map((request) => (
                                     <div key={request.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors gap-4">
                                         <div className="flex items-start gap-4">
-                                            <div className={`p-2 rounded-full ${request.priority === 'urgent' ? 'bg-red-100 dark:bg-red-900/30' : 'bg-muted'}`}>
+                                            <div className={`p-2 rounded-full ${request.priority === 'urgent' ? 'bg-red-100 dark:bg-red-900/30 border border-red-200 dark:border-red-800' : 'bg-muted'}`}>
                                                 {getPriorityIcon(request.priority)}
                                             </div>
                                             <div>
