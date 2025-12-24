@@ -38,12 +38,12 @@ export const RoleManagement: React.FC = () => {
   ];
 
   const roleColors: Record<AppRole, string> = {
-    admin: 'bg-red-500',
-    health_personnel: 'bg-blue-500',
-    patient: 'bg-green-500',
-    pharmacy: 'bg-purple-500',
-    institution_admin: 'bg-orange-500',
-    institution_staff: 'bg-cyan-500'
+    admin: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 hover:bg-red-100/80 dark:hover:bg-red-900/40',
+    health_personnel: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 hover:bg-blue-100/80 dark:hover:bg-blue-900/40',
+    patient: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 hover:bg-green-100/80 dark:hover:bg-green-900/40',
+    pharmacy: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300 hover:bg-purple-100/80 dark:hover:bg-purple-900/40',
+    institution_admin: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300 hover:bg-orange-100/80 dark:hover:bg-orange-900/40',
+    institution_staff: 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300 hover:bg-cyan-100/80 dark:hover:bg-cyan-900/40'
   };
 
   useEffect(() => {
@@ -53,7 +53,7 @@ export const RoleManagement: React.FC = () => {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      
+
       // Fetch all profiles
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
@@ -145,12 +145,12 @@ export const RoleManagement: React.FC = () => {
   };
 
   const filteredUsers = users.filter(user => {
-    const matchesSearch = 
+    const matchesSearch =
       user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       `${user.first_name} ${user.last_name}`.toLowerCase().includes(searchTerm.toLowerCase());
-    
+
     const matchesRole = selectedRole === 'all' || user.roles.includes(selectedRole);
-    
+
     return matchesSearch && matchesRole;
   });
 

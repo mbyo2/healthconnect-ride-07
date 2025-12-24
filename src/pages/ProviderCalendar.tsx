@@ -325,8 +325,8 @@ const ProviderCalendar = () => {
                             ? appointment
                               ? 'bg-primary/10'
                               : slot.is_available
-                                ? 'bg-green-50 hover:bg-green-100'
-                                : 'bg-red-50'
+                                ? 'bg-green-50 dark:bg-green-950/20 hover:bg-green-100 dark:hover:bg-green-950/30'
+                                : 'bg-red-50 dark:bg-red-950/20'
                             : 'hover:bg-accent/50'
                             }`}
                         >
@@ -378,11 +378,11 @@ const ProviderCalendar = () => {
         </CardHeader>
         <CardContent className="flex gap-4 text-sm">
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-green-50 border" />
+            <div className="w-4 h-4 bg-green-50 dark:bg-green-950/20 border" />
             <span>Available</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-red-50 border" />
+            <div className="w-4 h-4 bg-red-50 dark:bg-red-950/20 border" />
             <span>Blocked</span>
           </div>
           <div className="flex items-center gap-2">

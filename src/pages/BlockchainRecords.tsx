@@ -44,13 +44,13 @@ const BlockchainRecords = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-background via-purple-50/20 to-background p-4 md:p-6 lg:p-8">
+        <div className="min-h-screen bg-gradient-to-br from-background via-purple-50/20 to-background dark:via-purple-950/10 p-4 md:p-6 lg:p-8">
             <div className="max-w-7xl mx-auto space-y-6">
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div>
                         <h1 className="text-3xl md:text-4xl font-bold tracking-tight flex items-center gap-3">
-                            <Shield className="w-10 h-10 text-purple-600" />
+                            <Shield className="w-10 h-10 text-purple-600 dark:text-purple-400" />
                             Blockchain Medical Records
                         </h1>
                         <p className="text-muted-foreground mt-1">Secure, immutable, and verifiable health records</p>
@@ -130,11 +130,11 @@ const BlockchainRecords = () => {
                 </div>
 
                 {/* Security Info Banner */}
-                <Card className="border-purple-200 bg-purple-50/50">
+                <Card className="border-purple-200 bg-purple-50/50 dark:bg-purple-950/10 dark:border-purple-900/50">
                     <CardContent className="p-6">
                         <div className="flex items-start gap-4">
-                            <div className="p-3 rounded-full bg-purple-100">
-                                <Lock className="w-6 h-6 text-purple-600" />
+                            <div className="p-3 rounded-full bg-purple-100 dark:bg-purple-900/30">
+                                <Lock className="w-6 h-6 text-purple-600 dark:text-purple-400" />
                             </div>
                             <div className="flex-1">
                                 <h3 className="font-semibold text-lg">End-to-End Encryption</h3>
@@ -143,15 +143,15 @@ const BlockchainRecords = () => {
                                 </p>
                                 <div className="flex gap-4 mt-3">
                                     <div className="flex items-center gap-2 text-sm">
-                                        <CheckCircle2 className="w-4 h-4 text-green-600" />
+                                        <CheckCircle2 className="w-4 h-4 text-green-600 dark:text-green-400" />
                                         <span>256-bit Encryption</span>
                                     </div>
                                     <div className="flex items-center gap-2 text-sm">
-                                        <CheckCircle2 className="w-4 h-4 text-green-600" />
+                                        <CheckCircle2 className="w-4 h-4 text-green-600 dark:text-green-400" />
                                         <span>Immutable Records</span>
                                     </div>
                                     <div className="flex items-center gap-2 text-sm">
-                                        <CheckCircle2 className="w-4 h-4 text-green-600" />
+                                        <CheckCircle2 className="w-4 h-4 text-green-600 dark:text-green-400" />
                                         <span>Full Audit Trail</span>
                                     </div>
                                 </div>
@@ -174,17 +174,17 @@ const BlockchainRecords = () => {
                                 medicalRecords.map((record) => (
                                     <div
                                         key={record.id}
-                                        className={`p-4 border rounded-lg cursor-pointer transition-all hover:shadow-md ${selectedRecord === record.id ? 'border-purple-500 bg-purple-50/50' : ''
+                                        className={`p-4 border rounded-lg cursor-pointer transition-all hover:shadow-md ${selectedRecord === record.id ? 'border-purple-500 bg-purple-50/50 dark:bg-purple-900/20' : ''
                                             }`}
                                         onClick={() => setSelectedRecord(record.id)}
                                     >
                                         <div className="flex items-start justify-between">
                                             <div className="flex-1">
                                                 <div className="flex items-center gap-2 mb-2">
-                                                    <FileText className="w-5 h-5 text-purple-600" />
+                                                    <FileText className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                                                     <h4 className="font-semibold">{record.title}</h4>
                                                     {record.verified && (
-                                                        <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                                                        <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 dark:bg-green-950/20 dark:text-green-400 dark:border-green-900/50">
                                                             <CheckCircle2 className="w-3 h-3 mr-1" />
                                                             Verified
                                                         </Badge>
@@ -197,8 +197,8 @@ const BlockchainRecords = () => {
                                                 </p>
                                                 {record.shared_with && record.shared_with.length > 0 && (
                                                     <div className="mt-2 flex items-center gap-2">
-                                                        <Share2 className="w-3 h-3 text-blue-600" />
-                                                        <span className="text-xs text-blue-600">Shared with: {record.shared_with.join(', ')}</span>
+                                                        <Share2 className="w-3 h-3 text-blue-600 dark:text-blue-400" />
+                                                        <span className="text-xs text-blue-600 dark:text-blue-400">Shared with: {record.shared_with.join(', ')}</span>
                                                     </div>
                                                 )}
                                             </div>
@@ -226,11 +226,11 @@ const BlockchainRecords = () => {
                         <CardContent className="space-y-4">
                             {auditTrail.map((entry, index) => (
                                 <div key={index} className="flex items-start gap-3 pb-4 border-b last:border-0">
-                                    <div className={`p-2 rounded-full ${entry.verified ? 'bg-green-50' : 'bg-yellow-50'}`}>
+                                    <div className={`p-2 rounded-full ${entry.verified ? 'bg-green-50 dark:bg-green-900/30' : 'bg-yellow-50 dark:bg-yellow-900/30'}`}>
                                         {entry.verified ? (
-                                            <CheckCircle2 className="w-4 h-4 text-green-600" />
+                                            <CheckCircle2 className="w-4 h-4 text-green-600 dark:text-green-400" />
                                         ) : (
-                                            <AlertTriangle className="w-4 h-4 text-yellow-600" />
+                                            <AlertTriangle className="w-4 h-4 text-yellow-600 dark:text-yellow-400" />
                                         )}
                                     </div>
                                     <div className="flex-1">
@@ -272,7 +272,7 @@ const BlockchainRecords = () => {
                                         <p className="text-xs text-muted-foreground font-mono bg-muted p-3 rounded">
                                             {medicalRecords.find(r => r.id === selectedRecord)?.hash}
                                         </p>
-                                        <div className="flex items-center gap-2 text-sm text-green-600">
+                                        <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
                                             <CheckCircle2 className="w-4 h-4" />
                                             <span>Verified on blockchain</span>
                                         </div>

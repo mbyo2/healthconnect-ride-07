@@ -64,11 +64,11 @@ const VideoDashboard: React.FC = () => {
           <CardDescription>Start a video session or schedule an appointment</CardDescription>
         </CardHeader>
         <CardContent className="flex gap-4">
-          <Button className="flex items-center gap-2">
+          <Button className="flex items-center gap-2" onClick={() => window.location.href = `/video-call/${crypto.randomUUID()}`}>
             <Phone className="h-4 w-4" />
             Start Video Call
           </Button>
-          <Button variant="outline" className="flex items-center gap-2">
+          <Button variant="outline" className="flex items-center gap-2" onClick={() => window.location.href = '/appointments'}>
             <Calendar className="h-4 w-4" />
             Schedule Session
           </Button>

@@ -38,8 +38,8 @@ const Symptoms = () => {
   ];
 
   const toggleSymptom = useCallback((symptom: string) => {
-    setSelectedSymptoms(prev => 
-      prev.includes(symptom) 
+    setSelectedSymptoms(prev =>
+      prev.includes(symptom)
         ? prev.filter(s => s !== symptom)
         : [...prev, symptom]
     );
@@ -52,6 +52,10 @@ const Symptoms = () => {
     }
     toast.success('Symptoms recorded successfully');
     console.log({ selectedSymptoms, severity, description });
+    // Reset form
+    setSelectedSymptoms([]);
+    setSeverity('');
+    setDescription('');
   };
 
   const handleAIAnalysis = () => {
@@ -85,7 +89,7 @@ const Symptoms = () => {
                 Get instant AI-powered analysis of your symptoms, upload medical images, and receive personalized health guidance 24/7.
               </p>
             </div>
-            <Button 
+            <Button
               onClick={() => navigate('/ai-diagnostics')}
               className="w-full sm:w-auto gap-2"
             >
@@ -158,14 +162,14 @@ const Symptoms = () => {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <Button 
-                  onClick={handleSubmit} 
+                <Button
+                  onClick={handleSubmit}
                   className="w-full touch-manipulation hover:shadow-sm transition-all active:scale-95"
                   size="lg"
                 >
                   Record Symptoms
                 </Button>
-                <Button 
+                <Button
                   onClick={handleAIAnalysis}
                   variant="outline"
                   className="w-full touch-manipulation hover:shadow-sm transition-all active:scale-95 gap-2"
@@ -187,8 +191,8 @@ const Symptoms = () => {
               <CardContent>
                 <div className="flex flex-wrap gap-2">
                   {selectedSymptoms.map((symptom) => (
-                    <Badge 
-                      key={symptom} 
+                    <Badge
+                      key={symptom}
                       variant="default"
                       className="cursor-pointer hover:bg-destructive transition-colors"
                       onClick={() => toggleSymptom(symptom)}

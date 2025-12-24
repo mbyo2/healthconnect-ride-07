@@ -51,13 +51,13 @@ const ApplicationStatus = () => {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'approved':
-        return <CheckCircle2 className="h-5 w-5 text-green-500" />;
+        return <CheckCircle2 className="h-5 w-5 text-green-500 dark:text-green-400" />;
       case 'rejected':
-        return <AlertCircle className="h-5 w-5 text-red-500" />;
+        return <AlertCircle className="h-5 w-5 text-red-500 dark:text-red-400" />;
       case 'under_review':
-        return <Clock className="h-5 w-5 text-blue-500" />;
+        return <Clock className="h-5 w-5 text-blue-500 dark:text-blue-400" />;
       default:
-        return <Clock className="h-5 w-5 text-yellow-500" />;
+        return <Clock className="h-5 w-5 text-yellow-500 dark:text-yellow-400" />;
     }
   };
 
@@ -148,7 +148,7 @@ const ApplicationStatus = () => {
                 {/* Status-specific messages */}
                 {application.status === 'pending' && (
                   <div className="flex items-start gap-2 p-3 rounded-lg bg-yellow-50 dark:bg-yellow-950/20 text-sm">
-                    <Clock className="h-4 w-4 text-yellow-600 mt-0.5 flex-shrink-0" />
+                    <Clock className="h-4 w-4 text-yellow-600 dark:text-yellow-400 mt-0.5 flex-shrink-0" />
                     <p className="text-yellow-900 dark:text-yellow-100">
                       Your application is awaiting review. You'll be notified once it's processed.
                     </p>
@@ -157,7 +157,7 @@ const ApplicationStatus = () => {
 
                 {application.status === 'under_review' && (
                   <div className="flex items-start gap-2 p-3 rounded-lg bg-blue-50 dark:bg-blue-950/20 text-sm">
-                    <Clock className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                    <Clock className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
                     <p className="text-blue-900 dark:text-blue-100">
                       Your application is currently under review. This typically takes 3-5 business days.
                     </p>
@@ -166,7 +166,7 @@ const ApplicationStatus = () => {
 
                 {application.status === 'approved' && (
                   <div className="flex items-start gap-2 p-3 rounded-lg bg-green-50 dark:bg-green-950/20 text-sm">
-                    <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                    <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
                     <p className="text-green-900 dark:text-green-100">
                       Your application has been approved! Check your email for next steps.
                     </p>
@@ -175,7 +175,7 @@ const ApplicationStatus = () => {
 
                 {application.status === 'rejected' && (
                   <div className="flex items-start gap-2 p-3 rounded-lg bg-red-50 dark:bg-red-950/20 text-sm">
-                    <AlertCircle className="h-4 w-4 text-red-600 mt-0.5 flex-shrink-0" />
+                    <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" />
                     <p className="text-red-900 dark:text-red-100">
                       Your application was not approved. Please review the notes above for details.
                     </p>
@@ -183,7 +183,7 @@ const ApplicationStatus = () => {
                 )}
 
                 <div className="flex gap-2">
-                  <Button size="sm" variant="outline">
+                  <Button size="sm" variant="outline" onClick={() => toast.info("Download feature coming soon")}>
                     <Download className="h-4 w-4 mr-2" />
                     Download Application
                   </Button>

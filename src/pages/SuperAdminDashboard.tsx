@@ -47,30 +47,30 @@ const SuperAdminDashboard = () => {
       try {
         setIsLoading(true);
         const { data: { session } } = await supabase.auth.getSession();
-        
+
         if (!session) {
           toast.error("You need to be logged in");
           navigate("/auth");
           return;
         }
-        
+
         const { data: profile, error } = await supabase
           .from('profiles')
           .select('role, admin_level')
           .eq('id', session.user.id)
           .single();
-        
+
         if (error) throw error;
-        
+
         if (profile?.admin_level !== 'superadmin') {
           toast.error("You don't have permission to access this page");
           navigate("/");
           return;
         }
-        
+
         setUserRole(profile.role as UserRole);
         setAdminLevel(profile.admin_level as AdminLevel);
-        
+
         // Fetch admin users
         fetchAdmins();
       } catch (error) {
@@ -79,7 +79,7 @@ const SuperAdminDashboard = () => {
         navigate("/");
       }
     };
-    
+
     checkSuperAdmin();
   }, [navigate]);
 
@@ -90,9 +90,9 @@ const SuperAdminDashboard = () => {
         .select('*')
         .in('admin_level', ['admin', 'superadmin'])
         .order('created_at', { ascending: false });
-      
+
       if (error) throw error;
-      
+
       setAdmins(data as AdminUser[]);
     } catch (error) {
       console.error("Error fetching admin users:", error);
@@ -105,15 +105,15 @@ const SuperAdminDashboard = () => {
   const handleCreateAdmin = async () => {
     try {
       setIsSubmitting(true);
-      
+
       const userData = await supabase.auth.getUser();
       const userId = userData.data.user?.id;
-      
+
       if (!userId) {
         toast.error("Authentication error");
         return;
       }
-      
+
       // Use our createSuperAdmin utility function
       const result = await createSuperAdmin(
         newAdminEmail,
@@ -121,23 +121,23 @@ const SuperAdminDashboard = () => {
         newAdminFirstName,
         newAdminLastName
       );
-      
+
       if (!result.success) {
         throw new Error(result.error || "Failed to create admin");
       }
-      
+
       toast.success("Admin created successfully");
       setIsAddAdminOpen(false);
-      
+
       // Clear form
       setNewAdminEmail("");
       setNewAdminPassword("");
       setNewAdminFirstName("");
       setNewAdminLastName("");
-      
+
       // Refresh admin list
       fetchAdmins();
-      
+
     } catch (error: any) {
       console.error("Error creating admin:", error);
       toast.error(error.message || "Failed to create admin");
@@ -149,20 +149,20 @@ const SuperAdminDashboard = () => {
   const toggleAdminLevel = async (id: string, currentLevel: AdminLevel) => {
     try {
       setIsSubmitting(true);
-      
+
       const newLevel = currentLevel === 'admin' ? 'superadmin' : 'admin';
-      
+
       const { error } = await supabase
         .from('profiles')
         .update({
           admin_level: newLevel
         })
         .eq('id', id);
-        
+
       if (error) throw error;
-      
+
       toast.success(`Admin ${newLevel === 'superadmin' ? 'promoted to Superadmin' : 'changed to Admin'}`);
-      
+
       // Refresh admin list
       fetchAdmins();
     } catch (error) {
@@ -192,11 +192,11 @@ const SuperAdminDashboard = () => {
       cell: ({ row }) => {
         const level = row.getValue("admin_level") as AdminLevel;
         return level === "superadmin" ? (
-          <Badge className="bg-purple-100 text-purple-800 border-purple-200">
+          <Badge className="bg-purple-100 dark:bg-purple-950/20 text-purple-800 dark:text-purple-200 border-purple-200 dark:border-purple-800">
             Super Admin
           </Badge>
         ) : (
-          <Badge className="bg-blue-100 text-blue-800 border-blue-200">
+          <Badge className="bg-blue-100 dark:bg-blue-950/20 text-blue-800 dark:text-blue-200 border-blue-200 dark:border-blue-800">
             Admin
           </Badge>
         );
@@ -214,7 +214,7 @@ const SuperAdminDashboard = () => {
       id: "actions",
       cell: ({ row }) => {
         const admin = row.original;
-        
+
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -314,15 +314,15 @@ const SuperAdminDashboard = () => {
                 </div>
               </div>
               <DialogFooter>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   onClick={() => setIsAddAdminOpen(false)}
                   disabled={isSubmitting}
                 >
                   Cancel
                 </Button>
-                <Button 
-                  onClick={handleCreateAdmin} 
+                <Button
+                  onClick={handleCreateAdmin}
                   disabled={isSubmitting || !newAdminEmail || !newAdminPassword}
                 >
                   {isSubmitting ? "Creating..." : "Create Admin"}
@@ -385,10 +385,10 @@ const SuperAdminDashboard = () => {
           <CardTitle>Admin Management</CardTitle>
         </CardHeader>
         <CardContent>
-          <DataTable 
-            columns={adminColumns} 
-            data={admins} 
-            searchColumn="email" 
+          <DataTable
+            columns={adminColumns}
+            data={admins}
+            searchColumn="email"
           />
         </CardContent>
       </Card>

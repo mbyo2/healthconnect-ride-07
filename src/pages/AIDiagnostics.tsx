@@ -144,7 +144,7 @@ const AIDiagnostics = () => {
           </Tabs>
 
           {/* Disclaimer */}
-          <Card className="border-warning/50 bg-warning/5">
+          <Card className="border-yellow-500/50 bg-yellow-500/5">
             <CardContent className="pt-4 sm:pt-6">
               <h3 className="font-semibold mb-2 text-xs sm:text-sm">⚠️ Important Medical Disclaimer</h3>
               <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">

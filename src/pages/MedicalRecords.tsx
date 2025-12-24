@@ -3,10 +3,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { 
-  FileText, 
-  Download, 
-  Upload, 
+import {
+  FileText,
+  Download,
+  Upload,
   Calendar,
   User,
   Heart,
@@ -50,13 +50,13 @@ export default function MedicalRecords() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "Normal":
-        return "bg-green-100 text-green-800";
+        return "bg-green-100 dark:bg-green-950/20 text-green-800 dark:text-green-200";
       case "Active":
-        return "bg-blue-100 text-blue-800";
+        return "bg-blue-100 dark:bg-blue-950/20 text-blue-800 dark:text-blue-200";
       case "Complete":
-        return "bg-gray-100 text-gray-800";
+        return "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200";
     }
   };
 
@@ -111,144 +111,144 @@ export default function MedicalRecords() {
         </div>
 
         {/* AI Insights for Medical Records */}
-        <AIInsightsWidget 
-          context="records" 
-          data={{ 
+        <AIInsightsWidget
+          context="records"
+          data={{
             recordCount: records.length,
-            metricsCount: healthMetrics.length 
-          }} 
+            metricsCount: healthMetrics.length
+          }}
         />
 
         {/* Comprehensive Medical Records Section */}
         <ComprehensiveMedicalRecords />
-        
+
         <Separator />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Recent Records */}
-        <div className="lg:col-span-2">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <ClipboardList className="h-5 w-5" />
-                Recent Records
-              </CardTitle>
-              <CardDescription>
-                Your latest medical documents and reports
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {records.length > 0 ? records.map((record) => (
-                <div key={record.id} className="flex items-center justify-between p-4 border rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-blue-100 rounded-lg">
-                      {getTypeIcon(record.type)}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Recent Records */}
+          <div className="lg:col-span-2">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <ClipboardList className="h-5 w-5" />
+                  Recent Records
+                </CardTitle>
+                <CardDescription>
+                  Your latest medical documents and reports
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {records.length > 0 ? records.map((record) => (
+                  <div key={record.id} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-blue-100 dark:bg-blue-950/20 rounded-lg">
+                        {getTypeIcon(record.type)}
+                      </div>
+                      <div>
+                        <h3 className="font-semibold">{record.title}</h3>
+                        <p className="text-sm text-muted-foreground">
+                          {record.provider} • {new Date(record.date).toLocaleDateString()}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="font-semibold">{record.title}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        {record.provider} • {new Date(record.date).toLocaleDateString()}
-                      </p>
+                    <div className="flex items-center gap-2">
+                      <Badge className={getStatusColor(record.status)}>
+                        {record.status}
+                      </Badge>
+                      <Button variant="ghost" size="sm">
+                        <Download className="h-4 w-4" />
+                      </Button>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Badge className={getStatusColor(record.status)}>
-                      {record.status}
-                    </Badge>
-                    <Button variant="ghost" size="sm">
-                      <Download className="h-4 w-4" />
-                    </Button>
+                )) : (
+                  <div className="text-center py-8">
+                    <p className="text-muted-foreground">No medical records found. Upload your first record!</p>
                   </div>
-                </div>
-              )) : (
-                <div className="text-center py-8">
-                  <p className="text-muted-foreground">No medical records found. Upload your first record!</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Health Metrics */}
-        <div>
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Activity className="h-5 w-5" />
-                Health Metrics
-              </CardTitle>
-              <CardDescription>
-                Your latest vital signs and test results
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {healthMetrics.length > 0 ? healthMetrics.map((metric, index) => (
-                <div key={index}>
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <p className="font-medium">{metric.label}</p>
-                      <p className="text-2xl font-bold">{metric.value}</p>
-                      <p className="text-xs text-muted-foreground">{metric.date}</p>
-                    </div>
-                    <Badge className={getStatusColor(metric.status)}>
-                      {metric.status}
-                    </Badge>
-                  </div>
-                  {index < healthMetrics.length - 1 && <Separator className="mt-4" />}
-                </div>
-              )) : (
-                <div className="text-center py-4">
-                  <p className="text-muted-foreground text-sm">No health metrics recorded yet.</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-
-      {/* Quick Actions - Responsive Grid */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Quick Actions</CardTitle>
-          <CardDescription>
-            Common tasks for managing your medical records
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            <Button 
-              variant="outline" 
-              className="flex items-center justify-start gap-2 h-auto py-3"
-              onClick={() => navigate('/appointments')}
-            >
-              <Calendar className="h-4 w-4 flex-shrink-0" />
-              <span className="text-left">Schedule Checkup</span>
-            </Button>
-            <Button 
-              variant="outline" 
-              className="flex items-center justify-start gap-2 h-auto py-3"
-            >
-              <FileText className="h-4 w-4 flex-shrink-0" />
-              <span className="text-left">Request Records</span>
-            </Button>
-            <Button 
-              variant="outline" 
-              className="flex items-center justify-start gap-2 h-auto py-3"
-            >
-              <Upload className="h-4 w-4 flex-shrink-0" />
-              <span className="text-left">Upload Document</span>
-            </Button>
-            <Button 
-              variant="outline" 
-              className="flex items-center justify-start gap-2 h-auto py-3"
-              onClick={() => navigate('/health-dashboard')}
-            >
-              <Heart className="h-4 w-4 flex-shrink-0" />
-              <span className="text-left">Health Summary</span>
-            </Button>
+                )}
+              </CardContent>
+            </Card>
           </div>
-        </CardContent>
-      </Card>
+
+          {/* Health Metrics */}
+          <div>
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Activity className="h-5 w-5" />
+                  Health Metrics
+                </CardTitle>
+                <CardDescription>
+                  Your latest vital signs and test results
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {healthMetrics.length > 0 ? healthMetrics.map((metric, index) => (
+                  <div key={index}>
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className="font-medium">{metric.label}</p>
+                        <p className="text-2xl font-bold">{metric.value}</p>
+                        <p className="text-xs text-muted-foreground">{metric.date}</p>
+                      </div>
+                      <Badge className={getStatusColor(metric.status)}>
+                        {metric.status}
+                      </Badge>
+                    </div>
+                    {index < healthMetrics.length - 1 && <Separator className="mt-4" />}
+                  </div>
+                )) : (
+                  <div className="text-center py-4">
+                    <p className="text-muted-foreground text-sm">No health metrics recorded yet.</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Quick Actions - Responsive Grid */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Quick Actions</CardTitle>
+            <CardDescription>
+              Common tasks for managing your medical records
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              <Button
+                variant="outline"
+                className="flex items-center justify-start gap-2 h-auto py-3"
+                onClick={() => navigate('/appointments')}
+              >
+                <Calendar className="h-4 w-4 flex-shrink-0" />
+                <span className="text-left">Schedule Checkup</span>
+              </Button>
+              <Button
+                variant="outline"
+                className="flex items-center justify-start gap-2 h-auto py-3"
+              >
+                <FileText className="h-4 w-4 flex-shrink-0" />
+                <span className="text-left">Request Records</span>
+              </Button>
+              <Button
+                variant="outline"
+                className="flex items-center justify-start gap-2 h-auto py-3"
+              >
+                <Upload className="h-4 w-4 flex-shrink-0" />
+                <span className="text-left">Upload Document</span>
+              </Button>
+              <Button
+                variant="outline"
+                className="flex items-center justify-start gap-2 h-auto py-3"
+                onClick={() => navigate('/health-dashboard')}
+              >
+                <Heart className="h-4 w-4 flex-shrink-0" />
+                <span className="text-left">Health Summary</span>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </ProtectedRoute>
   );

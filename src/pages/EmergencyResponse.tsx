@@ -39,29 +39,29 @@ const EmergencyResponse = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-background via-red-50/20 to-background p-4 md:p-6 lg:p-8">
+        <div className="min-h-screen bg-gradient-to-br from-background via-red-50/20 to-background dark:via-red-950/10 p-4 md:p-6 lg:p-8">
             <div className="max-w-7xl mx-auto space-y-6">
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div>
                         <h1 className="text-3xl md:text-4xl font-bold tracking-tight flex items-center gap-3">
-                            <AlertTriangle className="w-10 h-10 text-red-600" />
+                            <AlertTriangle className="w-10 h-10 text-destructive" />
                             Emergency Response
                         </h1>
                         <p className="text-muted-foreground mt-1">24/7 emergency assistance and medical information</p>
                     </div>
-                    <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 px-4 py-2">
+                    <Badge variant="outline" className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 border-green-200 dark:border-green-800 px-4 py-2">
                         <Clock className="w-4 h-4 mr-2" />
                         Available 24/7
                     </Badge>
                 </div>
 
                 {/* Emergency Button */}
-                <Card className="border-red-500 bg-red-50/50">
+                <Card className="border-destructive bg-destructive/5">
                     <CardContent className="p-8">
                         <div className="flex flex-col items-center text-center space-y-4">
-                            <div className="p-6 rounded-full bg-red-100">
-                                <Phone className="w-12 h-12 text-red-600" />
+                            <div className="p-6 rounded-full bg-destructive/10">
+                                <Phone className="w-12 h-12 text-destructive" />
                             </div>
                             <div>
                                 <h2 className="text-2xl font-bold">Need Immediate Help?</h2>
@@ -69,7 +69,8 @@ const EmergencyResponse = () => {
                             </div>
                             <Button
                                 size="lg"
-                                className="bg-red-600 hover:bg-red-700 text-white px-12 py-6 text-xl h-auto"
+                                variant="destructive"
+                                className="px-12 py-6 text-xl h-auto"
                                 onClick={handleEmergencyCall}
                             >
                                 <Phone className="w-6 h-6 mr-3" />
@@ -126,7 +127,7 @@ const EmergencyResponse = () => {
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="p-3 border rounded-lg">
                                     <p className="text-sm text-muted-foreground">Blood Type</p>
-                                    <p className="text-xl font-bold text-red-600">{medicalInfo.bloodType}</p>
+                                    <p className="text-xl font-bold text-destructive">{medicalInfo.bloodType}</p>
                                 </div>
                                 <div className="p-3 border rounded-lg">
                                     <p className="text-sm text-muted-foreground">Allergies</p>
@@ -208,11 +209,11 @@ const EmergencyResponse = () => {
                 </Card>
 
                 {/* Location Sharing */}
-                <Card className="border-blue-200 bg-blue-50/50">
+                <Card className="border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-900/10">
                     <CardContent className="p-6">
                         <div className="flex items-start gap-4">
-                            <div className="p-3 rounded-full bg-blue-100">
-                                <Shield className="w-6 h-6 text-blue-600" />
+                            <div className="p-3 rounded-full bg-blue-100 dark:bg-blue-900/30">
+                                <Shield className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                             </div>
                             <div className="flex-1">
                                 <h3 className="font-semibold text-lg">Location Sharing</h3>
@@ -228,7 +229,7 @@ const EmergencyResponse = () => {
                                         {locationSharing ? 'Stop Sharing Location' : 'Share My Location'}
                                     </Button>
                                     {locationSharing && (
-                                        <Badge variant="outline" className="bg-green-50 text-green-700">
+                                        <Badge variant="outline" className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 border-green-200 dark:border-green-800">
                                             Location Sharing Active
                                         </Badge>
                                     )}
@@ -246,23 +247,23 @@ const EmergencyResponse = () => {
                     <CardContent>
                         <ul className="space-y-3 text-sm">
                             <li className="flex items-start gap-3">
-                                <span className="text-red-600 font-bold">1.</span>
+                                <span className="text-destructive font-bold">1.</span>
                                 <span>Keep your emergency contacts up to date and ensure they know they're listed</span>
                             </li>
                             <li className="flex items-start gap-3">
-                                <span className="text-red-600 font-bold">2.</span>
+                                <span className="text-destructive font-bold">2.</span>
                                 <span>Update your medical information regularly, especially after new diagnoses or medication changes</span>
                             </li>
                             <li className="flex items-start gap-3">
-                                <span className="text-red-600 font-bold">3.</span>
+                                <span className="text-destructive font-bold">3.</span>
                                 <span>Familiarize yourself with the locations of nearby hospitals and emergency facilities</span>
                             </li>
                             <li className="flex items-start gap-3">
-                                <span className="text-red-600 font-bold">4.</span>
+                                <span className="text-destructive font-bold">4.</span>
                                 <span>Enable location services to ensure emergency responders can find you quickly</span>
                             </li>
                             <li className="flex items-start gap-3">
-                                <span className="text-red-600 font-bold">5.</span>
+                                <span className="text-destructive font-bold">5.</span>
                                 <span>For life-threatening emergencies, always call your local emergency number (911 in the US)</span>
                             </li>
                         </ul>

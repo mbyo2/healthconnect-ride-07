@@ -96,13 +96,13 @@ const PharmacyInventory = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "In Stock":
-        return "bg-green-100 text-green-800";
+        return "bg-green-100 dark:bg-green-950/20 text-green-800 dark:text-green-200";
       case "Low Stock":
-        return "bg-yellow-100 text-yellow-800";
+        return "bg-yellow-100 dark:bg-yellow-950/20 text-yellow-800 dark:text-yellow-200";
       case "Out of Stock":
-        return "bg-red-100 text-red-800";
+        return "bg-red-100 dark:bg-red-950/20 text-red-800 dark:text-red-200";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200";
     }
   };
 

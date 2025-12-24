@@ -5,11 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  CheckCircle, 
-  XCircle, 
-  AlertTriangle, 
-  Play, 
+import {
+  CheckCircle,
+  XCircle,
+  AlertTriangle,
+  Play,
   RotateCcw,
   Monitor,
   Smartphone,
@@ -108,13 +108,13 @@ export default function Testing() {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "passed":
-        return <CheckCircle className="h-4 w-4 text-green-500" />;
+        return <CheckCircle className="h-4 w-4 text-green-500 dark:text-green-400" />;
       case "failed":
-        return <XCircle className="h-4 w-4 text-red-500" />;
+        return <XCircle className="h-4 w-4 text-red-500 dark:text-red-400" />;
       case "warning":
-        return <AlertTriangle className="h-4 w-4 text-yellow-500" />;
+        return <AlertTriangle className="h-4 w-4 text-yellow-500 dark:text-yellow-400" />;
       default:
-        return <div className="h-4 w-4 bg-gray-300 rounded-full" />;
+        return <div className="h-4 w-4 bg-muted rounded-full" />;
     }
   };
 
@@ -140,8 +140,8 @@ export default function Testing() {
           Comprehensive testing suite for Doc' O Clock platform quality assurance
         </p>
         <div className="flex justify-center gap-4">
-          <Button 
-            onClick={() => runTests()} 
+          <Button
+            onClick={() => runTests()}
             disabled={isRunning}
             className="flex items-center gap-2"
           >
@@ -191,8 +191,8 @@ export default function Testing() {
                       </CardTitle>
                       <CardDescription>{suite.description}</CardDescription>
                     </div>
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       size="sm"
                       onClick={() => runTests(suite.id)}
                       disabled={isRunning}
@@ -286,15 +286,15 @@ export default function Testing() {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <span>Cached Pages</span>
-                    <CheckCircle className="h-4 w-4 text-green-500" />
+                    <CheckCircle className="h-4 w-4 text-green-500 dark:text-green-400" />
                   </div>
                   <div className="flex items-center justify-between">
                     <span>Offline Forms</span>
-                    <CheckCircle className="h-4 w-4 text-green-500" />
+                    <CheckCircle className="h-4 w-4 text-green-500 dark:text-green-400" />
                   </div>
                   <div className="flex items-center justify-between">
                     <span>Data Sync</span>
-                    <CheckCircle className="h-4 w-4 text-green-500" />
+                    <CheckCircle className="h-4 w-4 text-green-500 dark:text-green-400" />
                   </div>
                 </div>
               </CardContent>
@@ -313,19 +313,19 @@ export default function Testing() {
             <CardContent className="space-y-6">
               <div className="grid md:grid-cols-3 gap-4">
                 <div className="text-center p-4 border rounded-lg">
-                  <div className="text-2xl font-bold text-green-600">94%</div>
+                  <div className="text-2xl font-bold text-green-600 dark:text-green-400">94%</div>
                   <div className="text-sm text-muted-foreground">Pass Rate</div>
                 </div>
                 <div className="text-center p-4 border rounded-lg">
-                  <div className="text-2xl font-bold text-blue-600">1,247</div>
+                  <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">1,247</div>
                   <div className="text-sm text-muted-foreground">Total Tests</div>
                 </div>
                 <div className="text-center p-4 border rounded-lg">
-                  <div className="text-2xl font-bold text-purple-600">12min</div>
+                  <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">12min</div>
                   <div className="text-sm text-muted-foreground">Avg Runtime</div>
                 </div>
               </div>
-              
+
               <div className="flex gap-4">
                 <Button variant="outline">Download Report</Button>
                 <Button variant="outline">Export CSV</Button>

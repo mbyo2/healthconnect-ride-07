@@ -53,13 +53,13 @@ const IoTMonitoring = () => {
     });
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-background via-blue-50/20 to-background p-4 md:p-6 lg:p-8">
+        <div className="min-h-screen bg-gradient-to-br from-background via-blue-50/20 to-background dark:via-blue-950/10 p-4 md:p-6 lg:p-8">
             <div className="max-w-7xl mx-auto space-y-6">
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div>
                         <h1 className="text-3xl md:text-4xl font-bold tracking-tight flex items-center gap-3">
-                            <Activity className="w-10 h-10 text-blue-600" />
+                            <Activity className="w-10 h-10 text-primary" />
                             IoT Health Monitoring
                         </h1>
                         <p className="text-muted-foreground mt-1">Real-time data from your connected devices</p>
@@ -112,8 +112,8 @@ const IoTMonitoring = () => {
                             >
                                 <CardContent className="p-6">
                                     <div className="flex items-start justify-between mb-4">
-                                        <div className="p-3 rounded-full bg-blue-50">
-                                            <Icon className="w-6 h-6 text-blue-600" />
+                                        <div className="p-3 rounded-full bg-blue-100 dark:bg-blue-900/30">
+                                            <Icon className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                                         </div>
                                         <Badge variant={device.is_active ? 'default' : 'secondary'}>
                                             {device.is_active ? 'Connected' : 'Offline'}
@@ -144,7 +144,7 @@ const IoTMonitoring = () => {
                 <Card>
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
-                            <Heart className="w-5 h-5 text-red-500" />
+                            <Heart className="w-5 h-5 text-destructive" />
                             Current Vital Signs
                         </CardTitle>
                         <CardDescription>Real-time health measurements from your devices</CardDescription>
@@ -153,8 +153,8 @@ const IoTMonitoring = () => {
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                             <div className="p-4 border rounded-lg">
                                 <div className="flex items-center justify-between mb-2">
-                                    <Heart className="w-5 h-5 text-red-500" />
-                                    <Badge variant="outline" className="bg-green-50 text-green-700">
+                                    <Heart className="w-5 h-5 text-destructive" />
+                                    <Badge variant="outline" className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 border-green-200 dark:border-green-800">
                                         Normal
                                     </Badge>
                                 </div>
@@ -165,8 +165,8 @@ const IoTMonitoring = () => {
 
                             <div className="p-4 border rounded-lg">
                                 <div className="flex items-center justify-between mb-2">
-                                    <Activity className="w-5 h-5 text-blue-500" />
-                                    <Badge variant="outline" className="bg-green-50 text-green-700">
+                                    <Activity className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                                    <Badge variant="outline" className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 border-green-200 dark:border-green-800">
                                         Normal
                                     </Badge>
                                 </div>
@@ -181,8 +181,8 @@ const IoTMonitoring = () => {
 
                             <div className="p-4 border rounded-lg">
                                 <div className="flex items-center justify-between mb-2">
-                                    <Thermometer className="w-5 h-5 text-orange-500" />
-                                    <Badge variant="outline" className="bg-green-50 text-green-700">
+                                    <Thermometer className="w-5 h-5 text-orange-600 dark:text-orange-400" />
+                                    <Badge variant="outline" className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 border-green-200 dark:border-green-800">
                                         Normal
                                     </Badge>
                                 </div>
@@ -193,8 +193,8 @@ const IoTMonitoring = () => {
 
                             <div className="p-4 border rounded-lg">
                                 <div className="flex items-center justify-between mb-2">
-                                    <Droplet className="w-5 h-5 text-cyan-500" />
-                                    <Badge variant="outline" className="bg-green-50 text-green-700">
+                                    <Droplet className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
+                                    <Badge variant="outline" className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 border-green-200 dark:border-green-800">
                                         Normal
                                     </Badge>
                                 </div>
@@ -239,13 +239,13 @@ const IoTMonitoring = () => {
                         <CardContent className="space-y-4">
                             {alerts.map((alert) => (
                                 <div key={alert.id} className="flex items-start gap-3 p-3 border rounded-lg">
-                                    <div className={`p-2 rounded-full ${alert.severity === 'low' ? 'bg-blue-50' :
-                                        alert.severity === 'medium' ? 'bg-yellow-50' : 'bg-red-50'
+                                    <div className={`p-2 rounded-full ${alert.severity === 'low' ? 'bg-blue-100 dark:bg-blue-900/30' :
+                                        alert.severity === 'medium' ? 'bg-yellow-100 dark:bg-yellow-900/30' : 'bg-red-100 dark:bg-red-900/30'
                                         }`}>
                                         {alert.severity === 'low' ? (
-                                            <CheckCircle2 className="w-4 h-4 text-blue-600" />
+                                            <CheckCircle2 className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                                         ) : (
-                                            <AlertCircle className="w-4 h-4 text-yellow-600" />
+                                            <AlertCircle className="w-4 h-4 text-yellow-600 dark:text-yellow-400" />
                                         )}
                                     </div>
                                     <div className="flex-1">
@@ -275,11 +275,11 @@ const IoTMonitoring = () => {
                 />
 
                 {/* Device Pairing Guide */}
-                <Card className="border-blue-200 bg-blue-50/50">
+                <Card className="border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-900/10">
                     <CardContent className="p-6">
                         <div className="flex items-start gap-4">
-                            <div className="p-3 rounded-full bg-blue-100">
-                                <Smartphone className="w-6 h-6 text-blue-600" />
+                            <div className="p-3 rounded-full bg-blue-100 dark:bg-blue-900/30">
+                                <Smartphone className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                             </div>
                             <div className="flex-1">
                                 <h3 className="font-semibold text-lg">Connect More Devices</h3>

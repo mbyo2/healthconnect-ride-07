@@ -168,7 +168,7 @@ const InstitutionPatients = () => {
                                             {patient.last_visit ? format(new Date(patient.last_visit), 'MMM d, yyyy') : 'N/A'}
                                         </TableCell>
                                         <TableCell>
-                                            <Button variant="ghost" size="sm">
+                                            <Button variant="ghost" size="sm" onClick={() => toast.info("Patient details view coming soon")}>
                                                 <FileText className="h-4 w-4" />
                                             </Button>
                                         </TableCell>

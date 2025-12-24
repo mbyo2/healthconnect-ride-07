@@ -20,13 +20,13 @@ export const ProviderPortal = () => {
     const checkSession = async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
-        
+
         if (error) {
           console.error("Error checking session:", error);
           setError(error.message);
           return;
         }
-        
+
         if (session) {
           console.log("Provider already logged in, checking profile...");
           const { data: profile, error: profileError } = await supabase
@@ -41,7 +41,7 @@ export const ProviderPortal = () => {
           }
 
           setIsRedirecting(true);
-          
+
           if (profile?.role === 'health_personnel') {
             // Check if the provider has an approved application
             const { data: application, error: applicationError } = await supabase
@@ -49,14 +49,14 @@ export const ProviderPortal = () => {
               .select('status')
               .eq('user_id', session.user.id)
               .single();
-              
+
             if (applicationError && applicationError.code !== 'PGRST116') {
               console.error("Error checking application status:", applicationError);
               toast.error("Error checking application status");
               setIsLoading(false);
               return;
             }
-            
+
             if (application?.status === 'approved') {
               // Only allow approved providers to access the dashboard
               if (!profile?.is_profile_complete) {
@@ -155,7 +155,7 @@ export const ProviderPortal = () => {
               <TabsTrigger value="signin">Sign In</TabsTrigger>
               <TabsTrigger value="signup">Register</TabsTrigger>
             </TabsList>
-            
+
             <TabsContent value="signin">
               <Auth
                 supabaseClient={supabase}
@@ -166,13 +166,15 @@ export const ProviderPortal = () => {
                     anchor: { color: 'rgb(var(--primary))' },
                     container: { width: '100%' },
                     message: { color: 'rgb(var(--destructive))' },
-                    input: { 
+                    input: {
                       borderRadius: '0.375rem',
-                      backgroundColor: 'white' 
-                    },
-                    label: { 
+                      backgroundColor: 'transparent',
                       color: 'rgb(var(--foreground))',
-                      fontSize: '0.875rem' 
+                      borderColor: 'rgb(var(--border))'
+                    },
+                    label: {
+                      color: 'rgb(var(--foreground))',
+                      fontSize: '0.875rem'
                     }
                   },
                 }}
@@ -181,7 +183,7 @@ export const ProviderPortal = () => {
                 redirectTo={`${window.location.origin}/provider-dashboard`}
               />
             </TabsContent>
-            
+
             <TabsContent value="signup">
               <Auth
                 supabaseClient={supabase}
@@ -192,13 +194,15 @@ export const ProviderPortal = () => {
                     anchor: { color: 'rgb(var(--primary))' },
                     container: { width: '100%' },
                     message: { color: 'rgb(var(--destructive))' },
-                    input: { 
+                    input: {
                       borderRadius: '0.375rem',
-                      backgroundColor: 'white' 
-                    },
-                    label: { 
+                      backgroundColor: 'transparent',
                       color: 'rgb(var(--foreground))',
-                      fontSize: '0.875rem' 
+                      borderColor: 'rgb(var(--border))'
+                    },
+                    label: {
+                      color: 'rgb(var(--foreground))',
+                      fontSize: '0.875rem'
                     }
                   },
                 }}

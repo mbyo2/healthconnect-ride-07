@@ -219,12 +219,12 @@ const PharmacyManagement = () => {
                 <Card>
                     <CardHeader className="pb-3">
                         <CardTitle className="text-sm font-medium flex items-center gap-2">
-                            <AlertTriangle className="h-4 w-4 text-orange-500" />
+                            <AlertTriangle className="h-4 w-4 text-orange-500 dark:text-orange-400" />
                             Low Stock
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-orange-500">{lowStockItems.length}</div>
+                        <div className="text-2xl font-bold text-orange-500 dark:text-orange-400">{lowStockItems.length}</div>
                     </CardContent>
                 </Card>
 
@@ -243,12 +243,12 @@ const PharmacyManagement = () => {
                 <Card>
                     <CardHeader className="pb-3">
                         <CardTitle className="text-sm font-medium flex items-center gap-2">
-                            <DollarSign className="h-4 w-4 text-green-500" />
+                            <DollarSign className="h-4 w-4 text-green-500 dark:text-green-400" />
                             Today's Revenue
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-green-500">K{todayRevenue.toFixed(2)}</div>
+                        <div className="text-2xl font-bold text-green-500 dark:text-green-400">K{todayRevenue.toFixed(2)}</div>
                     </CardContent>
                 </Card>
             </div>
@@ -331,10 +331,10 @@ const PharmacyManagement = () => {
                     {(lowStockItems.length > 0 || expiringItems.length > 0) && (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {lowStockItems.length > 0 && (
-                                <Card className="border-orange-200">
+                                <Card className="border-orange-200 dark:border-orange-900/50">
                                     <CardHeader>
                                         <CardTitle className="text-sm flex items-center gap-2">
-                                            <AlertTriangle className="h-4 w-4 text-orange-500" />
+                                            <AlertTriangle className="h-4 w-4 text-orange-500 dark:text-orange-400" />
                                             Low Stock Alert
                                         </CardTitle>
                                     </CardHeader>
@@ -352,10 +352,10 @@ const PharmacyManagement = () => {
                             )}
 
                             {expiringItems.length > 0 && (
-                                <Card className="border-red-200">
+                                <Card className="border-destructive/50">
                                     <CardHeader>
                                         <CardTitle className="text-sm flex items-center gap-2">
-                                            <AlertTriangle className="h-4 w-4 text-red-500" />
+                                            <AlertTriangle className="h-4 w-4 text-destructive" />
                                             Expiring Soon
                                         </CardTitle>
                                     </CardHeader>
@@ -473,7 +473,7 @@ const PharmacyManagement = () => {
                                             />
                                         </div>
                                         {patientSearchTerm && (
-                                            <div className="max-h-32 overflow-y-auto border rounded-md bg-white">
+                                            <div className="max-h-32 overflow-y-auto border rounded-md bg-background">
                                                 {patients?.filter(p =>
                                                     `${p.first_name} ${p.last_name}`.toLowerCase().includes(patientSearchTerm.toLowerCase())
                                                 ).map(p => (
@@ -499,7 +499,7 @@ const PharmacyManagement = () => {
                                                 onVerified={(v) => setSelectedVerification(v)}
                                             />
                                             {selectedVerification && (
-                                                <div className="p-2 bg-green-50 border border-green-200 rounded text-xs text-green-800 flex items-center gap-2">
+                                                <div className="p-2 bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 border border-green-200 dark:border-green-800 rounded text-xs flex items-center gap-2">
                                                     <CheckCircle className="h-3 w-3" />
                                                     <span>Insurance Applied: {selectedVerification.coverage_percentage}%</span>
                                                 </div>

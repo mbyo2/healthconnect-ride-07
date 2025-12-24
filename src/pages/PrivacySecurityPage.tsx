@@ -286,9 +286,9 @@ const PrivacySecurityPage = () => {
                     onClick={() => setShowCurrentPassword(!showCurrentPassword)}
                   >
                     {showCurrentPassword ? (
-                      <EyeOff className="h-4 w-4 text-gray-500" />
+                      <EyeOff className="h-4 w-4 text-muted-foreground" />
                     ) : (
-                      <Eye className="h-4 w-4 text-gray-500" />
+                      <Eye className="h-4 w-4 text-muted-foreground" />
                     )}
                   </button>
                 </div>
@@ -311,9 +311,9 @@ const PrivacySecurityPage = () => {
                     onClick={() => setShowNewPassword(!showNewPassword)}
                   >
                     {showNewPassword ? (
-                      <EyeOff className="h-4 w-4 text-gray-500" />
+                      <EyeOff className="h-4 w-4 text-muted-foreground" />
                     ) : (
-                      <Eye className="h-4 w-4 text-gray-500" />
+                      <Eye className="h-4 w-4 text-muted-foreground" />
                     )}
                   </button>
                 </div>
@@ -456,7 +456,7 @@ const PrivacySecurityPage = () => {
               )}
             </ul>
 
-            <Button variant="outline" className="mt-4 w-full">View Full Security Log</Button>
+            <Button variant="outline" className="mt-4 w-full" onClick={() => toast.info("Full security log coming soon")}>View Full Security Log</Button>
           </Card>
         </TabsContent>
 
@@ -547,7 +547,7 @@ const PrivacySecurityPage = () => {
                 <p className="text-sm text-muted-foreground mb-2">
                   Download a copy of all your personal data stored in our system
                 </p>
-                <Button variant="outline">Request Data Export</Button>
+                <Button variant="outline" onClick={() => toast.info("Data export coming soon")}>Request Data Export</Button>
               </div>
 
               <Separator />
@@ -557,14 +557,14 @@ const PrivacySecurityPage = () => {
                 <p className="text-sm text-muted-foreground mb-2">
                   Request deletion of all your personal data (apart from that required by law)
                 </p>
-                <Button variant="outline">Request Data Deletion</Button>
+                <Button variant="outline" onClick={() => toast.info("Data deletion request coming soon")}>Request Data Deletion</Button>
               </div>
             </div>
           </Card>
 
-          <Card className="p-6 border-red-200">
+          <Card className="p-6 border-destructive/50">
             <div className="space-y-4">
-              <div className="flex items-center space-x-2 text-red-500">
+              <div className="flex items-center space-x-2 text-destructive">
                 <AlertTriangle className="h-5 w-5" />
                 <h2 className="text-xl font-semibold">Danger Zone</h2>
               </div>

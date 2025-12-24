@@ -32,7 +32,7 @@ const Settings = () => {
         <h1 className="text-3xl font-bold bg-gradient-to-r from-trust-600 to-trust-400 bg-clip-text text-transparent">
           Settings
         </h1>
-        <p className="text-muted-foreground">
+        <p className="text-sm sm:text-base text-muted-foreground">
           Customize your Doc' O Clock experience
         </p>
       </div>
@@ -40,7 +40,7 @@ const Settings = () => {
       {/* Account Settings */}
       <Card className="border-trust-100 shadow-trust">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-trust-700">
+          <CardTitle className="flex items-center gap-2 text-foreground">
             <User className="h-5 w-5" />
             Account
           </CardTitle>
@@ -58,9 +58,9 @@ const Settings = () => {
             </div>
             <Switch checked={true} />
           </div>
-          
+
           <Separator />
-          
+
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label className="text-base">Two-Factor Authentication</Label>
@@ -76,7 +76,7 @@ const Settings = () => {
       {/* Notification Settings */}
       <Card className="border-trust-100 shadow-trust">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-trust-700">
+          <CardTitle className="flex items-center gap-2 text-foreground">
             <Bell className="h-5 w-5" />
             Notifications
           </CardTitle>
@@ -94,9 +94,9 @@ const Settings = () => {
             </div>
             <Switch checked={notifications} onCheckedChange={handleNotificationToggle} />
           </div>
-          
+
           <Separator />
-          
+
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label className="text-base">Email Notifications</Label>
@@ -106,9 +106,9 @@ const Settings = () => {
             </div>
             <Switch checked={true} />
           </div>
-          
+
           <Separator />
-          
+
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label className="text-base">SMS Reminders</Label>
@@ -124,7 +124,7 @@ const Settings = () => {
       {/* Privacy & Security */}
       <Card className="border-trust-100 shadow-trust">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-trust-700">
+          <CardTitle className="flex items-center gap-2 text-foreground">
             <Shield className="h-5 w-5" />
             Privacy & Security
           </CardTitle>

@@ -10,32 +10,32 @@ const PaymentCancel = () => {
     <div className="min-h-screen flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
-            <XCircle className="h-6 w-6 text-red-600" />
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-950/20">
+            <XCircle className="h-6 w-6 text-red-600 dark:text-red-400" />
           </div>
-          <CardTitle className="text-red-800">Payment Cancelled</CardTitle>
+          <CardTitle className="text-lg sm:text-xl text-foreground">Payment Cancelled</CardTitle>
           <CardDescription>
             Your payment was cancelled. No charges have been made to your account.
           </CardDescription>
         </CardHeader>
-        
+
         <CardContent className="space-y-4">
-          <div className="bg-red-50 p-4 rounded-lg border border-red-200">
-            <p className="text-sm text-red-800">
+          <div className="bg-red-50 dark:bg-red-950/20 p-4 rounded-lg border border-red-200 dark:border-red-800">
+            <p className="text-sm text-red-800 dark:text-red-200">
               You can try again with a different payment method or contact support if you need assistance.
             </p>
           </div>
-          
+
           <div className="flex flex-col gap-2">
-            <Button 
+            <Button
               onClick={() => navigate(-1)}
               className="w-full"
             >
               <RotateCcw className="h-4 w-4 mr-2" />
               Try Again
             </Button>
-            
-            <Button 
+
+            <Button
               variant="outline"
               onClick={() => navigate("/")}
               className="w-full"

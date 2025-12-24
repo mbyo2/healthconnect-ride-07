@@ -30,7 +30,7 @@ const Marketplace = () => {
 
   const filteredProducts = (products || []).filter(product => {
     const matchesSearch = (product.medication_name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (product.generic_name || '').toLowerCase().includes(searchTerm.toLowerCase());
+      (product.generic_name || '').toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
@@ -60,7 +60,7 @@ const Marketplace = () => {
           <Tabs defaultValue="products">
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="products" className="text-xs">Browse</TabsTrigger>
-                <TabsTrigger value="cart" className="flex items-center gap-1 text-xs">
+              <TabsTrigger value="cart" className="flex items-center gap-1 text-xs">
                 <ShoppingCart className="h-3 w-3" />
                 Cart ({cart?.items?.length ?? 0})
               </TabsTrigger>
@@ -134,11 +134,10 @@ const Marketplace = () => {
                   <div key={order.id} className="border rounded-lg p-4">
                     <div className="flex justify-between items-start mb-2">
                       <h3 className="font-semibold">Order #{order.id.slice(0, 8)}</h3>
-                      <span className={`px-2 py-1 rounded text-sm ${
-                        order.status === 'delivered' ? 'bg-green-100 text-green-800' :
-                        order.status === 'cancelled' ? 'bg-red-100 text-red-800' :
-                        'bg-blue-100 text-blue-800'
-                      }`}>
+                      <span className={`px-2 py-1 rounded text-sm ${order.status === 'delivered' ? 'bg-green-100 dark:bg-green-950/20 text-green-800 dark:text-green-200' :
+                          order.status === 'cancelled' ? 'bg-red-100 dark:bg-red-950/20 text-red-800 dark:text-red-200' :
+                            'bg-blue-100 dark:bg-blue-950/20 text-blue-800 dark:text-blue-200'
+                        }`}>
                         {order.status.replace('_', ' ')}
                       </span>
                     </div>

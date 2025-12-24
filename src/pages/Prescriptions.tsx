@@ -59,11 +59,11 @@ const Prescriptions = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'active': return 'bg-green-100 text-green-800';
-      case 'completed': return 'bg-gray-100 text-gray-800';
-      case 'expired': return 'bg-red-100 text-red-800';
-      case 'pending': return 'bg-yellow-100 text-yellow-800';
-      default: return 'bg-blue-100 text-blue-800';
+      case 'active': return 'bg-green-100 dark:bg-green-950/20 text-green-800 dark:text-green-200';
+      case 'completed': return 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200';
+      case 'expired': return 'bg-red-100 dark:bg-red-950/20 text-red-800 dark:text-red-200';
+      case 'pending': return 'bg-yellow-100 dark:bg-yellow-950/20 text-yellow-800 dark:text-yellow-200';
+      default: return 'bg-blue-100 dark:bg-blue-950/20 text-blue-800 dark:text-blue-200';
     }
   };
 
@@ -74,8 +74,8 @@ const Prescriptions = () => {
   return (
     <div className="container mx-auto py-8 space-y-6">
       <div className="text-center">
-        <h1 className="text-3xl font-bold mb-2">My Prescriptions</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-2 text-foreground">My Prescriptions</h1>
+        <p className="text-sm sm:text-base text-muted-foreground">
           Track and manage your medication prescriptions
         </p>
       </div>
@@ -86,9 +86,9 @@ const Prescriptions = () => {
             <CardHeader>
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-3">
-                  <Pill className="h-8 w-8 text-blue-600" />
+                  <Pill className="h-8 w-8 text-primary" />
                   <div>
-                    <CardTitle className="text-xl">{prescription.medication}</CardTitle>
+                    <CardTitle className="text-lg sm:text-xl text-foreground">{prescription.medication}</CardTitle>
                     <CardDescription className="flex items-center gap-2 mt-1">
                       <User className="h-3 w-3" />
                       Prescribed by {prescription.prescriber}

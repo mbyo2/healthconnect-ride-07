@@ -381,7 +381,7 @@ const AppointmentDetails = () => {
           </CardHeader>
           <CardContent className="flex flex-wrap gap-3">
             {appointment.type === 'video' && (
-              <Button>
+              <Button onClick={() => window.location.href = `/video-call/${id}`}>
                 <Video className="h-4 w-4 mr-2" />
                 Join Video Call
               </Button>

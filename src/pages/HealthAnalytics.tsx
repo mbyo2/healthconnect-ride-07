@@ -40,13 +40,13 @@ const HealthAnalytics = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-background via-green-50/20 to-background p-4 md:p-6 lg:p-8">
+        <div className="min-h-screen bg-gradient-to-br from-background via-green-50/20 to-background dark:via-green-950/10 p-4 md:p-6 lg:p-8">
             <div className="max-w-7xl mx-auto space-y-6">
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div>
                         <h1 className="text-3xl md:text-4xl font-bold tracking-tight flex items-center gap-3">
-                            <BarChart3 className="w-10 h-10 text-green-600" />
+                            <BarChart3 className="w-10 h-10 text-green-600 dark:text-green-400" />
                             Health Data Analytics
                         </h1>
                         <p className="text-muted-foreground mt-1">Comprehensive insights into your health trends</p>
@@ -77,8 +77,8 @@ const HealthAnalytics = () => {
                             <CardContent className="p-6">
                                 <div className="flex items-start justify-between mb-3">
                                     <h3 className="font-semibold">{insight.title}</h3>
-                                    <span className={`text-lg font-bold ${insight.trend === 'positive' ? 'text-green-600' :
-                                        insight.trend === 'negative' ? 'text-red-600' : 'text-blue-600'
+                                    <span className={`text-lg font-bold ${insight.trend === 'positive' ? 'text-green-600 dark:text-green-400' :
+                                        insight.trend === 'negative' ? 'text-red-600 dark:text-red-400' : 'text-blue-600 dark:text-blue-400'
                                         }`}>
                                         {insight.metric}
                                     </span>
@@ -178,56 +178,56 @@ const HealthAnalytics = () => {
                                     <Card>
                                         <CardHeader>
                                             <CardTitle className="text-base flex items-center gap-2">
-                                                <Heart className="w-4 h-4 text-red-500" />
+                                                <Heart className="w-4 h-4 text-red-500 dark:text-red-400" />
                                                 Blood Pressure
                                             </CardTitle>
                                         </CardHeader>
                                         <CardContent>
                                             <div className="text-3xl font-bold">120/80</div>
                                             <p className="text-sm text-muted-foreground mt-1">mmHg - Normal</p>
-                                            <p className="text-xs text-green-600 mt-2">↓ 2% from last week</p>
+                                            <p className="text-xs text-green-600 dark:text-green-400 mt-2">↓ 2% from last week</p>
                                         </CardContent>
                                     </Card>
 
                                     <Card>
                                         <CardHeader>
                                             <CardTitle className="text-base flex items-center gap-2">
-                                                <Droplet className="w-4 h-4 text-blue-500" />
+                                                <Droplet className="w-4 h-4 text-blue-500 dark:text-blue-400" />
                                                 Oxygen Saturation
                                             </CardTitle>
                                         </CardHeader>
                                         <CardContent>
                                             <div className="text-3xl font-bold">98%</div>
                                             <p className="text-sm text-muted-foreground mt-1">SpO2 - Excellent</p>
-                                            <p className="text-xs text-green-600 mt-2">Stable</p>
+                                            <p className="text-xs text-green-600 dark:text-green-400 mt-2">Stable</p>
                                         </CardContent>
                                     </Card>
 
                                     <Card>
                                         <CardHeader>
                                             <CardTitle className="text-base flex items-center gap-2">
-                                                <Weight className="w-4 h-4 text-purple-500" />
+                                                <Weight className="w-4 h-4 text-purple-500 dark:text-purple-400" />
                                                 Weight
                                             </CardTitle>
                                         </CardHeader>
                                         <CardContent>
                                             <div className="text-3xl font-bold">70 kg</div>
                                             <p className="text-sm text-muted-foreground mt-1">BMI: 22.5 - Healthy</p>
-                                            <p className="text-xs text-green-600 mt-2">↓ 0.5 kg this month</p>
+                                            <p className="text-xs text-green-600 dark:text-green-400 mt-2">↓ 0.5 kg this month</p>
                                         </CardContent>
                                     </Card>
 
                                     <Card>
                                         <CardHeader>
                                             <CardTitle className="text-base flex items-center gap-2">
-                                                <Activity className="w-4 h-4 text-orange-500" />
+                                                <Activity className="w-4 h-4 text-orange-500 dark:text-orange-400" />
                                                 Resting Heart Rate
                                             </CardTitle>
                                         </CardHeader>
                                         <CardContent>
                                             <div className="text-3xl font-bold">62 bpm</div>
                                             <p className="text-sm text-muted-foreground mt-1">Excellent fitness level</p>
-                                            <p className="text-xs text-green-600 mt-2">↓ 3 bpm this month</p>
+                                            <p className="text-xs text-green-600 dark:text-green-400 mt-2">↓ 3 bpm this month</p>
                                         </CardContent>
                                     </Card>
                                 </div>
@@ -237,25 +237,25 @@ const HealthAnalytics = () => {
                 </Card>
 
                 {/* Recommendations */}
-                <Card className="border-green-200 bg-green-50/50">
+                <Card className="border-green-200 bg-green-50/50 dark:bg-green-950/10 dark:border-green-900/50">
                     <CardContent className="p-6">
                         <div className="flex items-start gap-4">
-                            <div className="p-3 rounded-full bg-green-100">
-                                <TrendingUp className="w-6 h-6 text-green-600" />
+                            <div className="p-3 rounded-full bg-green-100 dark:bg-green-900/30">
+                                <TrendingUp className="w-6 h-6 text-green-600 dark:text-green-400" />
                             </div>
                             <div className="flex-1">
                                 <h3 className="font-semibold text-lg">Personalized Recommendations</h3>
                                 <ul className="mt-3 space-y-2 text-sm">
                                     <li className="flex items-start gap-2">
-                                        <span className="text-green-600">•</span>
+                                        <span className="text-green-600 dark:text-green-400">•</span>
                                         <span>Continue your current exercise routine - your cardiovascular health is improving</span>
                                     </li>
                                     <li className="flex items-start gap-2">
-                                        <span className="text-green-600">•</span>
+                                        <span className="text-green-600 dark:text-green-400">•</span>
                                         <span>Try to maintain consistent sleep schedule - your body responds well to routine</span>
                                     </li>
                                     <li className="flex items-start gap-2">
-                                        <span className="text-green-600">•</span>
+                                        <span className="text-green-600 dark:text-green-400">•</span>
                                         <span>Consider adding strength training 2-3 times per week for balanced fitness</span>
                                     </li>
                                 </ul>

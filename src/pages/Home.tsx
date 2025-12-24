@@ -12,7 +12,7 @@ const Home = () => {
   // Render authenticated view
   if (isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gray-50/50">
+      <div className="min-h-screen bg-background">
         <RoleBasedWorkflow />
       </div>
     );
@@ -23,7 +23,7 @@ const Home = () => {
     <div className="min-h-screen">
       <Hero />
       <div className="container-modern py-12">
-        <h2 className="text-2xl font-bold mb-6 text-gray-900">Specialized Care</h2>
+        <h2 className="text-2xl font-bold mb-6 text-foreground">Specialized Care</h2>
         <SpecializedHelp />
       </div>
       <ServiceHighlights />

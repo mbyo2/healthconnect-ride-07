@@ -9,10 +9,10 @@ const AdvancedDashboard = () => {
     const { profile } = useAuth();
 
     const quickStats = [
-        { label: 'Appointments', value: '3', icon: Calendar, color: 'text-blue-600', bgColor: 'bg-blue-50' },
-        { label: 'Health Score', value: '85%', icon: Heart, color: 'text-red-600', bgColor: 'bg-red-50' },
-        { label: 'Active Days', value: '12', icon: Activity, color: 'text-green-600', bgColor: 'bg-green-50' },
-        { label: 'Providers', value: '5', icon: Users, color: 'text-purple-600', bgColor: 'bg-purple-50' },
+        { label: 'Appointments', value: '3', icon: Calendar, color: 'text-blue-600 dark:text-blue-400', bgColor: 'bg-blue-50 dark:bg-blue-950/20' },
+        { label: 'Health Score', value: '85%', icon: Heart, color: 'text-red-600 dark:text-red-400', bgColor: 'bg-red-50 dark:bg-red-950/20' },
+        { label: 'Active Days', value: '12', icon: Activity, color: 'text-green-600 dark:text-green-400', bgColor: 'bg-green-50 dark:bg-green-950/20' },
+        { label: 'Providers', value: '5', icon: Users, color: 'text-purple-600 dark:text-purple-400', bgColor: 'bg-purple-50 dark:bg-purple-950/20' },
     ];
 
     const upcomingAppointments = [
@@ -92,7 +92,7 @@ const AdvancedDashboard = () => {
                                         <p className="text-sm mt-1">{apt.date} at {apt.time}</p>
                                     </div>
                                     <div className="flex items-center gap-3 self-start sm:self-auto">
-                                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${apt.status === 'confirmed' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${apt.status === 'confirmed' ? 'bg-green-100 dark:bg-green-950/20 text-green-700 dark:text-green-300' : 'bg-yellow-100 dark:bg-yellow-950/20 text-yellow-700 dark:text-yellow-300'
                                             }`}>
                                             {apt.status}
                                         </span>
@@ -147,8 +147,8 @@ const AdvancedDashboard = () => {
                                     <p className="text-2xl font-bold mt-1">{metric.value}</p>
                                     <div className="flex items-center gap-2 mt-2">
                                         <span className={`text-sm font-medium ${metric.status === 'normal' || metric.status === 'good' || metric.status === 'improving'
-                                            ? 'text-green-600'
-                                            : 'text-red-600'
+                                            ? 'text-green-600 dark:text-green-400'
+                                            : 'text-red-600 dark:text-red-400'
                                             }`}>
                                             {metric.trend}
                                         </span>

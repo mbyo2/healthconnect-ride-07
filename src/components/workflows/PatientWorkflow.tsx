@@ -102,7 +102,7 @@ export const PatientWorkflow = React.memo(() => {
                   <Sparkles className="h-3.5 w-3.5 text-blue-100" />
                   <span className="text-[10px] md:text-xs font-semibold uppercase tracking-wider text-blue-50">Welcome back!</span>
                 </div>
-                <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight">
+                <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight">
                   Your Health Dashboard
                 </h1>
                 <p className="text-blue-100/90 text-sm md:text-base max-w-md">
@@ -124,7 +124,7 @@ export const PatientWorkflow = React.memo(() => {
 
         {/* Quick Access Cards */}
         <div>
-          <h2 className="text-xl font-bold mb-4 px-1">Quick Access</h2>
+          <h2 className="text-lg sm:text-xl font-bold mb-4 px-1 text-foreground">Quick Access</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer border-none shadow-sm bg-white hover:-translate-y-1 active:scale-95" onClick={() => handleNavigation('/emergency', 'Emergency')}>
               <CardHeader className="pb-3">
@@ -132,11 +132,11 @@ export const PatientWorkflow = React.memo(() => {
                   <div className="p-2 bg-rose-50 rounded-lg group-hover:bg-rose-100 transition-colors">
                     <Activity className="h-5 w-5 text-rose-600" />
                   </div>
-                  <CardTitle className="text-sm font-bold">Emergency</CardTitle>
+                  <CardTitle className="text-xs sm:text-sm font-bold text-foreground">Emergency</CardTitle>
                 </div>
               </CardHeader>
               <CardContent>
-                <CardDescription className="text-xs font-medium">Get help now</CardDescription>
+                <CardDescription className="text-[11px] sm:text-xs font-medium">Get help now</CardDescription>
               </CardContent>
             </Card>
 
@@ -146,11 +146,11 @@ export const PatientWorkflow = React.memo(() => {
                   <div className="p-2 bg-emerald-50 rounded-lg group-hover:bg-emerald-100 transition-colors">
                     <CreditCard className="h-5 w-5 text-emerald-600" />
                   </div>
-                  <CardTitle className="text-sm font-bold">Buy Medicine</CardTitle>
+                  <CardTitle className="text-xs sm:text-sm font-bold text-foreground">Buy Medicine</CardTitle>
                 </div>
               </CardHeader>
               <CardContent>
-                <CardDescription className="text-xs font-medium">Order online</CardDescription>
+                <CardDescription className="text-[11px] sm:text-xs font-medium">Order online</CardDescription>
               </CardContent>
             </Card>
 
@@ -160,11 +160,11 @@ export const PatientWorkflow = React.memo(() => {
                   <div className="p-2 bg-blue-50 rounded-lg group-hover:bg-blue-100 transition-colors">
                     <Users className="h-5 w-5 text-blue-600" />
                   </div>
-                  <CardTitle className="text-sm font-bold">Find Doctor</CardTitle>
+                  <CardTitle className="text-xs sm:text-sm font-bold text-foreground">Find Doctor</CardTitle>
                 </div>
               </CardHeader>
               <CardContent>
-                <CardDescription className="text-xs font-medium">Book visits</CardDescription>
+                <CardDescription className="text-[11px] sm:text-xs font-medium">Book visits</CardDescription>
               </CardContent>
             </Card>
 
@@ -174,11 +174,11 @@ export const PatientWorkflow = React.memo(() => {
                   <div className="p-2 bg-purple-50 rounded-lg group-hover:bg-purple-100 transition-colors">
                     <Calendar className="h-5 w-5 text-purple-600" />
                   </div>
-                  <CardTitle className="text-sm font-bold">Visits</CardTitle>
+                  <CardTitle className="text-xs sm:text-sm font-bold text-foreground">Visits</CardTitle>
                 </div>
               </CardHeader>
               <CardContent>
-                <CardDescription className="text-xs font-medium">My schedule</CardDescription>
+                <CardDescription className="text-[11px] sm:text-xs font-medium">My schedule</CardDescription>
               </CardContent>
             </Card>
           </div>
@@ -188,7 +188,7 @@ export const PatientWorkflow = React.memo(() => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
             <section>
-              <h2 className="text-lg font-bold mb-3 text-gray-800">Specialized Care</h2>
+              <h2 className="text-base sm:text-lg font-bold mb-3 text-foreground">Specialized Care</h2>
               <SpecializedHelp />
             </section>
           </div>

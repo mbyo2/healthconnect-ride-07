@@ -185,7 +185,7 @@ const HealthcareProfessionals = () => {
                 <div className="flex items-center gap-4 text-sm">
                   {prof.rating && (
                     <div className="flex items-center gap-1">
-                      <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                      <Star className="h-4 w-4 fill-yellow-400 text-yellow-400 dark:fill-yellow-500 dark:text-yellow-500" />
                       <span className="font-medium">{prof.rating.toFixed(1)}</span>
                       {prof.reviews_count && (
                         <span className="text-muted-foreground">
@@ -203,11 +203,11 @@ const HealthcareProfessionals = () => {
                 </div>
 
                 <div className="flex gap-2 pt-2">
-                  <Button size="sm" className="flex-1">
+                  <Button size="sm" className="flex-1" onClick={() => navigate(`/book/${prof.id}`)}>
                     <Calendar className="h-4 w-4 mr-2" />
                     Book
                   </Button>
-                  <Button size="sm" variant="outline">
+                  <Button size="sm" variant="outline" onClick={() => navigate(`/provider/${prof.id}`)}>
                     Profile
                   </Button>
                 </div>

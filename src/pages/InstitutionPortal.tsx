@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Building2 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -137,16 +137,18 @@ export const InstitutionPortal = () => {
                 appearance={{
                   theme: ThemeSupa,
                   style: {
-                    button: { background: 'rgb(var(--primary))', color: 'white' },
-                    anchor: { color: 'rgb(var(--primary))' },
+                    button: { background: 'hsl(var(--primary))', color: 'hsl(var(--primary-foreground))' },
+                    anchor: { color: 'hsl(var(--primary))' },
                     container: { width: '100%' },
-                    message: { color: 'rgb(var(--destructive))' },
+                    message: { color: 'hsl(var(--destructive))' },
                     input: {
                       borderRadius: '0.375rem',
-                      backgroundColor: 'white'
+                      backgroundColor: 'transparent',
+                      color: 'hsl(var(--foreground))',
+                      borderColor: 'hsl(var(--border))'
                     },
                     label: {
-                      color: 'rgb(var(--foreground))',
+                      color: 'hsl(var(--foreground))',
                       fontSize: '0.875rem'
                     }
                   },
@@ -163,16 +165,18 @@ export const InstitutionPortal = () => {
                 appearance={{
                   theme: ThemeSupa,
                   style: {
-                    button: { background: 'rgb(var(--primary))', color: 'white' },
-                    anchor: { color: 'rgb(var(--primary))' },
+                    button: { background: 'hsl(var(--primary))', color: 'hsl(var(--primary-foreground))' },
+                    anchor: { color: 'hsl(var(--primary))' },
                     container: { width: '100%' },
-                    message: { color: 'rgb(var(--destructive))' },
+                    message: { color: 'hsl(var(--destructive))' },
                     input: {
                       borderRadius: '0.375rem',
-                      backgroundColor: 'white'
+                      backgroundColor: 'transparent',
+                      color: 'hsl(var(--foreground))',
+                      borderColor: 'hsl(var(--border))'
                     },
                     label: {
-                      color: 'rgb(var(--foreground))',
+                      color: 'hsl(var(--foreground))',
                       fontSize: '0.875rem'
                     }
                   },
@@ -191,9 +195,9 @@ export const InstitutionPortal = () => {
           </p>
           <div className="text-xs text-muted-foreground">
             By signing in, you agree to our{" "}
-            <a href="#" className="text-primary hover:underline">Terms of Service</a>
+            <Link to="/terms" className="text-primary hover:underline">Terms of Service</Link>
             {" "}and{" "}
-            <a href="#" className="text-primary hover:underline">Privacy Policy</a>
+            <Link to="/privacy" className="text-primary hover:underline">Privacy Policy</Link>
           </div>
         </div>
       </div>

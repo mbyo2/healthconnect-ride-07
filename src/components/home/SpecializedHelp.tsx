@@ -37,7 +37,7 @@ export const SpecializedHelp = () => {
                             <div className="p-2.5 bg-white rounded-2xl shadow-sm group-hover:shadow-md transition-all duration-300 group-hover:scale-110">
                                 {category.icon}
                             </div>
-                            <span className="text-[10px] font-extrabold text-gray-700 text-center px-2 leading-tight tracking-tight">
+                            <span className="text-[11px] sm:text-xs font-extrabold text-foreground text-center px-2 leading-tight tracking-tight">
                                 {category.name}
                             </span>
                         </CardContent>

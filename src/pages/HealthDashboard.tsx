@@ -57,11 +57,11 @@ export default function HealthDashboard() {
   const getTrendIcon = (trend: string) => {
     switch (trend) {
       case "up":
-        return <TrendingUp className="h-4 w-4 text-green-600" />;
+        return <TrendingUp className="h-4 w-4 text-green-600 dark:text-green-400" />;
       case "down":
-        return <TrendingDown className="h-4 w-4 text-red-600" />;
+        return <TrendingDown className="h-4 w-4 text-red-600 dark:text-red-400" />;
       default:
-        return <Minus className="h-4 w-4 text-gray-600" />;
+        return <Minus className="h-4 w-4 text-gray-600 dark:text-gray-400" />;
     }
   };
 
@@ -70,13 +70,13 @@ export default function HealthDashboard() {
       case "Normal":
       case "Good":
       case "On Track":
-        return "bg-green-100 text-green-800";
+        return "bg-green-100 dark:bg-green-950/20 text-green-800 dark:text-green-200";
       case "Warning":
-        return "bg-yellow-100 text-yellow-800";
+        return "bg-yellow-100 dark:bg-yellow-950/20 text-yellow-800 dark:text-yellow-200";
       case "Alert":
-        return "bg-red-100 text-red-800";
+        return "bg-red-100 dark:bg-red-950/20 text-red-800 dark:text-red-200";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200";
     }
   };
 
@@ -114,12 +114,12 @@ export default function HealthDashboard() {
       </div>
 
       {/* AI Insights Widget */}
-      <AIInsightsWidget 
-        context="health" 
-        data={{ 
-          stats: healthStats, 
-          goals: healthGoals 
-        }} 
+      <AIInsightsWidget
+        context="health"
+        data={{
+          stats: healthStats,
+          goals: healthGoals
+        }}
       />
 
       {/* Health Stats */}
@@ -128,7 +128,7 @@ export default function HealthDashboard() {
           <Card key={index}>
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
-                <div className="p-2 bg-blue-100 rounded-lg">
+                <div className="p-2 bg-blue-100 dark:bg-blue-950/20 rounded-lg">
                   {getIconComponent(stat.icon)}
                 </div>
                 {getTrendIcon(stat.trend)}
@@ -209,7 +209,7 @@ export default function HealthDashboard() {
                     {appointment.date} at {appointment.time}
                   </p>
                 </div>
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" onClick={() => navigate(`/appointments/${index}`)}>
                   View Details
                 </Button>
               </div>
@@ -250,7 +250,7 @@ export default function HealthDashboard() {
             <Button
               variant="outline"
               className="flex items-center justify-start gap-2 h-auto py-3"
-              onClick={() => navigate('/health-dashboard')}
+              onClick={() => navigate('/iot-monitoring')}
             >
               <Heart className="h-4 w-4 flex-shrink-0" />
               <span className="text-left">Record Vitals</span>
@@ -266,7 +266,7 @@ export default function HealthDashboard() {
             <Button
               variant="outline"
               className="flex items-center justify-start gap-2 h-auto py-3"
-              onClick={() => navigate('/health-dashboard')}
+              onClick={() => navigate('/health-analytics')}
             >
               <Target className="h-4 w-4 flex-shrink-0" />
               <span className="text-left">Set New Goal</span>
@@ -292,7 +292,7 @@ function GamificationSection() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Trophy className="h-5 w-5 text-yellow-500" />
+            <Trophy className="h-5 w-5 text-yellow-500 dark:text-yellow-400" />
             Your Badges
           </CardTitle>
           <CardDescription>Earn badges by staying healthy</CardDescription>
@@ -300,9 +300,9 @@ function GamificationSection() {
         <CardContent>
           <div className="flex flex-wrap gap-2">
             {badges.length > 0 ? badges.map((userBadge) => (
-              <div key={userBadge.id} className="flex flex-col items-center p-2 border rounded-lg bg-yellow-50/50" title={userBadge.badge.description}>
-                <div className="p-2 bg-yellow-100 rounded-full mb-1">
-                  <Award className="h-4 w-4 text-yellow-600" />
+              <div key={userBadge.id} className="flex flex-col items-center p-2 border rounded-lg bg-yellow-50/50 dark:bg-yellow-950/10" title={userBadge.badge.description}>
+                <div className="p-2 bg-yellow-100 dark:bg-yellow-950/20 rounded-full mb-1">
+                  <Award className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
                 </div>
                 <span className="text-xs font-medium">{userBadge.badge.name}</span>
               </div>
@@ -316,7 +316,7 @@ function GamificationSection() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Target className="h-5 w-5 text-blue-500" />
+            <Target className="h-5 w-5 text-blue-500 dark:text-blue-400" />
             Achievements
           </CardTitle>
           <CardDescription>Progress towards milestones</CardDescription>

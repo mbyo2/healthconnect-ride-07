@@ -58,13 +58,13 @@ const InstitutionStatus = () => {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'approved':
-        return <CheckCircle2 className="h-6 w-6 text-green-500" />;
+        return <CheckCircle2 className="h-6 w-6 text-green-500 dark:text-green-400" />;
       case 'rejected':
-        return <XCircle className="h-6 w-6 text-red-500" />;
+        return <XCircle className="h-6 w-6 text-red-500 dark:text-red-400" />;
       case 'under_review':
-        return <Clock className="h-6 w-6 text-blue-500" />;
+        return <Clock className="h-6 w-6 text-blue-500 dark:text-blue-400" />;
       default:
-        return <AlertCircle className="h-6 w-6 text-yellow-500" />;
+        return <AlertCircle className="h-6 w-6 text-yellow-500 dark:text-yellow-400" />;
     }
   };
 
@@ -158,7 +158,7 @@ const InstitutionStatus = () => {
           <div className="grid md:grid-cols-3 gap-4 mt-6">
             <div className="flex items-start gap-3 p-3 rounded-lg border">
               <FileText
-                className={`h-5 w-5 mt-0.5 ${application.documents_complete ? 'text-green-500' : 'text-muted-foreground'
+                className={`h-5 w-5 mt-0.5 ${application.documents_complete ? 'text-green-500 dark:text-green-400' : 'text-muted-foreground'
                   }`}
               />
               <div>
@@ -168,13 +168,13 @@ const InstitutionStatus = () => {
                 </p>
               </div>
               {application.documents_complete && (
-                <CheckCircle2 className="h-4 w-4 text-green-500 ml-auto" />
+                <CheckCircle2 className="h-4 w-4 text-green-500 dark:text-green-400 ml-auto" />
               )}
             </div>
 
             <div className="flex items-start gap-3 p-3 rounded-lg border">
               <CheckCircle2
-                className={`h-5 w-5 mt-0.5 ${application.verification_complete ? 'text-green-500' : 'text-muted-foreground'
+                className={`h-5 w-5 mt-0.5 ${application.verification_complete ? 'text-green-500 dark:text-green-400' : 'text-muted-foreground'
                   }`}
               />
               <div>
@@ -184,13 +184,13 @@ const InstitutionStatus = () => {
                 </p>
               </div>
               {application.verification_complete && (
-                <CheckCircle2 className="h-4 w-4 text-green-500 ml-auto" />
+                <CheckCircle2 className="h-4 w-4 text-green-500 dark:text-green-400 ml-auto" />
               )}
             </div>
 
             <div className="flex items-start gap-3 p-3 rounded-lg border">
               <Upload
-                className={`h-5 w-5 mt-0.5 ${application.payment_complete ? 'text-green-500' : 'text-muted-foreground'
+                className={`h-5 w-5 mt-0.5 ${application.payment_complete ? 'text-green-500 dark:text-green-400' : 'text-muted-foreground'
                   }`}
               />
               <div>
@@ -200,7 +200,7 @@ const InstitutionStatus = () => {
                 </p>
               </div>
               {application.payment_complete && (
-                <CheckCircle2 className="h-4 w-4 text-green-500 ml-auto" />
+                <CheckCircle2 className="h-4 w-4 text-green-500 dark:text-green-400 ml-auto" />
               )}
             </div>
           </div>
@@ -262,11 +262,11 @@ const InstitutionStatus = () => {
         </CardHeader>
         <CardContent className="space-y-3">
           {application.status === 'pending' && (
-            <div className="flex items-start gap-3 p-3 rounded-lg bg-yellow-50 dark:bg-yellow-950/20">
-              <Clock className="h-5 w-5 text-yellow-600 mt-0.5" />
+            <div className="flex items-start gap-3 p-3 rounded-lg bg-yellow-100 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-800">
+              <Clock className="h-5 w-5 text-yellow-800 dark:text-yellow-300 mt-0.5" />
               <div>
-                <p className="font-medium text-sm">Awaiting Review</p>
-                <p className="text-xs text-muted-foreground">
+                <p className="font-medium text-sm text-yellow-900 dark:text-yellow-100">Awaiting Review</p>
+                <p className="text-xs text-yellow-800 dark:text-yellow-300">
                   Your application is in queue for review. You'll be notified once it's being processed.
                 </p>
               </div>
@@ -274,11 +274,11 @@ const InstitutionStatus = () => {
           )}
 
           {application.status === 'under_review' && (
-            <div className="flex items-start gap-3 p-3 rounded-lg bg-blue-50 dark:bg-blue-950/20">
-              <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5" />
+            <div className="flex items-start gap-3 p-3 rounded-lg bg-blue-100 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800">
+              <AlertCircle className="h-5 w-5 text-blue-800 dark:text-blue-300 mt-0.5" />
               <div>
-                <p className="font-medium text-sm">Under Review</p>
-                <p className="text-xs text-muted-foreground">
+                <p className="font-medium text-sm text-blue-900 dark:text-blue-100">Under Review</p>
+                <p className="text-xs text-blue-800 dark:text-blue-300">
                   Our team is currently reviewing your application. This typically takes 3-5 business days.
                 </p>
               </div>
@@ -286,11 +286,11 @@ const InstitutionStatus = () => {
           )}
 
           {application.status === 'approved' && (
-            <div className="flex items-start gap-3 p-3 rounded-lg bg-green-50 dark:bg-green-950/20">
-              <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5" />
+            <div className="flex items-start gap-3 p-3 rounded-lg bg-green-100 dark:bg-green-900/30 border border-green-200 dark:border-green-800">
+              <CheckCircle2 className="h-5 w-5 text-green-800 dark:text-green-300 mt-0.5" />
               <div>
-                <p className="font-medium text-sm">Application Approved!</p>
-                <p className="text-xs text-muted-foreground mb-3">
+                <p className="font-medium text-sm text-green-900 dark:text-green-100">Application Approved!</p>
+                <p className="text-xs text-green-800 dark:text-green-300 mb-3">
                   Congratulations! Your institution has been approved. You can now access the institution portal.
                 </p>
                 <Button size="sm" onClick={() => navigate('/institution-portal')}>
@@ -301,11 +301,11 @@ const InstitutionStatus = () => {
           )}
 
           {application.status === 'rejected' && (
-            <div className="flex items-start gap-3 p-3 rounded-lg bg-red-50 dark:bg-red-950/20">
-              <XCircle className="h-5 w-5 text-red-600 mt-0.5" />
+            <div className="flex items-start gap-3 p-3 rounded-lg bg-red-100 dark:bg-red-900/30 border border-red-200 dark:border-red-800">
+              <XCircle className="h-5 w-5 text-red-800 dark:text-red-300 mt-0.5" />
               <div>
-                <p className="font-medium text-sm">Application Rejected</p>
-                <p className="text-xs text-muted-foreground mb-3">
+                <p className="font-medium text-sm text-red-900 dark:text-red-100">Application Rejected</p>
+                <p className="text-xs text-red-800 dark:text-red-300 mb-3">
                   Unfortunately, your application was not approved. Please review the reviewer notes above and consider reapplying.
                 </p>
                 <Button size="sm" variant="outline" onClick={() => navigate('/institution-registration')}>

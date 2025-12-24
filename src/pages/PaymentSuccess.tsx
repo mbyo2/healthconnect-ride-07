@@ -74,24 +74,24 @@ const PaymentSuccess = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center space-y-4">
-          <div className="animate-spin h-12 w-12 border-4 border-blue-600 border-t-transparent rounded-full mx-auto"></div>
-          <p className="text-gray-600 font-medium">Finalizing your payment...</p>
+          <div className="animate-spin h-12 w-12 border-4 border-primary border-t-transparent rounded-full mx-auto"></div>
+          <p className="text-sm sm:text-base text-muted-foreground font-medium">Finalizing your payment...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-background">
       <Card className="w-full max-w-md shadow-2xl border-none">
         <CardHeader className="text-center pb-2">
           <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-green-100 animate-bounce">
-            <CheckCircle2 className="h-10 w-10 text-green-600" />
+            <CheckCircle2 className="h-10 w-10 text-green-600 dark:text-green-400" />
           </div>
-          <CardTitle className="text-2xl font-bold text-gray-900">Payment Successful!</CardTitle>
-          <CardDescription className="text-gray-500 mt-2">
+          <CardTitle className="text-xl sm:text-2xl font-bold text-foreground">Payment Successful!</CardTitle>
+          <CardDescription className="text-sm sm:text-base text-muted-foreground mt-2">
             {isWalletTopUp
               ? "Your wallet has been topped up successfully."
               : "Your payment has been processed successfully."}
@@ -99,8 +99,8 @@ const PaymentSuccess = () => {
         </CardHeader>
 
         <CardContent className="space-y-6 pt-4">
-          <div className="bg-green-50 p-4 rounded-xl border border-green-100">
-            <p className="text-sm text-green-800 leading-relaxed">
+          <div className="bg-green-50 dark:bg-green-950/20 p-4 rounded-xl border border-green-200 dark:border-green-800">
+            <p className="text-sm text-green-800 dark:text-green-200 leading-relaxed">
               {isWalletTopUp
                 ? "The funds are now available in your wallet for consultations and medicine orders."
                 : "You will receive a confirmation shortly. You can view your transaction details in your dashboard."}
@@ -111,7 +111,7 @@ const PaymentSuccess = () => {
             {isWalletTopUp ? (
               <Button
                 onClick={() => navigate("/wallet")}
-                className="w-full h-12 bg-blue-600 hover:bg-blue-700 font-bold shadow-lg shadow-blue-200"
+                className="w-full h-12 font-bold shadow-lg"
               >
                 <WalletIcon className="h-4 w-4 mr-2" />
                 Go to My Wallet
@@ -119,7 +119,7 @@ const PaymentSuccess = () => {
             ) : (
               <Button
                 onClick={() => navigate("/appointments")}
-                className="w-full h-12 bg-blue-600 hover:bg-blue-700 font-bold shadow-lg shadow-blue-200"
+                className="w-full h-12 font-bold shadow-lg"
               >
                 View My Appointments
               </Button>
@@ -128,7 +128,7 @@ const PaymentSuccess = () => {
             <Button
               variant="ghost"
               onClick={() => navigate("/")}
-              className="w-full h-12 text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+              className="w-full h-12 hover:bg-accent"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Home

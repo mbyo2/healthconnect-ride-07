@@ -10,7 +10,7 @@ const VideoConsultations = () => {
     const preloadVideoAssets = () => {
       // Implementation would go here
     };
-    
+
     preloadVideoAssets();
   }, []);
 
@@ -21,10 +21,10 @@ const VideoConsultations = () => {
         <meta name="description" content="Connect with healthcare providers through video consultations" />
       </Helmet>
       <div className="container mx-auto py-6 animate-fade-in">
-        <h1 className="text-2xl font-bold mb-4 text-trust-700 dark:text-trust-300">
+        <h1 className="text-2xl font-bold mb-4 text-foreground">
           Video Consultations
         </h1>
-        <div className="bg-white/80 dark:bg-gray-800/80 rounded-xl shadow-soft-blue backdrop-blur-sm">
+        <div className="bg-card rounded-xl shadow-soft-blue backdrop-blur-sm border border-border">
           <VideoConsultation />
         </div>
       </div>

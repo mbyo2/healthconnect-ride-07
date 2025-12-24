@@ -22,13 +22,13 @@ const Login = () => {
       try {
         console.log("Checking existing session...");
         const { data: { session }, error } = await supabase.auth.getSession();
-        
+
         if (error) {
           console.error("Error checking session:", error);
           setError(error.message);
           return;
         }
-        
+
         if (session) {
           console.log("User already logged in, checking profile completion...");
           const { data: profile, error: profileError } = await supabase
@@ -43,7 +43,7 @@ const Login = () => {
           }
 
           setIsRedirecting(true);
-          
+
           if (!profile?.is_profile_complete) {
             console.log("Profile incomplete, redirecting to setup...");
             navigate("/profile-setup");
@@ -66,11 +66,11 @@ const Login = () => {
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state changed:", event, session);
-      
+
       if (event === "SIGNED_IN" && session) {
         console.log("User signed in successfully:", session.user);
         setIsRedirecting(true);
-        
+
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('is_profile_complete, role')
@@ -154,13 +154,13 @@ const Login = () => {
                 anchor: { color: 'rgb(var(--primary))' },
                 container: { width: '100%' },
                 message: { color: 'rgb(var(--destructive))' },
-                input: { 
+                input: {
                   borderRadius: '0.375rem',
-                  backgroundColor: 'white' 
+                  backgroundColor: 'white'
                 },
-                label: { 
+                label: {
                   color: 'rgb(var(--foreground))',
-                  fontSize: '0.875rem' 
+                  fontSize: '0.875rem'
                 }
               },
             }}
@@ -176,7 +176,7 @@ const Login = () => {
               <span>Healthcare Provider Portal</span>
             </Link>
           </Button>
-          
+
           <Button variant="outline" asChild className="flex flex-col h-auto py-4">
             <Link to="/institution-portal">
               <Building2 className="h-5 w-5 mb-2" />
@@ -191,9 +191,9 @@ const Login = () => {
           </p>
           <div className="text-xs text-muted-foreground">
             By signing in, you agree to our{" "}
-            <a href="#" className="text-primary hover:underline">Terms of Service</a>
+            <Link to="/terms" className="text-primary hover:underline">Terms of Service</Link>
             {" "}and{" "}
-            <a href="#" className="text-primary hover:underline">Privacy Policy</a>
+            <Link to="/privacy" className="text-primary hover:underline">Privacy Policy</Link>
           </div>
         </div>
       </div>

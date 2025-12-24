@@ -184,8 +184,8 @@ export const UserMarketplace = () => {
   // Filter available tabs based on user role
   const getAvailableTabs = () => {
     return [
-      { id: "all", label: "All Providers", count: users?.length || 0 },
-      { id: "health_personnel", label: "Doctors & Specialists", count: users?.filter(u => u.role === 'health_personnel').length || 0 },
+      { id: "all", label: "All", count: users?.length || 0 },
+      { id: "health_personnel", label: "Doctors", count: users?.filter(u => u.role === 'health_personnel').length || 0 },
       { id: "admin", label: "Institutions", count: users?.filter(u => u.role === 'admin').length || 0 }
     ];
   };
@@ -201,8 +201,8 @@ export const UserMarketplace = () => {
   return (
     <div className="container mx-auto py-8 space-y-6">
       <div className="text-center">
-        <h1 className="text-3xl font-bold mb-2">Healthcare Marketplace</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-2 text-foreground">Healthcare Marketplace</h1>
+        <p className="text-sm sm:text-base text-muted-foreground">
           Connect with healthcare providers{currentUserProfile?.role !== 'patient' ? ', patients,' : ''} and pharmacies
         </p>
       </div>

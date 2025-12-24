@@ -15,7 +15,7 @@ import { LoadingScreen } from '@/components/LoadingScreen';
 
 const MapPage = () => {
   const [selectedProvider, setSelectedProvider] = useState<Provider | null>(null);
-  const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null);
+  const [userLocation, setUserLocation] = useState<{ lat: number, lng: number } | null>(null);
   const [locationLoading, setLocationLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredProviders, setFilteredProviders] = useState<Provider[]>([]);
@@ -53,8 +53,8 @@ const MapPage = () => {
           latitude: profile.provider_locations[0].latitude ? Number(profile.provider_locations[0].latitude) : 37.7749,
           longitude: profile.provider_locations[0].longitude ? Number(profile.provider_locations[0].longitude) : -122.4194
         } : {
-          latitude: 37.7749,
-          longitude: -122.4194
+          latitude: -15.3875,
+          longitude: 28.3228
         }
       }));
     }
@@ -94,7 +94,7 @@ const MapPage = () => {
       return;
     }
 
-    const filtered = providers.filter(provider => 
+    const filtered = providers.filter(provider =>
       `${provider.first_name} ${provider.last_name}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
       provider.specialty?.toLowerCase().includes(searchQuery.toLowerCase())
     );
@@ -170,8 +170,8 @@ const MapPage = () => {
         <div className="grid lg:grid-cols-2 gap-4">
           {/* Provider List */}
           <div className="order-2 lg:order-1">
-            <MobileOptimizedCard 
-              title="Healthcare Providers" 
+            <MobileOptimizedCard
+              title="Healthcare Providers"
               description={`${filteredProviders.length} providers found`}
             >
               <ProviderList
@@ -184,13 +184,13 @@ const MapPage = () => {
 
           {/* Map */}
           <div className="order-1 lg:order-2">
-            <MobileOptimizedCard 
+            <MobileOptimizedCard
               title="Map View"
               className="h-[400px] sm:h-[500px] lg:h-[600px]"
             >
               <div className="h-full w-full">
-                <ProviderMap 
-                  providers={filteredProviders} 
+                <ProviderMap
+                  providers={filteredProviders}
                   userLocation={userLocation ? {
                     latitude: userLocation.lat,
                     longitude: userLocation.lng
@@ -203,15 +203,15 @@ const MapPage = () => {
 
         {/* Selected Provider Details */}
         {selectedProvider && (
-          <MobileOptimizedCard 
+          <MobileOptimizedCard
             title="Selected Provider"
-            className="border-primary/20 bg-primary/5"
+            className="border-primary/20 dark:border-primary/30 bg-primary/5"
           >
             <div className="space-y-3">
               <div className="flex items-start gap-3">
                 {selectedProvider.avatar_url && (
-                  <img 
-                    src={selectedProvider.avatar_url} 
+                  <img
+                    src={selectedProvider.avatar_url}
                     alt={`${selectedProvider.first_name} ${selectedProvider.last_name}`}
                     className="w-12 h-12 rounded-full object-cover"
                   />
@@ -229,10 +229,10 @@ const MapPage = () => {
                 </div>
               </div>
               <div className="flex gap-2">
-                <Button size="sm" className="flex-1">
+                <Button size="sm" className="flex-1" onClick={() => window.location.href = `/book/${selectedProvider.id}`}>
                   Book Appointment
                 </Button>
-                <Button variant="outline" size="sm" className="flex-1">
+                <Button variant="outline" size="sm" className="flex-1" onClick={() => window.location.href = `/provider/${selectedProvider.id}`}>
                   View Profile
                 </Button>
               </div>

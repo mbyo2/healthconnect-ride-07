@@ -21,6 +21,7 @@ import {
     DollarSign,
     Activity,
     Plus,
+    CheckCircle,
 } from 'lucide-react';
 
 const HospitalManagement = () => {
@@ -202,11 +203,11 @@ const HospitalManagement = () => {
                 <Card>
                     <CardHeader className="pb-3">
                         <CardTitle className="text-sm font-medium flex items-center gap-2">
-                            <Activity className="h-4 w-4 text-green-500" /> Occupancy Rate
+                            <Activity className="h-4 w-4 text-green-500 dark:text-green-400" /> Occupancy Rate
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-green-500">{occupancyRate}%</div>
+                        <div className="text-2xl font-bold text-green-500 dark:text-green-400">{occupancyRate}%</div>
                         <p className="text-xs text-muted-foreground">
                             {occupiedBeds} occupied, {availableBeds} available
                         </p>
@@ -323,10 +324,10 @@ const HospitalManagement = () => {
                                             key={bed.id}
                                             className={
                                                 bed.status === 'available'
-                                                    ? 'border-green-200'
+                                                    ? 'border-green-200 dark:border-green-800'
                                                     : bed.status === 'occupied'
-                                                        ? 'border-blue-200'
-                                                        : 'border-gray-200'
+                                                        ? 'border-blue-200 dark:border-blue-800'
+                                                        : 'border-border'
                                             }
                                         >
                                             <CardHeader className="pb-3">
@@ -499,7 +500,7 @@ const HospitalManagement = () => {
                                     onVerified={(v) => setSelectedVerification(v)}
                                 />
                                 {selectedVerification && (
-                                    <div className="p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-800 flex items-center gap-2">
+                                    <div className="p-3 bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 border border-green-200 dark:border-green-800 rounded-lg text-sm flex items-center gap-2">
                                         <CheckCircle className="h-4 w-4" />
                                         <div>
                                             <p className="font-semibold">Insurance Applied: {selectedVerification.coverage_percentage}%</p>
