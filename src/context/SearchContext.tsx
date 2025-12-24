@@ -112,7 +112,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const fetchProviders = async () => {
     setIsLoading(true);
     try {
-      const { data, error, count } = await supabase
+      let query = supabase
         .from('profiles' as any)
         .select(`
           id,
@@ -128,7 +128,21 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             longitude
           )
         `, { count: 'exact' })
-        .eq('role', 'health_personnel')
+        .eq('role', 'health_personnel');
+
+      if (selectedSpecialty) {
+        query = query.eq('specialty', selectedSpecialty);
+      }
+
+      if (selectedType) {
+        query = query.eq('provider_type', selectedType);
+      }
+
+      if (searchTerm) {
+        query = query.or(`first_name.ilike.%${searchTerm}%,last_name.ilike.%${searchTerm}%,specialty.ilike.%${searchTerm}%`);
+      }
+
+      const { data, error, count } = await query
         .limit(10)
         .range((currentPage - 1) * 10, currentPage * 10 - 1);
 

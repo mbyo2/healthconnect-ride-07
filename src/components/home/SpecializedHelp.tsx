@@ -5,13 +5,13 @@ import { Heart, Activity, Brain, Baby, Bone, Zap, ShieldAlert, Smile } from "luc
 import { useNavigate } from "react-router-dom";
 
 const categories = [
+    { id: 'dental', name: 'Dental Health', icon: <Smile className="h-6 w-6 text-cyan-500" />, color: 'bg-cyan-50' },
     { id: 'skin', name: 'Skin & Hair', icon: <Zap className="h-6 w-6 text-orange-500" />, color: 'bg-orange-50' },
     { id: 'heart', name: 'Heart Health', icon: <Heart className="h-6 w-6 text-red-500" />, color: 'bg-red-50' },
     { id: 'mental', name: 'Mental Health', icon: <Brain className="h-6 w-6 text-purple-500" />, color: 'bg-purple-50' },
     { id: 'pediatrics', name: 'Pediatrics', icon: <Baby className="h-6 w-6 text-blue-500" />, color: 'bg-blue-50' },
     { id: 'ortho', name: 'Orthopedics', icon: <Bone className="h-6 w-6 text-amber-500" />, color: 'bg-amber-50' },
     { id: 'neuro', name: 'Neurology', icon: <Activity className="h-6 w-6 text-indigo-500" />, color: 'bg-indigo-50' },
-    { id: 'dental', name: 'Dental Care', icon: <Smile className="h-6 w-6 text-cyan-500" />, color: 'bg-cyan-50' },
     { id: 'emergency', name: 'Emergency', icon: <ShieldAlert className="h-6 w-6 text-rose-500" />, color: 'bg-rose-50' },
 ];
 

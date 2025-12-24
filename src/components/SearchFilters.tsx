@@ -42,7 +42,7 @@ export const SearchFilters = () => {
           <Filter className="h-4 w-4" />
           Filters
         </Button>
-        
+
         <div className="flex items-center gap-2">
           <MapPin className="h-4 w-4 text-muted-foreground" />
           <Switch
@@ -95,10 +95,15 @@ export const SearchFilters = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="">All specialties</SelectItem>
-                    <SelectItem value="cardiology">Cardiology</SelectItem>
-                    <SelectItem value="pediatrics">Pediatrics</SelectItem>
-                    <SelectItem value="general_practice">General Practice</SelectItem>
-                    <SelectItem value="emergency_medicine">Emergency Medicine</SelectItem>
+                    <SelectItem value="General Practice">General Practice</SelectItem>
+                    <SelectItem value="Cardiology">Cardiology</SelectItem>
+                    <SelectItem value="Dermatology">Dermatology</SelectItem>
+                    <SelectItem value="Neurology">Neurology</SelectItem>
+                    <SelectItem value="Pediatrics">Pediatrics</SelectItem>
+                    <SelectItem value="Orthopedics">Orthopedics</SelectItem>
+                    <SelectItem value="Psychiatry">Psychiatry</SelectItem>
+                    <SelectItem value="General Dentistry">General Dentistry</SelectItem>
+                    <SelectItem value="Emergency Medicine">Emergency Medicine</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

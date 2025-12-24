@@ -9,7 +9,7 @@ import { SearchFilters } from "@/components/SearchFilters";
 import { useSuccessFeedback } from "@/hooks/use-success-feedback";
 
 const SearchPage = () => {
-  const { searchQuery, setSearchQuery, setSearchTerm, refreshProviders } = useSearch();
+  const { searchQuery, setSearchQuery, setSearchTerm, setSelectedSpecialty, refreshProviders } = useSearch();
   const { showSuccess } = useSuccessFeedback();
   const location = useLocation();
 
@@ -31,12 +31,34 @@ const SearchPage = () => {
     // Get search query from URL params if coming from header search
     const urlParams = new URLSearchParams(location.search);
     const query = urlParams.get('q');
+    const category = urlParams.get('category');
+
     if (query) {
       setSearchQuery(query);
       setSearchTerm(query);
       refreshProviders();
+    } else if (category) {
+      // Map category ID to SpecialtyType
+      const categoryMap: Record<string, string> = {
+        'skin': 'Dermatology',
+        'heart': 'Cardiology',
+        'mental': 'Psychiatry',
+        'pediatrics': 'Pediatrics',
+        'ortho': 'Orthopedics',
+        'neuro': 'Neurology',
+        'dental': 'General Dentistry',
+        'emergency': 'Emergency Medicine'
+      };
+
+      const specialty = categoryMap[category];
+      if (specialty) {
+        setSelectedSpecialty(specialty as any);
+        setSearchQuery("");
+        setSearchTerm("");
+        refreshProviders();
+      }
     }
-  }, [location, setSearchQuery, setSearchTerm, refreshProviders]);
+  }, [location, setSearchQuery, setSearchTerm, setSelectedSpecialty, refreshProviders]);
 
   return (
     <div className="space-y-6">
@@ -61,8 +83,8 @@ const SearchPage = () => {
             onKeyPress={handleKeyPress}
             className="pl-10 h-12 border-trust-200 focus:border-trust-400"
           />
-          <Button 
-            size="icon" 
+          <Button
+            size="icon"
             className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8"
             onClick={handleSearch}
           >
