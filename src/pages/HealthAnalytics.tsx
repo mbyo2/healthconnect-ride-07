@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 import { useHealthData } from '@/hooks/useHealthData';
 import { useAuth } from '@/hooks/useAuth';
+import { AIInsightsWidget } from '@/components/ai/AIInsightsWidget';
 
 const HealthAnalytics = () => {
     const { user } = useAuth();
@@ -18,26 +19,6 @@ const HealthAnalytics = () => {
     // For now, we'll just let the charts handle empty data or show a message
 
 
-    const insights = [
-        {
-            title: 'Heart Rate Improving',
-            description: 'Your resting heart rate has decreased by 3% this week, indicating improved cardiovascular fitness.',
-            trend: 'positive',
-            metric: '-3%'
-        },
-        {
-            title: 'Activity Goal Achieved',
-            description: 'You\'ve exceeded your daily step goal 5 out of 7 days this week. Great job!',
-            trend: 'positive',
-            metric: '71%'
-        },
-        {
-            title: 'Sleep Pattern Stable',
-            description: 'Your sleep duration is consistent. Consider maintaining this routine for optimal rest.',
-            trend: 'neutral',
-            metric: '7.7h avg'
-        },
-    ];
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-background via-green-50/20 to-background dark:via-green-950/10 p-4 md:p-6 lg:p-8">
@@ -70,24 +51,16 @@ const HealthAnalytics = () => {
                     </div>
                 </div>
 
-                {/* Key Insights */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {insights.map((insight, index) => (
-                        <Card key={index} className="hover:shadow-lg transition-shadow">
-                            <CardContent className="p-6">
-                                <div className="flex items-start justify-between mb-3">
-                                    <h3 className="font-semibold">{insight.title}</h3>
-                                    <span className={`text-lg font-bold ${insight.trend === 'positive' ? 'text-green-600 dark:text-green-400' :
-                                        insight.trend === 'negative' ? 'text-red-600 dark:text-red-400' : 'text-blue-600 dark:text-blue-400'
-                                        }`}>
-                                        {insight.metric}
-                                    </span>
-                                </div>
-                                <p className="text-sm text-muted-foreground">{insight.description}</p>
-                            </CardContent>
-                        </Card>
-                    ))}
-                </div>
+                {/* AI Health Insights */}
+                <AIInsightsWidget
+                    context="health"
+                    data={{
+                        heartRate: heartRateData,
+                        activity: activityData,
+                        sleep: sleepData,
+                        timeRange
+                    }}
+                />
 
                 {/* Analytics Tabs */}
                 <Card>
@@ -236,33 +209,6 @@ const HealthAnalytics = () => {
                     </CardContent>
                 </Card>
 
-                {/* Recommendations */}
-                <Card className="border-green-200 bg-green-50/50 dark:bg-green-950/10 dark:border-green-900/50">
-                    <CardContent className="p-6">
-                        <div className="flex items-start gap-4">
-                            <div className="p-3 rounded-full bg-green-100 dark:bg-green-900/30">
-                                <TrendingUp className="w-6 h-6 text-green-600 dark:text-green-400" />
-                            </div>
-                            <div className="flex-1">
-                                <h3 className="font-semibold text-lg">Personalized Recommendations</h3>
-                                <ul className="mt-3 space-y-2 text-sm">
-                                    <li className="flex items-start gap-2">
-                                        <span className="text-green-600 dark:text-green-400">•</span>
-                                        <span>Continue your current exercise routine - your cardiovascular health is improving</span>
-                                    </li>
-                                    <li className="flex items-start gap-2">
-                                        <span className="text-green-600 dark:text-green-400">•</span>
-                                        <span>Try to maintain consistent sleep schedule - your body responds well to routine</span>
-                                    </li>
-                                    <li className="flex items-start gap-2">
-                                        <span className="text-green-600 dark:text-green-400">•</span>
-                                        <span>Consider adding strength training 2-3 times per week for balanced fitness</span>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
             </div>
         </div>
     );
