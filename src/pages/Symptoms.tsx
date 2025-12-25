@@ -1,4 +1,5 @@
-import { useState, useCallback, memo } from 'react';
+import { useState, useEffect, useCallback, memo } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,7 +24,7 @@ const Symptoms = () => {
   const fetchSymptomCategories = async () => {
     try {
       const { data, error } = await supabase
-        .from('symptom_categories')
+        .from('symptom_categories' as any)
         .select('*')
         .order('title');
 
@@ -38,7 +39,7 @@ const Symptoms = () => {
         ]);
         return;
       }
-      setSymptomCategories(data || []);
+      setSymptomCategories((data as any[]) || []);
     } catch (error) {
       console.error('Error fetching symptom categories:', error);
     }

@@ -77,7 +77,7 @@ const LabManagement = () => {
         queryKey: ['lab-test-catalog'],
         queryFn: async () => {
             const { data, error } = await supabase
-                .from('lab_test_catalog')
+                .from('lab_test_catalog' as any)
                 .select('*')
                 .order('name');
 
@@ -90,7 +90,7 @@ const LabManagement = () => {
                     { name: 'Lipid Profile', code: 'BIO-001', category: 'Biochemistry', price: 200 },
                 ];
             }
-            return data;
+            return data as any[];
         }
     });
 

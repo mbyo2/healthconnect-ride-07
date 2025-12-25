@@ -50,11 +50,11 @@ const HospitalManagement = () => {
         queryKey: ['hospital-departments', hospital?.id],
         queryFn: async () => {
             const { data } = await supabase
-                .from('hospital_departments')
+                .from('hospital_departments' as any)
                 .select('*')
                 .eq('hospital_id', hospital?.id)
                 .order('name');
-            return data || [];
+            return (data as any[]) || [];
         },
         enabled: !!hospital,
     });
@@ -64,10 +64,10 @@ const HospitalManagement = () => {
         queryKey: ['hospital-beds', hospital?.id],
         queryFn: async () => {
             const { data } = await supabase
-                .from('hospital_beds')
+                .from('hospital_beds' as any)
                 .select('*, department:hospital_departments(name)')
                 .eq('hospital_id', hospital?.id);
-            return data || [];
+            return (data as any[]) || [];
         },
         enabled: !!hospital,
     });
@@ -77,12 +77,12 @@ const HospitalManagement = () => {
         queryKey: ['hospital-admissions', hospital?.id],
         queryFn: async () => {
             const { data } = await supabase
-                .from('hospital_admissions')
+                .from('hospital_admissions' as any)
                 .select('*, patient:profiles!patient_id(first_name, last_name), department:hospital_departments(name)')
                 .eq('hospital_id', hospital?.id)
                 .eq('status', 'admitted')
                 .order('admission_date', { ascending: false });
-            return data || [];
+            return (data as any[]) || [];
         },
         enabled: !!hospital,
     });
@@ -92,11 +92,11 @@ const HospitalManagement = () => {
         queryKey: ['hospital-billing', hospital?.id],
         queryFn: async () => {
             const { data } = await supabase
-                .from('hospital_billing')
+                .from('hospital_billing' as any)
                 .select('*, patient:profiles!patient_id(first_name, last_name)')
                 .eq('hospital_id', hospital?.id)
                 .order('created_at', { ascending: false });
-            return data || [];
+            return (data as any[]) || [];
         },
         enabled: !!hospital,
     });
@@ -125,7 +125,7 @@ const HospitalManagement = () => {
 
             const invoiceNumber = `INV-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
             const { error } = await supabase
-                .from('hospital_billing')
+                .from('hospital_billing' as any)
                 .insert({
                     hospital_id: hospital.id,
                     patient_id: selectedPatientId,

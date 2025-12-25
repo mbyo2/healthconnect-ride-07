@@ -49,11 +49,11 @@ const PharmacyManagement = () => {
         queryKey: ['pharmacy-inventory', pharmacy?.id],
         queryFn: async () => {
             const { data } = await supabase
-                .from('pharmacy_inventory')
+                .from('pharmacy_inventory' as any)
                 .select('*')
                 .eq('pharmacy_id', pharmacy?.id)
                 .order('product_name');
-            return data || [];
+            return (data as any[]) || [];
         },
         enabled: !!pharmacy
     });
@@ -63,12 +63,12 @@ const PharmacyManagement = () => {
         queryFn: async () => {
             const today = new Date().toISOString().split('T')[0];
             const { data } = await supabase
-                .from('pharmacy_sales')
+                .from('pharmacy_sales' as any)
                 .select('*')
                 .eq('pharmacy_id', pharmacy?.id)
                 .gte('created_at', today)
                 .order('created_at', { ascending: false });
-            return data || [];
+            return (data as any[]) || [];
         },
         enabled: !!pharmacy
     });
@@ -141,7 +141,7 @@ const PharmacyManagement = () => {
 
             // 1. Create sale record
             const { error: saleError } = await supabase
-                .from('pharmacy_sales')
+                .from('pharmacy_sales' as any)
                 .insert({
                     pharmacy_id: pharmacy.id,
                     transaction_id: transactionId,
@@ -162,7 +162,7 @@ const PharmacyManagement = () => {
             // 2. Update inventory
             for (const item of cart) {
                 const { error: invError } = await supabase
-                    .from('pharmacy_inventory')
+                    .from('pharmacy_inventory' as any)
                     .update({ quantity: item.quantity - item.cartQuantity })
                     .eq('id', item.id);
 

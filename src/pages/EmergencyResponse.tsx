@@ -30,13 +30,13 @@ const EmergencyResponse = () => {
     const fetchEmergencyContacts = async () => {
         try {
             const { data, error } = await supabase
-                .from('emergency_contacts')
+                .from('emergency_contacts' as any)
                 .select('*')
                 .eq('patient_id', user?.id)
                 .order('is_primary', { ascending: false });
 
             if (error) throw error;
-            setEmergencyContacts(data || []);
+            setEmergencyContacts((data as any[]) || []);
         } catch (error) {
             console.error('Error fetching emergency contacts:', error);
         }
