@@ -476,7 +476,10 @@ const PrivacySecurityPage = () => {
                 <Switch
                   id="share-data"
                   checked={shareMedicalData}
-                  onCheckedChange={setShareMedicalData}
+                  onCheckedChange={(checked) => {
+                    setShareMedicalData(checked);
+                    toast.info(`Medical data sharing ${checked ? 'enabled' : 'disabled'}. Remember to save changes.`);
+                  }}
                 />
               </div>
 
@@ -490,7 +493,10 @@ const PrivacySecurityPage = () => {
                 <Switch
                   id="research-usage"
                   checked={allowResearchUsage}
-                  onCheckedChange={setAllowResearchUsage}
+                  onCheckedChange={(checked) => {
+                    setAllowResearchUsage(checked);
+                    toast.info(`Research data usage ${checked ? 'enabled' : 'disabled'}. Remember to save changes.`);
+                  }}
                 />
               </div>
 
@@ -504,7 +510,10 @@ const PrivacySecurityPage = () => {
                 <Switch
                   id="profile-search"
                   checked={showInSearch}
-                  onCheckedChange={setShowInSearch}
+                  onCheckedChange={(checked) => {
+                    setShowInSearch(checked);
+                    toast.info(`Profile search visibility ${checked ? 'enabled' : 'disabled'}. Remember to save changes.`);
+                  }}
                 />
               </div>
 

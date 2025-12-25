@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,6 +11,7 @@ import { toast } from "sonner";
 import { Loader2, Save, ShieldCheck } from "lucide-react";
 import { InsuranceProvider } from "@/types/healthcare";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -152,7 +152,6 @@ const InstitutionSettings = () => {
                             </div>
                             <div className="space-y-2">
                                 <Label htmlFor="currency">Preferred Currency</Label>
-                                <Label htmlFor="currency">Preferred Currency</Label>
                                 <Select
                                     value={formData.currency}
                                     onValueChange={(value) => setFormData({ ...formData, currency: value })}
@@ -186,7 +185,10 @@ const InstitutionSettings = () => {
                                     <div className="flex items-center gap-2">
                                         <Switch
                                             checked={!formData.operating_hours[day]?.closed}
-                                            onCheckedChange={(checked) => handleHoursChange(day, 'closed', !checked)}
+                                            onCheckedChange={(checked) => {
+                                                handleHoursChange(day, 'closed', !checked);
+                                                toast.info(`${day} set to ${checked ? 'Open' : 'Closed'}. Remember to save changes.`);
+                                            }}
                                         />
                                         <span className="text-sm text-muted-foreground w-16">
                                             {formData.operating_hours[day]?.closed ? 'Closed' : 'Open'}
@@ -215,10 +217,6 @@ const InstitutionSettings = () => {
                     </CardContent>
                 </Card>
 
-                <Button type="submit" disabled={saving}>
-                    {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-                    Save Changes
-                </Button>
                 <Card>
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
@@ -246,6 +244,11 @@ const InstitutionSettings = () => {
                         </div>
                     </CardContent>
                 </Card>
+
+                <Button type="submit" disabled={saving}>
+                    {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                    Save Changes
+                </Button>
             </form>
         </div>
     );

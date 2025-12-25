@@ -5,13 +5,13 @@ import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Eye, 
-  Volume2, 
-  Keyboard, 
-  Mic, 
-  Palette, 
-  Type, 
+import {
+  Eye,
+  Volume2,
+  Keyboard,
+  Mic,
+  Palette,
+  Type,
   Focus,
   CheckCircle,
   AlertTriangle,
@@ -38,7 +38,7 @@ export const AccessibilityControls: React.FC = () => {
     const newPreferences = { ...preferences, [key]: value };
     setPreferences(newPreferences);
     advancedAccessibilityService.updatePreferences({ [key]: value });
-    
+
     // Also update context preferences for backward compatibility
     updateContextPreferences({
       highContrast: newPreferences.highContrast,
@@ -99,7 +99,7 @@ export const AccessibilityControls: React.FC = () => {
               </div>
               {getScoreBadge(accessibilityReport.score)}
             </div>
-            
+
             {accessibilityReport.issues.length > 0 && (
               <div className="space-y-2">
                 <h3 className="font-semibold text-sm">Issues Found:</h3>
@@ -148,6 +148,7 @@ export const AccessibilityControls: React.FC = () => {
               onCheckedChange={(checked) => {
                 handlePreferenceChange('highContrast', checked);
                 announceChange(checked ? 'High contrast enabled' : 'High contrast disabled');
+                toast.success(`High contrast ${checked ? 'enabled' : 'disabled'}`);
               }}
             />
           </div>
@@ -162,6 +163,7 @@ export const AccessibilityControls: React.FC = () => {
               onCheckedChange={(checked) => {
                 handlePreferenceChange('largeText', checked);
                 announceChange(checked ? 'Large text enabled' : 'Large text disabled');
+                toast.success(`Large text ${checked ? 'enabled' : 'disabled'}`);
               }}
             />
           </div>
@@ -255,6 +257,7 @@ export const AccessibilityControls: React.FC = () => {
               onCheckedChange={(checked) => {
                 handlePreferenceChange('reducedMotion', checked);
                 announceChange(checked ? 'Motion reduction enabled' : 'Motion reduction disabled');
+                toast.success(`Reduced motion ${checked ? 'enabled' : 'disabled'}`);
               }}
             />
           </div>
@@ -280,6 +283,7 @@ export const AccessibilityControls: React.FC = () => {
               onCheckedChange={(checked) => {
                 handlePreferenceChange('screenReader', checked);
                 announceChange(checked ? 'Screen reader support enabled' : 'Screen reader support disabled');
+                toast.success(`Screen reader support ${checked ? 'enabled' : 'disabled'}`);
               }}
             />
           </div>
@@ -328,6 +332,7 @@ export const AccessibilityControls: React.FC = () => {
               onCheckedChange={(checked) => {
                 handlePreferenceChange('keyboardNavigation', checked);
                 announceChange(checked ? 'Enhanced keyboard navigation enabled' : 'Enhanced keyboard navigation disabled');
+                toast.success(`Keyboard navigation ${checked ? 'enabled' : 'disabled'}`);
               }}
             />
           </div>
@@ -358,7 +363,7 @@ export const AccessibilityControls: React.FC = () => {
           >
             Test Screen Reader
           </Button>
-          
+
           <Button
             variant="outline"
             size="sm"

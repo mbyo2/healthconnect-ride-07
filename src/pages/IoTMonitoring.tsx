@@ -1,7 +1,13 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Activity, Smartphone, Watch, Heart, Thermometer, Droplet, Zap, Plus, Settings, TrendingUp, AlertCircle, CheckCircle2, Battery, Bot, ArrowRight } from 'lucide-react';
+import { Activity, Smartphone, Watch, Heart, Thermometer, Droplet, Zap, Settings, TrendingUp, AlertCircle, CheckCircle2, Battery, Bot, ArrowRight, Bluetooth, Usb, Cable, Wifi } from 'lucide-react';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -27,6 +33,17 @@ const IoTMonitoring = () => {
             case 'blood_pressure_monitor': return Heart;
             case 'thermometer': return Thermometer;
             default: return Smartphone;
+        }
+    };
+
+    // Helper to get icon for connection type
+    const getConnectionIcon = (type: string) => {
+        switch (type) {
+            case 'bluetooth': return Bluetooth;
+            case 'usb': return Usb;
+            case 'serial': return Cable;
+            case 'wifi': return Wifi;
+            default: return Zap;
         }
     };
 
@@ -69,33 +86,45 @@ const IoTMonitoring = () => {
                             <Settings className="w-4 h-4 mr-2" />
                             Device Settings
                         </Button>
-                        <Button
-                            variant="secondary"
-                            onClick={scanAndConnectDevice}
-                            disabled={isScanning}
-                        >
-                            {isScanning ? (
-                                <>
-                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2"></div>
-                                    Scanning...
-                                </>
-                            ) : (
-                                <>
-                                    <Zap className="w-4 h-4 mr-2" />
-                                    Scan for Device
-                                </>
-                            )}
-                        </Button>
-                        <Button onClick={() => addDevice({
-                            device_name: 'New Device',
-                            device_type: 'fitness_tracker',
-                            device_id: `DEV-${Date.now()}`,
-                            is_active: true,
-                            battery_level: 100
-                        })}>
-                            <Plus className="w-4 h-4 mr-2" />
-                            Add Mock Device
-                        </Button>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button
+                                    variant="secondary"
+                                    disabled={isScanning}
+                                >
+                                    {isScanning ? (
+                                        <>
+                                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2"></div>
+                                            Scanning...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Zap className="w-4 h-4 mr-2" />
+                                            Connect Device
+                                        </>
+                                    )}
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={() => scanAndConnectDevice('bluetooth')}>
+                                    <Bluetooth className="w-4 h-4 mr-2" />
+                                    Bluetooth
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => scanAndConnectDevice('usb')}>
+                                    <Usb className="w-4 h-4 mr-2" />
+                                    USB (Cable)
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => scanAndConnectDevice('serial')}>
+                                    <Cable className="w-4 h-4 mr-2" />
+                                    Serial (Legacy)
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => scanAndConnectDevice('wifi')}>
+                                    <Wifi className="w-4 h-4 mr-2" />
+                                    Wi-Fi / Cloud
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+
                     </div>
                 </div>
 
@@ -112,8 +141,13 @@ const IoTMonitoring = () => {
                             >
                                 <CardContent className="p-6">
                                     <div className="flex items-start justify-between mb-4">
-                                        <div className="p-3 rounded-full bg-blue-100 dark:bg-blue-900/30">
-                                            <Icon className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                                        <div className="flex gap-2">
+                                            <div className="p-3 rounded-full bg-blue-100 dark:bg-blue-900/30">
+                                                <Icon className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                                            </div>
+                                            <div className="p-3 rounded-full bg-gray-100 dark:bg-gray-800/30">
+                                                {React.createElement(getConnectionIcon(device.connection_type), { className: "w-4 h-4 text-gray-600 dark:text-gray-400" })}
+                                            </div>
                                         </div>
                                         <Badge variant={device.is_active ? 'default' : 'secondary'}>
                                             {device.is_active ? 'Connected' : 'Offline'}
@@ -287,10 +321,6 @@ const IoTMonitoring = () => {
                                     Pair your fitness trackers, smartwatches, and health monitors to get comprehensive health insights.
                                 </p>
                                 <div className="flex gap-3 mt-3">
-                                    <Button>
-                                        <Plus className="w-4 h-4 mr-2" />
-                                        Pair New Device
-                                    </Button>
                                     <Button variant="outline" onClick={() => navigate('/ai-diagnostics')}>
                                         <Bot className="w-4 h-4 mr-2" />
                                         AI Analysis

@@ -1,16 +1,20 @@
 // IoT and health monitoring types
 
+export type ConnectionType = 'bluetooth' | 'usb' | 'serial' | 'wifi' | 'cloud';
+
 export interface IoTDevice {
     id: string;
     user_id: string;
     device_name: string;
     device_type: DeviceType;
+    connection_type: ConnectionType;
     device_id: string;
     is_active: boolean;
     last_sync?: string;
     battery_level?: number;
     firmware_version?: string;
     created_at: string;
+    metadata?: Record<string, any>;
 }
 
 export type DeviceType =
@@ -35,6 +39,7 @@ export interface VitalSigns {
     blood_glucose?: number;
     weight?: number;
     recorded_at: string;
+    metadata?: Record<string, any>;
 }
 
 export interface BloodPressure {

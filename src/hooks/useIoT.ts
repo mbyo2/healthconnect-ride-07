@@ -3,6 +3,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { IoTDevice, VitalSigns, DeviceAlert, BloodPressure } from '@/types/iot';
 import { toast } from 'sonner';
 import { bluetoothService } from '@/services/iot/bluetooth-service';
+import { usbService } from '@/services/iot/usb-service';
+import { serialService } from '@/services/iot/serial-service';
+import { wifiService } from '@/services/iot/wifi-service';
+import { ConnectionType } from '@/types/iot';
 
 // Throttle function to prevent excessive updates
 const throttle = <T extends (...args: any[]) => void>(func: T, limit: number): T => {
@@ -181,84 +185,121 @@ export function useIoT(userId: string | undefined) {
     }
   }, [userId, fetchDevices]);
 
-  const scanAndConnectDevice = useCallback(async () => {
+  const scanAndConnectDevice = useCallback(async (type: ConnectionType = 'bluetooth') => {
     if (!userId) return;
 
     setIsScanning(true);
     try {
-      if (!bluetoothService.isSupported()) {
-        toast.error('Bluetooth is not supported on this device');
+      let deviceData: any;
+      let connectionId: string;
+      let deviceName: string;
+
+      if (type === 'bluetooth') {
+        if (!bluetoothService.isSupported()) {
+          toast.error('Bluetooth is not supported on this device');
+          return;
+        }
+        const device = await bluetoothService.scanForDevices();
+        toast.loading(`Connecting to ${device.name || 'Bluetooth Device'}...`);
+        await bluetoothService.connect(device);
+        connectionId = device.id;
+        deviceName = device.name || 'Unknown Bluetooth Device';
+
+        // Start listening for HR
+        await bluetoothService.startHeartRateNotifications(async (hr) => {
+          await persistVitalSigns(hr, connectionId);
+        });
+      } else if (type === 'usb') {
+        if (!usbService.isSupported()) {
+          toast.error('Web USB is not supported on this device');
+          return;
+        }
+        const device = await usbService.scanForDevices();
+        toast.loading(`Connecting to ${device.productName || 'USB Device'}...`);
+        await usbService.connect(device);
+        connectionId = device.serialNumber || `USB-${Date.now()}`;
+        deviceName = device.productName || 'Unknown USB Device';
+
+        await usbService.startDataStream(async (data) => {
+          // Generic parser for USB data - in real app, this would be device-specific
+          const hr = data.getUint8(0);
+          await persistVitalSigns(hr, connectionId);
+        });
+      } else if (type === 'serial') {
+        if (!serialService.isSupported()) {
+          toast.error('Web Serial is not supported on this device');
+          return;
+        }
+        const port = await serialService.scanForDevices();
+        toast.loading(`Connecting to Serial Port...`);
+        await serialService.connect(port);
+        connectionId = `SERIAL-${Date.now()}`;
+        deviceName = 'Serial Device';
+
+        await serialService.startDataStream(async (data) => {
+          // Generic parser for Serial data
+          const hr = data[0];
+          await persistVitalSigns(hr, connectionId);
+        });
+      } else {
+        toast.error(`Connection type ${type} not yet implemented for scanning`);
         return;
       }
 
-      const device = await bluetoothService.scanForDevices();
-      toast.loading(`Connecting to ${device.name || 'Device'}...`);
-
-      await bluetoothService.connect(device);
       toast.dismiss();
-      toast.success(`Connected to ${device.name}`);
+      toast.success(`Connected to ${deviceName}`);
 
       // Register device in DB
       await addDevice({
-        device_name: device.name || 'Unknown Device',
-        device_type: 'smartwatch', // Defaulting to smartwatch for generic BLE
-        device_id: device.id,
+        device_name: deviceName,
+        device_type: 'smartwatch',
+        connection_type: type,
+        device_id: connectionId,
         is_active: true,
-        battery_level: 100 // Initial assumption, will update if read
+        battery_level: 100
       });
-
-      // Start listening for data
-      try {
-        await bluetoothService.startHeartRateNotifications(async (hr) => {
-          // Update local state immediately for responsiveness
-          setVitalSigns(prev => ({
-            ...prev!,
-            heart_rate: hr,
-            recorded_at: new Date().toISOString()
-          }));
-
-          // Persist to DB (throttled in real app, here we just insert)
-          // Note: In a real high-frequency scenario, we'd buffer these
-          await supabase.from('vital_signs' as any).insert({
-            user_id: userId,
-            heart_rate: hr,
-            device_id: device.id,
-            recorded_at: new Date().toISOString()
-          });
-        });
-      } catch (e) {
-        console.warn('Could not start HR notifications', e);
-      }
-
-      // Try reading battery
-      try {
-        const battery = await bluetoothService.readBatteryLevel();
-        // Update device battery in DB
-        // We'd need the device DB ID here, but for now we skip the update to keep it simple
-        // or we could query the device we just added.
-      } catch (e) {
-        console.warn('Could not read battery', e);
-      }
 
     } catch (error: any) {
       console.error('[useIoT] Scanning error:', error);
-      if (error.name === 'NotFoundError') {
-        toast.info('Scanning cancelled or no device selected');
-      } else if (error.name === 'SecurityError') {
-        toast.error('Bluetooth security error. Please ensure the site is served over HTTPS.');
-      } else if (error.name === 'NotAllowedError') {
-        toast.error('Bluetooth permission denied by user or browser.');
-      } else if (error.name === 'NotSupportedError') {
-        toast.error('Bluetooth is not supported or disabled on this device.');
-      } else {
-        toast.error(`Failed to connect: ${error.message || 'Unknown error'}`);
-      }
+      handleConnectionError(error);
     } finally {
       setIsScanning(false);
       toast.dismiss();
     }
-
   }, [userId, addDevice]);
+
+  const persistVitalSigns = async (hr: number, deviceId: string) => {
+    if (!userId) return;
+
+    // Update local state immediately
+    setVitalSigns(prev => ({
+      ...prev!,
+      heart_rate: hr,
+      recorded_at: new Date().toISOString()
+    }));
+
+    // Persist to DB
+    await supabase.from('vital_signs' as any).insert({
+      user_id: userId,
+      heart_rate: hr,
+      device_id: deviceId,
+      recorded_at: new Date().toISOString()
+    });
+  };
+
+  const handleConnectionError = (error: any) => {
+    if (error.name === 'NotFoundError') {
+      toast.info('Scanning cancelled or no device selected');
+    } else if (error.name === 'SecurityError') {
+      toast.error('Security error. Please ensure the site is served over HTTPS.');
+    } else if (error.name === 'NotAllowedError') {
+      toast.error('Permission denied by user or browser.');
+    } else if (error.name === 'NotSupportedError') {
+      toast.error('Protocol is not supported or disabled on this device.');
+    } else {
+      toast.error(`Failed to connect: ${error.message || 'Unknown error'}`);
+    }
+  };
 
   const removeDevice = useCallback(async (deviceId: string) => {
     try {
