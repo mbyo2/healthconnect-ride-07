@@ -72,3 +72,23 @@ export const getHealthMetrics = async (): Promise<HealthMetric[]> => {
     return [];
   }
 };
+
+export const updateMedicalRecord = async (id: string, updates: Partial<MedicalRecord>): Promise<boolean> => {
+  try {
+    const { error } = await supabase
+      .from('comprehensive_medical_records')
+      .update({
+        title: updates.title,
+        record_type: updates.type,
+        status: updates.status,
+        visit_date: updates.date,
+      })
+      .eq('id', id);
+
+    if (error) throw error;
+    return true;
+  } catch (error) {
+    console.error('Error updating medical record:', error);
+    return false;
+  }
+};

@@ -1,31 +1,66 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, Phone, MapPin, Heart, User, FileText, Navigation, Clock, Shield } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 const EmergencyResponse = () => {
+    const { user, profile } = useAuth();
     const [locationSharing, setLocationSharing] = useState(false);
+    const [emergencyContacts, setEmergencyContacts] = useState<any[]>([]);
+    const [nearbyHospitals, setNearbyHospitals] = useState<any[]>([]);
+    const [medicalInfo, setMedicalInfo] = useState({
+        bloodType: profile?.blood_type || 'Unknown',
+        allergies: profile?.allergies || [],
+        conditions: profile?.medical_conditions || [],
+        medications: profile?.current_medications || [],
+    });
 
-    const emergencyContacts = [
-        { id: 1, name: 'Dr. Sarah Johnson', relation: 'Primary Care', phone: '+1 (555) 123-4567', priority: 1 },
-        { id: 2, name: 'John Doe', relation: 'Emergency Contact', phone: '+1 (555) 987-6543', priority: 2 },
-        { id: 3, name: 'City Hospital', relation: 'Nearest Hospital', phone: '+1 (555) 911-0000', priority: 3 },
-    ];
+    useEffect(() => {
+        if (user) {
+            fetchEmergencyContacts();
+            fetchNearbyHospitals();
+        }
+    }, [user]);
 
-    const nearbyHospitals = [
-        { id: 1, name: 'City General Hospital', distance: '1.2 km', time: '5 min', emergency: true },
-        { id: 2, name: 'St. Mary\'s Medical Center', distance: '2.8 km', time: '10 min', emergency: true },
-        { id: 3, name: 'Community Health Clinic', distance: '3.5 km', time: '12 min', emergency: false },
-    ];
+    const fetchEmergencyContacts = async () => {
+        try {
+            const { data, error } = await supabase
+                .from('emergency_contacts')
+                .select('*')
+                .eq('patient_id', user?.id)
+                .order('is_primary', { ascending: false });
 
-    const medicalInfo = {
-        bloodType: 'O+',
-        allergies: ['Penicillin', 'Peanuts'],
-        conditions: ['Hypertension'],
-        medications: ['Lisinopril 10mg'],
+            if (error) throw error;
+            setEmergencyContacts(data || []);
+        } catch (error) {
+            console.error('Error fetching emergency contacts:', error);
+        }
+    };
+
+    const fetchNearbyHospitals = async () => {
+        try {
+            const { data, error } = await supabase
+                .from('healthcare_institutions')
+                .select('*')
+                .eq('type', 'hospital')
+                .limit(3);
+
+            if (error) throw error;
+            setNearbyHospitals((data || []).map(h => ({
+                id: h.id,
+                name: h.name,
+                distance: 'Nearby', // In a real app, calculate distance
+                time: 'Calculating...',
+                emergency: true
+            })));
+        } catch (error) {
+            console.error('Error fetching nearby hospitals:', error);
+        }
     };
 
     const handleEmergencyCall = () => {
@@ -98,7 +133,7 @@ const EmergencyResponse = () => {
                                 <div key={contact.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent transition-colors">
                                     <div className="flex-1">
                                         <h4 className="font-semibold">{contact.name}</h4>
-                                        <p className="text-sm text-muted-foreground">{contact.relation}</p>
+                                        <p className="text-sm text-muted-foreground">{contact.relationship || contact.relation}</p>
                                         <p className="text-sm mt-1">{contact.phone}</p>
                                     </div>
                                     <Button size="sm">

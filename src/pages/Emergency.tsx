@@ -34,46 +34,49 @@ const Emergency = () => {
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [emergencyMessage, setEmergencyMessage] = useState('');
   const [isEmergencyActive, setIsEmergencyActive] = useState(false);
-
-  const emergencyServices: EmergencyService[] = [
-    {
-      id: '1',
-      name: 'Ambulance Service Zambia',
-      phone: '911',
-      description: 'Emergency ambulance and medical response',
-      type: 'ambulance',
-      available24h: true
-    },
-    {
-      id: '2',
-      name: 'University Teaching Hospital',
-      phone: '+260-211-256067',
-      description: 'Main emergency hospital in Lusaka',
-      type: 'hospital',
-      available24h: true
-    },
-    {
-      id: '3',
-      name: 'Zambia Police',
-      phone: '999',
-      description: 'Police emergency services',
-      type: 'police',
-      available24h: true
-    },
-    {
-      id: '4',
-      name: 'Fire Department',
-      phone: '993',
-      description: 'Fire and rescue services',
-      type: 'fire',
-      available24h: true
-    }
-  ];
+  const [emergencyServices, setEmergencyServices] = useState<EmergencyService[]>([]);
 
   useEffect(() => {
+    fetchEmergencyServices();
     loadEmergencyContacts();
     getCurrentLocation();
   }, [user]);
+
+  const fetchEmergencyServices = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('emergency_services' as any)
+        .select('*')
+        .order('name');
+
+      if (error) {
+        console.error('Error fetching emergency services:', error);
+        // Fallback to default services if table doesn't exist
+        setEmergencyServices([
+          {
+            id: '1',
+            name: 'Ambulance Service Zambia',
+            phone: '911',
+            description: 'Emergency ambulance and medical response',
+            type: 'ambulance',
+            available24h: true
+          },
+          {
+            id: '2',
+            name: 'University Teaching Hospital',
+            phone: '+260-211-256067',
+            description: 'Main emergency hospital in Lusaka',
+            type: 'hospital',
+            available24h: true
+          }
+        ]);
+        return;
+      }
+      setEmergencyServices(data || []);
+    } catch (error) {
+      console.error('Error fetching emergency services:', error);
+    }
+  };
 
   const loadEmergencyContacts = async () => {
     if (!user) return;
@@ -119,7 +122,7 @@ const Emergency = () => {
     try {
       // Send emergency alert to contacts
       const primaryContact = emergencyContacts.find(contact => contact.is_primary);
-      
+
       if (primaryContact) {
         // Here you would integrate with SMS service
         toast.success(`Emergency alert sent to ${primaryContact.name}`);
@@ -162,7 +165,7 @@ const Emergency = () => {
       <div className="min-h-screen bg-background">
         <main className="container mx-auto px-4 py-6 space-y-6 max-w-7xl">
           <div className="space-y-6">
-            
+
             {/* Emergency Alert Section */}
             <Card className="border-red-200 bg-red-50">
               <CardHeader>
@@ -178,7 +181,7 @@ const Emergency = () => {
                   onChange={(e) => setEmergencyMessage(e.target.value)}
                   className="min-h-20"
                 />
-                
+
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <MapPin className="h-4 w-4" />
                   {location ? 'Location detected' : 'Getting location...'}
@@ -282,7 +285,7 @@ const Emergency = () => {
                   <div className="text-center py-8">
                     <User className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                     <p className="text-muted-foreground">
-                      No emergency contacts set up. 
+                      No emergency contacts set up.
                       Go to your profile to add emergency contacts.
                     </p>
                   </div>
@@ -305,7 +308,7 @@ const Emergency = () => {
                       <li>Don't move severely injured persons unless in immediate danger</li>
                     </ul>
                   </div>
-                  
+
                   <div>
                     <h4 className="font-semibold mb-2">Important Numbers:</h4>
                     <ul className="list-disc pl-5 space-y-1">

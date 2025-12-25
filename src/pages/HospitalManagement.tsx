@@ -24,6 +24,8 @@ import {
     CheckCircle,
 } from 'lucide-react';
 
+const INVOICE_DUE_DAYS = 7;
+
 const HospitalManagement = () => {
     const { user } = useAuth();
     const { formatPrice, currency } = useCurrency();
@@ -133,7 +135,7 @@ const HospitalManagement = () => {
                     insurance_claim_id: insuranceClaimId,
                     items: [{ description: invoiceDescription, amount: total }],
                     payment_status: balance === 0 ? 'paid' : 'pending',
-                    due_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // 7 days from now
+                    due_date: new Date(Date.now() + INVOICE_DUE_DAYS * 24 * 60 * 60 * 1000).toISOString()
                 });
 
             if (error) throw error;

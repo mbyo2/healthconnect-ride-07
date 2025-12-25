@@ -368,34 +368,29 @@ const PharmacyInventory = () => {
                 <div className="space-y-4">
                   <h3 className="font-semibold">Top Categories</h3>
                   <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span>Pain Relief</span>
-                      <span className="font-semibold">25%</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Antibiotics</span>
-                      <span className="font-semibold">20%</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Diabetes</span>
-                      <span className="font-semibold">18%</span>
-                    </div>
+                    {Object.entries(
+                      medications.reduce((acc: any, med: any) => {
+                        acc[med.category] = (acc[med.category] || 0) + 1;
+                        return acc;
+                      }, {})
+                    )
+                      .sort((a: any, b: any) => b[1] - a[1])
+                      .slice(0, 3)
+                      .map(([category, count]: any) => (
+                        <div key={category} className="flex justify-between">
+                          <span>{category}</span>
+                          <span className="font-semibold">
+                            {Math.round((count / medications.length) * 100)}%
+                          </span>
+                        </div>
+                      ))}
                   </div>
                 </div>
                 <div className="space-y-4">
                   <h3 className="font-semibold">Monthly Usage</h3>
                   <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span>November 2024</span>
-                      <span className="font-semibold">450 units</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>October 2024</span>
-                      <span className="font-semibold">420 units</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>September 2024</span>
-                      <span className="font-semibold">380 units</span>
+                    <div className="flex justify-between text-muted-foreground italic">
+                      <span>Usage data will appear here once sales are recorded</span>
                     </div>
                   </div>
                 </div>

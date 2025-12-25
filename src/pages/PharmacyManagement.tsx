@@ -16,6 +16,9 @@ import {
 } from 'lucide-react';
 import { InstitutionInsuranceVerification } from '@/components/institution/InstitutionInsuranceVerification';
 
+const TAX_RATE = 0.16;
+const DEFAULT_PAYMENT_METHOD = 'cash';
+
 const PharmacyManagement = () => {
     const { user } = useAuth();
     const { formatPrice } = useCurrency();
@@ -116,7 +119,7 @@ const PharmacyManagement = () => {
     };
 
     const cartSubtotal = cart.reduce((sum, item) => sum + (item.unit_price * item.cartQuantity), 0);
-    const cartTax = cartSubtotal * 0.16;
+    const cartTax = cartSubtotal * TAX_RATE;
     const cartTotal = cartSubtotal + cartTax;
 
     const completeSale = async () => {
@@ -150,7 +153,7 @@ const PharmacyManagement = () => {
                     balance: balance,
                     paid_amount: total - balance,
                     insurance_claim_id: insuranceClaimId,
-                    payment_method: 'cash', // Default for now
+                    payment_method: DEFAULT_PAYMENT_METHOD,
                     payment_status: balance === 0 ? 'completed' : 'pending'
                 });
 
@@ -512,7 +515,7 @@ const PharmacyManagement = () => {
                                         <span>{formatPrice(cartSubtotal)}</span>
                                     </div>
                                     <div className="flex justify-between text-sm">
-                                        <span>Tax (16%)</span>
+                                        <span>Tax ({TAX_RATE * 100}%)</span>
                                         <span>{formatPrice(cartTax)}</span>
                                     </div>
                                     <div className="flex justify-between font-bold text-lg">

@@ -14,28 +14,45 @@ const Symptoms = () => {
   const [description, setDescription] = useState<string>('');
   const navigate = useNavigate();
 
-  const symptomCategories = [
-    {
-      title: 'General',
-      icon: <Activity className="h-5 w-5" />,
-      symptoms: ['Fever', 'Fatigue', 'Weight Loss', 'Nausea', 'Dizziness']
-    },
-    {
-      title: 'Cardiovascular',
-      icon: <Heart className="h-5 w-5" />,
-      symptoms: ['Chest Pain', 'Shortness of Breath', 'Palpitations', 'Swelling']
-    },
-    {
-      title: 'Neurological',
-      icon: <Brain className="h-5 w-5" />,
-      symptoms: ['Headache', 'Memory Issues', 'Confusion', 'Seizures']
-    },
-    {
-      title: 'Sensory',
-      icon: <Eye className="h-5 w-5" />,
-      symptoms: ['Vision Problems', 'Hearing Loss', 'Tinnitus', 'Smell/Taste Loss']
+  const [symptomCategories, setSymptomCategories] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetchSymptomCategories();
+  }, []);
+
+  const fetchSymptomCategories = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('symptom_categories')
+        .select('*')
+        .order('title');
+
+      if (error) {
+        console.error('Error fetching symptom categories:', error);
+        // Fallback to minimal set if table doesn't exist
+        setSymptomCategories([
+          {
+            title: 'General',
+            symptoms: ['Fever', 'Fatigue', 'Weight Loss', 'Nausea', 'Dizziness']
+          }
+        ]);
+        return;
+      }
+      setSymptomCategories(data || []);
+    } catch (error) {
+      console.error('Error fetching symptom categories:', error);
     }
-  ];
+  };
+
+  const getIconForCategory = (title: string) => {
+    switch (title) {
+      case 'General': return <Activity className="h-5 w-5" />;
+      case 'Cardiovascular': return <Heart className="h-5 w-5" />;
+      case 'Neurological': return <Brain className="h-5 w-5" />;
+      case 'Sensory': return <Eye className="h-5 w-5" />;
+      default: return <Activity className="h-5 w-5" />;
+    }
+  };
 
   const toggleSymptom = useCallback((symptom: string) => {
     setSelectedSymptoms(prev =>
@@ -111,7 +128,7 @@ const Symptoms = () => {
               {symptomCategories.map((category) => (
                 <div key={category.title}>
                   <h4 className="font-medium flex items-center gap-2 mb-2">
-                    {category.icon}
+                    {getIconForCategory(category.title)}
                     {category.title}
                   </h4>
                   <div className="flex flex-wrap gap-2">

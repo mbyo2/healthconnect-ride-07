@@ -54,10 +54,8 @@ const LabManagement = () => {
                 if (error) throw error;
                 return data as any[];
             } catch (e) {
-                if (import.meta.env.DEV) {
-                    console.log('Using mock lab data as table might not exist yet');
-                }
-                return MOCK_REQUESTS as any[];
+                console.error('Error fetching lab requests:', e);
+                return [];
             }
         }
     });
@@ -75,13 +73,26 @@ const LabManagement = () => {
     });
 
     // Lab Test Catalog (for selection)
-    const TEST_CATALOG = [
-        { name: 'Complete Blood Count (CBC)', code: 'HEM-001', category: 'Hematology', price: 150 },
-        { name: 'Lipid Profile', code: 'BIO-001', category: 'Biochemistry', price: 200 },
-        { name: 'Liver Function Test', code: 'BIO-002', category: 'Biochemistry', price: 250 },
-        { name: 'Urinalysis', code: 'MIC-001', category: 'Microbiology', price: 80 },
-        { name: 'Thyroid Panel', code: 'IMM-001', category: 'Immunology', price: 300 },
-    ];
+    const { data: testCatalog = [] } = useQuery({
+        queryKey: ['lab-test-catalog'],
+        queryFn: async () => {
+            const { data, error } = await supabase
+                .from('lab_test_catalog')
+                .select('*')
+                .order('name');
+
+            if (error) {
+                console.error('Error fetching test catalog:', error);
+                // Fallback to a minimal set if table doesn't exist yet, 
+                // but ideally we should have this table.
+                return [
+                    { name: 'Complete Blood Count (CBC)', code: 'HEM-001', category: 'Hematology', price: 150 },
+                    { name: 'Lipid Profile', code: 'BIO-001', category: 'Biochemistry', price: 200 },
+                ];
+            }
+            return data;
+        }
+    });
 
     const submitResult = async () => {
         if (!selectedRequest || !resultSummary) return;
@@ -113,7 +124,7 @@ const LabManagement = () => {
         if (!selectedPatientId || !selectedTestType || !user) return;
         setIsSubmitting(true);
         try {
-            const test = TEST_CATALOG.find(t => t.name === selectedTestType);
+            const test = testCatalog.find(t => t.name === selectedTestType);
             const total = test?.price || 0;
             let balance = total;
             let insuranceClaimId = null;
@@ -298,7 +309,7 @@ const LabManagement = () => {
                                                         <SelectValue placeholder="Select test type" />
                                                     </SelectTrigger>
                                                     <SelectContent>
-                                                        {TEST_CATALOG.map(test => (
+                                                        {testCatalog.map(test => (
                                                             <SelectItem key={test.code} value={test.name}>
                                                                 {test.name} ({formatPrice(test.price)})
                                                             </SelectItem>
@@ -460,7 +471,7 @@ const LabManagement = () => {
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-4">
-                                {TEST_CATALOG.map((test, i) => (
+                                {testCatalog.map((test, i) => (
                                     <div key={i} className="flex items-center justify-between p-3 border rounded-lg">
                                         <div>
                                             <h4 className="font-medium">{test.name}</h4>
@@ -480,38 +491,6 @@ const LabManagement = () => {
     );
 };
 
-// Mock Data for fallback
-const MOCK_REQUESTS = [
-    {
-        id: '1',
-        status: 'pending',
-        priority: 'urgent',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        patient: { first_name: 'John', last_name: 'Doe' },
-        test: { name: 'Complete Blood Count (CBC)', code: 'HEM-001' },
-        provider: { last_name: 'Smith' }
-    },
-    {
-        id: '2',
-        status: 'in_progress',
-        priority: 'routine',
-        created_at: new Date(Date.now() - 86400000).toISOString(),
-        updated_at: new Date().toISOString(),
-        patient: { first_name: 'Jane', last_name: 'Wilson' },
-        test: { name: 'Lipid Profile', code: 'BIO-001' },
-        provider: { last_name: 'Johnson' }
-    },
-    {
-        id: '3',
-        status: 'completed',
-        priority: 'routine',
-        created_at: new Date(Date.now() - 172800000).toISOString(),
-        updated_at: new Date().toISOString(),
-        patient: { first_name: 'Robert', last_name: 'Brown' },
-        test: { name: 'Urinalysis', code: 'MIC-001' },
-        provider: { last_name: 'Williams' }
-    }
-];
+
 
 export default LabManagement;

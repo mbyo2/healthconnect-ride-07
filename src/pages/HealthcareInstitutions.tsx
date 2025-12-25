@@ -27,18 +27,28 @@ const HealthcareInstitutions = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
 
-  const institutionTypes = [
-    'Hospital',
-    'Clinic',
-    'Laboratory',
-    'Pharmacy',
-    'Mental Health Center',
-    'Rehabilitation Center',
-  ];
+  const [institutionTypes, setInstitutionTypes] = useState<string[]>([]);
 
   useEffect(() => {
     fetchInstitutions();
+    fetchInstitutionTypes();
   }, []);
+
+  const fetchInstitutionTypes = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('healthcare_institutions')
+        .select('type')
+        .not('type', 'is', null);
+
+      if (error) throw error;
+
+      const uniqueTypes = Array.from(new Set(data.map(i => i.type))).filter(Boolean) as string[];
+      setInstitutionTypes(uniqueTypes.sort());
+    } catch (error) {
+      console.error('Error fetching institution types:', error);
+    }
+  };
 
   const fetchInstitutions = async () => {
     try {

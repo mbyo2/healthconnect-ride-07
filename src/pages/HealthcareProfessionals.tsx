@@ -30,20 +30,29 @@ const HealthcareProfessionals = () => {
   const [specialtyFilter, setSpecialtyFilter] = useState('all');
   const [sortBy, setSortBy] = useState('rating');
 
-  const specialties = [
-    'General Practice',
-    'Cardiology',
-    'Dermatology',
-    'Pediatrics',
-    'Psychiatry',
-    'Orthopedics',
-    'Neurology',
-    'Oncology',
-  ];
+  const [specialties, setSpecialties] = useState<string[]>([]);
 
   useEffect(() => {
     fetchProfessionals();
+    fetchSpecialties();
   }, []);
+
+  const fetchSpecialties = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('specialty')
+        .eq('role', 'health_personnel')
+        .not('specialty', 'is', null);
+
+      if (error) throw error;
+
+      const uniqueSpecialties = Array.from(new Set(data.map(p => p.specialty))).filter(Boolean) as string[];
+      setSpecialties(uniqueSpecialties.sort());
+    } catch (error) {
+      console.error('Error fetching specialties:', error);
+    }
+  };
 
   const fetchProfessionals = async () => {
     try {
@@ -56,7 +65,21 @@ const HealthcareProfessionals = () => {
         .limit(50);
 
       if (error) throw error;
-      setProfessionals(data || []);
+
+      const mappedData = (data || []).map((item: any) => ({
+        id: item.id,
+        first_name: item.first_name,
+        last_name: item.last_name,
+        specialty: item.specialty,
+        location: item.location,
+        rating: item.rating || 0,
+        reviews_count: item.reviews_count || 0,
+        years_experience: item.years_experience || 0,
+        accepting_patients: item.accepting_patients ?? true,
+        profile_image: item.avatar_url
+      }));
+
+      setProfessionals(mappedData);
     } catch (error) {
       console.error('Error fetching professionals:', error);
       toast.error('Failed to load healthcare professionals');

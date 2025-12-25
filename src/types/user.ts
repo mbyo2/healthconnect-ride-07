@@ -1,5 +1,5 @@
 
-export type UserRole = 'patient' | 'health_personnel' | 'admin' | 'institution_admin' | 'pharmacy' | 'institution_staff' | 'lab' | 'super_admin' | 'support';
+export type UserRole = 'patient' | 'health_personnel' | 'admin' | 'institution_admin' | 'pharmacy' | 'institution_staff' | 'lab' | 'super_admin' | 'support' | 'doctor' | 'nurse' | 'radiologist' | 'pharmacist' | 'lab_technician';
 export type AdminLevel = 'admin' | 'superadmin' | null;
 
 export interface UserProfile {

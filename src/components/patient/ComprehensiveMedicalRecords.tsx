@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import { useUserRoles } from '@/context/UserRolesContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,7 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { format } from 'date-fns';
-import { CalendarIcon, Plus, FileText, Stethoscope, TestTube, Camera, Pill, AlertTriangle, Heart, Shield } from 'lucide-react';
+import { CalendarIcon, Plus, FileText, Stethoscope, TestTube, Camera, Pill, AlertTriangle, Heart, Shield, Edit2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
@@ -68,12 +69,48 @@ const statusOptions = [
 ];
 
 export const ComprehensiveMedicalRecords = () => {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
+  const { availableRoles, isAdmin, isSuperAdmin } = useUserRoles();
   const [records, setRecords] = useState<MedicalRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
   const [filterType, setFilterType] = useState<string>('all');
   const [sortBy, setSortBy] = useState<string>('date_desc');
+  const [editingRecordId, setEditingRecordId] = useState<string | null>(null);
+
+  const userSpecialty = profile?.specialty?.toLowerCase() || '';
+
+  const canEditRecordType = (recordType: string) => {
+    if (isSuperAdmin || isAdmin) return true;
+
+    const roles = availableRoles;
+    const specialty = userSpecialty;
+
+    switch (recordType) {
+      case 'diagnosis':
+        return roles.includes('doctor');
+      case 'treatment':
+        return roles.includes('doctor') || roles.includes('nurse');
+      case 'lab_result':
+        return roles.includes('lab_technician') || roles.includes('lab') || (roles.includes('doctor') && specialty.includes('patholog'));
+      case 'imaging':
+        return roles.includes('radiologist') || (roles.includes('doctor') && specialty.includes('radiolog'));
+      case 'procedure':
+        return roles.includes('doctor') || roles.includes('nurse');
+      case 'medication':
+        return roles.includes('doctor') || roles.includes('pharmacist') || roles.includes('pharmacy');
+      case 'allergy':
+        return roles.includes('doctor') || roles.includes('nurse');
+      case 'vital_signs':
+        return roles.includes('nurse') || roles.includes('doctor') || roles.includes('lab_technician');
+      case 'vaccination':
+        return roles.includes('nurse') || roles.includes('doctor');
+      default:
+        return false;
+    }
+  };
+
+  const canAddAny = recordTypes.some(type => canEditRecordType(type.value));
 
   const [formData, setFormData] = useState({
     record_type: '',
@@ -106,7 +143,7 @@ export const ComprehensiveMedicalRecords = () => {
 
       const orderColumn = sortBy.includes('date') ? 'visit_date' : 'created_at';
       const orderDirection = sortBy.includes('desc') ? { ascending: false } : { ascending: true };
-      
+
       query = query.order(orderColumn, orderDirection);
 
       const { data, error } = await query;
@@ -123,25 +160,44 @@ export const ComprehensiveMedicalRecords = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
+    if (!canEditRecordType(formData.record_type)) {
+      toast.error('You do not have permission to add/edit this type of medical record');
+      return;
+    }
+
     if (!formData.record_type || !formData.title || !formData.description) {
       toast.error('Please fill in all required fields');
       return;
     }
 
     try {
-      const { data, error } = await supabase
-        .from('comprehensive_medical_records')
-        .insert({
-          patient_id: user?.id,
-          ...formData,
-          visit_date: format(formData.visit_date, 'yyyy-MM-dd')
-        });
+      if (editingRecordId) {
+        const { error } = await supabase
+          .from('comprehensive_medical_records')
+          .update({
+            ...formData,
+            visit_date: format(formData.visit_date, 'yyyy-MM-dd')
+          })
+          .eq('id', editingRecordId);
 
-      if (error) throw error;
+        if (error) throw error;
+        toast.success('Medical record updated successfully');
+      } else {
+        const { error } = await supabase
+          .from('comprehensive_medical_records')
+          .insert({
+            patient_id: user?.id,
+            ...formData,
+            visit_date: format(formData.visit_date, 'yyyy-MM-dd')
+          });
 
-      toast.success('Medical record added successfully');
+        if (error) throw error;
+        toast.success('Medical record added successfully');
+      }
+
       setShowAddForm(false);
+      setEditingRecordId(null);
       setFormData({
         record_type: '',
         title: '',
@@ -154,9 +210,43 @@ export const ComprehensiveMedicalRecords = () => {
       });
       fetchMedicalRecords();
     } catch (error) {
-      console.error('Error adding medical record:', error);
-      toast.error('Failed to add medical record');
+      console.error('Error saving medical record:', error);
+      toast.error('Failed to save medical record');
     }
+  };
+
+  const handleEdit = (record: MedicalRecord) => {
+    if (!canEditRecordType(record.record_type)) {
+      toast.error('You do not have permission to edit this record');
+      return;
+    }
+    setFormData({
+      record_type: record.record_type,
+      title: record.title,
+      description: record.description,
+      visit_date: new Date(record.visit_date),
+      severity_level: record.severity_level,
+      status: record.status,
+      is_private: record.is_private,
+      clinical_data: record.clinical_data || {}
+    });
+    setEditingRecordId(record.id);
+    setShowAddForm(true);
+  };
+
+  const handleCancel = () => {
+    setShowAddForm(false);
+    setEditingRecordId(null);
+    setFormData({
+      record_type: '',
+      title: '',
+      description: '',
+      visit_date: new Date(),
+      severity_level: 'low',
+      status: 'active',
+      is_private: false,
+      clinical_data: {}
+    });
   };
 
   const getSeverityBadge = (level: string) => {
@@ -214,10 +304,12 @@ export const ComprehensiveMedicalRecords = () => {
           <h2 className="text-2xl font-bold">Medical Records</h2>
           <p className="text-muted-foreground">Comprehensive medical history and records</p>
         </div>
-        <Button onClick={() => setShowAddForm(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          Add Record
-        </Button>
+        {canAddAny && (
+          <Button onClick={() => setShowAddForm(true)}>
+            <Plus className="h-4 w-4 mr-2" />
+            Add Record
+          </Button>
+        )}
       </div>
 
       {/* Filters */}
@@ -248,19 +340,21 @@ export const ComprehensiveMedicalRecords = () => {
         </Select>
       </div>
 
-      {/* Add Record Form */}
+      {/* Add/Edit Record Form */}
       {showAddForm && (
         <Card>
           <CardHeader>
-            <CardTitle>Add Medical Record</CardTitle>
-            <CardDescription>Record new medical information</CardDescription>
+            <CardTitle>{editingRecordId ? 'Edit Medical Record' : 'Add Medical Record'}</CardTitle>
+            <CardDescription>
+              {editingRecordId ? 'Update medical information' : 'Record new medical information'}
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="record_type">Record Type *</Label>
-                  <Select value={formData.record_type} onValueChange={(value) => 
+                  <Select value={formData.record_type} onValueChange={(value) =>
                     setFormData(prev => ({ ...prev, record_type: value }))
                   }>
                     <SelectTrigger>
@@ -268,8 +362,12 @@ export const ComprehensiveMedicalRecords = () => {
                     </SelectTrigger>
                     <SelectContent>
                       {recordTypes.map((type) => (
-                        <SelectItem key={type.value} value={type.value}>
-                          {type.label}
+                        <SelectItem
+                          key={type.value}
+                          value={type.value}
+                          disabled={!canEditRecordType(type.value)}
+                        >
+                          {type.label} {!canEditRecordType(type.value) && '(Unauthorized)'}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -295,7 +393,7 @@ export const ComprehensiveMedicalRecords = () => {
                       <Calendar
                         mode="single"
                         selected={formData.visit_date}
-                        onSelect={(date) => 
+                        onSelect={(date) =>
                           setFormData(prev => ({ ...prev, visit_date: date || new Date() }))
                         }
                         initialFocus
@@ -306,7 +404,7 @@ export const ComprehensiveMedicalRecords = () => {
 
                 <div>
                   <Label htmlFor="severity_level">Severity Level</Label>
-                  <Select value={formData.severity_level} onValueChange={(value) => 
+                  <Select value={formData.severity_level} onValueChange={(value) =>
                     setFormData(prev => ({ ...prev, severity_level: value }))
                   }>
                     <SelectTrigger>
@@ -324,7 +422,7 @@ export const ComprehensiveMedicalRecords = () => {
 
                 <div>
                   <Label htmlFor="status">Status</Label>
-                  <Select value={formData.status} onValueChange={(value) => 
+                  <Select value={formData.status} onValueChange={(value) =>
                     setFormData(prev => ({ ...prev, status: value }))
                   }>
                     <SelectTrigger>
@@ -365,11 +463,11 @@ export const ComprehensiveMedicalRecords = () => {
               </div>
 
               <div className="flex justify-end gap-2">
-                <Button type="button" variant="outline" onClick={() => setShowAddForm(false)}>
+                <Button type="button" variant="outline" onClick={handleCancel}>
                   Cancel
                 </Button>
                 <Button type="submit">
-                  Add Record
+                  {editingRecordId ? 'Update Record' : 'Add Record'}
                 </Button>
               </div>
             </form>
@@ -385,12 +483,14 @@ export const ComprehensiveMedicalRecords = () => {
               <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
               <h3 className="text-lg font-semibold mb-2">No Medical Records</h3>
               <p className="text-muted-foreground mb-4">
-                Start by adding your first medical record
+                {canAddAny ? 'Start by adding your first medical record' : 'No medical records found.'}
               </p>
-              <Button onClick={() => setShowAddForm(true)}>
-                <Plus className="h-4 w-4 mr-2" />
-                Add Your First Record
-              </Button>
+              {canAddAny && (
+                <Button onClick={() => setShowAddForm(true)}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Your First Record
+                </Button>
+              )}
             </CardContent>
           </Card>
         ) : (
@@ -403,15 +503,20 @@ export const ComprehensiveMedicalRecords = () => {
                     <div>
                       <CardTitle className="text-lg">{record.title}</CardTitle>
                       <CardDescription>
-                        {recordTypes.find(t => t.value === record.record_type)?.label} • 
+                        {recordTypes.find(t => t.value === record.record_type)?.label} •
                         {format(new Date(record.visit_date), 'PPP')}
                       </CardDescription>
                     </div>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 items-center">
                     {getSeverityBadge(record.severity_level)}
                     {getStatusBadge(record.status)}
                     {record.is_private && <Badge variant="outline">Private</Badge>}
+                    {canEditRecordType(record.record_type) && (
+                      <Button variant="ghost" size="icon" onClick={() => handleEdit(record)}>
+                        <Edit2 className="h-4 w-4" />
+                      </Button>
+                    )}
                   </div>
                 </div>
               </CardHeader>
