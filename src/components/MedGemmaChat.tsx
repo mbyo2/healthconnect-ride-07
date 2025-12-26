@@ -7,8 +7,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { Loader2, Send, Bot, User, X, Paperclip, Lightbulb } from 'lucide-react';
 import { toast } from 'sonner';
 import { ClinicalDecisionCard, ClinicalDecision, parseClinicalDecisions, ClinicalAction } from './ai/ClinicalDecisionCard';
-import { ChatSettings } from './ai/ChatSettings';
-import { importChatFromJSON } from '@/utils/chat-export';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -248,13 +246,6 @@ export const MedGemmaChat = ({ onActionClick }: MedGemmaChatProps) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
-    }
-  };
-
-  const handleImportChat = async (importedMessages: Message[]) => {
-    if (importedMessages && importedMessages.length > 0) {
-      setMessages(importedMessages);
-      toast.success(`Imported ${importedMessages.length} messages`);
     }
   };
 
