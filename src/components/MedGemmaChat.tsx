@@ -48,14 +48,34 @@ interface MedGemmaChatProps {
   onActionClick?: (action: ClinicalAction) => void;
 }
 
+const STORAGE_KEY = 'medgemma_chat_history';
+
 export const MedGemmaChat = ({ onActionClick }: MedGemmaChatProps) => {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      role: 'assistant',
-      content: AI_WELCOME_MESSAGE,
-      timestamp: new Date()
+  // Load messages from localStorage on mount
+  const [messages, setMessages] = useState<Message[]>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        // Convert timestamp strings back to Date objects
+        return parsed.map((msg: any) => ({
+          ...msg,
+          timestamp: new Date(msg.timestamp)
+        }));
+      }
+    } catch (error) {
+      console.error('Failed to load chat history:', error);
     }
-  ]);
+    // Default welcome message
+    return [
+      {
+        role: 'assistant',
+        content: AI_WELCOME_MESSAGE,
+        timestamp: new Date()
+      }
+    ];
+  });
+
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -63,6 +83,16 @@ export const MedGemmaChat = ({ onActionClick }: MedGemmaChatProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  // Save messages to localStorage whenever they change
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+    } catch (error) {
+      console.error('Failed to save chat history:', error);
+    }
+  }, [messages]);
+
+  // Auto-scroll to bottom
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -200,6 +230,18 @@ export const MedGemmaChat = ({ onActionClick }: MedGemmaChatProps) => {
     }
   };
 
+  const clearChatHistory = () => {
+    setMessages([
+      {
+        role: 'assistant',
+        content: AI_WELCOME_MESSAGE,
+        timestamp: new Date()
+      }
+    ]);
+    localStorage.removeItem(STORAGE_KEY);
+    toast.success('Chat history cleared');
+  };
+
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -210,14 +252,26 @@ export const MedGemmaChat = ({ onActionClick }: MedGemmaChatProps) => {
   return (
     <Card className="w-full h-[calc(100dvh-16rem)] sm:h-[600px] md:h-[700px] flex flex-col shadow-lg border-2">
       <CardHeader className="border-b py-2 sm:py-4 bg-gradient-to-r from-primary/5 to-primary/10">
-        <CardTitle className="flex items-center gap-2 text-sm sm:text-lg">
-          <div className="w-7 h-7 sm:w-10 sm:h-10 rounded-full bg-primary/20 flex items-center justify-center">
-            <Bot className="h-3.5 w-3.5 sm:h-5 sm:w-5 text-primary" />
+        <CardTitle className="flex items-center justify-between text-sm sm:text-lg">
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 sm:w-10 sm:h-10 rounded-full bg-primary/20 flex items-center justify-center">
+              <Bot className="h-3.5 w-3.5 sm:h-5 sm:w-5 text-primary" />
+            </div>
+            <div>
+              <div className="font-bold">Doc 0 Clock Assistant</div>
+              <div className="text-xs text-muted-foreground font-normal">Online • AI Medical Helper</div>
+            </div>
           </div>
-          <div>
-            <div className="font-bold">Doc 0 Clock Assistant</div>
-            <div className="text-xs text-muted-foreground font-normal">Online • AI Medical Helper</div>
-          </div>
+          {messages.length > 1 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={clearChatHistory}
+              className="text-xs"
+            >
+              Clear Chat
+            </Button>
+          )}
         </CardTitle>
       </CardHeader>
 

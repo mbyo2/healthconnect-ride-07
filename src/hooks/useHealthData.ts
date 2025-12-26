@@ -6,6 +6,12 @@ export function useHealthData(userId: string | undefined, timeRange: string) {
     const [heartRateData, setHeartRateData] = useState<any[]>([]);
     const [activityData, setActivityData] = useState<any[]>([]);
     const [sleepData, setSleepData] = useState<any[]>([]);
+    const [vitalsData, setVitalsData] = useState<any>({
+        bloodPressure: '120/80',
+        oxygenSaturation: '98%',
+        weight: '70 kg',
+        restingHeartRate: '62 bpm'
+    });
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -40,10 +46,10 @@ export function useHealthData(userId: string | undefined, timeRange: string) {
 
             if (metricsError) throw metricsError;
 
-            // Fetch Vital Signs (Heart Rate)
+            // Fetch Vital Signs
             const { data: vitals, error: vitalsError } = await supabase
                 .from('vital_signs')
-                .select('heart_rate, recorded_at')
+                .select('*')
                 .eq('user_id', userId)
                 .gte('recorded_at', startDate.toISOString())
                 .lte('recorded_at', endDate.toISOString())
@@ -99,8 +105,13 @@ export function useHealthData(userId: string | undefined, timeRange: string) {
     };
 
     const processVitals = (data: any[]) => {
-        // Group by day and calculate min/max/avg
+        if (data.length === 0) return;
+
+        // Group by day and calculate min/max/avg for heart rate
         const grouped: Record<string, number[]> = {};
+
+        // Latest vitals for the summary cards
+        const latest = data[data.length - 1];
 
         data.forEach(d => {
             const date = new Date(d.recorded_at).toLocaleDateString('en-US', { weekday: 'short' });
@@ -116,12 +127,23 @@ export function useHealthData(userId: string | undefined, timeRange: string) {
         }));
 
         setHeartRateData(chartData);
+
+        // Update summary vitals
+        setVitalsData({
+            bloodPressure: latest.blood_pressure_systolic && latest.blood_pressure_diastolic
+                ? `${latest.blood_pressure_systolic}/${latest.blood_pressure_diastolic}`
+                : '120/80',
+            oxygenSaturation: latest.oxygen_saturation ? `${latest.oxygen_saturation}%` : '98%',
+            weight: latest.weight ? `${latest.weight} kg` : '70 kg',
+            restingHeartRate: latest.heart_rate ? `${latest.heart_rate} bpm` : '62 bpm'
+        });
     };
 
     return {
         heartRateData,
         activityData,
         sleepData,
+        vitalsData,
         loading
     };
 }

@@ -1,36 +1,213 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calendar, Activity, Heart, TrendingUp, Users, Clock, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { Link } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+import { useHealthData } from '@/hooks/useHealthData';
 
 const AdvancedDashboard = () => {
-    const { profile } = useAuth();
+    const { profile, user } = useAuth();
+    const [appointments, setAppointments] = useState<any[]>([]);
+    const [appointmentCount, setAppointmentCount] = useState(0);
+    const [providerCount, setProviderCount] = useState(0);
+    const [healthScore, setHealthScore] = useState(0);
+    const [activeDays, setActiveDays] = useState(0);
+    const [stepsToday, setStepsToday] = useState(0);
+    const [recentActivity, setRecentActivity] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    // Fetch health data using the existing hook
+    const { vitalsData } = useHealthData(user?.id, '7days');
+
+    useEffect(() => {
+        if (user) {
+            fetchDashboardData();
+        }
+    }, [user]);
+
+    const fetchDashboardData = async () => {
+        if (!user) return;
+
+        try {
+            // Fetch upcoming appointments
+            const { data: appts, error: apptsError } = await supabase
+                .from('appointments')
+                .select(`
+                    id,
+                    appointment_date,
+                    appointment_time,
+                    status,
+                    provider:provider_id (
+                        id,
+                        first_name,
+                        last_name,
+                        specialization
+                    )
+                `)
+                .eq('patient_id', user.id)
+                .gte('appointment_date', new Date().toISOString().split('T')[0])
+                .order('appointment_date', { ascending: true })
+                .limit(2);
+
+            if (!apptsError && appts) {
+                setAppointments(appts);
+            }
+
+            // Get total appointment count
+            const { count: totalAppts } = await supabase
+                .from('appointments')
+                .select('*', { count: 'exact', head: true })
+                .eq('patient_id', user.id);
+
+            setAppointmentCount(totalAppts || 0);
+
+            // Get unique provider count
+            const { data: uniqueProviders } = await supabase
+                .from('appointments')
+                .select('provider_id')
+                .eq('patient_id', user.id);
+
+            const uniqueCount = new Set(uniqueProviders?.map(p => p.provider_id)).size;
+            setProviderCount(uniqueCount);
+
+            // Calculate Active Days (days with health metrics in last 30 days)
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+            const { data: metricsData } = await supabase
+                .from('comprehensive_health_metrics')
+                .select('recorded_at')
+                .eq('user_id', user.id)
+                .gte('recorded_at', thirtyDaysAgo.toISOString());
+
+            const uniqueDays = new Set(
+                metricsData?.map(m => new Date(m.recorded_at).toDateString())
+            );
+            setActiveDays(uniqueDays.size);
+
+            // Get steps for today
+            const today = new Date().toISOString().split('T')[0];
+            const { data: stepsData } = await supabase
+                .from('comprehensive_health_metrics')
+                .select('value')
+                .eq('user_id', user.id)
+                .eq('metric_name', 'steps')
+                .gte('recorded_at', today)
+                .order('recorded_at', { ascending: false })
+                .limit(1)
+                .maybeSingle();
+
+            setStepsToday(stepsData?.value ? parseInt(stepsData.value) : 0);
+
+            // Fetch recent activity from user_events
+            const { data: events } = await supabase
+                .from('user_events')
+                .select('event_type, created_at')
+                .eq('user_id', user.id)
+                .order('created_at', { ascending: false })
+                .limit(3);
+
+            if (events && events.length > 0) {
+                const activityMap: Record<string, { action: string; icon: any }> = {
+                    'profile_updated': { action: 'Updated profile', icon: CheckCircle2 },
+                    'appointment_booked': { action: 'Booked appointment', icon: Calendar },
+                    'feature_used': { action: 'Used health feature', icon: Activity },
+                    'form_submit': { action: 'Submitted health data', icon: Activity },
+                };
+
+                const formattedActivity = events.map((event, idx) => ({
+                    id: idx + 1,
+                    action: activityMap[event.event_type]?.action || 'Activity logged',
+                    time: formatTimeAgo(new Date(event.created_at)),
+                    icon: activityMap[event.event_type]?.icon || Activity
+                }));
+
+                setRecentActivity(formattedActivity);
+            } else {
+                // Fallback to default activities if no events
+                setRecentActivity([
+                    { id: 1, action: 'Welcome to HealthConnect', time: 'Just now', icon: Activity },
+                ]);
+            }
+
+            // Calculate Health Score (0-100) based on available metrics
+            const { data: vitals } = await supabase
+                .from('vital_signs')
+                .select('*')
+                .eq('user_id', user.id)
+                .order('recorded_at', { ascending: false })
+                .limit(1)
+                .maybeSingle();
+
+            let score = 50; // Base score
+
+            if (vitals) {
+                // Blood pressure score (max 20 points)
+                if (vitals.blood_pressure_systolic && vitals.blood_pressure_diastolic) {
+                    const sys = vitals.blood_pressure_systolic;
+                    const dia = vitals.blood_pressure_diastolic;
+                    if (sys >= 90 && sys <= 120 && dia >= 60 && dia <= 80) score += 20;
+                    else if (sys >= 80 && sys <= 140 && dia >= 50 && dia <= 90) score += 10;
+                }
+
+                // Heart rate score (max 15 points)
+                if (vitals.heart_rate) {
+                    if (vitals.heart_rate >= 60 && vitals.heart_rate <= 100) score += 15;
+                    else if (vitals.heart_rate >= 50 && vitals.heart_rate <= 110) score += 8;
+                }
+
+                // Oxygen saturation score (max 15 points)
+                if (vitals.oxygen_saturation) {
+                    if (vitals.oxygen_saturation >= 95) score += 15;
+                    else if (vitals.oxygen_saturation >= 90) score += 8;
+                }
+            }
+
+            setHealthScore(Math.min(100, score));
+
+        } catch (error) {
+            console.error('Error fetching dashboard data:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Helper function to format time ago
+    const formatTimeAgo = (date: Date): string => {
+        const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
+
+        if (seconds < 60) return 'Just now';
+        if (seconds < 3600) return `${Math.floor(seconds / 60)} minutes ago`;
+        if (seconds < 86400) return `${Math.floor(seconds / 3600)} hours ago`;
+        if (seconds < 604800) return `${Math.floor(seconds / 86400)} days ago`;
+        return date.toLocaleDateString();
+    };
 
     const quickStats = [
-        { label: 'Appointments', value: '3', icon: Calendar, color: 'text-blue-600 dark:text-blue-400', bgColor: 'bg-blue-50 dark:bg-blue-950/20' },
-        { label: 'Health Score', value: '85%', icon: Heart, color: 'text-red-600 dark:text-red-400', bgColor: 'bg-red-50 dark:bg-red-950/20' },
-        { label: 'Active Days', value: '12', icon: Activity, color: 'text-green-600 dark:text-green-400', bgColor: 'bg-green-50 dark:bg-green-950/20' },
-        { label: 'Providers', value: '5', icon: Users, color: 'text-purple-600 dark:text-purple-400', bgColor: 'bg-purple-50 dark:bg-purple-950/20' },
+        { label: 'Appointments', value: appointmentCount.toString(), icon: Calendar, color: 'text-blue-600 dark:text-blue-400', bgColor: 'bg-blue-50 dark:bg-blue-950/20' },
+        { label: 'Health Score', value: `${healthScore}%`, icon: Heart, color: 'text-red-600 dark:text-red-400', bgColor: 'bg-red-50 dark:bg-red-950/20' },
+        { label: 'Active Days', value: activeDays.toString(), icon: Activity, color: 'text-green-600 dark:text-green-400', bgColor: 'bg-green-50 dark:bg-green-950/20' },
+        { label: 'Providers', value: providerCount.toString(), icon: Users, color: 'text-purple-600 dark:text-purple-400', bgColor: 'bg-purple-50 dark:bg-purple-950/20' },
     ];
 
-    const upcomingAppointments = [
-        { id: 1, doctor: 'Dr. Sarah Johnson', specialty: 'Cardiologist', date: '2025-11-25', time: '10:00 AM', status: 'confirmed' },
-        { id: 2, doctor: 'Dr. Michael Chen', specialty: 'General Practitioner', date: '2025-11-28', time: '2:30 PM', status: 'pending' },
-    ];
+    const upcomingAppointments = appointments.map(apt => ({
+        id: apt.id,
+        doctor: apt.provider ? `Dr. ${apt.provider.first_name} ${apt.provider.last_name}` : 'Unknown Provider',
+        specialty: apt.provider?.specialization || 'General',
+        date: new Date(apt.appointment_date).toLocaleDateString(),
+        time: apt.appointment_time || 'TBD',
+        status: apt.status || 'pending'
+    }));
 
-    const recentActivity = [
-        { id: 1, action: 'Logged vital signs', time: '2 hours ago', icon: Activity },
-        { id: 2, action: 'Completed health assessment', time: '1 day ago', icon: CheckCircle2 },
-        { id: 3, action: 'Prescription refilled', time: '3 days ago', icon: Clock },
-    ];
+    // recentActivity is now set from fetchDashboardData
 
     const healthMetrics = [
-        { label: 'Heart Rate', value: '72 bpm', trend: '+2%', status: 'normal' },
-        { label: 'Blood Pressure', value: '120/80', trend: '-3%', status: 'normal' },
-        { label: 'Weight', value: '70 kg', trend: '-1%', status: 'improving' },
-        { label: 'Steps Today', value: '8,542', trend: '+15%', status: 'good' },
+        { label: 'Heart Rate', value: vitalsData.restingHeartRate, trend: '+2%', status: 'normal' },
+        { label: 'Blood Pressure', value: vitalsData.bloodPressure, trend: '-3%', status: 'normal' },
+        { label: 'Weight', value: vitalsData.weight, trend: '-1%', status: 'improving' },
+        { label: 'Steps Today', value: stepsToday.toLocaleString(), trend: '+15%', status: 'good' },
     ];
 
     return (

@@ -13,7 +13,7 @@ import { AIInsightsWidget } from '@/components/ai/AIInsightsWidget';
 const HealthAnalytics = () => {
     const { user } = useAuth();
     const [timeRange, setTimeRange] = useState('7days');
-    const { heartRateData, activityData, sleepData, loading } = useHealthData(user?.id, timeRange);
+    const { heartRateData, activityData, sleepData, vitalsData, loading } = useHealthData(user?.id, timeRange);
 
     // Fallback data if empty (to show empty charts or skeletons)
     // For now, we'll just let the charts handle empty data or show a message
@@ -156,7 +156,7 @@ const HealthAnalytics = () => {
                                             </CardTitle>
                                         </CardHeader>
                                         <CardContent>
-                                            <div className="text-3xl font-bold">120/80</div>
+                                            <div className="text-3xl font-bold">{vitalsData.bloodPressure}</div>
                                             <p className="text-sm text-muted-foreground mt-1">mmHg - Normal</p>
                                             <p className="text-xs text-green-600 dark:text-green-400 mt-2">↓ 2% from last week</p>
                                         </CardContent>
@@ -170,7 +170,7 @@ const HealthAnalytics = () => {
                                             </CardTitle>
                                         </CardHeader>
                                         <CardContent>
-                                            <div className="text-3xl font-bold">98%</div>
+                                            <div className="text-3xl font-bold">{vitalsData.oxygenSaturation}</div>
                                             <p className="text-sm text-muted-foreground mt-1">SpO2 - Excellent</p>
                                             <p className="text-xs text-green-600 dark:text-green-400 mt-2">Stable</p>
                                         </CardContent>
@@ -184,7 +184,7 @@ const HealthAnalytics = () => {
                                             </CardTitle>
                                         </CardHeader>
                                         <CardContent>
-                                            <div className="text-3xl font-bold">70 kg</div>
+                                            <div className="text-3xl font-bold">{vitalsData.weight}</div>
                                             <p className="text-sm text-muted-foreground mt-1">BMI: 22.5 - Healthy</p>
                                             <p className="text-xs text-green-600 dark:text-green-400 mt-2">↓ 0.5 kg this month</p>
                                         </CardContent>
@@ -198,7 +198,7 @@ const HealthAnalytics = () => {
                                             </CardTitle>
                                         </CardHeader>
                                         <CardContent>
-                                            <div className="text-3xl font-bold">62 bpm</div>
+                                            <div className="text-3xl font-bold">{vitalsData.restingHeartRate}</div>
                                             <p className="text-sm text-muted-foreground mt-1">Excellent fitness level</p>
                                             <p className="text-xs text-green-600 dark:text-green-400 mt-2">↓ 3 bpm this month</p>
                                         </CardContent>
