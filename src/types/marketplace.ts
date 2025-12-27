@@ -87,4 +87,5 @@ export interface CartItem {
   subtotal: number;
 }
 
-// TODO: Ensure all marketplace status transitions (pending, confirmed, preparing, etc.) are handled in workflows and reflected in the UI
+// Marketplace status transitions implemented in src/utils/marketplace-workflows.ts
+// Use confirmOrder(), startPreparation(), markReady(), markDelivered(), and cancelOrder()

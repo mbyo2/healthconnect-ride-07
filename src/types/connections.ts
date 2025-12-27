@@ -53,4 +53,5 @@ export interface ConnectionRequest {
   notes?: string;
 }
 
-// TODO: Implement logic for connection status transitions (pending, approved, rejected, blocked) and update UI accordingly
+// Connection status transitions implemented in src/utils/connection-workflows.ts
+// Use sendConnectionRequest(), approveConnection(), rejectConnection(), blockConnection(), and unblockConnection()

@@ -65,4 +65,5 @@ export interface PaymentMethod {
   created_at: string;
 }
 
-// TODO: Implement logic to transition payment status from 'pending' to 'completed' or 'failed' in payment workflows
+// Status transition logic implemented in src/utils/payment-workflows.ts
+// Use processPayment(), handlePaymentSuccess(), handlePaymentFailure(), and refundPayment()

@@ -75,4 +75,5 @@ export interface TwoFactorSettings {
   updated_at?: string;
 }
 
-// TODO: Review all status types and ensure transitions are implemented in relevant workflows
+// Settings status management implemented in src/utils/settings-workflows.ts
+// Use updateSettingStatus(), applySettingChange(), and archiveSetting()
