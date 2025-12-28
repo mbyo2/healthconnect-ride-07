@@ -21,75 +21,54 @@ export const HealthPersonnelApplicationForm = () => {
     license_number: "",
     specialty: "",
     years_of_experience: "",
-  });
-  const [errors, setErrors] = useState<FormErrors>({});
-
-  const validateForm = () => {
-    const newErrors: FormErrors = {};
-    if (!formData.license_number.trim()) {
-      newErrors.license_number = "License number is required";
-    }
-    if (!formData.specialty.trim()) {
-      newErrors.specialty = "Specialty is required";
-    }
-    if (!formData.years_of_experience) {
-      newErrors.years_of_experience = "Years of experience is required";
-    } else if (parseInt(formData.years_of_experience) < 0) {
-      newErrors.years_of_experience = "Years of experience must be positive";
-    }
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validateForm()) return;
+    if(!validateForm()) return;
 
-    setIsSubmitting(true);
+  setIsSubmitting(true);
 
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
 
-      if (!user) {
-        toast.error("You must be logged in to submit an application");
-        return;
-      }
+    if (!user) {
+      toast.error("You must be logged in to submit an application");
+      return;
+    }
 
-      const application: HealthPersonnelApplication = {
-        license_number: formData.license_number,
-        specialty: formData.specialty,
-        years_of_experience: parseInt(formData.years_of_experience),
-        user_id: user.id,
-        documents_url: [],
-        status: "pending"
-      };
+    const application: HealthPersonnelApplication = {
+      license_number: formData.license_number,
+      specialty: formData.specialty,
+      years_of_experience: parseInt(formData.years_of_experience),
+      user_id: user.id,
+      documents_url: [],
+      status: "pending"
+    };
 
-      const { error } = await supabase
-        .from("health_personnel_applications")
-        .insert(application);
+    const { error } = await supabase
+      .from("health_personnel_applications")
+      .insert(application);
 
-      if (error) throw error;
+    if (error) throw error;
 
-      toast.success("Application submitted successfully!");
-      setFormData({
-        license_number: "",
-        specialty: "",
-        years_of_experience: "",
-      });
-    } catch (error: any) {
-      console.error("Error submitting application:", error);
-      toast.error(error.message || "Failed to submit application");
-    } finally {
-      {
-        isSubmitting ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Submitting...
-          </>
-        ) : (
-          "Submit Application"
-        )
-      }
+    toast.success("Application submitted successfully!");
+    setFormData({
+      license_number: "",
+      specialty: "",
+      years_of_experience: "",
+    });
+  } catch (error: any) {
+    console.error("Error submitting application:", error);
+    toast.error(error.message || "Failed to submit application");
+  } finally {
+    {
+      isSubmitting ? (
+        <>
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          Submitting...
+        </>
+      ) : (
+        "Submit Application"
+      )
+    }
       </Button >
     </form >
   );
