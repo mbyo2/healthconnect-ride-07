@@ -4,7 +4,7 @@ import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-requested-with',
 };
 
 // Input validation schema
@@ -56,12 +56,12 @@ serve(async (req) => {
     // Validate input
     const requestData = await req.json();
     const validationResult = captureRequestSchema.safeParse(requestData);
-    
+
     if (!validationResult.success) {
       console.error('Validation error:', validationResult.error);
       return new Response(
-        JSON.stringify({ 
-          success: false, 
+        JSON.stringify({
+          success: false,
           error: 'Invalid request data',
           details: validationResult.error.errors
         }),
@@ -222,7 +222,7 @@ serve(async (req) => {
 
     } catch (paypalError) {
       console.error('PayPal capture error:', paypalError);
-      
+
       // Update payment status to failed
       await supabaseClient
         .from('payments')
@@ -239,7 +239,7 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error capturing PayPal payment:', error);
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         success: false,
         error: error.message,
         message: 'Failed to capture PayPal payment'
