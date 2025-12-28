@@ -17,7 +17,7 @@ const AdminDashboard = lazy(() => import('@/pages/AdminDashboard'));
 const Connections = lazy(() => import('@/pages/Connections'));
 const Chat = lazy(() => import('@/pages/Chat'));
 const Prescriptions = lazy(() => import('@/pages/Prescriptions'));
-import Symptoms from '@/pages/Symptoms'; // Direct import to fix lazy loading issue
+const Symptoms = lazy(() => import('@/pages/Symptoms'));
 const HealthcareProfessionals = lazy(() => import('@/pages/HealthcareProfessionals'));
 const HealthcareInstitutions = lazy(() => import('@/pages/HealthcareInstitutions'));
 const VideoDashboard = lazy(() => import('@/pages/VideoDashboard'));
