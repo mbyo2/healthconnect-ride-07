@@ -10,19 +10,19 @@ interface AppLogoProps {
   linkTo?: string;
 }
 
-export const AppLogo = ({ 
-  size = "md", 
-  showText = true, 
+export const AppLogo = ({
+  size = "md",
+  showText = true,
   className = "",
   onClick,
   linkTo = "/"
 }: AppLogoProps) => {
   const sizeClasses = {
     sm: "w-6 h-6 text-sm",
-    md: "w-8 h-8 text-base", 
+    md: "w-8 h-8 text-base",
     lg: "w-12 h-12 text-xl"
   };
-  
+
   const textSizeClasses = {
     sm: "text-lg",
     md: "text-xl",
@@ -39,7 +39,7 @@ export const AppLogo = ({
       </div>
       {showText && (
         <span className={cn(
-          "font-bold text-foreground",
+          "font-bold text-foreground whitespace-nowrap",
           textSizeClasses[size]
         )}>
           Doc&apos; O Clock
