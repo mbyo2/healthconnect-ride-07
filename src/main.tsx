@@ -173,13 +173,5 @@ if (document.readyState === 'loading') {
   renderApp();
 }
 
-// Safeguard against potential failures to render
-// Only attempt ONE re-render after a longer delay
-setTimeout(() => {
-  if (!window.appLoaded && !hasRendered) {
-    if (import.meta.env.DEV) {
-      console.warn('App may not have loaded properly, attempting one-time re-render');
-    }
-    renderApp();
-  }
-}, 5000);
+// Safeguard removed to prevent double-loading issues
+// The app should handle its own loading state via React Suspense and ErrorBoundaries

@@ -26,6 +26,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // Attempt to load cached profile first for instant load
+    const cachedProfile = localStorage.getItem('doc_oclock_profile');
+    if (cachedProfile) {
+      try {
+        setProfile(JSON.parse(cachedProfile));
+      } catch (e) {
+        console.error('Error parsing cached profile', e);
+      }
+    }
+
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, currentSession) => {
@@ -42,6 +52,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         if (event === 'SIGNED_OUT') {
           setProfile(null);
+          localStorage.removeItem('doc_oclock_profile');
         }
       }
     );
@@ -52,10 +63,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(currentSession?.user ?? null);
 
       if (currentSession?.user) {
-        await fetchProfile(currentSession.user.id);
+        // If we have a cached profile, we can stop loading immediately
+        // and let the fresh profile fetch happen in the background
+        if (localStorage.getItem('doc_oclock_profile')) {
+          setIsLoading(false);
+          fetchProfile(currentSession.user.id); // Fetch fresh data in background
+        } else {
+          await fetchProfile(currentSession.user.id);
+          setIsLoading(false);
+        }
+      } else {
+        setIsLoading(false);
       }
-
-      setIsLoading(false);
     });
 
     return () => subscription.unsubscribe();
@@ -90,10 +109,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       if (profileData) {
-        setProfile({
+        const fullProfile = {
           ...profileData,
           role: roleData || profileData.role || 'patient', // Use role from user_roles table or fallback to profile role
-        });
+        };
+        setProfile(fullProfile);
+        localStorage.setItem('doc_oclock_profile', JSON.stringify(fullProfile));
       } else {
         // If no profile exists, create a basic one
         console.log('No profile found, creating basic profile for:', userId);
@@ -129,6 +150,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               ...newProfile,
               role: roleData || 'patient'
             });
+            localStorage.setItem('doc_oclock_profile', JSON.stringify({
+              ...newProfile,
+              role: roleData || 'patient'
+            }));
           } else if (fetchNewError) {
             console.error('Error fetching newly created profile:', fetchNewError);
           }
