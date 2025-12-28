@@ -11,9 +11,9 @@ const Switch = React.forwardRef<
   <SwitchPrimitives.Root
     className={cn(
       "peer inline-flex h-7 w-12 shrink-0 cursor-pointer items-center rounded-full border-2 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50",
-      // ON state - High contrast dark green
-      "data-[state=checked]:bg-green-600 dark:data-[state=checked]:bg-green-500 data-[state=checked]:border-green-700 dark:data-[state=checked]:border-green-600",
-      // OFF state - High contrast gray
+      // ON state - Very dark/black for maximum contrast
+      "data-[state=checked]:bg-black dark:data-[state=checked]:bg-slate-950 data-[state=checked]:border-black dark:data-[state=checked]:border-slate-900",
+      // OFF state - Light gray
       "data-[state=unchecked]:bg-slate-300 dark:data-[state=unchecked]:bg-slate-700 data-[state=unchecked]:border-slate-400 dark:data-[state=unchecked]:border-slate-600",
       "shadow-inner",
       className
@@ -31,7 +31,7 @@ const Switch = React.forwardRef<
         className={cn(
           "h-3 w-3 transition-opacity duration-200",
           "data-[state=checked]:opacity-100 data-[state=unchecked]:opacity-0",
-          "text-green-600 dark:text-green-500"
+          "text-black dark:text-slate-950"
         )}
         data-state={props.checked ? "checked" : "unchecked"}
       />
