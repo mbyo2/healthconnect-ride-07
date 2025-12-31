@@ -28,6 +28,7 @@ interface MedicalRecord {
   provider_id?: string;
   is_private: boolean;
   created_at: string;
+  record_source?: 'provider' | 'patient' | 'device';
 }
 
 const recordTypeIcons = {
@@ -81,6 +82,9 @@ export const ComprehensiveMedicalRecords = () => {
   const userSpecialty = profile?.specialty?.toLowerCase() || '';
 
   const canEditRecordType = (recordType: string) => {
+    // Allow patients to add their own records (will be marked as patient-reported)
+    if (!availableRoles || availableRoles.length === 0 || availableRoles.includes('patient')) return true;
+
     if (isSuperAdmin || isAdmin) return true;
 
     const roles = availableRoles;
@@ -189,7 +193,8 @@ export const ComprehensiveMedicalRecords = () => {
           .insert({
             patient_id: user?.id,
             ...formData,
-            visit_date: format(formData.visit_date, 'yyyy-MM-dd')
+            visit_date: format(formData.visit_date, 'yyyy-MM-dd'),
+            record_source: (isSuperAdmin || isAdmin || (availableRoles && availableRoles.some(r => r !== 'patient'))) ? 'provider' : 'patient'
           });
 
         if (error) throw error;
@@ -511,6 +516,11 @@ export const ComprehensiveMedicalRecords = () => {
                   <div className="flex gap-2 items-center">
                     {getSeverityBadge(record.severity_level)}
                     {getStatusBadge(record.status)}
+                    {record.record_source === 'patient' && (
+                      <Badge variant="outline" className="border-orange-200 text-orange-700 bg-orange-50">
+                        Patient Reported
+                      </Badge>
+                    )}
                     {record.is_private && <Badge variant="outline">Private</Badge>}
                     {canEditRecordType(record.record_type) && (
                       <Button variant="ghost" size="icon" onClick={() => handleEdit(record)}>

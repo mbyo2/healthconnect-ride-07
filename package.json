@@ -9,8 +9,8 @@
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
-  "test": "vitest",
-  "test:smoke": "vitest run --threads=1 src/tests/marketplace.smoke.test.ts",
+    "test": "vitest",
+    "test:smoke": "vitest run --threads=1 src/tests/marketplace.smoke.test.ts",
     "postbuild": "echo 'Build completed successfully for Netlify'"
   },
   "dependencies": {
@@ -19,7 +19,6 @@
     "@capacitor/core": "^7.2.0",
     "@capacitor/device": "^7.0.1",
     "@capacitor/ios": "^7.2.0",
-    "@capacitor/push-notifications": "^7.0.1",
     "@capacitor/splash-screen": "^7.0.1",
     "@capacitor/status-bar": "^7.0.1",
     "@daily-co/daily-js": "^0.77.0",

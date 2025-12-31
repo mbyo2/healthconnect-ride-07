@@ -5,10 +5,6 @@ const config: CapacitorConfig = {
   appId: 'app.lovable.f6b5c73f67aa4f8baaf628968ed3c903',
   appName: 'HealthConnect Teledoc',
   webDir: 'dist',
-  server: {
-    url: 'https://f6b5c73f-67aa-4f8b-aaf6-28968ed3c903.lovableproject.com?forceHideBadge=true',
-    cleartext: true
-  },
   plugins: {
     SplashScreen: {
       launchAutoHide: false,
@@ -22,10 +18,6 @@ const config: CapacitorConfig = {
     StatusBar: {
       style: "dark",
       backgroundColor: "#ffffffff"
-    },
-    // Enable push notifications
-    PushNotifications: {
-      presentationOptions: ["badge", "sound", "alert"]
     }
   },
   // Enable deep linking

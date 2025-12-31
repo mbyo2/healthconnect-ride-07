@@ -71,7 +71,7 @@ const Emergency = () => {
           }
         ]);
       } else {
-        setEmergencyServices(data || []);
+        setEmergencyServices((data as any) || []);
       }
     } catch (error) {
       console.error('Error fetching emergency services:', error);
