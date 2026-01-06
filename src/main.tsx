@@ -9,6 +9,12 @@ import { Toaster } from 'sonner';
 import { ThemeProvider } from './hooks/use-theme';
 import { LoadingScreen } from './components/LoadingScreen';
 import { ErrorBoundary } from './components/ui/error-boundary';
+import { safeLocalClear, safeSessionClear } from './utils/storage';
+import { registerServiceWorker } from './utils/service-worker';
+import { applyLegacyFixes } from './utils/legacy-compat';
+
+// Apply fixes for older Android/WebView compatibility
+applyLegacyFixes();
 
 // Extend Window interface to include our custom properties
 declare global {
@@ -69,8 +75,8 @@ function renderErrorFallback(rootElement: HTMLElement, error?: Error) {
   });
 
   document.getElementById('clear-btn')?.addEventListener('click', () => {
-    localStorage.clear();
-    sessionStorage.clear();
+    safeLocalClear();
+    safeSessionClear();
     window.location.reload();
   });
 }
@@ -88,21 +94,9 @@ const queryClient = new QueryClient({
   },
 });
 
-// Initialize service worker if available (compatible with Netlify)
-if ('serviceWorker' in navigator && import.meta.env.PROD) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
-      .then((registration) => {
-        if (import.meta.env.DEV) {
-          console.info('ServiceWorker registration successful with scope:', registration.scope);
-        }
-      })
-      .catch((error) => {
-        if (import.meta.env.DEV) {
-          console.log('ServiceWorker registration failed:', error);
-        }
-      });
-  });
+// Initialize service worker using the consolidated utility
+if (import.meta.env.PROD) {
+  registerServiceWorker();
 }
 
 // Add offline/online event listeners
@@ -172,6 +166,3 @@ if (document.readyState === 'loading') {
 } else {
   renderApp();
 }
-
-// Safeguard removed to prevent double-loading issues
-// The app should handle its own loading state via React Suspense and ErrorBoundaries

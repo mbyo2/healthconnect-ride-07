@@ -2,6 +2,7 @@ import React, { createContext, useState, useEffect, useContext } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Session, User } from '@supabase/supabase-js';
 import { toast } from 'sonner';
+import { safeLocalGet, safeLocalSet, safeLocalRemove } from '@/utils/storage';
 
 interface AuthContextType {
   user: User | null;
@@ -27,7 +28,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Attempt to load cached profile first for instant load
-    const cachedProfile = localStorage.getItem('doc_oclock_profile');
+    const cachedProfile = safeLocalGet('doc_oclock_profile');
     if (cachedProfile) {
       try {
         setProfile(JSON.parse(cachedProfile));
@@ -52,7 +53,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         if (event === 'SIGNED_OUT') {
           setProfile(null);
-          localStorage.removeItem('doc_oclock_profile');
+          safeLocalRemove('doc_oclock_profile');
         }
       }
     );
@@ -65,7 +66,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (currentSession?.user) {
         // If we have a cached profile, we can stop loading immediately
         // and let the fresh profile fetch happen in the background
-        if (localStorage.getItem('doc_oclock_profile')) {
+        if (safeLocalGet('doc_oclock_profile')) {
           setIsLoading(false);
           fetchProfile(currentSession.user.id); // Fetch fresh data in background
         } else {
@@ -114,7 +115,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           role: roleData || profileData.role || 'patient', // Use role from user_roles table or fallback to profile role
         };
         setProfile(fullProfile);
-        localStorage.setItem('doc_oclock_profile', JSON.stringify(fullProfile));
+        safeLocalSet('doc_oclock_profile', JSON.stringify(fullProfile));
       } else {
         // If no profile exists, create a basic one
         console.log('No profile found, creating basic profile for:', userId);
@@ -150,7 +151,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               ...newProfile,
               role: roleData || 'patient'
             });
-            localStorage.setItem('doc_oclock_profile', JSON.stringify({
+            safeLocalSet('doc_oclock_profile', JSON.stringify({
               ...newProfile,
               role: roleData || 'patient'
             }));

@@ -1,15 +1,19 @@
-
 {
-  "name": "HealthConnect - Complete Healthcare Platform",
-  "short_name": "HealthConnect",
+  "name": "Doc' O Clock - Complete Healthcare Platform",
+  "short_name": "Doc' O Clock",
   "description": "Secure healthcare platform with advanced fraud detection, biometric authentication, and comprehensive medical services. Book appointments, order medications, and access telemedicine services.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#4CAF50",
+  "theme_color": "#3B82F6",
   "orientation": "portrait-primary",
   "scope": "/",
-  "categories": ["health", "medical", "appointments", "healthcare"],
+  "categories": [
+    "health",
+    "medical",
+    "appointments",
+    "healthcare"
+  ],
   "dir": "ltr",
   "lang": "en-US",
   "prefer_related_applications": false,
@@ -101,6 +105,9 @@
   "related_applications": [],
   "capture_links": "existing-client-navigate",
   "launch_handler": {
-    "client_mode": ["navigate-existing", "auto"]
+    "client_mode": [
+      "navigate-existing",
+      "auto"
+    ]
   }
 }

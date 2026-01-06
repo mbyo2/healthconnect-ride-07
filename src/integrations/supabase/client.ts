@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
+import { safeLocalGet, safeLocalSet, safeLocalRemove } from '@/utils/storage';
 
 // For local development, we'll use the production Supabase URL
 // In production, these will be set via environment variables in Netlify
@@ -19,55 +20,16 @@ if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
   console.error('Missing Supabase environment variables. Please check your .env file.');
 }
 
-// Check if storage is available
-const isStorageAvailable = () => {
-  try {
-    const test = '__storage_test__';
-    localStorage.setItem(test, test);
-    localStorage.removeItem(test);
-    return true;
-  } catch {
-    return false;
-  }
-};
-
-const storageAvailable = isStorageAvailable();
-
 // Custom storage adapter to handle "insecure operation" errors in production
 const customStorageAdapter = {
   getItem: (key: string): string | null => {
-    if (!storageAvailable) return null;
-    try {
-      return localStorage.getItem(key);
-    } catch (error) {
-      // Silently fail - don't log in production to avoid console spam
-      if (import.meta.env.DEV) {
-        console.warn('Storage access blocked:', error);
-      }
-      return null;
-    }
+    return safeLocalGet(key);
   },
   setItem: (key: string, value: string): void => {
-    if (!storageAvailable) return;
-    try {
-      localStorage.setItem(key, value);
-    } catch (error) {
-      // Silently fail - don't log in production
-      if (import.meta.env.DEV) {
-        console.warn('Storage write blocked:', error);
-      }
-    }
+    safeLocalSet(key, value);
   },
   removeItem: (key: string): void => {
-    if (!storageAvailable) return;
-    try {
-      localStorage.removeItem(key);
-    } catch (error) {
-      // Silently fail - don't log in production
-      if (import.meta.env.DEV) {
-        console.warn('Storage removal blocked:', error);
-      }
-    }
+    safeLocalRemove(key);
   },
 };
 

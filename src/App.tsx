@@ -9,6 +9,7 @@ import { SearchProvider } from '@/context/SearchContext';
 import { AccessibilityProvider } from '@/context/AccessibilityContext';
 import { RouteGuard } from '@/components/auth/RouteGuard';
 import { useRoutePrefetch, useInitializePrefetch } from '@/hooks/use-route-prefetch';
+import { useAndroidBackButton } from '@/hooks/use-android-back-button';
 
 // Lazy load all page components for better performance
 const Home = lazy(() => import('@/pages/Home'));
@@ -77,6 +78,9 @@ const Wallet = lazy(() => import('@/pages/Wallet'));
 
 const AppContent = () => {
   const { user, session, isLoading, profile } = useAuth();
+
+  // Initialize Android Hardware Back Button listener
+  useAndroidBackButton();
 
   const isNewUser = useMemo(() => {
     // Check if user needs onboarding based on profile data
@@ -244,11 +248,11 @@ const App: React.FC = () => {
   );
 };
 
-import { createSpecificSuperUser } from './utils/createSpecificSuperUser';
+// import { createSpecificSuperUser } from './utils/createSpecificSuperUser';
 
 // Expose superuser creation to window for console access
-if (typeof window !== 'undefined') {
-  (window as any).createSpecificSuperUser = createSpecificSuperUser;
-}
+// if (typeof window !== 'undefined') {
+//   (window as any).createSpecificSuperUser = createSpecificSuperUser;
+// }
 
 export default App;

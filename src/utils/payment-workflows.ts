@@ -58,7 +58,7 @@ export const processPayment = async (
         }
 
         // Validate transition
-        if (!isValidTransition(payment.status, 'completed')) {
+        if (!isValidTransition(payment.status as PaymentStatus, 'completed')) {
             return {
                 success: false,
                 message: `Cannot transition from ${payment.status} to completed`,
@@ -66,7 +66,7 @@ export const processPayment = async (
         }
 
         // Update status with history
-        const statusHistory: PaymentStatusHistory[] = payment.status_history || [];
+        const statusHistory = (payment.status_history as unknown as PaymentStatusHistory[]) || [];
         statusHistory.push({
             status: 'completed',
             timestamp: new Date().toISOString(),
@@ -146,14 +146,14 @@ export const handlePaymentFailure = async (
             };
         }
 
-        if (!isValidTransition(payment.status, 'failed')) {
+        if (!isValidTransition(payment.status as PaymentStatus, 'failed')) {
             return {
                 success: false,
                 message: `Cannot transition from ${payment.status} to failed`,
             };
         }
 
-        const statusHistory: PaymentStatusHistory[] = payment.status_history || [];
+        const statusHistory = (payment.status_history as unknown as PaymentStatusHistory[]) || [];
         statusHistory.push({
             status: 'failed',
             timestamp: new Date().toISOString(),
@@ -219,7 +219,7 @@ export const refundPayment = async (
             };
         }
 
-        if (!isValidTransition(payment.status, 'refunded')) {
+        if (!isValidTransition(payment.status as PaymentStatus, 'refunded')) {
             return {
                 success: false,
                 message: `Cannot refund payment with status ${payment.status}`,
@@ -227,7 +227,7 @@ export const refundPayment = async (
         }
 
         const refundAmount = amount ?? payment.amount;
-        const statusHistory: PaymentStatusHistory[] = payment.status_history || [];
+        const statusHistory = (payment.status_history as unknown as PaymentStatusHistory[]) || [];
         statusHistory.push({
             status: 'refunded',
             timestamp: new Date().toISOString(),
@@ -289,7 +289,7 @@ export const getPaymentHistory = async (
             return [];
         }
 
-        return data.status_history || [];
+        return (data.status_history as unknown as PaymentStatusHistory[]) || [];
     } catch (error) {
         console.error('Error getting payment history:', error);
         return [];

@@ -18,7 +18,8 @@ interface ExtendedServiceWorkerRegistration extends ServiceWorkerRegistration {
 export const registerServiceWorker = async () => {
   if ('serviceWorker' in navigator) {
     try {
-      const registration = await navigator.serviceWorker.register('/service-worker.js', {
+      // Use /sw.js as the standard path for the generated service worker
+      const registration = await navigator.serviceWorker.register('/sw.js', {
         scope: '/',
         updateViaCache: 'none'
       });

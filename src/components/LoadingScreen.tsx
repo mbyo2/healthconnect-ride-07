@@ -102,19 +102,21 @@ export const LoadingScreen = React.memo<LoadingScreenProps>(({
     <div className="fixed inset-0 bg-gradient-to-br from-blue-50 via-white to-gray-50 flex flex-col items-center justify-center z-50">
       <div className="flex flex-col items-center gap-8 animate-fadeIn p-10 rounded-2xl bg-white shadow-2xl border border-gray-200 max-w-lg text-center">
 
-        {/* Modern Doc' O Clock Logo */}
+        {/* Branded Doc' O Clock Splash Logo */}
         <div className="flex flex-col items-center gap-6 animate-pulse">
           <div className="relative">
-            <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center text-white font-bold text-2xl shadow-lg">
-              D0C
-            </div>
-            <div className="absolute -inset-2 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl blur opacity-20"></div>
+            <img 
+              src="/d0c-icon.svg" 
+              alt="Doc' O Clock" 
+              className="w-24 h-24 object-contain shadow-sm" 
+            />
+            <div className="absolute -inset-4 bg-blue-500 rounded-full blur-2xl opacity-10 -z-10 animate-pulse"></div>
           </div>
           <div className="space-y-2">
             <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
               Doc' O Clock
             </h1>
-            <p className="text-sm text-gray-500 font-medium">Emergency Healthcare System</p>
+            <p className="text-sm text-gray-500 font-medium tracking-wide uppercase">Emergency Healthcare</p>
           </div>
         </div>
 
@@ -128,86 +130,46 @@ export const LoadingScreen = React.memo<LoadingScreenProps>(({
 
         {/* Status Messages */}
         <div className="space-y-3">
-          <p className="text-lg font-semibold text-gray-800">{currentMessage}</p>
-          <p className="text-sm text-gray-600">{message}</p>
+          <p className="text-lg font-semibold text-gray-800 tracking-tight">{currentMessage}</p>
+          <p className="text-sm text-gray-600 italic">"{message}"</p>
         </div>
 
         {/* Modern Progress Bar */}
-        <div className="w-full">
-          <div className="flex justify-between text-xs text-gray-500 mb-2">
-            <span>Loading...</span>
+        <div className="w-full max-w-[280px]">
+          <div className="flex justify-between text-[10px] uppercase tracking-wider text-gray-400 mb-2">
+            <span>System Load</span>
             <span>{Math.round(loadingProgress)}%</span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+          <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden border border-gray-50">
             <div
-              className="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all duration-500 shadow-sm"
+              className="bg-gradient-to-r from-blue-500 to-blue-600 h-full rounded-full transition-all duration-500 shadow-sm"
               style={{ width: `${loadingProgress}%` }}
             />
           </div>
         </div>
 
-        {/* Status Indicator */}
-        <div className="flex items-center gap-2">
-          <div className={`w-3 h-3 rounded-full ${loadingFailed ? 'bg-red-500' : 'bg-green-500 animate-pulse'}`}></div>
-          <p className="text-sm font-medium text-gray-600">
-            {loadingFailed
-              ? "System initialization failed"
-              : "Emergency healthcare system initializing..."}
-          </p>
-        </div>
-
-        {/* Action Buttons */}
+        {/* Action Buttons (Appears only on slow/failed load) */}
         {(showFallback || loadingFailed) && (
           <div className="mt-6 text-center space-y-4 w-full">
-            <p className="text-sm text-gray-600">
-              {loadingFailed
-                ? "Emergency system could not initialize. Please refresh or reset."
-                : longWait
-                  ? "System initialization taking longer than expected."
-                  : "Taking longer to ensure emergency readiness."}
-            </p>
             <div className="flex gap-3 justify-center">
               <Button
                 onClick={handleRefresh}
                 variant={loadingFailed ? "destructive" : "outline"}
-                size="lg"
-                className="min-w-[120px]"
+                size="sm"
+                className="rounded-full px-8"
               >
-                Refresh System
+                Retry
               </Button>
-
-              {(longWait || loadingFailed) && (
-                <div className="flex flex-col gap-3 w-full">
-                  <div className="flex gap-3 justify-center">
-                    <Button
-                      variant="outline"
-                      size="lg"
-                      onClick={handleClearCacheAndReload}
-                      className="flex-1"
-                    >
-                      Emergency Reset
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="lg"
-                      onClick={handleSignOut}
-                      className="flex-1 text-red-600 hover:text-red-700 hover:bg-red-50"
-                    >
-                      Sign Out
-                    </Button>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         )}
       </div>
 
       {/* Trust indicators at bottom */}
-      <div className="absolute bottom-8 flex items-center gap-6 text-sm text-gray-500">
-        <span>🔒 HIPAA Compliant</span>
-        <span>✓ Emergency Ready</span>
-        <span>⚡ 99.9% Uptime</span>
+      <div className="absolute bottom-10 flex items-center gap-8 text-[10px] font-bold uppercase tracking-[0.2em] text-blue-300">
+        <span>🔒 HIPAA SECURE</span>
+        <span className="w-1 h-1 bg-blue-200 rounded-full"></span>
+        <span>✓ ZAMBIAN HEALTH NETWORK</span>
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
+import { safeLocalGet, safeLocalSet, safeLocalRemove } from '@/utils/storage';
 
 export interface ChatMessage {
     id?: string;
@@ -75,8 +76,8 @@ export const useAIChat = () => {
             setMessages(formattedMessages);
 
             // Also save to localStorage as cache
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(formattedMessages));
-            localStorage.setItem(CURRENT_CONVERSATION_KEY, conversationId);
+            safeLocalSet(STORAGE_KEY, JSON.stringify(formattedMessages));
+            safeLocalSet(CURRENT_CONVERSATION_KEY, conversationId);
         } catch (error) {
             console.error('Error loading messages:', error);
             // Fallback to localStorage
@@ -136,7 +137,7 @@ export const useAIChat = () => {
 
             // Save to localStorage as backup
             const updated = [...messages, message];
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+            safeLocalSet(STORAGE_KEY, JSON.stringify(updated));
         } catch (error) {
             console.error('Error saving message:', error);
             // Still update local state even if sync fails
@@ -163,8 +164,8 @@ export const useAIChat = () => {
             if (currentConversationId === conversationId) {
                 setCurrentConversationId(null);
                 setMessages([]);
-                localStorage.removeItem(STORAGE_KEY);
-                localStorage.removeItem(CURRENT_CONVERSATION_KEY);
+                safeLocalRemove(STORAGE_KEY);
+                safeLocalRemove(CURRENT_CONVERSATION_KEY);
             }
         } catch (error) {
             console.error('Error deleting conversation:', error);
@@ -191,8 +192,8 @@ export const useAIChat = () => {
     // Load from localStorage (fallback)
     const loadFromLocalStorage = useCallback(() => {
         try {
-            const saved = localStorage.getItem(STORAGE_KEY);
-            const savedConvId = localStorage.getItem(CURRENT_CONVERSATION_KEY);
+            const saved = safeLocalGet(STORAGE_KEY);
+            const savedConvId = safeLocalGet(CURRENT_CONVERSATION_KEY);
 
             if (saved) {
                 const parsed = JSON.parse(saved);
@@ -216,7 +217,7 @@ export const useAIChat = () => {
             loadConversations();
 
             // Try to restore last conversation
-            const savedConvId = localStorage.getItem(CURRENT_CONVERSATION_KEY);
+            const savedConvId = safeLocalGet(CURRENT_CONVERSATION_KEY);
             if (savedConvId) {
                 setCurrentConversationId(savedConvId);
                 loadMessages(savedConvId);

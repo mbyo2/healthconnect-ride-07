@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { Card } from "@/components/ui/card";
-import { Heart, Building2, User, MapPin, Search } from "lucide-react";
+import { Heart, Building2, User, MapPin } from "lucide-react";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/context/AuthContext";
@@ -52,12 +52,7 @@ const providerSignupSchema = z.object({
   path: ["confirmPassword"],
 });
 
-type LoginFormValues = z.infer<typeof loginSchema>;
-type PatientSignupFormValues = z.infer<typeof patientSignupSchema>;
-type ProviderSignupFormValues = z.infer<typeof providerSignupSchema>;
-
 export const Auth = () => {
-  const { user } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [error, setError] = useState<string | null>(null);
@@ -68,321 +63,112 @@ export const Auth = () => {
   const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "signin");
   const { showSuccess, showError } = useFeedbackSystem();
   const [locationLoading, setLocationLoading] = useState(false);
-  const [currentLocation, setCurrentLocation] = useState<{ lat: number, lng: number } | null>(null);
 
-  // Simplified and more robust auth check
   useEffect(() => {
-    let mounted = true;
-
     const checkAuth = async () => {
-      try {
-        setLocalLoading(true);
-        const { data, error } = await supabase.auth.getSession();
-
-        if (error) {
-          console.error("Auth check error:", error);
-          if (mounted) setError(error.message);
-          return;
-        }
-
-        if (data.session?.user) {
-          setIsAuthenticated(true);
-          navigate("/home");
-        }
-      } catch (err) {
-        console.error("Unexpected error checking auth:", err);
-      } finally {
-        if (mounted) {
-          setLocalLoading(false);
-          setAuthLoading(false);
-        }
+      const { data } = await supabase.auth.getSession();
+      if (data.session?.user) {
+        setIsAuthenticated(true);
+        navigate("/home");
       }
+      setAuthLoading(false);
     };
-
     checkAuth();
-
-    return () => {
-      mounted = false;
-    };
   }, [navigate]);
 
-  const loginForm = useForm<LoginFormValues>({
+  const loginForm = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
+    defaultValues: { email: "", password: "" },
   });
 
-  const patientSignupForm = useForm<PatientSignupFormValues>({
+  const patientSignupForm = useForm<z.infer<typeof patientSignupSchema>>({
     resolver: zodResolver(patientSignupSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-      confirmPassword: "",
-      firstName: "",
-      lastName: "",
-    },
+    mode: "onBlur", // Performance optimization: validate on blur instead of change
   });
 
-  const providerSignupForm = useForm<ProviderSignupFormValues>({
+  const providerSignupForm = useForm<z.infer<typeof providerSignupSchema>>({
     resolver: zodResolver(providerSignupSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-      confirmPassword: "",
-      firstName: "",
-      lastName: "",
-      specialty: "",
-      licenseNumber: "",
-      address: "",
-      city: "",
-      country: "",
-      latitude: undefined,
-      longitude: undefined,
-    },
+    mode: "onBlur",
   });
 
-  // Location detection function
   const getCurrentLocation = async () => {
     setLocationLoading(true);
     try {
-      if (!navigator.geolocation) {
-        throw new Error('Geolocation is not supported by this browser');
-      }
-
-      if (!window.isSecureContext) {
-        throw new Error('Geolocation requires a secure context (HTTPS)');
-      }
-
-      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(resolve, reject, {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 300000
-        });
+      if (!navigator.geolocation) throw new Error('Geolocation not supported');
+      const pos = await new Promise<GeolocationPosition>((res, rej) => {
+        navigator.geolocation.getCurrentPosition(res, rej, { timeout: 10000 });
       });
-
-      const { latitude, longitude } = position.coords;
-      setCurrentLocation({ lat: latitude, lng: longitude });
-
-      // Update form with coordinates
+      const { latitude, longitude } = pos.coords;
       providerSignupForm.setValue('latitude', latitude);
       providerSignupForm.setValue('longitude', longitude);
-
-      // Reverse geocoding to get address
-      try {
-        // Use OpenStreetMap Nominatim API (free, no key required for low volume)
-        // instead of OpenCage which requires a key
-        const response = await fetch(
-          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`
-        );
-        const data = await response.json();
-
-        if (data && data.display_name) {
-          providerSignupForm.setValue('address', data.display_name || '');
-          providerSignupForm.setValue('city', data.address?.city || data.address?.town || data.address?.village || '');
-          providerSignupForm.setValue('country', data.address?.country || '');
-          toast.success('Location detected successfully');
-        } else {
-          throw new Error('Could not get address details');
-        }
-      } catch (geocodeError) {
-        console.warn('Reverse geocoding failed:', geocodeError);
-        toast.info('Location detected, please fill in address details manually');
-      }
-    } catch (error: any) {
-      console.error('Location detection failed:', error);
-      toast.error(error.message || 'Failed to detect location. Please enter address manually.');
+      toast.success('Location detected');
+    } catch (e: any) {
+      toast.error('Failed to detect location. Enter manually.');
     } finally {
       setLocationLoading(false);
     }
   };
 
-  // Form submission handlers with improved error handling and logging
-  const onLoginSubmit = async (data: LoginFormValues) => {
-    try {
-      setError(null);
-      setLocalLoading(true);
-
-      console.log('Attempting to sign in with:', data.email);
-
-      const { data: authData, error } = await supabase.auth.signInWithPassword({
-        email: data.email,
-        password: data.password,
-      });
-
-      if (error) {
-        console.error('Authentication error details:', {
-          status: error.status,
-          name: error.name,
-          code: error.code,
-          message: error.message,
-        });
-        throw error;
-      }
-
-      console.log('Auth response:', {
-        session: !!authData.session,
-        user: authData.user?.id ? 'User ID: ' + authData.user.id : 'No user',
-        expiresAt: authData.session?.expires_at,
-      });
-
-      showSuccess("Signed in successfully!");
-      toast.success("Signed in successfully!");
-
-      // Small delay to ensure session is properly set
-      setTimeout(() => {
-        navigate("/home");
-      }, 500);
-
-    } catch (err: any) {
-      let errorMessage = 'Failed to sign in';
-
-      if (err.status === 400) {
-        errorMessage = 'Invalid email or password';
-      } else if (err.message?.includes('network')) {
-        errorMessage = 'Network error. Please check your connection.';
-      } else if (err.message) {
-        errorMessage = err.message;
-      }
-
-      console.error('Login error details:', {
-        error: err,
-        timestamp: new Date().toISOString(),
-        url: window.location.href,
-      });
-
-      setError(errorMessage);
-      showError(errorMessage);
-      toast.error(errorMessage);
-    } finally {
-      setLocalLoading(false);
+  const onLoginSubmit = async (data: z.infer<typeof loginSchema>) => {
+    setLocalLoading(true);
+    const { error } = await supabase.auth.signInWithPassword(data);
+    if (error) {
+      setError(error.message);
+      showError(error.message);
+    } else {
+      navigate("/home");
     }
+    setLocalLoading(false);
   };
 
-  // Updated patient signup with role
-  const onPatientSignupSubmit = async (data: PatientSignupFormValues) => {
-    try {
-      setError(null);
-      setLocalLoading(true);
-      const response = await supabase.auth.signUp({
-        email: data.email,
-        password: data.password,
-        options: {
-          data: {
-            first_name: data.firstName,
-            last_name: data.lastName,
-            role: "patient",
-          },
+  const onSignupSubmit = async (data: any) => {
+    setLocalLoading(true);
+    const { error } = await supabase.auth.signUp({
+      email: data.email,
+      password: data.password,
+      options: {
+        data: {
+          first_name: data.firstName,
+          last_name: data.lastName,
+          role: userType,
+          specialty: data.specialty,
+          license_number: data.licenseNumber,
+          address: data.address,
+          city: data.city,
+          country: data.country,
         },
-      });
+      },
+    });
 
-      // eslint-disable-next-line no-console
-      console.debug('patient signUp response:', response);
-
-      if (response.error) throw response.error;
-
-      showSuccess("Account created! Please verify your email address.");
-      toast.success("Account created! Please verify your email address.");
+    if (error) {
+      setError(error.message);
+      showError(error.message);
+    } else {
+      showSuccess("Success! Check your email to verify.");
       setActiveTab("signin");
-    } catch (err: any) {
-      const errorMessage = err?.message || "Failed to create account";
-      setError(errorMessage);
-      showError(errorMessage);
-      // eslint-disable-next-line no-console
-      console.error("Patient signup error:", err);
-      toast.error(errorMessage);
-    } finally {
-      setLocalLoading(false);
     }
+    setLocalLoading(false);
   };
 
-  // Updated provider signup with role, professional details, and location
-  const onProviderSignupSubmit = async (data: ProviderSignupFormValues) => {
-    try {
-      setError(null);
-      setLocalLoading(true);
-      const response = await supabase.auth.signUp({
-        email: data.email,
-        password: data.password,
-        options: {
-          data: {
-            first_name: data.firstName,
-            last_name: data.lastName,
-            role: "health_personnel",
-            specialty: data.specialty,
-            license_number: data.licenseNumber,
-            address: data.address,
-            city: data.city,
-            country: data.country,
-            latitude: data.latitude,
-            longitude: data.longitude,
-          },
-        },
-      });
-
-      // eslint-disable-next-line no-console
-      console.debug('provider signUp response:', response);
-
-      if (response.error) throw response.error;
-
-      showSuccess("Account created! Please verify your email address.");
-      toast.success("Account created! Please verify your email address.");
-      setActiveTab("signin");
-    } catch (err: any) {
-      const errorMessage = err?.message || "Failed to create account";
-      setError(errorMessage);
-      showError(errorMessage);
-      // eslint-disable-next-line no-console
-      console.error("Provider signup error:", err);
-      toast.error(errorMessage);
-    } finally {
-      setLocalLoading(false);
-    }
-  };
-
-  if (authLoading || localLoading) {
-    return <LoadingScreen timeout={2000} />;
-  }
-
-  // If already authenticated, redirect
-  if (isAuthenticated) {
-    navigate("/home");
-    return <LoadingScreen message="Redirecting..." />;
-  }
+  if (authLoading) return <LoadingScreen timeout={1000} />;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted flex items-center justify-center p-2 sm:p-4">
-      <div className="w-full max-w-md space-y-4 sm:space-y-8">
+    <div className="min-h-[100dvh] bg-gradient-to-b from-background to-muted flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
+      <div className="w-full max-w-md space-y-4 py-8">
         <div className="text-center space-y-2">
-          <div className="flex justify-center">
-            <div className="bg-primary/10 p-3 rounded-full">
-              <Heart className="h-8 w-8 text-primary" />
-            </div>
-          </div>
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-            Welcome to Doc&apos; O Clock
-          </h1>
-          <p className="text-muted-foreground">
-            Access your healthcare services securely
-          </p>
+          <img src="/d0c-icon.svg" className="h-16 w-16 mx-auto mb-2" alt="Logo" />
+          <h1 className="text-2xl font-bold text-primary">Doc' O Clock</h1>
+          <p className="text-xs text-muted-foreground">Healthcare for Everyone</p>
         </div>
 
-        {error && (
-          <Alert variant="destructive" className="mb-4">
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
-
-        <Card className="p-4 sm:p-6 shadow-lg">
-          <Tabs defaultValue={activeTab} value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-2 mb-4 h-auto">
-              <TabsTrigger value="signin" className="text-sm py-2">Sign In</TabsTrigger>
-              <TabsTrigger value="signup" className="text-sm py-2">Register</TabsTrigger>
+        <Card className="p-4 shadow-xl border-t-4 border-t-primary">
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="grid w-full grid-cols-2 mb-6">
+              <TabsTrigger value="signin">Sign In</TabsTrigger>
+              <TabsTrigger value="signup">Register</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="signin">
+            <TabsContent value="signin" className="animate-in fade-in duration-300">
               <Form {...loginForm}>
                 <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
                   <FormField
@@ -391,418 +177,111 @@ export const Auth = () => {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Email</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Enter your email"
-                            {...field}
-                          />
-                        </FormControl>
+                        <FormControl><Input placeholder="Email" {...field} type="email" /></FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-
                   <FormField
                     control={loginForm.control}
                     name="password"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Password</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="password"
-                            placeholder="Enter your password"
-                            {...field}
-                          />
-                        </FormControl>
+                        <FormControl><Input type="password" placeholder="Password" {...field} /></FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-
-                  <div className="text-sm text-right">
-                    <Link to="/reset-password" className="text-primary hover:underline">
-                      Forgot password?
-                    </Link>
-                  </div>
-
-                  <AnimatedButton
-                    type="submit"
-                    className="w-full"
-                    loading={loginForm.formState.isSubmitting}
-                    loadingText="Signing in..."
-                  >
+                  <AnimatedButton type="submit" className="w-full h-12" loading={localLoading}>
                     Sign In
                   </AnimatedButton>
                 </form>
               </Form>
             </TabsContent>
 
-            <TabsContent value="signup">
-              <div className="mb-4">
-                <FormLabel className="text-sm font-medium">I am a</FormLabel>
-                <div className="grid grid-cols-2 gap-2 sm:gap-4 mt-2">
-                  <Button
-                    type="button"
-                    variant={userType === "patient" ? "default" : "outline"}
-                    className="flex flex-col h-auto py-3 px-2 text-xs sm:text-sm"
-                    onClick={() => setUserType("patient")}
-                  >
-                    <User className="h-4 w-4 sm:h-5 sm:w-5 mb-1 sm:mb-2" />
-                    <span>Patient</span>
-                  </Button>
-
-                  <Button
-                    type="button"
-                    variant={userType === "health_personnel" ? "default" : "outline"}
-                    className="flex flex-col h-auto py-3 px-2 text-xs sm:text-sm"
-                    onClick={() => setUserType("health_personnel")}
-                  >
-                    <Building2 className="h-4 w-4 sm:h-5 sm:w-5 mb-1 sm:mb-2" />
-                    <span className="text-center leading-tight">Healthcare Provider</span>
-                  </Button>
-                </div>
+            <TabsContent value="signup" className="animate-in fade-in duration-300">
+              <div className="flex gap-2 mb-6">
+                <Button 
+                  variant={userType === 'patient' ? 'default' : 'outline'} 
+                  className="flex-1 text-xs h-10" 
+                  onClick={() => setUserType('patient')}
+                >Patient</Button>
+                <Button 
+                  variant={userType === 'health_personnel' ? 'default' : 'outline'} 
+                  className="flex-1 text-xs h-10"
+                  onClick={() => setUserType('health_personnel')}
+                >Provider</Button>
               </div>
 
-              {userType === "patient" ? (
+              {userType === 'patient' ? (
                 <Form {...patientSignupForm}>
-                  <form onSubmit={patientSignupForm.handleSubmit(onPatientSignupSubmit)} className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <FormField
-                        control={patientSignupForm.control}
-                        name="firstName"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>First Name <span className="text-red-500">*</span></FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder="First name"
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={patientSignupForm.control}
-                        name="lastName"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Last Name <span className="text-red-500">*</span></FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder="Last name"
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                  <form onSubmit={patientSignupForm.handleSubmit(onSignupSubmit)} className="space-y-4">
+                    <div className="grid grid-cols-2 gap-2">
+                      <FormField control={patientSignupForm.control} name="firstName" render={({field}) => (
+                        <FormItem><FormLabel className="text-xs">First Name</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>
+                      )} />
+                      <FormField control={patientSignupForm.control} name="lastName" render={({field}) => (
+                        <FormItem><FormLabel className="text-xs">Last Name</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>
+                      )} />
                     </div>
-
-                    <FormField
-                      control={patientSignupForm.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Email <span className="text-red-500">*</span></FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="Enter your email"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={patientSignupForm.control}
-                      name="password"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Password <span className="text-red-500">*</span></FormLabel>
-                          <FormControl>
-                            <Input
-                              type="password"
-                              placeholder="Create a password"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={patientSignupForm.control}
-                      name="confirmPassword"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Confirm Password <span className="text-red-500">*</span></FormLabel>
-                          <FormControl>
-                            <Input
-                              type="password"
-                              placeholder="Confirm your password"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <AnimatedButton
-                      type="submit"
-                      className="w-full"
-                      loading={patientSignupForm.formState.isSubmitting}
-                      loadingText="Creating Account..."
-                    >
-                      Create Patient Account
-                    </AnimatedButton>
+                    <FormField control={patientSignupForm.control} name="email" render={({field}) => (
+                      <FormItem><FormLabel className="text-xs">Email</FormLabel><FormControl><Input {...field} type="email" /></FormControl></FormItem>
+                    )} />
+                    <FormField control={patientSignupForm.control} name="password" render={({field}) => (
+                      <FormItem><FormLabel className="text-xs">Password</FormLabel><FormControl><Input type="password" {...field} /></FormControl></FormItem>
+                    )} />
+                    <FormField control={patientSignupForm.control} name="confirmPassword" render={({field}) => (
+                      <FormItem><FormLabel className="text-xs">Confirm</FormLabel><FormControl><Input type="password" {...field} /></FormControl></FormItem>
+                    )} />
+                    <AnimatedButton type="submit" className="w-full h-12" loading={localLoading}>Create Account</AnimatedButton>
                   </form>
                 </Form>
               ) : (
                 <Form {...providerSignupForm}>
-                  <form onSubmit={providerSignupForm.handleSubmit(onProviderSignupSubmit)} className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <FormField
-                        control={providerSignupForm.control}
-                        name="firstName"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>First Name <span className="text-red-500">*</span></FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder="First name"
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={providerSignupForm.control}
-                        name="lastName"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Last Name <span className="text-red-500">*</span></FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder="Last name"
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                  <form onSubmit={providerSignupForm.handleSubmit(onSignupSubmit)} className="space-y-4">
+                     <div className="grid grid-cols-2 gap-2">
+                      <FormField control={providerSignupForm.control} name="firstName" render={({field}) => (
+                        <FormItem><FormLabel className="text-xs">First Name</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>
+                      )} />
+                      <FormField control={providerSignupForm.control} name="lastName" render={({field}) => (
+                        <FormItem><FormLabel className="text-xs">Last Name</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>
+                      )} />
                     </div>
-
-                    <FormField
-                      control={providerSignupForm.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Email <span className="text-red-500">*</span></FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="Enter your email"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={providerSignupForm.control}
-                      name="specialty"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Specialty <span className="text-red-500">*</span></FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="Enter your specialty"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={providerSignupForm.control}
-                      name="licenseNumber"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>License Number <span className="text-red-500">*</span></FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="Enter your license number"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    {/* Location Section */}
-                    <div className="space-y-4 border-t pt-4">
-                      <div className="flex items-center justify-between">
-                        <FormLabel className="text-base font-medium">Practice Location</FormLabel>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={getCurrentLocation}
-                          disabled={locationLoading}
-                          className="flex items-center gap-2"
-                        >
-                          {locationLoading ? (
-                            <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                          ) : (
-                            <MapPin className="w-4 h-4" />
-                          )}
-                          {locationLoading ? 'Detecting...' : 'Use Current Location'}
+                    <FormField control={providerSignupForm.control} name="email" render={({field}) => (
+                      <FormItem><FormLabel className="text-xs">Email</FormLabel><FormControl><Input {...field} type="email" /></FormControl></FormItem>
+                    )} />
+                    <div className="grid grid-cols-2 gap-2">
+                      <FormField control={providerSignupForm.control} name="specialty" render={({field}) => (
+                        <FormItem><FormLabel className="text-xs">Specialty</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>
+                      )} />
+                      <FormField control={providerSignupForm.control} name="licenseNumber" render={({field}) => (
+                        <FormItem><FormLabel className="text-xs">License #</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>
+                      )} />
+                    </div>
+                    
+                    <div className="bg-muted/30 p-2 rounded-lg space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-[10px] font-bold uppercase">Practice Location</span>
+                        <Button type="button" size="sm" variant="ghost" className="h-6 text-[10px]" onClick={getCurrentLocation}>
+                          <MapPin className="w-3 h-3 mr-1" /> Auto-Detect
                         </Button>
                       </div>
-
-                      <FormField
-                        control={providerSignupForm.control}
-                        name="address"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Address <span className="text-red-500">*</span></FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder="Enter practice address"
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <div className="grid grid-cols-2 gap-4">
-                        <FormField
-                          control={providerSignupForm.control}
-                          name="city"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>City <span className="text-red-500">*</span></FormLabel>
-                              <FormControl>
-                                <Input
-                                  placeholder="City"
-                                  {...field}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={providerSignupForm.control}
-                          name="country"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Country <span className="text-red-500">*</span></FormLabel>
-                              <FormControl>
-                                <Input
-                                  placeholder="Country"
-                                  {...field}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-
-                      {currentLocation && (
-                        <div className="text-sm text-muted-foreground bg-muted/50 p-3 rounded-lg">
-                          <div className="flex items-center gap-2 mb-1">
-                            <MapPin className="w-4 h-4" />
-                            <span className="font-medium">Location Detected</span>
-                          </div>
-                          <p>Lat: {currentLocation.lat.toFixed(6)}, Lng: {currentLocation.lng.toFixed(6)}</p>
-                        </div>
-                      )}
+                      <FormField control={providerSignupForm.control} name="address" render={({field}) => (
+                        <FormControl><Input placeholder="Address" {...field} className="h-8 text-xs" /></FormControl>
+                      )} />
                     </div>
 
-                    <FormField
-                      control={providerSignupForm.control}
-                      name="password"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Password <span className="text-red-500">*</span></FormLabel>
-                          <FormControl>
-                            <Input
-                              type="password"
-                              placeholder="Create a password"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={providerSignupForm.control}
-                      name="confirmPassword"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Confirm Password <span className="text-red-500">*</span></FormLabel>
-                          <FormControl>
-                            <Input
-                              type="password"
-                              placeholder="Confirm your password"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <AnimatedButton
-                      type="submit"
-                      className="w-full"
-                      loading={providerSignupForm.formState.isSubmitting}
-                      loadingText="Creating Account..."
-                    >
-                      Create Provider Account
-                    </AnimatedButton>
+                    <FormField control={providerSignupForm.control} name="password" render={({field}) => (
+                      <FormItem><FormLabel className="text-xs">Password</FormLabel><FormControl><Input type="password" {...field} /></FormControl></FormItem>
+                    )} />
+                    <AnimatedButton type="submit" className="w-full h-12" loading={localLoading}>Create Provider Account</AnimatedButton>
                   </form>
                 </Form>
               )}
             </TabsContent>
           </Tabs>
         </Card>
-
-        <div className="text-center space-y-4">
-          <p className="text-sm text-muted-foreground">
-            Your health information is protected by industry-standard encryption
-          </p>
-          <div className="text-xs text-muted-foreground">
-            By signing in, you agree to our{" "}
-            <Link to="/terms" className="text-primary hover:underline">Terms of Service</Link>
-            {" "}and{" "}
-            <Link to="/privacy" className="text-primary hover:underline">Privacy Policy</Link>
-          </div>
-        </div>
       </div>
     </div>
   );

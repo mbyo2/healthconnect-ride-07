@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { safeLocalGet, safeLocalSet, safeLocalRemove } from '@/utils/storage';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -54,7 +55,7 @@ export const MedGemmaChat = ({ onActionClick }: MedGemmaChatProps) => {
   // Load messages from localStorage on mount
   const [messages, setMessages] = useState<Message[]>(() => {
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
+      const saved = safeLocalGet(STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
         // Convert timestamp strings back to Date objects
@@ -86,7 +87,7 @@ export const MedGemmaChat = ({ onActionClick }: MedGemmaChatProps) => {
   // Save messages to localStorage whenever they change
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+      safeLocalSet(STORAGE_KEY, JSON.stringify(messages));
     } catch (error) {
       console.error('Failed to save chat history:', error);
     }
@@ -238,7 +239,7 @@ export const MedGemmaChat = ({ onActionClick }: MedGemmaChatProps) => {
         timestamp: new Date()
       }
     ]);
-    localStorage.removeItem(STORAGE_KEY);
+    safeLocalRemove(STORAGE_KEY);
     toast.success('Chat history cleared');
   };
 

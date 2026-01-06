@@ -92,23 +92,32 @@ export const ClinicalDecisionCard = ({ decision, onActionClick, compact = false 
   const Icon = config.icon;
 
   const handleActionClick = (action: ClinicalAction) => {
-    console.log('AI Action clicked:', action);
-
+    // 1. If parent provided a handler, use it first (essential for internal tab switching)
     if (onActionClick) {
       onActionClick(action);
     }
 
+    // 2. Handle phone calls
     if (action.type === 'call') {
       window.location.href = `tel:${action.details || '911'}`;
       return;
     }
 
+    // 3. Handle navigation
     if (action.route) {
-      // If it's an external link (starts with http)
+      // INTERNAL TAB FIX: Don't navigate if it's a "tab:" pseudo-route
+      if (action.route.startsWith('tab:')) {
+        console.log('Internal tab switch handled by parent:', action.route);
+        return;
+      }
+
+      // External links
       if (action.route.startsWith('http')) {
         window.open(action.route, '_blank');
         return;
       }
+
+      // Standard route navigation
       navigate(action.route);
     }
   };
@@ -216,17 +225,10 @@ export const ClinicalDecisionCard = ({ decision, onActionClick, compact = false 
 export const parseClinicalDecisions = (aiResponse: string): ClinicalDecision[] => {
   const decisions: ClinicalDecision[] = [];
 
-  // Check for emergency indicators
-  const emergencyKeywords = ['emergency', 'call 911', 'immediately', 'life-threatening', 'urgent care', 'severe pain', 'difficulty breathing', 'chest pain'];
-  const urgentKeywords = ['within 24 hours', 'see a doctor soon', 'schedule appointment', 'consult', 'persistent', 'worsening'];
-  const preventiveKeywords = ['screening', 'vaccination', 'checkup', 'prevention', 'routine check', 'healthy lifestyle'];
-  const monitoringKeywords = ['monitor', 'track', 'watch for', 'observe', 'daily', 'regularly'];
-  const medicationKeywords = ['medicine', 'prescription', 'pill', 'pharmacy', 'drug', 'medication', 'dosage', 'antibiotic'];
-  const labKeywords = ['lab', 'test', 'blood work', 'results', 'scan', 'x-ray', 'mri', 'ultrasound'];
-
   const lowerResponse = aiResponse.toLowerCase();
 
-  // Emergency detection
+  // 1. Emergency detection
+  const emergencyKeywords = ['emergency', 'call 911', 'immediately', 'life-threatening', 'urgent care', 'severe pain', 'difficulty breathing', 'chest pain'];
   if (emergencyKeywords.some(k => lowerResponse.includes(k))) {
     decisions.push({
       type: 'emergency',
@@ -241,7 +243,8 @@ export const parseClinicalDecisions = (aiResponse: string): ClinicalDecision[] =
     });
   }
 
-  // Medication/Pharmacy detection
+  // 2. Medication/Pharmacy detection
+  const medicationKeywords = ['medicine', 'prescription', 'pill', 'pharmacy', 'drug', 'medication', 'dosage', 'antibiotic'];
   if (medicationKeywords.some(k => lowerResponse.includes(k))) {
     decisions.push({
       type: 'routine',
@@ -255,7 +258,8 @@ export const parseClinicalDecisions = (aiResponse: string): ClinicalDecision[] =
     });
   }
 
-  // Lab/Test detection
+  // 3. Lab/Test detection
+  const labKeywords = ['lab', 'test', 'blood work', 'results', 'scan', 'x-ray', 'mri', 'ultrasound'];
   if (labKeywords.some(k => lowerResponse.includes(k))) {
     decisions.push({
       type: 'monitoring',
@@ -269,7 +273,8 @@ export const parseClinicalDecisions = (aiResponse: string): ClinicalDecision[] =
     });
   }
 
-  // Urgent care detection
+  // 4. Urgent care detection
+  const urgentKeywords = ['within 24 hours', 'see a doctor soon', 'schedule appointment', 'consult', 'persistent', 'worsening'];
   if (urgentKeywords.some(k => lowerResponse.includes(k)) && !emergencyKeywords.some(k => lowerResponse.includes(k))) {
     decisions.push({
       type: 'urgent',
@@ -285,7 +290,8 @@ export const parseClinicalDecisions = (aiResponse: string): ClinicalDecision[] =
     });
   }
 
-  // Preventive care detection
+  // 5. Preventive care detection
+  const preventiveKeywords = ['screening', 'vaccination', 'checkup', 'prevention', 'routine check', 'healthy lifestyle'];
   if (preventiveKeywords.some(k => lowerResponse.includes(k))) {
     decisions.push({
       type: 'preventive',
@@ -299,7 +305,8 @@ export const parseClinicalDecisions = (aiResponse: string): ClinicalDecision[] =
     });
   }
 
-  // Monitoring detection
+  // 6. Monitoring detection
+  const monitoringKeywords = ['monitor', 'track', 'watch for', 'observe', 'daily', 'regularly'];
   if (monitoringKeywords.some(k => lowerResponse.includes(k))) {
     decisions.push({
       type: 'monitoring',
@@ -314,8 +321,8 @@ export const parseClinicalDecisions = (aiResponse: string): ClinicalDecision[] =
     });
   }
 
-  // Default routine recommendation if no other triggers
-  if (decisions.length === 0 && aiResponse.length > 50) {
+  // 7. Default routine recommendation
+  if (decisions.length === 0 && aiResponse.length > 20) {
     decisions.push({
       type: 'routine',
       title: 'Next Steps',
@@ -323,8 +330,7 @@ export const parseClinicalDecisions = (aiResponse: string): ClinicalDecision[] =
       confidence: 0.6,
       actions: [
         { id: 'view-history', label: 'View My History', type: 'navigate', route: 'tab:history', priority: 'medium' },
-        { id: 'book-app', label: 'Book Appointment', type: 'navigate', route: '/appointments', priority: 'medium' },
-        { id: 'go-home', label: 'Back to Home', type: 'navigate', route: '/home', priority: 'low' }
+        { id: 'book-app', label: 'Book Appointment', type: 'navigate', route: '/appointments', priority: 'medium' }
       ]
     });
   }

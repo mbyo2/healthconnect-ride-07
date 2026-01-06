@@ -20,9 +20,9 @@ export const applyLegacyFixes = () => {
     
     // Polyfill for RequestAnimationFrame if missing
     if (!window.requestAnimationFrame) {
-      window.requestAnimationFrame = (callback) => {
+      (window as any).requestAnimationFrame = (callback: any) => {
         return window.setTimeout(() => callback(Date.now()), 16);
-      } as any;
+      };
     }
 
     // Fix for older WebViews that don't support some CSS variables properly

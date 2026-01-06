@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useNotifications } from '@/hooks/useNotifications';
+import { useNotifications } from '@/hooks/use-notifications';
 import { Link } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 

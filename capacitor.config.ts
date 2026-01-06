@@ -3,7 +3,7 @@ import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'app.lovable.f6b5c73f67aa4f8baaf628968ed3c903',
-  appName: 'HealthConnect Teledoc',
+  appName: "Doc' O Clock",
   webDir: 'dist',
   plugins: {
     SplashScreen: {
@@ -12,7 +12,7 @@ const config: CapacitorConfig = {
       androidSplashResourceName: "splash",
       androidScaleType: "CENTER_CROP",
       showSpinner: true,
-      spinnerColor: "#4CAF50",
+      spinnerColor: "#3B82F6",
       androidSpinnerStyle: "large",
     },
     StatusBar: {
