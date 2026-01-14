@@ -337,12 +337,13 @@ serve(async (req) => {
           adminLevel: account.adminLevel
         });
 
-      } catch (error) {
+      } catch (error: unknown) {
         console.error(`Error creating account for ${account.email}:`, error);
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         results.push({
           email: account.email,
           success: false,
-          error: error.message
+          error: errorMessage
         });
       }
     }
@@ -370,12 +371,13 @@ serve(async (req) => {
       }
     )
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Setup error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
       JSON.stringify({
         success: false,
-        error: error.message
+        error: errorMessage
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

@@ -117,11 +117,12 @@ serve(async (req) => {
       }
     );
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error sending SMS:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
       JSON.stringify({ 
-        error: error.message, 
+        error: errorMessage, 
         success: false 
       }),
       {
@@ -163,10 +164,11 @@ async function simulateZambianSMS(phone: string, message: string, config: any) {
       timestamp: new Date().toISOString()
     };
 
-  } catch (error) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return {
       success: false,
-      error: error.message,
+      error: errorMessage,
       provider: config.provider
     };
   }

@@ -41,7 +41,7 @@ export const PrescriptionStatus = () => {
 
       // Always fetch fresh data
       const { data, error } = await supabase
-        .from('prescriptions')
+        .from('comprehensive_prescriptions')
         .select('*')
         .eq('patient_id', user.id)
         .order('prescribed_date', { ascending: false });
@@ -49,7 +49,7 @@ export const PrescriptionStatus = () => {
       if (error) throw error;
       
       if (data) {
-        setPrescriptions(data);
+        setPrescriptions(data as unknown as Prescription[]);
         // Cache the fresh data
         await cacheData(`prescriptions_${user.id}`, data, 30); // Cache for 30 minutes
       }

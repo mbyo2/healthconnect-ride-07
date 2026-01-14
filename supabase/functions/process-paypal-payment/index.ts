@@ -228,28 +228,30 @@ serve(async (req) => {
         }
       );
 
-    } catch (paypalError) {
+    } catch (paypalError: unknown) {
       console.error('PayPal API error:', paypalError);
+      const errorMessage = paypalError instanceof Error ? paypalError.message : 'Unknown PayPal error';
 
       // Update payment status to failed
       await supabaseClient
         .from('payments')
         .update({
           status: 'failed',
-          error_message: paypalError.message,
+          error_message: errorMessage,
           failed_at: new Date().toISOString()
         })
         .eq('id', payment.id);
 
-      throw new Error(`PayPal integration error: ${paypalError.message}`);
+      throw new Error(`PayPal integration error: ${errorMessage}`);
     }
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error processing PayPal payment:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
       JSON.stringify({
         success: false,
-        error: error.message,
+        error: errorMessage,
         message: 'Failed to process PayPal payment'
       }),
       {

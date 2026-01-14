@@ -145,12 +145,13 @@ serve(async (req) => {
       }
     );
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error processing payment with splits:', error);
+    const errorMessage = error instanceof Error ? error.message : 'An error occurred while processing the payment';
     return new Response(
       JSON.stringify({
         success: false,
-        error: error.message || 'An error occurred while processing the payment'
+        error: errorMessage
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

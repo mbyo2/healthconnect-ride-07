@@ -99,7 +99,7 @@ const AdvancedDashboard = () => {
                 .limit(1)
                 .maybeSingle();
 
-            setStepsToday(stepsData?.value ? parseInt(stepsData.value) : 0);
+            setStepsToday(stepsData?.value ? parseInt(String(stepsData.value)) : 0);
 
             // Fetch recent activity from user_events
             const { data: events } = await supabase

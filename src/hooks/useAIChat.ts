@@ -68,9 +68,9 @@ export const useAIChat = () => {
                 id: msg.id,
                 role: msg.role as 'user' | 'assistant',
                 content: msg.content,
-                timestamp: new Date(msg.created_at),
+                timestamp: new Date(msg.created_at || new Date()),
                 image: msg.image_data || undefined,
-                decisions: msg.clinical_decisions || undefined
+                decisions: Array.isArray(msg.clinical_decisions) ? msg.clinical_decisions : undefined
             }));
 
             setMessages(formattedMessages);

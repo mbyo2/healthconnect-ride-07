@@ -22,13 +22,13 @@ export const HealthMetricsChart = () => {
         if (!user) return;
 
         const { data, error } = await supabase
-          .from("health_metrics")
+          .from("comprehensive_health_metrics")
           .select("*")
           .eq('user_id', user.id)
           .order("recorded_at", { ascending: true });
 
         if (error) throw error;
-        setMetrics(data || []);
+        setMetrics((data as unknown as HealthMetric[]) || []);
       } catch (error: any) {
         toast.error(error.message);
       } finally {

@@ -39,15 +39,15 @@ serve(async (req) => {
     switch (emailRequest.type) {
       case "appointment_reminder":
         subject = "Appointment Reminder";
-        html = appointmentReminderTemplate(emailRequest.data);
+        html = appointmentReminderTemplate(emailRequest.data as { date: string; time: string; provider: { first_name: string; last_name: string; }; });
         break;
       case "payment_confirmation":
         subject = "Payment Confirmation";
-        html = paymentConfirmationTemplate(emailRequest.data);
+        html = paymentConfirmationTemplate(emailRequest.data as { amount: number; date: string; service: string; });
         break;
       case "registration_confirmation":
         subject = "Welcome to Doc' O Clock";
-        html = registrationConfirmationTemplate(emailRequest.data);
+        html = registrationConfirmationTemplate(emailRequest.data as { first_name: string; });
         break;
       default:
         throw new Error("Invalid email type");
@@ -80,10 +80,11 @@ serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error in send-email function:", error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: errorMessage }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 500,
