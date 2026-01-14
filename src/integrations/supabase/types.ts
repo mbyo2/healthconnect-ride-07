@@ -47,6 +47,78 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_chat_conversations: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_archived: boolean | null
+          title: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_archived?: boolean | null
+          title?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_archived?: boolean | null
+          title?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ai_chat_messages: {
+        Row: {
+          clinical_decisions: Json | null
+          content: string
+          conversation_id: string
+          created_at: string | null
+          id: string
+          image_data: string | null
+          role: string
+        }
+        Insert: {
+          clinical_decisions?: Json | null
+          content: string
+          conversation_id: string
+          created_at?: string | null
+          id?: string
+          image_data?: string | null
+          role: string
+        }
+        Update: {
+          clinical_decisions?: Json | null
+          content?: string
+          conversation_id?: string
+          created_at?: string | null
+          id?: string
+          image_data?: string | null
+          role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_chat_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "ai_chat_conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_conversation"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "ai_chat_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ai_diagnosis_history: {
         Row: {
           analysis: string | null
@@ -409,6 +481,7 @@ export type Database = {
           is_private: boolean | null
           patient_id: string
           provider_id: string | null
+          record_source: string | null
           record_type: string
           severity_level: string | null
           status: string | null
@@ -425,6 +498,7 @@ export type Database = {
           is_private?: boolean | null
           patient_id: string
           provider_id?: string | null
+          record_source?: string | null
           record_type: string
           severity_level?: string | null
           status?: string | null
@@ -441,6 +515,7 @@ export type Database = {
           is_private?: boolean | null
           patient_id?: string
           provider_id?: string | null
+          record_source?: string | null
           record_type?: string
           severity_level?: string | null
           status?: string | null
@@ -532,45 +607,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      daily_health_metrics: {
-        Row: {
-          active_minutes: number | null
-          calories_burned: number | null
-          created_at: string | null
-          date: string
-          distance: number | null
-          id: string
-          sleep_hours: number | null
-          steps: number | null
-          user_id: string
-          water_intake: number | null
-        }
-        Insert: {
-          active_minutes?: number | null
-          calories_burned?: number | null
-          created_at?: string | null
-          date: string
-          distance?: number | null
-          id?: string
-          sleep_hours?: number | null
-          steps?: number | null
-          user_id: string
-          water_intake?: number | null
-        }
-        Update: {
-          active_minutes?: number | null
-          calories_burned?: number | null
-          created_at?: string | null
-          date?: string
-          distance?: number | null
-          id?: string
-          sleep_hours?: number | null
-          steps?: number | null
-          user_id?: string
-          water_intake?: number | null
-        }
-        Relationships: []
       }
       delivery_tracking: {
         Row: {
@@ -856,6 +892,36 @@ export type Database = {
         }
         Relationships: []
       }
+      emergency_services: {
+        Row: {
+          available24h: boolean | null
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          phone: string
+          type: string
+        }
+        Insert: {
+          available24h?: boolean | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          phone: string
+          type: string
+        }
+        Update: {
+          available24h?: boolean | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          phone?: string
+          type?: string
+        }
+        Relationships: []
+      }
       family_members: {
         Row: {
           created_at: string | null
@@ -984,44 +1050,6 @@ export type Database = {
           },
         ]
       }
-      health_metrics: {
-        Row: {
-          id: string
-          metric_type: string
-          notes: string | null
-          recorded_at: string | null
-          unit: string
-          user_id: string
-          value: number
-        }
-        Insert: {
-          id?: string
-          metric_type: string
-          notes?: string | null
-          recorded_at?: string | null
-          unit: string
-          user_id: string
-          value: number
-        }
-        Update: {
-          id?: string
-          metric_type?: string
-          notes?: string | null
-          recorded_at?: string | null
-          unit?: string
-          user_id?: string
-          value?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "health_metrics_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       health_personnel_applications: {
         Row: {
           created_at: string | null
@@ -1141,11 +1169,13 @@ export type Database = {
       }
       healthcare_institutions: {
         Row: {
+          accepted_insurance_providers: string[] | null
           address: string | null
           admin_id: string | null
           city: string | null
           country: string | null
           created_at: string | null
+          currency: string | null
           email: string | null
           id: string
           is_verified: boolean | null
@@ -1160,11 +1190,13 @@ export type Database = {
           website: string | null
         }
         Insert: {
+          accepted_insurance_providers?: string[] | null
           address?: string | null
           admin_id?: string | null
           city?: string | null
           country?: string | null
           created_at?: string | null
+          currency?: string | null
           email?: string | null
           id?: string
           is_verified?: boolean | null
@@ -1179,11 +1211,13 @@ export type Database = {
           website?: string | null
         }
         Update: {
+          accepted_insurance_providers?: string[] | null
           address?: string | null
           admin_id?: string | null
           city?: string | null
           country?: string | null
           created_at?: string | null
+          currency?: string | null
           email?: string | null
           id?: string
           is_verified?: boolean | null
@@ -1542,6 +1576,95 @@ export type Database = {
           },
         ]
       }
+      hospital_invoices: {
+        Row: {
+          amount: number
+          created_at: string
+          due_date: string | null
+          hospital_id: string | null
+          id: string
+          invoice_number: string
+          patient_id: string | null
+          status: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          due_date?: string | null
+          hospital_id?: string | null
+          id?: string
+          invoice_number: string
+          patient_id?: string | null
+          status?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          due_date?: string | null
+          hospital_id?: string | null
+          id?: string
+          invoice_number?: string
+          patient_id?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hospital_invoices_hospital_id_fkey"
+            columns: ["hospital_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      institution_applications: {
+        Row: {
+          applicant_id: string | null
+          created_at: string
+          documents_complete: boolean | null
+          id: string
+          institution_name: string
+          institution_type: string
+          payment_complete: boolean | null
+          reviewed_at: string | null
+          reviewer_notes: string | null
+          status: string | null
+          submitted_at: string
+          updated_at: string
+          verification_complete: boolean | null
+        }
+        Insert: {
+          applicant_id?: string | null
+          created_at?: string
+          documents_complete?: boolean | null
+          id?: string
+          institution_name: string
+          institution_type: string
+          payment_complete?: boolean | null
+          reviewed_at?: string | null
+          reviewer_notes?: string | null
+          status?: string | null
+          submitted_at?: string
+          updated_at?: string
+          verification_complete?: boolean | null
+        }
+        Update: {
+          applicant_id?: string | null
+          created_at?: string
+          documents_complete?: boolean | null
+          id?: string
+          institution_name?: string
+          institution_type?: string
+          payment_complete?: boolean | null
+          reviewed_at?: string | null
+          reviewer_notes?: string | null
+          status?: string | null
+          submitted_at?: string
+          updated_at?: string
+          verification_complete?: boolean | null
+        }
+        Relationships: []
+      }
       institution_locations: {
         Row: {
           created_at: string | null
@@ -1570,6 +1693,47 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "institution_locations_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      institution_personnel: {
+        Row: {
+          created_at: string
+          id: string
+          institution_id: string | null
+          joined_at: string
+          role: string | null
+          status: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          institution_id?: string | null
+          joined_at?: string
+          role?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          institution_id?: string | null
+          joined_at?: string
+          role?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "institution_personnel_institution_id_fkey"
             columns: ["institution_id"]
             isOneToOne: false
             referencedRelation: "healthcare_institutions"
@@ -1863,7 +2027,7 @@ export type Database = {
             foreignKeyName: "inventory_transactions_prescription_id_fkey"
             columns: ["prescription_id"]
             isOneToOne: false
-            referencedRelation: "prescriptions"
+            referencedRelation: "comprehensive_prescriptions"
             referencedColumns: ["id"]
           },
         ]
@@ -1871,6 +2035,7 @@ export type Database = {
       iot_devices: {
         Row: {
           battery_level: number | null
+          connection_type: string | null
           created_at: string | null
           device_id: string
           device_name: string
@@ -1879,10 +2044,12 @@ export type Database = {
           id: string
           is_active: boolean | null
           last_sync: string | null
+          metadata: Json | null
           user_id: string
         }
         Insert: {
           battery_level?: number | null
+          connection_type?: string | null
           created_at?: string | null
           device_id: string
           device_name: string
@@ -1891,10 +2058,12 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           last_sync?: string | null
+          metadata?: Json | null
           user_id: string
         }
         Update: {
           battery_level?: number | null
+          connection_type?: string | null
           created_at?: string | null
           device_id?: string
           device_name?: string
@@ -1903,9 +2072,54 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           last_sync?: string | null
+          metadata?: Json | null
           user_id?: string
         }
         Relationships: []
+      }
+      lab_requests: {
+        Row: {
+          created_at: string
+          id: string
+          notes: string | null
+          patient_id: string | null
+          priority: string | null
+          provider_id: string | null
+          status: string | null
+          test_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          patient_id?: string | null
+          priority?: string | null
+          provider_id?: string | null
+          status?: string | null
+          test_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          patient_id?: string | null
+          priority?: string | null
+          provider_id?: string | null
+          status?: string | null
+          test_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lab_requests_test_id_fkey"
+            columns: ["test_id"]
+            isOneToOne: false
+            referencedRelation: "lab_tests"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       lab_results: {
         Row: {
@@ -1954,16 +2168,47 @@ export type Database = {
           },
         ]
       }
+      lab_test_catalog: {
+        Row: {
+          category: string
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          price: number
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          price: number
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          price?: number
+        }
+        Relationships: []
+      }
       lab_tests: {
         Row: {
           admission_id: string | null
+          balance: number | null
           created_at: string | null
           id: string
+          insurance_claim_id: string | null
           lab_id: string
           notes: string | null
           ordered_by: string
           patient_id: string
+          payment_status: string | null
           performed_by: string | null
+          price: number | null
           priority: string | null
           result: Json | null
           result_summary: string | null
@@ -1974,18 +2219,23 @@ export type Database = {
           test_category: string | null
           test_number: string
           test_type: string
+          total_amount: number | null
           updated_at: string | null
           verified_by: string | null
         }
         Insert: {
           admission_id?: string | null
+          balance?: number | null
           created_at?: string | null
           id?: string
+          insurance_claim_id?: string | null
           lab_id: string
           notes?: string | null
           ordered_by: string
           patient_id: string
+          payment_status?: string | null
           performed_by?: string | null
+          price?: number | null
           priority?: string | null
           result?: Json | null
           result_summary?: string | null
@@ -1996,18 +2246,23 @@ export type Database = {
           test_category?: string | null
           test_number: string
           test_type: string
+          total_amount?: number | null
           updated_at?: string | null
           verified_by?: string | null
         }
         Update: {
           admission_id?: string | null
+          balance?: number | null
           created_at?: string | null
           id?: string
+          insurance_claim_id?: string | null
           lab_id?: string
           notes?: string | null
           ordered_by?: string
           patient_id?: string
+          payment_status?: string | null
           performed_by?: string | null
+          price?: number | null
           priority?: string | null
           result?: Json | null
           result_summary?: string | null
@@ -2018,6 +2273,7 @@ export type Database = {
           test_category?: string | null
           test_number?: string
           test_type?: string
+          total_amount?: number | null
           updated_at?: string | null
           verified_by?: string | null
         }
@@ -2027,6 +2283,13 @@ export type Database = {
             columns: ["admission_id"]
             isOneToOne: false
             referencedRelation: "hospital_admissions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lab_tests_insurance_claim_id_fkey"
+            columns: ["insurance_claim_id"]
+            isOneToOne: false
+            referencedRelation: "insurance_verifications"
             referencedColumns: ["id"]
           },
           {
@@ -2202,62 +2465,6 @@ export type Database = {
         }
         Relationships: []
       }
-      medical_records: {
-        Row: {
-          category: string | null
-          created_at: string | null
-          date: string
-          description: string | null
-          hash: string | null
-          id: string
-          patient_id: string
-          provider: string | null
-          record_type: string
-          shared_with: string[] | null
-          title: string | null
-          updated_at: string | null
-          verified: boolean | null
-        }
-        Insert: {
-          category?: string | null
-          created_at?: string | null
-          date: string
-          description?: string | null
-          hash?: string | null
-          id?: string
-          patient_id: string
-          provider?: string | null
-          record_type: string
-          shared_with?: string[] | null
-          title?: string | null
-          updated_at?: string | null
-          verified?: boolean | null
-        }
-        Update: {
-          category?: string | null
-          created_at?: string | null
-          date?: string
-          description?: string | null
-          hash?: string | null
-          id?: string
-          patient_id?: string
-          provider?: string | null
-          record_type?: string
-          shared_with?: string[] | null
-          title?: string | null
-          updated_at?: string | null
-          verified?: boolean | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "medical_records_patient_id_fkey"
-            columns: ["patient_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       medication_alerts: {
         Row: {
           adherence_tracking: boolean
@@ -2426,6 +2633,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      medications: {
+        Row: {
+          created_at: string
+          dosage: string
+          frequency: string
+          id: string
+          name: string
+          next_dose: string | null
+          remaining: number | null
+          total: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          dosage: string
+          frequency: string
+          id?: string
+          name: string
+          next_dose?: string | null
+          remaining?: number | null
+          total?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          dosage?: string
+          frequency?: string
+          id?: string
+          name?: string
+          next_dose?: string | null
+          remaining?: number | null
+          total?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       messages: {
         Row: {
@@ -2708,7 +2954,7 @@ export type Database = {
             foreignKeyName: "orders_prescription_id_fkey"
             columns: ["prescription_id"]
             isOneToOne: false
-            referencedRelation: "prescriptions"
+            referencedRelation: "comprehensive_prescriptions"
             referencedColumns: ["id"]
           },
         ]
@@ -2803,69 +3049,51 @@ export type Database = {
       payments: {
         Row: {
           amount: number
-          completed_at: string | null
-          created_at: string
-          currency: string | null
-          error_message: string | null
-          external_payment_id: string | null
-          failed_at: string | null
+          created_at: string | null
           id: string
           invoice_number: string | null
-          metadata: Json | null
-          patient_id: string | null
+          patient_id: string
+          payment_date: string | null
           payment_method: string | null
-          payment_url: string | null
-          provider_id: string | null
+          provider_id: string
           refund_amount: number | null
           refund_reason: string | null
           service_id: string | null
-          status: string | null
+          status: string
           status_history: Json | null
-          updated_at: string
+          updated_at: string | null
         }
         Insert: {
           amount: number
-          completed_at?: string | null
-          created_at?: string
-          currency?: string | null
-          error_message?: string | null
-          external_payment_id?: string | null
-          failed_at?: string | null
+          created_at?: string | null
           id?: string
           invoice_number?: string | null
-          metadata?: Json | null
-          patient_id?: string | null
+          patient_id: string
+          payment_date?: string | null
           payment_method?: string | null
-          payment_url?: string | null
-          provider_id?: string | null
+          provider_id: string
           refund_amount?: number | null
           refund_reason?: string | null
           service_id?: string | null
-          status?: string | null
+          status?: string
           status_history?: Json | null
-          updated_at?: string
+          updated_at?: string | null
         }
         Update: {
           amount?: number
-          completed_at?: string | null
-          created_at?: string
-          currency?: string | null
-          error_message?: string | null
-          external_payment_id?: string | null
-          failed_at?: string | null
+          created_at?: string | null
           id?: string
           invoice_number?: string | null
-          metadata?: Json | null
-          patient_id?: string | null
+          patient_id?: string
+          payment_date?: string | null
           payment_method?: string | null
-          payment_url?: string | null
-          provider_id?: string | null
+          provider_id?: string
           refund_amount?: number | null
           refund_reason?: string | null
           service_id?: string | null
-          status?: string | null
+          status?: string
           status_history?: Json | null
-          updated_at?: string
+          updated_at?: string | null
         }
         Relationships: [
           {
@@ -3069,12 +3297,15 @@ export type Database = {
       }
       pharmacy_sales: {
         Row: {
+          balance: number | null
           created_at: string | null
           customer_id: string | null
           discount: number | null
           id: string
+          insurance_claim_id: string | null
           items: Json
           notes: string | null
+          paid_amount: number | null
           payment_method: string
           payment_status: string | null
           pharmacy_id: string
@@ -3086,12 +3317,15 @@ export type Database = {
           transaction_id: string
         }
         Insert: {
+          balance?: number | null
           created_at?: string | null
           customer_id?: string | null
           discount?: number | null
           id?: string
+          insurance_claim_id?: string | null
           items: Json
           notes?: string | null
+          paid_amount?: number | null
           payment_method: string
           payment_status?: string | null
           pharmacy_id: string
@@ -3103,12 +3337,15 @@ export type Database = {
           transaction_id: string
         }
         Update: {
+          balance?: number | null
           created_at?: string | null
           customer_id?: string | null
           discount?: number | null
           id?: string
+          insurance_claim_id?: string | null
           items?: Json
           notes?: string | null
+          paid_amount?: number | null
           payment_method?: string
           payment_status?: string | null
           pharmacy_id?: string
@@ -3125,6 +3362,13 @@ export type Database = {
             columns: ["customer_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pharmacy_sales_insurance_claim_id_fkey"
+            columns: ["insurance_claim_id"]
+            isOneToOne: false
+            referencedRelation: "insurance_verifications"
             referencedColumns: ["id"]
           },
           {
@@ -3227,56 +3471,6 @@ export type Database = {
           },
         ]
       }
-      prescriptions: {
-        Row: {
-          created_at: string | null
-          dosage: string
-          end_date: string | null
-          frequency: string
-          id: string
-          medication_name: string
-          notes: string | null
-          patient_id: string
-          prescribed_by: string
-          prescribed_date: string
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          dosage: string
-          end_date?: string | null
-          frequency: string
-          id?: string
-          medication_name: string
-          notes?: string | null
-          patient_id: string
-          prescribed_by: string
-          prescribed_date: string
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          dosage?: string
-          end_date?: string | null
-          frequency?: string
-          id?: string
-          medication_name?: string
-          notes?: string | null
-          patient_id?: string
-          prescribed_by?: string
-          prescribed_date?: string
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "prescriptions_patient_id_fkey"
-            columns: ["patient_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       primary_provider_assignments: {
         Row: {
           assigned_at: string | null
@@ -3313,77 +3507,107 @@ export type Database = {
       profiles: {
         Row: {
           accepted_insurances: string[] | null
+          accepting_patients: boolean | null
           address: string | null
           admin_level: Database["public"]["Enums"]["admin_level"] | null
+          allow_research_usage: boolean | null
           avatar_url: string | null
           bio: string | null
           city: string | null
           created_at: string | null
+          data_retention_period: string | null
           date_of_birth: string | null
           email: string | null
           first_name: string | null
           gender: string | null
           id: string
           is_profile_complete: boolean | null
+          is_verified: boolean | null
           last_name: string | null
+          location: string | null
           phone: string | null
           provider_type:
-          | Database["public"]["Enums"]["healthcare_provider_type"]
-          | null
+            | Database["public"]["Enums"]["healthcare_provider_type"]
+            | null
+          rating: number | null
+          reviews_count: number | null
           role: Database["public"]["Enums"]["user_role"]
+          share_medical_data: boolean | null
+          show_in_search: boolean | null
           specialty: string | null
           state: string | null
           updated_at: string | null
+          years_experience: number | null
           zip_code: string | null
         }
         Insert: {
           accepted_insurances?: string[] | null
+          accepting_patients?: boolean | null
           address?: string | null
           admin_level?: Database["public"]["Enums"]["admin_level"] | null
+          allow_research_usage?: boolean | null
           avatar_url?: string | null
           bio?: string | null
           city?: string | null
           created_at?: string | null
+          data_retention_period?: string | null
           date_of_birth?: string | null
           email?: string | null
           first_name?: string | null
           gender?: string | null
           id: string
           is_profile_complete?: boolean | null
+          is_verified?: boolean | null
           last_name?: string | null
+          location?: string | null
           phone?: string | null
           provider_type?:
-          | Database["public"]["Enums"]["healthcare_provider_type"]
-          | null
+            | Database["public"]["Enums"]["healthcare_provider_type"]
+            | null
+          rating?: number | null
+          reviews_count?: number | null
           role?: Database["public"]["Enums"]["user_role"]
+          share_medical_data?: boolean | null
+          show_in_search?: boolean | null
           specialty?: string | null
           state?: string | null
           updated_at?: string | null
+          years_experience?: number | null
           zip_code?: string | null
         }
         Update: {
           accepted_insurances?: string[] | null
+          accepting_patients?: boolean | null
           address?: string | null
           admin_level?: Database["public"]["Enums"]["admin_level"] | null
+          allow_research_usage?: boolean | null
           avatar_url?: string | null
           bio?: string | null
           city?: string | null
           created_at?: string | null
+          data_retention_period?: string | null
           date_of_birth?: string | null
           email?: string | null
           first_name?: string | null
           gender?: string | null
           id?: string
           is_profile_complete?: boolean | null
+          is_verified?: boolean | null
           last_name?: string | null
+          location?: string | null
           phone?: string | null
           provider_type?:
-          | Database["public"]["Enums"]["healthcare_provider_type"]
-          | null
+            | Database["public"]["Enums"]["healthcare_provider_type"]
+            | null
+          rating?: number | null
+          reviews_count?: number | null
           role?: Database["public"]["Enums"]["user_role"]
+          share_medical_data?: boolean | null
+          show_in_search?: boolean | null
           specialty?: string | null
           state?: string | null
           updated_at?: string | null
+          years_experience?: number | null
           zip_code?: string | null
         }
         Relationships: []
@@ -3559,6 +3783,48 @@ export type Database = {
         }
         Relationships: []
       }
+      reviews: {
+        Row: {
+          comment: string | null
+          created_at: string | null
+          id: string
+          provider_id: string
+          rating: number
+          reviewer_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string | null
+          id?: string
+          provider_id: string
+          rating: number
+          reviewer_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string | null
+          id?: string
+          provider_id?: string
+          rating?: number
+          reviewer_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_reviewer_id_fkey"
+            columns: ["reviewer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       security_audit_log: {
         Row: {
           created_at: string | null
@@ -3697,6 +3963,36 @@ export type Database = {
         }
         Relationships: []
       }
+      specialized_care_categories: {
+        Row: {
+          color_class: string
+          created_at: string | null
+          display_order: number | null
+          icon_name: string
+          id: string
+          name: string
+          route: string
+        }
+        Insert: {
+          color_class: string
+          created_at?: string | null
+          display_order?: number | null
+          icon_name: string
+          id: string
+          name: string
+          route: string
+        }
+        Update: {
+          color_class?: string
+          created_at?: string | null
+          display_order?: number | null
+          icon_name?: string
+          id?: string
+          name?: string
+          route?: string
+        }
+        Relationships: []
+      }
       suppliers: {
         Row: {
           address: string | null
@@ -3743,6 +4039,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      symptom_categories: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
       }
       symptoms_diary: {
         Row: {
@@ -4136,6 +4453,7 @@ export type Database = {
           device_id: string | null
           heart_rate: number | null
           id: string
+          metadata: Json | null
           oxygen_saturation: number | null
           recorded_at: string | null
           respiratory_rate: number | null
@@ -4150,6 +4468,7 @@ export type Database = {
           device_id?: string | null
           heart_rate?: number | null
           id?: string
+          metadata?: Json | null
           oxygen_saturation?: number | null
           recorded_at?: string | null
           respiratory_rate?: number | null
@@ -4164,6 +4483,7 @@ export type Database = {
           device_id?: string | null
           heart_rate?: number | null
           id?: string
+          metadata?: Json | null
           oxygen_saturation?: number | null
           recorded_at?: string | null
           respiratory_rate?: number | null
@@ -4311,25 +4631,25 @@ export type Database = {
       }
       is_super_admin: { Args: never; Returns: boolean }
       process_payment_with_splits:
-      | {
-        Args: {
-          p_institution_id?: string
-          p_payment_id: string
-          p_payment_type?: string
-          p_provider_id: string
-          p_total_amount: number
-        }
-        Returns: Json
-      }
-      | {
-        Args: {
-          p_institution_id?: string
-          p_payment_id: string
-          p_provider_id: string
-          p_total_amount: number
-        }
-        Returns: Json
-      }
+        | {
+            Args: {
+              p_institution_id?: string
+              p_payment_id: string
+              p_provider_id: string
+              p_total_amount: number
+            }
+            Returns: Json
+          }
+        | {
+            Args: {
+              p_institution_id?: string
+              p_payment_id: string
+              p_payment_type?: string
+              p_provider_id: string
+              p_total_amount: number
+            }
+            Returns: Json
+          }
       process_wallet_transaction: {
         Args: {
           p_amount: number
@@ -4344,32 +4664,32 @@ export type Database = {
     Enums: {
       admin_level: "admin" | "superadmin"
       app_role:
-      | "patient"
-      | "health_personnel"
-      | "admin"
-      | "institution_admin"
-      | "pharmacy"
-      | "institution_staff"
+        | "patient"
+        | "health_personnel"
+        | "admin"
+        | "institution_admin"
+        | "pharmacy"
+        | "institution_staff"
       experience_level: "entry" | "intermediate" | "expert"
       healthcare_provider_type:
-      | "doctor"
-      | "nurse"
-      | "hospital"
-      | "clinic"
-      | "pharmacy"
-      | "nursing_home"
-      | "dentist"
+        | "doctor"
+        | "nurse"
+        | "hospital"
+        | "clinic"
+        | "pharmacy"
+        | "nursing_home"
+        | "dentist"
       medication_type:
-      | "tablet"
-      | "capsule"
-      | "liquid"
-      | "injection"
-      | "cream"
-      | "ointment"
-      | "drops"
-      | "inhaler"
-      | "powder"
-      | "other"
+        | "tablet"
+        | "capsule"
+        | "liquid"
+        | "injection"
+        | "cream"
+        | "ointment"
+        | "drops"
+        | "inhaler"
+        | "powder"
+        | "other"
       user_role: "admin" | "health_personnel" | "patient"
     }
     CompositeTypes: {
@@ -4384,116 +4704,116 @@ type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
-  | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
-  | { schema: keyof DatabaseWithoutInternals },
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-  ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-    DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-  : never = never,
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
   ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-    DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
-  ? R
-  : never
+    ? R
+    : never
   : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
-    DefaultSchema["Views"])
-  ? (DefaultSchema["Tables"] &
-    DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
-      Row: infer R
-    }
-  ? R
-  : never
-  : never
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
 
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
-  | keyof DefaultSchema["Tables"]
-  | { schema: keyof DatabaseWithoutInternals },
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-  ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-  : never = never,
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
   ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-    Insert: infer I
-  }
-  ? I
-  : never
+      Insert: infer I
+    }
+    ? I
+    : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-  ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-    Insert: infer I
-  }
-  ? I
-  : never
-  : never
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
+    : never
 
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
-  | keyof DefaultSchema["Tables"]
-  | { schema: keyof DatabaseWithoutInternals },
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-  ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-  : never = never,
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
   ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-    Update: infer U
-  }
-  ? U
-  : never
+      Update: infer U
+    }
+    ? U
+    : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-  ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-    Update: infer U
-  }
-  ? U
-  : never
-  : never
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
+    : never
 
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
-  | keyof DefaultSchema["Enums"]
-  | { schema: keyof DatabaseWithoutInternals },
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-  ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-  : never = never,
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
   ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
-  ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
-  : never
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
-  | keyof DefaultSchema["CompositeTypes"]
-  | { schema: keyof DatabaseWithoutInternals },
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-  ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-  : never = never,
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
   ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
-  ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
-  : never
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
 
 export const Constants = {
   public: {

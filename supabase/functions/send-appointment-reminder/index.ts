@@ -98,7 +98,8 @@ serve(async (req) => {
     }
 
     // Format provider name
-    const providerName = `Dr. ${appointment.profiles.first_name} ${appointment.profiles.last_name}`;
+    const profiles = appointment.profiles as { first_name: string; last_name: string } | null;
+    const providerName = profiles ? `Dr. ${profiles.first_name} ${profiles.last_name}` : 'Your Provider';
     
     // Create reminder object
     const reminderData: AppointmentReminder = {
@@ -155,10 +156,11 @@ serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" }
       }
     );
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error in send-appointment-reminder function:", error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: errorMessage }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 500,

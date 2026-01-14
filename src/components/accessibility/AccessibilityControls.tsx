@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { advancedAccessibilityService, AccessibilityPreferences } from '@/utils/advanced-accessibility';
 import { useAccessibility } from '@/context/AccessibilityContext';
+import { toast } from 'sonner';
 
 export const AccessibilityControls: React.FC = () => {
   const { preferences: contextPreferences, updatePreferences: updateContextPreferences } = useAccessibility();

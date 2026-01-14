@@ -107,7 +107,7 @@ export const MedicationInventory = () => {
         return null;
       }
 
-      return data?.institution_id;
+      return (data as unknown as { institution_id: string } | null)?.institution_id || null;
     },
   });
 
@@ -128,7 +128,7 @@ export const MedicationInventory = () => {
         throw new Error(error.message);
       }
 
-      return data as MedicationInventoryItem[];
+      return (data as unknown as MedicationInventoryItem[]) || [];
     },
     enabled: !!userInstitution,
   });

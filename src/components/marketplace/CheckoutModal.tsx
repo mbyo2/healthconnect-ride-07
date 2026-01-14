@@ -53,7 +53,7 @@ export const CheckoutModal = ({
       if (!user) throw new Error('Not authenticated');
 
       const { data, error } = await supabase
-        .from('prescriptions')
+        .from('comprehensive_prescriptions')
         .select('*')
         .eq('patient_id', user.id)
         .order('prescribed_date', { ascending: false });
