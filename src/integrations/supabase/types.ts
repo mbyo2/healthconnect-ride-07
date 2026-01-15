@@ -3050,11 +3050,17 @@ export type Database = {
         Row: {
           amount: number
           created_at: string | null
+          currency: string | null
+          error_message: string | null
+          external_payment_id: string | null
+          failed_at: string | null
           id: string
           invoice_number: string | null
+          metadata: Json | null
           patient_id: string
           payment_date: string | null
           payment_method: string | null
+          payment_url: string | null
           provider_id: string
           refund_amount: number | null
           refund_reason: string | null
@@ -3066,11 +3072,17 @@ export type Database = {
         Insert: {
           amount: number
           created_at?: string | null
+          currency?: string | null
+          error_message?: string | null
+          external_payment_id?: string | null
+          failed_at?: string | null
           id?: string
           invoice_number?: string | null
+          metadata?: Json | null
           patient_id: string
           payment_date?: string | null
           payment_method?: string | null
+          payment_url?: string | null
           provider_id: string
           refund_amount?: number | null
           refund_reason?: string | null
@@ -3082,11 +3094,17 @@ export type Database = {
         Update: {
           amount?: number
           created_at?: string | null
+          currency?: string | null
+          error_message?: string | null
+          external_payment_id?: string | null
+          failed_at?: string | null
           id?: string
           invoice_number?: string | null
+          metadata?: Json | null
           patient_id?: string
           payment_date?: string | null
           payment_method?: string | null
+          payment_url?: string | null
           provider_id?: string
           refund_amount?: number | null
           refund_reason?: string | null
