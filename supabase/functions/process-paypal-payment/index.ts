@@ -44,6 +44,22 @@ interface PayPalOrderResponse {
   }>;
 }
 
+const isUuid = (value: string) =>
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
+
+const getErrorMessage = (err: unknown): string => {
+  if (err instanceof Error) return err.message;
+  if (typeof err === 'string') return err;
+  if (err && typeof err === 'object' && 'message' in err && typeof (err as any).message === 'string') {
+    return (err as any).message;
+  }
+  try {
+    return JSON.stringify(err);
+  } catch {
+    return 'Unknown error';
+  }
+};
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -94,25 +110,32 @@ serve(async (req) => {
     }
 
     // Create payment record in our database first
+    // NOTE: payments.service_id is a UUID in our schema, but wallet top-ups send serviceId like "wallet_topup".
+    // We store non-UUID service identifiers in metadata and set service_id to null.
+    const serviceIdForDb = isUuid(serviceId) ? serviceId : null;
+
     const { data: payment, error: paymentError } = await supabaseClient
       .from('payments')
       .insert({
         patient_id: patientId,
         provider_id: providerId,
-        service_id: serviceId,
+        service_id: serviceIdForDb,
         amount: amount,
         currency: currency || 'USD',
         status: 'pending',
         payment_method: 'paypal',
         invoice_number: `PAY-${Date.now()}-${patientId}`,
+        metadata: {
+          requested_service_id: serviceId,
+          requested_provider_id: providerId,
+          requested_currency: currency || 'USD'
+        },
         created_at: new Date().toISOString()
       })
       .select()
       .single();
 
     if (paymentError) throw paymentError;
-
-    // Get PayPal credentials from environment
     const paypalClientId = Deno.env.get('PAYPAL_CLIENT_ID');
     const paypalClientSecret = Deno.env.get('PAYPAL_CLIENT_SECRET');
     const paypalBaseUrl = Deno.env.get('PAYPAL_BASE_URL') || 'https://api-m.sandbox.paypal.com'; // Default to sandbox
@@ -203,6 +226,9 @@ serve(async (req) => {
           external_payment_id: orderData.id,
           payment_url: approvalUrl,
           metadata: {
+            ...(typeof (payment as any).metadata === 'object' && (payment as any).metadata !== null
+              ? (payment as any).metadata
+              : {}),
             paypal_order_id: orderData.id,
             paypal_status: orderData.status
           }
@@ -230,7 +256,7 @@ serve(async (req) => {
 
     } catch (paypalError: unknown) {
       console.error('PayPal API error:', paypalError);
-      const errorMessage = paypalError instanceof Error ? paypalError.message : 'Unknown PayPal error';
+      const errorMessage = getErrorMessage(paypalError);
 
       // Update payment status to failed
       await supabaseClient
