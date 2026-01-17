@@ -55,6 +55,9 @@ const getErrorMessage = (err: unknown): string => {
   }
   try {
     return JSON.stringify(err);
+  } catch {
+    return 'Unknown error';
+  }
 };
 
 const ZERO_UUID = '00000000-0000-0000-0000-000000000000';
