@@ -70,9 +70,11 @@ export const Hero = () => {
           <div className="relative">
             <div className="modern-card p-8 max-w-md mx-auto">
               <div className="text-center mb-6">
-                <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-xl mx-auto mb-4">
-                  D0C
-                </div>
+                <img 
+                  src="/d0c-icon.svg" 
+                  alt="Doc' O Clock" 
+                  className="w-16 h-16 mx-auto mb-4 object-contain"
+                />
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">Emergency Ready</h3>
                 <p className="text-gray-600">Healthcare at your fingertips</p>
               </div>
