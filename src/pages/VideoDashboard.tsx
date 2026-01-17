@@ -3,6 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Video, Calendar, Users, Phone } from 'lucide-react';
+import { safeCryptoUUID } from '@/utils/storage';
 
 const VideoDashboard: React.FC = () => {
   return (
@@ -64,7 +65,7 @@ const VideoDashboard: React.FC = () => {
           <CardDescription>Start a video session or schedule an appointment</CardDescription>
         </CardHeader>
         <CardContent className="flex gap-4">
-          <Button className="flex items-center gap-2" onClick={() => window.location.href = `/video-call/${crypto.randomUUID()}`}>
+          <Button className="flex items-center gap-2" onClick={() => window.location.href = `/video-call/${safeCryptoUUID()}`}>
             <Phone className="h-4 w-4" />
             Start Video Call
           </Button>

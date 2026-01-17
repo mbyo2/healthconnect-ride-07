@@ -17,14 +17,18 @@ export function usePwaStatus() {
       const swStatus = await checkServiceWorkerStatus();
       setIsServiceWorkerActive(swStatus);
       
-      // Check if initial caching is complete
-      if (swStatus && 'caches' in window) {
+      // Check if initial caching is complete - wrapped in try-catch for security restrictions
+      if (swStatus) {
         try {
-          const cache = await caches.open('doc-o-clock-cache-v1');
-          const keys = await cache.keys();
-          setCachingComplete(keys.length > 0);
+          if ('caches' in window && typeof caches !== 'undefined') {
+            const cache = await caches.open('doc-o-clock-cache-v1');
+            const keys = await cache.keys();
+            setCachingComplete(keys.length > 0);
+          }
         } catch (err) {
-          console.error('Error checking cache status:', err);
+          // Cache API may be blocked in some environments (private browsing, iframes)
+          console.warn('Cache API access blocked:', err);
+          setCachingComplete(false);
         }
       }
     };
