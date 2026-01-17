@@ -20,12 +20,49 @@ serve(async (req) => {
   }
 
   try {
+    // Authentication check - require valid user token
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      console.error('Missing or invalid Authorization header');
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized', success: false }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Create authenticated client to verify user
+    const supabaseAuth = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser();
+    if (authError || !user) {
+      console.error('Authentication failed:', authError?.message);
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized', success: false }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    console.log('Authenticated user:', user.id);
+
+    // Use service role client for database operations
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
     const { phone, message, type, patientId } = await req.json() as SMSRequest;
+
+    // Input validation
+    if (!phone || !message || !type) {
+      return new Response(
+        JSON.stringify({ error: 'Missing required fields: phone, message, type', success: false }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     // Format phone number for Zambian mobile networks
     const formatZambianPhone = (phoneNumber: string): string => {
@@ -81,7 +118,7 @@ serve(async (req) => {
     // Simulate SMS API call (replace with actual provider)
     const smsResponse = await simulateZambianSMS(formattedPhone, message, smsConfig);
 
-    // Log SMS attempt in database
+    // Log SMS attempt in database with sender info
     const { error: logError } = await supabaseClient
       .from('sms_logs')
       .insert({
@@ -89,6 +126,7 @@ serve(async (req) => {
         message: message,
         type: type,
         patient_id: patientId,
+        sender_id: user.id, // Track who sent the SMS
         status: smsResponse.success ? 'sent' : 'failed',
         provider: smsConfig.provider,
         response_data: smsResponse,
@@ -103,7 +141,7 @@ serve(async (req) => {
       throw new Error(smsResponse.error || 'Failed to send SMS');
     }
 
-    console.log(`SMS sent successfully to ${formattedPhone}:`, smsResponse);
+    console.log(`SMS sent successfully by user ${user.id} to ${formattedPhone}:`, smsResponse);
 
     return new Response(
       JSON.stringify({

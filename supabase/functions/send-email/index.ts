@@ -1,5 +1,5 @@
-
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
 import {
   appointmentReminderTemplate,
   paymentConfirmationTemplate,
@@ -29,8 +29,54 @@ serve(async (req) => {
   }
 
   try {
+    // Authentication check - require valid user token
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      console.error('Missing or invalid Authorization header');
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Create authenticated client to verify user
+    const supabaseAuth = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser();
+    if (authError || !user) {
+      console.error('Authentication failed:', authError?.message);
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    console.log('Authenticated user:', user.id);
+
     const emailRequest: EmailRequest = await req.json();
-    console.log("Processing email request:", emailRequest);
+    console.log("Processing email request from user:", user.id, emailRequest.type);
+
+    // Input validation
+    if (!emailRequest.type || !emailRequest.to || !Array.isArray(emailRequest.to) || emailRequest.to.length === 0) {
+      return new Response(
+        JSON.stringify({ error: 'Missing required fields: type and to (array of emails)' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Validate email addresses
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const invalidEmails = emailRequest.to.filter(email => !emailRegex.test(email));
+    if (invalidEmails.length > 0) {
+      return new Response(
+        JSON.stringify({ error: `Invalid email addresses: ${invalidEmails.join(', ')}` }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     let subject: string;
     let html: string;
@@ -74,7 +120,7 @@ serve(async (req) => {
     }
 
     const data = await res.json();
-    console.log("Email sent successfully:", data);
+    console.log("Email sent successfully by user:", user.id, data);
 
     return new Response(JSON.stringify(data), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
