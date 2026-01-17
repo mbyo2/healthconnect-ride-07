@@ -418,7 +418,7 @@ const LabManagement = () => {
                             {selectedRequest ? (
                                 <div className="space-y-4">
                                     <div className="p-4 bg-accent/50 rounded-lg">
-                                        <h4 className="font-semibold">{selectedRequest.test_type || (selectedRequest as any).test?.name}</h4>
+                                        <h4 className="font-semibold">{(selectedRequest as any).test_type || (selectedRequest as any).test?.name}</h4>
                                         <p className="text-sm">Patient: {selectedRequest.patient?.first_name} {selectedRequest.patient?.last_name}</p>
                                     </div>
                                     <div className="space-y-2">

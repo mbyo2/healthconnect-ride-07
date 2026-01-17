@@ -55,10 +55,9 @@ const getErrorMessage = (err: unknown): string => {
   }
   try {
     return JSON.stringify(err);
-  } catch {
-    return 'Unknown error';
-  }
 };
+
+const ZERO_UUID = '00000000-0000-0000-0000-000000000000';
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -101,8 +100,21 @@ serve(async (req) => {
 
     const { amount, currency, patientId, providerId, serviceId, redirectUrl } = validationResult.data;
 
-    // Prevent self-payment
-    if (patientId === providerId) {
+    const isWalletTopUp = serviceId === 'wallet_topup';
+
+    // Wallet top-ups are platform/system payments (no real provider). Our DB requires provider_id,
+    // so we store provider_id as the patient's own profile for top-ups.
+    const providerIdForDb = isWalletTopUp ? patientId : providerId;
+
+    if (!isWalletTopUp && providerId === ZERO_UUID) {
+      return new Response(
+        JSON.stringify({ success: false, error: 'Invalid provider ID' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Prevent self-payment for normal service payments (wallet top-ups are allowed)
+    if (!isWalletTopUp && patientId === providerId) {
       return new Response(
         JSON.stringify({ success: false, error: 'Cannot process payment to yourself' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -118,7 +130,7 @@ serve(async (req) => {
       .from('payments')
       .insert({
         patient_id: patientId,
-        provider_id: providerId,
+        provider_id: providerIdForDb,
         service_id: serviceIdForDb,
         amount: amount,
         currency: currency || 'USD',
@@ -128,6 +140,7 @@ serve(async (req) => {
         metadata: {
           requested_service_id: serviceId,
           requested_provider_id: providerId,
+          provider_id_for_db: providerIdForDb,
           requested_currency: currency || 'USD'
         },
         created_at: new Date().toISOString()
@@ -273,7 +286,7 @@ serve(async (req) => {
 
   } catch (error: unknown) {
     console.error('Error processing PayPal payment:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorMessage = getErrorMessage(error);
     return new Response(
       JSON.stringify({
         success: false,

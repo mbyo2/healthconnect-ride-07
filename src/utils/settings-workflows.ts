@@ -1,6 +1,8 @@
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
+const sb: any = supabase;
+
 export type SettingStatus = 'active' | 'inactive' | 'pending' | 'archived';
 
 interface SettingChange {
@@ -48,9 +50,9 @@ export const updateSettingStatus = async (
 ): Promise<SettingTransitionResult> => {
     try {
         // Get current setting
-        const { data: setting, error: fetchError } = await supabase
+        const { data: setting, error: fetchError } = await sb
             .from('user_settings')
-            .select('status, change_history')
+            .select('status, change_history, value')
             .eq('setting_key', settingKey)
             .eq('user_id', userId)
             .single();
@@ -83,7 +85,7 @@ export const updateSettingStatus = async (
             reason,
         });
 
-        const { error: updateError } = await supabase
+        const { error: updateError } = await sb
             .from('user_settings')
             .update({
                 status: newStatus,
@@ -137,7 +139,7 @@ export const applySettingChange = async (
         }
 
         // Get current setting
-        const { data: setting, error: fetchError } = await supabase
+        const { data: setting, error: fetchError } = await sb
             .from('user_settings')
             .select('value, change_history')
             .eq('setting_key', settingKey)
@@ -155,7 +157,7 @@ export const applySettingChange = async (
         });
 
         // Upsert setting
-        const { error: upsertError } = await supabase
+        const { error: upsertError } = await sb
             .from('user_settings')
             .upsert({
                 user_id: userId,
@@ -199,7 +201,7 @@ export const getSettingHistory = async (
     userId: string
 ): Promise<SettingChange[]> => {
     try {
-        const { data, error } = await supabase
+        const { data, error } = await sb
             .from('user_settings')
             .select('change_history')
             .eq('setting_key', settingKey)

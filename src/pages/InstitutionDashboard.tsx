@@ -89,7 +89,7 @@ export const InstitutionDashboard = () => {
 
                 // Report Count (Audit logs)
                 const { count: reportCount } = await supabase
-                    .from('audit_logs')
+                    .from('audit_logs' as any)
                     .select('*', { count: 'exact', head: true })
                     .eq('institution_id', inst.id);
 

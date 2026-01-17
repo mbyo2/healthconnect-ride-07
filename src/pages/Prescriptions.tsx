@@ -21,7 +21,7 @@ const Prescriptions = () => {
 
   const fetchPrescriptions = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('comprehensive_prescriptions')
         .select(`
           id,
@@ -39,17 +39,21 @@ const Prescriptions = () => {
 
       if (error) throw error;
 
-      setPrescriptions(data?.map(p => ({
-        id: p.id,
-        medication: p.medication_name,
-        prescriber: p.provider ? `Dr. ${p.provider.first_name} ${p.provider.last_name}` : 'Unknown Provider',
-        dosage: p.dosage,
-        duration: p.duration_days ? `${p.duration_days} days` : 'As directed',
-        prescribedDate: p.prescribed_date,
-        status: p.status || 'active',
-        refillsRemaining: p.refills_remaining || 0,
-        instructions: p.instructions
-      })) || []);
+      const rows: any[] = data || [];
+
+      setPrescriptions(
+        rows.map((p) => ({
+          id: p.id,
+          medication: p.medication_name,
+          prescriber: p.provider ? `Dr. ${p.provider.first_name} ${p.provider.last_name}` : 'Unknown Provider',
+          dosage: p.dosage,
+          duration: p.duration_days ? `${p.duration_days} days` : 'As directed',
+          prescribedDate: p.prescribed_date,
+          status: p.status || 'active',
+          refillsRemaining: p.refills_remaining || 0,
+          instructions: p.instructions
+        }))
+      );
     } catch (error) {
       console.error('Error fetching prescriptions:', error);
     } finally {

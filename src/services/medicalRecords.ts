@@ -22,7 +22,7 @@ export const getMedicalRecords = async (): Promise<MedicalRecord[]> => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return [];
 
-    const { data: records } = await supabase
+    const { data: records } = await (supabase as any)
       .from('comprehensive_medical_records')
       .select(`
         id,
@@ -35,14 +35,16 @@ export const getMedicalRecords = async (): Promise<MedicalRecord[]> => {
       .eq('patient_id', user.id)
       .order('visit_date', { ascending: false });
 
-    return records?.map(record => ({
+    const rows: any[] = records || [];
+
+    return rows.map((record) => ({
       id: record.id,
       title: record.title,
       date: record.visit_date,
       provider: record.provider ? `Dr. ${record.provider.first_name} ${record.provider.last_name}` : 'Healthcare Provider',
       type: record.record_type,
       status: record.status || 'Active'
-    })) || [];
+    }));
   } catch (error) {
     console.error('Error fetching medical records:', error);
     return [];

@@ -59,8 +59,8 @@ const ProviderCalendar = () => {
 
       // Fetch time slots for the current week
       const weekEnd = addDays(currentWeekStart, 7);
-      const { data: slotsData, error: slotsError } = await supabase
-        .from('provider_time_slots' as any)
+      const { data: slotsData, error: slotsError } = await (supabase as any)
+        .from('provider_time_slots')
         .select('*')
         .eq('provider_id', user.id)
         .gte('date', format(currentWeekStart, 'yyyy-MM-dd'))
@@ -68,13 +68,15 @@ const ProviderCalendar = () => {
 
       if (slotsError) throw slotsError;
 
+      const slots: any[] = slotsData || [];
+
       // Fetch appointments for these time slots
-      const slotIds = slotsData?.map((s) => s.id) || [];
-      let appointmentsData = [];
+      const slotIds = slots.map((s) => s.id) || [];
+      let appointmentsData: any[] = [];
 
       if (slotIds.length > 0) {
-        const { data: apptData, error: apptError } = await supabase
-          .from('appointments' as any)
+        const { data: apptData, error: apptError } = await (supabase as any)
+          .from('appointments')
           .select(`
             *,
             patient:profiles!patient_id(first_name, last_name)
@@ -86,7 +88,7 @@ const ProviderCalendar = () => {
         appointmentsData = apptData || [];
       }
 
-      setTimeSlots(slotsData || []);
+      setTimeSlots(slots as any);
       setAppointments(
         appointmentsData.map((a: any) => ({
           ...a,
