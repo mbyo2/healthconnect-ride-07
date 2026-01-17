@@ -105,11 +105,24 @@ serve(async (req) => {
 
     const isWalletTopUp = serviceId === 'wallet_topup';
 
+    console.log('Payment request details:', {
+      isWalletTopUp,
+      patientId,
+      providerId,
+      serviceId,
+      amount,
+      currency
+    });
+
     // Wallet top-ups are platform/system payments (no real provider). Our DB requires provider_id,
     // so we store provider_id as the patient's own profile for top-ups.
     const providerIdForDb = isWalletTopUp ? patientId : providerId;
 
+    console.log('Provider ID for DB:', providerIdForDb);
+
+    // Only reject ZERO_UUID for non-wallet-topup payments
     if (!isWalletTopUp && providerId === ZERO_UUID) {
+      console.error('Invalid provider ID for non-wallet payment');
       return new Response(
         JSON.stringify({ success: false, error: 'Invalid provider ID' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
