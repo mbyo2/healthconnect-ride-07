@@ -4,7 +4,16 @@ import { safeLocalGet, safeLocalSet, safeLocalRemove } from '@/utils/storage';
 
 // For local development, we'll use the production Supabase URL
 // In production, these will be set via environment variables in Netlify
-const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const getIsLocalhost = (): boolean => {
+  try {
+    if (typeof window === 'undefined') return false;
+    const hostname = window.location?.hostname;
+    return hostname === 'localhost' || hostname === '127.0.0.1';
+  } catch {
+    return false;
+  }
+};
+const isLocalhost = getIsLocalhost();
 
 // Use Supabase URL and key from environment variables only
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
