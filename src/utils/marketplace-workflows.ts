@@ -1,6 +1,8 @@
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
+const sb: any = supabase;
+
 export type MarketplaceOrderStatus =
     | 'pending'
     | 'confirmed'
@@ -104,7 +106,7 @@ const transitionOrderStatus = async (
 ): Promise<OrderTransitionResult> => {
     try {
         // Get current order
-        const { data: order, error: fetchError } = await supabase
+        const { data: order, error: fetchError } = await sb
             .from('marketplace_orders')
             .select('status, status_history')
             .eq('id', orderId)
@@ -135,7 +137,7 @@ const transitionOrderStatus = async (
             updatedBy: userId,
         });
 
-        const { error: updateError } = await supabase
+        const { error: updateError } = await sb
             .from('marketplace_orders')
             .update({
                 status: newStatus,
@@ -186,7 +188,7 @@ export const getOrderHistory = async (
     orderId: string
 ): Promise<OrderStatusHistory[]> => {
     try {
-        const { data, error } = await supabase
+        const { data, error } = await sb
             .from('marketplace_orders')
             .select('status_history')
             .eq('id', orderId)

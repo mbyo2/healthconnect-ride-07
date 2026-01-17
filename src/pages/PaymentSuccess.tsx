@@ -39,11 +39,16 @@ const PaymentSuccess = () => {
             // Check if it was a wallet top-up
             const { data: paymentData } = await supabase
               .from('payments')
-              .select('service_id')
+              .select('metadata')
               .eq('id', paymentId)
               .single();
 
-            if (paymentData?.service_id === 'wallet_topup') {
+            const requestedServiceId =
+              paymentData?.metadata && typeof paymentData.metadata === 'object'
+                ? (paymentData.metadata as any).requested_service_id
+                : null;
+
+            if (requestedServiceId === 'wallet_topup') {
               setIsWalletTopUp(true);
             }
           } else {
