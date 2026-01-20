@@ -76,7 +76,7 @@ const AppointmentDetails = lazy(() => import('@/pages/AppointmentDetails'));
 const Wallet = lazy(() => import('@/pages/Wallet'));
 
 const AppContent = () => {
-  const { user, session, isLoading, profile } = useAuth();
+  const { user, isLoading, profile } = useAuth();
 
   // Initialize Android Hardware Back Button listener
   useAndroidBackButton();
