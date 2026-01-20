@@ -1,7 +1,5 @@
-
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,13 +7,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ColumnDef } from "@tanstack/react-table";
 import { DataTable } from "@/components/ui/data-table";
 import { MoreHorizontal, UserPlus, ShieldAlert, Users, Settings } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { AdminLevel, UserRole } from "@/types/user";
+import { AdminLevel } from "@/types/user";
 import { Badge } from "@/components/ui/badge";
 import { createSuperAdmin } from "@/utils/createSuperAdmin";
 
@@ -38,8 +35,6 @@ const SuperAdminDashboard = () => {
   const [newAdminLastName, setNewAdminLastName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
-  const [userRole, setUserRole] = useState<UserRole | null>(null);
-  const [adminLevel, setAdminLevel] = useState<AdminLevel | null>(null);
 
   useEffect(() => {
     // Check if user is superadmin
@@ -68,8 +63,7 @@ const SuperAdminDashboard = () => {
           return;
         }
 
-        setUserRole(profile.role as UserRole);
-        setAdminLevel(profile.admin_level as AdminLevel);
+        // Permission check passed, fetch admins
 
         // Fetch admin users
         fetchAdmins();

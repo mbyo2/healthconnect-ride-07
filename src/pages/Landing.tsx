@@ -1,6 +1,4 @@
-
-import React, { useEffect } from 'react';
-import { Header } from '@/components/Header';
+import { useEffect } from 'react';
 import { Hero } from "@/components/Hero";
 import { ServiceHighlights } from "@/components/ServiceHighlights";
 import { Testimonials } from "@/components/Testimonials";
