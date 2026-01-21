@@ -102,19 +102,19 @@ export const Testimonials = () => {
 
   if (loading) {
     return (
-      <section className="py-16 px-4">
+      <section className="py-16 px-4 bg-background">
         <div className="container mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">What Our Users Say</h2>
+            <h2 className="text-3xl font-bold mb-4 text-foreground">What Our Users Say</h2>
             <p className="text-muted-foreground">Loading testimonials...</p>
           </div>
           <div className="grid md:grid-cols-3 gap-6">
             {[1, 2, 3].map((i) => (
               <Card key={i} className="animate-pulse">
                 <CardContent className="p-6">
-                  <div className="h-4 bg-gray-200 rounded mb-4"></div>
-                  <div className="h-16 bg-gray-200 rounded mb-4"></div>
-                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                  <div className="h-4 bg-muted rounded mb-4"></div>
+                  <div className="h-16 bg-muted rounded mb-4"></div>
+                  <div className="h-4 bg-muted rounded w-3/4"></div>
                 </CardContent>
               </Card>
             ))}
@@ -125,10 +125,10 @@ export const Testimonials = () => {
   }
 
   return (
-    <section className="py-16 px-4">
+    <section className="py-16 px-4 bg-background">
       <div className="container mx-auto">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold mb-4">What Our Users Say</h2>
+          <h2 className="text-3xl font-bold mb-4 text-foreground">What Our Users Say</h2>
           <p className="text-muted-foreground">
             Trusted by thousands of patients and healthcare providers
           </p>
@@ -136,14 +136,14 @@ export const Testimonials = () => {
         
         <div className="grid md:grid-cols-3 gap-6">
           {testimonials.map((testimonial) => (
-            <Card key={testimonial.id}>
+            <Card key={testimonial.id} className="bg-card border-border">
               <CardContent className="p-6">
                 <div className="flex mb-4">
                   {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                    <Star key={i} className="h-4 w-4 fill-yellow-500 text-yellow-500" />
                   ))}
                 </div>
-                <p className="text-sm mb-4">"{testimonial.content}"</p>
+                <p className="text-sm mb-4 text-foreground">"{testimonial.content}"</p>
                 <div className="flex items-center gap-3">
                   {testimonial.avatar_url && (
                     <img 
@@ -153,7 +153,7 @@ export const Testimonials = () => {
                     />
                   )}
                   <div>
-                    <p className="font-medium">{testimonial.name}</p>
+                    <p className="font-medium text-foreground">{testimonial.name}</p>
                     <p className="text-xs text-muted-foreground">{testimonial.role}</p>
                   </div>
                 </div>

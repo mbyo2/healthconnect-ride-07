@@ -34,14 +34,14 @@ export const SpecializedHelp = () => {
                 console.error('Error fetching specialized care categories:', error);
                 // Fallback to hardcoded values if table doesn't exist
                 return [
-                    { id: 'dental', name: 'Dental Health', icon_name: 'Smile', color_class: 'bg-cyan-50', route: '/search?category=dental' },
-                    { id: 'skin', name: 'Skin & Hair', icon_name: 'Zap', color_class: 'bg-orange-50', route: '/search?category=skin' },
-                    { id: 'heart', name: 'Heart Health', icon_name: 'Heart', color_class: 'bg-red-50', route: '/search?category=heart' },
-                    { id: 'mental', name: 'Mental Health', icon_name: 'Brain', color_class: 'bg-purple-50', route: '/search?category=mental' },
-                    { id: 'pediatrics', name: 'Pediatrics', icon_name: 'Baby', color_class: 'bg-blue-50', route: '/search?category=pediatrics' },
-                    { id: 'ortho', name: 'Orthopedics', icon_name: 'Bone', color_class: 'bg-amber-50', route: '/search?category=ortho' },
-                    { id: 'neuro', name: 'Neurology', icon_name: 'Activity', color_class: 'bg-indigo-50', route: '/search?category=neuro' },
-                    { id: 'emergency', name: 'Emergency', icon_name: 'ShieldAlert', color_class: 'bg-rose-50', route: '/emergency' },
+                    { id: 'dental', name: 'Dental Health', icon_name: 'Smile', color_class: 'bg-cyan-500/10 dark:bg-cyan-500/20', route: '/search?category=dental' },
+                    { id: 'skin', name: 'Skin & Hair', icon_name: 'Zap', color_class: 'bg-orange-500/10 dark:bg-orange-500/20', route: '/search?category=skin' },
+                    { id: 'heart', name: 'Heart Health', icon_name: 'Heart', color_class: 'bg-red-500/10 dark:bg-red-500/20', route: '/search?category=heart' },
+                    { id: 'mental', name: 'Mental Health', icon_name: 'Brain', color_class: 'bg-purple-500/10 dark:bg-purple-500/20', route: '/search?category=mental' },
+                    { id: 'pediatrics', name: 'Pediatrics', icon_name: 'Baby', color_class: 'bg-blue-500/10 dark:bg-blue-500/20', route: '/search?category=pediatrics' },
+                    { id: 'ortho', name: 'Orthopedics', icon_name: 'Bone', color_class: 'bg-amber-500/10 dark:bg-amber-500/20', route: '/search?category=ortho' },
+                    { id: 'neuro', name: 'Neurology', icon_name: 'Activity', color_class: 'bg-indigo-500/10 dark:bg-indigo-500/20', route: '/search?category=neuro' },
+                    { id: 'emergency', name: 'Emergency', icon_name: 'ShieldAlert', color_class: 'bg-rose-500/10 dark:bg-rose-500/20', route: '/emergency' },
                 ];
             }
             return data;
@@ -62,11 +62,11 @@ export const SpecializedHelp = () => {
                 {categories?.map((category: any) => (
                     <Card
                         key={category.id}
-                        className="w-28 h-28 flex-shrink-0 cursor-pointer hover:shadow-lg transition-all duration-300 border-none shadow-sm hover:-translate-y-1 active:scale-95 group"
+                        className="w-28 h-28 flex-shrink-0 cursor-pointer hover:shadow-lg transition-all duration-300 border border-border shadow-sm hover:-translate-y-1 active:scale-95 group"
                         onClick={() => navigate(category.route)}
                     >
-                        <CardContent className={`p-0 h-full flex flex-col items-center justify-center gap-3 rounded-xl transition-colors duration-300 ${category.color_class} group-hover:bg-opacity-80`}>
-                            <div className="p-2.5 bg-white rounded-2xl shadow-sm group-hover:shadow-md transition-all duration-300 group-hover:scale-110">
+                        <CardContent className={`p-0 h-full flex flex-col items-center justify-center gap-3 rounded-xl transition-colors duration-300 ${category.color_class}`}>
+                            <div className="p-2.5 bg-card border border-border rounded-2xl shadow-sm group-hover:shadow-md transition-all duration-300 group-hover:scale-110">
                                 {iconMap[category.icon_name] || <Activity className="h-6 w-6" />}
                             </div>
                             <span className="text-[11px] sm:text-xs font-extrabold text-foreground text-center px-2 leading-tight tracking-tight">

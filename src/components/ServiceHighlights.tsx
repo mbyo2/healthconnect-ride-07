@@ -83,55 +83,55 @@ export const ServiceHighlights = () => {
   ];
 
   return (
-    <section className="py-16 bg-gray-50">
+    <section className="py-16 bg-muted/50">
       <div className="container-modern">
         <div className="text-center mb-12">
-          <h2 className="text-3xl lg:text-4xl font-bold mb-4 text-gray-900">
+          <h2 className="text-3xl lg:text-4xl font-bold mb-4 text-foreground">
             Everything You Need for Better Healthcare
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             Discover why {stats.totalUsers > 0 ? `${stats.totalUsers} users` : 'thousands'} trust Doc' O Clock for their healthcare needs
           </p>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {services.map((service, index) => (
-            <div key={index} className="service-card group">
+            <div key={index} className="bg-card border border-border rounded-xl p-6 hover:shadow-lg transition-shadow group">
               <div className="flex items-start gap-4 mb-4">
-                <div className="p-3 bg-gray-50 rounded-xl group-hover:bg-blue-50 transition-colors duration-200">
+                <div className="p-3 bg-muted rounded-xl group-hover:bg-primary/10 transition-colors duration-200">
                   {service.icon}
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900 mb-2 text-lg">
+                  <h3 className="font-semibold text-foreground mb-2 text-lg">
                     {service.title}
                   </h3>
-                  <p className="text-gray-600 text-sm leading-relaxed mb-3">
+                  <p className="text-muted-foreground text-sm leading-relaxed mb-3">
                     {service.description}
                   </p>
 
                   {/* Rating and stats */}
                   <div className="flex items-center justify-between text-xs">
                     <div className="flex items-center gap-1">
-                      <Star className="h-3 w-3 text-yellow-400 fill-current" />
-                      <span className="font-medium text-gray-700">{service.rating}</span>
+                      <Star className="h-3 w-3 text-yellow-500 fill-current" />
+                      <span className="font-medium text-foreground">{service.rating}</span>
                     </div>
-                    <span className="text-gray-500">{service.users}</span>
+                    <span className="text-muted-foreground">{service.users}</span>
                   </div>
                 </div>
               </div>
 
               {/* Progress indicator */}
-              <div className="w-full bg-gray-200 rounded-full h-1 mb-2">
-                <div className="bg-blue-600 h-1 rounded-full" style={{ width: `${90 + index * 2}%` }}></div>
+              <div className="w-full bg-muted rounded-full h-1 mb-2">
+                <div className="bg-primary h-1 rounded-full" style={{ width: `${90 + index * 2}%` }}></div>
               </div>
-              <p className="text-xs text-gray-500">Available now</p>
+              <p className="text-xs text-muted-foreground">Available now</p>
             </div>
           ))}
         </div>
 
         {/* Bottom CTA */}
         <div className="text-center mt-12">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-medium mb-4">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-500/10 dark:bg-green-500/20 text-green-700 dark:text-green-300 rounded-full text-sm font-medium mb-4">
             <CheckCircle className="h-4 w-4" />
             All services included in free plan
           </div>
