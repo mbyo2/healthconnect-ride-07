@@ -66,7 +66,7 @@ export const PatientWorkflow = React.memo(() => {
     return (
       <div className="space-y-6">
         <div className="text-center">
-          <h2 className="text-2xl font-bold">Loading Your Health Journey...</h2>
+          <h2 className="text-2xl font-bold text-foreground">Loading Your Health Journey...</h2>
         </div>
       </div>
     );
@@ -126,11 +126,11 @@ export const PatientWorkflow = React.memo(() => {
         <div>
           <h2 className="text-lg sm:text-xl font-bold mb-4 px-1 text-foreground">Quick Access</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer border-none shadow-sm bg-white hover:-translate-y-1 active:scale-95" onClick={() => handleNavigation('/emergency', 'Emergency')}>
+            <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer border border-border shadow-sm bg-card hover:-translate-y-1 active:scale-95" onClick={() => handleNavigation('/emergency', 'Emergency')}>
               <CardHeader className="pb-3">
                 <div className="flex items-center gap-2">
-                  <div className="p-2 bg-rose-50 rounded-lg group-hover:bg-rose-100 transition-colors">
-                    <Activity className="h-5 w-5 text-rose-600" />
+                  <div className="p-2 bg-rose-500/10 dark:bg-rose-500/20 rounded-lg group-hover:bg-rose-500/20 transition-colors">
+                    <Activity className="h-5 w-5 text-rose-600 dark:text-rose-400" />
                   </div>
                   <CardTitle className="text-xs sm:text-sm font-bold text-foreground">Emergency</CardTitle>
                 </div>
@@ -140,11 +140,11 @@ export const PatientWorkflow = React.memo(() => {
               </CardContent>
             </Card>
 
-            <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer border-none shadow-sm bg-white hover:-translate-y-1 active:scale-95" onClick={() => handleNavigation('/marketplace', 'Pharmacy')}>
+            <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer border border-border shadow-sm bg-card hover:-translate-y-1 active:scale-95" onClick={() => handleNavigation('/marketplace', 'Pharmacy')}>
               <CardHeader className="pb-3">
                 <div className="flex items-center gap-2">
-                  <div className="p-2 bg-emerald-50 rounded-lg group-hover:bg-emerald-100 transition-colors">
-                    <CreditCard className="h-5 w-5 text-emerald-600" />
+                  <div className="p-2 bg-emerald-500/10 dark:bg-emerald-500/20 rounded-lg group-hover:bg-emerald-500/20 transition-colors">
+                    <CreditCard className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
                   </div>
                   <CardTitle className="text-xs sm:text-sm font-bold text-foreground">Buy Medicine</CardTitle>
                 </div>
@@ -154,11 +154,11 @@ export const PatientWorkflow = React.memo(() => {
               </CardContent>
             </Card>
 
-            <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer border-none shadow-sm bg-white hover:-translate-y-1 active:scale-95" onClick={() => handleNavigation('/marketplace-users', 'Providers')}>
+            <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer border border-border shadow-sm bg-card hover:-translate-y-1 active:scale-95" onClick={() => handleNavigation('/marketplace-users', 'Providers')}>
               <CardHeader className="pb-3">
                 <div className="flex items-center gap-2">
-                  <div className="p-2 bg-blue-50 rounded-lg group-hover:bg-blue-100 transition-colors">
-                    <Users className="h-5 w-5 text-blue-600" />
+                  <div className="p-2 bg-blue-500/10 dark:bg-blue-500/20 rounded-lg group-hover:bg-blue-500/20 transition-colors">
+                    <Users className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                   </div>
                   <CardTitle className="text-xs sm:text-sm font-bold text-foreground">Find Doctor</CardTitle>
                 </div>
@@ -168,11 +168,11 @@ export const PatientWorkflow = React.memo(() => {
               </CardContent>
             </Card>
 
-            <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer border-none shadow-sm bg-white hover:-translate-y-1 active:scale-95" onClick={() => handleNavigation('/appointments', 'Appointments')}>
+            <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer border border-border shadow-sm bg-card hover:-translate-y-1 active:scale-95" onClick={() => handleNavigation('/appointments', 'Appointments')}>
               <CardHeader className="pb-3">
                 <div className="flex items-center gap-2">
-                  <div className="p-2 bg-purple-50 rounded-lg group-hover:bg-purple-100 transition-colors">
-                    <Calendar className="h-5 w-5 text-purple-600" />
+                  <div className="p-2 bg-purple-500/10 dark:bg-purple-500/20 rounded-lg group-hover:bg-purple-500/20 transition-colors">
+                    <Calendar className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                   </div>
                   <CardTitle className="text-xs sm:text-sm font-bold text-foreground">Visits</CardTitle>
                 </div>
@@ -203,14 +203,14 @@ export const PatientWorkflow = React.memo(() => {
   return (
     <div className="space-y-6">
       <div className="text-center space-y-4">
-        <h2 className="text-2xl font-bold">Your Health Journey</h2>
+        <h2 className="text-2xl font-bold text-foreground">Your Health Journey</h2>
         <p className="text-muted-foreground">
           Complete these steps to unlock the full potential of your healthcare experience
         </p>
 
         <div className="max-w-md mx-auto space-y-2">
           <div className="flex justify-between items-center">
-            <span className="text-sm font-medium">Setup Progress</span>
+            <span className="text-sm font-medium text-foreground">Setup Progress</span>
             <span className="text-sm text-muted-foreground">{completionPercentage}%</span>
           </div>
           <Progress value={completionPercentage} className="h-2" />
@@ -230,27 +230,27 @@ export const PatientWorkflow = React.memo(() => {
           return (
             <Card
               key={step.id}
-              className={`cursor-pointer hover:shadow-md transition-all active:scale-95 touch-manipulation ${step.completed ? 'border-green-200 bg-green-50/50' : ''
-                } ${isHighlighted ? 'border-blue-200 bg-blue-50/50 ring-2 ring-blue-100' : ''
+              className={`cursor-pointer hover:shadow-md transition-all active:scale-95 touch-manipulation bg-card border-border ${step.completed ? 'border-green-500/30 bg-green-500/5' : ''
+                } ${isHighlighted ? 'border-primary/30 bg-primary/5 ring-2 ring-primary/20' : ''
                 }`}
             >
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
-                    <div className={`p-2 rounded-lg flex-shrink-0 ${step.completed ? 'bg-green-500/10' :
-                      isHighlighted ? 'bg-blue-500/10' : 'bg-gray-500/10'
+                    <div className={`p-2 rounded-lg flex-shrink-0 ${step.completed ? 'bg-green-500/10 dark:bg-green-500/20' :
+                      isHighlighted ? 'bg-primary/10 dark:bg-primary/20' : 'bg-muted'
                       }`}>
-                      <IconComponent className={`h-4 w-4 ${step.completed ? 'text-green-600' :
-                        isHighlighted ? 'text-blue-600' : 'text-gray-600'
+                      <IconComponent className={`h-4 w-4 ${step.completed ? 'text-green-600 dark:text-green-400' :
+                        isHighlighted ? 'text-primary' : 'text-muted-foreground'
                         }`} />
                     </div>
-                    <CardTitle className="text-sm leading-tight">{step.title}</CardTitle>
+                    <CardTitle className="text-sm leading-tight text-foreground">{step.title}</CardTitle>
                   </div>
                   <div className="flex-shrink-0">
                     {step.completed ? (
-                      <CheckCircle2 className="h-4 w-4 text-green-600" />
+                      <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
                     ) : (
-                      <Circle className="h-4 w-4 text-gray-400" />
+                      <Circle className="h-4 w-4 text-muted-foreground" />
                     )}
                   </div>
                 </div>
@@ -260,7 +260,7 @@ export const PatientWorkflow = React.memo(() => {
                   </Badge>
                 )}
                 {isHighlighted && (
-                  <Badge variant="outline" className="w-fit text-xs border-blue-300 text-blue-700">
+                  <Badge variant="outline" className="w-fit text-xs border-primary/50 text-primary">
                     Next Step
                   </Badge>
                 )}

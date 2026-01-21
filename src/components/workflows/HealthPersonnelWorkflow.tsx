@@ -94,7 +94,7 @@ export const HealthPersonnelWorkflow = () => {
   return (
     <div className="space-y-6 px-4 py-6 max-w-7xl mx-auto">
       <div className="text-center space-y-2">
-        <h2 className="text-xl md:text-2xl font-bold">Healthcare Provider Dashboard</h2>
+        <h2 className="text-xl md:text-2xl font-bold text-foreground">Healthcare Provider Dashboard</h2>
         <p className="text-muted-foreground text-sm md:text-base px-4">
           Manage your practice and provide quality care to your patients
         </p>
@@ -102,13 +102,13 @@ export const HealthPersonnelWorkflow = () => {
 
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {workflowSteps.map((step, index) => (
-          <Card key={index} className="cursor-pointer hover:shadow-md transition-all active:scale-95 touch-manipulation">
+          <Card key={index} className="cursor-pointer hover:shadow-md transition-all active:scale-95 touch-manipulation bg-card border-border">
             <CardHeader className="pb-3">
               <div className="flex items-center space-x-2">
-                <div className="p-2 bg-green-500/10 rounded-lg flex-shrink-0">
+                <div className="p-2 bg-green-500/10 dark:bg-green-500/20 rounded-lg flex-shrink-0">
                   {step.icon}
                 </div>
-                <CardTitle className="text-xs leading-tight">{step.title}</CardTitle>
+                <CardTitle className="text-xs leading-tight text-foreground">{step.title}</CardTitle>
               </div>
             </CardHeader>
             <CardContent>
