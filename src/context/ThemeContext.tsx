@@ -27,26 +27,34 @@ export function ThemeProvider({
   storageKey = "vite-ui-theme",
   ...props
 }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(
-    () => (safeLocalGet(storageKey) as Theme) || defaultTheme
-  );
+  const [theme, setTheme] = useState<Theme>(() => {
+    try {
+      return (safeLocalGet(storageKey) as Theme) || defaultTheme;
+    } catch {
+      return defaultTheme;
+    }
+  });
 
   useEffect(() => {
-    const root = window.document.documentElement;
+    try {
+      const root = window.document.documentElement;
 
-    root.classList.remove("light", "dark");
+      root.classList.remove("light", "dark");
 
-    if (theme === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
-        .matches
-        ? "dark"
-        : "light";
+      if (theme === "system") {
+        const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
+          .matches
+          ? "dark"
+          : "light";
 
-      root.classList.add(systemTheme);
-      return;
+        root.classList.add(systemTheme);
+        return;
+      }
+
+      root.classList.add(theme);
+    } catch (error) {
+      console.warn('Theme update failed:', error);
     }
-
-    root.classList.add(theme);
   }, [theme]);
 
   const value = {
