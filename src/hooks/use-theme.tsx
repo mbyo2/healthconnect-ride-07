@@ -30,26 +30,34 @@ export function ThemeProvider({
   storageKey = "doc-oclock-theme",
   ...props
 }: ThemeProviderProps) {
-  const [theme, setTheme] = React.useState<Theme>(
-    () => (safeLocalGet(storageKey) as Theme) || defaultTheme
-  );
+  const [theme, setTheme] = React.useState<Theme>(() => {
+    try {
+      return (safeLocalGet(storageKey) as Theme) || defaultTheme;
+    } catch {
+      return defaultTheme;
+    }
+  });
 
   React.useEffect(() => {
-    const root = window.document.documentElement;
-    
-    if (theme === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
-        ? "dark"
-        : "light";
+    try {
+      const root = window.document.documentElement;
       
-      root.classList.remove("light", "dark");
-      root.classList.add(systemTheme);
-    } else {
-      root.classList.remove("light", "dark");
-      root.classList.add(theme);
+      if (theme === "system") {
+        const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
+          ? "dark"
+          : "light";
+        
+        root.classList.remove("light", "dark");
+        root.classList.add(systemTheme);
+      } else {
+        root.classList.remove("light", "dark");
+        root.classList.add(theme);
+      }
+      
+      safeLocalSet(storageKey, theme);
+    } catch (error) {
+      console.warn('Theme update failed:', error);
     }
-    
-    safeLocalSet(storageKey, theme);
   }, [theme, storageKey]);
 
   const value = {
