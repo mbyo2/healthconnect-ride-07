@@ -45,6 +45,7 @@ const CreateAdmin = lazy(() => import('@/pages/CreateAdmin'));
 const Auth = lazy(() => import('@/pages/Auth'));
 const AIDiagnostics = lazy(() => import('@/pages/AIDiagnostics'));
 const Register = lazy(() => import('@/pages/Register'));
+const ResetPassword = lazy(() => import('@/pages/ResetPassword'));
 const MedicalRecords = lazy(() => import('@/pages/MedicalRecords'));
 const VideoConsultations = lazy(() => import('@/pages/VideoConsultations'));
 const HealthDashboard = lazy(() => import('@/pages/HealthDashboard'));
@@ -100,8 +101,7 @@ const AppContent = () => {
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/register" element={<Register />} />
-
-            {/* Auth Routes */}
+            <Route path="/reset-password" element={<Suspense fallback={<LoadingScreen />}><ResetPassword /></Suspense>} />
             <Route path="/login" element={<Navigate to="/auth" replace />} />
             <Route
               path="/auth"
