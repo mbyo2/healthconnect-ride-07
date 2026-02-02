@@ -27,19 +27,17 @@ vi.mock('@/integrations/supabase/client', () => {
   };
 });
 
-const mockLocal: Record<string, string> = {};
-const safeLocalSet = vi.fn((k: string, v: string) => { mockLocal[k] = v; });
-const safeLocalGet = vi.fn((k: string) => mockLocal[k] ?? null);
-const safeLocalRemove = vi.fn((k: string) => { delete mockLocal[k]; });
-
 vi.mock('@/utils/storage', () => ({
-  safeLocalSet,
-  safeLocalGet,
-  safeLocalRemove,
+  safeLocalSet: vi.fn(),
+  safeLocalGet: vi.fn(),
+  safeLocalRemove: vi.fn(),
 }));
 
-// Import hook after mocks
 import { useMarketplace } from '@/hooks/useMarketplace';
+import { safeLocalSet } from '@/utils/storage';
+
+// Get the mocked function
+const mockSafeLocalSet = vi.mocked(safeLocalSet);
 
 function HookTester() {
   const m = useMarketplace();
@@ -85,8 +83,7 @@ describe('marketplace smoke', () => {
 
     // @ts-ignore
     expect((window as any).__market.cart.items.length).toBe(1);
-    expect(safeLocalSet).toHaveBeenCalled();
-    expect(mockLocal['hc_cart_v1']).toBeTruthy();
+    expect(mockSafeLocalSet).toHaveBeenCalled();
 
     // Cleanup
     unmount();

@@ -435,6 +435,7 @@ export const PUBLIC_ROUTES = [
   '/landing',
   '/healthcare-professionals',
   '/healthcare-institutions',
+  '/healthcare-application',
   '/terms',
   '/privacy',
   '/contact'
