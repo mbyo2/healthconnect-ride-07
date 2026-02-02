@@ -24,7 +24,8 @@ export const AppointmentsList = () => {
           provider:profiles!appointments_provider_id_fkey (
             first_name,
             last_name,
-            specialty
+            specialty,
+            address
           )
         `)
         .eq('patient_id', user.id)
@@ -84,7 +85,23 @@ export const AppointmentsList = () => {
                 <Clock className="w-4 h-4" />
                 <span>{appointment.time}</span>
               </div>
-              <Badge 
+              {appointment.type === 'physical' && appointment.provider.address && (
+                <div className="flex items-start gap-2 mt-2 text-sm text-muted-foreground">
+                  <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                  <div className="flex flex-col">
+                    <span>{appointment.provider.address}</span>
+                    <a
+                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(appointment.provider.address)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary hover:underline text-xs mt-1"
+                    >
+                      Get Directions →
+                    </a>
+                  </div>
+                </div>
+              )}
+              <Badge
                 variant={
                   appointment.status === 'scheduled' ? 'default' : 
                   appointment.status === 'completed' ? 'secondary' : 'destructive'
