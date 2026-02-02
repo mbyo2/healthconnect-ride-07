@@ -142,17 +142,23 @@ export class ProviderRegistrationService {
       transaction.userId = authData.user.id;
 
       // Step 2: Create/update profile
-      const profileData = {
+      const nameParts = data.full_name.trim().split(/\s+/);
+      const first_name = nameParts[0] || '';
+      const last_name = nameParts.slice(1).join(' ');
+      
+      const profileData: Database['public']['Tables']['profiles']['Insert'] = {
         id: authData.user.id,
         email: data.email,
-        full_name: data.full_name,
-        phone_number: data.phone_number || null,
+        first_name,
+        last_name,
+        phone: data.phone_number || null,
         is_profile_complete: true,
-        role: 'health_personnel' // Set default role in profile
+        role: 'health_personnel',
+        specialty: data.specialty
       };
 
       const { error: profileError } = await this.retryOperation(
-        () => supabase.from('profiles').upsert(profileData),
+        async () => await supabase.from('profiles').upsert(profileData),
         "Profile creation"
       );
 
@@ -164,7 +170,7 @@ export class ProviderRegistrationService {
 
       // Step 3: Assign provider role
       const { error: roleError } = await this.retryOperation(
-        () => supabase.from('user_roles').insert({
+        async () => await supabase.from('user_roles').insert({
           user_id: authData.user.id,
           role: 'health_personnel'
         }),
@@ -188,7 +194,7 @@ export class ProviderRegistrationService {
       };
 
       const { error: applicationError } = await this.retryOperation(
-        () => supabase.from('health_personnel_applications').insert(applicationData),
+        async () => await supabase.from('health_personnel_applications').insert(applicationData),
         "Application creation"
       );
 
@@ -238,7 +244,7 @@ export class ProviderRegistrationService {
    * Retries an operation with exponential backoff
    */
   private static async retryOperation<T>(
-    operation: () => Promise<T>,
+    operation: () => PromiseLike<T>,
     operationName: string,
     retryCount = 0
   ): Promise<T> {
