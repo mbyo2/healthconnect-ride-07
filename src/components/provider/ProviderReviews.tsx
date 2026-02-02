@@ -3,6 +3,7 @@ import React from "react";
 import { Card } from "@/components/ui/card";
 import { Avatar } from "@/components/ui/avatar";
 import { Star, User } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ProviderReviewsProps {
   providerId: string | undefined;

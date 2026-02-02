@@ -106,8 +106,8 @@ const AppointmentDetails = () => {
 
       if (error) throw error;
 
-      setAppointment(data);
-      setNotes(data.notes || '');
+      setAppointment(data as any);
+      setNotes((data as any)?.notes || '');
     } catch (error) {
       console.error('Error fetching appointment:', error);
       toast.error('Failed to load appointment details');

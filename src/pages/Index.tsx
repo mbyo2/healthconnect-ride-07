@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useCallback } from "react";
 import { SymptomCollector } from "@/components/SymptomCollector";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -18,20 +17,14 @@ export const Index = () => {
   
   // Automatically redirect authenticated users to their role-based dashboard
   const { isLoading, shouldRedirect } = useRoleDashboard({ redirectOnAuth: true });
-  
-  // Show loading while checking authentication and roles
-  if (isLoading || shouldRedirect) {
-    return <LoadingScreen message="Loading your dashboard..." />;
-  }
-  
-  const handleSymptomSubmit = (symptoms: string, urgency: string) => {
-    console.log("Symptoms submitted:", { symptoms, urgency });
-    toast.success("Symptoms recorded successfully");
-  };
 
+  // All hooks MUST be called before any conditional returns
   useEffect(() => {
+    // Only run feature highlights if not loading/redirecting
+    if (isLoading || shouldRedirect) return;
+    
     // Show feature highlights with slight delays between them
-    setTimeout(() => {
+    const timer1 = setTimeout(() => {
       showFeatureHighlight({
         id: "home-symptoms",
         targetSelector: ".symptom-collector",
@@ -42,7 +35,7 @@ export const Index = () => {
       });
     }, 2000);
     
-    setTimeout(() => {
+    const timer2 = setTimeout(() => {
       showFeatureHighlight({
         id: "home-find-care",
         targetSelector: ".find-care-button",
@@ -52,10 +45,20 @@ export const Index = () => {
         showDelay: 500
       });
     }, 4000);
-  }, [showFeatureHighlight]);
+
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+    };
+  }, [showFeatureHighlight, isLoading, shouldRedirect]);
+
+  const handleSymptomSubmit = useCallback((symptoms: string, urgency: string) => {
+    console.log("Symptoms submitted:", { symptoms, urgency });
+    toast.success("Symptoms recorded successfully");
+  }, []);
 
   // Quick action buttons with enhanced mobile touch support
-  const quickActions = [
+  const quickActions = useMemo(() => [
     {
       label: "Find Healthcare Providers",
       icon: <ArrowRight size={16} />,
@@ -77,7 +80,12 @@ export const Index = () => {
       icon: <ArrowRight size={16} />,
       action: () => navigate('/profile')
     }
-  ];
+  ], [navigate]);
+
+  // Show loading while checking authentication and roles
+  if (isLoading || shouldRedirect) {
+    return <LoadingScreen message="Loading your dashboard..." />;
+  }
 
   return (
     <div className="container mx-auto px-4 md:px-6 py-10 space-y-8">

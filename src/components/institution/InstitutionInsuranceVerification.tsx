@@ -37,12 +37,20 @@ export const InstitutionInsuranceVerification = ({ patientId, onVerified }: Prop
             if (instError) {
                 // Fallback: if not admin, check if personnel
                 const { data: personnel } = await supabase
-                    .from('institution_personnel')
-                    .select('institution:healthcare_institutions(accepted_insurance_providers)')
-                    .eq('user_id', user.id)
+                    .from('institution_staff')
+                    .select('institution_id')
+                    .eq('provider_id', user.id)
+                    .eq('is_active', true)
                     .single();
 
-                acceptedProviders = (personnel as any)?.institution?.accepted_insurance_providers || [];
+                if (personnel?.institution_id) {
+                    const { data: instData } = await supabase
+                        .from('healthcare_institutions')
+                        .select('accepted_insurance_providers')
+                        .eq('id', personnel.institution_id)
+                        .single();
+                    acceptedProviders = instData?.accepted_insurance_providers || [];
+                }
             } else {
                 acceptedProviders = inst?.accepted_insurance_providers || [];
             }

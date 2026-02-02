@@ -1,14 +1,11 @@
-import React, { useState, useEffect, useMemo } from "react";
-import { useNavigate, Link, useSearchParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Card } from "@/components/ui/card";
-import { Heart, Building2, User, MapPin } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -55,20 +52,16 @@ const providerSignupSchema = z.object({
 export const Auth = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [error, setError] = useState<string | null>(null);
   const [localLoading, setLocalLoading] = useState(false);
   const [authLoading, setAuthLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userType, setUserType] = useState<'patient' | 'health_personnel'>('patient');
   const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "signin");
   const { showSuccess, showError } = useFeedbackSystem();
-  const [locationLoading, setLocationLoading] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
       const { data } = await supabase.auth.getSession();
       if (data.session?.user) {
-        setIsAuthenticated(true);
         navigate("/home");
       }
       setAuthLoading(false);
@@ -92,7 +85,7 @@ export const Auth = () => {
   });
 
   const getCurrentLocation = async () => {
-    setLocationLoading(true);
+    setLocalLoading(true);
     try {
       if (!navigator.geolocation) throw new Error('Geolocation not supported');
       const pos = await new Promise<GeolocationPosition>((res, rej) => {
@@ -102,19 +95,21 @@ export const Auth = () => {
       providerSignupForm.setValue('latitude', latitude);
       providerSignupForm.setValue('longitude', longitude);
       toast.success('Location detected');
-    } catch (e: any) {
+    } catch {
       toast.error('Failed to detect location. Enter manually.');
     } finally {
-      setLocationLoading(false);
+      setLocalLoading(false);
     }
   };
 
   const onLoginSubmit = async (data: z.infer<typeof loginSchema>) => {
     setLocalLoading(true);
-    const { error } = await supabase.auth.signInWithPassword(data);
-    if (error) {
-      setError(error.message);
-      showError(error.message);
+    const { error: authError } = await supabase.auth.signInWithPassword({
+      email: data.email,
+      password: data.password
+    });
+    if (authError) {
+      showError(authError.message);
     } else {
       navigate("/home");
     }
@@ -123,7 +118,7 @@ export const Auth = () => {
 
   const onSignupSubmit = async (data: any) => {
     setLocalLoading(true);
-    const { error } = await supabase.auth.signUp({
+    const { error: signupError } = await supabase.auth.signUp({
       email: data.email,
       password: data.password,
       options: {
@@ -140,9 +135,8 @@ export const Auth = () => {
       },
     });
 
-    if (error) {
-      setError(error.message);
-      showError(error.message);
+    if (signupError) {
+      showError(signupError.message);
     } else {
       showSuccess("Success! Check your email to verify.");
       setActiveTab("signin");

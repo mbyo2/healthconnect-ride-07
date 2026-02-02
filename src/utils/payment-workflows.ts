@@ -77,7 +77,7 @@ export const processPayment = async (
             .from('payments')
             .update({
                 status: 'completed',
-                status_history: statusHistory,
+                status_history: statusHistory as any,
                 updated_at: new Date().toISOString(),
             })
             .eq('id', paymentId);
@@ -165,7 +165,7 @@ export const handlePaymentFailure = async (
             .from('payments')
             .update({
                 status: 'failed',
-                status_history: statusHistory,
+                status_history: statusHistory as any,
                 updated_at: new Date().toISOString(),
             })
             .eq('id', paymentId);
@@ -239,7 +239,7 @@ export const refundPayment = async (
             .from('payments')
             .update({
                 status: 'refunded',
-                status_history: statusHistory,
+                status_history: statusHistory as any,
                 refund_amount: refundAmount,
                 refund_reason: reason,
                 updated_at: new Date().toISOString(),

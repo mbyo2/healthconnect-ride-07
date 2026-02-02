@@ -44,6 +44,24 @@ interface PayPalOrderResponse {
   }>;
 }
 
+const isUuid = (value: string) =>
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
+
+const getErrorMessage = (err: unknown): string => {
+  if (err instanceof Error) return err.message;
+  if (typeof err === 'string') return err;
+  if (err && typeof err === 'object' && 'message' in err && typeof (err as any).message === 'string') {
+    return (err as any).message;
+  }
+  try {
+    return JSON.stringify(err);
+  } catch {
+    return 'Unknown error';
+  }
+};
+
+const ZERO_UUID = '00000000-0000-0000-0000-000000000000';
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -85,8 +103,34 @@ serve(async (req) => {
 
     const { amount, currency, patientId, providerId, serviceId, redirectUrl } = validationResult.data;
 
-    // Prevent self-payment
-    if (patientId === providerId) {
+    const isWalletTopUp = serviceId === 'wallet_topup';
+
+    console.log('Payment request details:', {
+      isWalletTopUp,
+      patientId,
+      providerId,
+      serviceId,
+      amount,
+      currency
+    });
+
+    // Wallet top-ups are platform/system payments (no real provider). Our DB requires provider_id,
+    // so we store provider_id as the patient's own profile for top-ups.
+    const providerIdForDb = isWalletTopUp ? patientId : providerId;
+
+    console.log('Provider ID for DB:', providerIdForDb);
+
+    // Only reject ZERO_UUID for non-wallet-topup payments
+    if (!isWalletTopUp && providerId === ZERO_UUID) {
+      console.error('Invalid provider ID for non-wallet payment');
+      return new Response(
+        JSON.stringify({ success: false, error: 'Invalid provider ID' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Prevent self-payment for normal service payments (wallet top-ups are allowed)
+    if (!isWalletTopUp && patientId === providerId) {
       return new Response(
         JSON.stringify({ success: false, error: 'Cannot process payment to yourself' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -94,25 +138,33 @@ serve(async (req) => {
     }
 
     // Create payment record in our database first
+    // NOTE: payments.service_id is a UUID in our schema, but wallet top-ups send serviceId like "wallet_topup".
+    // We store non-UUID service identifiers in metadata and set service_id to null.
+    const serviceIdForDb = isUuid(serviceId) ? serviceId : null;
+
     const { data: payment, error: paymentError } = await supabaseClient
       .from('payments')
       .insert({
         patient_id: patientId,
-        provider_id: providerId,
-        service_id: serviceId,
+        provider_id: providerIdForDb,
+        service_id: serviceIdForDb,
         amount: amount,
         currency: currency || 'USD',
         status: 'pending',
         payment_method: 'paypal',
         invoice_number: `PAY-${Date.now()}-${patientId}`,
+        metadata: {
+          requested_service_id: serviceId,
+          requested_provider_id: providerId,
+          provider_id_for_db: providerIdForDb,
+          requested_currency: currency || 'USD'
+        },
         created_at: new Date().toISOString()
       })
       .select()
       .single();
 
     if (paymentError) throw paymentError;
-
-    // Get PayPal credentials from environment
     const paypalClientId = Deno.env.get('PAYPAL_CLIENT_ID');
     const paypalClientSecret = Deno.env.get('PAYPAL_CLIENT_SECRET');
     const paypalBaseUrl = Deno.env.get('PAYPAL_BASE_URL') || 'https://api-m.sandbox.paypal.com'; // Default to sandbox
@@ -203,6 +255,9 @@ serve(async (req) => {
           external_payment_id: orderData.id,
           payment_url: approvalUrl,
           metadata: {
+            ...(typeof (payment as any).metadata === 'object' && (payment as any).metadata !== null
+              ? (payment as any).metadata
+              : {}),
             paypal_order_id: orderData.id,
             paypal_status: orderData.status
           }
@@ -228,28 +283,30 @@ serve(async (req) => {
         }
       );
 
-    } catch (paypalError) {
+    } catch (paypalError: unknown) {
       console.error('PayPal API error:', paypalError);
+      const errorMessage = getErrorMessage(paypalError);
 
       // Update payment status to failed
       await supabaseClient
         .from('payments')
         .update({
           status: 'failed',
-          error_message: paypalError.message,
+          error_message: errorMessage,
           failed_at: new Date().toISOString()
         })
         .eq('id', payment.id);
 
-      throw new Error(`PayPal integration error: ${paypalError.message}`);
+      throw new Error(`PayPal integration error: ${errorMessage}`);
     }
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error processing PayPal payment:', error);
+    const errorMessage = getErrorMessage(error);
     return new Response(
       JSON.stringify({
         success: false,
-        error: error.message,
+        error: errorMessage,
         message: 'Failed to process PayPal payment'
       }),
       {

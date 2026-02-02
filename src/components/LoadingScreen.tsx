@@ -99,8 +99,8 @@ export const LoadingScreen = React.memo<LoadingScreenProps>(({
   }, []);
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-blue-50 via-white to-gray-50 flex flex-col items-center justify-center z-50">
-      <div className="flex flex-col items-center gap-8 animate-fadeIn p-10 rounded-2xl bg-white shadow-2xl border border-gray-200 max-w-lg text-center">
+    <div className="fixed inset-0 bg-gradient-to-br from-primary/5 via-background to-muted flex flex-col items-center justify-center z-50">
+      <div className="flex flex-col items-center gap-8 animate-fadeIn p-10 rounded-2xl bg-card shadow-2xl border border-border max-w-lg text-center">
 
         {/* Branded Doc' O Clock Splash Logo */}
         <div className="flex flex-col items-center gap-6 animate-pulse">
@@ -110,39 +110,39 @@ export const LoadingScreen = React.memo<LoadingScreenProps>(({
               alt="Doc' O Clock" 
               className="w-24 h-24 object-contain shadow-sm" 
             />
-            <div className="absolute -inset-4 bg-blue-500 rounded-full blur-2xl opacity-10 -z-10 animate-pulse"></div>
+            <div className="absolute -inset-4 bg-primary rounded-full blur-2xl opacity-10 -z-10 animate-pulse"></div>
           </div>
           <div className="space-y-2">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
               Doc' O Clock
             </h1>
-            <p className="text-sm text-gray-500 font-medium tracking-wide uppercase">Emergency Healthcare</p>
+            <p className="text-sm text-muted-foreground font-medium tracking-wide uppercase">Emergency Healthcare</p>
           </div>
         </div>
 
         {/* Modern Loading Spinner */}
         <div className="relative">
-          <LoadingSpinner size="lg" className="text-blue-500" />
+          <LoadingSpinner size="lg" className="text-primary" />
           <div className="absolute inset-0 animate-ping">
-            <LoadingSpinner size="lg" className="text-blue-300 opacity-30" />
+            <LoadingSpinner size="lg" className="text-primary/30 opacity-30" />
           </div>
         </div>
 
         {/* Status Messages */}
         <div className="space-y-3">
-          <p className="text-lg font-semibold text-gray-800 tracking-tight">{currentMessage}</p>
-          <p className="text-sm text-gray-600 italic">"{message}"</p>
+          <p className="text-lg font-semibold text-foreground tracking-tight">{currentMessage}</p>
+          <p className="text-sm text-muted-foreground italic">"{message}"</p>
         </div>
 
         {/* Modern Progress Bar */}
         <div className="w-full max-w-[280px]">
-          <div className="flex justify-between text-[10px] uppercase tracking-wider text-gray-400 mb-2">
+          <div className="flex justify-between text-[10px] uppercase tracking-wider text-muted-foreground mb-2">
             <span>System Load</span>
             <span>{Math.round(loadingProgress)}%</span>
           </div>
-          <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden border border-gray-50">
+          <div className="w-full bg-muted rounded-full h-2 overflow-hidden border border-border">
             <div
-              className="bg-gradient-to-r from-blue-500 to-blue-600 h-full rounded-full transition-all duration-500 shadow-sm"
+              className="bg-gradient-to-r from-primary to-primary/80 h-full rounded-full transition-all duration-500 shadow-sm"
               style={{ width: `${loadingProgress}%` }}
             />
           </div>
@@ -166,9 +166,9 @@ export const LoadingScreen = React.memo<LoadingScreenProps>(({
       </div>
 
       {/* Trust indicators at bottom */}
-      <div className="absolute bottom-10 flex items-center gap-8 text-[10px] font-bold uppercase tracking-[0.2em] text-blue-300">
+      <div className="absolute bottom-10 flex items-center gap-8 text-[10px] font-bold uppercase tracking-[0.2em] text-primary/60">
         <span>🔒 HIPAA SECURE</span>
-        <span className="w-1 h-1 bg-blue-200 rounded-full"></span>
+        <span className="w-1 h-1 bg-primary/40 rounded-full"></span>
         <span>✓ ZAMBIAN HEALTH NETWORK</span>
       </div>
     </div>

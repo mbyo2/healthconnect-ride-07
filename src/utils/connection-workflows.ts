@@ -1,6 +1,8 @@
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
+const sb: any = supabase;
+
 export type ConnectionStatus = 'pending' | 'approved' | 'rejected' | 'blocked';
 
 interface ConnectionStatusHistory {
@@ -44,7 +46,7 @@ export const sendConnectionRequest = async (
 ): Promise<ConnectionTransitionResult> => {
     try {
         // Check if connection already exists
-        const { data: existing } = await supabase
+        const { data: existing } = await sb
             .from('connections')
             .select('id, status')
             .or(`from_user_id.eq.${fromUserId},to_user_id.eq.${toUserId}`)
@@ -65,7 +67,7 @@ export const sendConnectionRequest = async (
             updatedBy: fromUserId,
         }];
 
-        const { data, error } = await supabase
+        const { data, error } = await sb
             .from('connections')
             .insert({
                 from_user_id: fromUserId,
@@ -156,7 +158,7 @@ const transitionConnectionStatus = async (
 ): Promise<ConnectionTransitionResult> => {
     try {
         // Get current connection
-        const { data: connection, error: fetchError } = await supabase
+        const { data: connection, error: fetchError } = await sb
             .from('connections')
             .select('status, status_history')
             .eq('id', connectionId)
@@ -197,7 +199,7 @@ const transitionConnectionStatus = async (
             updateData.rejection_reason = reason;
         }
 
-        const { error: updateError } = await supabase
+        const { error: updateError } = await sb
             .from('connections')
             .update(updateData)
             .eq('id', connectionId);
@@ -241,7 +243,7 @@ export const getConnectionHistory = async (
     connectionId: string
 ): Promise<ConnectionStatusHistory[]> => {
     try {
-        const { data, error } = await supabase
+        const { data, error } = await sb
             .from('connections')
             .select('status_history')
             .eq('id', connectionId)

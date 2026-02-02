@@ -112,14 +112,20 @@ serve(async (req) => {
     const paypalBaseUrl = Deno.env.get('PAYPAL_BASE_URL') || 'https://api-m.sandbox.paypal.com';
 
     if (!paypalClientId || !paypalClientSecret) {
+      const existingMetadata =
+        payment.metadata && typeof payment.metadata === 'object'
+          ? (payment.metadata as Record<string, unknown>)
+          : {};
+
       // Mock capture for development
       await supabaseClient
         .from('payments')
         .update({
           status: 'completed',
-          completed_at: new Date().toISOString(),
+          payment_date: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
           metadata: {
-            ...payment.metadata,
+            ...existingMetadata,
             mock_capture: true,
             captured_at: new Date().toISOString()
           }
@@ -177,15 +183,21 @@ serve(async (req) => {
         throw new Error(`PayPal capture not completed. Status: ${capture?.status}`);
       }
 
+      const existingMetadata =
+        payment.metadata && typeof payment.metadata === 'object'
+          ? (payment.metadata as Record<string, unknown>)
+          : {};
+
       // Update payment record
       await supabaseClient
         .from('payments')
         .update({
           status: 'completed',
-          completed_at: new Date().toISOString(),
+          payment_date: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
           external_payment_id: capture.id,
           metadata: {
-            ...payment.metadata,
+            ...existingMetadata,
             paypal_capture_id: capture.id,
             paypal_capture_status: capture.status,
             captured_amount: capture.amount.value,
@@ -196,7 +208,12 @@ serve(async (req) => {
         .eq('id', paymentId);
 
       // Process wallet credit if this was a wallet top-up
-      if (payment.service_id === 'wallet_topup') {
+      const requestedServiceId =
+        payment.metadata && typeof payment.metadata === 'object'
+          ? (payment.metadata as any).requested_service_id
+          : null;
+
+      if (requestedServiceId === 'wallet_topup') {
         const { error: walletError } = await supabaseClient.rpc('process_wallet_transaction', {
           p_user_id: payment.patient_id,
           p_transaction_type: 'credit',
@@ -231,28 +248,30 @@ serve(async (req) => {
         }
       );
 
-    } catch (paypalError) {
+    } catch (paypalError: unknown) {
       console.error('PayPal capture error:', paypalError);
+      const errorMessage = paypalError instanceof Error ? paypalError.message : 'Unknown PayPal error';
 
       // Update payment status to failed
       await supabaseClient
         .from('payments')
         .update({
           status: 'failed',
-          error_message: paypalError.message,
+          error_message: errorMessage,
           failed_at: new Date().toISOString()
         })
         .eq('id', paymentId);
 
-      throw new Error(`PayPal capture error: ${paypalError.message}`);
+      throw new Error(`PayPal capture error: ${errorMessage}`);
     }
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error capturing PayPal payment:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
       JSON.stringify({
         success: false,
-        error: error.message,
+        error: errorMessage,
         message: 'Failed to capture PayPal payment'
       }),
       {

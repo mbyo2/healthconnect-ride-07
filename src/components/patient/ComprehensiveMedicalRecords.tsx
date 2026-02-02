@@ -153,7 +153,7 @@ export const ComprehensiveMedicalRecords = () => {
       const { data, error } = await query;
 
       if (error) throw error;
-      setRecords(data || []);
+      setRecords((data as unknown as MedicalRecord[]) || []);
     } catch (error) {
       console.error('Error fetching medical records:', error);
       toast.error('Failed to load medical records');

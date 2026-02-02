@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, Filter } from "lucide-react";
@@ -12,6 +12,8 @@ const SearchPage = () => {
   const { searchQuery, setSearchQuery, setSearchTerm, setSelectedSpecialty, refreshProviders } = useSearch();
   const { showSuccess } = useSuccessFeedback();
   const location = useLocation();
+  const initializedRef = useRef(false);
+  const lastSearchRef = useRef<string>("");
 
   const handleSearch = () => {
     if (searchQuery.trim()) {
@@ -27,9 +29,19 @@ const SearchPage = () => {
     }
   };
 
+  // Only process URL params on mount or when search string actually changes
   useEffect(() => {
-    // Get search query from URL params if coming from header search
-    const urlParams = new URLSearchParams(location.search);
+    const searchString = location.search;
+    
+    // Skip if we've already processed this exact search string
+    if (lastSearchRef.current === searchString && initializedRef.current) {
+      return;
+    }
+    
+    lastSearchRef.current = searchString;
+    initializedRef.current = true;
+    
+    const urlParams = new URLSearchParams(searchString);
     const query = urlParams.get('q');
     const category = urlParams.get('category');
 
@@ -58,7 +70,7 @@ const SearchPage = () => {
         refreshProviders();
       }
     }
-  }, [location, setSearchQuery, setSearchTerm, setSelectedSpecialty, refreshProviders]);
+  }, [location.search, setSearchQuery, setSearchTerm, setSelectedSpecialty, refreshProviders]);
 
   return (
     <div className="space-y-6">

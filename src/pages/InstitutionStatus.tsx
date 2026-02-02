@@ -46,7 +46,7 @@ const InstitutionStatus = () => {
         .single();
 
       if (error && error.code !== 'PGRST116') throw error;
-      setApplication(data);
+      setApplication(data as any);
     } catch (error) {
       console.error('Error fetching application:', error);
       toast.error('Failed to load application status');

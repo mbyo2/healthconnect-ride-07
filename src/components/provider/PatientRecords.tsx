@@ -49,7 +49,7 @@ export const PatientRecords = () => {
 
       if (error) throw error;
 
-      return data.map(record => ({
+      return (data as any[]).map(record => ({
         id: record.id,
         patient_id: record.patient_id,
         record_type: record.record_type,

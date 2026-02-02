@@ -1,18 +1,15 @@
-
-import React from 'react';
 import { WalletCard } from "@/components/home/WalletCard";
 import { WalletTopUp } from "@/components/wallet/WalletTopUp";
 import { WalletHistory } from "@/components/wallet/WalletHistory";
-import { Header } from "@/components/Header";
-import { BottomNav } from "@/components/BottomNav";
 import { useAuth } from "@/context/AuthContext";
 import { Navigate } from "react-router-dom";
+import { LoadingScreen } from "@/components/LoadingScreen";
 
 const Wallet = () => {
     const { user, isLoading } = useAuth();
 
     if (isLoading) {
-        return null;
+        return <LoadingScreen />;
     }
 
     if (!user) {
@@ -20,28 +17,22 @@ const Wallet = () => {
     }
 
     return (
-        <div className="min-h-screen bg-background pb-24">
-            <Header />
+        <div className="space-y-6 max-w-4xl mx-auto">
+            <div className="space-y-2">
+                <h1 className="text-2xl sm:text-3xl font-bold text-foreground">My Wallet</h1>
+                <p className="text-sm sm:text-base text-muted-foreground">Manage your funds and view transaction history</p>
+            </div>
 
-            <main className="container max-w-4xl mx-auto p-4 pt-20 space-y-6">
-                <div className="space-y-2">
-                    <h1 className="text-2xl sm:text-3xl font-bold text-foreground">My Wallet</h1>
-                    <p className="text-sm sm:text-base text-muted-foreground">Manage your funds and view transaction history</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-6">
+                    <WalletCard />
+                    <WalletTopUp />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-6">
-                        <WalletCard />
-                        <WalletTopUp />
-                    </div>
-
-                    <div className="md:h-full">
-                        <WalletHistory />
-                    </div>
+                <div className="md:h-full">
+                    <WalletHistory />
                 </div>
-            </main>
-
-            <BottomNav />
+            </div>
         </div>
     );
 };

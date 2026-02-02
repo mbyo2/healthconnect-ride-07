@@ -168,11 +168,12 @@ serve(async (req) => {
       }
     );
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error processing mobile money payment:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
       JSON.stringify({ 
-        error: error.message, 
+        error: errorMessage, 
         success: false 
       }),
       {
@@ -225,10 +226,11 @@ async function initiateMobileMoneyPayment({
       estimatedProcessingTime: getProcessingTime(provider)
     };
 
-  } catch (error) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return {
       success: false,
-      error: `Failed to initiate ${provider.toUpperCase()} payment: ${error.message}`
+      error: `Failed to initiate ${provider.toUpperCase()} payment: ${errorMessage}`
     };
   }
 }
@@ -243,7 +245,7 @@ function getRandomFailureReason(provider: string): string {
     'Transaction limit exceeded for today'
   ];
 
-  const providerSpecific = {
+  const providerSpecific: Record<string, string[]> = {
     'mtn': [
       'MTN Mobile Money service under maintenance',
       'Please ensure your MTN line is active and has mobile money enabled'
@@ -264,7 +266,7 @@ function getRandomFailureReason(provider: string): string {
 
 // Get realistic processing times for different providers
 function getProcessingTime(provider: string): string {
-  const times = {
+  const times: Record<string, string> = {
     'mtn': '1-3 minutes',
     'vodacom': '30 seconds - 2 minutes', 
     'zamtel': '1-5 minutes'

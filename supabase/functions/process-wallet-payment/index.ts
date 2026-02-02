@@ -126,12 +126,13 @@ serve(async (req) => {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         }
       );
-    } catch (walletError) {
+    } catch (walletError: unknown) {
       console.error('Wallet transaction failed:', walletError);
+      const walletErrorMessage = walletError instanceof Error ? walletError.message : 'Wallet transaction failed';
       return new Response(
         JSON.stringify({ 
           success: false, 
-          message: walletError.message || 'Wallet transaction failed'
+          message: walletErrorMessage
         }),
         {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -139,10 +140,11 @@ serve(async (req) => {
         }
       );
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error processing wallet payment:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
-      JSON.stringify({ error: error.message, success: false }),
+      JSON.stringify({ error: errorMessage, success: false }),
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

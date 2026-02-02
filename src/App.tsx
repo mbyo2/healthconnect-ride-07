@@ -1,6 +1,5 @@
-
-import React, { useEffect, useState, Suspense, lazy, useMemo } from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from 'react-router-dom';
+import React, { Suspense, lazy, useMemo } from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { MobileLayout } from '@/components/MobileLayout';
 import { LoadingScreen } from '@/components/LoadingScreen';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
@@ -77,7 +76,7 @@ const AppointmentDetails = lazy(() => import('@/pages/AppointmentDetails'));
 const Wallet = lazy(() => import('@/pages/Wallet'));
 
 const AppContent = () => {
-  const { user, session, isLoading, profile } = useAuth();
+  const { user, isLoading, profile } = useAuth();
 
   // Initialize Android Hardware Back Button listener
   useAndroidBackButton();

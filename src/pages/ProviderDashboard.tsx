@@ -4,10 +4,9 @@ import { WaitlistManager } from "@/components/provider/WaitlistManager";
 import { DigitalSignature } from "@/components/provider/DigitalSignature";
 import { PatientRecords } from "@/components/provider/PatientRecords";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Package, Bot, Brain, Sparkles, ArrowRight } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { AIInsightsWidget } from "@/components/ai/AIInsightsWidget";
 
 const ProviderDashboard = () => {
   const navigate = useNavigate();
