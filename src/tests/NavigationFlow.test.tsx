@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { getRoleLandingPage, hasRoutePermission } from '@/utils/rolePermissions';
+import { getRoleLandingPage, hasRoutePermission, USER_ROLES, type UserRole } from '@/utils/rolePermissions';
 
 describe('Navigation Flow Tests', () => {
   /**
@@ -7,7 +7,7 @@ describe('Navigation Flow Tests', () => {
    * Requirements: 1.4
    */
   it('should redirect health_personnel role to provider dashboard', () => {
-    const landingPage = getRoleLandingPage(['health_personnel']);
+    const landingPage = getRoleLandingPage([USER_ROLES.HEALTH_PERSONNEL]);
     expect(landingPage).toBe('/provider-dashboard');
   });
 
@@ -16,7 +16,7 @@ describe('Navigation Flow Tests', () => {
    * Requirements: 1.4
    */
   it('should allow health_personnel to access provider dashboard route', () => {
-    const hasAccess = hasRoutePermission(['health_personnel'], '/provider-dashboard');
+    const hasAccess = hasRoutePermission([USER_ROLES.HEALTH_PERSONNEL], '/provider-dashboard');
     expect(hasAccess).toBe(true);
   });
 
@@ -43,12 +43,12 @@ describe('Navigation Flow Tests', () => {
    * Requirements: 1.4
    */
   it('should redirect different roles to appropriate dashboards', () => {
-    const testCases = [
-      { roles: ['health_personnel'], expectedPath: '/provider-dashboard' },
-      { roles: ['patient'], expectedPath: '/home' },
-      { roles: ['admin'], expectedPath: '/admin-dashboard' },
-      { roles: ['pharmacy'], expectedPath: '/pharmacy-portal' },
-      { roles: ['institution_admin'], expectedPath: '/institution-portal' },
+    const testCases: { roles: UserRole[]; expectedPath: string }[] = [
+      { roles: [USER_ROLES.HEALTH_PERSONNEL], expectedPath: '/provider-dashboard' },
+      { roles: [USER_ROLES.PATIENT], expectedPath: '/home' },
+      { roles: [USER_ROLES.ADMIN], expectedPath: '/admin-dashboard' },
+      { roles: [USER_ROLES.PHARMACY], expectedPath: '/pharmacy-portal' },
+      { roles: [USER_ROLES.INSTITUTION_ADMIN], expectedPath: '/institution-portal' },
     ];
 
     testCases.forEach(({ roles, expectedPath }) => {
