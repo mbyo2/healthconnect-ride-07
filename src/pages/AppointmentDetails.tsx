@@ -31,6 +31,7 @@ interface AppointmentData {
     first_name: string;
     last_name: string;
     specialty?: string;
+    address?: string;
   };
   status: string;
   notes?: string;
@@ -99,7 +100,7 @@ const AppointmentDetails = () => {
           *,
           time_slot:provider_time_slots(*),
           patient:profiles!patient_id(first_name, last_name, email, phone),
-          provider:profiles!provider_id(first_name, last_name, specialty)
+          provider:profiles!provider_id(first_name, last_name, specialty, address)
         `)
         .eq('id', id)
         .single();
@@ -286,6 +287,31 @@ const AppointmentDetails = () => {
                 <p className="text-sm text-muted-foreground capitalize">{appointment.type}</p>
               </div>
             </div>
+
+            {/* Location for physical appointments */}
+            {appointment.type === 'physical' && (
+              <div className="flex items-start gap-3">
+                <MapPin className="h-5 w-5 text-muted-foreground mt-0.5" />
+                <div>
+                  <p className="font-medium">Location</p>
+                  {appointment.provider.address ? (
+                    <div className="space-y-2">
+                      <p className="text-sm text-muted-foreground">{appointment.provider.address}</p>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(appointment.provider.address || '')}`, '_blank')}
+                      >
+                        <MapPin className="h-4 w-4 mr-2" />
+                        Get Directions
+                      </Button>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">Address not available</p>
+                  )}
+                </div>
+              </div>
+            )}
 
             {appointment.reason && (
               <div className="flex items-start gap-3">
