@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Card } from "@/components/ui/card";
-import { MapPin } from "lucide-react";
+import { MapPin, Eye, EyeOff } from "lucide-react";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -10,10 +10,10 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { AnimatedButton } from "@/components/ui/animated-button";
 import { useFeedbackSystem } from "@/hooks/use-feedback-system";
+import { ForgotPasswordDialog } from "@/components/auth/ForgotPasswordDialog";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -56,6 +56,7 @@ export const Auth = () => {
   const [authLoading, setAuthLoading] = useState(true);
   const [userType, setUserType] = useState<'patient' | 'health_personnel'>('patient');
   const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "signin");
+  const [showPassword, setShowPassword] = useState(false);
   const { showSuccess, showError } = useFeedbackSystem();
 
   useEffect(() => {
@@ -94,9 +95,9 @@ export const Auth = () => {
       const { latitude, longitude } = pos.coords;
       providerSignupForm.setValue('latitude', latitude);
       providerSignupForm.setValue('longitude', longitude);
-      toast.success('Location detected');
+      showSuccess('Location detected');
     } catch {
-      toast.error('Failed to detect location. Enter manually.');
+      showError('Failed to detect location. Enter manually.');
     } finally {
       setLocalLoading(false);
     }
@@ -181,8 +182,26 @@ export const Auth = () => {
                     name="password"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Password</FormLabel>
-                        <FormControl><Input type="password" placeholder="Password" {...field} /></FormControl>
+                        <div className="flex items-center justify-between">
+                          <FormLabel>Password</FormLabel>
+                          <ForgotPasswordDialog />
+                        </div>
+                        <FormControl>
+                          <div className="relative">
+                            <Input 
+                              type={showPassword ? "text" : "password"} 
+                              placeholder="Password" 
+                              {...field} 
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowPassword(!showPassword)}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                            >
+                              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                            </button>
+                          </div>
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}

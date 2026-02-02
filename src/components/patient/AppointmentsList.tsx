@@ -1,12 +1,12 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { LoadingSpinner } from "@/components/ui/loading-spinner";
-import { Calendar, Clock, MapPin } from "lucide-react";
+import { ListSkeleton } from "@/components/ui/list-skeleton";
+import { EmptyState } from "@/components/ui/empty-state";
+import { Calendar, Clock, MapPin, CalendarX } from "lucide-react";
 import { toast } from "sonner";
 import { AppointmentWithProvider } from "@/types/appointments";
 
@@ -55,15 +55,16 @@ export const AppointmentsList = () => {
   };
 
   if (isLoading) {
-    return <LoadingSpinner />;
+    return <ListSkeleton count={3} showAvatar />;
   }
 
   if (appointments.length === 0) {
     return (
-      <Card className="p-6 text-center">
-        <p className="text-muted-foreground">No upcoming appointments scheduled</p>
-        <p className="text-sm text-muted-foreground mt-2">Book a new appointment to see a healthcare provider</p>
-      </Card>
+      <EmptyState
+        icon={CalendarX}
+        title="No upcoming appointments"
+        description="Book a new appointment to see a healthcare provider"
+      />
     );
   }
 

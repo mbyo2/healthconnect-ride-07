@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
 import { AccessibilityMenu } from "@/components/AccessibilityMenu";
 import { useLocation } from "react-router-dom";
+import { OfflineIndicator } from "@/hooks/use-network-status";
 
 interface MobileLayoutProps {
   children: ReactNode;
@@ -77,6 +78,7 @@ export const MobileLayout = ({ children, isLoading }: MobileLayoutProps) => {
         </div>
       </main>
       {isAuthenticated && <BottomNav />}
+      <OfflineIndicator />
       <AccessibilityMenu />
     </div>
   );
