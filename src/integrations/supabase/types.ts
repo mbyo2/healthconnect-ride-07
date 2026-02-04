@@ -4647,6 +4647,7 @@ export type Database = {
         Args: { institution_id: string }
         Returns: boolean
       }
+      is_service_role: { Args: never; Returns: boolean }
       is_super_admin: { Args: never; Returns: boolean }
       process_payment_with_splits:
         | {
