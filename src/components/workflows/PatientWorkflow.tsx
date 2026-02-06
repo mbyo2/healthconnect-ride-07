@@ -1,4 +1,3 @@
-
 import React, { useMemo, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -19,10 +18,16 @@ import {
   Sparkles,
   Video,
   CreditCard,
-  Users
+  Users,
+  Phone,
+  Pill,
+  Building2,
+  AlertTriangle
 } from 'lucide-react';
 import { SpecializedHelp } from "@/components/home/SpecializedHelp";
 import { WalletCard } from "@/components/home/WalletCard";
+import { ConnectedWorkflows } from "@/components/home/ConnectedWorkflows";
+import { ZAMBIA_CONFIG } from '@/config/zambia';
 
 const getIcon = (iconName: string) => {
   const icons = {
@@ -89,14 +94,14 @@ export const PatientWorkflow = React.memo(() => {
   // Show completion message if all required steps are done
   if (isWorkflowComplete) {
     return (
-      <div className="space-y-8">
-        {/* Welcome Section */}
-        <div className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-500 to-indigo-600 text-white py-8 md:py-12 rounded-3xl shadow-xl">
+      <div className="space-y-6 md:space-y-8">
+        {/* Welcome Section - Zambian focused */}
+        <div className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-500 to-indigo-600 text-white py-6 md:py-10 rounded-2xl md:rounded-3xl shadow-xl">
           <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
           <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-48 h-48 bg-blue-400/20 rounded-full blur-2xl" />
 
-          <div className="relative px-6 md:px-8">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+          <div className="relative px-4 md:px-8">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 md:gap-6">
               <div className="space-y-2">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 mb-2">
                   <Sparkles className="h-3.5 w-3.5 text-blue-100" />
@@ -106,56 +111,54 @@ export const PatientWorkflow = React.memo(() => {
                   Your Health Dashboard
                 </h1>
                 <p className="text-blue-100/90 text-sm md:text-base max-w-md">
-                  Everything looks good! You're all set to manage your health journey.
+                  Quality healthcare at your fingertips. Anywhere in Zambia. 🇿🇲
                 </p>
               </div>
-              <Button
-                variant="outline"
-                size="lg"
-                className="bg-white/10 backdrop-blur-md border-white/30 text-white hover:bg-white/20 hover:border-white/40 w-full sm:w-auto font-bold shadow-lg transition-all active:scale-95"
-                onClick={() => handleNavigation('/emergency', 'Emergency Help')}
+              <a
+                href={`tel:${ZAMBIA_CONFIG.emergencyNumbers.ambulance}`}
+                className="flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg font-bold shadow-lg transition-all active:scale-95 w-full sm:w-auto justify-center"
               >
-                <div className="mr-2 h-4 w-4 bg-red-500 rounded-full animate-pulse" />
-                Emergency Help
-              </Button>
+                <Phone className="h-4 w-4" />
+                Emergency {ZAMBIA_CONFIG.emergencyNumbers.ambulance}
+              </a>
             </div>
           </div>
         </div>
 
-        {/* Quick Access Cards */}
+        {/* Quick Access Cards - Zambian context */}
         <div>
           <h2 className="text-lg sm:text-xl font-bold mb-4 px-1 text-foreground">Quick Access</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
             <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer border border-border shadow-sm bg-card hover:-translate-y-1 active:scale-95" onClick={() => handleNavigation('/emergency', 'Emergency')}>
-              <CardHeader className="pb-3">
+              <CardHeader className="pb-2 md:pb-3">
                 <div className="flex items-center gap-2">
-                  <div className="p-2 bg-rose-500/10 dark:bg-rose-500/20 rounded-lg group-hover:bg-rose-500/20 transition-colors">
-                    <Activity className="h-5 w-5 text-rose-600 dark:text-rose-400" />
+                  <div className="p-2 bg-red-500/10 dark:bg-red-500/20 rounded-lg group-hover:bg-red-500/20 transition-colors">
+                    <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
                   </div>
                   <CardTitle className="text-xs sm:text-sm font-bold text-foreground">Emergency</CardTitle>
                 </div>
               </CardHeader>
-              <CardContent>
-                <CardDescription className="text-[11px] sm:text-xs font-medium">Get help now</CardDescription>
+              <CardContent className="pt-0">
+                <CardDescription className="text-[11px] sm:text-xs font-medium">Call 991</CardDescription>
               </CardContent>
             </Card>
 
             <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer border border-border shadow-sm bg-card hover:-translate-y-1 active:scale-95" onClick={() => handleNavigation('/marketplace', 'Pharmacy')}>
-              <CardHeader className="pb-3">
+              <CardHeader className="pb-2 md:pb-3">
                 <div className="flex items-center gap-2">
                   <div className="p-2 bg-emerald-500/10 dark:bg-emerald-500/20 rounded-lg group-hover:bg-emerald-500/20 transition-colors">
-                    <CreditCard className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                    <Pill className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
                   </div>
                   <CardTitle className="text-xs sm:text-sm font-bold text-foreground">Buy Medicine</CardTitle>
                 </div>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-0">
                 <CardDescription className="text-[11px] sm:text-xs font-medium">Order online</CardDescription>
               </CardContent>
             </Card>
 
             <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer border border-border shadow-sm bg-card hover:-translate-y-1 active:scale-95" onClick={() => handleNavigation('/marketplace-users', 'Providers')}>
-              <CardHeader className="pb-3">
+              <CardHeader className="pb-2 md:pb-3">
                 <div className="flex items-center gap-2">
                   <div className="p-2 bg-blue-500/10 dark:bg-blue-500/20 rounded-lg group-hover:bg-blue-500/20 transition-colors">
                     <Users className="h-5 w-5 text-blue-600 dark:text-blue-400" />
@@ -163,30 +166,33 @@ export const PatientWorkflow = React.memo(() => {
                   <CardTitle className="text-xs sm:text-sm font-bold text-foreground">Find Doctor</CardTitle>
                 </div>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-0">
                 <CardDescription className="text-[11px] sm:text-xs font-medium">Book visits</CardDescription>
               </CardContent>
             </Card>
 
-            <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer border border-border shadow-sm bg-card hover:-translate-y-1 active:scale-95" onClick={() => handleNavigation('/appointments', 'Appointments')}>
-              <CardHeader className="pb-3">
+            <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer border border-border shadow-sm bg-card hover:-translate-y-1 active:scale-95" onClick={() => handleNavigation('/healthcare-institutions', 'Hospitals')}>
+              <CardHeader className="pb-2 md:pb-3">
                 <div className="flex items-center gap-2">
                   <div className="p-2 bg-purple-500/10 dark:bg-purple-500/20 rounded-lg group-hover:bg-purple-500/20 transition-colors">
-                    <Calendar className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                    <Building2 className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                   </div>
-                  <CardTitle className="text-xs sm:text-sm font-bold text-foreground">Visits</CardTitle>
+                  <CardTitle className="text-xs sm:text-sm font-bold text-foreground">Hospitals</CardTitle>
                 </div>
               </CardHeader>
-              <CardContent>
-                <CardDescription className="text-[11px] sm:text-xs font-medium">My schedule</CardDescription>
+              <CardContent className="pt-0">
+                <CardDescription className="text-[11px] sm:text-xs font-medium">UTH, Levy & more</CardDescription>
               </CardContent>
             </Card>
           </div>
         </div>
 
+        {/* Connected Workflows */}
+        <ConnectedWorkflows />
+
         {/* Specialized Help & Wallet */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+          <div className="lg:col-span-2 space-y-4 md:space-y-6">
             <section>
               <h2 className="text-base sm:text-lg font-bold mb-3 text-foreground">Specialized Care</h2>
               <SpecializedHelp />

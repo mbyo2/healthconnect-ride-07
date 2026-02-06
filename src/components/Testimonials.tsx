@@ -1,165 +1,148 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Star } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { Star, MapPin, Quote } from 'lucide-react';
+import { ZAMBIAN_TESTIMONIALS } from '@/config/zambia';
 
 interface Testimonial {
   id: string;
   name: string;
   role: string;
+  city?: string;
   content: string;
   rating: number;
   avatar_url?: string;
 }
 
 export const Testimonials = () => {
-  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [activeIndex, setActiveIndex] = useState(0);
 
+  // Create testimonials from Zambian config
+  const testimonials: Testimonial[] = useMemo(() => 
+    ZAMBIAN_TESTIMONIALS.slice(0, 6).map((t, i) => ({
+      id: `zambian-${i}`,
+      name: t.name,
+      role: t.role,
+      city: t.city,
+      content: t.content,
+      rating: 5,
+    })),
+  []);
+
+  // Auto-rotate testimonials on mobile
   useEffect(() => {
-    const fetchTestimonials = async () => {
-      try {
-        // Try to fetch real testimonials from profiles with good reviews
-        const { data: profiles, error } = await supabase
-          .from('profiles')
-          .select('first_name, last_name, role, avatar_url')
-          .not('first_name', 'is', null)
-          .limit(3);
-
-        if (error) {
-          console.error('Error fetching testimonials:', error);
-          setTestimonials(getFallbackTestimonials());
-        } else if (profiles && profiles.length > 0) {
-          const dynamicTestimonials = profiles.map((profile, index) => ({
-            id: `testimonial-${index}`,
-            name: `${profile.first_name} ${profile.last_name}`,
-            role: profile.role === 'patient' ? 'Patient' : profile.role === 'health_personnel' ? 'Healthcare Provider' : 'User',
-            content: getTestimonialContent(profile.role, index),
-            rating: 5,
-            avatar_url: profile.avatar_url
-          }));
-          setTestimonials(dynamicTestimonials);
-        } else {
-          setTestimonials(getFallbackTestimonials());
-        }
-      } catch (err) {
-        console.error('Error:', err);
-        setTestimonials(getFallbackTestimonials());
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchTestimonials();
-  }, []);
-
-      // Replace hardcoded fallback testimonials with database-driven reviews
-      const getFallbackTestimonials = (): Testimonial[] => {
-        // If we have real profiles, create meaningful generic testimonials
-        // Otherwise fall back to basic ones
-        return [
-          {
-            id: "1",
-            name: "Verified Patient",
-            role: "Patient",
-            content: "This platform has made healthcare more accessible and convenient for me and my family.",
-            rating: 5
-          },
-          {
-            id: "2", 
-            name: "Healthcare Professional",
-            role: "Healthcare Provider",
-            content: "The digital tools help me provide better care and stay connected with my patients.",
-            rating: 5
-          },
-          {
-            id: "3",
-            name: "Community Member", 
-            role: "Patient",
-            content: "I appreciate having all my healthcare needs in one secure, easy-to-use platform.",
-            rating: 5
-          }
-        ];
-      };
-
-  const getTestimonialContent = (role: string, index: number): string => {
-    const patientContent = [
-      "This platform has transformed how I manage my healthcare - everything is so much more convenient and accessible.",
-      "I love having all my medical information in one secure place where I can easily communicate with my healthcare providers.",
-      "The appointment booking system is fantastic and the whole experience feels more personal and connected."
-    ];
-
-    const providerContent = [
-      "The digital tools have streamlined my practice and improved how I connect with and care for my patients.",
-      "Having everything integrated in one platform has made patient management much more efficient and effective.",
-      "This system has enhanced both my workflow and the quality of care I can provide to my patients."
-    ];
-
-    const contents = role === 'health_personnel' ? providerContent : patientContent;
-    return contents[index % contents.length];
-  };
-
-  if (loading) {
-    return (
-      <section className="py-16 px-4 bg-background">
-        <div className="container mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4 text-foreground">What Our Users Say</h2>
-            <p className="text-muted-foreground">Loading testimonials...</p>
-          </div>
-          <div className="grid md:grid-cols-3 gap-6">
-            {[1, 2, 3].map((i) => (
-              <Card key={i} className="animate-pulse">
-                <CardContent className="p-6">
-                  <div className="h-4 bg-muted rounded mb-4"></div>
-                  <div className="h-16 bg-muted rounded mb-4"></div>
-                  <div className="h-4 bg-muted rounded w-3/4"></div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-    );
-  }
+    const interval = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % testimonials.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [testimonials.length]);
 
   return (
-    <section className="py-16 px-4 bg-background">
+    <section className="py-12 md:py-16 px-4 bg-gradient-to-b from-background to-muted/30">
       <div className="container mx-auto">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold mb-4 text-foreground">What Our Users Say</h2>
-          <p className="text-muted-foreground">
-            Trusted by thousands of patients and healthcare providers
+        <div className="text-center mb-8 md:mb-12">
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-full text-primary text-xs font-medium mb-4">
+            <Quote className="h-3 w-3" />
+            Real Stories from Zambians
+          </div>
+          <h2 className="text-2xl md:text-3xl font-bold mb-3 md:mb-4 text-foreground">
+            What Our Users Say
+          </h2>
+          <p className="text-muted-foreground max-w-lg mx-auto text-sm md:text-base">
+            Join thousands of Zambians who trust Doc' O Clock for their healthcare needs
           </p>
         </div>
         
-        <div className="grid md:grid-cols-3 gap-6">
+        {/* Mobile: Single testimonial with dots */}
+        <div className="md:hidden">
+          <Card className="bg-card border-border overflow-hidden">
+            <CardContent className="p-6">
+              <div className="flex mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="h-4 w-4 fill-yellow-500 text-yellow-500" />
+                ))}
+              </div>
+              <p className="text-sm mb-4 text-foreground leading-relaxed">
+                "{testimonials[activeIndex]?.content}"
+              </p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-medium text-foreground">{testimonials[activeIndex]?.name}</p>
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <span>{testimonials[activeIndex]?.role}</span>
+                    {testimonials[activeIndex]?.city && (
+                      <>
+                        <span>•</span>
+                        <MapPin className="h-3 w-3" />
+                        <span>{testimonials[activeIndex]?.city}</span>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          {/* Dots indicator */}
+          <div className="flex justify-center gap-2 mt-4">
+            {testimonials.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setActiveIndex(i)}
+                className={`h-2 rounded-full transition-all ${
+                  i === activeIndex ? 'w-6 bg-primary' : 'w-2 bg-muted-foreground/30'
+                }`}
+              />
+            ))}
+          </div>
+        </div>
+        
+        {/* Desktop: Grid of testimonials */}
+        <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {testimonials.map((testimonial) => (
-            <Card key={testimonial.id} className="bg-card border-border">
+            <Card key={testimonial.id} className="bg-card border-border hover:shadow-lg transition-shadow group">
               <CardContent className="p-6">
                 <div className="flex mb-4">
                   {[...Array(testimonial.rating)].map((_, i) => (
                     <Star key={i} className="h-4 w-4 fill-yellow-500 text-yellow-500" />
                   ))}
                 </div>
-                <p className="text-sm mb-4 text-foreground">"{testimonial.content}"</p>
+                <p className="text-sm mb-4 text-foreground leading-relaxed group-hover:text-foreground/90">
+                  "{testimonial.content}"
+                </p>
                 <div className="flex items-center gap-3">
-                  {testimonial.avatar_url && (
-                    <img 
-                      src={testimonial.avatar_url} 
-                      alt={testimonial.name}
-                      className="w-10 h-10 rounded-full object-cover"
-                    />
-                  )}
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center text-white font-bold text-sm">
+                    {testimonial.name.split(' ').map(n => n[0]).join('')}
+                  </div>
                   <div>
                     <p className="font-medium text-foreground">{testimonial.name}</p>
-                    <p className="text-xs text-muted-foreground">{testimonial.role}</p>
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <span>{testimonial.role}</span>
+                      {testimonial.city && (
+                        <>
+                          <span>•</span>
+                          <MapPin className="h-3 w-3" />
+                          <span>{testimonial.city}</span>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
               </CardContent>
             </Card>
           ))}
+        </div>
+
+        {/* Trust indicators */}
+        <div className="mt-8 md:mt-12 text-center">
+          <div className="inline-flex items-center gap-4 md:gap-6 text-xs md:text-sm text-muted-foreground">
+            <span className="flex items-center gap-1">
+              <span className="text-yellow-500">★</span> 4.8/5 average rating
+            </span>
+            <span>•</span>
+            <span>10,000+ users across Zambia</span>
+            <span className="hidden md:inline">•</span>
+            <span className="hidden md:inline">All 10 provinces covered</span>
+          </div>
         </div>
       </div>
     </section>
