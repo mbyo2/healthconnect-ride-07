@@ -38,6 +38,33 @@ serve(async (req) => {
   }
 
   try {
+    // Validate authentication - user must be logged in
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      console.error('Missing authorization header');
+      return new Response(
+        JSON.stringify({ success: false, error: 'Unauthorized - authentication required' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Create auth client to validate the user's JWT
+    const authClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    const { data: { user }, error: authError } = await authClient.auth.getUser();
+    if (authError || !user) {
+      console.error('Authentication failed:', authError?.message);
+      return new Response(
+        JSON.stringify({ success: false, error: 'Unauthorized - invalid token' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Create service role client for privileged operations
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
@@ -61,6 +88,15 @@ serve(async (req) => {
 
     const { amount, currency, patientId, providerId, serviceId, institutionId, paymentMethod, paymentType } = validationResult.data;
 
+    // CRITICAL: Verify the authenticated user is the patient making the payment
+    if (user.id !== patientId) {
+      console.error('Authorization failed: user', user.id, 'attempted to pay as patient', patientId);
+      return new Response(
+        JSON.stringify({ success: false, error: 'Forbidden - can only process payments for yourself' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     // Prevent self-payment
     if (patientId === providerId) {
       return new Response(
@@ -69,7 +105,7 @@ serve(async (req) => {
       );
     }
 
-    console.log('Processing payment with splits:', { amount, currency, patientId, providerId, serviceId, institutionId, paymentMethod, paymentType });
+    console.log('Processing payment with splits:', { authenticatedUserId: user.id, amount, currency, patientId, providerId, serviceId, institutionId, paymentMethod, paymentType });
 
     // First, deduct from patient's wallet
     const walletResult = await supabase.rpc('process_wallet_transaction', {
