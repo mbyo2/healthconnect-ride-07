@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Header } from '@/components/Header';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Phone, MapPin, Ambulance, Heart, AlertTriangle, User, Clock } from 'lucide-react';
+import { Phone, MapPin, Ambulance, Heart, AlertTriangle, User, Clock, Building2, Shield } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
+import { ZAMBIA_CONFIG } from '@/config/zambia';
 
 interface EmergencyService {
   id: string;
@@ -30,6 +30,7 @@ interface EmergencyContact {
 
 const Emergency = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [emergencyContacts, setEmergencyContacts] = useState<EmergencyContact[]>([]);
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [emergencyMessage, setEmergencyMessage] = useState('');
@@ -37,45 +38,36 @@ const Emergency = () => {
   const [emergencyServices, setEmergencyServices] = useState<EmergencyService[]>([]);
 
   useEffect(() => {
-    fetchEmergencyServices();
+    loadZambianEmergencyServices();
     loadEmergencyContacts();
     getCurrentLocation();
   }, [user]);
 
-  const fetchEmergencyServices = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('emergency_services' as any)
-        .select('*')
-        .order('name');
+  const loadZambianEmergencyServices = () => {
+    // Load Zambian ambulance services
+    const ambulanceServices: EmergencyService[] = ZAMBIA_CONFIG.ambulanceServices.map(s => ({
+      id: s.id,
+      name: s.name,
+      phone: s.phone,
+      description: s.description,
+      type: 'ambulance' as const,
+      available24h: s.available24h,
+    }));
 
-      if (error) {
-        console.error('Error fetching emergency services:', error);
-        // Fallback to default services if table doesn't exist
-        setEmergencyServices([
-          {
-            id: '1',
-            name: 'Ambulance Service Zambia',
-            phone: '911',
-            description: 'Emergency ambulance and medical response',
-            type: 'ambulance',
-            available24h: true
-          },
-          {
-            id: '2',
-            name: 'University Teaching Hospital',
-            phone: '+260-211-256067',
-            description: 'Main emergency hospital in Lusaka',
-            type: 'hospital' as const,
-            available24h: true
-          }
-        ]);
-      } else {
-        setEmergencyServices((data as any) || []);
-      }
-    } catch (error) {
-      console.error('Error fetching emergency services:', error);
-    }
+    // Load Zambian hospitals
+    const hospitalServices: EmergencyService[] = ZAMBIA_CONFIG.healthcareInstitutions
+      .filter(h => h.type === 'hospital')
+      .slice(0, 4)
+      .map(h => ({
+        id: h.id,
+        name: h.name,
+        phone: h.phone,
+        description: h.description,
+        type: 'hospital' as const,
+        available24h: h.available24h,
+      }));
+
+    setEmergencyServices([...ambulanceServices, ...hospitalServices]);
   };
 
   const loadEmergencyContacts = async () => {
@@ -165,11 +157,46 @@ const Emergency = () => {
       <div className="min-h-screen bg-background">
         <main className="container mx-auto px-4 py-6 space-y-6 max-w-7xl">
           <div className="space-y-6">
+            {/* Quick Call Buttons - Most Important */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <a 
+                href={`tel:${ZAMBIA_CONFIG.emergencyNumbers.ambulance}`}
+                className="flex flex-col items-center justify-center p-6 bg-red-600 hover:bg-red-700 text-white rounded-xl shadow-lg active:scale-95 transition-all"
+              >
+                <Ambulance className="h-8 w-8 mb-2" />
+                <span className="font-bold">Ambulance</span>
+                <span className="text-lg font-mono">{ZAMBIA_CONFIG.emergencyNumbers.ambulance}</span>
+              </a>
+              <a 
+                href={`tel:${ZAMBIA_CONFIG.emergencyNumbers.police}`}
+                className="flex flex-col items-center justify-center p-6 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-lg active:scale-95 transition-all"
+              >
+                <Shield className="h-8 w-8 mb-2" />
+                <span className="font-bold">Police</span>
+                <span className="text-lg font-mono">{ZAMBIA_CONFIG.emergencyNumbers.police}</span>
+              </a>
+              <a 
+                href={`tel:${ZAMBIA_CONFIG.emergencyNumbers.fire}`}
+                className="flex flex-col items-center justify-center p-6 bg-orange-600 hover:bg-orange-700 text-white rounded-xl shadow-lg active:scale-95 transition-all"
+              >
+                <AlertTriangle className="h-8 w-8 mb-2" />
+                <span className="font-bold">Fire</span>
+                <span className="text-lg font-mono">{ZAMBIA_CONFIG.emergencyNumbers.fire}</span>
+              </a>
+              <button 
+                onClick={() => navigate('/healthcare-institutions')}
+                className="flex flex-col items-center justify-center p-6 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-lg active:scale-95 transition-all"
+              >
+                <Building2 className="h-8 w-8 mb-2" />
+                <span className="font-bold">Hospitals</span>
+                <span className="text-sm">Find Nearby</span>
+              </button>
+            </div>
 
             {/* Emergency Alert Section */}
-            <Card className="border-red-200 bg-red-50">
+            <Card className="border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/30">
               <CardHeader>
-                <CardTitle className="text-red-800 flex items-center gap-2">
+                <CardTitle className="text-red-800 dark:text-red-200 flex items-center gap-2">
                   <AlertTriangle className="h-6 w-6" />
                   Emergency Alert System
                 </CardTitle>
@@ -179,12 +206,12 @@ const Emergency = () => {
                   placeholder="Describe your emergency situation (optional)"
                   value={emergencyMessage}
                   onChange={(e) => setEmergencyMessage(e.target.value)}
-                  className="min-h-20"
+                  className="min-h-20 bg-white dark:bg-background"
                 />
 
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <MapPin className="h-4 w-4" />
-                  {location ? 'Location detected' : 'Getting location...'}
+                  {location ? `📍 Location detected (${location.lat.toFixed(4)}, ${location.lng.toFixed(4)})` : 'Getting your location...'}
                 </div>
 
                 <Button
@@ -207,8 +234,8 @@ const Emergency = () => {
 
                 {isEmergencyActive && (
                   <div className="text-center">
-                    <Badge className="bg-red-100 text-red-800">
-                      Emergency services notified • Help is on the way
+                    <Badge className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                      🚨 Emergency services notified • Help is on the way
                     </Badge>
                   </div>
                 )}
@@ -218,32 +245,36 @@ const Emergency = () => {
             {/* Emergency Services */}
             <Card>
               <CardHeader>
-                <CardTitle>Emergency Services</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <Phone className="h-5 w-5 text-primary" />
+                  Emergency Services in Zambia
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {emergencyServices.map((service) => (
-                    <div key={service.id} className="border rounded-lg p-4 hover:bg-gray-50">
+                    <div key={service.id} className="border border-border rounded-lg p-4 hover:bg-muted/50 transition-colors">
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
-                          {getServiceIcon(service.type)}
-                          <h3 className="font-semibold">{service.name}</h3>
+                          <div className={`p-2 rounded-lg ${service.type === 'ambulance' ? 'bg-red-100 dark:bg-red-900/30' : 'bg-emerald-100 dark:bg-emerald-900/30'}`}>
+                            {getServiceIcon(service.type)}
+                          </div>
+                          <h3 className="font-semibold text-foreground">{service.name}</h3>
                         </div>
                         {service.available24h && (
-                          <Badge variant="secondary">24/7</Badge>
+                          <Badge variant="secondary" className="text-xs">24/7</Badge>
                         )}
                       </div>
                       <p className="text-sm text-muted-foreground mb-3">
                         {service.description}
                       </p>
-                      <Button
-                        onClick={() => window.open(`tel:${service.phone}`)}
-                        variant="outline"
-                        className="w-full"
+                      <a
+                        href={`tel:${service.phone}`}
+                        className="flex items-center justify-center gap-2 w-full py-2 px-4 border border-border rounded-lg hover:bg-primary hover:text-primary-foreground transition-colors font-medium"
                       >
-                        <Phone className="h-4 w-4 mr-2" />
+                        <Phone className="h-4 w-4" />
                         Call {service.phone}
-                      </Button>
+                      </a>
                     </div>
                   ))}
                 </div>
@@ -252,81 +283,111 @@ const Emergency = () => {
 
             {/* Emergency Contacts */}
             <Card>
-              <CardHeader>
+              <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>Your Emergency Contacts</CardTitle>
+                <Button variant="outline" size="sm" onClick={() => navigate('/profile')}>
+                  Manage
+                </Button>
               </CardHeader>
               <CardContent>
                 {emergencyContacts.length > 0 ? (
                   <div className="space-y-3">
                     {emergencyContacts.map((contact) => (
-                      <div key={contact.id} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div key={contact.id} className="flex items-center justify-between p-3 border border-border rounded-lg">
                         <div className="flex items-center gap-3">
-                          <User className="h-5 w-5 text-muted-foreground" />
+                          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                            <User className="h-5 w-5 text-primary" />
+                          </div>
                           <div>
-                            <p className="font-medium">{contact.name}</p>
+                            <p className="font-medium text-foreground">{contact.name}</p>
                             <p className="text-sm text-muted-foreground">
                               {contact.relationship}
-                              {contact.is_primary && ' (Primary)'}
+                              {contact.is_primary && <Badge variant="outline" className="ml-2 text-xs">Primary</Badge>}
                             </p>
                           </div>
                         </div>
-                        <Button
-                          onClick={() => window.open(`tel:${contact.phone}`)}
-                          variant="outline"
-                          size="sm"
+                        <a
+                          href={`tel:${contact.phone}`}
+                          className="flex items-center gap-2 px-3 py-2 border border-border rounded-lg hover:bg-primary hover:text-primary-foreground transition-colors"
                         >
-                          <Phone className="h-4 w-4 mr-2" />
-                          {contact.phone}
-                        </Button>
+                          <Phone className="h-4 w-4" />
+                          <span className="hidden sm:inline">{contact.phone}</span>
+                        </a>
                       </div>
                     ))}
                   </div>
                 ) : (
                   <div className="text-center py-8">
                     <User className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                    <p className="text-muted-foreground">
-                      No emergency contacts set up.
-                      Go to your profile to add emergency contacts.
+                    <p className="text-muted-foreground mb-4">
+                      No emergency contacts set up yet.
                     </p>
+                    <Button variant="outline" onClick={() => navigate('/profile')}>
+                      Add Emergency Contacts
+                    </Button>
                   </div>
                 )}
               </CardContent>
             </Card>
 
-            {/* Safety Tips */}
+            {/* Zambian Emergency Safety Tips */}
             <Card>
               <CardHeader>
-                <CardTitle>Emergency Safety Tips for Zambia</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <Heart className="h-5 w-5 text-red-500" />
+                  Emergency Safety Tips for Zambia
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4 text-sm">
-                  <div>
-                    <h4 className="font-semibold mb-2">Medical Emergency:</h4>
-                    <ul className="list-disc pl-5 space-y-1">
-                      <li>Call 911 for ambulance services</li>
-                      <li>Stay calm and provide clear location information</li>
-                      <li>Don't move severely injured persons unless in immediate danger</li>
-                    </ul>
+                <div className="grid md:grid-cols-2 gap-6 text-sm">
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="font-semibold mb-2 text-foreground flex items-center gap-2">
+                        <Ambulance className="h-4 w-4 text-red-500" />
+                        Medical Emergency
+                      </h4>
+                      <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                        <li>Call <strong>{ZAMBIA_CONFIG.emergencyNumbers.ambulance}</strong> for ambulance</li>
+                        <li>Stay calm and provide clear location</li>
+                        <li>Mention nearby landmarks (shopping centers, schools)</li>
+                        <li>Don't move injured persons unless in danger</li>
+                      </ul>
+                    </div>
+
+                    <div>
+                      <h4 className="font-semibold mb-2 text-foreground">📞 Important Numbers</h4>
+                      <div className="grid grid-cols-2 gap-2 text-muted-foreground">
+                        <span>Police:</span><strong>{ZAMBIA_CONFIG.emergencyNumbers.police}</strong>
+                        <span>Fire:</span><strong>{ZAMBIA_CONFIG.emergencyNumbers.fire}</strong>
+                        <span>Ambulance:</span><strong>{ZAMBIA_CONFIG.emergencyNumbers.ambulance}</strong>
+                        <span>General:</span><strong>{ZAMBIA_CONFIG.emergencyNumbers.generalEmergency}</strong>
+                      </div>
+                    </div>
                   </div>
 
-                  <div>
-                    <h4 className="font-semibold mb-2">Important Numbers:</h4>
-                    <ul className="list-disc pl-5 space-y-1">
-                      <li>Police: 999</li>
-                      <li>Fire: 993</li>
-                      <li>Ambulance: 911</li>
-                      <li>Road Traffic Accidents: 991</li>
-                    </ul>
-                  </div>
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="font-semibold mb-2 text-foreground flex items-center gap-2">
+                        <Building2 className="h-4 w-4 text-emerald-500" />
+                        Nearest Major Hospitals
+                      </h4>
+                      <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                        <li><strong>UTH</strong> - Lusaka (Nationalist Road)</li>
+                        <li><strong>Levy Mwanawasa</strong> - Lusaka (Kasama Road)</li>
+                        <li><strong>Ndola Central</strong> - Copperbelt</li>
+                        <li><strong>Kitwe Central</strong> - Kitwe</li>
+                      </ul>
+                    </div>
 
-                  <div>
-                    <h4 className="font-semibold mb-2">What to do while waiting:</h4>
-                    <ul className="list-disc pl-5 space-y-1">
-                      <li>Stay with the patient and keep them comfortable</li>
-                      <li>Do not give food or water unless instructed</li>
-                      <li>Apply basic first aid if trained</li>
-                      <li>Keep emergency contact information accessible</li>
-                    </ul>
+                    <div>
+                      <h4 className="font-semibold mb-2 text-foreground">⏳ While Waiting for Help</h4>
+                      <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                        <li>Keep the patient comfortable and calm</li>
+                        <li>Apply basic first aid if trained</li>
+                        <li>Don't give food or water unless instructed</li>
+                        <li>Have someone wait outside to guide responders</li>
+                      </ul>
+                    </div>
                   </div>
                 </div>
               </CardContent>
@@ -335,7 +396,7 @@ const Emergency = () => {
           </div>
         </main>
       </div>
-    </ProtectedRoute >
+    </ProtectedRoute>
   );
 };
 

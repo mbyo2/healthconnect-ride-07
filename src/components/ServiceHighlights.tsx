@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Calendar, Search, MessageSquare, FileText, Shield, Users, Star, Clock, CheckCircle } from 'lucide-react';
+import { Calendar, Search, MessageSquare, FileText, Shield, Clock, CheckCircle, Pill, Building2, Phone, CreditCard, Video } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { ZAMBIAN_STATS } from '@/config/zambia';
 
 export const ServiceHighlights = () => {
   const [stats, setStats] = useState({
@@ -14,7 +15,6 @@ export const ServiceHighlights = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        // Fetch real statistics from the database
         const [usersCount, appointmentsCount, messagesCount, providersCount] = await Promise.all([
           supabase.from('profiles' as any).select('id', { count: 'exact', head: true }),
           supabase.from('appointments' as any).select('id', { count: 'exact', head: true }),
@@ -30,7 +30,6 @@ export const ServiceHighlights = () => {
         });
       } catch (error) {
         console.error('Error fetching stats:', error);
-        // Keep default values if error occurs
       }
     };
 
@@ -39,101 +38,111 @@ export const ServiceHighlights = () => {
 
   const services = [
     {
-      icon: <Search className="h-6 w-6 text-blue-600" />,
-      title: "Find Trusted Providers",
-      description: "Search verified healthcare providers with patient reviews and credentials",
-      rating: "4.9/5",
-      users: `${stats.totalProviders}+ providers`
+      icon: <Search className="h-6 w-6 text-blue-600 dark:text-blue-400" />,
+      title: "Find Trusted Doctors",
+      description: "Search verified healthcare providers across all 10 provinces of Zambia",
+      stat: ZAMBIAN_STATS.doctors,
+      statLabel: "doctors"
     },
     {
-      icon: <Calendar className="h-6 w-6 text-green-600" />,
-      title: "Simple Scheduling",
+      icon: <Building2 className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />,
+      title: "Connected Hospitals",
+      description: "Access to UTH, Levy Mwanawasa, and major hospitals nationwide",
+      stat: ZAMBIAN_STATS.hospitals,
+      statLabel: "hospitals"
+    },
+    {
+      icon: <Calendar className="h-6 w-6 text-purple-600 dark:text-purple-400" />,
+      title: "Easy Scheduling",
       description: "Book appointments instantly with real-time availability",
-      rating: "4.8/5",
-      users: `${stats.totalAppointments}+ bookings`
+      stat: `${stats.totalAppointments || '1000'}+`,
+      statLabel: "bookings"
     },
     {
-      icon: <MessageSquare className="h-6 w-6 text-purple-600" />,
-      title: "Secure Communication",
-      description: "HIPAA-compliant messaging with your healthcare team",
-      rating: "4.9/5",
-      users: `${stats.totalMessages}+ messages`
+      icon: <Pill className="h-6 w-6 text-orange-600 dark:text-orange-400" />,
+      title: "Pharmacy Network",
+      description: "Order medicine online from registered pharmacies with delivery",
+      stat: ZAMBIAN_STATS.pharmacies,
+      statLabel: "pharmacies"
     },
     {
-      icon: <FileText className="h-6 w-6 text-indigo-600" />,
-      title: "Digital Health Records",
-      description: "Access your complete medical history anytime, anywhere",
-      rating: "4.7/5",
-      users: `${stats.totalUsers}+ records`
+      icon: <CreditCard className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />,
+      title: "Mobile Money Payments",
+      description: "Pay easily with MTN, Airtel, or Zamtel Mobile Money",
+      stat: "3",
+      statLabel: "providers"
     },
     {
-      icon: <Shield className="h-6 w-6 text-red-600" />,
-      title: "Bank-Level Security",
-      description: "Your health data protected with enterprise-grade encryption",
-      rating: "5.0/5",
-      users: "100% secure"
+      icon: <Video className="h-6 w-6 text-red-600 dark:text-red-400" />,
+      title: "Video Consultations",
+      description: "See a doctor from anywhere in Zambia via secure video call",
+      stat: "24/7",
+      statLabel: "available"
     },
     {
-      icon: <Clock className="h-6 w-6 text-orange-600" />,
-      title: "24/7 Emergency Support",
-      description: "Get help when you need it with our dedicated emergency team",
-      rating: "4.8/5",
-      users: "24/7 available"
+      icon: <Shield className="h-6 w-6 text-green-600 dark:text-green-400" />,
+      title: "NHIMA Support",
+      description: "Integrated with National Health Insurance for covered services",
+      stat: "100%",
+      statLabel: "secure"
+    },
+    {
+      icon: <Phone className="h-6 w-6 text-red-600 dark:text-red-400" />,
+      title: "Emergency Response",
+      description: "Quick access to ambulance (991), police (999), and hospitals",
+      stat: "24/7",
+      statLabel: "emergency"
     }
   ];
 
   return (
-    <section className="py-16 bg-muted/50">
+    <section className="py-12 md:py-16 bg-muted/50">
       <div className="container-modern">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl lg:text-4xl font-bold mb-4 text-foreground">
+        <div className="text-center mb-8 md:mb-12">
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-full text-primary text-xs font-medium mb-4">
+            <CheckCircle className="h-3 w-3" />
+            Built for Zambia
+          </div>
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-4 text-foreground">
             Everything You Need for Better Healthcare
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Discover why {stats.totalUsers > 0 ? `${stats.totalUsers} users` : 'thousands'} trust Doc' O Clock for their healthcare needs
+          <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
+            Connecting {ZAMBIAN_STATS.patients} Zambians to quality healthcare across all provinces
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
           {services.map((service, index) => (
-            <div key={index} className="bg-card border border-border rounded-xl p-6 hover:shadow-lg transition-shadow group">
-              <div className="flex items-start gap-4 mb-4">
-                <div className="p-3 bg-muted rounded-xl group-hover:bg-primary/10 transition-colors duration-200">
+            <div 
+              key={index} 
+              className="bg-card border border-border rounded-xl p-4 md:p-6 hover:shadow-lg transition-all group"
+            >
+              <div className="flex flex-col gap-3">
+                <div className="p-2 md:p-3 bg-muted rounded-xl group-hover:bg-primary/10 transition-colors w-fit">
                   {service.icon}
                 </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-foreground mb-2 text-lg">
+                <div>
+                  <h3 className="font-semibold text-foreground text-sm md:text-base mb-1 md:mb-2">
                     {service.title}
                   </h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed mb-3">
+                  <p className="text-muted-foreground text-xs md:text-sm leading-relaxed mb-2 md:mb-3 line-clamp-2">
                     {service.description}
                   </p>
-
-                  {/* Rating and stats */}
-                  <div className="flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-1">
-                      <Star className="h-3 w-3 text-yellow-500 fill-current" />
-                      <span className="font-medium text-foreground">{service.rating}</span>
-                    </div>
-                    <span className="text-muted-foreground">{service.users}</span>
+                  <div className="flex items-center gap-2 text-xs">
+                    <span className="font-bold text-primary">{service.stat}</span>
+                    <span className="text-muted-foreground">{service.statLabel}</span>
                   </div>
                 </div>
               </div>
-
-              {/* Progress indicator */}
-              <div className="w-full bg-muted rounded-full h-1 mb-2">
-                <div className="bg-primary h-1 rounded-full" style={{ width: `${90 + index * 2}%` }}></div>
-              </div>
-              <p className="text-xs text-muted-foreground">Available now</p>
             </div>
           ))}
         </div>
 
         {/* Bottom CTA */}
-        <div className="text-center mt-12">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-500/10 dark:bg-green-500/20 text-green-700 dark:text-green-300 rounded-full text-sm font-medium mb-4">
+        <div className="text-center mt-8 md:mt-12">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 rounded-full text-sm font-medium">
             <CheckCircle className="h-4 w-4" />
-            All services included in free plan
+            Free to start • Pay only for services you use
           </div>
         </div>
       </div>
