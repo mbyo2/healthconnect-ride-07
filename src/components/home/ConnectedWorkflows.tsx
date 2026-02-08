@@ -1,6 +1,5 @@
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
 import { 
   Search, 
@@ -14,9 +13,7 @@ import {
   AlertTriangle,
   Building2,
   Ambulance,
-  Heart,
-  Stethoscope,
-  MessageSquare
+  Heart
 } from 'lucide-react';
 
 interface WorkflowStep {
@@ -28,58 +25,46 @@ interface WorkflowStep {
 interface Workflow {
   id: string;
   title: string;
-  description: string;
   color: string;
+  bgColor: string;
   steps: WorkflowStep[];
 }
 
 const workflows: Workflow[] = [
   {
     id: 'doctor-visit',
-    title: 'Find Doctor → Book → Consult',
-    description: 'Complete doctor visit journey',
-    color: 'from-blue-500 to-blue-600',
+    title: 'Doctor Visit',
+    color: 'text-blue-600 dark:text-blue-400',
+    bgColor: 'bg-blue-500',
     steps: [
-      { icon: Search, label: 'Find Doctor', route: '/marketplace-users' },
-      { icon: Calendar, label: 'Book Visit', route: '/appointments' },
+      { icon: Search, label: 'Find', route: '/marketplace-users' },
+      { icon: Calendar, label: 'Book', route: '/appointments' },
       { icon: CreditCard, label: 'Pay', route: '/wallet' },
       { icon: Video, label: 'Consult', route: '/video-consultations' },
     ]
   },
   {
     id: 'medicine',
-    title: 'Prescription → Pharmacy → Delivery',
-    description: 'Get your medicine delivered',
-    color: 'from-emerald-500 to-emerald-600',
+    title: 'Get Medicine',
+    color: 'text-emerald-600 dark:text-emerald-400',
+    bgColor: 'bg-emerald-500',
     steps: [
-      { icon: Pill, label: 'Prescriptions', route: '/prescriptions' },
-      { icon: ShoppingCart, label: 'Buy Medicine', route: '/marketplace' },
+      { icon: Pill, label: 'Rx', route: '/prescriptions' },
+      { icon: ShoppingCart, label: 'Buy', route: '/marketplace' },
       { icon: CreditCard, label: 'Pay', route: '/wallet' },
-      { icon: Truck, label: 'Track Delivery', route: '/marketplace' },
+      { icon: Truck, label: 'Track', route: '/marketplace' },
     ]
   },
   {
     id: 'emergency',
-    title: 'Emergency → Hospital → Care',
-    description: 'Get immediate help when needed',
-    color: 'from-red-500 to-red-600',
+    title: 'Emergency',
+    color: 'text-red-600 dark:text-red-400',
+    bgColor: 'bg-red-500',
     steps: [
-      { icon: AlertTriangle, label: 'Emergency', route: '/emergency' },
-      { icon: Building2, label: 'Find Hospital', route: '/healthcare-institutions' },
-      { icon: Ambulance, label: 'Call 991', route: 'tel:991' },
-      { icon: Heart, label: 'Get Care', route: '/emergency' },
-    ]
-  },
-  {
-    id: 'care-team',
-    title: 'Build Your Care Team',
-    description: 'Connect with healthcare providers',
-    color: 'from-purple-500 to-purple-600',
-    steps: [
-      { icon: Stethoscope, label: 'Find Doctors', route: '/healthcare-professionals' },
-      { icon: Building2, label: 'Clinics', route: '/healthcare-institutions' },
-      { icon: MessageSquare, label: 'Chat', route: '/chat' },
-      { icon: Calendar, label: 'Schedule', route: '/appointments' },
+      { icon: AlertTriangle, label: 'SOS', route: '/emergency' },
+      { icon: Building2, label: 'Hospital', route: '/healthcare-institutions' },
+      { icon: Ambulance, label: '991', route: 'tel:991' },
+      { icon: Heart, label: 'Care', route: '/emergency' },
     ]
   },
 ];
@@ -96,36 +81,31 @@ export const ConnectedWorkflows: React.FC = () => {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-bold text-foreground">Quick Workflows</h2>
-        <span className="text-xs text-muted-foreground">Tap any step to start</span>
-      </div>
+    <div className="space-y-3">
+      <h2 className="text-lg font-bold text-foreground px-1">Quick Workflows</h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {workflows.map((workflow) => (
-          <Card key={workflow.id} className="overflow-hidden group hover:shadow-lg transition-all">
-            <CardHeader className={`py-3 px-4 bg-gradient-to-r ${workflow.color} text-white`}>
-              <CardTitle className="text-sm font-semibold">{workflow.title}</CardTitle>
-              <CardDescription className="text-white/80 text-xs">
-                {workflow.description}
-              </CardDescription>
+          <Card key={workflow.id} className="overflow-hidden group hover:shadow-lg transition-all border-border">
+            <CardHeader className={`py-2 px-3 ${workflow.bgColor}`}>
+              <CardTitle className="text-xs font-bold text-white">{workflow.title}</CardTitle>
             </CardHeader>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between gap-1">
+            <CardContent className="p-3">
+              <div className="flex items-center justify-between">
                 {workflow.steps.map((step, idx) => (
                   <React.Fragment key={idx}>
                     <button
                       onClick={() => handleStepClick(step.route)}
-                      className="flex items-center justify-center p-2 rounded-lg hover:bg-muted transition-colors group/step"
+                      className="flex items-center justify-center p-2 rounded-lg hover:bg-muted transition-colors group/step active:scale-95"
                       aria-label={step.label}
+                      title={step.label}
                     >
-                      <div className="p-2 rounded-full bg-primary/10 group-hover/step:bg-primary/20 transition-colors">
-                        <step.icon className="h-5 w-5 text-foreground group-hover/step:text-primary" />
+                      <div className={`p-2 rounded-full bg-muted group-hover/step:bg-primary/10 transition-colors`}>
+                        <step.icon className={`h-4 w-4 ${workflow.color} group-hover/step:scale-110 transition-transform`} />
                       </div>
                     </button>
                     {idx < workflow.steps.length - 1 && (
-                      <ArrowRight className="h-3 w-3 text-muted-foreground/50 flex-shrink-0" />
+                      <ArrowRight className="h-3 w-3 text-muted-foreground/40 flex-shrink-0" />
                     )}
                   </React.Fragment>
                 ))}

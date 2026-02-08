@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
@@ -35,20 +34,6 @@ export const AppLogo = ({
         src="/d0c-icon.svg" 
         alt="Doc' O Clock" 
         className={cn("object-contain", sizeClasses[size])}
-        onError={(e) => {
-          // Fallback if SVG fails
-          const target = e.target as HTMLImageElement;
-          target.style.display = 'none';
-          const parent = target.parentElement;
-          if (parent) {
-            const fallback = document.createElement('div');
-            fallback.className = "bg-primary rounded-full flex items-center justify-center text-white font-bold";
-            fallback.style.width = sizeClasses[size].split(' ')[0].replace('w-', '') + 'px';
-            fallback.style.height = sizeClasses[size].split(' ')[1].replace('h-', '') + 'px';
-            fallback.innerText = "D0C";
-            parent.prepend(fallback);
-          }
-        }}
       />
       {showText && (
         <span className={cn(
