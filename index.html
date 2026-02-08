@@ -4,55 +4,43 @@
 <head>
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="/d0c-icon.svg" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/logo192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="/logo512.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
-  <meta name="description"
-    content="Complete healthcare platform connecting patients with doctors, pharmacies, and emergency services. Book appointments, order medications, and access telemedicine services." />
+  <meta name="description" content="Doc' O Clock - Zambia's trusted healthcare platform. Book appointments, order medications, access telemedicine and emergency services." />
   <meta name="theme-color" content="#3B82F6" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="apple-touch-icon" href="/d0c-icon.svg" />
+  <meta name="apple-mobile-web-app-title" content="Doc' O Clock" />
+  <link rel="apple-touch-icon" href="/logo192.png" />
+  <link rel="apple-touch-startup-image" href="/splash.png" />
   <link rel="manifest" href="/manifest.json" />
-  <title>Doc' O Clock - Complete Healthcare Platform</title>
+  <title>Doc' O Clock - Healthcare Zambia</title>
 
-  <!-- Cache control -->
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <meta http-equiv="Pragma" content="no-cache" />
-  <meta http-equiv="Expires" content="0" />
-
-  <!-- Meta tags for SEO -->
-  <meta name="keywords" content="healthcare, doctors, appointments, medical, health, telemedicine" />
+  <!-- SEO Meta -->
+  <meta name="keywords" content="healthcare zambia, doctors lusaka, medical appointments, telemedicine zambia, pharmacy delivery, emergency services, NHIMA, UTH" />
   <meta name="author" content="Doc' O Clock" />
+  <meta name="robots" content="index, follow" />
 
-  <!-- Meta tags for social sharing -->
-  <meta property="og:title" content="Doc' O Clock - Healthcare Services" />
-  <meta property="og:description"
-    content="Access healthcare services anytime, anywhere. Book appointments, chat with doctors, and manage your health." />
-  <meta property="og:image" content="/d0c-icon.svg" />
+  <!-- Open Graph -->
+  <meta property="og:title" content="Doc' O Clock - Healthcare Zambia" />
+  <meta property="og:description" content="Book appointments, order medicine, access emergency services. Quality healthcare at your fingertips." />
+  <meta property="og:image" content="/og-image.png" />
   <meta property="og:url" content="https://dococlockapp.com" />
   <meta property="og:type" content="website" />
+  <meta property="og:locale" content="en_ZM" />
+
+  <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Doc' O Clock - Healthcare Services" />
-  <meta name="twitter:description" content="Access healthcare services anytime, anywhere" />
-  <meta name="twitter:image" content="/d0c-icon.svg" />
+  <meta name="twitter:title" content="Doc' O Clock - Healthcare Zambia" />
+  <meta name="twitter:description" content="Quality healthcare at your fingertips. Anywhere in Zambia." />
+  <meta name="twitter:image" content="/og-image.png" />
 
-  <!-- Apple specific meta tags for PWA -->
-  <link rel="apple-touch-startup-image" href="/d0c-icon.svg" />
-  <meta name="apple-mobile-web-app-title" content="Doc' O Clock" />
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
-  <!-- Apple splash screens -->
-  <link rel="apple-touch-startup-image" href="/d0c-icon.svg"
-    media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)" />
-  <link rel="apple-touch-startup-image" href="/d0c-icon.svg"
-    media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)" />
-
-  <!-- Removed problematic preload that was causing console warnings -->
-
-  <!-- Touch icons for various platforms -->
-  <link rel="icon" type="image/png" sizes="192x192" href="/logo192.png" />
-  <link rel="icon" type="image/png" sizes="512x512" href="/logo512.png" />
-  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico" />
-
-  <!-- Ensure key elements load even if JavaScript fails -->
+  <!-- Fallback styles -->
   <style>
     .js-error-fallback {
       display: none;

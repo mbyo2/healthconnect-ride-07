@@ -1,4 +1,3 @@
-
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
@@ -7,25 +6,33 @@ const config: CapacitorConfig = {
   webDir: 'dist',
   plugins: {
     SplashScreen: {
-      launchAutoHide: false,
-      backgroundColor: "#ffffffff",
+      launchAutoHide: true,
+      launchShowDuration: 2000,
+      backgroundColor: "#FFFFFF",
       androidSplashResourceName: "splash",
       androidScaleType: "CENTER_CROP",
       showSpinner: true,
       spinnerColor: "#3B82F6",
       androidSpinnerStyle: "large",
+      iosSpinnerStyle: "large",
+      splashFullScreen: true,
+      splashImmersive: true
     },
     StatusBar: {
       style: "dark",
-      backgroundColor: "#ffffffff"
+      backgroundColor: "#FFFFFF"
     }
   },
-  // Enable deep linking
   ios: {
-    scheme: "healthconnect"
+    scheme: "dococlockzm",
+    contentInset: "automatic"
   },
   android: {
-    allowMixedContent: true
+    allowMixedContent: true,
+    backgroundColor: "#FFFFFF"
+  },
+  server: {
+    androidScheme: "https"
   }
 };
 

@@ -1,7 +1,7 @@
 {
-  "name": "Doc' O Clock - Complete Healthcare Platform",
+  "name": "Doc' O Clock - Healthcare Zambia",
   "short_name": "Doc' O Clock",
-  "description": "Secure healthcare platform with advanced fraud detection, biometric authentication, and comprehensive medical services. Book appointments, order medications, and access telemedicine services.",
+  "description": "Zambia's trusted healthcare platform. Book appointments, order medications, access telemedicine, and emergency services - all in one app.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
@@ -11,103 +11,74 @@
   "categories": [
     "health",
     "medical",
-    "appointments",
     "healthcare"
   ],
   "dir": "ltr",
-  "lang": "en-US",
+  "lang": "en-ZM",
   "prefer_related_applications": false,
   "icons": [
     {
-      "src": "favicon.ico",
+      "src": "/favicon.ico",
       "sizes": "64x64 32x32 24x24 16x16",
       "type": "image/x-icon"
     },
     {
-      "src": "d0c-icon.svg",
+      "src": "/d0c-icon.svg",
       "type": "image/svg+xml",
       "sizes": "any",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
-      "src": "logo192.png",
+      "src": "/logo192.png",
       "type": "image/png",
       "sizes": "192x192",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
-      "src": "logo512.png",
+      "src": "/logo512.png",
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "any"
     },
     {
-      "src": "maskable_icon.png",
+      "src": "/maskable_icon.png",
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "maskable"
     }
   ],
-  "screenshots": [
-    {
-      "src": "screenshots/home.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "platform": "wide",
-      "label": "Home screen of Doc' O Clock app"
-    },
-    {
-      "src": "screenshots/appointments.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "platform": "wide",
-      "label": "Appointments screen of Doc' O Clock app"
-    }
-  ],
   "shortcuts": [
+    {
+      "name": "Emergency - Call 991",
+      "short_name": "Emergency",
+      "description": "Access emergency services immediately",
+      "url": "/emergency",
+      "icons": [{ "src": "/logo192.png", "sizes": "192x192" }]
+    },
     {
       "name": "Book Appointment",
       "short_name": "Book",
       "description": "Book a new appointment with a healthcare provider",
-      "url": "/search",
-      "icons": [
-        {
-          "src": "d0c-icon.svg",
-          "sizes": "192x192"
-        }
-      ]
+      "url": "/marketplace-users",
+      "icons": [{ "src": "/logo192.png", "sizes": "192x192" }]
     },
     {
       "name": "My Appointments",
       "short_name": "Appointments",
       "description": "View your upcoming appointments",
       "url": "/appointments",
-      "icons": [
-        {
-          "src": "d0c-icon.svg",
-          "sizes": "192x192"
-        }
-      ]
+      "icons": [{ "src": "/logo192.png", "sizes": "192x192" }]
     },
     {
-      "name": "Video Consultation",
-      "short_name": "Video",
-      "description": "Join a video consultation with a doctor",
-      "url": "/video-consultations",
-      "icons": [
-        {
-          "src": "d0c-icon.svg",
-          "sizes": "192x192"
-        }
-      ]
+      "name": "Buy Medicine",
+      "short_name": "Pharmacy",
+      "description": "Order medications for delivery",
+      "url": "/marketplace",
+      "icons": [{ "src": "/logo192.png", "sizes": "192x192" }]
     }
   ],
   "related_applications": [],
-  "capture_links": "existing-client-navigate",
   "launch_handler": {
-    "client_mode": [
-      "navigate-existing",
-      "auto"
-    ]
+    "client_mode": ["navigate-existing", "auto"]
   }
 }
