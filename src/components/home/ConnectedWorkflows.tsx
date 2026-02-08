@@ -117,14 +117,12 @@ export const ConnectedWorkflows: React.FC = () => {
                   <React.Fragment key={idx}>
                     <button
                       onClick={() => handleStepClick(step.route)}
-                      className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-muted transition-colors group/step flex-1 min-w-0"
+                      className="flex items-center justify-center p-2 rounded-lg hover:bg-muted transition-colors group/step"
+                      aria-label={step.label}
                     >
-                      <div className="p-2 rounded-full bg-muted group-hover/step:bg-primary/10 transition-colors">
-                        <step.icon className="h-4 w-4 text-muted-foreground group-hover/step:text-primary" />
+                      <div className="p-2 rounded-full bg-primary/10 group-hover/step:bg-primary/20 transition-colors">
+                        <step.icon className="h-5 w-5 text-foreground group-hover/step:text-primary" />
                       </div>
-                      <span className="text-[10px] text-muted-foreground group-hover/step:text-foreground text-center leading-tight truncate w-full">
-                        {step.label}
-                      </span>
                     </button>
                     {idx < workflow.steps.length - 1 && (
                       <ArrowRight className="h-3 w-3 text-muted-foreground/50 flex-shrink-0" />
