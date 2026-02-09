@@ -90,22 +90,22 @@ export const ConnectedWorkflows: React.FC = () => {
             <CardHeader className={`py-2 px-3 ${workflow.bgColor}`}>
               <CardTitle className="text-xs font-bold text-white">{workflow.title}</CardTitle>
             </CardHeader>
-            <CardContent className="p-3">
-              <div className="flex items-center justify-between">
+            <CardContent className="p-2">
+              <div className="flex items-center justify-evenly gap-1">
                 {workflow.steps.map((step, idx) => (
                   <React.Fragment key={idx}>
                     <button
                       onClick={() => handleStepClick(step.route)}
-                      className="flex items-center justify-center p-2 rounded-lg hover:bg-muted transition-colors group/step active:scale-95"
+                      className="flex items-center justify-center p-1 rounded-lg hover:bg-muted transition-colors group/step active:scale-95"
                       aria-label={step.label}
                       title={step.label}
                     >
-                      <div className={`p-2 rounded-full bg-muted group-hover/step:bg-primary/10 transition-colors`}>
-                        <step.icon className={`h-4 w-4 ${workflow.color} group-hover/step:scale-110 transition-transform`} />
+                      <div className="p-1.5 rounded-full bg-muted group-hover/step:bg-primary/10 transition-colors">
+                        <step.icon className={`h-3.5 w-3.5 ${workflow.color} group-hover/step:scale-110 transition-transform`} />
                       </div>
                     </button>
                     {idx < workflow.steps.length - 1 && (
-                      <ArrowRight className="h-3 w-3 text-muted-foreground/40 flex-shrink-0" />
+                      <ArrowRight className="h-2.5 w-2.5 text-muted-foreground/40 flex-shrink-0" />
                     )}
                   </React.Fragment>
                 ))}
