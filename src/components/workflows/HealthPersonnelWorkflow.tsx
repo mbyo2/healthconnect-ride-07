@@ -29,9 +29,9 @@ export const HealthPersonnelWorkflow = () => {
       title: "Professional Profile",
       description: "Complete credentials and specializations",
       icon: <Stethoscope className="h-5 w-5" />,
-      action: () => handleNavigation('/profile-setup', 'Setup Profile'),
+      action: () => handleNavigation('/profile', 'Profile'),
       completed: false,
-      route: '/profile-setup'
+      route: '/profile'
     },
     {
       title: "Schedule Management",
@@ -105,7 +105,7 @@ export const HealthPersonnelWorkflow = () => {
           <Card key={index} className="cursor-pointer hover:shadow-md transition-all active:scale-95 touch-manipulation bg-card border-border">
             <CardHeader className="pb-3">
               <div className="flex items-center space-x-2">
-                <div className="p-2 bg-green-500/10 dark:bg-green-500/20 rounded-lg flex-shrink-0">
+                <div className="p-2 bg-primary/10 dark:bg-primary/20 rounded-lg flex-shrink-0">
                   {step.icon}
                 </div>
                 <CardTitle className="text-xs leading-tight text-foreground">{step.title}</CardTitle>
