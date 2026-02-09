@@ -84,9 +84,9 @@ export const ConnectedWorkflows: React.FC = () => {
     <div className="space-y-3">
       <h2 className="text-lg font-bold text-foreground px-1">Quick Workflows</h2>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <div className="flex overflow-x-auto gap-3 pb-2 snap-x snap-mandatory scrollbar-hide sm:grid sm:grid-cols-3 sm:overflow-visible">
         {workflows.map((workflow) => (
-          <Card key={workflow.id} className="overflow-hidden group hover:shadow-lg transition-all border-border">
+          <Card key={workflow.id} className="overflow-hidden group hover:shadow-lg transition-all border-border min-w-[200px] snap-start flex-shrink-0 sm:min-w-0">
             <CardHeader className={`py-2 px-3 ${workflow.bgColor}`}>
               <CardTitle className="text-xs font-bold text-white">{workflow.title}</CardTitle>
             </CardHeader>
