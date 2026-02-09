@@ -1,5 +1,5 @@
 
-import { Home, Search, Calendar, MessageSquare, Heart, Users, ShoppingCart, Pill, AlertTriangle, User, Wallet, Brain, Shield, Activity, BarChart3, Zap, Settings, Building2 } from "lucide-react";
+import { Home, Search, Calendar, MessageSquare, Heart, Users, ShoppingCart, Pill, AlertTriangle, User, Wallet, Brain, Shield, Activity, BarChart3, Zap, Settings, Building2, Stethoscope, Package } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useDeviceType } from "@/hooks/use-device-type";
@@ -16,41 +16,214 @@ export function BottomNav() {
   const supabase = useSupabaseClient();
   const { isDesktop } = useDeviceType();
   const { isAuthenticated, user } = useAuth();
-  const { availableRoles } = useUserRoles();
+  const { availableRoles, isHealthPersonnel, isAdmin, isPatient } = useUserRoles();
 
-  // Optimized navigation items for mobile
-  const navItems = useMemo(() => [
-    {
-      to: "/",
-      label: "Home",
-      icon: <Home className="h-5 w-5" />,
-      active: location.pathname === "/",
-      description: "Dashboard and overview"
-    },
-    {
-      to: "/search",
-      label: "Find",
-      icon: <Search className="h-5 w-5" />,
-      active: location.pathname === "/search",
-      description: "Find doctors and clinics"
-    },
-    {
-      to: "/symptoms",
-      label: "Symptoms",
-      icon: <Heart className="h-5 w-5" />,
-      active: location.pathname === "/symptoms",
-      description: "Track symptoms and health"
-    },
-    {
-      to: "/chat",
-      label: "Chat",
-      icon: <MessageSquare className="h-5 w-5" />,
-      active: location.pathname === "/chat",
-      description: "Chat with providers"
+  // Role-specific primary navigation items
+  const navItems = useMemo(() => {
+    // Health Personnel / Doctor / Nurse nav
+    if (isHealthPersonnel || availableRoles.some(r => ['doctor', 'nurse', 'radiologist'].includes(r))) {
+      return [
+        {
+          to: "/provider-dashboard",
+          label: "Dashboard",
+          icon: <Stethoscope className="h-5 w-5" />,
+          active: location.pathname === "/provider-dashboard",
+          description: "Provider dashboard"
+        },
+        {
+          to: "/appointments",
+          label: "Appointments",
+          icon: <Calendar className="h-5 w-5" />,
+          active: location.pathname === "/appointments",
+          description: "Patient appointments"
+        },
+        {
+          to: "/chat",
+          label: "Chat",
+          icon: <MessageSquare className="h-5 w-5" />,
+          active: location.pathname === "/chat",
+          description: "Patient messages"
+        },
+        {
+          to: "/ai-diagnostics",
+          label: "AI",
+          icon: <Brain className="h-5 w-5" />,
+          active: location.pathname === "/ai-diagnostics",
+          description: "AI clinical assistant"
+        }
+      ];
     }
-  ], [location.pathname]);
 
-  // Enhanced menu items for comprehensive access
+    // Pharmacy nav
+    if (availableRoles.some(r => ['pharmacy', 'pharmacist'].includes(r))) {
+      return [
+        {
+          to: "/pharmacy-portal",
+          label: "Portal",
+          icon: <Package className="h-5 w-5" />,
+          active: location.pathname === "/pharmacy-portal",
+          description: "Pharmacy portal"
+        },
+        {
+          to: "/pharmacy-inventory",
+          label: "Inventory",
+          icon: <Pill className="h-5 w-5" />,
+          active: location.pathname === "/pharmacy-inventory",
+          description: "Manage inventory"
+        },
+        {
+          to: "/prescriptions",
+          label: "Rx",
+          icon: <Heart className="h-5 w-5" />,
+          active: location.pathname === "/prescriptions",
+          description: "Prescriptions"
+        },
+        {
+          to: "/marketplace",
+          label: "Market",
+          icon: <ShoppingCart className="h-5 w-5" />,
+          active: location.pathname === "/marketplace",
+          description: "Marketplace"
+        }
+      ];
+    }
+
+    // Admin nav
+    if (isAdmin) {
+      return [
+        {
+          to: "/admin-dashboard",
+          label: "Admin",
+          icon: <Shield className="h-5 w-5" />,
+          active: location.pathname === "/admin-dashboard",
+          description: "Admin dashboard"
+        },
+        {
+          to: "/healthcare-application",
+          label: "Apps",
+          icon: <Users className="h-5 w-5" />,
+          active: location.pathname === "/healthcare-application",
+          description: "Applications"
+        },
+        {
+          to: "/chat",
+          label: "Chat",
+          icon: <MessageSquare className="h-5 w-5" />,
+          active: location.pathname === "/chat",
+          description: "Messages"
+        },
+        {
+          to: "/settings",
+          label: "Settings",
+          icon: <Settings className="h-5 w-5" />,
+          active: location.pathname === "/settings",
+          description: "Settings"
+        }
+      ];
+    }
+
+    // Institution admin/staff nav
+    if (availableRoles.some(r => ['institution_admin', 'institution_staff'].includes(r))) {
+      return [
+        {
+          to: "/institution-dashboard",
+          label: "Dashboard",
+          icon: <Building2 className="h-5 w-5" />,
+          active: location.pathname === "/institution-dashboard",
+          description: "Institution dashboard"
+        },
+        {
+          to: "/institution/appointments",
+          label: "Appointments",
+          icon: <Calendar className="h-5 w-5" />,
+          active: location.pathname === "/institution/appointments",
+          description: "Appointments"
+        },
+        {
+          to: "/institution/patients",
+          label: "Patients",
+          icon: <Users className="h-5 w-5" />,
+          active: location.pathname === "/institution/patients",
+          description: "Patients"
+        },
+        {
+          to: "/chat",
+          label: "Chat",
+          icon: <MessageSquare className="h-5 w-5" />,
+          active: location.pathname === "/chat",
+          description: "Messages"
+        }
+      ];
+    }
+
+    // Lab nav
+    if (availableRoles.some(r => ['lab', 'lab_technician'].includes(r))) {
+      return [
+        {
+          to: "/lab-management",
+          label: "Lab",
+          icon: <Activity className="h-5 w-5" />,
+          active: location.pathname === "/lab-management",
+          description: "Lab management"
+        },
+        {
+          to: "/medical-records",
+          label: "Records",
+          icon: <Heart className="h-5 w-5" />,
+          active: location.pathname === "/medical-records",
+          description: "Medical records"
+        },
+        {
+          to: "/search",
+          label: "Search",
+          icon: <Search className="h-5 w-5" />,
+          active: location.pathname === "/search",
+          description: "Search"
+        },
+        {
+          to: "/profile",
+          label: "Profile",
+          icon: <User className="h-5 w-5" />,
+          active: location.pathname === "/profile",
+          description: "Profile"
+        }
+      ];
+    }
+
+    // Default: Patient nav
+    return [
+      {
+        to: "/home",
+        label: "Home",
+        icon: <Home className="h-5 w-5" />,
+        active: location.pathname === "/home" || location.pathname === "/",
+        description: "Dashboard and overview"
+      },
+      {
+        to: "/search",
+        label: "Find",
+        icon: <Search className="h-5 w-5" />,
+        active: location.pathname === "/search",
+        description: "Find doctors and clinics"
+      },
+      {
+        to: "/symptoms",
+        label: "Symptoms",
+        icon: <Heart className="h-5 w-5" />,
+        active: location.pathname === "/symptoms",
+        description: "Track symptoms and health"
+      },
+      {
+        to: "/chat",
+        label: "Chat",
+        icon: <MessageSquare className="h-5 w-5" />,
+        active: location.pathname === "/chat",
+        description: "Chat with providers"
+      }
+    ];
+  }, [location.pathname, isHealthPersonnel, isAdmin, isPatient, availableRoles]);
+
+  // Enhanced menu items for comprehensive access - filtered by role
   const menuItems = useMemo(() => [
     {
       to: "/appointments",
@@ -83,61 +256,23 @@ export function BottomNav() {
       icon: <Users className="h-5 w-5" />
     },
     {
-      to: "/marketplace-users",
-      label: "Find Providers",
-      description: "Browse healthcare marketplace",
-      icon: <Users className="h-5 w-5" />
+      to: "/wallet",
+      label: "Wallet",
+      description: "Manage your payments",
+      icon: <Wallet className="h-5 w-5" />
     },
     {
-      to: "/healthcare-institutions",
-      label: "Institutions",
-      description: "Find hospitals and clinics",
-      icon: <Building2 className="h-5 w-5" />
+      to: "/medical-records",
+      label: "Medical Records",
+      description: "View your health records",
+      icon: <Heart className="h-5 w-5" />
     },
     {
-      to: "/healthcare-professionals",
-      label: "Doctors",
-      description: "Find healthcare professionals",
-      icon: <User className="h-5 w-5" />
+      to: "/provider-calendar",
+      label: "Calendar",
+      description: "Provider schedule calendar",
+      icon: <Calendar className="h-5 w-5" />
     },
-    {
-      to: "/pharmacy-portal",
-      label: "Pharmacy Portal",
-      description: "Manage pharmacy (for admins)",
-      icon: <ShoppingCart className="h-5 w-5" />
-    },
-    {
-      to: "/profile",
-      label: "My Profile",
-      description: "Personal information and settings",
-      icon: <User className="h-5 w-5" />
-    },
-    // Advanced Healthcare Features
-    {
-      to: "/ai-diagnostics",
-      label: "AI Diagnostic Assistant",
-      description: "AI-powered symptom analysis and diagnosis",
-      icon: <Brain className="h-5 w-5 text-purple-600" />
-    },
-    {
-      to: "/blockchain-records",
-      label: "Blockchain Medical Records",
-      description: "Secure, decentralized medical data",
-      icon: <Shield className="h-5 w-5 text-green-600" />
-    },
-    {
-      to: "/iot-monitoring",
-      label: "IoT Health Monitoring",
-      description: "Real-time device health tracking",
-      icon: <Activity className="h-5 w-5 text-red-600" />
-    },
-    {
-      to: "/health-analytics",
-      label: "Health Data Analytics",
-      description: "Advanced health analytics and charts",
-      icon: <BarChart3 className="h-5 w-5 text-indigo-600" />
-    },
-    // Management Systems
     {
       to: "/pharmacy-management",
       label: "Pharmacy Management",
@@ -155,6 +290,12 @@ export function BottomNav() {
       label: "Lab Management",
       description: "Manage lab tests and results",
       icon: <Activity className="h-5 w-5" />
+    },
+    {
+      to: "/profile",
+      label: "My Profile",
+      description: "Personal information and settings",
+      icon: <User className="h-5 w-5" />
     },
     {
       to: "/settings",
