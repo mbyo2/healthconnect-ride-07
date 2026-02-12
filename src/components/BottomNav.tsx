@@ -223,89 +223,69 @@ export function BottomNav() {
     ];
   }, [location.pathname, isHealthPersonnel, isAdmin, isPatient, availableRoles]);
 
-  // Enhanced menu items for comprehensive access - filtered by role
-  const menuItems = useMemo(() => [
-    {
-      to: "/appointments",
-      label: "My Appointments",
-      description: "View and manage your appointments",
-      icon: <Calendar className="h-5 w-5" />
-    },
-    {
-      to: "/emergency",
-      label: "Emergency Help",
-      description: "Emergency services and contacts",
-      icon: <AlertTriangle className="h-5 w-5 text-red-600" />
-    },
-    {
-      to: "/marketplace",
-      label: "Buy Medicine",
-      description: "Order medications from pharmacies",
-      icon: <Pill className="h-5 w-5" />
-    },
-    {
-      to: "/prescriptions",
-      label: "Prescriptions",
-      description: "View and manage your medications",
-      icon: <Heart className="h-5 w-5" />
-    },
-    {
-      to: "/connections",
-      label: "My Providers",
-      description: "Your healthcare provider network",
-      icon: <Users className="h-5 w-5" />
-    },
-    {
-      to: "/wallet",
-      label: "Wallet",
-      description: "Manage your payments",
-      icon: <Wallet className="h-5 w-5" />
-    },
-    {
-      to: "/medical-records",
-      label: "Medical Records",
-      description: "View your health records",
-      icon: <Heart className="h-5 w-5" />
-    },
-    {
-      to: "/provider-calendar",
-      label: "Calendar",
-      description: "Provider schedule calendar",
-      icon: <Calendar className="h-5 w-5" />
-    },
-    {
-      to: "/pharmacy-management",
-      label: "Pharmacy Management",
-      description: "Manage pharmacy operations",
-      icon: <ShoppingCart className="h-5 w-5" />
-    },
-    {
-      to: "/hospital-management",
-      label: "Hospital Management",
-      description: "Manage hospital operations",
-      icon: <Activity className="h-5 w-5" />
-    },
-    {
-      to: "/lab-management",
-      label: "Lab Management",
-      description: "Manage lab tests and results",
-      icon: <Activity className="h-5 w-5" />
-    },
-    {
-      to: "/profile",
-      label: "My Profile",
-      description: "Personal information and settings",
-      icon: <User className="h-5 w-5" />
-    },
-    {
-      to: "/settings",
-      label: "Settings",
-      description: "App settings and preferences",
-      icon: <Settings className="h-5 w-5" />
+  // Role-specific menu items for the "more" overflow menu
+  const menuItems = useMemo(() => {
+    // Health Personnel / Doctor / Nurse menu
+    if (isHealthPersonnel || availableRoles.some(r => ['doctor', 'nurse', 'radiologist'].includes(r))) {
+      return [
+        { to: "/provider-calendar", label: "Schedule Calendar", description: "View and manage your schedule", icon: <Calendar className="h-5 w-5" /> },
+        { to: "/medical-records", label: "Patient Records", description: "Access patient medical records", icon: <Heart className="h-5 w-5" /> },
+        { to: "/prescriptions", label: "Write Prescriptions", description: "Create and manage prescriptions", icon: <Pill className="h-5 w-5" /> },
+        { to: "/connections", label: "My Patients", description: "Your connected patients", icon: <Users className="h-5 w-5" /> },
+        { to: "/wallet", label: "Earnings", description: "View your earnings and payouts", icon: <Wallet className="h-5 w-5" /> },
+        { to: "/healthcare-application", label: "Applications", description: "Review healthcare applications", icon: <Activity className="h-5 w-5" /> },
+        { to: "/emergency", label: "Emergency Protocols", description: "Emergency response tools", icon: <AlertTriangle className="h-5 w-5 text-red-600" /> },
+        { to: "/profile", label: "Professional Profile", description: "Credentials and specializations", icon: <User className="h-5 w-5" /> },
+        { to: "/settings", label: "Settings", description: "Practice preferences", icon: <Settings className="h-5 w-5" /> },
+      ];
     }
-  ], []);
 
-  // Filter menu items based on user permissions
+    // Pharmacy menu
+    if (availableRoles.some(r => ['pharmacy', 'pharmacist'].includes(r))) {
+      return [
+        { to: "/pharmacy-management", label: "Pharmacy Management", description: "Manage pharmacy operations", icon: <ShoppingCart className="h-5 w-5" /> },
+        { to: "/wallet", label: "Revenue", description: "Track sales and revenue", icon: <Wallet className="h-5 w-5" /> },
+        { to: "/profile", label: "Pharmacy Profile", description: "Business information", icon: <User className="h-5 w-5" /> },
+        { to: "/settings", label: "Settings", description: "Pharmacy preferences", icon: <Settings className="h-5 w-5" /> },
+      ];
+    }
+
+    // Admin menu
+    if (isAdmin) {
+      return [
+        { to: "/hospital-management", label: "Hospital Management", description: "Manage hospital operations", icon: <Activity className="h-5 w-5" /> },
+        { to: "/pharmacy-management", label: "Pharmacy Management", description: "Manage pharmacy operations", icon: <ShoppingCart className="h-5 w-5" /> },
+        { to: "/lab-management", label: "Lab Management", description: "Manage lab operations", icon: <Activity className="h-5 w-5" /> },
+        { to: "/wallet", label: "Admin Wallet", description: "Platform finances", icon: <Wallet className="h-5 w-5" /> },
+        { to: "/profile", label: "Profile", description: "Admin profile", icon: <User className="h-5 w-5" /> },
+      ];
+    }
+
+    // Institution menu
+    if (availableRoles.some(r => ['institution_admin', 'institution_staff'].includes(r))) {
+      return [
+        { to: "/hospital-management", label: "Facility Management", description: "Manage facility operations", icon: <Activity className="h-5 w-5" /> },
+        { to: "/wallet", label: "Finances", description: "Institution finances", icon: <Wallet className="h-5 w-5" /> },
+        { to: "/profile", label: "Profile", description: "Institution profile", icon: <User className="h-5 w-5" /> },
+        { to: "/settings", label: "Settings", description: "Institution settings", icon: <Settings className="h-5 w-5" /> },
+      ];
+    }
+
+    // Default: Patient menu
+    return [
+      { to: "/appointments", label: "My Appointments", description: "View and manage your appointments", icon: <Calendar className="h-5 w-5" /> },
+      { to: "/emergency", label: "Emergency Help", description: "Emergency services and contacts", icon: <AlertTriangle className="h-5 w-5 text-red-600" /> },
+      { to: "/marketplace", label: "Buy Medicine", description: "Order medications from pharmacies", icon: <Pill className="h-5 w-5" /> },
+      { to: "/prescriptions", label: "Prescriptions", description: "View and manage your medications", icon: <Heart className="h-5 w-5" /> },
+      { to: "/connections", label: "My Providers", description: "Your healthcare provider network", icon: <Users className="h-5 w-5" /> },
+      { to: "/wallet", label: "Wallet", description: "Manage your payments", icon: <Wallet className="h-5 w-5" /> },
+      { to: "/medical-records", label: "Medical Records", description: "View your health records", icon: <Heart className="h-5 w-5" /> },
+      { to: "/profile", label: "My Profile", description: "Personal information and settings", icon: <User className="h-5 w-5" /> },
+      { to: "/settings", label: "Settings", description: "App settings and preferences", icon: <Settings className="h-5 w-5" /> },
+    ];
+  }, [isHealthPersonnel, isAdmin, availableRoles]);
+
+  // Menu items are already role-specific, just filter by route permission as a safety check
   const filteredMenuItems = useMemo(() => {
     return menuItems.filter(item => hasRoutePermission(availableRoles, item.to));
   }, [menuItems, availableRoles]);
