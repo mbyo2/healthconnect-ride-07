@@ -1,29 +1,47 @@
-
 import React from 'react';
 import { useUserRoles } from '@/context/UserRolesContext';
 import { PatientWorkflow } from './PatientWorkflow';
 import { HealthPersonnelWorkflow } from './HealthPersonnelWorkflow';
 import { AdminWorkflow } from './AdminWorkflow';
 import { InstitutionAdminWorkflow } from './InstitutionAdminWorkflow';
+import { PharmacyWorkflow } from './PharmacyWorkflow';
+import { LabWorkflow } from './LabWorkflow';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { InfoIcon } from 'lucide-react';
 
 export const RoleBasedWorkflow = () => {
-  const { currentRole, userRole, isAdmin } = useUserRoles();
+  const { currentRole, userRole, isAdmin, availableRoles } = useUserRoles();
   
-  // Determine which workflow to show based on current role
   const getCurrentWorkflow = () => {
-    // Check for admin first (admin_level takes precedence)
+    // Check for admin first
     if (isAdmin) {
       return <AdminWorkflow />;
     }
     
-    // Then check role-based workflows
-    switch (currentRole || userRole) {
+    const activeRole = currentRole || userRole;
+
+    // Check for pharmacy roles
+    if (activeRole === 'pharmacy' || activeRole === 'pharmacist' || 
+        availableRoles.some(r => ['pharmacy', 'pharmacist'].includes(r))) {
+      return <PharmacyWorkflow />;
+    }
+
+    // Check for lab roles
+    if (activeRole === 'lab' || activeRole === 'lab_technician' ||
+        availableRoles.some(r => ['lab', 'lab_technician'].includes(r))) {
+      return <LabWorkflow />;
+    }
+
+    // Check role-based workflows
+    switch (activeRole) {
       case 'health_personnel':
+      case 'doctor':
+      case 'nurse':
+      case 'radiologist':
         return <HealthPersonnelWorkflow />;
       case 'institution_admin':
+      case 'institution_staff':
         return <InstitutionAdminWorkflow />;
       case 'patient':
       default:

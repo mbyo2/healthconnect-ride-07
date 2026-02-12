@@ -37,7 +37,7 @@ export async function subscribeToNotifications() {
       return false;
     }
 
-    const subscription = await registration.pushManager.subscribe({
+    const subscription = await (registration as any).pushManager.subscribe({
       userVisibleOnly: true,
       applicationServerKey: urlBase64ToUint8Array(vapidKey)
     });
@@ -78,7 +78,7 @@ export async function subscribeToNotifications() {
 export async function unsubscribeFromNotifications() {
   try {
     const registration = await navigator.serviceWorker.ready;
-    const subscription = await registration.pushManager.getSubscription();
+    const subscription = await (registration as any).pushManager.getSubscription();
 
     if (!subscription) {
       return true;

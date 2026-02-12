@@ -418,6 +418,7 @@ export const ROLE_LANDING_PAGES = {
   [USER_ROLES.LAB]: '/lab-management',
   [USER_ROLES.PHARMACY]: '/pharmacy-portal',
   [USER_ROLES.INSTITUTION_ADMIN]: '/institution-portal',
+  [USER_ROLES.INSTITUTION_STAFF]: '/institution-dashboard',
   [USER_ROLES.SUPER_ADMIN]: '/super-admin-dashboard',
   [USER_ROLES.SUPPORT]: '/admin-dashboard',
   [USER_ROLES.DOCTOR]: '/provider-dashboard',
@@ -482,14 +483,16 @@ export const hasAnyRole = (userRoles: UserRole[] | null, roles: UserRole[]): boo
 export const getRoleLandingPage = (userRoles: UserRole[] | null): string => {
   if (!userRoles || userRoles.length === 0) return '/auth';
 
-  // Priority order: admin > institution_admin > health_personnel > pharmacy > patient
-  if (userRoles.includes(USER_ROLES.ADMIN)) return '/admin-dashboard';
+  // Priority order: admin > institution_admin > health_personnel > pharmacy > lab > patient
+  if (userRoles.includes(USER_ROLES.ADMIN) || userRoles.includes(USER_ROLES.SUPER_ADMIN)) return '/admin-dashboard';
   if (userRoles.includes(USER_ROLES.INSTITUTION_ADMIN)) return '/institution-portal';
-  if (userRoles.includes(USER_ROLES.HEALTH_PERSONNEL)) return '/provider-dashboard';
-  if (userRoles.includes(USER_ROLES.PHARMACY)) return '/pharmacy-portal';
+  if (userRoles.includes(USER_ROLES.INSTITUTION_STAFF)) return '/institution-dashboard';
+  if (userRoles.includes(USER_ROLES.HEALTH_PERSONNEL) || userRoles.includes(USER_ROLES.DOCTOR) || userRoles.includes(USER_ROLES.NURSE) || userRoles.includes(USER_ROLES.RADIOLOGIST)) return '/provider-dashboard';
+  if (userRoles.includes(USER_ROLES.PHARMACY) || userRoles.includes(USER_ROLES.PHARMACIST)) return '/pharmacy-portal';
+  if (userRoles.includes(USER_ROLES.LAB) || userRoles.includes(USER_ROLES.LAB_TECHNICIAN)) return '/lab-management';
   if (userRoles.includes(USER_ROLES.PATIENT)) return '/home';
 
-  return '/';
+  return '/home';
 };
 
 // Get navigation items based on user's roles (supports multiple roles)
