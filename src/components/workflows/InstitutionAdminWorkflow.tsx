@@ -11,7 +11,11 @@ import {
   Package, 
   Settings,
   BarChart3,
-  Shield 
+  Bed,
+  Stethoscope,
+  Scissors,
+  DollarSign,
+  ClipboardList
 } from 'lucide-react';
 
 export const InstitutionAdminWorkflow = () => {
@@ -25,86 +29,115 @@ export const InstitutionAdminWorkflow = () => {
 
   const workflowSteps = [
     {
-      title: "Institution Profile",
-      description: "Setup facility details and certifications",
+      title: "HMS Dashboard",
+      description: "Full hospital management overview",
       icon: <Building2 className="h-5 w-5" />,
-      action: () => handleNavigation('/institution-portal', 'Institution Profile'),
-      completed: false,
-      route: '/institution-portal'
+      route: '/hospital-management',
+      color: 'bg-primary/10'
     },
     {
-      title: "Staff Management",
-      description: "Manage healthcare personnel",
+      title: "OPD Management",
+      description: "Outpatient queue & token system",
+      icon: <Stethoscope className="h-5 w-5" />,
+      route: '/hospital-management',
+      color: 'bg-primary/10'
+    },
+    {
+      title: "IPD / Admissions",
+      description: "Admit, discharge & transfer patients",
+      icon: <Bed className="h-5 w-5" />,
+      route: '/hospital-management',
+      color: 'bg-primary/10'
+    },
+    {
+      title: "Operation Theatre",
+      description: "Surgery scheduling & management",
+      icon: <Scissors className="h-5 w-5" />,
+      route: '/hospital-management',
+      color: 'bg-primary/10'
+    },
+    {
+      title: "Staff & Roster",
+      description: "Duty roster & personnel management",
       icon: <Users className="h-5 w-5" />,
-      action: () => navigate('/institution-portal'),
-      completed: false,
-      route: '/institution-portal'
+      route: '/institution/personnel',
+      color: 'bg-primary/10'
     },
     {
-      title: "Facility Scheduling",
-      description: "Manage schedules and availability",
+      title: "Billing & Invoices",
+      description: "Generate invoices with insurance",
+      icon: <DollarSign className="h-5 w-5" />,
+      route: '/hospital-management',
+      color: 'bg-primary/10'
+    },
+    {
+      title: "Appointments",
+      description: "View & manage appointments",
       icon: <Calendar className="h-5 w-5" />,
-      action: () => navigate('/institution-portal'),
-      completed: false,
-      route: '/institution-portal'
+      route: '/institution/appointments',
+      color: 'bg-primary/10'
     },
     {
-      title: "Compliance",
-      description: "Manage certifications and compliance",
-      icon: <FileText className="h-5 w-5" />,
-      action: () => navigate('/institution-portal'),
-      completed: false,
-      route: '/institution-portal'
+      title: "Patient Records",
+      description: "View all patient records",
+      icon: <ClipboardList className="h-5 w-5" />,
+      route: '/institution/patients',
+      color: 'bg-primary/10'
     },
     {
       title: "Inventory",
-      description: "Medical supplies and equipment",
+      description: "Medical supplies & equipment",
       icon: <Package className="h-5 w-5" />,
-      action: () => navigate('/pharmacy-inventory'),
-      completed: false,
-      route: '/pharmacy-inventory'
+      route: '/pharmacy-inventory',
+      color: 'bg-primary/10'
     },
     {
-      title: "Analytics",
-      description: "Institution performance metrics",
+      title: "Reports & Analytics",
+      description: "Performance metrics & MIS reports",
       icon: <BarChart3 className="h-5 w-5" />,
-      action: () => navigate('/institution-portal'),
-      completed: false,
-      route: '/institution-portal'
+      route: '/institution/reports',
+      color: 'bg-primary/10'
     },
     {
-      title: "Security",
-      description: "Access control and security",
-      icon: <Shield className="h-5 w-5" />,
-      action: () => navigate('/institution-portal'),
-      completed: false,
-      route: '/institution-portal'
+      title: "Compliance",
+      description: "Certifications & regulatory docs",
+      icon: <FileText className="h-5 w-5" />,
+      route: '/institution/settings',
+      color: 'bg-primary/10'
     },
     {
       title: "Settings",
-      description: "Institution preferences",
+      description: "Institution preferences & hours",
       icon: <Settings className="h-5 w-5" />,
-      action: () => navigate('/settings'),
-      completed: false,
-      route: '/settings'
+      route: '/institution/settings',
+      color: 'bg-primary/10'
     }
   ];
 
   return (
     <div className="space-y-6 px-4 py-6 max-w-7xl mx-auto">
       <div className="text-center space-y-2">
-        <h2 className="text-xl md:text-2xl font-bold">Institution Admin Center</h2>
+        <h2 className="text-xl md:text-2xl font-bold">Hospital Management System</h2>
         <p className="text-muted-foreground text-sm md:text-base px-4">
-          Manage your healthcare institution and ensure operational excellence
+          Complete HMS with OPD, IPD, OT, Billing, Staff Roster & more
         </p>
+      </div>
+
+      {/* Quick Access - HMS */}
+      <div className="flex justify-center">
+        <Button size="lg" onClick={() => handleNavigation('/hospital-management', 'HMS Dashboard')} className="gap-2">
+          <Building2 className="h-5 w-5" />
+          Open Full HMS Dashboard
+        </Button>
       </div>
 
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {workflowSteps.map((step, index) => (
-          <Card key={index} className="cursor-pointer hover:shadow-md transition-all active:scale-95 touch-manipulation">
+          <Card key={index} className="cursor-pointer hover:shadow-md transition-all active:scale-95 touch-manipulation"
+            onClick={() => handleNavigation(step.route, step.title)}>
             <CardHeader className="pb-3">
               <div className="flex items-center space-x-2">
-                <div className="p-2 bg-blue-500/10 rounded-lg flex-shrink-0">
+                <div className={`p-2 ${step.color} rounded-lg flex-shrink-0`}>
                   {step.icon}
                 </div>
                 <CardTitle className="text-xs leading-tight">{step.title}</CardTitle>
@@ -115,12 +148,12 @@ export const InstitutionAdminWorkflow = () => {
                 {step.description}
               </CardDescription>
               <Button 
-                onClick={() => handleNavigation(step.route, step.title)}
+                onClick={(e) => { e.stopPropagation(); handleNavigation(step.route, step.title); }}
                 size="sm" 
-                className="w-full hover:shadow-sm transition-all active:scale-95 touch-manipulation text-xs"
-                variant={step.completed ? "outline" : "default"}
+                className="w-full text-xs"
+                variant="outline"
               >
-                {step.completed ? "Manage" : "Setup"}
+                Open
               </Button>
             </CardContent>
           </Card>
