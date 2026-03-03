@@ -86,6 +86,8 @@ const InstitutionSettings = lazyWithRetry(() => import('@/pages/InstitutionSetti
 const AppointmentDetails = lazyWithRetry(() => import('@/pages/AppointmentDetails'));
 const Wallet = lazyWithRetry(() => import('@/pages/Wallet'));
 
+import { RoleRedirect } from '@/components/auth/RoleRedirect';
+
 const AppContent = () => {
   const { user, isLoading, profile } = useAuth();
 
@@ -119,14 +121,14 @@ const AppContent = () => {
                 isLoading ? (
                   <LoadingScreen />
                 ) : user ? (
-                  <Navigate to="/home" replace={true} />
+                  <Navigate to="/" replace={true} />
                 ) : (
                   <Auth />
                 )
               }
             />
 
-            {/* Main App Route */}
+            {/* Main App Route - role-based redirect */}
             <Route
               path="/"
               element={
@@ -136,7 +138,7 @@ const AppContent = () => {
                   isNewUser ? (
                     <Navigate to="/onboarding" replace={true} />
                   ) : (
-                    <Navigate to="/home" replace={true} />
+                    <RoleRedirect />
                   )
                 ) : (
                   <Navigate to="/auth" replace={true} />
