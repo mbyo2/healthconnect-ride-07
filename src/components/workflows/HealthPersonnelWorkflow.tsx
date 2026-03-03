@@ -9,10 +9,12 @@ import {
   Calendar, 
   Users, 
   FileText, 
-  Package, 
   Settings,
   ClipboardList,
-  MessageSquare 
+  MessageSquare,
+  Brain,
+  Wallet,
+  AlertTriangle
 } from 'lucide-react';
 
 export const HealthPersonnelWorkflow = () => {
@@ -26,67 +28,69 @@ export const HealthPersonnelWorkflow = () => {
 
   const workflowSteps = [
     {
-      title: "Professional Profile",
-      description: "Complete credentials and specializations",
-      icon: <Stethoscope className="h-5 w-5" />,
-      action: () => handleNavigation('/profile', 'Profile'),
-      completed: false,
-      route: '/profile'
-    },
-    {
-      title: "Schedule Management",
-      description: "Set availability and working hours",
+      title: "My Schedule",
+      description: "View and manage your availability & appointments",
       icon: <Calendar className="h-5 w-5" />,
-      action: () => navigate('/provider-dashboard'),
-      completed: false,
-      route: '/provider-dashboard'
+      route: '/provider-calendar'
     },
     {
-      title: "Patient Waitlist",
-      description: "Review and manage appointments",
-      icon: <Users className="h-5 w-5" />,
-      action: () => navigate('/provider-dashboard'),
-      completed: false,
-      route: '/provider-dashboard'
+      title: "Patient Appointments",
+      description: "Today's queue, upcoming & past consultations",
+      icon: <ClipboardList className="h-5 w-5" />,
+      route: '/appointments'
     },
     {
-      title: "Prescriptions",
-      description: "Digital signatures and prescriptions",
+      title: "Patient Records",
+      description: "Access and update patient medical records",
+      icon: <Stethoscope className="h-5 w-5" />,
+      route: '/medical-records'
+    },
+    {
+      title: "Write Prescriptions",
+      description: "Digital prescriptions with e-signature",
       icon: <FileText className="h-5 w-5" />,
-      action: () => navigate('/provider-dashboard'),
-      completed: false,
-      route: '/provider-dashboard'
+      route: '/prescriptions'
     },
     {
-      title: "Inventory",
-      description: "Medication and supply management",
-      icon: <Package className="h-5 w-5" />,
-      action: () => navigate('/pharmacy-inventory'),
-      completed: false,
-      route: '/pharmacy-inventory'
+      title: "AI Clinical Assistant",
+      description: "AI-powered diagnostic support tool",
+      icon: <Brain className="h-5 w-5" />,
+      route: '/ai-diagnostics'
+    },
+    {
+      title: "My Patients",
+      description: "Your connected patient network",
+      icon: <Users className="h-5 w-5" />,
+      route: '/connections'
     },
     {
       title: "Patient Chat",
-      description: "Communicate with patients",
+      description: "Secure messaging with patients",
       icon: <MessageSquare className="h-5 w-5" />,
-      action: () => navigate('/chat'),
-      completed: false,
       route: '/chat'
     },
     {
-      title: "Applications",
-      description: "Review healthcare applications",
-      icon: <ClipboardList className="h-5 w-5" />,
-      action: () => navigate('/healthcare-application'),
-      completed: false,
-      route: '/healthcare-application'
+      title: "Earnings & Wallet",
+      description: "View consultations revenue and payouts",
+      icon: <Wallet className="h-5 w-5" />,
+      route: '/wallet'
+    },
+    {
+      title: "Emergency Protocols",
+      description: "Emergency response tools",
+      icon: <AlertTriangle className="h-5 w-5" />,
+      route: '/emergency'
+    },
+    {
+      title: "Professional Profile",
+      description: "Credentials, specializations & bio",
+      icon: <Stethoscope className="h-5 w-5" />,
+      route: '/profile'
     },
     {
       title: "Settings",
       description: "Configure practice preferences",
       icon: <Settings className="h-5 w-5" />,
-      action: () => navigate('/settings'),
-      completed: false,
       route: '/settings'
     }
   ];
@@ -96,13 +100,14 @@ export const HealthPersonnelWorkflow = () => {
       <div className="text-center space-y-2">
         <h2 className="text-xl md:text-2xl font-bold text-foreground">Healthcare Provider Dashboard</h2>
         <p className="text-muted-foreground text-sm md:text-base px-4">
-          Manage your practice and provide quality care to your patients
+          Manage your practice, patients, and consultations
         </p>
       </div>
 
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {workflowSteps.map((step, index) => (
-          <Card key={index} className="cursor-pointer hover:shadow-md transition-all active:scale-95 touch-manipulation bg-card border-border">
+          <Card key={index} className="cursor-pointer hover:shadow-md transition-all active:scale-95 touch-manipulation bg-card border-border"
+            onClick={() => handleNavigation(step.route, step.title)}>
             <CardHeader className="pb-3">
               <div className="flex items-center space-x-2">
                 <div className="p-2 bg-primary/10 dark:bg-primary/20 rounded-lg flex-shrink-0">
@@ -116,12 +121,11 @@ export const HealthPersonnelWorkflow = () => {
                 {step.description}
               </CardDescription>
               <Button 
-                onClick={() => handleNavigation(step.route, step.title)}
+                onClick={(e) => { e.stopPropagation(); handleNavigation(step.route, step.title); }}
                 size="sm" 
                 className="w-full hover:shadow-sm transition-all active:scale-95 touch-manipulation text-xs"
-                variant={step.completed ? "outline" : "default"}
               >
-                {step.completed ? "Manage" : "Setup"}
+                Open
               </Button>
             </CardContent>
           </Card>

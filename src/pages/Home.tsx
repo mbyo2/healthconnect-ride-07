@@ -4,12 +4,28 @@ import { Testimonials } from "@/components/Testimonials";
 import { CtaSection } from "@/components/CtaSection";
 import { RoleBasedWorkflow } from "@/components/workflows/RoleBasedWorkflow";
 import { useAuth } from "@/context/AuthContext";
+import { useUserRoles } from "@/context/UserRolesContext";
+import { useRoleDashboard } from "@/hooks/useRoleDashboard";
 import { SpecializedHelp } from "@/components/home/SpecializedHelp";
+import { LoadingScreen } from "@/components/LoadingScreen";
 
 const Home = () => {
   const { isAuthenticated } = useAuth();
+  const { isPatient, loading } = useUserRoles();
+  
+  // Auto-redirect non-patient roles to their specific dashboard
+  const { isLoading, shouldRedirect } = useRoleDashboard({ 
+    redirectOnAuth: true,
+    // Only redirect if user is NOT a patient — patients stay on /home
+    skip: isPatient || loading
+  });
 
-  // Render authenticated view
+  // Show loading while determining role redirect
+  if (isAuthenticated && (isLoading || shouldRedirect || loading)) {
+    return <LoadingScreen message="Loading your dashboard..." />;
+  }
+
+  // Render authenticated patient view
   if (isAuthenticated) {
     return (
       <div className="min-h-screen bg-background">
