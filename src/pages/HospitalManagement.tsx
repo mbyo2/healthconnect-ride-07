@@ -13,6 +13,21 @@ import { DepartmentManagement } from '@/components/hospital/DepartmentManagement
 import { OTManagement } from '@/components/hospital/OTManagement';
 import { StaffRoster } from '@/components/hospital/StaffRoster';
 import { HospitalBilling } from '@/components/hospital/HospitalBilling';
+import { EMRCaseSheets } from '@/components/hospital/EMRCaseSheets';
+import { HospitalPharmacy } from '@/components/hospital/HospitalPharmacy';
+import { HospitalLab } from '@/components/hospital/HospitalLab';
+import { RadiologyImaging } from '@/components/hospital/RadiologyImaging';
+import { InventoryPurchase } from '@/components/hospital/InventoryPurchase';
+import { DischargeSummary } from '@/components/hospital/DischargeSummary';
+import { InsuranceTPA } from '@/components/hospital/InsuranceTPA';
+import { DayCareManagement } from '@/components/hospital/DayCareManagement';
+import { EmergencyTriage } from '@/components/hospital/EmergencyTriage';
+import { MISReports } from '@/components/hospital/MISReports';
+import { PatientQueue } from '@/components/hospital/PatientQueue';
+import { ReferralManagement } from '@/components/hospital/ReferralManagement';
+import { BloodBank } from '@/components/hospital/BloodBank';
+import { CSSDManagement } from '@/components/hospital/CSSDManagement';
+import { DietManagement } from '@/components/hospital/DietManagement';
 
 const HospitalManagement = () => {
   const { user } = useAuth();
@@ -20,7 +35,6 @@ const HospitalManagement = () => {
   const { data: hospital, isLoading: loadingHospital } = useQuery({
     queryKey: ['hospital', user?.id],
     queryFn: async () => {
-      // Try hospital first, then any institution type
       const { data } = await supabase
         .from('healthcare_institutions')
         .select('*')
@@ -116,7 +130,6 @@ const HospitalManagement = () => {
 
   return (
     <div className="container mx-auto p-4 md:p-6 space-y-4">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl md:text-2xl font-bold flex items-center gap-2">
@@ -127,78 +140,60 @@ const HospitalManagement = () => {
         </div>
       </div>
 
-      {/* Main Tabs */}
       <Tabs defaultValue="dashboard" className="space-y-4">
-        <div className="overflow-x-auto">
-          <TabsList className="inline-flex w-auto min-w-full sm:min-w-0">
+        <div className="overflow-x-auto pb-2">
+          <TabsList className="inline-flex w-auto min-w-full sm:min-w-0 flex-wrap h-auto gap-1">
             <TabsTrigger value="dashboard" className="text-xs">Dashboard</TabsTrigger>
+            <TabsTrigger value="emr" className="text-xs">EMR</TabsTrigger>
             <TabsTrigger value="opd" className="text-xs">OPD</TabsTrigger>
             <TabsTrigger value="ipd" className="text-xs">IPD/ADT</TabsTrigger>
-            <TabsTrigger value="beds" className="text-xs">Beds & Wards</TabsTrigger>
-            <TabsTrigger value="departments" className="text-xs">Departments</TabsTrigger>
+            <TabsTrigger value="emergency" className="text-xs">A&E</TabsTrigger>
             <TabsTrigger value="ot" className="text-xs">OT</TabsTrigger>
+            <TabsTrigger value="daycare" className="text-xs">Day Care</TabsTrigger>
+            <TabsTrigger value="lab" className="text-xs">Lab/LIMS</TabsTrigger>
+            <TabsTrigger value="radiology" className="text-xs">Radiology</TabsTrigger>
+            <TabsTrigger value="pharmacy" className="text-xs">Pharmacy</TabsTrigger>
+            <TabsTrigger value="beds" className="text-xs">Beds</TabsTrigger>
             <TabsTrigger value="billing" className="text-xs">Billing</TabsTrigger>
-            <TabsTrigger value="staff" className="text-xs">Staff Roster</TabsTrigger>
+            <TabsTrigger value="insurance" className="text-xs">Insurance</TabsTrigger>
+            <TabsTrigger value="discharge" className="text-xs">Discharge</TabsTrigger>
+            <TabsTrigger value="queue" className="text-xs">Queue</TabsTrigger>
+            <TabsTrigger value="inventory" className="text-xs">Inventory</TabsTrigger>
+            <TabsTrigger value="bloodbank" className="text-xs">Blood Bank</TabsTrigger>
+            <TabsTrigger value="cssd" className="text-xs">CSSD</TabsTrigger>
+            <TabsTrigger value="diet" className="text-xs">Diet</TabsTrigger>
+            <TabsTrigger value="referrals" className="text-xs">Referrals</TabsTrigger>
+            <TabsTrigger value="staff" className="text-xs">Staff</TabsTrigger>
+            <TabsTrigger value="departments" className="text-xs">Departments</TabsTrigger>
+            <TabsTrigger value="mis" className="text-xs">MIS Reports</TabsTrigger>
           </TabsList>
         </div>
 
         <TabsContent value="dashboard">
-          <HMSDashboard
-            hospital={hospital}
-            departments={departments}
-            beds={beds}
-            admissions={admissions}
-            invoices={invoices}
-          />
+          <HMSDashboard hospital={hospital} departments={departments} beds={beds} admissions={admissions} invoices={invoices} />
         </TabsContent>
-
-        <TabsContent value="opd">
-          <OPDManagement hospital={hospital} departments={departments} />
-        </TabsContent>
-
-        <TabsContent value="ipd">
-          <IPDManagement
-            hospital={hospital}
-            departments={departments}
-            beds={beds}
-            admissions={admissions}
-            onRefresh={refreshAll}
-          />
-        </TabsContent>
-
-        <TabsContent value="beds">
-          <BedWardManagement
-            hospital={hospital}
-            departments={departments}
-            beds={beds}
-            onRefresh={refreshAll}
-          />
-        </TabsContent>
-
-        <TabsContent value="departments">
-          <DepartmentManagement
-            hospital={hospital}
-            departments={departments}
-            onRefresh={refreshAll}
-          />
-        </TabsContent>
-
-        <TabsContent value="ot">
-          <OTManagement />
-        </TabsContent>
-
-        <TabsContent value="billing">
-          <HospitalBilling
-            hospital={hospital}
-            admissions={admissions}
-            invoices={invoices}
-            onRefresh={refreshAll}
-          />
-        </TabsContent>
-
-        <TabsContent value="staff">
-          <StaffRoster hospital={hospital} departments={departments} />
-        </TabsContent>
+        <TabsContent value="emr"><EMRCaseSheets hospital={hospital} departments={departments} /></TabsContent>
+        <TabsContent value="opd"><OPDManagement hospital={hospital} departments={departments} /></TabsContent>
+        <TabsContent value="ipd"><IPDManagement hospital={hospital} departments={departments} beds={beds} admissions={admissions} onRefresh={refreshAll} /></TabsContent>
+        <TabsContent value="emergency"><EmergencyTriage hospital={hospital} /></TabsContent>
+        <TabsContent value="ot"><OTManagement /></TabsContent>
+        <TabsContent value="daycare"><DayCareManagement hospital={hospital} /></TabsContent>
+        <TabsContent value="lab"><HospitalLab hospital={hospital} /></TabsContent>
+        <TabsContent value="radiology"><RadiologyImaging hospital={hospital} /></TabsContent>
+        <TabsContent value="pharmacy"><HospitalPharmacy hospital={hospital} /></TabsContent>
+        <TabsContent value="beds"><BedWardManagement hospital={hospital} departments={departments} beds={beds} onRefresh={refreshAll} /></TabsContent>
+        <TabsContent value="billing"><HospitalBilling hospital={hospital} admissions={admissions} invoices={invoices} onRefresh={refreshAll} /></TabsContent>
+        <TabsContent value="insurance"><InsuranceTPA hospital={hospital} /></TabsContent>
+        <TabsContent value="discharge"><DischargeSummary hospital={hospital} admissions={admissions} /></TabsContent>
+        <TabsContent value="queue"><PatientQueue hospital={hospital} departments={departments} /></TabsContent>
+        <TabsContent value="inventory"><InventoryPurchase hospital={hospital} /></TabsContent>
+        <TabsContent value="bloodbank"><BloodBank hospital={hospital} /></TabsContent>
+        <TabsContent value="cssd"><CSSDManagement hospital={hospital} /></TabsContent>
+        <TabsContent value="diet"><DietManagement hospital={hospital} /></TabsContent>
+        <TabsContent value="referrals"><ReferralManagement hospital={hospital} /></TabsContent>
+        <TabsContent value="staff"><StaffRoster hospital={hospital} departments={departments} /></TabsContent>
+        <TabsContent value="departments"><DepartmentManagement hospital={hospital} departments={departments} onRefresh={refreshAll} /></TabsContent>
+        <TabsContent value="mis"><MISReports hospital={hospital} /></TabsContent>
       </Tabs>
     </div>
   );
