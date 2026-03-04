@@ -85,6 +85,12 @@ const InstitutionAppointments = lazyWithRetry(() => import('@/pages/InstitutionA
 const InstitutionSettings = lazyWithRetry(() => import('@/pages/InstitutionSettings'));
 const AppointmentDetails = lazyWithRetry(() => import('@/pages/AppointmentDetails'));
 const Wallet = lazyWithRetry(() => import('@/pages/Wallet'));
+const ProviderPortal = lazyWithRetry(() => import('@/pages/ProviderPortal'));
+const ProviderProfile = lazyWithRetry(() => import('@/pages/ProviderProfile'));
+const ProviderDetail = lazyWithRetry(() => import('@/pages/ProviderDetail'));
+const VideoCall = lazyWithRetry(() => import('@/pages/VideoCall'));
+const Providers = lazyWithRetry(() => import('@/pages/Providers'));
+const RoleManagement = lazyWithRetry(() => import('@/pages/RoleManagement'));
 
 import { RoleRedirect } from '@/components/auth/RoleRedirect';
 
@@ -210,6 +216,14 @@ const AppContent = () => {
             <Route path="/institution/appointments" element={<RouteGuard><InstitutionAppointments /></RouteGuard>} />
             <Route path="/institution/settings" element={<RouteGuard><InstitutionSettings /></RouteGuard>} />
             <Route path="/appointments/:id" element={<RouteGuard><AppointmentDetails /></RouteGuard>} />
+
+            {/* Provider & Video */}
+            <Route path="/provider-portal" element={<RouteGuard><ProviderPortal /></RouteGuard>} />
+            <Route path="/provider-profile/:id" element={<RouteGuard><ProviderProfile /></RouteGuard>} />
+            <Route path="/provider/:id" element={<RouteGuard><ProviderDetail /></RouteGuard>} />
+            <Route path="/providers" element={<RouteGuard><Providers /></RouteGuard>} />
+            <Route path="/video-call/:roomId" element={<RouteGuard><VideoCall /></RouteGuard>} />
+            <Route path="/role-management" element={<RouteGuard><RoleManagement /></RouteGuard>} />
 
             {/* Payment Routes */}
             <Route path="/payment-success" element={<RouteGuard><PaymentSuccess /></RouteGuard>} />

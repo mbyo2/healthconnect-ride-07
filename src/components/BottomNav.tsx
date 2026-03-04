@@ -20,8 +20,42 @@ export function BottomNav() {
 
   // Role-specific primary navigation items
   const navItems = useMemo(() => {
-    // Health Personnel / Doctor / Nurse nav
-    if (isHealthPersonnel || availableRoles.some(r => ['doctor', 'nurse', 'radiologist'].includes(r))) {
+    // Solo Nurse Consultant nav
+    if (availableRoles.includes('nurse') && !availableRoles.some(r => ['institution_admin', 'institution_staff'].includes(r))) {
+      return [
+        {
+          to: "/provider-dashboard",
+          label: "Dashboard",
+          icon: <Stethoscope className="h-5 w-5" />,
+          active: location.pathname === "/provider-dashboard",
+          description: "Nurse dashboard"
+        },
+        {
+          to: "/appointments",
+          label: "Visits",
+          icon: <Calendar className="h-5 w-5" />,
+          active: location.pathname === "/appointments",
+          description: "Patient visits & home calls"
+        },
+        {
+          to: "/medical-records",
+          label: "Care",
+          icon: <Heart className="h-5 w-5" />,
+          active: location.pathname === "/medical-records",
+          description: "Patient care & vitals"
+        },
+        {
+          to: "/chat",
+          label: "Chat",
+          icon: <MessageSquare className="h-5 w-5" />,
+          active: location.pathname === "/chat",
+          description: "Patient & doctor messages"
+        }
+      ];
+    }
+
+    // Health Personnel / Doctor / Radiologist nav
+    if (isHealthPersonnel || availableRoles.some(r => ['doctor', 'radiologist'].includes(r))) {
       return [
         {
           to: "/provider-dashboard",
@@ -225,8 +259,21 @@ export function BottomNav() {
 
   // Role-specific menu items for the "more" overflow menu
   const menuItems = useMemo(() => {
-    // Health Personnel / Doctor / Nurse menu
-    if (isHealthPersonnel || availableRoles.some(r => ['doctor', 'nurse', 'radiologist'].includes(r))) {
+    // Solo Nurse Consultant menu
+    if (availableRoles.includes('nurse') && !availableRoles.some(r => ['institution_admin', 'institution_staff'].includes(r))) {
+      return [
+        { to: "/provider-calendar", label: "My Schedule", description: "View & manage schedule", icon: <Calendar className="h-5 w-5" /> },
+        { to: "/medications", label: "Medication Admin", description: "Track medication rounds", icon: <Pill className="h-5 w-5" /> },
+        { to: "/connections", label: "My Patients", description: "Connected patients", icon: <Users className="h-5 w-5" /> },
+        { to: "/wallet", label: "Earnings", description: "Revenue and payouts", icon: <Wallet className="h-5 w-5" /> },
+        { to: "/emergency", label: "Emergency", description: "Emergency protocols", icon: <AlertTriangle className="h-5 w-5 text-red-600" /> },
+        { to: "/profile", label: "Profile", description: "Nursing credentials", icon: <User className="h-5 w-5" /> },
+        { to: "/settings", label: "Settings", description: "Preferences", icon: <Settings className="h-5 w-5" /> },
+      ];
+    }
+
+    // Health Personnel / Doctor / Radiologist menu
+    if (isHealthPersonnel || availableRoles.some(r => ['doctor', 'radiologist'].includes(r))) {
       return [
         { to: "/provider-calendar", label: "Schedule Calendar", description: "View and manage your schedule", icon: <Calendar className="h-5 w-5" /> },
         { to: "/medical-records", label: "Patient Records", description: "Access patient medical records", icon: <Heart className="h-5 w-5" /> },
