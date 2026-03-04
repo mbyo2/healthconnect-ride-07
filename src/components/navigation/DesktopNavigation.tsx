@@ -23,8 +23,22 @@ export const DesktopNavigation = () => {
       ];
     }
 
-    // Health Personnel / Doctor / Nurse / Radiologist
-    if (isHealthPersonnel || availableRoles.some(r => ['doctor', 'nurse', 'radiologist'].includes(r))) {
+    // Solo Nurse Consultant
+    if (availableRoles.includes('nurse') && !availableRoles.some(r => ['institution_admin', 'institution_staff'].includes(r))) {
+      return [
+        { to: "/provider-dashboard", label: "Dashboard", icon: <Stethoscope className="h-5 w-5 mr-2" /> },
+        { to: "/appointments", label: "Visits", icon: <Calendar className="h-5 w-5 mr-2" /> },
+        { to: "/medical-records", label: "Care Plans", icon: <Heart className="h-5 w-5 mr-2" /> },
+        { to: "/medications", label: "Medications", icon: <Pill className="h-5 w-5 mr-2" /> },
+        { to: "/chat", label: "Messages", icon: <MessageSquare className="h-5 w-5 mr-2" /> },
+        { to: "/connections", label: "My Patients", icon: <Users className="h-5 w-5 mr-2" /> },
+        { to: "/wallet", label: "Earnings", icon: <Wallet className="h-5 w-5 mr-2" /> },
+        { to: "/settings", label: "Settings", icon: <Settings className="h-5 w-5 mr-2" /> },
+      ];
+    }
+
+    // Health Personnel / Doctor / Radiologist
+    if (isHealthPersonnel || availableRoles.some(r => ['doctor', 'radiologist'].includes(r))) {
       return [
         { to: "/provider-dashboard", label: "Dashboard", icon: <Stethoscope className="h-5 w-5 mr-2" /> },
         { to: "/appointments", label: "Appointments", icon: <Calendar className="h-5 w-5 mr-2" /> },
