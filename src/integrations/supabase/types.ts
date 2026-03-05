@@ -1972,6 +1972,88 @@ export type Database = {
           },
         ]
       }
+      intake_forms: {
+        Row: {
+          allergies: Json | null
+          appointment_id: string | null
+          consent_signed: boolean | null
+          consent_signed_at: string | null
+          created_at: string | null
+          current_medications: Json | null
+          emergency_contact: Json | null
+          form_type: string
+          id: string
+          insurance_info: Json | null
+          medical_history: Json | null
+          patient_id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          submitted_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          allergies?: Json | null
+          appointment_id?: string | null
+          consent_signed?: boolean | null
+          consent_signed_at?: string | null
+          created_at?: string | null
+          current_medications?: Json | null
+          emergency_contact?: Json | null
+          form_type?: string
+          id?: string
+          insurance_info?: Json | null
+          medical_history?: Json | null
+          patient_id: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submitted_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          allergies?: Json | null
+          appointment_id?: string | null
+          consent_signed?: boolean | null
+          consent_signed_at?: string | null
+          created_at?: string | null
+          current_medications?: Json | null
+          emergency_contact?: Json | null
+          form_type?: string
+          id?: string
+          insurance_info?: Json | null
+          medical_history?: Json | null
+          patient_id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submitted_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "intake_forms_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "intake_forms_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "intake_forms_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       inventory_transactions: {
         Row: {
           created_at: string
@@ -3702,6 +3784,129 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "provider_locations_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      provider_reviews: {
+        Row: {
+          appointment_id: string | null
+          created_at: string | null
+          helpful_count: number | null
+          id: string
+          is_verified: boolean | null
+          is_visible: boolean | null
+          patient_id: string
+          provider_id: string
+          provider_response: string | null
+          provider_response_at: string | null
+          rating: number
+          review_text: string | null
+          title: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          appointment_id?: string | null
+          created_at?: string | null
+          helpful_count?: number | null
+          id?: string
+          is_verified?: boolean | null
+          is_visible?: boolean | null
+          patient_id: string
+          provider_id: string
+          provider_response?: string | null
+          provider_response_at?: string | null
+          rating: number
+          review_text?: string | null
+          title?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          appointment_id?: string | null
+          created_at?: string | null
+          helpful_count?: number | null
+          id?: string
+          is_verified?: boolean | null
+          is_visible?: boolean | null
+          patient_id?: string
+          provider_id?: string
+          provider_response?: string | null
+          provider_response_at?: string | null
+          rating?: number
+          review_text?: string | null
+          title?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "provider_reviews_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: true
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "provider_reviews_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "provider_reviews_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      provider_statistics: {
+        Row: {
+          average_rating: number | null
+          cancelled_appointments: number | null
+          completed_appointments: number | null
+          id: string
+          no_show_count: number | null
+          provider_id: string
+          response_rate: number | null
+          total_appointments: number | null
+          total_patients: number | null
+          total_reviews: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          average_rating?: number | null
+          cancelled_appointments?: number | null
+          completed_appointments?: number | null
+          id?: string
+          no_show_count?: number | null
+          provider_id: string
+          response_rate?: number | null
+          total_appointments?: number | null
+          total_patients?: number | null
+          total_reviews?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          average_rating?: number | null
+          cancelled_appointments?: number | null
+          completed_appointments?: number | null
+          id?: string
+          no_show_count?: number | null
+          provider_id?: string
+          response_rate?: number | null
+          total_appointments?: number | null
+          total_patients?: number | null
+          total_reviews?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "provider_statistics_provider_id_fkey"
             columns: ["provider_id"]
             isOneToOne: true
             referencedRelation: "profiles"
