@@ -60,7 +60,9 @@ export const ROLE_PERMISSIONS = {
     '/medications',
     '/provider-calendar',
     '/payment-success',
-    '/payment-cancel'
+    '/payment-cancel',
+    '/intake-form',
+    '/provider/:id'
   ],
   [USER_ROLES.HEALTH_PERSONNEL]: [
     '/',
