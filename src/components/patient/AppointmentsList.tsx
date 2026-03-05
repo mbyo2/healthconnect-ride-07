@@ -6,11 +6,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ListSkeleton } from "@/components/ui/list-skeleton";
 import { EmptyState } from "@/components/ui/empty-state";
-import { Calendar, Clock, MapPin, CalendarX } from "lucide-react";
+import { Calendar, Clock, MapPin, CalendarX, RefreshCw, FileCheck } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { AppointmentWithProvider } from "@/types/appointments";
 
 export const AppointmentsList = () => {
+  const navigate = useNavigate();
   const { data: appointments = [], isLoading, refetch } = useQuery({
     queryKey: ['patient-appointments'],
     queryFn: async () => {
@@ -113,14 +115,34 @@ export const AppointmentsList = () => {
               </Badge>
             </div>
             <div className="flex flex-col w-full md:w-auto gap-2">
-              <Button
-                variant="destructive"
-                onClick={() => cancelAppointment(appointment.id)}
-                disabled={appointment.status !== 'scheduled'}
-                className="w-full"
-              >
-                Cancel
-              </Button>
+              {appointment.status === 'scheduled' && (
+                <>
+                  <Button
+                    variant="outline"
+                    onClick={() => navigate(`/search?reschedule=${appointment.id}&provider=${appointment.provider_id}`)}
+                    className="w-full gap-1"
+                  >
+                    <RefreshCw className="h-3 w-3" />
+                    Reschedule
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => navigate(`/intake-form?appointment=${appointment.id}`)}
+                    className="w-full gap-1"
+                  >
+                    <FileCheck className="h-3 w-3" />
+                    Intake Form
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    onClick={() => cancelAppointment(appointment.id)}
+                    className="w-full"
+                  >
+                    Cancel
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </Card>

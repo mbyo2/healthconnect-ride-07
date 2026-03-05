@@ -2,7 +2,7 @@
 import { Provider } from "@/types/provider";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { MapPin, Star } from "lucide-react";
+import { MapPin, Star, CalendarPlus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface ProviderListProps {
@@ -84,16 +84,29 @@ export const ProviderList = ({ providers, onProviderSelect, selectedProvider }: 
                   )}
                 </div>
               </div>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleViewProfile(provider.id);
-                }}
-              >
-                View Profile
-              </Button>
+              <div className="flex flex-col gap-2">
+                <Button 
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleViewProfile(provider.id);
+                  }}
+                  className="gap-1"
+                >
+                  <CalendarPlus className="h-3 w-3" />
+                  Book Now
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleViewProfile(provider.id);
+                  }}
+                >
+                  View Profile
+                </Button>
+              </div>
             </div>
           </Card>
         ))

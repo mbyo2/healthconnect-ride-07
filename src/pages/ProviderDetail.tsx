@@ -1,14 +1,16 @@
 
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Phone, Clock, Star } from "lucide-react";
+import { MapPin, Phone, Clock, Star, CalendarPlus } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { ProviderReviews } from "@/components/reviews/ProviderReviews";
 
 const ProviderDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { data: provider, isLoading } = useQuery({
     queryKey: ['provider-detail', id],
     queryFn: async () => {
@@ -60,15 +62,11 @@ const ProviderDetail = () => {
                   {provider.specialty && (
                     <CardDescription className="text-lg">{provider.specialty}</CardDescription>
                   )}
-                  <div className="flex items-center gap-2 mt-2">
-                    <div className="flex items-center">
-                      <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                      <span className="ml-1 font-medium">4.8</span>
-                    </div>
-                    <span className="text-muted-foreground">(124 reviews)</span>
-                  </div>
                 </div>
-                <Button size="lg">Book Appointment</Button>
+                <Button size="lg" onClick={() => navigate(`/search?provider=${id}`)}>
+                  <CalendarPlus className="h-4 w-4 mr-2" />
+                  Book Appointment
+                </Button>
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -98,21 +96,8 @@ const ProviderDetail = () => {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Education & Certifications</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <h4 className="font-semibold mb-2">Education</h4>
-                <p className="text-muted-foreground">Education details not available.</p>
-              </div>
-              <div>
-                <h4 className="font-semibold mb-2">Certifications</h4>
-                <p className="text-muted-foreground">Certification details not available.</p>
-              </div>
-            </CardContent>
-          </Card>
+          {/* Patient Reviews */}
+          {id && <ProviderReviews providerId={id} />}
         </div>
 
         <div className="space-y-6">

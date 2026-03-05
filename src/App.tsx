@@ -91,6 +91,7 @@ const ProviderDetail = lazyWithRetry(() => import('@/pages/ProviderDetail'));
 const VideoCall = lazyWithRetry(() => import('@/pages/VideoCall'));
 const Providers = lazyWithRetry(() => import('@/pages/Providers'));
 const RoleManagement = lazyWithRetry(() => import('@/pages/RoleManagement'));
+const IntakeForm = lazyWithRetry(() => import('@/pages/IntakeForm'));
 
 import { RoleRedirect } from '@/components/auth/RoleRedirect';
 
@@ -224,6 +225,7 @@ const AppContent = () => {
             <Route path="/providers" element={<RouteGuard><Providers /></RouteGuard>} />
             <Route path="/video-call/:roomId" element={<RouteGuard><VideoCall /></RouteGuard>} />
             <Route path="/role-management" element={<RouteGuard><RoleManagement /></RouteGuard>} />
+            <Route path="/intake-form" element={<RouteGuard><IntakeForm /></RouteGuard>} />
 
             {/* Payment Routes */}
             <Route path="/payment-success" element={<RouteGuard><PaymentSuccess /></RouteGuard>} />
