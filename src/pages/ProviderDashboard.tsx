@@ -3,9 +3,10 @@ import { ScheduleManager } from "@/components/provider/ScheduleManager";
 import { WaitlistManager } from "@/components/provider/WaitlistManager";
 import { DigitalSignature } from "@/components/provider/DigitalSignature";
 import { PatientRecords } from "@/components/provider/PatientRecords";
+import { ProviderAnalyticsDashboard } from "@/components/provider/ProviderAnalyticsDashboard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Package, Bot, Brain, Sparkles, ArrowRight } from "lucide-react";
+import { Package, Bot, Brain, Sparkles, ArrowRight, BarChart3 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
 const ProviderDashboard = () => {
@@ -55,10 +56,14 @@ const ProviderDashboard = () => {
       </Card>
       
       <Tabs defaultValue="schedule" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="schedule">Schedule</TabsTrigger>
           <TabsTrigger value="patients">Patients</TabsTrigger>
           <TabsTrigger value="waitlist">Waitlist</TabsTrigger>
+          <TabsTrigger value="analytics" className="gap-1">
+            <BarChart3 className="h-3 w-3" />
+            Analytics
+          </TabsTrigger>
           <TabsTrigger value="signatures">Signatures</TabsTrigger>
         </TabsList>
 
@@ -72,6 +77,10 @@ const ProviderDashboard = () => {
 
         <TabsContent value="waitlist">
           <WaitlistManager />
+        </TabsContent>
+
+        <TabsContent value="analytics">
+          <ProviderAnalyticsDashboard />
         </TabsContent>
 
         <TabsContent value="signatures">
