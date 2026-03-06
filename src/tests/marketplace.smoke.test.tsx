@@ -1,3 +1,6 @@
+/**
+ * @vitest-environment jsdom
+ */
 import React, { useEffect } from 'react';
 import { render, act } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -26,6 +29,19 @@ vi.mock('@/integrations/supabase/client', () => {
     }
   };
 });
+
+vi.mock('@/context/AuthContext', () => ({
+  useAuth: () => ({
+    user: { id: 'test-user' },
+    profile: { id: 'test-user', role: 'patient' },
+    loading: false,
+    isLoading: false,
+    userRole: 'patient',
+    session: null,
+    signOut: vi.fn(),
+  }),
+  AuthProvider: ({ children }: any) => children,
+}));
 
 vi.mock('@/utils/storage', () => ({
   safeLocalSet: vi.fn(),
