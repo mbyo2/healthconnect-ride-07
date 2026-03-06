@@ -38,7 +38,7 @@ export function DesktopUserMenu({ user, profile, onLogout }: DesktopUserMenuProp
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-64 bg-white border-trust-200 shadow-xl z-50 max-h-[80vh] overflow-y-auto">
+      <DropdownMenuContent align="end" className="w-64 bg-popover border-border shadow-xl z-[60] max-h-[80vh] overflow-y-auto">
         <DropdownMenuLabel className="pb-2">
           <div className="text-sm font-semibold text-trust-700">{user.email}</div>
           <div className="text-xs text-muted-foreground">My Account</div>
