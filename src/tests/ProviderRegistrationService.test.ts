@@ -399,10 +399,12 @@ describe('ProviderRegistrationService Property Tests', () => {
     expect(mockFromChain.upsert).toHaveBeenCalledWith({
       id: mockUser.id,
       email: registrationData.email,
-      full_name: registrationData.full_name,
-      phone_number: registrationData.phone_number,
+      first_name: 'Test',
+      last_name: 'Provider',
+      phone: registrationData.phone_number,
       is_profile_complete: true,
-      role: 'health_personnel'
+      role: 'health_personnel',
+      specialty: registrationData.specialty
     });
     
     // Verify role assignment (Requirement 1.2)

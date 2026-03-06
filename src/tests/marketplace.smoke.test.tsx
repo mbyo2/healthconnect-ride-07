@@ -1,3 +1,6 @@
+/**
+ * @vitest-environment jsdom
+ */
 import React, { useEffect } from 'react';
 import { render, act } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
