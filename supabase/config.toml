@@ -64,7 +64,7 @@ verify_jwt = true
 verify_jwt = true
 
 [functions.setup-test-accounts]
-verify_jwt = true
+verify_jwt = false
 
 [functions.medgemma-health-analysis]
 verify_jwt = true
