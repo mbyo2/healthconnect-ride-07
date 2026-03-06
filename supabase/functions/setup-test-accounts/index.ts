@@ -150,6 +150,53 @@ serve(async (req) => {
   }
 
   try {
+    // --- Authorization: require super_admin role ---
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return new Response(
+        JSON.stringify({ success: false, error: 'Unauthorized' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 401 }
+      );
+    }
+
+    const userClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: claimsData, error: claimsError } = await userClient.auth.getClaims(token);
+    if (claimsError || !claimsData?.claims) {
+      return new Response(
+        JSON.stringify({ success: false, error: 'Unauthorized' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 401 }
+      );
+    }
+
+    const userId = claimsData.claims.sub;
+
+    // Check if the caller has super_admin role using the has_role function
+    const { data: isSuperAdmin, error: roleError } = await userClient
+      .rpc('has_role', { _user_id: userId, _role: 'admin' });
+
+    // Also check admin_level in profiles for superadmin
+    const { data: profileData } = await userClient
+      .from('profiles')
+      .select('admin_level')
+      .eq('id', userId)
+      .single();
+
+    const hasSuperAdminAccess = isSuperAdmin && profileData?.admin_level === 'superadmin';
+
+    if (roleError || !hasSuperAdminAccess) {
+      return new Response(
+        JSON.stringify({ success: false, error: 'Forbidden: super_admin role required' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 403 }
+      );
+    }
+    // --- End authorization ---
+
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
