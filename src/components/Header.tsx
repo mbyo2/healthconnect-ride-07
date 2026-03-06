@@ -62,8 +62,8 @@ export function Header() {
   if (isDesktop) return null;
 
   return (
-    <header className="modern-header sticky top-0 z-40 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-trust-100">
-      <div className="flex h-16 items-center justify-between px-4">
+    <header className="modern-header fixed top-0 left-0 right-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
+      <div className="flex h-14 items-center justify-between px-4">
         {/* Logo and Name on one line */}
         <div className="flex items-center flex-shrink-0">
           <AppLogo size="sm" className="gap-1.5" />
@@ -106,7 +106,7 @@ export function Header() {
                 )}
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-64 bg-popover border border-border shadow-lg max-h-[80vh] overflow-y-auto z-50">
+            <DropdownMenuContent align="end" className="w-64 bg-popover border border-border shadow-lg max-h-[80vh] overflow-y-auto z-[60]">
               {user ? (
                 <>
                   <DropdownMenuLabel className="pb-2">

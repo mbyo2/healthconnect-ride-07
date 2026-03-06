@@ -64,7 +64,7 @@ export const MobileLayout = ({ children, isLoading }: MobileLayoutProps) => {
         role="main"
         aria-label="Main Content"
         className={cn(
-          "flex-1 pt-16 overflow-y-auto overflow-x-hidden",
+          "flex-1 pt-14 overflow-y-auto overflow-x-hidden",
           isAuthenticated ? "pb-24" : "pb-6",
           "transition-all duration-100 ease-out",
           "min-h-0",
