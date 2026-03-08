@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { useSuccessFeedback } from '@/hooks/use-success-feedback';
@@ -13,7 +13,10 @@ import {
   FileCheck,
   CreditCard,
   Building2,
-  UserPlus
+  UserPlus,
+  AlertTriangle,
+  Activity,
+  ClipboardList
 } from 'lucide-react';
 
 export const AdminWorkflow = () => {
@@ -29,75 +32,79 @@ export const AdminWorkflow = () => {
   const allWorkflowSteps = [
     {
       title: "User Management",
-      description: "Manage accounts and permissions",
+      description: "Manage accounts, roles & permissions",
       icon: <Users className="h-5 w-5" />,
-      action: () => handleNavigation('/admin-dashboard/users', 'User Management'),
-      completed: false,
       route: '/admin-dashboard',
+      tab: 'users',
       requiredSuperAdmin: false
     },
     {
-      title: "Provider Apps",
-      description: "Review healthcare applications",
+      title: "Provider Applications",
+      description: "Review healthcare provider applications",
       icon: <FileCheck className="h-5 w-5" />,
-      action: () => navigate('/admin-dashboard/applications'),
-      completed: false,
       route: '/admin-dashboard',
+      tab: 'applications',
       requiredSuperAdmin: false
     },
     {
-      title: "Analytics",
-      description: "Platform metrics and reports",
+      title: "Platform Analytics",
+      description: "Platform metrics, growth & reports",
       icon: <BarChart3 className="h-5 w-5" />,
-      action: () => navigate('/admin-dashboard/analytics'),
-      completed: false,
       route: '/admin-dashboard',
+      tab: 'analytics',
       requiredSuperAdmin: false
     },
     {
-      title: "Financial",
-      description: "Payments and billing reports",
+      title: "Financial Overview",
+      description: "Revenue, payments & billing reports",
       icon: <CreditCard className="h-5 w-5" />,
-      action: () => navigate('/admin-wallet'),
-      completed: false,
-      route: '/admin-wallet',
+      route: '/wallet',
       requiredSuperAdmin: false
     },
     {
       title: "Institutions",
-      description: "Healthcare facility management",
+      description: "Healthcare facility management & verification",
       icon: <Building2 className="h-5 w-5" />,
-      action: () => navigate('/admin-dashboard/institutions'),
-      completed: false,
       route: '/admin-dashboard',
+      tab: 'institutions',
       requiredSuperAdmin: false
     },
     {
-      title: "Create Admins",
-      description: "New admin accounts",
+      title: "Audit Logs",
+      description: "System activity & change history",
+      icon: <ClipboardList className="h-5 w-5" />,
+      route: '/admin-dashboard',
+      tab: 'security',
+      requiredSuperAdmin: false
+    },
+    {
+      title: "Role Management",
+      description: "Assign and manage user roles",
+      icon: <Activity className="h-5 w-5" />,
+      route: '/role-management',
+      requiredSuperAdmin: true
+    },
+    {
+      title: "Create Admin",
+      description: "Create new admin accounts",
       icon: <UserPlus className="h-5 w-5" />,
-      action: () => navigate('/create-admin'),
-      completed: false,
       route: '/create-admin',
       requiredSuperAdmin: true
     },
     {
-      title: "Settings",
-      description: "Platform configuration",
-      icon: <Settings className="h-5 w-5" />,
-      action: () => navigate('/admin-dashboard/settings'),
-      completed: false,
-      route: '/settings',
-      requiredSuperAdmin: false
+      title: "Security & Compliance",
+      description: "Security events, fraud alerts & compliance",
+      icon: <ShieldCheck className="h-5 w-5" />,
+      route: '/admin-dashboard',
+      tab: 'security',
+      requiredSuperAdmin: true
     },
     {
-      title: "Security",
-      description: "Security and compliance",
-      icon: <ShieldCheck className="h-5 w-5" />,
-      action: () => navigate('/admin-dashboard/security'),
-      completed: false,
-      route: '/admin-dashboard',
-      requiredSuperAdmin: true
+      title: "Settings",
+      description: "Platform configuration & preferences",
+      icon: <Settings className="h-5 w-5" />,
+      route: '/settings',
+      requiredSuperAdmin: false
     }
   ];
 
@@ -118,7 +125,8 @@ export const AdminWorkflow = () => {
 
       <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {workflowSteps.map((step, index) => (
-          <Card key={index} className="cursor-pointer hover:shadow-md transition-all active:scale-95 touch-manipulation bg-card border-border">
+          <Card key={index} className="cursor-pointer hover:shadow-md transition-all active:scale-95 touch-manipulation bg-card border-border"
+            onClick={() => handleNavigation(step.route, step.title)}>
             <CardContent className="p-4">
               <div className="flex items-center gap-3 mb-2">
                 <div className="p-2 bg-destructive/10 rounded-lg shrink-0">
@@ -130,10 +138,9 @@ export const AdminWorkflow = () => {
                 </div>
               </div>
               <Button
-                onClick={() => handleNavigation(step.route, step.title)}
+                onClick={(e) => { e.stopPropagation(); handleNavigation(step.route, step.title); }}
                 size="sm"
                 className="w-full text-xs mt-2"
-                variant={step.completed ? "outline" : "default"}
               >
                 Manage
               </Button>

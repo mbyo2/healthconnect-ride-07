@@ -63,7 +63,7 @@ const workflows: Workflow[] = [
     steps: [
       { icon: AlertTriangle, label: 'SOS', route: '/emergency' },
       { icon: Building2, label: 'Hospital', route: '/healthcare-institutions' },
-      { icon: Ambulance, label: '991', route: 'tel:991' },
+      { icon: Ambulance, label: 'Call', route: '/emergency' },
       { icon: Heart, label: 'Care', route: '/emergency' },
     ]
   },
@@ -73,11 +73,7 @@ export const ConnectedWorkflows: React.FC = () => {
   const navigate = useNavigate();
 
   const handleStepClick = (route: string) => {
-    if (route.startsWith('tel:')) {
-      window.location.href = route;
-    } else {
-      navigate(route);
-    }
+    navigate(route);
   };
 
   return (
