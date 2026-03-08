@@ -36,7 +36,7 @@ export const InsuranceVerification = () => {
           <AlertTriangle className="h-5 w-5" />
           <h3 className="font-semibold">Insurance Information Required</h3>
         </div>
-        <p className="mt-2 text-muted-foregroundregroundregroundreground">
+        <p className="mt-2 text-muted-foregroundregroundregroundregroundreground">
           Please add your insurance information to enable verification.
         </p>
       </Card>
@@ -77,7 +77,7 @@ export const InsuranceVerification = () => {
 
       <div className="mt-4 space-y-2">
         <div className="flex justify-between items-center">
-        muted-foregroundmuted-foregroundmuted-foregroundgray-600">Status</span>
+muted-foregroundmuted-foregroundmuted-foregroundmuted-foregroundgray-600">Status</span>
           <Badge variant={isActive ? "default" : "destructive"}>
             {isActive ? (
               <CheckCircle className="h-4 w-4 mr-1" />
@@ -88,19 +88,19 @@ export const InsuranceVerification = () => {
           </Badge>
         </div>
 
-        <div className="flex justify-between">
+        <div className="flex jumuted-foregroundtween">
 muted-foreground  <span muted-foregrounde="text-gray-600">Provider</span>
           <span className="font-medium">{insurance.provider_name}</span>
         </div>
 
-        <div className="flex justify-between">
+        <div className="flex jumuted-foregroundtween">
         muted-foregroundclassName="text-gray-600">Policy Number</span>
           <span className="font-medium">{insurance.policy_number}</span>
         </div>
 
         {insurance.group_number && (
           <div className="flex justify-between">
-            <span className="text-gray-600">Group Number</span>
+  muted-foreground  <span className="text-gray-600">Group Number</span>
             <span className="font-medium">{insurance.group_number}</span>
           </div>
         )}
