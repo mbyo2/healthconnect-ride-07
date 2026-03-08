@@ -29,7 +29,8 @@ const TIME_SLOTS = [
 export const BookingModal = ({ provider, isOpen, onClose }: BookingModalProps) => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [step, setStep] = useState<'type' | 'datetime' | 'confirm'>('type');
+  const [step, setStep] = useState<'visit' | 'type' | 'datetime' | 'confirm'>('visit');
+  const [visitType, setVisitType] = useState<'new' | 'returning'>('new');
   const [appointmentType, setAppointmentType] = useState<'physical' | 'virtual'>('physical');
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
@@ -37,6 +38,7 @@ export const BookingModal = ({ provider, isOpen, onClose }: BookingModalProps) =
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [weekStart, setWeekStart] = useState(startOfWeek(new Date(), { weekStartsOn: 1 }));
   const [bookedSlots, setBookedSlots] = useState<string[]>([]);
+  const [showWaitlist, setShowWaitlist] = useState(false);
 
   // Fetch booked slots for this provider
   useEffect(() => {
