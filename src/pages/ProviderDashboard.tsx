@@ -23,6 +23,7 @@ import { useCurrency } from "@/hooks/use-currency";
 const ProviderDashboard = () => {
   const navigate = useNavigate();
   const today = new Date();
+  const { formatPrice } = useCurrency();
 
   const { data: todayAppointments = [] } = useQuery({
     queryKey: ['provider-today-appointments'],
