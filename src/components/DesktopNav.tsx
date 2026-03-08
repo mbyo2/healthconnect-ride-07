@@ -4,20 +4,23 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useSearch } from "@/context/SearchContext";
-import { Home, Calendar, MessageSquare, Users, ShoppingCart, Heart, Settings, User, Brain, Shield, Activity, BarChart3, AlertTriangle, Zap, Package, Pill, Stethoscope, Building2 } from "lucide-react";
+import {
+  Home, Calendar, MessageSquare, Users, ShoppingCart, Heart, Settings, User, Brain,
+  Shield, Activity, BarChart3, AlertTriangle, Zap, Package, Pill, Stethoscope,
+  Building2, Wallet
+} from "lucide-react";
 import { DesktopNavMenu } from "@/components/navigation/DesktopNavMenu";
 import { DesktopUserMenu } from "@/components/navigation/DesktopUserMenu";
 import { AppLogo } from "@/components/ui/AppLogo";
 import { NotificationBell } from "@/components/NotificationBell";
 import { useUserRoles } from "@/context/UserRolesContext";
-import { hasRoutePermission } from "@/utils/rolePermissions";
 
 export function DesktopNav() {
   const location = useLocation();
   const { user, signOut, profile, isAuthenticated } = useAuth();
-  const { availableRoles } = useUserRoles();
+  const { availableRoles, isHealthPersonnel, isAdmin, isPatient } = useUserRoles();
   const [searchTerm, setSearchTerm] = useState("");
   const { setSearchQuery } = useSearch();
   const navigate = useNavigate();
@@ -43,37 +46,170 @@ export function DesktopNav() {
     }
   }, [signOut, navigate]);
 
-  const mainNavItems = [
-    { to: "/", label: "Home", icon: <Home className="h-4 w-4" />, active: location.pathname === "/" || location.pathname === "/home" },
-    { to: "/search", label: "Find Care", icon: <Search className="h-4 w-4" />, active: location.pathname === "/search" },
-  ];
+  // Role-specific main nav items (top bar links)
+  const mainNavItems = useMemo(() => {
+    if (!isAuthenticated) {
+      return [
+        { to: "/", label: "Home", icon: <Home className="h-4 w-4" />, active: location.pathname === "/" || location.pathname === "/home" },
+        { to: "/search", label: "Find Care", icon: <Search className="h-4 w-4" />, active: location.pathname === "/search" },
+      ];
+    }
 
-  if (isAuthenticated) {
-    mainNavItems.push(
+    // Nurse (solo)
+    if (availableRoles.includes('nurse') && !availableRoles.some(r => ['institution_admin', 'institution_staff'].includes(r))) {
+      return [
+        { to: "/provider-dashboard", label: "Dashboard", icon: <Stethoscope className="h-4 w-4" />, active: location.pathname === "/provider-dashboard" },
+        { to: "/appointments", label: "Visits", icon: <Calendar className="h-4 w-4" />, active: location.pathname === "/appointments" },
+        { to: "/medical-records", label: "Care", icon: <Heart className="h-4 w-4" />, active: location.pathname === "/medical-records" },
+        { to: "/chat", label: "Messages", icon: <MessageSquare className="h-4 w-4" />, active: location.pathname === "/chat" },
+      ];
+    }
+
+    // Doctor / Health Personnel / Radiologist
+    if (isHealthPersonnel || availableRoles.some(r => ['doctor', 'radiologist'].includes(r))) {
+      return [
+        { to: "/provider-dashboard", label: "Dashboard", icon: <Stethoscope className="h-4 w-4" />, active: location.pathname === "/provider-dashboard" },
+        { to: "/appointments", label: "Appointments", icon: <Calendar className="h-4 w-4" />, active: location.pathname === "/appointments" },
+        { to: "/chat", label: "Messages", icon: <MessageSquare className="h-4 w-4" />, active: location.pathname === "/chat" },
+        { to: "/ai-diagnostics", label: "AI Assistant", icon: <Brain className="h-4 w-4" />, active: location.pathname === "/ai-diagnostics" },
+      ];
+    }
+
+    // Pharmacy / Pharmacist
+    if (availableRoles.some(r => ['pharmacy', 'pharmacist'].includes(r))) {
+      return [
+        { to: "/pharmacy-portal", label: "Portal", icon: <Package className="h-4 w-4" />, active: location.pathname === "/pharmacy-portal" },
+        { to: "/pharmacy-inventory", label: "Inventory", icon: <Pill className="h-4 w-4" />, active: location.pathname === "/pharmacy-inventory" },
+        { to: "/prescriptions", label: "Rx", icon: <Heart className="h-4 w-4" />, active: location.pathname === "/prescriptions" },
+        { to: "/marketplace", label: "Market", icon: <ShoppingCart className="h-4 w-4" />, active: location.pathname === "/marketplace" },
+      ];
+    }
+
+    // Admin
+    if (isAdmin) {
+      return [
+        { to: "/admin-dashboard", label: "Dashboard", icon: <Shield className="h-4 w-4" />, active: location.pathname === "/admin-dashboard" },
+        { to: "/healthcare-application", label: "Applications", icon: <Users className="h-4 w-4" />, active: location.pathname === "/healthcare-application" },
+        { to: "/chat", label: "Messages", icon: <MessageSquare className="h-4 w-4" />, active: location.pathname === "/chat" },
+      ];
+    }
+
+    // Institution Admin/Staff
+    if (availableRoles.some(r => ['institution_admin', 'institution_staff'].includes(r))) {
+      return [
+        { to: "/institution-dashboard", label: "Dashboard", icon: <Building2 className="h-4 w-4" />, active: location.pathname === "/institution-dashboard" },
+        { to: "/institution/appointments", label: "Appointments", icon: <Calendar className="h-4 w-4" />, active: location.pathname === "/institution/appointments" },
+        { to: "/institution/patients", label: "Patients", icon: <Users className="h-4 w-4" />, active: location.pathname === "/institution/patients" },
+        { to: "/chat", label: "Messages", icon: <MessageSquare className="h-4 w-4" />, active: location.pathname === "/chat" },
+      ];
+    }
+
+    // Lab / Lab Technician
+    if (availableRoles.some(r => ['lab', 'lab_technician'].includes(r))) {
+      return [
+        { to: "/lab-management", label: "Lab", icon: <Activity className="h-4 w-4" />, active: location.pathname === "/lab-management" },
+        { to: "/medical-records", label: "Records", icon: <Heart className="h-4 w-4" />, active: location.pathname === "/medical-records" },
+        { to: "/search", label: "Search", icon: <Search className="h-4 w-4" />, active: location.pathname === "/search" },
+      ];
+    }
+
+    // Default: Patient
+    return [
+      { to: "/home", label: "Home", icon: <Home className="h-4 w-4" />, active: location.pathname === "/" || location.pathname === "/home" },
+      { to: "/search", label: "Find Care", icon: <Search className="h-4 w-4" />, active: location.pathname === "/search" },
       { to: "/appointments", label: "My Care", icon: <Calendar className="h-4 w-4" />, active: location.pathname.includes("appointment") },
-      { to: "/chat", label: "Messages", icon: <MessageSquare className="h-4 w-4" />, active: location.pathname === "/chat" }
-    );
-  }
+      { to: "/chat", label: "Messages", icon: <MessageSquare className="h-4 w-4" />, active: location.pathname === "/chat" },
+    ];
+  }, [location.pathname, isAuthenticated, isHealthPersonnel, isAdmin, isPatient, availableRoles]);
 
-  const secondaryNavItems = [
-    { to: "/connections", label: "My Providers", icon: <Users className="h-4 w-4 mr-2" /> },
-    { to: "/profile", label: "My Profile", icon: <User className="h-4 w-4 mr-2" /> },
-    { to: "/marketplace-users", label: "Healthcare Marketplace", icon: <ShoppingCart className="h-4 w-4 mr-2" /> },
-    { to: "/prescriptions", label: "Prescriptions", icon: <Pill className="h-4 w-4 mr-2" /> },
-    { to: "/symptoms", label: "Health Tracking", icon: <Heart className="h-4 w-4 mr-2" /> },
-    { to: "/medical-records", label: "Medical Records", icon: <Heart className="h-4 w-4 mr-2" /> },
-    { to: "/video-consultations", label: "Video Consultations", icon: <MessageSquare className="h-4 w-4 mr-2" /> },
-    { to: "/advanced-dashboard", label: "Advanced Healthcare", icon: <Zap className="h-4 w-4 mr-2" />, badge: "NEW" },
-    { to: "/ai-diagnostics", label: "AI Diagnostic Assistant", icon: <Brain className="h-4 w-4 mr-2" />, badge: "AI" },
-    { to: "/blockchain-records", label: "Blockchain Records", icon: <Shield className="h-4 w-4 mr-2" /> },
-    { to: "/iot-monitoring", label: "IoT Monitoring", icon: <Activity className="h-4 w-4 mr-2" /> },
-    { to: "/health-analytics", label: "Health Analytics", icon: <BarChart3 className="h-4 w-4 mr-2" /> },
-    { to: "/emergency-response", label: "Emergency Response", icon: <AlertTriangle className="h-4 w-4 mr-2" /> },
-    { to: "/pharmacy-management", label: "Pharmacy Management", icon: <Package className="h-4 w-4 mr-2" /> },
-    { to: "/hospital-management", label: "Hospital Management", icon: <Building2 className="h-4 w-4 mr-2" /> },
-    { to: "/lab-management", label: "Lab Management", icon: <Stethoscope className="h-4 w-4 mr-2" /> },
-    { to: "/settings", label: "Settings", icon: <Settings className="h-4 w-4 mr-2" /> },
-  ];
+  // Role-specific "More" menu items
+  const secondaryNavItems = useMemo(() => {
+    // Nurse (solo)
+    if (availableRoles.includes('nurse') && !availableRoles.some(r => ['institution_admin', 'institution_staff'].includes(r))) {
+      return [
+        { to: "/provider-calendar", label: "My Schedule", icon: <Calendar className="h-4 w-4 mr-2" /> },
+        { to: "/medications", label: "Medication Admin", icon: <Pill className="h-4 w-4 mr-2" /> },
+        { to: "/connections", label: "My Patients", icon: <Users className="h-4 w-4 mr-2" /> },
+        { to: "/wallet", label: "Earnings", icon: <Wallet className="h-4 w-4 mr-2" /> },
+        { to: "/emergency", label: "Emergency", icon: <AlertTriangle className="h-4 w-4 mr-2" /> },
+        { to: "/profile", label: "Profile", icon: <User className="h-4 w-4 mr-2" /> },
+        { to: "/settings", label: "Settings", icon: <Settings className="h-4 w-4 mr-2" /> },
+      ];
+    }
+
+    // Doctor / Health Personnel / Radiologist
+    if (isHealthPersonnel || availableRoles.some(r => ['doctor', 'radiologist'].includes(r))) {
+      return [
+        { to: "/provider-calendar", label: "Schedule Calendar", icon: <Calendar className="h-4 w-4 mr-2" /> },
+        { to: "/medical-records", label: "Patient Records", icon: <Heart className="h-4 w-4 mr-2" /> },
+        { to: "/prescriptions", label: "Write Prescriptions", icon: <Pill className="h-4 w-4 mr-2" /> },
+        { to: "/connections", label: "My Patients", icon: <Users className="h-4 w-4 mr-2" /> },
+        { to: "/wallet", label: "Earnings", icon: <Wallet className="h-4 w-4 mr-2" /> },
+        { to: "/emergency", label: "Emergency Protocols", icon: <AlertTriangle className="h-4 w-4 mr-2" /> },
+        { to: "/profile", label: "Professional Profile", icon: <User className="h-4 w-4 mr-2" /> },
+        { to: "/settings", label: "Settings", icon: <Settings className="h-4 w-4 mr-2" /> },
+      ];
+    }
+
+    // Pharmacy / Pharmacist
+    if (availableRoles.some(r => ['pharmacy', 'pharmacist'].includes(r))) {
+      return [
+        { to: "/pharmacy-management", label: "Pharmacy Management", icon: <ShoppingCart className="h-4 w-4 mr-2" /> },
+        { to: "/wallet", label: "Revenue", icon: <Wallet className="h-4 w-4 mr-2" /> },
+        { to: "/profile", label: "Pharmacy Profile", icon: <User className="h-4 w-4 mr-2" /> },
+        { to: "/settings", label: "Settings", icon: <Settings className="h-4 w-4 mr-2" /> },
+      ];
+    }
+
+    // Admin
+    if (isAdmin) {
+      return [
+        { to: "/hospital-management", label: "Hospital Management", icon: <Building2 className="h-4 w-4 mr-2" /> },
+        { to: "/pharmacy-management", label: "Pharmacy Management", icon: <ShoppingCart className="h-4 w-4 mr-2" /> },
+        { to: "/lab-management", label: "Lab Management", icon: <Activity className="h-4 w-4 mr-2" /> },
+        { to: "/wallet", label: "Admin Wallet", icon: <Wallet className="h-4 w-4 mr-2" /> },
+        { to: "/role-management", label: "Role Management", icon: <Shield className="h-4 w-4 mr-2" /> },
+        { to: "/profile", label: "Profile", icon: <User className="h-4 w-4 mr-2" /> },
+        { to: "/settings", label: "Settings", icon: <Settings className="h-4 w-4 mr-2" /> },
+      ];
+    }
+
+    // Institution Admin/Staff
+    if (availableRoles.some(r => ['institution_admin', 'institution_staff'].includes(r))) {
+      return [
+        { to: "/hospital-management", label: "Facility Management", icon: <Building2 className="h-4 w-4 mr-2" /> },
+        { to: "/institution/personnel", label: "Staff", icon: <Users className="h-4 w-4 mr-2" /> },
+        { to: "/institution/reports", label: "Reports", icon: <BarChart3 className="h-4 w-4 mr-2" /> },
+        { to: "/wallet", label: "Finances", icon: <Wallet className="h-4 w-4 mr-2" /> },
+        { to: "/institution/settings", label: "Settings", icon: <Settings className="h-4 w-4 mr-2" /> },
+        { to: "/profile", label: "Profile", icon: <User className="h-4 w-4 mr-2" /> },
+      ];
+    }
+
+    // Lab / Lab Technician
+    if (availableRoles.some(r => ['lab', 'lab_technician'].includes(r))) {
+      return [
+        { to: "/wallet", label: "Revenue", icon: <Wallet className="h-4 w-4 mr-2" /> },
+        { to: "/connections", label: "Patients", icon: <Users className="h-4 w-4 mr-2" /> },
+        { to: "/profile", label: "Profile", icon: <User className="h-4 w-4 mr-2" /> },
+        { to: "/settings", label: "Settings", icon: <Settings className="h-4 w-4 mr-2" /> },
+      ];
+    }
+
+    // Default: Patient
+    return [
+      { to: "/appointments", label: "My Appointments", icon: <Calendar className="h-4 w-4 mr-2" /> },
+      { to: "/emergency", label: "Emergency Help", icon: <AlertTriangle className="h-4 w-4 mr-2" /> },
+      { to: "/marketplace", label: "Buy Medicine", icon: <Pill className="h-4 w-4 mr-2" /> },
+      { to: "/prescriptions", label: "Prescriptions", icon: <Heart className="h-4 w-4 mr-2" /> },
+      { to: "/connections", label: "My Providers", icon: <Users className="h-4 w-4 mr-2" /> },
+      { to: "/wallet", label: "Wallet", icon: <Wallet className="h-4 w-4 mr-2" /> },
+      { to: "/medical-records", label: "Medical Records", icon: <Heart className="h-4 w-4 mr-2" /> },
+      { to: "/symptoms", label: "Health Tracking", icon: <Heart className="h-4 w-4 mr-2" /> },
+      { to: "/profile", label: "My Profile", icon: <User className="h-4 w-4 mr-2" /> },
+      { to: "/settings", label: "Settings", icon: <Settings className="h-4 w-4 mr-2" /> },
+    ];
+  }, [isHealthPersonnel, isAdmin, availableRoles]);
 
   return (
     <header className="bg-background sticky top-0 z-50 border-b border-border" role="banner">
@@ -99,7 +235,7 @@ export function DesktopNav() {
               </Link>
             ))}
 
-            <DesktopNavMenu secondaryNavItems={secondaryNavItems.filter(item => hasRoutePermission(availableRoles, item.to))} />
+            {isAuthenticated && <DesktopNavMenu secondaryNavItems={secondaryNavItems} />}
           </nav>
         </div>
 

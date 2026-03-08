@@ -10,7 +10,8 @@ import { AccessibilityMenu } from '@/components/AccessibilityMenu';
 import { useAuth } from "@/context/AuthContext";
 import { useUserRoles } from "@/context/UserRolesContext";
 import { NavigateFunction } from "react-router-dom";
-import { 
+import { useMemo } from "react";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -29,24 +30,72 @@ interface HeaderControlsProps {
 
 export const HeaderControls = ({ isMenuOpen, setIsMenuOpen, navigate }: HeaderControlsProps) => {
   const { isAuthenticated, signOut, profile, user } = useAuth();
-  const { currentRole } = useUserRoles();
+  const { availableRoles, isHealthPersonnel, isAdmin } = useUserRoles();
 
   const handleLogout = async () => {
     try {
       await signOut();
-      navigate("/login");
+      navigate("/auth");
       toast.success("Signed out successfully");
     } catch (error) {
       toast.error("Error signing out");
     }
   };
 
-  const getProfileDashboardLink = () => {
-    if (currentRole === 'health_personnel') return '/provider-dashboard';
-    if (currentRole === 'admin') return '/admin-dashboard';
-    if (currentRole === 'institution_admin') return '/institution-dashboard';
-    return '/profile'; // Default for patients or unknown roles
-  };
+  // Role-specific dashboard link
+  const dashboardLink = useMemo(() => {
+    if (availableRoles.includes('nurse') && !availableRoles.some(r => ['institution_admin', 'institution_staff'].includes(r))) return '/provider-dashboard';
+    if (isHealthPersonnel || availableRoles.some(r => ['doctor', 'radiologist'].includes(r))) return '/provider-dashboard';
+    if (availableRoles.some(r => ['pharmacy', 'pharmacist'].includes(r))) return '/pharmacy-portal';
+    if (isAdmin) return '/admin-dashboard';
+    if (availableRoles.some(r => ['institution_admin', 'institution_staff'].includes(r))) return '/institution-dashboard';
+    if (availableRoles.some(r => ['lab', 'lab_technician'].includes(r))) return '/lab-management';
+    return '/home';
+  }, [availableRoles, isHealthPersonnel, isAdmin]);
+
+  // Role-specific quick items for the dropdown
+  const quickItems = useMemo(() => {
+    if (isHealthPersonnel || availableRoles.some(r => ['doctor', 'nurse', 'radiologist'].includes(r))) {
+      return [
+        { label: "My Dashboard", path: "/provider-dashboard" },
+        { label: "Patient Appointments", path: "/appointments" },
+        { label: "Profile", path: "/profile" },
+      ];
+    }
+    if (availableRoles.some(r => ['pharmacy', 'pharmacist'].includes(r))) {
+      return [
+        { label: "Pharmacy Portal", path: "/pharmacy-portal" },
+        { label: "Inventory", path: "/pharmacy-inventory" },
+        { label: "Profile", path: "/profile" },
+      ];
+    }
+    if (isAdmin) {
+      return [
+        { label: "Admin Dashboard", path: "/admin-dashboard" },
+        { label: "Applications", path: "/healthcare-application" },
+        { label: "Profile", path: "/profile" },
+      ];
+    }
+    if (availableRoles.some(r => ['institution_admin', 'institution_staff'].includes(r))) {
+      return [
+        { label: "Institution Dashboard", path: "/institution-dashboard" },
+        { label: "Staff", path: "/institution/personnel" },
+        { label: "Profile", path: "/profile" },
+      ];
+    }
+    if (availableRoles.some(r => ['lab', 'lab_technician'].includes(r))) {
+      return [
+        { label: "Lab Dashboard", path: "/lab-management" },
+        { label: "Profile", path: "/profile" },
+      ];
+    }
+    // Patient
+    return [
+      { label: "My Dashboard", path: "/home" },
+      { label: "My Appointments", path: "/appointments" },
+      { label: "Profile Settings", path: "/profile" },
+    ];
+  }, [availableRoles, isHealthPersonnel, isAdmin]);
 
   return (
     <div className="flex items-center gap-2">
@@ -69,15 +118,11 @@ export const HeaderControls = ({ isMenuOpen, setIsMenuOpen, navigate }: HeaderCo
                 {profile?.first_name ? `${profile.first_name} ${profile.last_name || ''}` : user?.email}
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => navigate(getProfileDashboardLink())}>
-                My Dashboard
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate('/appointments')}>
-                My Appointments
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate('/profile-setup')}>
-                Profile Settings
-              </DropdownMenuItem>
+              {quickItems.map((item) => (
+                <DropdownMenuItem key={item.path} onClick={() => navigate(item.path)}>
+                  {item.label}
+                </DropdownMenuItem>
+              ))}
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleLogout}>
                 Sign Out

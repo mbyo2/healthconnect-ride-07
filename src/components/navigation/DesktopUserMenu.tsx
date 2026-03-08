@@ -10,8 +10,10 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User, Calendar, Users, Settings, Heart } from "lucide-react";
+import { User, Calendar, Users, Settings, Heart, Stethoscope, Shield, Building2, Package, Activity, Wallet } from "lucide-react";
 import { User as SupabaseUser } from "@supabase/supabase-js";
+import { useUserRoles } from "@/context/UserRolesContext";
+import { useMemo } from "react";
 
 interface Profile {
   role?: string;
@@ -26,6 +28,80 @@ interface DesktopUserMenuProps {
 }
 
 export function DesktopUserMenu({ user, profile, onLogout }: DesktopUserMenuProps) {
+  const { availableRoles, isHealthPersonnel, isAdmin } = useUserRoles();
+
+  const menuItems = useMemo(() => {
+    // Nurse (solo)
+    if (availableRoles.includes('nurse') && !availableRoles.some(r => ['institution_admin', 'institution_staff'].includes(r))) {
+      return [
+        { to: "/provider-dashboard", label: "Nurse Dashboard", icon: <Stethoscope className="h-4 w-4" /> },
+        { to: "/appointments", label: "Patient Visits", icon: <Calendar className="h-4 w-4" /> },
+        { to: "/wallet", label: "Earnings", icon: <Wallet className="h-4 w-4" /> },
+        { to: "/profile", label: "Profile", icon: <User className="h-4 w-4" /> },
+        { to: "/settings", label: "Settings", icon: <Settings className="h-4 w-4" /> },
+      ];
+    }
+
+    // Doctor / Health Personnel / Radiologist
+    if (isHealthPersonnel || availableRoles.some(r => ['doctor', 'radiologist'].includes(r))) {
+      return [
+        { to: "/provider-dashboard", label: "Provider Dashboard", icon: <Stethoscope className="h-4 w-4" /> },
+        { to: "/appointments", label: "Patient Appointments", icon: <Calendar className="h-4 w-4" /> },
+        { to: "/connections", label: "My Patients", icon: <Users className="h-4 w-4" /> },
+        { to: "/wallet", label: "Earnings", icon: <Wallet className="h-4 w-4" /> },
+        { to: "/profile", label: "Professional Profile", icon: <User className="h-4 w-4" /> },
+        { to: "/settings", label: "Settings", icon: <Settings className="h-4 w-4" /> },
+      ];
+    }
+
+    // Pharmacy / Pharmacist
+    if (availableRoles.some(r => ['pharmacy', 'pharmacist'].includes(r))) {
+      return [
+        { to: "/pharmacy-portal", label: "Pharmacy Portal", icon: <Package className="h-4 w-4" /> },
+        { to: "/wallet", label: "Revenue", icon: <Wallet className="h-4 w-4" /> },
+        { to: "/profile", label: "Pharmacy Profile", icon: <User className="h-4 w-4" /> },
+        { to: "/settings", label: "Settings", icon: <Settings className="h-4 w-4" /> },
+      ];
+    }
+
+    // Admin
+    if (isAdmin) {
+      return [
+        { to: "/admin-dashboard", label: "Admin Dashboard", icon: <Shield className="h-4 w-4" /> },
+        { to: "/wallet", label: "Finances", icon: <Wallet className="h-4 w-4" /> },
+        { to: "/profile", label: "Profile", icon: <User className="h-4 w-4" /> },
+        { to: "/settings", label: "Settings", icon: <Settings className="h-4 w-4" /> },
+      ];
+    }
+
+    // Institution Admin/Staff
+    if (availableRoles.some(r => ['institution_admin', 'institution_staff'].includes(r))) {
+      return [
+        { to: "/institution-dashboard", label: "Institution Dashboard", icon: <Building2 className="h-4 w-4" /> },
+        { to: "/wallet", label: "Finances", icon: <Wallet className="h-4 w-4" /> },
+        { to: "/profile", label: "Profile", icon: <User className="h-4 w-4" /> },
+        { to: "/settings", label: "Settings", icon: <Settings className="h-4 w-4" /> },
+      ];
+    }
+
+    // Lab / Lab Technician
+    if (availableRoles.some(r => ['lab', 'lab_technician'].includes(r))) {
+      return [
+        { to: "/lab-management", label: "Lab Dashboard", icon: <Activity className="h-4 w-4" /> },
+        { to: "/profile", label: "Profile", icon: <User className="h-4 w-4" /> },
+        { to: "/settings", label: "Settings", icon: <Settings className="h-4 w-4" /> },
+      ];
+    }
+
+    // Default: Patient
+    return [
+      { to: "/profile", label: "My Profile", icon: <User className="h-4 w-4" /> },
+      { to: "/appointments", label: "My Appointments", icon: <Calendar className="h-4 w-4" /> },
+      { to: "/connections", label: "My Providers", icon: <Users className="h-4 w-4" /> },
+      { to: "/settings", label: "Settings", icon: <Settings className="h-4 w-4" /> },
+    ];
+  }, [availableRoles, isHealthPersonnel, isAdmin]);
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -44,43 +120,13 @@ export function DesktopUserMenu({ user, profile, onLogout }: DesktopUserMenuProp
           <div className="text-xs text-muted-foreground">My Account</div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <Link to="/profile" className="flex items-center gap-2">
-            <User className="h-4 w-4" /> My Profile
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link to="/appointments" className="flex items-center gap-2">
-            <Calendar className="h-4 w-4" /> My Appointments
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link to="/connections" className="flex items-center gap-2">
-            <Users className="h-4 w-4" /> My Providers
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link to="/settings" className="flex items-center gap-2">
-            <Settings className="h-4 w-4" /> Settings
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-
-        {profile?.role === "health_personnel" && (
-          <DropdownMenuItem asChild>
-            <Link to="/provider-dashboard" className="flex items-center gap-2">
-              <Heart className="h-4 w-4" /> Provider Dashboard
+        {menuItems.map((item) => (
+          <DropdownMenuItem key={item.to} asChild>
+            <Link to={item.to} className="flex items-center gap-2">
+              {item.icon} {item.label}
             </Link>
           </DropdownMenuItem>
-        )}
-
-        {(profile?.admin_level === "admin" || profile?.admin_level === "superadmin") && (
-          <DropdownMenuItem asChild>
-            <Link to="/admin-dashboard" className="flex items-center gap-2">
-              <Settings className="h-4 w-4" /> Admin Dashboard
-            </Link>
-          </DropdownMenuItem>
-        )}
+        ))}
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onSelect={(e) => { e.preventDefault(); onLogout(); }}
