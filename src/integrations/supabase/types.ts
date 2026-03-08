@@ -355,6 +355,42 @@ export type Database = {
           },
         ]
       }
+      booking_fees: {
+        Row: {
+          amount: number
+          appointment_id: string
+          charged_at: string | null
+          created_at: string
+          currency: string
+          id: string
+          patient_id: string
+          provider_id: string
+          status: string
+        }
+        Insert: {
+          amount?: number
+          appointment_id: string
+          charged_at?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          patient_id: string
+          provider_id: string
+          status?: string
+        }
+        Update: {
+          amount?: number
+          appointment_id?: string
+          charged_at?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          patient_id?: string
+          provider_id?: string
+          status?: string
+        }
+        Relationships: []
+      }
       chat_attachments: {
         Row: {
           created_at: string | null
@@ -5216,6 +5252,7 @@ export type Database = {
       }
       subscription_plans: {
         Row: {
+          booking_fee: number | null
           created_at: string | null
           currency: string
           description: string | null
@@ -5224,7 +5261,11 @@ export type Database = {
           id: string
           is_active: boolean
           limits: Json | null
+          max_beds: number | null
+          max_doctors: number | null
+          max_users: number | null
           name: string
+          plan_type: string
           price_annual: number
           price_monthly: number
           slug: string
@@ -5233,6 +5274,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          booking_fee?: number | null
           created_at?: string | null
           currency?: string
           description?: string | null
@@ -5241,7 +5283,11 @@ export type Database = {
           id?: string
           is_active?: boolean
           limits?: Json | null
+          max_beds?: number | null
+          max_doctors?: number | null
+          max_users?: number | null
           name: string
+          plan_type?: string
           price_annual?: number
           price_monthly?: number
           slug: string
@@ -5250,6 +5296,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          booking_fee?: number | null
           created_at?: string | null
           currency?: string
           description?: string | null
@@ -5258,7 +5305,11 @@ export type Database = {
           id?: string
           is_active?: boolean
           limits?: Json | null
+          max_beds?: number | null
+          max_doctors?: number | null
+          max_users?: number | null
           name?: string
+          plan_type?: string
           price_annual?: number
           price_monthly?: number
           slug?: string
