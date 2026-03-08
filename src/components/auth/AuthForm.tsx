@@ -213,7 +213,14 @@ export const AuthForm = ({ mode = 'login' }: AuthFormProps) => {
             </Button>
           </form>
         </TabsContent>
-      </Tabs>
+          </Tabs>
+          <div className="mt-4 text-center">
+            <Button variant="outline" className="w-full gap-2" onClick={() => setShowPhoneOTP(true)}>
+              📱 Sign in with Phone (SMS OTP)
+            </Button>
+          </div>
+        </>
+      )}
     </div>
   );
 };
