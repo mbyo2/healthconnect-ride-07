@@ -125,6 +125,7 @@ export const BookingModal = ({ provider, isOpen, onClose }: BookingModalProps) =
         <ChevronLeft className="h-4 w-4 mr-1" />
         Back
       </Button>
+      <div className="text-center pb-4 border-b border-border">
         <div className="flex items-center justify-center gap-3 mb-2">
           {provider.avatar_url ? (
             <img src={provider.avatar_url} alt="" className="w-16 h-16 rounded-full object-cover" />
