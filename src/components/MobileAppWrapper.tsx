@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from 'react';
 import { useDeviceCapabilities } from '@/hooks/use-device-capabilities';
-import { useSupabaseClient, useSession as useSupabaseSession } from '@supabase/auth-helpers-react';
+import { useAuth } from '@/context/AuthContext';
 import { useNetwork } from '@/hooks/use-network';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
