@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useBattery } from './use-battery';
 import { useNetwork } from './use-network';
 
@@ -27,27 +27,17 @@ interface DeviceCapabilities {
 }
 
 export function useDeviceCapabilities() {
-  const [capabilities, setCapabilities] = useState<DeviceCapabilities>({
+  const [staticCaps, setStaticCaps] = useState({
     hasCamera: false,
     hasMicrophone: false,
-    hasGeolocation: 'geolocation' in navigator,
-    hasNotificationSupport: 'Notification' in window,
-    hasVibration: 'vibrate' in navigator,
-    hasOrientation: 'DeviceOrientationEvent' in window,
+    hasGeolocation: typeof navigator !== 'undefined' && 'geolocation' in navigator,
+    hasNotificationSupport: typeof window !== 'undefined' && 'Notification' in window,
+    hasVibration: typeof navigator !== 'undefined' && 'vibrate' in navigator,
+    hasOrientation: typeof window !== 'undefined' && 'DeviceOrientationEvent' in window,
     hasTouchscreen: false,
-    hasBiometrics: null,
-    hasMotionSensors: 'DeviceMotionEvent' in window,
-    battery: {
-      level: null,
-      charging: null,
-      chargingTime: null,
-      dischargingTime: null,
-    },
-    network: {
-      isOnline: navigator.onLine,
-      connectionQuality: 'unknown',
-    },
-    isCapacitor: typeof (window as any).Capacitor !== 'undefined',
+    hasBiometrics: null as boolean | null,
+    hasMotionSensors: typeof window !== 'undefined' && 'DeviceMotionEvent' in window,
+    isCapacitor: typeof window !== 'undefined' && typeof (window as any).Capacitor !== 'undefined',
   });
 
   const battery = useBattery();
@@ -56,90 +46,55 @@ export function useDeviceCapabilities() {
   useEffect(() => {
     const checkMediaDevices = async () => {
       try {
-        if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
-          return;
-        }
-
+        if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) return;
         const devices = await navigator.mediaDevices.enumerateDevices();
         const hasCamera = devices.some(device => device.kind === 'videoinput');
         const hasMicrophone = devices.some(device => device.kind === 'audioinput');
-
-        setCapabilities(prev => ({
-          ...prev,
-          hasCamera,
-          hasMicrophone,
-        }));
+        setStaticCaps(prev => ({ ...prev, hasCamera, hasMicrophone }));
       } catch (err) {
         console.error('Error checking media devices:', err);
       }
     };
 
-    const checkTouchscreen = () => {
-      const hasTouchscreen = (
-        'ontouchstart' in window ||
-        navigator.maxTouchPoints > 0 ||
-        (navigator as any).msMaxTouchPoints > 0
-      );
-
-      setCapabilities(prev => ({
-        ...prev,
-        hasTouchscreen,
-      }));
-    };
+    const hasTouchscreen = (
+      'ontouchstart' in window ||
+      navigator.maxTouchPoints > 0 ||
+      (navigator as any).msMaxTouchPoints > 0
+    );
+    setStaticCaps(prev => ({ ...prev, hasTouchscreen }));
 
     const checkBiometrics = async () => {
       try {
         if (window.PublicKeyCredential) {
           const available = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
-          setCapabilities(prev => ({
-            ...prev,
-            hasBiometrics: available,
-          }));
+          setStaticCaps(prev => ({ ...prev, hasBiometrics: available }));
         } else {
-          setCapabilities(prev => ({
-            ...prev,
-            hasBiometrics: false,
-          }));
+          setStaticCaps(prev => ({ ...prev, hasBiometrics: false }));
         }
-      } catch (err) {
-        console.error('Error checking biometrics:', err);
-        setCapabilities(prev => ({
-          ...prev,
-          hasBiometrics: false,
-        }));
+      } catch {
+        setStaticCaps(prev => ({ ...prev, hasBiometrics: false }));
       }
     };
 
     checkMediaDevices();
-    checkTouchscreen();
     checkBiometrics();
   }, []);
 
-  // Update battery status when it changes
-  useEffect(() => {
-    setCapabilities(prev => ({
-      ...prev,
-      battery: {
-        level: battery.batteryLevel,
-        charging: battery.isCharging,
-        chargingTime: battery.chargingTime,
-        dischargingTime: battery.dischargingTime,
-      },
-    }));
-  }, [battery]);
+  // Memoize battery object to avoid new references
+  const batteryInfo = useMemo(() => ({
+    level: battery.batteryLevel,
+    charging: battery.isCharging,
+    chargingTime: battery.chargingTime,
+    dischargingTime: battery.dischargingTime,
+  }), [battery.batteryLevel, battery.isCharging, battery.chargingTime, battery.dischargingTime]);
 
-  // Update network status when it changes
-  useEffect(() => {
-    setCapabilities(prev => ({
-      ...prev,
-      network: {
-        isOnline: network.isOnline,
-        connectionQuality: network.connectionQuality,
-      },
-    }));
-  }, [network]);
+  // Memoize network object
+  const networkInfo = useMemo(() => ({
+    isOnline: network.isOnline,
+    connectionQuality: network.connectionQuality,
+  }), [network.isOnline, network.connectionQuality]);
 
-  const requestPermission = async (permission: 'camera' | 'microphone' | 'geolocation' | 'notifications') => {
+  const requestPermission = useCallback(async (permission: 'camera' | 'microphone' | 'geolocation' | 'notifications') => {
     try {
       switch (permission) {
         case 'camera':
@@ -149,47 +104,37 @@ export function useDeviceCapabilities() {
             video: permission === 'camera',
           };
           const stream = await navigator.mediaDevices.getUserMedia(constraints);
-          stream.getTracks().forEach(track => track.stop()); // Clean up
+          stream.getTracks().forEach(track => track.stop());
           return true;
         }
         case 'geolocation': {
-          if (!window.isSecureContext) {
-            console.warn('Geolocation requires a secure context (HTTPS)');
-            return false;
-          }
+          if (!window.isSecureContext) return false;
           return new Promise<boolean>((resolve) => {
-            try {
-              navigator.geolocation.getCurrentPosition(
-                () => resolve(true),
-                () => resolve(false),
-                {
-                  enableHighAccuracy: false,
-                  timeout: 5000,
-                  maximumAge: 0
-                }
-              );
-            } catch (error) {
-              console.error('Geolocation error:', error);
-              resolve(false);
-            }
+            navigator.geolocation.getCurrentPosition(
+              () => resolve(true),
+              () => resolve(false),
+              { enableHighAccuracy: false, timeout: 5000, maximumAge: 0 }
+            );
           });
         }
         case 'notifications': {
           if (!('Notification' in window)) return false;
-          const permission = await Notification.requestPermission();
-          return permission === 'granted';
+          const perm = await Notification.requestPermission();
+          return perm === 'granted';
         }
         default:
           return false;
       }
-    } catch (err) {
-      console.error(`Error requesting ${permission} permission:`, err);
+    } catch {
       return false;
     }
-  };
+  }, []);
 
-  return {
-    ...capabilities,
+  // Return a stable object using useMemo with primitive deps
+  return useMemo(() => ({
+    ...staticCaps,
+    battery: batteryInfo,
+    network: networkInfo,
     requestPermission,
-  };
+  }), [staticCaps, batteryInfo, networkInfo, requestPermission]);
 }

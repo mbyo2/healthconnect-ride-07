@@ -1,11 +1,10 @@
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useDeviceCapabilities } from '@/hooks/use-device-capabilities';
 import { useAuth } from '@/context/AuthContext';
-import { useNetwork } from '@/hooks/use-network';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { Battery, BatteryLow, WifiOff } from 'lucide-react';
+import { BatteryLow } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface MobileAppWrapperProps {
@@ -14,58 +13,44 @@ interface MobileAppWrapperProps {
 
 export function MobileAppWrapper({ children }: MobileAppWrapperProps) {
   const capabilities = useDeviceCapabilities();
-  const { isOnline } = useNetwork();
   const { session } = useAuth();
   const [lowPowerMode, setLowPowerMode] = useState(false);
-  const [hasRequestedPermissions, setHasRequestedPermissions] = useState(false);
-  const [batteryWarningShown, setBatteryWarningShown] = useState(false);
+  const hasRequestedPermissions = useRef(false);
+  const batteryWarningShown = useRef(false);
 
-  // App behavior for low battery - with stable dependency array
+  const batteryLevel = capabilities.battery.level;
+  const batteryCharging = capabilities.battery.charging;
+  const isOnline = capabilities.network.isOnline;
+
+  // Battery warning - use primitive deps only
   useEffect(() => {
-    if (capabilities.battery.level !== null && 
-        capabilities.battery.level <= 0.15 && 
-        !capabilities.battery.charging && 
-        !batteryWarningShown) {
+    if (batteryLevel !== null && batteryLevel <= 0.15 && !batteryCharging && !batteryWarningShown.current) {
       setLowPowerMode(true);
-      setBatteryWarningShown(true);
-      toast.warning("Battery is low. Enabling power saving mode.", {
-        duration: 5000,
-      });
-    } else if (capabilities.battery.level !== null && 
-               (capabilities.battery.level > 0.15 || capabilities.battery.charging) && 
-               batteryWarningShown) {
+      batteryWarningShown.current = true;
+      toast.warning("Battery is low. Enabling power saving mode.", { duration: 5000 });
+    } else if (batteryLevel !== null && (batteryLevel > 0.15 || batteryCharging) && batteryWarningShown.current) {
       setLowPowerMode(false);
-      setBatteryWarningShown(false);
+      batteryWarningShown.current = false;
     }
-  }, [capabilities.battery.level, capabilities.battery.charging, batteryWarningShown]);
+  }, [batteryLevel, batteryCharging]);
 
-  // Request necessary permissions when logged in - with stable dependency array
+  // Request permissions once when logged in
   useEffect(() => {
-    const requestPermissions = async () => {
-      if (session && !hasRequestedPermissions && capabilities.isCapacitor) {
-        setHasRequestedPermissions(true);
-        
-        // Request critical permissions for app functionality
-        const notificationPermission = await capabilities.requestPermission('notifications');
-        if (!notificationPermission) {
-          toast.info("Please enable notifications for appointment reminders", {
-            action: {
-              label: "Enable",
-              onClick: () => capabilities.requestPermission('notifications')
-            }
-          });
+    if (session && !hasRequestedPermissions.current && capabilities.isCapacitor) {
+      hasRequestedPermissions.current = true;
+      capabilities.requestPermission('notifications').then((granted) => {
+        if (!granted) {
+          toast.info("Please enable notifications for appointment reminders");
         }
-      }
-    };
-    
-    requestPermissions();
-  }, [session, hasRequestedPermissions, capabilities]);
+      });
+    }
+  }, [session, capabilities.isCapacitor, capabilities.requestPermission]);
 
-  // Handle app going offline - with stable dependency array
+  // Offline toast
   useEffect(() => {
     if (!isOnline) {
       toast.error("You're offline. Some features may be limited.", {
-        duration: 0, // Won't dismiss until online again
+        duration: 0,
         id: "offline-toast"
       });
     } else {
@@ -74,12 +59,12 @@ export function MobileAppWrapper({ children }: MobileAppWrapperProps) {
   }, [isOnline]);
 
   return (
-    <div className={`${lowPowerMode ? 'low-power-mode' : ''}`}>
-      {capabilities.battery.level !== null && capabilities.battery.level <= 0.1 && !capabilities.battery.charging && (
-        <Alert className="mb-2 border-red-300 bg-red-50 dark:bg-red-900/20 sticky top-0 z-50">
-          <BatteryLow className="h-4 w-4 text-red-600 dark:text-red-400" />
-          <AlertDescription className="text-red-600 dark:text-red-400 flex items-center justify-between">
-            <span>Battery critically low ({Math.round(capabilities.battery.level * 100)}%)</span>
+    <div className={lowPowerMode ? 'low-power-mode' : ''}>
+      {batteryLevel !== null && batteryLevel <= 0.1 && !batteryCharging && (
+        <Alert className="mb-2 border-destructive/30 bg-destructive/10 sticky top-0 z-50">
+          <BatteryLow className="h-4 w-4 text-destructive" />
+          <AlertDescription className="text-destructive flex items-center justify-between">
+            <span>Battery critically low ({Math.round(batteryLevel * 100)}%)</span>
             <Button
               size="sm"
               variant="ghost"
@@ -97,17 +82,13 @@ export function MobileAppWrapper({ children }: MobileAppWrapperProps) {
       {capabilities.isCapacitor && (
         <style dangerouslySetInnerHTML={{
           __html: `
-            .low-power-mode {
-              /* Reduce animations */
-              * {
-                transition: none !important;
-                animation: none !important;
-              }
-              /* Use darker colors for OLED screens */
-              .dark {
-                --background: #000000;
-                --card: #0a0a0a;
-              }
+            .low-power-mode * {
+              transition: none !important;
+              animation: none !important;
+            }
+            .low-power-mode .dark {
+              --background: 0 0% 0%;
+              --card: 0 0% 4%;
             }
           `
         }} />
