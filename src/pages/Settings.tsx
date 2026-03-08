@@ -471,7 +471,7 @@ const Settings = () => {
           </Card>
 
           {/* Regional Settings */}
-          <Card className="border-trust-100 shadow-trust">
+          <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-foreground">
                 <Globe className="h-5 w-5" />

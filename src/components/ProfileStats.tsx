@@ -23,26 +23,22 @@ export const ProfileStats = ({ userId }: ProfileStatsProps) => {
       if (!userId) return;
 
       try {
-        // Fetch appointment count
         const { count: appointmentCount } = await supabase
           .from('appointments')
           .select('*', { count: 'exact', head: true })
           .eq('patient_id', userId);
 
-        // Fetch provider connections count
         const { count: connectionsCount } = await supabase
           .from('user_connections')
           .select('*', { count: 'exact', head: true })
           .eq('patient_id', userId)
           .eq('status', 'approved');
 
-        // Fetch prescriptions count
         const { count: prescriptionsCount } = await supabase
           .from('comprehensive_prescriptions')
           .select('*', { count: 'exact', head: true })
           .eq('patient_id', userId);
 
-        // Calculate unique providers from appointments
         const { data: appointmentProviders } = await supabase
           .from('appointments')
           .select('provider_id')
@@ -76,32 +72,23 @@ export const ProfileStats = ({ userId }: ProfileStatsProps) => {
     );
   }
 
+  const statItems = [
+    { value: stats.appointments, label: "Appointments" },
+    { value: stats.providers, label: "Providers" },
+    { value: stats.prescriptions, label: "Prescriptions" },
+    { value: stats.connections, label: "Connections" },
+  ];
+
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-      <Card className="border-trust-100 shadow-trust">
-        <CardContent className="pt-4 text-center">
-          <div className="text-2xl font-bold text-trust-600">{stats.appointments}</div>
-          <div className="text-sm text-muted-foreground">Appointments</div>
-        </CardContent>
-      </Card>
-      <Card className="border-trust-100 shadow-trust">
-        <CardContent className="pt-4 text-center">
-          <div className="text-2xl font-bold text-trust-600">{stats.providers}</div>
-          <div className="text-sm text-muted-foreground">Providers</div>
-        </CardContent>
-      </Card>
-      <Card className="border-trust-100 shadow-trust">
-        <CardContent className="pt-4 text-center">
-          <div className="text-2xl font-bold text-trust-600">{stats.prescriptions}</div>
-          <div className="text-sm text-muted-foreground">Prescriptions</div>
-        </CardContent>
-      </Card>
-      <Card className="border-trust-100 shadow-trust">
-        <CardContent className="pt-4 text-center">
-          <div className="text-2xl font-bold text-trust-600">{stats.connections}</div>
-          <div className="text-sm text-muted-foreground">Connections</div>
-        </CardContent>
-      </Card>
+      {statItems.map((item) => (
+        <Card key={item.label}>
+          <CardContent className="pt-4 text-center">
+            <div className="text-2xl font-bold text-primary">{item.value}</div>
+            <div className="text-sm text-muted-foreground">{item.label}</div>
+          </CardContent>
+        </Card>
+      ))}
     </div>
   );
 };
