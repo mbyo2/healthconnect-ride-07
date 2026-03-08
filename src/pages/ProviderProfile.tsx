@@ -189,18 +189,13 @@ const ProviderProfile = () => {
                 <Card className="p-6">
                   <h2 className="text-xl font-bold mb-4">Specialties</h2>
                   <div className="flex flex-wrap gap-2">
-                    <Badge>{provider.specialty}</Badge>
-                    <Badge>Primary Care</Badge>
-                    <Badge>Family Medicine</Badge>
-                  </div>
-                </Card>
-
-                <Card className="p-6">
-                  <h2 className="text-xl font-bold mb-4">Languages</h2>
-                  <div className="flex flex-wrap gap-2">
-                    <Badge variant="outline">English</Badge>
-                    <Badge variant="outline">Nyanja</Badge>
-                    <Badge variant="outline">Bemba</Badge>
+                    {provider.specialty ? (
+                      provider.specialty.split(',').map((s: string) => (
+                        <Badge key={s.trim()}>{s.trim()}</Badge>
+                      ))
+                    ) : (
+                      <p className="text-sm text-muted-foreground">No specialties listed</p>
+                    )}
                   </div>
                 </Card>
               </TabsContent>
@@ -212,23 +207,13 @@ const ProviderProfile = () => {
               <TabsContent value="experience">
                 <Card className="p-6">
                   <h2 className="text-xl font-bold mb-4">Professional Experience</h2>
-                  <div className="space-y-4">
-                    <div className="border-l-2 border-primary pl-4 pb-6">
-                      <p className="font-semibold">Senior Doctor</p>
-                      <p className="text-sm text-muted-foreground">University Teaching Hospital, Lusaka</p>
-                      <p className="text-sm text-muted-foreground">2018 - Present</p>
-                    </div>
-                    <div className="border-l-2 border-primary pl-4 pb-6">
-                      <p className="font-semibold">Resident Physician</p>
-                      <p className="text-sm text-muted-foreground">Levy Mwanawasa General Hospital</p>
-                      <p className="text-sm text-muted-foreground">2015 - 2018</p>
-                    </div>
-                    <div className="border-l-2 border-primary pl-4">
-                      <p className="font-semibold">Medical Intern</p>
-                      <p className="text-sm text-muted-foreground">Ndola Teaching Hospital</p>
-                      <p className="text-sm text-muted-foreground">2014 - 2015</p>
-                    </div>
-                  </div>
+                  {provider.years_experience ? (
+                    <p className="text-muted-foreground">
+                      {provider.years_experience} years of professional experience in {provider.specialty || 'healthcare'}.
+                    </p>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">No experience information available yet.</p>
+                  )}
                 </Card>
               </TabsContent>
 
