@@ -53,7 +53,9 @@ interface MedGemmaChatProps {
 
 const STORAGE_KEY = 'medgemma_chat_history';
 
-export const MedGemmaChat = ({ onActionClick }: MedGemmaChatProps) => {
+export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps) => {
+  const { currentRole, userRole } = useUserRoles();
+  const activeRole = roleOverride || currentRole || userRole || 'patient';
   // Load messages from localStorage on mount
   const [messages, setMessages] = useState<Message[]>(() => {
     try {
