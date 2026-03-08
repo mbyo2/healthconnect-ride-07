@@ -28,6 +28,11 @@ import { ReferralManagement } from '@/components/hospital/ReferralManagement';
 import { BloodBank } from '@/components/hospital/BloodBank';
 import { CSSDManagement } from '@/components/hospital/CSSDManagement';
 import { DietManagement } from '@/components/hospital/DietManagement';
+// New MocDoc-parity modules
+import { InfectionManagement } from '@/components/clinical/InfectionManagement';
+import { NotificationCenter } from '@/components/hospital/NotificationCenter';
+import { PatientFeedback } from '@/components/hospital/PatientFeedback';
+import { SecurityManagement } from '@/components/hospital/SecurityManagement';
 
 const HospitalManagement = () => {
   const { user } = useAuth();
@@ -144,6 +149,7 @@ const HospitalManagement = () => {
         <div className="overflow-x-auto pb-2">
           <TabsList className="inline-flex w-auto min-w-full sm:min-w-0 flex-wrap h-auto gap-1">
             <TabsTrigger value="dashboard" className="text-xs">Dashboard</TabsTrigger>
+            <TabsTrigger value="notifications" className="text-xs">🔔 Alerts</TabsTrigger>
             <TabsTrigger value="emr" className="text-xs">EMR</TabsTrigger>
             <TabsTrigger value="opd" className="text-xs">OPD</TabsTrigger>
             <TabsTrigger value="ipd" className="text-xs">IPD/ADT</TabsTrigger>
@@ -162,9 +168,12 @@ const HospitalManagement = () => {
             <TabsTrigger value="bloodbank" className="text-xs">Blood Bank</TabsTrigger>
             <TabsTrigger value="cssd" className="text-xs">CSSD</TabsTrigger>
             <TabsTrigger value="diet" className="text-xs">Diet</TabsTrigger>
+            <TabsTrigger value="infection" className="text-xs">Infection</TabsTrigger>
+            <TabsTrigger value="feedback" className="text-xs">Feedback</TabsTrigger>
             <TabsTrigger value="referrals" className="text-xs">Referrals</TabsTrigger>
             <TabsTrigger value="staff" className="text-xs">Staff</TabsTrigger>
             <TabsTrigger value="departments" className="text-xs">Departments</TabsTrigger>
+            <TabsTrigger value="security" className="text-xs">Security</TabsTrigger>
             <TabsTrigger value="mis" className="text-xs">MIS Reports</TabsTrigger>
           </TabsList>
         </div>
@@ -172,6 +181,7 @@ const HospitalManagement = () => {
         <TabsContent value="dashboard">
           <HMSDashboard hospital={hospital} departments={departments} beds={beds} admissions={admissions} invoices={invoices} />
         </TabsContent>
+        <TabsContent value="notifications"><NotificationCenter hospitalId={hospital.id} /></TabsContent>
         <TabsContent value="emr"><EMRCaseSheets hospital={hospital} departments={departments} /></TabsContent>
         <TabsContent value="opd"><OPDManagement hospital={hospital} departments={departments} /></TabsContent>
         <TabsContent value="ipd"><IPDManagement hospital={hospital} departments={departments} beds={beds} admissions={admissions} onRefresh={refreshAll} /></TabsContent>
@@ -190,9 +200,12 @@ const HospitalManagement = () => {
         <TabsContent value="bloodbank"><BloodBank hospital={hospital} /></TabsContent>
         <TabsContent value="cssd"><CSSDManagement hospital={hospital} /></TabsContent>
         <TabsContent value="diet"><DietManagement hospital={hospital} /></TabsContent>
+        <TabsContent value="infection"><InfectionManagement hospital={hospital} /></TabsContent>
+        <TabsContent value="feedback"><PatientFeedback hospital={hospital} /></TabsContent>
         <TabsContent value="referrals"><ReferralManagement hospital={hospital} /></TabsContent>
         <TabsContent value="staff"><StaffRoster hospital={hospital} departments={departments} /></TabsContent>
         <TabsContent value="departments"><DepartmentManagement hospital={hospital} departments={departments} onRefresh={refreshAll} /></TabsContent>
+        <TabsContent value="security"><SecurityManagement hospital={hospital} /></TabsContent>
         <TabsContent value="mis"><MISReports hospital={hospital} /></TabsContent>
       </Tabs>
     </div>

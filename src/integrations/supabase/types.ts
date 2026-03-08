@@ -821,6 +821,164 @@ export type Database = {
           },
         ]
       }
+      discharge_checklists: {
+        Row: {
+          admission_id: string
+          all_cleared: boolean | null
+          billing_clearance: boolean | null
+          billing_cleared_at: string | null
+          billing_cleared_by: string | null
+          created_at: string | null
+          discharge_summary_clearance: boolean | null
+          education_completed_at: string | null
+          education_completed_by: string | null
+          hospital_id: string
+          id: string
+          medical_clearance: boolean | null
+          medical_cleared_at: string | null
+          medical_cleared_by: string | null
+          medication_reconciled_at: string | null
+          medication_reconciled_by: string | null
+          medication_reconciliation: boolean | null
+          nursing_clearance: boolean | null
+          nursing_cleared_at: string | null
+          nursing_cleared_by: string | null
+          patient_education_completed: boolean | null
+          patient_id: string
+          summary_cleared_at: string | null
+          summary_cleared_by: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          admission_id: string
+          all_cleared?: boolean | null
+          billing_clearance?: boolean | null
+          billing_cleared_at?: string | null
+          billing_cleared_by?: string | null
+          created_at?: string | null
+          discharge_summary_clearance?: boolean | null
+          education_completed_at?: string | null
+          education_completed_by?: string | null
+          hospital_id: string
+          id?: string
+          medical_clearance?: boolean | null
+          medical_cleared_at?: string | null
+          medical_cleared_by?: string | null
+          medication_reconciled_at?: string | null
+          medication_reconciled_by?: string | null
+          medication_reconciliation?: boolean | null
+          nursing_clearance?: boolean | null
+          nursing_cleared_at?: string | null
+          nursing_cleared_by?: string | null
+          patient_education_completed?: boolean | null
+          patient_id: string
+          summary_cleared_at?: string | null
+          summary_cleared_by?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          admission_id?: string
+          all_cleared?: boolean | null
+          billing_clearance?: boolean | null
+          billing_cleared_at?: string | null
+          billing_cleared_by?: string | null
+          created_at?: string | null
+          discharge_summary_clearance?: boolean | null
+          education_completed_at?: string | null
+          education_completed_by?: string | null
+          hospital_id?: string
+          id?: string
+          medical_clearance?: boolean | null
+          medical_cleared_at?: string | null
+          medical_cleared_by?: string | null
+          medication_reconciled_at?: string | null
+          medication_reconciled_by?: string | null
+          medication_reconciliation?: boolean | null
+          nursing_clearance?: boolean | null
+          nursing_cleared_at?: string | null
+          nursing_cleared_by?: string | null
+          patient_education_completed?: boolean | null
+          patient_id?: string
+          summary_cleared_at?: string | null
+          summary_cleared_by?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "discharge_checklists_hospital_id_fkey"
+            columns: ["hospital_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      drug_interactions: {
+        Row: {
+          clinical_effect: string | null
+          created_at: string | null
+          description: string
+          drug_a: string
+          drug_b: string
+          id: string
+          interaction_type: string
+          management: string | null
+          severity: string
+        }
+        Insert: {
+          clinical_effect?: string | null
+          created_at?: string | null
+          description: string
+          drug_a: string
+          drug_b: string
+          id?: string
+          interaction_type?: string
+          management?: string | null
+          severity?: string
+        }
+        Update: {
+          clinical_effect?: string | null
+          created_at?: string | null
+          description?: string
+          drug_a?: string
+          drug_b?: string
+          id?: string
+          interaction_type?: string
+          management?: string | null
+          severity?: string
+        }
+        Relationships: []
+      }
+      drug_risk_levels: {
+        Row: {
+          created_at: string | null
+          drug_name: string
+          generic_name: string | null
+          id: string
+          risk_category: string | null
+          risk_level: string
+          special_instructions: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          drug_name: string
+          generic_name?: string | null
+          id?: string
+          risk_category?: string | null
+          risk_level?: string
+          special_instructions?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          drug_name?: string
+          generic_name?: string | null
+          id?: string
+          risk_category?: string | null
+          risk_level?: string
+          special_instructions?: string | null
+        }
+        Relationships: []
+      }
       emergency_contacts: {
         Row: {
           address: string | null
@@ -1677,6 +1835,130 @@ export type Database = {
           },
         ]
       }
+      hospital_notifications: {
+        Row: {
+          category: string
+          created_at: string | null
+          hospital_id: string
+          id: string
+          is_read: boolean | null
+          message: string
+          metadata: Json | null
+          read_at: string | null
+          recipient_id: string | null
+          severity: string | null
+          title: string
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          hospital_id: string
+          id?: string
+          is_read?: boolean | null
+          message: string
+          metadata?: Json | null
+          read_at?: string | null
+          recipient_id?: string | null
+          severity?: string | null
+          title: string
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          hospital_id?: string
+          id?: string
+          is_read?: boolean | null
+          message?: string
+          metadata?: Json | null
+          read_at?: string | null
+          recipient_id?: string | null
+          severity?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hospital_notifications_hospital_id_fkey"
+            columns: ["hospital_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      infection_records: {
+        Row: {
+          admission_id: string | null
+          closed_at: string | null
+          created_at: string | null
+          detection_date: string
+          follow_up_notes: string | null
+          hospital_id: string
+          id: string
+          infection_site: string | null
+          infection_type: string
+          organism: string | null
+          outcome: string | null
+          patient_id: string
+          preventive_measures: string[] | null
+          prophylactic_drugs: string[] | null
+          reported_by: string | null
+          risk_factors: string[] | null
+          source: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          admission_id?: string | null
+          closed_at?: string | null
+          created_at?: string | null
+          detection_date?: string
+          follow_up_notes?: string | null
+          hospital_id: string
+          id?: string
+          infection_site?: string | null
+          infection_type: string
+          organism?: string | null
+          outcome?: string | null
+          patient_id: string
+          preventive_measures?: string[] | null
+          prophylactic_drugs?: string[] | null
+          reported_by?: string | null
+          risk_factors?: string[] | null
+          source?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          admission_id?: string | null
+          closed_at?: string | null
+          created_at?: string | null
+          detection_date?: string
+          follow_up_notes?: string | null
+          hospital_id?: string
+          id?: string
+          infection_site?: string | null
+          infection_type?: string
+          organism?: string | null
+          outcome?: string | null
+          patient_id?: string
+          preventive_measures?: string[] | null
+          prophylactic_drugs?: string[] | null
+          reported_by?: string | null
+          risk_factors?: string[] | null
+          source?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "infection_records_hospital_id_fkey"
+            columns: ["hospital_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       institution_applications: {
         Row: {
           applicant_id: string | null
@@ -2336,6 +2618,50 @@ export type Database = {
         }
         Relationships: []
       }
+      lab_reflex_tests: {
+        Row: {
+          auto_add: boolean | null
+          charge_amount: number | null
+          created_at: string | null
+          hospital_id: string
+          id: string
+          is_active: boolean | null
+          primary_test_name: string
+          reflex_test_name: string
+          trigger_condition: string
+        }
+        Insert: {
+          auto_add?: boolean | null
+          charge_amount?: number | null
+          created_at?: string | null
+          hospital_id: string
+          id?: string
+          is_active?: boolean | null
+          primary_test_name: string
+          reflex_test_name: string
+          trigger_condition: string
+        }
+        Update: {
+          auto_add?: boolean | null
+          charge_amount?: number | null
+          created_at?: string | null
+          hospital_id?: string
+          id?: string
+          is_active?: boolean | null
+          primary_test_name?: string
+          reflex_test_name?: string
+          trigger_condition?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lab_reflex_tests_hospital_id_fkey"
+            columns: ["hospital_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lab_requests: {
         Row: {
           created_at: string
@@ -2622,6 +2948,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      login_security_log: {
+        Row: {
+          browser: string | null
+          created_at: string | null
+          description: string | null
+          email: string
+          event_type: string
+          id: string
+          ip_address: string | null
+          platform: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          browser?: string | null
+          created_at?: string | null
+          description?: string | null
+          email: string
+          event_type?: string
+          id?: string
+          ip_address?: string | null
+          platform?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          browser?: string | null
+          created_at?: string | null
+          description?: string | null
+          email?: string
+          event_type?: string
+          id?: string
+          ip_address?: string | null
+          platform?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
       }
       marketplace_products: {
         Row: {
@@ -3214,6 +3576,288 @@ export type Database = {
             columns: ["prescription_id"]
             isOneToOne: false
             referencedRelation: "comprehensive_prescriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ot_anaesthesia_records: {
+        Row: {
+          admission_id: string | null
+          anaesthesia_type: string
+          anaesthetist_name: string | null
+          checkin_time: string | null
+          checkout_time: string | null
+          complications: string | null
+          consent_signed: boolean | null
+          created_at: string | null
+          drugs_administered: Json | null
+          guardian_name: string | null
+          guardian_signature: string | null
+          hospital_id: string
+          id: string
+          intraop_monitoring: Json | null
+          is_minor: boolean | null
+          notes: string | null
+          ot_booking_id: string | null
+          patient_id: string
+          post_anaesthesia_status: string | null
+          pre_op_assessment: string | null
+          recovery_vitals: Json | null
+          surgery_end_time: string | null
+          surgery_start_time: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          admission_id?: string | null
+          anaesthesia_type: string
+          anaesthetist_name?: string | null
+          checkin_time?: string | null
+          checkout_time?: string | null
+          complications?: string | null
+          consent_signed?: boolean | null
+          created_at?: string | null
+          drugs_administered?: Json | null
+          guardian_name?: string | null
+          guardian_signature?: string | null
+          hospital_id: string
+          id?: string
+          intraop_monitoring?: Json | null
+          is_minor?: boolean | null
+          notes?: string | null
+          ot_booking_id?: string | null
+          patient_id: string
+          post_anaesthesia_status?: string | null
+          pre_op_assessment?: string | null
+          recovery_vitals?: Json | null
+          surgery_end_time?: string | null
+          surgery_start_time?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          admission_id?: string | null
+          anaesthesia_type?: string
+          anaesthetist_name?: string | null
+          checkin_time?: string | null
+          checkout_time?: string | null
+          complications?: string | null
+          consent_signed?: boolean | null
+          created_at?: string | null
+          drugs_administered?: Json | null
+          guardian_name?: string | null
+          guardian_signature?: string | null
+          hospital_id?: string
+          id?: string
+          intraop_monitoring?: Json | null
+          is_minor?: boolean | null
+          notes?: string | null
+          ot_booking_id?: string | null
+          patient_id?: string
+          post_anaesthesia_status?: string | null
+          pre_op_assessment?: string | null
+          recovery_vitals?: Json | null
+          surgery_end_time?: string | null
+          surgery_start_time?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ot_anaesthesia_records_hospital_id_fkey"
+            columns: ["hospital_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      password_policies: {
+        Row: {
+          created_at: string | null
+          expiry_days: number | null
+          hospital_id: string | null
+          id: string
+          is_global: boolean | null
+          lockout_duration_minutes: number | null
+          max_failed_attempts: number | null
+          min_length: number | null
+          require_numbers: boolean | null
+          require_special_chars: boolean | null
+          require_uppercase: boolean | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          expiry_days?: number | null
+          hospital_id?: string | null
+          id?: string
+          is_global?: boolean | null
+          lockout_duration_minutes?: number | null
+          max_failed_attempts?: number | null
+          min_length?: number | null
+          require_numbers?: boolean | null
+          require_special_chars?: boolean | null
+          require_uppercase?: boolean | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          expiry_days?: number | null
+          hospital_id?: string | null
+          id?: string
+          is_global?: boolean | null
+          lockout_duration_minutes?: number | null
+          max_failed_attempts?: number | null
+          min_length?: number | null
+          require_numbers?: boolean | null
+          require_special_chars?: boolean | null
+          require_uppercase?: boolean | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "password_policies_hospital_id_fkey"
+            columns: ["hospital_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      patient_allergies: {
+        Row: {
+          allergen_name: string
+          allergen_type: string
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          notes: string | null
+          patient_id: string
+          reaction: string | null
+          reported_at: string | null
+          reported_by: string | null
+          severity: string
+        }
+        Insert: {
+          allergen_name: string
+          allergen_type?: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          notes?: string | null
+          patient_id: string
+          reaction?: string | null
+          reported_at?: string | null
+          reported_by?: string | null
+          severity?: string
+        }
+        Update: {
+          allergen_name?: string
+          allergen_type?: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          notes?: string | null
+          patient_id?: string
+          reaction?: string | null
+          reported_at?: string | null
+          reported_by?: string | null
+          severity?: string
+        }
+        Relationships: []
+      }
+      patient_doc_folders: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          folder_name: string
+          folder_type: string | null
+          id: string
+          patient_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          folder_name: string
+          folder_type?: string | null
+          id?: string
+          patient_id: string
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          folder_name?: string
+          folder_type?: string | null
+          id?: string
+          patient_id?: string
+        }
+        Relationships: []
+      }
+      patient_feedback: {
+        Row: {
+          cleanliness_rating: number | null
+          comments: string | null
+          created_at: string | null
+          department: string | null
+          hospital_id: string | null
+          id: string
+          is_anonymous: boolean | null
+          patient_id: string
+          provider_id: string | null
+          rating: number | null
+          responded_at: string | null
+          responded_by: string | null
+          response: string | null
+          staff_rating: number | null
+          status: string | null
+          suggestions: string | null
+          visit_type: string | null
+          wait_time_rating: number | null
+        }
+        Insert: {
+          cleanliness_rating?: number | null
+          comments?: string | null
+          created_at?: string | null
+          department?: string | null
+          hospital_id?: string | null
+          id?: string
+          is_anonymous?: boolean | null
+          patient_id: string
+          provider_id?: string | null
+          rating?: number | null
+          responded_at?: string | null
+          responded_by?: string | null
+          response?: string | null
+          staff_rating?: number | null
+          status?: string | null
+          suggestions?: string | null
+          visit_type?: string | null
+          wait_time_rating?: number | null
+        }
+        Update: {
+          cleanliness_rating?: number | null
+          comments?: string | null
+          created_at?: string | null
+          department?: string | null
+          hospital_id?: string | null
+          id?: string
+          is_anonymous?: boolean | null
+          patient_id?: string
+          provider_id?: string | null
+          rating?: number | null
+          responded_at?: string | null
+          responded_by?: string | null
+          response?: string | null
+          staff_rating?: number | null
+          status?: string | null
+          suggestions?: string | null
+          visit_type?: string | null
+          wait_time_rating?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "patient_feedback_hospital_id_fkey"
+            columns: ["hospital_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
             referencedColumns: ["id"]
           },
         ]
