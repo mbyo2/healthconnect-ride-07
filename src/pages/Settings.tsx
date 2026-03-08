@@ -342,7 +342,7 @@ const Settings = () => {
           </Card>
 
           {/* Appearance Settings */}
-          <Card className="border-trust-100 shadow-trust">
+          <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-foreground">
                 <Palette className="h-5 w-5" />
