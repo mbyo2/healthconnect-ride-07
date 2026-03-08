@@ -86,8 +86,8 @@ export const CommissionSettings = () => {
     switch (entityType) {
       case 'app_owner': return 10.00;
       case 'institution': return 15.00;
-      case 'health_personnel': return 75.00;
-      case 'pharmacy': return 5.00;
+      case 'health_personnel': return 72.50;
+      case 'pharmacy': return 2.50;
       default: return 0.00;
     }
   };
