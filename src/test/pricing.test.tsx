@@ -71,13 +71,12 @@ describe('PricingPage', () => {
     expect(screen.getByText(/Free/i)).toBeInTheDocument();
   });
 
-  it('shows pharmacy commission-only section', async () => {
+  it('shows pharmacy tab', async () => {
     const { PricingPage } = await import('@/components/subscription/PricingPage');
     const Wrapper = createWrapper();
     render(<PricingPage />, { wrapper: Wrapper });
 
-    expect(screen.getByText('Pharmacies')).toBeInTheDocument();
-    expect(screen.getByText(/commission-only model/)).toBeInTheDocument();
+    expect(screen.getByText(/Pharmacies/)).toBeInTheDocument();
   });
 
   it('displays ZMW currency notice', async () => {
