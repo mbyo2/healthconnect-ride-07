@@ -2,6 +2,7 @@ import React, { Suspense, lazy, useMemo } from 'react';
 import { HelmetProvider } from 'react-helmet-async';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { MobileLayout } from '@/components/MobileLayout';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { LoadingScreen } from '@/components/LoadingScreen';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { UserRolesProvider } from '@/context/UserRolesContext';
@@ -117,6 +118,7 @@ const AppContent = () => {
   return (
     <SearchProvider>
       <MobileLayout>
+        <ErrorBoundary>
         <Suspense fallback={<LoadingScreen />}>
           <Routes>
             {/* Public Routes */}
@@ -247,6 +249,7 @@ const AppContent = () => {
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
+        </ErrorBoundary>
       </MobileLayout>
     </SearchProvider>
   );

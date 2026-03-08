@@ -256,6 +256,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/provider-calendar',
     '/testing',
     '/documentation',
+    '/role-management',
   ],
 
   // ── Support ──────────────────────────────────────────────
@@ -320,6 +321,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/provider-calendar',
     '/testing',
     '/documentation',
+    '/role-management',
   ]
 };
 
