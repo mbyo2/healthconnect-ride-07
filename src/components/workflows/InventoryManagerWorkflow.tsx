@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,79 +7,24 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Package, AlertTriangle, TrendingDown, Plus, Loader2, Search } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { useInstitutionAffiliation } from '@/hooks/useInstitutionAffiliation';
-import { toast } from 'sonner';
+import { useHospitalInventory } from '@/hooks/useHospitalInventory';
 import { BarcodeScanner } from '@/components/shared/BarcodeScanner';
 
-interface InventoryItem {
-  id: string;
-  name: string;
-  category: string;
-  quantity: number;
-  reorder_level: number;
-  unit: string;
-  expiry_date: string | null;
-  barcode: string;
-  supplier: string;
-  unit_cost: number;
-}
-
 export const InventoryManagerWorkflow = () => {
-  const { institutionId } = useInstitutionAffiliation();
-  const [items, setItems] = useState<InventoryItem[]>([]);
-  const [loading, setLoading] = useState(false);
+  const { items, loading, lowStock, expiringSoon, addItem } = useHospitalInventory();
   const [showAdd, setShowAdd] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
   const [search, setSearch] = useState('');
-  const [form, setForm] = useState({ name: '', category: 'consumable', quantity: 0, reorder_level: 10, unit: 'pcs', expiry_date: '', supplier: '', unit_cost: 0 });
-
-  // Fetch from medication_inventory as a proxy for now
-  useEffect(() => {
-    if (!institutionId) return;
-    const fetch = async () => {
-      setLoading(true);
-      const { data } = await (supabase.from('medication_inventory' as any) as any)
-        .select('*')
-        .eq('pharmacy_id', institutionId)
-        .order('medication_name', { ascending: true })
-        .limit(200);
-
-      setItems((data || []).map((d: any) => ({
-        id: d.id,
-        name: d.medication_name,
-        category: d.category || 'general',
-        quantity: d.quantity_available || 0,
-        reorder_level: d.reorder_level || 10,
-        unit: d.unit || 'pcs',
-        expiry_date: d.expiry_date,
-        barcode: d.barcode || '',
-        supplier: d.supplier || '',
-        unit_cost: d.unit_price || 0,
-      })));
-      setLoading(false);
-    };
-    fetch();
-  }, [institutionId]);
-
-  const lowStock = items.filter(i => i.quantity <= i.reorder_level);
-  const expiringSoon = items.filter(i => {
-    if (!i.expiry_date) return false;
-    const diff = new Date(i.expiry_date).getTime() - Date.now();
-    return diff > 0 && diff < 30 * 86400000;
-  });
+  const [form, setForm] = useState({ item_name: '', category: 'consumable', quantity_available: 0, reorder_level: 10, unit: 'pcs', unit_cost: 0, supplier: '', barcode: '', location: '', expiry_date: '' });
 
   const filtered = items.filter(i =>
-    i.name.toLowerCase().includes(search.toLowerCase()) ||
-    i.barcode.includes(search)
+    i.item_name.toLowerCase().includes(search.toLowerCase()) ||
+    (i.barcode || '').includes(search)
   );
 
   const handleScan = (code: string) => {
     setSearch(code);
     setShowScanner(false);
-    const found = items.find(i => i.barcode === code);
-    if (found) toast.success(`Found: ${found.name}`);
-    else toast.info(`Barcode ${code} — no match`);
   };
 
   return (
@@ -87,18 +32,16 @@ export const InventoryManagerWorkflow = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Inventory Management</h1>
-          <p className="text-muted-foreground">Stock tracking, procurement & expiry management</p>
+          <p className="text-muted-foreground">Hospital-wide stock: consumables, surgical, PPE, equipment & more</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => setShowScanner(!showScanner)} className="gap-1">
-            <Search className="h-4 w-4" /> Scan
-          </Button>
+          <Button variant="outline" onClick={() => setShowScanner(!showScanner)} className="gap-1"><Search className="h-4 w-4" /> Scan</Button>
           <Dialog open={showAdd} onOpenChange={setShowAdd}>
             <DialogTrigger asChild><Button className="gap-1"><Plus className="h-4 w-4" /> Add Item</Button></DialogTrigger>
             <DialogContent>
               <DialogHeader><DialogTitle>Add Inventory Item</DialogTitle></DialogHeader>
               <div className="space-y-3">
-                <div className="space-y-1"><Label>Item Name</Label><Input value={form.name} onChange={e => setForm({...form, name: e.target.value})} /></div>
+                <div className="space-y-1"><Label>Item Name</Label><Input value={form.item_name} onChange={e => setForm({...form, item_name: e.target.value})} /></div>
                 <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-1"><Label>Category</Label>
                     <Select value={form.category} onValueChange={v => setForm({...form, category: v})}>
@@ -107,24 +50,28 @@ export const InventoryManagerWorkflow = () => {
                         <SelectItem value="consumable">Consumable</SelectItem><SelectItem value="surgical">Surgical</SelectItem>
                         <SelectItem value="pharmaceutical">Pharmaceutical</SelectItem><SelectItem value="equipment">Equipment</SelectItem>
                         <SelectItem value="linen">Linen</SelectItem><SelectItem value="ppe">PPE</SelectItem>
+                        <SelectItem value="biomedical">Biomedical</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="space-y-1"><Label>Unit</Label><Input value={form.unit} onChange={e => setForm({...form, unit: e.target.value})} /></div>
+                  <div className="space-y-1"><Label>Location</Label><Input value={form.location} onChange={e => setForm({...form, location: e.target.value})} placeholder="Ward/Store/OT" /></div>
                 </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="space-y-1"><Label>Quantity</Label><Input type="number" value={form.quantity} onChange={e => setForm({...form, quantity: +e.target.value})} /></div>
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="space-y-1"><Label>Qty</Label><Input type="number" value={form.quantity_available} onChange={e => setForm({...form, quantity_available: +e.target.value})} /></div>
                   <div className="space-y-1"><Label>Reorder Level</Label><Input type="number" value={form.reorder_level} onChange={e => setForm({...form, reorder_level: +e.target.value})} /></div>
+                  <div className="space-y-1"><Label>Unit</Label><Input value={form.unit} onChange={e => setForm({...form, unit: e.target.value})} /></div>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-1"><Label>Supplier</Label><Input value={form.supplier} onChange={e => setForm({...form, supplier: e.target.value})} /></div>
                   <div className="space-y-1"><Label>Unit Cost (K)</Label><Input type="number" value={form.unit_cost} onChange={e => setForm({...form, unit_cost: +e.target.value})} /></div>
                 </div>
-                <div className="space-y-1"><Label>Expiry Date</Label><Input type="date" value={form.expiry_date} onChange={e => setForm({...form, expiry_date: e.target.value})} /></div>
-                <Button className="w-full" onClick={() => {
-                  setItems(prev => [...prev, { id: Date.now().toString(), ...form, barcode: `INV-${Date.now().toString(36).toUpperCase()}` }]);
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-1"><Label>Barcode</Label><Input value={form.barcode} onChange={e => setForm({...form, barcode: e.target.value})} /></div>
+                  <div className="space-y-1"><Label>Expiry Date</Label><Input type="date" value={form.expiry_date} onChange={e => setForm({...form, expiry_date: e.target.value})} /></div>
+                </div>
+                <Button className="w-full" onClick={async () => {
+                  await addItem({ ...form, expiry_date: form.expiry_date || null } as any);
                   setShowAdd(false);
-                  toast.success('Item added');
                 }}>Add Item</Button>
               </div>
             </DialogContent>
@@ -154,15 +101,15 @@ export const InventoryManagerWorkflow = () => {
                 {filtered.slice(0, 50).map(item => (
                   <div key={item.id} className="flex items-center justify-between p-3 rounded-lg border">
                     <div>
-                      <p className="font-medium">{item.name}</p>
-                      <p className="text-sm text-muted-foreground">{item.category} • {item.barcode} • {item.supplier || 'No supplier'}</p>
+                      <p className="font-medium">{item.item_name}</p>
+                      <p className="text-sm text-muted-foreground">{item.category} • {item.location || 'N/A'} • {item.supplier || 'No supplier'} {item.barcode ? `• ${item.barcode}` : ''}</p>
                     </div>
                     <div className="flex items-center gap-3 text-right">
                       <div>
-                        <p className={`font-bold ${item.quantity <= item.reorder_level ? 'text-destructive' : ''}`}>{item.quantity} {item.unit}</p>
+                        <p className={`font-bold ${item.quantity_available <= item.reorder_level ? 'text-destructive' : ''}`}>{item.quantity_available} {item.unit}</p>
                         <p className="text-xs text-muted-foreground">K{item.unit_cost}/{item.unit}</p>
                       </div>
-                      {item.quantity <= item.reorder_level && <Badge variant="destructive">Low</Badge>}
+                      {item.quantity_available <= item.reorder_level && <Badge variant="destructive">Low</Badge>}
                     </div>
                   </div>
                 ))}
