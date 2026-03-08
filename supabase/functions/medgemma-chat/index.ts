@@ -74,8 +74,8 @@ CRITICAL: If symptoms suggest emergency, immediately advise to call emergency se
       );
     }
     
-    // Use HuggingFace MedGemma2-8B (latest version)
-    const response = await fetch('https://api-inference.huggingface.co/models/google/medgemma-2-8b', {
+    // Use HuggingFace MedGemma 1.5 4B IT (instruction-tuned medical model)
+    const response = await fetch('https://api-inference.huggingface.co/models/google/medgemma-1.5-4b-it', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${HF_TOKEN}`,
