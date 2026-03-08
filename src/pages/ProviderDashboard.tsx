@@ -245,7 +245,7 @@ const ProviderDashboard = () => {
             </div>
           ) : (
             <div className="space-y-3">
-              {todayAppointments.slice(0, 5).map((appointment: any) => (
+              {todayAppointments.slice(0, 8).map((appointment: any) => (
                 <div 
                   key={appointment.id} 
                   className="flex items-center justify-between p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors"
@@ -270,17 +270,39 @@ const ProviderDashboard = () => {
                     >
                       {appointment.status}
                     </Badge>
-                    <Button 
-                      size="sm" 
-                      variant="outline"
-                      onClick={() => navigate(`/appointments/${appointment.id}`)}
-                    >
-                      View
-                    </Button>
+                    {appointment.status === 'scheduled' && appointment.type === 'video_consultation' && (
+                      <Button 
+                        size="sm" 
+                        className="bg-emerald-600 hover:bg-emerald-700 gap-1"
+                        onClick={() => navigate(`/video-call/${appointment.id}`)}
+                      >
+                        <Video className="h-3 w-3" />
+                        Start
+                      </Button>
+                    )}
+                    {appointment.status === 'scheduled' && appointment.type !== 'video_consultation' && (
+                      <Button 
+                        size="sm"
+                        onClick={() => navigate(`/appointments/${appointment.id}`)}
+                        className="gap-1"
+                      >
+                        <Stethoscope className="h-3 w-3" />
+                        Consult
+                      </Button>
+                    )}
+                    {appointment.status !== 'scheduled' && (
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => navigate(`/appointments/${appointment.id}`)}
+                      >
+                        View
+                      </Button>
+                    )}
                   </div>
                 </div>
               ))}
-              {todayAppointments.length > 5 && (
+              {todayAppointments.length > 8 && (
                 <Button variant="link" className="w-full" onClick={() => navigate('/appointments')}>
                   View all {todayAppointments.length} appointments
                 </Button>
