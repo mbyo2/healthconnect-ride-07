@@ -7,9 +7,9 @@ export const BrowseSpecialties = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="py-24 md:py-32">
+    <section className="py-14 md:py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
+        <div className="text-center mb-10">
           <p className="text-sm font-semibold text-primary uppercase tracking-widest mb-3">Specialties</p>
           <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Find Care by Specialty</h2>
         </div>
