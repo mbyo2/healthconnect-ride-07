@@ -308,6 +308,154 @@ export type Database = {
         }
         Relationships: []
       }
+      billing_invoices: {
+        Row: {
+          admission_id: string | null
+          balance: number | null
+          created_at: string
+          created_by: string
+          discount: number | null
+          due_date: string | null
+          id: string
+          institution_id: string
+          insurance_claim_number: string | null
+          insurance_provider: string | null
+          invoice_number: string
+          items: Json
+          notes: string | null
+          paid_amount: number | null
+          patient_id: string | null
+          patient_name: string
+          status: Database["public"]["Enums"]["invoice_status"]
+          subtotal: number
+          tax: number | null
+          total_amount: number
+          updated_at: string
+        }
+        Insert: {
+          admission_id?: string | null
+          balance?: number | null
+          created_at?: string
+          created_by: string
+          discount?: number | null
+          due_date?: string | null
+          id?: string
+          institution_id: string
+          insurance_claim_number?: string | null
+          insurance_provider?: string | null
+          invoice_number: string
+          items?: Json
+          notes?: string | null
+          paid_amount?: number | null
+          patient_id?: string | null
+          patient_name: string
+          status?: Database["public"]["Enums"]["invoice_status"]
+          subtotal?: number
+          tax?: number | null
+          total_amount?: number
+          updated_at?: string
+        }
+        Update: {
+          admission_id?: string | null
+          balance?: number | null
+          created_at?: string
+          created_by?: string
+          discount?: number | null
+          due_date?: string | null
+          id?: string
+          institution_id?: string
+          insurance_claim_number?: string | null
+          insurance_provider?: string | null
+          invoice_number?: string
+          items?: Json
+          notes?: string | null
+          paid_amount?: number | null
+          patient_id?: string | null
+          patient_name?: string
+          status?: Database["public"]["Enums"]["invoice_status"]
+          subtotal?: number
+          tax?: number | null
+          total_amount?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "billing_invoices_admission_id_fkey"
+            columns: ["admission_id"]
+            isOneToOne: false
+            referencedRelation: "hospital_admissions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "billing_invoices_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "billing_invoices_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      billing_payments: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          institution_id: string
+          invoice_id: string
+          notes: string | null
+          payment_date: string
+          payment_mode: Database["public"]["Enums"]["payment_mode"]
+          received_by: string
+          reference_number: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          institution_id: string
+          invoice_id: string
+          notes?: string | null
+          payment_date?: string
+          payment_mode?: Database["public"]["Enums"]["payment_mode"]
+          received_by: string
+          reference_number?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          institution_id?: string
+          invoice_id?: string
+          notes?: string | null
+          payment_date?: string
+          payment_mode?: Database["public"]["Enums"]["payment_mode"]
+          received_by?: string
+          reference_number?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "billing_payments_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "billing_payments_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "billing_invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       billing_records: {
         Row: {
           amount: number
@@ -2474,6 +2622,88 @@ export type Database = {
         }
         Relationships: []
       }
+      insurance_claims: {
+        Row: {
+          approved_amount: number | null
+          claim_amount: number
+          created_at: string
+          created_by: string
+          documents: Json | null
+          id: string
+          institution_id: string
+          insurance_provider: string
+          invoice_id: string | null
+          patient_id: string | null
+          patient_name: string
+          policy_number: string
+          processed_at: string | null
+          rejection_reason: string | null
+          status: string
+          submitted_at: string
+          updated_at: string
+        }
+        Insert: {
+          approved_amount?: number | null
+          claim_amount: number
+          created_at?: string
+          created_by: string
+          documents?: Json | null
+          id?: string
+          institution_id: string
+          insurance_provider: string
+          invoice_id?: string | null
+          patient_id?: string | null
+          patient_name: string
+          policy_number: string
+          processed_at?: string | null
+          rejection_reason?: string | null
+          status?: string
+          submitted_at?: string
+          updated_at?: string
+        }
+        Update: {
+          approved_amount?: number | null
+          claim_amount?: number
+          created_at?: string
+          created_by?: string
+          documents?: Json | null
+          id?: string
+          institution_id?: string
+          insurance_provider?: string
+          invoice_id?: string | null
+          patient_id?: string | null
+          patient_name?: string
+          policy_number?: string
+          processed_at?: string | null
+          rejection_reason?: string | null
+          status?: string
+          submitted_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "insurance_claims_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "insurance_claims_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "billing_invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "insurance_claims_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       insurance_information: {
         Row: {
           coverage_end_date: string | null
@@ -3059,6 +3289,62 @@ export type Database = {
             columns: ["verified_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leave_requests: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          created_at: string
+          end_date: string
+          id: string
+          institution_id: string
+          leave_type: Database["public"]["Enums"]["leave_type"]
+          reason: string | null
+          rejection_reason: string | null
+          staff_id: string
+          start_date: string
+          status: Database["public"]["Enums"]["leave_status"]
+          updated_at: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          end_date: string
+          id?: string
+          institution_id: string
+          leave_type: Database["public"]["Enums"]["leave_type"]
+          reason?: string | null
+          rejection_reason?: string | null
+          staff_id: string
+          start_date: string
+          status?: Database["public"]["Enums"]["leave_status"]
+          updated_at?: string
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          end_date?: string
+          id?: string
+          institution_id?: string
+          leave_type?: Database["public"]["Enums"]["leave_type"]
+          reason?: string | null
+          rejection_reason?: string | null
+          staff_id?: string
+          start_date?: string
+          status?: Database["public"]["Enums"]["leave_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leave_requests_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
             referencedColumns: ["id"]
           },
         ]
@@ -4242,6 +4528,77 @@ export type Database = {
           },
         ]
       }
+      payroll_records: {
+        Row: {
+          allowances: number | null
+          basic_salary: number
+          created_at: string
+          created_by: string | null
+          currency: string | null
+          deductions: number | null
+          id: string
+          institution_id: string
+          net_salary: number
+          notes: string | null
+          overtime_pay: number | null
+          paid_at: string | null
+          period_end: string
+          period_start: string
+          staff_id: string
+          status: string
+          tax: number | null
+          updated_at: string
+        }
+        Insert: {
+          allowances?: number | null
+          basic_salary?: number
+          created_at?: string
+          created_by?: string | null
+          currency?: string | null
+          deductions?: number | null
+          id?: string
+          institution_id: string
+          net_salary?: number
+          notes?: string | null
+          overtime_pay?: number | null
+          paid_at?: string | null
+          period_end: string
+          period_start: string
+          staff_id: string
+          status?: string
+          tax?: number | null
+          updated_at?: string
+        }
+        Update: {
+          allowances?: number | null
+          basic_salary?: number
+          created_at?: string
+          created_by?: string | null
+          currency?: string | null
+          deductions?: number | null
+          id?: string
+          institution_id?: string
+          net_salary?: number
+          notes?: string | null
+          overtime_pay?: number | null
+          paid_at?: string | null
+          period_end?: string
+          period_start?: string
+          staff_id?: string
+          status?: string
+          tax?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payroll_records_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pharmacy_customers: {
         Row: {
           created_at: string
@@ -5336,6 +5693,85 @@ export type Database = {
         }
         Relationships: []
       }
+      queue_tokens: {
+        Row: {
+          assigned_doctor_id: string | null
+          check_in_time: string
+          completed_time: string | null
+          created_at: string
+          created_by: string
+          department: string
+          id: string
+          institution_id: string
+          notes: string | null
+          patient_id: string | null
+          patient_name: string
+          priority: Database["public"]["Enums"]["queue_priority"]
+          serving_start_time: string | null
+          status: Database["public"]["Enums"]["queue_status"]
+          token_number: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_doctor_id?: string | null
+          check_in_time?: string
+          completed_time?: string | null
+          created_at?: string
+          created_by: string
+          department?: string
+          id?: string
+          institution_id: string
+          notes?: string | null
+          patient_id?: string | null
+          patient_name: string
+          priority?: Database["public"]["Enums"]["queue_priority"]
+          serving_start_time?: string | null
+          status?: Database["public"]["Enums"]["queue_status"]
+          token_number: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_doctor_id?: string | null
+          check_in_time?: string
+          completed_time?: string | null
+          created_at?: string
+          created_by?: string
+          department?: string
+          id?: string
+          institution_id?: string
+          notes?: string | null
+          patient_id?: string | null
+          patient_name?: string
+          priority?: Database["public"]["Enums"]["queue_priority"]
+          serving_start_time?: string | null
+          status?: Database["public"]["Enums"]["queue_status"]
+          token_number?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "queue_tokens_assigned_doctor_id_fkey"
+            columns: ["assigned_doctor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "queue_tokens_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "queue_tokens_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       referral_links: {
         Row: {
           created_at: string | null
@@ -5767,6 +6203,62 @@ export type Database = {
           },
         ]
       }
+      staff_attendance: {
+        Row: {
+          clock_in: string | null
+          clock_out: string | null
+          created_at: string
+          date: string
+          hours_worked: number | null
+          id: string
+          institution_id: string
+          notes: string | null
+          overtime_hours: number | null
+          recorded_by: string | null
+          staff_id: string
+          status: Database["public"]["Enums"]["attendance_status"]
+          updated_at: string
+        }
+        Insert: {
+          clock_in?: string | null
+          clock_out?: string | null
+          created_at?: string
+          date?: string
+          hours_worked?: number | null
+          id?: string
+          institution_id: string
+          notes?: string | null
+          overtime_hours?: number | null
+          recorded_by?: string | null
+          staff_id: string
+          status?: Database["public"]["Enums"]["attendance_status"]
+          updated_at?: string
+        }
+        Update: {
+          clock_in?: string | null
+          clock_out?: string | null
+          created_at?: string
+          date?: string
+          hours_worked?: number | null
+          id?: string
+          institution_id?: string
+          notes?: string | null
+          overtime_hours?: number | null
+          recorded_by?: string | null
+          staff_id?: string
+          status?: Database["public"]["Enums"]["attendance_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_attendance_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       staff_invitations: {
         Row: {
           accepted_at: string | null
@@ -6074,6 +6566,97 @@ export type Database = {
             columns: ["patient_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      triage_assessments: {
+        Row: {
+          allergies: string | null
+          assessed_at: string
+          assessed_by: string
+          assessment_notes: string | null
+          bleeding: boolean | null
+          chief_complaint: string
+          consciousness_level: string | null
+          created_at: string
+          current_medications: string | null
+          disposition: string | null
+          id: string
+          institution_id: string
+          mobility: string | null
+          pain_level: number | null
+          patient_id: string | null
+          patient_name: string
+          queue_token_id: string | null
+          triage_level: Database["public"]["Enums"]["triage_level"]
+          updated_at: string
+          vital_signs: Json | null
+        }
+        Insert: {
+          allergies?: string | null
+          assessed_at?: string
+          assessed_by: string
+          assessment_notes?: string | null
+          bleeding?: boolean | null
+          chief_complaint: string
+          consciousness_level?: string | null
+          created_at?: string
+          current_medications?: string | null
+          disposition?: string | null
+          id?: string
+          institution_id: string
+          mobility?: string | null
+          pain_level?: number | null
+          patient_id?: string | null
+          patient_name: string
+          queue_token_id?: string | null
+          triage_level?: Database["public"]["Enums"]["triage_level"]
+          updated_at?: string
+          vital_signs?: Json | null
+        }
+        Update: {
+          allergies?: string | null
+          assessed_at?: string
+          assessed_by?: string
+          assessment_notes?: string | null
+          bleeding?: boolean | null
+          chief_complaint?: string
+          consciousness_level?: string | null
+          created_at?: string
+          current_medications?: string | null
+          disposition?: string | null
+          id?: string
+          institution_id?: string
+          mobility?: string | null
+          pain_level?: number | null
+          patient_id?: string | null
+          patient_name?: string
+          queue_token_id?: string | null
+          triage_level?: Database["public"]["Enums"]["triage_level"]
+          updated_at?: string
+          vital_signs?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "triage_assessments_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "triage_assessments_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "triage_assessments_queue_token_id_fkey"
+            columns: ["queue_token_id"]
+            isOneToOne: false
+            referencedRelation: "queue_tokens"
             referencedColumns: ["id"]
           },
         ]
@@ -6738,6 +7321,7 @@ export type Database = {
         | "lab"
         | "support"
         | "super_admin"
+      attendance_status: "present" | "absent" | "late" | "half_day" | "on_leave"
       experience_level: "entry" | "intermediate" | "expert"
       healthcare_provider_type:
         | "doctor"
@@ -6755,6 +7339,23 @@ export type Database = {
         | "skin_clinic"
         | "dental_clinic"
         | "specialty_clinic"
+      invoice_status:
+        | "draft"
+        | "sent"
+        | "paid"
+        | "partial"
+        | "overdue"
+        | "cancelled"
+        | "refunded"
+      leave_status: "pending" | "approved" | "rejected" | "cancelled"
+      leave_type:
+        | "annual"
+        | "sick"
+        | "maternity"
+        | "paternity"
+        | "unpaid"
+        | "compassionate"
+        | "study"
       medication_type:
         | "tablet"
         | "capsule"
@@ -6766,7 +7367,22 @@ export type Database = {
         | "inhaler"
         | "powder"
         | "other"
+      payment_mode:
+        | "cash"
+        | "card"
+        | "mobile_money"
+        | "insurance"
+        | "bank_transfer"
+        | "cheque"
       promo_code_type: "one_time" | "new_users_only" | "referral" | "multi_use"
+      queue_priority: "emergency" | "urgent" | "normal" | "low"
+      queue_status:
+        | "waiting"
+        | "serving"
+        | "completed"
+        | "cancelled"
+        | "no_show"
+      triage_level: "critical" | "urgent" | "standard" | "non_urgent"
       user_role: "admin" | "health_personnel" | "patient"
     }
     CompositeTypes: {
@@ -6912,6 +7528,7 @@ export const Constants = {
         "support",
         "super_admin",
       ],
+      attendance_status: ["present", "absent", "late", "half_day", "on_leave"],
       experience_level: ["entry", "intermediate", "expert"],
       healthcare_provider_type: [
         "doctor",
@@ -6930,6 +7547,25 @@ export const Constants = {
         "dental_clinic",
         "specialty_clinic",
       ],
+      invoice_status: [
+        "draft",
+        "sent",
+        "paid",
+        "partial",
+        "overdue",
+        "cancelled",
+        "refunded",
+      ],
+      leave_status: ["pending", "approved", "rejected", "cancelled"],
+      leave_type: [
+        "annual",
+        "sick",
+        "maternity",
+        "paternity",
+        "unpaid",
+        "compassionate",
+        "study",
+      ],
       medication_type: [
         "tablet",
         "capsule",
@@ -6942,7 +7578,18 @@ export const Constants = {
         "powder",
         "other",
       ],
+      payment_mode: [
+        "cash",
+        "card",
+        "mobile_money",
+        "insurance",
+        "bank_transfer",
+        "cheque",
+      ],
       promo_code_type: ["one_time", "new_users_only", "referral", "multi_use"],
+      queue_priority: ["emergency", "urgent", "normal", "low"],
+      queue_status: ["waiting", "serving", "completed", "cancelled", "no_show"],
+      triage_level: ["critical", "urgent", "standard", "non_urgent"],
       user_role: ["admin", "health_personnel", "patient"],
     },
   },
