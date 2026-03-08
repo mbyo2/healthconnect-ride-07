@@ -61,7 +61,8 @@ export default function HealthDashboard() {
       case "down":
         return <TrendingDown className="h-4 w-4 text-red-600 dark:text-red-400" />;
       default:
-        return <Minus className="h-4 w-4 text-muted-foreground
+        return <Minus className="h-4 w-4 text-muted-foreground" />;
+    }
   };
 
   const getStatusColor = (status: string) => {
