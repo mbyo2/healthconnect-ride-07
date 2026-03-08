@@ -122,7 +122,7 @@ export function DesktopNav() {
       { to: "/appointments", label: "My Care", icon: <Calendar className="h-4 w-4" />, active: location.pathname.includes("appointment") },
       { to: "/chat", label: "Messages", icon: <MessageSquare className="h-4 w-4" />, active: location.pathname === "/chat" },
     ];
-  }, [location.pathname, isAuthenticated, isHealthPersonnel, isAdmin, isPatient, availableRoles]);
+  }, [location.pathname, isAuthenticated, isHealthPersonnel, isAdmin, isPatient, availableRoles, isInstitutionAffiliated]);
 
   // Role-specific "More" menu items
   const secondaryNavItems = useMemo(() => {
