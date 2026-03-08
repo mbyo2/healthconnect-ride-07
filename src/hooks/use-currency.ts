@@ -70,8 +70,7 @@ export const SUPPORTED_CURRENCIES = Object.entries(CURRENCY_SYMBOLS).map(([code,
 
 export const useCurrency = () => {
   const [currency, setCurrencyState] = useState<string>(() => {
-    // Check localStorage first for user preference
-    const saved = localStorage.getItem(STORAGE_KEY);
+    const saved = safeLocalGet(STORAGE_KEY);
     return saved || 'USD';
   });
   const [loading, setLoading] = useState(true);
