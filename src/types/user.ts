@@ -1,5 +1,6 @@
+// Re-export UserRole from the single source of truth
+export type { UserRole } from '@/config/roleConfig';
 
-export type UserRole = 'patient' | 'health_personnel' | 'admin' | 'institution_admin' | 'pharmacy' | 'institution_staff' | 'lab' | 'super_admin' | 'support' | 'doctor' | 'nurse' | 'radiologist' | 'pharmacist' | 'lab_technician' | 'receptionist' | 'hr_manager' | 'cxo' | 'ot_staff' | 'phlebotomist' | 'billing_staff' | 'inventory_manager' | 'triage_staff' | 'maintenance_manager' | 'specialist' | 'ambulance_staff' | 'pathologist';
 export type AdminLevel = 'admin' | 'superadmin' | null;
 
 export interface UserProfile {
@@ -7,7 +8,7 @@ export interface UserProfile {
   email: string;
   first_name?: string;
   last_name?: string;
-  role: UserRole;
+  role: string;
   admin_level?: AdminLevel;
   avatar_url?: string;
   is_profile_complete: boolean;
