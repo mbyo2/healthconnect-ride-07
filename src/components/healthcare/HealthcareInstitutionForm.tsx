@@ -26,9 +26,17 @@ interface FormErrors {
 const PROVIDER_TYPES = [
   'hospital',
   'clinic',
+  'dental_clinic',
+  'eye_clinic',
+  'skin_clinic',
+  'specialty_clinic',
   'pharmacy',
   'nursing_home',
-  'dentist'
+  'dentist',
+  'optician',
+  'dermatology_clinic',
+  'physiotherapy',
+  'radiology_center',
 ] as const;
 
 export const HealthcareInstitutionForm = () => {
