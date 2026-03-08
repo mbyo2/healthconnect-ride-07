@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScheduleManager } from "@/components/provider/ScheduleManager";
 import { WaitlistManager as ProviderWaitlistOld } from "@/components/provider/WaitlistManager";
@@ -15,18 +15,36 @@ import {
   Bot, Brain, Sparkles, ArrowRight, BarChart3, 
   Calendar, Users, Clock, FileText, Video, Stethoscope,
   ClipboardList, Wallet, MessageSquare,
-  TrendingUp
+  TrendingUp, Heart, Pill, Thermometer, Home as HomeIcon,
+  Image, Scan, MonitorDot
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format, startOfWeek, endOfWeek } from "date-fns";
 import { useCurrency } from "@/hooks/use-currency";
+import { useUserRoles } from "@/context/UserRolesContext";
+import { useInstitutionAffiliation } from "@/hooks/useInstitutionAffiliation";
 
 const ProviderDashboard = () => {
   const navigate = useNavigate();
   const today = new Date();
   const { formatPrice } = useCurrency();
+  const { availableRoles, isHealthPersonnel } = useUserRoles();
+  const { isInstitutionAffiliated } = useInstitutionAffiliation();
+
+  // Determine specific provider type
+  const isDoctor = availableRoles.includes('doctor');
+  const isNurse = availableRoles.includes('nurse');
+  const isRadiologist = availableRoles.includes('radiologist');
+
+  // Role-specific dashboard title and subtitle
+  const dashboardMeta = useMemo(() => {
+    if (isRadiologist) return { title: "Radiologist Dashboard", subtitle: "Imaging reads, reports & AI analysis", color: "from-violet-500/10 to-violet-500/5" };
+    if (isNurse) return { title: "Nurse Dashboard", subtitle: "Patient care, vitals & home visits", color: "from-teal-500/10 to-teal-500/5" };
+    if (isDoctor) return { title: "Doctor Dashboard", subtitle: "Consultations, prescriptions & clinical tools", color: "from-blue-500/10 to-blue-500/5" };
+    return { title: "Provider Dashboard", subtitle: "Manage your practice and patient care", color: "from-primary/10 to-primary/5" };
+  }, [isDoctor, isNurse, isRadiologist]);
 
   const { data: todayAppointments = [] } = useQuery({
     queryKey: ['provider-today-appointments'],
@@ -69,41 +87,89 @@ const ProviderDashboard = () => {
   const scheduledToday = todayAppointments.filter((a: any) => a.status === 'scheduled');
   const completedToday = todayAppointments.filter((a: any) => a.status === 'completed');
 
-  const quickActions = [
-    { icon: Calendar, label: "Schedule", route: "/provider-calendar", color: "text-blue-600 dark:text-blue-400 bg-blue-500/10" },
-    { icon: ClipboardList, label: "Queue", route: "/appointments", color: "text-purple-600 dark:text-purple-400 bg-purple-500/10" },
-    { icon: FileText, label: "Prescribe", route: "/prescriptions", color: "text-emerald-600 dark:text-emerald-400 bg-emerald-500/10" },
-    { icon: Video, label: "Video", route: "/video-consultations", color: "text-orange-600 dark:text-orange-400 bg-orange-500/10" },
-    { icon: Stethoscope, label: "Records", route: "/medical-records", color: "text-pink-600 dark:text-pink-400 bg-pink-500/10" },
-    { icon: MessageSquare, label: "Chat", route: "/chat", color: "text-cyan-600 dark:text-cyan-400 bg-cyan-500/10" },
-  ];
+  // Role-specific quick actions
+  const quickActions = useMemo(() => {
+    if (isRadiologist) {
+      return [
+        { icon: Calendar, label: "Schedule", route: "/provider-calendar", color: "text-blue-600 dark:text-blue-400 bg-blue-500/10" },
+        { icon: ClipboardList, label: "Queue", route: "/appointments", color: "text-purple-600 dark:text-purple-400 bg-purple-500/10" },
+        { icon: Image, label: "Imaging", route: "/medical-records", color: "text-violet-600 dark:text-violet-400 bg-violet-500/10" },
+        { icon: Brain, label: "AI Analysis", route: "/ai-diagnostics", color: "text-pink-600 dark:text-pink-400 bg-pink-500/10" },
+        { icon: FileText, label: "Reports", route: "/medical-records", color: "text-emerald-600 dark:text-emerald-400 bg-emerald-500/10" },
+        { icon: MessageSquare, label: "Chat", route: "/chat", color: "text-cyan-600 dark:text-cyan-400 bg-cyan-500/10" },
+      ];
+    }
+    if (isNurse) {
+      return [
+        { icon: Calendar, label: "Schedule", route: "/provider-calendar", color: "text-blue-600 dark:text-blue-400 bg-blue-500/10" },
+        { icon: ClipboardList, label: "Visits", route: "/appointments", color: "text-purple-600 dark:text-purple-400 bg-purple-500/10" },
+        { icon: Thermometer, label: "Vitals", route: "/medical-records", color: "text-rose-600 dark:text-rose-400 bg-rose-500/10" },
+        { icon: Pill, label: "Meds", route: "/medications", color: "text-emerald-600 dark:text-emerald-400 bg-emerald-500/10" },
+        { icon: Heart, label: "Care Plans", route: "/medical-records", color: "text-pink-600 dark:text-pink-400 bg-pink-500/10" },
+        { icon: MessageSquare, label: "Chat", route: "/chat", color: "text-cyan-600 dark:text-cyan-400 bg-cyan-500/10" },
+      ];
+    }
+    // Doctor / generic health_personnel
+    return [
+      { icon: Calendar, label: "Schedule", route: "/provider-calendar", color: "text-blue-600 dark:text-blue-400 bg-blue-500/10" },
+      { icon: ClipboardList, label: "Queue", route: "/appointments", color: "text-purple-600 dark:text-purple-400 bg-purple-500/10" },
+      { icon: FileText, label: "Prescribe", route: "/prescriptions", color: "text-emerald-600 dark:text-emerald-400 bg-emerald-500/10" },
+      { icon: Video, label: "Video", route: "/video-consultations", color: "text-orange-600 dark:text-orange-400 bg-orange-500/10" },
+      { icon: Stethoscope, label: "Records", route: "/medical-records", color: "text-pink-600 dark:text-pink-400 bg-pink-500/10" },
+      { icon: MessageSquare, label: "Chat", route: "/chat", color: "text-cyan-600 dark:text-cyan-400 bg-cyan-500/10" },
+    ];
+  }, [isDoctor, isNurse, isRadiologist]);
+
+  // Stats - conditionally show revenue based on institution affiliation
+  const statsCards = useMemo(() => {
+    const base = [
+      { label: "Today", value: todayAppointments.length, sub: `${scheduledToday.length} pending · ${completedToday.length} done`, icon: Users, color: "border-l-blue-500", iconBg: "bg-blue-500/10", iconColor: "text-blue-600 dark:text-blue-400" },
+      { label: "This Week", value: weekStats?.total || 0, sub: `${weekStats?.completed || 0} completed`, icon: TrendingUp, color: "border-l-emerald-500", iconBg: "bg-emerald-500/10", iconColor: "text-emerald-600 dark:text-emerald-400" },
+      { label: "Pending", value: weekStats?.pending || 0, sub: "Awaiting consult", icon: Clock, color: "border-l-orange-500", iconBg: "bg-orange-500/10", iconColor: "text-orange-600 dark:text-orange-400" },
+    ];
+    if (!isInstitutionAffiliated) {
+      base.push({ label: "Revenue", value: formatPrice(weekStats?.revenue || 0) as any, sub: "+12% vs last week", icon: Wallet, color: "border-l-purple-500", iconBg: "bg-purple-500/10", iconColor: "text-purple-600 dark:text-purple-400" });
+    }
+    return base;
+  }, [todayAppointments, scheduledToday, completedToday, weekStats, isInstitutionAffiliated, formatPrice]);
+
+  // Role-specific tabs
+  const tabConfig = useMemo(() => {
+    const base = [
+      { value: "schedule", label: "Schedule" },
+      { value: "patients", label: "Patients" },
+      { value: "waitlist", label: "Waitlist" },
+      { value: "analytics", label: "Analytics", icon: <BarChart3 className="h-3 w-3" /> },
+    ];
+    if (isDoctor || isHealthPersonnel) {
+      base.push({ value: "signatures", label: "Signatures" });
+    }
+    return base;
+  }, [isDoctor, isHealthPersonnel]);
 
   return (
     <div className="space-y-5 max-w-7xl mx-auto">
       {/* Header */}
       <div className="flex flex-col gap-3">
         <div>
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">Provider Dashboard</h1>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">{dashboardMeta.title}</h1>
           <p className="text-sm text-muted-foreground">{format(today, 'EEEE, MMMM d, yyyy')}</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={() => navigate('/ai-diagnostics')} className="gap-1.5 text-xs">
-            <Bot className="h-3.5 w-3.5" /> AI Assistant
-          </Button>
+          {(isDoctor || isRadiologist || isHealthPersonnel) && (
+            <Button variant="outline" size="sm" onClick={() => navigate('/ai-diagnostics')} className="gap-1.5 text-xs">
+              <Bot className="h-3.5 w-3.5" /> AI Assistant
+            </Button>
+          )}
           <Button size="sm" onClick={() => navigate('/provider-calendar')} className="gap-1.5 text-xs">
             <Calendar className="h-3.5 w-3.5" /> Calendar
           </Button>
         </div>
       </div>
 
-      {/* Stats — horizontal scroll on mobile */}
+      {/* Stats */}
       <div className="flex gap-3 overflow-x-auto pb-1 -mx-1 px-1 snap-x">
-        {[
-          { label: "Today", value: todayAppointments.length, sub: `${scheduledToday.length} pending · ${completedToday.length} done`, icon: Users, color: "border-l-blue-500", iconBg: "bg-blue-500/10", iconColor: "text-blue-600 dark:text-blue-400" },
-          { label: "This Week", value: weekStats?.total || 0, sub: `${weekStats?.completed || 0} completed`, icon: TrendingUp, color: "border-l-emerald-500", iconBg: "bg-emerald-500/10", iconColor: "text-emerald-600 dark:text-emerald-400" },
-          { label: "Pending", value: weekStats?.pending || 0, sub: "Awaiting consult", icon: Clock, color: "border-l-orange-500", iconBg: "bg-orange-500/10", iconColor: "text-orange-600 dark:text-orange-400" },
-          { label: "Revenue", value: formatPrice(weekStats?.revenue || 0), sub: "+12% vs last week", icon: Wallet, color: "border-l-purple-500", iconBg: "bg-purple-500/10", iconColor: "text-purple-600 dark:text-purple-400" },
-        ].map((stat) => (
+        {statsCards.map((stat) => (
           <Card key={stat.label} className={`border-l-4 ${stat.color} min-w-[160px] flex-1 snap-start`}>
             <CardContent className="p-3 sm:p-4">
               <div className="flex items-start justify-between gap-2">
@@ -121,7 +187,7 @@ const ProviderDashboard = () => {
         ))}
       </div>
 
-      {/* Quick Actions — 2-col mobile, 3-col sm, 6-col md */}
+      {/* Quick Actions */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 sm:gap-3">
         {quickActions.map((action, idx) => (
           <Card 
@@ -139,28 +205,35 @@ const ProviderDashboard = () => {
         ))}
       </div>
 
-      {/* AI Banner */}
-      <Card className="border-primary/30 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5">
-        <CardContent className="p-4">
-          <div className="flex items-start gap-3">
-            <div className="p-2.5 rounded-full bg-primary/20 shrink-0">
-              <Brain className="h-5 w-5 text-primary" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-1.5 mb-0.5">
-                <h3 className="font-semibold text-sm text-foreground">Clinical AI</h3>
-                <Sparkles className="h-3.5 w-3.5 text-primary" />
+      {/* AI Banner — only for clinical roles */}
+      {(isDoctor || isRadiologist || isHealthPersonnel) && (
+        <Card className="border-primary/30 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5">
+          <CardContent className="p-4">
+            <div className="flex items-start gap-3">
+              <div className="p-2.5 rounded-full bg-primary/20 shrink-0">
+                <Brain className="h-5 w-5 text-primary" />
               </div>
-              <p className="text-xs text-muted-foreground leading-relaxed mb-3">
-                AI-powered clinical insights and evidence-based recommendations.
-              </p>
-              <Button size="sm" onClick={() => navigate('/ai-diagnostics')} className="gap-1.5 text-xs">
-                Open <ArrowRight className="h-3 w-3" />
-              </Button>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-1.5 mb-0.5">
+                  <h3 className="font-semibold text-sm text-foreground">
+                    {isRadiologist ? "Imaging AI" : "Clinical AI"}
+                  </h3>
+                  <Sparkles className="h-3.5 w-3.5 text-primary" />
+                </div>
+                <p className="text-xs text-muted-foreground leading-relaxed mb-3">
+                  {isRadiologist 
+                    ? "AI-assisted anomaly detection and imaging analysis."
+                    : "AI-powered clinical insights and evidence-based recommendations."
+                  }
+                </p>
+                <Button size="sm" onClick={() => navigate('/ai-diagnostics')} className="gap-1.5 text-xs">
+                  Open <ArrowRight className="h-3 w-3" />
+                </Button>
+              </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Today's Queue */}
       <Card>
@@ -169,7 +242,7 @@ const ProviderDashboard = () => {
             <div>
               <CardTitle className="flex items-center gap-2 text-base">
                 <ClipboardList className="h-4 w-4 text-primary" />
-                Today's Queue
+                {isNurse ? "Today's Visits" : isRadiologist ? "Today's Reads" : "Today's Queue"}
               </CardTitle>
               <CardDescription className="text-xs">{format(today, 'MMMM d')}</CardDescription>
             </div>
@@ -182,7 +255,9 @@ const ProviderDashboard = () => {
           {todayAppointments.length === 0 ? (
             <div className="text-center py-6 text-muted-foreground">
               <Calendar className="h-10 w-10 mx-auto mb-2 opacity-50" />
-              <p className="text-sm">No appointments today</p>
+              <p className="text-sm">
+                {isNurse ? "No visits today" : isRadiologist ? "No reads scheduled today" : "No appointments today"}
+              </p>
               <Button variant="link" size="sm" onClick={() => navigate('/provider-calendar')} className="text-xs">
                 View calendar
               </Button>
@@ -255,23 +330,23 @@ const ProviderDashboard = () => {
         </CardContent>
       </Card>
       
-      {/* Tabs — scrollable on mobile */}
+      {/* Tabs */}
       <Tabs defaultValue="schedule" className="space-y-4">
         <TabsList className="w-full overflow-x-auto flex justify-start gap-1 h-auto p-1">
-          <TabsTrigger value="schedule" className="text-xs px-3 py-1.5 shrink-0">Schedule</TabsTrigger>
-          <TabsTrigger value="patients" className="text-xs px-3 py-1.5 shrink-0">Patients</TabsTrigger>
-          <TabsTrigger value="waitlist" className="text-xs px-3 py-1.5 shrink-0">Waitlist</TabsTrigger>
-          <TabsTrigger value="analytics" className="text-xs px-3 py-1.5 shrink-0 gap-1">
-            <BarChart3 className="h-3 w-3" /> Analytics
-          </TabsTrigger>
-          <TabsTrigger value="signatures" className="text-xs px-3 py-1.5 shrink-0">Signatures</TabsTrigger>
+          {tabConfig.map(tab => (
+            <TabsTrigger key={tab.value} value={tab.value} className="text-xs px-3 py-1.5 shrink-0 gap-1">
+              {tab.icon}{tab.label}
+            </TabsTrigger>
+          ))}
         </TabsList>
 
         <TabsContent value="schedule"><ScheduleManager /></TabsContent>
         <TabsContent value="patients"><PatientRecords /></TabsContent>
         <TabsContent value="waitlist"><WaitlistManager /></TabsContent>
         <TabsContent value="analytics"><ProviderAnalyticsDashboard /></TabsContent>
-        <TabsContent value="signatures"><DigitalSignature /></TabsContent>
+        {(isDoctor || isHealthPersonnel) && (
+          <TabsContent value="signatures"><DigitalSignature /></TabsContent>
+        )}
       </Tabs>
     </div>
   );
