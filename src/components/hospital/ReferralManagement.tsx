@@ -1,25 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowRightLeft, Plus, ArrowRight, ArrowLeft, CheckCircle2, Clock } from 'lucide-react';
+import { ArrowRightLeft, Plus, ArrowRight, ArrowLeft, CheckCircle2, Clock, Inbox } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useQuery } from '@tanstack/react-query';
 
 export const ReferralManagement = ({ hospital }: { hospital: any }) => {
-  const [incoming] = useState([
-    { id: 'REF-IN-001', patient: 'John Mwale', from: 'Chipata District Hospital', doctor: 'Dr. Kamanga', reason: 'Cardiac catheterization needed', dept: 'Cardiology', date: '2026-03-04', status: 'accepted', priority: 'urgent' },
-    { id: 'REF-IN-002', patient: 'Mary Phiri', from: 'Ndola Central', doctor: 'Dr. Sakala', reason: 'Neurosurgery consult', dept: 'Neurosurgery', date: '2026-03-03', status: 'pending', priority: 'routine' },
-  ]);
+  const { data: referrals = [], isLoading } = useQuery({
+    queryKey: ['referrals', hospital?.id],
+    queryFn: async () => {
+      if (!hospital?.id) return [];
+      // Try to query a referrals table if it exists; gracefully return empty
+      try {
+        const { data, error } = await supabase
+          .from('patient_referrals' as any)
+          .select('*')
+          .or(`from_institution_id.eq.${hospital.id},to_institution_id.eq.${hospital.id}`)
+          .order('created_at', { ascending: false })
+          .limit(50);
+        if (error) return [];
+        return data || [];
+      } catch {
+        return [];
+      }
+    },
+    enabled: !!hospital?.id,
+  });
 
-  const [outgoing] = useState([
-    { id: 'REF-OUT-001', patient: 'Grace Banda', to: 'UTH Lusaka', doctor: 'Dr. Banda', reason: 'Oncology treatment - advanced breast cancer', dept: 'Oncology', date: '2026-03-02', status: 'acknowledged', priority: 'urgent' },
-    { id: 'REF-OUT-002', patient: 'Peter Zulu', to: 'Levy Mwanawasa Hospital', doctor: 'Dr. Tembo', reason: 'Renal transplant evaluation', dept: 'Nephrology', date: '2026-03-01', status: 'sent', priority: 'routine' },
-  ]);
+  const incoming = referrals.filter((r: any) => r.to_institution_id === hospital?.id);
+  const outgoing = referrals.filter((r: any) => r.from_institution_id === hospital?.id);
 
-  const [internal] = useState([
-    { id: 'REF-INT-001', patient: 'David Mumba', from: 'Dr. Banda (General)', to: 'Dr. Chanda (Cardiology)', reason: 'Abnormal ECG, needs cardiology opinion', date: '2026-03-04', status: 'seen' },
-    { id: 'REF-INT-002', patient: 'Sarah Tembo', from: 'Dr. Mulenga (Ortho)', to: 'Dr. Tembo (Physio)', reason: 'Post-op rehabilitation', date: '2026-03-04', status: 'pending' },
-  ]);
+  const EmptyState = ({ message }: { message: string }) => (
+    <div className="flex flex-col items-center justify-center py-8 text-center">
+      <Inbox className="h-10 w-10 text-muted-foreground/40 mb-3" />
+      <p className="text-sm text-muted-foreground">{message}</p>
+    </div>
+  );
 
   return (
     <div className="space-y-4">
@@ -44,71 +62,59 @@ export const ReferralManagement = ({ hospital }: { hospital: any }) => {
         </CardContent></Card>
         <Card><CardContent className="pt-4 text-center">
           <ArrowRightLeft className="h-5 w-5 mx-auto text-primary mb-1" />
-          <p className="text-2xl font-bold text-foreground">{internal.length}</p>
-          <p className="text-xs text-muted-foreground">Internal</p>
+          <p className="text-2xl font-bold text-foreground">{referrals.length}</p>
+          <p className="text-xs text-muted-foreground">Total</p>
         </CardContent></Card>
       </div>
 
-      <Tabs defaultValue="incoming">
-        <TabsList>
-          <TabsTrigger value="incoming" className="text-xs">Incoming</TabsTrigger>
-          <TabsTrigger value="outgoing" className="text-xs">Outgoing</TabsTrigger>
-          <TabsTrigger value="internal" className="text-xs">Internal</TabsTrigger>
+      <Tabs defaultValue="incoming" className="w-full">
+        <TabsList className="w-full grid grid-cols-2">
+          <TabsTrigger value="incoming" className="gap-1.5"><ArrowLeft className="h-3.5 w-3.5" /> Incoming</TabsTrigger>
+          <TabsTrigger value="outgoing" className="gap-1.5"><ArrowRight className="h-3.5 w-3.5" /> Outgoing</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="incoming" className="space-y-3">
-          {incoming.map(r => (
-            <Card key={r.id} className={r.priority === 'urgent' ? 'border-amber-500/30' : ''}>
-              <CardContent className="pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <div>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-medium text-sm text-foreground">{r.patient}</span>
-                    <Badge variant={r.status === 'accepted' ? 'default' : 'secondary'} className="text-[10px] capitalize">{r.status}</Badge>
-                    {r.priority === 'urgent' && <Badge variant="destructive" className="text-[10px]">URGENT</Badge>}
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-1">From: {r.from} ({r.doctor}) → {r.dept}</p>
-                  <p className="text-xs text-muted-foreground">{r.reason}</p>
-                </div>
-                <div className="flex gap-1">
-                  {r.status === 'pending' && <>
-                    <Button size="sm" className="text-xs">Accept</Button>
-                    <Button size="sm" variant="outline" className="text-xs">Decline</Button>
-                  </>}
-                  <Button size="sm" variant="outline" className="text-xs">View</Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+        <TabsContent value="incoming">
+          {incoming.length === 0 ? (
+            <EmptyState message="No incoming referrals yet" />
+          ) : (
+            <div className="space-y-2">
+              {incoming.map((ref: any) => (
+                <Card key={ref.id}>
+                  <CardContent className="p-4 flex items-center justify-between">
+                    <div>
+                      <p className="font-medium text-foreground">{ref.patient_name || 'Patient'}</p>
+                      <p className="text-xs text-muted-foreground">{ref.reason || 'No reason specified'}</p>
+                    </div>
+                    <Badge variant={ref.status === 'accepted' ? 'default' : 'secondary'}>
+                      {ref.status || 'pending'}
+                    </Badge>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
         </TabsContent>
 
-        <TabsContent value="outgoing" className="space-y-3">
-          {outgoing.map(r => (
-            <Card key={r.id}>
-              <CardContent className="pt-4">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-medium text-sm text-foreground">{r.patient}</span>
-                  <Badge variant={r.status === 'acknowledged' ? 'default' : 'secondary'} className="text-[10px] capitalize">{r.status}</Badge>
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">To: {r.to} • {r.dept} • {r.doctor}</p>
-                <p className="text-xs text-muted-foreground">{r.reason}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </TabsContent>
-
-        <TabsContent value="internal" className="space-y-3">
-          {internal.map(r => (
-            <Card key={r.id}>
-              <CardContent className="pt-4">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-medium text-sm text-foreground">{r.patient}</span>
-                  <Badge variant={r.status === 'seen' ? 'default' : 'secondary'} className="text-[10px] capitalize">{r.status}</Badge>
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">{r.from} → {r.to}</p>
-                <p className="text-xs text-muted-foreground">{r.reason}</p>
-              </CardContent>
-            </Card>
-          ))}
+        <TabsContent value="outgoing">
+          {outgoing.length === 0 ? (
+            <EmptyState message="No outgoing referrals yet" />
+          ) : (
+            <div className="space-y-2">
+              {outgoing.map((ref: any) => (
+                <Card key={ref.id}>
+                  <CardContent className="p-4 flex items-center justify-between">
+                    <div>
+                      <p className="font-medium text-foreground">{ref.patient_name || 'Patient'}</p>
+                      <p className="text-xs text-muted-foreground">{ref.reason || 'No reason specified'}</p>
+                    </div>
+                    <Badge variant={ref.status === 'acknowledged' ? 'default' : 'secondary'}>
+                      {ref.status || 'sent'}
+                    </Badge>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
         </TabsContent>
       </Tabs>
     </div>

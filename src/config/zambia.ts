@@ -288,13 +288,7 @@ export const ZAMBIAN_TESTIMONIALS = [
   },
 ];
 
-// Hero section stats for Zambia
-export const ZAMBIAN_STATS = {
-  hospitals: '50+',
-  pharmacies: '200+',
-  doctors: '500+',
-  patients: '10,000+',
-  provinces: '10',
-};
+// DEPRECATED: Use usePlatformStats() hook for dynamic stats instead
+// export const ZAMBIAN_STATS = { ... };
 
 export default ZAMBIA_CONFIG;
