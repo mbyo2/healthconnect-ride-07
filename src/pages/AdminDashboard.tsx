@@ -23,10 +23,14 @@ const AdminDashboard = () => {
       </div>
 
       <Tabs defaultValue="users" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="users" className="flex items-center gap-2">
             <Users className="h-4 w-4" />
-            User Management
+            Users
+          </TabsTrigger>
+          <TabsTrigger value="revenue" className="flex items-center gap-2">
+            <DollarSign className="h-4 w-4" />
+            Revenue
           </TabsTrigger>
           <TabsTrigger value="applications" className="flex items-center gap-2">
             <Building2 className="h-4 w-4" />
@@ -38,7 +42,7 @@ const AdminDashboard = () => {
           </TabsTrigger>
           <TabsTrigger value="test" className="flex items-center gap-2">
             <Shield className="h-4 w-4" />
-            Test Accounts
+            Test
           </TabsTrigger>
         </TabsList>
 
