@@ -1,4 +1,5 @@
 import React, { Suspense, lazy, useMemo } from 'react';
+import { HelmetProvider } from 'react-helmet-async';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { MobileLayout } from '@/components/MobileLayout';
 import { LoadingScreen } from '@/components/LoadingScreen';
