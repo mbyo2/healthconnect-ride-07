@@ -280,7 +280,6 @@ export function BottomNav() {
         { to: "/prescriptions", label: "Write Prescriptions", description: "Create and manage prescriptions", icon: <Pill className="h-5 w-5" /> },
         { to: "/connections", label: "My Patients", description: "Your connected patients", icon: <Users className="h-5 w-5" /> },
         { to: "/wallet", label: "Earnings", description: "View your earnings and payouts", icon: <Wallet className="h-5 w-5" /> },
-        { to: "/healthcare-application", label: "Applications", description: "Review healthcare applications", icon: <Activity className="h-5 w-5" /> },
         { to: "/emergency", label: "Emergency Protocols", description: "Emergency response tools", icon: <AlertTriangle className="h-5 w-5 text-red-600" /> },
         { to: "/profile", label: "Professional Profile", description: "Credentials and specializations", icon: <User className="h-5 w-5" /> },
         { to: "/settings", label: "Settings", description: "Practice preferences", icon: <Settings className="h-5 w-5" /> },
