@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getRoleLandingPage, hasRoutePermission, PUBLIC_ROUTES } from '@/utils/rolePermissions';
+import { getRoleLandingPage, hasRoutePermission, PUBLIC_ROUTES, USER_ROLES, ROLE_PERMISSIONS } from '@/utils/rolePermissions';
 import type { UserRole } from '@/utils/rolePermissions';
 
 describe('Role Routing', () => {
@@ -48,6 +48,18 @@ describe('Role Routing', () => {
     it('prioritizes doctor over patient when user has both', () => {
       expect(getRoleLandingPage(['patient', 'doctor'])).toBe('/provider-dashboard');
     });
+
+    // ─── All 26 roles land on a valid page ─────────────────
+    const allRoles = Object.values(USER_ROLES);
+    allRoles.forEach(role => {
+      it(`${role} landing page is accessible by that role`, () => {
+        const landing = getRoleLandingPage([role as UserRole]);
+        expect(landing).toBeTruthy();
+        // The landing page should be in that role's permissions or be a common route
+        const hasAccess = hasRoutePermission([role as UserRole], landing);
+        expect(hasAccess).toBe(true);
+      });
+    });
   });
 
   describe('hasRoutePermission', () => {
@@ -94,6 +106,56 @@ describe('Role Routing', () => {
 
     it('allows pricing for everyone (public)', () => {
       expect(hasRoutePermission(null, '/pricing')).toBe(true);
+    });
+
+    // ─── institution_staff must NOT access /institution/settings ────
+    it('denies /institution/settings for institution_staff', () => {
+      expect(hasRoutePermission(['institution_staff'], '/institution/settings')).toBe(false);
+    });
+
+    it('allows /institution/settings for institution_admin', () => {
+      expect(hasRoutePermission(['institution_admin'], '/institution/settings')).toBe(true);
+    });
+
+    // ─── Cross-role isolation checks ───────────────────────
+    it('denies lab routes for pharmacist', () => {
+      expect(hasRoutePermission(['pharmacist'], '/lab-management')).toBe(false);
+    });
+
+    it('denies admin-dashboard for doctor', () => {
+      expect(hasRoutePermission(['doctor'], '/admin-dashboard')).toBe(false);
+    });
+
+    it('denies provider-dashboard for receptionist', () => {
+      expect(hasRoutePermission(['receptionist'], '/provider-dashboard')).toBe(false);
+    });
+
+    it('allows institution-dashboard for billing_staff', () => {
+      expect(hasRoutePermission(['billing_staff'], '/institution-dashboard')).toBe(true);
+    });
+
+    it('denies create-admin for support role', () => {
+      expect(hasRoutePermission(['support'], '/create-admin')).toBe(false);
+    });
+  });
+
+  describe('Permission completeness', () => {
+    const allRoles = Object.values(USER_ROLES);
+
+    it('every role has a permissions entry', () => {
+      allRoles.forEach(role => {
+        expect(ROLE_PERMISSIONS[role]).toBeDefined();
+        expect(Array.isArray(ROLE_PERMISSIONS[role])).toBe(true);
+        expect(ROLE_PERMISSIONS[role].length).toBeGreaterThan(0);
+      });
+    });
+
+    it('no role has duplicate routes', () => {
+      allRoles.forEach(role => {
+        const routes = ROLE_PERMISSIONS[role];
+        const unique = new Set(routes);
+        expect(unique.size).toBe(routes.length);
+      });
     });
   });
 });

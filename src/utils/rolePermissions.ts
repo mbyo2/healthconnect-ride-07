@@ -1,65 +1,10 @@
 // Role-based permissions and route definitions
-export const USER_ROLES = {
-  PATIENT: 'patient',
-  HEALTH_PERSONNEL: 'health_personnel',
-  PHARMACY: 'pharmacy',
-  INSTITUTION_ADMIN: 'institution_admin',
-  INSTITUTION_STAFF: 'institution_staff',
-  ADMIN: 'admin',
-  LAB: 'lab',
-  SUPER_ADMIN: 'super_admin',
-  SUPPORT: 'support',
-  DOCTOR: 'doctor',
-  NURSE: 'nurse',
-  RADIOLOGIST: 'radiologist',
-  PHARMACIST: 'pharmacist',
-  LAB_TECHNICIAN: 'lab_technician',
-  RECEPTIONIST: 'receptionist',
-  HR_MANAGER: 'hr_manager',
-  CXO: 'cxo',
-  OT_STAFF: 'ot_staff',
-  PHLEBOTOMIST: 'phlebotomist',
-  BILLING_STAFF: 'billing_staff',
-  INVENTORY_MANAGER: 'inventory_manager',
-  TRIAGE_STAFF: 'triage_staff',
-  MAINTENANCE_MANAGER: 'maintenance_manager',
-  SPECIALIST: 'specialist',
-  AMBULANCE_STAFF: 'ambulance_staff',
-  PATHOLOGIST: 'pathologist',
-} as const;
+// Re-export from centralized config
+export { USER_ROLES, COMMON_ROUTES, PROVIDER_CORE_ROUTES, INSTITUTION_OPERATIONAL_ROUTES, PUBLIC_ROUTES, ROLE_META, ROLE_PRIORITY } from '@/config/roleConfig';
+export type { UserRole, RoleMeta } from '@/config/roleConfig';
 
-export type UserRole = typeof USER_ROLES[keyof typeof USER_ROLES];
-
-// ─── Shared route groups ────────────────────────────────────────────
-const COMMON_ROUTES = [
-  '/',
-  '/home',
-  '/onboarding',
-  '/profile',
-  '/settings',
-  '/notifications',
-  '/privacy-security',
-  '/payment-success',
-  '/payment-cancel'
-];
-
-const PROVIDER_CORE_ROUTES = [
-  '/provider-dashboard',
-  '/provider-portal',
-  '/appointments',
-  '/appointments/:id',
-  '/chat',
-  '/connections',
-  '/medical-records',
-  '/provider-calendar',
-  '/wallet',
-  '/emergency',
-  '/video-consultations',
-  '/application-status',
-  '/healthcare-application', // to submit their own application
-  '/map',
-  '/search'
-];
+import { USER_ROLES, COMMON_ROUTES, PROVIDER_CORE_ROUTES, INSTITUTION_OPERATIONAL_ROUTES, PUBLIC_ROUTES, ROLE_META, ROLE_PRIORITY } from '@/config/roleConfig';
+import type { UserRole } from '@/config/roleConfig';
 
 // ─── Per-role permissions ───────────────────────────────────────────
 export const ROLE_PERMISSIONS: Record<string, string[]> = {
@@ -114,7 +59,6 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/iot-monitoring',      // vitals monitoring
     '/health-analytics',    // patient health trends
     '/telemedicine',
-    '/video-consultations', // telenursing
   ],
 
   // ── Radiologist ──────────────────────────────────────────
@@ -336,17 +280,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
   ]
 };
 
-// New role permissions
-const INSTITUTION_OPERATIONAL_ROUTES = [
-  ...COMMON_ROUTES,
-  '/institution-dashboard',
-  '/institution-portal',
-  '/institution/patients',
-  '/institution/appointments',
-  '/chat',
-  '/map',
-  '/search',
-];
+// New role permissions (INSTITUTION_OPERATIONAL_ROUTES imported from config)
 
 ROLE_PERMISSIONS[USER_ROLES.RECEPTIONIST] = [
   ...INSTITUTION_OPERATIONAL_ROUTES,
@@ -489,27 +423,7 @@ export const ROLE_LANDING_PAGES: Record<string, string> = {
   [USER_ROLES.PATHOLOGIST]: '/lab-management',
 };
 
-// Public routes that don't require authentication
-export const PUBLIC_ROUTES = [
-  '/auth',
-  '/login',
-  '/register',
-  '/landing',
-  '/healthcare-professionals',
-  '/healthcare-institutions',
-  '/healthcare-application',
-  '/terms',
-  '/privacy',
-  '/contact',
-  '/search',
-  '/providers',
-  '/marketplace-users',
-  '/emergency',
-  '/provider/:id',
-  '/booking-confirmed',
-  '/pricing',
-  '/reset-password'
-];
+// PUBLIC_ROUTES imported from config
 
 // Check if a user has permission to access a route (supports multiple roles)
 export const hasRoutePermission = (userRoles: UserRole[] | null, route: string): boolean => {
