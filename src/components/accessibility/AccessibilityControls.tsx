@@ -338,7 +338,7 @@ export const AccessibilityControls: React.FC = () => {
             />
           </div>
 
-          <div className="text-xs text-gray-600 space-y-1">
+          <div className="text-xs text-muted-foreground space-y-1">
             <div><strong>Keyboard Shortcuts:</strong></div>
             <div>• Ctrl+Alt+H: Navigate to next heading</div>
             <div>• Ctrl+Alt+L: Navigate to next landmark</div>

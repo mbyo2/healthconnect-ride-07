@@ -16,7 +16,7 @@ const statusVariants = cva("", {
       rejected: "bg-red-500 hover:bg-red-600",
       completed: "bg-blue-500 hover:bg-blue-600",
       scheduled: "bg-purple-500 hover:bg-purple-600",
-      canceled: "bg-gray-500 hover:bg-gray-600",
+      canceled: "bg-muted-foreground hover:bg-muted-foreground/80",
     },
   },
   defaultVariants: {
