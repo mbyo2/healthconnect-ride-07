@@ -147,11 +147,12 @@ export const Auth = () => {
           role: data.providerType,
           specialty: data.specialty || data.providerType,
           license_number: data.licenseNumber,
+          years_experience: data.yearsExperience ? parseInt(data.yearsExperience) : 0,
         },
       },
     });
     if (error) showError(error.message);
-    else { showSuccess("Account created! Check your email to verify."); setActiveTab("signin"); }
+    else { showSuccess("Account created! Your application is under review. Check your email to verify."); setActiveTab("signin"); }
     setLocalLoading(false);
   };
 
