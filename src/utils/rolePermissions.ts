@@ -281,17 +281,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
   ]
 };
 
-// New role permissions
-const INSTITUTION_OPERATIONAL_ROUTES = [
-  ...COMMON_ROUTES,
-  '/institution-dashboard',
-  '/institution-portal',
-  '/institution/patients',
-  '/institution/appointments',
-  '/chat',
-  '/map',
-  '/search',
-];
+// New role permissions (INSTITUTION_OPERATIONAL_ROUTES imported from config)
 
 ROLE_PERMISSIONS[USER_ROLES.RECEPTIONIST] = [
   ...INSTITUTION_OPERATIONAL_ROUTES,
