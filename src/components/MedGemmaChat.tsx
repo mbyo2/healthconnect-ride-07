@@ -187,6 +187,7 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
           const medgemmaResponse = await supabase.functions.invoke('medgemma-chat', {
             body: {
               message: userMessage.content,
+              userRole: activeRole,
               conversationHistory: messages.slice(-10).map(m => ({
                 role: m.role,
                 content: m.content
