@@ -13,7 +13,7 @@ export const ThemeToggle = () => {
     const newTheme = theme === "dark" ? "light" : "dark";
     setTheme(newTheme);
     toast.success(`${newTheme.charAt(0).toUpperCase() + newTheme.slice(1)} mode activated`, {
-      className: "bg-trust-50 border-trust-200 text-trust-900 dark:bg-trust-900 dark:text-trust-50"
+      className: "bg-background border-border text-foreground"
     });
   };
 

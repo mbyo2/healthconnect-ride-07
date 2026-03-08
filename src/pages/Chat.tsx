@@ -26,7 +26,7 @@ const Chat = () => {
         <meta name="description" content="Chat with healthcare professionals" />
       </Helmet>
       <div className="container mx-auto py-6 animate-fade-in">
-        <h1 className="text-2xl font-bold mb-4 text-trust-700 dark:text-trust-300">
+        <h1 className="text-2xl font-bold mb-4 text-foreground">
           Messages
         </h1>
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-soft-blue">
