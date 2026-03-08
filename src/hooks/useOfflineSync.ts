@@ -91,11 +91,11 @@ export function useOfflineSync() {
       for (const action of actions) {
         let error: any = null;
         if (action.operation === 'insert') {
-          const res = await supabase.from(action.table).insert(action.data);
+          const res = await (supabase.from(action.table as any) as any).insert(action.data);
           error = res.error;
         } else if (action.operation === 'update') {
           const { id, ...rest } = action.data;
-          const res = await supabase.from(action.table).update(rest).eq('id', id);
+          const res = await (supabase.from(action.table as any) as any).update(rest).eq('id', id);
           error = res.error;
         }
 
