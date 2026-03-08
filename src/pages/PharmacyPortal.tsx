@@ -7,7 +7,7 @@ import { PharmacyDashboard } from '@/components/pharmacy/PharmacyDashboard';
 import { PharmacyPOS } from '@/components/pharmacy/PharmacyPOS';
 import { MedicationInventory } from '@/components/pharmacy/MedicationInventory';
 import { PrescriptionFulfillment } from '@/components/pharmacy/PrescriptionFulfillment';
-import { SupplierManagement } from '@/components/pharmacy/SupplierManagement';
+import SupplierManagement from '@/components/pharmacy/SupplierManagement';
 import { PharmacyCustomers } from '@/components/pharmacy/PharmacyCustomers';
 import { PharmacySalesReport } from '@/components/pharmacy/PharmacySalesReport';
 import { PharmacyDeliveryTracking } from '@/components/pharmacy/PharmacyDeliveryTracking';
