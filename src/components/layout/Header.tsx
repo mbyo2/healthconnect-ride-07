@@ -14,16 +14,16 @@ export const Header = () => {
   const { isAuthenticated } = useAuth();
 
   return (
-    <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b">
-      <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-6">
-          <div className="logo-link" onClick={() => navigate('/')}>
+    <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b w-full overflow-hidden">
+      <div className="max-w-screen-2xl mx-auto px-4 py-3 flex items-center justify-between">
+        <div className="flex items-center gap-6 min-w-0">
+          <div className="logo-link flex-shrink-0 cursor-pointer" onClick={() => navigate('/')}>
             <Logo />
           </div>
           <DesktopNavigation />
         </div>
         
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-shrink-0">
           {isAuthenticated && <RoleSwitcher />}
           <HeaderControls 
             isMenuOpen={isMenuOpen} 
