@@ -80,12 +80,12 @@ export const MedicalHistory = () => {
                 <CardTitle className="text-lg">
                   {record.record_type}
                 </CardTitle>
-                <div classNammuted-foregroundmuted-foregroundgray-500">
+                <div className="text-sm text-muted-foreground">
                   {new Date(record.date).toLocaleDateString()}
                 </div>
               </CardHeader>
               <CardContent>
-                <p foregrounde="text-gray-700">{record.description}</p>
+                <p className="text-foreground">{record.description}</p>
               </CardContent>
             </Card>
           ))}
