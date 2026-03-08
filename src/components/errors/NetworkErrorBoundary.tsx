@@ -41,7 +41,7 @@ export const NetworkErrorBoundary = ({
   if (hasError && !isOnline) {
     return fallbackComponent || (
       <div className="p-4 border rounded-lg bg-background shadow-sm">
-        <Alert variant="destructive" className="border-red-200 bg-red-50 dark:bg-red-950/30 dark:border-red-800">
+        <Alert variant="destructive" className="border-destructive/30 bg-destructive/5">
           <WifiOff className="h-4 w-4" />
           <AlertTitle>Network Error</AlertTitle>
           <AlertDescription className="mt-2">
