@@ -337,6 +337,129 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
   ]
 };
 
+// New role permissions
+const INSTITUTION_OPERATIONAL_ROUTES = [
+  ...COMMON_ROUTES,
+  '/institution-dashboard',
+  '/institution-portal',
+  '/institution/patients',
+  '/institution/appointments',
+  '/chat',
+  '/map',
+  '/search',
+];
+
+ROLE_PERMISSIONS[USER_ROLES.RECEPTIONIST] = [
+  ...INSTITUTION_OPERATIONAL_ROUTES,
+  '/appointments',
+  '/appointments/:id',
+];
+
+ROLE_PERMISSIONS[USER_ROLES.HR_MANAGER] = [
+  ...INSTITUTION_OPERATIONAL_ROUTES,
+  '/institution/personnel',
+  '/institution/reports',
+  '/institution/settings',
+  '/wallet',
+];
+
+ROLE_PERMISSIONS[USER_ROLES.CXO] = [
+  ...INSTITUTION_OPERATIONAL_ROUTES,
+  '/institution/reports',
+  '/institution/personnel',
+  '/institution/settings',
+  '/institution/devices',
+  '/hospital-management',
+  '/wallet',
+  '/admin-wallet',
+  '/health-analytics',
+  '/advanced-dashboard',
+  '/compliance-audit',
+];
+
+ROLE_PERMISSIONS[USER_ROLES.OT_STAFF] = [
+  ...COMMON_ROUTES,
+  '/institution-dashboard',
+  '/appointments',
+  '/appointments/:id',
+  '/medical-records',
+  '/chat',
+  '/emergency',
+];
+
+ROLE_PERMISSIONS[USER_ROLES.PHLEBOTOMIST] = [
+  ...COMMON_ROUTES,
+  '/lab-management',
+  '/medical-records',
+  '/connections',
+  '/map',
+  '/search',
+  '/chat',
+];
+
+ROLE_PERMISSIONS[USER_ROLES.BILLING_STAFF] = [
+  ...INSTITUTION_OPERATIONAL_ROUTES,
+  '/wallet',
+  '/institution/reports',
+  '/prescriptions',
+];
+
+ROLE_PERMISSIONS[USER_ROLES.INVENTORY_MANAGER] = [
+  ...INSTITUTION_OPERATIONAL_ROUTES,
+  '/pharmacy-inventory',
+  '/institution/reports',
+  '/medications',
+];
+
+ROLE_PERMISSIONS[USER_ROLES.TRIAGE_STAFF] = [
+  ...COMMON_ROUTES,
+  '/institution-dashboard',
+  '/appointments',
+  '/appointments/:id',
+  '/medical-records',
+  '/emergency',
+  '/chat',
+  '/search',
+];
+
+ROLE_PERMISSIONS[USER_ROLES.MAINTENANCE_MANAGER] = [
+  ...INSTITUTION_OPERATIONAL_ROUTES,
+  '/institution/devices',
+  '/institution/reports',
+  '/institution/settings',
+];
+
+ROLE_PERMISSIONS[USER_ROLES.SPECIALIST] = [
+  ...COMMON_ROUTES,
+  ...PROVIDER_CORE_ROUTES,
+  '/prescriptions',
+  '/ai-diagnostics',
+  '/telemedicine',
+  '/health-analytics',
+  '/medications',
+];
+
+ROLE_PERMISSIONS[USER_ROLES.AMBULANCE_STAFF] = [
+  ...COMMON_ROUTES,
+  '/institution-dashboard',
+  '/emergency',
+  '/emergency-response',
+  '/map',
+  '/chat',
+  '/appointments',
+];
+
+ROLE_PERMISSIONS[USER_ROLES.PATHOLOGIST] = [
+  ...COMMON_ROUTES,
+  '/lab-management',
+  '/medical-records',
+  '/connections',
+  '/wallet',
+  '/map',
+  '/search',
+  '/ai-diagnostics',
+];
+
 // Default landing pages for each role
 export const ROLE_LANDING_PAGES: Record<string, string> = {
   [USER_ROLES.PATIENT]: '/home',
@@ -352,7 +475,19 @@ export const ROLE_LANDING_PAGES: Record<string, string> = {
   [USER_ROLES.NURSE]: '/provider-dashboard',
   [USER_ROLES.RADIOLOGIST]: '/provider-dashboard',
   [USER_ROLES.PHARMACIST]: '/pharmacy-portal',
-  [USER_ROLES.LAB_TECHNICIAN]: '/lab-management'
+  [USER_ROLES.LAB_TECHNICIAN]: '/lab-management',
+  [USER_ROLES.RECEPTIONIST]: '/institution-dashboard',
+  [USER_ROLES.HR_MANAGER]: '/institution-dashboard',
+  [USER_ROLES.CXO]: '/institution-dashboard',
+  [USER_ROLES.OT_STAFF]: '/institution-dashboard',
+  [USER_ROLES.PHLEBOTOMIST]: '/lab-management',
+  [USER_ROLES.BILLING_STAFF]: '/institution-dashboard',
+  [USER_ROLES.INVENTORY_MANAGER]: '/institution-dashboard',
+  [USER_ROLES.TRIAGE_STAFF]: '/institution-dashboard',
+  [USER_ROLES.MAINTENANCE_MANAGER]: '/institution-dashboard',
+  [USER_ROLES.SPECIALIST]: '/provider-dashboard',
+  [USER_ROLES.AMBULANCE_STAFF]: '/institution-dashboard',
+  [USER_ROLES.PATHOLOGIST]: '/lab-management',
 };
 
 // Public routes that don't require authentication
