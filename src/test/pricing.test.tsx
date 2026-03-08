@@ -79,12 +79,12 @@ describe('PricingPage', () => {
     expect(screen.getByText(/Pharmacies/)).toBeInTheDocument();
   });
 
-  it('displays ZMW currency notice', async () => {
+  it('displays pricing subtitle', async () => {
     const { PricingPage } = await import('@/components/subscription/PricingPage');
     const Wrapper = createWrapper();
     render(<PricingPage />, { wrapper: Wrapper });
 
-    expect(screen.getByText(/Zambian Kwacha/)).toBeInTheDocument();
+    expect(screen.getByText(/Free to browse for patients/)).toBeInTheDocument();
   });
 });
 
