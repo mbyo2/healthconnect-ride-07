@@ -66,6 +66,7 @@ export const MobileLayout = ({ children, isLoading }: MobileLayoutProps) => {
         </div>
       </main>
       {isAuthenticated && <BottomNav />}
+      <OfflineBanner />
       <OfflineIndicator />
       <AccessibilityMenu />
     </div>
