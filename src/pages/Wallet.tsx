@@ -1,6 +1,7 @@
 import { WalletCard } from "@/components/home/WalletCard";
 import { WalletTopUp } from "@/components/wallet/WalletTopUp";
 import { WalletHistory } from "@/components/wallet/WalletHistory";
+import { CurrencySelector } from "@/components/wallet/CurrencySelector";
 import { useAuth } from "@/context/AuthContext";
 import { Navigate } from "react-router-dom";
 import { LoadingScreen } from "@/components/LoadingScreen";
@@ -18,9 +19,14 @@ const Wallet = () => {
 
     return (
         <div className="space-y-6 max-w-4xl mx-auto">
-            <div className="space-y-2">
-                <h1 className="text-2xl sm:text-3xl font-bold text-foreground">My Wallet</h1>
-                <p className="text-sm sm:text-base text-muted-foreground">Manage your funds and view transaction history</p>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="space-y-2">
+                    <h1 className="text-2xl sm:text-3xl font-bold text-foreground">My Wallet</h1>
+                    <p className="text-sm sm:text-base text-muted-foreground">Manage your funds and view transaction history</p>
+                </div>
+                <div className="w-full sm:w-48">
+                    <CurrencySelector />
+                </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

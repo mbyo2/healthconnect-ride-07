@@ -8,11 +8,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
 import { Loader2, DollarSign, CreditCard, ShieldCheck } from "lucide-react";
+import { useCurrency } from "@/hooks/use-currency";
 
 export const WalletTopUp = () => {
     const { user } = useAuth();
     const [amount, setAmount] = useState<string>('50');
     const [isLoading, setIsLoading] = useState(false);
+    const { currency, getSymbol } = useCurrency();
 
     const handleTopUp = async () => {
         if (!user) {
@@ -33,7 +35,7 @@ export const WalletTopUp = () => {
             const { data, error } = await supabase.functions.invoke('process-paypal-payment', {
                 body: {
                     amount: numAmount,
-                    currency: 'USD',
+                    currency,
                     patientId: user.id,
                     providerId: '00000000-0000-0000-0000-000000000000', // System/Platform provider ID
                     serviceId: 'wallet_topup',
@@ -86,7 +88,7 @@ export const WalletTopUp = () => {
                                     }`}
                                 onClick={() => setAmount(q)}
                             >
-                                ${q}
+                                {getSymbol()}{q}
                             </Button>
                         ))}
                     </div>

@@ -6,6 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader2, Pill, DollarSign } from "lucide-react";
+import { useCurrency } from "@/hooks/use-currency";
 import type { Order } from "@/types/marketplace";
 
 interface PharmacyPaymentProps {
@@ -15,6 +16,7 @@ interface PharmacyPaymentProps {
 
 export const PharmacyPayment = ({ order, onPaymentSuccess }: PharmacyPaymentProps) => {
   const [loading, setLoading] = useState(false);
+  const { currency, formatPrice } = useCurrency();
 
   const handlePayment = async () => {
     setLoading(true);
@@ -22,7 +24,7 @@ export const PharmacyPayment = ({ order, onPaymentSuccess }: PharmacyPaymentProp
       const { data, error } = await supabase.functions.invoke('process-payment-with-splits', {
         body: {
           amount: order?.total_amount ?? 0,
-          currency: 'USD',
+          currency,
           patientId: order?.patient_id,
           providerId: order?.pharmacy_id, // Pharmacy as provider
           serviceId: order?.id,
@@ -65,19 +67,19 @@ export const PharmacyPayment = ({ order, onPaymentSuccess }: PharmacyPaymentProp
         <div className="space-y-2">
           <div className="flex justify-between">
             <span>Order Total:</span>
-            <span className="font-medium">${(order?.total_amount ?? 0).toFixed(2)}</span>
+            <span className="font-medium">{formatPrice(order?.total_amount ?? 0)}</span>
           </div>
           <div className="flex justify-between text-sm text-muted-foreground">
             <span>Pharmacy Commission (5%):</span>
-            <span>${(order.total_amount * 0.05).toFixed(2)}</span>
+            <span>{formatPrice(order.total_amount * 0.05)}</span>
           </div>
           <div className="flex justify-between text-sm text-muted-foreground">
             <span>Platform Fee (10%):</span>
-            <span>${(order.total_amount * 0.10).toFixed(2)}</span>
+            <span>{formatPrice(order.total_amount * 0.10)}</span>
           </div>
           <div className="flex justify-between text-sm text-muted-foreground">
             <span>Pharmacy Revenue:</span>
-            <span>${(order.total_amount * 0.85).toFixed(2)}</span>
+            <span>{formatPrice(order.total_amount * 0.85)}</span>
           </div>
         </div>
         
@@ -103,7 +105,7 @@ export const PharmacyPayment = ({ order, onPaymentSuccess }: PharmacyPaymentProp
           ) : (
             <>
               <DollarSign className="h-4 w-4 mr-2" />
-              Pay ${order.total_amount.toFixed(2)}
+              Pay {formatPrice(order.total_amount)}
             </>
           )}
         </Button>

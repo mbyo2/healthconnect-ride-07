@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { MarketplaceProduct } from '@/types/marketplace';
 import { ShoppingCart, Pill, AlertTriangle } from 'lucide-react';
+import { useCurrency } from '@/hooks/use-currency';
 
 interface ProductCardProps {
   product: MarketplaceProduct;
@@ -12,6 +13,7 @@ interface ProductCardProps {
 }
 
 export const ProductCard = ({ product, onAddToCart }: ProductCardProps) => {
+  const { formatPrice } = useCurrency();
   return (
     <Card className="h-full flex flex-col">
       <CardHeader className="pb-3">
@@ -43,7 +45,7 @@ export const ProductCard = ({ product, onAddToCart }: ProductCardProps) => {
           
           <div className="flex justify-between items-center">
             <span className="text-sm text-muted-foreground">Price:</span>
-            <span className="text-lg font-bold text-green-600">K{product?.price ?? '0.00'}</span>
+            <span className="text-lg font-bold text-green-600">{formatPrice(Number(product?.price ?? 0))}</span>
           </div>
           
           <div className="flex justify-between items-center">
