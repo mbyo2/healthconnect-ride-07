@@ -1,5 +1,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
+import { safeLocalGet, safeLocalSet } from '@/utils/storage';
 
 // Map of country codes to currency codes and symbols
 const COUNTRY_CURRENCY_MAP: Record<string, { code: string; symbol: string }> = {
@@ -69,8 +70,7 @@ export const SUPPORTED_CURRENCIES = Object.entries(CURRENCY_SYMBOLS).map(([code,
 
 export const useCurrency = () => {
   const [currency, setCurrencyState] = useState<string>(() => {
-    // Check localStorage first for user preference
-    const saved = localStorage.getItem(STORAGE_KEY);
+    const saved = safeLocalGet(STORAGE_KEY);
     return saved || 'USD';
   });
   const [loading, setLoading] = useState(true);
@@ -79,7 +79,7 @@ export const useCurrency = () => {
   useEffect(() => {
     const detectCurrency = async () => {
       // If user already has a saved preference, use it
-      const saved = localStorage.getItem(STORAGE_KEY);
+      const saved = safeLocalGet(STORAGE_KEY);
       if (saved) {
         setCurrencyState(saved);
         setLoading(false);
@@ -100,11 +100,11 @@ export const useCurrency = () => {
           const mapped = COUNTRY_CURRENCY_MAP[countryCode];
           if (mapped) {
             setCurrencyState(mapped.code);
-            localStorage.setItem(STORAGE_KEY, mapped.code);
+            safeLocalSet(STORAGE_KEY, mapped.code);
           } else {
             // Default to USD for unmapped countries
             setCurrencyState('USD');
-            localStorage.setItem(STORAGE_KEY, 'USD');
+            safeLocalSet(STORAGE_KEY, 'USD');
           }
         }
       } catch (error) {
@@ -120,7 +120,7 @@ export const useCurrency = () => {
 
   const setCurrency = useCallback((newCurrency: string) => {
     setCurrencyState(newCurrency);
-    localStorage.setItem(STORAGE_KEY, newCurrency);
+    safeLocalSet(STORAGE_KEY, newCurrency);
   }, []);
 
   const getSymbol = useCallback((code?: string) => {

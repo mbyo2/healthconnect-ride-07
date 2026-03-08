@@ -1,4 +1,5 @@
 import React, { Suspense, lazy, useMemo } from 'react';
+import { HelmetProvider } from 'react-helmet-async';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { MobileLayout } from '@/components/MobileLayout';
 import { LoadingScreen } from '@/components/LoadingScreen';
@@ -272,17 +273,19 @@ AppContentWithPreload.displayName = 'AppContentWithPreload';
 // Main App Component with Authentication and Routing
 const App: React.FC = () => {
   return (
-    <AuthProvider>
-      <UserRolesProvider>
-        <AccessibilityProvider>
-          <Router>
-            <div className="App">
-              <AppContentWithPreload />
-            </div>
-          </Router>
-        </AccessibilityProvider>
-      </UserRolesProvider>
-    </AuthProvider>
+    <HelmetProvider>
+      <AuthProvider>
+        <UserRolesProvider>
+          <AccessibilityProvider>
+            <Router>
+              <div className="App">
+                <AppContentWithPreload />
+              </div>
+            </Router>
+          </AccessibilityProvider>
+        </UserRolesProvider>
+      </AuthProvider>
+    </HelmetProvider>
   );
 };
 

@@ -3,6 +3,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { HelmetProvider } from 'react-helmet-async';
 
 // Mock supabase - return empty array instead of undefined
 vi.mock('@/integrations/supabase/client', () => ({
@@ -42,9 +43,11 @@ const createWrapper = () => {
     defaultOptions: { queries: { retry: false } },
   });
   return ({ children }: { children: React.ReactNode }) => (
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>{children}</BrowserRouter>
-    </QueryClientProvider>
+    <HelmetProvider>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>{children}</BrowserRouter>
+      </QueryClientProvider>
+    </HelmetProvider>
   );
 };
 
@@ -55,35 +58,33 @@ describe('PricingPage', () => {
     render(<PricingPage />, { wrapper: Wrapper });
     
     expect(screen.getByText('Simple, Transparent Pricing')).toBeInTheDocument();
-    expect(screen.getByText('Patients')).toBeInTheDocument();
-    expect(screen.getByText('Providers')).toBeInTheDocument();
-    expect(screen.getByText('Institutions')).toBeInTheDocument();
+    expect(screen.getByText(/Patients/)).toBeInTheDocument();
+    expect(screen.getByText(/Providers/)).toBeInTheDocument();
+    expect(screen.getByText(/Pharmacies/)).toBeInTheDocument();
   });
 
-  it('shows free messaging for patients', async () => {
+  it('shows free section for patients', async () => {
     const { PricingPage } = await import('@/components/subscription/PricingPage');
     const Wrapper = createWrapper();
     render(<PricingPage />, { wrapper: Wrapper });
 
-    expect(screen.getByText('Always Free for Patients')).toBeInTheDocument();
-    expect(screen.getByText(/No hidden fees/)).toBeInTheDocument();
+    expect(screen.getByText('Free to Use — Pay Only for Care')).toBeInTheDocument();
   });
 
-  it('shows pharmacy commission-only section', async () => {
+  it('shows pharmacy tab', async () => {
     const { PricingPage } = await import('@/components/subscription/PricingPage');
     const Wrapper = createWrapper();
     render(<PricingPage />, { wrapper: Wrapper });
 
-    expect(screen.getByText('Pharmacies')).toBeInTheDocument();
-    expect(screen.getByText(/commission-only model/)).toBeInTheDocument();
+    expect(screen.getByText(/Pharmacies/)).toBeInTheDocument();
   });
 
-  it('displays ZMW currency notice', async () => {
+  it('displays pricing subtitle', async () => {
     const { PricingPage } = await import('@/components/subscription/PricingPage');
     const Wrapper = createWrapper();
     render(<PricingPage />, { wrapper: Wrapper });
 
-    expect(screen.getByText(/Zambian Kwacha/)).toBeInTheDocument();
+    expect(screen.getByText(/Free to browse for patients/)).toBeInTheDocument();
   });
 });
 

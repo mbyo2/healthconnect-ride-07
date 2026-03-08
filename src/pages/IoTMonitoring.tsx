@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useIoT } from '@/hooks/useIoT';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/context/AuthContext';
 import { IoTDevice } from '@/types/iot';
 import { AIInsightsWidget } from '@/components/ai/AIInsightsWidget';
 import { useNavigate } from 'react-router-dom';
