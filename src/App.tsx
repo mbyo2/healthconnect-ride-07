@@ -118,6 +118,7 @@ const AppContent = () => {
   return (
     <SearchProvider>
       <MobileLayout>
+        <ErrorBoundary>
         <Suspense fallback={<LoadingScreen />}>
           <Routes>
             {/* Public Routes */}
