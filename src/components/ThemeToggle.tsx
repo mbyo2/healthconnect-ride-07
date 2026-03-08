@@ -24,7 +24,7 @@ export const ThemeToggle = () => {
       onClick={toggleTheme}
       className={cn(
         "relative h-9 w-9 rounded-md transition-colors duration-200",
-        theme === "dark" ? "bg-gray-800 text-gray-100" : "bg-trust-50 text-trust-600"
+        theme === "dark" ? "bg-secondary text-secondary-foreground" : "bg-muted text-muted-foreground"
       )}
       aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
     >

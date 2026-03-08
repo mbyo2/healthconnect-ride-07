@@ -29,7 +29,7 @@ const Chat = () => {
         <h1 className="text-2xl font-bold mb-4 text-foreground">
           Messages
         </h1>
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-soft-blue">
+        <div className="bg-card rounded-xl border border-border">
           <ChatList />
         </div>
       </div>
