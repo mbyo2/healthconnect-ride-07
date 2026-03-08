@@ -131,7 +131,7 @@ const ProviderProfile = () => {
                 <MapPin className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="font-medium">Location</p>
-                  <p className="text-sm text-muted-foreground">Lusaka, Zambia</p>
+                  <p className="text-sm text-muted-foreground">{provider?.city || 'Location not set'}</p>
                 </div>
               </div>
 

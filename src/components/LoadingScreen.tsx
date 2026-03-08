@@ -169,7 +169,7 @@ export const LoadingScreen = React.memo<LoadingScreenProps>(({
       <div className="absolute bottom-10 flex items-center gap-8 text-[10px] font-bold uppercase tracking-[0.2em] text-primary/60">
         <span>🔒 HIPAA SECURE</span>
         <span className="w-1 h-1 bg-primary/40 rounded-full"></span>
-        <span>✓ ZAMBIAN HEALTH NETWORK</span>
+        <span>✓ GLOBAL HEALTH NETWORK</span>
       </div>
     </div>
   );

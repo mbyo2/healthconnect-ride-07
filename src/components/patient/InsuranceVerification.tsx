@@ -70,7 +70,7 @@ export const InsuranceVerification = () => {
         <h3 className="font-semibold">Insurance Details</h3>
         {isZambianProvider && (
           <Badge variant="outline" className="ml-auto">
-            Zambian Provider
+            Supported Provider
           </Badge>
         )}
       </div>

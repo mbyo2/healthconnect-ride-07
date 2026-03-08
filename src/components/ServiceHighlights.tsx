@@ -2,7 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calendar, Search, MessageSquare, FileText, Shield, Clock, CheckCircle, Pill, Building2, Phone, CreditCard, Video } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { ZAMBIAN_STATS } from '@/config/zambia';
+
+const PLATFORM_STATS = {
+  doctors: '500+',
+  hospitals: '50+',
+  pharmacies: '200+',
+  patients: '10,000+',
+};
 
 export const ServiceHighlights = () => {
   const [stats, setStats] = useState({
@@ -40,15 +46,15 @@ export const ServiceHighlights = () => {
     {
       icon: <Search className="h-6 w-6 text-blue-600 dark:text-blue-400" />,
       title: "Find Trusted Doctors",
-      description: "Search verified healthcare providers across all 10 provinces of Zambia",
-      stat: ZAMBIAN_STATS.doctors,
+      description: "Search verified healthcare providers in your area and beyond",
+      stat: PLATFORM_STATS.doctors,
       statLabel: "doctors"
     },
     {
       icon: <Building2 className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />,
       title: "Connected Hospitals",
-      description: "Access to UTH, Levy Mwanawasa, and major hospitals nationwide",
-      stat: ZAMBIAN_STATS.hospitals,
+      description: "Access major hospitals and clinics on the platform",
+      stat: PLATFORM_STATS.hospitals,
       statLabel: "hospitals"
     },
     {
@@ -62,34 +68,34 @@ export const ServiceHighlights = () => {
       icon: <Pill className="h-6 w-6 text-orange-600 dark:text-orange-400" />,
       title: "Pharmacy Network",
       description: "Order medicine online from registered pharmacies with delivery",
-      stat: ZAMBIAN_STATS.pharmacies,
+      stat: PLATFORM_STATS.pharmacies,
       statLabel: "pharmacies"
     },
     {
       icon: <CreditCard className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />,
-      title: "Mobile Money Payments",
-      description: "Pay easily with MTN, Airtel, or Zamtel Mobile Money",
-      stat: "3",
-      statLabel: "providers"
+      title: "Flexible Payments",
+      description: "Pay with mobile money, cards, or insurance",
+      stat: "5+",
+      statLabel: "methods"
     },
     {
       icon: <Video className="h-6 w-6 text-red-600 dark:text-red-400" />,
       title: "Video Consultations",
-      description: "See a doctor from anywhere in Zambia via secure video call",
+      description: "See a doctor from anywhere via secure video call",
       stat: "24/7",
       statLabel: "available"
     },
     {
       icon: <Shield className="h-6 w-6 text-green-600 dark:text-green-400" />,
-      title: "NHIMA Support",
-      description: "Integrated with National Health Insurance for covered services",
+      title: "Insurance Support",
+      description: "Integrated with major insurance providers for covered services",
       stat: "100%",
       statLabel: "secure"
     },
     {
       icon: <Phone className="h-6 w-6 text-red-600 dark:text-red-400" />,
       title: "Emergency Response",
-      description: "Quick access to ambulance (991), police (999), and hospitals",
+      description: "Quick access to ambulance, police, and nearby hospitals",
       stat: "24/7",
       statLabel: "emergency"
     }
@@ -101,13 +107,13 @@ export const ServiceHighlights = () => {
         <div className="text-center mb-8 md:mb-12">
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-full text-primary text-xs font-medium mb-4">
             <CheckCircle className="h-3 w-3" />
-            Built for Zambia
+            Comprehensive Healthcare Platform
           </div>
           <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-4 text-foreground">
             Everything You Need for Better Healthcare
           </h2>
           <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
-            Connecting {ZAMBIAN_STATS.patients} Zambians to quality healthcare across all provinces
+            Connecting {PLATFORM_STATS.patients} users to quality healthcare providers worldwide
           </p>
         </div>
 
