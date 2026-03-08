@@ -284,11 +284,6 @@ const App: React.FC = () => {
   );
 };
 
-// import { createSpecificSuperUser } from './utils/createSpecificSuperUser';
 
-// Expose superuser creation to window for console access
-// if (typeof window !== 'undefined') {
-//   (window as any).createSpecificSuperUser = createSpecificSuperUser;
-// }
 
 export default App;

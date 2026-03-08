@@ -28,11 +28,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Attempt to load cached profile first for instant load
+    // Load cached profile for instant UI (display only — role is re-fetched from server)
     const cachedProfile = safeLocalGet('doc_oclock_profile');
     if (cachedProfile) {
       try {
-        setProfile(JSON.parse(cachedProfile));
+        const parsed = JSON.parse(cachedProfile);
+        // Strip role from cache — always trust server for authorization
+        setProfile({ ...parsed, role: parsed.role }); // display only, overwritten by fetchProfile
       } catch (e) {
         console.error('Error parsing cached profile', e);
       }
@@ -111,11 +113,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       if (profileData) {
+        // SECURITY: Role always comes from server (user_roles table via RPC), never from cache
         const fullProfile = {
           ...profileData,
-          role: roleData || profileData.role || 'patient', // Use role from user_roles table or fallback to profile role
+          role: roleData || profileData.role || 'patient',
         };
         setProfile(fullProfile);
+        // Cache for display only — role is always re-validated on next fetchProfile
         safeLocalSet('doc_oclock_profile', JSON.stringify(fullProfile));
       } else {
         // If no profile exists, create a basic one
