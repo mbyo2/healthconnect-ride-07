@@ -76,7 +76,8 @@ export const InsuranceVerification = () => {
       </div>
 
       <div className="mt-4 space-y-2">
-        <div className="flex justifymuted-foregroundmuted-foregroundmuted-foregroundmuted-foregroundmuted-foregroundmuted-foregroundmuted-foregroundgray-600">Status</span>
+        <div className="flex justify-between items-center">
+          <span className="text-muted-foreground">Status</span>
           <Badge variant={isActive ? "default" : "destructive"}>
             {isActive ? (
               <CheckCircle className="h-4 w-4 mr-1" />
@@ -84,29 +85,36 @@ export const InsuranceVerification = () => {
               <AlertTriangle className="h-4 w-4 mr-1" />
             )}
             {isActive ? "Active" : "Expired"}
-          </Badge>muted-foreground </div>
-muted-foreground <div clmuted-foreground"flex jumuted-foregroundtween">
-muted-foreground  <span muted-foregrounde="text-gray-600">Provider</span>
-          <span className="font-medium">{insuranmuted-foregroundder_name}</span>muted-foreground </div>
+          </Badge>
+        </div>
 
-       muted-foregroundassName="flex jumuted-foregroundtween">
-        muted-foregroundclassName="text-gray-600">Policy Number</span>
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">Provider</span>
+          <span className="font-medium">{insurance.provider_name}</span>
+        </div>
+
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">Policy Number</span>
           <span className="font-medium">{insurance.policy_number}</span>
-        muted-foreground        {insurance.groupmuted-foreground&& (
-          <div clasmuted-foregroundlex justify-between">
-  muted-foreground  <span className="text-gray-600">Group Number</span>
-            <span className="font-medium">{insurance.group_nummuted-foregroundan>
+        </div>
+
+        {insurance.group_number && (
+          <div className="flex justify-between">
+            <span className="text-muted-foreground">Group Number</span>
+            <span className="font-medium">{insurance.group_number}</span>
           </div>
         )}
-muted-foreground <div className="flex justify-bemuted-foreground          <span className="text-gray-600">Coverage Start</span>
+
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">Coverage Start</span>
           <span className="font-medium">
             {format(new Date(insurance.coverage_start_date), 'PP')}
           </span>
         </div>
 
-        {insurance.coverage_emuted-foreground&& (
-          <div className="flex justmuted-foregroundeen">
-            <span className="text-gray-600">Coverage End</span>
+        {insurance.coverage_end_date && (
+          <div className="flex justify-between">
+            <span className="text-muted-foreground">Coverage End</span>
             <span className="font-medium">
               {format(new Date(insurance.coverage_end_date), 'PP')}
             </span>
@@ -115,8 +123,8 @@ muted-foreground <div className="flex justify-bemuted-foreground          <span 
         
         {/* Show NHIMA-specific information */}
         {insurance.provider_name === InsuranceProvider.NHIMA && (
-          <div className="mt-4muted-foregroundrder-t">
-            <p className="text-sm text-gray-600">
+          <div className="mt-4 pt-2 border-t">
+            <p className="text-sm text-muted-foreground">
               NHIMA provides equitable access to quality healthcare through the National Health Insurance Scheme (NHIS).
             </p>
           </div>
