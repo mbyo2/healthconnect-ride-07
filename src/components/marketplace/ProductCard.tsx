@@ -45,7 +45,7 @@ export const ProductCard = ({ product, onAddToCart }: ProductCardProps) => {
           
           <div className="flex justify-between items-center">
             <span className="text-sm text-muted-foreground">Price:</span>
-            <span className="text-lg font-bold text-green-600">K{product?.price ?? '0.00'}</span>
+            <span className="text-lg font-bold text-green-600">{formatPrice(Number(product?.price ?? 0))}</span>
           </div>
           
           <div className="flex justify-between items-center">
