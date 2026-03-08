@@ -53,7 +53,7 @@ export const usePlatformStats = (): PlatformStats => {
           supabase
             .from('profiles')
             .select('id', { count: 'exact', head: true })
-            .in('role', ['health_personnel', 'doctor', 'specialist', 'nurse']),
+            .in('role', ['health_personnel', 'doctor', 'specialist', 'nurse'] as any[]),
           // Institutions (hospitals/clinics)
           supabase
             .from('healthcare_institutions')
