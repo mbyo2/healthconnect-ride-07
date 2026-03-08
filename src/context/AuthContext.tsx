@@ -241,11 +241,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-export const useAuth = () => {
+export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    // During HMR or initial mount race conditions, return a safe default
-    // instead of crashing the entire app
+    // During HMR or mount race conditions, return safe defaults instead of crashing
     console.warn('useAuth called outside AuthProvider — returning defaults');
     return {
       user: null,
@@ -259,7 +258,7 @@ export const useAuth = () => {
       signUp: async () => ({ error: new Error('AuthProvider not mounted'), data: null }),
       signOut: async () => {},
       refreshProfile: async () => {},
-    } as ReturnType<typeof useContext<typeof AuthContext>> & NonNullable<ReturnType<typeof useContext<typeof AuthContext>>>;
+    };
   }
   return context;
 };
