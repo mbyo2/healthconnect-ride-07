@@ -103,7 +103,9 @@ CRITICAL: If symptoms suggest emergency, immediately advise to call emergency se
     const data = await response.json();
     const reply = data.choices[0].message.content;
 
-    console.log('MedGemma chat AI generated')AIeturn new Response(
+    console.log('AI chat response generated');
+
+    return new Response(
       JSON.stringify({
         reply,
         timestamp: new Date().toISOString(),
