@@ -8,7 +8,9 @@ import { useMemo } from "react";
 import { 
   Home, Search, Calendar, MessageSquare, Settings, Heart, Wallet,
   Stethoscope, Package, Pill, Shield, Building2, Activity, Brain,
-  Users, ShoppingCart, AlertTriangle, User
+  Users, ShoppingCart, AlertTriangle, User, Scissors, Droplets,
+  DollarSign, Wrench, Truck, Microscope, BarChart3, ClipboardList,
+  Navigation, Headphones
 } from "lucide-react";
 
 export const DesktopNavigation = () => {
