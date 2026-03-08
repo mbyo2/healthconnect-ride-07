@@ -22,7 +22,7 @@ export const LandingHero = () => {
       </div>
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="max-w-3xl mx-auto text-center mb-12">
+        <div className="max-w-3xl mx-auto text-center mb-10">
           <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-medium text-primary mb-8 animate-in fade-in slide-in-from-bottom-3 duration-700">
             <Sparkles className="h-3.5 w-3.5" />
             Trusted by {ZAMBIAN_STATS.patients} across Zambia
