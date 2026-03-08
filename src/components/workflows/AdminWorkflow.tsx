@@ -25,6 +25,8 @@ export const AdminWorkflow = () => {
     { title: "Provider Applications", description: "Review healthcare provider applications", icon: <FileCheck className="h-5 w-5" />, route: '/admin-dashboard', requiredSuperAdmin: false },
     { title: "Platform Analytics", description: "Platform metrics, growth & reports", icon: <BarChart3 className="h-5 w-5" />, route: '/admin-dashboard', requiredSuperAdmin: false },
     { title: "Financial Overview", description: "Revenue, payments & billing reports", icon: <CreditCard className="h-5 w-5" />, route: '/wallet', requiredSuperAdmin: false },
+    { title: "Revenue Analytics", description: "MRR, churn, subscription & commission KPIs", icon: <DollarSign className="h-5 w-5" />, route: '/admin-dashboard', requiredSuperAdmin: false },
+    { title: "Subscription Plans", description: "Manage pricing tiers for all user types", icon: <Tag className="h-5 w-5" />, route: '/pricing', requiredSuperAdmin: false },
     { title: "Institutions", description: "Healthcare facility management & verification", icon: <Building2 className="h-5 w-5" />, route: '/admin-dashboard', requiredSuperAdmin: false },
     { title: "Clinical Safety Oversight", description: "Allergy alerts & drug interaction reports", icon: <Shield className="h-5 w-5" />, route: '/admin-dashboard', requiredSuperAdmin: false },
     { title: "Infection Surveillance", description: "Platform-wide HAI tracking & reports", icon: <Bug className="h-5 w-5" />, route: '/admin-dashboard', requiredSuperAdmin: false },

@@ -35,6 +35,7 @@ const Landing = () => {
             <nav className="hidden lg:flex items-center gap-1 shrink-0">
               {[
                 { label: "Find Doctors", route: "/search" },
+                { label: "Pricing", route: "/pricing" },
                 { label: "For Providers", route: "/healthcare-application" },
                 { label: "Emergency", route: "/emergency" },
               ].map((item) => (
