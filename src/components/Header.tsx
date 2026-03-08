@@ -14,7 +14,6 @@ import {
 import { Menu, Search } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useSearch } from "@/context/SearchContext";
-import { UserRole, AdminLevel } from "@/types/user";
 import { useDeviceType } from "@/hooks/use-device-type";
 import { AppLogo } from "@/components/ui/AppLogo";
 import { NotificationBell } from "@/components/NotificationBell";
