@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { useUserRoles } from "@/context/UserRolesContext";
+import { useInstitutionAffiliation } from "@/hooks/useInstitutionAffiliation";
 import { useMemo } from "react";
 import { 
   Home, Search, Calendar, MessageSquare, Settings, Heart, Wallet,
@@ -14,6 +15,7 @@ export const DesktopNavigation = () => {
   const location = useLocation();
   const { isAuthenticated } = useAuth();
   const { availableRoles, isHealthPersonnel, isAdmin, isPatient } = useUserRoles();
+  const { isInstitutionAffiliated } = useInstitutionAffiliation();
 
   const navItems = useMemo(() => {
     if (!isAuthenticated) {
@@ -32,7 +34,7 @@ export const DesktopNavigation = () => {
         { to: "/medications", label: "Medications", icon: <Pill className="h-5 w-5 mr-2" /> },
         { to: "/chat", label: "Messages", icon: <MessageSquare className="h-5 w-5 mr-2" /> },
         { to: "/connections", label: "My Patients", icon: <Users className="h-5 w-5 mr-2" /> },
-        { to: "/wallet", label: "Earnings", icon: <Wallet className="h-5 w-5 mr-2" /> },
+        ...(!isInstitutionAffiliated ? [{ to: "/wallet", label: "Earnings", icon: <Wallet className="h-5 w-5 mr-2" /> }] : []),
         { to: "/settings", label: "Settings", icon: <Settings className="h-5 w-5 mr-2" /> },
       ];
     }
@@ -47,7 +49,7 @@ export const DesktopNavigation = () => {
         { to: "/chat", label: "Messages", icon: <MessageSquare className="h-5 w-5 mr-2" /> },
         { to: "/ai-diagnostics", label: "AI Assistant", icon: <Brain className="h-5 w-5 mr-2" /> },
         { to: "/connections", label: "My Patients", icon: <Users className="h-5 w-5 mr-2" /> },
-        { to: "/wallet", label: "Earnings", icon: <Wallet className="h-5 w-5 mr-2" /> },
+        ...(!isInstitutionAffiliated ? [{ to: "/wallet", label: "Earnings", icon: <Wallet className="h-5 w-5 mr-2" /> }] : []),
         { to: "/settings", label: "Settings", icon: <Settings className="h-5 w-5 mr-2" /> },
       ];
     }
@@ -59,7 +61,7 @@ export const DesktopNavigation = () => {
         { to: "/pharmacy-inventory", label: "Inventory", icon: <Pill className="h-5 w-5 mr-2" /> },
         { to: "/prescriptions", label: "Prescriptions", icon: <Heart className="h-5 w-5 mr-2" /> },
         { to: "/marketplace", label: "Marketplace", icon: <ShoppingCart className="h-5 w-5 mr-2" /> },
-        { to: "/wallet", label: "Revenue", icon: <Wallet className="h-5 w-5 mr-2" /> },
+        ...(!isInstitutionAffiliated ? [{ to: "/wallet", label: "Revenue", icon: <Wallet className="h-5 w-5 mr-2" /> }] : []),
         { to: "/settings", label: "Settings", icon: <Settings className="h-5 w-5 mr-2" /> },
       ];
     }
@@ -110,7 +112,7 @@ export const DesktopNavigation = () => {
       { to: "/marketplace", label: "Buy Medicine", icon: <Pill className="h-5 w-5 mr-2" /> },
       { to: "/settings", label: "Settings", icon: <Settings className="h-5 w-5 mr-2" /> },
     ];
-  }, [isAuthenticated, isHealthPersonnel, isAdmin, isPatient, availableRoles]);
+  }, [isAuthenticated, isHealthPersonnel, isAdmin, isPatient, availableRoles, isInstitutionAffiliated]);
 
   return (
     <div className="hidden md:flex items-center space-x-2">

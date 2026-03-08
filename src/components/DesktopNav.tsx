@@ -16,11 +16,13 @@ import { DesktopUserMenu } from "@/components/navigation/DesktopUserMenu";
 import { AppLogo } from "@/components/ui/AppLogo";
 import { NotificationBell } from "@/components/NotificationBell";
 import { useUserRoles } from "@/context/UserRolesContext";
+import { useInstitutionAffiliation } from "@/hooks/useInstitutionAffiliation";
 
 export function DesktopNav() {
   const location = useLocation();
   const { user, signOut, profile, isAuthenticated } = useAuth();
   const { availableRoles, isHealthPersonnel, isAdmin, isPatient } = useUserRoles();
+  const { isInstitutionAffiliated } = useInstitutionAffiliation();
   const [searchTerm, setSearchTerm] = useState("");
   const { setSearchQuery } = useSearch();
   const navigate = useNavigate();
@@ -120,7 +122,7 @@ export function DesktopNav() {
       { to: "/appointments", label: "My Care", icon: <Calendar className="h-4 w-4" />, active: location.pathname.includes("appointment") },
       { to: "/chat", label: "Messages", icon: <MessageSquare className="h-4 w-4" />, active: location.pathname === "/chat" },
     ];
-  }, [location.pathname, isAuthenticated, isHealthPersonnel, isAdmin, isPatient, availableRoles]);
+  }, [location.pathname, isAuthenticated, isHealthPersonnel, isAdmin, isPatient, availableRoles, isInstitutionAffiliated]);
 
   // Role-specific "More" menu items
   const secondaryNavItems = useMemo(() => {
@@ -130,7 +132,7 @@ export function DesktopNav() {
         { to: "/provider-calendar", label: "My Schedule", icon: <Calendar className="h-4 w-4 mr-2" /> },
         { to: "/medications", label: "Medication Admin", icon: <Pill className="h-4 w-4 mr-2" /> },
         { to: "/connections", label: "My Patients", icon: <Users className="h-4 w-4 mr-2" /> },
-        { to: "/wallet", label: "Earnings", icon: <Wallet className="h-4 w-4 mr-2" /> },
+        ...(!isInstitutionAffiliated ? [{ to: "/wallet", label: "Earnings", icon: <Wallet className="h-4 w-4 mr-2" /> }] : []),
         { to: "/emergency", label: "Emergency", icon: <AlertTriangle className="h-4 w-4 mr-2" /> },
         { to: "/profile", label: "Profile", icon: <User className="h-4 w-4 mr-2" /> },
         { to: "/settings", label: "Settings", icon: <Settings className="h-4 w-4 mr-2" /> },
@@ -144,7 +146,7 @@ export function DesktopNav() {
         { to: "/medical-records", label: "Patient Records", icon: <Heart className="h-4 w-4 mr-2" /> },
         { to: "/prescriptions", label: "Write Prescriptions", icon: <Pill className="h-4 w-4 mr-2" /> },
         { to: "/connections", label: "My Patients", icon: <Users className="h-4 w-4 mr-2" /> },
-        { to: "/wallet", label: "Earnings", icon: <Wallet className="h-4 w-4 mr-2" /> },
+        ...(!isInstitutionAffiliated ? [{ to: "/wallet", label: "Earnings", icon: <Wallet className="h-4 w-4 mr-2" /> }] : []),
         { to: "/emergency", label: "Emergency Protocols", icon: <AlertTriangle className="h-4 w-4 mr-2" /> },
         { to: "/profile", label: "Professional Profile", icon: <User className="h-4 w-4 mr-2" /> },
         { to: "/settings", label: "Settings", icon: <Settings className="h-4 w-4 mr-2" /> },
@@ -209,7 +211,7 @@ export function DesktopNav() {
       { to: "/profile", label: "My Profile", icon: <User className="h-4 w-4 mr-2" /> },
       { to: "/settings", label: "Settings", icon: <Settings className="h-4 w-4 mr-2" /> },
     ];
-  }, [isHealthPersonnel, isAdmin, availableRoles]);
+  }, [isHealthPersonnel, isAdmin, availableRoles, isInstitutionAffiliated]);
 
   return (
     <header className="bg-background sticky top-0 z-50 border-b border-border" role="banner">

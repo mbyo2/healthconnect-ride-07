@@ -9,6 +9,7 @@ import { VoiceCommandButton } from '@/components/VoiceCommandButton';
 import { AccessibilityMenu } from '@/components/AccessibilityMenu';
 import { useAuth } from "@/context/AuthContext";
 import { useUserRoles } from "@/context/UserRolesContext";
+import { useInstitutionAffiliation } from "@/hooks/useInstitutionAffiliation";
 import { NavigateFunction } from "react-router-dom";
 import { useMemo } from "react";
 import {
@@ -31,6 +32,7 @@ interface HeaderControlsProps {
 export const HeaderControls = ({ isMenuOpen, setIsMenuOpen, navigate }: HeaderControlsProps) => {
   const { isAuthenticated, signOut, profile, user } = useAuth();
   const { availableRoles, isHealthPersonnel, isAdmin } = useUserRoles();
+  const { isInstitutionAffiliated } = useInstitutionAffiliation();
 
   const handleLogout = async () => {
     try {

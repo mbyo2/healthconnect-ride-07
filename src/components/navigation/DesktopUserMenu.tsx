@@ -13,6 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User, Calendar, Users, Settings, Heart, Stethoscope, Shield, Building2, Package, Activity, Wallet } from "lucide-react";
 import { User as SupabaseUser } from "@supabase/supabase-js";
 import { useUserRoles } from "@/context/UserRolesContext";
+import { useInstitutionAffiliation } from "@/hooks/useInstitutionAffiliation";
 import { useMemo } from "react";
 
 interface Profile {
@@ -29,6 +30,7 @@ interface DesktopUserMenuProps {
 
 export function DesktopUserMenu({ user, profile, onLogout }: DesktopUserMenuProps) {
   const { availableRoles, isHealthPersonnel, isAdmin } = useUserRoles();
+  const { isInstitutionAffiliated } = useInstitutionAffiliation();
 
   const menuItems = useMemo(() => {
     // Nurse (solo)
@@ -36,7 +38,7 @@ export function DesktopUserMenu({ user, profile, onLogout }: DesktopUserMenuProp
       return [
         { to: "/provider-dashboard", label: "Nurse Dashboard", icon: <Stethoscope className="h-4 w-4" /> },
         { to: "/appointments", label: "Patient Visits", icon: <Calendar className="h-4 w-4" /> },
-        { to: "/wallet", label: "Earnings", icon: <Wallet className="h-4 w-4" /> },
+        ...(!isInstitutionAffiliated ? [{ to: "/wallet", label: "Earnings", icon: <Wallet className="h-4 w-4" /> }] : []),
         { to: "/profile", label: "Profile", icon: <User className="h-4 w-4" /> },
         { to: "/settings", label: "Settings", icon: <Settings className="h-4 w-4" /> },
       ];
@@ -48,7 +50,7 @@ export function DesktopUserMenu({ user, profile, onLogout }: DesktopUserMenuProp
         { to: "/provider-dashboard", label: "Provider Dashboard", icon: <Stethoscope className="h-4 w-4" /> },
         { to: "/appointments", label: "Patient Appointments", icon: <Calendar className="h-4 w-4" /> },
         { to: "/connections", label: "My Patients", icon: <Users className="h-4 w-4" /> },
-        { to: "/wallet", label: "Earnings", icon: <Wallet className="h-4 w-4" /> },
+        ...(!isInstitutionAffiliated ? [{ to: "/wallet", label: "Earnings", icon: <Wallet className="h-4 w-4" /> }] : []),
         { to: "/profile", label: "Professional Profile", icon: <User className="h-4 w-4" /> },
         { to: "/settings", label: "Settings", icon: <Settings className="h-4 w-4" /> },
       ];
@@ -58,7 +60,7 @@ export function DesktopUserMenu({ user, profile, onLogout }: DesktopUserMenuProp
     if (availableRoles.some(r => ['pharmacy', 'pharmacist'].includes(r))) {
       return [
         { to: "/pharmacy-portal", label: "Pharmacy Portal", icon: <Package className="h-4 w-4" /> },
-        { to: "/wallet", label: "Revenue", icon: <Wallet className="h-4 w-4" /> },
+        ...(!isInstitutionAffiliated ? [{ to: "/wallet", label: "Revenue", icon: <Wallet className="h-4 w-4" /> }] : []),
         { to: "/profile", label: "Pharmacy Profile", icon: <User className="h-4 w-4" /> },
         { to: "/settings", label: "Settings", icon: <Settings className="h-4 w-4" /> },
       ];
@@ -100,7 +102,7 @@ export function DesktopUserMenu({ user, profile, onLogout }: DesktopUserMenuProp
       { to: "/connections", label: "My Providers", icon: <Users className="h-4 w-4" /> },
       { to: "/settings", label: "Settings", icon: <Settings className="h-4 w-4" /> },
     ];
-  }, [availableRoles, isHealthPersonnel, isAdmin]);
+  }, [availableRoles, isHealthPersonnel, isAdmin, isInstitutionAffiliated]);
 
   return (
     <DropdownMenu>

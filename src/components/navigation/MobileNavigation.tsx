@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { NavigateFunction } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { useUserRoles } from "@/context/UserRolesContext";
+import { useInstitutionAffiliation } from "@/hooks/useInstitutionAffiliation";
 import { useMemo } from "react";
 import {
   Home, Search, Calendar, MessageSquare, Settings, Building2, User,
@@ -18,6 +19,7 @@ interface MobileNavigationProps {
 export const MobileNavigation = ({ setIsMenuOpen, navigate }: MobileNavigationProps) => {
   const { isAuthenticated, user, signOut, profile } = useAuth();
   const { currentRole, availableRoles, isHealthPersonnel, isAdmin } = useUserRoles();
+  const { isInstitutionAffiliated } = useInstitutionAffiliation();
 
   const handleLogout = async () => {
     try {
@@ -68,7 +70,7 @@ export const MobileNavigation = ({ setIsMenuOpen, navigate }: MobileNavigationPr
         { to: "/medications", label: "Medications", icon: <Pill className="mr-2 h-5 w-5" /> },
         { to: "/chat", label: "Messages", icon: <MessageSquare className="mr-2 h-5 w-5" /> },
         { to: "/connections", label: "My Patients", icon: <Users className="mr-2 h-5 w-5" /> },
-        { to: "/wallet", label: "Earnings", icon: <Wallet className="mr-2 h-5 w-5" /> },
+        ...(!isInstitutionAffiliated ? [{ to: "/wallet", label: "Earnings", icon: <Wallet className="mr-2 h-5 w-5" /> }] : []),
         { to: "/emergency", label: "Emergency", icon: <AlertTriangle className="mr-2 h-5 w-5" /> },
       ];
     }
@@ -83,7 +85,7 @@ export const MobileNavigation = ({ setIsMenuOpen, navigate }: MobileNavigationPr
         { to: "/chat", label: "Messages", icon: <MessageSquare className="mr-2 h-5 w-5" /> },
         { to: "/ai-diagnostics", label: "AI Assistant", icon: <Brain className="mr-2 h-5 w-5" /> },
         { to: "/connections", label: "My Patients", icon: <Users className="mr-2 h-5 w-5" /> },
-        { to: "/wallet", label: "Earnings", icon: <Wallet className="mr-2 h-5 w-5" /> },
+        ...(!isInstitutionAffiliated ? [{ to: "/wallet", label: "Earnings", icon: <Wallet className="mr-2 h-5 w-5" /> }] : []),
         { to: "/emergency", label: "Emergency", icon: <AlertTriangle className="mr-2 h-5 w-5" /> },
       ];
     }
@@ -95,7 +97,7 @@ export const MobileNavigation = ({ setIsMenuOpen, navigate }: MobileNavigationPr
         { to: "/pharmacy-inventory", label: "Inventory", icon: <Pill className="mr-2 h-5 w-5" /> },
         { to: "/prescriptions", label: "Prescriptions", icon: <Heart className="mr-2 h-5 w-5" /> },
         { to: "/marketplace", label: "Marketplace", icon: <ShoppingCart className="mr-2 h-5 w-5" /> },
-        { to: "/wallet", label: "Revenue", icon: <Wallet className="mr-2 h-5 w-5" /> },
+        ...(!isInstitutionAffiliated ? [{ to: "/wallet", label: "Revenue", icon: <Wallet className="mr-2 h-5 w-5" /> }] : []),
       ];
     }
 
@@ -131,7 +133,7 @@ export const MobileNavigation = ({ setIsMenuOpen, navigate }: MobileNavigationPr
         { to: "/lab-management", label: "Lab Dashboard", icon: <Activity className="mr-2 h-5 w-5" /> },
         { to: "/medical-records", label: "Records", icon: <Heart className="mr-2 h-5 w-5" /> },
         { to: "/connections", label: "Patients", icon: <Users className="mr-2 h-5 w-5" /> },
-        { to: "/wallet", label: "Revenue", icon: <Wallet className="mr-2 h-5 w-5" /> },
+        ...(!isInstitutionAffiliated ? [{ to: "/wallet", label: "Revenue", icon: <Wallet className="mr-2 h-5 w-5" /> }] : []),
       ];
     }
 
@@ -148,7 +150,7 @@ export const MobileNavigation = ({ setIsMenuOpen, navigate }: MobileNavigationPr
       { to: "/emergency", label: "Emergency", icon: <AlertTriangle className="mr-2 h-5 w-5" /> },
       { to: "/medical-records", label: "Medical Records", icon: <Heart className="mr-2 h-5 w-5" /> },
     ];
-  }, [isAuthenticated, isHealthPersonnel, isAdmin, availableRoles]);
+  }, [isAuthenticated, isHealthPersonnel, isAdmin, availableRoles, isInstitutionAffiliated]);
 
   return (
     <div className="absolute top-16 left-0 right-0 bg-background/95 backdrop-blur-md border-b shadow-lg animate-in slide-in-from-top duration-300 md:hidden z-50">
