@@ -228,8 +228,7 @@ const AppContent = () => {
             {/* Provider & Video */}
             <Route path="/provider-portal" element={<RouteGuard><ProviderPortal /></RouteGuard>} />
             <Route path="/provider-profile/:id" element={<RouteGuard><ProviderProfile /></RouteGuard>} />
-            <Route path="/provider/:id" element={<RouteGuard><ProviderDetail /></RouteGuard>} />
-            <Route path="/providers" element={<RouteGuard><Providers /></RouteGuard>} />
+            {/* provider/:id and providers are now public above */}
             <Route path="/video-call/:roomId" element={<RouteGuard><VideoCall /></RouteGuard>} />
             <Route path="/role-management" element={<RouteGuard><RoleManagement /></RouteGuard>} />
             <Route path="/intake-form" element={<RouteGuard><IntakeForm /></RouteGuard>} />
