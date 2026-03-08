@@ -34,7 +34,7 @@ export const DesktopNavigation = () => {
         { to: "/medications", label: "Medications", icon: <Pill className="h-5 w-5 mr-2" /> },
         { to: "/chat", label: "Messages", icon: <MessageSquare className="h-5 w-5 mr-2" /> },
         { to: "/connections", label: "My Patients", icon: <Users className="h-5 w-5 mr-2" /> },
-        { to: "/wallet", label: "Earnings", icon: <Wallet className="h-5 w-5 mr-2" /> },
+        ...(!isInstitutionAffiliated ? [{ to: "/wallet", label: "Earnings", icon: <Wallet className="h-5 w-5 mr-2" /> }] : []),
         { to: "/settings", label: "Settings", icon: <Settings className="h-5 w-5 mr-2" /> },
       ];
     }
