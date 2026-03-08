@@ -79,7 +79,7 @@ export const useCurrency = () => {
   useEffect(() => {
     const detectCurrency = async () => {
       // If user already has a saved preference, use it
-      const saved = localStorage.getItem(STORAGE_KEY);
+      const saved = safeLocalGet(STORAGE_KEY);
       if (saved) {
         setCurrencyState(saved);
         setLoading(false);
