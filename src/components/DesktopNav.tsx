@@ -132,7 +132,7 @@ export function DesktopNav() {
         { to: "/provider-calendar", label: "My Schedule", icon: <Calendar className="h-4 w-4 mr-2" /> },
         { to: "/medications", label: "Medication Admin", icon: <Pill className="h-4 w-4 mr-2" /> },
         { to: "/connections", label: "My Patients", icon: <Users className="h-4 w-4 mr-2" /> },
-        { to: "/wallet", label: "Earnings", icon: <Wallet className="h-4 w-4 mr-2" /> },
+        ...(!isInstitutionAffiliated ? [{ to: "/wallet", label: "Earnings", icon: <Wallet className="h-4 w-4 mr-2" /> }] : []),
         { to: "/emergency", label: "Emergency", icon: <AlertTriangle className="h-4 w-4 mr-2" /> },
         { to: "/profile", label: "Profile", icon: <User className="h-4 w-4 mr-2" /> },
         { to: "/settings", label: "Settings", icon: <Settings className="h-4 w-4 mr-2" /> },
