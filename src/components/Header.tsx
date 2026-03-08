@@ -24,14 +24,10 @@ export function Header() {
   const location = useLocation();
   const navigate = useNavigate();
   const { setSearchQuery } = useSearch();
-  const [userRole, setUserRole] = useState<UserRole | null>(null);
-  const [adminLevel, setAdminLevel] = useState<AdminLevel | null>(null);
   const { isDesktop } = useDeviceType();
 
-  if (profile?.role !== userRole) {
-    setUserRole(profile?.role as UserRole);
-    setAdminLevel(profile?.admin_level as AdminLevel);
-  }
+  const userRole = profile?.role ?? null;
+  const adminLevel = profile?.admin_level ?? null;
 
   const handleSignOut = useCallback(async () => {
     try {
