@@ -85,7 +85,8 @@ export const BookingModal = ({ provider, isOpen, onClose }: BookingModalProps) =
         type: appointmentType === 'virtual' ? 'video_consultation' : 'in_person',
         status: 'scheduled',
         notes: reason || null,
-        duration: 30
+        duration: visitType === 'new' ? 45 : 30,
+        patient_visit_type: visitType
       });
 
       if (error) throw error;
