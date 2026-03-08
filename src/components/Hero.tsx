@@ -48,7 +48,7 @@ export const Hero = () => {
             </h1>
 
             <p className="text-lg text-muted-foreground mb-8 leading-relaxed max-w-xl mx-auto lg:mx-0">
-              Find trusted doctors, book instantly, consult via video — all from Zambia's most modern healthcare platform.
+              Find trusted doctors, book instantly, consult via video — all from your most modern healthcare platform.
             </p>
 
             {/* Search */}

@@ -63,6 +63,9 @@ const ProviderProfile = () => {
         provider_type: data.provider_type,
         email: data.email,
         phone: data.phone,
+        years_experience: data.years_experience,
+        rating: data.rating,
+        reviews_count: data.reviews_count,
         location: {
           latitude: data.provider_locations?.[0]?.latitude || -15.3875,
           longitude: data.provider_locations?.[0]?.longitude || 28.3228
