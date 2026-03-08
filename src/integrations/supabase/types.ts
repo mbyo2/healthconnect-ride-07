@@ -6730,6 +6730,13 @@ export type Database = {
         | "institution_admin"
         | "pharmacy"
         | "institution_staff"
+        | "doctor"
+        | "nurse"
+        | "pharmacist"
+        | "lab_technician"
+        | "radiologist"
+        | "lab"
+        | "support"
       experience_level: "entry" | "intermediate" | "expert"
       healthcare_provider_type:
         | "doctor"
@@ -6895,6 +6902,13 @@ export const Constants = {
         "institution_admin",
         "pharmacy",
         "institution_staff",
+        "doctor",
+        "nurse",
+        "pharmacist",
+        "lab_technician",
+        "radiologist",
+        "lab",
+        "support",
       ],
       experience_level: ["entry", "intermediate", "expert"],
       healthcare_provider_type: [
