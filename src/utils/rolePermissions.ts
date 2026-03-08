@@ -59,7 +59,6 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/iot-monitoring',      // vitals monitoring
     '/health-analytics',    // patient health trends
     '/telemedicine',
-    '/video-consultations', // telenursing
   ],
 
   // ── Radiologist ──────────────────────────────────────────
