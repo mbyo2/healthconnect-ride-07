@@ -41,8 +41,7 @@ export const NetworkErrorBoundary = ({
   if (hasError && !isOnline) {
     return fallbackComponent || (
       <div className="p-4 border rounded-lg bg-background shadow-sm">
-        <Alert variant="destructive" className="border-destructive/30 bg-destructive/5">
-          <WifiOff className="h-4 w-4" />
+        <Alert variant="destructive" className="border-destructive/30 bg-destructive/5ssName="h-4 w-4" />
           <AlertTitle>Network Error</AlertTitle>
           <AlertDescription className="mt-2">
             <p className="mb-4">We're having trouble connecting to the server. Please check your internet connection.</p>
@@ -63,8 +62,7 @@ export const NetworkErrorBoundary = ({
   if (isOnline && connectionQuality === "poor") {
     return (
       <>
-        <Alert className="mb-4 border-yellow-200 bg-yellow-50 dark:bg-yellow-950/30 dark:border-yellow-800">
-          <Wifi className="h-4 w-4" />
+        <Alert className="mb-4 border-yellow-200 bg-yellow-50 dwarning/30 bg-warning/5ame="h-4 w-4" />
           <AlertTitle>Slow Connection</AlertTitle>
           <AlertDescription>
             Your internet connection is unstable. Some features may respond slower than usual.
