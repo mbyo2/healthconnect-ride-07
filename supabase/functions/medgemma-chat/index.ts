@@ -122,7 +122,7 @@ CRITICAL: If symptoms suggest emergency, immediately advise to call emergency se
       JSON.stringify({
         reply,
         timestamp: new Date().toISOString(),
-        model: 'medgemma-2-8b'
+        model: 'medgemma-1.5-4b-it'
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
