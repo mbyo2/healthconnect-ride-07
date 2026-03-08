@@ -64,7 +64,7 @@ const Profile = () => {
             <div className="relative">
               <Avatar className="h-24 w-24 ring-4 ring-border">
                 <AvatarImage src={profile?.avatar_url || ""} />
-                <AvatarFallback className="bg-trust-100 text-trust-600 text-xl">
+                <AvatarFallback className="bg-primary/10 text-primary text-xl">
                   {formData.firstName?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || "U"}
                 </AvatarFallback>
               </Avatar>
