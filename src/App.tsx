@@ -166,7 +166,7 @@ const AppContent = () => {
             <Route path="/profile-setup" element={<Navigate to="/onboarding" replace />} />
             <Route path="/profile" element={<RouteGuard><Profile /></RouteGuard>} />
             <Route path="/settings" element={<RouteGuard><Settings /></RouteGuard>} />
-            <Route path="/search" element={<RouteGuard><SearchPage /></RouteGuard>} />
+            {/* search is now public above */}
             <Route path="/appointments" element={<RouteGuard><Appointments /></RouteGuard>} />
             <Route path="/admin-dashboard" element={<RouteGuard><AdminDashboard /></RouteGuard>} />
             <Route path="/provider-dashboard" element={<RouteGuard><ProviderDashboard /></RouteGuard>} />
