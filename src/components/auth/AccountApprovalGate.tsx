@@ -109,9 +109,9 @@ export const AccountApprovalGate = ({ children }: { children: React.ReactNode })
               What you can do while waiting:
             </h4>
             <ul className="text-sm text-muted-foreground space-y-1.5 ml-6">
-              <li className="flex items-center gap-2"><CheckCircle2 className="h-3 w-3 text-green-500" /> Complete your profile</li>
-              <li className="flex items-center gap-2"><CheckCircle2 className="h-3 w-3 text-green-500" /> Upload additional documents</li>
-              <li className="flex items-center gap-2"><CheckCircle2 className="h-3 w-3 text-green-500" /> Explore the platform as a patient</li>
+              <li className="flex items-center gap-2"><CheckCircle2 className="h-3 w-3 text-primary" /> Complete your profile</li>
+              <li className="flex items-center gap-2"><CheckCircle2 className="h-3 w-3 text-primary" /> Upload additional documents</li>
+              <li className="flex items-center gap-2"><CheckCircle2 className="h-3 w-3 text-primary" /> Explore the platform as a patient</li>
             </ul>
           </div>
 
