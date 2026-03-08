@@ -63,7 +63,8 @@ export const NetworkErrorBoundary = ({
   if (isOnline && connectionQuality === "poor") {
     return (
       <>
-        <Alert className="mb-4 border-yellow-200 bg-yellow-50 dwarning/30 bg-warning/5ame="h-4 w-4" />
+        <Alert className="mb-4 border-warning/30 bg-warning/5">
+          <Wifi className="h-4 w-4" />
           <AlertTitle>Slow Connection</AlertTitle>
           <AlertDescription>
             Your internet connection is unstable. Some features may respond slower than usual.
