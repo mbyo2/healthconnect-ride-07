@@ -15,6 +15,7 @@ export const DesktopNavigation = () => {
   const location = useLocation();
   const { isAuthenticated } = useAuth();
   const { availableRoles, isHealthPersonnel, isAdmin, isPatient } = useUserRoles();
+  const { isInstitutionAffiliated } = useInstitutionAffiliation();
 
   const navItems = useMemo(() => {
     if (!isAuthenticated) {
