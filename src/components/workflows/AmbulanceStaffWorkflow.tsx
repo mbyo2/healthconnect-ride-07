@@ -1,66 +1,121 @@
-import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Link } from 'react-router-dom';
-import { Truck, MapPin, AlertTriangle, Phone, Clock, Navigation } from 'lucide-react';
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Badge } from '@/components/ui/badge';
+import { Truck, AlertTriangle, Clock, Phone, Plus, MapPin, Navigation } from 'lucide-react';
+import { toast } from 'sonner';
+
+interface Dispatch {
+  id: string;
+  patient_name: string;
+  pickup_location: string;
+  destination: string;
+  priority: 'emergency' | 'urgent' | 'routine';
+  status: 'dispatched' | 'en_route' | 'on_scene' | 'transporting' | 'delivered' | 'completed';
+  ambulance_unit: string;
+  contact_phone: string;
+  notes: string;
+  created_at: string;
+}
 
 export const AmbulanceStaffWorkflow = () => {
-  const quickActions = [
-    { to: '/emergency', label: 'Active Dispatch', description: 'Current emergency calls', icon: <AlertTriangle className="h-6 w-6" /> },
-    { to: '/map', label: 'Navigation', description: 'Route & hospital locations', icon: <Navigation className="h-6 w-6" /> },
-    { to: '/appointments', label: 'Transport Log', description: 'Patient transfer schedule', icon: <Truck className="h-6 w-6" /> },
-    { to: '/chat', label: 'Dispatch Radio', description: 'Communication with dispatch', icon: <Phone className="h-6 w-6" /> },
-  ];
+  const [dispatches, setDispatches] = useState<Dispatch[]>([]);
+  const [showAdd, setShowAdd] = useState(false);
+  const [form, setForm] = useState({ patient_name: '', pickup_location: '', destination: '', priority: 'urgent' as const, ambulance_unit: 'AMB-01', contact_phone: '', notes: '' });
+
+  const active = dispatches.filter(d => !['delivered', 'completed'].includes(d.status));
+  const inTransit = dispatches.filter(d => d.status === 'transporting');
+  const completedToday = dispatches.filter(d => d.status === 'completed');
+
+  const statusFlow: Record<string, string> = {
+    dispatched: 'en_route', en_route: 'on_scene', on_scene: 'transporting', transporting: 'delivered', delivered: 'completed',
+  };
+
+  const priorityColor = (p: string) => {
+    switch (p) { case 'emergency': return 'bg-destructive/10 text-destructive'; case 'urgent': return 'bg-amber-100 text-amber-800'; default: return ''; }
+  };
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Ambulance & Transport Dashboard</h1>
-        <p className="text-muted-foreground">Emergency dispatch, transport logs & route management</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">Ambulance & Transport</h1>
+          <p className="text-muted-foreground">Emergency dispatch, patient transport & route tracking</p>
+        </div>
+        <Dialog open={showAdd} onOpenChange={setShowAdd}>
+          <DialogTrigger asChild><Button className="gap-1 bg-destructive hover:bg-destructive/90"><Plus className="h-4 w-4" /> New Dispatch</Button></DialogTrigger>
+          <DialogContent>
+            <DialogHeader><DialogTitle>Emergency Dispatch</DialogTitle></DialogHeader>
+            <div className="space-y-3">
+              <div className="space-y-1"><Label>Patient / Caller Name</Label><Input value={form.patient_name} onChange={e => setForm({...form, patient_name: e.target.value})} /></div>
+              <div className="space-y-1"><Label>Pickup Location</Label><Input value={form.pickup_location} onChange={e => setForm({...form, pickup_location: e.target.value})} placeholder="Address or landmark" /></div>
+              <div className="space-y-1"><Label>Destination Hospital</Label><Input value={form.destination} onChange={e => setForm({...form, destination: e.target.value})} /></div>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="space-y-1"><Label>Priority</Label>
+                  <Select value={form.priority} onValueChange={v => setForm({...form, priority: v as any})}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent><SelectItem value="emergency">🔴 Emergency</SelectItem><SelectItem value="urgent">🟡 Urgent</SelectItem><SelectItem value="routine">🟢 Routine</SelectItem></SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1"><Label>Unit</Label>
+                  <Select value={form.ambulance_unit} onValueChange={v => setForm({...form, ambulance_unit: v})}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent><SelectItem value="AMB-01">AMB-01</SelectItem><SelectItem value="AMB-02">AMB-02</SelectItem><SelectItem value="AMB-03">AMB-03</SelectItem></SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="space-y-1"><Label>Contact Phone</Label><Input type="tel" value={form.contact_phone} onChange={e => setForm({...form, contact_phone: e.target.value})} /></div>
+              <div className="space-y-1"><Label>Notes</Label><Textarea value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} rows={2} /></div>
+              <Button className="w-full bg-destructive hover:bg-destructive/90" onClick={() => {
+                setDispatches(prev => [{ id: Date.now().toString(), ...form, status: 'dispatched', created_at: new Date().toISOString() }, ...prev]);
+                setShowAdd(false);
+                toast.success('Dispatch created — unit ' + form.ambulance_unit);
+              }}>Dispatch Now</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="border-destructive/20 bg-destructive/5">
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-lg"><AlertTriangle className="h-5 w-5 text-destructive" /> Active Calls</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold text-destructive">--</p>
-            <p className="text-sm text-muted-foreground">Emergency dispatches</p>
-          </CardContent>
-        </Card>
-        <Card className="border-primary/20 bg-primary/5">
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-lg"><Truck className="h-5 w-5 text-primary" /> In Transit</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold text-primary">--</p>
-            <p className="text-sm text-muted-foreground">Patient transfers</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-lg"><Clock className="h-5 w-5" /> Completed Today</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold">--</p>
-            <p className="text-sm text-muted-foreground">Trips completed</p>
-          </CardContent>
-        </Card>
+        <Card className="border-destructive/20 bg-destructive/5"><CardHeader className="pb-2"><CardTitle className="flex items-center gap-2 text-lg"><AlertTriangle className="h-5 w-5 text-destructive" /> Active Calls</CardTitle></CardHeader><CardContent><p className="text-3xl font-bold text-destructive">{active.length}</p></CardContent></Card>
+        <Card className="border-primary/20 bg-primary/5"><CardHeader className="pb-2"><CardTitle className="flex items-center gap-2 text-lg"><Truck className="h-5 w-5 text-primary" /> In Transit</CardTitle></CardHeader><CardContent><p className="text-3xl font-bold text-primary">{inTransit.length}</p></CardContent></Card>
+        <Card><CardHeader className="pb-2"><CardTitle className="flex items-center gap-2 text-lg"><Clock className="h-5 w-5" /> Completed</CardTitle></CardHeader><CardContent><p className="text-3xl font-bold">{completedToday.length}</p></CardContent></Card>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {quickActions.map((action) => (
-          <Card key={action.to} className="hover:shadow-md transition-shadow cursor-pointer">
-            <Link to={action.to}>
-              <CardHeader className="pb-2">
-                <div className="text-primary">{action.icon}</div>
-                <CardTitle className="text-base">{action.label}</CardTitle>
-                <CardDescription className="text-xs">{action.description}</CardDescription>
-              </CardHeader>
-            </Link>
-          </Card>
-        ))}
-      </div>
+      <Card>
+        <CardHeader><CardTitle>Dispatch Board</CardTitle></CardHeader>
+        <CardContent>
+          {dispatches.length === 0 ? <p className="text-muted-foreground text-center py-4">No active dispatches</p> : (
+            <div className="space-y-2">
+              {dispatches.map(d => (
+                <div key={d.id} className="flex items-center justify-between p-3 rounded-lg border">
+                  <div>
+                    <p className="font-medium">{d.patient_name} — {d.ambulance_unit}</p>
+                    <p className="text-sm text-muted-foreground">
+                      <MapPin className="inline h-3 w-3" /> {d.pickup_location} → <Navigation className="inline h-3 w-3" /> {d.destination}
+                    </p>
+                    {d.contact_phone && <p className="text-xs text-muted-foreground"><Phone className="inline h-3 w-3" /> {d.contact_phone}</p>}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className={priorityColor(d.priority)}>{d.priority}</Badge>
+                    <Badge variant="outline">{d.status.replace('_', ' ')}</Badge>
+                    {statusFlow[d.status] && (
+                      <Button size="sm" onClick={() => setDispatches(prev => prev.map(x => x.id === d.id ? {...x, status: statusFlow[d.status] as any} : x))}>
+                        {statusFlow[d.status].replace('_', ' ')}
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };
