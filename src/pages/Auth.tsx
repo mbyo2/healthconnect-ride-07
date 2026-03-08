@@ -108,7 +108,7 @@ export const Auth = () => {
   // ---------- Handlers ----------
   const onLogin = async (data: z.infer<typeof loginSchema>) => {
     setLocalLoading(true);
-    const { error } = await supabase.auth.signInWithPassword(data);
+    const { error } = await supabase.auth.signInWithPassword({ email: data.email, password: data.password });
     if (error) showError(error.message);
     else navigate("/home");
     setLocalLoading(false);
