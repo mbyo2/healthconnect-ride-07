@@ -6,7 +6,7 @@ import { useSuccessFeedback } from '@/hooks/use-success-feedback';
 import { 
   Building2, Users, Calendar, FileText, Settings,
   BarChart3, Bed, Heart, Pill, DollarSign, ClipboardList,
-  Thermometer, Activity, AlertTriangle, Bug, Shield, Bell
+  Thermometer, Activity, AlertTriangle, Bug, Shield, Bell, CreditCard
 } from 'lucide-react';
 
 export const NursingHomeWorkflow = () => {
