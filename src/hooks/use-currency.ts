@@ -104,7 +104,7 @@ export const useCurrency = () => {
           } else {
             // Default to USD for unmapped countries
             setCurrencyState('USD');
-            localStorage.setItem(STORAGE_KEY, 'USD');
+            safeLocalSet(STORAGE_KEY, 'USD');
           }
         }
       } catch (error) {
