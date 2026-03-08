@@ -19,6 +19,7 @@ interface MobileNavigationProps {
 export const MobileNavigation = ({ setIsMenuOpen, navigate }: MobileNavigationProps) => {
   const { isAuthenticated, user, signOut, profile } = useAuth();
   const { currentRole, availableRoles, isHealthPersonnel, isAdmin } = useUserRoles();
+  const { isInstitutionAffiliated } = useInstitutionAffiliation();
 
   const handleLogout = async () => {
     try {
