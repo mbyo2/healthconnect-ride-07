@@ -75,7 +75,7 @@ export const AccountApprovalGate = ({ children }: { children: React.ReactNode })
             {isRejected ? (
               <XCircle className="h-12 w-12 text-destructive" />
             ) : (
-              <Clock className="h-12 w-12 text-amber-500 animate-pulse" />
+              <Clock className="h-12 w-12 text-primary animate-pulse" />
             )}
           </div>
           <CardTitle className="text-2xl">
