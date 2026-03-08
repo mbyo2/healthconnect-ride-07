@@ -8,6 +8,16 @@ import { ZAMBIA_CONFIG, ZAMBIAN_STATS } from '@/config/zambia';
 
 export const Hero = () => {
   const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+    } else {
+      navigate('/search');
+    }
+  };
 
   const quickActions = [
     { icon: Stethoscope, label: 'Find Doctor', route: '/marketplace-users', color: 'text-blue-600 dark:text-blue-400' },
