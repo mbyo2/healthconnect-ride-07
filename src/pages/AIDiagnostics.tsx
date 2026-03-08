@@ -1,5 +1,5 @@
 import { Helmet } from "react-helmet-async";
-import { MedGemmaChat } from "@/components/MedGemmaChat";
+import { MedGemmaChat as DocOClockAIChat } from "@/components/MedGemmaChat";
 import { SymptomCollector } from "@/components/SymptomCollector";
 import { AIDiagnosisHistory } from "@/components/AIDiagnosisHistory";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
