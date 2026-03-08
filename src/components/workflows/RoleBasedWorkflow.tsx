@@ -100,8 +100,10 @@ export const RoleBasedWorkflow = () => {
   }
 
   return (
-    <div className="container mx-auto p-6">
-      {getCurrentWorkflow()}
-    </div>
+    <AccountApprovalGate>
+      <div className="container mx-auto p-6">
+        {getCurrentWorkflow()}
+      </div>
+    </AccountApprovalGate>
   );
 };
