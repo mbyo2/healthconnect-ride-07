@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { BarChart3, TrendingUp, Users, DollarSign, Bed, Calendar, FileText, Download } from 'lucide-react';
+import { BarChart3, TrendingUp, Users, DollarSign, Bed, Calendar, FileText, Download, ClipboardCheck, TestTube, Pill, AlertTriangle, Receipt, UserCheck } from 'lucide-react';
 
 export const MISReports = ({ hospital }: { hospital: any }) => {
   const reports = [
@@ -12,12 +12,19 @@ export const MISReports = ({ hospital }: { hospital: any }) => {
     { title: 'Doctor Performance', desc: 'Consultations, procedures, revenue per doctor', category: 'HR', frequency: 'Monthly', icon: <TrendingUp className="h-5 w-5" /> },
     { title: 'Bed Occupancy Trends', desc: 'Occupancy rates, average LOS, turnover', category: 'Operations', frequency: 'Weekly', icon: <Bed className="h-5 w-5" /> },
     { title: 'OT Utilization', desc: 'Surgery counts, OT usage hours, cancellations', category: 'Operations', frequency: 'Weekly', icon: <Calendar className="h-5 w-5" /> },
-    { title: 'Lab TAT Report', desc: 'Sample turnaround times by test type', category: 'Lab', frequency: 'Daily', icon: <FileText className="h-5 w-5" /> },
-    { title: 'Pharmacy Sales', desc: 'Drug dispensing volume, revenue, expiry waste', category: 'Pharmacy', frequency: 'Daily', icon: <DollarSign className="h-5 w-5" /> },
+    { title: 'Lab TAT Report', desc: 'Sample turnaround times by test type', category: 'Lab', frequency: 'Daily', icon: <TestTube className="h-5 w-5" /> },
+    { title: 'Outsourced Tests Report', desc: 'Tests outsourced to external labs, TAT & costs', category: 'Lab', frequency: 'Weekly', icon: <TestTube className="h-5 w-5" /> },
+    { title: 'Pharmacy Sales', desc: 'Drug dispensing volume, revenue, expiry waste', category: 'Pharmacy', frequency: 'Daily', icon: <Pill className="h-5 w-5" /> },
+    { title: 'Monthly Purchase (Supplier-wise)', desc: 'All purchase invoices grouped by supplier with subtotals', category: 'Pharmacy', frequency: 'Monthly', icon: <Receipt className="h-5 w-5" /> },
+    { title: 'Near-Expiry Drug Report', desc: 'Drugs approaching expiry with batch and quantity details', category: 'Pharmacy', frequency: 'Weekly', icon: <AlertTriangle className="h-5 w-5" /> },
     { title: 'Insurance Receivables', desc: 'Claims status, aging analysis, TPA-wise', category: 'Finance', frequency: 'Weekly', icon: <DollarSign className="h-5 w-5" /> },
+    { title: 'Sales & Return Tax Report', desc: 'Cash vs Credit breakdown with tax details for sales & returns', category: 'Finance', frequency: 'Monthly', icon: <Receipt className="h-5 w-5" /> },
+    { title: 'Check-in vs Billed Report', desc: 'Discrepancy report: patients seen but not billed', category: 'Finance', frequency: 'Daily', icon: <ClipboardCheck className="h-5 w-5" /> },
     { title: 'Discharge Summary Report', desc: 'Discharge stats, LAMA, AMA cases', category: 'Operations', frequency: 'Daily', icon: <FileText className="h-5 w-5" /> },
     { title: 'Referral Analytics', desc: 'Incoming/outgoing referral patterns', category: 'Marketing', frequency: 'Monthly', icon: <TrendingUp className="h-5 w-5" /> },
     { title: 'Inventory Consumption', desc: 'Department-wise consumption & wastage', category: 'Inventory', frequency: 'Weekly', icon: <BarChart3 className="h-5 w-5" /> },
+    { title: 'Infection Surveillance Report', desc: 'HAI trends, organisms, outcomes by period', category: 'Quality', frequency: 'Monthly', icon: <AlertTriangle className="h-5 w-5" /> },
+    { title: 'Patient Feedback Analysis', desc: 'Ratings, satisfaction trends, NPS score', category: 'Quality', frequency: 'Monthly', icon: <UserCheck className="h-5 w-5" /> },
   ];
 
   const categories = [...new Set(reports.map(r => r.category))];
@@ -27,7 +34,7 @@ export const MISReports = ({ hospital }: { hospital: any }) => {
       <div className="flex flex-col sm:flex-row gap-3 justify-between">
         <div>
           <h3 className="text-lg font-semibold text-foreground">MIS Reports & Analytics</h3>
-          <p className="text-sm text-muted-foreground">Management information system — operational & financial reports</p>
+          <p className="text-sm text-muted-foreground">Management information system — operational, financial & quality reports</p>
         </div>
         <Button size="sm" variant="outline" className="gap-2"><Download className="h-4 w-4" /> Export All</Button>
       </div>
