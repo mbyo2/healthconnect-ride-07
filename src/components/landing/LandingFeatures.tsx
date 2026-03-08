@@ -10,7 +10,7 @@ export const HowItWorks = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="py-14 md:py-20 relative">
+    <section className="py-12 md:py-14 lg:py-20 relative">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-10">
           <p className="text-sm font-semibold text-primary uppercase tracking-widest mb-3">How It Works</p>
