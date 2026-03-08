@@ -4,38 +4,39 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { useSuccessFeedback } from '@/hooks/use-success-feedback';
-import { 
+import {
   Stethoscope, Calendar, Users, FileText, Settings,
   ClipboardList, MessageSquare, Brain, Wallet, AlertTriangle,
-  Shield, Video, Activity, Pill, Bug
+  Shield, Bug, Pill, Video, Activity
 } from 'lucide-react';
 
-export const HealthPersonnelWorkflow = () => {
+export const DoctorWorkflow = () => {
   const navigate = useNavigate();
   const { showSuccess } = useSuccessFeedback();
-  
+
   const handleNavigation = (route: string, title: string) => {
     navigate(route);
     showSuccess({ message: `Opening ${title}...` });
   };
 
   const workflowSteps = [
-    { title: "My Schedule", description: "View and manage your availability & appointments", icon: <Calendar className="h-5 w-5" />, route: '/provider-calendar' },
-    { title: "Patient Appointments", description: "Today's queue, upcoming & past consultations", icon: <ClipboardList className="h-5 w-5" />, route: '/appointments' },
-    { title: "Patient Records", description: "Access and update patient medical records", icon: <Stethoscope className="h-5 w-5" />, route: '/medical-records' },
-    { title: "Write Prescriptions", description: "Digital Rx with allergy & interaction safety", icon: <FileText className="h-5 w-5" />, route: '/prescriptions' },
-    { title: "Allergy & Drug Safety", description: "Check patient allergies & drug interactions", icon: <Shield className="h-5 w-5" />, route: '/prescriptions' },
+    { title: "My Schedule", description: "Availability, appointments & calendar", icon: <Calendar className="h-5 w-5" />, route: '/provider-calendar' },
+    { title: "Patient Queue", description: "Today's consultations & upcoming visits", icon: <ClipboardList className="h-5 w-5" />, route: '/appointments' },
+    { title: "Patient Records (EMR)", description: "Access case sheets, vitals & history", icon: <Stethoscope className="h-5 w-5" />, route: '/medical-records' },
+    { title: "Write Prescriptions", description: "Digital Rx with allergy & interaction alerts", icon: <FileText className="h-5 w-5" />, route: '/prescriptions' },
+    { title: "Allergy & Drug Safety", description: "Check allergies & drug interactions", icon: <Shield className="h-5 w-5" />, route: '/prescriptions' },
     { title: "AI Clinical Assistant", description: "AI-powered CDSS & diagnostic support", icon: <Brain className="h-5 w-5" />, route: '/ai-diagnostics' },
     { title: "Infection Management", description: "Track HAI cases & antibiotic stewardship", icon: <Bug className="h-5 w-5" />, route: '/medical-records' },
+    { title: "Discharge Planning", description: "Multi-dept discharge checklists", icon: <ClipboardList className="h-5 w-5" />, route: '/medical-records' },
     { title: "Video Consultations", description: "Telemedicine & remote patient care", icon: <Video className="h-5 w-5" />, route: '/video-consultations' },
-    { title: "My Patients", description: "Your connected patient network", icon: <Users className="h-5 w-5" />, route: '/connections' },
+    { title: "My Patients", description: "Connected patient network", icon: <Users className="h-5 w-5" />, route: '/connections' },
     { title: "Patient Chat", description: "Secure messaging with patients", icon: <MessageSquare className="h-5 w-5" />, route: '/chat' },
     { title: "Medication Management", description: "Review active medications & refills", icon: <Pill className="h-5 w-5" />, route: '/medications' },
-    { title: "Health Analytics", description: "Patient trends & clinical outcomes", icon: <Activity className="h-5 w-5" />, route: '/health-analytics' },
-    { title: "Earnings & Wallet", description: "View consultations revenue and payouts", icon: <Wallet className="h-5 w-5" />, route: '/wallet' },
+    { title: "Health Analytics", description: "Patient trends & outcomes", icon: <Activity className="h-5 w-5" />, route: '/health-analytics' },
+    { title: "Earnings & Wallet", description: "Consultation revenue & payouts", icon: <Wallet className="h-5 w-5" />, route: '/wallet' },
     { title: "Emergency Protocols", description: "Emergency response tools", icon: <AlertTriangle className="h-5 w-5" />, route: '/emergency' },
     { title: "Professional Profile", description: "Credentials, specializations & bio", icon: <Stethoscope className="h-5 w-5" />, route: '/profile' },
-    { title: "Settings", description: "Configure practice preferences", icon: <Settings className="h-5 w-5" />, route: '/settings' },
+    { title: "Settings", description: "Practice preferences", icon: <Settings className="h-5 w-5" />, route: '/settings' },
   ];
 
   return (
@@ -43,9 +44,9 @@ export const HealthPersonnelWorkflow = () => {
       <ApplicationStatusBanner />
       <ProfileCompleteBanner />
       <div className="text-center space-y-2">
-        <h2 className="text-xl md:text-2xl font-bold text-foreground">Healthcare Provider Dashboard</h2>
+        <h2 className="text-xl md:text-2xl font-bold text-foreground">Doctor Dashboard</h2>
         <p className="text-muted-foreground text-sm md:text-base px-4">
-          Manage your practice, patients, and consultations
+          Clinical tools, prescriptions, patient management & decision support
         </p>
       </div>
 
@@ -63,8 +64,7 @@ export const HealthPersonnelWorkflow = () => {
                   <p className="text-xs text-muted-foreground line-clamp-1">{step.description}</p>
                 </div>
               </div>
-              <Button 
-                onClick={(e) => { e.stopPropagation(); handleNavigation(step.route, step.title); }}
+              <Button onClick={(e) => { e.stopPropagation(); handleNavigation(step.route, step.title); }}
                 size="sm" className="w-full text-xs mt-2">Open</Button>
             </CardContent>
           </Card>

@@ -91,6 +91,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/ai-diagnostics',      // clinical decision support
     '/telemedicine',
     '/medications',
+    '/health-analytics',    // patient trends & outcomes
   ],
 
   // ── Nurse (Solo Consultant) ──────────────────────────────
@@ -101,7 +102,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/iot-monitoring',      // vitals monitoring
     '/health-analytics',    // patient health trends
     '/telemedicine',
-    // NOTE: nurses do NOT get /prescriptions or /ai-diagnostics
+    '/video-consultations', // telenursing
   ],
 
   // ── Radiologist ──────────────────────────────────────────
@@ -110,6 +111,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     ...PROVIDER_CORE_ROUTES,
     '/ai-diagnostics',      // imaging AI support
     '/medications',
+    '/health-analytics',    // performance analytics
   ],
 
   // ── Generic Health Personnel (legacy catch-all provider) ─
@@ -138,6 +140,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/map',
     '/search',
     '/medications',
+    '/connections',         // customer records
   ],
 
   // ── Pharmacy (business entity) ───────────────────────────
@@ -152,6 +155,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/map',
     '/search',
     '/medications',
+    '/connections',         // customer records
   ],
 
   // ── Lab Technician ───────────────────────────────────────
@@ -163,6 +167,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/search',
     '/medical-records',
     '/medications',
+    '/connections',         // patient lookup
   ],
 
   // ── Lab (business entity) ────────────────────────────────
@@ -173,6 +178,8 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/map',
     '/search',
     '/medications',
+    '/medical-records',     // results & reports
+    '/connections',         // patient records
   ],
 
   // ── Institution Admin ────────────────────────────────────
@@ -259,6 +266,8 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/chat',
     '/search',
     '/healthcare-application',
+    '/medical-records',     // view patient records for support
+    '/appointments',        // view appointments for support
   ],
 
   // ── Super Admin (everything) ─────────────────────────────
