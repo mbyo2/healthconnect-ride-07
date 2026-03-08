@@ -209,11 +209,6 @@ export const HealthcareInstitutionForm = () => {
             disabled={isSubmitting}
           />
         )}
-          </Select>
-          {errors.type && (
-            <p className="text-sm text-destructive mt-1">{errors.type}</p>
-          )}
-        </div>
 
         <div>
           <Label htmlFor="license_number">License Number <span className="text-destructive">*</span></Label>
