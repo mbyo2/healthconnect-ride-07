@@ -120,7 +120,7 @@ export const useCurrency = () => {
 
   const setCurrency = useCallback((newCurrency: string) => {
     setCurrencyState(newCurrency);
-    localStorage.setItem(STORAGE_KEY, newCurrency);
+    safeLocalSet(STORAGE_KEY, newCurrency);
   }, []);
 
   const getSymbol = useCallback((code?: string) => {

@@ -17,7 +17,7 @@ interface MobileLayoutProps {
 }
 
 // Routes that manage their own layout (no global header/nav)
-const STANDALONE_ROUTES = ['/landing'];
+const STANDALONE_ROUTES = ['/landing', '/auth', '/pricing', '/reset-password', '/terms', '/privacy'];
 
 export const MobileLayout = ({ children, isLoading }: MobileLayoutProps) => {
   const { isDesktop } = useDeviceType();

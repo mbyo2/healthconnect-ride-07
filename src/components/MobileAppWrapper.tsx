@@ -1,8 +1,7 @@
 
 import { useEffect, useState } from 'react';
 import { useDeviceCapabilities } from '@/hooks/use-device-capabilities';
-import { useAuth } from '@/context/AuthContext';
-import { useNetwork } from '@/hooks/use-network';
+import { useAuth } from '@/context/AuthContex';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Battery, BatteryLow, WifiOff } from 'lucide-react';
@@ -16,7 +15,7 @@ export function MobileAppWrapper({ children }: MobileAppWrapperProps) {
   const capabilities = useDeviceCapabilities();
   const { isOnline } = useNetwork();
   const session = useSupabaseSession();
-  const [lowPowerMode, setLowPowerMode] = useState(false);
+  const [lowPowerMo{ session } = useAuthate(false);
   const [hasRequestedPermissions, setHasRequestedPermissions] = useState(false);
   const [batteryWarningShown, setBatteryWarningShown] = useState(false);
 

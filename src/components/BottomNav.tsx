@@ -1,7 +1,6 @@
 
 import { Home, Search, Calendar, MessageSquare, Heart, Users, ShoppingCart, Pill, AlertTriangle, User, Wallet, Brain, Shield, Activity, BarChart3, Zap, Settings, Building2, Stethoscope, Package } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useDeviceType } from "@/hooks/use-device-type";
 import { useAuth } from "@/context/AuthContext";
 import { useUserRoles } from "@/context/UserRolesContext";
@@ -13,7 +12,6 @@ import { BottomNavMenu } from "@/components/navigation/BottomNavMenu";
 
 export function BottomNav() {
   const location = useLocation();
-  const supabase = useSupabaseClient();
   const { isDesktop } = useDeviceType();
   const { isAuthenticated, user } = useAuth();
   const { availableRoles, isHealthPersonnel, isAdmin, isPatient } = useUserRoles();

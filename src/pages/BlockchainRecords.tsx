@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Shield, Lock, Share2, Eye, Download, FileText, CheckCircle2, AlertTriangle, Plus } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/context/AuthContext";
 import { useMedicalRecords } from "@/hooks/useMedicalRecords";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";

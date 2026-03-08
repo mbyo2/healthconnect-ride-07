@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import { getHealthStats, getHealthGoals, getUpcomingAppointments, type HealthStat, type HealthGoal, type UpcomingAppointment } from "@/services/healthMetrics";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/context/AuthContext";
 import { useGamification } from "@/hooks/useGamification";
 import { Trophy, Award } from "lucide-react";
 import { AIInsightsWidget } from "@/components/ai/AIInsightsWidget";
