@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Loader2, Send, Bot, User, X, Paperclip, Lightbulb } from 'lucide-react';
 import { toast } from 'sonner';
 import { ClinicalDecisionCard, ClinicalDecision, parseClinicalDecisions, ClinicalAction } from './ai/ClinicalDecisionCard';
+import { useUserRoles } from '@/context/UserRolesContext';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -47,11 +48,14 @@ const AI_WELCOME_MESSAGE = "Hello! I'm Doc 0 Clock, your AI medical assistant. I
 
 interface MedGemmaChatProps {
   onActionClick?: (action: ClinicalAction) => void;
+  roleOverride?: string;
 }
 
 const STORAGE_KEY = 'medgemma_chat_history';
 
-export const MedGemmaChat = ({ onActionClick }: MedGemmaChatProps) => {
+export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps) => {
+  const { currentRole, userRole } = useUserRoles();
+  const activeRole = roleOverride || currentRole || userRole || 'patient';
   // Load messages from localStorage on mount
   const [messages, setMessages] = useState<Message[]>(() => {
     try {
@@ -164,6 +168,7 @@ export const MedGemmaChat = ({ onActionClick }: MedGemmaChatProps) => {
           body: {
             message: userMessage.content,
             image: imageToSend || null,
+            userRole: activeRole,
             conversationHistory: messages.slice(-10).map(m => ({
               role: m.role,
               content: m.content
@@ -182,6 +187,7 @@ export const MedGemmaChat = ({ onActionClick }: MedGemmaChatProps) => {
           const medgemmaResponse = await supabase.functions.invoke('medgemma-chat', {
             body: {
               message: userMessage.content,
+              userRole: activeRole,
               conversationHistory: messages.slice(-10).map(m => ({
                 role: m.role,
                 content: m.content

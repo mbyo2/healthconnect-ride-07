@@ -9,6 +9,7 @@ const corsHeaders = {
 // Input validation schema
 const chatRequestSchema = z.object({
   message: z.string().min(1, 'Message cannot be empty').max(2000, 'Message too long'),
+  userRole: z.string().optional().default('patient'),
   conversationHistory: z.array(z.object({
     role: z.enum(['user', 'assistant']),
     content: z.string().max(2000)
@@ -36,37 +37,29 @@ serve(async (req) => {
       );
     }
 
-    const { message, conversationHistory } = validationResult.data;
+    const { message, userRole, conversationHistory } = validationResult.data;
 
-    // Use Lovable AI Gateway instead of HuggingFace (which has deprecated API)
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {
       console.error('LOVABLE_API_KEY not configured');
       return new Response(
-        JSON.stringify({
-          error: 'LOVABLE_API_KEY not configured',
-          fallback: true
-        }),
+        JSON.stringify({ error: 'LOVABLE_API_KEY not configured', fallback: true }),
         { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Build conversation context
-    const systemPrompt = `You are Doc 0 Clock, a knowledgeable medical AI assistant available 24/7. You provide:
-- Evidence-based medical information
-- Symptom analysis and health guidance
-- Medication information
-- Preventive care recommendations
-- Mental health support
+    // Role-aware prompt (simplified version for fallback)
+    const roleLabel = ['doctor','health_personnel','radiologist'].includes(userRole) ? 'clinical professional'
+      : ['nurse'].includes(userRole) ? 'nursing professional'
+      : ['pharmacist','pharmacy'].includes(userRole) ? 'pharmacist'
+      : ['lab','lab_technician'].includes(userRole) ? 'lab professional'
+      : 'patient';
 
-Always:
-1. Be empathetic and supportive
-2. Provide accurate medical information
-3. Recommend seeking professional care when appropriate
-4. Include disclaimers about not replacing professional medical advice
-5. Ask clarifying questions when needed
+    const systemPrompt = `You are Doc 0 Clock, a medical AI assistant. You are speaking with a ${roleLabel}.
+${roleLabel !== 'patient' ? 'Use appropriate clinical terminology and provide evidence-based decision support.' : 'Use simple, clear language and be empathetic.'}
 
-CRITICAL: If symptoms suggest emergency (chest pain, difficulty breathing, severe bleeding, loss of consciousness), immediately advise to call emergency services.`;
+Always recommend seeking professional care when appropriate.
+CRITICAL: If symptoms suggest emergency, immediately advise to call emergency services.`;
 
     // Format conversation for API
     const messages = [
