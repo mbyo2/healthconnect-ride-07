@@ -20,12 +20,14 @@ export const ChatList = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let userId: string | null = null;
+
     const fetchContacts = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
+        userId = user.id;
 
-        // Fetch health personnel for patients, and patients for health personnel
         const { data: profiles, error } = await supabase
           .from('profiles')
           .select('id, first_name, last_name, avatar_url, role')
@@ -42,6 +44,32 @@ export const ChatList = () => {
     };
 
     fetchContacts();
+
+    // Real-time: listen for new messages to re-sort / highlight contacts
+    const channel = supabase
+      .channel('chat-list-realtime')
+      .on('postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'messages' },
+        (payload) => {
+          const msg = payload.new as any;
+          // Bubble the contact who sent/received the latest message to the top
+          if (msg.sender_id === userId || msg.receiver_id === userId) {
+            setContacts(prev => {
+              const contactId = msg.sender_id === userId ? msg.receiver_id : msg.sender_id;
+              const idx = prev.findIndex(c => c.id === contactId);
+              if (idx <= 0) return prev;
+              const updated = [...prev];
+              const [contact] = updated.splice(idx, 1);
+              return [contact, ...updated];
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   if (loading) {
