@@ -121,7 +121,7 @@ const AIDiagnostics = () => {
             </TabsList>
 
             <TabsContent value="chat" className="mt-3 sm:mt-6">
-              <MedGemmaChat onActionClick={handleActionClick} />
+              <DocOClockAIChat onActionClick={handleActionClick} />
             </TabsContent>
 
             <TabsContent value="symptoms" className="mt-4 sm:mt-6">
