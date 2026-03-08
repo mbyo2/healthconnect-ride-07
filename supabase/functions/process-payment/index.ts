@@ -10,7 +10,7 @@ const corsHeaders = {
 // Input validation schema
 const paymentRequestSchema = z.object({
   amount: z.number().positive().max(1000000, 'Amount exceeds maximum'),
-  currency: z.enum(['USD', 'EUR', 'GBP', 'KES', 'UGX', 'TZS']),
+  currency: z.enum(['USD', 'EUR', 'GBP', 'KES', 'UGX', 'TZS', 'ZMW', 'ZAR', 'NGN', 'GHS']),
   patientId: z.string().uuid('Invalid patient ID'),
   providerId: z.string().uuid('Invalid provider ID'),
   serviceId: z.string().max(200, 'Service ID too long'),
