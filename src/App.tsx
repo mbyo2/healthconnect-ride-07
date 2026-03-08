@@ -9,7 +9,6 @@ import { UserRolesProvider } from '@/context/UserRolesContext';
 import { SearchProvider } from '@/context/SearchContext';
 import { AccessibilityProvider } from '@/context/AccessibilityContext';
 import { RouteGuard } from '@/components/auth/RouteGuard';
-import { useRoutePrefetch, useInitializePrefetch } from '@/hooks/use-route-prefetch';
 import { useAndroidBackButton } from '@/hooks/use-android-back-button';
 import { usePageTracking } from '@/hooks/use-analytics';
 
@@ -23,7 +22,11 @@ const lazyWithRetry = (importFn: () => Promise<any>) =>
     )
   );
 
-// Lazy load all page components with retry for chunk errors
+// EAGERLY import the Landing page — it's the primary entry point for all visitors
+import LandingPage from '@/pages/Landing';
+const Landing = () => <LandingPage />;
+
+// Lazy load all other page components with retry for chunk errors
 const Home = lazyWithRetry(() => import('@/pages/Home'));
 const Appointments = lazyWithRetry(() => import('@/pages/Appointments'));
 const AdminDashboard = lazyWithRetry(() => import('@/pages/AdminDashboard'));
@@ -34,7 +37,6 @@ const Symptoms = lazyWithRetry(() => import('@/pages/Symptoms'));
 const HealthcareProfessionals = lazyWithRetry(() => import('@/pages/HealthcareProfessionals'));
 const HealthcareInstitutions = lazyWithRetry(() => import('@/pages/HealthcareInstitutions'));
 const VideoDashboard = lazyWithRetry(() => import('@/pages/VideoDashboard'));
-const Landing = lazyWithRetry(() => import('@/pages/Landing'));
 const Profile = lazyWithRetry(() => import('@/pages/Profile'));
 const Settings = lazyWithRetry(() => import('@/pages/Settings'));
 const SearchPage = lazyWithRetry(() => import('@/pages/SearchPage'));
@@ -122,6 +124,7 @@ const AppContent = () => {
         <Suspense fallback={<LoadingScreen />}>
           <Routes>
             {/* Public Routes */}
+            {/* Landing page is eagerly imported — no Suspense needed */}
             <Route path="/landing" element={<Landing />} />
             <Route path="/healthcare-professionals" element={<HealthcareProfessionals />} />
             <Route path="/healthcare-institutions" element={<HealthcareInstitutions />} />
@@ -255,20 +258,9 @@ const AppContent = () => {
   );
 };
 
-// Route prefetch wrapper component
-const RoutePrefetchWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  useRoutePrefetch();
-  useInitializePrefetch();
-  return <>{children}</>;
-};
-
-// Simplified App Content Component without problematic dependencies
+// Simplified App Content Component — prefetching deferred to after interaction
 const AppContentWithPreload: React.FC = React.memo(() => {
-  return (
-    <RoutePrefetchWrapper>
-      <AppContent />
-    </RoutePrefetchWrapper>
-  );
+  return <AppContent />;
 });
 
 AppContentWithPreload.displayName = 'AppContentWithPreload';

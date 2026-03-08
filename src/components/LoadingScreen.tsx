@@ -11,7 +11,7 @@ interface LoadingScreenProps {
 
 export const LoadingScreen = React.memo<LoadingScreenProps>(({
   message = "Loading...",
-  timeout = 4000
+  timeout = 2500
 }) => {
   const [showRetry, setShowRetry] = useState(false);
 

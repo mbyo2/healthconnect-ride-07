@@ -52,7 +52,7 @@ export function UserRolesProvider({ children }: { children: React.ReactNode }) {
             setAvailableRoles(['patient']);
             setLoading(false);
           }
-        }, 10000); // 10 seconds safety timeout
+        }, 5000); // 5 seconds safety timeout
 
         return;
       }
