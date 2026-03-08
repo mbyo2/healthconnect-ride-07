@@ -51,7 +51,7 @@ interface MedGemmaChatProps {
   roleOverride?: string;
 }
 
-const STdoc_oclock_aiY = 'medgemma_chat_history';
+const STORAGE_KEY = 'doc_oclock_ai_chat_history';
 
 export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps) => {
   const { currentRole, userRole } = useUserRoles();
