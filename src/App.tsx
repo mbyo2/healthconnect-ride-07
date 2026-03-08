@@ -258,20 +258,9 @@ const AppContent = () => {
   );
 };
 
-// Route prefetch wrapper component
-const RoutePrefetchWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  useRoutePrefetch();
-  useInitializePrefetch();
-  return <>{children}</>;
-};
-
-// Simplified App Content Component without problematic dependencies
+// Simplified App Content Component — prefetching deferred to after interaction
 const AppContentWithPreload: React.FC = React.memo(() => {
-  return (
-    <RoutePrefetchWrapper>
-      <AppContent />
-    </RoutePrefetchWrapper>
-  );
+  return <AppContent />;
 });
 
 AppContentWithPreload.displayName = 'AppContentWithPreload';
