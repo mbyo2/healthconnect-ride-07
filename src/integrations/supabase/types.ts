@@ -423,6 +423,33 @@ export type Database = {
           },
         ]
       }
+      clinic_specialty_catalog: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          icon_name: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          icon_name?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          icon_name?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+        }
+        Relationships: []
+      }
       commission_settings: {
         Row: {
           commission_percentage: number
@@ -2253,6 +2280,45 @@ export type Database = {
           },
         ]
       }
+      institution_specialties: {
+        Row: {
+          created_at: string | null
+          id: string
+          institution_id: string
+          is_primary: boolean | null
+          specialty_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          institution_id: string
+          is_primary?: boolean | null
+          specialty_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          institution_id?: string
+          is_primary?: boolean | null
+          specialty_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "institution_specialties_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "institution_specialties_specialty_id_fkey"
+            columns: ["specialty_id"]
+            isOneToOne: false
+            referencedRelation: "clinic_specialty_catalog"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       institution_staff: {
         Row: {
           created_at: string | null
@@ -2271,6 +2337,8 @@ export type Database = {
           qualification: string | null
           role: string
           specialty: string | null
+          specialty_id: string | null
+          specialty_role_id: string | null
           staff_type: string | null
           start_date: string | null
           updated_at: string | null
@@ -2292,6 +2360,8 @@ export type Database = {
           qualification?: string | null
           role: string
           specialty?: string | null
+          specialty_id?: string | null
+          specialty_role_id?: string | null
           staff_type?: string | null
           start_date?: string | null
           updated_at?: string | null
@@ -2313,6 +2383,8 @@ export type Database = {
           qualification?: string | null
           role?: string
           specialty?: string | null
+          specialty_id?: string | null
+          specialty_role_id?: string | null
           staff_type?: string | null
           start_date?: string | null
           updated_at?: string | null
@@ -2330,6 +2402,20 @@ export type Database = {
             columns: ["provider_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "institution_staff_specialty_id_fkey"
+            columns: ["specialty_id"]
+            isOneToOne: false
+            referencedRelation: "clinic_specialty_catalog"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "institution_staff_specialty_role_id_fkey"
+            columns: ["specialty_role_id"]
+            isOneToOne: false
+            referencedRelation: "specialty_staff_roles"
             referencedColumns: ["id"]
           },
         ]
@@ -5117,6 +5203,44 @@ export type Database = {
         }
         Relationships: []
       }
+      specialty_staff_roles: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          is_clinical: boolean | null
+          requires_license: boolean | null
+          role_name: string
+          specialty_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_clinical?: boolean | null
+          requires_license?: boolean | null
+          role_name: string
+          specialty_id: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_clinical?: boolean | null
+          requires_license?: boolean | null
+          role_name?: string
+          specialty_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "specialty_staff_roles_specialty_id_fkey"
+            columns: ["specialty_id"]
+            isOneToOne: false
+            referencedRelation: "clinic_specialty_catalog"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       staff_invitations: {
         Row: {
           accepted_at: string | null
@@ -6068,6 +6192,14 @@ export type Database = {
         | "pharmacy"
         | "nursing_home"
         | "dentist"
+        | "optician"
+        | "dermatology_clinic"
+        | "physiotherapy"
+        | "radiology_center"
+        | "eye_clinic"
+        | "skin_clinic"
+        | "dental_clinic"
+        | "specialty_clinic"
       medication_type:
         | "tablet"
         | "capsule"
@@ -6225,6 +6357,14 @@ export const Constants = {
         "pharmacy",
         "nursing_home",
         "dentist",
+        "optician",
+        "dermatology_clinic",
+        "physiotherapy",
+        "radiology_center",
+        "eye_clinic",
+        "skin_clinic",
+        "dental_clinic",
+        "specialty_clinic",
       ],
       medication_type: [
         "tablet",
