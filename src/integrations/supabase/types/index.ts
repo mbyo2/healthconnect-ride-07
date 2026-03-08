@@ -1,7 +1,7 @@
 import type { Database } from './database';
 
 export type Tables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Row'];
-export type UserRole = 'admin' | 'health_personnel' | 'patient';
+export type UserRole = 'patient' | 'health_personnel' | 'admin' | 'institution_admin' | 'pharmacy' | 'institution_staff' | 'lab' | 'super_admin' | 'support' | 'doctor' | 'nurse' | 'radiologist' | 'pharmacist' | 'lab_technician';
 
 export interface Profile {
   id: string;

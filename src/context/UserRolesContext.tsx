@@ -77,12 +77,16 @@ export function UserRolesProvider({ children }: { children: React.ReactNode }) {
             const roles = rolesData.map(r => r.role as UserRole);
             setAvailableRoles(roles);
 
-            // Set primary role (admin > institution_admin > health_personnel > patient)
-            const primaryRole = roles.find(r => r === 'admin') ||
-              roles.find(r => r === 'institution_admin') ||
-              roles.find(r => r === 'health_personnel') ||
-              roles.find(r => r === 'patient') ||
-              roles[0];
+            // Set primary role (super_admin > admin > institution_admin > doctor/nurse/radiologist > health_personnel > pharmacist > pharmacy > lab_technician > lab > patient)
+            const rolePriority: UserRole[] = [
+              'super_admin', 'admin', 'support',
+              'institution_admin', 'institution_staff',
+              'doctor', 'nurse', 'radiologist', 'health_personnel',
+              'pharmacist', 'pharmacy',
+              'lab_technician', 'lab',
+              'patient'
+            ];
+            const primaryRole = rolePriority.find(r => roles.includes(r)) || roles[0];
 
             setUserRole(primaryRole);
             setCurrentRole(primaryRole);

@@ -212,8 +212,6 @@ const AppContent = () => {
             <Route path="/privacy-security" element={<RouteGuard><PrivacySecurityPage /></RouteGuard>} />
             <Route path="/medications" element={<RouteGuard><Medications /></RouteGuard>} />
             <Route path="/provider-calendar" element={<RouteGuard><ProviderCalendar /></RouteGuard>} />
-            <Route path="/healthcare-professionals" element={<RouteGuard><HealthcareProfessionals /></RouteGuard>} />
-            <Route path="/healthcare-institutions" element={<RouteGuard><HealthcareInstitutions /></RouteGuard>} />
 
             {/* Institution & Application Management */}
             <Route path="/application-status" element={<RouteGuard><ApplicationStatus /></RouteGuard>} />
