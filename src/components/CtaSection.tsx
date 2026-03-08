@@ -12,93 +12,67 @@ const PLATFORM_STATS = {
 
 export const CtaSection = () => {
   return (
-    <section className="py-12 md:py-16 bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 text-white relative overflow-hidden">
-      {/* Background pattern */}
-      <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
-      
+    <section className="py-16 md:py-24 bg-primary text-primary-foreground relative overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.1),transparent)]" />
+
       <div className="container-modern relative">
-        <div className="text-center max-w-4xl mx-auto">
-          {/* Icon */}
+        <div className="text-center max-w-3xl mx-auto">
           <div className="flex justify-center mb-6">
-            <div className="p-4 bg-white/20 rounded-full backdrop-blur-sm">
-              <Shield className="h-10 md:h-12 w-10 md:w-12 text-white" />
+            <div className="p-3 bg-primary-foreground/15 rounded-2xl backdrop-blur-sm">
+              <Shield className="h-8 w-8" />
             </div>
           </div>
-          
-          {/* Headline */}
-          <h2 className="text-2xl sm:text-3xl lg:text-5xl font-bold mb-4 md:mb-6 leading-tight">
-            Healthcare for
-            <span className="block text-orange-300">Everyone</span>
+
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 leading-tight tracking-tight">
+            Your Health, Simplified
           </h2>
-          
-          {/* Subheadline */}
-          <p className="text-base md:text-xl mb-6 md:mb-8 opacity-90 leading-relaxed max-w-2xl mx-auto px-4">
-            Join {PLATFORM_STATS.patients} users who trust Doc' O Clock for quality healthcare. 
-            Find doctors, order medicine, and get emergency care—all in one app.
+
+          <p className="text-base md:text-lg mb-8 opacity-85 leading-relaxed max-w-xl mx-auto">
+            Join {PLATFORM_STATS.patients} users who trust Doc' O Clock for quality healthcare.
           </p>
-          
-          {/* Benefits row */}
-          <div className="grid grid-cols-2 md:flex md:flex-wrap justify-center gap-3 md:gap-6 mb-6 md:mb-8 text-xs md:text-sm px-4">
-            <div className="flex items-center gap-2 justify-center">
-              <CheckCircle className="h-4 w-4 text-green-300 flex-shrink-0" />
-              <span className="whitespace-nowrap">Free to start</span>
-            </div>
-            <div className="flex items-center gap-2 justify-center">
-              <CreditCard className="h-4 w-4 text-yellow-300 flex-shrink-0" />
-              <span className="whitespace-nowrap">Flexible payments</span>
-            </div>
-            <div className="flex items-center gap-2 justify-center">
-              <MapPin className="h-4 w-4 text-emerald-300 flex-shrink-0" />
-              <span className="whitespace-nowrap">Growing worldwide</span>
-            </div>
-            <div className="flex items-center gap-2 justify-center">
-              <Phone className="h-4 w-4 text-red-300 flex-shrink-0" />
-              <span className="whitespace-nowrap">24/7 Emergency</span>
-            </div>
+
+          <div className="flex flex-wrap justify-center gap-4 md:gap-6 mb-8 text-sm">
+            {[
+              { icon: CheckCircle, label: "Free to start" },
+              { icon: CreditCard, label: "Flexible payments" },
+              { icon: MapPin, label: "Growing worldwide" },
+              { icon: Phone, label: "24/7 Emergency" },
+            ].map(({ icon: Icon, label }) => (
+              <div key={label} className="flex items-center gap-1.5 opacity-85">
+                <Icon className="h-4 w-4" />
+                <span>{label}</span>
+              </div>
+            ))}
           </div>
-          
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center max-w-sm sm:max-w-md mx-auto mb-6 md:mb-8 px-4">
-            <Button 
-              asChild 
-              variant="amazon"
-              size="xl"
-              className="bg-orange-500 hover:bg-orange-600 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
-            >
+
+          <div className="flex flex-col sm:flex-row gap-3 justify-center max-w-sm mx-auto mb-10">
+            <Button asChild variant="secondary" size="xl" className="shadow-lg">
               <Link to="/auth?tab=signup" className="flex items-center gap-2">
-                Start Free Today
-                <ArrowRight className="h-5 w-5" />
+                Get Started Free <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>
-            
-            <Button 
-              asChild 
-              variant="outline" 
+            <Button
+              asChild
+              variant="outline"
               size="xl"
-              className="border-white/40 text-white hover:bg-white/10 backdrop-blur-sm bg-white/5"
+              className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10"
             >
               <Link to="/contact">Contact Us</Link>
             </Button>
           </div>
-          
-          {/* Trust indicators */}
-          <div className="grid grid-cols-4 gap-2 sm:gap-4 max-w-xl sm:max-w-2xl mx-auto px-4">
-            <div className="text-center">
-              <div className="text-lg md:text-2xl font-bold text-emerald-300">{PLATFORM_STATS.doctors}</div>
-              <div className="text-[10px] md:text-sm opacity-80 leading-tight">Doctors</div>
-            </div>
-            <div className="text-center">
-              <div className="text-lg md:text-2xl font-bold text-blue-300">{PLATFORM_STATS.hospitals}</div>
-              <div className="text-[10px] md:text-sm opacity-80 leading-tight">Hospitals</div>
-            </div>
-            <div className="text-center">
-              <div className="text-lg md:text-2xl font-bold text-orange-300">{PLATFORM_STATS.pharmacies}</div>
-              <div className="text-[10px] md:text-sm opacity-80 leading-tight">Pharmacies</div>
-            </div>
-            <div className="text-center">
-              <div className="text-lg md:text-2xl font-bold text-yellow-300">4.8★</div>
-              <div className="text-[10px] md:text-sm opacity-80 leading-tight">Rating</div>
-            </div>
+
+          <div className="grid grid-cols-4 gap-4 max-w-md mx-auto">
+            {[
+              { value: PLATFORM_STATS.doctors, label: "Doctors" },
+              { value: PLATFORM_STATS.hospitals, label: "Hospitals" },
+              { value: PLATFORM_STATS.pharmacies, label: "Pharmacies" },
+              { value: "4.8★", label: "Rating" },
+            ].map((stat) => (
+              <div key={stat.label} className="text-center">
+                <div className="text-lg md:text-2xl font-bold">{stat.value}</div>
+                <div className="text-xs opacity-70">{stat.label}</div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
