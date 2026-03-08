@@ -129,6 +129,7 @@ const AppContent = () => {
             <Route path="/marketplace-users" element={<UserMarketplace />} />
             <Route path="/provider/:id" element={<ProviderDetail />} />
             <Route path="/emergency" element={<Emergency />} />
+            <Route path="/pricing" element={<Pricing />} />
             <Route path="/booking-confirmed" element={<RouteGuard><BookingConfirmed /></RouteGuard>} />
             <Route path="/reset-password" element={<Suspense fallback={<LoadingScreen />}><ResetPassword /></Suspense>} />
             <Route path="/login" element={<Navigate to="/auth" replace />} />
