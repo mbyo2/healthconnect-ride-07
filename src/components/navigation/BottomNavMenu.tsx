@@ -31,83 +31,64 @@ interface BottomNavMenuProps {
 export function BottomNavMenu({ user, menuItems }: BottomNavMenuProps) {
   const touchFeedbackProps = useTouchFeedback({
     rippleColor: 'var(--primary)',
-    rippleOpacity: 0.15
+    rippleOpacity: 0.12
   });
 
   return (
     <Sheet>
       <SheetTrigger asChild>
         <button
-          className={cn(
-            "flex flex-1 flex-col items-center justify-center py-2 px-1 rounded-xl transition-all duration-300 ease-out min-h-[52px]",
-            "text-muted-foreground hover:text-primary hover:scale-105 relative overflow-hidden"
-          )}
+          className="flex flex-1 flex-col items-center justify-center gap-1 py-2 px-1 rounded-xl min-h-[52px] text-muted-foreground touch-manipulation"
           {...touchFeedbackProps}
-          aria-label="More options and settings"
+          aria-label="More options"
         >
-          <div className="flex flex-col items-center justify-center space-y-1">
-            <div className="p-1.5 rounded-lg">
-              <Menu className="h-5 w-5" />
-            </div>
-            <span className="text-[10px] font-medium leading-tight tracking-tight">More</span>
+          <div className="p-1.5 rounded-lg">
+            <Menu className="h-5 w-5" />
           </div>
+          <span className="text-[10px] font-medium leading-none">More</span>
         </button>
       </SheetTrigger>
 
       <SheetContent
         side="right"
-        className="w-[90vw] max-w-sm bg-background/98 backdrop-blur-xl border-trust-200 shadow-2xl animate-in slide-in-from-right duration-300 ease-out data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right data-[state=closed]:fade-out-0 data-[state=closed]:duration-200 flex flex-col h-full"
+        className="w-[85vw] max-w-sm bg-background border-border flex flex-col h-full"
       >
         <SheetHeader className="pb-4 flex-shrink-0">
-          <SheetTitle className="text-primary text-xl font-bold">Quick Access</SheetTitle>
+          <SheetTitle className="text-lg font-bold">Menu</SheetTitle>
           {user && (
-            <div className="flex items-center gap-3 py-3 px-3 bg-secondary rounded-xl border border-border shadow-sm">
-              <Avatar className="h-12 w-12 ring-2 ring-primary/20 shadow-sm">
+            <div className="flex items-center gap-3 py-3 px-3 bg-muted/50 rounded-xl">
+              <Avatar className="h-10 w-10 ring-2 ring-border">
                 <AvatarImage src={user?.user_metadata?.avatar_url || ""} />
-                <AvatarFallback className="bg-primary/10 text-primary font-bold text-base">
+                <AvatarFallback className="bg-primary/10 text-primary font-semibold">
                   {user?.email?.[0]?.toUpperCase() || "U"}
                 </AvatarFallback>
               </Avatar>
               <div className="flex flex-col flex-1 min-w-0">
-                <span className="font-bold text-foreground text-base truncate">
+                <span className="font-semibold text-sm truncate">
                   {user.user_metadata?.name || user.email?.split('@')[0] || 'User'}
                 </span>
-                <span className="text-xs text-muted-foreground truncate">
-                  {user.email}
-                </span>
+                <span className="text-xs text-muted-foreground truncate">{user.email}</span>
               </div>
             </div>
           )}
         </SheetHeader>
 
-        <ScrollArea className="flex-1 px-1 overflow-y-auto">
-          <div className="space-y-2 pb-6">
+        <ScrollArea className="flex-1 px-1">
+          <div className="space-y-1 pb-6">
             {menuItems.map((item, idx) => (
               <SheetClose key={idx} asChild>
-                <Button
-                  variant="ghost"
-                  className={cn(
-                    "w-full justify-start h-auto p-3 text-left transition-all duration-200 rounded-lg",
-                    "hover:bg-accent hover:text-accent-foreground hover:scale-[1.01] hover:shadow-sm",
-                    "active:scale-[0.99] active:bg-accent/80 group border border-transparent hover:border-border",
-                    "touch-manipulation transform-gpu"
-                  )}
-                  asChild
+                <Link
+                  to={item.to}
+                  className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-accent transition-colors group"
                 >
-                  <Link to={item.to} className="flex items-center gap-3 w-full">
-                    <div className="p-2 rounded-lg bg-primary/10 text-primary group-hover:bg-primary/20 transition-colors flex-shrink-0">
-                      {item.icon}
-                    </div>
-                    <div className="flex flex-col items-start gap-0.5 min-w-0 flex-1">
-                      <span className="font-medium group-hover:text-primary text-sm leading-tight">
-                        {item.label}
-                      </span>
-                      <span className="text-xs text-muted-foreground group-hover:text-foreground/80 leading-tight">
-                        {item.description}
-                      </span>
-                    </div>
-                  </Link>
-                </Button>
+                  <div className="p-2 rounded-lg bg-primary/10 text-primary group-hover:bg-primary/15 transition-colors shrink-0">
+                    {item.icon}
+                  </div>
+                  <div className="flex flex-col min-w-0">
+                    <span className="text-sm font-medium">{item.label}</span>
+                    <span className="text-xs text-muted-foreground truncate">{item.description}</span>
+                  </div>
+                </Link>
               </SheetClose>
             ))}
           </div>
