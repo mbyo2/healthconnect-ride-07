@@ -94,6 +94,7 @@ const Providers = lazyWithRetry(() => import('@/pages/Providers'));
 const RoleManagement = lazyWithRetry(() => import('@/pages/RoleManagement'));
 const IntakeForm = lazyWithRetry(() => import('@/pages/IntakeForm'));
 const BookingConfirmed = lazyWithRetry(() => import('@/pages/BookingConfirmed'));
+const Pricing = lazyWithRetry(() => import('@/pages/Pricing'));
 
 import { RoleRedirect } from '@/components/auth/RoleRedirect';
 
