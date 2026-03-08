@@ -460,6 +460,7 @@ const ProviderDetail = () => {
         />
       )}
     </div>
+    </>
   );
 };
 

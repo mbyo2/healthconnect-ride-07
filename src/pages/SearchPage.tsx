@@ -120,6 +120,7 @@ const SearchPage = () => {
       {/* Search Results */}
       <SearchResults />
     </div>
+    </>
   );
 };
 

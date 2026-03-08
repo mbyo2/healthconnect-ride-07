@@ -570,6 +570,7 @@ const Landing = () => {
         </div>
       </footer>
     </div>
+    </>
   );
 };
 

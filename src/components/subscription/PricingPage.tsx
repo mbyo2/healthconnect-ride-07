@@ -407,5 +407,6 @@ export const PricingPage = () => {
         <p>All prices in Zambian Kwacha (ZMW). Need a custom plan? <Button variant="link" className="p-0 h-auto text-sm">Contact our sales team</Button></p>
       </div>
     </div>
+    </>
   );
 };
