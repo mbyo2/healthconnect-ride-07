@@ -102,7 +102,7 @@ export function DesktopUserMenu({ user, profile, onLogout }: DesktopUserMenuProp
       { to: "/connections", label: "My Providers", icon: <Users className="h-4 w-4" /> },
       { to: "/settings", label: "Settings", icon: <Settings className="h-4 w-4" /> },
     ];
-  }, [availableRoles, isHealthPersonnel, isAdmin]);
+  }, [availableRoles, isHealthPersonnel, isAdmin, isInstitutionAffiliated]);
 
   return (
     <DropdownMenu>

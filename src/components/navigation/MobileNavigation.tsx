@@ -150,7 +150,7 @@ export const MobileNavigation = ({ setIsMenuOpen, navigate }: MobileNavigationPr
       { to: "/emergency", label: "Emergency", icon: <AlertTriangle className="mr-2 h-5 w-5" /> },
       { to: "/medical-records", label: "Medical Records", icon: <Heart className="mr-2 h-5 w-5" /> },
     ];
-  }, [isAuthenticated, isHealthPersonnel, isAdmin, availableRoles]);
+  }, [isAuthenticated, isHealthPersonnel, isAdmin, availableRoles, isInstitutionAffiliated]);
 
   return (
     <div className="absolute top-16 left-0 right-0 bg-background/95 backdrop-blur-md border-b shadow-lg animate-in slide-in-from-top duration-300 md:hidden z-50">
