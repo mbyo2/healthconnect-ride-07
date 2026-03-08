@@ -10,9 +10,9 @@ export const HowItWorks = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="py-24 md:py-32 relative">
+    <section className="py-14 md:py-20 relative">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
+        <div className="text-center mb-10">
           <p className="text-sm font-semibold text-primary uppercase tracking-widest mb-3">How It Works</p>
           <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Book in 4 Simple Steps</h2>
         </div>
