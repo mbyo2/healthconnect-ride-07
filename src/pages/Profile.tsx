@@ -62,7 +62,7 @@ const Profile = () => {
         <CardContent className="pt-6">
           <div className="flex flex-col items-center space-y-4">
             <div className="relative">
-              <Avatar className="h-24 w-24 ring-4 ring-trust-100">
+              <Avatar className="h-24 w-24 ring-4 ring-border">
                 <AvatarImage src={profile?.avatar_url || ""} />
                 <AvatarFallback className="bg-trust-100 text-trust-600 text-xl">
                   {formData.firstName?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || "U"}
