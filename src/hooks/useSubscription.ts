@@ -17,6 +17,11 @@ export interface SubscriptionPlan {
   is_active: boolean;
   sort_order: number;
   highlight: boolean;
+  plan_type: 'free' | 'pay_per_booking' | 'subscription';
+  booking_fee: number;
+  max_beds?: number;
+  max_users?: number;
+  max_doctors?: number;
 }
 
 export interface UserSubscription {
@@ -29,6 +34,18 @@ export interface UserSubscription {
   current_period_end: string;
   cancel_at_period_end: boolean;
   plan?: SubscriptionPlan;
+}
+
+export interface BookingFee {
+  id: string;
+  provider_id: string;
+  patient_id: string;
+  appointment_id: string;
+  amount: number;
+  currency: string;
+  status: string;
+  charged_at: string | null;
+  created_at: string;
 }
 
 export const useSubscriptionPlans = (audience?: string) => {
@@ -69,6 +86,25 @@ export const useUserSubscription = () => {
       
       if (error) throw error;
       return data as (UserSubscription & { plan: SubscriptionPlan }) | null;
+    },
+    enabled: !!user,
+  });
+};
+
+export const useProviderBookingFees = () => {
+  const { user } = useAuth();
+
+  return useQuery({
+    queryKey: ['booking-fees', user?.id],
+    queryFn: async () => {
+      const { data, error } = await (supabase as any)
+        .from('booking_fees')
+        .select('*')
+        .eq('provider_id', user!.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data as BookingFee[];
     },
     enabled: !!user,
   });
