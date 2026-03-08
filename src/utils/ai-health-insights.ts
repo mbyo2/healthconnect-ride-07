@@ -143,7 +143,7 @@ class AIHealthInsights {
 
       if (!profile || vitals.length === 0) return insights;
 
-      // Use Doc' O Clock AI for risk assessment
+      // Use Doc' O Clock AI fork assessment
       const latestVitals = vitals[0] || {};
       const { data, error } = await supabase.functions.invoke('medgemma-health-analysis', {
         body: {
@@ -160,7 +160,7 @@ class AIHealthInsights {
       });
 
       if (error) {
-        logger.error('MedGemma risk assessment failed', 'AI_HEALTH', error);
+        logger.error('MedGAIk assessment failed', 'AI_HEALTH', error);
         return insights;
       }
 
