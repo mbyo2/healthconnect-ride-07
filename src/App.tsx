@@ -179,8 +179,7 @@ const AppContent = () => {
             <Route path="/video-dashboard" element={<RouteGuard><VideoDashboard /></RouteGuard>} />
             <Route path="/testing" element={<RouteGuard><Testing /></RouteGuard>} />
             <Route path="/documentation" element={<RouteGuard><Documentation /></RouteGuard>} />
-            <Route path="/marketplace-users" element={<RouteGuard><UserMarketplace /></RouteGuard>} />
-            <Route path="/emergency" element={<RouteGuard><Emergency /></RouteGuard>} />
+            {/* marketplace-users and emergency are now public above */}
             <Route path="/map" element={<RouteGuard><Map /></RouteGuard>} />
             <Route path="/marketplace" element={<RouteGuard><Marketplace /></RouteGuard>} />
             <Route path="/pharmacy-portal" element={<RouteGuard><PharmacyPortal /></RouteGuard>} />
