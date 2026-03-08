@@ -39,6 +39,7 @@ const providerSchema = z.object({
   providerType: z.string().min(1, "Select your profession"),
   specialty: z.string().optional(),
   licenseNumber: z.string().min(2, "License number required"),
+  yearsExperience: z.string().optional(),
   password: z.string().min(6, "Min 6 characters"),
   confirmPassword: z.string().min(6),
 }).refine(d => d.password === d.confirmPassword, { message: "Passwords don't match", path: ["confirmPassword"] });
@@ -146,11 +147,12 @@ export const Auth = () => {
           role: data.providerType,
           specialty: data.specialty || data.providerType,
           license_number: data.licenseNumber,
+          years_experience: data.yearsExperience ? parseInt(data.yearsExperience) : 0,
         },
       },
     });
     if (error) showError(error.message);
-    else { showSuccess("Account created! Check your email to verify."); setActiveTab("signin"); }
+    else { showSuccess("Account created! Your application is under review. Check your email to verify."); setActiveTab("signin"); }
     setLocalLoading(false);
   };
 
@@ -177,7 +179,7 @@ export const Auth = () => {
       },
     });
     if (error) showError(error.message);
-    else { showSuccess("Account created! Check your email to verify."); setActiveTab("signin"); }
+    else { showSuccess("Business registered! Your account is under review. Check your email to verify."); setActiveTab("signin"); }
     setLocalLoading(false);
   };
 
@@ -331,9 +333,14 @@ export const Auth = () => {
                     <FormField control={providerForm.control} name="specialty" render={({ field }) => (
                       <FormItem><FormLabel className="text-xs">Specialty (optional)</FormLabel><FormControl><Input {...field} placeholder="e.g. Cardiology, Pediatrics" /></FormControl></FormItem>
                     )} />
-                    <FormField control={providerForm.control} name="licenseNumber" render={({ field }) => (
-                      <FormItem><FormLabel className="text-xs">License / Registration Number</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
-                    )} />
+                    <div className="grid grid-cols-2 gap-2">
+                      <FormField control={providerForm.control} name="licenseNumber" render={({ field }) => (
+                        <FormItem><FormLabel className="text-xs">License / Reg. Number</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                      )} />
+                      <FormField control={providerForm.control} name="yearsExperience" render={({ field }) => (
+                        <FormItem><FormLabel className="text-xs">Years Experience</FormLabel><FormControl><Input {...field} type="number" min="0" placeholder="e.g. 5" /></FormControl></FormItem>
+                      )} />
+                    </div>
                     <FormField control={providerForm.control} name="email" render={({ field }) => (
                       <FormItem><FormLabel className="text-xs">Email</FormLabel><FormControl><Input {...field} type="email" /></FormControl><FormMessage /></FormItem>
                     )} />
