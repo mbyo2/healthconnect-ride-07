@@ -99,7 +99,25 @@ const ProviderDetail = () => {
   const rating = stats?.average_rating || provider.rating || 4.5;
   const reviewCount = stats?.total_reviews || 0;
 
+  const providerName = `Dr. ${provider.first_name || ''} ${provider.last_name || ''}`.trim();
+  const providerSpecialty = provider.specialty || 'Healthcare Provider';
+
   return (
+    <>
+      <Helmet>
+        <title>{providerName} — {providerSpecialty} | Doc' O Clock</title>
+        <meta name="description" content={`Book an appointment with ${providerName}, a verified ${providerSpecialty} on Doc' O Clock. View reviews, availability, and credentials.`} />
+        <meta property="og:title" content={`${providerName} — ${providerSpecialty}`} />
+        <meta property="og:description" content={`Book with ${providerName} on Doc' O Clock.`} />
+        <link rel="canonical" href={`https://dococlockapp.com/provider/${id}`} />
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Physician",
+          "name": providerName,
+          "medicalSpecialty": providerSpecialty,
+          "aggregateRating": reviewCount > 0 ? { "@type": "AggregateRating", "ratingValue": rating, "reviewCount": reviewCount } : undefined
+        })}</script>
+      </Helmet>
     <div className="container mx-auto px-4 py-6 pb-24">
       {/* Hero Section - ZocDoc Style */}
       <div className="bg-gradient-to-br from-primary/5 via-blue-50/50 to-background dark:from-primary/10 dark:via-blue-900/10 dark:to-background rounded-2xl p-6 mb-6">
