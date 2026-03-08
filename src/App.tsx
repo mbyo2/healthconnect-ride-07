@@ -83,6 +83,7 @@ const InstitutionPatients = lazyWithRetry(() => import('@/pages/InstitutionPatie
 const InstitutionReports = lazyWithRetry(() => import('@/pages/InstitutionReports'));
 const InstitutionAppointments = lazyWithRetry(() => import('@/pages/InstitutionAppointments'));
 const InstitutionSettings = lazyWithRetry(() => import('@/pages/InstitutionSettings'));
+const InstitutionDevices = lazyWithRetry(() => import('@/pages/InstitutionDevices'));
 const AppointmentDetails = lazyWithRetry(() => import('@/pages/AppointmentDetails'));
 const Wallet = lazyWithRetry(() => import('@/pages/Wallet'));
 const ProviderPortal = lazyWithRetry(() => import('@/pages/ProviderPortal'));
@@ -223,6 +224,7 @@ const AppContent = () => {
             <Route path="/institution/reports" element={<RouteGuard><InstitutionReports /></RouteGuard>} />
             <Route path="/institution/appointments" element={<RouteGuard><InstitutionAppointments /></RouteGuard>} />
             <Route path="/institution/settings" element={<RouteGuard><InstitutionSettings /></RouteGuard>} />
+            <Route path="/institution/devices" element={<RouteGuard><InstitutionDevices /></RouteGuard>} />
             <Route path="/appointments/:id" element={<RouteGuard><AppointmentDetails /></RouteGuard>} />
 
             {/* Provider & Video */}

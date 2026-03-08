@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { StaffManagement } from "@/components/institution/StaffManagement";
+import { DeviceManagement } from "@/components/institution/DeviceManagement";
 import { Loader2 } from "lucide-react";
 
-const InstitutionPersonnel = () => {
+const InstitutionDevices = () => {
   const [institutionId, setInstitutionId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -12,7 +12,6 @@ const InstitutionPersonnel = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Check if user is admin of an institution
       const { data } = await supabase
         .from('healthcare_institutions')
         .select('id')
@@ -22,7 +21,6 @@ const InstitutionPersonnel = () => {
       if (data) {
         setInstitutionId(data.id);
       } else {
-        // Check if user is staff at an institution
         const { data: staffData } = await supabase
           .from('institution_staff')
           .select('institution_id')
@@ -45,9 +43,10 @@ const InstitutionPersonnel = () => {
 
   return (
     <div className="container mx-auto p-4 md:p-6">
-      <StaffManagement institutionId={institutionId} />
+      <h1 className="text-2xl font-bold mb-6 text-foreground">Connected Devices & IoT</h1>
+      <DeviceManagement institutionId={institutionId} />
     </div>
   );
 };
 
-export default InstitutionPersonnel;
+export default InstitutionDevices;

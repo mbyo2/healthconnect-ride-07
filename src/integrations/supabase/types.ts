@@ -729,6 +729,66 @@ export type Database = {
           },
         ]
       }
+      device_data_feeds: {
+        Row: {
+          acknowledged: boolean
+          acknowledged_by: string | null
+          created_at: string
+          data_type: string
+          data_value: Json
+          device_id: string
+          id: string
+          institution_id: string
+          is_critical: boolean
+          patient_id: string | null
+          recorded_at: string
+          unit: string | null
+        }
+        Insert: {
+          acknowledged?: boolean
+          acknowledged_by?: string | null
+          created_at?: string
+          data_type: string
+          data_value: Json
+          device_id: string
+          id?: string
+          institution_id: string
+          is_critical?: boolean
+          patient_id?: string | null
+          recorded_at?: string
+          unit?: string | null
+        }
+        Update: {
+          acknowledged?: boolean
+          acknowledged_by?: string | null
+          created_at?: string
+          data_type?: string
+          data_value?: Json
+          device_id?: string
+          id?: string
+          institution_id?: string
+          is_critical?: boolean
+          patient_id?: string | null
+          recorded_at?: string
+          unit?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "device_data_feeds_device_id_fkey"
+            columns: ["device_id"]
+            isOneToOne: false
+            referencedRelation: "institution_devices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "device_data_feeds_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       digital_signatures: {
         Row: {
           created_at: string | null
@@ -1665,6 +1725,96 @@ export type Database = {
         }
         Relationships: []
       }
+      institution_devices: {
+        Row: {
+          battery_level: number | null
+          calibration_date: string | null
+          connection_config: Json | null
+          connection_protocol: string | null
+          created_at: string
+          department_id: string | null
+          device_name: string
+          device_type: string
+          firmware_version: string | null
+          id: string
+          institution_id: string
+          ip_address: string | null
+          is_active: boolean
+          last_heartbeat: string | null
+          location_description: string | null
+          manufacturer: string | null
+          model_number: string | null
+          next_calibration_date: string | null
+          registered_by: string | null
+          serial_number: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          battery_level?: number | null
+          calibration_date?: string | null
+          connection_config?: Json | null
+          connection_protocol?: string | null
+          created_at?: string
+          department_id?: string | null
+          device_name: string
+          device_type: string
+          firmware_version?: string | null
+          id?: string
+          institution_id: string
+          ip_address?: string | null
+          is_active?: boolean
+          last_heartbeat?: string | null
+          location_description?: string | null
+          manufacturer?: string | null
+          model_number?: string | null
+          next_calibration_date?: string | null
+          registered_by?: string | null
+          serial_number?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          battery_level?: number | null
+          calibration_date?: string | null
+          connection_config?: Json | null
+          connection_protocol?: string | null
+          created_at?: string
+          department_id?: string | null
+          device_name?: string
+          device_type?: string
+          firmware_version?: string | null
+          id?: string
+          institution_id?: string
+          ip_address?: string | null
+          is_active?: boolean
+          last_heartbeat?: string | null
+          location_description?: string | null
+          manufacturer?: string | null
+          model_number?: string | null
+          next_calibration_date?: string | null
+          registered_by?: string | null
+          serial_number?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "institution_devices_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "hospital_departments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "institution_devices_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       institution_locations: {
         Row: {
           created_at: string | null
@@ -1789,36 +1939,63 @@ export type Database = {
         Row: {
           created_at: string | null
           department: string | null
+          email: string | null
+          employee_id: string | null
+          employment_type: string | null
           end_date: string | null
+          hired_date: string | null
           id: string
           institution_id: string | null
           is_active: boolean | null
+          license_number: string | null
+          phone: string | null
           provider_id: string | null
+          qualification: string | null
           role: string
+          specialty: string | null
+          staff_type: string | null
           start_date: string | null
           updated_at: string | null
         }
         Insert: {
           created_at?: string | null
           department?: string | null
+          email?: string | null
+          employee_id?: string | null
+          employment_type?: string | null
           end_date?: string | null
+          hired_date?: string | null
           id?: string
           institution_id?: string | null
           is_active?: boolean | null
+          license_number?: string | null
+          phone?: string | null
           provider_id?: string | null
+          qualification?: string | null
           role: string
+          specialty?: string | null
+          staff_type?: string | null
           start_date?: string | null
           updated_at?: string | null
         }
         Update: {
           created_at?: string | null
           department?: string | null
+          email?: string | null
+          employee_id?: string | null
+          employment_type?: string | null
           end_date?: string | null
+          hired_date?: string | null
           id?: string
           institution_id?: string | null
           is_active?: boolean | null
+          license_number?: string | null
+          phone?: string | null
           provider_id?: string | null
+          qualification?: string | null
           role?: string
+          specialty?: string | null
+          staff_type?: string | null
           start_date?: string | null
           updated_at?: string | null
         }
@@ -4215,6 +4392,139 @@ export type Database = {
           route?: string
         }
         Relationships: []
+      }
+      staff_invitations: {
+        Row: {
+          accepted_at: string | null
+          created_at: string
+          department_id: string | null
+          department_name: string | null
+          email: string
+          expires_at: string
+          id: string
+          institution_id: string
+          invited_by: string | null
+          specialty: string | null
+          staff_role: string
+          status: string
+          token: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          created_at?: string
+          department_id?: string | null
+          department_name?: string | null
+          email: string
+          expires_at?: string
+          id?: string
+          institution_id: string
+          invited_by?: string | null
+          specialty?: string | null
+          staff_role?: string
+          status?: string
+          token?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          created_at?: string
+          department_id?: string | null
+          department_name?: string | null
+          email?: string
+          expires_at?: string
+          id?: string
+          institution_id?: string
+          invited_by?: string | null
+          specialty?: string | null
+          staff_role?: string
+          status?: string
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_invitations_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "hospital_departments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staff_invitations_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      staff_shifts: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          department_id: string | null
+          end_time: string
+          id: string
+          institution_id: string
+          notes: string | null
+          shift_date: string
+          shift_type: string
+          staff_id: string
+          start_time: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          department_id?: string | null
+          end_time: string
+          id?: string
+          institution_id: string
+          notes?: string | null
+          shift_date: string
+          shift_type?: string
+          staff_id: string
+          start_time: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          department_id?: string | null
+          end_time?: string
+          id?: string
+          institution_id?: string
+          notes?: string | null
+          shift_date?: string
+          shift_type?: string
+          staff_id?: string
+          start_time?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_shifts_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "hospital_departments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staff_shifts_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staff_shifts_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "institution_staff"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       suppliers: {
         Row: {
