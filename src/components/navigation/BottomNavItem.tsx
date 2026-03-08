@@ -21,22 +21,22 @@ export function BottomNavItem({ to, label, icon, active, description }: BottomNa
     <Link
       to={to}
       className={cn(
-        "flex flex-1 basis-0 flex-col items-center justify-center gap-1 py-2 rounded-xl transition-colors min-h-[52px] touch-manipulation",
+        "relative flex flex-1 basis-0 flex-col items-center justify-center gap-0.5 py-1.5 transition-all duration-200 min-h-0 touch-manipulation select-none",
         active
           ? "text-primary"
-          : "text-muted-foreground"
+          : "text-muted-foreground hover:text-foreground/70 active:text-foreground/50"
       )}
       {...touchFeedbackProps}
       aria-label={`${label} - ${description}`}
     >
       <div className={cn(
-        "p-1.5 rounded-lg transition-colors flex items-center justify-center",
-        active && "bg-primary/10"
+        "flex items-center justify-center w-10 h-7 sm:w-12 sm:h-8 rounded-full transition-all duration-200",
+        active && "bg-primary/12 scale-105"
       )}>
         {icon}
       </div>
       <span className={cn(
-        "text-[10px] font-medium leading-none text-center",
+        "text-[10px] sm:text-[11px] font-semibold leading-tight text-center tracking-tight",
         active ? "text-primary" : "text-muted-foreground"
       )}>
         {label}

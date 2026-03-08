@@ -38,14 +38,14 @@ export function BottomNavMenu({ user, menuItems }: BottomNavMenuProps) {
     <Sheet>
       <SheetTrigger asChild>
         <button
-          className="flex flex-1 basis-0 flex-col items-center justify-center gap-1 py-2 rounded-xl min-h-[52px] text-muted-foreground touch-manipulation"
+          className="relative flex flex-1 basis-0 flex-col items-center justify-center gap-0.5 py-1.5 min-h-0 text-muted-foreground hover:text-foreground/70 active:text-foreground/50 touch-manipulation select-none transition-all duration-200"
           {...touchFeedbackProps}
           aria-label="More options"
         >
-          <div className="p-1.5 rounded-lg">
+          <div className="flex items-center justify-center w-10 h-7 sm:w-12 sm:h-8 rounded-full">
             <Menu className="h-5 w-5" />
           </div>
-          <span className="text-[10px] font-medium leading-none">More</span>
+          <span className="text-[10px] sm:text-[11px] font-semibold leading-tight tracking-tight">More</span>
         </button>
       </SheetTrigger>
 
