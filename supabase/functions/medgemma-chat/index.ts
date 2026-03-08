@@ -39,14 +39,6 @@ serve(async (req) => {
 
     const { message, userRole, conversationHistory } = validationResult.data;
 
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    if (!LOVABLE_API_KEY) {
-      console.error('LOVABLE_API_KEY not configured');
-      return new Response(
-        JSON.stringify({ error: 'LOVABLE_API_KEY not configured', fallback: true }),
-        { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
 
     // Role-aware prompt (simplified version for fallback)
     const roleLabel = ['doctor','health_personnel','radiologist'].includes(userRole) ? 'clinical professional'
