@@ -14,8 +14,8 @@ interface MobileAppWrapperProps {
 export function MobileAppWrapper({ children }: MobileAppWrapperProps) {
   const capabilities = useDeviceCapabilities();
   const { isOnline } = useNetwork();
-  const session = useSupabaseSession();
-  const [lowPowerMo{ session } = useAuthate(false);
+  const { session } = useAuth();
+  const [lowPowerMode, setLowPowerMode] = useState(false);
   const [hasRequestedPermissions, setHasRequestedPermissions] = useState(false);
   const [batteryWarningShown, setBatteryWarningShown] = useState(false);
 
