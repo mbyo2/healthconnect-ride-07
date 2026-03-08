@@ -3,11 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { Search, Sparkles, Stethoscope, Building2, Pill, Star } from "lucide-react";
-import { ZAMBIAN_STATS } from "@/config/zambia";
+import { usePlatformStats, formatStat } from "@/hooks/usePlatformStats";
 
 export const LandingHero = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
+  const stats = usePlatformStats();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,7 +26,7 @@ export const LandingHero = () => {
         <div className="max-w-3xl mx-auto text-center mb-10">
           <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-medium text-primary mb-8 animate-in fade-in slide-in-from-bottom-3 duration-700">
             <Sparkles className="h-3.5 w-3.5" />
-            Trusted by {ZAMBIAN_STATS.patients} across Zambia
+            Trusted by {formatStat(stats.patients)} users
           </div>
 
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.05] mb-6 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
@@ -37,7 +38,7 @@ export const LandingHero = () => {
 
           <p className="text-lg md:text-xl text-muted-foreground leading-relaxed mb-10 max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-5 duration-700 delay-200">
             Find trusted doctors, book instantly, consult via video — 
-            all from Zambia's most modern healthcare platform.
+            all from your most modern healthcare platform.
           </p>
 
           <form onSubmit={handleSearch} className="max-w-xl mx-auto mb-8 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-300">
@@ -75,10 +76,10 @@ export const LandingHero = () => {
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 max-w-3xl mx-auto animate-in fade-in slide-in-from-bottom-8 duration-700 delay-500">
           {[
-            { value: ZAMBIAN_STATS.doctors, label: "Verified Doctors", icon: Stethoscope },
-            { value: ZAMBIAN_STATS.hospitals, label: "Partner Hospitals", icon: Building2 },
-            { value: ZAMBIAN_STATS.pharmacies, label: "Pharmacies", icon: Pill },
-            { value: "4.8★", label: "Average Rating", icon: Star },
+            { value: formatStat(stats.doctors), label: "Verified Doctors", icon: Stethoscope },
+            { value: formatStat(stats.hospitals), label: "Partner Hospitals", icon: Building2 },
+            { value: formatStat(stats.pharmacies), label: "Pharmacies", icon: Pill },
+            { value: `${stats.rating}★`, label: "Average Rating", icon: Star },
           ].map((stat) => (
             <div key={stat.label} className="text-center p-4 md:p-5 rounded-2xl bg-card border border-border/40 shadow-sm">
               <stat.icon className="h-5 w-5 mx-auto mb-2 text-primary" />
