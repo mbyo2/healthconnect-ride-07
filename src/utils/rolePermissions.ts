@@ -577,9 +577,10 @@ export const getRoleLandingPage = (userRoles: UserRole[] | null): string => {
 
 // Get navigation items based on user's roles (supports multiple roles)
 export const getRoleNavigation = (userRoles: UserRole[] | null) => {
+  const allRoles = ['patient', 'health_personnel', 'pharmacy', 'institution_admin', 'institution_staff', 'admin', 'lab', 'super_admin', 'support', 'doctor', 'nurse', 'radiologist', 'pharmacist', 'lab_technician', 'receptionist', 'hr_manager', 'cxo', 'ot_staff', 'phlebotomist', 'billing_staff', 'inventory_manager', 'triage_staff', 'maintenance_manager', 'specialist', 'ambulance_staff', 'pathologist'];
   const baseNavigation = [
-    { path: '/profile', label: 'Profile', icon: 'User', roles: ['patient', 'health_personnel', 'pharmacy', 'institution_admin', 'institution_staff', 'admin', 'lab', 'super_admin', 'support', 'doctor', 'nurse', 'radiologist', 'pharmacist', 'lab_technician'] },
-    { path: '/settings', label: 'Settings', icon: 'Settings', roles: ['patient', 'health_personnel', 'pharmacy', 'institution_admin', 'institution_staff', 'admin', 'lab', 'super_admin', 'support', 'doctor', 'nurse', 'radiologist', 'pharmacist', 'lab_technician'] }
+    { path: '/profile', label: 'Profile', icon: 'User', roles: allRoles },
+    { path: '/settings', label: 'Settings', icon: 'Settings', roles: allRoles }
   ];
 
   const allNavigationItems = [

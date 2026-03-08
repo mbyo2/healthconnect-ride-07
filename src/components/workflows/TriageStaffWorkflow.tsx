@@ -28,21 +28,21 @@ export const TriageStaffWorkflow = () => {
             <p className="text-sm text-muted-foreground">Immediate attention</p>
           </CardContent>
         </Card>
-        <Card className="border-orange-500/20 bg-orange-500/5">
+        <Card className="border-primary/20 bg-primary/5">
           <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-lg"><Stethoscope className="h-5 w-5 text-orange-600" /> Urgent</CardTitle>
+            <CardTitle className="flex items-center gap-2 text-lg"><Stethoscope className="h-5 w-5 text-primary" /> Urgent</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold text-orange-600">--</p>
+            <p className="text-3xl font-bold text-primary">--</p>
             <p className="text-sm text-muted-foreground">High priority</p>
           </CardContent>
         </Card>
-        <Card className="border-yellow-500/20 bg-yellow-500/5">
+        <Card className="border-accent/20 bg-accent/5">
           <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-lg"><Clock className="h-5 w-5 text-yellow-600" /> Standard</CardTitle>
+            <CardTitle className="flex items-center gap-2 text-lg"><Clock className="h-5 w-5" /> Standard</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold text-yellow-600">--</p>
+            <p className="text-3xl font-bold">--</p>
             <p className="text-sm text-muted-foreground">Normal queue</p>
           </CardContent>
         </Card>
