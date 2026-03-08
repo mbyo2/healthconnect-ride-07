@@ -92,6 +92,7 @@ const VideoCall = lazyWithRetry(() => import('@/pages/VideoCall'));
 const Providers = lazyWithRetry(() => import('@/pages/Providers'));
 const RoleManagement = lazyWithRetry(() => import('@/pages/RoleManagement'));
 const IntakeForm = lazyWithRetry(() => import('@/pages/IntakeForm'));
+const BookingConfirmed = lazyWithRetry(() => import('@/pages/BookingConfirmed'));
 
 import { RoleRedirect } from '@/components/auth/RoleRedirect';
 
