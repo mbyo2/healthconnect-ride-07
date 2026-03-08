@@ -142,10 +142,10 @@ export const DeliveryCalculator = ({ product, quantity, onDeliverySelect }: Deli
           {deliveryZones.map((zone) => (
             <div
               key={zone.id}
-              className={`border rounded-lg p-4 cursor-pointer transition-colors ${
+            className={`border rounded-lg p-4 cursor-pointer transition-colors ${
                 selectedZone === zone.id 
                   ? 'border-primary bg-primary/5' 
-                  : 'border-gray-200 hover:border-gray-300'
+                  : 'border-border hover:border-muted-foreground/30'
               }`}
               onClick={() => selectDeliveryOption(zone)}
             >
