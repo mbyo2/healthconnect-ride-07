@@ -76,7 +76,9 @@ export default function HealthDashboard() {
       case "Alert":
         return "bg-red-100 dark:bg-red-950/20 text-red-800 dark:text-red-200";
       default:
-        return "bg-gray-100 damuted text-muted-foreground};
+        return "bg-muted text-muted-foreground";
+    }
+  };
 
   const getIconComponent = (iconName: string) => {
     const icons: Record<string, any> = {
