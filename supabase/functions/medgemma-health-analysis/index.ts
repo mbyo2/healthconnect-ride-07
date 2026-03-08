@@ -139,7 +139,7 @@ Provide:
     );
 
   } catch (error) {
-    console.error('Error in MedGemma analysis:', error);
+    console.error('Error in AI analysis:', error);
     
     return new Response(
       JSON.stringify({ 
