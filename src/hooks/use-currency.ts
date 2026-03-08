@@ -1,5 +1,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
+import { safeLocalGet, safeLocalSet } from '@/utils/storage';
 
 // Map of country codes to currency codes and symbols
 const COUNTRY_CURRENCY_MAP: Record<string, { code: string; symbol: string }> = {
