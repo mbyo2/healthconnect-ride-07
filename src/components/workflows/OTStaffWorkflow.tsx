@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { Scissors, Clock, AlertTriangle, Calendar, Plus, Loader2 } from 'lucide-react';
+import { Scissors, Clock, AlertTriangle, Plus, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { useInstitutionAffiliation } from '@/hooks/useInstitutionAffiliation';
@@ -34,37 +34,76 @@ export const OTStaffWorkflow = () => {
   const [showAdd, setShowAdd] = useState(false);
   const [form, setForm] = useState({ patient_name: '', procedure_name: '', ot_room: 'OT-1', scheduled_time: '', surgeon_name: '', anaesthesia_type: 'general', notes: '' });
 
-  // Use local state since we don't have a dedicated OT table yet — simulating with appointments
-  useEffect(() => {
+  const fetchSurgeries = useCallback(async () => {
     if (!institutionId) return;
-    const fetchSurgeries = async () => {
-      setLoading(true);
-      try {
-        const today = new Date().toISOString().split('T')[0];
-        const { data } = await supabase
-          .from('appointments')
-          .select('id, patient_id, date, time, type, status, notes')
-          .eq('type', 'surgery')
-          .eq('date', today)
-          .order('time', { ascending: true });
+    setLoading(true);
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const { data, error } = await supabase
+        .from('ot_surgeries')
+        .select('*')
+        .eq('institution_id', institutionId)
+        .eq('scheduled_date', today)
+        .order('scheduled_time', { ascending: true });
 
-        setSurgeries((data || []).map((a: any) => ({
-          id: a.id,
-          patient_name: a.notes?.split('|')[0] || 'Patient',
-          procedure_name: a.notes?.split('|')[1] || 'Surgery',
-          ot_room: a.notes?.split('|')[2] || 'OT-1',
-          scheduled_time: a.time,
-          status: a.status === 'completed' ? 'completed' : a.status === 'in_progress' ? 'in_progress' : 'scheduled',
-          surgeon_name: a.notes?.split('|')[3] || '',
-          anaesthesia_type: a.notes?.split('|')[4] || 'general',
-          consent_signed: true,
-          notes: null,
-        })));
-      } catch { /* fallback empty */ }
-      setLoading(false);
-    };
-    fetchSurgeries();
+      if (error) throw error;
+      setSurgeries((data || []).map((s: any) => ({
+        id: s.id,
+        patient_name: s.patient_name,
+        procedure_name: s.procedure_name,
+        ot_room: s.ot_room,
+        scheduled_time: s.scheduled_time,
+        status: s.status,
+        surgeon_name: s.surgeon_name,
+        anaesthesia_type: s.anaesthesia_type,
+        consent_signed: s.consent_signed,
+        notes: s.notes,
+      })));
+    } catch (err) {
+      console.error('Error fetching surgeries:', err);
+    }
+    setLoading(false);
   }, [institutionId]);
+
+  useEffect(() => { fetchSurgeries(); }, [fetchSurgeries]);
+
+  const handleCreate = async () => {
+    if (!institutionId || !user) return;
+    try {
+      const { error } = await supabase.from('ot_surgeries').insert({
+        institution_id: institutionId,
+        patient_name: form.patient_name,
+        procedure_name: form.procedure_name,
+        ot_room: form.ot_room,
+        scheduled_time: form.scheduled_time || '08:00',
+        surgeon_name: form.surgeon_name,
+        anaesthesia_type: form.anaesthesia_type,
+        notes: form.notes || null,
+        created_by: user.id,
+      });
+      if (error) throw error;
+      toast.success('Surgery scheduled');
+      setShowAdd(false);
+      setForm({ patient_name: '', procedure_name: '', ot_room: 'OT-1', scheduled_time: '', surgeon_name: '', anaesthesia_type: 'general', notes: '' });
+      fetchSurgeries();
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to schedule surgery');
+    }
+  };
+
+  const updateStatus = async (id: string, status: string) => {
+    try {
+      const updates: any = { status };
+      if (status === 'in_progress') updates.started_at = new Date().toISOString();
+      if (status === 'completed') updates.completed_at = new Date().toISOString();
+      const { error } = await supabase.from('ot_surgeries').update(updates).eq('id', id);
+      if (error) throw error;
+      setSurgeries(prev => prev.map(s => s.id === id ? { ...s, status: status as any } : s));
+      toast.success(`Surgery marked as ${status}`);
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to update');
+    }
+  };
 
   const statusColor = (s: string) => {
     switch (s) {
@@ -112,11 +151,7 @@ export const OTStaffWorkflow = () => {
                 </Select>
               </div>
               <div className="space-y-1"><Label>Notes</Label><Textarea value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} rows={2} /></div>
-              <Button className="w-full" onClick={() => {
-                setSurgeries(prev => [...prev, { id: Date.now().toString(), ...form, status: 'scheduled', consent_signed: false, notes: form.notes || null }]);
-                setShowAdd(false);
-                toast.success('Surgery scheduled');
-              }}>Schedule</Button>
+              <Button className="w-full" onClick={handleCreate} disabled={!form.patient_name || !form.procedure_name || !form.surgeon_name}>Schedule</Button>
             </div>
           </DialogContent>
         </Dialog>
@@ -143,10 +178,10 @@ export const OTStaffWorkflow = () => {
                     <div className="flex items-center gap-2">
                       <Badge variant="outline" className={statusColor(s.status)}>{s.status}</Badge>
                       {s.status === 'scheduled' && (
-                        <Button size="sm" variant="outline" onClick={() => setSurgeries(prev => prev.map(x => x.id === s.id ? {...x, status: 'in_progress'} : x))}>Start</Button>
+                        <Button size="sm" variant="outline" onClick={() => updateStatus(s.id, 'in_progress')}>Start</Button>
                       )}
                       {s.status === 'in_progress' && (
-                        <Button size="sm" onClick={() => setSurgeries(prev => prev.map(x => x.id === s.id ? {...x, status: 'completed'} : x))}>Complete</Button>
+                        <Button size="sm" onClick={() => updateStatus(s.id, 'completed')}>Complete</Button>
                       )}
                     </div>
                   </div>

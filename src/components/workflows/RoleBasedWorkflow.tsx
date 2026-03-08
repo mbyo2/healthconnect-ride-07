@@ -7,6 +7,7 @@ import { HealthPersonnelWorkflow } from './HealthPersonnelWorkflow';
 import { DoctorWorkflow } from './DoctorWorkflow';
 import { AdminWorkflow } from './AdminWorkflow';
 import { InstitutionAdminWorkflow } from './InstitutionAdminWorkflow';
+import { InstitutionStaffWorkflow } from './InstitutionStaffWorkflow';
 import { PharmacyWorkflow } from './PharmacyWorkflow';
 import { PharmacistWorkflow } from './PharmacistWorkflow';
 import { LabWorkflow } from './LabWorkflow';
@@ -100,6 +101,10 @@ export const RoleBasedWorkflow = () => {
       const specialty = profile?.specialty?.toLowerCase() || '';
       if (specialty.includes('nursing home') || specialty.includes('care home') || specialty.includes('aged care')) {
         return <NursingHomeWorkflow />;
+      }
+      // Staff gets reduced-permission UI
+      if (activeRole === 'institution_staff') {
+        return <InstitutionStaffWorkflow />;
       }
       return <InstitutionAdminWorkflow />;
     }

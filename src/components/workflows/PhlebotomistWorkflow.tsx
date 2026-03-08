@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { Droplets, MapPin, Users, Truck, Plus, Loader2, CheckCircle } from 'lucide-react';
+import { Droplets, Truck, Plus, Loader2, CheckCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { useInstitutionAffiliation } from '@/hooks/useInstitutionAffiliation';
@@ -32,22 +32,90 @@ export const PhlebotomistWorkflow = () => {
   const [loading, setLoading] = useState(false);
   const [showAdd, setShowAdd] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
-  const [form, setForm] = useState({ patient_name: '', sample_type: 'blood', collection_type: 'in_lab' as const, address: '', scheduled_time: '' });
+  const [form, setForm] = useState<{ patient_name: string; sample_type: string; collection_type: 'in_lab' | 'home_visit'; address: string; scheduled_time: string }>({ patient_name: '', sample_type: 'blood', collection_type: 'in_lab', address: '', scheduled_time: '' });
 
-  const pending = samples.filter(s => s.status === 'pending');
-  const homeVisits = samples.filter(s => s.collection_type === 'home_visit' && s.status === 'pending');
-  const collected = samples.filter(s => ['collected', 'received'].includes(s.status));
+  const fetchSamples = useCallback(async () => {
+    if (!user) return;
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('sample_collections')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-  const handleBarcodeScan = (code: string) => {
+      if (error) throw error;
+      setSamples((data || []).map((s: any) => ({
+        id: s.id,
+        patient_name: s.patient_name,
+        sample_type: s.sample_type,
+        barcode: s.barcode,
+        collection_type: s.collection_type,
+        status: s.status,
+        address: s.address,
+        scheduled_time: s.scheduled_time || '',
+        collected_at: s.collected_at,
+      })));
+    } catch (err) {
+      console.error('Error fetching samples:', err);
+    }
+    setLoading(false);
+  }, [user]);
+
+  useEffect(() => { fetchSamples(); }, [fetchSamples]);
+
+  const handleCreate = async () => {
+    if (!user) return;
+    const barcode = `SMP-${Date.now().toString(36).toUpperCase()}`;
+    try {
+      const { error } = await supabase.from('sample_collections').insert({
+        institution_id: institutionId || null,
+        patient_name: form.patient_name,
+        sample_type: form.sample_type,
+        barcode,
+        collection_type: form.collection_type,
+        address: form.collection_type === 'home_visit' ? form.address : null,
+        scheduled_time: form.scheduled_time || null,
+        created_by: user.id,
+      });
+      if (error) throw error;
+      toast.success(`Sample ${barcode} created`);
+      setShowAdd(false);
+      setForm({ patient_name: '', sample_type: 'blood', collection_type: 'in_lab', address: '', scheduled_time: '' });
+      fetchSamples();
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to create sample');
+    }
+  };
+
+  const updateStatus = async (id: string, status: string) => {
+    try {
+      const updates: any = { status };
+      if (status === 'collected') {
+        updates.collected_at = new Date().toISOString();
+        updates.collected_by = user?.id;
+      }
+      const { error } = await supabase.from('sample_collections').update(updates).eq('id', id);
+      if (error) throw error;
+      setSamples(prev => prev.map(s => s.id === id ? { ...s, status: status as any, ...(status === 'collected' ? { collected_at: new Date().toISOString() } : {}) } : s));
+      toast.success(`Sample marked as ${status}`);
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to update');
+    }
+  };
+
+  const handleBarcodeScan = async (code: string) => {
     const sample = samples.find(s => s.barcode === code);
     if (sample) {
-      setSamples(prev => prev.map(s => s.id === sample.id ? { ...s, status: 'collected', collected_at: new Date().toISOString() } : s));
-      toast.success(`Sample ${code} marked as collected`);
+      await updateStatus(sample.id, 'collected');
     } else {
       toast.info(`Barcode: ${code} — No matching sample found`);
     }
     setShowScanner(false);
   };
+
+  const pending = samples.filter(s => s.status === 'pending');
+  const homeVisits = samples.filter(s => s.collection_type === 'home_visit' && s.status === 'pending');
+  const collected = samples.filter(s => ['collected', 'received'].includes(s.status));
 
   return (
     <div className="space-y-6">
@@ -82,16 +150,11 @@ export const PhlebotomistWorkflow = () => {
                     <SelectContent><SelectItem value="in_lab">In-Lab</SelectItem><SelectItem value="home_visit">Home Visit</SelectItem></SelectContent>
                   </Select>
                 </div>
-                {(form.collection_type as string) === 'home_visit' && (
+                {form.collection_type === 'home_visit' && (
                   <div className="space-y-1"><Label>Address</Label><Input value={form.address} onChange={e => setForm({...form, address: e.target.value})} /></div>
                 )}
                 <div className="space-y-1"><Label>Scheduled Time</Label><Input type="time" value={form.scheduled_time} onChange={e => setForm({...form, scheduled_time: e.target.value})} /></div>
-                <Button className="w-full" onClick={() => {
-                  const barcode = `SMP-${Date.now().toString(36).toUpperCase()}`;
-                  setSamples(prev => [...prev, { id: Date.now().toString(), ...form, barcode, status: 'pending', scheduled_time: form.scheduled_time || new Date().toTimeString().slice(0, 5) }]);
-                  setShowAdd(false);
-                  toast.success(`Sample ${barcode} created`);
-                }}>Create & Print Label</Button>
+                <Button className="w-full" onClick={handleCreate} disabled={!form.patient_name}>Create & Print Label</Button>
               </div>
             </DialogContent>
           </Dialog>
@@ -109,33 +172,31 @@ export const PhlebotomistWorkflow = () => {
       <Card>
         <CardHeader><CardTitle>Collection Queue</CardTitle></CardHeader>
         <CardContent>
-          {samples.length === 0 ? <p className="text-muted-foreground text-center py-4">No samples in queue</p> : (
-            <div className="space-y-2">
-              {samples.map(s => (
-                <div key={s.id} className="flex items-center justify-between p-3 rounded-lg border">
-                  <div>
-                    <p className="font-medium">{s.patient_name} — {s.sample_type}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {s.barcode} • {s.collection_type === 'home_visit' ? `🏠 ${s.address}` : '🏥 In-Lab'} • {s.scheduled_time}
-                    </p>
+          {loading ? <Loader2 className="h-6 w-6 animate-spin mx-auto" /> :
+            samples.length === 0 ? <p className="text-muted-foreground text-center py-4">No samples in queue</p> : (
+              <div className="space-y-2">
+                {samples.map(s => (
+                  <div key={s.id} className="flex items-center justify-between p-3 rounded-lg border">
+                    <div>
+                      <p className="font-medium">{s.patient_name} — {s.sample_type}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {s.barcode} • {s.collection_type === 'home_visit' ? `🏠 ${s.address}` : '🏥 In-Lab'} • {s.scheduled_time}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline">{s.status}</Badge>
+                      {s.status === 'pending' && (
+                        <Button size="sm" onClick={() => updateStatus(s.id, 'collected')}>Collect</Button>
+                      )}
+                      {s.status === 'collected' && (
+                        <Button size="sm" variant="outline" onClick={() => updateStatus(s.id, 'in_transit')}>Send to Lab</Button>
+                      )}
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Badge variant="outline">{s.status}</Badge>
-                    {s.status === 'pending' && (
-                      <Button size="sm" onClick={() => setSamples(prev => prev.map(x => x.id === s.id ? {...x, status: 'collected', collected_at: new Date().toISOString()} : x))}>
-                        Collect
-                      </Button>
-                    )}
-                    {s.status === 'collected' && (
-                      <Button size="sm" variant="outline" onClick={() => setSamples(prev => prev.map(x => x.id === s.id ? {...x, status: 'in_transit'} : x))}>
-                        Send to Lab
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+                ))}
+              </div>
+            )
+          }
         </CardContent>
       </Card>
     </div>
