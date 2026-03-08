@@ -187,6 +187,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/institution/reports',
     '/institution/appointments',
     '/institution/settings',
+    '/institution/devices',
     '/appointments',
     '/appointments/:id',
     '/chat',
