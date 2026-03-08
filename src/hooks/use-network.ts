@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 export interface NetworkState {
   isOnline: boolean;
@@ -10,13 +10,15 @@ export interface NetworkState {
 export const useNetwork = (): NetworkState => {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [connectionQuality, setConnectionQuality] = useState<NetworkState['connectionQuality']>('unknown');
+  const checkingRef = useRef(false);
 
-  const checkConnection = async () => {
+  const checkConnection = useCallback(async () => {
+    if (checkingRef.current) return;
+    checkingRef.current = true;
+
     try {
-      // If Network Information API is available (Chrome, Android)
       if ('connection' in navigator && (navigator as any).connection) {
-        const { effectiveType, downlink, rtt } = (navigator as any).connection;
-
+        const { effectiveType, downlink } = (navigator as any).connection;
         if (effectiveType === 'slow-2g' || effectiveType === '2g') {
           setConnectionQuality('poor');
         } else if (effectiveType === '3g') {
@@ -26,87 +28,51 @@ export const useNetwork = (): NetworkState => {
         } else if (effectiveType === '4g' && downlink >= 5) {
           setConnectionQuality('excellent');
         }
-
-        // If we have connection info, we are likely online
-        if (navigator.onLine) {
-          setIsOnline(true);
-        }
       } else {
-        // Fall back to ping test if Network Information API not available
         const startTime = Date.now();
-        const response = await fetch('/favicon.ico', {
-          method: 'HEAD',
-          cache: 'no-cache',
-        });
-
+        const response = await fetch('/favicon.ico', { method: 'HEAD', cache: 'no-cache' });
         if (response.ok || response.status === 404) {
-          // If we get a response (even 404), we are online
           setIsOnline(true);
-
           const duration = Date.now() - startTime;
-
-          if (duration < 100) {
-            setConnectionQuality('excellent');
-          } else if (duration < 300) {
-            setConnectionQuality('good');
-          } else if (duration < 750) {
-            setConnectionQuality('average');
-          } else {
-            setConnectionQuality('poor');
-          }
-        } else {
-          // Response not OK and not 404 might indicate issue, but strictly speaking we reached server
-          // But if fetch throws, it goes to catch
-          setIsOnline(true);
+          if (duration < 100) setConnectionQuality('excellent');
+          else if (duration < 300) setConnectionQuality('good');
+          else if (duration < 750) setConnectionQuality('average');
+          else setConnectionQuality('poor');
         }
       }
-    } catch (error) {
-      console.error('Error checking connection quality:', error);
-      // If fetch fails completely, we might be offline
-      // But only set offline if navigator also thinks so, or if we want to be strict
-      // For now, let's trust navigator.onLine primarily, but if ping fails, maybe we are offline?
-      // Actually, if ping fails, it's a strong indicator of offline.
-
-      // However, to avoid false positives due to server issues, let's only set offline if navigator agrees
-      // OR if we are explicitly checking.
-
-      // Let's keep isOnline as is, but set quality to unknown
-      if (isOnline) {
-        setConnectionQuality('unknown');
-      }
+    } catch {
+      setConnectionQuality('unknown');
+    } finally {
+      checkingRef.current = false;
     }
-  };
+  }, []);
 
   useEffect(() => {
-    // Network status change handlers
     const handleOnline = () => {
       setIsOnline(true);
       checkConnection();
     };
     const handleOffline = () => setIsOnline(false);
 
-    // Add event listeners for online/offline events
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
 
-    // Initial check
+    // Initial check only
     if (navigator.onLine) {
       checkConnection();
     }
 
-    // Periodically check connection quality (every 30 seconds)
+    // Check every 60s instead of 30s to reduce overhead
     const intervalId = setInterval(() => {
-      if (navigator.onLine) {
-        checkConnection();
-      }
-    }, 30000);
+      if (navigator.onLine) checkConnection();
+    }, 60000);
 
     return () => {
       clearInterval(intervalId);
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
-  }, []);
+  }, [checkConnection]);
 
   return { isOnline, connectionQuality, checkConnection };
 };

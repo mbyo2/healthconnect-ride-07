@@ -1,5 +1,5 @@
 
-import { useEffect, useState, useMemo, useCallback } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 
 type DeviceType = 'mobile' | 'tablet' | 'desktop' | 'tv' | 'unknown';
 
@@ -13,51 +13,43 @@ export function useDeviceType(): {
   const [width, setWidth] = useState<number>(
     typeof window !== 'undefined' ? window.innerWidth : 0
   );
-  
-  // Throttle resize handler for better performance
-  const handleResize = useCallback(() => {
-    // Only update if the width change is significant
-    if (Math.abs(window.innerWidth - width) > 50) {
-      setWidth(window.innerWidth);
-    }
-  }, [width]);
-  
+  const widthRef = useRef(width);
+  widthRef.current = width;
+
   useEffect(() => {
-    // Only run on client side
     if (typeof window === 'undefined') return;
-    
+
+    let rafId: number;
+    const handleResize = () => {
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        const newWidth = window.innerWidth;
+        if (Math.abs(newWidth - widthRef.current) > 50) {
+          setWidth(newWidth);
+        }
+      });
+    };
+
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [handleResize]);
-  
-  const deviceData = useMemo(() => {
-    // Detect device type
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      cancelAnimationFrame(rafId);
+    };
+  }, []); // Stable — no deps needed, uses ref
+
+  return useMemo(() => {
     const detectDeviceType = (): DeviceType => {
       if (typeof window === 'undefined') return 'unknown';
-      
-      // Check if we're on a TV
       if (
-        navigator.userAgent.toLowerCase().indexOf('smart-tv') > -1 ||
-        navigator.userAgent.toLowerCase().indexOf('tv') > -1 ||
-        /\b(smart[-_]?tv|hbbtv|appletv|googletv|hdmi|netcast|viera|nettv|roku|kdl|bravia|skyworth|sony-bravia)\b/i.test(navigator.userAgent.toLowerCase()) ||
-        /\b(tv|dtv|smarttv|opera tv|televízio)/i.test(navigator.appVersion) ||
-        window.matchMedia('(device-width: 1920px) and (device-height: 1080px)').matches
-      ) {
-        return 'tv';
-      }
-
-      // Check for other devices using improved breakpoints
-      if (width <= 640) {
-        return 'mobile';
-      } else if (width <= 1024) {
-        return 'tablet';
-      } else {
-        return 'desktop';
-      }
+        /\b(smart[-_]?tv|hbbtv|appletv|googletv|hdmi|netcast|viera|nettv|roku|kdl|bravia|skyworth|sony-bravia)\b/i.test(navigator.userAgent) ||
+        /\b(tv|dtv|smarttv|opera tv)/i.test(navigator.appVersion)
+      ) return 'tv';
+      if (width <= 640) return 'mobile';
+      if (width <= 1024) return 'tablet';
+      return 'desktop';
     };
-    
+
     const deviceType = detectDeviceType();
-    
     return {
       deviceType,
       isMobile: deviceType === 'mobile',
@@ -66,6 +58,4 @@ export function useDeviceType(): {
       isTV: deviceType === 'tv',
     };
   }, [width]);
-  
-  return deviceData;
 }
