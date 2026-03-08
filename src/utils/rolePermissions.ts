@@ -555,9 +555,19 @@ export const getRoleLandingPage = (userRoles: UserRole[] | null): string => {
 
   // Priority order: admin > institution_admin > health_personnel > pharmacy > lab > patient
   if (userRoles.includes(USER_ROLES.ADMIN) || userRoles.includes(USER_ROLES.SUPER_ADMIN)) return '/admin-dashboard';
+  if (userRoles.includes(USER_ROLES.CXO)) return '/institution-dashboard';
   if (userRoles.includes(USER_ROLES.INSTITUTION_ADMIN)) return '/institution-portal';
   if (userRoles.includes(USER_ROLES.INSTITUTION_STAFF)) return '/institution-dashboard';
-  if (userRoles.includes(USER_ROLES.HEALTH_PERSONNEL) || userRoles.includes(USER_ROLES.DOCTOR) || userRoles.includes(USER_ROLES.NURSE) || userRoles.includes(USER_ROLES.RADIOLOGIST)) return '/provider-dashboard';
+  if (userRoles.includes(USER_ROLES.RECEPTIONIST)) return '/institution-dashboard';
+  if (userRoles.includes(USER_ROLES.HR_MANAGER)) return '/institution-dashboard';
+  if (userRoles.includes(USER_ROLES.BILLING_STAFF)) return '/institution-dashboard';
+  if (userRoles.includes(USER_ROLES.TRIAGE_STAFF)) return '/institution-dashboard';
+  if (userRoles.includes(USER_ROLES.OT_STAFF)) return '/institution-dashboard';
+  if (userRoles.includes(USER_ROLES.MAINTENANCE_MANAGER)) return '/institution-dashboard';
+  if (userRoles.includes(USER_ROLES.INVENTORY_MANAGER)) return '/institution-dashboard';
+  if (userRoles.includes(USER_ROLES.AMBULANCE_STAFF)) return '/institution-dashboard';
+  if (userRoles.includes(USER_ROLES.HEALTH_PERSONNEL) || userRoles.includes(USER_ROLES.DOCTOR) || userRoles.includes(USER_ROLES.NURSE) || userRoles.includes(USER_ROLES.RADIOLOGIST) || userRoles.includes(USER_ROLES.SPECIALIST)) return '/provider-dashboard';
+  if (userRoles.includes(USER_ROLES.PATHOLOGIST) || userRoles.includes(USER_ROLES.PHLEBOTOMIST)) return '/lab-management';
   if (userRoles.includes(USER_ROLES.PHARMACY) || userRoles.includes(USER_ROLES.PHARMACIST)) return '/pharmacy-portal';
   if (userRoles.includes(USER_ROLES.LAB) || userRoles.includes(USER_ROLES.LAB_TECHNICIAN)) return '/lab-management';
   if (userRoles.includes(USER_ROLES.PATIENT)) return '/home';
