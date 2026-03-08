@@ -103,9 +103,9 @@ const Profile = () => {
       </Card>
 
       {/* Profile Details */}
-      <Card className="border-trust-100 shadow-trust">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-trust-700">Personal Information</CardTitle>
+          <CardTitle>Personal Information</CardTitle>
           <CardDescription>
             Manage your personal details and preferences
           </CardDescription>
