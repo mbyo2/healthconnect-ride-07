@@ -9,6 +9,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
+import { SpecialtySelector } from "./SpecialtySelector";
+import { saveInstitutionSpecialties } from "@/hooks/useClinicSpecialties";
 
 type HealthcareInstitution = Database['public']['Tables']['healthcare_institutions']['Insert'];
 
@@ -24,9 +26,17 @@ interface FormErrors {
 const PROVIDER_TYPES = [
   'hospital',
   'clinic',
+  'dental_clinic',
+  'eye_clinic',
+  'skin_clinic',
+  'specialty_clinic',
   'pharmacy',
   'nursing_home',
-  'dentist'
+  'dentist',
+  'optician',
+  'dermatology_clinic',
+  'physiotherapy',
+  'radiology_center',
 ] as const;
 
 export const HealthcareInstitutionForm = () => {
@@ -46,6 +56,10 @@ export const HealthcareInstitutionForm = () => {
     website: "",
   });
   const [errors, setErrors] = useState<FormErrors>({});
+  const [selectedSpecialties, setSelectedSpecialties] = useState<string[]>([]);
+  const [primarySpecialtyId, setPrimarySpecialtyId] = useState<string>();
+
+  const isClinicType = ['clinic', 'dental_clinic', 'eye_clinic', 'skin_clinic', 'specialty_clinic'].includes(formData.type);
 
   const validateForm = () => {
     const newErrors: FormErrors = {};
@@ -97,11 +111,22 @@ export const HealthcareInstitutionForm = () => {
         operating_hours: {}
       };
 
-      const { error: institutionError } = await supabase
+      const { data: institutionData, error: institutionError } = await supabase
         .from("healthcare_institutions" as any)
-        .insert(institution);
+        .insert(institution)
+        .select("id")
+        .single();
 
       if (institutionError) throw institutionError;
+
+      // Save specialties if clinic type
+      if (isClinicType && selectedSpecialties.length > 0 && institutionData) {
+        await saveInstitutionSpecialties(
+          (institutionData as any).id,
+          selectedSpecialties,
+          primarySpecialtyId
+        );
+      }
 
       // 2. Create the application record
       const application = {
@@ -165,7 +190,7 @@ export const HealthcareInstitutionForm = () => {
             <SelectContent>
               {PROVIDER_TYPES.map((type) => (
                 <SelectItem key={type} value={type}>
-                  {type.charAt(0).toUpperCase() + type.slice(1)}
+                  {type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -174,6 +199,16 @@ export const HealthcareInstitutionForm = () => {
             <p className="text-sm text-destructive mt-1">{errors.type}</p>
           )}
         </div>
+
+        {isClinicType && (
+          <SpecialtySelector
+            selected={selectedSpecialties}
+            primaryId={primarySpecialtyId}
+            onSelectionChange={setSelectedSpecialties}
+            onPrimaryChange={setPrimarySpecialtyId}
+            disabled={isSubmitting}
+          />
+        )}
 
         <div>
           <Label htmlFor="license_number">License Number <span className="text-destructive">*</span></Label>

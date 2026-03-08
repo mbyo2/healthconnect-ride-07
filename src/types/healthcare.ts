@@ -5,7 +5,15 @@ export type HealthcareProviderType =
   | 'clinic'
   | 'pharmacy'
   | 'nursing_home'
-  | 'dentist';
+  | 'dentist'
+  | 'optician'
+  | 'dermatology_clinic'
+  | 'physiotherapy'
+  | 'radiology_center'
+  | 'eye_clinic'
+  | 'skin_clinic'
+  | 'dental_clinic'
+  | 'specialty_clinic';
 
 export interface HealthcareLocation {
   id: string;
