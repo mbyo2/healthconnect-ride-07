@@ -1,7 +1,45 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Star, MapPin, Quote } from 'lucide-react';
-import { ZAMBIAN_TESTIMONIALS } from '@/config/zambia';
+
+const TESTIMONIALS = [
+  {
+    name: 'Sarah M.',
+    role: 'Patient',
+    city: 'Lusaka',
+    content: "Doc' O Clock has made healthcare so much easier for my family. I can book appointments without queuing for hours!",
+  },
+  {
+    name: 'Dr. James K.',
+    role: 'Healthcare Provider',
+    city: 'Nairobi',
+    content: 'This platform helps me reach more patients and manage my practice efficiently. A game-changer for healthcare delivery.',
+  },
+  {
+    name: 'Maria L.',
+    role: 'Mother of Two',
+    city: 'Lagos',
+    content: "The emergency feature is incredible. I found the nearest hospital and got help within minutes.",
+  },
+  {
+    name: 'David N.',
+    role: 'Pharmacy Owner',
+    city: 'Lusaka',
+    content: 'Managing prescriptions and inventory has never been easier. My customers love ordering medicine through the app.',
+  },
+  {
+    name: 'Grace T.',
+    role: 'Patient',
+    city: 'Dar es Salaam',
+    content: 'Living far from major hospitals, this app connects me to doctors via video call. Truly life-changing technology!',
+  },
+  {
+    name: 'Dr. Amina B.',
+    role: 'Specialist',
+    city: 'Accra',
+    content: 'The platform helps me manage referrals and follow up with patients. Healthcare is becoming more accessible for everyone.',
+  },
+];
 
 interface Testimonial {
   id: string;
@@ -16,10 +54,9 @@ interface Testimonial {
 export const Testimonials = () => {
   const [activeIndex, setActiveIndex] = useState(0);
 
-  // Create testimonials from Zambian config
   const testimonials: Testimonial[] = useMemo(() => 
-    ZAMBIAN_TESTIMONIALS.slice(0, 6).map((t, i) => ({
-      id: `zambian-${i}`,
+    TESTIMONIALS.map((t, i) => ({
+      id: `testimonial-${i}`,
       name: t.name,
       role: t.role,
       city: t.city,
@@ -28,7 +65,6 @@ export const Testimonials = () => {
     })),
   []);
 
-  // Auto-rotate testimonials on mobile
   useEffect(() => {
     const interval = setInterval(() => {
       setActiveIndex((prev) => (prev + 1) % testimonials.length);
@@ -42,13 +78,13 @@ export const Testimonials = () => {
         <div className="text-center mb-8 md:mb-12">
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-full text-primary text-xs font-medium mb-4">
             <Quote className="h-3 w-3" />
-            Real Stories from Zambians
+            Real Stories from Our Users
           </div>
           <h2 className="text-2xl md:text-3xl font-bold mb-3 md:mb-4 text-foreground">
             What Our Users Say
           </h2>
           <p className="text-muted-foreground max-w-lg mx-auto text-sm md:text-base">
-            Join thousands of Zambians who trust Doc' O Clock for their healthcare needs
+            Join thousands of people who trust Doc' O Clock for their healthcare needs
           </p>
         </div>
         
@@ -82,7 +118,6 @@ export const Testimonials = () => {
             </CardContent>
           </Card>
           
-          {/* Dots indicator */}
           <div className="flex justify-center gap-2 mt-4">
             {testimonials.map((_, i) => (
               <button
@@ -96,7 +131,7 @@ export const Testimonials = () => {
           </div>
         </div>
         
-        {/* Desktop: Grid of testimonials */}
+        {/* Desktop: Grid */}
         <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {testimonials.map((testimonial) => (
             <Card key={testimonial.id} className="bg-card border-border hover:shadow-lg transition-shadow group">
@@ -139,9 +174,9 @@ export const Testimonials = () => {
               <span className="text-yellow-500">★</span> 4.8/5 average rating
             </span>
             <span>•</span>
-            <span>10,000+ users across Zambia</span>
+            <span>10,000+ users worldwide</span>
             <span className="hidden md:inline">•</span>
-            <span className="hidden md:inline">All 10 provinces covered</span>
+            <span className="hidden md:inline">Growing globally</span>
           </div>
         </div>
       </div>

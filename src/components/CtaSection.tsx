@@ -2,7 +2,13 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Shield, CheckCircle, MapPin, Phone, CreditCard } from 'lucide-react';
-import { ZAMBIAN_STATS, ZAMBIA_CONFIG } from '@/config/zambia';
+
+const PLATFORM_STATS = {
+  doctors: '500+',
+  hospitals: '50+',
+  pharmacies: '200+',
+  patients: '10,000+',
+};
 
 export const CtaSection = () => {
   return (
@@ -12,27 +18,26 @@ export const CtaSection = () => {
       
       <div className="container-modern relative">
         <div className="text-center max-w-4xl mx-auto">
-          {/* Icon with Zambian flag colors accent */}
+          {/* Icon */}
           <div className="flex justify-center mb-6">
-            <div className="p-4 bg-white/20 rounded-full backdrop-blur-sm relative">
+            <div className="p-4 bg-white/20 rounded-full backdrop-blur-sm">
               <Shield className="h-10 md:h-12 w-10 md:w-12 text-white" />
-              <div className="absolute -top-1 -right-1 text-lg">🇿🇲</div>
             </div>
           </div>
           
           {/* Headline */}
           <h2 className="text-2xl sm:text-3xl lg:text-5xl font-bold mb-4 md:mb-6 leading-tight">
             Healthcare for
-            <span className="block text-orange-300">Every Zambian</span>
+            <span className="block text-orange-300">Everyone</span>
           </h2>
           
           {/* Subheadline */}
           <p className="text-base md:text-xl mb-6 md:mb-8 opacity-90 leading-relaxed max-w-2xl mx-auto px-4">
-            Join {ZAMBIAN_STATS.patients} Zambians who trust Doc' O Clock for quality healthcare. 
+            Join {PLATFORM_STATS.patients} users who trust Doc' O Clock for quality healthcare. 
             Find doctors, order medicine, and get emergency care—all in one app.
           </p>
           
-          {/* Benefits row - Zambian focused */}
+          {/* Benefits row */}
           <div className="grid grid-cols-2 md:flex md:flex-wrap justify-center gap-3 md:gap-6 mb-6 md:mb-8 text-xs md:text-sm px-4">
             <div className="flex items-center gap-2 justify-center">
               <CheckCircle className="h-4 w-4 text-green-300 flex-shrink-0" />
@@ -40,11 +45,11 @@ export const CtaSection = () => {
             </div>
             <div className="flex items-center gap-2 justify-center">
               <CreditCard className="h-4 w-4 text-yellow-300 flex-shrink-0" />
-              <span className="whitespace-nowrap">Mobile Money</span>
+              <span className="whitespace-nowrap">Flexible payments</span>
             </div>
             <div className="flex items-center gap-2 justify-center">
               <MapPin className="h-4 w-4 text-emerald-300 flex-shrink-0" />
-              <span className="whitespace-nowrap">All 10 provinces</span>
+              <span className="whitespace-nowrap">Growing worldwide</span>
             </div>
             <div className="flex items-center gap-2 justify-center">
               <Phone className="h-4 w-4 text-red-300 flex-shrink-0" />
@@ -76,18 +81,18 @@ export const CtaSection = () => {
             </Button>
           </div>
           
-          {/* Trust indicators - Zambian stats */}
+          {/* Trust indicators */}
           <div className="grid grid-cols-4 gap-2 sm:gap-4 max-w-xl sm:max-w-2xl mx-auto px-4">
             <div className="text-center">
-              <div className="text-lg md:text-2xl font-bold text-emerald-300">{ZAMBIAN_STATS.doctors}</div>
+              <div className="text-lg md:text-2xl font-bold text-emerald-300">{PLATFORM_STATS.doctors}</div>
               <div className="text-[10px] md:text-sm opacity-80 leading-tight">Doctors</div>
             </div>
             <div className="text-center">
-              <div className="text-lg md:text-2xl font-bold text-blue-300">{ZAMBIAN_STATS.hospitals}</div>
+              <div className="text-lg md:text-2xl font-bold text-blue-300">{PLATFORM_STATS.hospitals}</div>
               <div className="text-[10px] md:text-sm opacity-80 leading-tight">Hospitals</div>
             </div>
             <div className="text-center">
-              <div className="text-lg md:text-2xl font-bold text-orange-300">{ZAMBIAN_STATS.pharmacies}</div>
+              <div className="text-lg md:text-2xl font-bold text-orange-300">{PLATFORM_STATS.pharmacies}</div>
               <div className="text-[10px] md:text-sm opacity-80 leading-tight">Pharmacies</div>
             </div>
             <div className="text-center">
