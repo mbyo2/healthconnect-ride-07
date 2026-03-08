@@ -75,6 +75,23 @@ const AppointmentsPage = () => {
     }
   );
 
+  // Real-time subscription for appointment status changes
+  useEffect(() => {
+    const channel = supabase
+      .channel('appointments-realtime')
+      .on('postgres_changes',
+        { event: '*', schema: 'public', table: 'appointments' },
+        (payload) => {
+          queryClient.invalidateQueries({ queryKey: ['appointments'] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
+
   const cancelAppointment = useMutation({
     mutationFn: async (appointmentId: string) => {
       const { error } = await supabase
