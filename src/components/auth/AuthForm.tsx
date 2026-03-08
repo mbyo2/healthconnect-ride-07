@@ -115,6 +115,8 @@ export const AuthForm = ({ mode = 'login' }: AuthFormProps) => {
     }
   };
 
+  const [showPhoneOTP, setShowPhoneOTP] = useState(false);
+
   return (
     <div className="max-w-md mx-auto p-4">
       {rateLimitExceeded && (
@@ -124,12 +126,16 @@ export const AuthForm = ({ mode = 'login' }: AuthFormProps) => {
           </p>
         </div>
       )}
-      
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="login">Sign In</TabsTrigger>
-          <TabsTrigger value="register">Sign Up</TabsTrigger>
-        </TabsList>
+
+      {showPhoneOTP ? (
+        <PhoneOTPLogin onBack={() => setShowPhoneOTP(false)} />
+      ) : (
+        <>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="login">Sign In</TabsTrigger>
+              <TabsTrigger value="register">Sign Up</TabsTrigger>
+            </TabsList>
         
         <TabsContent value="login">
           <form onSubmit={handleLogin} className="space-y-4 mt-4">
