@@ -40,7 +40,13 @@ const ProviderDetail = () => {
         .single();
 
       if (error) throw error;
-      return data as Provider & { provider_statistics?: { average_rating: number; total_reviews: number; total_appointments: number }[] };
+      
+      // Map database response to Provider type
+      const mapped: Provider & { provider_statistics?: any[] } = {
+        ...data,
+        accepted_insurances: data.accepted_insurances || [],
+      };
+      return mapped;
     },
     enabled: !!id,
   });
