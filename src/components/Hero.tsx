@@ -66,6 +66,23 @@ export const Hero = () => {
               Book appointments, order medicine, and get emergency care—all in one app.
             </p>
 
+            {/* ZocDoc-style Search Bar */}
+            <form onSubmit={handleSearch} className="flex gap-2 mb-6 md:mb-8 max-w-xl mx-auto lg:mx-0">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                <Input
+                  type="text"
+                  placeholder="Search doctors, specialties, conditions..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 h-12 text-base rounded-xl border-2 border-border focus:border-primary"
+                />
+              </div>
+              <Button type="submit" size="lg" className="h-12 px-6 rounded-xl">
+                Search
+              </Button>
+            </form>
+
             {/* Quick Stats */}
             <div className="grid grid-cols-4 gap-2 md:gap-4 mb-6 md:mb-8 max-w-md mx-auto lg:mx-0">
               <div className="text-center p-2 md:p-3 bg-card rounded-xl border border-border">
