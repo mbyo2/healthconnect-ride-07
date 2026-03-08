@@ -100,24 +100,25 @@ export const DeliveryCalculator = ({ product, quantity, onDeliverySelect }: Deli
 
   if (!canBeDelivered(product)) {
     return (
-      <Card className="border-orange-200 bg-orange-50">
+      <Card className="border-orange-500/30 bg-orange-500/5">
         <CardHeader>
-          <CardTitle className="text-orange-800 flex items-center gap-2">
+          <CardTitle className="text-orange-700 dark:text-orange-400 flex items-center gap-2">
             <AlertTriangle className="h-5 w-5" />
             Pharmacy Pickup Required
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-orange-700 mb-4">
+          <p className="text-orange-600 dark:text-orange-300 mb-4">
             {getRestrictionReason(product)}
           </p>
-          <div className="flex items-center gap-2 text-sm text-orange-600">
+          <div className="flex items-center gap-2 text-sm text-orange-600 dark:text-orange-400">
             <MapPin className="h-4 w-4" />
             Available for pickup at participating pharmacies
           </div>
           <Button
             onClick={selectPickup}
-            className="w-full mt-4 bg-orange-600 hover:bg-orange-700"
+            className="w-full mt-4"
+            variant="destructive"
           >
             Select Pharmacy Pickup (Free)
           </Button>
