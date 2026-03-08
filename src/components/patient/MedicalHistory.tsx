@@ -68,7 +68,7 @@ export const MedicalHistory = () => {
         </div>
       ) : records.length === 0 ? (
         <Card>
-          <CardContent className="p-6 text-center text-gray-500">
+          <CardContent className="p-6 text-center text-muted-foreground">
             No medical records found
           </CardContent>
         </Card>
