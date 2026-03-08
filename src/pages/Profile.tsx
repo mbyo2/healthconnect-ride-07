@@ -85,7 +85,7 @@ const Profile = () => {
                 <Mail className="h-4 w-4" />
                 {formData.email}
               </div>
-              <Badge variant="secondary" className="bg-trust-50 text-trust-600">
+              <Badge variant="secondary" className="bg-primary/10 text-primary">
                 {profile?.role === 'health_personnel' ? 'Healthcare Provider' : 'Patient'}
               </Badge>
             </div>
