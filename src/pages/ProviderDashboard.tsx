@@ -99,7 +99,7 @@ const ProviderDashboard = () => {
           { label: "Today", value: todayAppointments.length, sub: `${scheduledToday.length} pending · ${completedToday.length} done`, icon: Users, color: "border-l-blue-500", iconBg: "bg-blue-500/10", iconColor: "text-blue-600 dark:text-blue-400" },
           { label: "This Week", value: weekStats?.total || 0, sub: `${weekStats?.completed || 0} completed`, icon: TrendingUp, color: "border-l-emerald-500", iconBg: "bg-emerald-500/10", iconColor: "text-emerald-600 dark:text-emerald-400" },
           { label: "Pending", value: weekStats?.pending || 0, sub: "Awaiting consult", icon: Clock, color: "border-l-orange-500", iconBg: "bg-orange-500/10", iconColor: "text-orange-600 dark:text-orange-400" },
-          { label: "Revenue", value: `K${weekStats?.revenue || 0}`, sub: "+12% vs last week", icon: Wallet, color: "border-l-purple-500", iconBg: "bg-purple-500/10", iconColor: "text-purple-600 dark:text-purple-400" },
+          { label: "Revenue", value: formatPrice(weekStats?.revenue || 0), sub: "+12% vs last week", icon: Wallet, color: "border-l-purple-500", iconBg: "bg-purple-500/10", iconColor: "text-purple-600 dark:text-purple-400" },
         ].map((stat) => (
           <Card key={stat.label} className={`border-l-4 ${stat.color} min-w-[160px] flex-1 snap-start`}>
             <CardContent className="p-3 sm:p-4">
