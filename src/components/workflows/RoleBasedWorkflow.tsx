@@ -7,6 +7,7 @@ import { HealthPersonnelWorkflow } from './HealthPersonnelWorkflow';
 import { DoctorWorkflow } from './DoctorWorkflow';
 import { AdminWorkflow } from './AdminWorkflow';
 import { InstitutionAdminWorkflow } from './InstitutionAdminWorkflow';
+import { InstitutionStaffWorkflow } from './InstitutionStaffWorkflow';
 import { PharmacyWorkflow } from './PharmacyWorkflow';
 import { PharmacistWorkflow } from './PharmacistWorkflow';
 import { LabWorkflow } from './LabWorkflow';
