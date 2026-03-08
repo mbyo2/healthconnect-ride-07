@@ -102,9 +102,9 @@ Provide:
         throw new Error('Invalid analysis type');
     }
 
-    console.log('Calling MedGemma with prompt:', prompt);
+    console.log('Calling AI health analysis...');
 
-    // Call MedGemma via Hugging Face
+    // Call AI model via Hugging Face
     const response = await hf.textGeneration({
       model: 'google/medgemma-7b',
       inputs: `${systemContext}\n\n${prompt}`,
