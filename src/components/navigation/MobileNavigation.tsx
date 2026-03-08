@@ -133,7 +133,7 @@ export const MobileNavigation = ({ setIsMenuOpen, navigate }: MobileNavigationPr
         { to: "/lab-management", label: "Lab Dashboard", icon: <Activity className="mr-2 h-5 w-5" /> },
         { to: "/medical-records", label: "Records", icon: <Heart className="mr-2 h-5 w-5" /> },
         { to: "/connections", label: "Patients", icon: <Users className="mr-2 h-5 w-5" /> },
-        { to: "/wallet", label: "Revenue", icon: <Wallet className="mr-2 h-5 w-5" /> },
+        ...(!isInstitutionAffiliated ? [{ to: "/wallet", label: "Revenue", icon: <Wallet className="mr-2 h-5 w-5" /> }] : []),
       ];
     }
 
