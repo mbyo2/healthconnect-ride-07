@@ -207,16 +207,16 @@ export const DeliveryCalculator = ({ product, quantity, onDeliverySelect }: Deli
         </div>
 
         {/* Safety Notice */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+        <div className="bg-primary/5 border border-primary/20 rounded-lg p-3">
           <div className="flex items-start gap-2">
-            <AlertTriangle className="h-4 w-4 text-blue-600 mt-0.5" />
+            <AlertTriangle className="h-4 w-4 text-primary mt-0.5" />
             <div className="text-sm">
-              <p className="font-medium text-blue-800">Delivery Safety Notice</p>
-              <p className="text-blue-700">
+              <p className="font-medium text-foreground">Delivery Safety Notice</p>
+              <p className="text-muted-foreground">
                 • ID verification required for prescription medications<br/>
                 • Secure packaging ensures medication integrity<br/>
                 • Contact {' '}
-                <a href="tel:+260977123456" className="underline font-medium">
+                <a href="tel:+260977123456" className="underline font-medium text-primary">
                   +260 977 123456
                 </a> for delivery tracking
               </p>
