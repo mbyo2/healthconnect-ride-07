@@ -333,8 +333,14 @@ export const Auth = () => {
                     <FormField control={providerForm.control} name="specialty" render={({ field }) => (
                       <FormItem><FormLabel className="text-xs">Specialty (optional)</FormLabel><FormControl><Input {...field} placeholder="e.g. Cardiology, Pediatrics" /></FormControl></FormItem>
                     )} />
-                    <FormField control={providerForm.control} name="licenseNumber" render={({ field }) => (
-                      <FormItem><FormLabel className="text-xs">License / Registration Number</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                    <div className="grid grid-cols-2 gap-2">
+                      <FormField control={providerForm.control} name="licenseNumber" render={({ field }) => (
+                        <FormItem><FormLabel className="text-xs">License / Reg. Number</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                      )} />
+                      <FormField control={providerForm.control} name="yearsExperience" render={({ field }) => (
+                        <FormItem><FormLabel className="text-xs">Years Experience</FormLabel><FormControl><Input {...field} type="number" min="0" placeholder="e.g. 5" /></FormControl></FormItem>
+                      )} />
+                    </div>
                     )} />
                     <FormField control={providerForm.control} name="email" render={({ field }) => (
                       <FormItem><FormLabel className="text-xs">Email</FormLabel><FormControl><Input {...field} type="email" /></FormControl><FormMessage /></FormItem>
