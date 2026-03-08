@@ -9,6 +9,7 @@ import { AccessibilityProvider } from '@/context/AccessibilityContext';
 import { RouteGuard } from '@/components/auth/RouteGuard';
 import { useRoutePrefetch, useInitializePrefetch } from '@/hooks/use-route-prefetch';
 import { useAndroidBackButton } from '@/hooks/use-android-back-button';
+import { usePageTracking } from '@/hooks/use-analytics';
 
 // Retry wrapper for lazy imports to handle stale chunk errors
 const lazyWithRetry = (importFn: () => Promise<any>) =>
