@@ -112,7 +112,7 @@ export const DesktopNavigation = () => {
       { to: "/marketplace", label: "Buy Medicine", icon: <Pill className="h-5 w-5 mr-2" /> },
       { to: "/settings", label: "Settings", icon: <Settings className="h-5 w-5 mr-2" /> },
     ];
-  }, [isAuthenticated, isHealthPersonnel, isAdmin, isPatient, availableRoles]);
+  }, [isAuthenticated, isHealthPersonnel, isAdmin, isPatient, availableRoles, isInstitutionAffiliated]);
 
   return (
     <div className="hidden md:flex items-center space-x-2">
