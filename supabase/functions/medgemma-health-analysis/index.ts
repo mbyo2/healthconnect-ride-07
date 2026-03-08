@@ -124,7 +124,7 @@ Provide:
       timestamp: new Date().toISOString(),
       model: 'doc-oclock-ai',
       analysisType,
-      confidence: 0.85, // MedGemma provides high-quality medical analysis
+      confidence: 0.85,
       disclaimer: 'This analysis is for informational purposes only and does not constitute medical advice. Always consult with a qualified healthcare professional for medical decisions.'
     };
 
