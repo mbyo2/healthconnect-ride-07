@@ -7,7 +7,7 @@ import { useSuccessFeedback } from '@/hooks/use-success-feedback';
 import {
   MonitorDot, Calendar, Users, FileText, Settings,
   ClipboardList, MessageSquare, Brain, Wallet,
-  Image, Scan, Activity
+  Image, Scan, Activity, Megaphone, Code2, Bell, CreditCard
 } from 'lucide-react';
 
 export const RadiologistWorkflow = () => {
@@ -31,6 +31,10 @@ export const RadiologistWorkflow = () => {
     { title: "Patient Records", description: "Clinical context for readings", icon: <Users className="h-5 w-5" />, route: '/connections' },
     { title: "Performance Analytics", description: "TAT, volume & accuracy metrics", icon: <Activity className="h-5 w-5" />, route: '/health-analytics' },
     { title: "Earnings & Wallet", description: "Reading fees & payouts", icon: <Wallet className="h-5 w-5" />, route: '/wallet' },
+    { title: "Promote Practice", description: "Sponsored listings & growth tools", icon: <Megaphone className="h-5 w-5" />, route: '/provider-dashboard' },
+    { title: "Booking Widget", description: "Embed booking on your website", icon: <Code2 className="h-5 w-5" />, route: '/provider-dashboard' },
+    { title: "Patient Waitlist", description: "Manage waitlisted patients", icon: <Bell className="h-5 w-5" />, route: '/provider-dashboard' },
+    { title: "Insurance Verification", description: "Verify patient insurance cards", icon: <CreditCard className="h-5 w-5" />, route: '/appointments' },
     { title: "Professional Profile", description: "Credentials & subspecialties", icon: <MonitorDot className="h-5 w-5" />, route: '/profile' },
     { title: "Settings", description: "Display & reading preferences", icon: <Settings className="h-5 w-5" />, route: '/settings' },
   ];

@@ -6,7 +6,8 @@ import { useNavigate } from 'react-router-dom';
 import { useSuccessFeedback } from '@/hooks/use-success-feedback';
 import {
   Package, Pill, ShoppingCart, FileText, Truck, Settings,
-  BarChart3, Users, Shield, AlertTriangle, Wallet, ClipboardList
+  BarChart3, Users, Shield, AlertTriangle, Wallet, ClipboardList,
+  Megaphone, CreditCard
 } from 'lucide-react';
 
 export const PharmacistWorkflow = () => {
@@ -30,6 +31,8 @@ export const PharmacistWorkflow = () => {
     { title: "Customer Records", description: "Patient medication history", icon: <Users className="h-5 w-5" />, route: '/connections' },
     { title: "Medication Guide", description: "Drug information & patient counseling", icon: <Pill className="h-5 w-5" />, route: '/medications' },
     { title: "Sales Analytics", description: "Revenue, top sellers & trends", icon: <BarChart3 className="h-5 w-5" />, route: '/pharmacy-portal' },
+    { title: "Promote Pharmacy", description: "Sponsored listings & visibility", icon: <Megaphone className="h-5 w-5" />, route: '/pharmacy-portal' },
+    { title: "Insurance Verification", description: "Verify patient insurance for Rx", icon: <CreditCard className="h-5 w-5" />, route: '/prescriptions' },
     { title: "Earnings & Wallet", description: "Revenue & payment management", icon: <Wallet className="h-5 w-5" />, route: '/wallet' },
     { title: "Settings", description: "Pharmacy preferences & profile", icon: <Settings className="h-5 w-5" />, route: '/settings' },
   ];

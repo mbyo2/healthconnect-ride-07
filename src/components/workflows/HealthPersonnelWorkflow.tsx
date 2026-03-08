@@ -7,7 +7,7 @@ import { useSuccessFeedback } from '@/hooks/use-success-feedback';
 import { 
   Stethoscope, Calendar, Users, FileText, Settings,
   ClipboardList, MessageSquare, Brain, Wallet, AlertTriangle,
-  Shield, Video, Activity, Pill, Bug
+  Shield, Video, Activity, Pill, Bug, Megaphone, Code2, Bell, CreditCard
 } from 'lucide-react';
 
 export const HealthPersonnelWorkflow = () => {
@@ -34,6 +34,11 @@ export const HealthPersonnelWorkflow = () => {
     { title: "Health Analytics", description: "Patient trends & clinical outcomes", icon: <Activity className="h-5 w-5" />, route: '/health-analytics' },
     { title: "Earnings & Wallet", description: "View consultations revenue and payouts", icon: <Wallet className="h-5 w-5" />, route: '/wallet' },
     { title: "Emergency Protocols", description: "Emergency response tools", icon: <AlertTriangle className="h-5 w-5" />, route: '/emergency' },
+    { title: "Promote Practice", description: "Sponsored listings & growth tools", icon: <Megaphone className="h-5 w-5" />, route: '/provider-dashboard' },
+    { title: "Booking Widget", description: "Embed booking on your website", icon: <Code2 className="h-5 w-5" />, route: '/provider-dashboard' },
+    { title: "Patient Waitlist", description: "Manage waitlisted patients", icon: <Bell className="h-5 w-5" />, route: '/provider-dashboard' },
+    { title: "Appointment Reminders", description: "Automated SMS/email reminders", icon: <Bell className="h-5 w-5" />, route: '/appointments' },
+    { title: "Insurance Verification", description: "Verify patient insurance cards", icon: <CreditCard className="h-5 w-5" />, route: '/appointments' },
     { title: "Professional Profile", description: "Credentials, specializations & bio", icon: <Stethoscope className="h-5 w-5" />, route: '/profile' },
     { title: "Settings", description: "Configure practice preferences", icon: <Settings className="h-5 w-5" />, route: '/settings' },
   ];

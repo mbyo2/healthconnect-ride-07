@@ -8,7 +8,7 @@ import {
   Heart, Calendar, Users, FileText, Settings,
   ClipboardList, MessageSquare, Wallet, AlertTriangle,
   Activity, Thermometer, Home, Pill, Stethoscope,
-  Shield, Bug, Video
+  Shield, Bug, Video, Megaphone, Code2, Bell, CreditCard
 } from 'lucide-react';
 
 export const NurseWorkflow = () => {
@@ -37,6 +37,11 @@ export const NurseWorkflow = () => {
     { title: "Patient Chat", description: "Secure messaging with patients & doctors", icon: <MessageSquare className="h-5 w-5" />, route: '/chat' },
     { title: "Earnings & Wallet", description: "View consultation revenue and payouts", icon: <Wallet className="h-5 w-5" />, route: '/wallet' },
     { title: "Emergency Protocols", description: "Emergency response & first aid tools", icon: <AlertTriangle className="h-5 w-5" />, route: '/emergency' },
+    { title: "Promote Practice", description: "Sponsored listings & growth tools", icon: <Megaphone className="h-5 w-5" />, route: '/provider-dashboard' },
+    { title: "Booking Widget", description: "Embed booking on your website", icon: <Code2 className="h-5 w-5" />, route: '/provider-dashboard' },
+    { title: "Patient Waitlist", description: "Manage waitlisted patients", icon: <Bell className="h-5 w-5" />, route: '/provider-dashboard' },
+    { title: "Appointment Reminders", description: "Automated SMS/email reminders", icon: <Bell className="h-5 w-5" />, route: '/appointments' },
+    { title: "Insurance Verification", description: "Verify patient insurance cards", icon: <CreditCard className="h-5 w-5" />, route: '/appointments' },
     { title: "Professional Profile", description: "Nursing credentials & certifications", icon: <Stethoscope className="h-5 w-5" />, route: '/profile' },
     { title: "Settings", description: "Consultation & practice preferences", icon: <Settings className="h-5 w-5" />, route: '/settings' },
   ];

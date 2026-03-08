@@ -7,7 +7,7 @@ import { useUserRoles } from '@/context/UserRolesContext';
 import {
   ShieldCheck, Users, Settings, BarChart3, FileCheck,
   CreditCard, Building2, UserPlus, Activity, ClipboardList,
-  Bell, Bug, Shield, MessageSquare, Brain
+  Bell, Bug, Shield, MessageSquare, Brain, Megaphone
 } from 'lucide-react';
 
 export const AdminWorkflow = () => {
@@ -31,6 +31,10 @@ export const AdminWorkflow = () => {
     { title: "Notification Management", description: "Platform-wide announcements & alerts", icon: <Bell className="h-5 w-5" />, route: '/admin-dashboard', requiredSuperAdmin: false },
     { title: "Patient Feedback", description: "Satisfaction scores & improvement areas", icon: <MessageSquare className="h-5 w-5" />, route: '/admin-dashboard', requiredSuperAdmin: false },
     { title: "AI Diagnostics Monitor", description: "AI usage, accuracy & audit trail", icon: <Brain className="h-5 w-5" />, route: '/ai-diagnostics', requiredSuperAdmin: false },
+    { title: "Insurance Oversight", description: "Insurance verification stats & issues", icon: <CreditCard className="h-5 w-5" />, route: '/admin-dashboard', requiredSuperAdmin: false },
+    { title: "Waitlist Analytics", description: "Cancellation fill rates & wait times", icon: <Bell className="h-5 w-5" />, route: '/admin-dashboard', requiredSuperAdmin: false },
+    { title: "Promoted Listings", description: "Manage provider ad tiers & revenue", icon: <Megaphone className="h-5 w-5" />, route: '/admin-dashboard', requiredSuperAdmin: false },
+    { title: "Reminder System", description: "SMS/email reminder delivery & stats", icon: <Bell className="h-5 w-5" />, route: '/admin-dashboard', requiredSuperAdmin: false },
     { title: "Audit Logs", description: "System activity & change history", icon: <ClipboardList className="h-5 w-5" />, route: '/admin-dashboard', requiredSuperAdmin: false },
     { title: "Role Management", description: "Assign and manage user roles", icon: <Activity className="h-5 w-5" />, route: '/role-management', requiredSuperAdmin: true },
     { title: "Create Admin", description: "Create new admin accounts", icon: <UserPlus className="h-5 w-5" />, route: '/create-admin', requiredSuperAdmin: true },

@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSuccessFeedback } from '@/hooks/use-success-feedback';
 import {
   Headphones, MessageSquare, Users, Search, FileText,
-  Settings, ShieldCheck, ClipboardList, BarChart3
+  Settings, ShieldCheck, ClipboardList, BarChart3, CreditCard, Bell
 } from 'lucide-react';
 
 export const SupportWorkflow = () => {
@@ -25,6 +25,8 @@ export const SupportWorkflow = () => {
     { title: "User Accounts", description: "Account status & management", icon: <Users className="h-5 w-5" />, route: '/admin-dashboard' },
     { title: "Audit Trail", description: "View system activity logs", icon: <ClipboardList className="h-5 w-5" />, route: '/admin-dashboard' },
     { title: "Security Events", description: "Fraud alerts & suspicious activity", icon: <ShieldCheck className="h-5 w-5" />, route: '/admin-dashboard' },
+    { title: "Insurance Support", description: "Help users with insurance issues", icon: <CreditCard className="h-5 w-5" />, route: '/admin-dashboard' },
+    { title: "Waitlist Issues", description: "Manage waitlist complaints & escalations", icon: <Bell className="h-5 w-5" />, route: '/admin-dashboard' },
     { title: "Support Analytics", description: "Ticket volume & resolution metrics", icon: <BarChart3 className="h-5 w-5" />, route: '/admin-dashboard' },
     { title: "Settings", description: "Support preferences", icon: <Settings className="h-5 w-5" />, route: '/settings' },
   ];

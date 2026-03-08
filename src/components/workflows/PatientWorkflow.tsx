@@ -189,6 +189,68 @@ export const PatientWorkflow = React.memo(() => {
           </div>
         </div>
 
+        {/* ZocDoc Features - Insurance, Waitlist, Cost Estimator */}
+        <div>
+          <h2 className="text-lg sm:text-xl font-bold mb-4 px-1 text-foreground">Insurance & Scheduling</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+            <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer border border-border shadow-sm bg-card hover:-translate-y-1 active:scale-95" onClick={() => handleNavigation('/profile', 'Insurance Card Upload')}>
+              <CardHeader className="pb-2 md:pb-3">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 bg-teal-500/10 dark:bg-teal-500/20 rounded-lg group-hover:bg-teal-500/20 transition-colors">
+                    <CreditCard className="h-5 w-5 text-teal-600 dark:text-teal-400" />
+                  </div>
+                  <CardTitle className="text-xs sm:text-sm font-bold text-foreground">Insurance Card</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <CardDescription className="text-[11px] sm:text-xs font-medium">Upload & verify</CardDescription>
+              </CardContent>
+            </Card>
+
+            <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer border border-border shadow-sm bg-card hover:-translate-y-1 active:scale-95" onClick={() => handleNavigation('/marketplace-users', 'Cost Estimator')}>
+              <CardHeader className="pb-2 md:pb-3">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 bg-orange-500/10 dark:bg-orange-500/20 rounded-lg group-hover:bg-orange-500/20 transition-colors">
+                    <Shield className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                  </div>
+                  <CardTitle className="text-xs sm:text-sm font-bold text-foreground">Cost Estimate</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <CardDescription className="text-[11px] sm:text-xs font-medium">Know your costs</CardDescription>
+              </CardContent>
+            </Card>
+
+            <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer border border-border shadow-sm bg-card hover:-translate-y-1 active:scale-95" onClick={() => handleNavigation('/appointments', 'Waitlist')}>
+              <CardHeader className="pb-2 md:pb-3">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 bg-indigo-500/10 dark:bg-indigo-500/20 rounded-lg group-hover:bg-indigo-500/20 transition-colors">
+                    <Calendar className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+                  </div>
+                  <CardTitle className="text-xs sm:text-sm font-bold text-foreground">Waitlist</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <CardDescription className="text-[11px] sm:text-xs font-medium">Get early slots</CardDescription>
+              </CardContent>
+            </Card>
+
+            <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer border border-border shadow-sm bg-card hover:-translate-y-1 active:scale-95" onClick={() => handleNavigation('/appointments', 'Reminders')}>
+              <CardHeader className="pb-2 md:pb-3">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 bg-pink-500/10 dark:bg-pink-500/20 rounded-lg group-hover:bg-pink-500/20 transition-colors">
+                    <Activity className="h-5 w-5 text-pink-600 dark:text-pink-400" />
+                  </div>
+                  <CardTitle className="text-xs sm:text-sm font-bold text-foreground">Reminders</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <CardDescription className="text-[11px] sm:text-xs font-medium">Apt reminders</CardDescription>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
         {/* Connected Workflows */}
         <ConnectedWorkflows />
 
