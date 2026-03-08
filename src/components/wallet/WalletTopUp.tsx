@@ -14,6 +14,7 @@ export const WalletTopUp = () => {
     const { user } = useAuth();
     const [amount, setAmount] = useState<string>('50');
     const [isLoading, setIsLoading] = useState(false);
+    const { currency, getSymbol } = useCurrency();
 
     const handleTopUp = async () => {
         if (!user) {
