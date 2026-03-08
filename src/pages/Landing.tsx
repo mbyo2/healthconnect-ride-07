@@ -28,35 +28,33 @@ const Landing = () => {
       {/* ─── Sticky Header ─── */}
       <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between">
-            <AppLogo size="sm" linkTo="/landing" />
+          <div className="flex h-14 items-center justify-between gap-2">
+            <AppLogo size="sm" linkTo="/landing" className="shrink-0" />
 
-            <nav className="hidden md:flex items-center gap-1">
-              {["Find Doctors", "For Providers", "Emergency"].map((item) => (
+            <nav className="hidden md:flex items-center gap-1 shrink-0">
+              {[
+                { label: "Find Doctors", route: "/search" },
+                { label: "For Providers", route: "/healthcare-application" },
+                { label: "Emergency", route: "/emergency" },
+              ].map((item) => (
                 <Button
-                  key={item}
+                  key={item.label}
                   variant="ghost"
                   size="sm"
-                  className="text-muted-foreground hover:text-foreground font-medium"
-                  onClick={() =>
-                    navigate(
-                      item === "Find Doctors" ? "/search" :
-                      item === "For Providers" ? "/healthcare-application" :
-                      "/emergency"
-                    )
-                  }
+                  className="text-muted-foreground hover:text-foreground font-medium text-sm"
+                  onClick={() => navigate(item.route)}
                 >
-                  {item}
+                  {item.label}
                 </Button>
               ))}
             </nav>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 shrink-0">
               <ThemeToggle />
-              <Button variant="ghost" size="sm" onClick={() => navigate("/auth")} className="hidden sm:inline-flex">
+              <Button variant="ghost" size="sm" onClick={() => navigate("/auth")} className="hidden sm:inline-flex text-sm">
                 Sign In
               </Button>
-              <Button size="sm" onClick={() => navigate("/auth?tab=signup")}>
+              <Button size="sm" onClick={() => navigate("/auth?tab=signup")} className="text-sm">
                 Get Started
               </Button>
             </div>
