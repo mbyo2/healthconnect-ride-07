@@ -120,7 +120,7 @@ export const AccessibilityControls: React.FC = () => {
               <div className="mt-4 space-y-1">
                 <h3 className="font-semibold text-sm">Recommendations:</h3>
                 {accessibilityReport.recommendations.map((rec: string, index: number) => (
-                  <div key={index} className="text-sm text-gray-600">
+                  <div key={index} className="text-sm text-muted-foreground">
                     • {rec}
                   </div>
                 ))}
