@@ -95,6 +95,8 @@ export const PatientWorkflow = React.memo(() => {
   if (isWorkflowComplete) {
     return (
       <div className="space-y-6 md:space-y-8">
+        <ApplicationStatusBanner />
+        <ProfileCompleteBanner />
         {/* Welcome Section - Zambian focused */}
         <div className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-500 to-indigo-600 text-white py-6 md:py-10 rounded-2xl md:rounded-3xl shadow-xl">
           <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
