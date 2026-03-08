@@ -120,6 +120,13 @@ const AppContent = () => {
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/register" element={<Register />} />
+            {/* Public search & provider pages (ZocDoc-style) */}
+            <Route path="/search" element={<SearchPage />} />
+            <Route path="/providers" element={<Providers />} />
+            <Route path="/marketplace-users" element={<UserMarketplace />} />
+            <Route path="/provider/:id" element={<ProviderDetail />} />
+            <Route path="/emergency" element={<Emergency />} />
+            <Route path="/booking-confirmed" element={<RouteGuard><BookingConfirmed /></RouteGuard>} />
             <Route path="/reset-password" element={<Suspense fallback={<LoadingScreen />}><ResetPassword /></Suspense>} />
             <Route path="/login" element={<Navigate to="/auth" replace />} />
             <Route
