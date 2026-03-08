@@ -266,6 +266,8 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/chat',
     '/search',
     '/healthcare-application',
+    '/medical-records',     // view patient records for support
+    '/appointments',        // view appointments for support
   ],
 
   // ── Super Admin (everything) ─────────────────────────────
