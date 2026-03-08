@@ -68,7 +68,7 @@ export const MedicalHistory = () => {
         </div>
       ) : records.length === 0 ? (
         <Card>
-          <CardContent className="p-6 text-center text-muted-foreground">
+          <CardContent className="p-6 text-center text-muted-foregroundreground">
             No medical records found
           </CardContent>
         </Card>
@@ -80,7 +80,7 @@ export const MedicalHistory = () => {
                 <CardTitle className="text-lg">
                   {record.record_type}
                 </CardTitle>
-                <div className="text-sm text-gray-500">
+                <div className="text-muted-foregroundgray-500">
                   {new Date(record.date).toLocaleDateString()}
                 </div>
               </CardHeader>
