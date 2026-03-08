@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
 import { Loader2, DollarSign, CreditCard, ShieldCheck } from "lucide-react";
+import { useCurrency } from "@/hooks/use-currency";
 
 export const WalletTopUp = () => {
     const { user } = useAuth();
