@@ -85,7 +85,7 @@ export const MobileNavigation = ({ setIsMenuOpen, navigate }: MobileNavigationPr
         { to: "/chat", label: "Messages", icon: <MessageSquare className="mr-2 h-5 w-5" /> },
         { to: "/ai-diagnostics", label: "AI Assistant", icon: <Brain className="mr-2 h-5 w-5" /> },
         { to: "/connections", label: "My Patients", icon: <Users className="mr-2 h-5 w-5" /> },
-        { to: "/wallet", label: "Earnings", icon: <Wallet className="mr-2 h-5 w-5" /> },
+        ...(!isInstitutionAffiliated ? [{ to: "/wallet", label: "Earnings", icon: <Wallet className="mr-2 h-5 w-5" /> }] : []),
         { to: "/emergency", label: "Emergency", icon: <AlertTriangle className="mr-2 h-5 w-5" /> },
       ];
     }
