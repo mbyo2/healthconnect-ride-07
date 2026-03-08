@@ -145,8 +145,8 @@ const IoTMonitoring = () => {
                                             <div className="p-3 rounded-full bg-blue-100 dark:bg-blue-900/30">
                                                 <Icon className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                                             </div>
-                                            <div className="p-3 rounded-full bg-gray-100 dark:bg-gray-800/30">
-                                                {React.createElement(getConnectionIcon(device.connection_type), { className: "w-4 h-4 text-gray-600 dark:text-gray-400" })}
+                                            <div className="p-3 rounded-full bg-muted">
+                                                {React.createElement(getConnectionIcon(device.connection_type), { className: "w-4 h-4 text-muted-foreground" })}
                                             </div>
                                         </div>
                                         <Badge variant={device.is_active ? 'default' : 'secondary'}>

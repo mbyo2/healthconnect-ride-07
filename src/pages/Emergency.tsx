@@ -206,7 +206,7 @@ const Emergency = () => {
                   placeholder="Describe your emergency situation (optional)"
                   value={emergencyMessage}
                   onChange={(e) => setEmergencyMessage(e.target.value)}
-                  className="min-h-20 bg-white dark:bg-background"
+                  className="min-h-20 bg-background"
                 />
 
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">

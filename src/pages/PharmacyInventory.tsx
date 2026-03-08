@@ -102,7 +102,7 @@ const PharmacyInventory = () => {
       case "Out of Stock":
         return "bg-red-100 dark:bg-red-950/20 text-red-800 dark:text-red-200";
       default:
-        return "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200";
+        return "bg-muted text-muted-foreground";
     }
   };
 

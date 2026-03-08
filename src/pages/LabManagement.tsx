@@ -187,7 +187,7 @@ const LabManagement = () => {
         if (priority === 'urgent' || priority === 'stat') {
             return <AlertCircle className="h-4 w-4 text-red-500 dark:text-red-400" />;
         }
-        return <Clock className="h-4 w-4 text-gray-400 dark:text-gray-500" />;
+        return <Clock className="h-4 w-4 text-muted-foreground" />;
     };
 
     return (
