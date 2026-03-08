@@ -41,7 +41,7 @@ export const NetworkErrorBoundary = ({
   if (hasError && !isOnline) {
     return fallbackComponent || (
       <div className="p-4 border rounded-lg bg-background shadow-sm">
-        <Alert variant="destructive" className="border-red-200 bg-red-50 dark:bg-red-950/30 dark:border-red-800">
+        <Alert variant="destructive" className="border-destructive/30 bg-destructive/5">
           <WifiOff className="h-4 w-4" />
           <AlertTitle>Network Error</AlertTitle>
           <AlertDescription className="mt-2">
@@ -49,7 +49,7 @@ export const NetworkErrorBoundary = ({
             <Button 
               onClick={handleRetry}
               variant="outline" 
-              className="flex items-center gap-2 bg-white dark:bg-gray-800"
+              className="flex items-center gap-2 bg-card"
             >
               <RefreshCw className="h-4 w-4" />
               Try Again
@@ -63,7 +63,7 @@ export const NetworkErrorBoundary = ({
   if (isOnline && connectionQuality === "poor") {
     return (
       <>
-        <Alert className="mb-4 border-yellow-200 bg-yellow-50 dark:bg-yellow-950/30 dark:border-yellow-800">
+        <Alert className="mb-4 border-warning/30 bg-warning/5">
           <Wifi className="h-4 w-4" />
           <AlertTitle>Slow Connection</AlertTitle>
           <AlertDescription>

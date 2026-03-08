@@ -100,24 +100,25 @@ export const DeliveryCalculator = ({ product, quantity, onDeliverySelect }: Deli
 
   if (!canBeDelivered(product)) {
     return (
-      <Card className="border-orange-200 bg-orange-50">
+      <Card className="border-orange-500/30 bg-orange-500/5">
         <CardHeader>
-          <CardTitle className="text-orange-800 flex items-center gap-2">
+          <CardTitle className="text-orange-700 dark:text-orange-400 flex items-center gap-2">
             <AlertTriangle className="h-5 w-5" />
             Pharmacy Pickup Required
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-orange-700 mb-4">
+          <p className="text-orange-600 dark:text-orange-300 mb-4">
             {getRestrictionReason(product)}
           </p>
-          <div className="flex items-center gap-2 text-sm text-orange-600">
+          <div className="flex items-center gap-2 text-sm text-orange-600 dark:text-orange-400">
             <MapPin className="h-4 w-4" />
             Available for pickup at participating pharmacies
           </div>
           <Button
             onClick={selectPickup}
-            className="w-full mt-4 bg-orange-600 hover:bg-orange-700"
+            className="w-full mt-4"
+            variant="destructive"
           >
             Select Pharmacy Pickup (Free)
           </Button>
@@ -141,10 +142,10 @@ export const DeliveryCalculator = ({ product, quantity, onDeliverySelect }: Deli
           {deliveryZones.map((zone) => (
             <div
               key={zone.id}
-              className={`border rounded-lg p-4 cursor-pointer transition-colors ${
+            className={`border rounded-lg p-4 cursor-pointer transition-colors ${
                 selectedZone === zone.id 
                   ? 'border-primary bg-primary/5' 
-                  : 'border-gray-200 hover:border-gray-300'
+                  : 'border-border hover:border-muted-foreground/30'
               }`}
               onClick={() => selectDeliveryOption(zone)}
             >
@@ -190,7 +191,7 @@ export const DeliveryCalculator = ({ product, quantity, onDeliverySelect }: Deli
           className={`border rounded-lg p-4 cursor-pointer transition-colors ${
             selectedZone === 'pickup' 
               ? 'border-primary bg-primary/5' 
-              : 'border-gray-200 hover:border-gray-300'
+              : 'border-border hover:border-muted-foreground/30'
           }`}
           onClick={selectPickup}
         >
@@ -206,16 +207,16 @@ export const DeliveryCalculator = ({ product, quantity, onDeliverySelect }: Deli
         </div>
 
         {/* Safety Notice */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+        <div className="bg-primary/5 border border-primary/20 rounded-lg p-3">
           <div className="flex items-start gap-2">
-            <AlertTriangle className="h-4 w-4 text-blue-600 mt-0.5" />
+            <AlertTriangle className="h-4 w-4 text-primary mt-0.5" />
             <div className="text-sm">
-              <p className="font-medium text-blue-800">Delivery Safety Notice</p>
-              <p className="text-blue-700">
+              <p className="font-medium text-foreground">Delivery Safety Notice</p>
+              <p className="text-muted-foreground">
                 • ID verification required for prescription medications<br/>
                 • Secure packaging ensures medication integrity<br/>
                 • Contact {' '}
-                <a href="tel:+260977123456" className="underline font-medium">
+                <a href="tel:+260977123456" className="underline font-medium text-primary">
                   +260 977 123456
                 </a> for delivery tracking
               </p>
@@ -225,12 +226,12 @@ export const DeliveryCalculator = ({ product, quantity, onDeliverySelect }: Deli
 
         {/* Emergency Contact */}
         {product.requires_prescription && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-            <div className="flex items-center gap-2 text-red-800">
+          <div className="bg-destructive/5 border border-destructive/20 rounded-lg p-3">
+            <div className="flex items-center gap-2 text-destructive">
               <Phone className="h-4 w-4" />
               <span className="font-medium">Prescription Required</span>
             </div>
-            <p className="text-sm text-red-700 mt-1">
+            <p className="text-sm text-muted-foreground mt-1">
               Valid prescription must be provided before delivery. 
               Our pharmacist will verify your prescription during delivery.
             </p>

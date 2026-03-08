@@ -82,7 +82,7 @@ export const ProviderReviews: React.FC<ProviderReviewsProps> = ({ providerId }) 
                 {[...Array(5)].map((_, i) => (
                   <Star
                     key={i}
-                    className={`w-4 h-4 ${i < review.rating ? "text-yellow-500 fill-yellow-500" : "text-gray-300"}`}
+                    className={`w-4 h-4 ${i < review.rating ? "text-yellow-500 fill-yellow-500" : "text-muted-foreground/30"}`}
                   />
                 ))}
               </div>

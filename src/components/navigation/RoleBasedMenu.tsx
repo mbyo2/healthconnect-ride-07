@@ -52,15 +52,15 @@ export const RoleBasedMenu: React.FC<RoleBasedMenuProps> = ({ className }) => {
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
       case 'admin':
-        return 'bg-purple-100 text-purple-800 border-purple-200';
+        return 'bg-purple-500/10 text-purple-700 dark:text-purple-400 border-purple-500/20';
       case 'health_personnel':
-        return 'bg-blue-100 text-blue-800 border-blue-200';
+        return 'bg-primary/10 text-primary border-primary/20';
       case 'pharmacy':
-        return 'bg-green-100 text-green-800 border-green-200';
+        return 'bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20';
       case 'institution_admin':
-        return 'bg-orange-100 text-orange-800 border-orange-200';
+        return 'bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/20';
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+        return 'bg-muted text-muted-foreground border-border';
     }
   };
 

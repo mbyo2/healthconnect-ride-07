@@ -98,27 +98,28 @@ export const PatientWorkflow = React.memo(() => {
         <ApplicationStatusBanner />
         <ProfileCompleteBanner />
         {/* Welcome Section */}
-        <div className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-500 to-indigo-600 text-white py-6 md:py-10 rounded-2xl md:rounded-3xl shadow-xl">
-          <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-48 h-48 bg-blue-400/20 rounded-full blur-2xl" />
+        <div className="relative overflow-hidden bg-gradient-to-br from-primary via-primary to-primary/80 text-primary-foreground py-6 md:py-10 rounded-2xl md:rounded-3xl shadow-xl">
+          <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-primary-foreground/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-48 h-48 bg-primary-foreground/5 rounded-full blur-2xl" />
 
           <div className="relative px-4 md:px-8">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 md:gap-6">
               <div className="space-y-2">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 mb-2">
-                  <Sparkles className="h-3.5 w-3.5 text-blue-100" />
-                  <span className="text-[10px] md:text-xs font-semibold uppercase tracking-wider text-blue-50">Welcome back!</span>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-foreground/10 backdrop-blur-md border border-primary-foreground/20 mb-2">
+                  <Sparkles className="h-3.5 w-3.5 text-primary-foreground/80" />
+                  <span className="text-[10px] md:text-xs font-semibold uppercase tracking-wider text-primary-foreground/90">Welcome back!</span>
                 </div>
                 <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight">
                   Your Health Dashboard
                 </h1>
-                <p className="text-blue-100/90 text-sm md:text-base max-w-md">
+                <p className="text-primary-foreground/80 text-sm md:text-base max-w-md">
                   Quality healthcare at your fingertips. Anywhere, anytime.
                 </p>
               </div>
               <Button
                 onClick={() => handleNavigation('/emergency', 'Emergency')}
-                className="flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg font-bold shadow-lg transition-all active:scale-95 w-full sm:w-auto justify-center text-white border-0"
+                variant="destructive"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg font-bold shadow-lg transition-all active:scale-95 w-full sm:w-auto justify-center"
               >
                 <Phone className="h-4 w-4" />
                 Emergency Help
