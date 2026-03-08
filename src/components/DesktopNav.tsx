@@ -211,7 +211,7 @@ export function DesktopNav() {
       { to: "/profile", label: "My Profile", icon: <User className="h-4 w-4 mr-2" /> },
       { to: "/settings", label: "Settings", icon: <Settings className="h-4 w-4 mr-2" /> },
     ];
-  }, [isHealthPersonnel, isAdmin, availableRoles]);
+  }, [isHealthPersonnel, isAdmin, availableRoles, isInstitutionAffiliated]);
 
   return (
     <header className="bg-background sticky top-0 z-50 border-b border-border" role="banner">

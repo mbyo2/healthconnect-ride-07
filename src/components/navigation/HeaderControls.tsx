@@ -32,6 +32,7 @@ interface HeaderControlsProps {
 export const HeaderControls = ({ isMenuOpen, setIsMenuOpen, navigate }: HeaderControlsProps) => {
   const { isAuthenticated, signOut, profile, user } = useAuth();
   const { availableRoles, isHealthPersonnel, isAdmin } = useUserRoles();
+  const { isInstitutionAffiliated } = useInstitutionAffiliation();
 
   const handleLogout = async () => {
     try {
