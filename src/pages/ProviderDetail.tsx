@@ -41,12 +41,24 @@ const ProviderDetail = () => {
 
       if (error) throw error;
       
-      // Map database response to Provider type
-      const mapped: Provider & { provider_statistics?: any[] } = {
-        ...data,
-        accepted_insurances: data.accepted_insurances || [],
-      };
-      return mapped;
+      // Map database response to Provider type, handling location type mismatch
+      return {
+        id: data.id,
+        first_name: data.first_name || '',
+        last_name: data.last_name || '',
+        specialty: data.specialty || '',
+        bio: data.bio,
+        avatar_url: data.avatar_url,
+        expertise: data.expertise,
+        address: data.address,
+        city: data.city,
+        state: data.state,
+        phone: data.phone,
+        email: data.email,
+        rating: data.rating,
+        accepted_insurances: data.accepted_insurances,
+        provider_statistics: data.provider_statistics,
+      } as Provider & { provider_statistics?: any[] };
     },
     enabled: !!id,
   });
