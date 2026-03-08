@@ -4827,6 +4827,50 @@ export type Database = {
         }
         Relationships: []
       }
+      revenue_events: {
+        Row: {
+          amount: number
+          created_at: string | null
+          currency: string
+          event_type: string
+          id: string
+          metadata: Json | null
+          plan_id: string | null
+          source: string
+          user_id: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          currency?: string
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          plan_id?: string | null
+          source: string
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          currency?: string
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          plan_id?: string | null
+          source?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "revenue_events_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reviews: {
         Row: {
           comment: string | null
@@ -5170,6 +5214,60 @@ export type Database = {
           },
         ]
       }
+      subscription_plans: {
+        Row: {
+          created_at: string | null
+          currency: string
+          description: string | null
+          features: Json
+          highlight: boolean
+          id: string
+          is_active: boolean
+          limits: Json | null
+          name: string
+          price_annual: number
+          price_monthly: number
+          slug: string
+          sort_order: number
+          target_audience: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          currency?: string
+          description?: string | null
+          features?: Json
+          highlight?: boolean
+          id?: string
+          is_active?: boolean
+          limits?: Json | null
+          name: string
+          price_annual?: number
+          price_monthly?: number
+          slug: string
+          sort_order?: number
+          target_audience: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          currency?: string
+          description?: string | null
+          features?: Json
+          highlight?: boolean
+          id?: string
+          is_active?: boolean
+          limits?: Json | null
+          name?: string
+          price_annual?: number
+          price_monthly?: number
+          slug?: string
+          sort_order?: number
+          target_audience?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       suppliers: {
         Row: {
           address: string | null
@@ -5463,6 +5561,68 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      user_subscriptions: {
+        Row: {
+          billing_cycle: string
+          cancel_at_period_end: boolean | null
+          cancelled_at: string | null
+          created_at: string | null
+          current_period_end: string
+          current_period_start: string
+          external_subscription_id: string | null
+          id: string
+          metadata: Json | null
+          payment_method: string | null
+          plan_id: string
+          status: string
+          trial_end: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          billing_cycle?: string
+          cancel_at_period_end?: boolean | null
+          cancelled_at?: string | null
+          created_at?: string | null
+          current_period_end: string
+          current_period_start?: string
+          external_subscription_id?: string | null
+          id?: string
+          metadata?: Json | null
+          payment_method?: string | null
+          plan_id: string
+          status?: string
+          trial_end?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          billing_cycle?: string
+          cancel_at_period_end?: boolean | null
+          cancelled_at?: string | null
+          created_at?: string | null
+          current_period_end?: string
+          current_period_start?: string
+          external_subscription_id?: string | null
+          id?: string
+          metadata?: Json | null
+          payment_method?: string | null
+          plan_id?: string
+          status?: string
+          trial_end?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_subscriptions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_two_factor: {
         Row: {
