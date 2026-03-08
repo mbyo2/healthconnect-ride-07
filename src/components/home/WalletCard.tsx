@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { useCurrency } from "@/hooks/use-currency";
 
 export const WalletCard = () => {
     const { user } = useAuth();
