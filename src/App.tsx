@@ -83,6 +83,7 @@ const InstitutionPatients = lazyWithRetry(() => import('@/pages/InstitutionPatie
 const InstitutionReports = lazyWithRetry(() => import('@/pages/InstitutionReports'));
 const InstitutionAppointments = lazyWithRetry(() => import('@/pages/InstitutionAppointments'));
 const InstitutionSettings = lazyWithRetry(() => import('@/pages/InstitutionSettings'));
+const InstitutionDevices = lazyWithRetry(() => import('@/pages/InstitutionDevices'));
 const AppointmentDetails = lazyWithRetry(() => import('@/pages/AppointmentDetails'));
 const Wallet = lazyWithRetry(() => import('@/pages/Wallet'));
 const ProviderPortal = lazyWithRetry(() => import('@/pages/ProviderPortal'));
