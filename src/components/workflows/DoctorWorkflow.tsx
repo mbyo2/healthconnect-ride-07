@@ -7,7 +7,7 @@ import { useSuccessFeedback } from '@/hooks/use-success-feedback';
 import {
   Stethoscope, Calendar, Users, FileText, Settings,
   ClipboardList, MessageSquare, Brain, Wallet, AlertTriangle,
-  Shield, Bug, Pill, Video, Activity
+  Shield, Bug, Pill, Video, Activity, Megaphone, Code2, Bell
 } from 'lucide-react';
 
 export const DoctorWorkflow = () => {
@@ -36,6 +36,9 @@ export const DoctorWorkflow = () => {
     { title: "Earnings & Wallet", description: "Consultation revenue & payouts", icon: <Wallet className="h-5 w-5" />, route: '/wallet' },
     { title: "Emergency Protocols", description: "Emergency response tools", icon: <AlertTriangle className="h-5 w-5" />, route: '/emergency' },
     { title: "Professional Profile", description: "Credentials, specializations & bio", icon: <Stethoscope className="h-5 w-5" />, route: '/profile' },
+    { title: "Promote Practice", description: "Sponsored listings & growth tools", icon: <Megaphone className="h-5 w-5" />, route: '/provider-dashboard' },
+    { title: "Booking Widget", description: "Embed booking on your website", icon: <Code2 className="h-5 w-5" />, route: '/provider-dashboard' },
+    { title: "Patient Waitlist", description: "Manage waitlisted patients", icon: <Bell className="h-5 w-5" />, route: '/provider-dashboard' },
     { title: "Settings", description: "Practice preferences", icon: <Settings className="h-5 w-5" />, route: '/settings' },
   ];
 
