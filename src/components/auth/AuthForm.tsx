@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { PhoneOTPLogin } from './PhoneOTPLogin';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import type { AuthSession } from '@supabase/supabase-js';
