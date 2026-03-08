@@ -24,6 +24,25 @@ Deno.serve(async (req) => {
     const { patientId, resourceTypes } = await req.json();
     const targetId = patientId || user.id;
 
+    // SECURITY: Only allow exporting own data, or if user is a provider with an appointment relationship
+    if (targetId !== user.id) {
+      const { data: appointment } = await supabase
+        .from('appointments')
+        .select('id')
+        .eq('provider_id', user.id)
+        .eq('patient_id', targetId)
+        .limit(1)
+        .maybeSingle();
+      
+      if (!appointment) {
+        const { data: profile } = await supabase.from('profiles').select('role, admin_level').eq('id', user.id).single();
+        const isAdmin = profile?.admin_level === 'admin' || profile?.admin_level === 'superadmin';
+        if (!isAdmin) {
+          throw new Error('Unauthorized: You do not have access to this patient\'s records');
+        }
+      }
+    }
+
     // Get profile
     const { data: profile } = await supabase.from('profiles').select('*').eq('id', targetId).single();
 
