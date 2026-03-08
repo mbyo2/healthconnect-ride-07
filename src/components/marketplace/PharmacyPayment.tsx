@@ -67,7 +67,7 @@ export const PharmacyPayment = ({ order, onPaymentSuccess }: PharmacyPaymentProp
         <div className="space-y-2">
           <div className="flex justify-between">
             <span>Order Total:</span>
-            <span className="font-medium">${(order?.total_amount ?? 0).toFixed(2)}</span>
+            <span className="font-medium">{formatPrice(order?.total_amount ?? 0)}</span>
           </div>
           <div className="flex justify-between text-sm text-muted-foreground">
             <span>Pharmacy Commission (5%):</span>
