@@ -7,7 +7,7 @@ export const BrowseSpecialties = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="py-14 md:py-20">
+    <section className="py-12 md:py-14 lg:py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-10">
           <p className="text-sm font-semibold text-primary uppercase tracking-widest mb-3">Specialties</p>
@@ -45,7 +45,7 @@ export const CTASection = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="py-14 md:py-20">
+    <section className="py-12 md:py-14 lg:py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="relative rounded-3xl overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary to-primary/80" />
