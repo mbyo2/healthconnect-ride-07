@@ -61,7 +61,7 @@ export default function HealthDashboard() {
       case "down":
         return <TrendingDown className="h-4 w-4 text-red-600 dark:text-red-400" />;
       default:
-        return <Minus className="h-4 w-4 text-gray-600 dark:text-gray-400" />;
+        return <Minus className="h-4 w-4 text-muted-foreground" />;
     }
   };
 
@@ -76,7 +76,7 @@ export default function HealthDashboard() {
       case "Alert":
         return "bg-red-100 dark:bg-red-950/20 text-red-800 dark:text-red-200";
       default:
-        return "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200";
+        return "bg-muted text-muted-foreground";
     }
   };
 

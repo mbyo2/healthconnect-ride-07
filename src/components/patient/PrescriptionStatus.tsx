@@ -63,15 +63,15 @@ export const PrescriptionStatus = () => {
   const getStatusBadge = (status?: string) => {
     switch (status) {
       case 'pending':
-        return <Badge variant="outline" className="bg-yellow-100 text-yellow-800">Pending</Badge>;
+        return <Badge variant="outline" className="bg-yellow-100 dark:bg-yellow-950/30 text-yellow-800 dark:text-yellow-200">Pending</Badge>;
       case 'processing':
-        return <Badge variant="outline" className="bg-blue-100 text-blue-800">Being Processed</Badge>;
+        return <Badge variant="outline" className="bg-blue-100 dark:bg-blue-950/30 text-blue-800 dark:text-blue-200">Being Processed</Badge>;
       case 'fulfilled':
-        return <Badge variant="outline" className="bg-green-100 text-green-800">Ready for Pickup</Badge>;
+        return <Badge variant="outline" className="bg-green-100 dark:bg-green-950/30 text-green-800 dark:text-green-200">Ready for Pickup</Badge>;
       case 'declined':
-        return <Badge variant="outline" className="bg-red-100 text-red-800">Not Available</Badge>;
+        return <Badge variant="outline" className="bg-red-100 dark:bg-red-950/30 text-red-800 dark:text-red-200">Not Available</Badge>;
       default:
-        return <Badge variant="outline" className="bg-gray-100">Unknown</Badge>;
+        return <Badge variant="outline" className="bg-muted text-muted-foreground">Unknown</Badge>;
     }
   };
 

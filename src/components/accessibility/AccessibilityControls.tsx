@@ -64,15 +64,15 @@ export const AccessibilityControls: React.FC = () => {
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 90) return 'text-green-600';
-    if (score >= 70) return 'text-yellow-600';
-    return 'text-red-600';
+    if (score >= 90) return 'text-green-600 dark:text-green-400';
+    if (score >= 70) return 'text-yellow-600 dark:text-yellow-400';
+    return 'text-red-600 dark:text-red-400';
   };
 
   const getScoreBadge = (score: number) => {
-    if (score >= 90) return <Badge className="bg-green-100 text-green-800">Excellent</Badge>;
-    if (score >= 70) return <Badge className="bg-yellow-100 text-yellow-800">Good</Badge>;
-    return <Badge className="bg-red-100 text-red-800">Needs Improvement</Badge>;
+    if (score >= 90) return <Badge className="bg-green-100 dark:bg-green-950/30 text-green-800 dark:text-green-200">Excellent</Badge>;
+    if (score >= 70) return <Badge className="bg-yellow-100 dark:bg-yellow-950/30 text-yellow-800 dark:text-yellow-200">Good</Badge>;
+    return <Badge className="bg-red-100 dark:bg-red-950/30 text-red-800 dark:text-red-200">Needs Improvement</Badge>;
   };
 
   return (
@@ -120,7 +120,7 @@ export const AccessibilityControls: React.FC = () => {
               <div className="mt-4 space-y-1">
                 <h3 className="font-semibold text-sm">Recommendations:</h3>
                 {accessibilityReport.recommendations.map((rec: string, index: number) => (
-                  <div key={index} className="text-sm text-gray-600">
+                  <div key={index} className="text-sm text-muted-foreground">
                     • {rec}
                   </div>
                 ))}
@@ -306,7 +306,7 @@ export const AccessibilityControls: React.FC = () => {
               </Button>
             </div>
             {voiceControlActive && (
-              <div className="text-xs text-gray-600 bg-blue-50 p-2 rounded">
+              <div className="text-xs text-muted-foreground bg-primary/5 p-2 rounded">
                 Voice commands: "click", "scroll down", "scroll up", "go back", "search for [term]"
               </div>
             )}
@@ -338,7 +338,7 @@ export const AccessibilityControls: React.FC = () => {
             />
           </div>
 
-          <div className="text-xs text-gray-600 space-y-1">
+          <div className="text-xs text-muted-foreground space-y-1">
             <div><strong>Keyboard Shortcuts:</strong></div>
             <div>• Ctrl+Alt+H: Navigate to next heading</div>
             <div>• Ctrl+Alt+L: Navigate to next landmark</div>

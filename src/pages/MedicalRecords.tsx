@@ -55,9 +55,9 @@ export default function MedicalRecords() {
       case "Active":
         return "bg-blue-100 dark:bg-blue-950/20 text-blue-800 dark:text-blue-200";
       case "Complete":
-        return "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200";
+        return "bg-muted text-muted-foreground";
       default:
-        return "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200";
+        return "bg-muted text-muted-foreground";
     }
   };
 

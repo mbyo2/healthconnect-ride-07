@@ -37,11 +37,11 @@ interface Prescription {
 }
 
 const statusConfig = {
-  pending: { label: 'Pending', className: 'bg-yellow-100 text-yellow-800', icon: Clock },
-  filled: { label: 'Filled', className: 'bg-green-100 text-green-800', icon: CheckCircle },
-  partially_filled: { label: 'Partially Filled', className: 'bg-blue-100 text-blue-800', icon: RefreshCw },
-  cancelled: { label: 'Cancelled', className: 'bg-red-100 text-red-800', icon: AlertTriangle },
-  expired: { label: 'Expired', className: 'bg-gray-100 text-gray-800', icon: AlertTriangle }
+  pending: { label: 'Pending', className: 'bg-yellow-100 dark:bg-yellow-950/30 text-yellow-800 dark:text-yellow-200', icon: Clock },
+  filled: { label: 'Filled', className: 'bg-green-100 dark:bg-green-950/30 text-green-800 dark:text-green-200', icon: CheckCircle },
+  partially_filled: { label: 'Partially Filled', className: 'bg-blue-100 dark:bg-blue-950/30 text-blue-800 dark:text-blue-200', icon: RefreshCw },
+  cancelled: { label: 'Cancelled', className: 'bg-red-100 dark:bg-red-950/30 text-red-800 dark:text-red-200', icon: AlertTriangle },
+  expired: { label: 'Expired', className: 'bg-muted text-muted-foreground', icon: AlertTriangle }
 };
 
 export const ComprehensivePrescriptions = () => {
@@ -102,7 +102,7 @@ export const ComprehensivePrescriptions = () => {
     const Icon = config?.icon || Clock;
     
     return (
-      <Badge className={config?.className || 'bg-gray-100 text-gray-800'}>
+      <Badge className={config?.className || 'bg-muted text-muted-foreground'}>
         <Icon className="h-3 w-3 mr-1" />
         {config?.label || status}
       </Badge>
@@ -139,13 +139,13 @@ export const ComprehensivePrescriptions = () => {
         {[1, 2, 3].map((i) => (
           <Card key={i} className="animate-pulse">
             <CardHeader>
-              <div className="h-4 bg-gray-200 rounded w-1/3"></div>
-              <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+              <div className="h-4 bg-muted rounded w-1/3"></div>
+              <div className="h-3 bg-muted rounded w-1/2"></div>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                <div className="h-3 bg-gray-200 rounded w-full"></div>
-                <div className="h-3 bg-gray-200 rounded w-3/4"></div>
+                <div className="h-3 bg-muted rounded w-full"></div>
+                <div className="h-3 bg-muted rounded w-3/4"></div>
               </div>
             </CardContent>
           </Card>

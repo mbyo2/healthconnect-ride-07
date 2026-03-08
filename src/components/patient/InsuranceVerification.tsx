@@ -36,7 +36,7 @@ export const InsuranceVerification = () => {
           <AlertTriangle className="h-5 w-5" />
           <h3 className="font-semibold">Insurance Information Required</h3>
         </div>
-        <p className="mt-2 text-gray-600">
+        <p className="mt-2 text-muted-foregroundregroundregroundregroundregroundregroundregroundreground">
           Please add your insurance information to enable verification.
         </p>
       </Card>
@@ -77,7 +77,7 @@ export const InsuranceVerification = () => {
 
       <div className="mt-4 space-y-2">
         <div className="flex justify-between items-center">
-          <span className="text-gray-600">Status</span>
+          <span className="text-muted-foreground">Status</span>
           <Badge variant={isActive ? "default" : "destructive"}>
             {isActive ? (
               <CheckCircle className="h-4 w-4 mr-1" />
@@ -89,24 +89,24 @@ export const InsuranceVerification = () => {
         </div>
 
         <div className="flex justify-between">
-          <span className="text-gray-600">Provider</span>
+          <span className="text-muted-foreground">Provider</span>
           <span className="font-medium">{insurance.provider_name}</span>
         </div>
 
         <div className="flex justify-between">
-          <span className="text-gray-600">Policy Number</span>
+          <span className="text-muted-foreground">Policy Number</span>
           <span className="font-medium">{insurance.policy_number}</span>
         </div>
 
         {insurance.group_number && (
           <div className="flex justify-between">
-            <span className="text-gray-600">Group Number</span>
+            <span className="text-muted-foreground">Group Number</span>
             <span className="font-medium">{insurance.group_number}</span>
           </div>
         )}
 
         <div className="flex justify-between">
-          <span className="text-gray-600">Coverage Start</span>
+          <span className="text-muted-foreground">Coverage Start</span>
           <span className="font-medium">
             {format(new Date(insurance.coverage_start_date), 'PP')}
           </span>
@@ -114,7 +114,7 @@ export const InsuranceVerification = () => {
 
         {insurance.coverage_end_date && (
           <div className="flex justify-between">
-            <span className="text-gray-600">Coverage End</span>
+            <span className="text-muted-foreground">Coverage End</span>
             <span className="font-medium">
               {format(new Date(insurance.coverage_end_date), 'PP')}
             </span>
@@ -124,7 +124,7 @@ export const InsuranceVerification = () => {
         {/* Show NHIMA-specific information */}
         {insurance.provider_name === InsuranceProvider.NHIMA && (
           <div className="mt-4 pt-2 border-t">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-muted-foreground">
               NHIMA provides equitable access to quality healthcare through the National Health Insurance Scheme (NHIS).
             </p>
           </div>

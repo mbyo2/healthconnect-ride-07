@@ -148,7 +148,7 @@ const NotificationsPage = () => {
       case 'connection':
         return <Users className="h-5 w-5 text-indigo-500" />;
       default:
-        return <FileText className="h-5 w-5 text-gray-500" />;
+        return <FileText className="h-5 w-5 text-muted-foreground" />;
     }
   };
 
