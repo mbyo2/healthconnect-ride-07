@@ -78,7 +78,7 @@ const Profile = () => {
             </div>
             
             <div className="text-center space-y-2">
-              <h1 className="text-2xl font-bold text-trust-700">
+              <h1 className="text-2xl font-bold text-foreground">
                 {formData.firstName} {formData.lastName || "Welcome"}
               </h1>
               <div className="flex items-center justify-center gap-2 text-muted-foreground">
