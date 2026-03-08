@@ -115,7 +115,14 @@ CRITICAL: If symptoms suggest emergency, immediately advise to call emergency se
     }
 
     const data = await response.json();
-    const reply = data.choices[0].message.content;
+    
+    // HuggingFace returns array or object with generated_text
+    let reply: string;
+    if (Array.isArray(data)) {
+      reply = data[0]?.generated_text || 'No response generated';
+    } else {
+      reply = data.generated_text || data[0]?.generated_text || 'No response generated';
+    }
 
     console.log('AI chat response generated');
 
@@ -123,7 +130,7 @@ CRITICAL: If symptoms suggest emergency, immediately advise to call emergency se
       JSON.stringify({
         reply,
         timestamp: new Date().toISOString(),
-        model: 'gemini-2.5-flash'
+        model: 'medgemma-2-8b'
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
