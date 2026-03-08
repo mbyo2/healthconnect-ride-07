@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 const DB_NAME = 'healthconnect_offline';
 const DB_VERSION = 1;
@@ -34,6 +34,7 @@ export function useOfflineSync() {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [pendingCount, setPendingCount] = useState(0);
   const [syncing, setSyncing] = useState(false);
+  const syncingRef = useRef(false);
 
   useEffect(() => {
     const goOnline = () => setIsOnline(true);
@@ -76,7 +77,8 @@ export function useOfflineSync() {
   }, [countPending]);
 
   const syncAll = useCallback(async () => {
-    if (!isOnline || syncing) return;
+    if (!navigator.onLine || syncingRef.current) return;
+    syncingRef.current = true;
     setSyncing(true);
     try {
       const { supabase } = await import('@/integrations/supabase/client');
@@ -109,16 +111,17 @@ export function useOfflineSync() {
     } catch (err) {
       console.error('Offline sync error:', err);
     } finally {
+      syncingRef.current = false;
       setSyncing(false);
     }
-  }, [isOnline, syncing, countPending]);
+  }, [countPending]); // Stable deps - no syncing in deps
 
   // Auto-sync when coming online
   useEffect(() => {
     if (isOnline && pendingCount > 0) {
       syncAll();
     }
-  }, [isOnline, pendingCount, syncAll]);
+  }, [isOnline]); // Only trigger on online status change, not pendingCount
 
   return { isOnline, pendingCount, syncing, queueAction, syncAll };
 }
