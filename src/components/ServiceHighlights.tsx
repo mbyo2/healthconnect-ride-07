@@ -1,74 +1,37 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Calendar, Search, MessageSquare, FileText, Shield, Clock, CheckCircle, Pill, Building2, Phone, CreditCard, Video } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-
-const PLATFORM_STATS = {
-  doctors: '500+',
-  hospitals: '50+',
-  pharmacies: '200+',
-  patients: '10,000+',
-};
+import React from 'react';
+import { Calendar, Search, Shield, Clock, CheckCircle, Pill, Building2, Phone, CreditCard, Video } from 'lucide-react';
+import { usePlatformStats, formatStat } from '@/hooks/usePlatformStats';
 
 export const ServiceHighlights = () => {
-  const [stats, setStats] = useState({
-    totalUsers: 0,
-    totalAppointments: 0,
-    totalMessages: 0,
-    totalProviders: 0
-  });
-
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const [usersCount, appointmentsCount, messagesCount, providersCount] = await Promise.all([
-          supabase.from('profiles' as any).select('id', { count: 'exact', head: true }),
-          supabase.from('appointments' as any).select('id', { count: 'exact', head: true }),
-          supabase.from('messages' as any).select('id', { count: 'exact', head: true }),
-          supabase.from('profiles' as any).select('id', { count: 'exact', head: true }).eq('role', 'health_personnel')
-        ]);
-
-        setStats({
-          totalUsers: usersCount.count || 0,
-          totalAppointments: appointmentsCount.count || 0,
-          totalMessages: messagesCount.count || 0,
-          totalProviders: providersCount.count || 0
-        });
-      } catch (error) {
-        console.error('Error fetching stats:', error);
-      }
-    };
-
-    fetchStats();
-  }, []);
+  const stats = usePlatformStats();
 
   const services = [
     {
       icon: <Search className="h-6 w-6 text-blue-600 dark:text-blue-400" />,
       title: "Find Trusted Doctors",
       description: "Search verified healthcare providers in your area and beyond",
-      stat: PLATFORM_STATS.doctors,
+      stat: formatStat(stats.doctors),
       statLabel: "doctors"
     },
     {
       icon: <Building2 className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />,
       title: "Connected Hospitals",
       description: "Access major hospitals and clinics on the platform",
-      stat: PLATFORM_STATS.hospitals,
+      stat: formatStat(stats.hospitals),
       statLabel: "hospitals"
     },
     {
       icon: <Calendar className="h-6 w-6 text-purple-600 dark:text-purple-400" />,
       title: "Easy Scheduling",
       description: "Book appointments instantly with real-time availability",
-      stat: `${stats.totalAppointments || '1000'}+`,
+      stat: formatStat(stats.appointments),
       statLabel: "bookings"
     },
     {
       icon: <Pill className="h-6 w-6 text-orange-600 dark:text-orange-400" />,
       title: "Pharmacy Network",
       description: "Order medicine online from registered pharmacies with delivery",
-      stat: PLATFORM_STATS.pharmacies,
+      stat: formatStat(stats.pharmacies),
       statLabel: "pharmacies"
     },
     {
@@ -113,7 +76,7 @@ export const ServiceHighlights = () => {
             Everything You Need for Better Healthcare
           </h2>
           <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
-            Connecting {PLATFORM_STATS.patients} users to quality healthcare providers worldwide
+            Connecting {formatStat(stats.patients)} users to quality healthcare providers worldwide
           </p>
         </div>
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Star, MapPin, Quote } from 'lucide-react';
+import { usePlatformStats, formatStat } from '@/hooks/usePlatformStats';
 
 const TESTIMONIALS = [
   {
@@ -53,6 +54,7 @@ interface Testimonial {
 
 export const Testimonials = () => {
   const [activeIndex, setActiveIndex] = useState(0);
+  const stats = usePlatformStats();
 
   const testimonials: Testimonial[] = useMemo(() => 
     TESTIMONIALS.map((t, i) => ({
@@ -167,14 +169,14 @@ export const Testimonials = () => {
           ))}
         </div>
 
-        {/* Trust indicators */}
+        {/* Trust indicators — now dynamic */}
         <div className="mt-8 md:mt-12 text-center">
           <div className="inline-flex items-center gap-4 md:gap-6 text-xs md:text-sm text-muted-foreground">
             <span className="flex items-center gap-1">
-              <span className="text-yellow-500">★</span> 4.8/5 average rating
+              <span className="text-yellow-500">★</span> {stats.rating}/5 average rating
             </span>
             <span>•</span>
-            <span>10,000+ users worldwide</span>
+            <span>{formatStat(stats.patients)} users worldwide</span>
             <span className="hidden md:inline">•</span>
             <span className="hidden md:inline">Growing globally</span>
           </div>
