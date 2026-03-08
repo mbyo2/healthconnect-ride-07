@@ -179,7 +179,7 @@ export const Auth = () => {
       },
     });
     if (error) showError(error.message);
-    else { showSuccess("Account created! Check your email to verify."); setActiveTab("signin"); }
+    else { showSuccess("Business registered! Your account is under review. Check your email to verify."); setActiveTab("signin"); }
     setLocalLoading(false);
   };
 
