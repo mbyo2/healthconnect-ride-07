@@ -424,27 +424,7 @@ export const ROLE_LANDING_PAGES: Record<string, string> = {
   [USER_ROLES.PATHOLOGIST]: '/lab-management',
 };
 
-// Public routes that don't require authentication
-export const PUBLIC_ROUTES = [
-  '/auth',
-  '/login',
-  '/register',
-  '/landing',
-  '/healthcare-professionals',
-  '/healthcare-institutions',
-  '/healthcare-application',
-  '/terms',
-  '/privacy',
-  '/contact',
-  '/search',
-  '/providers',
-  '/marketplace-users',
-  '/emergency',
-  '/provider/:id',
-  '/booking-confirmed',
-  '/pricing',
-  '/reset-password'
-];
+// PUBLIC_ROUTES imported from config
 
 // Check if a user has permission to access a route (supports multiple roles)
 export const hasRoutePermission = (userRoles: UserRole[] | null, route: string): boolean => {
