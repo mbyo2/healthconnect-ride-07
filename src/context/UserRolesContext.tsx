@@ -79,11 +79,13 @@ export function UserRolesProvider({ children }: { children: React.ReactNode }) {
 
             // Set primary role (super_admin > admin > institution_admin > doctor/nurse/radiologist > health_personnel > pharmacist > pharmacy > lab_technician > lab > patient)
             const rolePriority: UserRole[] = [
-              'super_admin', 'admin', 'support',
+              'super_admin', 'admin', 'support', 'cxo',
               'institution_admin', 'institution_staff',
-              'doctor', 'nurse', 'radiologist', 'health_personnel',
-              'pharmacist', 'pharmacy',
+              'doctor', 'nurse', 'radiologist', 'pathologist', 'specialist', 'health_personnel',
+              'ot_staff', 'triage_staff', 'receptionist', 'hr_manager', 'billing_staff',
+              'pharmacist', 'pharmacy', 'phlebotomist',
               'lab_technician', 'lab',
+              'inventory_manager', 'maintenance_manager', 'ambulance_staff',
               'patient'
             ];
             const primaryRole = rolePriority.find(r => roles.includes(r)) || roles[0];
