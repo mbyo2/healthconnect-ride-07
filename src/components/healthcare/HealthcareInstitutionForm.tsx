@@ -111,11 +111,22 @@ export const HealthcareInstitutionForm = () => {
         operating_hours: {}
       };
 
-      const { error: institutionError } = await supabase
+      const { data: institutionData, error: institutionError } = await supabase
         .from("healthcare_institutions" as any)
-        .insert(institution);
+        .insert(institution)
+        .select("id")
+        .single();
 
       if (institutionError) throw institutionError;
+
+      // Save specialties if clinic type
+      if (isClinicType && selectedSpecialties.length > 0 && institutionData) {
+        await saveInstitutionSpecialties(
+          (institutionData as any).id,
+          selectedSpecialties,
+          primarySpecialtyId
+        );
+      }
 
       // 2. Create the application record
       const application = {
