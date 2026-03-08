@@ -23,8 +23,8 @@ html {
 
 /* Scrollbar */
 .scrollbar-thin { scrollbar-width: thin; }
-.scrollbar-thumb-gray-300::-webkit-scrollbar-thumb { background-color: #d1d5db; border-radius: 6px; }
-.scrollbar-track-gray-100::-webkit-scrollbar-track { background-color: #f3f4f6; }
+.scrollbar-thumb-gray-300::-webkit-scrollbar-thumb { background-color: hsl(var(--muted-foreground) / 0.3); border-radius: 6px; }
+.scrollbar-track-gray-100::-webkit-scrollbar-track { background-color: hsl(var(--muted)); }
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 
