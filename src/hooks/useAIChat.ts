@@ -20,7 +20,7 @@ export interface ChatConversation {
     is_archived: boolean;
 }
 
-const STORAGE_KEY = 'medgemma_chat_history';
+const STORAGE_KEY = 'doc_oclock_ai_chat_history';
 const CURRENT_CONVERSATION_KEY = 'current_conversation_id';
 
 export const useAIChat = () => {

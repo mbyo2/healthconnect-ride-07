@@ -129,7 +129,7 @@ const AIDiagnostics = () => {
                 <CardHeader>
                   <CardTitle className="text-lg sm:text-xl">Symptom Analysis</CardTitle>
                   <CardDescription className="text-xs sm:text-sm">
-                    Describe your symptoms and get an AI-powered analysis from Doc 0 Clock
+                    Describe your symptoms and get an AI-powered analysis from Doc' O Clock AI
                   </CardDescription>
                 </CardHeader>
                 <CardContent>

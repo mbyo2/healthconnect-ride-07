@@ -164,7 +164,7 @@ class AIHealthInsights {
         return insights;
       }
 
-      // Parse MedGemma response and create structured insights
+      // Parse AI response and create structured insights
       const analysis = data.analysis;
 
       insights.push({
