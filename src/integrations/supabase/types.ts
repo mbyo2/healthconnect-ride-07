@@ -4242,6 +4242,57 @@ export type Database = {
           },
         ]
       }
+      pharmacy_customers: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          insurance_number: string | null
+          insurance_provider: string | null
+          last_visit_at: string | null
+          name: string
+          notes: string | null
+          patient_id: string | null
+          pharmacy_id: string
+          phone: string | null
+          total_purchases: number
+          updated_at: string
+          visit_count: number
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          insurance_number?: string | null
+          insurance_provider?: string | null
+          last_visit_at?: string | null
+          name: string
+          notes?: string | null
+          patient_id?: string | null
+          pharmacy_id: string
+          phone?: string | null
+          total_purchases?: number
+          updated_at?: string
+          visit_count?: number
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          insurance_number?: string | null
+          insurance_provider?: string | null
+          last_visit_at?: string | null
+          name?: string
+          notes?: string | null
+          patient_id?: string | null
+          pharmacy_id?: string
+          phone?: string | null
+          total_purchases?: number
+          updated_at?: string
+          visit_count?: number
+        }
+        Relationships: []
+      }
       pharmacy_hours: {
         Row: {
           close_time: string
@@ -4593,6 +4644,176 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      pos_register_sessions: {
+        Row: {
+          card_sales: number
+          cash_sales: number
+          cashier_id: string
+          closed_at: string | null
+          closing_balance: number | null
+          closing_notes: string | null
+          expected_balance: number | null
+          id: string
+          mobile_money_sales: number
+          opened_at: string
+          opening_balance: number
+          pharmacy_id: string
+          status: string
+          total_refunds: number
+          total_sales: number
+          transaction_count: number
+        }
+        Insert: {
+          card_sales?: number
+          cash_sales?: number
+          cashier_id: string
+          closed_at?: string | null
+          closing_balance?: number | null
+          closing_notes?: string | null
+          expected_balance?: number | null
+          id?: string
+          mobile_money_sales?: number
+          opened_at?: string
+          opening_balance?: number
+          pharmacy_id: string
+          status?: string
+          total_refunds?: number
+          total_sales?: number
+          transaction_count?: number
+        }
+        Update: {
+          card_sales?: number
+          cash_sales?: number
+          cashier_id?: string
+          closed_at?: string | null
+          closing_balance?: number | null
+          closing_notes?: string | null
+          expected_balance?: number | null
+          id?: string
+          mobile_money_sales?: number
+          opened_at?: string
+          opening_balance?: number
+          pharmacy_id?: string
+          status?: string
+          total_refunds?: number
+          total_sales?: number
+          transaction_count?: number
+        }
+        Relationships: []
+      }
+      pos_sale_items: {
+        Row: {
+          batch_number: string | null
+          created_at: string
+          discount: number
+          id: string
+          item_name: string
+          medication_inventory_id: string | null
+          quantity: number
+          sale_id: string
+          total: number
+          unit_price: number
+        }
+        Insert: {
+          batch_number?: string | null
+          created_at?: string
+          discount?: number
+          id?: string
+          item_name: string
+          medication_inventory_id?: string | null
+          quantity?: number
+          sale_id: string
+          total: number
+          unit_price: number
+        }
+        Update: {
+          batch_number?: string | null
+          created_at?: string
+          discount?: number
+          id?: string
+          item_name?: string
+          medication_inventory_id?: string | null
+          quantity?: number
+          sale_id?: string
+          total?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pos_sale_items_sale_id_fkey"
+            columns: ["sale_id"]
+            isOneToOne: false
+            referencedRelation: "pos_sales"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pos_sales: {
+        Row: {
+          cashier_id: string
+          created_at: string
+          customer_name: string | null
+          customer_phone: string | null
+          discount_amount: number
+          id: string
+          notes: string | null
+          order_id: string | null
+          payment_method: string
+          payment_reference: string | null
+          pharmacy_id: string
+          prescription_id: string | null
+          receipt_number: string
+          sale_type: string
+          status: string
+          subtotal: number
+          tax_amount: number
+          total_amount: number
+          updated_at: string
+        }
+        Insert: {
+          cashier_id: string
+          created_at?: string
+          customer_name?: string | null
+          customer_phone?: string | null
+          discount_amount?: number
+          id?: string
+          notes?: string | null
+          order_id?: string | null
+          payment_method?: string
+          payment_reference?: string | null
+          pharmacy_id: string
+          prescription_id?: string | null
+          receipt_number: string
+          sale_type?: string
+          status?: string
+          subtotal?: number
+          tax_amount?: number
+          total_amount?: number
+          updated_at?: string
+        }
+        Update: {
+          cashier_id?: string
+          created_at?: string
+          customer_name?: string | null
+          customer_phone?: string | null
+          discount_amount?: number
+          id?: string
+          notes?: string | null
+          order_id?: string | null
+          payment_method?: string
+          payment_reference?: string | null
+          pharmacy_id?: string
+          prescription_id?: string | null
+          receipt_number?: string
+          sale_type?: string
+          status?: string
+          subtotal?: number
+          tax_amount?: number
+          total_amount?: number
+          updated_at?: string
+        }
+        Relationships: []
       }
       primary_provider_assignments: {
         Row: {
@@ -6385,6 +6606,10 @@ export type Database = {
         Returns: boolean
       }
       delete_user: { Args: never; Returns: undefined }
+      generate_receipt_number: {
+        Args: { p_pharmacy_id: string }
+        Returns: string
+      }
       get_current_user_admin_level: {
         Args: never
         Returns: Database["public"]["Enums"]["admin_level"]
