@@ -1,0 +1,251 @@
+import { useState, useRef } from 'react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Camera, Upload, CreditCard, CheckCircle2, AlertCircle, Loader2, X, Shield } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/context/AuthContext';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
+
+interface InsuranceCard {
+  id: string;
+  front_image_url: string;
+  back_image_url: string | null;
+  verification_status: string;
+  ocr_data: Record<string, string>;
+  created_at: string;
+}
+
+export const InsuranceCardUpload = () => {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const frontInputRef = useRef<HTMLInputElement>(null);
+  const backInputRef = useRef<HTMLInputElement>(null);
+  const [frontPreview, setFrontPreview] = useState<string | null>(null);
+  const [backPreview, setBackPreview] = useState<string | null>(null);
+  const [frontFile, setFrontFile] = useState<File | null>(null);
+  const [backFile, setBackFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [providerName, setProviderName] = useState('');
+  const [policyNumber, setPolicyNumber] = useState('');
+
+  const { data: cards = [], isLoading } = useQuery({
+    queryKey: ['insurance-cards', user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('insurance_cards')
+        .select('*')
+        .eq('patient_id', user!.id)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return (data || []) as InsuranceCard[];
+    },
+    enabled: !!user,
+  });
+
+  const handleFileSelect = (side: 'front' | 'back', file: File) => {
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please upload an image file');
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('File size must be under 10MB');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      if (side === 'front') {
+        setFrontPreview(e.target?.result as string);
+        setFrontFile(file);
+      } else {
+        setBackPreview(e.target?.result as string);
+        setBackFile(file);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const uploadCard = async () => {
+    if (!frontFile || !user) {
+      toast.error('Please upload the front of your insurance card');
+      return;
+    }
+    setUploading(true);
+    try {
+      const frontPath = `${user.id}/${Date.now()}-front.${frontFile.name.split('.').pop()}`;
+      const { error: frontErr } = await supabase.storage
+        .from('insurance_cards')
+        .upload(frontPath, frontFile);
+      if (frontErr) throw frontErr;
+
+      let backPath: string | null = null;
+      if (backFile) {
+        backPath = `${user.id}/${Date.now()}-back.${backFile.name.split('.').pop()}`;
+        const { error: backErr } = await supabase.storage
+          .from('insurance_cards')
+          .upload(backPath, backFile);
+        if (backErr) throw backErr;
+      }
+
+      const { error } = await supabase.from('insurance_cards').insert({
+        patient_id: user.id,
+        front_image_url: frontPath,
+        back_image_url: backPath,
+        ocr_data: { provider_name: providerName, policy_number: policyNumber },
+        verification_status: 'pending',
+      });
+      if (error) throw error;
+
+      toast.success('Insurance card uploaded successfully!');
+      setFrontPreview(null);
+      setBackPreview(null);
+      setFrontFile(null);
+      setBackFile(null);
+      setProviderName('');
+      setPolicyNumber('');
+      queryClient.invalidateQueries({ queryKey: ['insurance-cards'] });
+    } catch (err: any) {
+      toast.error(err.message || 'Upload failed');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const statusBadge = (status: string) => {
+    switch (status) {
+      case 'verified': return <Badge className="bg-emerald-500/10 text-emerald-700"><CheckCircle2 className="h-3 w-3 mr-1" />Verified</Badge>;
+      case 'pending': return <Badge variant="secondary"><Loader2 className="h-3 w-3 mr-1 animate-spin" />Pending</Badge>;
+      case 'failed': return <Badge variant="destructive"><AlertCircle className="h-3 w-3 mr-1" />Failed</Badge>;
+      default: return <Badge variant="outline">{status}</Badge>;
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <CreditCard className="h-5 w-5 text-primary" />
+            Upload Insurance Card
+          </CardTitle>
+          <CardDescription>
+            Take a photo or upload your insurance card for faster check-in and cost estimates
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Front */}
+            <div>
+              <Label className="text-sm font-medium mb-2 block">Front of Card *</Label>
+              <input
+                ref={frontInputRef}
+                type="file"
+                accept="image/*"
+                capture="environment"
+                className="hidden"
+                onChange={(e) => e.target.files?.[0] && handleFileSelect('front', e.target.files[0])}
+              />
+              {frontPreview ? (
+                <div className="relative rounded-xl overflow-hidden border-2 border-primary aspect-[1.6]">
+                  <img src={frontPreview} alt="Front" className="w-full h-full object-cover" />
+                  <button
+                    onClick={() => { setFrontPreview(null); setFrontFile(null); }}
+                    className="absolute top-2 right-2 p-1 bg-background/80 rounded-full"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => frontInputRef.current?.click()}
+                  className="w-full aspect-[1.6] rounded-xl border-2 border-dashed border-muted-foreground/30 flex flex-col items-center justify-center gap-2 hover:border-primary/50 hover:bg-primary/5 transition-all"
+                >
+                  <Camera className="h-8 w-8 text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground">Tap to capture or upload</span>
+                </button>
+              )}
+            </div>
+
+            {/* Back */}
+            <div>
+              <Label className="text-sm font-medium mb-2 block">Back of Card (optional)</Label>
+              <input
+                ref={backInputRef}
+                type="file"
+                accept="image/*"
+                capture="environment"
+                className="hidden"
+                onChange={(e) => e.target.files?.[0] && handleFileSelect('back', e.target.files[0])}
+              />
+              {backPreview ? (
+                <div className="relative rounded-xl overflow-hidden border-2 border-primary aspect-[1.6]">
+                  <img src={backPreview} alt="Back" className="w-full h-full object-cover" />
+                  <button
+                    onClick={() => { setBackPreview(null); setBackFile(null); }}
+                    className="absolute top-2 right-2 p-1 bg-background/80 rounded-full"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => backInputRef.current?.click()}
+                  className="w-full aspect-[1.6] rounded-xl border-2 border-dashed border-muted-foreground/30 flex flex-col items-center justify-center gap-2 hover:border-primary/50 hover:bg-primary/5 transition-all"
+                >
+                  <Upload className="h-8 w-8 text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground">Upload back (optional)</span>
+                </button>
+              )}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="provider">Insurance Provider</Label>
+              <Input id="provider" placeholder="e.g. Blue Cross" value={providerName} onChange={(e) => setProviderName(e.target.value)} className="mt-1" />
+            </div>
+            <div>
+              <Label htmlFor="policy">Policy Number</Label>
+              <Input id="policy" placeholder="e.g. XYZ123456" value={policyNumber} onChange={(e) => setPolicyNumber(e.target.value)} className="mt-1" />
+            </div>
+          </div>
+
+          <Button onClick={uploadCard} disabled={!frontFile || uploading} className="w-full">
+            {uploading ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Uploading...</> : <><Shield className="h-4 w-4 mr-2" />Upload & Verify</>}
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Existing cards */}
+      {cards.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Your Insurance Cards</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {cards.map((card) => (
+                <div key={card.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <CreditCard className="h-5 w-5 text-primary" />
+                    <div>
+                      <p className="text-sm font-medium">{(card.ocr_data as any)?.provider_name || 'Insurance Card'}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {(card.ocr_data as any)?.policy_number || 'No policy number'} • Uploaded {new Date(card.created_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                  {statusBadge(card.verification_status)}
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+};
