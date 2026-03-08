@@ -13,6 +13,7 @@ export const WalletCard = () => {
     const navigate = useNavigate();
     const [balance, setBalance] = useState<number | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const { formatPrice } = useCurrency();
 
     useEffect(() => {
         if (!user) return;
