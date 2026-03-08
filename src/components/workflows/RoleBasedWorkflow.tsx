@@ -102,6 +102,10 @@ export const RoleBasedWorkflow = () => {
       if (specialty.includes('nursing home') || specialty.includes('care home') || specialty.includes('aged care')) {
         return <NursingHomeWorkflow />;
       }
+      // Staff gets reduced-permission UI
+      if (activeRole === 'institution_staff') {
+        return <InstitutionStaffWorkflow />;
+      }
       return <InstitutionAdminWorkflow />;
     }
 
