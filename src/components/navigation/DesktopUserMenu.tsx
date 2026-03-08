@@ -30,6 +30,7 @@ interface DesktopUserMenuProps {
 
 export function DesktopUserMenu({ user, profile, onLogout }: DesktopUserMenuProps) {
   const { availableRoles, isHealthPersonnel, isAdmin } = useUserRoles();
+  const { isInstitutionAffiliated } = useInstitutionAffiliation();
 
   const menuItems = useMemo(() => {
     // Nurse (solo)
