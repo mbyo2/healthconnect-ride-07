@@ -1,23 +1,28 @@
-
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { format } from "date-fns";
+import { format, isPast, parseISO, isToday } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AppointmentWithProvider } from "@/types/appointments";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { NetworkErrorBoundary } from "@/components/errors/NetworkErrorBoundary";
 import { useApiQuery } from "@/hooks/use-api-query";
+import { 
+  Calendar, Clock, Video, MapPin, FileText, CalendarPlus, 
+  ArrowRight, Phone, CheckCircle
+} from "lucide-react";
 
 const AppointmentsPage = () => {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const [tab, setTab] = useState('upcoming');
 
-  // Efficiently fetch appointments with query key dependencies
-  const { data: appointments = [], isLoading, error } = useApiQuery<AppointmentWithProvider[]>(
+  const { data: appointments = [], isLoading } = useApiQuery<AppointmentWithProvider[]>(
     ['appointments'],
     async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -28,9 +33,7 @@ const AppointmentsPage = () => {
         .select(`
           *,
           provider:profiles!appointments_provider_id_fkey (
-            first_name,
-            last_name,
-            specialty
+            first_name, last_name, specialty, avatar_url, phone, address
           )
         `)
         .eq('patient_id', user.id)
@@ -40,151 +43,216 @@ const AppointmentsPage = () => {
       return data as AppointmentWithProvider[];
     },
     {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      refetchOnWindowFocus: true, // Refetch when window regains focus
+      staleTime: 5 * 60 * 1000,
+      refetchOnWindowFocus: true,
       errorMessage: "Failed to load appointments"
     }
   );
 
-  // Memoized mutation function with optimistic updates
   const cancelAppointment = useMutation({
     mutationFn: async (appointmentId: string) => {
       const { error } = await supabase
         .from('appointments')
         .update({ status: 'cancelled' })
         .eq('id', appointmentId);
-
       if (error) throw error;
     },
     onMutate: async (appointmentId) => {
-      // Cancel any outgoing refetches 
       await queryClient.cancelQueries({ queryKey: ['appointments'] });
-
-      // Snapshot the previous value
-      const previousAppointments = queryClient.getQueryData(['appointments']);
-
-      // Optimistically update to the new value
-      queryClient.setQueryData(['appointments'], (old: AppointmentWithProvider[] | undefined) => {
-        if (!old) return [];
-        return old.map(appointment =>
-          appointment.id === appointmentId
-            ? { ...appointment, status: 'cancelled' }
-            : appointment
-        );
-      });
-
-      return { previousAppointments };
+      const prev = queryClient.getQueryData(['appointments']);
+      queryClient.setQueryData(['appointments'], (old: AppointmentWithProvider[] | undefined) =>
+        (old || []).map(a => a.id === appointmentId ? { ...a, status: 'cancelled' } : a)
+      );
+      return { prev };
     },
-    onSuccess: () => {
-      toast.success('Appointment cancelled successfully');
-    },
-    onError: (error, appointmentId, context) => {
-      // Revert back to previous appointments on error
-      if (context?.previousAppointments) {
-        queryClient.setQueryData(['appointments'], context.previousAppointments);
-      }
-      console.error('Error canceling appointment:', error);
+    onSuccess: () => toast.success('Appointment cancelled'),
+    onError: (_err, _id, ctx) => {
+      if (ctx?.prev) queryClient.setQueryData(['appointments'], ctx.prev);
       toast.error('Failed to cancel appointment');
     },
-    onSettled: () => {
-      // Always refetch after error or success to ensure data consistency
-      queryClient.invalidateQueries({ queryKey: ['appointments'] });
-    }
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ['appointments'] }),
   });
 
-  // Memoized cancel handler
-  const handleCancel = useCallback((appointmentId: string) => {
-    cancelAppointment.mutate(appointmentId);
-  }, [cancelAppointment]);
+  const now = new Date();
+  const upcoming = useMemo(() => 
+    appointments.filter(a => !isPast(parseISO(a.date)) && a.status !== 'cancelled' && a.status !== 'completed')
+      .sort((a, b) => parseISO(a.date).getTime() - parseISO(b.date).getTime()),
+    [appointments]
+  );
+  const past = useMemo(() =>
+    appointments.filter(a => isPast(parseISO(a.date)) || a.status === 'completed' || a.status === 'cancelled')
+      .sort((a, b) => parseISO(b.date).getTime() - parseISO(a.date).getTime()),
+    [appointments]
+  );
+  const todayAppts = useMemo(() =>
+    appointments.filter(a => isToday(parseISO(a.date)) && a.status !== 'cancelled'),
+    [appointments]
+  );
 
-  // Memoize processed appointments for rendering optimization
-  const sortedAppointments = useMemo(() => {
-    if (!appointments.length) return [];
+  const renderAppointmentCard = (appointment: AppointmentWithProvider) => {
+    const provider = appointment.provider as any;
+    const isVideo = appointment.type === 'video_consultation';
+    const apptDate = parseISO(appointment.date);
+    const isUpcoming = !isPast(apptDate) && appointment.status !== 'cancelled' && appointment.status !== 'completed';
+    const isTodayAppt = isToday(apptDate);
 
-    // Sort upcoming appointments first, then past appointments
-    const now = new Date();
-    return [...appointments].sort((a, b) => {
-      const aDate = new Date(a.date);
-      const bDate = new Date(b.date);
+    return (
+      <Card key={appointment.id} className="p-4 hover:shadow-md transition-shadow border">
+        <div className="flex gap-4">
+          {/* Provider Avatar */}
+          <div className="flex-shrink-0">
+            {provider?.avatar_url ? (
+              <img src={provider.avatar_url} alt="" className="w-14 h-14 rounded-xl object-cover" />
+            ) : (
+              <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center text-lg font-bold text-primary">
+                {provider?.first_name?.[0]}{provider?.last_name?.[0]}
+              </div>
+            )}
+          </div>
 
-      // First compare if one is in the future and one is in the past
-      const aIsFuture = aDate >= now;
-      const bIsFuture = bDate >= now;
+          {/* Info */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-start justify-between gap-2">
+              <div>
+                <h3 className="font-semibold text-foreground">
+                  Dr. {provider?.first_name} {provider?.last_name}
+                </h3>
+                <p className="text-sm text-primary">{provider?.specialty}</p>
+              </div>
+              <Badge
+                variant={
+                  appointment.status === 'cancelled' ? 'destructive' :
+                  appointment.status === 'completed' ? 'outline' : 'default'
+                }
+                className={appointment.status === 'scheduled' ? 'bg-primary' : ''}
+              >
+                {appointment.status}
+              </Badge>
+            </div>
 
-      if (aIsFuture && !bIsFuture) return -1;
-      if (!aIsFuture && bIsFuture) return 1;
+            {/* Date/Time/Type */}
+            <div className="flex flex-wrap gap-3 mt-2 text-sm text-muted-foreground">
+              <span className="flex items-center gap-1">
+                <Calendar className="h-3.5 w-3.5" />
+                {isTodayAppt ? 'Today' : format(apptDate, 'EEE, MMM d')}
+              </span>
+              <span className="flex items-center gap-1">
+                <Clock className="h-3.5 w-3.5" />
+                {appointment.time}
+              </span>
+              <span className="flex items-center gap-1">
+                {isVideo ? <Video className="h-3.5 w-3.5 text-emerald-600" /> : <MapPin className="h-3.5 w-3.5 text-blue-600" />}
+                {isVideo ? 'Video' : 'In-Person'}
+              </span>
+            </div>
 
-      // Then sort by date (ascending for future dates, descending for past dates)
-      return aIsFuture
-        ? aDate.getTime() - bDate.getTime()
-        : bDate.getTime() - aDate.getTime();
-    });
-  }, [appointments]);
+            {/* Actions */}
+            <div className="flex flex-wrap gap-2 mt-3">
+              <Button size="sm" variant="outline" asChild>
+                <Link to={`/appointments/${appointment.id}`}>Details</Link>
+              </Button>
+
+              {isUpcoming && isVideo && isTodayAppt && (
+                <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 gap-1" asChild>
+                  <Link to={`/video-call/${appointment.id}`}>
+                    <Video className="h-3.5 w-3.5" />
+                    Join Call
+                  </Link>
+                </Button>
+              )}
+
+              {isUpcoming && (
+                <>
+                  <Button size="sm" variant="outline" onClick={() => navigate(`/intake-form?appointment=${appointment.id}`)}>
+                    <FileText className="h-3.5 w-3.5 mr-1" />
+                    Intake Form
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={() => cancelAppointment.mutate(appointment.id)}
+                  >
+                    Cancel
+                  </Button>
+                </>
+              )}
+
+              {appointment.status === 'completed' && (
+                <Button size="sm" variant="outline" onClick={() => navigate(`/provider/${appointment.provider_id}`)}>
+                  Book Again
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+      </Card>
+    );
+  };
 
   return (
     <NetworkErrorBoundary>
-      <div className="container mx-auto px-4 py-6 bg-background min-h-screen">
-        <h1 className="text-xl sm:text-2xl font-bold mb-6 text-foreground">Your Appointments</h1>
+      <div className="container mx-auto px-4 py-6 bg-background min-h-screen max-w-3xl">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold text-foreground">My Appointments</h1>
+          <Button onClick={() => navigate('/search')} className="gap-2">
+            <CalendarPlus className="h-4 w-4" />
+            Book New
+          </Button>
+        </div>
+
+        {/* Today's highlight */}
+        {todayAppts.length > 0 && (
+          <Card className="p-4 mb-6 border-primary/20 bg-primary/5">
+            <div className="flex items-center gap-2 mb-2">
+              <CheckCircle className="h-5 w-5 text-primary" />
+              <h2 className="font-semibold text-foreground">Today's Appointments ({todayAppts.length})</h2>
+            </div>
+            <div className="space-y-3">
+              {todayAppts.map(renderAppointmentCard)}
+            </div>
+          </Card>
+        )}
+
         {isLoading ? (
           <div className="space-y-4">
-            {[1, 2, 3].map((i) => (
-              <Skeleton key={i} className="h-32 w-full rounded-lg" />
-            ))}
+            {[1, 2, 3].map(i => <Skeleton key={i} className="h-32 w-full rounded-lg" />)}
           </div>
-        ) : sortedAppointments.length === 0 ? (
-          <Card className="p-6 text-center border shadow-md">
-            <p className="text-muted-foreground mb-4">No appointments scheduled</p>
-            <Button className="mt-4" asChild>
-              <Link to="/search">Find Healthcare Providers</Link>
-            </Button>
-          </Card>
         ) : (
-          <div className="space-y-4">
-            {sortedAppointments.map((appointment) => (
-              <Card key={appointment.id} className="p-6 bg-card hover:shadow-md transition-shadow border">
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                  <div>
-                    <h2 className="text-lg sm:text-xl font-semibold text-foreground">
-                      Dr. {appointment.provider.first_name} {appointment.provider.last_name}
-                    </h2>
-                    <p className="text-sm sm:text-base text-muted-foreground">{appointment.provider.specialty}</p>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {format(new Date(appointment.date), 'MMMM dd, yyyy')} at {appointment.time}
-                    </p>
-                    <Badge
-                      variant={
-                        appointment.status === 'cancelled' ? 'destructive' :
-                          appointment.status === 'completed' ? 'outline' : 'default'
-                      }
-                      className={`mt-2 ${appointment.status === 'scheduled' ? 'bg-primary' : ''
-                        }`}
-                    >
-                      {appointment.status}
-                    </Badge>
-                  </div>
-                  <div className="flex gap-2 w-full md:w-auto">
-                    <Button
-                      variant="outline"
-                      asChild
-                      className="flex-1 md:flex-none hover:bg-accent"
-                    >
-                      <Link to={`/appointments/${appointment.id}`}>
-                        View Details
-                      </Link>
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      onClick={() => handleCancel(appointment.id)}
-                      disabled={appointment.status === 'cancelled' || appointment.status === 'completed'}
-                      className="flex-1 md:flex-none"
-                    >
-                      Cancel
-                    </Button>
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
+          <Tabs value={tab} onValueChange={setTab}>
+            <TabsList className="grid w-full grid-cols-2 mb-4">
+              <TabsTrigger value="upcoming">
+                Upcoming ({upcoming.length})
+              </TabsTrigger>
+              <TabsTrigger value="past">
+                Past ({past.length})
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="upcoming">
+              {upcoming.length === 0 ? (
+                <Card className="p-8 text-center border">
+                  <Calendar className="h-12 w-12 mx-auto mb-3 text-muted-foreground opacity-50" />
+                  <p className="text-muted-foreground mb-4">No upcoming appointments</p>
+                  <Button asChild>
+                    <Link to="/search">Find a Doctor</Link>
+                  </Button>
+                </Card>
+              ) : (
+                <div className="space-y-3">{upcoming.map(renderAppointmentCard)}</div>
+              )}
+            </TabsContent>
+
+            <TabsContent value="past">
+              {past.length === 0 ? (
+                <Card className="p-8 text-center border">
+                  <p className="text-muted-foreground">No past appointments</p>
+                </Card>
+              ) : (
+                <div className="space-y-3">{past.map(renderAppointmentCard)}</div>
+              )}
+            </TabsContent>
+          </Tabs>
         )}
       </div>
     </NetworkErrorBoundary>
