@@ -39,14 +39,6 @@ serve(async (req) => {
 
     const { message, userRole, conversationHistory } = validationResult.data;
 
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    if (!LOVABLE_API_KEY) {
-      console.error('LOVABLE_API_KEY not configured');
-      return new Response(
-        JSON.stringify({ error: 'LOVABLE_API_KEY not configured', fallback: true }),
-        { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
 
     // Role-aware prompt (simplified version for fallback)
     const roleLabel = ['doctor','health_personnel','radiologist'].includes(userRole) ? 'clinical professional'
@@ -71,18 +63,32 @@ CRITICAL: If symptoms suggest emergency, immediately advise to call emergency se
       { role: 'user', content: message }
     ];
 
-    console.log('Doc O Clock AI chat request receivedAI Gateway
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    console.log('Doc O Clock AI chat request received');
+    
+    const HF_TOKEN = Deno.env.get('HF_TOKEN');
+    if (!HF_TOKEN) {
+      console.error('HF_TOKEN not configured');
+      return new Response(
+        JSON.stringify({ error: 'HF_TOKEN not configured', fallback: true }),
+        { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    // Use HuggingFace MedGemma2-8B (latest version)
+    const response = await fetch('https://api-inference.huggingface.co/models/google/medgemma-2-8b', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+        'Authorization': `Bearer ${HF_TOKEN}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
-        messages,
-        temperature: 0.4,
-        max_tokens: 800,
+        inputs: `${systemPrompt}\n\nConversation history:\n${conversationHistory.map(m => `${m.role}: ${m.content}`).join('\n')}\n\nUser: ${message}\n\nAssistant:`,
+        parameters: {
+          max_new_tokens: 800,
+          temperature: 0.4,
+          top_p: 0.95,
+          return_full_text: false
+        }
       }),
     });
 
@@ -101,7 +107,14 @@ CRITICAL: If symptoms suggest emergency, immediately advise to call emergency se
     }
 
     const data = await response.json();
-    const reply = data.choices[0].message.content;
+    
+    // HuggingFace returns array or object with generated_text
+    let reply: string;
+    if (Array.isArray(data)) {
+      reply = data[0]?.generated_text || 'No response generated';
+    } else {
+      reply = data.generated_text || data[0]?.generated_text || 'No response generated';
+    }
 
     console.log('AI chat response generated');
 
@@ -109,7 +122,7 @@ CRITICAL: If symptoms suggest emergency, immediately advise to call emergency se
       JSON.stringify({
         reply,
         timestamp: new Date().toISOString(),
-        model: 'gemini-2.5-flash'
+        model: 'medgemma-2-8b'
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
