@@ -24,7 +24,7 @@ export const PharmacyPayment = ({ order, onPaymentSuccess }: PharmacyPaymentProp
       const { data, error } = await supabase.functions.invoke('process-payment-with-splits', {
         body: {
           amount: order?.total_amount ?? 0,
-          currency: 'USD',
+          currency,
           patientId: order?.patient_id,
           providerId: order?.pharmacy_id, // Pharmacy as provider
           serviceId: order?.id,
