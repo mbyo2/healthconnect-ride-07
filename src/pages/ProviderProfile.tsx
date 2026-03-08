@@ -37,6 +37,9 @@ const ProviderProfile = () => {
           provider_type,
           email,
           phone,
+          years_experience,
+          rating,
+          reviews_count,
           provider_locations (
             latitude,
             longitude
