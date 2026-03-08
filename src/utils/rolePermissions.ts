@@ -13,7 +13,19 @@ export const USER_ROLES = {
   NURSE: 'nurse',
   RADIOLOGIST: 'radiologist',
   PHARMACIST: 'pharmacist',
-  LAB_TECHNICIAN: 'lab_technician'
+  LAB_TECHNICIAN: 'lab_technician',
+  RECEPTIONIST: 'receptionist',
+  HR_MANAGER: 'hr_manager',
+  CXO: 'cxo',
+  OT_STAFF: 'ot_staff',
+  PHLEBOTOMIST: 'phlebotomist',
+  BILLING_STAFF: 'billing_staff',
+  INVENTORY_MANAGER: 'inventory_manager',
+  TRIAGE_STAFF: 'triage_staff',
+  MAINTENANCE_MANAGER: 'maintenance_manager',
+  SPECIALIST: 'specialist',
+  AMBULANCE_STAFF: 'ambulance_staff',
+  PATHOLOGIST: 'pathologist',
 } as const;
 
 export type UserRole = typeof USER_ROLES[keyof typeof USER_ROLES];
