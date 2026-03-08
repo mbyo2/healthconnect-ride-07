@@ -156,8 +156,8 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
     try {
       console.log('Attempting AI chat...');
 
-      // Primary: doc-chat (Lovable AI - supports images)
-      // Fallback: medgemma-chat (text-only)
+      // Primary: doc-chat (supports images)
+      // Fallback: secondary chat (text-only)
       let data, error;
       let functionUsed = '';
 
