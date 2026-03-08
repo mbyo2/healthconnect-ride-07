@@ -27,11 +27,12 @@ const Landing = () => {
     <div className="min-h-screen bg-background">
       {/* ─── Sticky Header ─── */}
       <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-14 items-center justify-between gap-2">
-            <AppLogo size="sm" linkTo="/landing" className="shrink-0" />
+        <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
+          <div className="flex h-14 items-center justify-between gap-1">
+            <AppLogo size="sm" showText={false} linkTo="/landing" className="shrink-0 sm:hidden" />
+            <AppLogo size="sm" linkTo="/landing" className="shrink-0 hidden sm:flex" />
 
-            <nav className="hidden md:flex items-center gap-1 shrink-0">
+            <nav className="hidden lg:flex items-center gap-1 shrink-0">
               {[
                 { label: "Find Doctors", route: "/search" },
                 { label: "For Providers", route: "/healthcare-application" },
@@ -49,12 +50,12 @@ const Landing = () => {
               ))}
             </nav>
 
-            <div className="flex items-center gap-1.5 shrink-0">
+            <div className="flex items-center gap-1 shrink-0">
               <ThemeToggle />
-              <Button variant="ghost" size="sm" onClick={() => navigate("/auth")} className="hidden sm:inline-flex text-sm">
+              <Button variant="ghost" size="sm" onClick={() => navigate("/auth")} className="hidden md:inline-flex text-sm">
                 Sign In
               </Button>
-              <Button size="sm" onClick={() => navigate("/auth?tab=signup")} className="text-sm">
+              <Button size="sm" onClick={() => navigate("/auth?tab=signup")} className="text-xs sm:text-sm px-3 sm:px-4">
                 Get Started
               </Button>
             </div>
