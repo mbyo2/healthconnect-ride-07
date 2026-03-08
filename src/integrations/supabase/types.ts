@@ -146,6 +146,98 @@ export type Database = {
         }
         Relationships: []
       }
+      ambulance_dispatches: {
+        Row: {
+          ambulance_unit: string
+          arrived_at: string | null
+          completed_at: string | null
+          contact_phone: string | null
+          created_at: string | null
+          crew_lead_id: string | null
+          delivered_at: string | null
+          departed_at: string | null
+          destination: string
+          destination_lat: number | null
+          destination_lng: number | null
+          dispatched_at: string | null
+          dispatcher_id: string | null
+          distance_km: number | null
+          estimated_eta_minutes: number | null
+          id: string
+          institution_id: string | null
+          notes: string | null
+          patient_name: string
+          pickup_lat: number | null
+          pickup_lng: number | null
+          pickup_location: string
+          priority: string
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          ambulance_unit: string
+          arrived_at?: string | null
+          completed_at?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          crew_lead_id?: string | null
+          delivered_at?: string | null
+          departed_at?: string | null
+          destination: string
+          destination_lat?: number | null
+          destination_lng?: number | null
+          dispatched_at?: string | null
+          dispatcher_id?: string | null
+          distance_km?: number | null
+          estimated_eta_minutes?: number | null
+          id?: string
+          institution_id?: string | null
+          notes?: string | null
+          patient_name: string
+          pickup_lat?: number | null
+          pickup_lng?: number | null
+          pickup_location: string
+          priority?: string
+          status?: string
+          updated_at?: string | null
+        }
+        Update: {
+          ambulance_unit?: string
+          arrived_at?: string | null
+          completed_at?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          crew_lead_id?: string | null
+          delivered_at?: string | null
+          departed_at?: string | null
+          destination?: string
+          destination_lat?: number | null
+          destination_lng?: number | null
+          dispatched_at?: string | null
+          dispatcher_id?: string | null
+          distance_km?: number | null
+          estimated_eta_minutes?: number | null
+          id?: string
+          institution_id?: string | null
+          notes?: string | null
+          patient_name?: string
+          pickup_lat?: number | null
+          pickup_lng?: number | null
+          pickup_location?: string
+          priority?: string
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ambulance_dispatches_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       app_owner_wallet: {
         Row: {
           balance: number
@@ -223,6 +315,83 @@ export type Database = {
             columns: ["provider_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      asset_register: {
+        Row: {
+          asset_name: string
+          asset_tag: string | null
+          assigned_department: string | null
+          category: string
+          condition: string | null
+          created_at: string | null
+          id: string
+          institution_id: string
+          last_maintenance_date: string | null
+          location: string | null
+          manufacturer: string | null
+          model_number: string | null
+          next_maintenance_date: string | null
+          notes: string | null
+          purchase_cost: number | null
+          purchase_date: string | null
+          serial_number: string | null
+          status: string | null
+          updated_at: string | null
+          warranty_expiry: string | null
+        }
+        Insert: {
+          asset_name: string
+          asset_tag?: string | null
+          assigned_department?: string | null
+          category?: string
+          condition?: string | null
+          created_at?: string | null
+          id?: string
+          institution_id: string
+          last_maintenance_date?: string | null
+          location?: string | null
+          manufacturer?: string | null
+          model_number?: string | null
+          next_maintenance_date?: string | null
+          notes?: string | null
+          purchase_cost?: number | null
+          purchase_date?: string | null
+          serial_number?: string | null
+          status?: string | null
+          updated_at?: string | null
+          warranty_expiry?: string | null
+        }
+        Update: {
+          asset_name?: string
+          asset_tag?: string | null
+          assigned_department?: string | null
+          category?: string
+          condition?: string | null
+          created_at?: string | null
+          id?: string
+          institution_id?: string
+          last_maintenance_date?: string | null
+          location?: string | null
+          manufacturer?: string | null
+          model_number?: string | null
+          next_maintenance_date?: string | null
+          notes?: string | null
+          purchase_cost?: number | null
+          purchase_date?: string | null
+          serial_number?: string | null
+          status?: string | null
+          updated_at?: string | null
+          warranty_expiry?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "asset_register_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
             referencedColumns: ["id"]
           },
         ]
@@ -2032,6 +2201,77 @@ export type Database = {
           },
         ]
       }
+      hospital_inventory: {
+        Row: {
+          barcode: string | null
+          category: string
+          created_at: string | null
+          expiry_date: string | null
+          id: string
+          institution_id: string
+          is_active: boolean | null
+          item_name: string
+          last_restocked_at: string | null
+          location: string | null
+          quantity_available: number
+          reorder_level: number
+          sku: string | null
+          subcategory: string | null
+          supplier: string | null
+          unit: string
+          unit_cost: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          barcode?: string | null
+          category?: string
+          created_at?: string | null
+          expiry_date?: string | null
+          id?: string
+          institution_id: string
+          is_active?: boolean | null
+          item_name: string
+          last_restocked_at?: string | null
+          location?: string | null
+          quantity_available?: number
+          reorder_level?: number
+          sku?: string | null
+          subcategory?: string | null
+          supplier?: string | null
+          unit?: string
+          unit_cost?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          barcode?: string | null
+          category?: string
+          created_at?: string | null
+          expiry_date?: string | null
+          id?: string
+          institution_id?: string
+          is_active?: boolean | null
+          item_name?: string
+          last_restocked_at?: string | null
+          location?: string | null
+          quantity_available?: number
+          reorder_level?: number
+          sku?: string | null
+          subcategory?: string | null
+          supplier?: string | null
+          unit?: string
+          unit_cost?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hospital_inventory_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       hospital_invoices: {
         Row: {
           amount: number
@@ -2244,6 +2484,48 @@ export type Database = {
           verification_complete?: boolean | null
         }
         Relationships: []
+      }
+      institution_branches: {
+        Row: {
+          branch_institution_id: string
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          parent_institution_id: string
+          relationship_type: string | null
+        }
+        Insert: {
+          branch_institution_id: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          parent_institution_id: string
+          relationship_type?: string | null
+        }
+        Update: {
+          branch_institution_id?: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          parent_institution_id?: string
+          relationship_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "institution_branches_branch_institution_id_fkey"
+            columns: ["branch_institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "institution_branches_parent_institution_id_fkey"
+            columns: ["parent_institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       institution_devices: {
         Row: {
@@ -4210,6 +4492,80 @@ export type Database = {
           },
         ]
       }
+      pathologist_reviews: {
+        Row: {
+          clinical_significance: string | null
+          created_at: string | null
+          findings: string | null
+          id: string
+          institution_id: string
+          is_critical: boolean | null
+          lab_result_id: string | null
+          lab_tech_id: string | null
+          lab_tech_name: string | null
+          pathologist_id: string | null
+          pathologist_name: string | null
+          patient_name: string
+          reference_range: string | null
+          released_at: string | null
+          result_value: string | null
+          reviewed_at: string | null
+          status: string
+          test_name: string
+          updated_at: string | null
+        }
+        Insert: {
+          clinical_significance?: string | null
+          created_at?: string | null
+          findings?: string | null
+          id?: string
+          institution_id: string
+          is_critical?: boolean | null
+          lab_result_id?: string | null
+          lab_tech_id?: string | null
+          lab_tech_name?: string | null
+          pathologist_id?: string | null
+          pathologist_name?: string | null
+          patient_name: string
+          reference_range?: string | null
+          released_at?: string | null
+          result_value?: string | null
+          reviewed_at?: string | null
+          status?: string
+          test_name: string
+          updated_at?: string | null
+        }
+        Update: {
+          clinical_significance?: string | null
+          created_at?: string | null
+          findings?: string | null
+          id?: string
+          institution_id?: string
+          is_critical?: boolean | null
+          lab_result_id?: string | null
+          lab_tech_id?: string | null
+          lab_tech_name?: string | null
+          pathologist_id?: string | null
+          pathologist_name?: string | null
+          patient_name?: string
+          reference_range?: string | null
+          released_at?: string | null
+          result_value?: string | null
+          reviewed_at?: string | null
+          status?: string
+          test_name?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pathologist_reviews_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       patient_allergies: {
         Row: {
           allergen_name: string
@@ -6102,6 +6458,155 @@ export type Database = {
         }
         Relationships: []
       }
+      specialist_session_templates: {
+        Row: {
+          contraindications: string[] | null
+          created_at: string | null
+          created_by: string | null
+          default_duration_minutes: number | null
+          id: string
+          institution_id: string | null
+          is_active: boolean | null
+          post_session_checklist: Json | null
+          pre_session_checklist: Json | null
+          protocol_steps: Json | null
+          required_equipment: string[] | null
+          specialty_type: string
+          template_name: string
+          updated_at: string | null
+        }
+        Insert: {
+          contraindications?: string[] | null
+          created_at?: string | null
+          created_by?: string | null
+          default_duration_minutes?: number | null
+          id?: string
+          institution_id?: string | null
+          is_active?: boolean | null
+          post_session_checklist?: Json | null
+          pre_session_checklist?: Json | null
+          protocol_steps?: Json | null
+          required_equipment?: string[] | null
+          specialty_type: string
+          template_name: string
+          updated_at?: string | null
+        }
+        Update: {
+          contraindications?: string[] | null
+          created_at?: string | null
+          created_by?: string | null
+          default_duration_minutes?: number | null
+          id?: string
+          institution_id?: string | null
+          is_active?: boolean | null
+          post_session_checklist?: Json | null
+          pre_session_checklist?: Json | null
+          protocol_steps?: Json | null
+          required_equipment?: string[] | null
+          specialty_type?: string
+          template_name?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "specialist_session_templates_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      specialist_sessions: {
+        Row: {
+          complications: string | null
+          created_at: string | null
+          end_time: string | null
+          id: string
+          institution_id: string | null
+          medications_administered: Json | null
+          next_session_date: string | null
+          outcome: string | null
+          patient_id: string | null
+          patient_name: string
+          protocol_notes: string | null
+          provider_id: string | null
+          session_date: string
+          session_number: number | null
+          specialty_type: string
+          start_time: string | null
+          status: string
+          template_id: string | null
+          total_sessions: number | null
+          updated_at: string | null
+          vitals_after: Json | null
+          vitals_before: Json | null
+        }
+        Insert: {
+          complications?: string | null
+          created_at?: string | null
+          end_time?: string | null
+          id?: string
+          institution_id?: string | null
+          medications_administered?: Json | null
+          next_session_date?: string | null
+          outcome?: string | null
+          patient_id?: string | null
+          patient_name: string
+          protocol_notes?: string | null
+          provider_id?: string | null
+          session_date: string
+          session_number?: number | null
+          specialty_type: string
+          start_time?: string | null
+          status?: string
+          template_id?: string | null
+          total_sessions?: number | null
+          updated_at?: string | null
+          vitals_after?: Json | null
+          vitals_before?: Json | null
+        }
+        Update: {
+          complications?: string | null
+          created_at?: string | null
+          end_time?: string | null
+          id?: string
+          institution_id?: string | null
+          medications_administered?: Json | null
+          next_session_date?: string | null
+          outcome?: string | null
+          patient_id?: string | null
+          patient_name?: string
+          protocol_notes?: string | null
+          provider_id?: string | null
+          session_date?: string
+          session_number?: number | null
+          specialty_type?: string
+          start_time?: string | null
+          status?: string
+          template_id?: string | null
+          total_sessions?: number | null
+          updated_at?: string | null
+          vitals_after?: Json | null
+          vitals_before?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "specialist_sessions_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "specialist_sessions_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "specialist_session_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       specialized_care_categories: {
         Row: {
           color_class: string
@@ -7175,6 +7680,90 @@ export type Database = {
             columns: ["wallet_id"]
             isOneToOne: false
             referencedRelation: "user_wallets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      work_orders: {
+        Row: {
+          actual_cost: number | null
+          asset_id: string | null
+          assigned_to: string | null
+          assigned_to_name: string | null
+          category: string
+          completed_at: string | null
+          created_at: string | null
+          description: string | null
+          due_date: string | null
+          estimated_cost: number | null
+          id: string
+          institution_id: string
+          location: string | null
+          priority: string
+          reported_by: string | null
+          resolution_notes: string | null
+          started_at: string | null
+          status: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          actual_cost?: number | null
+          asset_id?: string | null
+          assigned_to?: string | null
+          assigned_to_name?: string | null
+          category?: string
+          completed_at?: string | null
+          created_at?: string | null
+          description?: string | null
+          due_date?: string | null
+          estimated_cost?: number | null
+          id?: string
+          institution_id: string
+          location?: string | null
+          priority?: string
+          reported_by?: string | null
+          resolution_notes?: string | null
+          started_at?: string | null
+          status?: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          actual_cost?: number | null
+          asset_id?: string | null
+          assigned_to?: string | null
+          assigned_to_name?: string | null
+          category?: string
+          completed_at?: string | null
+          created_at?: string | null
+          description?: string | null
+          due_date?: string | null
+          estimated_cost?: number | null
+          id?: string
+          institution_id?: string
+          location?: string | null
+          priority?: string
+          reported_by?: string | null
+          resolution_notes?: string | null
+          started_at?: string | null
+          status?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "work_orders_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "asset_register"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "work_orders_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
             referencedColumns: ["id"]
           },
         ]
