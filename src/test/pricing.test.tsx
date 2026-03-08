@@ -4,7 +4,7 @@ import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-// Mock modules
+// Mock supabase - return empty array instead of undefined
 vi.mock('@/integrations/supabase/client', () => ({
   supabase: {
     from: vi.fn(() => ({
@@ -15,6 +15,7 @@ vi.mock('@/integrations/supabase/client', () => ({
       limit: vi.fn().mockReturnThis(),
       maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
       single: vi.fn().mockResolvedValue({ data: null, error: null }),
+      then: vi.fn().mockImplementation((cb) => cb({ data: [], error: null })),
     })),
     auth: {
       getUser: vi.fn().mockResolvedValue({ data: { user: null }, error: null }),
@@ -29,15 +30,11 @@ vi.mock('@/context/AuthContext', () => ({
   AuthProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
-vi.mock('@/hooks/use-currency', () => ({
-  useCurrency: () => ({
-    currency: 'ZMW',
-    setCurrency: vi.fn(),
-    formatPrice: (amount: number) => `K${amount}`,
-    getSymbol: () => 'K',
-    loading: false,
-    detectedCountry: 'ZM',
-  }),
+// Mock the hooks directly to avoid supabase query issues
+vi.mock('@/hooks/useSubscription', () => ({
+  useSubscriptionPlans: () => ({ data: [], isLoading: false }),
+  useUserSubscription: () => ({ data: null, isLoading: false }),
+  useSubscribeToPlan: () => ({ mutate: vi.fn(), isPending: false }),
 }));
 
 const createWrapper = () => {
@@ -92,11 +89,14 @@ describe('PricingPage', () => {
 
 describe('SubscriptionBadge', () => {
   it('renders nothing when no subscription', async () => {
+    vi.doMock('@/hooks/useSubscription', () => ({
+      useUserSubscription: () => ({ data: null, isLoading: false }),
+      useSubscriptionPlans: () => ({ data: [], isLoading: false }),
+      useSubscribeToPlan: () => ({ mutate: vi.fn(), isPending: false }),
+    }));
     const { SubscriptionBadge } = await import('@/components/subscription/SubscriptionBadge');
     const Wrapper = createWrapper();
     const { container } = render(<SubscriptionBadge />, { wrapper: Wrapper });
-    
-    // Should render nothing for free/no subscription
     expect(container.innerHTML).toBe('');
   });
 });
