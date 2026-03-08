@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { MarketplaceProduct } from '@/types/marketplace';
 import { ShoppingCart, Pill, AlertTriangle } from 'lucide-react';
+import { useCurrency } from '@/hooks/use-currency';
 
 interface ProductCardProps {
   product: MarketplaceProduct;
