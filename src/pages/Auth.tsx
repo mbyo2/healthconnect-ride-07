@@ -39,6 +39,7 @@ const providerSchema = z.object({
   providerType: z.string().min(1, "Select your profession"),
   specialty: z.string().optional(),
   licenseNumber: z.string().min(2, "License number required"),
+  yearsExperience: z.string().optional(),
   password: z.string().min(6, "Min 6 characters"),
   confirmPassword: z.string().min(6),
 }).refine(d => d.password === d.confirmPassword, { message: "Passwords don't match", path: ["confirmPassword"] });
