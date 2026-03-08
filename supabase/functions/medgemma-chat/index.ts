@@ -9,6 +9,7 @@ const corsHeaders = {
 // Input validation schema
 const chatRequestSchema = z.object({
   message: z.string().min(1, 'Message cannot be empty').max(2000, 'Message too long'),
+  userRole: z.string().optional().default('patient'),
   conversationHistory: z.array(z.object({
     role: z.enum(['user', 'assistant']),
     content: z.string().max(2000)
