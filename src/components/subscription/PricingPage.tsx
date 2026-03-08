@@ -1,10 +1,9 @@
-import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Check, Sparkles, Building2, User, Stethoscope, Loader2, Crown, Shield, Heart, DollarSign, UserPlus, Clock, MessageSquare } from 'lucide-react';
+import { Check, Sparkles, Building2, User, Stethoscope, Loader2, Crown, Shield, Heart, DollarSign, UserPlus, Clock, Pill } from 'lucide-react';
 import { useSubscriptionPlans, useSubscribeToPlan, useUserSubscription, SubscriptionPlan } from '@/hooks/useSubscription';
 import { useAuth } from '@/context/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -18,7 +17,7 @@ const formatKwacha = (amount: number) => {
 
 /* ─── Patient Section ─── */
 const PatientFreeSection = () => (
-  <div className="max-w-3xl mx-auto">
+  <div className="max-w-3xl mx-auto space-y-6">
     <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-background">
       <CardHeader className="text-center pb-4">
         <div className="flex justify-center mb-3">
@@ -26,34 +25,54 @@ const PatientFreeSection = () => (
             <Heart className="h-8 w-8 text-primary" />
           </div>
         </div>
-        <CardTitle className="text-2xl">Always Free for Patients</CardTitle>
+        <CardTitle className="text-2xl">Free to Use — Pay Only for Care</CardTitle>
         <CardDescription className="text-base max-w-xl mx-auto">
-          Just like Zocdoc — patients never pay to book. Find doctors, book instantly, manage your health — all free.
+          Browsing, searching, and managing your health on Doc' O Clock is <strong>always free</strong>. 
+          You only pay when you book a consultation or appointment — and that's the doctor's fee, not ours.
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-          {[
-            'Unlimited appointment booking',
-            'Health records access',
-            'AI symptom checker',
-            'Medication reminders',
-            'Emergency services directory',
-            'Mobile money payments',
-            'Family member management',
-            'Video consultations',
-            'Prescription tracking',
-          ].map((feature, i) => (
-            <div key={i} className="flex items-center gap-2 text-sm">
-              <Check className="h-4 w-4 text-primary shrink-0" />
-              <span>{feature}</span>
-            </div>
-          ))}
+      <CardContent className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <h4 className="font-semibold text-sm mb-2 text-primary">Always Free</h4>
+            <ul className="space-y-1.5">
+              {[
+                'Search & browse doctors',
+                'AI symptom checker',
+                'Health records access',
+                'Medication reminders',
+                'Emergency services directory',
+                'Family member management',
+              ].map((f, i) => (
+                <li key={i} className="flex items-center gap-2 text-sm">
+                  <Check className="h-3.5 w-3.5 text-primary shrink-0" />
+                  <span>{f}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <h4 className="font-semibold text-sm mb-2 text-foreground">When You Book</h4>
+            <ul className="space-y-1.5">
+              {[
+                'Consultation fees (set by provider)',
+                'Video consultation fees',
+                'Prescription medication costs',
+                'Lab test fees (if ordered)',
+                'Delivery fees for pharmacy orders',
+              ].map((f, i) => (
+                <li key={i} className="flex items-center gap-2 text-sm">
+                  <DollarSign className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                  <span className="text-muted-foreground">{f}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </CardContent>
       <CardFooter className="justify-center pt-2">
         <Badge variant="secondary" className="text-sm px-4 py-1.5 gap-1">
-          <Shield className="h-3.5 w-3.5" /> No hidden fees. No credit card required.
+          <Shield className="h-3.5 w-3.5" /> Zero platform fees for patients. Ever.
         </Badge>
       </CardFooter>
     </Card>
@@ -81,7 +100,6 @@ const ProviderPayPerBookingSection = () => {
 
   return (
     <div className="space-y-8 max-w-4xl mx-auto">
-      {/* Hero card */}
       <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-background">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-3">
@@ -91,7 +109,7 @@ const ProviderPayPerBookingSection = () => {
           </div>
           <CardTitle className="text-2xl">Pay Only for New Patients</CardTitle>
           <CardDescription className="text-base max-w-xl mx-auto">
-            List your practice for free. You're only charged when a <strong>new patient</strong> books through Doc' O Clock. 
+            List your practice for free. You're only charged when a <strong>new patient</strong> books through Doc' O Clock.
             Returning patients are always free. No monthly fees. No contracts.
           </CardDescription>
         </CardHeader>
@@ -116,61 +134,44 @@ const ProviderPayPerBookingSection = () => {
         </CardContent>
       </Card>
 
-      {/* What's included */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg">What's Included — Free</CardTitle>
-          </CardHeader>
+          <CardHeader className="pb-3"><CardTitle className="text-lg">What's Included — Free</CardTitle></CardHeader>
           <CardContent>
             <ul className="space-y-2">
-              {[
-                'Professional profile & listing',
-                'Appointment management',
-                'Patient messaging & chat',
-                'Automated reminders (SMS/Email)',
-                'Video consultations',
-                'Prescription management',
-                'Analytics dashboard',
-                'No-show tracking & alerts',
-              ].map((f, i) => (
+              {['Professional profile & listing', 'Appointment management', 'Patient messaging & chat',
+                'Automated reminders (SMS/Email)', 'Video consultations', 'Prescription management',
+                'Analytics dashboard', 'No-show tracking & alerts'].map((f, i) => (
                 <li key={i} className="flex items-center gap-2 text-sm">
-                  <Check className="h-4 w-4 text-primary shrink-0" />
-                  <span>{f}</span>
+                  <Check className="h-4 w-4 text-primary shrink-0" /><span>{f}</span>
                 </li>
               ))}
             </ul>
           </CardContent>
         </Card>
-
         <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg">How It Works</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-3">
-              {[
-                { step: '1', title: 'Create your free profile', desc: 'List your practice, specialties, and availability' },
-                { step: '2', title: 'New patients find you', desc: 'Patients search and book appointments through Doc\' O Clock' },
-                { step: '3', title: 'You get charged per new booking', desc: 'A one-time fee based on your specialty — only for new patients' },
-                { step: '4', title: 'Returning patients = free', desc: 'Once a patient is yours, all future bookings cost you nothing' },
-              ].map((item) => (
-                <div key={item.step} className="flex gap-3">
-                  <div className="flex-shrink-0 w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center">
-                    <span className="text-xs font-bold text-primary">{item.step}</span>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">{item.title}</p>
-                    <p className="text-xs text-muted-foreground">{item.desc}</p>
-                  </div>
+          <CardHeader className="pb-3"><CardTitle className="text-lg">How It Works</CardTitle></CardHeader>
+          <CardContent className="space-y-3">
+            {[
+              { step: '1', title: 'Create your free profile', desc: 'List your practice, specialties, and availability' },
+              { step: '2', title: 'New patients find you', desc: 'Patients search and book appointments through Doc\' O Clock' },
+              { step: '3', title: 'You get charged per new booking', desc: 'A one-time fee based on your specialty — only for first-time patients' },
+              { step: '4', title: 'Returning patients = free', desc: 'Once a patient is yours, all future bookings cost you nothing' },
+            ].map((item) => (
+              <div key={item.step} className="flex gap-3">
+                <div className="flex-shrink-0 w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center">
+                  <span className="text-xs font-bold text-primary">{item.step}</span>
                 </div>
-              ))}
-            </div>
+                <div>
+                  <p className="text-sm font-medium">{item.title}</p>
+                  <p className="text-xs text-muted-foreground">{item.desc}</p>
+                </div>
+              </div>
+            ))}
           </CardContent>
         </Card>
       </div>
 
-      {/* Specialty fee table */}
       {specialtyFees && specialtyFees.length > 0 && (
         <Card>
           <CardHeader>
@@ -195,13 +196,12 @@ const ProviderPayPerBookingSection = () => {
               </TableBody>
             </Table>
             <p className="text-xs text-muted-foreground mt-3">
-              * Fees may vary by location. Premium areas may have higher rates. Contact us for custom pricing.
+              * Fees may vary by location. Premium areas may have higher rates.
             </p>
           </CardContent>
         </Card>
       )}
 
-      {/* CTA */}
       <div className="text-center">
         <Button size="lg" onClick={() => !user ? navigate('/auth') : navigate('/provider-dashboard')}>
           {user ? 'Go to Dashboard' : 'Get Started Free'}
@@ -212,12 +212,77 @@ const ProviderPayPerBookingSection = () => {
   );
 };
 
+/* ─── Pharmacy Section ─── */
+const PharmacySection = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  return (
+    <div className="max-w-3xl mx-auto space-y-6">
+      <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-background">
+        <CardHeader className="text-center">
+          <div className="flex justify-center mb-3">
+            <div className="p-3 rounded-full bg-primary/10">
+              <Pill className="h-8 w-8 text-primary" />
+            </div>
+          </div>
+          <CardTitle className="text-2xl">Marketplace Listing + Commission</CardTitle>
+          <CardDescription className="text-base max-w-xl mx-auto">
+            Get listed on Doc' O Clock, receive prescription orders, and manage deliveries. 
+            Small listing fee + 2.5% commission on each sale.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="text-center p-4 rounded-lg bg-background border">
+              <DollarSign className="h-6 w-6 text-primary mx-auto mb-2" />
+              <p className="font-semibold text-sm">K200/mo</p>
+              <p className="text-xs text-muted-foreground">Marketplace listing fee</p>
+            </div>
+            <div className="text-center p-4 rounded-lg bg-background border">
+              <Pill className="h-6 w-6 text-primary mx-auto mb-2" />
+              <p className="font-semibold text-sm">2.5% Commission</p>
+              <p className="text-xs text-muted-foreground">Per order processed</p>
+            </div>
+            <div className="text-center p-4 rounded-lg bg-background border">
+              <Clock className="h-6 w-6 text-primary mx-auto mb-2" />
+              <p className="font-semibold text-sm">K2,000/yr</p>
+              <p className="text-xs text-muted-foreground">Save with annual billing</p>
+            </div>
+          </div>
+
+          <div>
+            <h4 className="font-semibold text-sm mb-3">What's Included</h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {[
+                'Marketplace visibility & search',
+                'Online order receiving',
+                'Prescription fulfillment workflow',
+                'Delivery zone management',
+                'Inventory sync & alerts',
+                '2.5% commission on sales',
+              ].map((f, i) => (
+                <div key={i} className="flex items-center gap-2 text-sm">
+                  <Check className="h-4 w-4 text-primary shrink-0" /><span>{f}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+        <CardFooter className="justify-center">
+          <Button onClick={() => !user ? navigate('/auth') : navigate('/pharmacy')}>
+            {user ? 'Go to Pharmacy Dashboard' : 'Get Started'}
+          </Button>
+        </CardFooter>
+      </Card>
+    </div>
+  );
+};
+
 /* ─── Institution Plan Card ─── */
 const InstitutionPlanCard = ({ plan, currentPlanId, onSubscribe, isLoading }: {
-  plan: SubscriptionPlan;
-  currentPlanId?: string;
-  onSubscribe: (planId: string, cycle: 'monthly' | 'annual') => void;
-  isLoading: boolean;
+  plan: SubscriptionPlan; currentPlanId?: string;
+  onSubscribe: (planId: string, cycle: 'monthly' | 'annual') => void; isLoading: boolean;
 }) => {
   const isCurrent = plan.id === currentPlanId;
   const marketplaceFee = (plan.limits as any)?.marketplace_listing_fee;
@@ -226,9 +291,7 @@ const InstitutionPlanCard = ({ plan, currentPlanId, onSubscribe, isLoading }: {
     <Card className={`relative flex flex-col ${plan.highlight ? 'border-primary shadow-lg shadow-primary/10 scale-[1.02]' : 'border-border'}`}>
       {plan.highlight && (
         <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-          <Badge className="bg-primary text-primary-foreground gap-1">
-            <Sparkles className="h-3 w-3" /> Most Popular
-          </Badge>
+          <Badge className="bg-primary text-primary-foreground gap-1"><Sparkles className="h-3 w-3" /> Most Popular</Badge>
         </div>
       )}
       <CardHeader className="text-center pb-2">
@@ -241,31 +304,23 @@ const InstitutionPlanCard = ({ plan, currentPlanId, onSubscribe, isLoading }: {
             <span className="text-4xl font-bold">{formatKwacha(plan.price_annual)}</span>
             <span className="text-muted-foreground">/year</span>
           </div>
-          <p className="text-xs text-muted-foreground mt-1">
-            ~{formatKwacha(Math.round(plan.price_annual / 12))}/month
-          </p>
+          <p className="text-xs text-muted-foreground mt-1">~{formatKwacha(Math.round(plan.price_annual / 12))}/month</p>
         </div>
-
         <div className="flex flex-wrap gap-2 justify-center">
           {plan.max_beds && <Badge variant="outline" className="text-xs">{plan.max_beds} beds</Badge>}
           {plan.max_users && <Badge variant="outline" className="text-xs">{plan.max_users} staff</Badge>}
           {plan.max_doctors && <Badge variant="outline" className="text-xs">{plan.max_doctors} doctors</Badge>}
           {!plan.max_beds && !plan.max_users && <Badge variant="outline" className="text-xs">Unlimited capacity</Badge>}
         </div>
-
         {marketplaceFee && (
           <div className="text-center p-2 bg-muted/50 rounded-md">
-            <p className="text-xs text-muted-foreground">
-              Optional marketplace listing: <span className="font-medium text-foreground">K{marketplaceFee}/mo</span>
-            </p>
+            <p className="text-xs text-muted-foreground">Optional marketplace listing: <span className="font-medium text-foreground">K{marketplaceFee}/mo</span></p>
           </div>
         )}
-
         <ul className="space-y-2">
           {(plan.features as string[]).map((feature, i) => (
             <li key={i} className="flex items-start gap-2 text-sm">
-              <Check className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-              <span>{feature}</span>
+              <Check className="h-4 w-4 text-primary shrink-0 mt-0.5" /><span>{feature}</span>
             </li>
           ))}
         </ul>
@@ -274,8 +329,7 @@ const InstitutionPlanCard = ({ plan, currentPlanId, onSubscribe, isLoading }: {
         <Button className="w-full" variant={plan.highlight ? 'default' : 'outline'}
           disabled={isCurrent || isLoading} onClick={() => onSubscribe(plan.id, 'annual')}>
           {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> :
-           isCurrent ? <><Crown className="h-4 w-4 mr-1" /> Current Plan</> :
-           'Start Annual Plan'}
+           isCurrent ? <><Crown className="h-4 w-4 mr-1" /> Current Plan</> : 'Start Annual Plan'}
         </Button>
       </CardFooter>
     </Card>
@@ -306,24 +360,21 @@ export const PricingPage = () => {
       <div className="text-center space-y-4">
         <h1 className="text-4xl font-bold">Simple, Transparent Pricing</h1>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-          Free for patients. Pay-per-new-patient for providers. Annual HMS plans for hospitals & clinics.
+          Free to browse for patients. Pay-per-new-patient for providers. Listing + commission for pharmacies. Annual HMS for hospitals.
         </p>
       </div>
 
       <Tabs defaultValue="patient" className="space-y-6">
-        <TabsList className="grid w-full max-w-md mx-auto grid-cols-3">
-          <TabsTrigger value="patient" className="gap-1"><User className="h-4 w-4" /> Patients</TabsTrigger>
-          <TabsTrigger value="provider" className="gap-1"><Stethoscope className="h-4 w-4" /> Providers</TabsTrigger>
-          <TabsTrigger value="institution" className="gap-1"><Building2 className="h-4 w-4" /> Institutions</TabsTrigger>
+        <TabsList className="grid w-full max-w-lg mx-auto grid-cols-4">
+          <TabsTrigger value="patient" className="gap-1 text-xs sm:text-sm"><User className="h-4 w-4" /> Patients</TabsTrigger>
+          <TabsTrigger value="provider" className="gap-1 text-xs sm:text-sm"><Stethoscope className="h-4 w-4" /> Providers</TabsTrigger>
+          <TabsTrigger value="pharmacy" className="gap-1 text-xs sm:text-sm"><Pill className="h-4 w-4" /> Pharmacies</TabsTrigger>
+          <TabsTrigger value="institution" className="gap-1 text-xs sm:text-sm"><Building2 className="h-4 w-4" /> Hospitals</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="patient">
-          <PatientFreeSection />
-        </TabsContent>
-
-        <TabsContent value="provider">
-          <ProviderPayPerBookingSection />
-        </TabsContent>
+        <TabsContent value="patient"><PatientFreeSection /></TabsContent>
+        <TabsContent value="provider"><ProviderPayPerBookingSection /></TabsContent>
+        <TabsContent value="pharmacy"><PharmacySection /></TabsContent>
 
         <TabsContent value="institution">
           <div className="space-y-4">
@@ -341,16 +392,6 @@ export const PricingPage = () => {
           </div>
         </TabsContent>
       </Tabs>
-
-      {/* Pharmacy note */}
-      <div className="max-w-2xl mx-auto text-center space-y-3 border rounded-lg p-6 bg-muted/30">
-        <h3 className="font-semibold text-lg">Pharmacies</h3>
-        <p className="text-sm text-muted-foreground">
-          Pharmacies operate on a <strong>2.5% commission-only</strong> model — no subscription fees.
-          A small percentage is deducted from each order processed through Doc' O Clock.
-        </p>
-        <Button variant="link" className="text-sm">Contact us for details →</Button>
-      </div>
 
       <div className="text-center text-sm text-muted-foreground space-y-1">
         <p>All plans include SSL encryption, HIPAA-compliant data handling, and 24/7 system monitoring.</p>
