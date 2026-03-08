@@ -58,13 +58,13 @@ const Profile = () => {
   return (
     <div className="space-y-6">
       {/* Profile Header */}
-      <Card className="border-trust-100 shadow-trust">
+      <Card>
         <CardContent className="pt-6">
           <div className="flex flex-col items-center space-y-4">
             <div className="relative">
-              <Avatar className="h-24 w-24 ring-4 ring-trust-100">
+              <Avatar className="h-24 w-24 ring-4 ring-border">
                 <AvatarImage src={profile?.avatar_url || ""} />
-                <AvatarFallback className="bg-trust-100 text-trust-600 text-xl">
+                <AvatarFallback className="bg-primary/10 text-primary text-xl">
                   {formData.firstName?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || "U"}
                 </AvatarFallback>
               </Avatar>
@@ -78,14 +78,14 @@ const Profile = () => {
             </div>
             
             <div className="text-center space-y-2">
-              <h1 className="text-2xl font-bold text-trust-700">
+              <h1 className="text-2xl font-bold text-foreground">
                 {formData.firstName} {formData.lastName || "Welcome"}
               </h1>
               <div className="flex items-center justify-center gap-2 text-muted-foreground">
                 <Mail className="h-4 w-4" />
                 {formData.email}
               </div>
-              <Badge variant="secondary" className="bg-trust-50 text-trust-600">
+              <Badge variant="secondary" className="bg-primary/10 text-primary">
                 {profile?.role === 'health_personnel' ? 'Healthcare Provider' : 'Patient'}
               </Badge>
             </div>
@@ -103,9 +103,9 @@ const Profile = () => {
       </Card>
 
       {/* Profile Details */}
-      <Card className="border-trust-100 shadow-trust">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-trust-700">Personal Information</CardTitle>
+          <CardTitle>Personal Information</CardTitle>
           <CardDescription>
             Manage your personal details and preferences
           </CardDescription>

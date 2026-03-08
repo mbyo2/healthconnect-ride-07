@@ -306,7 +306,7 @@ const Settings = () => {
       <div className="grid gap-6 md:grid-cols-2">
         <div className="space-y-6">
           {/* Account Settings */}
-          <Card className="border-trust-100 shadow-trust">
+          <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-foreground">
                 <User className="h-5 w-5" />
@@ -342,7 +342,7 @@ const Settings = () => {
           </Card>
 
           {/* Appearance Settings */}
-          <Card className="border-trust-100 shadow-trust">
+          <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-foreground">
                 <Palette className="h-5 w-5" />
@@ -378,7 +378,7 @@ const Settings = () => {
           </Card>
 
           {/* Privacy & Security */}
-          <Card className="border-trust-100 shadow-trust">
+          <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-foreground">
                 <Shield className="h-5 w-5" />
@@ -423,7 +423,7 @@ const Settings = () => {
 
         <div className="space-y-6">
           {/* Notification Settings */}
-          <Card className="border-trust-100 shadow-trust">
+          <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-foreground">
                 <Bell className="h-5 w-5" />
@@ -471,7 +471,7 @@ const Settings = () => {
           </Card>
 
           {/* Regional Settings */}
-          <Card className="border-trust-100 shadow-trust">
+          <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-foreground">
                 <Globe className="h-5 w-5" />

@@ -3,203 +3,21 @@
   margin: 0 auto;
   width: 100%;
   min-height: 100vh;
-  font-size: 16px;
-  line-height: 1.6;
-}
-
-@media (min-width: 768px) {
-  #root {
-    padding: 0;
-  }
-}
-
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
-
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-  border: 1px solid rgb(156 163 175);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border-radius: 12px;
-  background: white;
-  transition: all 0.2s ease;
-}
-
-.card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.read-the-docs {
-  color: rgb(75 85 99);
-  font-weight: 500;
-  font-size: 16px;
-}
-
-/* Enhanced mobile-specific styles */
-@media (max-width: 767px) {
-  .mobile-container {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-  
-  .mobile-pb {
-    padding-bottom: 4rem;
-  }
-
-  /* Accessible touch targets */
-  button, input, select, textarea, a {
-    min-height: 44px;
-    min-width: 44px;
-    font-size: 16px;
-    font-weight: 500;
-  }
-}
-
-/* Enhanced button styles */
-button {
-  color: rgb(75 85 99) !important;
-  border: 1px solid rgb(156 163 175) !important;
-  font-weight: 600 !important;
-  font-size: 16px !important;
-  padding: 12px 20px !important;
-  border-radius: 8px !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
-  transition: all 0.2s ease !important;
-  background: white !important;
-}
-
-button:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-  transform: translateY(-1px);
-  border-color: rgb(99 102 241) !important;
-}
-
-.dark button {
-  color: rgb(229 231 235) !important;
-  border-color: rgb(75 85 99) !important;
-  background: rgb(31 41 55) !important;
-}
-
-.dark button:hover {
-  background-color: rgb(55 65 81) !important;
-  border-color: rgb(147 197 253) !important;
-}
-
-/* Enhanced primary buttons */
-.bg-primary {
-  color: white !important;
-  background-color: rgb(59 130 246) !important;
-  border: 1px solid rgb(59 130 246) !important;
-}
-
-.bg-primary:hover {
-  background-color: rgb(37 99 235) !important;
-  border-color: rgb(37 99 235) !important;
-}
-
-/* Enhanced hover states */
-.hover\:bg-accent:hover {
-  background-color: rgba(239 246 255 / 0.8) !important;
-  border: 1px solid rgb(147 197 253) !important;
-}
-
-/* Enhanced CTA sections */
-.bg-white.text-blue-700 {
-  background-color: white !important;
-  color: rgb(29 78 216) !important;
-  border: 1px solid rgb(147 197 253) !important;
-  font-weight: 600 !important;
-}
-
-.dark .bg-white.text-blue-700 {
-  background-color: rgb(31 41 55) !important;
-  color: rgb(147 197 253) !important;
-  border: 1px solid rgb(75 85 99) !important;
-}
-
-.border-white {
-  border: 1px solid rgb(229 231 235) !important;
-}
-
-/* Enhanced viewport handling */
-@supports (-webkit-touch-callout: none) {
-  .min-h-screen {
-    min-height: -webkit-fill-available;
-  }
-}
-
-/* Wide screen optimizations */
-@media (min-width: 1600px) {
-  .container {
-    max-width: 1400px;
-  }
-  
-  .card {
-    padding: 2.5em;
-  }
-  
-  button {
-    padding: 14px 24px !important;
-    font-size: 17px !important;
-  }
-}
-
-@media (min-width: 1920px) {
-  .container {
-    max-width: 1600px;
-  }
-  
-  .card {
-    padding: 3em;
-  }
-  
-  button {
-    padding: 16px 28px !important;
-    font-size: 18px !important;
-  }
-  
-  h1 { font-size: 2.5rem !important; }
-  h2 { font-size: 2rem !important; }
-  h3 { font-size: 1.5rem !important; }
 }
 
 html, body {
   overflow-x: hidden;
   position: relative;
   width: 100%;
-  -webkit-overflow-scrolling: touch;
-  font-size: 16px;
-  line-height: 1.6;
 }
 
-/* Enhanced accessibility styles */
+/* Focus indicators */
+*:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+/* Screen reader only */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -212,26 +30,9 @@ html, body {
   border-width: 0;
 }
 
-/* Enhanced form validation states */
-.error input, .error textarea, .error select {
-  border: 2px solid rgb(220 38 38) !important;
-  background-color: rgb(254 242 242) !important;
-}
-
-.success input, .success textarea, .success select {
-  border: 2px solid rgb(34 197 94) !important;
-  background-color: rgb(240 253 244) !important;
-}
-
-/* Enhanced focus indicators */
-*:focus-visible {
-  outline: 2px solid rgb(59 130 246) !important;
-  outline-offset: 2px !important;
-  box-shadow: 0 0 0 2px rgb(59 130 246 / 0.2) !important;
-}
-
-.high-contrast *:focus-visible {
-  outline: 3px solid rgb(220 38 38) !important;
-  outline-offset: 2px !important;
-  box-shadow: 0 0 0 3px rgb(220 38 38 / 0.3) !important;
+/* iOS viewport fix */
+@supports (-webkit-touch-callout: none) {
+  .min-h-screen {
+    min-height: -webkit-fill-available;
+  }
 }

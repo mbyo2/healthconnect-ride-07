@@ -27,68 +27,41 @@ export function DesktopNavMenu({ secondaryNavItems }: DesktopNavMenuProps) {
   const location = useLocation();
   const [open, setOpen] = useState(false);
   
-  // Close dropdown when route changes
-  useEffect(() => {
-    setOpen(false);
-  }, [location.pathname]);
+  useEffect(() => { setOpen(false); }, [location.pathname]);
   
-  // Check if any secondary nav item is currently active
   const isActiveSecondaryPage = secondaryNavItems.some(item => location.pathname === item.to);
   
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
-        <Button 
-          variant="ghost" 
-          className={`flex items-center px-4 py-2 rounded-xl transition-all duration-300 ${
-            isActiveSecondaryPage 
-              ? "bg-trust-600 text-white shadow-lg" 
-              : "hover:bg-trust-50 hover:text-trust-700"
-          } ${
-            open ? "opacity-100" : isActiveSecondaryPage ? "opacity-100" : "opacity-100 hover:opacity-90"
+        <button
+          className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+            isActiveSecondaryPage
+              ? "bg-primary/10 text-primary"
+              : "text-muted-foreground hover:text-foreground hover:bg-accent"
           }`}
         >
-          <MoreHorizontal className="h-5 w-5 mr-2" />
+          <MoreHorizontal className="h-4 w-4" />
           More
-        </Button>
+        </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent 
-        className={`w-56 bg-white border-trust-200 shadow-xl transition-all duration-200 ease-out max-h-96 overflow-y-auto ${
-          open ? "opacity-100 scale-100 animate-in fade-in-0 zoom-in-95" : "opacity-0 scale-95 animate-out fade-out-0 zoom-out-95"
-        }`}
-      >
-        <DropdownMenuLabel className="text-trust-700 font-semibold">Quick Access</DropdownMenuLabel>
+      <DropdownMenuContent className="w-60 max-h-[70vh] overflow-y-auto">
+        <DropdownMenuLabel className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Quick Access</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {secondaryNavItems.map((item, index) => (
-          <DropdownMenuItem 
-            key={index} 
-            asChild 
-            className={`hover:bg-trust-50 transition-all duration-200 ${
-              location.pathname === item.to ? "bg-trust-50 text-trust-700 font-medium" : ""
-            }`}
-            onClick={() => setOpen(false)}
-          >
+          <DropdownMenuItem key={index} asChild onClick={() => setOpen(false)}>
             <Link 
               to={item.to} 
-              className="flex items-center justify-between w-full"
-              onClick={() => {
-                // Add dissolving animation before navigation
-                setOpen(false);
-              }}
+              className={`flex items-center justify-between w-full ${
+                location.pathname === item.to ? "text-primary font-medium" : ""
+              }`}
             >
               <div className="flex items-center">
                 {item.icon}
                 {item.label}
               </div>
               {item.badge && (
-                <span className={`text-xs px-2 py-1 rounded-full font-medium transition-all duration-200 ${
-                  item.badge === 'NEW' ? 'bg-green-100 text-green-700' :
-                  item.badge === 'AI' ? 'bg-blue-100 text-blue-700' :
-                  item.badge === 'SECURE' ? 'bg-purple-100 text-purple-700' :
-                  item.badge === 'LIVE' ? 'bg-red-100 text-red-700' :
-                  item.badge === '24/7' ? 'bg-orange-100 text-orange-700' :
-                  'bg-gray-100 text-gray-700'
-                }`}>
+                <span className="text-[10px] px-1.5 py-0.5 rounded-full font-semibold bg-primary/10 text-primary">
                   {item.badge}
                 </span>
               )}

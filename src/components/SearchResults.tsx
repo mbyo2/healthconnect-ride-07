@@ -68,13 +68,13 @@ export const SearchResults = () => {
         
         <div className="flex items-center gap-3">
           {/* View Toggle */}
-          <div className="flex bg-trust-100 dark:bg-trust-900/20 rounded-lg p-1">
+          <div className="flex bg-muted rounded-lg p-1">
             <button
               onClick={() => setViewMode('list')}
               className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-all ${
                 viewMode === 'list'
-                  ? 'bg-white dark:bg-trust-800 text-trust-700 dark:text-trust-200 shadow-sm'
-                  : 'text-trust-600 dark:text-trust-400 hover:text-trust-700 dark:hover:text-trust-300'
+                  ? 'bg-background text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               <List className="h-4 w-4" />
@@ -84,8 +84,8 @@ export const SearchResults = () => {
               onClick={() => setViewMode('map')}
               className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-all ${
                 viewMode === 'map'
-                  ? 'bg-white dark:bg-trust-800 text-trust-700 dark:text-trust-200 shadow-sm'
-                  : 'text-trust-600 dark:text-trust-400 hover:text-trust-700 dark:hover:text-trust-300'
+                  ? 'bg-background text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               <MapPin className="h-4 w-4" />

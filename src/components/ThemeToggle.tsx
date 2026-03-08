@@ -13,7 +13,7 @@ export const ThemeToggle = () => {
     const newTheme = theme === "dark" ? "light" : "dark";
     setTheme(newTheme);
     toast.success(`${newTheme.charAt(0).toUpperCase() + newTheme.slice(1)} mode activated`, {
-      className: "bg-trust-50 border-trust-200 text-trust-900 dark:bg-trust-900 dark:text-trust-50"
+      className: "bg-background border-border text-foreground"
     });
   };
 
@@ -24,7 +24,7 @@ export const ThemeToggle = () => {
       onClick={toggleTheme}
       className={cn(
         "relative h-9 w-9 rounded-md transition-colors duration-200",
-        theme === "dark" ? "bg-gray-800 text-gray-100" : "bg-trust-50 text-trust-600"
+        theme === "dark" ? "bg-secondary text-secondary-foreground" : "bg-muted text-muted-foreground"
       )}
       aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
     >

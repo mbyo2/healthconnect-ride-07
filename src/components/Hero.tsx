@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Shield, CheckCircle, Star, MapPin, Phone, Clock, Heart, Users, Stethoscope, Building2, Search } from 'lucide-react';
+import { Shield, CheckCircle, Star, Clock, Heart, Users, Stethoscope, Building2, Search } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AppLogo } from '@/components/ui/AppLogo';
 
@@ -10,7 +10,6 @@ const PLATFORM_STATS = {
   hospitals: '50+',
   pharmacies: '200+',
   patients: '10,000+',
-  countries: '1+',
 };
 
 export const Hero = () => {
@@ -19,70 +18,55 @@ export const Hero = () => {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
-    } else {
-      navigate('/search');
-    }
+    navigate(searchQuery.trim() ? `/search?q=${encodeURIComponent(searchQuery.trim())}` : '/search');
   };
 
   const quickActions = [
-    { icon: Stethoscope, label: 'Find Doctor', route: '/marketplace-users', color: 'text-blue-600 dark:text-blue-400' },
-    { icon: Building2, label: 'Hospitals', route: '/healthcare-institutions', color: 'text-emerald-600 dark:text-emerald-400' },
-    { icon: Heart, label: 'Emergency', route: '/emergency', color: 'text-red-600 dark:text-red-400' },
-    { icon: Phone, label: 'Emergency Call', route: '/emergency', color: 'text-orange-600 dark:text-orange-400' },
+    { icon: Stethoscope, label: 'Find Doctor', route: '/search', color: 'text-primary' },
+    { icon: Building2, label: 'Hospitals', route: '/healthcare-institutions', color: 'text-primary' },
+    { icon: Heart, label: 'Emergency', route: '/emergency', color: 'text-destructive' },
+    { icon: Users, label: 'Specialists', route: '/search', color: 'text-primary' },
   ];
 
   return (
-    <div className="bg-gradient-to-b from-primary/5 via-blue-50/50 to-background dark:from-primary/10 dark:via-blue-900/10 dark:to-background">
-      <div className="container-modern py-12 md:py-16">
-        {/* Trust indicators */}
-        <div className="flex flex-wrap justify-center items-center gap-4 md:gap-6 mb-8 text-sm">
-          <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
-            <Shield className="h-4 w-4" />
-            <span className="font-medium">Verified Providers</span>
-          </div>
-          <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400">
-            <CheckCircle className="h-4 w-4" />
-            <span className="font-medium">Insurance Support</span>
-          </div>
-          <div className="flex items-center gap-2 text-orange-600 dark:text-orange-400">
-            <Star className="h-4 w-4 fill-current" />
-            <span className="font-medium">4.8/5 Rating</span>
-          </div>
-          <div className="flex items-center gap-2 text-primary">
-            <Clock className="h-4 w-4" />
-            <span className="font-medium">24/7 Emergency</span>
-          </div>
-        </div>
-        
-        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-          {/* Left column - Content */}
-          <div className="text-center lg:text-left">
-            <div className="flex justify-center lg:justify-start mb-6">
-              <AppLogo size="lg" className="p-4 bg-primary/10 rounded-2xl border border-primary/20" />
+    <div className="bg-gradient-to-b from-primary/5 to-background">
+      <div className="container-modern py-12 md:py-20">
+        {/* Trust bar */}
+        <div className="flex flex-wrap justify-center items-center gap-4 md:gap-6 mb-10 text-sm text-muted-foreground">
+          {[
+            { icon: Shield, label: "Verified Providers" },
+            { icon: CheckCircle, label: "Insurance Support" },
+            { icon: Star, label: "4.8/5 Rating" },
+            { icon: Clock, label: "24/7 Emergency" },
+          ].map(({ icon: Icon, label }) => (
+            <div key={label} className="flex items-center gap-1.5">
+              <Icon className="h-4 w-4 text-primary" />
+              <span className="font-medium">{label}</span>
             </div>
-            
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold mb-4 md:mb-6 text-foreground leading-tight">
-              Healthcare for
-              <span className="text-primary block">Everyone, Everywhere</span>
+          ))}
+        </div>
+
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div className="text-center lg:text-left">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold mb-5 text-foreground leading-tight tracking-tight">
+              Healthcare for{" "}
+              <span className="text-primary">Everyone</span>
             </h1>
-            
-            <p className="text-lg md:text-xl text-muted-foreground mb-6 md:mb-8 leading-relaxed max-w-xl mx-auto lg:mx-0">
-              Connect with trusted doctors, hospitals, and pharmacies worldwide. 
-              Book appointments, order medicine, and get emergency care—all in one app.
+
+            <p className="text-lg text-muted-foreground mb-8 leading-relaxed max-w-xl mx-auto lg:mx-0">
+              Find trusted doctors, book instantly, consult via video — all from Zambia's most modern healthcare platform.
             </p>
 
-            {/* Search Bar */}
-            <form onSubmit={handleSearch} className="flex gap-2 mb-6 md:mb-8 max-w-xl mx-auto lg:mx-0">
+            {/* Search */}
+            <form onSubmit={handleSearch} className="flex gap-2 mb-8 max-w-lg mx-auto lg:mx-0">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   type="text"
-                  placeholder="Search doctors, specialties, conditions..."
+                  placeholder="Search doctors, specialties..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 h-12 text-base rounded-xl border-2 border-border focus:border-primary"
+                  className="pl-10 h-12 rounded-xl"
                 />
               </div>
               <Button type="submit" size="lg" className="h-12 px-6 rounded-xl">
@@ -90,98 +74,67 @@ export const Hero = () => {
               </Button>
             </form>
 
-            {/* Quick Stats */}
-            <div className="grid grid-cols-4 gap-2 md:gap-4 mb-6 md:mb-8 max-w-md mx-auto lg:mx-0">
-              <div className="text-center p-2 md:p-3 bg-card rounded-xl border border-border">
-                <div className="text-lg md:text-xl font-bold text-primary">{PLATFORM_STATS.doctors}</div>
-                <div className="text-[10px] md:text-xs text-muted-foreground">Doctors</div>
-              </div>
-              <div className="text-center p-2 md:p-3 bg-card rounded-xl border border-border">
-                <div className="text-lg md:text-xl font-bold text-emerald-600">{PLATFORM_STATS.hospitals}</div>
-                <div className="text-[10px] md:text-xs text-muted-foreground">Hospitals</div>
-              </div>
-              <div className="text-center p-2 md:p-3 bg-card rounded-xl border border-border">
-                <div className="text-lg md:text-xl font-bold text-blue-600">{PLATFORM_STATS.pharmacies}</div>
-                <div className="text-[10px] md:text-xs text-muted-foreground">Pharmacies</div>
-              </div>
-              <div className="text-center p-2 md:p-3 bg-card rounded-xl border border-border">
-                <div className="text-lg md:text-xl font-bold text-orange-600">{PLATFORM_STATS.countries}</div>
-                <div className="text-[10px] md:text-xs text-muted-foreground">Countries</div>
-              </div>
+            {/* Stats */}
+            <div className="grid grid-cols-4 gap-3 mb-8 max-w-md mx-auto lg:mx-0">
+              {[
+                { value: PLATFORM_STATS.doctors, label: "Doctors" },
+                { value: PLATFORM_STATS.hospitals, label: "Hospitals" },
+                { value: PLATFORM_STATS.pharmacies, label: "Pharmacies" },
+                { value: PLATFORM_STATS.patients, label: "Patients" },
+              ].map((stat) => (
+                <div key={stat.label} className="text-center p-3 bg-card rounded-xl border border-border">
+                  <div className="text-lg font-bold text-primary">{stat.value}</div>
+                  <div className="text-[10px] text-muted-foreground">{stat.label}</div>
+                </div>
+              ))}
             </div>
-            
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3 md:gap-4 mb-6 md:mb-8">
-              <Button asChild variant="amazon" size="xl" className="flex-1 sm:flex-none">
-                <Link to="/auth?tab=signup" className="text-center">
-                  Get Started Free
-                </Link>
+
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Button asChild size="lg" className="flex-1 sm:flex-none rounded-xl h-12">
+                <Link to="/auth?tab=signup">Get Started Free</Link>
               </Button>
-              <Button asChild variant="outline" size="xl" className="flex-1 sm:flex-none">
-                <Link to="/auth" className="text-center">
-                  Sign In
-                </Link>
+              <Button asChild variant="outline" size="lg" className="flex-1 sm:flex-none rounded-xl h-12">
+                <Link to="/auth">Sign In</Link>
               </Button>
             </div>
-            
-            {/* Trust statement */}
-            <p className="text-xs md:text-sm text-muted-foreground">
-              Trusted by {PLATFORM_STATS.patients} users • Free to start • Multiple payment options
-            </p>
           </div>
-          
-          {/* Right column - Quick Actions & Visual */}
+
+          {/* Right column */}
           <div className="relative">
-            {/* Quick Action Cards for mobile */}
             <div className="grid grid-cols-2 gap-3 md:hidden mb-6">
               {quickActions.map((action, idx) => (
                 <button
                   key={idx}
                   onClick={() => navigate(action.route)}
-                  className="flex items-center gap-3 p-4 bg-card border border-border rounded-xl hover:shadow-lg transition-all active:scale-95"
+                  className="flex items-center gap-3 p-4 bg-card border border-border rounded-xl hover:shadow-md transition-all active:scale-[0.98]"
                 >
-                  <action.icon className={`h-6 w-6 ${action.color}`} />
+                  <action.icon className={`h-5 w-5 ${action.color}`} />
                   <span className="font-medium text-sm text-foreground">{action.label}</span>
                 </button>
               ))}
             </div>
 
-            {/* Desktop card */}
-            <div className="hidden md:block bg-card border border-border rounded-xl shadow-lg p-6 lg:p-8 max-w-md mx-auto">
+            <div className="hidden md:block bg-card border border-border rounded-2xl shadow-lg p-8 max-w-md mx-auto">
               <div className="text-center mb-6">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
-                  <Heart className="h-8 w-8 text-white" />
+                <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-primary/10 flex items-center justify-center">
+                  <Heart className="h-7 w-7 text-primary" />
                 </div>
-                <h3 className="text-xl font-semibold text-foreground mb-2">Your Health, Our Priority</h3>
-                <p className="text-muted-foreground text-sm">Quality healthcare accessible anywhere in the world</p>
+                <h3 className="text-lg font-semibold text-foreground mb-1">Your Health, Our Priority</h3>
+                <p className="text-sm text-muted-foreground">Quality healthcare accessible anywhere</p>
               </div>
-              
-              <div className="space-y-3">
-                <div className="flex items-center gap-3 p-3 bg-blue-500/10 dark:bg-blue-500/20 rounded-lg">
-                  <Stethoscope className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                  <span className="text-sm font-medium text-foreground">Find doctors near you</span>
-                </div>
-                <div className="flex items-center gap-3 p-3 bg-emerald-500/10 dark:bg-emerald-500/20 rounded-lg">
-                  <Building2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-                  <span className="text-sm font-medium text-foreground">Connected hospitals & clinics</span>
-                </div>
-                <div className="flex items-center gap-3 p-3 bg-orange-500/10 dark:bg-orange-500/20 rounded-lg">
-                  <Phone className="h-5 w-5 text-orange-600 dark:text-orange-400" />
-                  <span className="text-sm font-medium text-foreground">Emergency response — instant access</span>
-                </div>
-                <div className="flex items-center gap-3 p-3 bg-primary/10 dark:bg-primary/20 rounded-lg">
-                  <Shield className="h-5 w-5 text-primary" />
-                  <span className="text-sm font-medium text-foreground">Insurance integration support</span>
-                </div>
+
+              <div className="space-y-2.5">
+                {[
+                  { icon: Stethoscope, text: "Find doctors near you" },
+                  { icon: Building2, text: "Connected hospitals & clinics" },
+                  { icon: Shield, text: "Insurance integration support" },
+                ].map(({ icon: Icon, text }) => (
+                  <div key={text} className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                    <Icon className="h-5 w-5 text-primary" />
+                    <span className="text-sm font-medium">{text}</span>
+                  </div>
+                ))}
               </div>
-            </div>
-            
-            {/* Floating badges */}
-            <div className="hidden lg:block absolute -top-4 -right-4 bg-red-500/10 dark:bg-red-500/20 text-red-700 dark:text-red-300 px-3 py-1 rounded-full text-xs font-medium border border-red-500/20">
-              🚨 Emergency Ready
-            </div>
-            <div className="hidden lg:block absolute -bottom-4 -left-4 bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 px-3 py-1 rounded-full text-xs font-medium border border-emerald-500/20">
-              🌍 Global Healthcare
             </div>
           </div>
         </div>

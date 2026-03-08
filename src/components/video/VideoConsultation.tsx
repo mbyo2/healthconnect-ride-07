@@ -161,9 +161,9 @@ export const VideoConsultation = () => {
       )}
       
       {isTV && !activeConsultation && (
-        <div className="tv-indicator mb-6 p-4 flex items-center justify-center bg-trust-100 dark:bg-trust-900/50 rounded-lg">
-          <Tv className="h-6 w-6 mr-3 text-trust-500" />
-          <span className="text-xl text-trust-700 dark:text-trust-300">TV Mode Active - Use remote control for navigation</span>
+        <div className="tv-indicator mb-6 p-4 flex items-center justify-center bg-muted rounded-lg">
+          <Tv className="h-6 w-6 mr-3 text-primary" />
+          <span className="text-xl text-foreground">TV Mode Active - Use remote control for navigation</span>
         </div>
       )}
       
