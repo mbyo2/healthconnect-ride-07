@@ -16,6 +16,9 @@ interface MobileLayoutProps {
   isLoading?: boolean;
 }
 
+// Routes that manage their own layout (no global header/nav)
+const STANDALONE_ROUTES = ['/landing'];
+
 export const MobileLayout = ({ children, isLoading }: MobileLayoutProps) => {
   const { isDesktop } = useDeviceType();
   const { isAuthenticated } = useAuth();
@@ -31,6 +34,11 @@ export const MobileLayout = ({ children, isLoading }: MobileLayoutProps) => {
 
   if (isLoading) {
     return <LoadingScreen />;
+  }
+
+  // Standalone pages render without global chrome
+  if (STANDALONE_ROUTES.includes(location.pathname)) {
+    return <>{children}</>;
   }
 
   if (isDesktop) {
