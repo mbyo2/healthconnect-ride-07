@@ -4,11 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Camera, Upload, CreditCard, CheckCircle2, AlertCircle, Loader2, X, Shield } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 interface InsuranceCard {
@@ -33,10 +32,10 @@ export const InsuranceCardUpload = () => {
   const [providerName, setProviderName] = useState('');
   const [policyNumber, setPolicyNumber] = useState('');
 
-  const { data: cards = [], isLoading } = useQuery({
+  const { data: cards = [] } = useQuery({
     queryKey: ['insurance-cards', user?.id],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('insurance_cards')
         .select('*')
         .eq('patient_id', user!.id)
@@ -91,7 +90,7 @@ export const InsuranceCardUpload = () => {
         if (backErr) throw backErr;
       }
 
-      const { error } = await supabase.from('insurance_cards').insert({
+      const { error } = await (supabase as any).from('insurance_cards').insert({
         patient_id: user.id,
         front_image_url: frontPath,
         back_image_url: backPath,
@@ -138,7 +137,6 @@ export const InsuranceCardUpload = () => {
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Front */}
             <div>
               <Label className="text-sm font-medium mb-2 block">Front of Card *</Label>
               <input
@@ -170,7 +168,6 @@ export const InsuranceCardUpload = () => {
               )}
             </div>
 
-            {/* Back */}
             <div>
               <Label className="text-sm font-medium mb-2 block">Back of Card (optional)</Label>
               <input
@@ -205,12 +202,12 @@ export const InsuranceCardUpload = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="provider">Insurance Provider</Label>
-              <Input id="provider" placeholder="e.g. Blue Cross" value={providerName} onChange={(e) => setProviderName(e.target.value)} className="mt-1" />
+              <Label htmlFor="ins-provider">Insurance Provider</Label>
+              <Input id="ins-provider" placeholder="e.g. Blue Cross" value={providerName} onChange={(e) => setProviderName(e.target.value)} className="mt-1" />
             </div>
             <div>
-              <Label htmlFor="policy">Policy Number</Label>
-              <Input id="policy" placeholder="e.g. XYZ123456" value={policyNumber} onChange={(e) => setPolicyNumber(e.target.value)} className="mt-1" />
+              <Label htmlFor="ins-policy">Policy Number</Label>
+              <Input id="ins-policy" placeholder="e.g. XYZ123456" value={policyNumber} onChange={(e) => setPolicyNumber(e.target.value)} className="mt-1" />
             </div>
           </div>
 
@@ -220,7 +217,6 @@ export const InsuranceCardUpload = () => {
         </CardContent>
       </Card>
 
-      {/* Existing cards */}
       {cards.length > 0 && (
         <Card>
           <CardHeader>
@@ -233,9 +229,9 @@ export const InsuranceCardUpload = () => {
                   <div className="flex items-center gap-3">
                     <CreditCard className="h-5 w-5 text-primary" />
                     <div>
-                      <p className="text-sm font-medium">{(card.ocr_data as any)?.provider_name || 'Insurance Card'}</p>
+                      <p className="text-sm font-medium">{card.ocr_data?.provider_name || 'Insurance Card'}</p>
                       <p className="text-xs text-muted-foreground">
-                        {(card.ocr_data as any)?.policy_number || 'No policy number'} • Uploaded {new Date(card.created_at).toLocaleDateString()}
+                        {card.ocr_data?.policy_number || 'No policy number'} • Uploaded {new Date(card.created_at).toLocaleDateString()}
                       </p>
                     </div>
                   </div>

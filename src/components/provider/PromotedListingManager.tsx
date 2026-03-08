@@ -5,13 +5,23 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Megaphone, TrendingUp, Eye, MousePointer, CalendarCheck, DollarSign, BarChart3, Loader2, Sparkles } from 'lucide-react';
+import { Megaphone, TrendingUp, Eye, MousePointer, CalendarCheck, DollarSign, Loader2, Sparkles } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+
+interface PromotedListing {
+  id: string;
+  provider_id: string;
+  plan_type: string;
+  budget_daily: number;
+  spent_total: number;
+  impressions: number;
+  clicks: number;
+  bookings_from_ad: number;
+  is_active: boolean;
+}
 
 export const PromotedListingManager = () => {
   const { user } = useAuth();
@@ -19,24 +29,24 @@ export const PromotedListingManager = () => {
   const [planType, setPlanType] = useState('basic');
   const [dailyBudget, setDailyBudget] = useState('10');
 
-  const { data: listing, isLoading } = useQuery({
+  const { data: listing } = useQuery({
     queryKey: ['promoted-listing', user?.id],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data } = await (supabase as any)
         .from('promoted_listings')
         .select('*')
         .eq('provider_id', user!.id)
         .order('created_at', { ascending: false })
         .limit(1)
         .maybeSingle();
-      return data;
+      return data as PromotedListing | null;
     },
     enabled: !!user,
   });
 
   const createListing = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from('promoted_listings').insert({
+      const { error } = await (supabase as any).from('promoted_listings').insert({
         provider_id: user!.id,
         plan_type: planType,
         budget_daily: parseFloat(dailyBudget),
@@ -54,7 +64,7 @@ export const PromotedListingManager = () => {
   const toggleActive = useMutation({
     mutationFn: async () => {
       if (!listing) return;
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('promoted_listings')
         .update({ is_active: !listing.is_active, updated_at: new Date().toISOString() })
         .eq('id', listing.id);
@@ -77,56 +87,53 @@ export const PromotedListingManager = () => {
     const convRate = listing.clicks > 0 ? ((listing.bookings_from_ad / listing.clicks) * 100).toFixed(1) : '0';
 
     return (
-      <div className="space-y-6">
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                <Megaphone className="h-5 w-5 text-primary" />
-                Your Promoted Listing
-              </CardTitle>
-              <div className="flex items-center gap-2">
-                <Switch checked={listing.is_active} onCheckedChange={() => toggleActive.mutate()} />
-                <Badge variant={listing.is_active ? 'default' : 'secondary'}>
-                  {listing.is_active ? 'Active' : 'Paused'}
-                </Badge>
-              </div>
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <Megaphone className="h-5 w-5 text-primary" />
+              Your Promoted Listing
+            </CardTitle>
+            <div className="flex items-center gap-2">
+              <Switch checked={listing.is_active} onCheckedChange={() => toggleActive.mutate()} />
+              <Badge variant={listing.is_active ? 'default' : 'secondary'}>
+                {listing.is_active ? 'Active' : 'Paused'}
+              </Badge>
             </div>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="p-4 bg-muted/50 rounded-xl text-center">
-                <Eye className="h-5 w-5 text-primary mx-auto mb-1" />
-                <p className="text-2xl font-bold text-foreground">{listing.impressions?.toLocaleString()}</p>
-                <p className="text-xs text-muted-foreground">Impressions</p>
-              </div>
-              <div className="p-4 bg-muted/50 rounded-xl text-center">
-                <MousePointer className="h-5 w-5 text-blue-500 mx-auto mb-1" />
-                <p className="text-2xl font-bold text-foreground">{listing.clicks?.toLocaleString()}</p>
-                <p className="text-xs text-muted-foreground">Clicks ({ctr}% CTR)</p>
-              </div>
-              <div className="p-4 bg-muted/50 rounded-xl text-center">
-                <CalendarCheck className="h-5 w-5 text-emerald-500 mx-auto mb-1" />
-                <p className="text-2xl font-bold text-foreground">{listing.bookings_from_ad}</p>
-                <p className="text-xs text-muted-foreground">Bookings ({convRate}%)</p>
-              </div>
-              <div className="p-4 bg-muted/50 rounded-xl text-center">
-                <DollarSign className="h-5 w-5 text-amber-500 mx-auto mb-1" />
-                <p className="text-2xl font-bold text-foreground">${listing.spent_total?.toFixed(2)}</p>
-                <p className="text-xs text-muted-foreground">Total Spent</p>
-              </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="p-4 bg-muted/50 rounded-xl text-center">
+              <Eye className="h-5 w-5 text-primary mx-auto mb-1" />
+              <p className="text-2xl font-bold text-foreground">{listing.impressions?.toLocaleString()}</p>
+              <p className="text-xs text-muted-foreground">Impressions</p>
             </div>
-
-            <div className="mt-4 flex items-center gap-4 p-3 bg-primary/5 rounded-lg">
-              <Sparkles className="h-5 w-5 text-primary" />
-              <div>
-                <p className="text-sm font-medium capitalize">{listing.plan_type} Plan</p>
-                <p className="text-xs text-muted-foreground">Daily budget: ${listing.budget_daily}/day</p>
-              </div>
+            <div className="p-4 bg-muted/50 rounded-xl text-center">
+              <MousePointer className="h-5 w-5 text-primary mx-auto mb-1" />
+              <p className="text-2xl font-bold text-foreground">{listing.clicks?.toLocaleString()}</p>
+              <p className="text-xs text-muted-foreground">Clicks ({ctr}% CTR)</p>
             </div>
-          </CardContent>
-        </Card>
-      </div>
+            <div className="p-4 bg-muted/50 rounded-xl text-center">
+              <CalendarCheck className="h-5 w-5 text-primary mx-auto mb-1" />
+              <p className="text-2xl font-bold text-foreground">{listing.bookings_from_ad}</p>
+              <p className="text-xs text-muted-foreground">Bookings ({convRate}%)</p>
+            </div>
+            <div className="p-4 bg-muted/50 rounded-xl text-center">
+              <DollarSign className="h-5 w-5 text-primary mx-auto mb-1" />
+              <p className="text-2xl font-bold text-foreground">${listing.spent_total?.toFixed(2)}</p>
+              <p className="text-xs text-muted-foreground">Total Spent</p>
+            </div>
+          </div>
+          <div className="mt-4 flex items-center gap-4 p-3 bg-primary/5 rounded-lg">
+            <Sparkles className="h-5 w-5 text-primary" />
+            <div>
+              <p className="text-sm font-medium capitalize">{listing.plan_type} Plan</p>
+              <p className="text-xs text-muted-foreground">Daily budget: ${listing.budget_daily}/day</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
@@ -137,9 +144,7 @@ export const PromotedListingManager = () => {
           <Megaphone className="h-5 w-5 text-primary" />
           Promote Your Practice
         </CardTitle>
-        <CardDescription>
-          Reach more patients and grow your practice with promoted listings
-        </CardDescription>
+        <CardDescription>Reach more patients and grow your practice with promoted listings</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -148,9 +153,7 @@ export const PromotedListingManager = () => {
               key={plan.value}
               onClick={() => setPlanType(plan.value)}
               className={`p-4 rounded-xl border-2 text-left transition-all ${
-                planType === plan.value
-                  ? 'border-primary bg-primary/5'
-                  : 'border-border hover:border-primary/50'
+                planType === plan.value ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'
               }`}
             >
               <div className="flex items-center justify-between mb-2">
@@ -167,18 +170,10 @@ export const PromotedListingManager = () => {
             </button>
           ))}
         </div>
-
         <div>
           <Label>Daily Budget ($)</Label>
-          <Input
-            type="number"
-            min="5"
-            value={dailyBudget}
-            onChange={(e) => setDailyBudget(e.target.value)}
-            className="mt-1 max-w-[200px]"
-          />
+          <Input type="number" min="5" value={dailyBudget} onChange={(e) => setDailyBudget(e.target.value)} className="mt-1 max-w-[200px]" />
         </div>
-
         <Button onClick={() => createListing.mutate()} disabled={createListing.isPending} className="w-full" size="lg">
           {createListing.isPending ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Megaphone className="h-4 w-4 mr-2" />}
           Activate Promoted Listing

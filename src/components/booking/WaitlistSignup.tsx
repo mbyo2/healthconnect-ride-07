@@ -5,8 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Bell, Clock, Calendar, AlertTriangle, Check, Loader2 } from 'lucide-react';
+import { Bell, Clock, Calendar, AlertTriangle, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
@@ -60,7 +59,7 @@ export const WaitlistSignup = ({ provider, isOpen, onClose }: WaitlistSignupProp
     }
     setSubmitting(true);
     try {
-      const { error } = await supabase.from('appointment_waitlist').insert({
+      const { error } = await (supabase as any).from('appointment_waitlist').insert({
         patient_id: user.id,
         provider_id: provider.id,
         preferred_dates: selectedDays.length > 0 ? selectedDays : null,
@@ -93,27 +92,26 @@ export const WaitlistSignup = ({ provider, isOpen, onClose }: WaitlistSignupProp
         </DialogHeader>
 
         <div className="space-y-6">
-          {/* Urgency */}
           <div>
             <Label className="text-sm font-medium mb-3 block">How soon do you need to be seen?</Label>
             <RadioGroup value={urgency} onValueChange={setUrgency} className="space-y-2">
               <div className="flex items-center space-x-3 p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer">
-                <RadioGroupItem value="normal" id="normal" />
-                <Label htmlFor="normal" className="flex-1 cursor-pointer">
+                <RadioGroupItem value="normal" id="wl-normal" />
+                <Label htmlFor="wl-normal" className="flex-1 cursor-pointer">
                   <p className="font-medium text-sm">Flexible</p>
                   <p className="text-xs text-muted-foreground">Anytime in the next 30 days</p>
                 </Label>
               </div>
               <div className="flex items-center space-x-3 p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer">
-                <RadioGroupItem value="soon" id="soon" />
-                <Label htmlFor="soon" className="flex-1 cursor-pointer">
+                <RadioGroupItem value="soon" id="wl-soon" />
+                <Label htmlFor="wl-soon" className="flex-1 cursor-pointer">
                   <p className="font-medium text-sm">Soon</p>
                   <p className="text-xs text-muted-foreground">Within the next week</p>
                 </Label>
               </div>
-              <div className="flex items-center space-x-3 p-3 rounded-lg border border-amber-500/30 hover:bg-amber-500/5 cursor-pointer">
-                <RadioGroupItem value="urgent" id="urgent" />
-                <Label htmlFor="urgent" className="flex-1 cursor-pointer">
+              <div className="flex items-center space-x-3 p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer">
+                <RadioGroupItem value="urgent" id="wl-urgent" />
+                <Label htmlFor="wl-urgent" className="flex-1 cursor-pointer">
                   <div className="flex items-center gap-2">
                     <p className="font-medium text-sm">Urgent</p>
                     <AlertTriangle className="h-3 w-3 text-amber-500" />
@@ -124,7 +122,6 @@ export const WaitlistSignup = ({ provider, isOpen, onClose }: WaitlistSignupProp
             </RadioGroup>
           </div>
 
-          {/* Preferred Days */}
           <div>
             <Label className="text-sm font-medium mb-3 block flex items-center gap-2">
               <Calendar className="h-4 w-4 text-primary" />
@@ -139,9 +136,7 @@ export const WaitlistSignup = ({ provider, isOpen, onClose }: WaitlistSignupProp
                     key={dayStr}
                     onClick={() => toggleDay(dayStr)}
                     className={`px-3 py-2 rounded-lg text-xs font-medium transition-all ${
-                      isSelected
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-muted hover:bg-primary/10'
+                      isSelected ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-primary/10'
                     }`}
                   >
                     {format(day, 'EEE d')}
@@ -151,7 +146,6 @@ export const WaitlistSignup = ({ provider, isOpen, onClose }: WaitlistSignupProp
             </div>
           </div>
 
-          {/* Preferred Times */}
           <div>
             <Label className="text-sm font-medium mb-3 block flex items-center gap-2">
               <Clock className="h-4 w-4 text-primary" />
@@ -163,9 +157,7 @@ export const WaitlistSignup = ({ provider, isOpen, onClose }: WaitlistSignupProp
                   key={time.id}
                   onClick={() => toggleTime(time.id)}
                   className={`p-3 rounded-lg text-sm font-medium transition-all text-left ${
-                    selectedTimes.includes(time.id)
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted hover:bg-primary/10'
+                    selectedTimes.includes(time.id) ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-primary/10'
                   }`}
                 >
                   {time.label}
@@ -174,11 +166,10 @@ export const WaitlistSignup = ({ provider, isOpen, onClose }: WaitlistSignupProp
             </div>
           </div>
 
-          {/* Notes */}
           <div>
-            <Label htmlFor="notes">Additional Notes (optional)</Label>
+            <Label htmlFor="wl-notes">Additional Notes (optional)</Label>
             <Textarea
-              id="notes"
+              id="wl-notes"
               placeholder="Any details about your visit..."
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
