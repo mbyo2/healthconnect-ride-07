@@ -224,6 +224,7 @@ const AppContent = () => {
             <Route path="/institution/reports" element={<RouteGuard><InstitutionReports /></RouteGuard>} />
             <Route path="/institution/appointments" element={<RouteGuard><InstitutionAppointments /></RouteGuard>} />
             <Route path="/institution/settings" element={<RouteGuard><InstitutionSettings /></RouteGuard>} />
+            <Route path="/institution/devices" element={<RouteGuard><InstitutionDevices /></RouteGuard>} />
             <Route path="/appointments/:id" element={<RouteGuard><AppointmentDetails /></RouteGuard>} />
 
             {/* Provider & Video */}
