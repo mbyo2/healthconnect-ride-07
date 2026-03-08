@@ -75,7 +75,7 @@ export const CTASection = () => {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="rounded-xl border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 font-medium h-12 px-8"
+                  className="rounded-xl border-2 border-primary-foreground/50 text-primary-foreground hover:bg-primary-foreground/15 font-medium h-12 px-8 bg-primary-foreground/10"
                   onClick={() => navigate("/search")}
                 >
                   Browse Doctors
