@@ -22,9 +22,9 @@ const AIDiagnostics = () => {
   return (
     <>
       <Helmet>
-        <title>AI Diagnostic Assistant - MedGemma | Healthcare Platform</title>
-        <meta name="description" content="Get AI-powered health analysis and medical insights from MedGemma, Google's medical AI assistant. Analyze symptoms, get health recommendations, and chat with our medical AI." />
-        <meta name="keywords" content="AI diagnosis, medical AI, symptom checker, health analysis, MedGemma, medical assistant" />
+        <title>AI Diagnostic Assistant | Doc' O Clock</title>
+        <meta name="description" content="Get AI-powered health analysis and medical insights from Doc' O Clock AI. Analyze symptoms, get health recommendations, and chat with our intelligent medical assistant." />
+        <meta name="keywords" content="AI diagnosis, medical AI, symptom checker, health analysis, Doc O Clock AI, medical assistant" />
       </Helmet>
 
       <div className="container mx-auto px-4 py-2 sm:py-8 max-w-7xl">
