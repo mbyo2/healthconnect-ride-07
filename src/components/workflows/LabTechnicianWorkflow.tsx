@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { useSuccessFeedback } from '@/hooks/use-success-feedback';
+import { useInstitutionAffiliation } from '@/hooks/useInstitutionAffiliation';
 import {
   Activity, FileText, Search, Settings, BarChart3,
   Users, ClipboardList, TestTube, AlertTriangle, Wallet,
@@ -13,6 +14,7 @@ import {
 export const LabTechnicianWorkflow = () => {
   const navigate = useNavigate();
   const { showSuccess } = useSuccessFeedback();
+  const { isInstitutionAffiliated } = useInstitutionAffiliation();
 
   const handleNavigation = (route: string, title: string) => {
     navigate(route);
@@ -29,7 +31,7 @@ export const LabTechnicianWorkflow = () => {
     { title: "Patient Lookup", description: "Search patient test history", icon: <Search className="h-5 w-5" />, route: '/search' },
     { title: "Quality Control", description: "QC logs, calibration & NABL compliance", icon: <ClipboardList className="h-5 w-5" />, route: '/lab-management' },
     { title: "TAT Analytics", description: "Turnaround time & performance metrics", icon: <BarChart3 className="h-5 w-5" />, route: '/lab-management' },
-    { title: "Earnings & Wallet", description: "Test processing fees & payouts", icon: <Wallet className="h-5 w-5" />, route: '/wallet' },
+    ...(!isInstitutionAffiliated ? [{ title: "Earnings & Wallet", description: "Test processing fees & payouts", icon: <Wallet className="h-5 w-5" />, route: '/wallet' }] : []),
     { title: "Settings", description: "Lab preferences & configuration", icon: <Settings className="h-5 w-5" />, route: '/settings' },
   ];
 

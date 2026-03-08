@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { useSuccessFeedback } from '@/hooks/use-success-feedback';
+import { useInstitutionAffiliation } from '@/hooks/useInstitutionAffiliation';
 import {
   MonitorDot, Calendar, Users, FileText, Settings,
   ClipboardList, MessageSquare, Brain, Wallet,
@@ -13,6 +14,7 @@ import {
 export const RadiologistWorkflow = () => {
   const navigate = useNavigate();
   const { showSuccess } = useSuccessFeedback();
+  const { isInstitutionAffiliated } = useInstitutionAffiliation();
 
   const handleNavigation = (route: string, title: string) => {
     navigate(route);
@@ -30,7 +32,7 @@ export const RadiologistWorkflow = () => {
     { title: "Referring Physicians", description: "Communication with ordering doctors", icon: <MessageSquare className="h-5 w-5" />, route: '/chat' },
     { title: "Patient Records", description: "Clinical context for readings", icon: <Users className="h-5 w-5" />, route: '/connections' },
     { title: "Performance Analytics", description: "TAT, volume & accuracy metrics", icon: <Activity className="h-5 w-5" />, route: '/health-analytics' },
-    { title: "Earnings & Wallet", description: "Reading fees & payouts", icon: <Wallet className="h-5 w-5" />, route: '/wallet' },
+    ...(!isInstitutionAffiliated ? [{ title: "Earnings & Wallet", description: "Reading fees & payouts", icon: <Wallet className="h-5 w-5" />, route: '/wallet' }] : []),
     { title: "Promote Practice", description: "Sponsored listings & growth tools", icon: <Megaphone className="h-5 w-5" />, route: '/provider-dashboard' },
     { title: "Booking Widget", description: "Embed booking on your website", icon: <Code2 className="h-5 w-5" />, route: '/provider-dashboard' },
     { title: "Patient Waitlist", description: "Manage waitlisted patients", icon: <Bell className="h-5 w-5" />, route: '/provider-dashboard' },

@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { useSuccessFeedback } from '@/hooks/use-success-feedback';
+import { useInstitutionAffiliation } from '@/hooks/useInstitutionAffiliation';
 import { 
   Package, Pill, ShoppingCart, FileText, Truck, Settings,
   BarChart3, Users, Shield, AlertTriangle, Wallet, Megaphone, CreditCard
@@ -12,6 +13,7 @@ import {
 export const PharmacyWorkflow = () => {
   const navigate = useNavigate();
   const { showSuccess } = useSuccessFeedback();
+  const { isInstitutionAffiliated } = useInstitutionAffiliation();
   
   const handleNavigation = (route: string, title: string) => {
     navigate(route);
@@ -30,7 +32,7 @@ export const PharmacyWorkflow = () => {
     { title: "Sales Analytics", description: "Revenue and performance reports", icon: <BarChart3 className="h-5 w-5" />, route: '/pharmacy-portal' },
     { title: "Promote Pharmacy", description: "Sponsored listings & visibility", icon: <Megaphone className="h-5 w-5" />, route: '/pharmacy-portal' },
     { title: "Insurance Verification", description: "Verify patient insurance for Rx", icon: <CreditCard className="h-5 w-5" />, route: '/prescriptions' },
-    { title: "Earnings & Wallet", description: "Revenue & payment management", icon: <Wallet className="h-5 w-5" />, route: '/wallet' },
+    ...(!isInstitutionAffiliated ? [{ title: "Earnings & Wallet", description: "Revenue & payment management", icon: <Wallet className="h-5 w-5" />, route: '/wallet' }] : []),
     { title: "Settings", description: "Pharmacy preferences and profile", icon: <Settings className="h-5 w-5" />, route: '/settings' },
   ];
 

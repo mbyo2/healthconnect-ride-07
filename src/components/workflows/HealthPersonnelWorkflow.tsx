@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { useSuccessFeedback } from '@/hooks/use-success-feedback';
+import { useInstitutionAffiliation } from '@/hooks/useInstitutionAffiliation';
 import { 
   Stethoscope, Calendar, Users, FileText, Settings,
   ClipboardList, MessageSquare, Brain, Wallet, AlertTriangle,
@@ -13,6 +14,7 @@ import {
 export const HealthPersonnelWorkflow = () => {
   const navigate = useNavigate();
   const { showSuccess } = useSuccessFeedback();
+  const { isInstitutionAffiliated } = useInstitutionAffiliation();
   
   const handleNavigation = (route: string, title: string) => {
     navigate(route);
@@ -32,7 +34,7 @@ export const HealthPersonnelWorkflow = () => {
     { title: "Patient Chat", description: "Secure messaging with patients", icon: <MessageSquare className="h-5 w-5" />, route: '/chat' },
     { title: "Medication Management", description: "Review active medications & refills", icon: <Pill className="h-5 w-5" />, route: '/medications' },
     { title: "Health Analytics", description: "Patient trends & clinical outcomes", icon: <Activity className="h-5 w-5" />, route: '/health-analytics' },
-    { title: "Earnings & Wallet", description: "View consultations revenue and payouts", icon: <Wallet className="h-5 w-5" />, route: '/wallet' },
+    ...(!isInstitutionAffiliated ? [{ title: "Earnings & Wallet", description: "View consultations revenue and payouts", icon: <Wallet className="h-5 w-5" />, route: '/wallet' }] : []),
     { title: "Emergency Protocols", description: "Emergency response tools", icon: <AlertTriangle className="h-5 w-5" />, route: '/emergency' },
     { title: "Promote Practice", description: "Sponsored listings & growth tools", icon: <Megaphone className="h-5 w-5" />, route: '/provider-dashboard' },
     { title: "Booking Widget", description: "Embed booking on your website", icon: <Code2 className="h-5 w-5" />, route: '/provider-dashboard' },
