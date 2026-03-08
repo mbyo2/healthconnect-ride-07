@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSuccessFeedback } from '@/hooks/use-success-feedback';
 import { 
   Package, Pill, ShoppingCart, FileText, Truck, Settings,
-  BarChart3, Users, Shield, AlertTriangle, Wallet
+  BarChart3, Users, Shield, AlertTriangle, Wallet, Megaphone, CreditCard
 } from 'lucide-react';
 
 export const PharmacyWorkflow = () => {
