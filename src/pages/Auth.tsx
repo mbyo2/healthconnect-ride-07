@@ -341,7 +341,6 @@ export const Auth = () => {
                         <FormItem><FormLabel className="text-xs">Years Experience</FormLabel><FormControl><Input {...field} type="number" min="0" placeholder="e.g. 5" /></FormControl></FormItem>
                       )} />
                     </div>
-                    )} />
                     <FormField control={providerForm.control} name="email" render={({ field }) => (
                       <FormItem><FormLabel className="text-xs">Email</FormLabel><FormControl><Input {...field} type="email" /></FormControl><FormMessage /></FormItem>
                     )} />
