@@ -4439,6 +4439,94 @@ export type Database = {
           },
         ]
       }
+      ot_surgeries: {
+        Row: {
+          anaesthesia_type: string
+          completed_at: string | null
+          consent_signed: boolean
+          created_at: string
+          created_by: string | null
+          id: string
+          institution_id: string
+          notes: string | null
+          ot_room: string
+          patient_id: string | null
+          patient_name: string
+          procedure_name: string
+          scheduled_date: string
+          scheduled_time: string
+          started_at: string | null
+          status: string
+          surgeon_id: string | null
+          surgeon_name: string
+          updated_at: string
+        }
+        Insert: {
+          anaesthesia_type?: string
+          completed_at?: string | null
+          consent_signed?: boolean
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          institution_id: string
+          notes?: string | null
+          ot_room?: string
+          patient_id?: string | null
+          patient_name: string
+          procedure_name: string
+          scheduled_date?: string
+          scheduled_time: string
+          started_at?: string | null
+          status?: string
+          surgeon_id?: string | null
+          surgeon_name: string
+          updated_at?: string
+        }
+        Update: {
+          anaesthesia_type?: string
+          completed_at?: string | null
+          consent_signed?: boolean
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          institution_id?: string
+          notes?: string | null
+          ot_room?: string
+          patient_id?: string | null
+          patient_name?: string
+          procedure_name?: string
+          scheduled_date?: string
+          scheduled_time?: string
+          started_at?: string | null
+          status?: string
+          surgeon_id?: string | null
+          surgeon_name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ot_surgeries_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ot_surgeries_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ot_surgeries_surgeon_id_fkey"
+            columns: ["surgeon_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       password_policies: {
         Row: {
           created_at: string | null
@@ -6314,6 +6402,75 @@ export type Database = {
           {
             foreignKeyName: "reviews_reviewer_id_fkey"
             columns: ["reviewer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sample_collections: {
+        Row: {
+          address: string | null
+          barcode: string
+          collected_at: string | null
+          collected_by: string | null
+          collection_type: string
+          created_at: string
+          created_by: string | null
+          id: string
+          institution_id: string | null
+          patient_id: string | null
+          patient_name: string
+          sample_type: string
+          scheduled_time: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          barcode: string
+          collected_at?: string | null
+          collected_by?: string | null
+          collection_type?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          institution_id?: string | null
+          patient_id?: string | null
+          patient_name: string
+          sample_type?: string
+          scheduled_time?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          barcode?: string
+          collected_at?: string | null
+          collected_by?: string | null
+          collection_type?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          institution_id?: string | null
+          patient_id?: string | null
+          patient_name?: string
+          sample_type?: string
+          scheduled_time?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sample_collections_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sample_collections_patient_id_fkey"
+            columns: ["patient_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
