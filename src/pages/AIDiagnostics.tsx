@@ -38,7 +38,7 @@ const AIDiagnostics = () => {
               <div>
                 <h1 className="text-xl sm:text-3xl font-bold">AI Diagnostic Assistant</h1>
                 <p className="text-xs sm:text-base text-muted-foreground">
-                  Powered by Doc 0 Clock - Your 24/7 Medical AI
+                  Powered by Doc' O Clock AI - Your 24/7 Medical Assistant
                 </p>
               </div>
             </div>
