@@ -28,6 +28,126 @@ export function BottomNav() {
       ];
     }
 
+    // CXO / Executive
+    if (availableRoles.includes('cxo')) {
+      return [
+        { to: "/institution-dashboard", label: "Overview", icon: <BarChart3 className="h-5 w-5" />, active: location.pathname === "/institution-dashboard", description: "Executive overview" },
+        { to: "/institution/reports", label: "Reports", icon: <Activity className="h-5 w-5" />, active: location.pathname === "/institution/reports", description: "MIS reports" },
+        { to: "/wallet", label: "Finance", icon: <DollarSign className="h-5 w-5" />, active: location.pathname === "/wallet", description: "Financial overview" },
+        { to: "/hospital-management", label: "Ops", icon: <Building2 className="h-5 w-5" />, active: location.pathname === "/hospital-management", description: "Operations" },
+      ];
+    }
+
+    // Receptionist
+    if (availableRoles.includes('receptionist')) {
+      return [
+        { to: "/institution-dashboard", label: "Front Desk", icon: <ClipboardList className="h-5 w-5" />, active: location.pathname === "/institution-dashboard", description: "Front office" },
+        { to: "/appointments", label: "Appointments", icon: <Calendar className="h-5 w-5" />, active: location.pathname === "/appointments", description: "Schedule" },
+        { to: "/institution/patients", label: "Check-In", icon: <Users className="h-5 w-5" />, active: location.pathname === "/institution/patients", description: "Patient check-in" },
+        { to: "/chat", label: "Chat", icon: <MessageSquare className="h-5 w-5" />, active: location.pathname === "/chat", description: "Messages" },
+      ];
+    }
+
+    // HR Manager
+    if (availableRoles.includes('hr_manager')) {
+      return [
+        { to: "/institution-dashboard", label: "HR", icon: <Users className="h-5 w-5" />, active: location.pathname === "/institution-dashboard", description: "HR dashboard" },
+        { to: "/institution/personnel", label: "Staff", icon: <Users className="h-5 w-5" />, active: location.pathname === "/institution/personnel", description: "Staff management" },
+        { to: "/institution/reports", label: "Attendance", icon: <ClipboardList className="h-5 w-5" />, active: location.pathname === "/institution/reports", description: "Attendance" },
+        { to: "/wallet", label: "Payroll", icon: <DollarSign className="h-5 w-5" />, active: location.pathname === "/wallet", description: "Payroll" },
+      ];
+    }
+
+    // OT Staff
+    if (availableRoles.includes('ot_staff')) {
+      return [
+        { to: "/institution-dashboard", label: "OT", icon: <Scissors className="h-5 w-5" />, active: location.pathname === "/institution-dashboard", description: "Operation theatre" },
+        { to: "/appointments", label: "Schedule", icon: <Calendar className="h-5 w-5" />, active: location.pathname === "/appointments", description: "Surgery schedule" },
+        { to: "/medical-records", label: "Records", icon: <Heart className="h-5 w-5" />, active: location.pathname === "/medical-records", description: "Patient records" },
+        { to: "/emergency", label: "Emergency", icon: <AlertTriangle className="h-5 w-5" />, active: location.pathname === "/emergency", description: "Emergency OT" },
+      ];
+    }
+
+    // Triage Staff
+    if (availableRoles.includes('triage_staff')) {
+      return [
+        { to: "/institution-dashboard", label: "Triage", icon: <AlertTriangle className="h-5 w-5" />, active: location.pathname === "/institution-dashboard", description: "Triage queue" },
+        { to: "/appointments", label: "Queue", icon: <Users className="h-5 w-5" />, active: location.pathname === "/appointments", description: "Patient queue" },
+        { to: "/medical-records", label: "Vitals", icon: <Heart className="h-5 w-5" />, active: location.pathname === "/medical-records", description: "Vital signs" },
+        { to: "/emergency", label: "Emergency", icon: <AlertTriangle className="h-5 w-5" />, active: location.pathname === "/emergency", description: "Emergency cases" },
+      ];
+    }
+
+    // Billing Staff
+    if (availableRoles.includes('billing_staff')) {
+      return [
+        { to: "/institution-dashboard", label: "Billing", icon: <DollarSign className="h-5 w-5" />, active: location.pathname === "/institution-dashboard", description: "Billing dashboard" },
+        { to: "/wallet", label: "Invoices", icon: <Wallet className="h-5 w-5" />, active: location.pathname === "/wallet", description: "Invoices & payments" },
+        { to: "/institution/reports", label: "Reports", icon: <BarChart3 className="h-5 w-5" />, active: location.pathname === "/institution/reports", description: "Financial reports" },
+        { to: "/institution/patients", label: "Accounts", icon: <Users className="h-5 w-5" />, active: location.pathname === "/institution/patients", description: "Patient accounts" },
+      ];
+    }
+
+    // Inventory Manager
+    if (availableRoles.includes('inventory_manager')) {
+      return [
+        { to: "/institution-dashboard", label: "Inventory", icon: <Package className="h-5 w-5" />, active: location.pathname === "/institution-dashboard", description: "Inventory dashboard" },
+        { to: "/pharmacy-inventory", label: "Stock", icon: <Pill className="h-5 w-5" />, active: location.pathname === "/pharmacy-inventory", description: "Stock management" },
+        { to: "/medications", label: "Supplies", icon: <ClipboardList className="h-5 w-5" />, active: location.pathname === "/medications", description: "Medical supplies" },
+        { to: "/institution/reports", label: "Reports", icon: <BarChart3 className="h-5 w-5" />, active: location.pathname === "/institution/reports", description: "Usage reports" },
+      ];
+    }
+
+    // Maintenance Manager
+    if (availableRoles.includes('maintenance_manager')) {
+      return [
+        { to: "/institution-dashboard", label: "Maintenance", icon: <Wrench className="h-5 w-5" />, active: location.pathname === "/institution-dashboard", description: "Maintenance" },
+        { to: "/institution/devices", label: "Assets", icon: <Settings className="h-5 w-5" />, active: location.pathname === "/institution/devices", description: "Asset management" },
+        { to: "/institution/reports", label: "Work Orders", icon: <ClipboardList className="h-5 w-5" />, active: location.pathname === "/institution/reports", description: "Work orders" },
+        { to: "/institution/settings", label: "Contracts", icon: <Building2 className="h-5 w-5" />, active: location.pathname === "/institution/settings", description: "Vendor contracts" },
+      ];
+    }
+
+    // Ambulance Staff
+    if (availableRoles.includes('ambulance_staff')) {
+      return [
+        { to: "/institution-dashboard", label: "Dispatch", icon: <Truck className="h-5 w-5" />, active: location.pathname === "/institution-dashboard", description: "Ambulance dispatch" },
+        { to: "/emergency", label: "Emergency", icon: <AlertTriangle className="h-5 w-5" />, active: location.pathname === "/emergency", description: "Active emergencies" },
+        { to: "/map", label: "Navigate", icon: <Navigation className="h-5 w-5" />, active: location.pathname === "/map", description: "Route navigation" },
+        { to: "/chat", label: "Radio", icon: <MessageSquare className="h-5 w-5" />, active: location.pathname === "/chat", description: "Dispatch comms" },
+      ];
+    }
+
+    // Phlebotomist
+    if (availableRoles.includes('phlebotomist')) {
+      return [
+        { to: "/lab-management", label: "Samples", icon: <Droplets className="h-5 w-5" />, active: location.pathname === "/lab-management", description: "Sample queue" },
+        { to: "/map", label: "Route", icon: <Navigation className="h-5 w-5" />, active: location.pathname === "/map", description: "Home collections" },
+        { to: "/medical-records", label: "Status", icon: <ClipboardList className="h-5 w-5" />, active: location.pathname === "/medical-records", description: "Sample status" },
+        { to: "/connections", label: "Patients", icon: <Users className="h-5 w-5" />, active: location.pathname === "/connections", description: "Patient lookup" },
+      ];
+    }
+
+    // Pathologist
+    if (availableRoles.includes('pathologist')) {
+      return [
+        { to: "/lab-management", label: "Lab", icon: <Microscope className="h-5 w-5" />, active: location.pathname === "/lab-management", description: "Lab oversight" },
+        { to: "/medical-records", label: "Reports", icon: <Heart className="h-5 w-5" />, active: location.pathname === "/medical-records", description: "Diagnostic reports" },
+        { to: "/ai-diagnostics", label: "AI", icon: <Brain className="h-5 w-5" />, active: location.pathname === "/ai-diagnostics", description: "AI pathology" },
+        { to: "/connections", label: "Doctors", icon: <Users className="h-5 w-5" />, active: location.pathname === "/connections", description: "Referring doctors" },
+      ];
+    }
+
+    // Specialist (Dialysis/IVF)
+    if (availableRoles.includes('specialist')) {
+      return [
+        { to: "/provider-dashboard", label: "Dashboard", icon: <Stethoscope className="h-5 w-5" />, active: location.pathname === "/provider-dashboard", description: "Specialist dashboard" },
+        { to: "/appointments", label: "Sessions", icon: <Calendar className="h-5 w-5" />, active: location.pathname === "/appointments", description: "Treatment sessions" },
+        { to: "/medical-records", label: "Records", icon: <Heart className="h-5 w-5" />, active: location.pathname === "/medical-records", description: "Patient records" },
+        { to: "/ai-diagnostics", label: "AI", icon: <Brain className="h-5 w-5" />, active: location.pathname === "/ai-diagnostics", description: "Clinical AI" },
+      ];
+    }
+
     // Solo Nurse
     if (availableRoles.includes('nurse') && !availableRoles.some(r => ['institution_admin', 'institution_staff'].includes(r))) {
       return [
