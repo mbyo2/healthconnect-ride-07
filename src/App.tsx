@@ -124,6 +124,7 @@ const AppContent = () => {
         <Suspense fallback={<LoadingScreen />}>
           <Routes>
             {/* Public Routes */}
+            {/* Landing page is eagerly imported — no Suspense needed */}
             <Route path="/landing" element={<Landing />} />
             <Route path="/healthcare-professionals" element={<HealthcareProfessionals />} />
             <Route path="/healthcare-institutions" element={<HealthcareInstitutions />} />
