@@ -306,7 +306,7 @@ export const AccessibilityControls: React.FC = () => {
               </Button>
             </div>
             {voiceControlActive && (
-              <div className="text-xs text-gray-600 bg-blue-50 p-2 rounded">
+              <div className="text-xs text-muted-foreground bg-primary/5 p-2 rounded">
                 Voice commands: "click", "scroll down", "scroll up", "go back", "search for [term]"
               </div>
             )}
