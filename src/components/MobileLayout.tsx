@@ -16,21 +16,12 @@ interface MobileLayoutProps {
   isLoading?: boolean;
 }
 
-// Routes that manage their own layout (no global header/nav)
 const STANDALONE_ROUTES = ['/landing', '/auth', '/pricing', '/reset-password', '/terms', '/privacy'];
 
 export const MobileLayout = ({ children, isLoading }: MobileLayoutProps) => {
   const { isDesktop } = useDeviceType();
   const { isAuthenticated } = useAuth();
   const location = useLocation();
-  const [isTransitioning, setIsTransitioning] = useState(false);
-
-  // Snappier page transition effect
-  useEffect(() => {
-    setIsTransitioning(true);
-    const timer = setTimeout(() => setIsTransitioning(false), 100);
-    return () => clearTimeout(timer);
-  }, [location.pathname]);
 
   if (isLoading) {
     return <LoadingScreen />;
@@ -46,15 +37,8 @@ export const MobileLayout = ({ children, isLoading }: MobileLayoutProps) => {
       <SidebarProvider>
         <div className="flex flex-col min-h-screen bg-background w-full">
           <DesktopNav />
-          <main
-            id="main-content"
-            className={cn(
-              "flex-1 overflow-auto transition-opacity duration-100 ease-out",
-              !isAuthenticated && "w-full",
-              isTransitioning ? "opacity-98" : "opacity-100"
-            )}
-          >
-            <div className="container mx-auto px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 py-6 space-y-6 max-w-8xl animate-in fade-in duration-150">
+          <main id="main-content" className="flex-1 overflow-auto">
+            <div className="mx-auto max-w-screen-xl px-6 lg:px-8 py-6 space-y-6">
               {children}
             </div>
           </main>
@@ -70,19 +54,14 @@ export const MobileLayout = ({ children, isLoading }: MobileLayoutProps) => {
       <main
         id="main-content"
         role="main"
-        aria-label="Main Content"
         className={cn(
           "flex-1 pt-14 overflow-y-auto overflow-x-hidden",
           isAuthenticated ? "pb-24" : "pb-6",
-          "transition-all duration-100 ease-out",
-          "min-h-0",
-          isTransitioning ? "opacity-98" : "opacity-100"
+          "min-h-0"
         )}
       >
-        <div className="container mx-auto px-4 py-4 space-y-6 max-w-8xl min-h-full animate-in fade-in slide-in-from-bottom-2 duration-150">
-          <div className="w-full">
-            {children}
-          </div>
+        <div className="mx-auto max-w-screen-xl px-4 py-4 space-y-6">
+          {children}
         </div>
       </main>
       {isAuthenticated && <BottomNav />}
@@ -91,5 +70,3 @@ export const MobileLayout = ({ children, isLoading }: MobileLayoutProps) => {
     </div>
   );
 }
-
-
