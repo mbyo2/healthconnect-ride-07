@@ -22,6 +22,7 @@ export function DesktopNav() {
   const location = useLocation();
   const { user, signOut, profile, isAuthenticated } = useAuth();
   const { availableRoles, isHealthPersonnel, isAdmin, isPatient } = useUserRoles();
+  const { isInstitutionAffiliated } = useInstitutionAffiliation();
   const [searchTerm, setSearchTerm] = useState("");
   const { setSearchQuery } = useSearch();
   const navigate = useNavigate();
