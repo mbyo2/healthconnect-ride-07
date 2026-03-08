@@ -90,7 +90,23 @@ export const BookingModal = ({ provider, isOpen, onClose }: BookingModalProps) =
 
       toast.success("Appointment booked successfully!");
       onClose();
-      navigate('/appointments');
+      // Get the inserted appointment ID from a follow-up query
+      const { data: booked } = await supabase
+        .from('appointments')
+        .select('id')
+        .eq('patient_id', user.id)
+        .eq('provider_id', provider.id)
+        .eq('date', format(selectedDate, 'yyyy-MM-dd'))
+        .eq('time', selectedTime)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+      
+      if (booked?.id) {
+        navigate(`/booking-confirmed?id=${booked.id}`);
+      } else {
+        navigate('/appointments');
+      }
     } catch (error) {
       console.error('Booking error:', error);
       toast.error("Failed to book appointment. Please try again.");

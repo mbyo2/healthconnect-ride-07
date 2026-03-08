@@ -92,6 +92,7 @@ const VideoCall = lazyWithRetry(() => import('@/pages/VideoCall'));
 const Providers = lazyWithRetry(() => import('@/pages/Providers'));
 const RoleManagement = lazyWithRetry(() => import('@/pages/RoleManagement'));
 const IntakeForm = lazyWithRetry(() => import('@/pages/IntakeForm'));
+const BookingConfirmed = lazyWithRetry(() => import('@/pages/BookingConfirmed'));
 
 import { RoleRedirect } from '@/components/auth/RoleRedirect';
 
@@ -120,6 +121,13 @@ const AppContent = () => {
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/register" element={<Register />} />
+            {/* Public search & provider pages (ZocDoc-style) */}
+            <Route path="/search" element={<SearchPage />} />
+            <Route path="/providers" element={<Providers />} />
+            <Route path="/marketplace-users" element={<UserMarketplace />} />
+            <Route path="/provider/:id" element={<ProviderDetail />} />
+            <Route path="/emergency" element={<Emergency />} />
+            <Route path="/booking-confirmed" element={<RouteGuard><BookingConfirmed /></RouteGuard>} />
             <Route path="/reset-password" element={<Suspense fallback={<LoadingScreen />}><ResetPassword /></Suspense>} />
             <Route path="/login" element={<Navigate to="/auth" replace />} />
             <Route
@@ -148,7 +156,7 @@ const AppContent = () => {
                     <RoleRedirect />
                   )
                 ) : (
-                  <Navigate to="/auth" replace={true} />
+                  <Navigate to="/landing" replace={true} />
                 )
               }
             />
@@ -158,7 +166,7 @@ const AppContent = () => {
             <Route path="/profile-setup" element={<Navigate to="/onboarding" replace />} />
             <Route path="/profile" element={<RouteGuard><Profile /></RouteGuard>} />
             <Route path="/settings" element={<RouteGuard><Settings /></RouteGuard>} />
-            <Route path="/search" element={<RouteGuard><SearchPage /></RouteGuard>} />
+            {/* search is now public above */}
             <Route path="/appointments" element={<RouteGuard><Appointments /></RouteGuard>} />
             <Route path="/admin-dashboard" element={<RouteGuard><AdminDashboard /></RouteGuard>} />
             <Route path="/provider-dashboard" element={<RouteGuard><ProviderDashboard /></RouteGuard>} />
@@ -171,8 +179,7 @@ const AppContent = () => {
             <Route path="/video-dashboard" element={<RouteGuard><VideoDashboard /></RouteGuard>} />
             <Route path="/testing" element={<RouteGuard><Testing /></RouteGuard>} />
             <Route path="/documentation" element={<RouteGuard><Documentation /></RouteGuard>} />
-            <Route path="/marketplace-users" element={<RouteGuard><UserMarketplace /></RouteGuard>} />
-            <Route path="/emergency" element={<RouteGuard><Emergency /></RouteGuard>} />
+            {/* marketplace-users and emergency are now public above */}
             <Route path="/map" element={<RouteGuard><Map /></RouteGuard>} />
             <Route path="/marketplace" element={<RouteGuard><Marketplace /></RouteGuard>} />
             <Route path="/pharmacy-portal" element={<RouteGuard><PharmacyPortal /></RouteGuard>} />
@@ -221,8 +228,7 @@ const AppContent = () => {
             {/* Provider & Video */}
             <Route path="/provider-portal" element={<RouteGuard><ProviderPortal /></RouteGuard>} />
             <Route path="/provider-profile/:id" element={<RouteGuard><ProviderProfile /></RouteGuard>} />
-            <Route path="/provider/:id" element={<RouteGuard><ProviderDetail /></RouteGuard>} />
-            <Route path="/providers" element={<RouteGuard><Providers /></RouteGuard>} />
+            {/* provider/:id and providers are now public above */}
             <Route path="/video-call/:roomId" element={<RouteGuard><VideoCall /></RouteGuard>} />
             <Route path="/role-management" element={<RouteGuard><RoleManagement /></RouteGuard>} />
             <Route path="/intake-form" element={<RouteGuard><IntakeForm /></RouteGuard>} />

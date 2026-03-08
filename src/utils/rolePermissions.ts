@@ -460,7 +460,13 @@ export const PUBLIC_ROUTES = [
   '/healthcare-application',
   '/terms',
   '/privacy',
-  '/contact'
+  '/contact',
+  '/search',
+  '/providers',
+  '/marketplace-users',
+  '/emergency',
+  '/provider/:id',
+  '/booking-confirmed'
 ];
 
 // Check if a user has permission to access a route (supports multiple roles)
