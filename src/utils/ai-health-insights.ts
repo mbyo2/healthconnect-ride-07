@@ -143,7 +143,7 @@ class AIHealthInsights {
 
       if (!profile || vitals.length === 0) return insights;
 
-      // Use MedGemma for AI-powered risk assessment
+      // Use Doc' O Clock AI for risk assessment
       const latestVitals = vitals[0] || {};
       const { data, error } = await supabase.functions.invoke('medgemma-health-analysis', {
         body: {
