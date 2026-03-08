@@ -118,7 +118,9 @@ CRITICAL: If symptoms suggest emergency, immediately advise to call emergency se
     );
 
   } catch (error) {
-    console.error('Error in MedGemma chat:', errAI  return new Response(
+    console.error('Error in AI chat:', error);
+
+    return new Response(
       JSON.stringify({
         error: error instanceof Error ? error.message : 'Unknown error occurred',
         details: error instanceof Error ? error.stack : undefined
