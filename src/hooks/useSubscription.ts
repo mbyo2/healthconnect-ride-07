@@ -115,8 +115,14 @@ export const useSubscribeToPlan = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ planId, billingCycle }: { planId: string; billingCycle: 'monthly' | 'annual' }) => {
-      const periodEnd = new Date();
+    mutationFn: async ({ planId, billingCycle, promoCodeId, trialDays }: { planId: string; billingCycle: 'monthly' | 'annual'; promoCodeId?: string; trialDays?: number }) => {
+      const now = new Date();
+      const effectiveTrialDays = trialDays || 0;
+      
+      // If trial, period starts after trial
+      const trialEnd = effectiveTrialDays > 0 ? new Date(now.getTime() + effectiveTrialDays * 86400000) : null;
+      const periodStart = trialEnd || now;
+      const periodEnd = new Date(periodStart);
       if (billingCycle === 'monthly') {
         periodEnd.setMonth(periodEnd.getMonth() + 1);
       } else {
@@ -136,37 +142,54 @@ export const useSubscribeToPlan = () => {
           user_id: user!.id,
           plan_id: planId,
           billing_cycle: billingCycle,
-          current_period_start: new Date().toISOString(),
+          current_period_start: periodStart.toISOString(),
           current_period_end: periodEnd.toISOString(),
-          status: 'active',
+          status: effectiveTrialDays > 0 ? 'trialing' : 'active',
+          trial_start: effectiveTrialDays > 0 ? now.toISOString() : null,
+          trial_end: trialEnd?.toISOString() || null,
+          promo_code_id: promoCodeId || null,
         })
         .select('*, plan:subscription_plans(*)')
         .single();
 
       if (error) throw error;
 
-      // Log revenue event
-      const plan = data.plan;
-      const amount = billingCycle === 'monthly' ? plan.price_monthly : plan.price_annual;
-      if (amount > 0) {
-        await (supabase as any).from('revenue_events').insert({
-          user_id: user!.id,
-          event_type: 'subscription_started',
-          amount,
-          currency: plan.currency,
-          source: `subscription_${plan.slug}`,
-          plan_id: planId,
-        });
+      // Log revenue event (skip for trials)
+      if (effectiveTrialDays === 0) {
+        const plan = data.plan;
+        const amount = billingCycle === 'monthly' ? plan.price_monthly : plan.price_annual;
+        if (amount > 0) {
+          await (supabase as any).from('revenue_events').insert({
+            user_id: user!.id,
+            event_type: 'subscription_started',
+            amount,
+            currency: plan.currency,
+            source: `subscription_${plan.slug}`,
+            plan_id: planId,
+          });
+        }
       }
 
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['user-subscription'] });
-      toast.success('Subscription activated successfully!');
+      const isTrial = data.status === 'trialing';
+      toast.success(isTrial ? 'Free trial activated! Enjoy your 30-day trial.' : 'Subscription activated successfully!');
     },
     onError: (error: any) => {
       toast.error('Failed to subscribe: ' + error.message);
+    },
+  });
+};
+
+// Start a free 30-day trial for providers
+export const useStartFreeTrial = () => {
+  const subscribeToPlan = useSubscribeToPlan();
+  
+  return useMutation({
+    mutationFn: async ({ planId }: { planId: string }) => {
+      return subscribeToPlan.mutateAsync({ planId, billingCycle: 'monthly', trialDays: 30 });
     },
   });
 };
