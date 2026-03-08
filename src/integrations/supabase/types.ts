@@ -3544,6 +3544,59 @@ export type Database = {
           },
         ]
       }
+      no_show_fees: {
+        Row: {
+          amount: number
+          appointment_id: string
+          charged_at: string | null
+          created_at: string
+          currency: string
+          id: string
+          patient_id: string
+          provider_id: string
+          reason: string | null
+          status: string
+          waived_at: string | null
+          waived_by: string | null
+        }
+        Insert: {
+          amount?: number
+          appointment_id: string
+          charged_at?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          patient_id: string
+          provider_id: string
+          reason?: string | null
+          status?: string
+          waived_at?: string | null
+          waived_by?: string | null
+        }
+        Update: {
+          amount?: number
+          appointment_id?: string
+          charged_at?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          patient_id?: string
+          provider_id?: string
+          reason?: string | null
+          status?: string
+          waived_at?: string | null
+          waived_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "no_show_fees_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notification_settings: {
         Row: {
           appointment_reminders: boolean | null
