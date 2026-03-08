@@ -2,8 +2,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { UserManagement } from '@/components/admin/UserManagement';
 import { SecurityAuditLogs } from '@/components/admin/SecurityAuditLogs';
 import { TestAccountSetup } from '@/components/admin/TestAccountSetup';
+import { RevenueAnalyticsDashboard } from '@/components/admin/RevenueAnalyticsDashboard';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Shield, Users, Activity } from 'lucide-react';
+import { Shield, Users, Activity, DollarSign } from 'lucide-react';
 
 import { InstitutionApplications } from '@/components/admin/InstitutionApplications';
 import { Building2 } from 'lucide-react';
@@ -22,10 +23,14 @@ const AdminDashboard = () => {
       </div>
 
       <Tabs defaultValue="users" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="users" className="flex items-center gap-2">
             <Users className="h-4 w-4" />
-            User Management
+            Users
+          </TabsTrigger>
+          <TabsTrigger value="revenue" className="flex items-center gap-2">
+            <DollarSign className="h-4 w-4" />
+            Revenue
           </TabsTrigger>
           <TabsTrigger value="applications" className="flex items-center gap-2">
             <Building2 className="h-4 w-4" />
@@ -37,12 +42,16 @@ const AdminDashboard = () => {
           </TabsTrigger>
           <TabsTrigger value="test" className="flex items-center gap-2">
             <Shield className="h-4 w-4" />
-            Test Accounts
+            Test
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="users" className="space-y-4">
           <UserManagement />
+        </TabsContent>
+
+        <TabsContent value="revenue" className="space-y-4">
+          <RevenueAnalyticsDashboard />
         </TabsContent>
 
         <TabsContent value="applications" className="space-y-4">

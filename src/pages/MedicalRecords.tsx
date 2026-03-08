@@ -21,6 +21,7 @@ import { useNavigate } from "react-router-dom";
 import { ComprehensiveMedicalRecords } from "@/components/patient/ComprehensiveMedicalRecords";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { AIInsightsWidget } from "@/components/ai/AIInsightsWidget";
+import { FHIRExportPanel } from "@/components/medical/FHIRExportPanel";
 
 export default function MedicalRecords() {
   const [records, setRecords] = useState<MedicalRecord[]>([]);
@@ -169,8 +170,9 @@ export default function MedicalRecords() {
             </Card>
           </div>
 
-          {/* Health Metrics */}
-          <div>
+          {/* Health Metrics & FHIR Export */}
+          <div className="space-y-6">
+            <FHIRExportPanel />
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
