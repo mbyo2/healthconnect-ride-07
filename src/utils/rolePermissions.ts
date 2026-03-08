@@ -140,6 +140,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/map',
     '/search',
     '/medications',
+    '/connections',         // customer records
   ],
 
   // ── Pharmacy (business entity) ───────────────────────────
@@ -154,6 +155,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/map',
     '/search',
     '/medications',
+    '/connections',         // customer records
   ],
 
   // ── Lab Technician ───────────────────────────────────────
@@ -165,6 +167,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/search',
     '/medical-records',
     '/medications',
+    '/connections',         // patient lookup
   ],
 
   // ── Lab (business entity) ────────────────────────────────
@@ -175,6 +178,8 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/map',
     '/search',
     '/medications',
+    '/medical-records',     // results & reports
+    '/connections',         // patient records
   ],
 
   // ── Institution Admin ────────────────────────────────────
