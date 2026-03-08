@@ -12,35 +12,60 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Link, useNavigate } from "react-router-dom";
 import { NetworkErrorBoundary } from "@/components/errors/NetworkErrorBoundary";
 import { useApiQuery } from "@/hooks/use-api-query";
+import { useUserRoles } from "@/context/UserRolesContext";
 import { 
   Calendar, Clock, Video, MapPin, FileText, CalendarPlus, 
-  ArrowRight, Phone, CheckCircle
+  ArrowRight, Phone, CheckCircle, Stethoscope
 } from "lucide-react";
 
 const AppointmentsPage = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [tab, setTab] = useState('upcoming');
+  const { isPatient, isHealthPersonnel, availableRoles } = useUserRoles();
 
-  const { data: appointments = [], isLoading } = useApiQuery<AppointmentWithProvider[]>(
-    ['appointments'],
+  // Determine if user is a provider (doctor, nurse, health_personnel, radiologist)
+  const isProvider = availableRoles.some(r => 
+    ['health_personnel', 'doctor', 'nurse', 'radiologist'].includes(r)
+  );
+
+  const { data: appointments = [], isLoading } = useApiQuery<any[]>(
+    ['appointments', isProvider ? 'provider' : 'patient'],
     async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('User not authenticated');
 
-      const { data, error } = await supabase
-        .from('appointments')
-        .select(`
-          *,
-          provider:profiles!appointments_provider_id_fkey (
-            first_name, last_name, specialty, avatar_url, phone, address
-          )
-        `)
-        .eq('patient_id', user.id)
-        .order('date', { ascending: true });
+      if (isProvider) {
+        // Provider view: show appointments where user is the provider
+        const { data, error } = await supabase
+          .from('appointments')
+          .select(`
+            *,
+            patient:profiles!appointments_patient_id_fkey (
+              first_name, last_name, avatar_url, phone
+            )
+          `)
+          .eq('provider_id', user.id)
+          .order('date', { ascending: true });
 
-      if (error) throw error;
-      return data as AppointmentWithProvider[];
+        if (error) throw error;
+        return data || [];
+      } else {
+        // Patient view: show appointments where user is the patient
+        const { data, error } = await supabase
+          .from('appointments')
+          .select(`
+            *,
+            provider:profiles!appointments_provider_id_fkey (
+              first_name, last_name, specialty, avatar_url, phone, address
+            )
+          `)
+          .eq('patient_id', user.id)
+          .order('date', { ascending: true });
+
+        if (error) throw error;
+        return data || [];
+      }
     },
     {
       staleTime: 5 * 60 * 1000,
@@ -59,18 +84,33 @@ const AppointmentsPage = () => {
     },
     onMutate: async (appointmentId) => {
       await queryClient.cancelQueries({ queryKey: ['appointments'] });
-      const prev = queryClient.getQueryData(['appointments']);
-      queryClient.setQueryData(['appointments'], (old: AppointmentWithProvider[] | undefined) =>
+      const prev = queryClient.getQueryData(['appointments', isProvider ? 'provider' : 'patient']);
+      queryClient.setQueryData(['appointments', isProvider ? 'provider' : 'patient'], (old: any[] | undefined) =>
         (old || []).map(a => a.id === appointmentId ? { ...a, status: 'cancelled' } : a)
       );
       return { prev };
     },
     onSuccess: () => toast.success('Appointment cancelled'),
     onError: (_err, _id, ctx) => {
-      if (ctx?.prev) queryClient.setQueryData(['appointments'], ctx.prev);
+      if (ctx?.prev) queryClient.setQueryData(['appointments', isProvider ? 'provider' : 'patient'], ctx.prev);
       toast.error('Failed to cancel appointment');
     },
     onSettled: () => queryClient.invalidateQueries({ queryKey: ['appointments'] }),
+  });
+
+  const completeAppointment = useMutation({
+    mutationFn: async (appointmentId: string) => {
+      const { error } = await supabase
+        .from('appointments')
+        .update({ status: 'completed' })
+        .eq('id', appointmentId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('Appointment marked as completed');
+      queryClient.invalidateQueries({ queryKey: ['appointments'] });
+    },
+    onError: () => toast.error('Failed to update appointment'),
   });
 
   const now = new Date();
@@ -89,8 +129,8 @@ const AppointmentsPage = () => {
     [appointments]
   );
 
-  const renderAppointmentCard = (appointment: AppointmentWithProvider) => {
-    const provider = appointment.provider as any;
+  const renderAppointmentCard = (appointment: any) => {
+    const person = isProvider ? appointment.patient : appointment.provider;
     const isVideo = appointment.type === 'video_consultation';
     const apptDate = parseISO(appointment.date);
     const isUpcoming = !isPast(apptDate) && appointment.status !== 'cancelled' && appointment.status !== 'completed';
@@ -99,13 +139,13 @@ const AppointmentsPage = () => {
     return (
       <Card key={appointment.id} className="p-4 hover:shadow-md transition-shadow border">
         <div className="flex gap-4">
-          {/* Provider Avatar */}
+          {/* Avatar */}
           <div className="flex-shrink-0">
-            {provider?.avatar_url ? (
-              <img src={provider.avatar_url} alt="" className="w-14 h-14 rounded-xl object-cover" />
+            {person?.avatar_url ? (
+              <img src={person.avatar_url} alt="" className="w-14 h-14 rounded-xl object-cover" />
             ) : (
               <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center text-lg font-bold text-primary">
-                {provider?.first_name?.[0]}{provider?.last_name?.[0]}
+                {person?.first_name?.[0]}{person?.last_name?.[0]}
               </div>
             )}
           </div>
@@ -115,9 +155,11 @@ const AppointmentsPage = () => {
             <div className="flex items-start justify-between gap-2">
               <div>
                 <h3 className="font-semibold text-foreground">
-                  Dr. {provider?.first_name} {provider?.last_name}
+                  {isProvider ? '' : 'Dr. '}{person?.first_name} {person?.last_name}
                 </h3>
-                <p className="text-sm text-primary">{provider?.specialty}</p>
+                {!isProvider && person?.specialty && (
+                  <p className="text-sm text-primary">{person.specialty}</p>
+                )}
               </div>
               <Badge
                 variant={
@@ -156,12 +198,12 @@ const AppointmentsPage = () => {
                 <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 gap-1" asChild>
                   <Link to={`/video-call/${appointment.id}`}>
                     <Video className="h-3.5 w-3.5" />
-                    Join Call
+                    {isProvider ? 'Start Call' : 'Join Call'}
                   </Link>
                 </Button>
               )}
 
-              {isUpcoming && (
+              {isUpcoming && !isProvider && (
                 <>
                   <Button size="sm" variant="outline" onClick={() => navigate(`/intake-form?appointment=${appointment.id}`)}>
                     <FileText className="h-3.5 w-3.5 mr-1" />
@@ -177,7 +219,35 @@ const AppointmentsPage = () => {
                 </>
               )}
 
-              {appointment.status === 'completed' && (
+              {isUpcoming && isProvider && (
+                <>
+                  <Button
+                    size="sm"
+                    className="bg-emerald-600 hover:bg-emerald-700 gap-1"
+                    onClick={() => completeAppointment.mutate(appointment.id)}
+                  >
+                    <CheckCircle className="h-3.5 w-3.5" />
+                    Complete
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => navigate(`/prescriptions`)}
+                  >
+                    <FileText className="h-3.5 w-3.5 mr-1" />
+                    Prescribe
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={() => cancelAppointment.mutate(appointment.id)}
+                  >
+                    Cancel
+                  </Button>
+                </>
+              )}
+
+              {appointment.status === 'completed' && !isProvider && (
                 <Button size="sm" variant="outline" onClick={() => navigate(`/provider/${appointment.provider_id}`)}>
                   Book Again
                 </Button>
@@ -194,11 +264,20 @@ const AppointmentsPage = () => {
       <div className="container mx-auto px-4 py-6 bg-background min-h-screen max-w-3xl">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-foreground">My Appointments</h1>
-          <Button onClick={() => navigate('/search')} className="gap-2">
-            <CalendarPlus className="h-4 w-4" />
-            Book New
-          </Button>
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">
+              {isProvider ? 'Patient Appointments' : 'My Appointments'}
+            </h1>
+            {isProvider && (
+              <p className="text-sm text-muted-foreground mt-1">Manage your patient consultations</p>
+            )}
+          </div>
+          {!isProvider && (
+            <Button onClick={() => navigate('/search')} className="gap-2">
+              <CalendarPlus className="h-4 w-4" />
+              Book New
+            </Button>
+          )}
         </div>
 
         {/* Today's highlight */}
@@ -233,10 +312,14 @@ const AppointmentsPage = () => {
               {upcoming.length === 0 ? (
                 <Card className="p-8 text-center border">
                   <Calendar className="h-12 w-12 mx-auto mb-3 text-muted-foreground opacity-50" />
-                  <p className="text-muted-foreground mb-4">No upcoming appointments</p>
-                  <Button asChild>
-                    <Link to="/search">Find a Doctor</Link>
-                  </Button>
+                  <p className="text-muted-foreground mb-4">
+                    {isProvider ? 'No upcoming patient appointments' : 'No upcoming appointments'}
+                  </p>
+                  {!isProvider && (
+                    <Button asChild>
+                      <Link to="/search">Find a Doctor</Link>
+                    </Button>
+                  )}
                 </Card>
               ) : (
                 <div className="space-y-3">{upcoming.map(renderAppointmentCard)}</div>

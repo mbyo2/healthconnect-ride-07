@@ -28,7 +28,6 @@ import {
 import { SpecializedHelp } from "@/components/home/SpecializedHelp";
 import { WalletCard } from "@/components/home/WalletCard";
 import { ConnectedWorkflows } from "@/components/home/ConnectedWorkflows";
-import { ZAMBIA_CONFIG } from '@/config/zambia';
 
 const getIcon = (iconName: string) => {
   const icons = {
@@ -98,7 +97,7 @@ export const PatientWorkflow = React.memo(() => {
       <div className="space-y-6 md:space-y-8">
         <ApplicationStatusBanner />
         <ProfileCompleteBanner />
-        {/* Welcome Section - Zambian focused */}
+        {/* Welcome Section */}
         <div className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-500 to-indigo-600 text-white py-6 md:py-10 rounded-2xl md:rounded-3xl shadow-xl">
           <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
           <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-48 h-48 bg-blue-400/20 rounded-full blur-2xl" />
@@ -114,21 +113,21 @@ export const PatientWorkflow = React.memo(() => {
                   Your Health Dashboard
                 </h1>
                 <p className="text-blue-100/90 text-sm md:text-base max-w-md">
-                  Quality healthcare at your fingertips. Anywhere in Zambia. 🇿🇲
+                  Quality healthcare at your fingertips. Anywhere, anytime.
                 </p>
               </div>
-              <a
-                href={`tel:${ZAMBIA_CONFIG.emergencyNumbers.ambulance}`}
-                className="flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg font-bold shadow-lg transition-all active:scale-95 w-full sm:w-auto justify-center"
+              <Button
+                onClick={() => handleNavigation('/emergency', 'Emergency')}
+                className="flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg font-bold shadow-lg transition-all active:scale-95 w-full sm:w-auto justify-center text-white border-0"
               >
                 <Phone className="h-4 w-4" />
-                Emergency {ZAMBIA_CONFIG.emergencyNumbers.ambulance}
-              </a>
+                Emergency Help
+              </Button>
             </div>
           </div>
         </div>
 
-        {/* Quick Access Cards - Zambian context */}
+        {/* Quick Access Cards */}
         <div>
           <h2 className="text-lg sm:text-xl font-bold mb-4 px-1 text-foreground">Quick Access</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
@@ -142,7 +141,7 @@ export const PatientWorkflow = React.memo(() => {
                 </div>
               </CardHeader>
               <CardContent className="pt-0">
-                <CardDescription className="text-[11px] sm:text-xs font-medium">Call 991</CardDescription>
+                <CardDescription className="text-[11px] sm:text-xs font-medium">Get help now</CardDescription>
               </CardContent>
             </Card>
 
@@ -184,7 +183,7 @@ export const PatientWorkflow = React.memo(() => {
                 </div>
               </CardHeader>
               <CardContent className="pt-0">
-                <CardDescription className="text-[11px] sm:text-xs font-medium">UTH, Levy & more</CardDescription>
+                <CardDescription className="text-[11px] sm:text-xs font-medium">Find nearby</CardDescription>
               </CardContent>
             </Card>
           </div>
