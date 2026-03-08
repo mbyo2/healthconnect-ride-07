@@ -105,7 +105,7 @@ export const PharmacyPayment = ({ order, onPaymentSuccess }: PharmacyPaymentProp
           ) : (
             <>
               <DollarSign className="h-4 w-4 mr-2" />
-              Pay ${order.total_amount.toFixed(2)}
+              Pay {formatPrice(order.total_amount)}
             </>
           )}
         </Button>

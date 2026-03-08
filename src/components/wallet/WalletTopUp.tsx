@@ -88,7 +88,7 @@ export const WalletTopUp = () => {
                                     }`}
                                 onClick={() => setAmount(q)}
                             >
-                                ${q}
+                                {getSymbol()}{q}
                             </Button>
                         ))}
                     </div>
