@@ -14,7 +14,7 @@ import { MoreHorizontal, UserPlus, ShieldAlert, Users, Settings } from "lucide-r
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { AdminLevel } from "@/types/user";
 import { Badge } from "@/components/ui/badge";
-import { createSuperAdmin } from "@/utils/createSuperAdmin";
+
 
 type AdminUser = {
   id: string;
