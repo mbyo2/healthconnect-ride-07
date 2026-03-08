@@ -13,6 +13,7 @@ interface ProductCardProps {
 }
 
 export const ProductCard = ({ product, onAddToCart }: ProductCardProps) => {
+  const { formatPrice } = useCurrency();
   return (
     <Card className="h-full flex flex-col">
       <CardHeader className="pb-3">
