@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { Helmet } from "react-helmet";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, Filter } from "lucide-react";
@@ -73,6 +74,14 @@ const SearchPage = () => {
   }, [location.search, setSearchQuery, setSearchTerm, setSelectedSpecialty, refreshProviders]);
 
   return (
+    <>
+      <Helmet>
+        <title>Find Doctors & Specialists in Zambia | Doc' O Clock</title>
+        <meta name="description" content="Search and book appointments with verified doctors, specialists, hospitals, and clinics across Zambia. Filter by specialty, location, and availability." />
+        <meta property="og:title" content="Find Doctors & Specialists | Doc' O Clock" />
+        <meta property="og:description" content="Browse verified healthcare providers across Zambia." />
+        <link rel="canonical" href="https://dococlockapp.com/search" />
+      </Helmet>
     <div className="space-y-6">
       {/* Search Header */}
       <div className="space-y-4">
@@ -111,6 +120,7 @@ const SearchPage = () => {
       {/* Search Results */}
       <SearchResults />
     </div>
+    </>
   );
 };
 

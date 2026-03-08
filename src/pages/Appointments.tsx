@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { format, isPast, parseISO, isToday } from "date-fns";
@@ -73,6 +74,23 @@ const AppointmentsPage = () => {
       errorMessage: "Failed to load appointments"
     }
   );
+
+  // Real-time subscription for appointment status changes
+  useEffect(() => {
+    const channel = supabase
+      .channel('appointments-realtime')
+      .on('postgres_changes',
+        { event: '*', schema: 'public', table: 'appointments' },
+        (payload) => {
+          queryClient.invalidateQueries({ queryKey: ['appointments'] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
 
   const cancelAppointment = useMutation({
     mutationFn: async (appointmentId: string) => {

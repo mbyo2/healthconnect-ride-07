@@ -1,3 +1,4 @@
+import { Helmet } from 'react-helmet';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -356,6 +357,14 @@ export const PricingPage = () => {
   }
 
   return (
+    <>
+      <Helmet>
+        <title>Pricing — Doc' O Clock Healthcare Platform</title>
+        <meta name="description" content="Free for patients. Pay-per-booking for providers. Transparent pricing for pharmacies and hospitals. All prices in Zambian Kwacha." />
+        <meta property="og:title" content="Pricing | Doc' O Clock" />
+        <meta property="og:description" content="Simple, transparent healthcare pricing in Zambia." />
+        <link rel="canonical" href="https://dococlockapp.com/pricing" />
+      </Helmet>
     <div className="container mx-auto py-8 space-y-10">
       <div className="text-center space-y-4">
         <h1 className="text-4xl font-bold">Simple, Transparent Pricing</h1>
@@ -398,5 +407,6 @@ export const PricingPage = () => {
         <p>All prices in Zambian Kwacha (ZMW). Need a custom plan? <Button variant="link" className="p-0 h-auto text-sm">Contact our sales team</Button></p>
       </div>
     </div>
+    </>
   );
 };
