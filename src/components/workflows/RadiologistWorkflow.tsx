@@ -7,7 +7,7 @@ import { useSuccessFeedback } from '@/hooks/use-success-feedback';
 import {
   MonitorDot, Calendar, Users, FileText, Settings,
   ClipboardList, MessageSquare, Brain, Wallet,
-  Image, Scan, Activity
+  Image, Scan, Activity, Megaphone, Code2, Bell, CreditCard
 } from 'lucide-react';
 
 export const RadiologistWorkflow = () => {
