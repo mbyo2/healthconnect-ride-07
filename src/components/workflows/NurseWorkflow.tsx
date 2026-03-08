@@ -113,6 +113,8 @@ export const NurseWorkflow = () => {
 
   return (
     <div className="space-y-6 px-4 py-6 max-w-7xl mx-auto">
+      <ApplicationStatusBanner />
+      <ProfileCompleteBanner />
       <div className="text-center space-y-2">
         <h2 className="text-xl md:text-2xl font-bold text-foreground">Nurse Consultant Dashboard</h2>
         <p className="text-muted-foreground text-sm md:text-base px-4">
