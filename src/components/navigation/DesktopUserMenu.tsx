@@ -60,7 +60,7 @@ export function DesktopUserMenu({ user, profile, onLogout }: DesktopUserMenuProp
     if (availableRoles.some(r => ['pharmacy', 'pharmacist'].includes(r))) {
       return [
         { to: "/pharmacy-portal", label: "Pharmacy Portal", icon: <Package className="h-4 w-4" /> },
-        { to: "/wallet", label: "Revenue", icon: <Wallet className="h-4 w-4" /> },
+        ...(!isInstitutionAffiliated ? [{ to: "/wallet", label: "Revenue", icon: <Wallet className="h-4 w-4" /> }] : []),
         { to: "/profile", label: "Pharmacy Profile", icon: <User className="h-4 w-4" /> },
         { to: "/settings", label: "Settings", icon: <Settings className="h-4 w-4" /> },
       ];
