@@ -7,7 +7,7 @@ import { useSuccessFeedback } from '@/hooks/use-success-feedback';
 import {
   Stethoscope, Calendar, Users, FileText, Settings,
   ClipboardList, MessageSquare, Brain, Wallet, AlertTriangle,
-  Shield, Bug, Pill, Video, Activity
+  Shield, Bug, Pill, Video, Activity, Megaphone, Code2, Bell
 } from 'lucide-react';
 
 export const DoctorWorkflow = () => {
