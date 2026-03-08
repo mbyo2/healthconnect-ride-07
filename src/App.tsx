@@ -156,7 +156,7 @@ const AppContent = () => {
                     <RoleRedirect />
                   )
                 ) : (
-                  <Navigate to="/auth" replace={true} />
+                  <Navigate to="/landing" replace={true} />
                 )
               }
             />
