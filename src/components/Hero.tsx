@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Shield, CheckCircle, Star, MapPin, Phone, Clock, Heart, Users, Stethoscope, Building2 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Shield, CheckCircle, Star, MapPin, Phone, Clock, Heart, Users, Stethoscope, Building2, Search } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AppLogo } from '@/components/ui/AppLogo';
 import { ZAMBIA_CONFIG, ZAMBIAN_STATS } from '@/config/zambia';
