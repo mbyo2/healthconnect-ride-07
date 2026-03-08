@@ -61,7 +61,7 @@ export const DesktopNavigation = () => {
         { to: "/pharmacy-inventory", label: "Inventory", icon: <Pill className="h-5 w-5 mr-2" /> },
         { to: "/prescriptions", label: "Prescriptions", icon: <Heart className="h-5 w-5 mr-2" /> },
         { to: "/marketplace", label: "Marketplace", icon: <ShoppingCart className="h-5 w-5 mr-2" /> },
-        { to: "/wallet", label: "Revenue", icon: <Wallet className="h-5 w-5 mr-2" /> },
+        ...(!isInstitutionAffiliated ? [{ to: "/wallet", label: "Revenue", icon: <Wallet className="h-5 w-5 mr-2" /> }] : []),
         { to: "/settings", label: "Settings", icon: <Settings className="h-5 w-5 mr-2" /> },
       ];
     }
