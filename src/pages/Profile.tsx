@@ -58,7 +58,7 @@ const Profile = () => {
   return (
     <div className="space-y-6">
       {/* Profile Header */}
-      <Card className="border-trust-100 shadow-trust">
+      <Card>
         <CardContent className="pt-6">
           <div className="flex flex-col items-center space-y-4">
             <div className="relative">
