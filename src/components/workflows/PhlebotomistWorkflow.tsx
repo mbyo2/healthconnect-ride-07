@@ -82,7 +82,7 @@ export const PhlebotomistWorkflow = () => {
                     <SelectContent><SelectItem value="in_lab">In-Lab</SelectItem><SelectItem value="home_visit">Home Visit</SelectItem></SelectContent>
                   </Select>
                 </div>
-                {form.collection_type === 'home_visit' && (
+                {(form.collection_type as string) === 'home_visit' && (
                   <div className="space-y-1"><Label>Address</Label><Input value={form.address} onChange={e => setForm({...form, address: e.target.value})} /></div>
                 )}
                 <div className="space-y-1"><Label>Scheduled Time</Label><Input type="time" value={form.scheduled_time} onChange={e => setForm({...form, scheduled_time: e.target.value})} /></div>
