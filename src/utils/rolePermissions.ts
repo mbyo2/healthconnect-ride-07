@@ -358,7 +358,9 @@ export const PUBLIC_ROUTES = [
   '/marketplace-users',
   '/emergency',
   '/provider/:id',
-  '/booking-confirmed'
+  '/booking-confirmed',
+  '/pricing',
+  '/reset-password'
 ];
 
 // Check if a user has permission to access a route (supports multiple roles)
