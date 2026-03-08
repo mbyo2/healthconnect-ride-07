@@ -157,8 +157,8 @@ export const InstitutionInsuranceVerification = ({ patientId, onVerified }: Prop
                             {insuranceInfo.map((ins) => (
                                 <div
                                     key={ins.id}
-                                    className={`p-3 border rounded-lg cursor-pointer transition-colors ${selectedInsurance?.id === ins.id ? 'border-primary bg-white shadow-sm' : 'bg-white/50 hover:bg-white'
-                                        }`}
+                                     className={`p-3 border rounded-lg cursor-pointer transition-colors ${selectedInsurance?.id === ins.id ? 'border-primary bg-card shadow-sm' : 'bg-muted/50 hover:bg-muted'
+                                         }`}
                                     onClick={() => setSelectedInsurance(ins)}
                                 >
                                     <div className="flex justify-between items-start">
