@@ -62,14 +62,14 @@ export const SpecializedHelp = () => {
                 {categories?.map((category: any) => (
                     <Card
                         key={category.id}
-                        className="w-28 h-28 flex-shrink-0 cursor-pointer hover:shadow-lg transition-all duration-300 border border-border bg-card shadow-sm hover:-translate-y-1 active:scale-95 group"
+                        className="w-28 h-28 flex-shrink-0 cursor-pointer transition-all duration-300 border border-border bg-card shadow-sm hover:shadow-lg hover:-translate-y-1 hover:border-primary/40 hover:bg-primary/5 active:scale-95 group"
                         onClick={() => navigate(category.route)}
                     >
                         <CardContent className="p-0 h-full flex flex-col items-center justify-center gap-3 rounded-xl transition-colors duration-300">
-                            <div className="p-2.5 bg-muted border border-border rounded-2xl shadow-sm group-hover:shadow-md transition-all duration-300 group-hover:scale-110">
+                            <div className="p-2.5 bg-muted border border-border rounded-2xl shadow-sm group-hover:shadow-md group-hover:bg-primary/10 group-hover:border-primary/30 transition-all duration-300 group-hover:scale-110">
                                 {iconMap[category.icon_name] || <Activity className="h-6 w-6" />}
                             </div>
-                            <span className="text-[11px] sm:text-xs font-extrabold text-foreground text-center px-2 leading-tight tracking-tight">
+                            <span className="text-[11px] sm:text-xs font-extrabold text-foreground group-hover:text-primary text-center px-2 leading-tight tracking-tight transition-colors duration-300">
                                 {category.name}
                             </span>
                         </CardContent>
