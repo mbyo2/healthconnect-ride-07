@@ -6737,6 +6737,7 @@ export type Database = {
         | "radiologist"
         | "lab"
         | "support"
+        | "super_admin"
       experience_level: "entry" | "intermediate" | "expert"
       healthcare_provider_type:
         | "doctor"
@@ -6909,6 +6910,7 @@ export const Constants = {
         "radiologist",
         "lab",
         "support",
+        "super_admin",
       ],
       experience_level: ["entry", "intermediate", "expert"],
       healthcare_provider_type: [

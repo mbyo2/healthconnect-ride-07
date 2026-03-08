@@ -1,7 +1,7 @@
 import type { Database } from './database';
 
 export type Tables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Row'];
-export type UserRole = 'patient' | 'health_personnel' | 'admin' | 'institution_admin' | 'pharmacy' | 'institution_staff' | 'lab' | 'super_admin' | 'support' | 'doctor' | 'nurse' | 'radiologist' | 'pharmacist' | 'lab_technician';
+export type UserRole = 'patient' | 'health_personnel' | 'admin' | 'institution_admin' | 'pharmacy' | 'institution_staff' | 'lab' | 'super_admin' | 'support' | 'doctor' | 'nurse' | 'radiologist' | 'pharmacist' | 'lab_technician' | 'receptionist' | 'hr_manager' | 'cxo' | 'ot_staff' | 'phlebotomist' | 'billing_staff' | 'inventory_manager' | 'triage_staff' | 'maintenance_manager' | 'specialist' | 'ambulance_staff' | 'pathologist';
 
 export interface Profile {
   id: string;

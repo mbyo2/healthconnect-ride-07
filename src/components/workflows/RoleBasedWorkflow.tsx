@@ -15,6 +15,18 @@ import { NurseWorkflow } from './NurseWorkflow';
 import { NursingHomeWorkflow } from './NursingHomeWorkflow';
 import { RadiologistWorkflow } from './RadiologistWorkflow';
 import { SupportWorkflow } from './SupportWorkflow';
+import { ReceptionistWorkflow } from './ReceptionistWorkflow';
+import { HRManagerWorkflow } from './HRManagerWorkflow';
+import { CXOWorkflow } from './CXOWorkflow';
+import { OTStaffWorkflow } from './OTStaffWorkflow';
+import { PhlebotomistWorkflow } from './PhlebotomistWorkflow';
+import { BillingStaffWorkflow } from './BillingStaffWorkflow';
+import { InventoryManagerWorkflow } from './InventoryManagerWorkflow';
+import { TriageStaffWorkflow } from './TriageStaffWorkflow';
+import { MaintenanceManagerWorkflow } from './MaintenanceManagerWorkflow';
+import { SpecialistWorkflow } from './SpecialistWorkflow';
+import { AmbulanceStaffWorkflow } from './AmbulanceStaffWorkflow';
+import { PathologistWorkflow } from './PathologistWorkflow';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { InfoIcon } from 'lucide-react';
@@ -24,32 +36,62 @@ export const RoleBasedWorkflow = () => {
   const { profile } = useAuth();
   
   const getCurrentWorkflow = () => {
-    // Check for super admin / admin first
     if (isAdmin || isSuperAdmin) {
       return <AdminWorkflow />;
     }
 
     const activeRole = currentRole || userRole;
 
-    // Support role
-    if (activeRole === 'support') {
-      return <SupportWorkflow />;
+    switch (activeRole) {
+      case 'support':
+        return <SupportWorkflow />;
+      case 'cxo':
+        return <CXOWorkflow />;
+      case 'receptionist':
+        return <ReceptionistWorkflow />;
+      case 'hr_manager':
+        return <HRManagerWorkflow />;
+      case 'ot_staff':
+        return <OTStaffWorkflow />;
+      case 'phlebotomist':
+        return <PhlebotomistWorkflow />;
+      case 'billing_staff':
+        return <BillingStaffWorkflow />;
+      case 'inventory_manager':
+        return <InventoryManagerWorkflow />;
+      case 'triage_staff':
+        return <TriageStaffWorkflow />;
+      case 'maintenance_manager':
+        return <MaintenanceManagerWorkflow />;
+      case 'specialist':
+        return <SpecialistWorkflow />;
+      case 'ambulance_staff':
+        return <AmbulanceStaffWorkflow />;
+      case 'pathologist':
+        return <PathologistWorkflow />;
+      case 'pharmacist':
+        return <PharmacistWorkflow />;
+      case 'doctor':
+        return <DoctorWorkflow />;
+      case 'nurse':
+        return <NurseWorkflow />;
+      case 'radiologist':
+        return <RadiologistWorkflow />;
+      case 'health_personnel':
+        return <HealthPersonnelWorkflow />;
+      default:
+        break;
     }
 
-    // Pharmacist (individual) vs Pharmacy (business)
-    if (activeRole === 'pharmacist') {
-      return <PharmacistWorkflow />;
-    }
+    // Pharmacy / Lab business entities
     if (activeRole === 'pharmacy' || availableRoles.some(r => r === 'pharmacy')) {
       return <PharmacyWorkflow />;
     }
-
-    // Lab technician (individual) vs Lab (business)
-    if (activeRole === 'lab_technician') {
-      return <LabTechnicianWorkflow />;
-    }
     if (activeRole === 'lab' || availableRoles.some(r => r === 'lab')) {
       return <LabWorkflow />;
+    }
+    if (activeRole === 'lab_technician') {
+      return <LabTechnicianWorkflow />;
     }
 
     // Institution admin/staff — check if nursing home type
@@ -62,20 +104,8 @@ export const RoleBasedWorkflow = () => {
       return <InstitutionAdminWorkflow />;
     }
 
-    // Specific clinical roles
-    switch (activeRole) {
-      case 'doctor':
-        return <DoctorWorkflow />;
-      case 'nurse':
-        return <NurseWorkflow />;
-      case 'radiologist':
-        return <RadiologistWorkflow />;
-      case 'health_personnel':
-        return <HealthPersonnelWorkflow />;
-      case 'patient':
-      default:
-        return <PatientWorkflow />;
-    }
+    // Default: Patient
+    return <PatientWorkflow />;
   };
 
   if (!currentRole && !userRole) {

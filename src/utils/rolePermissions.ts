@@ -13,7 +13,19 @@ export const USER_ROLES = {
   NURSE: 'nurse',
   RADIOLOGIST: 'radiologist',
   PHARMACIST: 'pharmacist',
-  LAB_TECHNICIAN: 'lab_technician'
+  LAB_TECHNICIAN: 'lab_technician',
+  RECEPTIONIST: 'receptionist',
+  HR_MANAGER: 'hr_manager',
+  CXO: 'cxo',
+  OT_STAFF: 'ot_staff',
+  PHLEBOTOMIST: 'phlebotomist',
+  BILLING_STAFF: 'billing_staff',
+  INVENTORY_MANAGER: 'inventory_manager',
+  TRIAGE_STAFF: 'triage_staff',
+  MAINTENANCE_MANAGER: 'maintenance_manager',
+  SPECIALIST: 'specialist',
+  AMBULANCE_STAFF: 'ambulance_staff',
+  PATHOLOGIST: 'pathologist',
 } as const;
 
 export type UserRole = typeof USER_ROLES[keyof typeof USER_ROLES];
@@ -325,6 +337,129 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
   ]
 };
 
+// New role permissions
+const INSTITUTION_OPERATIONAL_ROUTES = [
+  ...COMMON_ROUTES,
+  '/institution-dashboard',
+  '/institution-portal',
+  '/institution/patients',
+  '/institution/appointments',
+  '/chat',
+  '/map',
+  '/search',
+];
+
+ROLE_PERMISSIONS[USER_ROLES.RECEPTIONIST] = [
+  ...INSTITUTION_OPERATIONAL_ROUTES,
+  '/appointments',
+  '/appointments/:id',
+];
+
+ROLE_PERMISSIONS[USER_ROLES.HR_MANAGER] = [
+  ...INSTITUTION_OPERATIONAL_ROUTES,
+  '/institution/personnel',
+  '/institution/reports',
+  '/institution/settings',
+  '/wallet',
+];
+
+ROLE_PERMISSIONS[USER_ROLES.CXO] = [
+  ...INSTITUTION_OPERATIONAL_ROUTES,
+  '/institution/reports',
+  '/institution/personnel',
+  '/institution/settings',
+  '/institution/devices',
+  '/hospital-management',
+  '/wallet',
+  '/admin-wallet',
+  '/health-analytics',
+  '/advanced-dashboard',
+  '/compliance-audit',
+];
+
+ROLE_PERMISSIONS[USER_ROLES.OT_STAFF] = [
+  ...COMMON_ROUTES,
+  '/institution-dashboard',
+  '/appointments',
+  '/appointments/:id',
+  '/medical-records',
+  '/chat',
+  '/emergency',
+];
+
+ROLE_PERMISSIONS[USER_ROLES.PHLEBOTOMIST] = [
+  ...COMMON_ROUTES,
+  '/lab-management',
+  '/medical-records',
+  '/connections',
+  '/map',
+  '/search',
+  '/chat',
+];
+
+ROLE_PERMISSIONS[USER_ROLES.BILLING_STAFF] = [
+  ...INSTITUTION_OPERATIONAL_ROUTES,
+  '/wallet',
+  '/institution/reports',
+  '/prescriptions',
+];
+
+ROLE_PERMISSIONS[USER_ROLES.INVENTORY_MANAGER] = [
+  ...INSTITUTION_OPERATIONAL_ROUTES,
+  '/pharmacy-inventory',
+  '/institution/reports',
+  '/medications',
+];
+
+ROLE_PERMISSIONS[USER_ROLES.TRIAGE_STAFF] = [
+  ...COMMON_ROUTES,
+  '/institution-dashboard',
+  '/appointments',
+  '/appointments/:id',
+  '/medical-records',
+  '/emergency',
+  '/chat',
+  '/search',
+];
+
+ROLE_PERMISSIONS[USER_ROLES.MAINTENANCE_MANAGER] = [
+  ...INSTITUTION_OPERATIONAL_ROUTES,
+  '/institution/devices',
+  '/institution/reports',
+  '/institution/settings',
+];
+
+ROLE_PERMISSIONS[USER_ROLES.SPECIALIST] = [
+  ...COMMON_ROUTES,
+  ...PROVIDER_CORE_ROUTES,
+  '/prescriptions',
+  '/ai-diagnostics',
+  '/telemedicine',
+  '/health-analytics',
+  '/medications',
+];
+
+ROLE_PERMISSIONS[USER_ROLES.AMBULANCE_STAFF] = [
+  ...COMMON_ROUTES,
+  '/institution-dashboard',
+  '/emergency',
+  '/emergency-response',
+  '/map',
+  '/chat',
+  '/appointments',
+];
+
+ROLE_PERMISSIONS[USER_ROLES.PATHOLOGIST] = [
+  ...COMMON_ROUTES,
+  '/lab-management',
+  '/medical-records',
+  '/connections',
+  '/wallet',
+  '/map',
+  '/search',
+  '/ai-diagnostics',
+];
+
 // Default landing pages for each role
 export const ROLE_LANDING_PAGES: Record<string, string> = {
   [USER_ROLES.PATIENT]: '/home',
@@ -340,7 +475,19 @@ export const ROLE_LANDING_PAGES: Record<string, string> = {
   [USER_ROLES.NURSE]: '/provider-dashboard',
   [USER_ROLES.RADIOLOGIST]: '/provider-dashboard',
   [USER_ROLES.PHARMACIST]: '/pharmacy-portal',
-  [USER_ROLES.LAB_TECHNICIAN]: '/lab-management'
+  [USER_ROLES.LAB_TECHNICIAN]: '/lab-management',
+  [USER_ROLES.RECEPTIONIST]: '/institution-dashboard',
+  [USER_ROLES.HR_MANAGER]: '/institution-dashboard',
+  [USER_ROLES.CXO]: '/institution-dashboard',
+  [USER_ROLES.OT_STAFF]: '/institution-dashboard',
+  [USER_ROLES.PHLEBOTOMIST]: '/lab-management',
+  [USER_ROLES.BILLING_STAFF]: '/institution-dashboard',
+  [USER_ROLES.INVENTORY_MANAGER]: '/institution-dashboard',
+  [USER_ROLES.TRIAGE_STAFF]: '/institution-dashboard',
+  [USER_ROLES.MAINTENANCE_MANAGER]: '/institution-dashboard',
+  [USER_ROLES.SPECIALIST]: '/provider-dashboard',
+  [USER_ROLES.AMBULANCE_STAFF]: '/institution-dashboard',
+  [USER_ROLES.PATHOLOGIST]: '/lab-management',
 };
 
 // Public routes that don't require authentication
@@ -408,9 +555,19 @@ export const getRoleLandingPage = (userRoles: UserRole[] | null): string => {
 
   // Priority order: admin > institution_admin > health_personnel > pharmacy > lab > patient
   if (userRoles.includes(USER_ROLES.ADMIN) || userRoles.includes(USER_ROLES.SUPER_ADMIN)) return '/admin-dashboard';
+  if (userRoles.includes(USER_ROLES.CXO)) return '/institution-dashboard';
   if (userRoles.includes(USER_ROLES.INSTITUTION_ADMIN)) return '/institution-portal';
   if (userRoles.includes(USER_ROLES.INSTITUTION_STAFF)) return '/institution-dashboard';
-  if (userRoles.includes(USER_ROLES.HEALTH_PERSONNEL) || userRoles.includes(USER_ROLES.DOCTOR) || userRoles.includes(USER_ROLES.NURSE) || userRoles.includes(USER_ROLES.RADIOLOGIST)) return '/provider-dashboard';
+  if (userRoles.includes(USER_ROLES.RECEPTIONIST)) return '/institution-dashboard';
+  if (userRoles.includes(USER_ROLES.HR_MANAGER)) return '/institution-dashboard';
+  if (userRoles.includes(USER_ROLES.BILLING_STAFF)) return '/institution-dashboard';
+  if (userRoles.includes(USER_ROLES.TRIAGE_STAFF)) return '/institution-dashboard';
+  if (userRoles.includes(USER_ROLES.OT_STAFF)) return '/institution-dashboard';
+  if (userRoles.includes(USER_ROLES.MAINTENANCE_MANAGER)) return '/institution-dashboard';
+  if (userRoles.includes(USER_ROLES.INVENTORY_MANAGER)) return '/institution-dashboard';
+  if (userRoles.includes(USER_ROLES.AMBULANCE_STAFF)) return '/institution-dashboard';
+  if (userRoles.includes(USER_ROLES.HEALTH_PERSONNEL) || userRoles.includes(USER_ROLES.DOCTOR) || userRoles.includes(USER_ROLES.NURSE) || userRoles.includes(USER_ROLES.RADIOLOGIST) || userRoles.includes(USER_ROLES.SPECIALIST)) return '/provider-dashboard';
+  if (userRoles.includes(USER_ROLES.PATHOLOGIST) || userRoles.includes(USER_ROLES.PHLEBOTOMIST)) return '/lab-management';
   if (userRoles.includes(USER_ROLES.PHARMACY) || userRoles.includes(USER_ROLES.PHARMACIST)) return '/pharmacy-portal';
   if (userRoles.includes(USER_ROLES.LAB) || userRoles.includes(USER_ROLES.LAB_TECHNICIAN)) return '/lab-management';
   if (userRoles.includes(USER_ROLES.PATIENT)) return '/home';
@@ -420,9 +577,10 @@ export const getRoleLandingPage = (userRoles: UserRole[] | null): string => {
 
 // Get navigation items based on user's roles (supports multiple roles)
 export const getRoleNavigation = (userRoles: UserRole[] | null) => {
+  const allRoles = ['patient', 'health_personnel', 'pharmacy', 'institution_admin', 'institution_staff', 'admin', 'lab', 'super_admin', 'support', 'doctor', 'nurse', 'radiologist', 'pharmacist', 'lab_technician', 'receptionist', 'hr_manager', 'cxo', 'ot_staff', 'phlebotomist', 'billing_staff', 'inventory_manager', 'triage_staff', 'maintenance_manager', 'specialist', 'ambulance_staff', 'pathologist'];
   const baseNavigation = [
-    { path: '/profile', label: 'Profile', icon: 'User', roles: ['patient', 'health_personnel', 'pharmacy', 'institution_admin', 'institution_staff', 'admin', 'lab', 'super_admin', 'support', 'doctor', 'nurse', 'radiologist', 'pharmacist', 'lab_technician'] },
-    { path: '/settings', label: 'Settings', icon: 'Settings', roles: ['patient', 'health_personnel', 'pharmacy', 'institution_admin', 'institution_staff', 'admin', 'lab', 'super_admin', 'support', 'doctor', 'nurse', 'radiologist', 'pharmacist', 'lab_technician'] }
+    { path: '/profile', label: 'Profile', icon: 'User', roles: allRoles },
+    { path: '/settings', label: 'Settings', icon: 'Settings', roles: allRoles }
   ];
 
   const allNavigationItems = [
