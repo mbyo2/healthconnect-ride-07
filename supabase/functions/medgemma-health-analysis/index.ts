@@ -128,7 +128,7 @@ Provide:
       disclaimer: 'This analysis is for informational purposes only and does not constitute medical advice. Always consult with a qualified healthcare professional for medical decisions.'
     };
 
-    console.log('MedGemma analysis completed successfully');
+    console.log('AI analysis completed successfully');
 
     return new Response(
       JSON.stringify(structuredResponse),
