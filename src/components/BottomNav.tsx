@@ -1,5 +1,5 @@
 
-import { Home, Search, Calendar, MessageSquare, Heart, Users, ShoppingCart, Pill, AlertTriangle, User, Wallet, Brain, Shield, Activity, Settings, Building2, Stethoscope, Package, Headphones } from "lucide-react";
+import { Home, Search, Calendar, MessageSquare, Heart, Users, ShoppingCart, Pill, AlertTriangle, User, Wallet, Brain, Shield, Activity, Settings, Building2, Stethoscope, Package, Headphones, Scissors, Droplets, DollarSign, Wrench, Truck, Microscope, BarChart3, ClipboardList, Navigation } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { useDeviceType } from "@/hooks/use-device-type";
 import { useAuth } from "@/context/AuthContext";
