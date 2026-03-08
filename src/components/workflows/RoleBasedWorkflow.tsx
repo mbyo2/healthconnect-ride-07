@@ -1,6 +1,7 @@
 import React from 'react';
 import { useUserRoles } from '@/context/UserRolesContext';
 import { useAuth } from '@/context/AuthContext';
+import { AccountApprovalGate } from '@/components/auth/AccountApprovalGate';
 import { PatientWorkflow } from './PatientWorkflow';
 import { HealthPersonnelWorkflow } from './HealthPersonnelWorkflow';
 import { DoctorWorkflow } from './DoctorWorkflow';
