@@ -100,7 +100,7 @@ export const useCurrency = () => {
           const mapped = COUNTRY_CURRENCY_MAP[countryCode];
           if (mapped) {
             setCurrencyState(mapped.code);
-            localStorage.setItem(STORAGE_KEY, mapped.code);
+            safeLocalSet(STORAGE_KEY, mapped.code);
           } else {
             // Default to USD for unmapped countries
             setCurrencyState('USD');
