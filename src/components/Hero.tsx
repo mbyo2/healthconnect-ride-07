@@ -3,18 +3,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Shield, CheckCircle, Star, Clock, Heart, Users, Stethoscope, Building2, Search } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { AppLogo } from '@/components/ui/AppLogo';
-
-const PLATFORM_STATS = {
-  doctors: '500+',
-  hospitals: '50+',
-  pharmacies: '200+',
-  patients: '10,000+',
-};
+import { usePlatformStats, formatStat } from '@/hooks/usePlatformStats';
 
 export const Hero = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
+  const stats = usePlatformStats();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +30,7 @@ export const Hero = () => {
           {[
             { icon: Shield, label: "Verified Providers" },
             { icon: CheckCircle, label: "Insurance Support" },
-            { icon: Star, label: "4.8/5 Rating" },
+            { icon: Star, label: `${stats.rating}/5 Rating` },
             { icon: Clock, label: "24/7 Emergency" },
           ].map(({ icon: Icon, label }) => (
             <div key={label} className="flex items-center gap-1.5">
@@ -77,10 +71,10 @@ export const Hero = () => {
             {/* Stats */}
             <div className="grid grid-cols-4 gap-3 mb-8 max-w-md mx-auto lg:mx-0">
               {[
-                { value: PLATFORM_STATS.doctors, label: "Doctors" },
-                { value: PLATFORM_STATS.hospitals, label: "Hospitals" },
-                { value: PLATFORM_STATS.pharmacies, label: "Pharmacies" },
-                { value: PLATFORM_STATS.patients, label: "Patients" },
+                { value: formatStat(stats.doctors), label: "Doctors" },
+                { value: formatStat(stats.hospitals), label: "Hospitals" },
+                { value: formatStat(stats.pharmacies), label: "Pharmacies" },
+                { value: formatStat(stats.patients), label: "Patients" },
               ].map((stat) => (
                 <div key={stat.label} className="text-center p-3 bg-card rounded-xl border border-border">
                   <div className="text-lg font-bold text-primary">{stat.value}</div>

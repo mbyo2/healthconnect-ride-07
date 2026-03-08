@@ -2,15 +2,11 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Shield, CheckCircle, MapPin, Phone, CreditCard } from 'lucide-react';
-
-const PLATFORM_STATS = {
-  doctors: '500+',
-  hospitals: '50+',
-  pharmacies: '200+',
-  patients: '10,000+',
-};
+import { usePlatformStats, formatStat } from '@/hooks/usePlatformStats';
 
 export const CtaSection = () => {
+  const stats = usePlatformStats();
+
   return (
     <section className="py-16 md:py-24 bg-primary text-primary-foreground relative overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.1),transparent)]" />
@@ -28,7 +24,7 @@ export const CtaSection = () => {
           </h2>
 
           <p className="text-base md:text-lg mb-8 opacity-85 leading-relaxed max-w-xl mx-auto">
-            Join {PLATFORM_STATS.patients} users who trust Doc' O Clock for quality healthcare.
+            Join {formatStat(stats.patients)} users who trust Doc' O Clock for quality healthcare.
           </p>
 
           <div className="flex flex-wrap justify-center gap-4 md:gap-6 mb-8 text-sm">
@@ -63,10 +59,10 @@ export const CtaSection = () => {
 
           <div className="grid grid-cols-4 gap-4 max-w-md mx-auto">
             {[
-              { value: PLATFORM_STATS.doctors, label: "Doctors" },
-              { value: PLATFORM_STATS.hospitals, label: "Hospitals" },
-              { value: PLATFORM_STATS.pharmacies, label: "Pharmacies" },
-              { value: "4.8★", label: "Rating" },
+              { value: formatStat(stats.doctors), label: "Doctors" },
+              { value: formatStat(stats.hospitals), label: "Hospitals" },
+              { value: formatStat(stats.pharmacies), label: "Pharmacies" },
+              { value: `${stats.rating}★`, label: "Rating" },
             ].map((stat) => (
               <div key={stat.label} className="text-center">
                 <div className="text-lg md:text-2xl font-bold">{stat.value}</div>
