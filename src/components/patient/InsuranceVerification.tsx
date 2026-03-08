@@ -36,7 +36,7 @@ export const InsuranceVerification = () => {
           <AlertTriangle className="h-5 w-5" />
           <h3 className="font-semibold">Insurance Information Required</h3>
         </div>
-        <p className="mt-2 text-muted-foreground">
+        <p className="mt-2 text-muted-foregroundreground">
           Please add your insurance information to enable verification.
         </p>
       </Card>
@@ -77,7 +77,7 @@ export const InsuranceVerification = () => {
 
       <div className="mt-4 space-y-2">
         <div className="flex justify-between items-center">
-          <span className="text-gray-600">Status</span>
+          <span classNammuted-foregroundgray-600">Status</span>
           <Badge variant={isActive ? "default" : "destructive"}>
             {isActive ? (
               <CheckCircle className="h-4 w-4 mr-1" />
