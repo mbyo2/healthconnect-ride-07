@@ -58,9 +58,9 @@ describe('PricingPage', () => {
     render(<PricingPage />, { wrapper: Wrapper });
     
     expect(screen.getByText('Simple, Transparent Pricing')).toBeInTheDocument();
-    expect(screen.getByText('Patients')).toBeInTheDocument();
-    expect(screen.getByText('Providers')).toBeInTheDocument();
-    expect(screen.getByText('Institutions')).toBeInTheDocument();
+    expect(screen.getByText(/Patients/)).toBeInTheDocument();
+    expect(screen.getByText(/Providers/)).toBeInTheDocument();
+    expect(screen.getByText(/Pharmacies/)).toBeInTheDocument();
   });
 
   it('shows free messaging for patients', async () => {
