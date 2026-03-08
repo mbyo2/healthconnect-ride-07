@@ -273,17 +273,19 @@ AppContentWithPreload.displayName = 'AppContentWithPreload';
 // Main App Component with Authentication and Routing
 const App: React.FC = () => {
   return (
-    <AuthProvider>
-      <UserRolesProvider>
-        <AccessibilityProvider>
-          <Router>
-            <div className="App">
-              <AppContentWithPreload />
-            </div>
-          </Router>
-        </AccessibilityProvider>
-      </UserRolesProvider>
-    </AuthProvider>
+    <HelmetProvider>
+      <AuthProvider>
+        <UserRolesProvider>
+          <AccessibilityProvider>
+            <Router>
+              <div className="App">
+                <AppContentWithPreload />
+              </div>
+            </Router>
+          </AccessibilityProvider>
+        </UserRolesProvider>
+      </AuthProvider>
+    </HelmetProvider>
   );
 };
 

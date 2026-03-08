@@ -1,7 +1,7 @@
 
 import { ChatList } from "@/components/chat/ChatList";
 import { useEffect } from "react";
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
 
 const Chat = () => {
   // Prefetch chat data when navigation occurs to this page

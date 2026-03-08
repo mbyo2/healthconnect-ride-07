@@ -1,6 +1,6 @@
 
 import { VideoConsultation } from "@/components/video/VideoConsultation";
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
 import { useEffect } from "react";
 
 const VideoConsultations = () => {
