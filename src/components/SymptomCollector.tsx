@@ -42,7 +42,7 @@ export const SymptomCollector = ({ onSymptomSubmit }: SymptomCollectorProps) => 
     setAiAnalysis("");
 
     try {
-      // Get AI analysis from MedGemma
+      // Get AI analysis
       const { data, error } = await supabase.functions.invoke('medgemma-health-analysis', {
         body: {
           analysisType: 'symptom_analysis',
