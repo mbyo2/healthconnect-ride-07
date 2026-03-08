@@ -3,11 +3,12 @@ import { supabase } from '@/integrations/supabase/client';
 import { Session, User } from '@supabase/supabase-js';
 import { toast } from 'sonner';
 import { safeLocalGet, safeLocalSet, safeLocalRemove } from '@/utils/storage';
+import type { Profile } from '@/types/profile';
 
 interface AuthContextType {
   user: User | null;
   session: Session | null;
-  profile: any | null;
+  profile: Profile | null;
   userRole: string | null;
   isLoading: boolean;
   loading: boolean;
