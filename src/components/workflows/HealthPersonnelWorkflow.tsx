@@ -107,26 +107,24 @@ export const HealthPersonnelWorkflow = () => {
         </p>
       </div>
 
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {workflowSteps.map((step, index) => (
           <Card key={index} className="cursor-pointer hover:shadow-md transition-all active:scale-95 touch-manipulation bg-card border-border"
             onClick={() => handleNavigation(step.route, step.title)}>
-            <CardHeader className="pb-3">
-              <div className="flex items-center space-x-2">
-                <div className="p-2 bg-primary/10 dark:bg-primary/20 rounded-lg flex-shrink-0">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 bg-primary/10 dark:bg-primary/20 rounded-lg shrink-0">
                   {step.icon}
                 </div>
-                <CardTitle className="text-xs leading-tight text-foreground">{step.title}</CardTitle>
+                <div className="min-w-0">
+                  <h3 className="text-sm font-semibold text-foreground truncate">{step.title}</h3>
+                  <p className="text-xs text-muted-foreground line-clamp-1">{step.description}</p>
+                </div>
               </div>
-            </CardHeader>
-            <CardContent>
-              <CardDescription className="text-xs mb-3 leading-tight">
-                {step.description}
-              </CardDescription>
               <Button 
                 onClick={(e) => { e.stopPropagation(); handleNavigation(step.route, step.title); }}
                 size="sm" 
-                className="w-full hover:shadow-sm transition-all active:scale-95 touch-manipulation text-xs"
+                className="w-full text-xs mt-2"
               >
                 Open
               </Button>
