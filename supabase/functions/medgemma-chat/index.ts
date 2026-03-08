@@ -71,7 +71,7 @@ CRITICAL: If symptoms suggest emergency, immediately advise to call emergency se
       { role: 'user', content: message }
     ];
 
-    console.log('MedGemma chat request received, calling Lovable AI...');
+    console.log('Doc O Clock AI chat request received...');
 
     // Call Lovable AI Gateway
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
