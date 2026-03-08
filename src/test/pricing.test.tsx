@@ -68,7 +68,7 @@ describe('PricingPage', () => {
     const Wrapper = createWrapper();
     render(<PricingPage />, { wrapper: Wrapper });
 
-    expect(screen.getByText(/Free/i)).toBeInTheDocument();
+    expect(screen.getByText('Free to Use — Pay Only for Care')).toBeInTheDocument();
   });
 
   it('shows pharmacy tab', async () => {
