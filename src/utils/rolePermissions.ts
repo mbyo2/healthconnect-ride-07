@@ -91,6 +91,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/ai-diagnostics',      // clinical decision support
     '/telemedicine',
     '/medications',
+    '/health-analytics',    // patient trends & outcomes
   ],
 
   // ── Nurse (Solo Consultant) ──────────────────────────────
@@ -101,7 +102,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/iot-monitoring',      // vitals monitoring
     '/health-analytics',    // patient health trends
     '/telemedicine',
-    // NOTE: nurses do NOT get /prescriptions or /ai-diagnostics
+    '/video-consultations', // telenursing
   ],
 
   // ── Radiologist ──────────────────────────────────────────
@@ -110,6 +111,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     ...PROVIDER_CORE_ROUTES,
     '/ai-diagnostics',      // imaging AI support
     '/medications',
+    '/health-analytics',    // performance analytics
   ],
 
   // ── Generic Health Personnel (legacy catch-all provider) ─
