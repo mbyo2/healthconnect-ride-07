@@ -28,11 +28,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Attempt to load cached profile first for instant load
+    // Load cached profile for instant UI (display only — role is re-fetched from server)
     const cachedProfile = safeLocalGet('doc_oclock_profile');
     if (cachedProfile) {
       try {
-        setProfile(JSON.parse(cachedProfile));
+        const parsed = JSON.parse(cachedProfile);
+        // Strip role from cache — always trust server for authorization
+        setProfile({ ...parsed, role: parsed.role }); // display only, overwritten by fetchProfile
       } catch (e) {
         console.error('Error parsing cached profile', e);
       }
