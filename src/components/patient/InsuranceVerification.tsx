@@ -36,7 +36,7 @@ export const InsuranceVerification = () => {
           <AlertTriangle className="h-5 w-5" />
           <h3 className="font-semibold">Insurance Information Required</h3>
         </div>
-        <p className="mt-2 text-gray-600">
+        <p className="mt-2 text-muted-foreground">
           Please add your insurance information to enable verification.
         </p>
       </Card>
