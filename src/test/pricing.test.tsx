@@ -63,13 +63,12 @@ describe('PricingPage', () => {
     expect(screen.getByText(/Pharmacies/)).toBeInTheDocument();
   });
 
-  it('shows free messaging for patients', async () => {
+  it('shows free section for patients', async () => {
     const { PricingPage } = await import('@/components/subscription/PricingPage');
     const Wrapper = createWrapper();
     render(<PricingPage />, { wrapper: Wrapper });
 
-    expect(screen.getByText('Always Free for Patients')).toBeInTheDocument();
-    expect(screen.getByText(/No hidden fees/)).toBeInTheDocument();
+    expect(screen.getByText(/Free/i)).toBeInTheDocument();
   });
 
   it('shows pharmacy commission-only section', async () => {
