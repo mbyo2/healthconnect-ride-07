@@ -56,6 +56,10 @@ export const HealthcareInstitutionForm = () => {
     website: "",
   });
   const [errors, setErrors] = useState<FormErrors>({});
+  const [selectedSpecialties, setSelectedSpecialties] = useState<string[]>([]);
+  const [primarySpecialtyId, setPrimarySpecialtyId] = useState<string>();
+
+  const isClinicType = ['clinic', 'dental_clinic', 'eye_clinic', 'skin_clinic', 'specialty_clinic'].includes(formData.type);
 
   const validateForm = () => {
     const newErrors: FormErrors = {};
