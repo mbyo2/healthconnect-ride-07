@@ -2,8 +2,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { UserManagement } from '@/components/admin/UserManagement';
 import { SecurityAuditLogs } from '@/components/admin/SecurityAuditLogs';
 import { TestAccountSetup } from '@/components/admin/TestAccountSetup';
+import { RevenueAnalyticsDashboard } from '@/components/admin/RevenueAnalyticsDashboard';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Shield, Users, Activity } from 'lucide-react';
+import { Shield, Users, Activity, DollarSign } from 'lucide-react';
 
 import { InstitutionApplications } from '@/components/admin/InstitutionApplications';
 import { Building2 } from 'lucide-react';
