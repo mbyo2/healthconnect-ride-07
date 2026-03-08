@@ -168,6 +168,7 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
           body: {
             message: userMessage.content,
             image: imageToSend || null,
+            userRole: activeRole,
             conversationHistory: messages.slice(-10).map(m => ({
               role: m.role,
               content: m.content
