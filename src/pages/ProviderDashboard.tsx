@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScheduleManager } from "@/components/provider/ScheduleManager";
-import { WaitlistManager } from "@/components/provider/WaitlistManager";
+import { WaitlistManager as ProviderWaitlistOld } from "@/components/provider/WaitlistManager";
 import { DigitalSignature } from "@/components/provider/DigitalSignature";
 import { PatientRecords } from "@/components/provider/PatientRecords";
 import { ProviderAnalyticsDashboard } from "@/components/provider/ProviderAnalyticsDashboard";
+import { PromotedListingManager } from "@/components/provider/PromotedListingManager";
+import { BookingWidgetManager } from "@/components/provider/BookingWidgetManager";
+import { WaitlistManager } from "@/components/booking/WaitlistManager";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
