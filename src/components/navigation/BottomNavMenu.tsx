@@ -38,7 +38,7 @@ export function BottomNavMenu({ user, menuItems }: BottomNavMenuProps) {
     <Sheet>
       <SheetTrigger asChild>
         <button
-          className="flex flex-1 flex-col items-center justify-center gap-1 py-2 px-1 rounded-xl min-h-[52px] text-muted-foreground touch-manipulation"
+          className="flex flex-1 basis-0 flex-col items-center justify-center gap-1 py-2 rounded-xl min-h-[52px] text-muted-foreground touch-manipulation"
           {...touchFeedbackProps}
           aria-label="More options"
         >
