@@ -14,7 +14,7 @@ import { MoreHorizontal, UserPlus, ShieldAlert, Users, Settings } from "lucide-r
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { AdminLevel } from "@/types/user";
 import { Badge } from "@/components/ui/badge";
-import { createSuperAdmin } from "@/utils/createSuperAdmin";
+
 
 type AdminUser = {
   id: string;
@@ -100,25 +100,18 @@ const SuperAdminDashboard = () => {
     try {
       setIsSubmitting(true);
 
-      const userData = await supabase.auth.getUser();
-      const userId = userData.data.user?.id;
+      const { data, error } = await supabase.functions.invoke('create-admin-user', {
+        body: {
+          email: newAdminEmail,
+          password: newAdminPassword,
+          firstName: newAdminFirstName,
+          lastName: newAdminLastName,
+          adminLevel: 'admin',
+        },
+      });
 
-      if (!userId) {
-        toast.error("Authentication error");
-        return;
-      }
-
-      // Use our createSuperAdmin utility function
-      const result = await createSuperAdmin(
-        newAdminEmail,
-        newAdminPassword,
-        newAdminFirstName,
-        newAdminLastName
-      );
-
-      if (!result.success) {
-        throw new Error(result.error || "Failed to create admin");
-      }
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
 
       toast.success("Admin created successfully");
       setIsAddAdminOpen(false);

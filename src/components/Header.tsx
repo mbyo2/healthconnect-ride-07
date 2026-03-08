@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useCallback } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -14,7 +14,6 @@ import {
 import { Menu, Search } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useSearch } from "@/context/SearchContext";
-import { UserRole, AdminLevel } from "@/types/user";
 import { useDeviceType } from "@/hooks/use-device-type";
 import { AppLogo } from "@/components/ui/AppLogo";
 import { NotificationBell } from "@/components/NotificationBell";
@@ -24,14 +23,10 @@ export function Header() {
   const location = useLocation();
   const navigate = useNavigate();
   const { setSearchQuery } = useSearch();
-  const [userRole, setUserRole] = useState<UserRole | null>(null);
-  const [adminLevel, setAdminLevel] = useState<AdminLevel | null>(null);
   const { isDesktop } = useDeviceType();
 
-  if (profile?.role !== userRole) {
-    setUserRole(profile?.role as UserRole);
-    setAdminLevel(profile?.admin_level as AdminLevel);
-  }
+  const userRole = profile?.role ?? null;
+  const adminLevel = profile?.admin_level ?? null;
 
   const handleSignOut = useCallback(async () => {
     try {
