@@ -39,13 +39,13 @@ export const PrescriptionList = () => {
       {prescriptions?.map((prescription) => (
         <Card key={prescription.id} className="p-4">
           <h3 className="font-semibold">{prescription.medication_name}</h3>
-          <p className="text-sm text-gray-600">Dosage: {prescription.dosage}</p>
-          <p className="text-sm text-gray-600">Instructions: {prescription.instructions}</p>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-muted-foreground">Dosage: {prescription.dosage}</p>
+          <p className="text-sm text-muted-foreground">Instructions: {prescription.instructions}</p>
+          <p className="text-sm text-muted-foreground">
             Prescribed: {format(new Date(prescription.prescribed_date), 'PPP')}
           </p>
           {prescription.notes && (
-            <p className="text-sm text-gray-600 mt-2">Notes: {prescription.notes}</p>
+            <p className="text-sm text-muted-foreground mt-2">Notes: {prescription.notes}</p>
           )}
         </Card>
       ))}
