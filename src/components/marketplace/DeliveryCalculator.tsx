@@ -226,12 +226,12 @@ export const DeliveryCalculator = ({ product, quantity, onDeliverySelect }: Deli
 
         {/* Emergency Contact */}
         {product.requires_prescription && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-            <div className="flex items-center gap-2 text-red-800">
+          <div className="bg-destructive/5 border border-destructive/20 rounded-lg p-3">
+            <div className="flex items-center gap-2 text-destructive">
               <Phone className="h-4 w-4" />
               <span className="font-medium">Prescription Required</span>
             </div>
-            <p className="text-sm text-red-700 mt-1">
+            <p className="text-sm text-muted-foreground mt-1">
               Valid prescription must be provided before delivery. 
               Our pharmacist will verify your prescription during delivery.
             </p>
