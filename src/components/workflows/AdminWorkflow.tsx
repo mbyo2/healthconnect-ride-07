@@ -7,7 +7,7 @@ import { useUserRoles } from '@/context/UserRolesContext';
 import {
   ShieldCheck, Users, Settings, BarChart3, FileCheck,
   CreditCard, Building2, UserPlus, Activity, ClipboardList,
-  Bell, Bug, Shield, MessageSquare, Brain
+  Bell, Bug, Shield, MessageSquare, Brain, Megaphone
 } from 'lucide-react';
 
 export const AdminWorkflow = () => {

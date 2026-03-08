@@ -7,7 +7,8 @@ import { useSuccessFeedback } from '@/hooks/use-success-feedback';
 import { 
   Building2, Users, Calendar, FileText, Package, Settings,
   BarChart3, Bed, Stethoscope, Scissors, DollarSign, ClipboardList,
-  UserPlus, Wifi, Shield, Bug, Bell, MessageSquare, AlertTriangle
+  UserPlus, Wifi, Shield, Bug, Bell, MessageSquare, AlertTriangle,
+  CreditCard, Megaphone
 } from 'lucide-react';
 
 export const InstitutionAdminWorkflow = () => {

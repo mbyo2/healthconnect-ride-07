@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSuccessFeedback } from '@/hooks/use-success-feedback';
 import {
   Headphones, MessageSquare, Users, Search, FileText,
-  Settings, ShieldCheck, ClipboardList, BarChart3
+  Settings, ShieldCheck, ClipboardList, BarChart3, CreditCard, Bell
 } from 'lucide-react';
 
 export const SupportWorkflow = () => {

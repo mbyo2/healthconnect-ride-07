@@ -8,7 +8,7 @@ import {
   Heart, Calendar, Users, FileText, Settings,
   ClipboardList, MessageSquare, Wallet, AlertTriangle,
   Activity, Thermometer, Home, Pill, Stethoscope,
-  Shield, Bug, Video
+  Shield, Bug, Video, Megaphone, Code2, Bell, CreditCard
 } from 'lucide-react';
 
 export const NurseWorkflow = () => {

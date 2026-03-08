@@ -39,6 +39,9 @@ export const DoctorWorkflow = () => {
     { title: "Promote Practice", description: "Sponsored listings & growth tools", icon: <Megaphone className="h-5 w-5" />, route: '/provider-dashboard' },
     { title: "Booking Widget", description: "Embed booking on your website", icon: <Code2 className="h-5 w-5" />, route: '/provider-dashboard' },
     { title: "Patient Waitlist", description: "Manage waitlisted patients", icon: <Bell className="h-5 w-5" />, route: '/provider-dashboard' },
+    { title: "Appointment Reminders", description: "Automated SMS/email reminders", icon: <Bell className="h-5 w-5" />, route: '/appointments' },
+    { title: "Insurance Verification", description: "Verify patient insurance cards", icon: <Shield className="h-5 w-5" />, route: '/appointments' },
+    { title: "Cost Estimation", description: "Pre-visit cost transparency", icon: <Wallet className="h-5 w-5" />, route: '/appointments' },
     { title: "Settings", description: "Practice preferences", icon: <Settings className="h-5 w-5" />, route: '/settings' },
   ];
 

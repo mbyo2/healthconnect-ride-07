@@ -34,6 +34,8 @@ export const NursingHomeWorkflow = () => {
     { title: "Incident Reports", description: "Falls, emergencies & incident documentation", icon: <AlertTriangle className="h-5 w-5" />, route: '/emergency' },
     { title: "Billing & Family Payments", description: "Invoices, family billing & insurance", icon: <DollarSign className="h-5 w-5" />, route: '/wallet' },
     { title: "Reports & Analytics", description: "Occupancy, care quality & compliance reports", icon: <BarChart3 className="h-5 w-5" />, route: '/institution/reports' },
+    { title: "Insurance Verification", description: "Verify resident insurance & coverage", icon: <CreditCard className="h-5 w-5" />, route: '/hospital-management' },
+    { title: "Appointment Reminders", description: "Automated family visit reminders", icon: <Bell className="h-5 w-5" />, route: '/institution/appointments' },
     { title: "Compliance", description: "Regulatory docs & certifications", icon: <FileText className="h-5 w-5" />, route: '/institution/settings' },
     { title: "Settings", description: "Facility preferences & configuration", icon: <Settings className="h-5 w-5" />, route: '/institution/settings' },
   ];
