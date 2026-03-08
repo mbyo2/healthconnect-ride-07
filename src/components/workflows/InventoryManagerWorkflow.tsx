@@ -39,8 +39,7 @@ export const InventoryManagerWorkflow = () => {
     if (!institutionId) return;
     const fetch = async () => {
       setLoading(true);
-      const { data } = await supabase
-        .from('medication_inventory')
+      const { data } = await (supabase.from('medication_inventory' as any) as any)
         .select('*')
         .eq('pharmacy_id', institutionId)
         .order('medication_name', { ascending: true })

@@ -38,8 +38,7 @@ export const PathologistWorkflow = () => {
     if (!institutionId) return;
     const fetch = async () => {
       setLoading(true);
-      const { data } = await supabase
-        .from('lab_test_results')
+      const { data } = await (supabase.from('lab_test_results' as any) as any)
         .select('*')
         .eq('institution_id', institutionId)
         .order('created_at', { ascending: false })

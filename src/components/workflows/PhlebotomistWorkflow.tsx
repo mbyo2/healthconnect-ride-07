@@ -36,7 +36,7 @@ export const PhlebotomistWorkflow = () => {
 
   const pending = samples.filter(s => s.status === 'pending');
   const homeVisits = samples.filter(s => s.collection_type === 'home_visit' && s.status === 'pending');
-  const collected = samples.filter(s => s.status === 'collected' || s.status === 'received');
+  const collected = samples.filter(s => ['collected', 'received'].includes(s.status));
 
   const handleBarcodeScan = (code: string) => {
     const sample = samples.find(s => s.barcode === code);
