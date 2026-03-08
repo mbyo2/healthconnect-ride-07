@@ -33,6 +33,9 @@ export interface UserSubscription {
   current_period_start: string;
   current_period_end: string;
   cancel_at_period_end: boolean;
+  trial_start?: string | null;
+  trial_end?: string | null;
+  promo_code_id?: string | null;
   plan?: SubscriptionPlan;
 }
 
