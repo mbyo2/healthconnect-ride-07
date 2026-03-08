@@ -44,14 +44,14 @@ const LinkifiedText = ({ text }: { text: string }) => {
   );
 };
 
-const AI_WELCOME_MESSAGE = "Hello! I'm Doc 0 Clock, your AI medical assistant. I can help you understand symptoms, discuss health concerns, and provide medical information. You can also upload medical images (lab results, X-rays, scans) for analysis. How can I assist you today?";
+const AI_WELCOME_MESSAGE = "Hello! I'm Doc' O Clock AI, your intelligent medical assistant. I can help you understand symptoms, discuss health concerns, and provide medical information. You can also upload medical images (lab results, X-rays, scans) for analysis. How can I assist you today?";
 
 interface MedGemmaChatProps {
   onActionClick?: (action: ClinicalAction) => void;
   roleOverride?: string;
 }
 
-const STORAGE_KEY = 'medgemma_chat_history';
+const STORAGE_KEY = 'doc_oclock_ai_chat_history';
 
 export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps) => {
   const { currentRole, userRole } = useUserRoles();
@@ -156,8 +156,8 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
     try {
       console.log('Attempting AI chat...');
 
-      // Primary: doc-chat (Lovable AI - supports images)
-      // Fallback: medgemma-chat (text-only)
+      // Primary: doc-chat (supports images)
+      // Fallback: secondary chat (text-only)
       let data, error;
       let functionUsed = '';
 
@@ -181,8 +181,8 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
 
         if (error || !data?.reply) throw new Error('doc-chat failed');
       } catch (docChatError) {
-        // Fallback to medgemma-chat (text-only, no image support)
-        console.log('doc-chat failed, trying medgemma-chat fallback...');
+        // Fallback to secondary chat (text-only, no image support)
+        console.log('doc-chat failed, trying fallback...');
         try {
           const medgemmaResponse = await supabase.functions.invoke('medgemma-chat', {
             body: {

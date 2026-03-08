@@ -1,5 +1,5 @@
 import { Helmet } from "react-helmet-async";
-import { MedGemmaChat } from "@/components/MedGemmaChat";
+import { MedGemmaChat as DocOClockAIChat } from "@/components/MedGemmaChat";
 import { SymptomCollector } from "@/components/SymptomCollector";
 import { AIDiagnosisHistory } from "@/components/AIDiagnosisHistory";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -22,9 +22,9 @@ const AIDiagnostics = () => {
   return (
     <>
       <Helmet>
-        <title>AI Diagnostic Assistant - MedGemma | Healthcare Platform</title>
-        <meta name="description" content="Get AI-powered health analysis and medical insights from MedGemma, Google's medical AI assistant. Analyze symptoms, get health recommendations, and chat with our medical AI." />
-        <meta name="keywords" content="AI diagnosis, medical AI, symptom checker, health analysis, MedGemma, medical assistant" />
+        <title>AI Diagnostic Assistant | Doc' O Clock</title>
+        <meta name="description" content="Get AI-powered health analysis and medical insights from Doc' O Clock AI. Analyze symptoms, get health recommendations, and chat with our intelligent medical assistant." />
+        <meta name="keywords" content="AI diagnosis, medical AI, symptom checker, health analysis, Doc O Clock AI, medical assistant" />
       </Helmet>
 
       <div className="container mx-auto px-4 py-2 sm:py-8 max-w-7xl">
@@ -38,7 +38,7 @@ const AIDiagnostics = () => {
               <div>
                 <h1 className="text-xl sm:text-3xl font-bold">AI Diagnostic Assistant</h1>
                 <p className="text-xs sm:text-base text-muted-foreground">
-                  Powered by Doc 0 Clock - Your 24/7 Medical AI
+                  Powered by Doc' O Clock AI - Your 24/7 Medical Assistant
                 </p>
               </div>
             </div>
@@ -121,7 +121,7 @@ const AIDiagnostics = () => {
             </TabsList>
 
             <TabsContent value="chat" className="mt-3 sm:mt-6">
-              <MedGemmaChat onActionClick={handleActionClick} />
+              <DocOClockAIChat onActionClick={handleActionClick} />
             </TabsContent>
 
             <TabsContent value="symptoms" className="mt-4 sm:mt-6">
@@ -129,7 +129,7 @@ const AIDiagnostics = () => {
                 <CardHeader>
                   <CardTitle className="text-lg sm:text-xl">Symptom Analysis</CardTitle>
                   <CardDescription className="text-xs sm:text-sm">
-                    Describe your symptoms and get an AI-powered analysis from Doc 0 Clock
+                    Describe your symptoms and get an AI-powered analysis from Doc' O Clock AI
                   </CardDescription>
                 </CardHeader>
                 <CardContent>

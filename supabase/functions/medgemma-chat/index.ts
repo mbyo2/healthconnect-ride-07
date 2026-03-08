@@ -71,9 +71,7 @@ CRITICAL: If symptoms suggest emergency, immediately advise to call emergency se
       { role: 'user', content: message }
     ];
 
-    console.log('MedGemma chat request received, calling Lovable AI...');
-
-    // Call Lovable AI Gateway
+    console.log('Doc O Clock AI chat request receivedAI Gateway
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -105,7 +103,7 @@ CRITICAL: If symptoms suggest emergency, immediately advise to call emergency se
     const data = await response.json();
     const reply = data.choices[0].message.content;
 
-    console.log('MedGemma chat response generated');
+    console.log('AI chat response generated');
 
     return new Response(
       JSON.stringify({
@@ -120,7 +118,7 @@ CRITICAL: If symptoms suggest emergency, immediately advise to call emergency se
     );
 
   } catch (error) {
-    console.error('Error in MedGemma chat:', error);
+    console.error('Error in AI chat:', error);
 
     return new Response(
       JSON.stringify({

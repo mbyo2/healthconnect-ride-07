@@ -102,9 +102,9 @@ Provide:
         throw new Error('Invalid analysis type');
     }
 
-    console.log('Calling MedGemma with prompt:', prompt);
+    console.log('Calling AI health analysis...');
 
-    // Call MedGemma via Hugging Face
+    // Call AI model via Hugging Face
     const response = await hf.textGeneration({
       model: 'google/medgemma-7b',
       inputs: `${systemContext}\n\n${prompt}`,
@@ -122,13 +122,13 @@ Provide:
     const structuredResponse = {
       analysis,
       timestamp: new Date().toISOString(),
-      model: 'medgemma-7b',
+      model: 'doc-oclock-ai',
       analysisType,
-      confidence: 0.85, // MedGemma provides high-quality medical analysis
+      confidence: 0.85,
       disclaimer: 'This analysis is for informational purposes only and does not constitute medical advice. Always consult with a qualified healthcare professional for medical decisions.'
     };
 
-    console.log('MedGemma analysis completed successfully');
+    console.log('AI analysis completed successfully');
 
     return new Response(
       JSON.stringify(structuredResponse),
@@ -139,7 +139,7 @@ Provide:
     );
 
   } catch (error) {
-    console.error('Error in MedGemma analysis:', error);
+    console.error('Error in AI analysis:', error);
     
     return new Response(
       JSON.stringify({ 

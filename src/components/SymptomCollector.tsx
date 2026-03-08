@@ -42,7 +42,7 @@ export const SymptomCollector = ({ onSymptomSubmit }: SymptomCollectorProps) => 
     setAiAnalysis("");
 
     try {
-      // Get AI analysis from MedGemma
+      // Get AI analysis
       const { data, error } = await supabase.functions.invoke('medgemma-health-analysis', {
         body: {
           analysisType: 'symptom_analysis',
@@ -62,7 +62,7 @@ export const SymptomCollector = ({ onSymptomSubmit }: SymptomCollectorProps) => 
       setAiAnalysis(analysis);
       
       toast.success("AI analysis completed", {
-        description: "MedGemma has analyzed your symptoms"
+        description: "Doc' O Clock AI has analyzed your symptoms"
       });
 
       if (onSymptomSubmit) {

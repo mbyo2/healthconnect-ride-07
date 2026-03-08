@@ -59,8 +59,8 @@ const SearchPage = () => {
   return (
     <>
       <Helmet>
-        <title>Find Doctors & Specialists in Zambia | Doc' O Clock</title>
-        <meta name="description" content="Search and book appointments with verified doctors, specialists, hospitals, and clinics across Zambia." />
+        <title>Find Doctors & Specialists | Doc' O Clock</title>
+        <meta name="description" content="Search and book appointments with verified doctors, specialists, hospitals, and clinics on Doc' O Clock." />
         <link rel="canonical" href="https://dococlockapp.com/search" />
       </Helmet>
 
