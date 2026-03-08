@@ -38,7 +38,7 @@ export function DesktopUserMenu({ user, profile, onLogout }: DesktopUserMenuProp
       return [
         { to: "/provider-dashboard", label: "Nurse Dashboard", icon: <Stethoscope className="h-4 w-4" /> },
         { to: "/appointments", label: "Patient Visits", icon: <Calendar className="h-4 w-4" /> },
-        { to: "/wallet", label: "Earnings", icon: <Wallet className="h-4 w-4" /> },
+        ...(!isInstitutionAffiliated ? [{ to: "/wallet", label: "Earnings", icon: <Wallet className="h-4 w-4" /> }] : []),
         { to: "/profile", label: "Profile", icon: <User className="h-4 w-4" /> },
         { to: "/settings", label: "Settings", icon: <Settings className="h-4 w-4" /> },
       ];
