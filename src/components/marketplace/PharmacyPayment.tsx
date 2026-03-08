@@ -6,6 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader2, Pill, DollarSign } from "lucide-react";
+import { useCurrency } from "@/hooks/use-currency";
 import type { Order } from "@/types/marketplace";
 
 interface PharmacyPaymentProps {
