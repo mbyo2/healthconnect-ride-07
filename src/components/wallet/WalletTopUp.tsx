@@ -35,7 +35,7 @@ export const WalletTopUp = () => {
             const { data, error } = await supabase.functions.invoke('process-paypal-payment', {
                 body: {
                     amount: numAmount,
-                    currency: 'USD',
+                    currency,
                     patientId: user.id,
                     providerId: '00000000-0000-0000-0000-000000000000', // System/Platform provider ID
                     serviceId: 'wallet_topup',
