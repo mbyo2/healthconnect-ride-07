@@ -5475,6 +5475,39 @@ export type Database = {
         }
         Relationships: []
       }
+      specialty_booking_fees: {
+        Row: {
+          booking_fee: number
+          created_at: string
+          currency: string
+          id: string
+          is_active: boolean
+          location_tier: string
+          specialty: string
+          updated_at: string
+        }
+        Insert: {
+          booking_fee: number
+          created_at?: string
+          currency?: string
+          id?: string
+          is_active?: boolean
+          location_tier?: string
+          specialty: string
+          updated_at?: string
+        }
+        Update: {
+          booking_fee?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          is_active?: boolean
+          location_tier?: string
+          specialty?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       specialty_staff_roles: {
         Row: {
           created_at: string | null

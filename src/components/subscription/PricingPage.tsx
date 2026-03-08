@@ -3,10 +3,13 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Check, Sparkles, Building2, User, Stethoscope, Loader2, Crown, Zap, Shield, Heart, AlertTriangle } from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Check, Sparkles, Building2, User, Stethoscope, Loader2, Crown, Shield, Heart, DollarSign, UserPlus, Clock, MessageSquare } from 'lucide-react';
 import { useSubscriptionPlans, useSubscribeToPlan, useUserSubscription, SubscriptionPlan } from '@/hooks/useSubscription';
 import { useAuth } from '@/context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 const formatKwacha = (amount: number) => {
   if (amount === 0) return 'Free';
@@ -25,7 +28,7 @@ const PatientFreeSection = () => (
         </div>
         <CardTitle className="text-2xl">Always Free for Patients</CardTitle>
         <CardDescription className="text-base max-w-xl mx-auto">
-          Book appointments, access your health records, use our AI symptom checker, and manage your healthcare — all at no cost. Just like Zocdoc, patients never pay platform fees.
+          Just like Zocdoc — patients never pay to book. Find doctors, book instantly, manage your health — all free.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -57,106 +60,155 @@ const PatientFreeSection = () => (
   </div>
 );
 
-/* ─── Provider Plan Card ─── */
-const ProviderPlanCard = ({ plan, currentPlanId, onSubscribe, isLoading }: {
-  plan: SubscriptionPlan;
-  currentPlanId?: string;
-  onSubscribe: (planId: string, cycle: 'monthly' | 'annual') => void;
-  isLoading: boolean;
-}) => {
-  const isCurrent = plan.id === currentPlanId;
-  const isPayPerBooking = plan.plan_type === 'pay_per_booking';
-  const bookingFee = plan.booking_fee;
+/* ─── Provider Pay-Per-Booking Section ─── */
+const ProviderPayPerBookingSection = () => {
+  const { data: specialtyFees } = useQuery({
+    queryKey: ['specialty-booking-fees'],
+    queryFn: async () => {
+      const { data, error } = await (supabase as any)
+        .from('specialty_booking_fees')
+        .select('*')
+        .eq('is_active', true)
+        .eq('location_tier', 'standard')
+        .order('specialty');
+      if (error) throw error;
+      return data as { specialty: string; booking_fee: number }[];
+    },
+  });
+
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   return (
-    <Card className={`relative flex flex-col ${plan.highlight ? 'border-primary shadow-lg shadow-primary/10 scale-[1.02]' : 'border-border'}`}>
-      {plan.highlight && (
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-          <Badge className="bg-primary text-primary-foreground gap-1">
-            <Sparkles className="h-3 w-3" /> Most Popular
-          </Badge>
-        </div>
-      )}
-      <CardHeader className="text-center pb-2">
-        <CardTitle className="text-xl">{plan.name}</CardTitle>
-        <CardDescription className="text-sm">{plan.description}</CardDescription>
-      </CardHeader>
-      <CardContent className="flex-1 space-y-4">
-        {/* Pricing */}
-        <div className="text-center">
-          {isPayPerBooking ? (
-            <>
-              <div className="flex items-baseline justify-center gap-1">
-                <span className="text-4xl font-bold">K0</span>
-                <span className="text-muted-foreground">/mo</span>
-              </div>
-              <p className="text-sm text-primary font-semibold mt-1">
-                K{bookingFee} per new patient booking
-              </p>
-            </>
-          ) : (
-            <>
-              <div className="flex items-baseline justify-center gap-1">
-                <span className="text-4xl font-bold">{formatKwacha(plan.price_monthly)}</span>
-                <span className="text-muted-foreground">/mo</span>
-              </div>
-              {plan.price_annual > 0 && (
-                <p className="text-xs text-muted-foreground mt-1">
-                  or {formatKwacha(plan.price_annual)}/yr (save {Math.round((1 - plan.price_annual / (plan.price_monthly * 12)) * 100)}%)
-                </p>
-              )}
-              {bookingFee > 0 && (
-                <p className="text-sm text-primary font-medium mt-1">
-                  + K{bookingFee} per new patient booking
-                </p>
-              )}
-              {bookingFee === 0 && plan.price_monthly > 0 && (
-                <p className="text-sm text-green-600 font-medium mt-1">
-                  No booking fees!
-                </p>
-              )}
-            </>
-          )}
-        </div>
-
-        {/* No-show protection badge */}
-        {(plan.features as string[]).some(f => f.toLowerCase().includes('no-show')) && (
-          <div className="flex justify-center">
-            <Badge variant="outline" className="text-xs gap-1">
-              <AlertTriangle className="h-3 w-3" /> No-show fee protection included
-            </Badge>
+    <div className="space-y-8 max-w-4xl mx-auto">
+      {/* Hero card */}
+      <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-background">
+        <CardHeader className="text-center">
+          <div className="flex justify-center mb-3">
+            <div className="p-3 rounded-full bg-primary/10">
+              <UserPlus className="h-8 w-8 text-primary" />
+            </div>
           </div>
-        )}
+          <CardTitle className="text-2xl">Pay Only for New Patients</CardTitle>
+          <CardDescription className="text-base max-w-xl mx-auto">
+            List your practice for free. You're only charged when a <strong>new patient</strong> books through Doc' O Clock. 
+            Returning patients are always free. No monthly fees. No contracts.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="text-center p-4 rounded-lg bg-background border">
+              <DollarSign className="h-6 w-6 text-primary mx-auto mb-2" />
+              <p className="font-semibold text-sm">K0 to List</p>
+              <p className="text-xs text-muted-foreground">Free profile & visibility</p>
+            </div>
+            <div className="text-center p-4 rounded-lg bg-background border">
+              <UserPlus className="h-6 w-6 text-primary mx-auto mb-2" />
+              <p className="font-semibold text-sm">K30–K120 per Booking</p>
+              <p className="text-xs text-muted-foreground">Only new patients, varies by specialty</p>
+            </div>
+            <div className="text-center p-4 rounded-lg bg-background border">
+              <Clock className="h-6 w-6 text-primary mx-auto mb-2" />
+              <p className="font-semibold text-sm">Cancel Anytime</p>
+              <p className="text-xs text-muted-foreground">No lock-in, no contracts</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
-        {/* Features */}
-        <ul className="space-y-2">
-          {(plan.features as string[]).map((feature, i) => (
-            <li key={i} className="flex items-start gap-2 text-sm">
-              <Check className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-              <span>{feature}</span>
-            </li>
-          ))}
-        </ul>
-      </CardContent>
-      <CardFooter className="flex-col gap-2">
-        <Button
-          className="w-full"
-          variant={plan.highlight ? 'default' : 'outline'}
-          disabled={isCurrent || isLoading}
-          onClick={() => onSubscribe(plan.id, 'monthly')}
-        >
-          {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> :
-           isCurrent ? <><Crown className="h-4 w-4 mr-1" /> Current Plan</> :
-           isPayPerBooking ? 'Get Started Free' :
-           'Start 30-Day Free Trial'}
+      {/* What's included */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg">What's Included — Free</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-2">
+              {[
+                'Professional profile & listing',
+                'Appointment management',
+                'Patient messaging & chat',
+                'Automated reminders (SMS/Email)',
+                'Video consultations',
+                'Prescription management',
+                'Analytics dashboard',
+                'No-show tracking & alerts',
+              ].map((f, i) => (
+                <li key={i} className="flex items-center gap-2 text-sm">
+                  <Check className="h-4 w-4 text-primary shrink-0" />
+                  <span>{f}</span>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg">How It Works</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-3">
+              {[
+                { step: '1', title: 'Create your free profile', desc: 'List your practice, specialties, and availability' },
+                { step: '2', title: 'New patients find you', desc: 'Patients search and book appointments through Doc\' O Clock' },
+                { step: '3', title: 'You get charged per new booking', desc: 'A one-time fee based on your specialty — only for new patients' },
+                { step: '4', title: 'Returning patients = free', desc: 'Once a patient is yours, all future bookings cost you nothing' },
+              ].map((item) => (
+                <div key={item.step} className="flex gap-3">
+                  <div className="flex-shrink-0 w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center">
+                    <span className="text-xs font-bold text-primary">{item.step}</span>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">{item.title}</p>
+                    <p className="text-xs text-muted-foreground">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Specialty fee table */}
+      {specialtyFees && specialtyFees.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Booking Fees by Specialty</CardTitle>
+            <CardDescription>One-time fee per new patient booking. Varies by specialty and demand.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Specialty</TableHead>
+                  <TableHead className="text-right">Fee per New Patient</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {specialtyFees.map((fee) => (
+                  <TableRow key={fee.specialty}>
+                    <TableCell className="font-medium">{fee.specialty}</TableCell>
+                    <TableCell className="text-right">K{fee.booking_fee}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+            <p className="text-xs text-muted-foreground mt-3">
+              * Fees may vary by location. Premium areas may have higher rates. Contact us for custom pricing.
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* CTA */}
+      <div className="text-center">
+        <Button size="lg" onClick={() => !user ? navigate('/auth') : navigate('/provider-dashboard')}>
+          {user ? 'Go to Dashboard' : 'Get Started Free'}
         </Button>
-        {!isPayPerBooking && !isCurrent && (
-          <p className="text-xs text-muted-foreground text-center">
-            No charge during trial · Cancel anytime
-          </p>
-        )}
-      </CardFooter>
-    </Card>
+        <p className="text-xs text-muted-foreground mt-2">No credit card required · Start getting patients today</p>
+      </div>
+    </div>
   );
 };
 
@@ -194,27 +246,17 @@ const InstitutionPlanCard = ({ plan, currentPlanId, onSubscribe, isLoading }: {
           </p>
         </div>
 
-        {/* Capacity badges */}
         <div className="flex flex-wrap gap-2 justify-center">
-          {plan.max_beds && (
-            <Badge variant="outline" className="text-xs">{plan.max_beds} beds</Badge>
-          )}
-          {plan.max_users && (
-            <Badge variant="outline" className="text-xs">{plan.max_users} staff</Badge>
-          )}
-          {plan.max_doctors && (
-            <Badge variant="outline" className="text-xs">{plan.max_doctors} doctors</Badge>
-          )}
-          {!plan.max_beds && !plan.max_users && (
-            <Badge variant="outline" className="text-xs">Unlimited capacity</Badge>
-          )}
+          {plan.max_beds && <Badge variant="outline" className="text-xs">{plan.max_beds} beds</Badge>}
+          {plan.max_users && <Badge variant="outline" className="text-xs">{plan.max_users} staff</Badge>}
+          {plan.max_doctors && <Badge variant="outline" className="text-xs">{plan.max_doctors} doctors</Badge>}
+          {!plan.max_beds && !plan.max_users && <Badge variant="outline" className="text-xs">Unlimited capacity</Badge>}
         </div>
 
-        {/* Marketplace note */}
         {marketplaceFee && (
           <div className="text-center p-2 bg-muted/50 rounded-md">
             <p className="text-xs text-muted-foreground">
-              Marketplace listing available as add-on: <span className="font-medium text-foreground">K{marketplaceFee}/mo</span>
+              Optional marketplace listing: <span className="font-medium text-foreground">K{marketplaceFee}/mo</span>
             </p>
           </div>
         )}
@@ -229,12 +271,8 @@ const InstitutionPlanCard = ({ plan, currentPlanId, onSubscribe, isLoading }: {
         </ul>
       </CardContent>
       <CardFooter>
-        <Button
-          className="w-full"
-          variant={plan.highlight ? 'default' : 'outline'}
-          disabled={isCurrent || isLoading}
-          onClick={() => onSubscribe(plan.id, 'annual')}
-        >
+        <Button className="w-full" variant={plan.highlight ? 'default' : 'outline'}
+          disabled={isCurrent || isLoading} onClick={() => onSubscribe(plan.id, 'annual')}>
           {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> :
            isCurrent ? <><Crown className="h-4 w-4 mr-1" /> Current Plan</> :
            'Start Annual Plan'}
@@ -253,17 +291,10 @@ export const PricingPage = () => {
   const subscribeMutation = useSubscribeToPlan();
 
   const handleSubscribe = (planId: string, cycle: 'monthly' | 'annual') => {
-    if (!user) {
-      navigate('/auth');
-      return;
-    }
-    // Providers get 30-day trial on paid plans
-    const plan = plans?.find(p => p.id === planId);
-    const trialDays = plan && plan.target_audience === 'provider' && plan.plan_type === 'subscription' ? 30 : 0;
-    subscribeMutation.mutate({ planId, billingCycle: cycle, trialDays });
+    if (!user) { navigate('/auth'); return; }
+    subscribeMutation.mutate({ planId, billingCycle: cycle });
   };
 
-  const providerPlans = plans?.filter(p => p.target_audience === 'provider') || [];
   const institutionPlans = plans?.filter(p => p.target_audience === 'institution') || [];
 
   if (plansLoading) {
@@ -272,11 +303,10 @@ export const PricingPage = () => {
 
   return (
     <div className="container mx-auto py-8 space-y-10">
-      {/* Hero */}
       <div className="text-center space-y-4">
         <h1 className="text-4xl font-bold">Simple, Transparent Pricing</h1>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-          Free for patients. Pay-per-booking or subscription for providers. Annual HMS plans for institutions.
+          Free for patients. Pay-per-new-patient for providers. Annual HMS plans for hospitals & clinics.
         </p>
       </div>
 
@@ -292,45 +322,14 @@ export const PricingPage = () => {
         </TabsContent>
 
         <TabsContent value="provider">
-          <div className="space-y-4">
-            <div className="text-center space-y-2">
-              <div className="flex items-center justify-center gap-2">
-                <Zap className="h-5 w-5 text-primary" />
-                <p className="text-sm font-medium text-primary">30-day free trial on all paid plans · No long-term contracts · Cancel anytime</p>
-              </div>
-              <p className="text-xs text-muted-foreground max-w-lg mx-auto">
-                Like Zocdoc, booking fees only apply for <strong>new patients</strong> who find you through Doc' O Clock. Returning patients are free.
-              </p>
-            </div>
-
-            {/* How booking fees work */}
-            <div className="max-w-2xl mx-auto p-4 bg-muted/30 border rounded-lg space-y-2">
-              <h4 className="font-semibold text-sm">How Booking Fees Work</h4>
-              <ul className="text-xs text-muted-foreground space-y-1">
-                <li>• You're only charged when a <strong>new patient</strong> books through the platform</li>
-                <li>• Returning patients booking again? <strong>Always free</strong></li>
-                <li>• Patient doesn't show up? <strong>No-show protection</strong> on Premium+ plans waives the fee</li>
-                <li>• Higher subscription tier = lower per-booking fee</li>
-              </ul>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-              {providerPlans.map(plan => (
-                <ProviderPlanCard key={plan.id} plan={plan} currentPlanId={currentSub?.plan_id}
-                  onSubscribe={handleSubscribe} isLoading={subscribeMutation.isPending} />
-              ))}
-            </div>
-          </div>
+          <ProviderPayPerBookingSection />
         </TabsContent>
 
         <TabsContent value="institution">
           <div className="space-y-4">
             <div className="text-center space-y-2">
               <p className="text-sm text-muted-foreground">
-                All plans billed annually. Includes full Hospital Management System (HMS). Own your billing — we only charge for the software.
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Marketplace listing is optional. Hospitals manage their own service pricing and patient billing.
+                HMS subscription only — you manage your own billing & pricing. Marketplace listing is optional.
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
