@@ -360,9 +360,9 @@ export const PricingPage = () => {
     <>
       <Helmet>
         <title>Pricing — Doc' O Clock Healthcare Platform</title>
-        <meta name="description" content="Free for patients. Pay-per-booking for providers. Transparent pricing for pharmacies and hospitals. All prices in Zambian Kwacha." />
+        <meta name="description" content="Free for patients. Pay-per-booking for providers. Transparent pricing for pharmacies and hospitals." />
         <meta property="og:title" content="Pricing | Doc' O Clock" />
-        <meta property="og:description" content="Simple, transparent healthcare pricing in Zambia." />
+        <meta property="og:description" content="Simple, transparent healthcare pricing." />
         <link rel="canonical" href="https://dococlockapp.com/pricing" />
       </Helmet>
     <div className="container mx-auto py-8 space-y-10">
