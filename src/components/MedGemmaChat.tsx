@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Loader2, Send, Bot, User, X, Paperclip, Lightbulb } from 'lucide-react';
 import { toast } from 'sonner';
 import { ClinicalDecisionCard, ClinicalDecision, parseClinicalDecisions, ClinicalAction } from './ai/ClinicalDecisionCard';
+import { useUserRoles } from '@/context/UserRolesContext';
 
 interface Message {
   role: 'user' | 'assistant';
