@@ -16,6 +16,7 @@ interface PharmacyPaymentProps {
 
 export const PharmacyPayment = ({ order, onPaymentSuccess }: PharmacyPaymentProps) => {
   const [loading, setLoading] = useState(false);
+  const { currency, formatPrice } = useCurrency();
 
   const handlePayment = async () => {
     setLoading(true);
