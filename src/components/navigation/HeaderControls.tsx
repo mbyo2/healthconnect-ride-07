@@ -9,6 +9,7 @@ import { VoiceCommandButton } from '@/components/VoiceCommandButton';
 import { AccessibilityMenu } from '@/components/AccessibilityMenu';
 import { useAuth } from "@/context/AuthContext";
 import { useUserRoles } from "@/context/UserRolesContext";
+import { useInstitutionAffiliation } from "@/hooks/useInstitutionAffiliation";
 import { NavigateFunction } from "react-router-dom";
 import { useMemo } from "react";
 import {

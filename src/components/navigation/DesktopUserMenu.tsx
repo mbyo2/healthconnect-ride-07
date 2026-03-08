@@ -13,6 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User, Calendar, Users, Settings, Heart, Stethoscope, Shield, Building2, Package, Activity, Wallet } from "lucide-react";
 import { User as SupabaseUser } from "@supabase/supabase-js";
 import { useUserRoles } from "@/context/UserRolesContext";
+import { useInstitutionAffiliation } from "@/hooks/useInstitutionAffiliation";
 import { useMemo } from "react";
 
 interface Profile {

@@ -16,6 +16,7 @@ import { DesktopUserMenu } from "@/components/navigation/DesktopUserMenu";
 import { AppLogo } from "@/components/ui/AppLogo";
 import { NotificationBell } from "@/components/NotificationBell";
 import { useUserRoles } from "@/context/UserRolesContext";
+import { useInstitutionAffiliation } from "@/hooks/useInstitutionAffiliation";
 
 export function DesktopNav() {
   const location = useLocation();

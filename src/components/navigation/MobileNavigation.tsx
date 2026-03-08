@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { NavigateFunction } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { useUserRoles } from "@/context/UserRolesContext";
+import { useInstitutionAffiliation } from "@/hooks/useInstitutionAffiliation";
 import { useMemo } from "react";
 import {
   Home, Search, Calendar, MessageSquare, Settings, Building2, User,
