@@ -10,9 +10,9 @@ export const HowItWorks = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="py-24 md:py-32 relative">
+    <section className="py-14 md:py-20 relative">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
+        <div className="text-center mb-10">
           <p className="text-sm font-semibold text-primary uppercase tracking-widest mb-3">How It Works</p>
           <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Book in 4 Simple Steps</h2>
         </div>
@@ -43,11 +43,11 @@ export const HowItWorks = () => {
 };
 
 export const Features = () => (
-  <section className="py-24 md:py-32 bg-muted/30 border-y border-border/30">
+  <section className="py-14 md:py-20 bg-muted/30 border-y border-border/30">
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-      <div className="text-center mb-16">
+      <div className="text-center mb-10">
         <p className="text-sm font-semibold text-primary uppercase tracking-widest mb-3">Platform</p>
-        <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">Everything in One Place</h2>
+        <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-3">Everything in One Place</h2>
         <p className="text-muted-foreground max-w-lg mx-auto">
           For patients, doctors, pharmacies, and hospitals — one unified platform.
         </p>
@@ -81,9 +81,9 @@ export const ForProviders = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="py-24 md:py-32 bg-muted/30 border-y border-border/30">
+    <section className="py-14 md:py-20 bg-muted/30 border-y border-border/30">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div>
             <p className="text-sm font-semibold text-primary uppercase tracking-widest mb-3">For Providers</p>
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-6">

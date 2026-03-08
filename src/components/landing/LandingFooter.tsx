@@ -7,9 +7,9 @@ export const BrowseSpecialties = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="py-24 md:py-32">
+    <section className="py-14 md:py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
+        <div className="text-center mb-10">
           <p className="text-sm font-semibold text-primary uppercase tracking-widest mb-3">Specialties</p>
           <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Find Care by Specialty</h2>
         </div>
@@ -45,7 +45,7 @@ export const CTASection = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="py-24 md:py-32">
+    <section className="py-14 md:py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="relative rounded-3xl overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary to-primary/80" />
@@ -126,8 +126,8 @@ const FOOTER_SECTIONS = [
 
 export const LandingFooter = () => (
   <footer className="border-t border-border/40 bg-muted/20">
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-12">
+    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-10">
         <div className="col-span-2 md:col-span-1">
           <AppLogo size="sm" linkTo="/landing" className="mb-4" />
           <p className="text-sm text-muted-foreground leading-relaxed">
