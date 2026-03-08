@@ -181,8 +181,8 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
 
         if (error || !data?.reply) throw new Error('doc-chat failed');
       } catch (docChatError) {
-        // Fallback to medgemma-chat (text-only, no image support)
-        console.log('doc-chat failed, trying medgemma-chat fallback...');
+        // Fallback to secondary chat (text-only, no image support)
+        console.log('doc-chat failed, trying fallback...');
         try {
           const medgemmaResponse = await supabase.functions.invoke('medgemma-chat', {
             body: {
