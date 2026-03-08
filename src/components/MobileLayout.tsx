@@ -10,6 +10,7 @@ import { useAuth } from "@/context/AuthContext";
 import { AccessibilityMenu } from "@/components/AccessibilityMenu";
 import { useLocation } from "react-router-dom";
 import { OfflineIndicator } from "@/hooks/use-network-status";
+import { OfflineBanner } from "@/components/shared/OfflineBanner";
 
 interface MobileLayoutProps {
   children: ReactNode;
@@ -65,6 +66,7 @@ export const MobileLayout = ({ children, isLoading }: MobileLayoutProps) => {
         </div>
       </main>
       {isAuthenticated && <BottomNav />}
+      <OfflineBanner />
       <OfflineIndicator />
       <AccessibilityMenu />
     </div>

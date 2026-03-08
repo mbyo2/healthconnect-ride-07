@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { PhoneOTPLogin } from './PhoneOTPLogin';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import type { AuthSession } from '@supabase/supabase-js';
@@ -115,6 +116,8 @@ export const AuthForm = ({ mode = 'login' }: AuthFormProps) => {
     }
   };
 
+  const [showPhoneOTP, setShowPhoneOTP] = useState(false);
+
   return (
     <div className="max-w-md mx-auto p-4">
       {rateLimitExceeded && (
@@ -124,12 +127,16 @@ export const AuthForm = ({ mode = 'login' }: AuthFormProps) => {
           </p>
         </div>
       )}
-      
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="login">Sign In</TabsTrigger>
-          <TabsTrigger value="register">Sign Up</TabsTrigger>
-        </TabsList>
+
+      {showPhoneOTP ? (
+        <PhoneOTPLogin onBack={() => setShowPhoneOTP(false)} />
+      ) : (
+        <>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="login">Sign In</TabsTrigger>
+              <TabsTrigger value="register">Sign Up</TabsTrigger>
+            </TabsList>
         
         <TabsContent value="login">
           <form onSubmit={handleLogin} className="space-y-4 mt-4">
@@ -206,7 +213,14 @@ export const AuthForm = ({ mode = 'login' }: AuthFormProps) => {
             </Button>
           </form>
         </TabsContent>
-      </Tabs>
+          </Tabs>
+          <div className="mt-4 text-center">
+            <Button variant="outline" className="w-full gap-2" onClick={() => setShowPhoneOTP(true)}>
+              📱 Sign in with Phone (SMS OTP)
+            </Button>
+          </div>
+        </>
+      )}
     </div>
   );
 };
