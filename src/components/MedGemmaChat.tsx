@@ -48,6 +48,7 @@ const AI_WELCOME_MESSAGE = "Hello! I'm Doc 0 Clock, your AI medical assistant. I
 
 interface MedGemmaChatProps {
   onActionClick?: (action: ClinicalAction) => void;
+  roleOverride?: string;
 }
 
 const STORAGE_KEY = 'medgemma_chat_history';
