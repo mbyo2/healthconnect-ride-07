@@ -170,8 +170,9 @@ export default function MedicalRecords() {
             </Card>
           </div>
 
-          {/* Health Metrics */}
-          <div>
+          {/* Health Metrics & FHIR Export */}
+          <div className="space-y-6">
+            <FHIRExportPanel />
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">

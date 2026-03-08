@@ -50,6 +50,10 @@ const AdminDashboard = () => {
           <UserManagement />
         </TabsContent>
 
+        <TabsContent value="revenue" className="space-y-4">
+          <RevenueAnalyticsDashboard />
+        </TabsContent>
+
         <TabsContent value="applications" className="space-y-4">
           <InstitutionApplications />
         </TabsContent>
