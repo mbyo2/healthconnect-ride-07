@@ -1245,6 +1245,33 @@ export type Database = {
           },
         ]
       }
+      feature_gates: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          feature_key: string
+          free_limit: number | null
+          id: string
+          requires_plan_type: string[] | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          feature_key: string
+          free_limit?: number | null
+          id?: string
+          requires_plan_type?: string[] | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          feature_key?: string
+          free_limit?: number | null
+          id?: string
+          requires_plan_type?: string[] | null
+        }
+        Relationships: []
+      }
       fraud_alerts: {
         Row: {
           created_at: string
@@ -4655,6 +4682,113 @@ export type Database = {
         }
         Relationships: []
       }
+      promo_code_redemptions: {
+        Row: {
+          context: string | null
+          discount_applied: number | null
+          id: string
+          promo_code_id: string
+          redeemed_at: string | null
+          referral_reward_paid: boolean | null
+          referral_spend_met: boolean | null
+          referred_by: string | null
+          user_id: string
+        }
+        Insert: {
+          context?: string | null
+          discount_applied?: number | null
+          id?: string
+          promo_code_id: string
+          redeemed_at?: string | null
+          referral_reward_paid?: boolean | null
+          referral_spend_met?: boolean | null
+          referred_by?: string | null
+          user_id: string
+        }
+        Update: {
+          context?: string | null
+          discount_applied?: number | null
+          id?: string
+          promo_code_id?: string
+          redeemed_at?: string | null
+          referral_reward_paid?: boolean | null
+          referral_spend_met?: boolean | null
+          referred_by?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "promo_code_redemptions_promo_code_id_fkey"
+            columns: ["promo_code_id"]
+            isOneToOne: false
+            referencedRelation: "promo_codes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      promo_codes: {
+        Row: {
+          code: string
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          discount_type: string
+          discount_value: number
+          id: string
+          is_active: boolean | null
+          max_uses: number | null
+          min_spend_amount: number | null
+          promo_type: Database["public"]["Enums"]["promo_code_type"]
+          referrer_reward_amount: number | null
+          referrer_reward_type: string | null
+          target_audience: string
+          times_used: number | null
+          updated_at: string | null
+          valid_from: string | null
+          valid_until: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          discount_type?: string
+          discount_value?: number
+          id?: string
+          is_active?: boolean | null
+          max_uses?: number | null
+          min_spend_amount?: number | null
+          promo_type?: Database["public"]["Enums"]["promo_code_type"]
+          referrer_reward_amount?: number | null
+          referrer_reward_type?: string | null
+          target_audience?: string
+          times_used?: number | null
+          updated_at?: string | null
+          valid_from?: string | null
+          valid_until?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          discount_type?: string
+          discount_value?: number
+          id?: string
+          is_active?: boolean | null
+          max_uses?: number | null
+          min_spend_amount?: number | null
+          promo_type?: Database["public"]["Enums"]["promo_code_type"]
+          referrer_reward_amount?: number | null
+          referrer_reward_type?: string | null
+          target_audience?: string
+          times_used?: number | null
+          updated_at?: string | null
+          valid_from?: string | null
+          valid_until?: string | null
+        }
+        Relationships: []
+      }
       provider_availability: {
         Row: {
           break_end: string | null
@@ -4857,6 +4991,53 @@ export type Database = {
           },
         ]
       }
+      provider_team_members: {
+        Row: {
+          created_at: string | null
+          id: string
+          invited_at: string | null
+          joined_at: string | null
+          member_email: string
+          member_id: string | null
+          owner_id: string
+          role_title: string
+          specialty_role_id: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          invited_at?: string | null
+          joined_at?: string | null
+          member_email: string
+          member_id?: string | null
+          owner_id: string
+          role_title: string
+          specialty_role_id?: string | null
+          status?: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          invited_at?: string | null
+          joined_at?: string | null
+          member_email?: string
+          member_id?: string | null
+          owner_id?: string
+          role_title?: string
+          specialty_role_id?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "provider_team_members_specialty_role_id_fkey"
+            columns: ["specialty_role_id"]
+            isOneToOne: false
+            referencedRelation: "specialty_staff_roles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       push_subscriptions: {
         Row: {
           created_at: string | null
@@ -4880,6 +5061,44 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      referral_links: {
+        Row: {
+          created_at: string | null
+          id: string
+          promo_code_id: string | null
+          referral_code: string
+          referrer_id: string
+          total_conversions: number | null
+          total_referrals: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          promo_code_id?: string | null
+          referral_code: string
+          referrer_id: string
+          total_conversions?: number | null
+          total_referrals?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          promo_code_id?: string | null
+          referral_code?: string
+          referrer_id?: string
+          total_conversions?: number | null
+          total_referrals?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referral_links_promo_code_id_fkey"
+            columns: ["promo_code_id"]
+            isOneToOne: false
+            referencedRelation: "promo_codes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       refunds: {
         Row: {
@@ -5750,8 +5969,10 @@ export type Database = {
           metadata: Json | null
           payment_method: string | null
           plan_id: string
+          promo_code_id: string | null
           status: string
           trial_end: string | null
+          trial_start: string | null
           updated_at: string | null
           user_id: string
         }
@@ -5767,8 +5988,10 @@ export type Database = {
           metadata?: Json | null
           payment_method?: string | null
           plan_id: string
+          promo_code_id?: string | null
           status?: string
           trial_end?: string | null
+          trial_start?: string | null
           updated_at?: string | null
           user_id: string
         }
@@ -5784,8 +6007,10 @@ export type Database = {
           metadata?: Json | null
           payment_method?: string | null
           plan_id?: string
+          promo_code_id?: string | null
           status?: string
           trial_end?: string | null
+          trial_start?: string | null
           updated_at?: string | null
           user_id?: string
         }
@@ -5795,6 +6020,13 @@ export type Database = {
             columns: ["plan_id"]
             isOneToOne: false
             referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_subscriptions_promo_code_id_fkey"
+            columns: ["promo_code_id"]
+            isOneToOne: false
+            referencedRelation: "promo_codes"
             referencedColumns: ["id"]
           },
         ]
@@ -6173,6 +6405,10 @@ export type Database = {
         }
         Returns: Json
       }
+      redeem_promo_code: {
+        Args: { p_code: string; p_context?: string }
+        Returns: Json
+      }
     }
     Enums: {
       admin_level: "admin" | "superadmin"
@@ -6211,6 +6447,7 @@ export type Database = {
         | "inhaler"
         | "powder"
         | "other"
+      promo_code_type: "one_time" | "new_users_only" | "referral" | "multi_use"
       user_role: "admin" | "health_personnel" | "patient"
     }
     CompositeTypes: {
@@ -6378,6 +6615,7 @@ export const Constants = {
         "powder",
         "other",
       ],
+      promo_code_type: ["one_time", "new_users_only", "referral", "multi_use"],
       user_role: ["admin", "health_personnel", "patient"],
     },
   },
