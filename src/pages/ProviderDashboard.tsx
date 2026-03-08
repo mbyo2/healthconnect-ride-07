@@ -18,6 +18,7 @@ import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format, startOfWeek, endOfWeek } from "date-fns";
+import { useCurrency } from "@/hooks/use-currency";
 
 const ProviderDashboard = () => {
   const navigate = useNavigate();
