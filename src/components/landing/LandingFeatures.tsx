@@ -81,7 +81,7 @@ export const ForProviders = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="py-14 md:py-20 bg-muted/30 border-y border-border/30">
+    <section className="py-12 md:py-14 lg:py-20 bg-muted/30 border-y border-border/30">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div>
