@@ -190,10 +190,25 @@ export const HealthcareInstitutionForm = () => {
             <SelectContent>
               {PROVIDER_TYPES.map((type) => (
                 <SelectItem key={type} value={type}>
-                  {type.charAt(0).toUpperCase() + type.slice(1)}
+                  {type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
                 </SelectItem>
               ))}
             </SelectContent>
+          </Select>
+          {errors.type && (
+            <p className="text-sm text-destructive mt-1">{errors.type}</p>
+          )}
+        </div>
+
+        {isClinicType && (
+          <SpecialtySelector
+            selected={selectedSpecialties}
+            primaryId={primarySpecialtyId}
+            onSelectionChange={setSelectedSpecialties}
+            onPrimaryChange={setPrimarySpecialtyId}
+            disabled={isSubmitting}
+          />
+        )}
           </Select>
           {errors.type && (
             <p className="text-sm text-destructive mt-1">{errors.type}</p>
