@@ -71,7 +71,7 @@ export const PharmacyPayment = ({ order, onPaymentSuccess }: PharmacyPaymentProp
           </div>
           <div className="flex justify-between text-sm text-muted-foreground">
             <span>Pharmacy Commission (5%):</span>
-            <span>${(order.total_amount * 0.05).toFixed(2)}</span>
+            <span>{formatPrice(order.total_amount * 0.05)}</span>
           </div>
           <div className="flex justify-between text-sm text-muted-foreground">
             <span>Platform Fee (10%):</span>
