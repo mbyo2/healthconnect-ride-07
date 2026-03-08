@@ -1,180 +1,148 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { setupAdmin, setupSuperAdmin } from '@/utils/setupAdmin';
-import { ChevronLeft } from 'lucide-react';
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ChevronLeft, Loader2, ShieldCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
-import { LoadingScreen } from '@/components/LoadingScreen';
+import { useUserRoles } from '@/context/UserRolesContext';
+import { supabase } from '@/integrations/supabase/client';
 
 const CreateAdmin: React.FC = () => {
-  const [isLoadingAdmin, setIsLoadingAdmin] = useState(false);
-  const [isLoadingSuperAdmin, setIsLoadingSuperAdmin] = useState(false);
-  const [adminCredentials, setAdminCredentials] = useState<{email: string, password: string} | null>(null);
-  const [superAdminCredentials, setSuperAdminCredentials] = useState<{email: string, password: string} | null>(null);
-  const { isAuthenticated, user } = useAuth();
-  
-  // Fixed type checking for admin_level
-  const hasAdminPrivileges = isAuthenticated && user && 
-    ('admin_level' in user ? Boolean(user.admin_level) : false);
+  const { isAuthenticated } = useAuth();
+  const { isAdmin, isSuperAdmin } = useUserRoles();
+  const [isCreating, setIsCreating] = useState(false);
+  const [credentials, setCredentials] = useState<{ email: string; adminLevel: string } | null>(null);
+  const [form, setForm] = useState({
+    email: '',
+    password: '',
+    firstName: '',
+    lastName: '',
+    adminLevel: 'admin',
+  });
 
-  const handleCreateAdmin = async () => {
-    setIsLoadingAdmin(true);
-    try {
-      const result = await setupAdmin();
-      
-      if (result.success) {
-        toast.success("Admin account created successfully");
-        setAdminCredentials(result.credentials);
-      } else {
-        toast.error(`Failed to create admin: ${result.error}`);
-      }
-    } catch (error: any) {
-      toast.error(`Error: ${error.message || 'Failed to create admin'}`);
-    } finally {
-      setIsLoadingAdmin(false);
-    }
-  };
-
-  const handleCreateSuperAdmin = async () => {
-    setIsLoadingSuperAdmin(true);
-    try {
-      const result = await setupSuperAdmin();
-      
-      if (result.success) {
-        toast.success("SuperAdmin account created successfully");
-        setSuperAdminCredentials(result.credentials);
-      } else {
-        toast.error(`Failed to create superadmin: ${result.error}`);
-      }
-    } catch (error: any) {
-      toast.error(`Error: ${error.message || 'Failed to create superadmin'}`);
-    } finally {
-      setIsLoadingSuperAdmin(false);
-    }
-  };
-
-  if (isAuthenticated && !hasAdminPrivileges) {
+  if (!isAuthenticated || !isAdmin) {
     return (
       <div className="container mx-auto p-4">
         <Card className="max-w-md mx-auto">
           <CardHeader>
             <CardTitle>Access Restricted</CardTitle>
-            <CardDescription>
-              You don't have permission to access this page.
-            </CardDescription>
+            <CardDescription>Only administrators can create admin accounts.</CardDescription>
           </CardHeader>
           <CardFooter>
-            <Link to="/">
-              <Button variant="secondary">
-                <ChevronLeft className="mr-2 h-4 w-4" />
-                Return to Home
-              </Button>
-            </Link>
+            <Link to="/"><Button variant="secondary"><ChevronLeft className="mr-2 h-4 w-4" />Return to Home</Button></Link>
           </CardFooter>
         </Card>
       </div>
     );
   }
 
+  const handleCreate = async () => {
+    if (!form.email || !form.password || !form.firstName || !form.lastName) {
+      toast.error('All fields are required');
+      return;
+    }
+    if (form.password.length < 8) {
+      toast.error('Password must be at least 8 characters');
+      return;
+    }
+
+    setIsCreating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('create-admin-user', {
+        body: {
+          email: form.email,
+          password: form.password,
+          firstName: form.firstName,
+          lastName: form.lastName,
+          adminLevel: form.adminLevel,
+        },
+      });
+
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      toast.success(`${data.adminLevel === 'superadmin' ? 'Super Admin' : 'Admin'} created successfully`);
+      setCredentials({ email: data.email, adminLevel: data.adminLevel });
+      setForm({ email: '', password: '', firstName: '', lastName: '', adminLevel: 'admin' });
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to create admin');
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
   return (
-    <div className="container mx-auto p-4">
-      <Link to="/">
-        <Button variant="ghost" className="mb-4">
-          <ChevronLeft className="mr-2 h-4 w-4" />
-          Back to Home
-        </Button>
+    <div className="container mx-auto p-4 max-w-lg">
+      <Link to="/admin-dashboard">
+        <Button variant="ghost" className="mb-4"><ChevronLeft className="mr-2 h-4 w-4" />Back to Dashboard</Button>
       </Link>
 
-      <div className="grid md:grid-cols-2 gap-4">
-        {/* Admin Card */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Create Admin Account</CardTitle>
-            <CardDescription>
-              Create a standard administrator account with permissions to manage users and content.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {adminCredentials ? (
-              <div className="bg-muted p-4 rounded-md">
-                <h3 className="font-semibold mb-2">Admin Credentials</h3>
-                <p><span className="font-medium">Email:</span> {adminCredentials.email}</p>
-                <p><span className="font-medium">Password:</span> {adminCredentials.password}</p>
-                <p className="text-xs mt-2 text-muted-foreground">
-                  Keep these credentials secure!
-                </p>
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <ShieldCheck className="h-5 w-5 text-primary" />
+            Create Admin Account
+          </CardTitle>
+          <CardDescription>
+            Create a new administrator account. {isSuperAdmin ? 'You can create admins and superadmins.' : 'You can create standard admins.'}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {credentials ? (
+            <div className="bg-muted p-4 rounded-md space-y-1">
+              <h3 className="font-semibold text-sm">✅ Account Created</h3>
+              <p className="text-sm"><span className="font-medium">Email:</span> {credentials.email}</p>
+              <p className="text-sm"><span className="font-medium">Level:</span> {credentials.adminLevel}</p>
+              <p className="text-xs text-muted-foreground mt-2">The user can now log in with the credentials you set.</p>
+              <Button size="sm" variant="outline" className="mt-3" onClick={() => setCredentials(null)}>Create Another</Button>
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <Label>First Name</Label>
+                  <Input value={form.firstName} onChange={e => setForm({ ...form, firstName: e.target.value })} />
+                </div>
+                <div className="space-y-1">
+                  <Label>Last Name</Label>
+                  <Input value={form.lastName} onChange={e => setForm({ ...form, lastName: e.target.value })} />
+                </div>
               </div>
-            ) : (
-              <p>
-                An admin user can manage users, appointments, and healthcare providers.
-              </p>
-            )}
-          </CardContent>
+              <div className="space-y-1">
+                <Label>Email</Label>
+                <Input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} />
+              </div>
+              <div className="space-y-1">
+                <Label>Password</Label>
+                <Input type="password" value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} placeholder="Min 8 characters" />
+              </div>
+              {isSuperAdmin && (
+                <div className="space-y-1">
+                  <Label>Admin Level</Label>
+                  <Select value={form.adminLevel} onValueChange={v => setForm({ ...form, adminLevel: v })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="admin">Admin</SelectItem>
+                      <SelectItem value="superadmin">Super Admin</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+            </>
+          )}
+        </CardContent>
+        {!credentials && (
           <CardFooter>
-            <Button 
-              onClick={handleCreateAdmin} 
-              disabled={isLoadingAdmin || !!adminCredentials}
-              className="w-full"
-            >
-              {isLoadingAdmin ? <LoadingScreen /> : adminCredentials ? 'Admin Created' : 'Create Admin Account'}
+            <Button className="w-full" onClick={handleCreate} disabled={isCreating}>
+              {isCreating ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Creating...</> : 'Create Admin Account'}
             </Button>
           </CardFooter>
-        </Card>
-
-        {/* SuperAdmin Card */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Create SuperAdmin Account</CardTitle>
-            <CardDescription>
-              Create a super administrator account with complete system access.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {superAdminCredentials ? (
-              <div className="bg-muted p-4 rounded-md">
-                <h3 className="font-semibold mb-2">SuperAdmin Credentials</h3>
-                <p><span className="font-medium">Email:</span> {superAdminCredentials.email}</p>
-                <p><span className="font-medium">Password:</span> {superAdminCredentials.password}</p>
-                <p className="text-xs mt-2 text-muted-foreground">
-                  Keep these credentials secure!
-                </p>
-              </div>
-            ) : (
-              <p>
-                A super admin has full access to all system features including creating other admins.
-              </p>
-            )}
-          </CardContent>
-          <CardFooter>
-            <Button 
-              onClick={handleCreateSuperAdmin} 
-              disabled={isLoadingSuperAdmin || !!superAdminCredentials}
-              className="w-full"
-            >
-              {isLoadingSuperAdmin ? <LoadingScreen /> : superAdminCredentials ? 'SuperAdmin Created' : 'Create SuperAdmin Account'}
-            </Button>
-          </CardFooter>
-        </Card>
-      </div>
-
-      {(adminCredentials || superAdminCredentials) && (
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle>Next Steps</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ol className="list-decimal ml-6 space-y-2">
-              <li>Log in with the credentials provided above</li>
-              <li>Visit the admin dashboard at <code>/admin-dashboard</code></li>
-              <li>For superadmin access, visit <code>/superadmin-dashboard</code></li>
-              <li>Use these accounts to manage the Doc' O Clock application</li>
-            </ol>
-          </CardContent>
-        </Card>
-      )}
+        )}
+      </Card>
     </div>
   );
 };
