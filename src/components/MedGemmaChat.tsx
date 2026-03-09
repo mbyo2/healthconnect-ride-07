@@ -448,23 +448,60 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
 
         {/* Input Area - WhatsApp style */}
         <div className="border-t p-3 sm:p-4 bg-card">
-          {selectedImage && (
-            <div className="mb-3 relative inline-block">
-              <div className="rounded-xl overflow-hidden border-2 border-primary shadow-md">
-                <img
-                  src={selectedImage}
-                  alt="Selected"
-                  className="h-24 sm:h-32 object-cover"
-                />
+          {/* Image Preview Section */}
+          {selectedImages.length > 0 && (
+            <div className="mb-3">
+              <div className="flex items-center gap-2 mb-2">
+                <ImageIcon className="h-4 w-4 text-primary" />
+                <span className="text-sm font-medium">{selectedImages.length} image(s) attached</span>
+                {selectedImages.length > 1 && (
+                  <span className="text-xs text-muted-foreground">
+                    ({analysisType === 'longitudinal' ? 'Longitudinal comparison' : 'Multiple images'})
+                  </span>
+                )}
               </div>
-              <Button
-                size="icon"
-                variant="destructive"
-                className="absolute -top-2 -right-2 h-7 w-7 rounded-full shadow-lg"
-                onClick={() => setSelectedImage(null)}
-              >
-                <X className="h-4 w-4" />
-              </Button>
+              <div className="grid grid-cols-5 gap-2">
+                {selectedImages.map((img, idx) => (
+                  <div key={idx} className="relative group">
+                    <div className="rounded-lg overflow-hidden border-2 border-primary shadow-md aspect-square">
+                      <img
+                        src={img}
+                        alt={`Selected ${idx + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <Button
+                      size="icon"
+                      variant="destructive"
+                      className="absolute -top-1 -right-1 h-6 w-6 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={() => removeImage(idx)}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                    <span className="absolute bottom-1 left-1 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded">
+                      {idx + 1}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              
+              {/* Analysis Type Selector - Only show when multiple images */}
+              {selectedImages.length > 1 && (
+                <div className="mt-3 space-y-1">
+                  <label className="text-xs text-muted-foreground">Analysis Type:</label>
+                  <Select value={analysisType} onValueChange={(value: AnalysisType) => setAnalysisType(value)}>
+                    <SelectTrigger className="w-full h-9 text-sm">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="general">General Analysis</SelectItem>
+                      <SelectItem value="longitudinal">Longitudinal Comparison (Track Changes)</SelectItem>
+                      <SelectItem value="anatomical_localization">Anatomical Localization</SelectItem>
+                      <SelectItem value="document_understanding">Document Extraction</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
             </div>
           )}
 
