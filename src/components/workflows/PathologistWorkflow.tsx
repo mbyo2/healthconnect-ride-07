@@ -63,31 +63,48 @@ export const PathologistWorkflow = () => {
         </Card>
       )}
 
-      <Card>
-        <CardHeader><CardTitle>Review Queue</CardTitle></CardHeader>
-        <CardContent>
-          {loading ? <Loader2 className="h-6 w-6 animate-spin mx-auto" /> :
-            reviews.length === 0 ? <p className="text-muted-foreground text-center py-4">No reports in queue</p> : (
-              <div className="space-y-2">
-                {reviews.map(r => (
-                  <div key={r.id} className="flex items-center justify-between p-3 rounded-lg border">
-                    <div>
-                      <p className="font-medium">{r.patient_name} — {r.test_name}</p>
-                      <p className="text-sm text-muted-foreground">Result: {r.result_value || '--'} (Ref: {r.reference_range || '--'}) • Lab: {r.lab_tech_name || 'N/A'}</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant={r.status === 'critical' ? 'destructive' : 'outline'}>{r.status.replace(/_/g, ' ')}</Badge>
-                      {['pending_review', 'critical'].includes(r.status) && (
-                        <Button size="sm" onClick={() => { setSelectedId(r.id); setFindings(r.findings || ''); }}>Review</Button>
-                      )}
-                    </div>
+      <Tabs defaultValue="queue">
+        <TabsList>
+          <TabsTrigger value="queue"><ClipboardList className="h-4 w-4 mr-1" /> Review Queue</TabsTrigger>
+          <TabsTrigger value="slide_viewer"><Eye className="h-4 w-4 mr-1" /> Slide Viewer</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="queue" className="mt-4">
+          <Card>
+            <CardHeader><CardTitle>Review Queue</CardTitle></CardHeader>
+            <CardContent>
+              {loading ? <Loader2 className="h-6 w-6 animate-spin mx-auto" /> :
+                reviews.length === 0 ? <p className="text-muted-foreground text-center py-4">No reports in queue</p> : (
+                  <div className="space-y-2">
+                    {reviews.map(r => (
+                      <div key={r.id} className="flex items-center justify-between p-3 rounded-lg border">
+                        <div>
+                          <p className="font-medium">{r.patient_name} — {r.test_name}</p>
+                          <p className="text-sm text-muted-foreground">Result: {r.result_value || '--'} (Ref: {r.reference_range || '--'}) • Lab: {r.lab_tech_name || 'N/A'}</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge variant={r.status === 'critical' ? 'destructive' : 'outline'}>{r.status.replace(/_/g, ' ')}</Badge>
+                          {['pending_review', 'critical'].includes(r.status) && (
+                            <Button size="sm" onClick={() => { setSelectedId(r.id); setFindings(r.findings || ''); }}>Review</Button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            )
-          }
-        </CardContent>
-      </Card>
+                )
+              }
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="slide_viewer" className="mt-4">
+          <DigitalSlideViewer
+            slideName={selectedReport ? `${selectedReport.patient_name} - ${selectedReport.test_name}` : 'Sample Slide'}
+            patientName={selectedReport?.patient_name}
+            testName={selectedReport?.test_name}
+          />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
