@@ -11,6 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { DollarSign, FileText, CreditCard, BarChart3, Receipt, Shield, Loader2, Plus, Trash2 } from 'lucide-react';
 import { useBillingModule, BillingInvoice } from '@/hooks/useBillingModule';
 import { format } from 'date-fns';
+import { InsuranceClaimWorkflow } from '@/components/billing/InsuranceClaimWorkflow';
 
 const STATUS_CONFIG: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
   draft: { label: 'Draft', variant: 'outline' },
