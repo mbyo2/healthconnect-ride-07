@@ -40,21 +40,40 @@ serve(async (req) => {
       );
     }
 
-    const { message, userRole, conversationHistory } = validationResult.data;
+    const { message, userRole, conversationHistory, images, analysisType } = validationResult.data;
 
-
-    // Role-aware prompt (simplified version for fallback)
+    // Role-aware prompt with multimodal capabilities
     const roleLabel = ['doctor','health_personnel','radiologist'].includes(userRole) ? 'clinical professional'
       : ['nurse'].includes(userRole) ? 'nursing professional'
       : ['pharmacist','pharmacy'].includes(userRole) ? 'pharmacist'
       : ['lab','lab_technician'].includes(userRole) ? 'lab professional'
       : 'patient';
 
-    const systemPrompt = `You are Doc 0 Clock, a medical AI assistant. You are speaking with a ${roleLabel}.
+    let systemPrompt = `You are Doc 0 Clock, a medical AI assistant powered by MedGemma 1.5 4B. You are speaking with a ${roleLabel}.
 ${roleLabel !== 'patient' ? 'Use appropriate clinical terminology and provide evidence-based decision support.' : 'Use simple, clear language and be empathetic.'}
 
 Always recommend seeking professional care when appropriate.
 CRITICAL: If symptoms suggest emergency, immediately advise to call emergency services.`;
+
+    // Enhanced prompts based on analysis type
+    if (analysisType === 'longitudinal' && images && images.length > 1) {
+      systemPrompt += `\n\nLONGITUDINAL ANALYSIS MODE:
+- You are analyzing ${images.length} sequential medical images
+- Compare findings across timepoints
+- Identify disease progression or treatment response
+- Highlight any significant changes`;
+    } else if (analysisType === 'document_understanding') {
+      systemPrompt += `\n\nDOCUMENT UNDERSTANDING MODE:
+- Extract structured data from medical documents/lab reports
+- Identify test names, values, units, and reference ranges
+- Flag abnormal values
+- Organize information clearly`;
+    } else if (analysisType === 'anatomical_localization') {
+      systemPrompt += `\n\nANATOMICAL LOCALIZATION MODE:
+- Identify and describe anatomical structures
+- Locate and describe any abnormalities with approximate positions
+- Use standard anatomical terminology`;
+    }
 
     // Format conversation for API
     const messages = [
