@@ -7,8 +7,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { Truck, AlertTriangle, Clock, Plus, MapPin, Navigation, Loader2, Phone } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Truck, AlertTriangle, Clock, Plus, MapPin, Navigation, Loader2, Phone, Map } from 'lucide-react';
 import { useAmbulanceDispatch } from '@/hooks/useAmbulanceDispatch';
+import { AmbulanceTrackingMap } from '@/components/ambulance/AmbulanceTrackingMap';
 
 export const AmbulanceStaffWorkflow = () => {
   const { dispatches, loading, active, inTransit, completedToday, createDispatch, updateStatus } = useAmbulanceDispatch();
