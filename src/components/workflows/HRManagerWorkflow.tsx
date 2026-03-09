@@ -178,6 +178,8 @@ export const HRManagerWorkflow = () => {
         <TabsList>
           <TabsTrigger value="leaves"><ClipboardCheck className="h-4 w-4 mr-1" /> Leave Requests ({leaveRequests.length})</TabsTrigger>
           <TabsTrigger value="attendance"><Clock className="h-4 w-4 mr-1" /> Attendance ({todayAttendance.length})</TabsTrigger>
+          <TabsTrigger value="shifts"><Calendar className="h-4 w-4 mr-1" /> Shifts</TabsTrigger>
+          <TabsTrigger value="bulk_import"><Upload className="h-4 w-4 mr-1" /> Bulk Import</TabsTrigger>
           <TabsTrigger value="payroll"><DollarSign className="h-4 w-4 mr-1" /> Payroll ({payroll.length})</TabsTrigger>
         </TabsList>
 
