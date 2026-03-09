@@ -75,17 +75,7 @@ CRITICAL: If symptoms suggest emergency, immediately advise to call emergency se
 - Use standard anatomical terminology`;
     }
 
-    // Format conversation for API
-    const messages = [
-      { role: 'system', content: systemPrompt },
-      ...conversationHistory.map((msg: any) => ({
-        role: msg.role,
-        content: msg.content
-      })),
-      { role: 'user', content: message }
-    ];
-
-    console.log('Doc O Clock AI chat request received');
+    console.log('MedGemma 1.5 4B multimodal request received');
     
     const HF_TOKEN = Deno.env.get('HF_TOKEN');
     if (!HF_TOKEN) {
@@ -96,7 +86,57 @@ CRITICAL: If symptoms suggest emergency, immediately advise to call emergency se
       );
     }
     
-    // Use HuggingFace MedGemma 1.5 4B IT (instruction-tuned medical model)
+    // Format messages for multimodal input
+    const formattedMessages: any[] = [
+      { role: 'system', content: systemPrompt }
+    ];
+
+    // Add conversation history
+    conversationHistory.forEach((msg: any) => {
+      formattedMessages.push({
+        role: msg.role,
+        content: msg.content
+      });
+    });
+
+    // Add current user message with images if provided
+    if (images && images.length > 0) {
+      const userContent: any[] = [];
+      
+      // Add images first (for longitudinal analysis, order matters)
+      images.forEach((imageBase64, index) => {
+        userContent.push({
+          type: 'image',
+          image: imageBase64 // Base64 encoded image
+        });
+        
+        if (analysisType === 'longitudinal') {
+          userContent.push({
+            type: 'text',
+            text: `[Image ${index + 1} of ${images.length}]`
+          });
+        }
+      });
+      
+      // Add text prompt
+      userContent.push({
+        type: 'text',
+        text: message
+      });
+
+      formattedMessages.push({
+        role: 'user',
+        content: userContent
+      });
+    } else {
+      // Text-only message
+      formattedMessages.push({
+        role: 'user',
+        content: message
+      });
+    }
+    
+    // Call HuggingFace Inference API with chat template
     const response = await fetch('https://api-inference.huggingface.co/models/google/medgemma-1.5-4b-it', {
       method: 'POST',
       headers: {
@@ -104,10 +144,12 @@ CRITICAL: If symptoms suggest emergency, immediately advise to call emergency se
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        inputs: `${systemPrompt}\n\nConversation history:\n${conversationHistory.map(m => `${m.role}: ${m.content}`).join('\n')}\n\nUser: ${message}\n\nAssistant:`,
+        inputs: {
+          messages: formattedMessages
+        },
         parameters: {
-          max_new_tokens: 800,
-          temperature: 0.4,
+          max_new_tokens: 2000, // Increased for detailed medical analysis
+          temperature: 0.3, // Lower for more factual medical responses
           top_p: 0.95,
           return_full_text: false
         }
