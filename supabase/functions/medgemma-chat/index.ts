@@ -13,7 +13,10 @@ const chatRequestSchema = z.object({
   conversationHistory: z.array(z.object({
     role: z.enum(['user', 'assistant']),
     content: z.string().max(2000)
-  })).max(50, 'Conversation history too long').optional().default([])
+  })).max(50, 'Conversation history too long').optional().default([]),
+  // Multimodal support
+  images: z.array(z.string()).max(10, 'Maximum 10 images allowed').optional(), // base64 encoded images
+  analysisType: z.enum(['general', 'longitudinal', 'document_understanding', 'anatomical_localization']).optional().default('general')
 });
 
 serve(async (req) => {
@@ -37,33 +40,42 @@ serve(async (req) => {
       );
     }
 
-    const { message, userRole, conversationHistory } = validationResult.data;
+    const { message, userRole, conversationHistory, images, analysisType } = validationResult.data;
 
-
-    // Role-aware prompt (simplified version for fallback)
+    // Role-aware prompt with multimodal capabilities
     const roleLabel = ['doctor','health_personnel','radiologist'].includes(userRole) ? 'clinical professional'
       : ['nurse'].includes(userRole) ? 'nursing professional'
       : ['pharmacist','pharmacy'].includes(userRole) ? 'pharmacist'
       : ['lab','lab_technician'].includes(userRole) ? 'lab professional'
       : 'patient';
 
-    const systemPrompt = `You are Doc 0 Clock, a medical AI assistant. You are speaking with a ${roleLabel}.
+    let systemPrompt = `You are Doc 0 Clock, a medical AI assistant powered by MedGemma 1.5 4B. You are speaking with a ${roleLabel}.
 ${roleLabel !== 'patient' ? 'Use appropriate clinical terminology and provide evidence-based decision support.' : 'Use simple, clear language and be empathetic.'}
 
 Always recommend seeking professional care when appropriate.
 CRITICAL: If symptoms suggest emergency, immediately advise to call emergency services.`;
 
-    // Format conversation for API
-    const messages = [
-      { role: 'system', content: systemPrompt },
-      ...conversationHistory.map((msg: any) => ({
-        role: msg.role,
-        content: msg.content
-      })),
-      { role: 'user', content: message }
-    ];
+    // Enhanced prompts based on analysis type
+    if (analysisType === 'longitudinal' && images && images.length > 1) {
+      systemPrompt += `\n\nLONGITUDINAL ANALYSIS MODE:
+- You are analyzing ${images.length} sequential medical images
+- Compare findings across timepoints
+- Identify disease progression or treatment response
+- Highlight any significant changes`;
+    } else if (analysisType === 'document_understanding') {
+      systemPrompt += `\n\nDOCUMENT UNDERSTANDING MODE:
+- Extract structured data from medical documents/lab reports
+- Identify test names, values, units, and reference ranges
+- Flag abnormal values
+- Organize information clearly`;
+    } else if (analysisType === 'anatomical_localization') {
+      systemPrompt += `\n\nANATOMICAL LOCALIZATION MODE:
+- Identify and describe anatomical structures
+- Locate and describe any abnormalities with approximate positions
+- Use standard anatomical terminology`;
+    }
 
-    console.log('Doc O Clock AI chat request received');
+    console.log('MedGemma 1.5 4B multimodal request received');
     
     const HF_TOKEN = Deno.env.get('HF_TOKEN');
     if (!HF_TOKEN) {
@@ -74,7 +86,57 @@ CRITICAL: If symptoms suggest emergency, immediately advise to call emergency se
       );
     }
     
-    // Use HuggingFace MedGemma 1.5 4B IT (instruction-tuned medical model)
+    // Format messages for multimodal input
+    const formattedMessages: any[] = [
+      { role: 'system', content: systemPrompt }
+    ];
+
+    // Add conversation history
+    conversationHistory.forEach((msg: any) => {
+      formattedMessages.push({
+        role: msg.role,
+        content: msg.content
+      });
+    });
+
+    // Add current user message with images if provided
+    if (images && images.length > 0) {
+      const userContent: any[] = [];
+      
+      // Add images first (for longitudinal analysis, order matters)
+      images.forEach((imageBase64, index) => {
+        userContent.push({
+          type: 'image',
+          image: imageBase64 // Base64 encoded image
+        });
+        
+        if (analysisType === 'longitudinal') {
+          userContent.push({
+            type: 'text',
+            text: `[Image ${index + 1} of ${images.length}]`
+          });
+        }
+      });
+      
+      // Add text prompt
+      userContent.push({
+        type: 'text',
+        text: message
+      });
+
+      formattedMessages.push({
+        role: 'user',
+        content: userContent
+      });
+    } else {
+      // Text-only message
+      formattedMessages.push({
+        role: 'user',
+        content: message
+      });
+    }
+    
+    // Call HuggingFace Inference API with chat template
     const response = await fetch('https://api-inference.huggingface.co/models/google/medgemma-1.5-4b-it', {
       method: 'POST',
       headers: {
@@ -82,10 +144,12 @@ CRITICAL: If symptoms suggest emergency, immediately advise to call emergency se
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        inputs: `${systemPrompt}\n\nConversation history:\n${conversationHistory.map(m => `${m.role}: ${m.content}`).join('\n')}\n\nUser: ${message}\n\nAssistant:`,
+        inputs: {
+          messages: formattedMessages
+        },
         parameters: {
-          max_new_tokens: 800,
-          temperature: 0.4,
+          max_new_tokens: 2000, // Increased for detailed medical analysis
+          temperature: 0.3, // Lower for more factual medical responses
           top_p: 0.95,
           return_full_text: false
         }
@@ -122,7 +186,16 @@ CRITICAL: If symptoms suggest emergency, immediately advise to call emergency se
       JSON.stringify({
         reply,
         timestamp: new Date().toISOString(),
-        model: 'medgemma-1.5-4b-it'
+        model: 'medgemma-1.5-4b-it',
+        analysisType,
+        imageCount: images?.length || 0,
+        capabilities: {
+          multimodal: true,
+          longitudinal: true,
+          document_understanding: true,
+          anatomical_localization: true,
+          native_3d_imaging: true
+        }
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

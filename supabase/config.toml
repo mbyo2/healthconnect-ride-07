@@ -71,3 +71,15 @@ verify_jwt = true
 
 [functions.doc-chat]
 verify_jwt = true
+
+[functions.med-ai]
+verify_jwt = true
+
+[functions.medgemma-chat]
+verify_jwt = true
+
+[functions.medgemma-document-analysis]
+verify_jwt = true
+
+[functions.medgemma-3d-imaging]
+verify_jwt = true

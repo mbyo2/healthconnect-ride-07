@@ -2,11 +2,28 @@
 
 ## Overview
 
-The Doc 0 Clock AI Diagnostic Assistant uses a **three-tier fallback system** to ensure continuous AI service availability:
+The Doc 0 Clock AI Diagnostic Assistant leverages **MedGemma 1.5 4B** - Google DeepMind's state-of-the-art multimodal medical AI model with advanced 3D imaging and longitudinal analysis capabilities.
 
-1. **Primary**: `medgemma-chat` - Hugging Face MedGemma (specialized medical AI)
-2. **Secondary**: `doc-chat` - Lovable AI with Gemini 2.5 Flash (vision-capable)
-3. **Final Fallback**: `med-ai` - OpenAI GPT-3.5-turbo
+### MedGemma 1.5 4B Capabilities
+
+- ✅ **Native 3D Medical Imaging**: CT and MRI volumetric analysis
+- ✅ **Longitudinal Tracking**: Compare sequential scans to track disease progression
+- ✅ **Multimodal Input**: Text + Images (up to 10 images simultaneously)
+- ✅ **Medical Document Understanding**: Extract structured data from lab reports
+- ✅ **Anatomical Localization**: Bounding box detection on chest X-rays
+- ✅ **Specialized Modalities**: Chest X-rays, dermatology, ophthalmology, histopathology
+- ✅ **Long Context**: Up to 128K tokens
+- ✅ **Privacy-First**: Can run offline on consumer hardware
+
+### Edge Functions Architecture
+
+The system provides specialized edge functions for different medical AI use cases:
+
+1. **`medgemma-chat`** - Primary multimodal conversational AI with image support
+2. **`medgemma-document-analysis`** - Lab report and medical document extraction
+3. **`medgemma-3d-imaging`** - 3D CT/MRI volumetric analysis
+4. **`doc-chat`** - Fallback using Lovable AI with Gemini 2.5 Flash
+5. **`med-ai`** - Final fallback using OpenAI GPT-3.5-turbo
 
 ## Architecture
 
@@ -23,15 +40,16 @@ graph TD
 
 ## Edge Functions
 
-### 1. medgemma-chat (Primary)
+### 1. medgemma-chat (Primary - Multimodal)
 
-**Purpose**: Specialized medical AI using Google's MedGemma model
-**Model**: `google/medgemma-7b` via Hugging Face
+**Purpose**: Advanced multimodal medical AI with image understanding
+**Model**: `google/medgemma-1.5-4b-it` via Hugging Face
 **Capabilities**:
-- Medical symptom analysis
-- Evidence-based health information
-- Medication guidance
-- Emergency detection
+- 🖼️ **Multimodal Input**: Text + up to 10 images simultaneously
+- 📊 **Longitudinal Analysis**: Compare multiple scans over time
+- 🔍 **Image Analysis**: Chest X-rays, dermatology, ophthalmology, histopathology
+- 💊 **Medical Guidance**: Symptom analysis, medication info, emergency detection
+- 🏥 **Role-Aware**: Adapts responses for doctors, nurses, pharmacists, and patients
 
 **Required Environment Variable**:
 ```
@@ -43,9 +61,82 @@ HF_TOKEN=your_hugging_face_token
 2. Sign up or log in
 3. Go to Settings → Access Tokens
 4. Create a new token with "Read" permissions
-5. Copy the token
+5. Request access to `google/medgemma-1.5-4b-it` model (if gated)
+6. Copy the token
 
-### 2. doc-chat (Secondary)
+**Usage Example**:
+```typescript
+const { data, error } = await supabase.functions.invoke('medgemma-chat', {
+  body: {
+    message: 'Analyze these chest X-rays',
+    images: [base64Image1, base64Image2], // Sequential scans
+    analysisType: 'longitudinal', // 'general' | 'longitudinal' | 'anatomical_localization'
+    userRole: 'doctor',
+    conversationHistory: []
+  }
+});
+```
+
+### 2. medgemma-document-analysis (Document Understanding)
+
+**Purpose**: Extract structured data from medical documents and lab reports
+**Model**: `google/medgemma-1.5-4b-it` via Hugging Face
+**Capabilities**:
+- 📄 **Lab Report Parsing**: Extract test names, values, units, reference ranges
+- 💊 **Prescription Reading**: Medication names, dosages, instructions
+- 🏥 **Report Analysis**: Radiology, pathology, discharge summaries
+- ✅ **Abnormality Flagging**: Identify critical or abnormal values
+- 📊 **Structured Output**: Organized, EHR-ready data
+
+**Required Environment Variable**:
+```
+HF_TOKEN=your_hugging_face_token
+```
+
+**Usage Example**:
+```typescript
+const { data, error } = await supabase.functions.invoke('medgemma-document-analysis', {
+  body: {
+    document: base64ImageOfLabReport,
+    documentType: 'lab_report', // 'lab_report' | 'prescription' | 'radiology_report' | 'pathology_report' | 'discharge_summary'
+    extractFields: ['CBC', 'Liver Function'], // Optional: specific tests to focus on
+    userRole: 'doctor'
+  }
+});
+```
+
+### 3. medgemma-3d-imaging (3D Volumetric Analysis)
+
+**Purpose**: Native 3D CT/MRI analysis with volumetric understanding
+**Model**: `google/medgemma-1.5-4b-it` via Hugging Face
+**Capabilities**:
+- 🧠 **3D Context Understanding**: Analyzes multiple slices together
+- 🔬 **Volumetric Analysis**: Organ segmentation, lesion detection
+- 📐 **Spatial Relationships**: Understanding anatomical context
+- 🎯 **Clinical Questions**: Targeted analysis based on clinical indication
+- 📋 **Systematic Reporting**: Structured radiology-style reports
+
+**Required Environment Variable**:
+```
+HF_TOKEN=your_hugging_face_token
+```
+
+**Usage Example**:
+```typescript
+const { data, error } = await supabase.functions.invoke('medgemma-3d-imaging', {
+  body: {
+    slices: [base64Slice1, base64Slice2, base64Slice3], // Up to 50 slices
+    imagingType: 'ct', // 'ct' | 'mri' | 'pet_ct'
+    bodyPart: 'chest', // 'head' | 'chest' | 'abdomen' | 'pelvis' | 'spine' | 'extremity' | 'whole_body'
+    clinicalQuestion: 'Rule out pulmonary embolism',
+    sliceOrientation: 'axial', // 'axial' | 'sagittal' | 'coronal'
+    contrastUsed: true,
+    userRole: 'radiologist'
+  }
+});
+```
+
+### 4. doc-chat (Fallback - Lovable AI)
 
 **Purpose**: Vision-capable AI for medical image analysis
 **Model**: `google/gemini-2.5-flash` via Lovable AI Gateway
@@ -65,7 +156,7 @@ LOVABLE_API_KEY=your_lovable_api_key
 2. Navigate to API settings
 3. Generate or copy your API key
 
-### 3. med-ai (Final Fallback)
+### 5. med-ai (Final Fallback - OpenAI)
 
 **Purpose**: Reliable fallback using OpenAI
 **Model**: `gpt-3.5-turbo`
@@ -110,16 +201,16 @@ OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 ### Step 2: Deploy Edge Functions
 
-Deploy all three Edge Functions to Supabase:
+Deploy all Edge Functions to Supabase:
 
 ```bash
-# Deploy medgemma-chat
+# Deploy MedGemma 1.5 4B functions
 supabase functions deploy medgemma-chat
+supabase functions deploy medgemma-document-analysis
+supabase functions deploy medgemma-3d-imaging
 
-# Deploy doc-chat
+# Deploy fallback functions
 supabase functions deploy doc-chat
-
-# Deploy med-ai
 supabase functions deploy med-ai
 ```
 
@@ -128,13 +219,20 @@ supabase functions deploy med-ai
 Test each function individually:
 
 ```bash
-# Test medgemma-chat
-supabase functions invoke medgemma-chat --body '{"message":"Hello, I have a headache"}'
+# Test text-only chat
+supabase functions invoke medgemma-chat --body '{"message":"What are the symptoms of pneumonia?","userRole":"patient"}'
 
-# Test doc-chat
+# Test multimodal analysis (with base64 image)
+supabase functions invoke medgemma-chat --body '{"message":"Analyze this chest X-ray","images":["data:image/jpeg;base64,..."],"analysisType":"general"}'
+
+# Test document analysis
+supabase functions invoke medgemma-document-analysis --body '{"document":"data:image/jpeg;base64,...","documentType":"lab_report"}'
+
+# Test 3D imaging
+supabase functions invoke medgemma-3d-imaging --body '{"slices":["data:image/jpeg;base64,..."],"imagingType":"ct","bodyPart":"chest","clinicalQuestion":"Assess for pneumonia"}'
+
+# Test fallback functions
 supabase functions invoke doc-chat --body '{"message":"Hello, I have a headache"}'
-
-# Test med-ai
 supabase functions invoke med-ai --body '{"message":"Hello, I have a headache"}'
 ```
 
