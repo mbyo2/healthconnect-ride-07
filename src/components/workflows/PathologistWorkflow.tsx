@@ -15,6 +15,7 @@ export const PathologistWorkflow = () => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [findings, setFindings] = useState('');
   const [significance, setSignificance] = useState('normal');
+  const [showSlideViewer, setShowSlideViewer] = useState(false);
 
   const selectedReport = reviews.find(r => r.id === selectedId);
 

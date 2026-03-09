@@ -153,6 +153,9 @@ export const MaintenanceManagerWorkflow = () => {
             </CardContent>
           </Card>
         </TabsContent>
+        <TabsContent value="preventive" className="mt-4">
+          <PreventiveMaintenanceScheduler />
+        </TabsContent>
       </Tabs>
     </div>
   );
