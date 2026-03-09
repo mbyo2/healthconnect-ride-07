@@ -365,13 +365,33 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
                       : 'bg-card border rounded-bl-sm'
                       }`}
                   >
-                    {message.image && (
-                      <div className="rounded-xl mb-3 overflow-hidden border-2 border-primary/20">
-                        <img
-                          src={message.image}
-                          alt="Medical image"
-                          className="w-full h-auto max-h-64 object-contain bg-muted/50"
-                        />
+                    {message.images && message.images.length > 0 && (
+                      <div className={`rounded-xl mb-3 overflow-hidden border-2 border-primary/20 ${
+                        message.images.length > 1 ? 'grid grid-cols-2 gap-2' : ''
+                      }`}>
+                        {message.images.map((img, imgIdx) => (
+                          <div key={imgIdx} className="relative">
+                            <img
+                              src={img}
+                              alt={`Medical image ${imgIdx + 1}`}
+                              className="w-full h-auto max-h-64 object-contain bg-muted/50"
+                            />
+                            {message.images && message.images.length > 1 && (
+                              <span className="absolute top-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
+                                {imgIdx + 1}/{message.images.length}
+                              </span>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {message.analysisType && message.analysisType !== 'general' && (
+                      <div className="mb-2 inline-block">
+                        <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
+                          {message.analysisType === 'longitudinal' && '📊 Longitudinal Analysis'}
+                          {message.analysisType === 'anatomical_localization' && '🎯 Anatomical Localization'}
+                          {message.analysisType === 'document_understanding' && '📄 Document Analysis'}
+                        </span>
                       </div>
                     )}
                     <p className="text-sm sm:text-base whitespace-pre-wrap leading-relaxed break-words overflow-hidden" style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>
