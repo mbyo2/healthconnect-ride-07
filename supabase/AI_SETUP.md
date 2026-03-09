@@ -156,7 +156,7 @@ LOVABLE_API_KEY=your_lovable_api_key
 2. Navigate to API settings
 3. Generate or copy your API key
 
-### 3. med-ai (Final Fallback)
+### 5. med-ai (Final Fallback - OpenAI)
 
 **Purpose**: Reliable fallback using OpenAI
 **Model**: `gpt-3.5-turbo`
