@@ -15,6 +15,7 @@ import { AmbulanceTrackingMap } from '@/components/ambulance/AmbulanceTrackingMa
 export const AmbulanceStaffWorkflow = () => {
   const { dispatches, loading, active, inTransit, completedToday, createDispatch, updateStatus } = useAmbulanceDispatch();
   const [showAdd, setShowAdd] = useState(false);
+  const [selectedDispatchId, setSelectedDispatchId] = useState<string | null>(null);
   const [form, setForm] = useState({ patient_name: '', pickup_location: '', destination: '', priority: 'urgent', ambulance_unit: 'AMB-01', contact_phone: '', notes: '' });
 
   const statusFlow: Record<string, string> = {
