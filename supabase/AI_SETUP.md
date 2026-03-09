@@ -136,7 +136,7 @@ const { data, error } = await supabase.functions.invoke('medgemma-3d-imaging', {
 });
 ```
 
-### 2. doc-chat (Secondary)
+### 4. doc-chat (Fallback - Lovable AI)
 
 **Purpose**: Vision-capable AI for medical image analysis
 **Model**: `google/gemini-2.5-flash` via Lovable AI Gateway
