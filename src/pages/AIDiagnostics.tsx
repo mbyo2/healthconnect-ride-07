@@ -59,7 +59,24 @@ const AIDiagnostics = () => {
               </CardHeader>
               <CardContent>
                 <p className="text-xs sm:text-sm text-muted-foreground">
-                  Chat & upload medical images for analysis
+                  Chat & upload multiple medical images for AI analysis
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card
+              className="min-w-[240px] sm:min-w-0 snap-center cursor-pointer hover:bg-accent/50 transition-colors"
+              onClick={() => setActiveTab("documents")}
+            >
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm sm:text-base flex items-center gap-2">
+                  <FileText className="h-4 w-4 text-primary" />
+                  Document Analysis
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-xs sm:text-sm text-muted-foreground">
+                  Extract data from lab reports & prescriptions
                 </p>
               </CardContent>
             </Card>
