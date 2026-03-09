@@ -219,6 +219,14 @@ export const HRManagerWorkflow = () => {
           )}
         </TabsContent>
 
+        <TabsContent value="shifts" className="mt-4">
+          <ShiftScheduleCalendar />
+        </TabsContent>
+
+        <TabsContent value="bulk_import" className="mt-4">
+          <BulkAttendanceImport onComplete={() => {}} />
+        </TabsContent>
+
         <TabsContent value="payroll" className="space-y-3 mt-4">
           {loading ? (
             <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
