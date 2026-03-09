@@ -2,11 +2,28 @@
 
 ## Overview
 
-The Doc 0 Clock AI Diagnostic Assistant uses a **three-tier fallback system** to ensure continuous AI service availability:
+The Doc 0 Clock AI Diagnostic Assistant leverages **MedGemma 1.5 4B** - Google DeepMind's state-of-the-art multimodal medical AI model with advanced 3D imaging and longitudinal analysis capabilities.
 
-1. **Primary**: `medgemma-chat` - Hugging Face MedGemma (specialized medical AI)
-2. **Secondary**: `doc-chat` - Lovable AI with Gemini 2.5 Flash (vision-capable)
-3. **Final Fallback**: `med-ai` - OpenAI GPT-3.5-turbo
+### MedGemma 1.5 4B Capabilities
+
+- ✅ **Native 3D Medical Imaging**: CT and MRI volumetric analysis
+- ✅ **Longitudinal Tracking**: Compare sequential scans to track disease progression
+- ✅ **Multimodal Input**: Text + Images (up to 10 images simultaneously)
+- ✅ **Medical Document Understanding**: Extract structured data from lab reports
+- ✅ **Anatomical Localization**: Bounding box detection on chest X-rays
+- ✅ **Specialized Modalities**: Chest X-rays, dermatology, ophthalmology, histopathology
+- ✅ **Long Context**: Up to 128K tokens
+- ✅ **Privacy-First**: Can run offline on consumer hardware
+
+### Edge Functions Architecture
+
+The system provides specialized edge functions for different medical AI use cases:
+
+1. **`medgemma-chat`** - Primary multimodal conversational AI with image support
+2. **`medgemma-document-analysis`** - Lab report and medical document extraction
+3. **`medgemma-3d-imaging`** - 3D CT/MRI volumetric analysis
+4. **`doc-chat`** - Fallback using Lovable AI with Gemini 2.5 Flash
+5. **`med-ai`** - Final fallback using OpenAI GPT-3.5-turbo
 
 ## Architecture
 
