@@ -988,6 +988,143 @@ export type Database = {
           },
         ]
       }
+      cxo_dashboard_metrics: {
+        Row: {
+          accounts_receivable: number | null
+          average_er_wait_time: number | null
+          average_lab_tat: number | null
+          average_length_of_stay: number | null
+          bed_occupancy_rate: number | null
+          cancelled_appointments: number | null
+          collection_rate: number | null
+          completed_appointments: number | null
+          created_at: string
+          er_to_admission_rate: number | null
+          er_visits: number | null
+          icu_occupancy_rate: number | null
+          id: string
+          infection_rate: number | null
+          institution_id: string
+          lab_tests_completed: number | null
+          lab_tests_ordered: number | null
+          medication_errors: number | null
+          metric_date: string
+          metric_period: string
+          mortality_rate: number | null
+          net_income: number | null
+          new_patients: number | null
+          no_show_rate: number | null
+          overtime_hours: number | null
+          patient_satisfaction_score: number | null
+          prescriptions_filled: number | null
+          radiology_exams: number | null
+          readmission_rate: number | null
+          returning_patients: number | null
+          staff_on_leave: number | null
+          staff_present: number | null
+          total_admissions: number | null
+          total_appointments: number | null
+          total_discharges: number | null
+          total_expenses: number | null
+          total_patients: number | null
+          total_revenue: number | null
+          total_staff: number | null
+          updated_at: string
+        }
+        Insert: {
+          accounts_receivable?: number | null
+          average_er_wait_time?: number | null
+          average_lab_tat?: number | null
+          average_length_of_stay?: number | null
+          bed_occupancy_rate?: number | null
+          cancelled_appointments?: number | null
+          collection_rate?: number | null
+          completed_appointments?: number | null
+          created_at?: string
+          er_to_admission_rate?: number | null
+          er_visits?: number | null
+          icu_occupancy_rate?: number | null
+          id?: string
+          infection_rate?: number | null
+          institution_id: string
+          lab_tests_completed?: number | null
+          lab_tests_ordered?: number | null
+          medication_errors?: number | null
+          metric_date: string
+          metric_period?: string
+          mortality_rate?: number | null
+          net_income?: number | null
+          new_patients?: number | null
+          no_show_rate?: number | null
+          overtime_hours?: number | null
+          patient_satisfaction_score?: number | null
+          prescriptions_filled?: number | null
+          radiology_exams?: number | null
+          readmission_rate?: number | null
+          returning_patients?: number | null
+          staff_on_leave?: number | null
+          staff_present?: number | null
+          total_admissions?: number | null
+          total_appointments?: number | null
+          total_discharges?: number | null
+          total_expenses?: number | null
+          total_patients?: number | null
+          total_revenue?: number | null
+          total_staff?: number | null
+          updated_at?: string
+        }
+        Update: {
+          accounts_receivable?: number | null
+          average_er_wait_time?: number | null
+          average_lab_tat?: number | null
+          average_length_of_stay?: number | null
+          bed_occupancy_rate?: number | null
+          cancelled_appointments?: number | null
+          collection_rate?: number | null
+          completed_appointments?: number | null
+          created_at?: string
+          er_to_admission_rate?: number | null
+          er_visits?: number | null
+          icu_occupancy_rate?: number | null
+          id?: string
+          infection_rate?: number | null
+          institution_id?: string
+          lab_tests_completed?: number | null
+          lab_tests_ordered?: number | null
+          medication_errors?: number | null
+          metric_date?: string
+          metric_period?: string
+          mortality_rate?: number | null
+          net_income?: number | null
+          new_patients?: number | null
+          no_show_rate?: number | null
+          overtime_hours?: number | null
+          patient_satisfaction_score?: number | null
+          prescriptions_filled?: number | null
+          radiology_exams?: number | null
+          readmission_rate?: number | null
+          returning_patients?: number | null
+          staff_on_leave?: number | null
+          staff_present?: number | null
+          total_admissions?: number | null
+          total_appointments?: number | null
+          total_discharges?: number | null
+          total_expenses?: number | null
+          total_patients?: number | null
+          total_revenue?: number | null
+          total_staff?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cxo_dashboard_metrics_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       delivery_tracking: {
         Row: {
           created_at: string | null
@@ -3802,6 +3939,127 @@ export type Database = {
           total_amount?: number
         }
         Relationships: []
+      }
+      medication_administration_records: {
+        Row: {
+          administered_by: string | null
+          administered_time: string | null
+          admission_id: string | null
+          created_at: string
+          dosage: string
+          frequency: string
+          hold_reason: string | null
+          id: string
+          institution_id: string
+          medication_name: string
+          not_given_reason: string | null
+          notes: string | null
+          patient_id: string
+          patient_response: string | null
+          prescription_id: string | null
+          refusal_reason: string | null
+          route: string
+          scheduled_time: string
+          status: string
+          updated_at: string
+          verified_by: string | null
+          vital_signs_after: Json | null
+          vital_signs_before: Json | null
+        }
+        Insert: {
+          administered_by?: string | null
+          administered_time?: string | null
+          admission_id?: string | null
+          created_at?: string
+          dosage: string
+          frequency: string
+          hold_reason?: string | null
+          id?: string
+          institution_id: string
+          medication_name: string
+          not_given_reason?: string | null
+          notes?: string | null
+          patient_id: string
+          patient_response?: string | null
+          prescription_id?: string | null
+          refusal_reason?: string | null
+          route?: string
+          scheduled_time: string
+          status?: string
+          updated_at?: string
+          verified_by?: string | null
+          vital_signs_after?: Json | null
+          vital_signs_before?: Json | null
+        }
+        Update: {
+          administered_by?: string | null
+          administered_time?: string | null
+          admission_id?: string | null
+          created_at?: string
+          dosage?: string
+          frequency?: string
+          hold_reason?: string | null
+          id?: string
+          institution_id?: string
+          medication_name?: string
+          not_given_reason?: string | null
+          notes?: string | null
+          patient_id?: string
+          patient_response?: string | null
+          prescription_id?: string | null
+          refusal_reason?: string | null
+          route?: string
+          scheduled_time?: string
+          status?: string
+          updated_at?: string
+          verified_by?: string | null
+          vital_signs_after?: Json | null
+          vital_signs_before?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medication_administration_records_administered_by_fkey"
+            columns: ["administered_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "medication_administration_records_admission_id_fkey"
+            columns: ["admission_id"]
+            isOneToOne: false
+            referencedRelation: "hospital_admissions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "medication_administration_records_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "medication_administration_records_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "medication_administration_records_prescription_id_fkey"
+            columns: ["prescription_id"]
+            isOneToOne: false
+            referencedRelation: "comprehensive_prescriptions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "medication_administration_records_verified_by_fkey"
+            columns: ["verified_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       medication_alerts: {
         Row: {
@@ -8067,6 +8325,18 @@ export type Database = {
         | "lab"
         | "support"
         | "super_admin"
+        | "cxo"
+        | "receptionist"
+        | "hr_manager"
+        | "ot_staff"
+        | "phlebotomist"
+        | "billing_staff"
+        | "inventory_manager"
+        | "triage_staff"
+        | "maintenance_manager"
+        | "specialist"
+        | "ambulance_staff"
+        | "pathologist"
       attendance_status: "present" | "absent" | "late" | "half_day" | "on_leave"
       experience_level: "entry" | "intermediate" | "expert"
       healthcare_provider_type:
@@ -8273,6 +8543,18 @@ export const Constants = {
         "lab",
         "support",
         "super_admin",
+        "cxo",
+        "receptionist",
+        "hr_manager",
+        "ot_staff",
+        "phlebotomist",
+        "billing_staff",
+        "inventory_manager",
+        "triage_staff",
+        "maintenance_manager",
+        "specialist",
+        "ambulance_staff",
+        "pathologist",
       ],
       attendance_status: ["present", "absent", "late", "half_day", "on_leave"],
       experience_level: ["entry", "intermediate", "expert"],
