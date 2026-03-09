@@ -118,28 +118,50 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
   }, [input]);
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
 
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      toast.error('Please select an image file');
+    // Check total images limit (10 max)
+    if (selectedImages.length + files.length > 10) {
+      toast.error('Maximum 10 images allowed');
       return;
     }
 
-    // Validate file size (max 10MB)
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error('Image must be less than 10MB');
-      return;
-    }
+    // Process all selected files
+    const fileArray = Array.from(files);
+    
+    fileArray.forEach((file) => {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        toast.error(`${file.name} is not an image file`);
+        return;
+      }
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const base64 = e.target?.result as string;
-      setSelectedImage(base64);
-      toast.success('Image attached! Add a message and send.');
-    };
-    reader.readAsDataURL(file);
+      // Validate file size (max 5MB per image)
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error(`${file.name} is too large (max 5MB per image)`);
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const base64 = e.target?.result as string;
+        setSelectedImages(prev => [...prev, base64]);
+      };
+      reader.readAsDataURL(file);
+    });
+
+    toast.success(`${files.length} image(s) attached`);
+    
+    // Clear the input to allow re-selecting the same files
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const removeImage = (index: number) => {
+    setSelectedImages(prev => prev.filter((_, i) => i !== index));
+    toast.success('Image removed');
   };
 
   const sendMessage = async () => {
