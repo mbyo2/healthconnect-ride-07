@@ -84,6 +84,23 @@ const AIDiagnostics = () => {
 
             <Card
               className="min-w-[240px] sm:min-w-0 snap-center cursor-pointer hover:bg-accent/50 transition-colors"
+              onClick={() => setActiveTab("imaging")}
+            >
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm sm:text-base flex items-center gap-2">
+                  <Layers className="h-4 w-4 text-primary" />
+                  3D Imaging
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-xs sm:text-sm text-muted-foreground">
+                  Volumetric CT/MRI/PET-CT analysis
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card
+              className="min-w-[240px] sm:min-w-0 snap-center cursor-pointer hover:bg-accent/50 transition-colors"
               onClick={() => setActiveTab("symptoms")}
             >
               <CardHeader className="pb-3">
