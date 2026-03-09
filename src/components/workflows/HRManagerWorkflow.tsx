@@ -8,9 +8,11 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
-import { Users, Calendar, Clock, FileText, DollarSign, ClipboardCheck, CheckCircle, XCircle, Loader2, Plus } from 'lucide-react';
+import { Users, Calendar, Clock, FileText, DollarSign, ClipboardCheck, CheckCircle, XCircle, Loader2, Plus, Upload } from 'lucide-react';
 import { useHRModule, LeaveRequest } from '@/hooks/useHRModule';
 import { format } from 'date-fns';
+import { BulkAttendanceImport } from '@/components/hr/BulkAttendanceImport';
+import { ShiftScheduleCalendar } from '@/components/hr/ShiftScheduleCalendar';
 
 const LEAVE_TYPE_LABELS: Record<string, string> = {
   annual: 'Annual Leave', sick: 'Sick Leave', maternity: 'Maternity', paternity: 'Paternity',
