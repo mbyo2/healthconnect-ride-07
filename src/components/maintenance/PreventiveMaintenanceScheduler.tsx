@@ -96,7 +96,7 @@ export const PreventiveMaintenanceScheduler: React.FC = () => {
     try {
       const nextDue = format(addDays(new Date(), scheduleForm.frequency_days), 'yyyy-MM-dd');
 
-      const { error } = await (supabase.from('maintenance_schedules') as any).insert({
+      const { error } = await (supabase.from('maintenance_schedules' as any) as any).insert({
         institution_id: institutionId,
         asset_id: selectedAssetId,
         schedule_type: scheduleForm.schedule_type,
