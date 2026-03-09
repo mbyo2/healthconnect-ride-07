@@ -8067,6 +8067,18 @@ export type Database = {
         | "lab"
         | "support"
         | "super_admin"
+        | "cxo"
+        | "receptionist"
+        | "hr_manager"
+        | "ot_staff"
+        | "phlebotomist"
+        | "billing_staff"
+        | "inventory_manager"
+        | "triage_staff"
+        | "maintenance_manager"
+        | "specialist"
+        | "ambulance_staff"
+        | "pathologist"
       attendance_status: "present" | "absent" | "late" | "half_day" | "on_leave"
       experience_level: "entry" | "intermediate" | "expert"
       healthcare_provider_type:
@@ -8273,6 +8285,18 @@ export const Constants = {
         "lab",
         "support",
         "super_admin",
+        "cxo",
+        "receptionist",
+        "hr_manager",
+        "ot_staff",
+        "phlebotomist",
+        "billing_staff",
+        "inventory_manager",
+        "triage_staff",
+        "maintenance_manager",
+        "specialist",
+        "ambulance_staff",
+        "pathologist",
       ],
       attendance_status: ["present", "absent", "late", "half_day", "on_leave"],
       experience_level: ["entry", "intermediate", "expert"],

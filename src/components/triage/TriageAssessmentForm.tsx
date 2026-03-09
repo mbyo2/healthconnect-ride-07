@@ -8,7 +8,6 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { AlertTriangle, Heart, Activity, Thermometer, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -16,24 +15,24 @@ import { cn } from '@/lib/utils';
 interface TriageFormProps {
   institutionId: string;
   patientId: string;
+  patientName: string;
   onComplete?: () => void;
 }
 
-const esiLevels = [
-  { level: 1, label: 'Resuscitation', description: 'Immediate life-saving intervention required', color: 'bg-red-600' },
-  { level: 2, label: 'Emergent', description: 'High risk situation, confused/lethargic, severe pain', color: 'bg-orange-500' },
-  { level: 3, label: 'Urgent', description: 'Two or more resources needed', color: 'bg-yellow-500' },
-  { level: 4, label: 'Less Urgent', description: 'One resource needed', color: 'bg-green-500' },
-  { level: 5, label: 'Non-Urgent', description: 'No resources needed', color: 'bg-blue-500' },
+// Using the existing triage_level enum: emergency, urgent, standard, non_urgent
+const triageLevels = [
+  { level: 'emergency', label: 'Emergency', description: 'Immediate life-saving intervention required', color: 'bg-destructive' },
+  { level: 'urgent', label: 'Urgent', description: 'High risk situation, severe pain', color: 'bg-orange-500' },
+  { level: 'standard', label: 'Standard', description: 'Moderate urgency, resources needed', color: 'bg-yellow-500' },
+  { level: 'non_urgent', label: 'Non-Urgent', description: 'Can wait, minimal resources needed', color: 'bg-primary' },
 ];
 
-export const TriageAssessmentForm: React.FC<TriageFormProps> = ({ institutionId, patientId, onComplete }) => {
+export const TriageAssessmentForm: React.FC<TriageFormProps> = ({ institutionId, patientId, patientName, onComplete }) => {
   const queryClient = useQueryClient();
   
   const [formData, setFormData] = useState({
-    esiLevel: 3,
+    triageLevel: 'standard' as 'emergency' | 'urgent' | 'standard' | 'non_urgent',
     chiefComplaint: '',
-    onsetTime: '',
     temperature: '',
     bpSystolic: '',
     bpDiastolic: '',
@@ -41,18 +40,13 @@ export const TriageAssessmentForm: React.FC<TriageFormProps> = ({ institutionId,
     respiratoryRate: '',
     spo2: '',
     painLevel: '',
-    mentalStatus: 'alert',
-    airwayStatus: 'patent',
-    breathingStatus: 'normal',
-    circulationStatus: 'normal',
-    resourcesPredicted: 0,
-    isPregnant: false,
-    isImmunocompromised: false,
-    isHighRisk: false,
+    consciousnessLevel: 'alert',
+    mobility: 'ambulatory',
+    bleeding: false,
     allergies: '',
     currentMedications: '',
-    assignedDepartment: '',
-    notes: '',
+    disposition: '',
+    assessmentNotes: '',
   });
 
   const submitMutation = useMutation({
@@ -66,7 +60,6 @@ export const TriageAssessmentForm: React.FC<TriageFormProps> = ({ institutionId,
         heart_rate: parseInt(formData.heartRate) || null,
         respiratory_rate: parseInt(formData.respiratoryRate) || null,
         spo2: parseInt(formData.spo2) || null,
-        pain_level: parseInt(formData.painLevel) || null,
       };
 
       const { error } = await supabase
@@ -74,24 +67,20 @@ export const TriageAssessmentForm: React.FC<TriageFormProps> = ({ institutionId,
         .insert({
           patient_id: patientId,
           institution_id: institutionId,
-          esi_level: formData.esiLevel,
+          patient_name: patientName,
+          triage_level: formData.triageLevel,
           chief_complaint: formData.chiefComplaint,
-          onset_time: formData.onsetTime || null,
           vital_signs: vitalSigns,
-          mental_status: formData.mentalStatus,
-          airway_status: formData.airwayStatus,
-          breathing_status: formData.breathingStatus,
-          circulation_status: formData.circulationStatus,
-          resources_predicted: formData.resourcesPredicted,
-          is_pregnant: formData.isPregnant,
-          is_immunocompromised: formData.isImmunocompromised,
-          is_high_risk: formData.isHighRisk,
-          allergies: formData.allergies ? formData.allergies.split(',').map(a => a.trim()) : null,
-          current_medications: formData.currentMedications ? formData.currentMedications.split(',').map(m => m.trim()) : null,
-          assigned_department: formData.assignedDepartment || null,
-          notes: formData.notes || null,
-          triaged_by: user?.id,
-          status: 'waiting',
+          pain_level: parseInt(formData.painLevel) || null,
+          consciousness_level: formData.consciousnessLevel,
+          mobility: formData.mobility,
+          bleeding: formData.bleeding,
+          allergies: formData.allergies || null,
+          current_medications: formData.currentMedications || null,
+          disposition: formData.disposition || null,
+          assessment_notes: formData.assessmentNotes || null,
+          assessed_by: user?.id,
+          assessed_at: new Date().toISOString(),
         });
 
       if (error) throw error;
@@ -107,36 +96,27 @@ export const TriageAssessmentForm: React.FC<TriageFormProps> = ({ institutionId,
     },
   });
 
-  const calculateESI = () => {
-    // Basic ESI calculation logic
-    let suggestedLevel = 5;
+  const calculateTriageLevel = () => {
+    let suggestedLevel: 'emergency' | 'urgent' | 'standard' | 'non_urgent' = 'non_urgent';
 
-    // Check for immediate life threats (ESI 1)
-    if (formData.airwayStatus === 'compromised' || formData.breathingStatus === 'absent') {
-      suggestedLevel = 1;
+    // Check for emergency conditions
+    if (formData.consciousnessLevel === 'unresponsive' || formData.bleeding) {
+      suggestedLevel = 'emergency';
     }
-    // Check for high-risk (ESI 2)
+    // Check for urgent conditions
     else if (
-      formData.mentalStatus !== 'alert' ||
-      formData.circulationStatus === 'shock' ||
+      formData.consciousnessLevel !== 'alert' ||
       parseInt(formData.painLevel) >= 8
     ) {
-      suggestedLevel = 2;
+      suggestedLevel = 'urgent';
     }
-    // Check resources (ESI 3-5)
-    else if (formData.resourcesPredicted >= 2) {
-      suggestedLevel = 3;
-    } else if (formData.resourcesPredicted === 1) {
-      suggestedLevel = 4;
+    // Standard if moderate pain or mobility issues
+    else if (parseInt(formData.painLevel) >= 5 || formData.mobility !== 'ambulatory') {
+      suggestedLevel = 'standard';
     }
 
-    // High-risk modifiers
-    if (formData.isHighRisk || formData.isImmunocompromised) {
-      suggestedLevel = Math.min(suggestedLevel, 3);
-    }
-
-    setFormData(prev => ({ ...prev, esiLevel: suggestedLevel }));
-    toast.info(`Suggested ESI Level: ${suggestedLevel}`);
+    setFormData(prev => ({ ...prev, triageLevel: suggestedLevel }));
+    toast.info(`Suggested Triage Level: ${suggestedLevel}`);
   };
 
   return (
@@ -147,37 +127,36 @@ export const TriageAssessmentForm: React.FC<TriageFormProps> = ({ institutionId,
           Emergency Triage Assessment
         </CardTitle>
         <CardDescription>
-          Emergency Severity Index (ESI) triage protocol
+          Triage assessment for: {patientName}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* ESI Level Selection */}
+        {/* Triage Level Selection */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <Label className="text-lg font-semibold">ESI Level</Label>
-            <Button type="button" variant="outline" size="sm" onClick={calculateESI}>
-              Calculate ESI
+            <Label className="text-lg font-semibold">Triage Level</Label>
+            <Button type="button" variant="outline" size="sm" onClick={calculateTriageLevel}>
+              Calculate Level
             </Button>
           </div>
-          <div className="grid grid-cols-5 gap-2">
-            {esiLevels.map((esi) => (
+          <div className="grid grid-cols-4 gap-2">
+            {triageLevels.map((triage) => (
               <button
-                key={esi.level}
+                key={triage.level}
                 type="button"
-                onClick={() => setFormData(prev => ({ ...prev, esiLevel: esi.level }))}
+                onClick={() => setFormData(prev => ({ ...prev, triageLevel: triage.level as typeof prev.triageLevel }))}
                 className={cn(
                   'p-3 rounded-lg border-2 transition-all text-white',
-                  esi.color,
-                  formData.esiLevel === esi.level ? 'ring-2 ring-offset-2 ring-primary' : 'opacity-60 hover:opacity-100'
+                  triage.color,
+                  formData.triageLevel === triage.level ? 'ring-2 ring-offset-2 ring-ring' : 'opacity-60 hover:opacity-100'
                 )}
               >
-                <div className="text-2xl font-bold">{esi.level}</div>
-                <div className="text-xs">{esi.label}</div>
+                <div className="text-sm font-bold">{triage.label}</div>
               </button>
             ))}
           </div>
           <p className="text-sm text-muted-foreground">
-            {esiLevels.find(e => e.level === formData.esiLevel)?.description}
+            {triageLevels.find(e => e.level === formData.triageLevel)?.description}
           </p>
         </div>
 
@@ -191,34 +170,6 @@ export const TriageAssessmentForm: React.FC<TriageFormProps> = ({ institutionId,
             placeholder="Describe the patient's main complaint..."
             required
           />
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="onsetTime">Onset Time</Label>
-            <Input
-              id="onsetTime"
-              value={formData.onsetTime}
-              onChange={(e) => setFormData(prev => ({ ...prev, onsetTime: e.target.value }))}
-              placeholder="e.g., 2 hours ago"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="resourcesPredicted">Resources Predicted</Label>
-            <Select
-              value={formData.resourcesPredicted.toString()}
-              onValueChange={(v) => setFormData(prev => ({ ...prev, resourcesPredicted: parseInt(v) }))}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="0">None</SelectItem>
-                <SelectItem value="1">One</SelectItem>
-                <SelectItem value="2">Two or more</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
         </div>
 
         {/* Vital Signs */}
@@ -306,113 +257,59 @@ export const TriageAssessmentForm: React.FC<TriageFormProps> = ({ institutionId,
           </div>
         </div>
 
-        {/* Primary Assessment */}
+        {/* Clinical Assessment */}
         <div className="space-y-3">
-          <Label className="text-lg font-semibold">Primary Assessment (AVPU / ABC)</Label>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <Label className="text-lg font-semibold">Clinical Assessment</Label>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             <div className="space-y-2">
-              <Label>Mental Status</Label>
+              <Label>Consciousness Level</Label>
               <Select
-                value={formData.mentalStatus}
-                onValueChange={(v) => setFormData(prev => ({ ...prev, mentalStatus: v }))}
+                value={formData.consciousnessLevel}
+                onValueChange={(v) => setFormData(prev => ({ ...prev, consciousnessLevel: v }))}
               >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="alert">Alert</SelectItem>
-                  <SelectItem value="verbal">Verbal</SelectItem>
-                  <SelectItem value="pain">Pain</SelectItem>
+                  <SelectItem value="verbal">Responds to Verbal</SelectItem>
+                  <SelectItem value="pain">Responds to Pain</SelectItem>
                   <SelectItem value="unresponsive">Unresponsive</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>Airway</Label>
+              <Label>Mobility</Label>
               <Select
-                value={formData.airwayStatus}
-                onValueChange={(v) => setFormData(prev => ({ ...prev, airwayStatus: v }))}
+                value={formData.mobility}
+                onValueChange={(v) => setFormData(prev => ({ ...prev, mobility: v }))}
               >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="patent">Patent</SelectItem>
-                  <SelectItem value="at_risk">At Risk</SelectItem>
-                  <SelectItem value="compromised">Compromised</SelectItem>
+                  <SelectItem value="ambulatory">Ambulatory</SelectItem>
+                  <SelectItem value="assisted">Assisted</SelectItem>
+                  <SelectItem value="wheelchair">Wheelchair</SelectItem>
+                  <SelectItem value="stretcher">Stretcher</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-2">
-              <Label>Breathing</Label>
-              <Select
-                value={formData.breathingStatus}
-                onValueChange={(v) => setFormData(prev => ({ ...prev, breathingStatus: v }))}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="normal">Normal</SelectItem>
-                  <SelectItem value="labored">Labored</SelectItem>
-                  <SelectItem value="absent">Absent</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label>Circulation</Label>
-              <Select
-                value={formData.circulationStatus}
-                onValueChange={(v) => setFormData(prev => ({ ...prev, circulationStatus: v }))}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="normal">Normal</SelectItem>
-                  <SelectItem value="abnormal">Abnormal</SelectItem>
-                  <SelectItem value="shock">Shock</SelectItem>
-                </SelectContent>
-              </Select>
+            <div className="flex items-center space-x-2 pt-6">
+              <Checkbox
+                id="bleeding"
+                checked={formData.bleeding}
+                onCheckedChange={(checked) => setFormData(prev => ({ ...prev, bleeding: !!checked }))}
+              />
+              <Label htmlFor="bleeding" className="text-destructive font-medium">Active Bleeding</Label>
             </div>
           </div>
         </div>
 
-        {/* Risk Factors */}
-        <div className="space-y-3">
-          <Label className="text-lg font-semibold">Risk Factors</Label>
-          <div className="flex flex-wrap gap-4">
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="isPregnant"
-                checked={formData.isPregnant}
-                onCheckedChange={(checked) => setFormData(prev => ({ ...prev, isPregnant: !!checked }))}
-              />
-              <Label htmlFor="isPregnant">Pregnant</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="isImmunocompromised"
-                checked={formData.isImmunocompromised}
-                onCheckedChange={(checked) => setFormData(prev => ({ ...prev, isImmunocompromised: !!checked }))}
-              />
-              <Label htmlFor="isImmunocompromised">Immunocompromised</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="isHighRisk"
-                checked={formData.isHighRisk}
-                onCheckedChange={(checked) => setFormData(prev => ({ ...prev, isHighRisk: !!checked }))}
-              />
-              <Label htmlFor="isHighRisk">High Risk</Label>
-            </div>
-          </div>
-        </div>
-
-        {/* Allergies & Medications */}
+        {/* Medical History */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="allergies">Allergies (comma-separated)</Label>
+            <Label htmlFor="allergies">Allergies</Label>
             <Input
               id="allergies"
               value={formData.allergies}
@@ -421,7 +318,7 @@ export const TriageAssessmentForm: React.FC<TriageFormProps> = ({ institutionId,
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="currentMedications">Current Medications (comma-separated)</Label>
+            <Label htmlFor="currentMedications">Current Medications</Label>
             <Input
               id="currentMedications"
               value={formData.currentMedications}
@@ -431,36 +328,33 @@ export const TriageAssessmentForm: React.FC<TriageFormProps> = ({ institutionId,
           </div>
         </div>
 
-        {/* Assignment */}
+        {/* Disposition */}
         <div className="space-y-2">
-          <Label htmlFor="assignedDepartment">Assign to Department</Label>
+          <Label htmlFor="disposition">Disposition</Label>
           <Select
-            value={formData.assignedDepartment}
-            onValueChange={(v) => setFormData(prev => ({ ...prev, assignedDepartment: v }))}
+            value={formData.disposition}
+            onValueChange={(v) => setFormData(prev => ({ ...prev, disposition: v }))}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Select department" />
+              <SelectValue placeholder="Select disposition" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="emergency">Emergency</SelectItem>
-              <SelectItem value="icu">ICU</SelectItem>
-              <SelectItem value="general_medicine">General Medicine</SelectItem>
-              <SelectItem value="surgery">Surgery</SelectItem>
-              <SelectItem value="pediatrics">Pediatrics</SelectItem>
-              <SelectItem value="obstetrics">Obstetrics</SelectItem>
-              <SelectItem value="cardiology">Cardiology</SelectItem>
-              <SelectItem value="orthopedics">Orthopedics</SelectItem>
+              <SelectItem value="emergency">Emergency Department</SelectItem>
+              <SelectItem value="urgent_care">Urgent Care</SelectItem>
+              <SelectItem value="outpatient">Outpatient Clinic</SelectItem>
+              <SelectItem value="admission">Direct Admission</SelectItem>
+              <SelectItem value="observation">Observation</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         {/* Notes */}
         <div className="space-y-2">
-          <Label htmlFor="notes">Additional Notes</Label>
+          <Label htmlFor="assessmentNotes">Assessment Notes</Label>
           <Textarea
-            id="notes"
-            value={formData.notes}
-            onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
+            id="assessmentNotes"
+            value={formData.assessmentNotes}
+            onChange={(e) => setFormData(prev => ({ ...prev, assessmentNotes: e.target.value }))}
             placeholder="Any additional observations or notes..."
           />
         </div>
