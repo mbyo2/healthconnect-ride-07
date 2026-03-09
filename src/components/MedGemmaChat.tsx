@@ -5,18 +5,22 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2, Send, Bot, User, X, Paperclip, Lightbulb } from 'lucide-react';
+import { Loader2, Send, Bot, User, X, Paperclip, Lightbulb, Image as ImageIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { ClinicalDecisionCard, ClinicalDecision, parseClinicalDecisions, ClinicalAction } from './ai/ClinicalDecisionCard';
 import { useUserRoles } from '@/context/UserRolesContext';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface Message {
   role: 'user' | 'assistant';
   content: string;
   timestamp: Date;
-  image?: string;
+  images?: string[]; // Changed to support multiple images
+  analysisType?: string;
   decisions?: ClinicalDecision[];
 }
+
+type AnalysisType = 'general' | 'longitudinal' | 'anatomical_localization' | 'document_understanding';
 
 const LinkifiedText = ({ text }: { text: string }) => {
   const urlRegex = /(https?:\/\/[^\s]+)/g;
