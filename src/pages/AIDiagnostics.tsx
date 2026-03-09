@@ -3,9 +3,10 @@ import { MedGemmaChat as DocOClockAIChat } from "@/components/MedGemmaChat";
 import { SymptomCollector } from "@/components/SymptomCollector";
 import { AIDiagnosisHistory } from "@/components/AIDiagnosisHistory";
 import { DocumentAnalysisUploader } from "@/components/ai/DocumentAnalysisUploader";
+import { Imaging3DUploader } from "@/components/ai/Imaging3DUploader";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Brain, MessageSquare, ClipboardList, Shield, History, FileText } from "lucide-react";
+import { Brain, MessageSquare, ClipboardList, Shield, History, FileText, Layers } from "lucide-react";
 
 import { useState } from "react";
 import { ClinicalAction } from "@/components/ai/ClinicalDecisionCard";
@@ -83,6 +84,23 @@ const AIDiagnostics = () => {
 
             <Card
               className="min-w-[240px] sm:min-w-0 snap-center cursor-pointer hover:bg-accent/50 transition-colors"
+              onClick={() => setActiveTab("imaging")}
+            >
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm sm:text-base flex items-center gap-2">
+                  <Layers className="h-4 w-4 text-primary" />
+                  3D Imaging
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-xs sm:text-sm text-muted-foreground">
+                  Volumetric CT/MRI/PET-CT analysis
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card
+              className="min-w-[240px] sm:min-w-0 snap-center cursor-pointer hover:bg-accent/50 transition-colors"
               onClick={() => setActiveTab("symptoms")}
             >
               <CardHeader className="pb-3">
@@ -132,9 +150,10 @@ const AIDiagnostics = () => {
 
           {/* Main Content */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full max-w-3xl mx-auto grid-cols-4">
+            <TabsList className="grid w-full max-w-4xl mx-auto grid-cols-5">
               <TabsTrigger value="chat" className="text-xs sm:text-sm">AI Chat</TabsTrigger>
               <TabsTrigger value="documents" className="text-xs sm:text-sm">Documents</TabsTrigger>
+              <TabsTrigger value="imaging" className="text-xs sm:text-sm">3D Imaging</TabsTrigger>
               <TabsTrigger value="symptoms" className="text-xs sm:text-sm">Symptoms</TabsTrigger>
               <TabsTrigger value="history" className="text-xs sm:text-sm">History</TabsTrigger>
             </TabsList>
@@ -145,6 +164,10 @@ const AIDiagnostics = () => {
 
             <TabsContent value="documents" className="mt-3 sm:mt-6">
               <DocumentAnalysisUploader />
+            </TabsContent>
+
+            <TabsContent value="imaging" className="mt-3 sm:mt-6">
+              <Imaging3DUploader />
             </TabsContent>
 
             <TabsContent value="symptoms" className="mt-4 sm:mt-6">
