@@ -13,7 +13,10 @@ const chatRequestSchema = z.object({
   conversationHistory: z.array(z.object({
     role: z.enum(['user', 'assistant']),
     content: z.string().max(2000)
-  })).max(50, 'Conversation history too long').optional().default([])
+  })).max(50, 'Conversation history too long').optional().default([]),
+  // Multimodal support
+  images: z.array(z.string()).max(10, 'Maximum 10 images allowed').optional(), // base64 encoded images
+  analysisType: z.enum(['general', 'longitudinal', 'document_understanding', 'anatomical_localization']).optional().default('general')
 });
 
 serve(async (req) => {
