@@ -104,7 +104,7 @@ export const MaintenanceManagerWorkflow = () => {
       </div>
 
       <Tabs defaultValue="work_orders">
-        <TabsList><TabsTrigger value="work_orders">Work Orders</TabsTrigger><TabsTrigger value="assets">Asset Register</TabsTrigger></TabsList>
+        <TabsList><TabsTrigger value="work_orders">Work Orders</TabsTrigger><TabsTrigger value="assets">Asset Register</TabsTrigger><TabsTrigger value="preventive"><Calendar className="h-4 w-4 mr-1" /> Preventive</TabsTrigger></TabsList>
         <TabsContent value="work_orders">
           <Card>
             <CardContent className="pt-4">
