@@ -150,9 +150,10 @@ const AIDiagnostics = () => {
 
           {/* Main Content */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full max-w-3xl mx-auto grid-cols-4">
+            <TabsList className="grid w-full max-w-4xl mx-auto grid-cols-5">
               <TabsTrigger value="chat" className="text-xs sm:text-sm">AI Chat</TabsTrigger>
               <TabsTrigger value="documents" className="text-xs sm:text-sm">Documents</TabsTrigger>
+              <TabsTrigger value="imaging" className="text-xs sm:text-sm">3D Imaging</TabsTrigger>
               <TabsTrigger value="symptoms" className="text-xs sm:text-sm">Symptoms</TabsTrigger>
               <TabsTrigger value="history" className="text-xs sm:text-sm">History</TabsTrigger>
             </TabsList>
@@ -163,6 +164,10 @@ const AIDiagnostics = () => {
 
             <TabsContent value="documents" className="mt-3 sm:mt-6">
               <DocumentAnalysisUploader />
+            </TabsContent>
+
+            <TabsContent value="imaging" className="mt-3 sm:mt-6">
+              <Imaging3DUploader />
             </TabsContent>
 
             <TabsContent value="symptoms" className="mt-4 sm:mt-6">
