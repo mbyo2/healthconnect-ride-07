@@ -72,7 +72,7 @@ export const TriageAssessmentForm: React.FC<TriageFormProps> = ({ institutionId,
           patient_id: patientId || null,
           institution_id: institutionId,
           patient_name: patientName,
-          triage_level: formData.triageLevel as 'emergency' | 'urgent' | 'standard' | 'non_urgent',
+          triage_level: formData.triageLevel,
           chief_complaint: formData.chiefComplaint,
           vital_signs: vitalSigns,
           pain_level: parseInt(formData.painLevel) || null,
@@ -101,11 +101,11 @@ export const TriageAssessmentForm: React.FC<TriageFormProps> = ({ institutionId,
   });
 
   const calculateTriageLevel = () => {
-    let suggestedLevel: 'emergency' | 'urgent' | 'standard' | 'non_urgent' = 'non_urgent';
+    let suggestedLevel: TriageLevel = 'non_urgent';
 
-    // Check for emergency conditions
+    // Check for critical conditions
     if (formData.consciousnessLevel === 'unresponsive' || formData.bleeding) {
-      suggestedLevel = 'emergency';
+      suggestedLevel = 'critical';
     }
     // Check for urgent conditions
     else if (
