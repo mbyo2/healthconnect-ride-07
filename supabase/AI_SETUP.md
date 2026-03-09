@@ -40,15 +40,16 @@ graph TD
 
 ## Edge Functions
 
-### 1. medgemma-chat (Primary)
+### 1. medgemma-chat (Primary - Multimodal)
 
-**Purpose**: Specialized medical AI using Google's MedGemma model
-**Model**: `google/medgemma-7b` via Hugging Face
+**Purpose**: Advanced multimodal medical AI with image understanding
+**Model**: `google/medgemma-1.5-4b-it` via Hugging Face
 **Capabilities**:
-- Medical symptom analysis
-- Evidence-based health information
-- Medication guidance
-- Emergency detection
+- 🖼️ **Multimodal Input**: Text + up to 10 images simultaneously
+- 📊 **Longitudinal Analysis**: Compare multiple scans over time
+- 🔍 **Image Analysis**: Chest X-rays, dermatology, ophthalmology, histopathology
+- 💊 **Medical Guidance**: Symptom analysis, medication info, emergency detection
+- 🏥 **Role-Aware**: Adapts responses for doctors, nurses, pharmacists, and patients
 
 **Required Environment Variable**:
 ```
@@ -60,7 +61,80 @@ HF_TOKEN=your_hugging_face_token
 2. Sign up or log in
 3. Go to Settings → Access Tokens
 4. Create a new token with "Read" permissions
-5. Copy the token
+5. Request access to `google/medgemma-1.5-4b-it` model (if gated)
+6. Copy the token
+
+**Usage Example**:
+```typescript
+const { data, error } = await supabase.functions.invoke('medgemma-chat', {
+  body: {
+    message: 'Analyze these chest X-rays',
+    images: [base64Image1, base64Image2], // Sequential scans
+    analysisType: 'longitudinal', // 'general' | 'longitudinal' | 'anatomical_localization'
+    userRole: 'doctor',
+    conversationHistory: []
+  }
+});
+```
+
+### 2. medgemma-document-analysis (Document Understanding)
+
+**Purpose**: Extract structured data from medical documents and lab reports
+**Model**: `google/medgemma-1.5-4b-it` via Hugging Face
+**Capabilities**:
+- 📄 **Lab Report Parsing**: Extract test names, values, units, reference ranges
+- 💊 **Prescription Reading**: Medication names, dosages, instructions
+- 🏥 **Report Analysis**: Radiology, pathology, discharge summaries
+- ✅ **Abnormality Flagging**: Identify critical or abnormal values
+- 📊 **Structured Output**: Organized, EHR-ready data
+
+**Required Environment Variable**:
+```
+HF_TOKEN=your_hugging_face_token
+```
+
+**Usage Example**:
+```typescript
+const { data, error } = await supabase.functions.invoke('medgemma-document-analysis', {
+  body: {
+    document: base64ImageOfLabReport,
+    documentType: 'lab_report', // 'lab_report' | 'prescription' | 'radiology_report' | 'pathology_report' | 'discharge_summary'
+    extractFields: ['CBC', 'Liver Function'], // Optional: specific tests to focus on
+    userRole: 'doctor'
+  }
+});
+```
+
+### 3. medgemma-3d-imaging (3D Volumetric Analysis)
+
+**Purpose**: Native 3D CT/MRI analysis with volumetric understanding
+**Model**: `google/medgemma-1.5-4b-it` via Hugging Face
+**Capabilities**:
+- 🧠 **3D Context Understanding**: Analyzes multiple slices together
+- 🔬 **Volumetric Analysis**: Organ segmentation, lesion detection
+- 📐 **Spatial Relationships**: Understanding anatomical context
+- 🎯 **Clinical Questions**: Targeted analysis based on clinical indication
+- 📋 **Systematic Reporting**: Structured radiology-style reports
+
+**Required Environment Variable**:
+```
+HF_TOKEN=your_hugging_face_token
+```
+
+**Usage Example**:
+```typescript
+const { data, error } = await supabase.functions.invoke('medgemma-3d-imaging', {
+  body: {
+    slices: [base64Slice1, base64Slice2, base64Slice3], // Up to 50 slices
+    imagingType: 'ct', // 'ct' | 'mri' | 'pet_ct'
+    bodyPart: 'chest', // 'head' | 'chest' | 'abdomen' | 'pelvis' | 'spine' | 'extremity' | 'whole_body'
+    clinicalQuestion: 'Rule out pulmonary embolism',
+    sliceOrientation: 'axial', // 'axial' | 'sagittal' | 'coronal'
+    contrastUsed: true,
+    userRole: 'radiologist'
+  }
+});
+```
 
 ### 2. doc-chat (Secondary)
 
