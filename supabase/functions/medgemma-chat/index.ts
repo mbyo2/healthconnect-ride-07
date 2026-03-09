@@ -43,14 +43,56 @@ serve(async (req) => {
     const { message, userRole, conversationHistory, images, analysisType } = validationResult.data;
 
     // Role-aware prompt with multimodal capabilities
-    const roleLabel = ['doctor','health_personnel','radiologist'].includes(userRole) ? 'clinical professional'
-      : ['nurse'].includes(userRole) ? 'nursing professional'
-      : ['pharmacist','pharmacy'].includes(userRole) ? 'pharmacist'
-      : ['lab','lab_technician'].includes(userRole) ? 'lab professional'
-      : 'patient';
+    let roleLabel = 'patient';
+    let roleGuidance = 'Use simple, clear language and be empathetic.';
+    
+    // Clinical roles with advanced terminology
+    if (['doctor', 'specialist', 'health_personnel'].includes(userRole)) {
+      roleLabel = 'clinical professional';
+      roleGuidance = 'Use clinical terminology, provide differential diagnoses, evidence-based decision support, and structured reporting. Include ICD codes when relevant.';
+    } else if (userRole === 'nurse') {
+      roleLabel = 'nursing professional';
+      roleGuidance = 'Focus on nursing assessments, care planning, vital sign interpretation, and patient deterioration indicators. Use nursing-appropriate clinical terminology.';
+    } else if (userRole === 'radiologist') {
+      roleLabel = 'radiologist';
+      roleGuidance = 'Provide structured radiology reporting (findings, impression, recommendations). Reference ACR guidelines, BI-RADS/LI-RADS classifications. Flag urgent findings.';
+    } else if (userRole === 'pathologist') {
+      roleLabel = 'pathologist';
+      roleGuidance = 'Focus on histopathology interpretation, WHO grading systems, IHC panel guidance, and synoptic reporting. Use pathology-specific terminology.';
+    } else if (['pharmacist', 'pharmacy'].includes(userRole)) {
+      roleLabel = 'pharmacist';
+      roleGuidance = 'Focus on drug interactions, dosing calculations, therapeutic monitoring, and medication counseling. Reference pharmacokinetic principles and flag black box warnings.';
+    } else if (['lab', 'lab_technician', 'phlebotomist'].includes(userRole)) {
+      roleLabel = 'lab professional';
+      roleGuidance = 'Focus on lab result interpretation, critical values, specimen requirements, and quality control. Use laboratory-specific terminology.';
+    } else if (userRole === 'triage_staff') {
+      roleLabel = 'triage professional';
+      roleGuidance = 'Focus on rapid assessment, ESI/CTAS scoring, red flag symptom identification, and acuity prioritization. Use rapid, decisive language.';
+    } else if (userRole === 'ot_staff') {
+      roleLabel = 'operating theater staff';
+      roleGuidance = 'Focus on surgical protocols, sterile technique, instrument identification, WHO Surgical Safety Checklist, and perioperative safety.';
+    } else if (userRole === 'ambulance_staff') {
+      roleLabel = 'paramedic/EMT';
+      roleGuidance = 'Focus on pre-hospital assessment (ABCDE approach), ACLS/PALS protocols, trauma management, and transport decisions. Emphasize time-critical interventions.';
+    } else if (['institution_admin', 'institution_staff', 'receptionist'].includes(userRole)) {
+      roleLabel = 'healthcare administrator';
+      roleGuidance = 'Focus on workflow optimization, patient flow, scheduling, and operational efficiency. Balance clinical and administrative perspectives.';
+    } else if (['hr_manager', 'cxo'].includes(userRole)) {
+      roleLabel = 'healthcare executive';
+      roleGuidance = 'Provide strategic insights, quality metrics, compliance guidance, and high-level operational recommendations.';
+    } else if (userRole === 'billing_staff') {
+      roleLabel = 'billing specialist';
+      roleGuidance = 'Focus on ICD-10/CPT coding, medical necessity documentation, claim denials, and revenue cycle optimization.';
+    } else if (['inventory_manager', 'maintenance_manager'].includes(userRole)) {
+      roleLabel = 'operations manager';
+      roleGuidance = 'Focus on equipment management, preventive maintenance, supply chain, and facility operations with patient safety considerations.';
+    } else if (['admin', 'super_admin', 'support'].includes(userRole)) {
+      roleLabel = 'system administrator';
+      roleGuidance = 'Provide platform analytics, technical support, and system-wide operational insights.';
+    }
 
     let systemPrompt = `You are Doc 0 Clock, a medical AI assistant powered by MedGemma 1.5 4B. You are speaking with a ${roleLabel}.
-${roleLabel !== 'patient' ? 'Use appropriate clinical terminology and provide evidence-based decision support.' : 'Use simple, clear language and be empathetic.'}
+${roleGuidance}
 
 Always recommend seeking professional care when appropriate.
 CRITICAL: If symptoms suggest emergency, immediately advise to call emergency services.`;
