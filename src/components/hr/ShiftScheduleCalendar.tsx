@@ -73,8 +73,8 @@ export const ShiftScheduleCalendar: React.FC = () => {
     if (!institutionId) return;
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('shift_schedules')
+      const { data, error } = await (supabase
+        .from('shift_schedules' as any) as any)
         .select('*')
         .eq('institution_id', institutionId)
         .gte('shift_date', format(monthStart, 'yyyy-MM-dd'))
