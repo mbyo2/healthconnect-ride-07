@@ -3,9 +3,10 @@ import { MedGemmaChat as DocOClockAIChat } from "@/components/MedGemmaChat";
 import { SymptomCollector } from "@/components/SymptomCollector";
 import { AIDiagnosisHistory } from "@/components/AIDiagnosisHistory";
 import { DocumentAnalysisUploader } from "@/components/ai/DocumentAnalysisUploader";
+import { Imaging3DUploader } from "@/components/ai/Imaging3DUploader";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Brain, MessageSquare, ClipboardList, Shield, History, FileText } from "lucide-react";
+import { Brain, MessageSquare, ClipboardList, Shield, History, FileText, Layers } from "lucide-react";
 
 import { useState } from "react";
 import { ClinicalAction } from "@/components/ai/ClinicalDecisionCard";
