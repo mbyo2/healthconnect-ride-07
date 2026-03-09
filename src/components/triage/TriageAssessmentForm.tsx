@@ -62,13 +62,15 @@ export const TriageAssessmentForm: React.FC<TriageFormProps> = ({ institutionId,
         spo2: parseInt(formData.spo2) || null,
       };
 
+      if (!user?.id) throw new Error('User not authenticated');
+
       const { error } = await supabase
         .from('triage_assessments')
-        .insert({
-          patient_id: patientId,
+        .insert([{
+          patient_id: patientId || null,
           institution_id: institutionId,
           patient_name: patientName,
-          triage_level: formData.triageLevel,
+          triage_level: formData.triageLevel as 'emergency' | 'urgent' | 'standard' | 'non_urgent',
           chief_complaint: formData.chiefComplaint,
           vital_signs: vitalSigns,
           pain_level: parseInt(formData.painLevel) || null,
@@ -79,9 +81,9 @@ export const TriageAssessmentForm: React.FC<TriageFormProps> = ({ institutionId,
           current_medications: formData.currentMedications || null,
           disposition: formData.disposition || null,
           assessment_notes: formData.assessmentNotes || null,
-          assessed_by: user?.id,
+          assessed_by: user.id,
           assessed_at: new Date().toISOString(),
-        });
+        }]);
 
       if (error) throw error;
     },
