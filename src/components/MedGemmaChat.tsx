@@ -5,18 +5,22 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2, Send, Bot, User, X, Paperclip, Lightbulb } from 'lucide-react';
+import { Loader2, Send, Bot, User, X, Paperclip, Lightbulb, Image as ImageIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { ClinicalDecisionCard, ClinicalDecision, parseClinicalDecisions, ClinicalAction } from './ai/ClinicalDecisionCard';
 import { useUserRoles } from '@/context/UserRolesContext';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface Message {
   role: 'user' | 'assistant';
   content: string;
   timestamp: Date;
-  image?: string;
+  images?: string[]; // Changed to support multiple images
+  analysisType?: string;
   decisions?: ClinicalDecision[];
 }
+
+type AnalysisType = 'general' | 'longitudinal' | 'anatomical_localization' | 'document_understanding';
 
 const LinkifiedText = ({ text }: { text: string }) => {
   const urlRegex = /(https?:\/\/[^\s]+)/g;
@@ -44,7 +48,7 @@ const LinkifiedText = ({ text }: { text: string }) => {
   );
 };
 
-const AI_WELCOME_MESSAGE = "Hello! I'm Doc' O Clock AI, your intelligent medical assistant. I can help you understand symptoms, discuss health concerns, and provide medical information. You can also upload medical images (lab results, X-rays, scans) for analysis. How can I assist you today?";
+const AI_WELCOME_MESSAGE = "Hello! I'm Doc' O Clock AI powered by MedGemma 1.5 4B, your advanced multimodal medical assistant. I can:\n\n🖼️ Analyze single or multiple medical images\n📊 Compare scans over time (longitudinal analysis)\n📄 Extract data from lab reports and documents\n🎯 Identify anatomical features with localization\n💬 Answer medical questions\n\nHow can I assist you today?";
 
 interface MedGemmaChatProps {
   onActionClick?: (action: ClinicalAction) => void;
@@ -83,7 +87,8 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
 
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedImages, setSelectedImages] = useState<string[]>([]); // Changed to array
+  const [analysisType, setAnalysisType] = useState<AnalysisType>('general');
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -113,61 +118,84 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
   }, [input]);
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
 
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      toast.error('Please select an image file');
+    // Check total images limit (10 max)
+    if (selectedImages.length + files.length > 10) {
+      toast.error('Maximum 10 images allowed');
       return;
     }
 
-    // Validate file size (max 10MB)
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error('Image must be less than 10MB');
-      return;
-    }
+    // Process all selected files
+    const fileArray = Array.from(files);
+    
+    fileArray.forEach((file) => {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        toast.error(`${file.name} is not an image file`);
+        return;
+      }
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const base64 = e.target?.result as string;
-      setSelectedImage(base64);
-      toast.success('Image attached! Add a message and send.');
-    };
-    reader.readAsDataURL(file);
+      // Validate file size (max 5MB per image)
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error(`${file.name} is too large (max 5MB per image)`);
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const base64 = e.target?.result as string;
+        setSelectedImages(prev => [...prev, base64]);
+      };
+      reader.readAsDataURL(file);
+    });
+
+    toast.success(`${files.length} image(s) attached`);
+    
+    // Clear the input to allow re-selecting the same files
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const removeImage = (index: number) => {
+    setSelectedImages(prev => prev.filter((_, i) => i !== index));
+    toast.success('Image removed');
   };
 
   const sendMessage = async () => {
-    if ((!input.trim() && !selectedImage) || isLoading) return;
+    if ((!input.trim() && selectedImages.length === 0) || isLoading) return;
 
     const userMessage: Message = {
       role: 'user',
-      content: input.trim() || 'Please analyze this medical image',
+      content: input.trim() || 'Please analyze these medical images',
       timestamp: new Date(),
-      image: selectedImage || undefined
+      images: selectedImages.length > 0 ? [...selectedImages] : undefined,
+      analysisType: selectedImages.length > 0 ? analysisType : undefined
     };
 
     setMessages(prev => [...prev, userMessage]);
     setInput('');
-    const imageToSend = selectedImage;
-    setSelectedImage(null);
+    const imagesToSend = [...selectedImages];
+    const currentAnalysisType = analysisType;
+    setSelectedImages([]);
     setIsLoading(true);
 
     try {
-      console.log('Attempting AI chat...');
+      console.log('Attempting MedGemma 1.5 4B multimodal chat...');
 
-      // Primary: doc-chat (supports images)
-      // Fallback: secondary chat (text-only)
       let data, error;
       let functionUsed = '';
 
-      // Use doc-chat as primary (supports images and is more reliable)
+      // Try medgemma-chat first (now supports multimodal with MedGemma 1.5 4B)
       try {
-        console.log('Calling doc-chat (primary)...');
-        const response = await supabase.functions.invoke('doc-chat', {
+        console.log('Calling medgemma-chat (MedGemma 1.5 4B - multimodal)...');
+        const response = await supabase.functions.invoke('medgemma-chat', {
           body: {
             message: userMessage.content,
-            image: imageToSend || null,
+            images: imagesToSend.length > 0 ? imagesToSend : undefined,
+            analysisType: imagesToSend.length > 0 ? currentAnalysisType : 'general',
             userRole: activeRole,
             conversationHistory: messages.slice(-10).map(m => ({
               role: m.role,
@@ -177,16 +205,17 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
         });
         data = response.data;
         error = response.error;
-        functionUsed = 'doc-chat';
+        functionUsed = 'medgemma-chat (MedGemma 1.5 4B)';
 
-        if (error || !data?.reply) throw new Error('doc-chat failed');
-      } catch (docChatError) {
-        // Fallback to secondary chat (text-only, no image support)
-        console.log('doc-chat failed, trying fallback...');
+        if (error || !data?.reply) throw new Error('medgemma-chat failed');
+      } catch (medgemmaError) {
+        // Fallback to doc-chat (Gemini 2.5 Flash - supports images)
+        console.log('MedGemma failed, trying doc-chat fallback...');
         try {
-          const medgemmaResponse = await supabase.functions.invoke('medgemma-chat', {
+          const docChatResponse = await supabase.functions.invoke('doc-chat', {
             body: {
               message: userMessage.content,
+              image: imagesToSend.length > 0 ? imagesToSend[0] : null, // doc-chat only supports single image
               userRole: activeRole,
               conversationHistory: messages.slice(-10).map(m => ({
                 role: m.role,
@@ -194,19 +223,45 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
               }))
             }
           });
-          data = medgemmaResponse.data;
-          error = medgemmaResponse.error;
-          functionUsed = 'medgemma-chat';
-        } catch (medgemmaError) {
-          console.error('All AI functions failed');
-          throw new Error('Unable to connect to AI assistant. Please try again.');
+          data = docChatResponse.data;
+          error = docChatResponse.error;
+          functionUsed = 'doc-chat (Gemini 2.5 Flash fallback)';
+          
+          if (imagesToSend.length > 1) {
+            toast.info('Note: Fallback AI analyzed only the first image');
+          }
+        } catch (docChatError) {
+          // Final fallback to med-ai (text-only)
+          console.log('doc-chat failed, trying med-ai fallback (text-only)...');
+          try {
+            const medAiResponse = await supabase.functions.invoke('med-ai', {
+              body: {
+                message: userMessage.content,
+                userRole: activeRole,
+                conversationHistory: messages.slice(-10).map(m => ({
+                  role: m.role,
+                  content: m.content
+                }))
+              }
+            });
+            data = medAiResponse.data;
+            error = medAiResponse.error;
+            functionUsed = 'med-ai (GPT-3.5 fallback - text only)';
+            
+            if (imagesToSend.length > 0) {
+              toast.warning('Note: Final fallback AI cannot analyze images');
+            }
+          } catch (medAiError) {
+            console.error('All AI functions failed');
+            throw new Error('Unable to connect to any AI assistant. Please try again.');
+          }
         }
       }
 
       console.log(`${functionUsed} response:`, { data, error });
 
       if (error) {
-        console.error('All AI functions failed:', error);
+        console.error('AI function error:', error);
         throw new Error(error.message || 'Failed to get response from AI');
       }
 
@@ -225,6 +280,11 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
       };
 
       setMessages(prev => [...prev, assistantMessage]);
+      
+      // Show model info
+      if (data.model) {
+        console.log(`Response from: ${data.model}`);
+      }
     } catch (error) {
       console.error('Error sending message:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to get response. Please try again.';
@@ -305,13 +365,33 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
                       : 'bg-card border rounded-bl-sm'
                       }`}
                   >
-                    {message.image && (
-                      <div className="rounded-xl mb-3 overflow-hidden border-2 border-primary/20">
-                        <img
-                          src={message.image}
-                          alt="Medical image"
-                          className="w-full h-auto max-h-64 object-contain bg-muted/50"
-                        />
+                    {message.images && message.images.length > 0 && (
+                      <div className={`rounded-xl mb-3 overflow-hidden border-2 border-primary/20 ${
+                        message.images.length > 1 ? 'grid grid-cols-2 gap-2' : ''
+                      }`}>
+                        {message.images.map((img, imgIdx) => (
+                          <div key={imgIdx} className="relative">
+                            <img
+                              src={img}
+                              alt={`Medical image ${imgIdx + 1}`}
+                              className="w-full h-auto max-h-64 object-contain bg-muted/50"
+                            />
+                            {message.images && message.images.length > 1 && (
+                              <span className="absolute top-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
+                                {imgIdx + 1}/{message.images.length}
+                              </span>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {message.analysisType && message.analysisType !== 'general' && (
+                      <div className="mb-2 inline-block">
+                        <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
+                          {message.analysisType === 'longitudinal' && '📊 Longitudinal Analysis'}
+                          {message.analysisType === 'anatomical_localization' && '🎯 Anatomical Localization'}
+                          {message.analysisType === 'document_understanding' && '📄 Document Analysis'}
+                        </span>
                       </div>
                     )}
                     <p className="text-sm sm:text-base whitespace-pre-wrap leading-relaxed break-words overflow-hidden" style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>
@@ -368,23 +448,60 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
 
         {/* Input Area - WhatsApp style */}
         <div className="border-t p-3 sm:p-4 bg-card">
-          {selectedImage && (
-            <div className="mb-3 relative inline-block">
-              <div className="rounded-xl overflow-hidden border-2 border-primary shadow-md">
-                <img
-                  src={selectedImage}
-                  alt="Selected"
-                  className="h-24 sm:h-32 object-cover"
-                />
+          {/* Image Preview Section */}
+          {selectedImages.length > 0 && (
+            <div className="mb-3">
+              <div className="flex items-center gap-2 mb-2">
+                <ImageIcon className="h-4 w-4 text-primary" />
+                <span className="text-sm font-medium">{selectedImages.length} image(s) attached</span>
+                {selectedImages.length > 1 && (
+                  <span className="text-xs text-muted-foreground">
+                    ({analysisType === 'longitudinal' ? 'Longitudinal comparison' : 'Multiple images'})
+                  </span>
+                )}
               </div>
-              <Button
-                size="icon"
-                variant="destructive"
-                className="absolute -top-2 -right-2 h-7 w-7 rounded-full shadow-lg"
-                onClick={() => setSelectedImage(null)}
-              >
-                <X className="h-4 w-4" />
-              </Button>
+              <div className="grid grid-cols-5 gap-2">
+                {selectedImages.map((img, idx) => (
+                  <div key={idx} className="relative group">
+                    <div className="rounded-lg overflow-hidden border-2 border-primary shadow-md aspect-square">
+                      <img
+                        src={img}
+                        alt={`Selected ${idx + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <Button
+                      size="icon"
+                      variant="destructive"
+                      className="absolute -top-1 -right-1 h-6 w-6 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={() => removeImage(idx)}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                    <span className="absolute bottom-1 left-1 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded">
+                      {idx + 1}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              
+              {/* Analysis Type Selector - Only show when multiple images */}
+              {selectedImages.length > 1 && (
+                <div className="mt-3 space-y-1">
+                  <label className="text-xs text-muted-foreground">Analysis Type:</label>
+                  <Select value={analysisType} onValueChange={(value: AnalysisType) => setAnalysisType(value)}>
+                    <SelectTrigger className="w-full h-9 text-sm">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="general">General Analysis</SelectItem>
+                      <SelectItem value="longitudinal">Longitudinal Comparison (Track Changes)</SelectItem>
+                      <SelectItem value="anatomical_localization">Anatomical Localization</SelectItem>
+                      <SelectItem value="document_understanding">Document Extraction</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
             </div>
           )}
 
@@ -394,6 +511,7 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
               ref={fileInputRef}
               onChange={handleImageSelect}
               accept="image/*"
+              multiple
               className="hidden"
             />
 
@@ -404,12 +522,14 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
               size="icon"
               variant="outline"
               className="flex-shrink-0 h-12 w-12 rounded-full border-2 hover:bg-primary/10 hover:border-primary transition-all"
-              title="Upload medical image (X-rays, lab results, scans)"
+              title="Upload medical images (max 10): X-rays, lab results, scans, etc."
             >
               <div className="relative">
                 <Paperclip className="h-5 w-5" />
-                {selectedImage && (
-                  <span className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full" />
+                {selectedImages.length > 0 && (
+                  <span className="absolute -top-1 -right-1 min-w-[16px] h-4 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center px-1">
+                    {selectedImages.length}
+                  </span>
                 )}
               </div>
             </Button>
@@ -420,14 +540,14 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyPress}
-                placeholder={selectedImage ? "Describe what you want to know about this image..." : "Ask me about your health..."}
+                placeholder={selectedImages.length > 0 ? "Describe what you want to know about these images..." : "Ask me about your health..."}
                 disabled={isLoading}
                 className="resize-none min-h-[48px] max-h-[120px] rounded-3xl px-4 py-3 pr-12 text-base bg-muted/50 border-2 focus-visible:ring-2 focus-visible:ring-primary"
                 rows={1}
               />
               <Button
                 onClick={sendMessage}
-                disabled={isLoading || (!input.trim() && !selectedImage)}
+                disabled={isLoading || (!input.trim() && selectedImages.length === 0)}
                 size="icon"
                 className="absolute right-1 bottom-1 h-10 w-10 rounded-full bg-primary hover:bg-primary/90 disabled:opacity-50"
               >
@@ -443,7 +563,7 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
           <div className="mt-3 flex items-center gap-2">
             <div className="flex-1">
               <p className="text-xs text-muted-foreground leading-relaxed">
-                💡 <strong>Upload medical images</strong> (lab results, X-rays, scans) for AI analysis
+                💡 <strong>Powered by MedGemma 1.5 4B</strong> • Upload up to 10 medical images for AI analysis • Supports longitudinal comparison & document extraction
               </p>
             </div>
           </div>

@@ -2,9 +2,10 @@ import { Helmet } from "react-helmet-async";
 import { MedGemmaChat as DocOClockAIChat } from "@/components/MedGemmaChat";
 import { SymptomCollector } from "@/components/SymptomCollector";
 import { AIDiagnosisHistory } from "@/components/AIDiagnosisHistory";
+import { DocumentAnalysisUploader } from "@/components/ai/DocumentAnalysisUploader";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Brain, MessageSquare, ClipboardList, Shield, History } from "lucide-react";
+import { Brain, MessageSquare, ClipboardList, Shield, History, FileText } from "lucide-react";
 
 import { useState } from "react";
 import { ClinicalAction } from "@/components/ai/ClinicalDecisionCard";
@@ -38,7 +39,7 @@ const AIDiagnostics = () => {
               <div>
                 <h1 className="text-xl sm:text-3xl font-bold">AI Diagnostic Assistant</h1>
                 <p className="text-xs sm:text-base text-muted-foreground">
-                  Powered by Doc' O Clock AI - Your 24/7 Medical Assistant
+                  Powered by MedGemma 1.5 4B - Multimodal Medical AI
                 </p>
               </div>
             </div>
@@ -58,7 +59,24 @@ const AIDiagnostics = () => {
               </CardHeader>
               <CardContent>
                 <p className="text-xs sm:text-sm text-muted-foreground">
-                  Chat & upload medical images for analysis
+                  Chat & upload multiple medical images for AI analysis
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card
+              className="min-w-[240px] sm:min-w-0 snap-center cursor-pointer hover:bg-accent/50 transition-colors"
+              onClick={() => setActiveTab("documents")}
+            >
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm sm:text-base flex items-center gap-2">
+                  <FileText className="h-4 w-4 text-primary" />
+                  Document Analysis
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-xs sm:text-sm text-muted-foreground">
+                  Extract data from lab reports & prescriptions
                 </p>
               </CardContent>
             </Card>
@@ -114,14 +132,19 @@ const AIDiagnostics = () => {
 
           {/* Main Content */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-3">
+            <TabsList className="grid w-full max-w-3xl mx-auto grid-cols-4">
               <TabsTrigger value="chat" className="text-xs sm:text-sm">AI Chat</TabsTrigger>
-              <TabsTrigger value="symptoms" className="text-xs sm:text-sm">Symptom Checker</TabsTrigger>
+              <TabsTrigger value="documents" className="text-xs sm:text-sm">Documents</TabsTrigger>
+              <TabsTrigger value="symptoms" className="text-xs sm:text-sm">Symptoms</TabsTrigger>
               <TabsTrigger value="history" className="text-xs sm:text-sm">History</TabsTrigger>
             </TabsList>
 
             <TabsContent value="chat" className="mt-3 sm:mt-6">
               <DocOClockAIChat onActionClick={handleActionClick} />
+            </TabsContent>
+
+            <TabsContent value="documents" className="mt-3 sm:mt-6">
+              <DocumentAnalysisUploader />
             </TabsContent>
 
             <TabsContent value="symptoms" className="mt-4 sm:mt-6">
