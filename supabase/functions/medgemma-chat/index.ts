@@ -186,7 +186,16 @@ CRITICAL: If symptoms suggest emergency, immediately advise to call emergency se
       JSON.stringify({
         reply,
         timestamp: new Date().toISOString(),
-        model: 'medgemma-1.5-4b-it'
+        model: 'medgemma-1.5-4b-it',
+        analysisType,
+        imageCount: images?.length || 0,
+        capabilities: {
+          multimodal: true,
+          longitudinal: true,
+          document_understanding: true,
+          anatomical_localization: true,
+          native_3d_imaging: true
+        }
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

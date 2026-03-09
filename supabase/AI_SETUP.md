@@ -219,13 +219,20 @@ supabase functions deploy med-ai
 Test each function individually:
 
 ```bash
-# Test medgemma-chat
-supabase functions invoke medgemma-chat --body '{"message":"Hello, I have a headache"}'
+# Test text-only chat
+supabase functions invoke medgemma-chat --body '{"message":"What are the symptoms of pneumonia?","userRole":"patient"}'
 
-# Test doc-chat
+# Test multimodal analysis (with base64 image)
+supabase functions invoke medgemma-chat --body '{"message":"Analyze this chest X-ray","images":["data:image/jpeg;base64,..."],"analysisType":"general"}'
+
+# Test document analysis
+supabase functions invoke medgemma-document-analysis --body '{"document":"data:image/jpeg;base64,...","documentType":"lab_report"}'
+
+# Test 3D imaging
+supabase functions invoke medgemma-3d-imaging --body '{"slices":["data:image/jpeg;base64,..."],"imagingType":"ct","bodyPart":"chest","clinicalQuestion":"Assess for pneumonia"}'
+
+# Test fallback functions
 supabase functions invoke doc-chat --body '{"message":"Hello, I have a headache"}'
-
-# Test med-ai
 supabase functions invoke med-ai --body '{"message":"Hello, I have a headache"}'
 ```
 
