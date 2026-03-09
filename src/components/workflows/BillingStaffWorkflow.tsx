@@ -344,6 +344,10 @@ export const BillingStaffWorkflow = () => {
             ))
           )}
         </TabsContent>
+
+        <TabsContent value="tpa" className="mt-4">
+          <InsuranceClaimWorkflow />
+        </TabsContent>
       </Tabs>
     </div>
   );
