@@ -522,12 +522,14 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
               size="icon"
               variant="outline"
               className="flex-shrink-0 h-12 w-12 rounded-full border-2 hover:bg-primary/10 hover:border-primary transition-all"
-              title="Upload medical image (X-rays, lab results, scans)"
+              title="Upload medical images (max 10): X-rays, lab results, scans, etc."
             >
               <div className="relative">
                 <Paperclip className="h-5 w-5" />
-                {selectedImage && (
-                  <span className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full" />
+                {selectedImages.length > 0 && (
+                  <span className="absolute -top-1 -right-1 min-w-[16px] h-4 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center px-1">
+                    {selectedImages.length}
+                  </span>
                 )}
               </div>
             </Button>
