@@ -8,9 +8,11 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
-import { Users, Calendar, Clock, FileText, DollarSign, ClipboardCheck, CheckCircle, XCircle, Loader2, Plus } from 'lucide-react';
+import { Users, Calendar, Clock, FileText, DollarSign, ClipboardCheck, CheckCircle, XCircle, Loader2, Plus, Upload } from 'lucide-react';
 import { useHRModule, LeaveRequest } from '@/hooks/useHRModule';
 import { format } from 'date-fns';
+import { BulkAttendanceImport } from '@/components/hr/BulkAttendanceImport';
+import { ShiftScheduleCalendar } from '@/components/hr/ShiftScheduleCalendar';
 
 const LEAVE_TYPE_LABELS: Record<string, string> = {
   annual: 'Annual Leave', sick: 'Sick Leave', maternity: 'Maternity', paternity: 'Paternity',
@@ -176,6 +178,8 @@ export const HRManagerWorkflow = () => {
         <TabsList>
           <TabsTrigger value="leaves"><ClipboardCheck className="h-4 w-4 mr-1" /> Leave Requests ({leaveRequests.length})</TabsTrigger>
           <TabsTrigger value="attendance"><Clock className="h-4 w-4 mr-1" /> Attendance ({todayAttendance.length})</TabsTrigger>
+          <TabsTrigger value="shifts"><Calendar className="h-4 w-4 mr-1" /> Shifts</TabsTrigger>
+          <TabsTrigger value="bulk_import"><Upload className="h-4 w-4 mr-1" /> Bulk Import</TabsTrigger>
           <TabsTrigger value="payroll"><DollarSign className="h-4 w-4 mr-1" /> Payroll ({payroll.length})</TabsTrigger>
         </TabsList>
 
@@ -213,6 +217,14 @@ export const HRManagerWorkflow = () => {
               ))}
             </div>
           )}
+        </TabsContent>
+
+        <TabsContent value="shifts" className="mt-4">
+          <ShiftScheduleCalendar />
+        </TabsContent>
+
+        <TabsContent value="bulk_import" className="mt-4">
+          <BulkAttendanceImport onComplete={() => {}} />
         </TabsContent>
 
         <TabsContent value="payroll" className="space-y-3 mt-4">

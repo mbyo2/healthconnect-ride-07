@@ -11,6 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { DollarSign, FileText, CreditCard, BarChart3, Receipt, Shield, Loader2, Plus, Trash2 } from 'lucide-react';
 import { useBillingModule, BillingInvoice } from '@/hooks/useBillingModule';
 import { format } from 'date-fns';
+import { InsuranceClaimWorkflow } from '@/components/billing/InsuranceClaimWorkflow';
 
 const STATUS_CONFIG: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
   draft: { label: 'Draft', variant: 'outline' },
@@ -307,6 +308,7 @@ export const BillingStaffWorkflow = () => {
         <TabsList>
           <TabsTrigger value="invoices"><Receipt className="h-4 w-4 mr-1" /> Invoices ({invoices.length})</TabsTrigger>
           <TabsTrigger value="claims"><Shield className="h-4 w-4 mr-1" /> Insurance Claims ({claims.length})</TabsTrigger>
+          <TabsTrigger value="tpa"><Shield className="h-4 w-4 mr-1" /> TPA Workflow</TabsTrigger>
         </TabsList>
 
         <TabsContent value="invoices" className="space-y-3 mt-4">
@@ -341,6 +343,10 @@ export const BillingStaffWorkflow = () => {
               </Card>
             ))
           )}
+        </TabsContent>
+
+        <TabsContent value="tpa" className="mt-4">
+          <InsuranceClaimWorkflow />
         </TabsContent>
       </Tabs>
     </div>

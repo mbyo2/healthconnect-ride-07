@@ -7,12 +7,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { Truck, AlertTriangle, Clock, Plus, MapPin, Navigation, Loader2, Phone } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Truck, AlertTriangle, Clock, Plus, MapPin, Navigation, Loader2, Phone, Map } from 'lucide-react';
 import { useAmbulanceDispatch } from '@/hooks/useAmbulanceDispatch';
+import { AmbulanceTrackingMap } from '@/components/ambulance/AmbulanceTrackingMap';
 
 export const AmbulanceStaffWorkflow = () => {
   const { dispatches, loading, active, inTransit, completedToday, createDispatch, updateStatus } = useAmbulanceDispatch();
   const [showAdd, setShowAdd] = useState(false);
+  const [selectedDispatchId, setSelectedDispatchId] = useState<string | null>(null);
   const [form, setForm] = useState({ patient_name: '', pickup_location: '', destination: '', priority: 'urgent', ambulance_unit: 'AMB-01', contact_phone: '', notes: '' });
 
   const statusFlow: Record<string, string> = {
@@ -66,31 +69,48 @@ export const AmbulanceStaffWorkflow = () => {
         <Card><CardHeader className="pb-2"><CardTitle className="flex items-center gap-2 text-lg"><Clock className="h-5 w-5" /> Completed Today</CardTitle></CardHeader><CardContent><p className="text-3xl font-bold">{completedToday.length}</p></CardContent></Card>
       </div>
 
-      <Card>
-        <CardHeader><CardTitle>Dispatch Board</CardTitle></CardHeader>
-        <CardContent>
-          {loading ? <Loader2 className="h-6 w-6 animate-spin mx-auto" /> :
-            dispatches.length === 0 ? <p className="text-muted-foreground text-center py-4">No dispatches</p> : (
-              <div className="space-y-2">
-                {dispatches.map(d => (
-                  <div key={d.id} className="flex items-center justify-between p-3 rounded-lg border">
-                    <div>
-                      <p className="font-medium">{d.patient_name} — {d.ambulance_unit}</p>
-                      <p className="text-sm text-muted-foreground"><MapPin className="inline h-3 w-3" /> {d.pickup_location} → <Navigation className="inline h-3 w-3" /> {d.destination}</p>
-                      {d.contact_phone && <p className="text-xs text-muted-foreground"><Phone className="inline h-3 w-3" /> {d.contact_phone}</p>}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline" className={priorityColor(d.priority)}>{d.priority}</Badge>
-                      <Badge variant="outline">{d.status.replace(/_/g, ' ')}</Badge>
-                      {statusFlow[d.status] && <Button size="sm" onClick={() => updateStatus(d.id, statusFlow[d.status])}>{statusFlow[d.status].replace(/_/g, ' ')}</Button>}
-                    </div>
+      <Tabs defaultValue="map">
+        <TabsList>
+          <TabsTrigger value="map"><Map className="h-4 w-4 mr-1" /> Live Map</TabsTrigger>
+          <TabsTrigger value="board">Dispatch Board</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="map" className="mt-4">
+          <AmbulanceTrackingMap
+            dispatches={dispatches}
+            selectedDispatchId={selectedDispatchId}
+            onSelectDispatch={setSelectedDispatchId}
+          />
+        </TabsContent>
+
+        <TabsContent value="board" className="mt-4">
+          <Card>
+            <CardHeader><CardTitle>Dispatch Board</CardTitle></CardHeader>
+            <CardContent>
+              {loading ? <Loader2 className="h-6 w-6 animate-spin mx-auto" /> :
+                dispatches.length === 0 ? <p className="text-muted-foreground text-center py-4">No dispatches</p> : (
+                  <div className="space-y-2">
+                    {dispatches.map(d => (
+                      <div key={d.id} className="flex items-center justify-between p-3 rounded-lg border">
+                        <div>
+                          <p className="font-medium">{d.patient_name} — {d.ambulance_unit}</p>
+                          <p className="text-sm text-muted-foreground"><MapPin className="inline h-3 w-3" /> {d.pickup_location} → <Navigation className="inline h-3 w-3" /> {d.destination}</p>
+                          {d.contact_phone && <p className="text-xs text-muted-foreground"><Phone className="inline h-3 w-3" /> {d.contact_phone}</p>}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline" className={priorityColor(d.priority)}>{d.priority}</Badge>
+                          <Badge variant="outline">{d.status.replace(/_/g, ' ')}</Badge>
+                          {statusFlow[d.status] && <Button size="sm" onClick={() => updateStatus(d.id, statusFlow[d.status])}>{statusFlow[d.status].replace(/_/g, ' ')}</Button>}
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            )
-          }
-        </CardContent>
-      </Card>
+                )
+              }
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

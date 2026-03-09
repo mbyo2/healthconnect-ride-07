@@ -8,8 +8,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Wrench, AlertTriangle, Settings, Plus, Loader2, Package } from 'lucide-react';
+import { Wrench, AlertTriangle, Settings, Plus, Loader2, Package, Calendar } from 'lucide-react';
 import { useMaintenanceModule } from '@/hooks/useMaintenanceModule';
+import { PreventiveMaintenanceScheduler } from '@/components/maintenance/PreventiveMaintenanceScheduler';
 
 export const MaintenanceManagerWorkflow = () => {
   const { workOrders, assets, loading, openOrders, criticalOrders, createWorkOrder, updateWorkOrder, addAsset } = useMaintenanceModule();
@@ -103,7 +104,7 @@ export const MaintenanceManagerWorkflow = () => {
       </div>
 
       <Tabs defaultValue="work_orders">
-        <TabsList><TabsTrigger value="work_orders">Work Orders</TabsTrigger><TabsTrigger value="assets">Asset Register</TabsTrigger></TabsList>
+        <TabsList><TabsTrigger value="work_orders">Work Orders</TabsTrigger><TabsTrigger value="assets">Asset Register</TabsTrigger><TabsTrigger value="preventive"><Calendar className="h-4 w-4 mr-1" /> Preventive</TabsTrigger></TabsList>
         <TabsContent value="work_orders">
           <Card>
             <CardContent className="pt-4">
@@ -151,6 +152,9 @@ export const MaintenanceManagerWorkflow = () => {
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+        <TabsContent value="preventive" className="mt-4">
+          <PreventiveMaintenanceScheduler />
         </TabsContent>
       </Tabs>
     </div>
