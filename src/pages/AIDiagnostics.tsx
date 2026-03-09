@@ -143,6 +143,10 @@ const AIDiagnostics = () => {
               <DocOClockAIChat onActionClick={handleActionClick} />
             </TabsContent>
 
+            <TabsContent value="documents" className="mt-3 sm:mt-6">
+              <DocumentAnalysisUploader />
+            </TabsContent>
+
             <TabsContent value="symptoms" className="mt-4 sm:mt-6">
               <Card>
                 <CardHeader>
