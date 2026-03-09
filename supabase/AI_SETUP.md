@@ -201,16 +201,16 @@ OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 ### Step 2: Deploy Edge Functions
 
-Deploy all three Edge Functions to Supabase:
+Deploy all Edge Functions to Supabase:
 
 ```bash
-# Deploy medgemma-chat
+# Deploy MedGemma 1.5 4B functions
 supabase functions deploy medgemma-chat
+supabase functions deploy medgemma-document-analysis
+supabase functions deploy medgemma-3d-imaging
 
-# Deploy doc-chat
+# Deploy fallback functions
 supabase functions deploy doc-chat
-
-# Deploy med-ai
 supabase functions deploy med-ai
 ```
 
