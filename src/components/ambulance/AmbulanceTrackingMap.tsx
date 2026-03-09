@@ -177,21 +177,7 @@ export const AmbulanceTrackingMap: React.FC<AmbulanceTrackingMapProps> = ({
                     </Popup>
                   </Marker>
 
-                  {/* Route line */}
-                  {isActive && (
-                    <Polyline
-                      positions={[
-                        [dispatch.pickup_lat!, dispatch.pickup_lng!],
-                        [dispatch.destination_lat, dispatch.destination_lng],
-                      ]}
-                      pathOptions={{
-                        color: getPriorityColor(dispatch.priority),
-                        weight: isSelected ? 4 : 2,
-                        dashArray: isActive ? undefined : '5, 10',
-                        opacity: isSelected ? 1 : 0.6,
-                      }}
-                    />
-                  )}
+                  {/* Route indicator via popup */}
                 </>
               )}
             </React.Fragment>
