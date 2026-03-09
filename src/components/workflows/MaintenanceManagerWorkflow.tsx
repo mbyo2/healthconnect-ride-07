@@ -8,8 +8,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Wrench, AlertTriangle, Settings, Plus, Loader2, Package } from 'lucide-react';
+import { Wrench, AlertTriangle, Settings, Plus, Loader2, Package, Calendar } from 'lucide-react';
 import { useMaintenanceModule } from '@/hooks/useMaintenanceModule';
+import { PreventiveMaintenanceScheduler } from '@/components/maintenance/PreventiveMaintenanceScheduler';
 
 export const MaintenanceManagerWorkflow = () => {
   const { workOrders, assets, loading, openOrders, criticalOrders, createWorkOrder, updateWorkOrder, addAsset } = useMaintenanceModule();
