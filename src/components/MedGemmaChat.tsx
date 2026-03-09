@@ -165,36 +165,37 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
   };
 
   const sendMessage = async () => {
-    if ((!input.trim() && !selectedImage) || isLoading) return;
+    if ((!input.trim() && selectedImages.length === 0) || isLoading) return;
 
     const userMessage: Message = {
       role: 'user',
-      content: input.trim() || 'Please analyze this medical image',
+      content: input.trim() || 'Please analyze these medical images',
       timestamp: new Date(),
-      image: selectedImage || undefined
+      images: selectedImages.length > 0 ? [...selectedImages] : undefined,
+      analysisType: selectedImages.length > 0 ? analysisType : undefined
     };
 
     setMessages(prev => [...prev, userMessage]);
     setInput('');
-    const imageToSend = selectedImage;
-    setSelectedImage(null);
+    const imagesToSend = [...selectedImages];
+    const currentAnalysisType = analysisType;
+    setSelectedImages([]);
     setIsLoading(true);
 
     try {
-      console.log('Attempting AI chat...');
+      console.log('Attempting MedGemma 1.5 4B multimodal chat...');
 
-      // Primary: doc-chat (supports images)
-      // Fallback: secondary chat (text-only)
       let data, error;
       let functionUsed = '';
 
-      // Use doc-chat as primary (supports images and is more reliable)
+      // Try medgemma-chat first (now supports multimodal with MedGemma 1.5 4B)
       try {
-        console.log('Calling doc-chat (primary)...');
-        const response = await supabase.functions.invoke('doc-chat', {
+        console.log('Calling medgemma-chat (MedGemma 1.5 4B - multimodal)...');
+        const response = await supabase.functions.invoke('medgemma-chat', {
           body: {
             message: userMessage.content,
-            image: imageToSend || null,
+            images: imagesToSend.length > 0 ? imagesToSend : undefined,
+            analysisType: imagesToSend.length > 0 ? currentAnalysisType : 'general',
             userRole: activeRole,
             conversationHistory: messages.slice(-10).map(m => ({
               role: m.role,
@@ -204,16 +205,17 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
         });
         data = response.data;
         error = response.error;
-        functionUsed = 'doc-chat';
+        functionUsed = 'medgemma-chat (MedGemma 1.5 4B)';
 
-        if (error || !data?.reply) throw new Error('doc-chat failed');
-      } catch (docChatError) {
-        // Fallback to secondary chat (text-only, no image support)
-        console.log('doc-chat failed, trying fallback...');
+        if (error || !data?.reply) throw new Error('medgemma-chat failed');
+      } catch (medgemmaError) {
+        // Fallback to doc-chat (Gemini 2.5 Flash - supports images)
+        console.log('MedGemma failed, trying doc-chat fallback...');
         try {
-          const medgemmaResponse = await supabase.functions.invoke('medgemma-chat', {
+          const docChatResponse = await supabase.functions.invoke('doc-chat', {
             body: {
               message: userMessage.content,
+              image: imagesToSend.length > 0 ? imagesToSend[0] : null, // doc-chat only supports single image
               userRole: activeRole,
               conversationHistory: messages.slice(-10).map(m => ({
                 role: m.role,
@@ -221,19 +223,45 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
               }))
             }
           });
-          data = medgemmaResponse.data;
-          error = medgemmaResponse.error;
-          functionUsed = 'medgemma-chat';
-        } catch (medgemmaError) {
-          console.error('All AI functions failed');
-          throw new Error('Unable to connect to AI assistant. Please try again.');
+          data = docChatResponse.data;
+          error = docChatResponse.error;
+          functionUsed = 'doc-chat (Gemini 2.5 Flash fallback)';
+          
+          if (imagesToSend.length > 1) {
+            toast.info('Note: Fallback AI analyzed only the first image');
+          }
+        } catch (docChatError) {
+          // Final fallback to med-ai (text-only)
+          console.log('doc-chat failed, trying med-ai fallback (text-only)...');
+          try {
+            const medAiResponse = await supabase.functions.invoke('med-ai', {
+              body: {
+                message: userMessage.content,
+                userRole: activeRole,
+                conversationHistory: messages.slice(-10).map(m => ({
+                  role: m.role,
+                  content: m.content
+                }))
+              }
+            });
+            data = medAiResponse.data;
+            error = medAiResponse.error;
+            functionUsed = 'med-ai (GPT-3.5 fallback - text only)';
+            
+            if (imagesToSend.length > 0) {
+              toast.warning('Note: Final fallback AI cannot analyze images');
+            }
+          } catch (medAiError) {
+            console.error('All AI functions failed');
+            throw new Error('Unable to connect to any AI assistant. Please try again.');
+          }
         }
       }
 
       console.log(`${functionUsed} response:`, { data, error });
 
       if (error) {
-        console.error('All AI functions failed:', error);
+        console.error('AI function error:', error);
         throw new Error(error.message || 'Failed to get response from AI');
       }
 
@@ -252,6 +280,11 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
       };
 
       setMessages(prev => [...prev, assistantMessage]);
+      
+      // Show model info
+      if (data.model) {
+        console.log(`Response from: ${data.model}`);
+      }
     } catch (error) {
       console.error('Error sending message:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to get response. Please try again.';
