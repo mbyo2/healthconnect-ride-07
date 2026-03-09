@@ -77,8 +77,8 @@ export const PreventiveMaintenanceScheduler: React.FC = () => {
     setLoading(true);
     try {
       const [assetsRes, schedulesRes] = await Promise.all([
-        (supabase.from('asset_register') as any).select('*').eq('institution_id', institutionId).order('asset_name'),
-        (supabase.from('maintenance_schedules') as any).select('*').eq('institution_id', institutionId),
+        (supabase.from('asset_register' as any) as any).select('*').eq('institution_id', institutionId).order('asset_name'),
+        (supabase.from('maintenance_schedules' as any) as any).select('*').eq('institution_id', institutionId),
       ]);
 
       if (!assetsRes.error) setAssets(assetsRes.data || []);
