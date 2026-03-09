@@ -19,19 +19,21 @@ interface TriageFormProps {
   onComplete?: () => void;
 }
 
-// Using the existing triage_level enum: emergency, urgent, standard, non_urgent
+// Using the existing triage_level enum: critical, urgent, standard, non_urgent
 const triageLevels = [
-  { level: 'emergency', label: 'Emergency', description: 'Immediate life-saving intervention required', color: 'bg-destructive' },
+  { level: 'critical', label: 'Critical', description: 'Immediate life-saving intervention required', color: 'bg-destructive' },
   { level: 'urgent', label: 'Urgent', description: 'High risk situation, severe pain', color: 'bg-orange-500' },
   { level: 'standard', label: 'Standard', description: 'Moderate urgency, resources needed', color: 'bg-yellow-500' },
   { level: 'non_urgent', label: 'Non-Urgent', description: 'Can wait, minimal resources needed', color: 'bg-primary' },
 ];
 
+type TriageLevel = 'critical' | 'urgent' | 'standard' | 'non_urgent';
+
 export const TriageAssessmentForm: React.FC<TriageFormProps> = ({ institutionId, patientId, patientName, onComplete }) => {
   const queryClient = useQueryClient();
   
   const [formData, setFormData] = useState({
-    triageLevel: 'standard' as 'emergency' | 'urgent' | 'standard' | 'non_urgent',
+    triageLevel: 'standard' as TriageLevel,
     chiefComplaint: '',
     temperature: '',
     bpSystolic: '',
