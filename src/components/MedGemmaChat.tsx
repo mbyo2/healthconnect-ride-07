@@ -511,6 +511,7 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
               ref={fileInputRef}
               onChange={handleImageSelect}
               accept="image/*"
+              multiple
               className="hidden"
             />
 
