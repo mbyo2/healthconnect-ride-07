@@ -308,6 +308,7 @@ export const BillingStaffWorkflow = () => {
         <TabsList>
           <TabsTrigger value="invoices"><Receipt className="h-4 w-4 mr-1" /> Invoices ({invoices.length})</TabsTrigger>
           <TabsTrigger value="claims"><Shield className="h-4 w-4 mr-1" /> Insurance Claims ({claims.length})</TabsTrigger>
+          <TabsTrigger value="tpa"><Shield className="h-4 w-4 mr-1" /> TPA Workflow</TabsTrigger>
         </TabsList>
 
         <TabsContent value="invoices" className="space-y-3 mt-4">
