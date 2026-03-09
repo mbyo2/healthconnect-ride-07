@@ -331,6 +331,7 @@ export type Database = {
           institution_id: string
           last_maintenance_date: string | null
           location: string | null
+          maintenance_interval_days: number | null
           manufacturer: string | null
           model_number: string | null
           next_maintenance_date: string | null
@@ -353,6 +354,7 @@ export type Database = {
           institution_id: string
           last_maintenance_date?: string | null
           location?: string | null
+          maintenance_interval_days?: number | null
           manufacturer?: string | null
           model_number?: string | null
           next_maintenance_date?: string | null
@@ -375,6 +377,7 @@ export type Database = {
           institution_id?: string
           last_maintenance_date?: string | null
           location?: string | null
+          maintenance_interval_days?: number | null
           manufacturer?: string | null
           model_number?: string | null
           next_maintenance_date?: string | null
@@ -3839,6 +3842,69 @@ export type Database = {
         }
         Relationships: []
       }
+      maintenance_schedules: {
+        Row: {
+          asset_id: string | null
+          assigned_to: string | null
+          created_at: string | null
+          created_by: string | null
+          estimated_duration_hours: number | null
+          frequency_days: number
+          id: string
+          institution_id: string
+          instructions: string | null
+          last_completed: string | null
+          next_due: string
+          schedule_type: string
+          updated_at: string | null
+        }
+        Insert: {
+          asset_id?: string | null
+          assigned_to?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          estimated_duration_hours?: number | null
+          frequency_days?: number
+          id?: string
+          institution_id: string
+          instructions?: string | null
+          last_completed?: string | null
+          next_due: string
+          schedule_type: string
+          updated_at?: string | null
+        }
+        Update: {
+          asset_id?: string | null
+          assigned_to?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          estimated_duration_hours?: number | null
+          frequency_days?: number
+          id?: string
+          institution_id?: string
+          instructions?: string | null
+          last_completed?: string | null
+          next_due?: string
+          schedule_type?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "maintenance_schedules_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "asset_register"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_schedules_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       marketplace_products: {
         Row: {
           can_be_delivered: boolean
@@ -6833,6 +6899,62 @@ export type Database = {
           name?: string
         }
         Relationships: []
+      }
+      shift_schedules: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          department: string | null
+          end_time: string
+          id: string
+          institution_id: string
+          notes: string | null
+          shift_date: string
+          shift_type: string
+          staff_id: string
+          staff_name: string | null
+          start_time: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          department?: string | null
+          end_time: string
+          id?: string
+          institution_id: string
+          notes?: string | null
+          shift_date: string
+          shift_type: string
+          staff_id: string
+          staff_name?: string | null
+          start_time: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          department?: string | null
+          end_time?: string
+          id?: string
+          institution_id?: string
+          notes?: string | null
+          shift_date?: string
+          shift_type?: string
+          staff_id?: string
+          staff_name?: string | null
+          start_time?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shift_schedules_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       sms_logs: {
         Row: {

@@ -128,7 +128,7 @@ export const PreventiveMaintenanceScheduler: React.FC = () => {
       const today = format(new Date(), 'yyyy-MM-dd');
       const nextDue = format(addDays(new Date(), frequencyDays), 'yyyy-MM-dd');
 
-      const { error } = await (supabase.from('maintenance_schedules') as any).update({
+      const { error } = await (supabase.from('maintenance_schedules' as any) as any).update({
         last_completed: today,
         next_due: nextDue,
         updated_at: new Date().toISOString(),

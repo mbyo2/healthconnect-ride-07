@@ -94,8 +94,8 @@ export const ShiftScheduleCalendar: React.FC = () => {
     if (!institutionId || !user || !selectedDate || !shiftForm.staff_id) return;
 
     try {
-      const { error } = await supabase
-        .from('shift_schedules')
+      const { error } = await (supabase
+        .from('shift_schedules' as any) as any)
         .insert({
           institution_id: institutionId,
           staff_id: shiftForm.staff_id,
@@ -106,7 +106,7 @@ export const ShiftScheduleCalendar: React.FC = () => {
           department: shiftForm.department || null,
           notes: shiftForm.notes || null,
           created_by: user.id,
-        } as any);
+        });
 
       if (error) throw error;
 
