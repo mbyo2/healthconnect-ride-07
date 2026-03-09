@@ -540,7 +540,7 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyPress}
-                placeholder={selectedImage ? "Describe what you want to know about this image..." : "Ask me about your health..."}
+                placeholder={selectedImages.length > 0 ? "Describe what you want to know about these images..." : "Ask me about your health..."}
                 disabled={isLoading}
                 className="resize-none min-h-[48px] max-h-[120px] rounded-3xl px-4 py-3 pr-12 text-base bg-muted/50 border-2 focus-visible:ring-2 focus-visible:ring-primary"
                 rows={1}
