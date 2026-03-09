@@ -563,7 +563,7 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
           <div className="mt-3 flex items-center gap-2">
             <div className="flex-1">
               <p className="text-xs text-muted-foreground leading-relaxed">
-                💡 <strong>Upload medical images</strong> (lab results, X-rays, scans) for AI analysis
+                💡 <strong>Powered by MedGemma 1.5 4B</strong> • Upload up to 10 medical images for AI analysis • Supports longitudinal comparison & document extraction
               </p>
             </div>
           </div>
