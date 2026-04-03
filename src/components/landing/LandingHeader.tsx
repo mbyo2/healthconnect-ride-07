@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { AppLogo } from "@/components/ui/AppLogo";
 import { ThemeToggle } from "@/components/ThemeToggle";
