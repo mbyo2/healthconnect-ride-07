@@ -304,7 +304,7 @@ export const Imaging3DUploader = () => {
             <div className="flex flex-col items-center justify-center h-64 text-center">
               <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
               <p className="text-sm text-muted-foreground">
-                Analyzing {slices.length} slices with MedGemma 1.5 4B...
+                Analyzing {slices.length} slices with Doc' O Clock AI...
               </p>
               <p className="text-xs text-muted-foreground mt-2">
                 This may take a moment for volumetric processing
