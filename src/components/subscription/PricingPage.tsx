@@ -430,10 +430,9 @@ export const PricingPage = () => {
                 HMS subscription only — you manage your own billing & pricing. Marketplace listing is optional.
               </p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-              {institutionPlans.map(plan => (
-                <InstitutionPlanCard key={plan.id} plan={plan} currentPlanId={currentSub?.plan_id}
-                  onSubscribe={handleSubscribe} isLoading={subscribeMutation.isPending} />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+              {staticInstitutionPlans.map((plan, i) => (
+                <StaticInstitutionCard key={i} plan={plan} />
               ))}
             </div>
           </div>
