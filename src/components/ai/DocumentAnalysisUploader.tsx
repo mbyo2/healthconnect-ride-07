@@ -205,7 +205,7 @@ export const DocumentAnalysisUploader = () => {
             <div className="flex flex-col items-center justify-center h-64 text-center">
               <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
               <p className="text-sm text-muted-foreground">
-                Analyzing document with MedGemma 1.5 4B...
+                Analyzing document with Doc' O Clock AI...
               </p>
             </div>
           ) : extractedData ? (
