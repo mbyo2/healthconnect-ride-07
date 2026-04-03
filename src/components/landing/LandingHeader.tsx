@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { AppLogo } from "@/components/ui/AppLogo";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -19,7 +19,10 @@ interface LandingHeaderProps {
 
 export const LandingHeader = ({ scrolled }: LandingHeaderProps) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const isActive = (route: string) => location.pathname === route;
 
   return (
     <header className={`fixed top-0 z-50 w-full transition-all duration-300 ${
@@ -29,18 +32,27 @@ export const LandingHeader = ({ scrolled }: LandingHeaderProps) => {
         <div className="flex h-16 items-center justify-between">
           <AppLogo size="sm" linkTo="/landing" className="shrink-0" />
 
-          <nav className="hidden lg:flex items-center gap-1">
-            {NAV_ITEMS.map((item) => (
-              <Button
-                key={item.label}
-                variant="ghost"
-                size="sm"
-                className="text-muted-foreground hover:text-foreground font-medium text-sm px-3"
-                onClick={() => navigate(item.route)}
-              >
-                {item.label}
-              </Button>
-            ))}
+          <nav className="hidden lg:flex items-center gap-0.5">
+            {NAV_ITEMS.map((item) => {
+              const active = isActive(item.route);
+              return (
+                <button
+                  key={item.label}
+                  onClick={() => navigate(item.route)}
+                  className={`relative px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200
+                    ${active
+                      ? 'text-primary bg-primary/10'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-muted/60'
+                    }
+                  `}
+                >
+                  {item.label}
+                  {active && (
+                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4/5 h-0.5 bg-primary rounded-full" />
+                  )}
+                </button>
+              );
+            })}
           </nav>
 
           <div className="flex items-center gap-2">
@@ -61,15 +73,23 @@ export const LandingHeader = ({ scrolled }: LandingHeaderProps) => {
       {mobileMenuOpen && (
         <div className="lg:hidden bg-background/98 backdrop-blur-xl border-b border-border animate-in slide-in-from-top-2 duration-200">
           <nav className="mx-auto max-w-7xl px-4 py-4 space-y-1">
-            {[...NAV_ITEMS, { label: "Sign In", route: "/auth" }].map((item) => (
-              <button
-                key={item.label}
-                className="w-full text-left px-4 py-3 rounded-lg text-sm font-medium text-foreground hover:bg-muted transition-colors"
-                onClick={() => { navigate(item.route); setMobileMenuOpen(false); }}
-              >
-                {item.label}
-              </button>
-            ))}
+            {[...NAV_ITEMS, { label: "Sign In", route: "/auth" }].map((item) => {
+              const active = isActive(item.route);
+              return (
+                <button
+                  key={item.label}
+                  className={`w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-colors
+                    ${active
+                      ? 'text-primary bg-primary/10 border-l-2 border-primary'
+                      : 'text-foreground hover:bg-muted'
+                    }
+                  `}
+                  onClick={() => { navigate(item.route); setMobileMenuOpen(false); }}
+                >
+                  {item.label}
+                </button>
+              );
+            })}
           </nav>
         </div>
       )}
