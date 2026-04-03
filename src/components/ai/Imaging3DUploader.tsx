@@ -283,7 +283,7 @@ export const Imaging3DUploader = () => {
           </Button>
 
           <div className="text-xs text-muted-foreground space-y-1">
-            <p>💡 <strong>MedGemma 1.5 4B Volumetric Analysis</strong></p>
+            <p>💡 <strong>Doc' O Clock AI Volumetric Analysis</strong></p>
             <p>• Native 3D understanding across slices</p>
             <p>• Cross-sectional anatomical correlation</p>
             <p>• Pathology detection and measurement</p>
