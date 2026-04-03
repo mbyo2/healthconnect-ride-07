@@ -374,11 +374,11 @@ export const PricingPage = () => {
       </div>
 
       <Tabs defaultValue="patient" className="space-y-6">
-        <TabsList className="grid w-full max-w-lg mx-auto grid-cols-4">
-          <TabsTrigger value="patient" className="gap-1 text-xs sm:text-sm"><User className="h-4 w-4" /> Patients</TabsTrigger>
-          <TabsTrigger value="provider" className="gap-1 text-xs sm:text-sm"><Stethoscope className="h-4 w-4" /> Providers</TabsTrigger>
-          <TabsTrigger value="pharmacy" className="gap-1 text-xs sm:text-sm"><Pill className="h-4 w-4" /> Pharmacies</TabsTrigger>
-          <TabsTrigger value="institution" className="gap-1 text-xs sm:text-sm"><Building2 className="h-4 w-4" /> Hospitals</TabsTrigger>
+        <TabsList className="grid w-full max-w-lg mx-auto grid-cols-4 bg-muted/80 p-1 rounded-xl">
+          <TabsTrigger value="patient" className="gap-1 text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-lg transition-all"><User className="h-4 w-4" /> Patients</TabsTrigger>
+          <TabsTrigger value="provider" className="gap-1 text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-lg transition-all"><Stethoscope className="h-4 w-4" /> Providers</TabsTrigger>
+          <TabsTrigger value="pharmacy" className="gap-1 text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-lg transition-all"><Pill className="h-4 w-4" /> Pharmacies</TabsTrigger>
+          <TabsTrigger value="institution" className="gap-1 text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-lg transition-all"><Building2 className="h-4 w-4" /> Hospitals</TabsTrigger>
         </TabsList>
 
         <TabsContent value="patient"><PatientFreeSection /></TabsContent>

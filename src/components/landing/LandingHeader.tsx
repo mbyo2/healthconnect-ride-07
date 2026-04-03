@@ -32,24 +32,21 @@ export const LandingHeader = ({ scrolled }: LandingHeaderProps) => {
         <div className="flex h-16 items-center justify-between">
           <AppLogo size="sm" linkTo="/landing" className="shrink-0" />
 
-          <nav className="hidden lg:flex items-center gap-0.5">
+          <nav className="hidden lg:flex items-center gap-1">
             {NAV_ITEMS.map((item) => {
               const active = isActive(item.route);
               return (
                 <button
                   key={item.label}
                   onClick={() => navigate(item.route)}
-                  className={`relative px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200
+                  className={`relative px-3.5 py-2 rounded-lg text-sm font-medium transition-all duration-200
                     ${active
-                      ? 'text-primary bg-primary/10'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-muted/60'
+                      ? 'text-primary-foreground bg-primary shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-accent hover:shadow-sm'
                     }
                   `}
                 >
                   {item.label}
-                  {active && (
-                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4/5 h-0.5 bg-primary rounded-full" />
-                  )}
                 </button>
               );
             })}
@@ -80,8 +77,8 @@ export const LandingHeader = ({ scrolled }: LandingHeaderProps) => {
                   key={item.label}
                   className={`w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-colors
                     ${active
-                      ? 'text-primary bg-primary/10 border-l-2 border-primary'
-                      : 'text-foreground hover:bg-muted'
+                      ? 'text-primary-foreground bg-primary shadow-sm'
+                      : 'text-foreground hover:bg-accent hover:text-accent-foreground'
                     }
                   `}
                   onClick={() => { navigate(item.route); setMobileMenuOpen(false); }}
