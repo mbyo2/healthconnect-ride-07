@@ -77,8 +77,8 @@ export const LandingHeader = ({ scrolled }: LandingHeaderProps) => {
                   key={item.label}
                   className={`w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-colors
                     ${active
-                      ? 'text-primary bg-primary/10 border-l-2 border-primary'
-                      : 'text-foreground hover:bg-muted'
+                      ? 'text-primary-foreground bg-primary shadow-sm'
+                      : 'text-foreground hover:bg-accent hover:text-accent-foreground'
                     }
                   `}
                   onClick={() => { navigate(item.route); setMobileMenuOpen(false); }}
