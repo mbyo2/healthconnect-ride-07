@@ -280,13 +280,46 @@ const PharmacySection = () => {
   );
 };
 
-/* ─── Institution Plan Card ─── */
-const InstitutionPlanCard = ({ plan, currentPlanId, onSubscribe, isLoading }: {
-  plan: SubscriptionPlan; currentPlanId?: string;
-  onSubscribe: (planId: string, cycle: 'monthly' | 'annual') => void; isLoading: boolean;
-}) => {
-  const isCurrent = plan.id === currentPlanId;
-  const marketplaceFee = (plan.limits as any)?.marketplace_listing_fee;
+/* ─── Static Institution Plans ─── */
+const staticInstitutionPlans = [
+  {
+    name: 'Clinic Basic',
+    price: 20000,
+    description: 'Perfect for small clinics and practices',
+    highlight: false,
+    features: ['Up to 20 beds', 'Up to 10 staff', 'Basic HMS modules', 'Patient management', 'Appointment scheduling', 'Basic reporting'],
+    badges: [{ label: '20 beds' }, { label: '10 staff' }],
+  },
+  {
+    name: 'Hospital Standard',
+    price: 45000,
+    description: 'For mid-size hospitals needing full HMS',
+    highlight: true,
+    features: ['Up to 100 beds', 'Up to 50 staff', 'Full HMS suite', 'Lab & radiology integration', 'Billing & invoicing', 'Advanced analytics', 'Telemedicine support'],
+    badges: [{ label: '100 beds' }, { label: '50 staff' }],
+  },
+  {
+    name: 'Hospital Enterprise',
+    price: 80000,
+    description: 'For large hospitals with advanced needs',
+    highlight: false,
+    features: ['Up to 500 beds', 'Up to 200 staff', 'Full HMS + CXO dashboards', 'Multi-department management', 'IoT device integration', 'Custom reporting', 'Priority support', 'API access'],
+    badges: [{ label: '500 beds' }, { label: '200 staff' }],
+  },
+  {
+    name: 'Custom / Unlimited',
+    price: -1,
+    description: 'Tailored for large networks & government',
+    highlight: false,
+    features: ['Unlimited beds & staff', 'Multi-facility management', 'Dedicated account manager', 'Custom integrations', 'On-premise deployment option', 'SLA guarantees', 'Training & onboarding'],
+    badges: [{ label: 'Unlimited capacity' }],
+  },
+];
+
+const StaticInstitutionCard = ({ plan }: { plan: typeof staticInstitutionPlans[0] }) => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const isContactUs = plan.price === -1;
 
   return (
     <Card className={`relative flex flex-col ${plan.highlight ? 'border-primary shadow-lg shadow-primary/10 scale-[1.02]' : 'border-border'}`}>
@@ -301,25 +334,25 @@ const InstitutionPlanCard = ({ plan, currentPlanId, onSubscribe, isLoading }: {
       </CardHeader>
       <CardContent className="flex-1 space-y-4">
         <div className="text-center">
-          <div className="flex items-baseline justify-center gap-1">
-            <span className="text-4xl font-bold">{formatKwacha(plan.price_annual)}</span>
-            <span className="text-muted-foreground">/year</span>
-          </div>
-          <p className="text-xs text-muted-foreground mt-1">~{formatKwacha(Math.round(plan.price_annual / 12))}/month</p>
+          {isContactUs ? (
+            <span className="text-3xl font-bold">Contact Us</span>
+          ) : (
+            <>
+              <div className="flex items-baseline justify-center gap-1">
+                <span className="text-4xl font-bold">{formatKwacha(plan.price)}</span>
+                <span className="text-muted-foreground">/year</span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">~{formatKwacha(Math.round(plan.price / 12))}/month</p>
+            </>
+          )}
         </div>
         <div className="flex flex-wrap gap-2 justify-center">
-          {plan.max_beds && <Badge variant="outline" className="text-xs">{plan.max_beds} beds</Badge>}
-          {plan.max_users && <Badge variant="outline" className="text-xs">{plan.max_users} staff</Badge>}
-          {plan.max_doctors && <Badge variant="outline" className="text-xs">{plan.max_doctors} doctors</Badge>}
-          {!plan.max_beds && !plan.max_users && <Badge variant="outline" className="text-xs">Unlimited capacity</Badge>}
+          {plan.badges.map((b, i) => (
+            <Badge key={i} variant="outline" className="text-xs">{b.label}</Badge>
+          ))}
         </div>
-        {marketplaceFee && (
-          <div className="text-center p-2 bg-muted/50 rounded-md">
-            <p className="text-xs text-muted-foreground">Optional marketplace listing: <span className="font-medium text-foreground">K{marketplaceFee}/mo</span></p>
-          </div>
-        )}
         <ul className="space-y-2">
-          {(plan.features as string[]).map((feature, i) => (
+          {plan.features.map((feature, i) => (
             <li key={i} className="flex items-start gap-2 text-sm">
               <Check className="h-4 w-4 text-primary shrink-0 mt-0.5" /><span>{feature}</span>
             </li>
@@ -327,11 +360,16 @@ const InstitutionPlanCard = ({ plan, currentPlanId, onSubscribe, isLoading }: {
         </ul>
       </CardContent>
       <CardFooter>
-        <Button className="w-full" variant={plan.highlight ? 'default' : 'outline'}
-          disabled={isCurrent || isLoading} onClick={() => onSubscribe(plan.id, 'annual')}>
-          {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> :
-           isCurrent ? <><Crown className="h-4 w-4 mr-1" /> Current Plan</> : 'Start Annual Plan'}
-        </Button>
+        {isContactUs ? (
+          <Button className="w-full" variant="outline" onClick={() => navigate('/contact')}>
+            Contact Sales
+          </Button>
+        ) : (
+          <Button className="w-full" variant={plan.highlight ? 'default' : 'outline'}
+            onClick={() => !user ? navigate('/auth') : navigate('/institution-dashboard')}>
+            {user ? 'Go to Dashboard' : 'Get Started'}
+          </Button>
+        )}
       </CardFooter>
     </Card>
   );
