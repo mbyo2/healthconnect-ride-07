@@ -184,7 +184,7 @@ export const DocumentAnalysisUploader = () => {
           </Button>
 
           <div className="text-xs text-muted-foreground space-y-1">
-            <p>💡 <strong>Powered by MedGemma 1.5 4B</strong></p>
+            <p>💡 <strong>Powered by Doc' O Clock AI</strong></p>
             <p>• Extracts test names, values, and units from lab reports</p>
             <p>• Reads prescriptions and medication details</p>
             <p>• Processes radiology and pathology reports</p>
@@ -205,7 +205,7 @@ export const DocumentAnalysisUploader = () => {
             <div className="flex flex-col items-center justify-center h-64 text-center">
               <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
               <p className="text-sm text-muted-foreground">
-                Analyzing document with MedGemma 1.5 4B...
+                Analyzing document with Doc' O Clock AI...
               </p>
             </div>
           ) : extractedData ? (

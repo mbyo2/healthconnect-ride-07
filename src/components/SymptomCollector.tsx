@@ -146,7 +146,7 @@ export const SymptomCollector = ({ onSymptomSubmit }: SymptomCollectorProps) => 
         <Card className="border-primary/20 mx-3 sm:mx-0">
           <CardContent className="pt-4 sm:pt-6">
             <h3 className="font-semibold text-base sm:text-lg mb-2 sm:mb-3 flex items-center gap-2">
-              <span className="text-primary">🤖</span> Doc 0 Clock AI Analysis
+              <span className="text-primary">🤖</span> Doc' O Clock AI Analysis
             </h3>
             <div className="prose prose-sm max-w-none text-foreground">
               <p className="whitespace-pre-wrap text-xs sm:text-sm leading-relaxed">{aiAnalysis}</p>

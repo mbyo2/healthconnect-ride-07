@@ -48,7 +48,7 @@ const LinkifiedText = ({ text }: { text: string }) => {
   );
 };
 
-const AI_WELCOME_MESSAGE = "Hello! I'm Doc' O Clock AI powered by MedGemma 1.5 4B, your advanced multimodal medical assistant. I can:\n\n🖼️ Analyze single or multiple medical images\n📊 Compare scans over time (longitudinal analysis)\n📄 Extract data from lab reports and documents\n🎯 Identify anatomical features with localization\n💬 Answer medical questions\n\nHow can I assist you today?";
+const AI_WELCOME_MESSAGE = "Hello! I'm Doc' O Clock AI Assistant, your advanced multimodal medical assistant. I can:\n\n🖼️ Analyze single or multiple medical images\n📊 Compare scans over time (longitudinal analysis)\n📄 Extract data from lab reports and documents\n🎯 Identify anatomical features with localization\n💬 Answer medical questions\n\nHow can I assist you today?";
 
 interface MedGemmaChatProps {
   onActionClick?: (action: ClinicalAction) => void;
@@ -563,7 +563,7 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
           <div className="mt-3 flex items-center gap-2">
             <div className="flex-1">
               <p className="text-xs text-muted-foreground leading-relaxed">
-                💡 <strong>Powered by MedGemma 1.5 4B</strong> • Upload up to 10 medical images for AI analysis • Supports longitudinal comparison & document extraction
+                💡 <strong>Powered by Doc' O Clock AI</strong> • Upload up to 10 medical images for AI analysis • Supports longitudinal comparison & document extraction
               </p>
             </div>
           </div>
