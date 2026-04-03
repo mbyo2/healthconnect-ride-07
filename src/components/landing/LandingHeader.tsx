@@ -73,15 +73,23 @@ export const LandingHeader = ({ scrolled }: LandingHeaderProps) => {
       {mobileMenuOpen && (
         <div className="lg:hidden bg-background/98 backdrop-blur-xl border-b border-border animate-in slide-in-from-top-2 duration-200">
           <nav className="mx-auto max-w-7xl px-4 py-4 space-y-1">
-            {[...NAV_ITEMS, { label: "Sign In", route: "/auth" }].map((item) => (
-              <button
-                key={item.label}
-                className="w-full text-left px-4 py-3 rounded-lg text-sm font-medium text-foreground hover:bg-muted transition-colors"
-                onClick={() => { navigate(item.route); setMobileMenuOpen(false); }}
-              >
-                {item.label}
-              </button>
-            ))}
+            {[...NAV_ITEMS, { label: "Sign In", route: "/auth" }].map((item) => {
+              const active = isActive(item.route);
+              return (
+                <button
+                  key={item.label}
+                  className={`w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-colors
+                    ${active
+                      ? 'text-primary bg-primary/10 border-l-2 border-primary'
+                      : 'text-foreground hover:bg-muted'
+                    }
+                  `}
+                  onClick={() => { navigate(item.route); setMobileMenuOpen(false); }}
+                >
+                  {item.label}
+                </button>
+              );
+            })}
           </nav>
         </div>
       )}
