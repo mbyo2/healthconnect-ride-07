@@ -63,7 +63,7 @@ const PaymentSuccess = () => {
         } else {
           // No valid payment parameters
           toast.error("Invalid payment session");
-          navigate("/");
+          navigate("/dashboard");
           return;
         }
       } catch (error) {

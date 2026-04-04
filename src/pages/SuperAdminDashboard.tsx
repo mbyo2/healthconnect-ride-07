@@ -70,7 +70,7 @@ const SuperAdminDashboard = () => {
       } catch (error) {
         console.error("Error checking permissions:", error);
         toast.error("Error checking permissions");
-        navigate("/");
+        navigate("/dashboard");
       }
     };
 
