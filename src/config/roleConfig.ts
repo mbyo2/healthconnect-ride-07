@@ -106,6 +106,7 @@ export const ROLE_PRIORITY: UserRole[] = [
 export const COMMON_ROUTES = [
   '/',
   '/home',
+  '/dashboard',
   '/onboarding',
   '/profile',
   '/settings',
