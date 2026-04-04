@@ -379,7 +379,7 @@ const StaticInstitutionCard = ({ plan }: { plan: typeof staticInstitutionPlans[0
 export const PricingPage = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { data: plans, isLoading: plansLoading } = useSubscriptionPlans();
+  const { data: plans } = useSubscriptionPlans();
   const { data: currentSub } = useUserSubscription();
   const subscribeMutation = useSubscribeToPlan();
 
@@ -387,12 +387,6 @@ export const PricingPage = () => {
     if (!user) { navigate('/auth'); return; }
     subscribeMutation.mutate({ planId, billingCycle: cycle });
   };
-
-  const institutionPlans = plans?.filter(p => p.target_audience === 'institution') || [];
-
-  if (plansLoading) {
-    return <div className="flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
-  }
 
   return (
     <>

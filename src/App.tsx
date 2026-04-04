@@ -155,9 +155,12 @@ const AppContent = () => {
               }
             />
 
-            {/* Main App Route - role-based redirect */}
+            {/* Landing page is the main entry point for everyone */}
+            <Route path="/" element={<Landing />} />
+
+            {/* Authenticated role-based dashboard redirect */}
             <Route
-              path="/"
+              path="/dashboard"
               element={
                 isLoading ? (
                   <LoadingScreen />
@@ -168,7 +171,7 @@ const AppContent = () => {
                     <RoleRedirect />
                   )
                 ) : (
-                  <Navigate to="/landing" replace={true} />
+                  <Navigate to="/auth" replace={true} />
                 )
               }
             />

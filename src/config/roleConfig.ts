@@ -145,10 +145,12 @@ export const INSTITUTION_OPERATIONAL_ROUTES = [
 ];
 
 export const PUBLIC_ROUTES = [
+  '/',
   '/auth',
   '/login',
   '/register',
   '/landing',
+  '/dashboard',
   '/healthcare-professionals',
   '/healthcare-institutions',
   '/healthcare-application',
