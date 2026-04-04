@@ -93,7 +93,7 @@ export const Auth = () => {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session?.user) navigate("/home");
+      if (data.session?.user) navigate("/dashboard");
       setAuthLoading(false);
     });
   }, [navigate]);
