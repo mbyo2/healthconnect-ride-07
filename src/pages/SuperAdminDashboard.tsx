@@ -59,7 +59,7 @@ const SuperAdminDashboard = () => {
 
         if (profile?.admin_level !== 'superadmin') {
           toast.error("You don't have permission to access this page");
-          navigate("/");
+          navigate("/dashboard");
           return;
         }
 
