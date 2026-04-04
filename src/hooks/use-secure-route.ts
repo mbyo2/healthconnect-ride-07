@@ -51,7 +51,7 @@ export function useSecureRoute(options: SecureRouteOptions = {}) {
       
       // For other roles, check profile.role
       if (!profile?.role || !roles.includes(profile.role as any)) {
-        navigate("/");
+        navigate("/dashboard");
         setIsAuthorized(false);
         return;
       }

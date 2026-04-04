@@ -70,7 +70,7 @@ export const PatientProfileSetup = () => {
       if (error) throw error;
       showSuccess("Profile setup completed successfully!");
       toast.success("Profile setup completed successfully!");
-      navigate('/');
+      navigate('/dashboard');
     } catch (error: any) {
       const errorMessage = error.message || "Failed to complete profile setup";
       showError(errorMessage);

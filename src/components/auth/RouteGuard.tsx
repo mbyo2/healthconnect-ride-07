@@ -47,8 +47,8 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
         // If we are stuck on a page we don't have permission for, and it's the landing page,
         // something is wrong with rolePermissions.ts or availableRoles.
         // Fallback to home if not already there
-        if (currentPath !== '/') {
-          navigate('/', { replace: true });
+        if (currentPath !== '/dashboard') {
+          navigate('/dashboard', { replace: true });
         }
       }
     }
