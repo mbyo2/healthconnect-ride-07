@@ -148,7 +148,7 @@ const AppContent = () => {
                 isLoading ? (
                   <LoadingScreen />
                 ) : user ? (
-                  <Navigate to="/" replace={true} />
+                  <Navigate to="/dashboard" replace={true} />
                 ) : (
                   <Auth />
                 )
