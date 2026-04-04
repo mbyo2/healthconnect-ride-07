@@ -93,7 +93,7 @@ export const Auth = () => {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session?.user) navigate("/home");
+      if (data.session?.user) navigate("/dashboard");
       setAuthLoading(false);
     });
   }, [navigate]);
@@ -111,7 +111,7 @@ export const Auth = () => {
     setLocalLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email: data.email, password: data.password });
     if (error) showError(error.message);
-    else navigate("/home");
+    else navigate("/dashboard");
     setLocalLoading(false);
   };
 

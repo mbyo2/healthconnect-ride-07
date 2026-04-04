@@ -77,7 +77,7 @@ export const ProfileSetup = () => {
 
       if (error) throw error;
       toast.success("Profile completed!");
-      navigate('/');
+      navigate('/dashboard');
     } catch (error: any) {
       toast.error(error.message);
     } finally {

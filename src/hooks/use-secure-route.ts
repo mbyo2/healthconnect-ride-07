@@ -44,14 +44,14 @@ export function useSecureRoute(options: SecureRouteOptions = {}) {
       
       // For admin role, check admin_level
       if (roles.includes("admin") && (!profile?.admin_level || !adminLevels.includes(profile.admin_level as any))) {
-        navigate("/");
+        navigate("/dashboard");
         setIsAuthorized(false);
         return;
       }
       
       // For other roles, check profile.role
       if (!profile?.role || !roles.includes(profile.role as any)) {
-        navigate("/");
+        navigate("/dashboard");
         setIsAuthorized(false);
         return;
       }

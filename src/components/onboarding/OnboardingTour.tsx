@@ -117,8 +117,8 @@ export function OnboardingTour({ onComplete }: { onComplete?: () => void }) {
 
   const handleSkip = () => {
     // Return to home if not on home already
-    if (location.pathname !== '/') {
-      navigate('/');
+    if (location.pathname !== '/dashboard') {
+      navigate('/dashboard');
     }
     handleComplete();
   };

@@ -72,7 +72,7 @@ export default function ResetPassword() {
       setSuccess(true);
       showSuccess("Password updated successfully!");
       setTimeout(() => {
-        navigate("/home");
+        navigate("/dashboard");
       }, 2000);
     }
   };
