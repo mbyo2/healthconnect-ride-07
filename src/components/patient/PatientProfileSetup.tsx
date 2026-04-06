@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,6 +16,7 @@ import { useFeedbackSystem } from "@/hooks/use-feedback-system";
 
 export const PatientProfileSetup = () => {
   const navigate = useNavigate();
+  const { refreshProfile } = useAuth();
   const [loading, setLoading] = useState(false);
   const [avatar, setAvatar] = useState<File | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
@@ -68,9 +70,10 @@ export const PatientProfileSetup = () => {
         ...formData, avatar_url: avatarUrl, is_profile_complete: true,
       }).eq('id', user.id);
       if (error) throw error;
+      await refreshProfile();
       showSuccess("Profile setup completed successfully!");
       toast.success("Profile setup completed successfully!");
-      navigate('/dashboard');
+      navigate('/dashboard', { replace: true });
     } catch (error: any) {
       const errorMessage = error.message || "Failed to complete profile setup";
       showError(errorMessage);
