@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,6 +12,7 @@ import { Loader2 } from "lucide-react";
 
 export const ProfileSetup = () => {
   const navigate = useNavigate();
+  const { refreshProfile } = useAuth();
   const [loading, setLoading] = useState(false);
   const [userRole, setUserRole] = useState<string>('patient');
   const [avatar, setAvatar] = useState<File | null>(null);
@@ -77,8 +79,9 @@ export const ProfileSetup = () => {
       }).eq('id', user.id);
 
       if (error) throw error;
+      await refreshProfile();
       toast.success("Profile completed!");
-      navigate('/dashboard');
+      navigate('/dashboard', { replace: true });
     } catch (error: any) {
       toast.error(error.message);
     } finally {
