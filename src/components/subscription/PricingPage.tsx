@@ -16,6 +16,17 @@ const formatKwacha = (amount: number) => {
   return `K${amount.toLocaleString()}`;
 };
 
+/* ─── Patient CTA ─── */
+const PatientCTA = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  return (
+    <Button size="lg" onClick={() => !user ? navigate('/auth?tab=signup&path=patient') : navigate('/home')}>
+      {user ? 'Go to Dashboard' : 'Sign Up Free'}
+    </Button>
+  );
+};
+
 /* ─── Patient Section ─── */
 const PatientFreeSection = () => (
   <div className="max-w-3xl mx-auto space-y-6">
@@ -71,10 +82,11 @@ const PatientFreeSection = () => (
           </div>
         </div>
       </CardContent>
-      <CardFooter className="justify-center pt-2">
+      <CardFooter className="flex flex-col items-center gap-3 pt-2">
         <Badge variant="secondary" className="text-sm px-4 py-1.5 gap-1">
           <Shield className="h-3.5 w-3.5" /> Zero platform fees for patients. Ever.
         </Badge>
+        <PatientCTA />
       </CardFooter>
     </Card>
   </div>
@@ -204,7 +216,7 @@ const ProviderPayPerBookingSection = () => {
       )}
 
       <div className="text-center">
-        <Button size="lg" onClick={() => !user ? navigate('/auth') : navigate('/provider-dashboard')}>
+        <Button size="lg" onClick={() => !user ? navigate('/auth?tab=signup&path=provider') : navigate('/provider-dashboard')}>
           {user ? 'Go to Dashboard' : 'Get Started Free'}
         </Button>
         <p className="text-xs text-muted-foreground mt-2">No credit card required · Start getting patients today</p>
@@ -271,7 +283,7 @@ const PharmacySection = () => {
           </div>
         </CardContent>
         <CardFooter className="justify-center">
-          <Button onClick={() => !user ? navigate('/auth') : navigate('/pharmacy')}>
+          <Button onClick={() => !user ? navigate('/auth?tab=signup&path=business') : navigate('/pharmacy-portal')}>
             {user ? 'Go to Pharmacy Dashboard' : 'Get Started'}
           </Button>
         </CardFooter>
@@ -366,7 +378,7 @@ const StaticInstitutionCard = ({ plan }: { plan: typeof staticInstitutionPlans[0
           </Button>
         ) : (
           <Button className="w-full" variant={plan.highlight ? 'default' : 'outline'}
-            onClick={() => !user ? navigate('/auth') : navigate('/institution-dashboard')}>
+            onClick={() => !user ? navigate('/auth?tab=signup&path=business') : navigate('/institution-dashboard')}>
             {user ? 'Go to Dashboard' : 'Get Started'}
           </Button>
         )}
