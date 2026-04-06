@@ -87,7 +87,8 @@ export const Auth = () => {
   const [localLoading, setLocalLoading] = useState(false);
   const [authLoading, setAuthLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "signin");
-  const [signupPath, setSignupPath] = useState<SignupPath>(null);
+  const pathParam = searchParams.get("path") as SignupPath;
+  const [signupPath, setSignupPath] = useState<SignupPath>(pathParam || null);
   const [showPassword, setShowPassword] = useState(false);
   const { showSuccess, showError } = useFeedbackSystem();
 
