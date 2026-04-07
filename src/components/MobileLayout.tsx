@@ -29,7 +29,10 @@ export const MobileLayout = ({ children, isLoading }: MobileLayoutProps) => {
   }
 
   // Standalone pages render without global chrome
-  if (STANDALONE_ROUTES.includes(location.pathname)) {
+  const isStandalone = STANDALONE_ROUTES.includes(location.pathname) || 
+    (location.pathname === '/' && !isAuthenticated);
+  
+  if (isStandalone) {
     return <>{children}</>;
   }
 
