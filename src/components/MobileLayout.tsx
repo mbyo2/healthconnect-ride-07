@@ -17,7 +17,7 @@ interface MobileLayoutProps {
   isLoading?: boolean;
 }
 
-const STANDALONE_ROUTES = ['/', '/landing', '/auth', '/reset-password', '/terms', '/privacy'];
+const STANDALONE_ROUTES = ['/landing', '/auth', '/reset-password', '/terms', '/privacy'];
 
 export const MobileLayout = ({ children, isLoading }: MobileLayoutProps) => {
   const { isDesktop } = useDeviceType();
@@ -29,7 +29,10 @@ export const MobileLayout = ({ children, isLoading }: MobileLayoutProps) => {
   }
 
   // Standalone pages render without global chrome
-  if (STANDALONE_ROUTES.includes(location.pathname)) {
+  const isStandalone = STANDALONE_ROUTES.includes(location.pathname) || 
+    (location.pathname === '/' && !isAuthenticated);
+  
+  if (isStandalone) {
     return <>{children}</>;
   }
 
