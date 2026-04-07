@@ -155,8 +155,23 @@ const AppContent = () => {
               }
             />
 
-            {/* Landing page is the main entry point for everyone */}
-            <Route path="/" element={<Landing />} />
+            {/* Landing page for unauthenticated users; authenticated users go to dashboard */}
+            <Route
+              path="/"
+              element={
+                isLoading ? (
+                  <LoadingScreen />
+                ) : user ? (
+                  isNewUser ? (
+                    <Navigate to="/onboarding" replace={true} />
+                  ) : (
+                    <Navigate to="/dashboard" replace={true} />
+                  )
+                ) : (
+                  <Landing />
+                )
+              }
+            />
 
             {/* Authenticated role-based dashboard redirect */}
             <Route
