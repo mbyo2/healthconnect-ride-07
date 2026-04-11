@@ -17,7 +17,7 @@ interface MobileLayoutProps {
   isLoading?: boolean;
 }
 
-const STANDALONE_ROUTES = ['/landing', '/auth', '/reset-password', '/terms', '/privacy'];
+const STANDALONE_ROUTES = ['/landing', '/auth', '/reset-password', '/terms', '/privacy', '/pricing'];
 
 export const MobileLayout = ({ children, isLoading }: MobileLayoutProps) => {
   const { isDesktop } = useDeviceType();

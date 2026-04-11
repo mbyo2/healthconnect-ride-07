@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
@@ -153,7 +152,7 @@ const Emergency = () => {
   };
 
   return (
-    <ProtectedRoute>
+    <>
       <div className="min-h-screen bg-background">
         <main className="container mx-auto px-4 py-6 space-y-6 max-w-7xl">
           <div className="space-y-6">
@@ -396,7 +395,7 @@ const Emergency = () => {
           </div>
         </main>
       </div>
-    </ProtectedRoute>
+    </>
   );
 };
 
