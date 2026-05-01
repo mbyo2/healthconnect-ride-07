@@ -118,12 +118,43 @@ export const InsuranceCardUpload = () => {
 
   const statusBadge = (status: string) => {
     switch (status) {
-      case 'verified': return <Badge className="bg-emerald-500/10 text-emerald-700"><CheckCircle2 className="h-3 w-3 mr-1" />Verified</Badge>;
-      case 'pending': return <Badge variant="secondary"><Loader2 className="h-3 w-3 mr-1 animate-spin" />Pending</Badge>;
-      case 'failed': return <Badge variant="destructive"><AlertCircle className="h-3 w-3 mr-1" />Failed</Badge>;
+      case 'verified': return <Badge className="bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"><CheckCircle2 className="h-3 w-3 mr-1" />Verified</Badge>;
+      case 'pending': return <Badge variant="secondary"><Loader2 className="h-3 w-3 mr-1 animate-spin" />Verifying</Badge>;
+      case 'failed': return <Badge variant="destructive"><AlertCircle className="h-3 w-3 mr-1" />Verification Failed</Badge>;
+      case 'expired': return <Badge variant="outline" className="border-amber-500 text-amber-700 dark:text-amber-300">Expired</Badge>;
       default: return <Badge variant="outline">{status}</Badge>;
     }
   };
+
+  const retryVerification = async (cardId: string) => {
+    const { error } = await (supabase as any)
+      .from('insurance_cards')
+      .update({ verification_status: 'pending', verification_notes: null })
+      .eq('id', cardId);
+    if (error) {
+      toast.error('Failed to retry verification');
+      return;
+    }
+    toast.success('Re-submitting for verification...');
+    queryClient.invalidateQueries({ queryKey: ['insurance-cards'] });
+  };
+
+  const deleteCard = async (cardId: string) => {
+    const { error } = await (supabase as any)
+      .from('insurance_cards')
+      .delete()
+      .eq('id', cardId);
+    if (error) {
+      toast.error('Failed to delete card');
+      return;
+    }
+    toast.success('Card removed. You can upload a new one.');
+    queryClient.invalidateQueries({ queryKey: ['insurance-cards'] });
+  };
+
+  const latestCard = cards[0];
+  const showFailedBanner = latestCard && latestCard.verification_status === 'failed';
+  const showVerifiedBanner = latestCard && latestCard.verification_status === 'verified';
 
   return (
     <div className="space-y-6">
