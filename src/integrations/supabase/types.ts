@@ -262,6 +262,60 @@ export type Database = {
         }
         Relationships: []
       }
+      appointment_waitlist: {
+        Row: {
+          cancelled_at: string | null
+          created_at: string
+          expires_at: string | null
+          id: string
+          notes: string | null
+          notified_at: string | null
+          patient_id: string
+          preferred_date_end: string | null
+          preferred_date_start: string | null
+          preferred_time_end: string | null
+          preferred_time_start: string | null
+          provider_id: string
+          status: string
+          updated_at: string
+          urgency: string
+        }
+        Insert: {
+          cancelled_at?: string | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          notes?: string | null
+          notified_at?: string | null
+          patient_id: string
+          preferred_date_end?: string | null
+          preferred_date_start?: string | null
+          preferred_time_end?: string | null
+          preferred_time_start?: string | null
+          provider_id: string
+          status?: string
+          updated_at?: string
+          urgency?: string
+        }
+        Update: {
+          cancelled_at?: string | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          notes?: string | null
+          notified_at?: string | null
+          patient_id?: string
+          preferred_date_end?: string | null
+          preferred_date_start?: string | null
+          preferred_time_end?: string | null
+          preferred_time_start?: string | null
+          provider_id?: string
+          status?: string
+          updated_at?: string
+          urgency?: string
+        }
+        Relationships: []
+      }
       appointments: {
         Row: {
           created_at: string
@@ -3041,6 +3095,39 @@ export type Database = {
           id?: string
           institution_id?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      insurance_cards: {
+        Row: {
+          back_image_url: string | null
+          created_at: string
+          front_image_url: string
+          id: string
+          ocr_data: Json | null
+          patient_id: string
+          updated_at: string
+          verification_status: string
+        }
+        Insert: {
+          back_image_url?: string | null
+          created_at?: string
+          front_image_url: string
+          id?: string
+          ocr_data?: Json | null
+          patient_id: string
+          updated_at?: string
+          verification_status?: string
+        }
+        Update: {
+          back_image_url?: string | null
+          created_at?: string
+          front_image_url?: string
+          id?: string
+          ocr_data?: Json | null
+          patient_id?: string
+          updated_at?: string
+          verification_status?: string
         }
         Relationships: []
       }

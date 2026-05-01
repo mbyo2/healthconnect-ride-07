@@ -100,6 +100,10 @@ const RoleManagement = lazyWithRetry(() => import('@/pages/RoleManagement'));
 const IntakeForm = lazyWithRetry(() => import('@/pages/IntakeForm'));
 const BookingConfirmed = lazyWithRetry(() => import('@/pages/BookingConfirmed'));
 const Pricing = lazyWithRetry(() => import('@/pages/Pricing'));
+const InsuranceCards = lazyWithRetry(() => import('@/pages/InsuranceCards'));
+const CostEstimatorPage = lazyWithRetry(() => import('@/pages/CostEstimatorPage'));
+const WaitlistPage = lazyWithRetry(() => import('@/pages/WaitlistPage'));
+const AppointmentReminders = lazyWithRetry(() => import('@/pages/AppointmentReminders'));
 
 import { RoleRedirect } from '@/components/auth/RoleRedirect';
 
@@ -221,6 +225,10 @@ const AppContent = () => {
             <Route path="/video-consultations" element={<RouteGuard><VideoConsultations /></RouteGuard>} />
             <Route path="/health-dashboard" element={<RouteGuard><HealthDashboard /></RouteGuard>} />
             <Route path="/wallet" element={<RouteGuard><Wallet /></RouteGuard>} />
+            <Route path="/insurance-cards" element={<RouteGuard><InsuranceCards /></RouteGuard>} />
+            <Route path="/cost-estimator" element={<RouteGuard><CostEstimatorPage /></RouteGuard>} />
+            <Route path="/waitlist" element={<RouteGuard><WaitlistPage /></RouteGuard>} />
+            <Route path="/appointment-reminders" element={<RouteGuard><AppointmentReminders /></RouteGuard>} />
 
             {/* Advanced Features */}
             <Route path="/advanced-dashboard" element={<RouteGuard><AdvancedDashboard /></RouteGuard>} />
