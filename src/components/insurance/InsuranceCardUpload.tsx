@@ -4,11 +4,12 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Camera, Upload, CreditCard, CheckCircle2, AlertCircle, Loader2, X, Shield } from 'lucide-react';
+import { Camera, Upload, CreditCard, CheckCircle2, AlertCircle, Loader2, X, Shield, RefreshCw, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 interface InsuranceCard {
   id: string;
@@ -16,6 +17,7 @@ interface InsuranceCard {
   back_image_url: string | null;
   verification_status: string;
   ocr_data: Record<string, string>;
+  verification_notes?: string | null;
   created_at: string;
 }
 
