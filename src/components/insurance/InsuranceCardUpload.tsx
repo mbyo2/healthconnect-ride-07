@@ -158,6 +158,36 @@ export const InsuranceCardUpload = () => {
 
   return (
     <div className="space-y-6">
+      {showVerifiedBanner && (
+        <Alert className="border-emerald-500/30 bg-emerald-500/5">
+          <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+          <AlertTitle className="text-emerald-700 dark:text-emerald-300">Insurance verified</AlertTitle>
+          <AlertDescription>
+            Your most recent card was successfully verified. You'll see accurate cost estimates at booking.
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {showFailedBanner && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Verification failed</AlertTitle>
+          <AlertDescription className="space-y-2">
+            <p>{latestCard.verification_notes || 'We couldn\'t verify your insurance. Common causes: blurry photo, glare, expired card, or mismatched policy number.'}</p>
+            <div className="flex gap-2 mt-2">
+              <Button size="sm" variant="outline" onClick={() => retryVerification(latestCard.id)}>
+                <RefreshCw className="h-3.5 w-3.5 mr-1.5" />
+                Retry verification
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => deleteCard(latestCard.id)}>
+                <Trash2 className="h-3.5 w-3.5 mr-1.5" />
+                Delete & re-upload
+              </Button>
+            </div>
+          </AlertDescription>
+        </Alert>
+      )}
+
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -258,17 +288,30 @@ export const InsuranceCardUpload = () => {
           <CardContent>
             <div className="space-y-3">
               {cards.map((card) => (
-                <div key={card.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <CreditCard className="h-5 w-5 text-primary" />
-                    <div>
-                      <p className="text-sm font-medium">{card.ocr_data?.provider_name || 'Insurance Card'}</p>
+                <div key={card.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 bg-muted/50 rounded-lg">
+                  <div className="flex items-center gap-3 flex-1">
+                    <CreditCard className="h-5 w-5 text-primary flex-shrink-0" />
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium truncate">{card.ocr_data?.provider_name || 'Insurance Card'}</p>
                       <p className="text-xs text-muted-foreground">
                         {card.ocr_data?.policy_number || 'No policy number'} • Uploaded {new Date(card.created_at).toLocaleDateString()}
                       </p>
+                      {card.verification_status === 'failed' && card.verification_notes && (
+                        <p className="text-xs text-destructive mt-1">{card.verification_notes}</p>
+                      )}
                     </div>
                   </div>
-                  {statusBadge(card.verification_status)}
+                  <div className="flex items-center gap-2">
+                    {statusBadge(card.verification_status)}
+                    {card.verification_status === 'failed' && (
+                      <Button size="sm" variant="ghost" onClick={() => retryVerification(card.id)} className="h-8 px-2">
+                        <RefreshCw className="h-3.5 w-3.5" />
+                      </Button>
+                    )}
+                    <Button size="sm" variant="ghost" onClick={() => deleteCard(card.id)} className="h-8 px-2 text-muted-foreground">
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>
