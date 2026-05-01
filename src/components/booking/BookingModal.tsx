@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { WaitlistSignup } from "./WaitlistSignup";
+import { CostBreakdown } from "./CostBreakdown";
 
 interface BookingModalProps {
   provider: Provider;
@@ -363,6 +364,12 @@ export const BookingModal = ({ provider, isOpen, onClose }: BookingModalProps) =
           </div>
         </div>
       </div>
+
+      <CostBreakdown
+        appointmentType={appointmentType}
+        visitType={visitType}
+        specialty={provider.specialty}
+      />
 
       <div>
         <Label htmlFor="reason" className="text-sm font-medium">
