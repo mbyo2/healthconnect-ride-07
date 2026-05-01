@@ -194,7 +194,7 @@ export const PatientWorkflow = React.memo(() => {
         <div>
           <h2 className="text-lg sm:text-xl font-bold mb-4 px-1 text-foreground">Insurance & Scheduling</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-            <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer border border-border shadow-sm bg-card hover:-translate-y-1 active:scale-95" onClick={() => handleNavigation('/profile', 'Insurance Card Upload')}>
+            <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer border border-border shadow-sm bg-card hover:-translate-y-1 active:scale-95" onClick={() => handleNavigation('/insurance-cards', 'Insurance Card Upload')}>
               <CardHeader className="pb-2 md:pb-3">
                 <div className="flex items-center gap-2">
                   <div className="p-2 bg-teal-500/10 dark:bg-teal-500/20 rounded-lg group-hover:bg-teal-500/20 transition-colors">
@@ -208,7 +208,7 @@ export const PatientWorkflow = React.memo(() => {
               </CardContent>
             </Card>
 
-            <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer border border-border shadow-sm bg-card hover:-translate-y-1 active:scale-95" onClick={() => handleNavigation('/marketplace-users', 'Cost Estimator')}>
+            <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer border border-border shadow-sm bg-card hover:-translate-y-1 active:scale-95" onClick={() => handleNavigation('/cost-estimator', 'Cost Estimator')}>
               <CardHeader className="pb-2 md:pb-3">
                 <div className="flex items-center gap-2">
                   <div className="p-2 bg-orange-500/10 dark:bg-orange-500/20 rounded-lg group-hover:bg-orange-500/20 transition-colors">
@@ -222,7 +222,7 @@ export const PatientWorkflow = React.memo(() => {
               </CardContent>
             </Card>
 
-            <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer border border-border shadow-sm bg-card hover:-translate-y-1 active:scale-95" onClick={() => handleNavigation('/appointments', 'Waitlist')}>
+            <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer border border-border shadow-sm bg-card hover:-translate-y-1 active:scale-95" onClick={() => handleNavigation('/waitlist', 'Waitlist')}>
               <CardHeader className="pb-2 md:pb-3">
                 <div className="flex items-center gap-2">
                   <div className="p-2 bg-indigo-500/10 dark:bg-indigo-500/20 rounded-lg group-hover:bg-indigo-500/20 transition-colors">
@@ -236,7 +236,7 @@ export const PatientWorkflow = React.memo(() => {
               </CardContent>
             </Card>
 
-            <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer border border-border shadow-sm bg-card hover:-translate-y-1 active:scale-95" onClick={() => handleNavigation('/appointments', 'Reminders')}>
+            <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer border border-border shadow-sm bg-card hover:-translate-y-1 active:scale-95" onClick={() => handleNavigation('/appointment-reminders', 'Reminders')}>
               <CardHeader className="pb-2 md:pb-3">
                 <div className="flex items-center gap-2">
                   <div className="p-2 bg-pink-500/10 dark:bg-pink-500/20 rounded-lg group-hover:bg-pink-500/20 transition-colors">
