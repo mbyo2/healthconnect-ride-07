@@ -4,11 +4,12 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Camera, Upload, CreditCard, CheckCircle2, AlertCircle, Loader2, X, Shield } from 'lucide-react';
+import { Camera, Upload, CreditCard, CheckCircle2, AlertCircle, Loader2, X, Shield, RefreshCw, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 interface InsuranceCard {
   id: string;
@@ -16,6 +17,7 @@ interface InsuranceCard {
   back_image_url: string | null;
   verification_status: string;
   ocr_data: Record<string, string>;
+  verification_notes?: string | null;
   created_at: string;
 }
 
@@ -116,15 +118,76 @@ export const InsuranceCardUpload = () => {
 
   const statusBadge = (status: string) => {
     switch (status) {
-      case 'verified': return <Badge className="bg-emerald-500/10 text-emerald-700"><CheckCircle2 className="h-3 w-3 mr-1" />Verified</Badge>;
-      case 'pending': return <Badge variant="secondary"><Loader2 className="h-3 w-3 mr-1 animate-spin" />Pending</Badge>;
-      case 'failed': return <Badge variant="destructive"><AlertCircle className="h-3 w-3 mr-1" />Failed</Badge>;
+      case 'verified': return <Badge className="bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"><CheckCircle2 className="h-3 w-3 mr-1" />Verified</Badge>;
+      case 'pending': return <Badge variant="secondary"><Loader2 className="h-3 w-3 mr-1 animate-spin" />Verifying</Badge>;
+      case 'failed': return <Badge variant="destructive"><AlertCircle className="h-3 w-3 mr-1" />Verification Failed</Badge>;
+      case 'expired': return <Badge variant="outline" className="border-amber-500 text-amber-700 dark:text-amber-300">Expired</Badge>;
       default: return <Badge variant="outline">{status}</Badge>;
     }
   };
 
+  const retryVerification = async (cardId: string) => {
+    const { error } = await (supabase as any)
+      .from('insurance_cards')
+      .update({ verification_status: 'pending', verification_notes: null })
+      .eq('id', cardId);
+    if (error) {
+      toast.error('Failed to retry verification');
+      return;
+    }
+    toast.success('Re-submitting for verification...');
+    queryClient.invalidateQueries({ queryKey: ['insurance-cards'] });
+  };
+
+  const deleteCard = async (cardId: string) => {
+    const { error } = await (supabase as any)
+      .from('insurance_cards')
+      .delete()
+      .eq('id', cardId);
+    if (error) {
+      toast.error('Failed to delete card');
+      return;
+    }
+    toast.success('Card removed. You can upload a new one.');
+    queryClient.invalidateQueries({ queryKey: ['insurance-cards'] });
+  };
+
+  const latestCard = cards[0];
+  const showFailedBanner = latestCard && latestCard.verification_status === 'failed';
+  const showVerifiedBanner = latestCard && latestCard.verification_status === 'verified';
+
   return (
     <div className="space-y-6">
+      {showVerifiedBanner && (
+        <Alert className="border-emerald-500/30 bg-emerald-500/5">
+          <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+          <AlertTitle className="text-emerald-700 dark:text-emerald-300">Insurance verified</AlertTitle>
+          <AlertDescription>
+            Your most recent card was successfully verified. You'll see accurate cost estimates at booking.
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {showFailedBanner && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Verification failed</AlertTitle>
+          <AlertDescription className="space-y-2">
+            <p>{latestCard.verification_notes || 'We couldn\'t verify your insurance. Common causes: blurry photo, glare, expired card, or mismatched policy number.'}</p>
+            <div className="flex gap-2 mt-2">
+              <Button size="sm" variant="outline" onClick={() => retryVerification(latestCard.id)}>
+                <RefreshCw className="h-3.5 w-3.5 mr-1.5" />
+                Retry verification
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => deleteCard(latestCard.id)}>
+                <Trash2 className="h-3.5 w-3.5 mr-1.5" />
+                Delete & re-upload
+              </Button>
+            </div>
+          </AlertDescription>
+        </Alert>
+      )}
+
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -225,17 +288,30 @@ export const InsuranceCardUpload = () => {
           <CardContent>
             <div className="space-y-3">
               {cards.map((card) => (
-                <div key={card.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <CreditCard className="h-5 w-5 text-primary" />
-                    <div>
-                      <p className="text-sm font-medium">{card.ocr_data?.provider_name || 'Insurance Card'}</p>
+                <div key={card.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 bg-muted/50 rounded-lg">
+                  <div className="flex items-center gap-3 flex-1">
+                    <CreditCard className="h-5 w-5 text-primary flex-shrink-0" />
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium truncate">{card.ocr_data?.provider_name || 'Insurance Card'}</p>
                       <p className="text-xs text-muted-foreground">
                         {card.ocr_data?.policy_number || 'No policy number'} • Uploaded {new Date(card.created_at).toLocaleDateString()}
                       </p>
+                      {card.verification_status === 'failed' && card.verification_notes && (
+                        <p className="text-xs text-destructive mt-1">{card.verification_notes}</p>
+                      )}
                     </div>
                   </div>
-                  {statusBadge(card.verification_status)}
+                  <div className="flex items-center gap-2">
+                    {statusBadge(card.verification_status)}
+                    {card.verification_status === 'failed' && (
+                      <Button size="sm" variant="ghost" onClick={() => retryVerification(card.id)} className="h-8 px-2">
+                        <RefreshCw className="h-3.5 w-3.5" />
+                      </Button>
+                    )}
+                    <Button size="sm" variant="ghost" onClick={() => deleteCard(card.id)} className="h-8 px-2 text-muted-foreground">
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>
