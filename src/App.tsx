@@ -104,6 +104,7 @@ const InsuranceCards = lazyWithRetry(() => import('@/pages/InsuranceCards'));
 const CostEstimatorPage = lazyWithRetry(() => import('@/pages/CostEstimatorPage'));
 const WaitlistPage = lazyWithRetry(() => import('@/pages/WaitlistPage'));
 const AppointmentReminders = lazyWithRetry(() => import('@/pages/AppointmentReminders'));
+const AcceptInvitation = lazyWithRetry(() => import('@/pages/AcceptInvitation'));
 
 import { RoleRedirect } from '@/components/auth/RoleRedirect';
 
@@ -136,6 +137,7 @@ const AppContent = () => {
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/accept-invitation" element={<AcceptInvitation />} />
             {/* Public search & provider pages (ZocDoc-style) */}
             <Route path="/search" element={<SearchPage />} />
             <Route path="/providers" element={<Providers />} />
