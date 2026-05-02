@@ -92,16 +92,19 @@ export const Auth = () => {
   const [showPassword, setShowPassword] = useState(false);
   const { showSuccess, showError } = useFeedbackSystem();
 
+  const redirectParam = searchParams.get("redirect");
+  const redirectTo = redirectParam && redirectParam.startsWith("/") ? redirectParam : "/dashboard";
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session?.user) navigate("/dashboard");
+      if (data.session?.user) navigate(redirectTo);
       setAuthLoading(false);
     });
-  }, [navigate]);
+  }, [navigate, redirectTo]);
 
   const loginForm = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { email: "", password: "" },
+    defaultValues: { email: searchParams.get("email") || "", password: "" },
   });
   const patientForm = useForm<z.infer<typeof patientSchema>>({ resolver: zodResolver(patientSchema), mode: "onBlur" });
   const providerForm = useForm<z.infer<typeof providerSchema>>({ resolver: zodResolver(providerSchema), mode: "onBlur" });
@@ -112,7 +115,7 @@ export const Auth = () => {
     setLocalLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email: data.email, password: data.password });
     if (error) showError(error.message);
-    else navigate("/dashboard");
+    else navigate(redirectTo);
     setLocalLoading(false);
   };
 
