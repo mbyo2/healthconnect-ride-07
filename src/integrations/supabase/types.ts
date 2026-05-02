@@ -8400,6 +8400,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      accept_staff_invitation: { Args: { _token: string }; Returns: Json }
       can_perform_service: {
         Args: { provider_id: string; service_category_id: string }
         Returns: boolean
@@ -8485,6 +8486,10 @@ export type Database = {
       }
       is_service_role: { Args: never; Returns: boolean }
       is_super_admin: { Args: never; Returns: boolean }
+      map_staff_role_to_app_role: {
+        Args: { _staff_role: string }
+        Returns: Database["public"]["Enums"]["app_role"]
+      }
       process_payment_with_splits:
         | {
             Args: {
