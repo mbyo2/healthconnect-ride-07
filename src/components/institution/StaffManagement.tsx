@@ -48,6 +48,7 @@ interface Invitation {
   status: string;
   expires_at: string;
   created_at: string;
+  token: string | null;
 }
 
 interface Shift {
@@ -623,11 +624,27 @@ export const StaffManagement = ({ institutionId }: { institutionId: string }) =>
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right">
-                          {inv.status === 'pending' && (
-                            <Button variant="ghost" size="sm" className="text-xs text-destructive" onClick={() => handleRevokeInvitation(inv.id)}>
-                              Revoke
-                            </Button>
-                          )}
+                          <div className="flex justify-end gap-1">
+                            {inv.status === 'pending' && inv.token && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-xs"
+                                onClick={() => {
+                                  const url = `${window.location.origin}/accept-invitation?token=${inv.token}`;
+                                  navigator.clipboard.writeText(url);
+                                  toast.success("Invite link copied");
+                                }}
+                              >
+                                Copy link
+                              </Button>
+                            )}
+                            {inv.status === 'pending' && (
+                              <Button variant="ghost" size="sm" className="text-xs text-destructive" onClick={() => handleRevokeInvitation(inv.id)}>
+                                Revoke
+                              </Button>
+                            )}
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
