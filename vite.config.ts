@@ -119,6 +119,8 @@ export default defineConfig(({ mode }) => ({
       'sonner',
       'leaflet',
       'react-leaflet',
+      'recharts',
+      'lodash',
     ],
     force: true,
     esbuildOptions: {
