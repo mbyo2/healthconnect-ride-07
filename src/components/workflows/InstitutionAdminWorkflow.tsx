@@ -1,5 +1,5 @@
 import React from 'react';
-import { ApplicationStatusBanner, ProfileCompleteBanner } from '@/components/dashboard/StatusBanners';
+import { ApplicationStatusBanner, ProfileCompleteBanner, InstitutionApprovalBanner } from "@/components/dashboard/StatusBanners";
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
@@ -53,6 +53,7 @@ export const InstitutionAdminWorkflow = () => {
   return (
     <div className="space-y-6 px-4 py-6 max-w-7xl mx-auto">
       <ApplicationStatusBanner />
+      <InstitutionApprovalBanner />
       <ProfileCompleteBanner />
       <div className="text-center space-y-2">
         <h2 className="text-xl md:text-2xl font-bold text-foreground">Hospital Management System</h2>

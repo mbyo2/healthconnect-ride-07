@@ -147,6 +147,77 @@ export const ApplicationStatusBanner = () => {
 };
 
 /**
+ * Shows approval / verification state of the user's institution
+ * (admin or affiliated staff). Visible to institution_admin, pharmacy, lab, staff.
+ */
+export const InstitutionApprovalBanner = () => {
+  const { user } = useAuth();
+  const [inst, setInst] = useState<{ id: string; name: string; is_verified: boolean } | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!user) { setLoading(false); return; }
+    (async () => {
+      try {
+        const { data: adminInst } = await supabase
+          .from('healthcare_institutions')
+          .select('id, name, is_verified')
+          .eq('admin_id', user.id)
+          .maybeSingle();
+        if (adminInst) { setInst(adminInst as any); return; }
+
+        const { data: staff } = await supabase
+          .from('institution_staff')
+          .select('institution_id')
+          .eq('provider_id', user.id)
+          .eq('is_active', true)
+          .maybeSingle();
+        if (staff?.institution_id) {
+          const { data: si } = await supabase
+            .from('healthcare_institutions')
+            .select('id, name, is_verified')
+            .eq('id', staff.institution_id)
+            .maybeSingle();
+          if (si) setInst(si as any);
+        }
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [user]);
+
+  if (loading || !inst) return null;
+
+  if (inst.is_verified) {
+    return (
+      <Alert className="border-emerald-500/30 bg-emerald-500/5 dark:bg-emerald-500/10 mb-4">
+        <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+        <AlertTitle className="flex items-center gap-2">
+          {inst.name} is Approved & Live
+          <Badge variant="secondary" className="text-[10px] bg-emerald-500/15 text-emerald-700 dark:text-emerald-300">VERIFIED</Badge>
+        </AlertTitle>
+        <AlertDescription className="text-sm text-muted-foreground mt-1">
+          Your institution has been approved by Doc' O Clock administrators and is now publicly listed. Patients can discover, book and message you.
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
+  return (
+    <Alert className="border-amber-500/30 bg-amber-500/5 dark:bg-amber-500/10 mb-4">
+      <Clock className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+      <AlertTitle className="flex items-center gap-2">
+        Awaiting Admin Approval
+        <Badge variant="secondary" className="text-[10px]">PENDING</Badge>
+      </AlertTitle>
+      <AlertDescription className="text-sm text-muted-foreground mt-1">
+        {inst.name} is registered but not yet verified by an administrator. You can configure your workspace, but the institution will only be visible to patients after approval.
+      </AlertDescription>
+    </Alert>
+  );
+};
+
+/**
  * Profile completeness checker — prompts users to fill in missing info.
  */
 export const ProfileCompleteBanner = () => {
