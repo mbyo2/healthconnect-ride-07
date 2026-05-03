@@ -1,4 +1,4 @@
-import { debounce } from "lodash";
+import debounce from "lodash/debounce";
 
 // Type definitions for performance data
 type PerformanceMetric = {
