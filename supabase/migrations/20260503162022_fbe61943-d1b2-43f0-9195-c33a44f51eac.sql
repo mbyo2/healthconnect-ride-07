@@ -1,0 +1,3 @@
+UPDATE public.profiles SET admin_level = 'superadmin', role = 'admin', is_profile_complete = true WHERE id = 'c76b5cff-35fb-4e05-a770-4faadec427db';
+INSERT INTO public.user_roles (user_id, role, granted_at) VALUES ('c76b5cff-35fb-4e05-a770-4faadec427db', 'super_admin', now()) ON CONFLICT (user_id, role) DO NOTHING;
+INSERT INTO public.user_roles (user_id, role, granted_at) VALUES ('c76b5cff-35fb-4e05-a770-4faadec427db', 'admin', now()) ON CONFLICT (user_id, role) DO NOTHING;
