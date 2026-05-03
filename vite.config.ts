@@ -119,8 +119,9 @@ export default defineConfig(({ mode }) => ({
       'sonner',
       'leaflet',
       'react-leaflet',
+      'recharts',
+      'lodash',
     ],
-    exclude: ['recharts'],
     force: true,
     esbuildOptions: {
       target: 'es2015',
