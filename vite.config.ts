@@ -120,7 +120,6 @@ export default defineConfig(({ mode }) => ({
       'leaflet',
       'react-leaflet',
     ],
-    exclude: ['recharts'],
     force: true,
     esbuildOptions: {
       target: 'es2015',
