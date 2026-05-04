@@ -215,7 +215,6 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
   [USER_ROLES.SUPPORT]: [
     ...COMMON_ROUTES,
     '/admin-dashboard',
-    '/super-admin-dashboard',
     '/chat',
     '/search',
     '/healthcare-application',
