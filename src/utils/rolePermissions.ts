@@ -189,13 +189,11 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
   [USER_ROLES.ADMIN]: [
     ...COMMON_ROUTES,
     '/admin-dashboard',
-    '/super-admin-dashboard',
     '/appointments',
     '/appointments/:id',
     '/chat',
     '/wallet',
     '/admin-wallet',
-    '/create-admin',
     '/compliance-audit',
     '/map',
     '/search',
@@ -211,7 +209,6 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/provider-calendar',
     '/testing',
     '/documentation',
-    '/role-management',
   ],
 
   // ── Support ──────────────────────────────────────────────
