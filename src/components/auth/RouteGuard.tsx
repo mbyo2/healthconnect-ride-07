@@ -7,14 +7,22 @@ import { LoadingScreen } from '@/components/LoadingScreen';
 
 interface RouteGuardProps {
   children: React.ReactNode;
+  /**
+   * Optional explicit role allowlist. If provided, the user must have at least
+   * one of these roles to access the route, regardless of the global
+   * rolePermissions matrix. Use for highly sensitive routes (e.g. superadmin).
+   */
+  requireRoles?: string[];
 }
 
-export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
+export const RouteGuard: React.FC<RouteGuardProps> = ({ children, requireRoles }) => {
   const { user, loading: authLoading } = useAuth();
   const { availableRoles, loading: rolesLoading } = useUserRoles();
   const location = useLocation();
   const navigate = useNavigate();
   const currentPath = location.pathname;
+
+  const hasRequiredRole = !requireRoles || requireRoles.some(r => availableRoles.includes(r as any));
 
   useEffect(() => {
     // Only run checks after loading is complete
@@ -31,6 +39,14 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
         console.log(`RouteGuard: Not authenticated, redirecting to /auth from ${currentPath}`);
         navigate('/auth', { replace: true, state: { from: location } });
       }
+      return;
+    }
+
+    // Explicit role allowlist takes priority
+    if (requireRoles && !hasRequiredRole) {
+      const landingPage = getRoleLandingPage(availableRoles);
+      console.warn(`RouteGuard: role-restricted route ${currentPath} blocked. Required: ${requireRoles.join(',')}`);
+      navigate(landingPage, { replace: true });
       return;
     }
 
