@@ -85,6 +85,11 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children, requireRoles }
     return null;
   }
 
+  // Explicit role gate
+  if (requireRoles && !hasRequiredRole) {
+    return null;
+  }
+
   // If authenticated but no permission, render nothing (useEffect will redirect)
   if (!hasRoutePermission(availableRoles, currentPath)) {
     return null;
