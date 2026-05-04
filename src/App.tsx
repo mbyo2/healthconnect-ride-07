@@ -269,7 +269,7 @@ const AppContent = () => {
             <Route path="/provider-profile/:id" element={<RouteGuard><ProviderProfile /></RouteGuard>} />
             {/* provider/:id and providers are now public above */}
             <Route path="/video-call/:roomId" element={<RouteGuard><VideoCall /></RouteGuard>} />
-            <Route path="/role-management" element={<RouteGuard><RoleManagement /></RouteGuard>} />
+            <Route path="/role-management" element={<RouteGuard requireRoles={["super_admin"]}><RoleManagement /></RouteGuard>} />
             <Route path="/intake-form" element={<RouteGuard><IntakeForm /></RouteGuard>} />
 
             {/* Payment Routes */}
