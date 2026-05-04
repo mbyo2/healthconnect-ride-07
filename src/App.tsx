@@ -206,7 +206,7 @@ const AppContent = () => {
             <Route path="/appointments" element={<RouteGuard><Appointments /></RouteGuard>} />
             <Route path="/admin-dashboard" element={<RouteGuard><AdminDashboard /></RouteGuard>} />
             <Route path="/provider-dashboard" element={<RouteGuard><ProviderDashboard /></RouteGuard>} />
-            <Route path="/super-admin-dashboard" element={<RouteGuard><SuperAdminDashboard /></RouteGuard>} />
+            <Route path="/super-admin-dashboard" element={<RouteGuard requireRoles={["super_admin"]}><SuperAdminDashboard /></RouteGuard>} />
             <Route path="/pharmacy-inventory" element={<RouteGuard><PharmacyInventory /></RouteGuard>} />
             <Route path="/connections" element={<RouteGuard><Connections /></RouteGuard>} />
             <Route path="/chat" element={<RouteGuard><Chat /></RouteGuard>} />
@@ -220,7 +220,7 @@ const AppContent = () => {
             <Route path="/marketplace" element={<RouteGuard><Marketplace /></RouteGuard>} />
             <Route path="/pharmacy-portal" element={<RouteGuard><PharmacyPortal /></RouteGuard>} />
             <Route path="/healthcare-application" element={<RouteGuard><HealthcareApplication /></RouteGuard>} />
-            <Route path="/create-admin" element={<RouteGuard><CreateAdmin /></RouteGuard>} />
+            <Route path="/create-admin" element={<RouteGuard requireRoles={["super_admin"]}><CreateAdmin /></RouteGuard>} />
             <Route path="/ai-diagnostics" element={<RouteGuard><AIDiagnostics /></RouteGuard>} />
             <Route path="/home" element={<RouteGuard><Home /></RouteGuard>} />
             <Route path="/medical-records" element={<RouteGuard><MedicalRecords /></RouteGuard>} />
