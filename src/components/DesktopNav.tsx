@@ -165,15 +165,18 @@ export function DesktopNav() {
 
     // Admin
     if (isAdmin) {
-      return [
+      const adminItems = [
         { to: "/hospital-management", label: "Hospital Management", icon: <Building2 className="h-4 w-4 mr-2" /> },
         { to: "/pharmacy-management", label: "Pharmacy Management", icon: <ShoppingCart className="h-4 w-4 mr-2" /> },
         { to: "/lab-management", label: "Lab Management", icon: <Activity className="h-4 w-4 mr-2" /> },
         { to: "/wallet", label: "Admin Wallet", icon: <Wallet className="h-4 w-4 mr-2" /> },
-        { to: "/role-management", label: "Role Management", icon: <Shield className="h-4 w-4 mr-2" /> },
         { to: "/profile", label: "Profile", icon: <User className="h-4 w-4 mr-2" /> },
         { to: "/settings", label: "Settings", icon: <Settings className="h-4 w-4 mr-2" /> },
       ];
+
+      return availableRoles.includes('super_admin')
+        ? [...adminItems, { to: "/role-management", label: "Role Management", icon: <Shield className="h-4 w-4 mr-2" /> }]
+        : adminItems;
     }
 
     // Institution Admin/Staff

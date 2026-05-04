@@ -268,14 +268,17 @@ export function BottomNav() {
 
     // Admin
     if (isAdmin) {
-      return [
+      const adminItems = [
         { to: "/hospital-management", label: "Hospital Management", description: "Manage hospital operations", icon: <Activity className="h-5 w-5" /> },
         { to: "/pharmacy-management", label: "Pharmacy Management", description: "Manage pharmacy operations", icon: <ShoppingCart className="h-5 w-5" /> },
         { to: "/lab-management", label: "Lab Management", description: "Manage lab operations", icon: <Activity className="h-5 w-5" /> },
         { to: "/wallet", label: "Admin Wallet", description: "Platform finances", icon: <Wallet className="h-5 w-5" /> },
-        { to: "/role-management", label: "Role Management", description: "Manage user roles", icon: <Shield className="h-5 w-5" /> },
         { to: "/profile", label: "Profile", description: "Admin profile", icon: <User className="h-5 w-5" /> },
       ];
+
+      return availableRoles.includes('super_admin')
+        ? [...adminItems, { to: "/role-management", label: "Role Management", description: "Manage user roles", icon: <Shield className="h-5 w-5" /> }]
+        : adminItems;
     }
 
     // Institution

@@ -189,13 +189,11 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
   [USER_ROLES.ADMIN]: [
     ...COMMON_ROUTES,
     '/admin-dashboard',
-    '/super-admin-dashboard',
     '/appointments',
     '/appointments/:id',
     '/chat',
     '/wallet',
     '/admin-wallet',
-    '/create-admin',
     '/compliance-audit',
     '/map',
     '/search',
@@ -211,14 +209,12 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/provider-calendar',
     '/testing',
     '/documentation',
-    '/role-management',
   ],
 
   // ── Support ──────────────────────────────────────────────
   [USER_ROLES.SUPPORT]: [
     ...COMMON_ROUTES,
     '/admin-dashboard',
-    '/super-admin-dashboard',
     '/chat',
     '/search',
     '/healthcare-application',
@@ -543,8 +539,8 @@ export const getRoleNavigation = (userRoles: UserRole[] | null) => {
 
     // ── Admin routes ──
     { path: '/admin-dashboard', label: 'Admin Dashboard', icon: 'LayoutDashboard', roles: ['admin', 'support', 'super_admin'] },
-    { path: '/super-admin-dashboard', label: 'Super Admin', icon: 'Shield', roles: ['admin', 'support', 'super_admin'] },
-    { path: '/create-admin', label: 'Create Admin', icon: 'UserPlus', roles: ['admin', 'super_admin'] },
+    { path: '/super-admin-dashboard', label: 'Super Admin', icon: 'Shield', roles: ['super_admin'] },
+    { path: '/create-admin', label: 'Create Admin', icon: 'UserPlus', roles: ['super_admin'] },
     { path: '/admin-wallet', label: 'Admin Wallet', icon: 'Wallet', roles: ['admin', 'super_admin'] },
     { path: '/compliance-audit', label: 'Compliance', icon: 'FileCheck', roles: ['admin', 'health_personnel', 'super_admin'] },
     { path: '/pharmacy-management', label: 'Pharmacy Management', icon: 'Pill', roles: ['admin', 'pharmacy', 'pharmacist', 'super_admin'] },
