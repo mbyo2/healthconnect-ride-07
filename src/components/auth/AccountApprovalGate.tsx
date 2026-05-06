@@ -68,18 +68,20 @@ const DocumentUploadSection = ({ userId, userRole }: { userId: string; userRole:
 
       if (error) throw error;
 
-      // Update the documents_url array in health_personnel_applications
+      // Update the documents_url array in health_personnel_applications (if a row exists for this user)
       const { data: app } = await supabase
         .from('health_personnel_applications')
-        .select('documents_url')
+        .select('id, documents_url')
         .eq('user_id', userId)
         .maybeSingle();
 
-      const currentDocs = app?.documents_url || [];
-      await supabase
-        .from('health_personnel_applications')
-        .update({ documents_url: [...currentDocs, path] })
-        .eq('user_id', userId);
+      if (app?.id) {
+        const currentDocs = app.documents_url || [];
+        await supabase
+          .from('health_personnel_applications')
+          .update({ documents_url: [...currentDocs, path] })
+          .eq('user_id', userId);
+      }
 
       toast.success(`${docLabel} uploaded successfully`);
       queryClient.invalidateQueries({ queryKey: ['registration-docs', userId] });
