@@ -81,6 +81,19 @@ export const ProfileSetup = () => {
       if (error) throw error;
       await refreshProfile();
       toast.success("Profile completed!");
+
+      // Institution roles need to register their institution next
+      if (isBusiness) {
+        const { data: existing } = await supabase
+          .from('healthcare_institutions')
+          .select('id')
+          .eq('admin_id', user.id)
+          .maybeSingle();
+        if (!existing) {
+          navigate('/institution-registration', { replace: true });
+          return;
+        }
+      }
       navigate('/dashboard', { replace: true });
     } catch (error: any) {
       toast.error(error.message);
