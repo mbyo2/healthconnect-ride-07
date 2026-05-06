@@ -7,7 +7,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Shield, Users, Activity, DollarSign } from 'lucide-react';
 
 import { InstitutionApplications } from '@/components/admin/InstitutionApplications';
-import { Building2 } from 'lucide-react';
+import { ProviderApplications } from '@/components/admin/ProviderApplications';
+import { Building2, Stethoscope } from 'lucide-react';
 
 const AdminDashboard = () => {
   return (
@@ -23,26 +24,24 @@ const AdminDashboard = () => {
       </div>
 
       <Tabs defaultValue="users" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="users" className="flex items-center gap-2">
-            <Users className="h-4 w-4" />
-            Users
+            <Users className="h-4 w-4" /> Users
           </TabsTrigger>
-          <TabsTrigger value="revenue" className="flex items-center gap-2">
-            <DollarSign className="h-4 w-4" />
-            Revenue
+          <TabsTrigger value="providers" className="flex items-center gap-2">
+            <Stethoscope className="h-4 w-4" /> Providers
           </TabsTrigger>
           <TabsTrigger value="applications" className="flex items-center gap-2">
-            <Building2 className="h-4 w-4" />
-            Applications
+            <Building2 className="h-4 w-4" /> Institutions
+          </TabsTrigger>
+          <TabsTrigger value="revenue" className="flex items-center gap-2">
+            <DollarSign className="h-4 w-4" /> Revenue
           </TabsTrigger>
           <TabsTrigger value="audit" className="flex items-center gap-2">
-            <Activity className="h-4 w-4" />
-            Audit Logs
+            <Activity className="h-4 w-4" /> Audit Logs
           </TabsTrigger>
           <TabsTrigger value="test" className="flex items-center gap-2">
-            <Shield className="h-4 w-4" />
-            Test
+            <Shield className="h-4 w-4" /> Test
           </TabsTrigger>
         </TabsList>
 
@@ -50,12 +49,16 @@ const AdminDashboard = () => {
           <UserManagement />
         </TabsContent>
 
-        <TabsContent value="revenue" className="space-y-4">
-          <RevenueAnalyticsDashboard />
+        <TabsContent value="providers" className="space-y-4">
+          <ProviderApplications />
         </TabsContent>
 
         <TabsContent value="applications" className="space-y-4">
           <InstitutionApplications />
+        </TabsContent>
+
+        <TabsContent value="revenue" className="space-y-4">
+          <RevenueAnalyticsDashboard />
         </TabsContent>
 
         <TabsContent value="audit" className="space-y-4">
