@@ -53,7 +53,7 @@ const SuperAdminDashboard = () => {
           .from('profiles')
           .select('role, admin_level')
           .eq('id', session.user.id)
-          .single();
+          .maybeSingle();
 
         if (error) throw error;
 
