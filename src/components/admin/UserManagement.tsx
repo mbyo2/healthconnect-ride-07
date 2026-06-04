@@ -53,34 +53,32 @@ export function UserManagement() {
   const fetchUsers = async () => {
     try {
       setIsLoading(true);
-      
-      // Fetch all profiles
-      const { data: profilesData, error: profilesError } = await supabase
-        .from('profiles')
-        .select('*')
-        .order('created_at', { ascending: false });
+
+      // Fetch all profiles and all roles in parallel (no N+1)
+      const [{ data: profilesData, error: profilesError }, { data: rolesData, error: rolesError }] = await Promise.all([
+        supabase.from('profiles').select('*').order('created_at', { ascending: false }),
+        supabase.from('user_roles').select('user_id, role'),
+      ]);
 
       if (profilesError) throw profilesError;
+      if (rolesError) throw rolesError;
 
-      // Fetch roles for each user
-      const usersWithRoles: UserWithRoles[] = await Promise.all(
-        (profilesData || []).map(async (profile) => {
-          const { data: rolesData } = await supabase
-            .from('user_roles')
-            .select('role')
-            .eq('user_id', profile.id);
+      const rolesByUser = new Map<string, UserRole[]>();
+      (rolesData || []).forEach((r: any) => {
+        const list = rolesByUser.get(r.user_id) || [];
+        list.push(r.role as UserRole);
+        rolesByUser.set(r.user_id, list);
+      });
 
-          return {
-            id: profile.id,
-            email: profile.email || '',
-            first_name: profile.first_name,
-            last_name: profile.last_name,
-            created_at: profile.created_at,
-            roles: rolesData?.map(r => r.role as UserRole) || [],
-            is_profile_complete: profile.is_profile_complete || false,
-          };
-        })
-      );
+      const usersWithRoles: UserWithRoles[] = (profilesData || []).map((profile) => ({
+        id: profile.id,
+        email: profile.email || '',
+        first_name: profile.first_name,
+        last_name: profile.last_name,
+        created_at: profile.created_at,
+        roles: rolesByUser.get(profile.id) || [],
+        is_profile_complete: profile.is_profile_complete || false,
+      }));
 
       setUsers(usersWithRoles);
     } catch (error) {

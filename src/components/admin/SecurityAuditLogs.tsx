@@ -40,7 +40,6 @@ export function SecurityAuditLogs() {
     try {
       setIsLoading(true);
 
-      // Fetch audit logs
       const { data: logsData, error: logsError } = await supabase
         .from('security_audit_log')
         .select('*')
@@ -49,31 +48,30 @@ export function SecurityAuditLogs() {
 
       if (logsError) throw logsError;
 
-      // Get unique event types
       const types = Array.from(new Set(logsData?.map(log => log.event_type) || []));
       setEventTypes(types);
 
-      // Fetch user emails for each log
-      const logsWithEmails: AuditLog[] = await Promise.all(
-        (logsData || []).map(async (log) => {
-          const { data: profileData } = await supabase
-            .from('profiles')
-            .select('email')
-            .eq('id', log.user_id)
-            .single();
+      // Batch-fetch all referenced user emails
+      const userIds = Array.from(new Set((logsData || []).map(l => l.user_id).filter(Boolean)));
+      const emailByUser = new Map<string, string>();
+      if (userIds.length) {
+        const { data: profs } = await supabase
+          .from('profiles')
+          .select('id, email')
+          .in('id', userIds);
+        (profs || []).forEach((p: any) => emailByUser.set(p.id, p.email || 'Unknown'));
+      }
 
-          return {
-            id: log.id,
-            user_id: log.user_id,
-            event_type: log.event_type,
-            event_data: log.event_data,
-            ip_address: log.ip_address as string | null,
-            user_agent: log.user_agent,
-            created_at: log.created_at,
-            user_email: profileData?.email || 'Unknown',
-          };
-        })
-      );
+      const logsWithEmails: AuditLog[] = (logsData || []).map((log) => ({
+        id: log.id,
+        user_id: log.user_id,
+        event_type: log.event_type,
+        event_data: log.event_data,
+        ip_address: log.ip_address as string | null,
+        user_agent: log.user_agent,
+        created_at: log.created_at,
+        user_email: emailByUser.get(log.user_id) || 'Unknown',
+      }));
 
       setLogs(logsWithEmails);
     } catch (error) {
