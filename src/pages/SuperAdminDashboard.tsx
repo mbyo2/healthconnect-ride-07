@@ -37,57 +37,22 @@ const SuperAdminDashboard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if user is superadmin
-    const checkSuperAdmin = async () => {
-      try {
-        setIsLoading(true);
-        const { data: { session } } = await supabase.auth.getSession();
-
-        if (!session) {
-          toast.error("You need to be logged in");
-          navigate("/auth");
-          return;
-        }
-
-        const { data: profile, error } = await supabase
-          .from('profiles')
-          .select('role, admin_level')
-          .eq('id', session.user.id)
-          .maybeSingle();
-
-        if (error) throw error;
-
-        if (profile?.admin_level !== 'superadmin') {
-          toast.error("You don't have permission to access this page");
-          navigate("/dashboard");
-          return;
-        }
-
-        // Permission check passed, fetch admins
-
-        // Fetch admin users
-        fetchAdmins();
-      } catch (error) {
-        console.error("Error checking permissions:", error);
-        toast.error("Error checking permissions");
-        navigate("/dashboard");
-      }
-    };
-
-    checkSuperAdmin();
-  }, [navigate]);
+    // RouteGuard already enforces super_admin access; just load data.
+    fetchAdmins();
+  }, []);
 
   const fetchAdmins = async () => {
     try {
+      setIsLoading(true);
       const { data, error } = await supabase
         .from('profiles')
-        .select('*')
+        .select('id, email, first_name, last_name, admin_level, created_at')
         .in('admin_level', ['admin', 'superadmin'])
         .order('created_at', { ascending: false });
 
       if (error) throw error;
 
-      setAdmins(data as AdminUser[]);
+      setAdmins((data || []) as AdminUser[]);
     } catch (error) {
       console.error("Error fetching admin users:", error);
       toast.error("Failed to load admin users");
@@ -95,6 +60,7 @@ const SuperAdminDashboard = () => {
       setIsLoading(false);
     }
   };
+
 
   const handleCreateAdmin = async () => {
     try {
