@@ -46,12 +46,13 @@ const ProviderProfile = () => {
           )
         `)
         .eq('id', providerId)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error('Error fetching provider:', error);
         throw error;
       }
+      if (!data) return null;
 
       return {
         id: data.id,
@@ -81,18 +82,20 @@ const ProviderProfile = () => {
 
   if (!provider) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen flex flex-col">
         <Header />
-        <main className="container mx-auto px-4 pt-20 pb-24">
-          <Card className="p-8 text-center">
-            <h2 className="text-xl font-bold mb-4">Provider Not Found</h2>
-            <p className="text-muted-foreground mb-4">The provider you're looking for doesn't exist or has been removed.</p>
-            <Button onClick={() => navigate('/search')}>Back to Search</Button>
+        <div className="flex-1 flex items-center justify-center p-6">
+          <Card className="max-w-md p-6 text-center">
+            <p className="text-lg font-medium mb-2">Provider not found</p>
+            <p className="text-sm text-muted-foreground mb-4">The provider you're looking for doesn't exist or is no longer available.</p>
+            <Button onClick={() => navigate('/providers')}>Browse providers</Button>
           </Card>
-        </main>
+        </div>
       </div>
     );
   }
+
+
 
   return (
     <div className="min-h-screen bg-background">
