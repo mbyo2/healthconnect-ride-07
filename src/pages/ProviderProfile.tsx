@@ -96,20 +96,6 @@ const ProviderProfile = () => {
   }
 
 
-  if (!provider) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <main className="container mx-auto px-4 pt-20 pb-24">
-          <Card className="p-8 text-center">
-            <h2 className="text-xl font-bold mb-4">Provider Not Found</h2>
-            <p className="text-muted-foreground mb-4">The provider you're looking for doesn't exist or has been removed.</p>
-            <Button onClick={() => navigate('/search')}>Back to Search</Button>
-          </Card>
-        </main>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-background">
