@@ -33,7 +33,7 @@ export const ProviderPortal = () => {
             .from('profiles')
             .select('is_profile_complete, role')
             .eq('id', session.user.id)
-            .single();
+            .maybeSingle();
 
           if (profileError) {
             console.error("Error fetching profile:", profileError);
@@ -43,37 +43,27 @@ export const ProviderPortal = () => {
           setIsRedirecting(true);
 
           if (profile?.role === 'health_personnel') {
-            // Check if the provider has an approved application
-            const { data: application, error: applicationError } = await supabase
+            const { data: application } = await supabase
               .from('health_personnel_applications')
               .select('status')
               .eq('user_id', session.user.id)
-              .single();
-
-            if (applicationError && applicationError.code !== 'PGRST116') {
-              console.error("Error checking application status:", applicationError);
-              toast.error("Error checking application status");
-              setIsLoading(false);
-              return;
-            }
+              .maybeSingle();
 
             if (application?.status === 'approved') {
-              // Only allow approved providers to access the dashboard
               if (!profile?.is_profile_complete) {
                 navigate("/profile-setup");
               } else {
                 navigate("/provider-dashboard");
               }
             } else {
-              // If application is pending or rejected, redirect to application status page
               navigate("/application-status");
             }
           } else {
-            // Not a health personnel
             toast.error("You don't have provider access");
             navigate("/login");
           }
         }
+
       } catch (err) {
         console.error("Unexpected error during session check:", err);
         setError(err instanceof Error ? err.message : "An unexpected error occurred");
