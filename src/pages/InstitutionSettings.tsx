@@ -41,9 +41,10 @@ const InstitutionSettings = () => {
                 .from('healthcare_institutions')
                 .select('*')
                 .eq('admin_id', user.id)
-                .single();
+                .maybeSingle();
 
             if (error) throw error;
+            if (!data) { setLoading(false); return; }
             setInstitution(data);
 
             // Initialize operating hours if empty
