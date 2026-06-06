@@ -25,10 +25,10 @@ const InstitutionAppointments = () => {
                 .from('healthcare_institutions')
                 .select('id')
                 .eq('admin_id', user.id)
-                .single();
+                .maybeSingle();
 
             if (instError) throw instError;
-            if (!inst) return;
+            if (!inst) { setLoading(false); return; }
 
             // 2. Get Personnel
             const { data: personnel } = await supabase

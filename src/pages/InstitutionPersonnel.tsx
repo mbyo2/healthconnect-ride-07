@@ -17,7 +17,7 @@ const InstitutionPersonnel = () => {
         .from('healthcare_institutions')
         .select('id')
         .eq('admin_id', user.id)
-        .single();
+        .maybeSingle();
 
       if (data) {
         setInstitutionId(data.id);
@@ -28,7 +28,7 @@ const InstitutionPersonnel = () => {
           .select('institution_id')
           .eq('provider_id', user.id)
           .eq('is_active', true)
-          .single();
+          .maybeSingle();
 
         if (staffData) {
           setInstitutionId(staffData.institution_id);
