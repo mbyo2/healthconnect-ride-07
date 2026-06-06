@@ -38,7 +38,7 @@ const PharmacyManagement = () => {
                 .select('*')
                 .eq('admin_id', user?.id)
                 .eq('type', 'pharmacy')
-                .single();
+                .maybeSingle();
             return data;
         },
         enabled: !!user

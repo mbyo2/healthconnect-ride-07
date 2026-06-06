@@ -100,7 +100,7 @@ export const MedicationInventory = () => {
         .select('institution_id')
         .eq('provider_id', user.id)
         .eq('is_active', true)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error('Error fetching institution:', error);
