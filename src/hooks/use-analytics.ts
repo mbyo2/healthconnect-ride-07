@@ -43,18 +43,26 @@ async function flushEvents() {
   const batch = eventQueue.splice(0, eventQueue.length);
 
   try {
-    // Log to console in dev mode for debugging
     if (import.meta.env.DEV) {
       console.log('[Analytics]', batch);
     }
 
-    // In production, you could send to a Supabase edge function or external service:
-    // await supabase.functions.invoke('track-analytics', { body: { events: batch } });
-    
-    // For now, store in sessionStorage for the session
-    const existing = JSON.parse(sessionStorage.getItem('doc_analytics') || '[]');
-    sessionStorage.setItem('doc_analytics', JSON.stringify([...existing, ...batch].slice(-100)));
-  } catch (error) {
+    // Persist locally for offline + sandbox resilience
+    try {
+      const existing = JSON.parse(sessionStorage.getItem('doc_analytics') || '[]');
+      sessionStorage.setItem('doc_analytics', JSON.stringify([...existing, ...batch].slice(-100)));
+    } catch {
+      // sessionStorage may be unavailable in some sandboxed contexts
+    }
+
+    // Ship to edge function (fire-and-forget; never block UI)
+    try {
+      const { supabase } = await import('@/integrations/supabase/client');
+      await supabase.functions.invoke('track-analytics', { body: { events: batch } });
+    } catch {
+      // Endpoint may not exist yet; events stay in sessionStorage above
+    }
+  } catch {
     // Re-enqueue on failure (don't lose events)
     eventQueue.unshift(...batch);
   }
