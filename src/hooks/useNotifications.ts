@@ -54,7 +54,6 @@ export async function dispatchNotification(payload: NotificationPayload): Promis
       message: payload.message,
       type: payload.category || 'system',
       read: false,
-      link: payload.link,
     });
   } catch {
     // notifications table may not exist on every env; ignore
