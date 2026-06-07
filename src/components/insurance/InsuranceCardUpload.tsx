@@ -70,6 +70,13 @@ export const InsuranceCardUpload = () => {
     reader.readAsDataURL(file);
   };
 
+  const fileToBase64 = (file: File): Promise<string> => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve((reader.result as string).split(',')[1] || '');
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+
   const uploadCard = async () => {
     if (!frontFile || !user) {
       toast.error('Please upload the front of your insurance card');
@@ -92,16 +99,38 @@ export const InsuranceCardUpload = () => {
         if (backErr) throw backErr;
       }
 
+      // Run OCR via edge function (fire-and-prefill; failures fall back to manual fields)
+      let ocrPayload: Record<string, string> = {
+        provider_name: providerName,
+        policy_number: policyNumber,
+      };
+      try {
+        const imageBase64 = await fileToBase64(frontFile);
+        const { data: ocrRes } = await supabase.functions.invoke('ocr-insurance-card', {
+          body: { imageBase64 },
+        });
+        if (ocrRes && typeof ocrRes === 'object') {
+          ocrPayload = {
+            ...ocrRes,
+            // Manual fields win over OCR if user typed them
+            provider_name: providerName || ocrRes.insurance_provider || ocrRes.provider_name || '',
+            policy_number: policyNumber || ocrRes.member_id || ocrRes.policy_number || '',
+          };
+        }
+      } catch (ocrErr) {
+        console.warn('OCR failed, proceeding with manual fields:', ocrErr);
+      }
+
       const { error } = await (supabase as any).from('insurance_cards').insert({
         patient_id: user.id,
         front_image_url: frontPath,
         back_image_url: backPath,
-        ocr_data: { provider_name: providerName, policy_number: policyNumber },
+        ocr_data: ocrPayload,
         verification_status: 'pending',
       });
       if (error) throw error;
 
-      toast.success('Insurance card uploaded successfully!');
+      toast.success('Insurance card uploaded and scanned successfully!');
       setFrontPreview(null);
       setBackPreview(null);
       setFrontFile(null);

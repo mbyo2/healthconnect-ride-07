@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Shield, Lock, Share2, Eye, Download, FileText, CheckCircle2, AlertTriangle, Plus } from 'lucide-react';
@@ -10,12 +10,21 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { supabase } from "@/integrations/supabase/client";
+
+interface AuditEntry {
+    action: string;
+    user: string;
+    timestamp: string;
+    verified: boolean;
+}
 
 const BlockchainRecords = () => {
     const { user } = useAuth();
     const { records: medicalRecords, loading, addRecord, shareRecord } = useMedicalRecords(user?.id);
     const [selectedRecord, setSelectedRecord] = useState<string | null>(null);
     const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+    const [auditTrail, setAuditTrail] = useState<AuditEntry[]>([]);
     const [newRecord, setNewRecord] = useState({
         title: '',
         provider: '',
@@ -37,11 +46,30 @@ const BlockchainRecords = () => {
         });
     };
 
-    const auditTrail = [
-        { action: 'Record Created', user: 'Dr. Sarah Johnson', timestamp: '2025-11-15 10:30 AM', verified: true },
-        { action: 'Record Accessed', user: 'You', timestamp: '2025-11-16 2:15 PM', verified: true },
-        { action: 'Shared with Provider', user: 'You', timestamp: '2025-11-17 9:00 AM', verified: true },
-    ];
+    useEffect(() => {
+        if (!user?.id) return;
+        (async () => {
+            try {
+                const { data } = await (supabase as any)
+                    .from('security_audit_log')
+                    .select('event_type, event_data, created_at')
+                    .eq('user_id', user.id)
+                    .in('event_type', ['medical_record_created', 'medical_record_accessed', 'medical_record_shared', 'role_assigned', 'role_change'])
+                    .order('created_at', { ascending: false })
+                    .limit(10);
+                const entries: AuditEntry[] = (data || []).map((r: any) => ({
+                    action: String(r.event_type || 'event').replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase()),
+                    user: r.event_data?.actor || 'You',
+                    timestamp: new Date(r.created_at).toLocaleString(),
+                    verified: true,
+                }));
+                setAuditTrail(entries);
+            } catch (err) {
+                console.error('Audit trail load error:', err);
+                setAuditTrail([]);
+            }
+        })();
+    }, [user?.id]);
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-background via-purple-50/20 to-background dark:via-purple-950/10 p-4 md:p-6 lg:p-8">
