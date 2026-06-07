@@ -386,6 +386,36 @@ export type Database = {
           },
         ]
       }
+      analytics_events: {
+        Row: {
+          created_at: string
+          event_name: string
+          id: string
+          occurred_at: string
+          path: string | null
+          props: Json | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_name: string
+          id?: string
+          occurred_at?: string
+          path?: string | null
+          props?: Json | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_name?: string
+          id?: string
+          occurred_at?: string
+          path?: string | null
+          props?: Json | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       app_owner_wallet: {
         Row: {
           balance: number
@@ -6590,6 +6620,42 @@ export type Database = {
           },
         ]
       }
+      medical_record_audit: {
+        Row: {
+          action: string
+          actor_id: string | null
+          created_at: string
+          id: string
+          metadata: Json | null
+          patient_id: string
+          payload_hash: string
+          prev_hash: string | null
+          record_id: string | null
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          patient_id: string
+          payload_hash: string
+          prev_hash?: string | null
+          record_id?: string | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          patient_id?: string
+          payload_hash?: string
+          prev_hash?: string | null
+          record_id?: string | null
+        }
+        Relationships: []
+      }
       medical_record_types_config: {
         Row: {
           created_at: string
@@ -9720,6 +9786,39 @@ export type Database = {
           },
         ]
       }
+      provider_insurance_networks: {
+        Row: {
+          created_at: string
+          id: string
+          insurer_name: string
+          is_in_network: boolean
+          notes: string | null
+          plan_codes: string[]
+          provider_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          insurer_name: string
+          is_in_network?: boolean
+          notes?: string | null
+          plan_codes?: string[]
+          provider_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          insurer_name?: string
+          is_in_network?: boolean
+          notes?: string | null
+          plan_codes?: string[]
+          provider_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       provider_locations: {
         Row: {
           created_at: string | null
@@ -10847,6 +10946,45 @@ export type Database = {
           id?: string
           min_experience_level?: Database["public"]["Enums"]["experience_level"]
           name?: string
+        }
+        Relationships: []
+      }
+      service_pricing: {
+        Row: {
+          base_price: number
+          category: string | null
+          created_at: string
+          currency: string
+          id: string
+          institution_id: string | null
+          is_active: boolean
+          service_code: string
+          service_label: string
+          updated_at: string
+        }
+        Insert: {
+          base_price?: number
+          category?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          institution_id?: string | null
+          is_active?: boolean
+          service_code: string
+          service_label: string
+          updated_at?: string
+        }
+        Update: {
+          base_price?: number
+          category?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          institution_id?: string | null
+          is_active?: boolean
+          service_code?: string
+          service_label?: string
+          updated_at?: string
         }
         Relationships: []
       }
