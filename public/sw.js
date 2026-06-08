@@ -81,6 +81,12 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Bypass service worker for built asset files to avoid serving fallback HTML
+  // when an old hashed filename is requested (lets the server return correct MIME).
+  if (url.pathname.startsWith('/assets/')) {
+    return;
+  }
+
   // Handle different types of requests
   if (isStaticAsset(request)) {
     event.respondWith(handleStaticAsset(request));
