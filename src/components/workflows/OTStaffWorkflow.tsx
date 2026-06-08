@@ -33,6 +33,12 @@ export const OTStaffWorkflow = () => {
   const [loading, setLoading] = useState(false);
   const [showAdd, setShowAdd] = useState(false);
   const [form, setForm] = useState({ patient_name: '', procedure_name: '', ot_room: 'OT-1', scheduled_time: '', surgeon_name: '', anaesthesia_type: 'general', notes: '' });
+  const [anaesSurgery, setAnaesSurgery] = useState<Surgery | null>(null);
+  const [anaesForm, setAnaesForm] = useState({
+    anaesthetist_name: '', pre_op_assessment: '', drugs_administered: '',
+    intraop_monitoring: '', recovery_vitals: '', post_anaesthesia_status: 'stable',
+    complications: '', consent_signed: false, notes: '',
+  });
 
   const fetchSurgeries = useCallback(async () => {
     if (!institutionId) return;
