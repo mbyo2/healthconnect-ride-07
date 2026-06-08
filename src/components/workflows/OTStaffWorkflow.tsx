@@ -33,6 +33,12 @@ export const OTStaffWorkflow = () => {
   const [loading, setLoading] = useState(false);
   const [showAdd, setShowAdd] = useState(false);
   const [form, setForm] = useState({ patient_name: '', procedure_name: '', ot_room: 'OT-1', scheduled_time: '', surgeon_name: '', anaesthesia_type: 'general', notes: '' });
+  const [anaesSurgery, setAnaesSurgery] = useState<Surgery | null>(null);
+  const [anaesForm, setAnaesForm] = useState({
+    anaesthetist_name: '', pre_op_assessment: '', drugs_administered: '',
+    intraop_monitoring: '', recovery_vitals: '', post_anaesthesia_status: 'stable',
+    complications: '', consent_signed: false, notes: '',
+  });
 
   const fetchSurgeries = useCallback(async () => {
     if (!institutionId) return;
@@ -102,6 +108,33 @@ export const OTStaffWorkflow = () => {
       toast.success(`Surgery marked as ${status}`);
     } catch (err: any) {
       toast.error(err.message || 'Failed to update');
+    }
+  };
+
+  const saveAnaesthesiaRecord = async () => {
+    if (!anaesSurgery || !institutionId || !user) return;
+    try {
+      const { error } = await (supabase.from('ot_anaesthesia_records' as any) as any).insert({
+        hospital_id: institutionId,
+        ot_booking_id: anaesSurgery.id,
+        anaesthesia_type: anaesSurgery.anaesthesia_type,
+        anaesthetist_name: anaesForm.anaesthetist_name || user.email,
+        pre_op_assessment: anaesForm.pre_op_assessment || null,
+        drugs_administered: anaesForm.drugs_administered || null,
+        intraop_monitoring: anaesForm.intraop_monitoring || null,
+        recovery_vitals: anaesForm.recovery_vitals || null,
+        post_anaesthesia_status: anaesForm.post_anaesthesia_status,
+        complications: anaesForm.complications || null,
+        consent_signed: anaesForm.consent_signed,
+        notes: anaesForm.notes || null,
+        checkin_time: new Date().toISOString(),
+      });
+      if (error) throw error;
+      toast.success('Anaesthesia record saved');
+      setAnaesSurgery(null);
+      setAnaesForm({ anaesthetist_name: '', pre_op_assessment: '', drugs_administered: '', intraop_monitoring: '', recovery_vitals: '', post_anaesthesia_status: 'stable', complications: '', consent_signed: false, notes: '' });
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to save anaesthesia record');
     }
   };
 
@@ -183,6 +216,7 @@ export const OTStaffWorkflow = () => {
                       {s.status === 'in_progress' && (
                         <Button size="sm" onClick={() => updateStatus(s.id, 'completed')}>Complete</Button>
                       )}
+                      <Button size="sm" variant="ghost" onClick={() => setAnaesSurgery(s)}>Anaesthesia Log</Button>
                     </div>
                   </div>
                 ))}
@@ -191,6 +225,39 @@ export const OTStaffWorkflow = () => {
           }
         </CardContent>
       </Card>
+
+      <Dialog open={!!anaesSurgery} onOpenChange={(o) => !o && setAnaesSurgery(null)}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader><DialogTitle>Anaesthesia Record — {anaesSurgery?.patient_name}</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-2">
+              <div className="space-y-1"><Label>Anaesthetist</Label><Input value={anaesForm.anaesthetist_name} onChange={e => setAnaesForm({...anaesForm, anaesthetist_name: e.target.value})} /></div>
+              <div className="space-y-1"><Label>Post-Anaesthesia Status</Label>
+                <Select value={anaesForm.post_anaesthesia_status} onValueChange={v => setAnaesForm({...anaesForm, post_anaesthesia_status: v})}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="stable">Stable</SelectItem>
+                    <SelectItem value="recovering">Recovering</SelectItem>
+                    <SelectItem value="monitoring">Needs Monitoring</SelectItem>
+                    <SelectItem value="complication">Complication</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="space-y-1"><Label>Pre-Op Assessment</Label><Textarea value={anaesForm.pre_op_assessment} onChange={e => setAnaesForm({...anaesForm, pre_op_assessment: e.target.value})} rows={2} /></div>
+            <div className="space-y-1"><Label>Drugs Administered</Label><Textarea value={anaesForm.drugs_administered} onChange={e => setAnaesForm({...anaesForm, drugs_administered: e.target.value})} rows={2} placeholder="Drug, dose, route, time" /></div>
+            <div className="space-y-1"><Label>Intra-Op Monitoring</Label><Textarea value={anaesForm.intraop_monitoring} onChange={e => setAnaesForm({...anaesForm, intraop_monitoring: e.target.value})} rows={2} placeholder="BP, HR, SpO2, EtCO2..." /></div>
+            <div className="space-y-1"><Label>Recovery Vitals</Label><Textarea value={anaesForm.recovery_vitals} onChange={e => setAnaesForm({...anaesForm, recovery_vitals: e.target.value})} rows={2} /></div>
+            <div className="space-y-1"><Label>Complications</Label><Input value={anaesForm.complications} onChange={e => setAnaesForm({...anaesForm, complications: e.target.value})} placeholder="None / describe" /></div>
+            <div className="flex items-center gap-2">
+              <input type="checkbox" id="consent" checked={anaesForm.consent_signed} onChange={e => setAnaesForm({...anaesForm, consent_signed: e.target.checked})} />
+              <Label htmlFor="consent">Informed consent signed</Label>
+            </div>
+            <div className="space-y-1"><Label>Notes</Label><Textarea value={anaesForm.notes} onChange={e => setAnaesForm({...anaesForm, notes: e.target.value})} rows={2} /></div>
+            <Button className="w-full" onClick={saveAnaesthesiaRecord} disabled={!anaesForm.anaesthetist_name}>Save Anaesthesia Record</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

@@ -103,12 +103,51 @@ const LabManagement = () => {
                 .update({
                     result_summary: resultSummary,
                     status: 'completed',
-                    results_date: new Date().toISOString()
+                    results_date: new Date().toISOString(),
+                    performed_by: user?.id ?? null,
                 })
                 .eq('id', selectedRequest.id);
 
             if (error) throw error;
-            toast.success('Results submitted successfully');
+
+            // Push to patient-facing lab_results
+            try {
+                await supabase.from('lab_results').insert({
+                    patient_id: (selectedRequest as any).patient_id,
+                    test_name: (selectedRequest as any).test_type || 'Lab Test',
+                    test_date: new Date().toISOString().split('T')[0],
+                    result_value: resultSummary,
+                    notes: 'Pending pathologist review',
+                });
+            } catch (e) { console.error('lab_results push failed', e); }
+
+            // Push to pathologist review queue
+            try {
+                const patientName = (selectedRequest as any).patient
+                    ? `${(selectedRequest as any).patient.first_name ?? ''} ${(selectedRequest as any).patient.last_name ?? ''}`.trim()
+                    : 'Unknown Patient';
+                const { data: staffRow } = await supabase
+                    .from('institution_staff')
+                    .select('institution_id')
+                    .eq('provider_id', user?.id ?? '')
+                    .eq('is_active', true)
+                    .limit(1)
+                    .maybeSingle();
+                const institutionId = staffRow?.institution_id;
+                if (institutionId) {
+                    await (supabase.from('pathologist_reviews' as any) as any).insert({
+                        institution_id: institutionId,
+                        patient_name: patientName,
+                        test_name: (selectedRequest as any).test_type || 'Lab Test',
+                        result_value: resultSummary,
+                        lab_tech_id: user?.id ?? null,
+                        lab_tech_name: user?.email ?? null,
+                        status: 'pending_review',
+                    });
+                }
+            } catch (e) { console.error('pathologist queue push failed', e); }
+
+            toast.success('Results submitted & sent for pathologist review');
             setSelectedRequest(null);
             setResultSummary('');
             queryClient.invalidateQueries({ queryKey: ['lab-requests'] });
