@@ -150,10 +150,15 @@ async function handleAPIRequest(request) {
     // If network fails, try cache
     const cachedResponse = await caches.match(request);
     if (cachedResponse) {
-      // Add offline indicator to response
-      const response = cachedResponse.clone();
-      response.headers.set('X-Served-From', 'cache');
-      return response;
+      // Add offline indicator to response without mutating headers
+      const body = await cachedResponse.clone().arrayBuffer();
+      const headers = new Headers(cachedResponse.headers);
+      headers.set('X-Served-From', 'cache');
+      return new Response(body, {
+        status: cachedResponse.status,
+        statusText: cachedResponse.statusText,
+        headers
+      });
     }
     
     return networkResponse;
