@@ -53,38 +53,41 @@ export const MedicationAdministrationRecord: React.FC<MARProps> = ({ institution
   const [holdReason, setHoldReason] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('administered');
 
-  // Using raw SQL query to avoid type issues with new tables
   const { data: marEntries, isLoading } = useQuery({
     queryKey: ['mar-entries', institutionId, patientId],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc('get_mar_entries' as never, {
-        p_institution_id: institutionId,
-        p_patient_id: patientId || null
-      } as never);
-      
-      // Fallback to empty array if RPC doesn't exist yet
+      let q = (supabase.from('medication_administration_records' as any) as any)
+        .select('*, patient:profiles!patient_id(first_name, last_name)')
+        .eq('institution_id', institutionId)
+        .order('scheduled_time', { ascending: true })
+        .limit(200);
+      if (patientId) q = q.eq('patient_id', patientId);
+      const { data, error } = await q;
       if (error) {
-        console.log('MAR RPC not available yet:', error.message);
+        console.error('MAR fetch error:', error);
         return [] as MAREntry[];
       }
       return (data || []) as MAREntry[];
     },
+    enabled: !!institutionId,
   });
 
   const administerMutation = useMutation({
     mutationFn: async ({ id, status, notes, holdReason }: { id: string; status: string; notes: string; holdReason?: string }) => {
       const { data: { user } } = await supabase.auth.getUser();
-      
-      // Use raw SQL for now since types aren't generated
-      const { error } = await supabase.rpc('update_mar_entry' as never, {
-        p_id: id,
-        p_status: status,
-        p_notes: notes,
-        p_hold_reason: holdReason || null,
-        p_administered_by: user?.id,
-        p_administered_time: status === 'administered' ? new Date().toISOString() : null
-      } as never);
+      const updates: Record<string, unknown> = {
+        status,
+        notes: notes || null,
+        administered_by: user?.id ?? null,
+        updated_at: new Date().toISOString(),
+      };
+      if (status === 'administered') updates.administered_time = new Date().toISOString();
+      if (status === 'held') updates.hold_reason = holdReason || null;
+      if (status === 'refused') updates.refusal_reason = notes || 'Patient refused';
+      if (status === 'not_given') updates.not_given_reason = notes || null;
 
+      const { error } = await (supabase.from('medication_administration_records' as any) as any)
+        .update(updates).eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => {
