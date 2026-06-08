@@ -111,6 +111,33 @@ export const OTStaffWorkflow = () => {
     }
   };
 
+  const saveAnaesthesiaRecord = async () => {
+    if (!anaesSurgery || !institutionId || !user) return;
+    try {
+      const { error } = await (supabase.from('ot_anaesthesia_records' as any) as any).insert({
+        hospital_id: institutionId,
+        ot_booking_id: anaesSurgery.id,
+        anaesthesia_type: anaesSurgery.anaesthesia_type,
+        anaesthetist_name: anaesForm.anaesthetist_name || user.email,
+        pre_op_assessment: anaesForm.pre_op_assessment || null,
+        drugs_administered: anaesForm.drugs_administered || null,
+        intraop_monitoring: anaesForm.intraop_monitoring || null,
+        recovery_vitals: anaesForm.recovery_vitals || null,
+        post_anaesthesia_status: anaesForm.post_anaesthesia_status,
+        complications: anaesForm.complications || null,
+        consent_signed: anaesForm.consent_signed,
+        notes: anaesForm.notes || null,
+        checkin_time: new Date().toISOString(),
+      });
+      if (error) throw error;
+      toast.success('Anaesthesia record saved');
+      setAnaesSurgery(null);
+      setAnaesForm({ anaesthetist_name: '', pre_op_assessment: '', drugs_administered: '', intraop_monitoring: '', recovery_vitals: '', post_anaesthesia_status: 'stable', complications: '', consent_signed: false, notes: '' });
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to save anaesthesia record');
+    }
+  };
+
   const statusColor = (s: string) => {
     switch (s) {
       case 'in_progress': return 'bg-amber-100 text-amber-800';
