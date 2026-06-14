@@ -173,6 +173,19 @@ export const PrescriptionWriter = () => {
           />
         </div>
 
+        {interactionWarning && (
+          <div className="rounded-md border border-destructive/50 bg-destructive/10 p-3 space-y-2">
+            <div className="flex items-start gap-2 text-sm">
+              <AlertTriangle className="h-4 w-4 text-destructive mt-0.5" />
+              <div className="whitespace-pre-line">{interactionWarning}</div>
+            </div>
+            <label className="flex items-center gap-2 text-xs">
+              <input type="checkbox" checked={overrideAck} onChange={(e) => setOverrideAck(e.target.checked)} />
+              I have reviewed and will proceed despite the interaction.
+            </label>
+          </div>
+        )}
+
         <Button type="submit" className="w-full">
           Create Prescription
         </Button>
