@@ -13,8 +13,12 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { checkInteractions, getPatientActiveMedications, isBlocking, summarize } from "@/utils/drug-interactions";
+import { AlertTriangle } from "lucide-react";
 
 export const PrescriptionWriter = () => {
+  const [interactionWarning, setInteractionWarning] = useState<string>("");
+  const [overrideAck, setOverrideAck] = useState(false);
   const [prescription, setPrescription] = useState({
     patient_id: "",
     medication_name: "",
