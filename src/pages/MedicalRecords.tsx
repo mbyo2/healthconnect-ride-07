@@ -22,6 +22,8 @@ import { ComprehensiveMedicalRecords } from "@/components/patient/ComprehensiveM
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { AIInsightsWidget } from "@/components/ai/AIInsightsWidget";
 import { FHIRExportPanel } from "@/components/medical/FHIRExportPanel";
+import PatientLabResults from "@/components/patient/PatientLabResults";
+import PatientMAR from "@/components/patient/PatientMAR";
 
 export default function MedicalRecords() {
   const [records, setRecords] = useState<MedicalRecord[]>([]);
@@ -124,6 +126,12 @@ export default function MedicalRecords() {
         <ComprehensiveMedicalRecords />
 
         <Separator />
+
+        {/* Lab results + medication administration (live data) */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <PatientLabResults />
+          <PatientMAR />
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Recent Records */}

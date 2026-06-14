@@ -13,6 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { Pill, Clock, CheckCircle2, XCircle, AlertTriangle, User, Loader2 } from 'lucide-react';
+import { checkInteractions, getPatientActiveMedications, isBlocking, summarize } from '@/utils/drug-interactions';
 
 interface MAREntry {
   id: string;
@@ -104,8 +105,19 @@ export const MedicationAdministrationRecord: React.FC<MARProps> = ({ institution
     },
   });
 
-  const handleAdminister = () => {
+  const handleAdminister = async () => {
     if (!selectedEntry) return;
+    // Safety: drug-interaction check when actually administering
+    if (selectedStatus === 'administered') {
+      const others = await getPatientActiveMedications(selectedEntry.patient_id);
+      const filtered = others.filter(d => d.toLowerCase() !== selectedEntry.medication_name.toLowerCase());
+      const interactions = await checkInteractions(selectedEntry.medication_name, filtered);
+      if (interactions.some(i => isBlocking(i.severity))) {
+        const msg = summarize(interactions);
+        const ok = window.confirm(`⚠️ Drug interaction detected:\n\n${msg}\n\nConfirm administration anyway?`);
+        if (!ok) return;
+      }
+    }
     administerMutation.mutate({
       id: selectedEntry.id,
       status: selectedStatus,

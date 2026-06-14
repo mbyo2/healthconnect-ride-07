@@ -13,8 +13,12 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { checkInteractions, getPatientActiveMedications, isBlocking, summarize } from "@/utils/drug-interactions";
+import { AlertTriangle } from "lucide-react";
 
 export const PrescriptionWriter = () => {
+  const [interactionWarning, setInteractionWarning] = useState<string>("");
+  const [overrideAck, setOverrideAck] = useState(false);
   const [prescription, setPrescription] = useState({
     patient_id: "",
     medication_name: "",
@@ -25,13 +29,31 @@ export const PrescriptionWriter = () => {
     notes: "",
   });
 
+  const runInteractionCheck = async (): Promise<{ blocking: boolean; message: string }> => {
+    if (!prescription.patient_id || !prescription.medication_name) return { blocking: false, message: "" };
+    const existing = await getPatientActiveMedications(prescription.patient_id);
+    const interactions = await checkInteractions(prescription.medication_name, existing);
+    if (!interactions.length) return { blocking: false, message: "" };
+    const blocking = interactions.some(i => isBlocking(i.severity));
+    return { blocking, message: summarize(interactions) };
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      // Parse duration to days (simple parsing)
+      // Drug-interaction safety gate
+      const check = await runInteractionCheck();
+      if (check.message) {
+        setInteractionWarning(check.message);
+        if (check.blocking && !overrideAck) {
+          toast.error("Major drug interaction detected — review and confirm to override.");
+          return;
+        }
+      }
+
       const durationDays = parseInt(prescription.duration) || 7;
 
       const { error } = await supabase
@@ -39,19 +61,23 @@ export const PrescriptionWriter = () => {
         .insert({
           patient_id: prescription.patient_id,
           medication_name: prescription.medication_name,
-          dosage: `${prescription.dosage} - ${prescription.frequency}`, // Combine for schema compatibility if needed, or just dosage
+          dosage: `${prescription.dosage} - ${prescription.frequency}`,
           instructions: `${prescription.frequency}. ${prescription.notes}`,
           duration_days: durationDays,
           quantity: parseInt(prescription.quantity) || 1,
           provider_id: user.id,
           prescribed_date: new Date().toISOString(),
           status: 'active',
-          notes: prescription.notes
+          notes: check.message
+            ? `${prescription.notes}\n[Interaction noted & acknowledged]: ${check.message}`
+            : prescription.notes
         });
 
       if (error) throw error;
 
       toast.success("Prescription created successfully");
+      setInteractionWarning("");
+      setOverrideAck(false);
       setPrescription({
         patient_id: "",
         medication_name: "",
@@ -146,6 +172,19 @@ export const PrescriptionWriter = () => {
             placeholder="Additional instructions or notes"
           />
         </div>
+
+        {interactionWarning && (
+          <div className="rounded-md border border-destructive/50 bg-destructive/10 p-3 space-y-2">
+            <div className="flex items-start gap-2 text-sm">
+              <AlertTriangle className="h-4 w-4 text-destructive mt-0.5" />
+              <div className="whitespace-pre-line">{interactionWarning}</div>
+            </div>
+            <label className="flex items-center gap-2 text-xs">
+              <input type="checkbox" checked={overrideAck} onChange={(e) => setOverrideAck(e.target.checked)} />
+              I have reviewed and will proceed despite the interaction.
+            </label>
+          </div>
+        )}
 
         <Button type="submit" className="w-full">
           Create Prescription
