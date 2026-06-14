@@ -490,6 +490,10 @@ const LabManagement = () => {
                                             onChange={(e) => setResultSummary(e.target.value)}
                                         />
                                     </div>
+                                    <label className="flex items-center gap-2 text-sm cursor-pointer">
+                                        <Checkbox checked={isCritical} onCheckedChange={(v) => setIsCritical(v === true)} />
+                                        Flag as <span className="font-semibold text-destructive">critical</span> — patient & ordering clinician will be notified immediately
+                                    </label>
                                     <div className="flex gap-3">
                                         <Button
                                             variant="outline"
