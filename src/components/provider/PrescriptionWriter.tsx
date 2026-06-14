@@ -29,13 +29,31 @@ export const PrescriptionWriter = () => {
     notes: "",
   });
 
+  const runInteractionCheck = async (): Promise<{ blocking: boolean; message: string }> => {
+    if (!prescription.patient_id || !prescription.medication_name) return { blocking: false, message: "" };
+    const existing = await getPatientActiveMedications(prescription.patient_id);
+    const interactions = await checkInteractions(prescription.medication_name, existing);
+    if (!interactions.length) return { blocking: false, message: "" };
+    const blocking = interactions.some(i => isBlocking(i.severity));
+    return { blocking, message: summarize(interactions) };
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      // Parse duration to days (simple parsing)
+      // Drug-interaction safety gate
+      const check = await runInteractionCheck();
+      if (check.message) {
+        setInteractionWarning(check.message);
+        if (check.blocking && !overrideAck) {
+          toast.error("Major drug interaction detected — review and confirm to override.");
+          return;
+        }
+      }
+
       const durationDays = parseInt(prescription.duration) || 7;
 
       const { error } = await supabase
@@ -43,19 +61,23 @@ export const PrescriptionWriter = () => {
         .insert({
           patient_id: prescription.patient_id,
           medication_name: prescription.medication_name,
-          dosage: `${prescription.dosage} - ${prescription.frequency}`, // Combine for schema compatibility if needed, or just dosage
+          dosage: `${prescription.dosage} - ${prescription.frequency}`,
           instructions: `${prescription.frequency}. ${prescription.notes}`,
           duration_days: durationDays,
           quantity: parseInt(prescription.quantity) || 1,
           provider_id: user.id,
           prescribed_date: new Date().toISOString(),
           status: 'active',
-          notes: prescription.notes
+          notes: check.message
+            ? `${prescription.notes}\n[Interaction noted & acknowledged]: ${check.message}`
+            : prescription.notes
         });
 
       if (error) throw error;
 
       toast.success("Prescription created successfully");
+      setInteractionWarning("");
+      setOverrideAck(false);
       setPrescription({
         patient_id: "",
         medication_name: "",
