@@ -26,6 +26,8 @@ import { InstitutionInsuranceVerification } from '@/components/institution/Insti
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
+import { dispatchNotification } from '@/hooks/useNotifications';
 
 const LabManagement = () => {
     const { user } = useAuth();
@@ -33,6 +35,7 @@ const LabManagement = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedRequest, setSelectedRequest] = useState<LabRequest | null>(null);
     const [resultSummary, setResultSummary] = useState('');
+    const [isCritical, setIsCritical] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showNewRequestDialog, setShowNewRequestDialog] = useState(false);
     const [selectedPatientId, setSelectedPatientId] = useState('');
@@ -111,17 +114,19 @@ const LabManagement = () => {
             if (error) throw error;
 
             // Push to patient-facing lab_results
+            const isUrgent = isCritical || ['stat', 'critical', 'urgent'].includes(((selectedRequest as any).priority || '').toLowerCase());
             try {
                 await supabase.from('lab_results').insert({
                     patient_id: (selectedRequest as any).patient_id,
                     test_name: (selectedRequest as any).test_type || 'Lab Test',
                     test_date: new Date().toISOString().split('T')[0],
                     result_value: resultSummary,
-                    notes: 'Pending pathologist review',
+                    notes: isUrgent ? `CRITICAL — ${selectedRequest ? 'requires immediate review' : ''}` : 'Pending pathologist review',
                 });
             } catch (e) { console.error('lab_results push failed', e); }
 
             // Push to pathologist review queue
+            let institutionId: string | undefined;
             try {
                 const patientName = (selectedRequest as any).patient
                     ? `${(selectedRequest as any).patient.first_name ?? ''} ${(selectedRequest as any).patient.last_name ?? ''}`.trim()
@@ -133,7 +138,7 @@ const LabManagement = () => {
                     .eq('is_active', true)
                     .limit(1)
                     .maybeSingle();
-                const institutionId = staffRow?.institution_id;
+                institutionId = staffRow?.institution_id;
                 if (institutionId) {
                     await (supabase.from('pathologist_reviews' as any) as any).insert({
                         institution_id: institutionId,
@@ -142,14 +147,30 @@ const LabManagement = () => {
                         result_value: resultSummary,
                         lab_tech_id: user?.id ?? null,
                         lab_tech_name: user?.email ?? null,
-                        status: 'pending_review',
+                        status: isUrgent ? 'urgent_review' : 'pending_review',
                     });
                 }
             } catch (e) { console.error('pathologist queue push failed', e); }
 
-            toast.success('Results submitted & sent for pathologist review');
+            // Critical-result push: notify patient + ordering provider
+            if (isUrgent) {
+                const patientId = (selectedRequest as any).patient_id;
+                const orderingId = (selectedRequest as any).ordered_by;
+                const testName = (selectedRequest as any).test_type || 'Lab Test';
+                const title = '⚠️ Critical Lab Result';
+                const message = `${testName}: ${resultSummary}. Please review immediately.`;
+                if (patientId) {
+                    dispatchNotification({ userId: patientId, title: 'New lab result available', message: `Your ${testName} result is ready. Open the app for details.`, category: 'lab', link: '/medical-records' });
+                }
+                if (orderingId && orderingId !== user?.id) {
+                    dispatchNotification({ userId: orderingId, title, message, category: 'lab', channels: ['push', 'sms', 'email'] });
+                }
+            }
+
+            toast.success(isUrgent ? '⚠️ Critical result submitted — clinicians notified' : 'Results submitted & sent for pathologist review');
             setSelectedRequest(null);
             setResultSummary('');
+            setIsCritical(false);
             queryClient.invalidateQueries({ queryKey: ['lab-requests'] });
         } catch (error) {
             console.error('Error submitting results:', error);
