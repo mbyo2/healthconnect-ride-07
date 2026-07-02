@@ -36,6 +36,7 @@ const Connections = lazyWithRetry(() => import('@/pages/Connections'));
 const Chat = lazyWithRetry(() => import('@/pages/Chat'));
 const Prescriptions = lazyWithRetry(() => import('@/pages/Prescriptions'));
 const Symptoms = lazyWithRetry(() => import('@/pages/Symptoms'));
+const TriageIntake = lazyWithRetry(() => import('@/pages/TriageIntake'));
 const HealthcareProfessionals = lazyWithRetry(() => import('@/pages/HealthcareProfessionals'));
 const HealthcareInstitutions = lazyWithRetry(() => import('@/pages/HealthcareInstitutions'));
 const VideoDashboard = lazyWithRetry(() => import('@/pages/VideoDashboard'));
@@ -214,6 +215,8 @@ const AppContent = () => {
             <Route path="/chat" element={<RouteGuard><Chat /></RouteGuard>} />
             <Route path="/prescriptions" element={<RouteGuard><Prescriptions /></RouteGuard>} />
             <Route path="/symptoms" element={<RouteGuard><Symptoms /></RouteGuard>} />
+            <Route path="/triage" element={<RouteGuard><TriageIntake /></RouteGuard>} />
+            <Route path="/doc-o-clock" element={<RouteGuard><TriageIntake /></RouteGuard>} />
             <Route path="/video-dashboard" element={<RouteGuard><VideoDashboard /></RouteGuard>} />
             <Route path="/testing" element={<RouteGuard><Testing /></RouteGuard>} />
             <Route path="/documentation" element={<RouteGuard><Documentation /></RouteGuard>} />
