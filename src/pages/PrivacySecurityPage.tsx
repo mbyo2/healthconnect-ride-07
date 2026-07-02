@@ -117,53 +117,62 @@ const PrivacySecurityPage = () => {
     }
   };
 
+  const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
+  const [manualEntryKey, setManualEntryKey] = useState<string | null>(null);
+
   const toggleTwoFactor = async () => {
     try {
       setIsLoading(true);
+      const { setupTwoFactor, disableTwoFactor } = await import('@/utils/two-factor-service');
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
 
       if (!isTwoFactorEnabled) {
-        // In a real implementation, this would initiate the 2FA setup process
-        // For demo purposes, we're simulating success
-
-        // Generate mock backup codes
-        const mockBackupCodes = Array.from({ length: 10 }, () =>
-          Math.random().toString(36).substring(2, 8).toUpperCase()
-        );
-
-        setBackupCodes(mockBackupCodes);
+        const setup = await setupTwoFactor(user.id);
+        setQrCodeUrl(setup.qrCodeUrl);
+        setManualEntryKey(setup.manualEntryKey);
+        setBackupCodes(setup.backupCodes);
         setShowBackupCodes(true);
         setIsVerifying(true);
       } else {
-        // Disable 2FA
+        const code = window.prompt('Enter a current 6-digit code (or a backup code) to disable 2FA');
+        if (!code) return;
+        await disableTwoFactor(user.id, code.trim());
         setIsTwoFactorEnabled(false);
         setShowBackupCodes(false);
         setBackupCodes([]);
-        toast.success("Two-factor authentication disabled");
-
-        // Log the 2FA disable action
-        logSecurityAction("2fa_disabled", "auth", "");
+        setQrCodeUrl(null);
+        setManualEntryKey(null);
+        toast.success('Two-factor authentication disabled');
+        logSecurityAction('2fa_disabled', 'auth', '');
       }
-    } catch (error) {
-      console.error("Error toggling 2FA:", error);
-      toast.error("Error updating two-factor authentication");
+    } catch (error: any) {
+      console.error('Error toggling 2FA:', error);
+      toast.error(error?.message || 'Error updating two-factor authentication');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const verifyTwoFactorSetup = () => {
-    // In a real implementation, this would verify the code against the authenticator app
-    if (verificationCode.length === 6) {
+  const verifyTwoFactorSetup = async () => {
+    try {
+      setIsLoading(true);
+      const { enableTwoFactor } = await import('@/utils/two-factor-service');
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      await enableTwoFactor(user.id, verificationCode.trim());
       setIsTwoFactorEnabled(true);
       setIsVerifying(false);
-      toast.success("Two-factor authentication enabled");
-
-      // Log the 2FA enable action
-      logSecurityAction("2fa_enabled", "auth", "");
-    } else {
-      toast.error("Invalid verification code");
+      setVerificationCode('');
+      toast.success('Two-factor authentication enabled');
+      logSecurityAction('2fa_enabled', 'auth', '');
+    } catch (error: any) {
+      toast.error(error?.message || 'Invalid verification code');
+    } finally {
+      setIsLoading(false);
     }
   };
+
 
   const updatePrivacySettings = async () => {
     try {
