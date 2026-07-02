@@ -69,18 +69,25 @@ serve(async (req) => {
   }
 
   try {
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return new Response(JSON.stringify({ success: false, error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+    const supabaseAuth = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      { global: { headers: { Authorization: authHeader } } }
+    );
+    const { data: { user }, error: authErr } = await supabaseAuth.auth.getUser();
+    if (authErr || !user) {
+      return new Response(JSON.stringify({ success: false, error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 
-    console.log('Environment check:', {
-      hasSupabaseUrl: !!supabaseUrl,
-      hasSupabaseKey: !!supabaseKey,
-      hasPaypalId: !!Deno.env.get('PAYPAL_CLIENT_ID'),
-      hasPaypalSecret: !!Deno.env.get('PAYPAL_CLIENT_SECRET')
-    });
-
     if (!supabaseUrl || !supabaseKey) {
-      throw new Error('Missing Supabase environment variables: SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY');
+      throw new Error('Missing Supabase environment variables');
     }
 
     const supabaseClient = createClient(supabaseUrl, supabaseKey);
@@ -101,7 +108,9 @@ serve(async (req) => {
       );
     }
 
-    const { amount, currency, patientId, providerId, serviceId, redirectUrl } = validationResult.data;
+    const { amount, currency, providerId, serviceId, redirectUrl } = validationResult.data;
+    // FORCE patientId to the authenticated user
+    const patientId = user.id;
 
     const isWalletTopUp = serviceId === 'wallet_topup';
 
