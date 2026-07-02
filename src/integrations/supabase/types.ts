@@ -13027,7 +13027,27 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      user_two_factor_status: {
+        Row: {
+          created_at: string | null
+          enabled: boolean | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          enabled?: boolean | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          enabled?: boolean | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       accept_staff_invitation: { Args: { _token: string }; Returns: Json }
