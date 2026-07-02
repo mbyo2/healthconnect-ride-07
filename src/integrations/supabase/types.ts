@@ -13080,6 +13080,17 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      get_public_profile: {
+        Args: { _user_id: string }
+        Returns: {
+          avatar_url: string
+          first_name: string
+          id: string
+          last_name: string
+          role: Database["public"]["Enums"]["user_role"]
+          specialty: string
+        }[]
+      }
       get_staff_invitation_by_token: {
         Args: { p_token: string }
         Returns: {
