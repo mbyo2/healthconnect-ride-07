@@ -215,11 +215,23 @@ serve(async (req) => {
     for (const account of testAccounts) {
       try {
         console.log(`Creating account for ${account.email}...`);
-        
+
+        // Generate a strong random password per account (never hardcoded)
+        const randomBytes = new Uint8Array(18);
+        crypto.getRandomValues(randomBytes);
+        const generatedPassword =
+          'Tk!' +
+          Array.from(randomBytes)
+            .map((b) => b.toString(36))
+            .join('')
+            .slice(0, 20) +
+          'Zx9';
+        account.password = generatedPassword;
+
         // Create the user with admin privileges
         const { data: authData, error: authError } = await supabaseClient.auth.admin.createUser({
           email: account.email,
-          password: account.password,
+          password: generatedPassword,
           email_confirm: true,
           user_metadata: {
             first_name: account.firstName,
