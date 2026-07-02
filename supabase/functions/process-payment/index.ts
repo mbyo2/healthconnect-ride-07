@@ -85,7 +85,8 @@ async function createPayPalOrder(amount: number, currency: string, accessToken: 
   const data = await response.json();
   
   if (!response.ok) {
-    throw new Error(`PayPal order creation failed: ${JSON.stringify(data)}`);
+    console.error('PayPal order creation failed:', response.status, data);
+    throw new Error('Payment processing failed');
   }
   
   return data;
