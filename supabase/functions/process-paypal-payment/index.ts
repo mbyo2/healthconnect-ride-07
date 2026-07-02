@@ -176,7 +176,7 @@ serve(async (req) => {
     if (paymentError) throw paymentError;
     const paypalClientId = Deno.env.get('PAYPAL_CLIENT_ID');
     const paypalClientSecret = Deno.env.get('PAYPAL_CLIENT_SECRET');
-    const paypalBaseUrl = Deno.env.get('PAYPAL_BASE_URL') || 'https://api-m.sandbox.paypal.com'; // Default to sandbox
+    const paypalBaseUrl = Deno.env.get('PAYPAL_BASE_URL') || 'https://api-m.paypal.com'; // Default to production
 
     if (!paypalClientId || !paypalClientSecret) {
       console.warn('PayPal credentials not configured, using mock payment');
