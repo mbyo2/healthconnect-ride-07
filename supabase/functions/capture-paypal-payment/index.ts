@@ -187,7 +187,8 @@ serve(async (req) => {
 
       if (!captureResponse.ok) {
         const errorText = await captureResponse.text();
-        throw new Error(`PayPal capture failed: ${errorText}`);
+        console.error('PayPal capture failed:', captureResponse.status, errorText);
+        throw new Error('Payment capture failed');
       }
 
       const captureData: PayPalCaptureResponse = await captureResponse.json();
