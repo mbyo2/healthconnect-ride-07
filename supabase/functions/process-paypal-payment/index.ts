@@ -295,19 +295,19 @@ serve(async (req) => {
 
     } catch (paypalError: unknown) {
       console.error('PayPal API error:', paypalError);
-      const errorMessage = getErrorMessage(paypalError);
+      const internalMessage = getErrorMessage(paypalError);
 
-      // Update payment status to failed
+      // Update payment status to failed (internal detail only)
       await supabaseClient
         .from('payments')
         .update({
           status: 'failed',
-          error_message: errorMessage,
+          error_message: internalMessage,
           failed_at: new Date().toISOString()
         })
         .eq('id', payment.id);
 
-      throw new Error(`PayPal integration error: ${errorMessage}`);
+      throw new Error('Payment processing failed');
     }
 
   } catch (error: unknown) {
