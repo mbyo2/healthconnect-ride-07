@@ -128,21 +128,38 @@ export function useOfflineSync() {
 
       for (const action of actions) {
         let error: any = null;
-        if (action.operation === 'insert') {
-          const res = await (supabase.from(action.table as any) as any).insert(action.data);
-          error = res.error;
+        let drop = false;
+
+        if (typeof action.table !== 'string' || !ALLOWED_SYNC_TABLES.has(action.table)) {
+          // Unknown/unauthorized table — drop from queue silently.
+          drop = true;
+        } else if (action.operation === 'insert') {
+          const clean = sanitizePayload(action.table, action.data);
+          if (!clean) { drop = true; }
+          else {
+            const res = await (supabase.from(action.table as any) as any).insert(clean);
+            error = res.error;
+          }
         } else if (action.operation === 'update') {
-          const { id, ...rest } = action.data;
-          const res = await (supabase.from(action.table as any) as any).update(rest).eq('id', id);
-          error = res.error;
+          const clean = sanitizePayload(action.table, action.data);
+          const rowId = action.data?.id;
+          if (!clean || !rowId) { drop = true; }
+          else {
+            const { id: _omit, ...rest } = clean as any;
+            const res = await (supabase.from(action.table as any) as any).update(rest).eq('id', rowId);
+            error = res.error;
+          }
+        } else {
+          drop = true;
         }
 
-        if (!error) {
+        if (drop || !error) {
           const delTx = db.transaction(STORE_NAME, 'readwrite');
           delTx.objectStore(STORE_NAME).delete(action.id);
           await new Promise((res) => { delTx.oncomplete = res; });
         }
       }
+
       countPending();
     } catch (err) {
       console.error('Offline sync error:', err);
