@@ -83,7 +83,15 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
-    const { analysisType, data } = await req.json();
+    const rawBody = await req.json();
+    const parsed = analysisSchema.safeParse(rawBody);
+    if (!parsed.success) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid request', details: parsed.error.flatten() }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    const { analysisType, data } = parsed.data as any;
     
     const HF_TOKEN = Deno.env.get('HF_TOKEN');
     if (!HF_TOKEN) {
