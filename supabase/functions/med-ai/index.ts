@@ -138,7 +138,7 @@ CRITICAL: If symptoms suggest emergency (chest pain, difficulty breathing, sever
 
         return new Response(
             JSON.stringify({
-                error: error instanceof Error ? error.message : 'Unknown error occurred',
+                error: 'An error occurred processing your request',
                 
             }),
             {

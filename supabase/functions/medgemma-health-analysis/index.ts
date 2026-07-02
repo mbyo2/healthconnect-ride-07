@@ -158,7 +158,7 @@ Provide:
     
     return new Response(
       JSON.stringify({ 
-        error: error instanceof Error ? error.message : 'Unknown error occurred',
+        error: 'An error occurred processing your request',
         
       }),
       { 
