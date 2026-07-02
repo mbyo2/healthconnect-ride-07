@@ -6390,6 +6390,7 @@ export type Database = {
           ip_address: string | null
           platform: string | null
           user_agent: string | null
+          user_id: string | null
         }
         Insert: {
           browser?: string | null
@@ -6401,6 +6402,7 @@ export type Database = {
           ip_address?: string | null
           platform?: string | null
           user_agent?: string | null
+          user_id?: string | null
         }
         Update: {
           browser?: string | null
@@ -6412,6 +6414,7 @@ export type Database = {
           ip_address?: string | null
           platform?: string | null
           user_agent?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
