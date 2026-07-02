@@ -76,7 +76,7 @@ export default function TriageIntake() {
 
   const runAssessment = async () => {
     if (!chiefComplaint.trim()) {
-      toast({ title: "Please describe your main symptom.", variant: "destructive" });
+      toast.error("Please describe your main symptom.");
       return;
     }
     setAssessing(true);
@@ -114,17 +114,13 @@ export default function TriageIntake() {
       setResult(data);
 
       if (data.urgency === "emergency") {
-        toast({
-          title: "Emergency alert dispatched",
+        toast.error("Emergency alert dispatched", {
           description: "Please stay on this page — help is being coordinated.",
-          variant: "destructive",
         });
       }
     } catch (err: any) {
-      toast({
-        title: "Triage failed",
+      toast.error("Triage failed", {
         description: err?.message ?? "Please try again.",
-        variant: "destructive",
       });
     } finally {
       setAssessing(false);
