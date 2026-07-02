@@ -10,7 +10,7 @@ const corsHeaders = {
 // Input validation schema
 const chatRequestSchema = z.object({
   message: z.string().min(1, 'Message cannot be empty').max(2000, 'Message too long'),
-  image: z.string().nullable().optional(),
+  image: z.string().max(5_000_000, 'Image exceeds 5MB base64 limit').nullable().optional(),
   userRole: z.string().optional().default('patient'),
   conversationHistory: z.array(z.object({
     role: z.enum(['user', 'assistant', 'system']),

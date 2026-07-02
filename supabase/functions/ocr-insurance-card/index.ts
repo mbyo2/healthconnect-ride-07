@@ -23,6 +23,18 @@ Deno.serve(async (req) => {
 
     const { imageBase64, imageUrl } = await req.json();
     if (!imageBase64 && !imageUrl) throw new Error('No image provided');
+    if (typeof imageBase64 === 'string' && imageBase64.length > 5_000_000) {
+      return new Response(
+        JSON.stringify({ error: 'Image exceeds 5MB base64 limit' }),
+        { status: 413, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    if (typeof imageUrl === 'string' && imageUrl.length > 2048) {
+      return new Response(
+        JSON.stringify({ error: 'Image URL too long' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     const hfToken = Deno.env.get('HF_TOKEN');
     if (!hfToken) throw new Error('HF_TOKEN not configured');

@@ -127,35 +127,13 @@ serve(async (req) => {
     const paypalBaseUrl = Deno.env.get('PAYPAL_BASE_URL') || 'https://api-m.paypal.com';
 
     if (!paypalClientId || !paypalClientSecret) {
-      const existingMetadata =
-        payment.metadata && typeof payment.metadata === 'object'
-          ? (payment.metadata as Record<string, unknown>)
-          : {};
-
-      // Mock capture for development
-      await supabaseClient
-        .from('payments')
-        .update({
-          status: 'completed',
-          payment_date: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          metadata: {
-            ...existingMetadata,
-            mock_capture: true,
-            captured_at: new Date().toISOString()
-          }
-        })
-        .eq('id', paymentId);
-
+      console.error('PayPal credentials missing at capture time — refusing to complete payment');
       return new Response(
         JSON.stringify({
-          success: true,
-          message: 'Mock payment captured successfully',
-          paymentId: payment.id
+          success: false,
+          error: 'Payment provider is not configured'
         }),
-        {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
