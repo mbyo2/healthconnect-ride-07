@@ -6,7 +6,27 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, paypal-auth-algo, paypal-cert-id, paypal-transmission-id, paypal-transmission-time',
 };
 
-// Verify PayPal webhook signature
+// Get a PayPal access token to call verification API
+async function getPayPalAccessToken(): Promise<string | null> {
+  const clientId = Deno.env.get('PAYPAL_CLIENT_ID');
+  const clientSecret = Deno.env.get('PAYPAL_CLIENT_SECRET');
+  if (!clientId || !clientSecret) return null;
+  const auth = btoa(`${clientId}:${clientSecret}`);
+  const base = Deno.env.get('PAYPAL_API_BASE') || 'https://api-m.paypal.com';
+  const res = await fetch(`${base}/v1/oauth2/token`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Basic ${auth}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: 'grant_type=client_credentials',
+  });
+  if (!res.ok) return null;
+  const data = await res.json();
+  return data.access_token ?? null;
+}
+
+// Verify PayPal webhook signature server-side using PayPal's verification API
 async function verifyPayPalSignature(
   headers: Headers,
   body: string,
@@ -14,27 +34,46 @@ async function verifyPayPalSignature(
 ): Promise<boolean> {
   try {
     const authAlgo = headers.get('paypal-auth-algo');
-    const certId = headers.get('paypal-cert-id');
+    const certUrl = headers.get('paypal-cert-url');
     const transmissionId = headers.get('paypal-transmission-id');
+    const transmissionSig = headers.get('paypal-transmission-sig');
     const transmissionTime = headers.get('paypal-transmission-time');
-    
-    if (!authAlgo || !certId || !transmissionId || !transmissionTime) {
-      console.error('Missing required PayPal headers for signature verification');
+
+    if (!authAlgo || !certUrl || !transmissionId || !transmissionSig || !transmissionTime) {
+      console.error('Missing required PayPal signature headers');
       return false;
     }
 
-    // Log verification attempt
-    console.log('PayPal webhook signature verification:', {
-      authAlgo,
-      certId,
-      transmissionId,
-      transmissionTime,
-      webhookId
+    const accessToken = await getPayPalAccessToken();
+    if (!accessToken) {
+      console.error('Unable to obtain PayPal access token for verification');
+      return false;
+    }
+
+    const base = Deno.env.get('PAYPAL_API_BASE') || 'https://api-m.paypal.com';
+    const verifyRes = await fetch(`${base}/v1/notifications/verify-webhook-signature`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        auth_algo: authAlgo,
+        cert_url: certUrl,
+        transmission_id: transmissionId,
+        transmission_sig: transmissionSig,
+        transmission_time: transmissionTime,
+        webhook_id: webhookId,
+        webhook_event: JSON.parse(body),
+      }),
     });
 
-    // For production, implement full PayPal certificate verification
-    // This is a basic validation that required headers are present
-    return true;
+    if (!verifyRes.ok) {
+      console.error('PayPal verify API returned', verifyRes.status);
+      return false;
+    }
+    const result = await verifyRes.json();
+    return result.verification_status === 'SUCCESS';
   } catch (error) {
     console.error('Error verifying PayPal signature:', error);
     return false;
