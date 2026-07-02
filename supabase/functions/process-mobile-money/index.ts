@@ -1,21 +1,21 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
+import { z } from 'https://esm.sh/zod@3.23.8';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-interface MobileMoneyRequest {
-  amount: number;
-  phoneNumber: string;
-  provider: 'mtn' | 'vodacom' | 'zamtel';
-  patientId: string;
-  providerId?: string;
-  serviceId?: string;
-  orderId?: string;
-  description?: string;
-}
+const mobileMoneySchema = z.object({
+  amount: z.number().positive().max(50000),
+  phoneNumber: z.string().min(9).max(20),
+  provider: z.enum(['mtn', 'vodacom', 'zamtel']),
+  providerId: z.string().uuid().optional(),
+  serviceId: z.string().max(200).optional(),
+  orderId: z.string().uuid().optional(),
+  description: z.string().max(500).optional(),
+});
 
 serve(async (req) => {
   // Handle CORS preflight requests
