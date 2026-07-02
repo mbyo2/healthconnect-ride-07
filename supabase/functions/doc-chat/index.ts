@@ -468,6 +468,27 @@ serve(async (req) => {
   }
 
   try {
+    // Require authentication BEFORE any AI call
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    const supabaseAuth = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      { global: { headers: { Authorization: authHeader } } }
+    );
+    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser();
+    if (authError || !user) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     // Validate input
     const requestData = await req.json();
     const validationResult = chatRequestSchema.safeParse(requestData);
@@ -483,15 +504,23 @@ serve(async (req) => {
       );
     }
 
-    const { message, image, userRole, conversationHistory } = validationResult.data;
+    const { message, image, conversationHistory } = validationResult.data;
 
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {
       throw new Error('LOVABLE_API_KEY not configured');
     }
 
-    // Role-specific system prompts
-    const systemPrompt = buildRoleAwarePrompt(userRole);
+    // Verify the user's role from the DB — never trust client-supplied userRole
+    const { data: profile } = await supabaseAuth
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .maybeSingle();
+    const verifiedRole = (profile?.role as string) || 'patient';
+
+    // Role-specific system prompts (server-verified role)
+    const systemPrompt = buildRoleAwarePrompt(verifiedRole);
 
     // Format conversation history with multi-modal support
     const messages = [
