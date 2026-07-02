@@ -245,7 +245,8 @@ serve(async (req) => {
 
       if (!orderResponse.ok) {
         const errorText = await orderResponse.text();
-        throw new Error(`PayPal order creation failed: ${errorText}`);
+        console.error('PayPal order creation failed:', orderResponse.status, errorText);
+        throw new Error('Payment processing failed');
       }
 
       const orderData: PayPalOrderResponse = await orderResponse.json();
