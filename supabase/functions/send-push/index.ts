@@ -98,30 +98,79 @@ serve(async (req) => {
     }
 
     // Determine target users
-    const targetUserIds = payload.userIds || (payload.userId ? [payload.userId] : []);
-    
+    const requestedTargetIds = payload.userIds || (payload.userId ? [payload.userId] : []);
+
+    // Sanitize title/body — reject HTML/URLs
+    const suspiciousPattern = /<[^>]+>|https?:\/\/|javascript:/i;
+    if (suspiciousPattern.test(payload.title) || suspiciousPattern.test(payload.body)) {
+      return new Response(
+        JSON.stringify({ error: "Title/body cannot contain HTML or URLs" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+    if (payload.title.length > 120 || payload.body.length > 500) {
+      return new Response(
+        JSON.stringify({ error: "Title or body too long" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // For non-admins, restrict recipients to patients with an existing care relationship
+    let targetUserIds = requestedTargetIds;
+    if (profile.role !== "admin") {
+      const { data: relationships } = await supabase
+        .from("user_connections")
+        .select("patient_id")
+        .eq("provider_id", user.id)
+        .eq("status", "approved")
+        .in("patient_id", requestedTargetIds);
+
+      const allowed = new Set((relationships || []).map((r: any) => r.patient_id));
+      targetUserIds = requestedTargetIds.filter((id) => allowed.has(id));
+
+      if (targetUserIds.length === 0) {
+        return new Response(
+          JSON.stringify({ error: "No authorized recipients (no care relationship)" }),
+          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
+
+    // Audit log of the push send
+    await supabase.from("audit_logs").insert({
+      user_id: user.id,
+      action: "push_notification_sent",
+      resource_type: "notification",
+      details: {
+        title: payload.title,
+        recipient_count: targetUserIds.length,
+        recipient_ids: targetUserIds,
+        tag: payload.tag || "general",
+      },
+    });
+
     // Fetch subscriptions
     const { data: subscriptions, error: subError } = await supabase
       .from("push_subscriptions")
       .select("subscription, user_id")
       .in("user_id", targetUserIds);
-    
+
     if (subError) {
       console.error("Error fetching subscriptions:", subError);
       return new Response(
         JSON.stringify({ error: "Error fetching subscriptions" }),
-        { 
-          status: 500, 
+        {
+          status: 500,
           headers: { ...corsHeaders, "Content-Type": "application/json" }
         }
       );
     }
-    
+
     if (!subscriptions || subscriptions.length === 0) {
       return new Response(
         JSON.stringify({ message: "No subscriptions found for the specified users" }),
-        { 
-          status: 200, 
+        {
+          status: 200,
           headers: { ...corsHeaders, "Content-Type": "application/json" }
         }
       );
