@@ -7964,6 +7964,91 @@ export type Database = {
           },
         ]
       }
+      patient_triage_sessions: {
+        Row: {
+          appointment_id: string | null
+          chief_complaint: string
+          created_at: string
+          duration: string | null
+          emergency_event_id: string | null
+          extra_notes: string | null
+          id: string
+          model: string | null
+          patient_id: string
+          reasoning: string | null
+          recommended_action: string | null
+          recommended_specialty: string | null
+          red_flags: string[]
+          severity: number | null
+          status: string
+          symptoms: string[]
+          updated_at: string
+          urgency: Database["public"]["Enums"]["triage_urgency"]
+        }
+        Insert: {
+          appointment_id?: string | null
+          chief_complaint: string
+          created_at?: string
+          duration?: string | null
+          emergency_event_id?: string | null
+          extra_notes?: string | null
+          id?: string
+          model?: string | null
+          patient_id: string
+          reasoning?: string | null
+          recommended_action?: string | null
+          recommended_specialty?: string | null
+          red_flags?: string[]
+          severity?: number | null
+          status?: string
+          symptoms?: string[]
+          updated_at?: string
+          urgency?: Database["public"]["Enums"]["triage_urgency"]
+        }
+        Update: {
+          appointment_id?: string | null
+          chief_complaint?: string
+          created_at?: string
+          duration?: string | null
+          emergency_event_id?: string | null
+          extra_notes?: string | null
+          id?: string
+          model?: string | null
+          patient_id?: string
+          reasoning?: string | null
+          recommended_action?: string | null
+          recommended_specialty?: string | null
+          red_flags?: string[]
+          severity?: number | null
+          status?: string
+          symptoms?: string[]
+          updated_at?: string
+          urgency?: Database["public"]["Enums"]["triage_urgency"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "patient_triage_sessions_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "patient_triage_sessions_emergency_event_id_fkey"
+            columns: ["emergency_event_id"]
+            isOneToOne: false
+            referencedRelation: "emergency_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "patient_triage_sessions_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payment_splits: {
         Row: {
           amount: number
@@ -13395,6 +13480,7 @@ export type Database = {
         | "cancelled"
         | "no_show"
       triage_level: "critical" | "urgent" | "standard" | "non_urgent"
+      triage_urgency: "emergency" | "urgent" | "routine" | "self_care"
       user_role: "admin" | "health_personnel" | "patient"
     }
     CompositeTypes: {
@@ -13614,6 +13700,7 @@ export const Constants = {
       queue_priority: ["emergency", "urgent", "normal", "low"],
       queue_status: ["waiting", "serving", "completed", "cancelled", "no_show"],
       triage_level: ["critical", "urgent", "standard", "non_urgent"],
+      triage_urgency: ["emergency", "urgent", "routine", "self_care"],
       user_role: ["admin", "health_personnel", "patient"],
     },
   },
