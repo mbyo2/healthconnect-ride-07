@@ -188,28 +188,12 @@ const Settings = () => {
     }
   };
 
-  const handleTwoFactorToggle = async (checked: boolean) => {
-    if (checked && !twoFactor) {
-      toast.info("Redirecting to security settings to set up 2FA...");
-      setTimeout(() => navigate("/privacy-security"), 1500);
-      return;
-    }
-
-    setTwoFactor(checked);
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      await supabase
-        .from('user_two_factor' as any)
-        .update({ enabled: checked })
-        .eq('user_id', user.id);
-
-      showSuccess({ message: `Two-factor authentication ${checked ? 'enabled' : 'disabled'}` });
-    } catch (error) {
-      toast.error("Failed to update 2FA settings");
-    }
+  const handleTwoFactorToggle = async (_checked: boolean) => {
+    // 2FA enable/disable requires TOTP verification via the security page.
+    toast.info("Manage two-factor authentication from Privacy & Security.");
+    navigate("/privacy-security");
   };
+
 
   const handleLanguageChange = async (value: string) => {
     setLanguage(value);
