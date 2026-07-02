@@ -54,7 +54,7 @@ function renderErrorFallback(rootElement: HTMLElement, error?: Error) {
       <h2 style="margin: 0; color: #1E40AF;">Doc' O Clock</h2>
       <p style="margin: 0; color: #e11d48; font-weight: 600;">System Initialization Failed</p>
       <p style="margin: 0; color: #4b5563;">We encountered a problem while loading the application. This might be due to a temporary connection issue.</p>
-      
+
       <div style="display: flex; gap: 12px; width: 100%; margin-top: 8px;">
         <button id="refresh-btn" style="flex: 1; background: #3B82F6; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-weight: 600;">
           Try Again
@@ -63,10 +63,14 @@ function renderErrorFallback(rootElement: HTMLElement, error?: Error) {
           Clear Cache
         </button>
       </div>
-      
-      ${error ? `<details style="margin-top: 16px; text-align: left; width: 100%;"><summary style="font-size: 12px; color: #9ca3af; cursor: pointer;">Error details</summary><pre style="font-size: 10px; color: #ef4444; overflow: auto; margin-top: 8px; background: #f9fafb; padding: 8px; border-radius: 4px; max-height: 150px;">${error.message}\n${error.stack || ''}</pre></details>` : ''}
     </div>
   `;
+  // Never inject raw error messages into innerHTML — could be attacker-controlled and lead to XSS.
+  // Log full details to the console for developers instead.
+  if (error) {
+    // eslint-disable-next-line no-console
+    console.error('System initialization failed:', error);
+  }
 
   rootElement.appendChild(errorDiv);
 

@@ -78,6 +78,37 @@ serve(async (req) => {
       );
     }
 
+    // Anti-abuse: only allow sending to the caller's own email address, unless the
+    // caller is an admin/superadmin. This prevents the function from being used as
+    // an open relay by any authenticated user.
+    const userEmail = (user.email ?? '').toLowerCase();
+    const requestedTo = emailRequest.to.map(e => e.toLowerCase());
+    let isAdmin = false;
+    try {
+      const supabaseService = createClient(
+        Deno.env.get('SUPABASE_URL') ?? '',
+        Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+      );
+      const { data: profile } = await supabaseService
+        .from('profiles')
+        .select('admin_level')
+        .eq('id', user.id)
+        .maybeSingle();
+      isAdmin = profile?.admin_level === 'admin' || profile?.admin_level === 'superadmin';
+    } catch (_e) {
+      isAdmin = false;
+    }
+
+    if (!isAdmin) {
+      const forbiddenRecipients = requestedTo.filter(e => e !== userEmail);
+      if (forbiddenRecipients.length > 0) {
+        return new Response(
+          JSON.stringify({ error: 'You may only send email to your own address' }),
+          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    }
+
     let subject: string;
     let html: string;
 
