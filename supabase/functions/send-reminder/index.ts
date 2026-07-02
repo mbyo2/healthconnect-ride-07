@@ -66,11 +66,10 @@ serve(async (req) => {
       status: 200,
     });
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    console.error("Error processing reminders:", errorMessage);
-    return new Response(JSON.stringify({ error: errorMessage }), {
+    console.error("Error processing reminders:", error);
+    return new Response(JSON.stringify({ error: 'An internal error occurred' }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 400,
+      status: 500,
     });
   }
 });
