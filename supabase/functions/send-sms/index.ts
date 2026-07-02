@@ -1,17 +1,20 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
+import { z } from 'https://esm.sh/zod@3.23.8';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-interface SMSRequest {
-  phone: string;
-  message: string;
-  type: 'emergency' | 'appointment' | 'prescription' | 'order';
-  patientId?: string;
-}
+const smsSchema = z.object({
+  phone: z.string().min(9).max(20),
+  message: z.string().min(1).max(640),
+  type: z.enum(['emergency', 'appointment', 'prescription', 'order']),
+  patientId: z.string().uuid().optional(),
+});
+
+const ALLOWED_ROLES = ['health_personnel', 'doctor', 'nurse', 'pharmacist', 'lab_technician', 'radiologist', 'institution_admin', 'institution_staff', 'admin', 'super_admin', 'receptionist'];
 
 serve(async (req) => {
   // Handle CORS preflight requests
