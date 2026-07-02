@@ -43,16 +43,14 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const body = await req.json() as MobileMoneyRequest;
-    const {
-      amount,
-      phoneNumber,
-      provider,
-      providerId,
-      serviceId,
-      orderId,
-      description
-    } = body;
+    const parsed = mobileMoneySchema.safeParse(await req.json());
+    if (!parsed.success) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid input', details: parsed.error.flatten().fieldErrors, success: false }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    const { amount, phoneNumber, provider, providerId, serviceId, orderId, description } = parsed.data;
     // FORCE patientId to the authenticated user
     const patientId = user.id;
 
