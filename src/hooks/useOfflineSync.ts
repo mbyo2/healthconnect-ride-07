@@ -12,6 +12,42 @@ interface PendingAction {
   createdAt: string;
 }
 
+// Allowlist of tables that may be replayed from IndexedDB queue.
+// Only user-owned, low-sensitivity tables are permitted. Any other table
+// name in a queued action is dropped to prevent XSS/extension-injected
+// writes to sensitive tables (payments, notifications, connections, etc.).
+const ALLOWED_SYNC_TABLES = new Set<string>([
+  'appointments',
+  'symptoms_diary',
+  'health_reminders',
+  'medication_reminders',
+  'vital_signs',
+  'comprehensive_health_metrics',
+]);
+
+// Per-table allowlist of field names permitted in the queued payload.
+// Anything else is stripped before replay.
+const ALLOWED_FIELDS: Record<string, Set<string>> = {
+  appointments: new Set(['id','patient_id','provider_id','date','time','reason','type','status','notes']),
+  symptoms_diary: new Set(['id','patient_id','symptom','severity','notes','recorded_at']),
+  health_reminders: new Set(['id','patient_id','title','description','remind_at','frequency','is_active']),
+  medication_reminders: new Set(['id','patient_id','medication_id','remind_at','frequency','is_active']),
+  vital_signs: new Set(['id','patient_id','heart_rate','blood_pressure_systolic','blood_pressure_diastolic','temperature','respiratory_rate','oxygen_saturation','glucose','weight','recorded_at','notes']),
+  comprehensive_health_metrics: new Set(['id','patient_id','metric_type','value','unit','recorded_at','notes']),
+};
+
+function sanitizePayload(table: string, data: any): Record<string, unknown> | null {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return null;
+  const allowed = ALLOWED_FIELDS[table];
+  if (!allowed) return null;
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(data)) {
+    if (allowed.has(k)) out[k] = v;
+  }
+  return out;
+}
+
+
 function openDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
     try {
