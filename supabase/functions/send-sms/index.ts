@@ -173,11 +173,10 @@ serve(async (req) => {
 
   } catch (error: unknown) {
     console.error('Error sending SMS:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
-      JSON.stringify({ 
-        error: errorMessage, 
-        success: false 
+      JSON.stringify({
+        error: 'An internal error occurred',
+        success: false
       }),
       {
         status: 500,
