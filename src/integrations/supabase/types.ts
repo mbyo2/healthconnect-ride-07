@@ -3128,10 +3128,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "employee_records_reporting_manager_id_fkey"
+            columns: ["reporting_manager_id"]
+            isOneToOne: false
+            referencedRelation: "institution_staff_directory"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "employee_records_staff_id_fkey"
             columns: ["staff_id"]
             isOneToOne: false
             referencedRelation: "institution_staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employee_records_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "institution_staff_directory"
             referencedColumns: ["id"]
           },
         ]
@@ -11619,6 +11633,13 @@ export type Database = {
             referencedRelation: "institution_staff"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "staff_shifts_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "institution_staff_directory"
+            referencedColumns: ["id"]
+          },
         ]
       }
       staff_types_config: {
@@ -13027,6 +13048,57 @@ export type Database = {
       }
     }
     Views: {
+      institution_staff_directory: {
+        Row: {
+          department: string | null
+          hired_date: string | null
+          id: string | null
+          institution_id: string | null
+          is_active: boolean | null
+          provider_id: string | null
+          role: string | null
+          specialty: string | null
+          start_date: string | null
+        }
+        Insert: {
+          department?: string | null
+          hired_date?: string | null
+          id?: string | null
+          institution_id?: string | null
+          is_active?: boolean | null
+          provider_id?: string | null
+          role?: string | null
+          specialty?: string | null
+          start_date?: string | null
+        }
+        Update: {
+          department?: string | null
+          hired_date?: string | null
+          id?: string | null
+          institution_id?: string | null
+          is_active?: boolean | null
+          provider_id?: string | null
+          role?: string | null
+          specialty?: string | null
+          start_date?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "institution_staff_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "institution_staff_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_two_factor_status: {
         Row: {
           created_at: string | null
