@@ -302,9 +302,12 @@ const App: React.FC = () => {
           <AccessibilityProvider>
             <Router>
               <div className="App">
-                <AppContentWithPreload />
+                <TwoFactorGate>
+                  <AppContentWithPreload />
+                </TwoFactorGate>
               </div>
             </Router>
+
           </AccessibilityProvider>
         </UserRolesProvider>
       </AuthProvider>
