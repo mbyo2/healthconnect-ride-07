@@ -147,11 +147,15 @@ serve(async (req) => {
       );
     } catch (walletError: unknown) {
       console.error('Wallet transaction failed:', walletError);
-      const walletErrorMessage = walletError instanceof Error ? walletError.message : 'Wallet transaction failed';
+      const rawMsg = walletError instanceof Error ? walletError.message : '';
+      // Only surface known safe business messages
+      const safeMsg = /insufficient/i.test(rawMsg)
+        ? 'Insufficient wallet balance'
+        : 'Wallet transaction failed';
       return new Response(
-        JSON.stringify({ 
-          success: false, 
-          message: walletErrorMessage
+        JSON.stringify({
+          success: false,
+          message: safeMsg
         }),
         {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -161,9 +165,8 @@ serve(async (req) => {
     }
   } catch (error: unknown) {
     console.error('Error processing wallet payment:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
-      JSON.stringify({ error: errorMessage, success: false }),
+      JSON.stringify({ error: 'An internal error occurred', success: false }),
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
