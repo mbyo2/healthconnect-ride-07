@@ -38,7 +38,7 @@ serve(async (req) => {
     );
 
     const { paymentId, amount, reason } = await req.json() as RefundRequest;
-    if (!paymentId || !amount || amount <= 0) {
+    if (!paymentId || typeof amount !== 'number' || !isFinite(amount) || amount <= 0) {
       return new Response(JSON.stringify({ error: 'Invalid input' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
@@ -63,11 +63,39 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: 'Forbidden' }), { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
-    const { error: updateError } = await supabaseClient
-      .from('payments')
-      .update({ status: 'refunded', updated_at: new Date().toISOString() })
-      .eq('id', paymentId);
-    if (updateError) throw updateError;
+    // Only completed payments are refundable, and never twice
+    if (payment.status !== 'completed') {
+      return new Response(JSON.stringify({ error: 'Payment is not eligible for refund' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+
+    // Sum existing refunds for this payment to enforce a total ceiling
+    const { data: existingRefunds, error: refundsFetchErr } = await supabaseClient
+      .from('refunds')
+      .select('amount,status')
+      .eq('payment_id', paymentId);
+    if (refundsFetchErr) throw refundsFetchErr;
+
+    const alreadyRefunded = (existingRefunds || [])
+      .filter((r: any) => r.status !== 'failed' && r.status !== 'cancelled')
+      .reduce((sum: number, r: any) => sum + Number(r.amount || 0), 0);
+
+    const paymentAmount = Number(payment.amount || 0);
+    if (alreadyRefunded >= paymentAmount) {
+      return new Response(JSON.stringify({ error: 'Payment has already been fully refunded' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+    if (amount + alreadyRefunded > paymentAmount) {
+      return new Response(JSON.stringify({ error: 'Refund amount exceeds remaining refundable balance' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+
+    const fullyRefunded = (amount + alreadyRefunded) >= paymentAmount;
+
+    if (fullyRefunded) {
+      const { error: updateError } = await supabaseClient
+        .from('payments')
+        .update({ status: 'refunded', updated_at: new Date().toISOString() })
+        .eq('id', paymentId);
+      if (updateError) throw updateError;
+    }
 
     const { error: refundError } = await supabaseClient
       .from('refunds')

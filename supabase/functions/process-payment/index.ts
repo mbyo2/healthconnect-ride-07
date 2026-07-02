@@ -29,6 +29,8 @@ interface PaymentRequest {
 }
 
 // PayPal API functions
+const PAYPAL_API_BASE = Deno.env.get('PAYPAL_API_BASE') || 'https://api-m.paypal.com';
+
 async function getPayPalAccessToken() {
   const clientId = Deno.env.get('PAYPAL_CLIENT_ID');
   const clientSecret = Deno.env.get('PAYPAL_CLIENT_SECRET');
@@ -38,7 +40,7 @@ async function getPayPalAccessToken() {
   }
 
   const auth = btoa(`${clientId}:${clientSecret}`);
-  const response = await fetch('https://api-m.sandbox.paypal.com/v1/oauth2/token', {
+  const response = await fetch(`${PAYPAL_API_BASE}/v1/oauth2/token`, {
     method: 'POST',
     headers: {
       'Authorization': `Basic ${auth}`,
@@ -57,7 +59,7 @@ async function getPayPalAccessToken() {
 }
 
 async function createPayPalOrder(amount: number, currency: string, accessToken: string, returnUrl: string, cancelUrl: string) {
-  const response = await fetch('https://api-m.sandbox.paypal.com/v2/checkout/orders', {
+  const response = await fetch(`${PAYPAL_API_BASE}/v2/checkout/orders`, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${accessToken}`,
