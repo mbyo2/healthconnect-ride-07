@@ -56,7 +56,19 @@ serve(async (req) => {
       );
     }
 
-    const { message, userRole, conversationHistory, images, analysisType } = validationResult.data;
+    const { message, userRole: _clientRole, conversationHistory, images, analysisType } = validationResult.data;
+
+    // SECURITY: Verify role server-side. Never trust client-supplied userRole.
+    const { data: verifiedRoles } = await supabaseAuth
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id);
+    const roleSet = new Set((verifiedRoles || []).map((r: any) => r.role));
+    const pickRole = (candidates: string[]) => candidates.find((c) => roleSet.has(c)) || 'patient';
+    const userRole = pickRole([
+      'super_admin','admin','support','cxo','hr_manager','institution_admin','institution_staff','receptionist','billing_staff','inventory_manager','maintenance_manager',
+      'doctor','specialist','health_personnel','nurse','radiologist','pathologist','pharmacist','pharmacy','lab','lab_technician','phlebotomist','triage_staff','ot_staff','ambulance_staff','patient'
+    ]);
 
     // Role-aware prompt with multimodal capabilities
     let roleLabel = 'patient';

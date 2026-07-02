@@ -49,7 +49,17 @@ serve(async (req) => {
       );
     }
 
-    const { document, documentType, extractFields, userRole } = validationResult.data;
+    const { document, documentType, extractFields, userRole: _clientRole } = validationResult.data;
+
+    // SECURITY: Verify clinical role server-side; never trust client
+    const { data: verifiedRoles } = await supabaseAuth
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id);
+    const isClinician = (verifiedRoles || []).some((r: any) =>
+      ['doctor','specialist','health_personnel','nurse','radiologist','pathologist','pharmacist','lab_technician'].includes(r.role)
+    );
+    const userRole = isClinician ? 'health_personnel' : 'patient';
 
     console.log('MedGemma 1.5 4B document analysis request received');
     
