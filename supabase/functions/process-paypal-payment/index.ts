@@ -176,7 +176,7 @@ serve(async (req) => {
     if (paymentError) throw paymentError;
     const paypalClientId = Deno.env.get('PAYPAL_CLIENT_ID');
     const paypalClientSecret = Deno.env.get('PAYPAL_CLIENT_SECRET');
-    const paypalBaseUrl = Deno.env.get('PAYPAL_BASE_URL') || 'https://api-m.sandbox.paypal.com'; // Default to sandbox
+    const paypalBaseUrl = Deno.env.get('PAYPAL_BASE_URL') || 'https://api-m.paypal.com'; // Default to production
 
     if (!paypalClientId || !paypalClientSecret) {
       console.warn('PayPal credentials not configured, using mock payment');
@@ -245,7 +245,8 @@ serve(async (req) => {
 
       if (!orderResponse.ok) {
         const errorText = await orderResponse.text();
-        throw new Error(`PayPal order creation failed: ${errorText}`);
+        console.error('PayPal order creation failed:', orderResponse.status, errorText);
+        throw new Error('Payment processing failed');
       }
 
       const orderData: PayPalOrderResponse = await orderResponse.json();
@@ -294,28 +295,27 @@ serve(async (req) => {
 
     } catch (paypalError: unknown) {
       console.error('PayPal API error:', paypalError);
-      const errorMessage = getErrorMessage(paypalError);
+      const internalMessage = getErrorMessage(paypalError);
 
-      // Update payment status to failed
+      // Update payment status to failed (internal detail only)
       await supabaseClient
         .from('payments')
         .update({
           status: 'failed',
-          error_message: errorMessage,
+          error_message: internalMessage,
           failed_at: new Date().toISOString()
         })
         .eq('id', payment.id);
 
-      throw new Error(`PayPal integration error: ${errorMessage}`);
+      throw new Error('Payment processing failed');
     }
 
   } catch (error: unknown) {
     console.error('Error processing PayPal payment:', error);
-    const errorMessage = getErrorMessage(error);
     return new Response(
       JSON.stringify({
         success: false,
-        error: errorMessage,
+        error: 'Payment processing failed',
         message: 'Failed to process PayPal payment'
       }),
       {
