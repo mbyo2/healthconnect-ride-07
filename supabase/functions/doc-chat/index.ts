@@ -580,35 +580,17 @@ serve(async (req) => {
 
     console.log('Doc 0 Clock response generated');
 
-    // Save diagnosis history to database if it's a symptom analysis or image analysis
+    // Save diagnosis history to database (auth already verified above)
     try {
-      const authHeader = req.headers.get('Authorization');
-      if (authHeader) {
-        const supabaseClient = createClient(
-          Deno.env.get('SUPABASE_URL') ?? '',
-          Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-          { global: { headers: { Authorization: authHeader } } }
-        );
-
-        // Extract user ID from auth
-        const { data: { user } } = await supabaseClient.auth.getUser();
-
-        if (user) {
-          // Save to ai_diagnosis_history
-          await supabaseClient
-            .from('ai_diagnosis_history')
-            .insert({
-              user_id: user.id,
-              symptoms: message,
-              analysis: reply,
-              patient_context: image ? { has_image: true } : null
-            });
-
-          console.log('Diagnosis history saved');
-        }
-      }
+      await supabaseAuth
+        .from('ai_diagnosis_history')
+        .insert({
+          user_id: user.id,
+          symptoms: message,
+          analysis: reply,
+          patient_context: image ? { has_image: true } : null
+        });
     } catch (historyError) {
-      // Log but don't fail the request if history save fails
       console.error('Failed to save diagnosis history:', historyError);
     }
 
@@ -626,16 +608,9 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('Error in Doc 0 Clock chat:', error);
-
     return new Response(
-      JSON.stringify({
-        error: error instanceof Error ? error.message : 'Unknown error occurred',
-        details: error instanceof Error ? error.stack : undefined
-      }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500
-      }
+      JSON.stringify({ error: 'An internal error occurred' }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
     );
   }
 });
