@@ -159,7 +159,7 @@ Provide:
     return new Response(
       JSON.stringify({ 
         error: error instanceof Error ? error.message : 'Unknown error occurred',
-        details: error instanceof Error ? error.stack : undefined
+        
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
