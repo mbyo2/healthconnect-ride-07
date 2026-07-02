@@ -1,17 +1,20 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
+import { z } from 'https://esm.sh/zod@3.23.8';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-interface SMSRequest {
-  phone: string;
-  message: string;
-  type: 'emergency' | 'appointment' | 'prescription' | 'order';
-  patientId?: string;
-}
+const smsSchema = z.object({
+  phone: z.string().min(9).max(20),
+  message: z.string().min(1).max(640),
+  type: z.enum(['emergency', 'appointment', 'prescription', 'order']),
+  patientId: z.string().uuid().optional(),
+});
+
+const ALLOWED_ROLES = ['health_personnel', 'doctor', 'nurse', 'pharmacist', 'lab_technician', 'radiologist', 'institution_admin', 'institution_staff', 'admin', 'super_admin', 'receptionist'];
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -54,15 +57,28 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const { phone, message, type, patientId } = await req.json() as SMSRequest;
-
-    // Input validation
-    if (!phone || !message || !type) {
+    // Role check — patients cannot send arbitrary SMS
+    const { data: roles } = await supabaseClient
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id);
+    const userRoles = (roles ?? []).map((r: any) => r.role);
+    const isAllowed = userRoles.some((r: string) => ALLOWED_ROLES.includes(r));
+    if (!isAllowed) {
       return new Response(
-        JSON.stringify({ error: 'Missing required fields: phone, message, type', success: false }),
+        JSON.stringify({ error: 'Forbidden', success: false }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const parsed = smsSchema.safeParse(await req.json());
+    if (!parsed.success) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid input', details: parsed.error.flatten().fieldErrors, success: false }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+    const { phone, message, type, patientId } = parsed.data;
 
     // Format phone number for Zambian mobile networks
     const formatZambianPhone = (phoneNumber: string): string => {
@@ -157,11 +173,10 @@ serve(async (req) => {
 
   } catch (error: unknown) {
     console.error('Error sending SMS:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
-      JSON.stringify({ 
-        error: errorMessage, 
-        success: false 
+      JSON.stringify({
+        error: 'An internal error occurred',
+        success: false
       }),
       {
         status: 500,

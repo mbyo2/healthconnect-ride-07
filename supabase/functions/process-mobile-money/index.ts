@@ -1,21 +1,21 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
+import { z } from 'https://esm.sh/zod@3.23.8';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-interface MobileMoneyRequest {
-  amount: number;
-  phoneNumber: string;
-  provider: 'mtn' | 'vodacom' | 'zamtel';
-  patientId: string;
-  providerId?: string;
-  serviceId?: string;
-  orderId?: string;
-  description?: string;
-}
+const mobileMoneySchema = z.object({
+  amount: z.number().positive().max(50000),
+  phoneNumber: z.string().min(9).max(20),
+  provider: z.enum(['mtn', 'vodacom', 'zamtel']),
+  providerId: z.string().uuid().optional(),
+  serviceId: z.string().max(200).optional(),
+  orderId: z.string().uuid().optional(),
+  description: z.string().max(500).optional(),
+});
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -43,16 +43,14 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const body = await req.json() as MobileMoneyRequest;
-    const {
-      amount,
-      phoneNumber,
-      provider,
-      providerId,
-      serviceId,
-      orderId,
-      description
-    } = body;
+    const parsed = mobileMoneySchema.safeParse(await req.json());
+    if (!parsed.success) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid input', details: parsed.error.flatten().fieldErrors, success: false }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    const { amount, phoneNumber, provider, providerId, serviceId, orderId, description } = parsed.data;
     // FORCE patientId to the authenticated user
     const patientId = user.id;
 
@@ -186,11 +184,10 @@ serve(async (req) => {
 
   } catch (error: unknown) {
     console.error('Error processing mobile money payment:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
-      JSON.stringify({ 
-        error: errorMessage, 
-        success: false 
+      JSON.stringify({
+        error: 'An internal error occurred',
+        success: false
       }),
       {
         status: 500,

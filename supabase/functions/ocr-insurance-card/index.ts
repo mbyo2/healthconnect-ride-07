@@ -104,7 +104,7 @@ Deno.serve(async (req) => {
     });
   } catch (error) {
     console.error('OCR error:', error);
-    return new Response(JSON.stringify({ success: false, error: error.message }), {
+    return new Response(JSON.stringify({ success: false, error: 'An internal error occurred' }), {
       status: 400,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
