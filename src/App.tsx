@@ -9,6 +9,8 @@ import { UserRolesProvider } from '@/context/UserRolesContext';
 import { SearchProvider } from '@/context/SearchContext';
 import { AccessibilityProvider } from '@/context/AccessibilityContext';
 import { RouteGuard } from '@/components/auth/RouteGuard';
+import { TwoFactorGate } from '@/components/auth/TwoFactorGate';
+
 import { useAndroidBackButton } from '@/hooks/use-android-back-button';
 import { usePageTracking } from '@/hooks/use-analytics';
 
