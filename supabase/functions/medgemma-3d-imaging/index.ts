@@ -8,8 +8,16 @@ const corsHeaders = {
 };
 
 // Input validation schema for 3D/volumetric imaging
+const MAX_SLICE_BYTES = 10_000_000; // 10 MB per slice (base64)
+const MAX_TOTAL_BYTES = 50_000_000; // 50 MB total payload
+
 const imaging3DSchema = z.object({
-  slices: z.array(z.string()).min(1, 'At least one slice required').max(50, 'Maximum 50 slices allowed'), // base64 encoded images
+  slices: z.array(z.string().max(MAX_SLICE_BYTES, 'Each slice must be at most 10MB (base64)'))
+    .min(1, 'At least one slice required')
+    .max(50, 'Maximum 50 slices allowed')
+    .refine((arr) => arr.reduce((s, x) => s + x.length, 0) <= MAX_TOTAL_BYTES, {
+      message: 'Combined slice payload exceeds 50MB',
+    }),
   imagingType: z.enum(['ct', 'mri', 'pet_ct']),
   bodyPart: z.enum(['head', 'chest', 'abdomen', 'pelvis', 'spine', 'extremity', 'whole_body']),
   clinicalQuestion: z.string().max(500),

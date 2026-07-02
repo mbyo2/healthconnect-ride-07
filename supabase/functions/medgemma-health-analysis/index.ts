@@ -1,6 +1,62 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 import { HfInference } from "https://esm.sh/@huggingface/inference@2.3.2";
+import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
+
+const stripCtl = (s: string) => s.replace(/[\u0000-\u001F\u007F]/g, ' ').slice(0, 2000);
+
+const analysisSchema = z.discriminatedUnion('analysisType', [
+  z.object({
+    analysisType: z.literal('symptom_analysis'),
+    data: z.object({
+      symptoms: z.string().min(1).max(2000).transform(stripCtl),
+      age: z.number().int().min(0).max(130).optional(),
+      gender: z.enum(['male', 'female', 'other', 'unknown']).optional(),
+      urgency: z.enum(['low', 'medium', 'high', 'critical']).optional(),
+    }),
+  }),
+  z.object({
+    analysisType: z.literal('risk_assessment'),
+    data: z.object({
+      vitals: z.record(z.union([z.string(), z.number()])).optional(),
+      age: z.number().int().min(0).max(130).optional(),
+      gender: z.enum(['male', 'female', 'other', 'unknown']).optional(),
+      bmi: z.number().min(5).max(100).optional(),
+      bloodPressure: z.string().max(20).optional(),
+      familyHistory: z.string().max(1000).transform(stripCtl).optional(),
+    }),
+  }),
+  z.object({
+    analysisType: z.literal('medication_interaction'),
+    data: z.object({
+      medications: z.array(z.object({
+        name: z.string().max(200),
+        dosage: z.string().max(100).optional(),
+      })).max(50),
+      newMedication: z.string().max(200).transform(stripCtl).optional(),
+    }),
+  }),
+  z.object({
+    analysisType: z.literal('trend_analysis'),
+    data: z.object({
+      healthMetrics: z.array(z.object({
+        metric: z.string().max(100),
+        value: z.union([z.string(), z.number()]),
+        recorded_at: z.string().max(40).optional(),
+      })).max(200),
+    }),
+  }),
+  z.object({
+    analysisType: z.literal('preventive_care'),
+    data: z.object({
+      age: z.number().int().min(0).max(130).optional(),
+      gender: z.enum(['male', 'female', 'other', 'unknown']).optional(),
+      lastCheckup: z.string().max(40).optional(),
+      healthStatus: z.record(z.union([z.string(), z.number(), z.boolean()])).optional(),
+    }),
+  }),
+]);
+
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -27,7 +83,15 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
-    const { analysisType, data } = await req.json();
+    const rawBody = await req.json();
+    const parsed = analysisSchema.safeParse(rawBody);
+    if (!parsed.success) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid request', details: parsed.error.flatten() }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    const { analysisType, data } = parsed.data as any;
     
     const HF_TOKEN = Deno.env.get('HF_TOKEN');
     if (!HF_TOKEN) {

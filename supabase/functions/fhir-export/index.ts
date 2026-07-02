@@ -26,14 +26,19 @@ Deno.serve(async (req) => {
 
     // SECURITY: Only allow exporting own data, or if user is a provider with an appointment relationship
     if (targetId !== user.id) {
+      // Only providers with an ACTIVE relationship (scheduled/confirmed/in_progress/completed)
+      // in the last 180 days can export a patient bundle.
+      const recentCutoff = new Date(Date.now() - 180 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
       const { data: appointment } = await supabase
         .from('appointments')
         .select('id')
         .eq('provider_id', user.id)
         .eq('patient_id', targetId)
+        .in('status', ['scheduled', 'confirmed', 'in_progress', 'completed'])
+        .gte('date', recentCutoff)
         .limit(1)
         .maybeSingle();
-      
+
       if (!appointment) {
         const { data: profile } = await supabase.from('profiles').select('role, admin_level').eq('id', user.id).single();
         const isAdmin = profile?.admin_level === 'admin' || profile?.admin_level === 'superadmin';
