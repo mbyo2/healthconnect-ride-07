@@ -146,7 +146,24 @@ serve(async (req) => {
       );
     }
 
-    // Create payment record in our database first
+    // Verify PayPal credentials BEFORE creating any DB records to avoid stale pending rows.
+    const paypalClientId = Deno.env.get('PAYPAL_CLIENT_ID');
+    const paypalClientSecret = Deno.env.get('PAYPAL_CLIENT_SECRET');
+    const paypalBaseUrl = Deno.env.get('PAYPAL_BASE_URL') || 'https://api-m.paypal.com';
+
+    if (!paypalClientId || !paypalClientSecret) {
+      console.error('PayPal credentials not configured; refusing to create payment record.');
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'Payment provider unavailable',
+          message: 'PayPal is not configured. Please contact support.'
+        }),
+        { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Create payment record in our database.
     // NOTE: payments.service_id is a UUID in our schema, but wallet top-ups send serviceId like "wallet_topup".
     // We store non-UUID service identifiers in metadata and set service_id to null.
     const serviceIdForDb = isUuid(serviceId) ? serviceId : null;
@@ -174,28 +191,6 @@ serve(async (req) => {
       .single();
 
     if (paymentError) throw paymentError;
-    const paypalClientId = Deno.env.get('PAYPAL_CLIENT_ID');
-    const paypalClientSecret = Deno.env.get('PAYPAL_CLIENT_SECRET');
-    const paypalBaseUrl = Deno.env.get('PAYPAL_BASE_URL') || 'https://api-m.paypal.com'; // Default to production
-
-    if (!paypalClientId || !paypalClientSecret) {
-      console.warn('PayPal credentials not configured, using mock payment');
-
-      // Return mock payment URL for development
-      const mockPaymentUrl = `${redirectUrl}?payment_id=${payment.id}&status=mock_success`;
-
-      return new Response(
-        JSON.stringify({
-          success: true,
-          paymentUrl: mockPaymentUrl,
-          paymentId: payment.id,
-          message: 'Mock PayPal payment created (development mode)'
-        }),
-        {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
-      );
-    }
 
     try {
       // Get PayPal access token
