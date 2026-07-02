@@ -57,15 +57,28 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const { phone, message, type, patientId } = await req.json() as SMSRequest;
-
-    // Input validation
-    if (!phone || !message || !type) {
+    // Role check — patients cannot send arbitrary SMS
+    const { data: roles } = await supabaseClient
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id);
+    const userRoles = (roles ?? []).map((r: any) => r.role);
+    const isAllowed = userRoles.some((r: string) => ALLOWED_ROLES.includes(r));
+    if (!isAllowed) {
       return new Response(
-        JSON.stringify({ error: 'Missing required fields: phone, message, type', success: false }),
+        JSON.stringify({ error: 'Forbidden', success: false }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const parsed = smsSchema.safeParse(await req.json());
+    if (!parsed.success) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid input', details: parsed.error.flatten().fieldErrors, success: false }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+    const { phone, message, type, patientId } = parsed.data;
 
     // Format phone number for Zambian mobile networks
     const formatZambianPhone = (phoneNumber: string): string => {
