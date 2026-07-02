@@ -16,7 +16,7 @@ const chatRequestSchema = z.object({
     content: z.string().max(2000)
   })).max(50, 'Conversation history too long').optional().default([]),
   // Multimodal support
-  images: z.array(z.string()).max(10, 'Maximum 10 images allowed').optional(), // base64 encoded images
+  images: z.array(z.string().max(5_000_000, 'Image exceeds 5MB base64 limit')).max(5, 'Maximum 5 images allowed').optional(), // base64 encoded images
   analysisType: z.enum(['general', 'longitudinal', 'document_understanding', 'anatomical_localization']).optional().default('general')
 });
 
