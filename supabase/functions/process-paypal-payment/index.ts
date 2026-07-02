@@ -312,11 +312,10 @@ serve(async (req) => {
 
   } catch (error: unknown) {
     console.error('Error processing PayPal payment:', error);
-    const errorMessage = getErrorMessage(error);
     return new Response(
       JSON.stringify({
         success: false,
-        error: errorMessage,
+        error: 'Payment processing failed',
         message: 'Failed to process PayPal payment'
       }),
       {
