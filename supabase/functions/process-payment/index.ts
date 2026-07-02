@@ -148,17 +148,16 @@ serve(async (req) => {
 
     console.log('Processing payment request:', { amount, currency, patientId, providerId, serviceId, paymentMethod });
 
-    // Generate a unique payment ID
-    const paymentId = `PAY-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
-    
     if (paymentMethod === 'paypal') {
+      // Generate a unique payment ID (UUID for PayPal path only)
+      const paymentId = crypto.randomUUID();
       // Create PayPal payment
       const accessToken = await getPayPalAccessToken();
       const returnUrl = redirectUrl || `${Deno.env.get('SUPABASE_URL')?.replace('supabase.co', 'lovableproject.com')}/payment-success`;
       const cancelUrl = redirectUrl || `${Deno.env.get('SUPABASE_URL')?.replace('supabase.co', 'lovableproject.com')}/payment-cancel`;
-      
+
       const paypalOrder = await createPayPalOrder(amount, currency, accessToken, returnUrl, cancelUrl);
-      
+
       // Store payment record in pending status
       const { data: payment, error: paymentError } = await supabaseClient
         .from('payments')
@@ -198,7 +197,31 @@ serve(async (req) => {
         }
       );
     } else {
-      // Handle wallet payment (existing logic)
+      // Wallet payment — deduct funds via RPC BEFORE marking completed
+      const paymentId = crypto.randomUUID();
+      const invoiceNumber = `WAL-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+
+      const { data: debitResult, error: debitError } = await supabaseClient.rpc('process_wallet_transaction', {
+        p_user_id: patientId,
+        p_transaction_type: 'debit',
+        p_amount: amount,
+        p_description: `Payment for service ${serviceId}`,
+        p_payment_id: paymentId,
+      });
+
+      if (debitError) {
+        console.error('Wallet debit failed:', debitError);
+        const msg = String(debitError.message || '');
+        const isInsufficient = msg.toLowerCase().includes('insufficient');
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: isInsufficient ? 'Insufficient wallet funds' : 'Wallet payment failed'
+          }),
+          { status: isInsufficient ? 402 : 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
       const { data: payment, error: paymentError } = await supabaseClient
         .from('payments')
         .insert({
@@ -210,25 +233,38 @@ serve(async (req) => {
           currency: currency,
           status: 'completed',
           payment_method: 'wallet',
+          invoice_number: invoiceNumber,
+          payment_date: new Date().toISOString(),
           created_at: new Date().toISOString(),
         })
         .select()
         .single();
 
-      if (paymentError) throw paymentError;
-
-      console.log('Wallet payment processed:', payment);
+      if (paymentError) {
+        // Rollback: credit the wallet back
+        console.error('Payment insert failed after wallet debit — rolling back credit:', paymentError);
+        await supabaseClient.rpc('process_wallet_transaction', {
+          p_user_id: patientId,
+          p_transaction_type: 'credit',
+          p_amount: amount,
+          p_description: `Rollback for failed payment ${paymentId}`,
+          p_payment_id: paymentId,
+        });
+        return new Response(
+          JSON.stringify({ success: false, error: 'Payment could not be recorded' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
 
       return new Response(
         JSON.stringify({
           success: true,
           paymentId: payment.id,
+          newBalance: (debitResult as any)?.new_balance,
           amount,
           currency
         }),
-        {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
   } catch (error: unknown) {
