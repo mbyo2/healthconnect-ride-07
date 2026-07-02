@@ -156,18 +156,16 @@ export default function TriageIntake() {
       if (error) throw error;
 
       // Link the appointment back to the triage session.
-      await supabase
+      await (supabase as any)
         .from("patient_triage_sessions")
         .update({ appointment_id: appt.id, status: "booked" })
         .eq("id", result.session_id);
 
-      toast({ title: "Appointment requested", description: "The provider has been notified." });
+      toast.success("Appointment requested", { description: "The provider has been notified." });
       navigate("/appointments");
     } catch (err: any) {
-      toast({
-        title: "Booking failed",
+      toast.error("Booking failed", {
         description: err?.message ?? "Please try again.",
-        variant: "destructive",
       });
     } finally {
       setBooking(null);
