@@ -53,7 +53,17 @@ serve(async (req) => {
       );
     }
 
-    const { slices, imagingType, bodyPart, clinicalQuestion, sliceOrientation, contrastUsed, userRole } = validationResult.data;
+    const { slices, imagingType, bodyPart, clinicalQuestion, sliceOrientation, contrastUsed, userRole: _clientRole } = validationResult.data;
+
+    // SECURITY: Verify clinical role server-side; never trust client
+    const { data: verifiedRoles } = await supabaseAuth
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id);
+    const isClinician = (verifiedRoles || []).some((r: any) =>
+      ['doctor','specialist','health_personnel','radiologist','pathologist'].includes(r.role)
+    );
+    const userRole = isClinician ? 'health_personnel' : 'patient';
 
     console.log(`MedGemma 1.5 4B 3D imaging analysis: ${imagingType.toUpperCase()} ${bodyPart}, ${slices.length} slices`);
     
