@@ -13080,6 +13080,30 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      get_staff_invitation_by_token: {
+        Args: { p_token: string }
+        Returns: {
+          accepted_at: string | null
+          created_at: string
+          department_id: string | null
+          department_name: string | null
+          email: string
+          expires_at: string
+          id: string
+          institution_id: string
+          invited_by: string | null
+          specialty: string | null
+          staff_role: string
+          status: string
+          token: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "staff_invitations"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       get_user_role: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]

@@ -1,10 +1,9 @@
-
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.47.0";
 
-// Create a Supabase client
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
 
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
@@ -14,157 +13,85 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
-interface AppointmentReminder {
-  appointment_id: string;
-  patient_id: string;
-  provider_name: string;
-  appointment_date: string;
-  appointment_time: string;
-  appointment_type: string;
-}
-
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    // Check authorization
     const authHeader = req.headers.get("Authorization");
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return new Response(
         JSON.stringify({ error: "Unauthorized" }),
-        { 
-          status: 401, 
-          headers: { ...corsHeaders, "Content-Type": "application/json" }
-        }
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    const token = authHeader.split(" ")[1];
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-
+    const userClient = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const { data: { user }, error: authError } = await userClient.auth.getUser();
     if (authError || !user) {
       return new Response(
         JSON.stringify({ error: "Unauthorized" }),
-        { 
-          status: 401, 
-          headers: { ...corsHeaders, "Content-Type": "application/json" }
-        }
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // Parse request body
-    const requestData = await req.json();
-    const { appointment_id } = requestData;
-
+    const { appointment_id } = await req.json();
     if (!appointment_id) {
       return new Response(
         JSON.stringify({ error: "Missing appointment_id" }),
-        { 
-          status: 400, 
-          headers: { ...corsHeaders, "Content-Type": "application/json" }
-        }
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // Get appointment details
     const { data: appointment, error: appointmentError } = await supabase
       .from("appointments")
-      .select(`
-        id,
-        date,
-        time,
-        type,
-        patient_id,
-        profiles:provider_id (
-          first_name,
-          last_name
-        )
-      `)
+      .select(`id, date, time, type, patient_id, provider_id, profiles:provider_id(first_name, last_name)`)
       .eq("id", appointment_id)
-      .single();
+      .maybeSingle();
 
-    if (appointmentError) {
-      console.error("Error fetching appointment:", appointmentError);
+    if (appointmentError || !appointment) {
       return new Response(
-        JSON.stringify({ error: "Error fetching appointment" }),
-        { 
-          status: 500, 
-          headers: { ...corsHeaders, "Content-Type": "application/json" }
-        }
+        JSON.stringify({ error: "Appointment not found" }),
+        { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // Format provider name
-    const profiles = appointment.profiles as { first_name: string; last_name: string } | null;
-    const providerName = profiles ? `Dr. ${profiles.first_name} ${profiles.last_name}` : 'Your Provider';
-    
-    // Create reminder object
-    const reminderData: AppointmentReminder = {
-      appointment_id: appointment.id,
-      patient_id: appointment.patient_id,
-      provider_name: providerName,
-      appointment_date: appointment.date,
-      appointment_time: appointment.time,
-      appointment_type: appointment.type,
-    };
-
-    // Format appointment date for display
-    const appointmentDate = new Date(appointment.date).toLocaleDateString();
-    
-    // Send push notification to the patient
-    const { data: pushSubscription, error: subscriptionError } = await supabase
-      .from("push_subscriptions")
-      .select("subscription")
-      .eq("user_id", appointment.patient_id)
-      .single();
-
-    if (subscriptionError) {
-      console.log("No push subscription found for user", appointment.patient_id);
+    // Ownership check — only participants can trigger reminders
+    if (appointment.provider_id !== user.id && appointment.patient_id !== user.id) {
+      return new Response(
+        JSON.stringify({ error: "Forbidden" }),
+        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
-    // Store notification in the database
-    const { data: notification, error: notificationError } = await supabase
+    const profiles = appointment.profiles as { first_name: string; last_name: string } | null;
+    const providerName = profiles ? `Dr. ${profiles.first_name} ${profiles.last_name}` : "Your Provider";
+    const appointmentDate = new Date(appointment.date).toLocaleDateString();
+
+    const { data: notification } = await supabase
       .from("notifications")
       .insert({
         user_id: appointment.patient_id,
         title: "Appointment Reminder",
         message: `You have an appointment with ${providerName} on ${appointmentDate} at ${appointment.time}`,
         type: "appointment",
-        read: false
+        read: false,
       })
       .select("id")
       .single();
 
-    if (notificationError) {
-      console.error("Error storing notification:", notificationError);
-    } else {
-      console.log("Notification stored with ID:", notification.id);
-    }
-
-    // Return success
     return new Response(
-      JSON.stringify({ 
-        success: true, 
-        message: "Appointment reminder sent",
-        notification_id: notification?.id
-      }),
-      { 
-        status: 200, 
-        headers: { ...corsHeaders, "Content-Type": "application/json" }
-      }
+      JSON.stringify({ success: true, notification_id: notification?.id }),
+      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
-  } catch (error: unknown) {
-    console.error("Error in send-appointment-reminder function:", error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+  } catch (error) {
+    console.error("Error in send-appointment-reminder:", error);
     return new Response(
-      JSON.stringify({ error: errorMessage }),
-      {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 500,
-      }
+      JSON.stringify({ error: "Internal server error" }),
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 });
