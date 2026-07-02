@@ -24,13 +24,32 @@ serve(async (req) => {
   }
 
   try {
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+    const supabaseAuth = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      { global: { headers: { Authorization: authHeader } } }
+    );
+    const { data: { user }, error: authErr } = await supabaseAuth.auth.getUser();
+    if (authErr || !user) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const { amount, currency, patientId, providerId, serviceId } = await req.json() as PaymentRequest;
-
+    const body = await req.json() as PaymentRequest;
+    const { amount, currency, providerId, serviceId } = body;
+    // FORCE patientId to the authenticated user — never trust client-supplied value
+    const patientId = user.id;
+    if (!amount || amount <= 0 || !providerId || !serviceId) {
+      return new Response(JSON.stringify({ error: 'Invalid input' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
     console.log('Processing wallet payment:', { amount, patientId, providerId, serviceId });
 
     // Process wallet transaction using database function
