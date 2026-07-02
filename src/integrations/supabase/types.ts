@@ -12706,34 +12706,55 @@ export type Database = {
       }
       user_two_factor: {
         Row: {
-          backup_codes: string[]
+          backup_codes_remaining: number
           created_at: string | null
           enabled: boolean | null
           id: string
-          secret: string
           updated_at: string | null
           user_id: string
           verified_at: string | null
         }
         Insert: {
-          backup_codes: string[]
+          backup_codes_remaining?: number
           created_at?: string | null
           enabled?: boolean | null
           id?: string
-          secret: string
           updated_at?: string | null
           user_id: string
           verified_at?: string | null
         }
         Update: {
-          backup_codes?: string[]
+          backup_codes_remaining?: number
           created_at?: string | null
           enabled?: boolean | null
           id?: string
-          secret?: string
           updated_at?: string | null
           user_id?: string
           verified_at?: string | null
+        }
+        Relationships: []
+      }
+      user_two_factor_secrets: {
+        Row: {
+          backup_codes: string[]
+          created_at: string
+          secret: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          backup_codes?: string[]
+          created_at?: string
+          secret: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          backup_codes?: string[]
+          created_at?: string
+          secret?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
