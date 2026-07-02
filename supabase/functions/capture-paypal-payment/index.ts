@@ -266,28 +266,26 @@ serve(async (req) => {
 
     } catch (paypalError: unknown) {
       console.error('PayPal capture error:', paypalError);
-      const errorMessage = paypalError instanceof Error ? paypalError.message : 'Unknown PayPal error';
+      const internalMessage = paypalError instanceof Error ? paypalError.message : 'Unknown PayPal error';
 
-      // Update payment status to failed
       await supabaseClient
         .from('payments')
         .update({
           status: 'failed',
-          error_message: errorMessage,
+          error_message: internalMessage,
           failed_at: new Date().toISOString()
         })
         .eq('id', paymentId);
 
-      throw new Error(`PayPal capture error: ${errorMessage}`);
+      throw new Error('Payment capture failed');
     }
 
   } catch (error: unknown) {
     console.error('Error capturing PayPal payment:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
       JSON.stringify({
         success: false,
-        error: errorMessage,
+        error: 'Payment capture failed',
         message: 'Failed to capture PayPal payment'
       }),
       {
