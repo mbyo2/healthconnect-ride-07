@@ -1,5 +1,4 @@
-import type { BridgeConfig, CanonicalReading } from './types.js'
-import type { BridgeConfig as _BC } from './config.js'
+import type { CanonicalReading } from './types.js'
 
 export async function forward(
   config: { ingestUrl: string; institutionId: string; bridgeToken: string },
