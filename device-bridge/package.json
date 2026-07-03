@@ -1,0 +1,32 @@
+{
+  "name": "@doc-o-clock/device-bridge",
+  "version": "0.1.0",
+  "description": "On-site bridge for HL7/MLLP and vendor-specific medical device protocols (Philips, GE, Dräger, Nihon Kohden, Mindray, Welch Allyn). Forwards normalized readings to Doc'O Clock.",
+  "type": "module",
+  "bin": {
+    "doc-o-clock-bridge": "dist/index.js"
+  },
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "simple-hl7": "^3.3.0",
+    "serialport": "^12.0.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.4.0",
+    "vitest": "^1.6.0"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "UNLICENSED"
+}

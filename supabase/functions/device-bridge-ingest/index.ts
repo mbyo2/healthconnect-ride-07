@@ -1,0 +1,151 @@
+// Device bridge ingest — receives HL7/normalized readings from on-site
+// `@doc-o-clock/device-bridge` package and writes them to device_data_feeds /
+// device_alerts. Authenticated with a per-institution HMAC token so the
+// service-role key never leaves the server.
+import { createClient } from 'npm:@supabase/supabase-js@2'
+import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors'
+import { z } from 'npm:zod@3.23.8'
+
+const BRIDGE_SECRET = Deno.env.get('DEVICE_BRIDGE_SECRET') ?? ''
+
+const ReadingSchema = z.object({
+  device_id: z.string().uuid(),
+  patient_id: z.string().uuid().optional().nullable(),
+  data_type: z.string().min(1).max(64),
+  data_value: z.record(z.any()),
+  unit: z.string().max(32).optional().nullable(),
+  is_critical: z.boolean().optional().default(false),
+  recorded_at: z.string().datetime().optional(),
+  alert: z
+    .object({
+      alert_type: z.string().min(1).max(64),
+      severity: z.enum(['info', 'warning', 'critical']),
+      message: z.string().min(1).max(500),
+    })
+    .optional(),
+})
+
+const PayloadSchema = z.object({
+  institution_id: z.string().uuid(),
+  readings: z.array(ReadingSchema).min(1).max(100),
+})
+
+async function hmac(secret: string, msg: string): Promise<string> {
+  const key = await crypto.subtle.importKey(
+    'raw',
+    new TextEncoder().encode(secret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign'],
+  )
+  const sig = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(msg))
+  return Array.from(new Uint8Array(sig))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('')
+}
+
+Deno.serve(async (req) => {
+  if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
+
+  try {
+    if (!BRIDGE_SECRET) {
+      return new Response(JSON.stringify({ error: 'Bridge not configured' }), {
+        status: 503,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
+    const raw = await req.text()
+    const token = req.headers.get('x-bridge-token') ?? ''
+    const institutionHeader = req.headers.get('x-institution-id') ?? ''
+    if (!token || !institutionHeader) {
+      return new Response(JSON.stringify({ error: 'Missing auth headers' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
+    const expected = await hmac(BRIDGE_SECRET, institutionHeader)
+    if (token !== expected) {
+      return new Response(JSON.stringify({ error: 'Invalid bridge token' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
+    const parsed = PayloadSchema.safeParse(JSON.parse(raw))
+    if (!parsed.success) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid payload', details: parsed.error.flatten() }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+      )
+    }
+    if (parsed.data.institution_id !== institutionHeader) {
+      return new Response(JSON.stringify({ error: 'Institution mismatch' }), {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL')!,
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
+    )
+
+    // Verify every device belongs to this institution
+    const deviceIds = [...new Set(parsed.data.readings.map((r) => r.device_id))]
+    const { data: devices, error: devErr } = await supabase
+      .from('institution_devices')
+      .select('id, institution_id')
+      .in('id', deviceIds)
+    if (devErr) throw devErr
+    const mismatched = devices?.find((d) => d.institution_id !== parsed.data.institution_id)
+    if (mismatched || (devices?.length ?? 0) !== deviceIds.length) {
+      return new Response(JSON.stringify({ error: 'Unknown or foreign device' }), {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
+    const feedRows = parsed.data.readings.map((r) => ({
+      device_id: r.device_id,
+      institution_id: parsed.data.institution_id,
+      patient_id: r.patient_id ?? null,
+      data_type: r.data_type,
+      data_value: r.data_value,
+      unit: r.unit ?? null,
+      is_critical: r.is_critical ?? false,
+      recorded_at: r.recorded_at ?? new Date().toISOString(),
+    }))
+    const { error: insErr } = await supabase.from('device_data_feeds').insert(feedRows)
+    if (insErr) throw insErr
+
+    const alertRows = parsed.data.readings
+      .filter((r) => r.alert)
+      .map((r) => ({
+        device_id: r.device_id,
+        alert_type: r.alert!.alert_type,
+        severity: r.alert!.severity,
+        message: r.alert!.message,
+      }))
+    if (alertRows.length) {
+      await supabase.from('device_alerts').insert(alertRows)
+    }
+
+    // Heartbeat
+    await supabase
+      .from('institution_devices')
+      .update({ last_heartbeat: new Date().toISOString() })
+      .in('id', deviceIds)
+
+    return new Response(JSON.stringify({ ok: true, ingested: feedRows.length }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
+  } catch (e) {
+    console.error('device-bridge-ingest error', e)
+    return new Response(JSON.stringify({ error: 'Ingest failed' }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
+  }
+})
