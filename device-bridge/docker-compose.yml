@@ -1,0 +1,18 @@
+services:
+  bridge:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - ./devices.json:/app/devices.json:ro
+    # Expose the standard HL7/MLLP ports so the hospital LAN can reach the bridge
+    ports:
+      - "2575:2575"   # generic HL7/MLLP
+      - "2576:2576"   # GE CARESCAPE
+      - "2577:2577"   # Welch Allyn
+      - "3002:3002"   # Nihon Kohden
+      - "3003:3003"   # Mindray
+      - "24105:24105" # Philips IntelliVue
+    # For Dräger serial pass a USB device through, e.g.:
+    # devices:
+    #   - "/dev/ttyUSB0:/dev/ttyUSB0"
