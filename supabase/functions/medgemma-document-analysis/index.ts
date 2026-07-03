@@ -8,11 +8,16 @@ const corsHeaders = {
 };
 
 // Input validation schema for lab report/document analysis
+// ~5MB base64 cap (base64 ≈ 4/3 of raw bytes)
+const MAX_DOCUMENT_BASE64_LEN = 7_500_000;
 const documentAnalysisSchema = z.object({
-  document: z.string().min(1, 'Document image required'), // base64 encoded image
+  document: z
+    .string()
+    .min(1, 'Document image required')
+    .max(MAX_DOCUMENT_BASE64_LEN, 'Document exceeds 5MB size limit'),
   documentType: z.enum(['lab_report', 'prescription', 'radiology_report', 'pathology_report', 'discharge_summary']).optional().default('lab_report'),
-  extractFields: z.array(z.string()).optional(), // Specific fields to extract
-  userRole: z.string().optional().default('patient')
+  extractFields: z.array(z.string().max(100, 'Field name too long')).max(20, 'Too many extractFields (max 20)').optional(),
+  userRole: z.string().max(50).optional().default('patient')
 });
 
 serve(async (req) => {
