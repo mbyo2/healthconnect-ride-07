@@ -10,15 +10,15 @@ export const QuickActions = () => {
   const navigate = useNavigate();
 
   const actions = [
-    { label: 'Admit Patient', icon: Bed, route: '/hospital-management', color: 'bg-blue-500/10 text-blue-600 dark:text-blue-400' },
+    { label: 'Admit Patient', icon: Bed, route: '/hospital-management?tab=ipd', color: 'bg-blue-500/10 text-blue-600 dark:text-blue-400' },
     { label: 'Add Staff', icon: UserPlus, route: '/institution/personnel', color: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' },
     { label: 'New Appointment', icon: Calendar, route: '/institution/appointments', color: 'bg-purple-500/10 text-purple-600 dark:text-purple-400' },
-    { label: 'OPD Queue', icon: Stethoscope, route: '/hospital-management', color: 'bg-amber-500/10 text-amber-600 dark:text-amber-400' },
-    { label: 'Create Invoice', icon: DollarSign, route: '/hospital-management', color: 'bg-rose-500/10 text-rose-600 dark:text-rose-400' },
-    { label: 'Schedule OT', icon: Scissors, route: '/hospital-management', color: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400' },
-    { label: 'Discharge', icon: ClipboardList, route: '/hospital-management', color: 'bg-teal-500/10 text-teal-600 dark:text-teal-400' },
-    { label: 'View Reports', icon: BarChart3, route: '/institution/reports', color: 'bg-slate-500/10 text-slate-600 dark:text-slate-400' },
-    { label: 'Inventory', icon: Package, route: '/pharmacy-inventory', color: 'bg-orange-500/10 text-orange-600 dark:text-orange-400' },
+    { label: 'OPD Queue', icon: Stethoscope, route: '/hospital-management?tab=opd', color: 'bg-amber-500/10 text-amber-600 dark:text-amber-400' },
+    { label: 'Create Invoice', icon: DollarSign, route: '/hospital-management?tab=billing', color: 'bg-rose-500/10 text-rose-600 dark:text-rose-400' },
+    { label: 'Schedule OT', icon: Scissors, route: '/hospital-management?tab=ot', color: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400' },
+    { label: 'Discharge', icon: ClipboardList, route: '/hospital-management?tab=discharge', color: 'bg-teal-500/10 text-teal-600 dark:text-teal-400' },
+    { label: 'View Reports', icon: BarChart3, route: '/hospital-management?tab=mis', color: 'bg-slate-500/10 text-slate-600 dark:text-slate-400' },
+    { label: 'Inventory', icon: Package, route: '/hospital-management?tab=inventory', color: 'bg-orange-500/10 text-orange-600 dark:text-orange-400' },
     { label: 'IoT Devices', icon: Wifi, route: '/institution/devices', color: 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400' },
     { label: 'Patient Records', icon: FileText, route: '/institution/patients', color: 'bg-pink-500/10 text-pink-600 dark:text-pink-400' },
     { label: 'Settings', icon: Settings, route: '/institution/settings', color: 'bg-gray-500/10 text-gray-600 dark:text-gray-400' },
