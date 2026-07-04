@@ -1,4 +1,5 @@
 import React from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useQuery } from '@tanstack/react-query';
@@ -36,6 +37,13 @@ import { SecurityManagement } from '@/components/hospital/SecurityManagement';
 
 const HospitalManagement = () => {
   const { user } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get('tab') || 'dashboard';
+  const setActiveTab = (t: string) => {
+    const next = new URLSearchParams(searchParams);
+    next.set('tab', t);
+    setSearchParams(next, { replace: true });
+  };
 
   const { data: hospital, isLoading: loadingHospital } = useQuery({
     queryKey: ['hospital', user?.id],
@@ -145,7 +153,7 @@ const HospitalManagement = () => {
         </div>
       </div>
 
-      <Tabs defaultValue="dashboard" className="space-y-4">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <div className="overflow-x-auto pb-2">
           <TabsList className="inline-flex w-auto min-w-full sm:min-w-0 flex-wrap h-auto gap-1">
             <TabsTrigger value="dashboard" className="text-xs">Dashboard</TabsTrigger>
