@@ -69,14 +69,28 @@ export const ProfileSetup = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("No user found");
 
-      let uploadedUrl = null;
+      let uploadedUrl: string | null = null;
       if (avatar) uploadedUrl = await uploadAvatar(user.id);
 
-      const { error } = await supabase.from('profiles').update({
-        ...formData,
-        avatar_url: uploadedUrl,
+      // Build payload — omit empty strings (esp. date_of_birth which is a DATE column)
+      // and skip DOB/gender entirely for business accounts.
+      const payload: Record<string, any> = {
+        first_name: formData.first_name.trim(),
+        last_name: formData.last_name.trim(),
         is_profile_complete: true,
-      }).eq('id', user.id);
+      };
+      if (formData.phone.trim()) payload.phone = formData.phone.trim();
+      if (formData.bio.trim()) payload.bio = formData.bio.trim();
+      if (uploadedUrl) payload.avatar_url = uploadedUrl;
+      if (!isBusiness) {
+        if (formData.date_of_birth) payload.date_of_birth = formData.date_of_birth;
+        if (formData.gender) payload.gender = formData.gender;
+      }
+
+      const { error } = await supabase
+        .from('profiles')
+        .update(payload as any)
+        .eq('id', user.id);
 
       if (error) throw error;
       await refreshProfile();
@@ -96,7 +110,8 @@ export const ProfileSetup = () => {
       }
       navigate('/dashboard', { replace: true });
     } catch (error: any) {
-      toast.error(error.message);
+      console.error('Profile completion failed:', error);
+      toast.error(error.message || 'Failed to save profile');
     } finally {
       setLoading(false);
     }
