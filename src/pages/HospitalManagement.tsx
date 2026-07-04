@@ -37,6 +37,13 @@ import { SecurityManagement } from '@/components/hospital/SecurityManagement';
 
 const HospitalManagement = () => {
   const { user } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get('tab') || 'dashboard';
+  const setActiveTab = (t: string) => {
+    const next = new URLSearchParams(searchParams);
+    next.set('tab', t);
+    setSearchParams(next, { replace: true });
+  };
 
   const { data: hospital, isLoading: loadingHospital } = useQuery({
     queryKey: ['hospital', user?.id],
