@@ -153,7 +153,7 @@ const HospitalManagement = () => {
         </div>
       </div>
 
-      <Tabs defaultValue="dashboard" className="space-y-4">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <div className="overflow-x-auto pb-2">
           <TabsList className="inline-flex w-auto min-w-full sm:min-w-0 flex-wrap h-auto gap-1">
             <TabsTrigger value="dashboard" className="text-xs">Dashboard</TabsTrigger>
