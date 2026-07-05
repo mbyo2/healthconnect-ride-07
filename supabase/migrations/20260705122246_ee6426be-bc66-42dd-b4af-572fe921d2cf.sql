@@ -1,0 +1,2 @@
+ALTER TABLE public.institution_devices ADD COLUMN IF NOT EXISTS bed_id UUID REFERENCES public.hospital_beds(id) ON DELETE SET NULL;
+CREATE INDEX IF NOT EXISTS idx_institution_devices_bed_id ON public.institution_devices(bed_id);

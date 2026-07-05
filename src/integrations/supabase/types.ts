@@ -4634,6 +4634,7 @@ export type Database = {
       institution_devices: {
         Row: {
           battery_level: number | null
+          bed_id: string | null
           calibration_date: string | null
           connection_config: Json | null
           connection_protocol: string | null
@@ -4658,6 +4659,7 @@ export type Database = {
         }
         Insert: {
           battery_level?: number | null
+          bed_id?: string | null
           calibration_date?: string | null
           connection_config?: Json | null
           connection_protocol?: string | null
@@ -4682,6 +4684,7 @@ export type Database = {
         }
         Update: {
           battery_level?: number | null
+          bed_id?: string | null
           calibration_date?: string | null
           connection_config?: Json | null
           connection_protocol?: string | null
@@ -4705,6 +4708,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "institution_devices_bed_id_fkey"
+            columns: ["bed_id"]
+            isOneToOne: false
+            referencedRelation: "hospital_beds"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "institution_devices_department_id_fkey"
             columns: ["department_id"]

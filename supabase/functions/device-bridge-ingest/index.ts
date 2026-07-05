@@ -92,11 +92,11 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
     )
 
-    // Verify every device belongs to this institution
+    // Verify every device belongs to this institution + fetch bed_id mapping
     const deviceIds = [...new Set(parsed.data.readings.map((r) => r.device_id))]
     const { data: devices, error: devErr } = await supabase
       .from('institution_devices')
-      .select('id, institution_id')
+      .select('id, institution_id, bed_id')
       .in('id', deviceIds)
     if (devErr) throw devErr
     const mismatched = devices?.find((d) => d.institution_id !== parsed.data.institution_id)
@@ -107,10 +107,39 @@ Deno.serve(async (req) => {
       })
     }
 
+    // Build device -> patient map via active hospital_admissions bed assignment
+    const bedIds = [...new Set((devices ?? []).map((d) => d.bed_id).filter(Boolean))] as string[]
+    const devicePatientMap = new Map<string, string | null>()
+    if (bedIds.length) {
+      const { data: admissions } = await supabase
+        .from('hospital_admissions')
+        .select('bed_id, patient_id, status')
+        .in('bed_id', bedIds)
+        .in('status', ['active', 'admitted'])
+      const bedToPatient = new Map<string, string>()
+      for (const a of admissions ?? []) {
+        if (a.bed_id && a.patient_id) bedToPatient.set(a.bed_id, a.patient_id)
+      }
+      // Fallback: hospital_beds.current_patient_id
+      const unresolvedBeds = bedIds.filter((b) => !bedToPatient.has(b))
+      if (unresolvedBeds.length) {
+        const { data: beds } = await supabase
+          .from('hospital_beds')
+          .select('id, current_patient_id')
+          .in('id', unresolvedBeds)
+        for (const b of beds ?? []) {
+          if (b.current_patient_id) bedToPatient.set(b.id, b.current_patient_id)
+        }
+      }
+      for (const d of devices ?? []) {
+        devicePatientMap.set(d.id, d.bed_id ? bedToPatient.get(d.bed_id) ?? null : null)
+      }
+    }
+
     const feedRows = parsed.data.readings.map((r) => ({
       device_id: r.device_id,
       institution_id: parsed.data.institution_id,
-      patient_id: r.patient_id ?? null,
+      patient_id: r.patient_id ?? devicePatientMap.get(r.device_id) ?? null,
       data_type: r.data_type,
       data_value: r.data_value,
       unit: r.unit ?? null,
@@ -138,9 +167,40 @@ Deno.serve(async (req) => {
       .update({ last_heartbeat: new Date().toISOString() })
       .in('id', deviceIds)
 
-    return new Response(JSON.stringify({ ok: true, ingested: feedRows.length }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    })
+    // Auto-update active triage sessions when critical vitals arrive
+    const criticalRows = feedRows.filter((r) => r.is_critical && r.patient_id)
+    const escalated: string[] = []
+    for (const row of criticalRows) {
+      const { data: sess } = await supabase
+        .from('patient_triage_sessions')
+        .select('id, urgency, red_flags, reasoning')
+        .eq('patient_id', row.patient_id!)
+        .in('status', ['open', 'active', 'pending'])
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+
+      const flag = `Critical ${row.data_type} from bedside device`
+      if (sess) {
+        const flags = Array.from(new Set([...(sess.red_flags ?? []), flag]))
+        await supabase
+          .from('patient_triage_sessions')
+          .update({
+            urgency: 'emergency',
+            red_flags: flags,
+            reasoning: `${sess.reasoning ?? ''}\n[auto] ${flag} at ${row.recorded_at}`.trim(),
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', sess.id)
+        escalated.push(sess.id)
+      }
+    }
+
+
+    return new Response(
+      JSON.stringify({ ok: true, ingested: feedRows.length, triage_escalated: escalated.length }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+    )
   } catch (e) {
     console.error('device-bridge-ingest error', e)
     return new Response(JSON.stringify({ error: 'Ingest failed' }), {
