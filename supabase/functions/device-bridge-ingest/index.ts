@@ -197,9 +197,10 @@ Deno.serve(async (req) => {
     }
 
 
-    return new Response(JSON.stringify({ ok: true, ingested: feedRows.length }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    })
+    return new Response(
+      JSON.stringify({ ok: true, ingested: feedRows.length, triage_escalated: escalated.length }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+    )
   } catch (e) {
     console.error('device-bridge-ingest error', e)
     return new Response(JSON.stringify({ error: 'Ingest failed' }), {
