@@ -21,42 +21,59 @@ const MapPage = () => {
   const [filteredProviders, setFilteredProviders] = useState<Provider[]>([]);
 
   const { data: providers = [], isLoading } = useQuery({
-    queryKey: ['providers'],
+    queryKey: ['providers-map'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select(`
-          id,
-          first_name,
-          last_name,
-          specialty,
-          bio,
-          avatar_url,
-          provider_locations (
-            latitude,
-            longitude
-          )
-        `)
-        .eq('role', 'health_personnel');
+      const PROVIDER_ROLES = [
+        'provider', 'health_personnel', 'doctor', 'nurse',
+        'specialist', 'pharmacist', 'radiologist', 'pathologist',
+      ];
 
-      if (error) throw error;
+      const [{ data: profiles, error: profErr }, { data: institutions, error: instErr }] =
+        await Promise.all([
+          supabase
+            .from('profiles')
+            .select(`id, first_name, last_name, specialty, bio, avatar_url,
+                     provider_locations ( latitude, longitude )`)
+            .in('role', PROVIDER_ROLES as any),
+          supabase
+            .from('healthcare_institutions')
+            .select('id, name, institution_type, description, logo_url, latitude, longitude, address')
+            .eq('is_verified', true as any),
+        ]);
+      if (profErr) throw profErr;
+      if (instErr) throw instErr;
 
-      return data.map((profile): Provider => ({
-        id: profile.id,
-        first_name: profile.first_name || '',
-        last_name: profile.last_name || '',
-        specialty: profile.specialty || 'General Practice',
-        bio: profile.bio,
-        avatar_url: profile.avatar_url,
+      const fromProfiles: Provider[] = (profiles || []).map((p: any) => ({
+        id: p.id,
+        first_name: p.first_name || '',
+        last_name: p.last_name || '',
+        specialty: p.specialty || 'General Practice',
+        bio: p.bio,
+        avatar_url: p.avatar_url,
         expertise: ['General Medicine', 'Primary Care'],
-        location: profile.provider_locations?.[0] ? {
-          latitude: profile.provider_locations[0].latitude ? Number(profile.provider_locations[0].latitude) : 37.7749,
-          longitude: profile.provider_locations[0].longitude ? Number(profile.provider_locations[0].longitude) : -122.4194
-        } : {
-          latitude: -15.3875,
-          longitude: 28.3228
-        }
+        location: p.provider_locations?.[0]
+          ? {
+              latitude: p.provider_locations[0].latitude ? Number(p.provider_locations[0].latitude) : -15.3875,
+              longitude: p.provider_locations[0].longitude ? Number(p.provider_locations[0].longitude) : 28.3228,
+            }
+          : { latitude: -15.3875, longitude: 28.3228 },
       }));
+
+      const fromInstitutions: Provider[] = (institutions || []).map((i: any) => ({
+        id: i.id,
+        first_name: i.name || 'Institution',
+        last_name: '',
+        specialty: i.institution_type || 'Healthcare Institution',
+        bio: i.description || i.address,
+        avatar_url: i.logo_url,
+        expertise: [i.institution_type || 'Healthcare'],
+        location: {
+          latitude: i.latitude ? Number(i.latitude) : -15.3875,
+          longitude: i.longitude ? Number(i.longitude) : 28.3228,
+        },
+      }));
+
+      return [...fromProfiles, ...fromInstitutions];
     }
   });
 
