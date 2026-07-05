@@ -3,79 +3,74 @@ import { UserManagement } from '@/components/admin/UserManagement';
 import { SecurityAuditLogs } from '@/components/admin/SecurityAuditLogs';
 import { TestAccountSetup } from '@/components/admin/TestAccountSetup';
 import { RevenueAnalyticsDashboard } from '@/components/admin/RevenueAnalyticsDashboard';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Shield, Users, Activity, DollarSign } from 'lucide-react';
-
 import { InstitutionApplications } from '@/components/admin/InstitutionApplications';
 import { ProviderApplications } from '@/components/admin/ProviderApplications';
-import { Building2, Stethoscope } from 'lucide-react';
+import { RoleManagement } from '@/components/admin/RoleManagement';
+import { PromoCodeManager } from '@/components/admin/PromoCodeManager';
+import { CommissionSettings } from '@/components/admin/CommissionSettings';
+import { SecurityDashboard } from '@/components/admin/SecurityDashboard';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Shield, Users, Activity, DollarSign, Building2, Stethoscope,
+  UserCog, Ticket, Percent, Lock,
+} from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
+
+const TABS = [
+  { value: 'users', label: 'Users', icon: Users },
+  { value: 'roles', label: 'Roles', icon: UserCog },
+  { value: 'providers', label: 'Providers', icon: Stethoscope },
+  { value: 'applications', label: 'Institutions', icon: Building2 },
+  { value: 'revenue', label: 'Revenue', icon: DollarSign },
+  { value: 'commissions', label: 'Commissions', icon: Percent },
+  { value: 'promos', label: 'Promos', icon: Ticket },
+  { value: 'security', label: 'Security', icon: Lock },
+  { value: 'audit', label: 'Audit', icon: Activity },
+  { value: 'test', label: 'Test', icon: Shield },
+];
 
 const AdminDashboard = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get('tab') || 'users';
+  const setTab = (v: string) => setSearchParams({ tab: v });
+
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Admin Dashboard</h1>
           <p className="text-muted-foreground">
-            Manage users, roles, and monitor security events
+            Manage users, roles, revenue, promotions and security
           </p>
         </div>
         <Shield className="h-12 w-12 text-primary" />
       </div>
 
-      <Tabs defaultValue="users" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-6">
-          <TabsTrigger value="users" className="flex items-center gap-2">
-            <Users className="h-4 w-4" /> Users
-          </TabsTrigger>
-          <TabsTrigger value="providers" className="flex items-center gap-2">
-            <Stethoscope className="h-4 w-4" /> Providers
-          </TabsTrigger>
-          <TabsTrigger value="applications" className="flex items-center gap-2">
-            <Building2 className="h-4 w-4" /> Institutions
-          </TabsTrigger>
-          <TabsTrigger value="revenue" className="flex items-center gap-2">
-            <DollarSign className="h-4 w-4" /> Revenue
-          </TabsTrigger>
-          <TabsTrigger value="audit" className="flex items-center gap-2">
-            <Activity className="h-4 w-4" /> Audit Logs
-          </TabsTrigger>
-          <TabsTrigger value="test" className="flex items-center gap-2">
-            <Shield className="h-4 w-4" /> Test
-          </TabsTrigger>
+      <Tabs value={activeTab} onValueChange={setTab} className="space-y-4">
+        <TabsList className="flex w-full flex-wrap h-auto justify-start gap-1">
+          {TABS.map(({ value, label, icon: Icon }) => (
+            <TabsTrigger key={value} value={value} className="flex items-center gap-2">
+              <Icon className="h-4 w-4" /> {label}
+            </TabsTrigger>
+          ))}
         </TabsList>
 
-        <TabsContent value="users" className="space-y-4">
-          <UserManagement />
-        </TabsContent>
-
-        <TabsContent value="providers" className="space-y-4">
-          <ProviderApplications />
-        </TabsContent>
-
-        <TabsContent value="applications" className="space-y-4">
-          <InstitutionApplications />
-        </TabsContent>
-
-        <TabsContent value="revenue" className="space-y-4">
-          <RevenueAnalyticsDashboard />
-        </TabsContent>
-
-        <TabsContent value="audit" className="space-y-4">
-          <SecurityAuditLogs />
-        </TabsContent>
-
-        <TabsContent value="test" className="space-y-4">
+        <TabsContent value="users"><UserManagement /></TabsContent>
+        <TabsContent value="roles"><RoleManagement /></TabsContent>
+        <TabsContent value="providers"><ProviderApplications /></TabsContent>
+        <TabsContent value="applications"><InstitutionApplications /></TabsContent>
+        <TabsContent value="revenue"><RevenueAnalyticsDashboard /></TabsContent>
+        <TabsContent value="commissions"><CommissionSettings /></TabsContent>
+        <TabsContent value="promos"><PromoCodeManager /></TabsContent>
+        <TabsContent value="security"><SecurityDashboard /></TabsContent>
+        <TabsContent value="audit"><SecurityAuditLogs /></TabsContent>
+        <TabsContent value="test">
           <Card>
             <CardHeader>
               <CardTitle>Test Account Setup</CardTitle>
-              <CardDescription>
-                Create test accounts for development and testing
-              </CardDescription>
+              <CardDescription>Create test accounts for development and testing</CardDescription>
             </CardHeader>
-            <CardContent>
-              <TestAccountSetup />
-            </CardContent>
+            <CardContent><TestAccountSetup /></CardContent>
           </Card>
         </TabsContent>
       </Tabs>
