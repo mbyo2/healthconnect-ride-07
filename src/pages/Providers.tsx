@@ -191,61 +191,65 @@ const Providers = () => {
   const fetchProviders = async () => {
     setLoading(true);
     try {
-      // Start building the query
-      let query = supabase
+      const PROVIDER_ROLES = [
+        'provider', 'health_personnel', 'doctor', 'nurse',
+        'specialist', 'pharmacist', 'radiologist', 'pathologist',
+      ];
+
+      let profQuery = supabase
         .from('profiles')
-        .select('*')
-        .eq('role', 'provider' as any);
+        .select('*', { count: 'exact' })
+        .in('role', PROVIDER_ROLES as any);
 
-      // Apply filters if they exist
-      if (filters.specialty) {
-        query = query.eq('specialty', filters.specialty);
-      }
-
-      if (filters.rating > 0) {
-        query = query.gte('rating', filters.rating);
-      }
-
+      if (filters.specialty) profQuery = profQuery.eq('specialty', filters.specialty);
+      if (filters.rating > 0) profQuery = profQuery.gte('rating', filters.rating);
       if (filters.searchTerm) {
-        query = query.or(
+        profQuery = profQuery.or(
           `first_name.ilike.%${filters.searchTerm}%,last_name.ilike.%${filters.searchTerm}%,specialty.ilike.%${filters.searchTerm}%`
         );
       }
-
-      // Add pagination
       const from = (currentPage - 1) * 10;
-      const to = from + 9;
-      query = query.range(from, to);
+      profQuery = profQuery.range(from, from + 9);
 
-      // Execute query
-      const { data, error, count } = await query;
-
-      if (error) throw error;
-
-      // Process and set provider data
-      if (data && Array.isArray(data)) {
-        // Cast to any to access potential extra fields not in the generated type
-        const formattedProviders = (data as any[]).map(provider => ({
-          id: provider.id,
-          first_name: provider.first_name || '',
-          last_name: provider.last_name || '',
-          specialty: provider.specialty || 'General Practice',
-          bio: provider.bio || '',
-          avatar_url: provider.avatar_url || '',
-          location: {
-            latitude: provider.latitude || 0,
-            longitude: provider.longitude || 0
-          },
-          rating: provider.rating || 0
-        }));
-
-        setProviders(formattedProviders);
-
-        // Calculate total pages
-        if (count) {
-          setTotalPages(Math.ceil(count / 10));
-        }
+      let instQuery = supabase
+        .from('healthcare_institutions')
+        .select('*')
+        .eq('is_verified', true as any);
+      if (filters.searchTerm) {
+        instQuery = instQuery.or(
+          `name.ilike.%${filters.searchTerm}%,institution_type.ilike.%${filters.searchTerm}%`
+        );
       }
+
+      const [{ data: profData, error: profErr, count }, { data: instData }] = await Promise.all([
+        profQuery, instQuery,
+      ]);
+      if (profErr) throw profErr;
+
+      const fromProfiles: Provider[] = ((profData as any[]) || []).map(p => ({
+        id: p.id,
+        first_name: p.first_name || '',
+        last_name: p.last_name || '',
+        specialty: p.specialty || 'General Practice',
+        bio: p.bio || '',
+        avatar_url: p.avatar_url || '',
+        location: { latitude: p.latitude || 0, longitude: p.longitude || 0 },
+        rating: p.rating || 0,
+      }));
+
+      const fromInstitutions: Provider[] = ((instData as any[]) || []).map(i => ({
+        id: i.id,
+        first_name: i.name || 'Institution',
+        last_name: '',
+        specialty: i.institution_type || 'Healthcare Institution',
+        bio: i.description || i.address || '',
+        avatar_url: i.logo_url || '',
+        location: { latitude: i.latitude || 0, longitude: i.longitude || 0 },
+        rating: i.rating || 0,
+      }));
+
+      setProviders([...fromProfiles, ...fromInstitutions]);
+      if (count) setTotalPages(Math.max(1, Math.ceil(count / 10)));
     } catch (error) {
       console.error('Error fetching providers:', error);
     } finally {
