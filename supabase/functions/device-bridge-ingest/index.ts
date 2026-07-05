@@ -167,6 +167,36 @@ Deno.serve(async (req) => {
       .update({ last_heartbeat: new Date().toISOString() })
       .in('id', deviceIds)
 
+    // Auto-update active triage sessions when critical vitals arrive
+    const criticalRows = feedRows.filter((r) => r.is_critical && r.patient_id)
+    const escalated: string[] = []
+    for (const row of criticalRows) {
+      const { data: sess } = await supabase
+        .from('patient_triage_sessions')
+        .select('id, urgency, red_flags, reasoning')
+        .eq('patient_id', row.patient_id!)
+        .in('status', ['open', 'active', 'pending'])
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+
+      const flag = `Critical ${row.data_type} from bedside device`
+      if (sess) {
+        const flags = Array.from(new Set([...(sess.red_flags ?? []), flag]))
+        await supabase
+          .from('patient_triage_sessions')
+          .update({
+            urgency: 'emergency',
+            red_flags: flags,
+            reasoning: `${sess.reasoning ?? ''}\n[auto] ${flag} at ${row.recorded_at}`.trim(),
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', sess.id)
+        escalated.push(sess.id)
+      }
+    }
+
+
     return new Response(JSON.stringify({ ok: true, ingested: feedRows.length }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
