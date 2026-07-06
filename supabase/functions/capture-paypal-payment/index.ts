@@ -108,6 +108,16 @@ serve(async (req) => {
       );
     }
 
+    // Verify the PayPal order ID matches the one stored on the payment record.
+    // Prevents capturing a cheaper order against a different (more expensive) payment.
+    if (payment.invoice_number !== paypalOrderId) {
+      return new Response(
+        JSON.stringify({ success: false, error: 'Order ID mismatch' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+
     if (payment.status === 'completed') {
       return new Response(
         JSON.stringify({
