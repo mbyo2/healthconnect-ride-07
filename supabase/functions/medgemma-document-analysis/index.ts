@@ -16,7 +16,11 @@ const documentAnalysisSchema = z.object({
     .min(1, 'Document image required')
     .max(MAX_DOCUMENT_BASE64_LEN, 'Document exceeds 5MB size limit'),
   documentType: z.enum(['lab_report', 'prescription', 'radiology_report', 'pathology_report', 'discharge_summary']).optional().default('lab_report'),
-  extractFields: z.array(z.string().max(100, 'Field name too long')).max(20, 'Too many extractFields (max 20)').optional(),
+  extractFields: z.array(
+    z.string()
+      .max(100, 'Field name too long')
+      .regex(/^[a-zA-Z0-9 \-\/()]+$/, 'Field name contains invalid characters')
+  ).max(20, 'Too many extractFields (max 20)').optional(),
   userRole: z.string().max(50).optional().default('patient')
 });
 
