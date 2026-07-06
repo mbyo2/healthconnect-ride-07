@@ -179,6 +179,16 @@ Deno.serve(async (req) => {
     }
 
     if (action === 'regenerate') {
+      const code = String(body?.code || '').replace(/\s/g, '');
+      const { data: existing } = await admin
+        .from('user_two_factor_secrets')
+        .select('secret, backup_codes')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      if (!existing) return json({ ok: false, error: '2FA not set up' }, 400);
+      const valid = (await verifyTotp(existing.secret, code)) ||
+        (Array.isArray(existing.backup_codes) && existing.backup_codes.includes(code));
+      if (!valid) return json({ ok: false, error: 'Invalid code' }, 400);
       const codes = Array.from({ length: 10 }, () => randomBackupCode());
       const { error } = await admin
         .from('user_two_factor_secrets')
