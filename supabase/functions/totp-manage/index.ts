@@ -107,6 +107,27 @@ Deno.serve(async (req) => {
     const action = String(body?.action || '');
 
     if (action === 'setup') {
+      // If 2FA is already enabled, require a valid TOTP or backup code before
+      // overwriting the existing secret. Prevents session-hijack silent reset.
+      const { data: status } = await admin
+        .from('user_two_factor')
+        .select('enabled')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      if (status?.enabled) {
+        const code = String(body?.code || '').replace(/\s/g, '');
+        const { data: prior } = await admin
+          .from('user_two_factor_secrets')
+          .select('secret, backup_codes')
+          .eq('user_id', user.id)
+          .maybeSingle();
+        const valid = !!prior && (
+          (await verifyTotp(prior.secret, code)) ||
+          (Array.isArray(prior.backup_codes) && prior.backup_codes.includes(code))
+        );
+        if (!valid) return json({ ok: false, error: 'Current 2FA code required to reset' }, 400);
+      }
+
       // Generate secret + backup codes; store server-side; return QR URL
       const secret = randomBase32(20);
       const codes = Array.from({ length: 10 }, () => randomBackupCode());
