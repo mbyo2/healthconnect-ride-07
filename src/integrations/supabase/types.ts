@@ -13334,6 +13334,10 @@ export type Database = {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"][]
       }
+      has_care_relationship: {
+        Args: { _patient: string; _provider: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -13384,6 +13388,15 @@ export type Database = {
             }
             Returns: Json
           }
+      process_refund_atomic: {
+        Args: {
+          p_amount: number
+          p_payment_id: string
+          p_reason: string
+          p_requester: string
+        }
+        Returns: Json
+      }
       process_wallet_transaction: {
         Args: {
           p_amount: number

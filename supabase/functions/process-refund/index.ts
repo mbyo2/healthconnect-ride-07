@@ -42,67 +42,27 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: 'Invalid input' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
-    const { data: payment, error: paymentError } = await supabaseClient
-      .from('payments')
-      .select('*')
-      .eq('id', paymentId)
-      .maybeSingle();
+    // Atomic refund: row-locks the payment and validates the refund ceiling
+    // inside the DB to prevent concurrent-request overspend.
+    const { data, error } = await supabaseClient.rpc('process_refund_atomic', {
+      p_payment_id: paymentId,
+      p_amount: amount,
+      p_reason: reason ?? null,
+      p_requester: user.id,
+    });
 
-    if (paymentError || !payment) {
-      return new Response(JSON.stringify({ error: 'Payment not found' }), { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    if (error) {
+      const msg = String(error.message || '');
+      let status = 400;
+      if (msg.includes('Forbidden')) status = 403;
+      else if (msg.includes('Payment not found')) status = 404;
+      return new Response(JSON.stringify({ error: msg || 'Refund failed' }), {
+        status,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
-    // Only patient, provider, or an admin can request a refund
-    const { data: profile } = await supabaseClient
-      .from('profiles')
-      .select('admin_level')
-      .eq('id', user.id)
-      .maybeSingle();
-    const isAdmin = profile?.admin_level === 'admin' || profile?.admin_level === 'superadmin';
-    if (!isAdmin && payment.patient_id !== user.id && payment.provider_id !== user.id) {
-      return new Response(JSON.stringify({ error: 'Forbidden' }), { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-    }
-
-    // Only completed payments are refundable, and never twice
-    if (payment.status !== 'completed') {
-      return new Response(JSON.stringify({ error: 'Payment is not eligible for refund' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-    }
-
-    // Sum existing refunds for this payment to enforce a total ceiling
-    const { data: existingRefunds, error: refundsFetchErr } = await supabaseClient
-      .from('refunds')
-      .select('amount,status')
-      .eq('payment_id', paymentId);
-    if (refundsFetchErr) throw refundsFetchErr;
-
-    const alreadyRefunded = (existingRefunds || [])
-      .filter((r: any) => r.status !== 'failed' && r.status !== 'cancelled')
-      .reduce((sum: number, r: any) => sum + Number(r.amount || 0), 0);
-
-    const paymentAmount = Number(payment.amount || 0);
-    if (alreadyRefunded >= paymentAmount) {
-      return new Response(JSON.stringify({ error: 'Payment has already been fully refunded' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-    }
-    if (amount + alreadyRefunded > paymentAmount) {
-      return new Response(JSON.stringify({ error: 'Refund amount exceeds remaining refundable balance' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-    }
-
-    const fullyRefunded = (amount + alreadyRefunded) >= paymentAmount;
-
-    if (fullyRefunded) {
-      const { error: updateError } = await supabaseClient
-        .from('payments')
-        .update({ status: 'refunded', updated_at: new Date().toISOString() })
-        .eq('id', paymentId);
-      if (updateError) throw updateError;
-    }
-
-    const { error: refundError } = await supabaseClient
-      .from('refunds')
-      .insert({ payment_id: paymentId, amount, reason, status: 'completed' });
-    if (refundError) throw refundError;
-
-    return new Response(JSON.stringify({ success: true }), {
+    return new Response(JSON.stringify({ success: true, ...(data as any) }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
