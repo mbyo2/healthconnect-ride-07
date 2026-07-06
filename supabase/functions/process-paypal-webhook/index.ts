@@ -143,7 +143,7 @@ serve(async (req) => {
         );
       }
 
-      // Update payment status to completed
+      // Update payment status to completed ONLY if currently pending (idempotency guard)
       const { data, error } = await supabaseClient
         .from('payments')
         .update({ 
@@ -152,8 +152,9 @@ serve(async (req) => {
           updated_at: new Date().toISOString()
         })
         .eq('id', paymentId)
+        .eq('status', 'pending')
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error('Error updating payment:', error);
@@ -163,6 +164,14 @@ serve(async (req) => {
             status: 500,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' }
           }
+        );
+      }
+
+      if (!data) {
+        console.log('Payment already processed or not pending, skipping wallet credit:', paymentId);
+        return new Response(
+          JSON.stringify({ received: true, status: 'already_processed' }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
 
