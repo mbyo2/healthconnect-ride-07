@@ -13,7 +13,7 @@ const chatRequestSchema = z.object({
   image: z.string().max(5_000_000, 'Image exceeds 5MB base64 limit').nullable().optional(),
   userRole: z.string().optional().default('patient'),
   conversationHistory: z.array(z.object({
-    role: z.enum(['user', 'assistant', 'system']),
+    role: z.enum(['user', 'assistant']),
     content: z.string().max(2000)
   })).max(50, 'Conversation history too long').optional().default([])
 });

@@ -92,9 +92,9 @@ export const getTwoFactorStatus = async (userId: string): Promise<TwoFactorStatu
   }
 };
 
-export const regenerateBackupCodes = async (userId: string): Promise<string[]> => {
+export const regenerateBackupCodes = async (userId: string, code: string): Promise<string[]> => {
   try {
-    const data = await invoke('regenerate');
+    const data = await invoke('regenerate', { code });
     return (data?.backupCodes ?? []) as string[];
   } catch (error) {
     errorHandler.handleError(error, 'regenerateBackupCodes');
