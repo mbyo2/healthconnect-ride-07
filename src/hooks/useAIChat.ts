@@ -87,8 +87,8 @@ export const useAIChat = () => {
             safeLocalSet(CURRENT_CONVERSATION_KEY, conversationId);
         } catch (error) {
             console.error('Error loading messages:', error);
-            // Fallback to localStorage
-            loadFromLocalStorage();
+            // Fallback to session cache
+            loadFromSessionStorage();
         } finally {
             setIsLoading(false);
         }
