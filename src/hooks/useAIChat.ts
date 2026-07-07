@@ -1,7 +1,14 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
-import { safeLocalGet, safeLocalSet, safeLocalRemove } from '@/utils/storage';
+import {
+    safeLocalGet,
+    safeLocalSet,
+    safeLocalRemove,
+    safeSessionGet,
+    safeSessionSet,
+    safeSessionRemove,
+} from '@/utils/storage';
 
 export interface ChatMessage {
     id?: string;
