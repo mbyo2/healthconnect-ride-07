@@ -14,6 +14,7 @@ import { MoreHorizontal, UserPlus, ShieldAlert, Users, Settings } from "lucide-r
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { AdminLevel } from "@/types/user";
 import { Badge } from "@/components/ui/badge";
+import { DPOPaymentsAdmin } from "@/components/admin/DPOPaymentsAdmin";
 
 
 type AdminUser = {
@@ -345,6 +346,10 @@ const SuperAdminDashboard = () => {
           />
         </CardContent>
       </Card>
+
+      <div className="mt-6">
+        <DPOPaymentsAdmin />
+      </div>
     </div>
   );
 };
