@@ -171,8 +171,10 @@ export const useAIChat = () => {
             if (currentConversationId === conversationId) {
                 setCurrentConversationId(null);
                 setMessages([]);
-                safeLocalRemove(STORAGE_KEY);
+                safeSessionRemove(STORAGE_KEY);
                 safeLocalRemove(CURRENT_CONVERSATION_KEY);
+                // Best-effort cleanup for any legacy localStorage PHI caches
+                safeLocalRemove(STORAGE_KEY);
             }
         } catch (error) {
             console.error('Error deleting conversation:', error);
