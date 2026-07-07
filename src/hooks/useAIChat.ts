@@ -82,8 +82,8 @@ export const useAIChat = () => {
 
             setMessages(formattedMessages);
 
-            // Also save to localStorage as cache
-            safeLocalSet(STORAGE_KEY, JSON.stringify(formattedMessages));
+            // Cache messages in sessionStorage (cleared on tab close) — PHI must not persist to localStorage
+            safeSessionSet(STORAGE_KEY, JSON.stringify(formattedMessages));
             safeLocalSet(CURRENT_CONVERSATION_KEY, conversationId);
         } catch (error) {
             console.error('Error loading messages:', error);
