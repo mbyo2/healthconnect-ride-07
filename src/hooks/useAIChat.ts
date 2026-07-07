@@ -198,10 +198,10 @@ export const useAIChat = () => {
         }
     }, [user, loadConversations]);
 
-    // Load from localStorage (fallback)
-    const loadFromLocalStorage = useCallback(() => {
+    // Load PHI cache from sessionStorage (cleared on tab close). Conversation id stays in localStorage as non-PHI metadata.
+    const loadFromSessionStorage = useCallback(() => {
         try {
-            const saved = safeLocalGet(STORAGE_KEY);
+            const saved = safeSessionGet(STORAGE_KEY);
             const savedConvId = safeLocalGet(CURRENT_CONVERSATION_KEY);
 
             if (saved) {
@@ -216,13 +216,16 @@ export const useAIChat = () => {
                 setCurrentConversationId(savedConvId);
             }
         } catch (error) {
-            console.error('Error loading from localStorage:', error);
+            console.error('Error loading chat cache:', error);
         }
     }, []);
 
     // Initialize
     useEffect(() => {
         if (user) {
+            // Purge any legacy PHI written to localStorage by previous versions
+            safeLocalRemove(STORAGE_KEY);
+
             loadConversations();
 
             // Try to restore last conversation
@@ -231,11 +234,17 @@ export const useAIChat = () => {
                 setCurrentConversationId(savedConvId);
                 loadMessages(savedConvId);
             } else {
-                // Load from localStorage as fallback
-                loadFromLocalStorage();
+                loadFromSessionStorage();
             }
+        } else {
+            // Signed out — clear cached PHI from both stores
+            safeSessionRemove(STORAGE_KEY);
+            safeLocalRemove(STORAGE_KEY);
+            safeLocalRemove(CURRENT_CONVERSATION_KEY);
+            setMessages([]);
+            setCurrentConversationId(null);
         }
-    }, [user, loadConversations, loadMessages, loadFromLocalStorage]);
+    }, [user, loadConversations, loadMessages, loadFromSessionStorage]);
 
     return {
         conversations,
