@@ -2666,6 +2666,60 @@ export type Database = {
           },
         ]
       }
+      dpo_payments: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          id: string
+          metadata: Json | null
+          redirect_url: string | null
+          reference_id: string | null
+          reference_type: string
+          result_code: string | null
+          result_explanation: string | null
+          status: string
+          trans_ref: string | null
+          trans_token: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string
+          id?: string
+          metadata?: Json | null
+          redirect_url?: string | null
+          reference_id?: string | null
+          reference_type: string
+          result_code?: string | null
+          result_explanation?: string | null
+          status?: string
+          trans_ref?: string | null
+          trans_token?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          metadata?: Json | null
+          redirect_url?: string | null
+          reference_id?: string | null
+          reference_type?: string
+          result_code?: string | null
+          result_explanation?: string | null
+          status?: string
+          trans_ref?: string | null
+          trans_token?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       drug_interactions: {
         Row: {
           clinical_effect: string | null
