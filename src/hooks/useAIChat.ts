@@ -142,9 +142,9 @@ export const useAIChat = () => {
             // Update local state
             setMessages(prev => [...prev, message]);
 
-            // Save to localStorage as backup
+            // Cache messages in sessionStorage (PHI never persisted to localStorage)
             const updated = [...messages, message];
-            safeLocalSet(STORAGE_KEY, JSON.stringify(updated));
+            safeSessionSet(STORAGE_KEY, JSON.stringify(updated));
         } catch (error) {
             console.error('Error saving message:', error);
             // Still update local state even if sync fails
