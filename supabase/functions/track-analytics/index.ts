@@ -44,11 +44,43 @@ Deno.serve(async (req) => {
     // Cap batch size to prevent abuse
     const capped = events.slice(0, 100);
 
+    const MAX_PROPS_KEYS = 20;
+    const MAX_PROPS_STRING = 500;
+    const MAX_PROPS_JSON_BYTES = 4096;
+
+    const sanitizeProps = (raw: unknown): Record<string, string | number | boolean> | null => {
+      if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null;
+      const out: Record<string, string | number | boolean> = {};
+      let keys = 0;
+      for (const [k, v] of Object.entries(raw as Record<string, unknown>)) {
+        if (keys >= MAX_PROPS_KEYS) break;
+        const key = String(k).slice(0, 80);
+        if (typeof v === 'string') {
+          out[key] = v.slice(0, MAX_PROPS_STRING);
+        } else if (typeof v === 'number' && Number.isFinite(v)) {
+          out[key] = v;
+        } else if (typeof v === 'boolean') {
+          out[key] = v;
+        } else {
+          continue; // drop nested/complex values
+        }
+        keys++;
+      }
+      if (keys === 0) return null;
+      // Final serialized-size cap
+      try {
+        if (JSON.stringify(out).length > MAX_PROPS_JSON_BYTES) return null;
+      } catch {
+        return null;
+      }
+      return out;
+    };
+
     const rows = capped.map((e) => ({
       user_id: userId,
       event_name: String(e.event || 'unknown').slice(0, 120),
       path: e.path ? String(e.path).slice(0, 500) : null,
-      props: e.props ?? null,
+      props: sanitizeProps(e.props),
       occurred_at: e.timestamp ? new Date(e.timestamp).toISOString() : new Date().toISOString(),
     }));
 
