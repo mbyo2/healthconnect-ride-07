@@ -1,7 +1,14 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
-import { safeLocalGet, safeLocalSet, safeLocalRemove } from '@/utils/storage';
+import {
+    safeLocalGet,
+    safeLocalSet,
+    safeLocalRemove,
+    safeSessionGet,
+    safeSessionSet,
+    safeSessionRemove,
+} from '@/utils/storage';
 
 export interface ChatMessage {
     id?: string;
@@ -75,13 +82,13 @@ export const useAIChat = () => {
 
             setMessages(formattedMessages);
 
-            // Also save to localStorage as cache
-            safeLocalSet(STORAGE_KEY, JSON.stringify(formattedMessages));
+            // Cache messages in sessionStorage (cleared on tab close) — PHI must not persist to localStorage
+            safeSessionSet(STORAGE_KEY, JSON.stringify(formattedMessages));
             safeLocalSet(CURRENT_CONVERSATION_KEY, conversationId);
         } catch (error) {
             console.error('Error loading messages:', error);
-            // Fallback to localStorage
-            loadFromLocalStorage();
+            // Fallback to session cache
+            loadFromSessionStorage();
         } finally {
             setIsLoading(false);
         }
@@ -135,9 +142,9 @@ export const useAIChat = () => {
             // Update local state
             setMessages(prev => [...prev, message]);
 
-            // Save to localStorage as backup
+            // Cache messages in sessionStorage (PHI never persisted to localStorage)
             const updated = [...messages, message];
-            safeLocalSet(STORAGE_KEY, JSON.stringify(updated));
+            safeSessionSet(STORAGE_KEY, JSON.stringify(updated));
         } catch (error) {
             console.error('Error saving message:', error);
             // Still update local state even if sync fails
@@ -164,8 +171,10 @@ export const useAIChat = () => {
             if (currentConversationId === conversationId) {
                 setCurrentConversationId(null);
                 setMessages([]);
-                safeLocalRemove(STORAGE_KEY);
+                safeSessionRemove(STORAGE_KEY);
                 safeLocalRemove(CURRENT_CONVERSATION_KEY);
+                // Best-effort cleanup for any legacy localStorage PHI caches
+                safeLocalRemove(STORAGE_KEY);
             }
         } catch (error) {
             console.error('Error deleting conversation:', error);
@@ -189,10 +198,10 @@ export const useAIChat = () => {
         }
     }, [user, loadConversations]);
 
-    // Load from localStorage (fallback)
-    const loadFromLocalStorage = useCallback(() => {
+    // Load PHI cache from sessionStorage (cleared on tab close). Conversation id stays in localStorage as non-PHI metadata.
+    const loadFromSessionStorage = useCallback(() => {
         try {
-            const saved = safeLocalGet(STORAGE_KEY);
+            const saved = safeSessionGet(STORAGE_KEY);
             const savedConvId = safeLocalGet(CURRENT_CONVERSATION_KEY);
 
             if (saved) {
@@ -207,13 +216,16 @@ export const useAIChat = () => {
                 setCurrentConversationId(savedConvId);
             }
         } catch (error) {
-            console.error('Error loading from localStorage:', error);
+            console.error('Error loading chat cache:', error);
         }
     }, []);
 
     // Initialize
     useEffect(() => {
         if (user) {
+            // Purge any legacy PHI written to localStorage by previous versions
+            safeLocalRemove(STORAGE_KEY);
+
             loadConversations();
 
             // Try to restore last conversation
@@ -222,11 +234,17 @@ export const useAIChat = () => {
                 setCurrentConversationId(savedConvId);
                 loadMessages(savedConvId);
             } else {
-                // Load from localStorage as fallback
-                loadFromLocalStorage();
+                loadFromSessionStorage();
             }
+        } else {
+            // Signed out — clear cached PHI from both stores
+            safeSessionRemove(STORAGE_KEY);
+            safeLocalRemove(STORAGE_KEY);
+            safeLocalRemove(CURRENT_CONVERSATION_KEY);
+            setMessages([]);
+            setCurrentConversationId(null);
         }
-    }, [user, loadConversations, loadMessages, loadFromLocalStorage]);
+    }, [user, loadConversations, loadMessages, loadFromSessionStorage]);
 
     return {
         conversations,
