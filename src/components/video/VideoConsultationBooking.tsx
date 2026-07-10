@@ -256,11 +256,11 @@ export const VideoConsultationBooking = ({ onBookingComplete }: VideoConsultatio
 
         <Button 
           onClick={handleBookConsultation}
-          disabled={!selectedDate || !selectedTime || !selectedProvider || !consultationType || isLoading}
+          disabled={!selectedDate || !selectedTime || !selectedProvider || !consultationType || isLoading || paymentLoading}
           className="w-full"
           size="lg"
         >
-          {isLoading ? 'Booking...' : 'Book Consultation'}
+          {isLoading || paymentLoading ? 'Processing…' : `Book & Pay${selectedConsultationType ? ` $${selectedConsultationType.price}` : ''}`}
         </Button>
       </CardContent>
     </Card>
