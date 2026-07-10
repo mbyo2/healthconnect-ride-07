@@ -98,18 +98,22 @@ export const VideoConsultationBooking = ({ onBookingComplete }: VideoConsultatio
 
       if (error) throw error;
 
-      toast.success('Video consultation booked successfully!');
-      
-      // Reset form
-      setSelectedDate(undefined);
-      setSelectedTime('');
-      setSelectedProvider('');
-      setConsultationType('');
-      setNotes('');
-      
+      toast.success('Consultation reserved — redirecting to secure payment…');
+
       if (onBookingComplete && data) {
         onBookingComplete(data.id);
       }
+
+      // Kick off DPO Pay hosted checkout for the consultation fee
+      await redirectToCheckout({
+        amount: consultationData.price,
+        currency: 'ZMW',
+        reference_type: 'consultation',
+        reference_id: data?.id,
+        description: `${consultationData.name} - Dr. ${provider.first_name || ''} ${provider.last_name || ''}`.trim(),
+        customer_first_name: (user as any)?.user_metadata?.first_name,
+        customer_last_name: (user as any)?.user_metadata?.last_name,
+      });
     } catch (error) {
       console.error('Error booking consultation:', error);
       toast.error('Failed to book consultation. Please try again.');
