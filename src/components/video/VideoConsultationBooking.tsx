@@ -24,6 +24,7 @@ interface VideoConsultationBookingProps {
 
 export const VideoConsultationBooking = ({ onBookingComplete }: VideoConsultationBookingProps) => {
   const { user } = useAuth();
+  const { redirectToCheckout, loading: paymentLoading } = useDPOPayment();
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [selectedTime, setSelectedTime] = useState('');
   const [selectedProvider, setSelectedProvider] = useState('');
