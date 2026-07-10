@@ -1,13 +1,13 @@
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams, useNavigate, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format, parseISO } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { 
-  CheckCircle, Calendar, Clock, MapPin, Video, 
-  FileText, ArrowRight, Download, Share2, Home
+import {
+  CheckCircle, Calendar, Clock, MapPin, Video,
+  FileText, ArrowRight, Home, CreditCard, Loader2, XCircle
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -34,6 +34,23 @@ const BookingConfirmed = () => {
       return data;
     },
     enabled: !!appointmentId,
+  });
+
+  const { data: payment } = useQuery({
+    queryKey: ['booking-confirmed-payment', appointmentId],
+    queryFn: async () => {
+      if (!appointmentId) return null;
+      const { data } = await (supabase as any)
+        .from('dpo_payments')
+        .select('id, status, amount, currency, trans_ref, result_code, result_explanation, created_at')
+        .eq('reference_id', appointmentId)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      return data;
+    },
+    enabled: !!appointmentId,
+    refetchInterval: (q) => (q.state.data?.status === 'pending' ? 5000 : false),
   });
 
   if (isLoading) {
