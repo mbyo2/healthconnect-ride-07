@@ -4,8 +4,15 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { RefreshCw, Search } from "lucide-react";
+import { RefreshCw, Search, Eye } from "lucide-react";
 import { format } from "date-fns";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface DPOPayment {
   id: string;
@@ -17,9 +24,12 @@ interface DPOPayment {
   status: string;
   trans_token: string | null;
   trans_ref: string | null;
+  redirect_url?: string | null;
   result_code: string | null;
   result_explanation: string | null;
+  metadata?: Record<string, any> | null;
   created_at: string;
+  updated_at?: string;
 }
 
 const statusVariant: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
@@ -29,10 +39,20 @@ const statusVariant: Record<string, "default" | "secondary" | "destructive" | "o
   cancelled: "outline",
 };
 
+function Row({ label, value, mono }: { label: string; value: React.ReactNode; mono?: boolean }) {
+  return (
+    <div className="grid grid-cols-3 gap-2 py-2 border-b border-border last:border-0">
+      <div className="text-xs uppercase tracking-wide text-muted-foreground">{label}</div>
+      <div className={`col-span-2 text-sm break-all ${mono ? "font-mono" : ""}`}>{value ?? "—"}</div>
+    </div>
+  );
+}
+
 export function DPOPaymentsAdmin() {
   const [rows, setRows] = useState<DPOPayment[]>([]);
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState("");
+  const [selected, setSelected] = useState<DPOPayment | null>(null);
 
   const load = async () => {
     setLoading(true);
@@ -47,6 +67,19 @@ export function DPOPaymentsAdmin() {
 
   useEffect(() => {
     load();
+    // Deep-link support: /superadmin?dpo=<paymentId>
+    const url = new URL(window.location.href);
+    const id = url.searchParams.get("dpo");
+    if (id) {
+      (async () => {
+        const { data } = await (supabase as any)
+          .from("dpo_payments")
+          .select("*")
+          .eq("id", id)
+          .maybeSingle();
+        if (data) setSelected(data as DPOPayment);
+      })();
+    }
   }, []);
 
   const filtered = rows.filter((r) => {
@@ -56,7 +89,8 @@ export function DPOPaymentsAdmin() {
       r.trans_ref?.toLowerCase().includes(s) ||
       r.trans_token?.toLowerCase().includes(s) ||
       r.reference_type.toLowerCase().includes(s) ||
-      r.status.toLowerCase().includes(s)
+      r.status.toLowerCase().includes(s) ||
+      r.reference_id?.toLowerCase().includes(s)
     );
   });
 
@@ -105,17 +139,18 @@ export function DPOPaymentsAdmin() {
                 <th className="px-4 py-2 text-right">Amount</th>
                 <th className="px-4 py-2">Status</th>
                 <th className="px-4 py-2">Code</th>
+                <th className="px-4 py-2"></th>
               </tr>
             </thead>
             <tbody>
               {loading && (
-                <tr><td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">Loading…</td></tr>
+                <tr><td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">Loading…</td></tr>
               )}
               {!loading && filtered.length === 0 && (
-                <tr><td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">No transactions yet</td></tr>
+                <tr><td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">No transactions yet</td></tr>
               )}
               {filtered.map((r) => (
-                <tr key={r.id} className="border-t">
+                <tr key={r.id} className="border-t hover:bg-muted/30 cursor-pointer" onClick={() => setSelected(r)}>
                   <td className="px-4 py-2 whitespace-nowrap">{format(new Date(r.created_at), "MMM d, HH:mm")}</td>
                   <td className="px-4 py-2 font-mono text-xs">{r.trans_ref || "—"}</td>
                   <td className="px-4 py-2">{r.reference_type}</td>
@@ -128,12 +163,64 @@ export function DPOPaymentsAdmin() {
                   <td className="px-4 py-2 text-xs text-muted-foreground">
                     {r.result_code || "—"} {r.result_explanation ? `· ${r.result_explanation}` : ""}
                   </td>
+                  <td className="px-4 py-2 text-right">
+                    <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); setSelected(r); }}>
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       </Card>
+
+      <Dialog open={!!selected} onOpenChange={(o) => !o && setSelected(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Transaction details</DialogTitle>
+            <DialogDescription>
+              Full DPO Pay record and result codes for this transaction.
+            </DialogDescription>
+          </DialogHeader>
+          {selected && (
+            <div className="space-y-1">
+              <Row label="Status" value={<Badge variant={statusVariant[selected.status] || "outline"}>{selected.status}</Badge>} />
+              <Row label="Amount" value={`${Number(selected.amount).toFixed(2)} ${selected.currency}`} />
+              <Row label="Reference type" value={selected.reference_type} />
+              <Row label="Reference ID" value={selected.reference_id} mono />
+              <Row label="Trans ref" value={selected.trans_ref} mono />
+              <Row label="Trans token" value={selected.trans_token} mono />
+              <Row label="Result code" value={selected.result_code} mono />
+              <Row label="Result explanation" value={selected.result_explanation} />
+              <Row label="User ID" value={selected.user_id} mono />
+              <Row label="Payment ID" value={selected.id} mono />
+              <Row label="Created" value={format(new Date(selected.created_at), "PPpp")} />
+              {selected.updated_at && (
+                <Row label="Updated" value={format(new Date(selected.updated_at), "PPpp")} />
+              )}
+              {selected.redirect_url && (
+                <Row
+                  label="Hosted checkout"
+                  value={
+                    <a href={selected.redirect_url} target="_blank" rel="noopener noreferrer" className="text-primary underline">
+                      Open link
+                    </a>
+                  }
+                />
+              )}
+              {selected.metadata && Object.keys(selected.metadata).length > 0 && (
+                <div className="pt-3">
+                  <div className="text-xs uppercase tracking-wide text-muted-foreground mb-1">Metadata</div>
+                  <pre className="text-xs bg-muted p-3 rounded-md overflow-auto max-h-64">
+                    {JSON.stringify(selected.metadata, null, 2)}
+                  </pre>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
