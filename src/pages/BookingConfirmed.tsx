@@ -1,13 +1,13 @@
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams, useNavigate, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format, parseISO } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { 
-  CheckCircle, Calendar, Clock, MapPin, Video, 
-  FileText, ArrowRight, Download, Share2, Home
+import {
+  CheckCircle, Calendar, Clock, MapPin, Video,
+  FileText, ArrowRight, Home, CreditCard, Loader2, XCircle
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -34,6 +34,23 @@ const BookingConfirmed = () => {
       return data;
     },
     enabled: !!appointmentId,
+  });
+
+  const { data: payment } = useQuery({
+    queryKey: ['booking-confirmed-payment', appointmentId],
+    queryFn: async () => {
+      if (!appointmentId) return null;
+      const { data } = await (supabase as any)
+        .from('dpo_payments')
+        .select('id, status, amount, currency, trans_ref, result_code, result_explanation, created_at')
+        .eq('reference_id', appointmentId)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      return data;
+    },
+    enabled: !!appointmentId,
+    refetchInterval: (q) => (q.state.data?.status === 'pending' ? 5000 : false),
   });
 
   if (isLoading) {
@@ -69,6 +86,48 @@ const BookingConfirmed = () => {
           Your appointment has been scheduled successfully.
         </p>
       </div>
+
+      {/* Payment Status */}
+      {payment && (() => {
+        const s = payment.status as string;
+        const cfg = {
+          paid: { icon: CheckCircle, color: 'text-emerald-600', bg: 'bg-emerald-500/10', label: 'Payment successful', variant: 'default' as const },
+          pending: { icon: Loader2, color: 'text-amber-600', bg: 'bg-amber-500/10', label: 'Payment pending', variant: 'secondary' as const },
+          failed: { icon: XCircle, color: 'text-destructive', bg: 'bg-destructive/10', label: 'Payment failed', variant: 'destructive' as const },
+          cancelled: { icon: XCircle, color: 'text-muted-foreground', bg: 'bg-muted', label: 'Payment cancelled', variant: 'outline' as const },
+        }[s] || { icon: CreditCard, color: 'text-muted-foreground', bg: 'bg-muted', label: s, variant: 'outline' as const };
+        const StatusIcon = cfg.icon;
+        return (
+          <Card>
+            <CardContent className="p-4 space-y-3">
+              <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${cfg.bg}`}>
+                  <StatusIcon className={`h-5 w-5 ${cfg.color} ${s === 'pending' ? 'animate-spin' : ''}`} />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <p className="font-medium text-foreground text-sm">{cfg.label}</p>
+                    <Badge variant={cfg.variant} className="text-xs">{s}</Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {Number(payment.amount).toFixed(2)} {payment.currency}
+                    {payment.trans_ref ? ` · ${payment.trans_ref}` : ''}
+                  </p>
+                </div>
+              </div>
+              {payment.result_explanation && (
+                <p className="text-xs text-muted-foreground">{payment.result_explanation}</p>
+              )}
+              <Link
+                to={`/superadmin?dpo=${payment.id}`}
+                className="text-xs text-primary hover:underline inline-flex items-center gap-1"
+              >
+                View transaction in admin <ArrowRight className="h-3 w-3" />
+              </Link>
+            </CardContent>
+          </Card>
+        );
+      })()}
 
       {/* Appointment Card */}
       <Card className="border-primary/20">

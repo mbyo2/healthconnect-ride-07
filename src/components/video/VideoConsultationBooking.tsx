@@ -16,6 +16,7 @@ import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { useDPOPayment } from '@/hooks/useDPOPayment';
 
 interface VideoConsultationBookingProps {
   onBookingComplete?: (consultationId: string) => void;
@@ -23,6 +24,7 @@ interface VideoConsultationBookingProps {
 
 export const VideoConsultationBooking = ({ onBookingComplete }: VideoConsultationBookingProps) => {
   const { user } = useAuth();
+  const { redirectToCheckout, loading: paymentLoading } = useDPOPayment();
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [selectedTime, setSelectedTime] = useState('');
   const [selectedProvider, setSelectedProvider] = useState('');
@@ -96,18 +98,22 @@ export const VideoConsultationBooking = ({ onBookingComplete }: VideoConsultatio
 
       if (error) throw error;
 
-      toast.success('Video consultation booked successfully!');
-      
-      // Reset form
-      setSelectedDate(undefined);
-      setSelectedTime('');
-      setSelectedProvider('');
-      setConsultationType('');
-      setNotes('');
-      
+      toast.success('Consultation reserved — redirecting to secure payment…');
+
       if (onBookingComplete && data) {
         onBookingComplete(data.id);
       }
+
+      // Kick off DPO Pay hosted checkout for the consultation fee
+      await redirectToCheckout({
+        amount: consultationData.price,
+        currency: 'ZMW',
+        reference_type: 'consultation',
+        reference_id: data?.id,
+        description: `${consultationData.name} - Dr. ${provider.first_name || ''} ${provider.last_name || ''}`.trim(),
+        customer_first_name: (user as any)?.user_metadata?.first_name,
+        customer_last_name: (user as any)?.user_metadata?.last_name,
+      });
     } catch (error) {
       console.error('Error booking consultation:', error);
       toast.error('Failed to book consultation. Please try again.');
@@ -250,11 +256,11 @@ export const VideoConsultationBooking = ({ onBookingComplete }: VideoConsultatio
 
         <Button 
           onClick={handleBookConsultation}
-          disabled={!selectedDate || !selectedTime || !selectedProvider || !consultationType || isLoading}
+          disabled={!selectedDate || !selectedTime || !selectedProvider || !consultationType || isLoading || paymentLoading}
           className="w-full"
           size="lg"
         >
-          {isLoading ? 'Booking...' : 'Book Consultation'}
+          {isLoading || paymentLoading ? 'Processing…' : `Book & Pay${selectedConsultationType ? ` $${selectedConsultationType.price}` : ''}`}
         </Button>
       </CardContent>
     </Card>
