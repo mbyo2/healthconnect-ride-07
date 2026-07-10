@@ -16,6 +16,7 @@ import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { useDPOPayment } from '@/hooks/useDPOPayment';
 
 interface VideoConsultationBookingProps {
   onBookingComplete?: (consultationId: string) => void;
