@@ -33,6 +33,7 @@ import {
 } from '@/components/ui/table';
 import { toast } from 'sonner';
 import { Plus, MoreHorizontal, Phone, Mail, MapPin, Store } from 'lucide-react';
+import { useInstitutionContext } from '@/hooks/useInstitutionContext';
 
 // Define the Supplier interface
 interface Supplier {
@@ -49,6 +50,7 @@ interface Supplier {
 }
 
 const SupplierManagement = () => {
+  const { institutionId, loading: institutionLoading } = useInstitutionContext();
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isAddSupplierOpen, setIsAddSupplierOpen] = useState(false);
@@ -64,28 +66,23 @@ const SupplierManagement = () => {
   });
 
   useEffect(() => {
-    fetchSuppliers();
-  }, []);
+    if (!institutionLoading) fetchSuppliers();
+  }, [institutionId, institutionLoading]);
 
   const fetchSuppliers = async () => {
     try {
       setIsLoading(true);
       
-      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-      if (sessionError) throw sessionError;
-      
-      if (!sessionData.session) {
-        toast.error("You need to be logged in");
+      if (!institutionId) {
+        setSuppliers([]);
+        toast.error('No institution is associated with this account.');
         return;
       }
-      
-      // Get institution_id from a profile or context if needed
-      // For now, we'll use a placeholder
-      const institutionId = "placeholder-institution-id"; // Replace with actual logic
-      
+
       const { data, error } = await supabase
         .from('suppliers')
         .select('*')
+        .eq('institution_id', institutionId)
         .order('name', { ascending: true });
         
       if (error) throw error;
@@ -107,8 +104,10 @@ const SupplierManagement = () => {
         return;
       }
       
-      // Get institution_id from a profile or context if needed
-      const institutionId = "placeholder-institution-id"; // Replace with actual logic
+      if (!institutionId) {
+        toast.error('No institution is associated with this account.');
+        return;
+      }
       
       const { data, error } = await supabase
         .from('suppliers')
@@ -158,7 +157,8 @@ const SupplierManagement = () => {
           address: formData.address,
           is_active: formData.is_active
         })
-        .eq('id', currentSupplier.id);
+        .eq('id', currentSupplier.id)
+        .eq('institution_id', institutionId);
         
       if (error) throw error;
       
@@ -177,7 +177,8 @@ const SupplierManagement = () => {
       const { error } = await supabase
         .from('suppliers')
         .delete()
-        .eq('id', id);
+        .eq('id', id)
+        .eq('institution_id', institutionId);
         
       if (error) throw error;
       
@@ -334,7 +335,7 @@ const SupplierManagement = () => {
         </Dialog>
       </CardHeader>
       <CardContent>
-        {isLoading ? (
+        {isLoading || institutionLoading ? (
           <div className="flex justify-center items-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
           </div>
