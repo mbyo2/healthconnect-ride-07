@@ -87,6 +87,35 @@ export const MISReports = ({ hospital }: { hospital: any }) => {
 
   const categories = [...new Set(reports.map((r) => r.category))];
 
+  const exportKpis = () => {
+    if (!kpis) {
+      toast.error('Wait for the live metrics to load before exporting.');
+      return;
+    }
+
+    const rows = [
+      ['Report', 'Value'],
+      ['Hospital', hospital?.name || 'Hospital'],
+      ['Generated at', new Date().toLocaleString()],
+      ['Bed occupancy', `${kpis.occupancy}%`],
+      ['Occupied beds', `${kpis.occupied}/${kpis.totalBeds}`],
+      ['Active admissions', String(kpis.activeAdmissions)],
+      ['Admissions today', String(kpis.admittedToday)],
+      ['Appointments today', String(kpis.appointmentsToday)],
+      ['Revenue month to date', String(kpis.revenueMTD)],
+      ['Outstanding balance', String(kpis.outstanding)],
+      ['Patient satisfaction', kpis.avgRating ? kpis.avgRating.toFixed(1) : 'No ratings'],
+    ];
+    const csv = rows.map((row) => row.map((value) => `"${String(value).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `hospital-kpis-${today}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+    toast.success('Live KPI report exported.');
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row gap-3 justify-between">
@@ -96,7 +125,7 @@ export const MISReports = ({ hospital }: { hospital: any }) => {
             Management information system — live operational, financial & quality metrics
           </p>
         </div>
-        <Button size="sm" variant="outline" className="gap-2" onClick={() => toast.info('Export coming soon')}>
+        <Button size="sm" variant="outline" className="gap-2" onClick={exportKpis} disabled={isLoading}>
           <Download className="h-4 w-4" /> Export All
         </Button>
       </div>

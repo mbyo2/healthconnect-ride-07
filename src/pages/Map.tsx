@@ -246,7 +246,7 @@ const MapPage = () => {
                 </div>
               </div>
               <div className="flex gap-2">
-                <Button size="sm" className="flex-1" onClick={() => window.location.href = `/book/${selectedProvider.id}`}>
+                <Button size="sm" className="flex-1" onClick={() => window.location.href = `/provider/${selectedProvider.id}`}>
                   Book Appointment
                 </Button>
                 <Button variant="outline" size="sm" className="flex-1" onClick={() => window.location.href = `/provider/${selectedProvider.id}`}>

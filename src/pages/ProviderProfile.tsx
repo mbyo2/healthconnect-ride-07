@@ -9,7 +9,6 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { toast } from "sonner";
 import { Calendar, MapPin, Star, Clock, Award, User, Phone, Mail, FileText } from "lucide-react";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { ProviderReviews } from "@/components/provider/ProviderReviews";
@@ -170,10 +169,10 @@ const ProviderProfile = () => {
             </div>
 
             <div className="mt-6 flex flex-col gap-3">
-              <Button className="w-full" onClick={() => navigate(`/book/${providerId}`)}>
+              <Button className="w-full" onClick={() => navigate(`/provider/${providerId}`)}>
                 Book Appointment
               </Button>
-              <Button variant="outline" className="w-full" onClick={() => toast.info("Messaging feature coming soon")}>
+              <Button variant="outline" className="w-full" onClick={() => navigate('/chat')}>
                 Send Message
               </Button>
             </div>

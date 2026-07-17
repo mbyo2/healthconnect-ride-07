@@ -97,6 +97,21 @@ const HospitalManagement = () => {
     enabled: !!hospital,
   });
 
+  const { data: patients = [] } = useQuery({
+    queryKey: ['hospital-patient-directory', hospital?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name, phone, date_of_birth')
+        .eq('role', 'patient')
+        .order('last_name')
+        .limit(200);
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!hospital,
+  });
+
   const { data: invoices = [], refetch: refetchInvoices } = useQuery({
     queryKey: ['hospital-billing', hospital?.id],
     queryFn: async () => {
@@ -192,7 +207,7 @@ const HospitalManagement = () => {
         <TabsContent value="notifications"><NotificationCenter hospitalId={hospital.id} /></TabsContent>
         <TabsContent value="emr"><EMRCaseSheets hospital={hospital} departments={departments} /></TabsContent>
         <TabsContent value="opd"><OPDManagement hospital={hospital} departments={departments} /></TabsContent>
-        <TabsContent value="ipd"><IPDManagement hospital={hospital} departments={departments} beds={beds} admissions={admissions} onRefresh={refreshAll} /></TabsContent>
+        <TabsContent value="ipd"><IPDManagement hospital={hospital} patients={patients} departments={departments} beds={beds} admissions={admissions} onRefresh={refreshAll} /></TabsContent>
         <TabsContent value="emergency"><EmergencyTriage hospital={hospital} /></TabsContent>
         <TabsContent value="ot"><OTManagement /></TabsContent>
         <TabsContent value="daycare"><DayCareManagement hospital={hospital} /></TabsContent>

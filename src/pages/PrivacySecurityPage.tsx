@@ -7,7 +7,6 @@ import { Switch } from "@/components/ui/switch";
 import { Shield, Lock, Eye, EyeOff, KeyRound, AlertTriangle, FileText, Bell, Activity } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TwoFactorMethod } from "@/types/settings";
@@ -32,8 +31,6 @@ const PrivacySecurityPage = () => {
   const [allowResearchUsage, setAllowResearchUsage] = useState(false);
   const [showInSearch, setShowInSearch] = useState(true);
   const [dataRetentionPeriod, setDataRetentionPeriod] = useState("365");
-
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchSecuritySettings = async () => {
@@ -67,7 +64,7 @@ const PrivacySecurityPage = () => {
 
   const [auditLogs, setAuditLogs] = useState<any[]>([]);
 
-  const fetchAuditLogs = async () => {
+  const fetchAuditLogs = async (limit = 5) => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
@@ -76,7 +73,7 @@ const PrivacySecurityPage = () => {
       .select('*')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
-      .limit(5);
+      .limit(limit);
 
     if (data) {
       setAuditLogs(data);
@@ -205,36 +202,46 @@ const PrivacySecurityPage = () => {
   };
 
   const handleDeleteAccount = async () => {
-    // This is a placeholder. In a real app, this would need a confirmation modal
     const confirmed = window.confirm(
-      "Are you sure you want to delete your account? This action cannot be undone."
+      "Request deletion of your account? We will retain only data required by law until the request is reviewed."
     );
 
     if (confirmed) {
-      try {
-        setIsLoading(true);
+      await submitDataRequest('deletion');
+    }
+  };
 
-        // In a real implementation, this would call a Supabase Edge Function
-        // that handles the full account deletion process safely
-        const { error } = await supabase.rpc('delete_user');
+  const submitDataRequest = async (requestType: 'export' | 'deletion') => {
+    try {
+      setIsLoading(true);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Please sign in to submit a data request.');
 
-        if (error) {
-          throw error;
+      const { error } = await supabase.from('data_subject_requests' as any).insert({
+        user_id: user.id,
+        request_type: requestType,
+        metadata: { requested_from: 'privacy_security_page' },
+      });
+
+      if (error) {
+        if (error.code === '23505') {
+          toast.info(`A ${requestType} request is already awaiting review.`);
+          return;
         }
-
-        // Log the account deletion action
-        logSecurityAction("account_deleted", "user", "");
-
-        // Sign out the user after account deletion
-        await supabase.auth.signOut();
-        toast.success("Your account has been deleted");
-        navigate("/auth");
-      } catch (error: any) {
-        console.error("Error deleting account:", error);
-        toast.error(error.message || "Failed to delete account");
-      } finally {
-        setIsLoading(false);
+        throw error;
       }
+
+      await logSecurityAction(`data_${requestType}_requested`, 'privacy', '');
+      toast.success(
+        requestType === 'export'
+          ? 'Your data export request has been submitted.'
+          : 'Your account deletion request has been submitted for review.',
+      );
+    } catch (error: any) {
+      console.error(`Error submitting ${requestType} request:`, error);
+      toast.error(error.message || 'Unable to submit your request. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -465,7 +472,7 @@ const PrivacySecurityPage = () => {
               )}
             </ul>
 
-            <Button variant="outline" className="mt-4 w-full" onClick={() => toast.info("Full security log coming soon")}>View Full Security Log</Button>
+            <Button variant="outline" className="mt-4 w-full" onClick={() => fetchAuditLogs(100)}>View Full Security Log</Button>
           </Card>
         </TabsContent>
 
@@ -565,7 +572,7 @@ const PrivacySecurityPage = () => {
                 <p className="text-sm text-muted-foreground mb-2">
                   Download a copy of all your personal data stored in our system
                 </p>
-                <Button variant="outline" onClick={() => toast.info("Data export coming soon")}>Request Data Export</Button>
+                <Button variant="outline" onClick={() => submitDataRequest('export')} disabled={isLoading}>Request Data Export</Button>
               </div>
 
               <Separator />
@@ -575,7 +582,7 @@ const PrivacySecurityPage = () => {
                 <p className="text-sm text-muted-foreground mb-2">
                   Request deletion of all your personal data (apart from that required by law)
                 </p>
-                <Button variant="outline" onClick={() => toast.info("Data deletion request coming soon")}>Request Data Deletion</Button>
+                <Button variant="outline" onClick={() => submitDataRequest('deletion')} disabled={isLoading}>Request Data Deletion</Button>
               </div>
             </div>
           </Card>
@@ -588,7 +595,7 @@ const PrivacySecurityPage = () => {
               </div>
 
               <p className="text-sm text-muted-foreground">
-                Permanently delete your account and all of your content. This action cannot be undone.
+                Submit a deletion request for review. Information that must be retained by law may be kept securely.
               </p>
 
               <Button
@@ -596,7 +603,7 @@ const PrivacySecurityPage = () => {
                 onClick={handleDeleteAccount}
                 disabled={isLoading}
               >
-                {isLoading ? "Processing..." : "Delete Account"}
+                {isLoading ? "Processing..." : "Request Account Deletion"}
               </Button>
             </div>
           </Card>

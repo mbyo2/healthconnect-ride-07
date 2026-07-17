@@ -316,7 +316,7 @@ const ProviderDetail = () => {
                     </div>
                   ) : (
                     <div className="text-center py-8">
-                      <p className="text-muted-foreground">Services information coming soon.</p>
+                      <p className="text-muted-foreground">No individual services have been published for this provider yet.</p>
                       <Button className="mt-4" onClick={() => setIsBookingOpen(true)}>
                         Book General Consultation
                       </Button>

@@ -16,13 +16,14 @@ import { format } from 'date-fns';
 
 interface IPDProps {
   hospital: any;
+  patients: any[];
   departments: any[];
   beds: any[];
   admissions: any[];
   onRefresh: () => void;
 }
 
-export const IPDManagement = ({ hospital, departments, beds, admissions, onRefresh }: IPDProps) => {
+export const IPDManagement = ({ hospital, patients, departments, beds, admissions, onRefresh }: IPDProps) => {
   const [showAdmitDialog, setShowAdmitDialog] = useState(false);
   const [showDischargeDialog, setShowDischargeDialog] = useState(false);
   const [showTransferDialog, setShowTransferDialog] = useState(false);
@@ -31,7 +32,7 @@ export const IPDManagement = ({ hospital, departments, beds, admissions, onRefre
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [admitForm, setAdmitForm] = useState({
-    patientName: '', admissionType: 'regular', departmentId: '',
+    patientId: '', admissionType: 'scheduled', departmentId: '',
     bedId: '', diagnosis: '', treatmentPlan: ''
   });
 
@@ -46,7 +47,7 @@ export const IPDManagement = ({ hospital, departments, beds, admissions, onRefre
   const availableBeds = beds?.filter(b => b.status === 'available') || [];
 
   const handleAdmit = async () => {
-    if (!admitForm.departmentId || !admitForm.admissionType) {
+    if (!admitForm.patientId || !admitForm.departmentId || !admitForm.admissionType) {
       toast.error('Please fill required fields');
       return;
     }
@@ -55,7 +56,7 @@ export const IPDManagement = ({ hospital, departments, beds, admissions, onRefre
       const admissionNumber = `ADM-${Date.now().toString(36).toUpperCase()}`;
       const { error } = await supabase.from('hospital_admissions' as any).insert({
         hospital_id: hospital.id,
-        patient_id: hospital.admin_id, // placeholder - would be actual patient
+        patient_id: admitForm.patientId,
         admission_number: admissionNumber,
         admission_type: admitForm.admissionType,
         department_id: admitForm.departmentId,
@@ -71,13 +72,13 @@ export const IPDManagement = ({ hospital, departments, beds, admissions, onRefre
       // Update bed status
       if (admitForm.bedId) {
         await supabase.from('hospital_beds' as any)
-          .update({ status: 'occupied' })
+          .update({ status: 'occupied', current_patient_id: admitForm.patientId })
           .eq('id', admitForm.bedId);
       }
 
       toast.success(`Patient admitted. Admission #${admissionNumber}`);
       setShowAdmitDialog(false);
-      setAdmitForm({ patientName: '', admissionType: 'regular', departmentId: '', bedId: '', diagnosis: '', treatmentPlan: '' });
+      setAdmitForm({ patientId: '', admissionType: 'scheduled', departmentId: '', bedId: '', diagnosis: '', treatmentPlan: '' });
       onRefresh();
     } catch (error) {
       console.error(error);
@@ -242,17 +243,29 @@ export const IPDManagement = ({ hospital, departments, beds, admissions, onRefre
             <DialogDescription>Admit a patient to the hospital</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Patient *</Label>
+              <Select value={admitForm.patientId} onValueChange={v => setAdmitForm(p => ({ ...p, patientId: v }))}>
+                <SelectTrigger><SelectValue placeholder="Select registered patient" /></SelectTrigger>
+                <SelectContent>
+                  {patients.map((patient: any) => (
+                    <SelectItem key={patient.id} value={patient.id}>
+                      {[patient.first_name, patient.last_name].filter(Boolean).join(' ') || patient.phone || patient.id}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {patients.length === 0 && <p className="text-xs text-muted-foreground">No patient profiles are available to admit.</p>}
+            </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Admission Type *</Label>
                 <Select value={admitForm.admissionType} onValueChange={v => setAdmitForm(p => ({ ...p, admissionType: v }))}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="regular">Regular</SelectItem>
+                    <SelectItem value="scheduled">Scheduled</SelectItem>
                     <SelectItem value="emergency">Emergency</SelectItem>
-                    <SelectItem value="daycare">Day Care</SelectItem>
-                    <SelectItem value="maternity">Maternity</SelectItem>
-                    <SelectItem value="surgical">Surgical</SelectItem>
+                    <SelectItem value="transfer">Transfer</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

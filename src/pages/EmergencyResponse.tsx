@@ -7,9 +7,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 
 const EmergencyResponse = () => {
     const { user, profile } = useAuth();
+    const navigate = useNavigate();
     const [locationSharing, setLocationSharing] = useState(false);
     const [emergencyContacts, setEmergencyContacts] = useState<any[]>([]);
     const [nearbyHospitals, setNearbyHospitals] = useState<any[]>([]);
@@ -54,6 +57,8 @@ const EmergencyResponse = () => {
             setNearbyHospitals((data || []).map(h => ({
                 id: h.id,
                 name: h.name,
+                address: h.address,
+                phone: h.phone,
                 distance: 'Nearby', // In a real app, calculate distance
                 time: 'Calculating...',
                 emergency: true
@@ -63,14 +68,75 @@ const EmergencyResponse = () => {
         }
     };
 
-    const handleEmergencyCall = () => {
-        // In a real app, this would trigger emergency services
-        alert('Emergency services would be contacted. This is a demo.');
+    const getCurrentPosition = () => new Promise<GeolocationPosition>((resolve, reject) => {
+        if (!navigator.geolocation) {
+            reject(new Error('Location is not available on this device.'));
+            return;
+        }
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+            enableHighAccuracy: true,
+            timeout: 10_000,
+            maximumAge: 60_000,
+        });
+    });
+
+    const handleEmergencyCall = async () => {
+        if (!user) return;
+
+        let latitude: number | null = null;
+        let longitude: number | null = null;
+        try {
+            const position = await getCurrentPosition();
+            latitude = position.coords.latitude;
+            longitude = position.coords.longitude;
+        } catch {
+            toast.info('Location was unavailable. Your call will continue without it.');
+        }
+
+        const { error } = await supabase.from('emergency_events' as any).insert({
+            patient_id: user.id,
+            latitude,
+            longitude,
+            message: 'Emergency call initiated from HealthConnect Ride.',
+            status: 'active',
+        });
+        if (error) {
+            console.error('Unable to record emergency event:', error);
+            toast.error('We could not save the emergency event, but you can still place the call.');
+        }
+
+        // Configure the local emergency number in VITE_EMERGENCY_NUMBER at deployment.
+        const phoneNumber = (import.meta.env.VITE_EMERGENCY_NUMBER || '112').replace(/[^\d+]/g, '');
+        window.location.assign(`tel:${phoneNumber}`);
     };
 
-    const handleShareLocation = () => {
-        setLocationSharing(!locationSharing);
-        // In a real app, this would share location with emergency contacts
+    const handleShareLocation = async () => {
+        if (locationSharing) {
+            setLocationSharing(false);
+            toast.success('Location sharing stopped.');
+            return;
+        }
+
+        try {
+            await getCurrentPosition();
+            setLocationSharing(true);
+            toast.success('Location sharing is active while this page remains open.');
+        } catch (error: any) {
+            toast.error(error?.message || 'Allow location access to share your location.');
+        }
+    };
+
+    const callNumber = (phone?: string) => {
+        if (!phone) {
+            toast.error('No phone number is available for this contact.');
+            return;
+        }
+        window.location.assign(`tel:${phone.replace(/[^\d+]/g, '')}`);
+    };
+
+    const openDirections = (hospital: any) => {
+        const destination = encodeURIComponent(hospital.address || hospital.name);
+        window.open(`https://www.google.com/maps/dir/?api=1&destination=${destination}`, '_blank', 'noopener,noreferrer');
     };
 
     return (
@@ -136,13 +202,13 @@ const EmergencyResponse = () => {
                                         <p className="text-sm text-muted-foreground">{contact.relationship || contact.relation}</p>
                                         <p className="text-sm mt-1">{contact.phone}</p>
                                     </div>
-                                    <Button size="sm">
+                                    <Button size="sm" onClick={() => callNumber(contact.phone)}>
                                         <Phone className="w-4 h-4 mr-2" />
                                         Call
                                     </Button>
                                 </div>
                             ))}
-                            <Button variant="outline" className="w-full">
+                            <Button variant="outline" className="w-full" onClick={() => navigate('/profile')}>
                                 <User className="w-4 h-4 mr-2" />
                                 Manage Contacts
                             </Button>
@@ -190,7 +256,7 @@ const EmergencyResponse = () => {
                                 </div>
                             </div>
 
-                            <Button variant="outline" className="w-full">
+                            <Button variant="outline" className="w-full" onClick={() => navigate('/profile')}>
                                 <FileText className="w-4 h-4 mr-2" />
                                 Update Medical Info
                             </Button>
@@ -229,11 +295,11 @@ const EmergencyResponse = () => {
                                     </div>
                                 </div>
                                 <div className="flex gap-2">
-                                    <Button size="sm" variant="outline">
+                                    <Button size="sm" variant="outline" onClick={() => openDirections(hospital)}>
                                         <Navigation className="w-4 h-4 mr-2" />
                                         Directions
                                     </Button>
-                                    <Button size="sm">
+                                    <Button size="sm" onClick={() => callNumber(hospital.phone)}>
                                         <Phone className="w-4 h-4 mr-2" />
                                         Call
                                     </Button>

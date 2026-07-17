@@ -226,7 +226,7 @@ const HealthcareProfessionals = () => {
                 </div>
 
                 <div className="flex gap-2 pt-2">
-                  <Button size="sm" className="flex-1" onClick={() => navigate(`/book/${prof.id}`)}>
+                  <Button size="sm" className="flex-1" onClick={() => navigate(`/provider/${prof.id}`)}>
                     <Calendar className="h-4 w-4 mr-2" />
                     Book
                   </Button>

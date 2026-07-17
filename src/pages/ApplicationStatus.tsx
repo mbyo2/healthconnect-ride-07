@@ -24,6 +24,26 @@ const ApplicationStatus = () => {
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const downloadApplication = (application: Application) => {
+    const lines = [
+      ['Field', 'Value'],
+      ['Application ID', application.id],
+      ['Application type', application.application_type],
+      ['Status', application.status],
+      ['Submitted at', format(new Date(application.submitted_at), 'PPP p')],
+      ['Reviewed at', application.reviewed_at ? format(new Date(application.reviewed_at), 'PPP p') : 'Not reviewed'],
+      ['Notes', application.notes || ''],
+    ];
+    const csv = lines.map((line) => line.map((value) => `"${String(value).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `application-${application.id}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+    toast.success('Application summary downloaded.');
+  };
+
   useEffect(() => {
     fetchApplications();
   }, [user]);
@@ -183,7 +203,7 @@ const ApplicationStatus = () => {
                 )}
 
                 <div className="flex gap-2">
-                  <Button size="sm" variant="outline" onClick={() => toast.info("Download feature coming soon")}>
+                  <Button size="sm" variant="outline" onClick={() => downloadApplication(application)}>
                     <Download className="h-4 w-4 mr-2" />
                     Download Application
                   </Button>

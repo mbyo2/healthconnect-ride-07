@@ -38,11 +38,26 @@ export const InfectionManagement = ({ hospital }: Props) => {
     enabled: !!hospital?.id,
   });
 
+  const { data: patients = [] } = useQuery({
+    queryKey: ['infection-patient-directory', hospital?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name, phone')
+        .eq('role', 'patient')
+        .order('last_name')
+        .limit(200);
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!hospital?.id,
+  });
+
   const addRecord = async () => {
-    if (!form.infection_type) { toast.error('Infection type required'); return; }
+    if (!form.patient_id || !form.infection_type) { toast.error('Patient and infection type are required'); return; }
     const { error } = await supabase.from('infection_records' as any).insert({
       hospital_id: hospital.id,
-      patient_id: hospital.admin_id, // placeholder
+      patient_id: form.patient_id,
       infection_type: form.infection_type,
       infection_site: form.infection_site,
       organism: form.organism,
@@ -136,6 +151,18 @@ export const InfectionManagement = ({ hospital }: Props) => {
         <DialogContent className="max-w-lg">
           <DialogHeader><DialogTitle>Log Infection Record</DialogTitle></DialogHeader>
           <div className="space-y-3 max-h-[60vh] overflow-y-auto">
+            <div><Label className="text-xs">Patient *</Label>
+              <Select value={form.patient_id} onValueChange={v => setForm(p => ({ ...p, patient_id: v }))}>
+                <SelectTrigger><SelectValue placeholder="Select registered patient" /></SelectTrigger>
+                <SelectContent>
+                  {patients.map((patient: any) => (
+                    <SelectItem key={patient.id} value={patient.id}>
+                      {[patient.first_name, patient.last_name].filter(Boolean).join(' ') || patient.phone || patient.id}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             <div className="grid grid-cols-2 gap-3">
               <div><Label className="text-xs">Infection Type *</Label>
                 <Select value={form.infection_type} onValueChange={v => setForm(p => ({ ...p, infection_type: v }))}>
