@@ -55,10 +55,10 @@ export const LandingHero = () => {
           <div className="relative mx-auto w-full max-w-lg">
             <div className="absolute -inset-4 rounded-[2rem] bg-primary/10 blur-2xl" />
             <div className="relative overflow-hidden rounded-[1.75rem] border border-border/60 bg-card p-2 shadow-2xl shadow-primary/15">
-              <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=1200&q=85" alt="Healthcare professional supporting a patient" className="h-[390px] w-full rounded-[1.35rem] object-cover sm:h-[470px]" />
+              <img src="https://images.unsplash.com/photo-1536064479547-7ee40b74b807?auto=format&fit=crop&w=1200&q=85" alt="Black African healthcare professional consulting with a young patient" className="h-[390px] w-full rounded-[1.35rem] object-cover sm:h-[470px]" />
               <div className="absolute inset-x-6 bottom-6 rounded-2xl border border-white/30 bg-background/95 p-4 shadow-lg backdrop-blur sm:inset-x-8 sm:bottom-8">
                 <div className="flex items-center gap-3">
-                  <img src="https://images.unsplash.com/photo-1594824476967-48c8b964273f?auto=format&fit=crop&w=160&q=80" alt="Doctor" className="h-11 w-11 rounded-full object-cover" />
+                  <img src="https://images.unsplash.com/photo-1666886573681-a8fbe983a3fd?auto=format&fit=crop&w=160&q=80" alt="Black African healthcare professional" className="h-11 w-11 rounded-full object-cover" />
                   <div className="min-w-0 flex-1"><p className="text-sm font-semibold">Care that fits your life</p><p className="text-xs text-muted-foreground">Clinics, hospitals, specialists, and pharmacy care</p></div>
                   <Video className="h-5 w-5 shrink-0 text-primary" />
                 </div>
