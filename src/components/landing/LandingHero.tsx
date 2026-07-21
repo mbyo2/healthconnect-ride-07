@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import { BadgeCheck, Building2, CalendarCheck, Pill, Search, Sparkles, Star, Stethoscope, Video } from "lucide-react";
+import { BadgeCheck, Building2, CalendarCheck, Pill, Search, Star, Stethoscope, Video } from "lucide-react";
 import { usePlatformStats, formatStat } from "@/hooks/usePlatformStats";
 
 export const LandingHero = () => {
@@ -21,9 +21,6 @@ export const LandingHero = () => {
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_.95fr] lg:gap-16">
           <div className="max-w-2xl text-center lg:text-left">
-            <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-medium text-primary">
-              <Sparkles className="h-3.5 w-3.5" /> Trusted by {formatStat(stats.patients)} users
-            </div>
             <h1 className="mb-6 text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl md:text-6xl">
               The right care, <span className="bg-gradient-to-r from-primary via-primary to-primary/70 bg-clip-text text-transparent">right on time.</span>
             </h1>
