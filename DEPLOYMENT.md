@@ -51,6 +51,7 @@ Ensure these are set in Netlify:
 # Supabase (already configured)
 VITE_SUPABASE_URL=your_supabase_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+VITE_EMERGENCY_NUMBER=112
 
 # Optional: Push Notifications
 VITE_VAPID_PUBLIC_KEY=your_vapid_key  # Optional
