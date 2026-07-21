@@ -155,6 +155,7 @@ function renderApp() {
       console.log("Doc' O Clock rendered successfully");
     }
     window.appLoaded = true;
+    clearTimeout(loadTimeoutId);
   } catch (error) {
     console.error("Failed to render app:", error);
     const rootElement = document.getElementById('root');
@@ -162,7 +163,16 @@ function renderApp() {
   }
 }
 
-// Simplified loading - let React handle the loading screen
+// Set a timeout to show error if app doesn't load
+const loadTimeoutId = setTimeout(() => {
+  if (!hasRendered && !window.appLoaded) {
+    console.warn('App took too long to load');
+    const rootElement = document.getElementById('root');
+    if (rootElement && !rootElement.hasChildNodes()) {
+      renderErrorFallback(rootElement, new Error('App initialization timeout - module loading took too long'));
+    }
+  }
+}, 15000); // 15 second timeout
 
 // Render immediately if the DOM is ready, otherwise wait for it
 if (document.readyState === 'loading') {

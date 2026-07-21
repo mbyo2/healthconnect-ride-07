@@ -36,7 +36,7 @@ self.addEventListener('install', (event) => {
       const cache = await caches.open(CACHE_NAME);
       console.log('Service Worker: Caching core files');
       await cache.addAll(CORE_ASSETS_TO_CACHE);
-      
+
       // Ensure offline page is cached
       try {
         const offlineResponse = await fetch(OFFLINE_URL);
@@ -44,7 +44,7 @@ self.addEventListener('install', (event) => {
       } catch (error) {
         console.error('Failed to cache offline page:', error);
       }
-      
+
       // Try to precache app shell for critical routes
       try {
         for (const route of CRITICAL_ROUTES) {
@@ -72,7 +72,7 @@ self.addEventListener('activate', (event) => {
       const deletePromises = cacheKeys
         .filter((key) => key !== CACHE_NAME && key !== DYNAMIC_CACHE_NAME)
         .map((key) => caches.delete(key));
-      
+
       await Promise.all(deletePromises);
       await self.clients.claim();
       console.log('Service Worker: Active and controlling pages');
@@ -83,41 +83,41 @@ self.addEventListener('activate', (event) => {
 // Network first, falling back to cache
 async function networkFirstStrategy(request) {
   const requestKey = request.url + (request.method || 'GET');
-  
+
   try {
     // Try network first
     const networkResponse = await fetch(request);
-    
+
     if (networkResponse.ok) {
       // Remove from failed requests if it was there
       failedRequests.delete(requestKey);
-      
+
       // Update cache with fresh response
       const cache = await caches.open(CACHE_NAME);
       await cache.put(request, networkResponse.clone());
       return networkResponse;
     }
-    
+
     throw new Error('Network response was not ok');
   } catch (error) {
     console.log('Network request failed, trying cache', request.url);
-    
+
     // Store failed request to retry later
     if (request.method === 'GET') {
       failedRequests.set(requestKey, request.clone());
     }
-    
+
     // Try to get from cache
     const cachedResponse = await caches.match(request);
     if (cachedResponse) {
       return cachedResponse;
     }
-    
+
     // Check if this is a navigation request for a critical route
     if (request.mode === 'navigate') {
       const url = new URL(request.url);
       const pathname = url.pathname;
-      
+
       if (CRITICAL_ROUTES.includes(pathname)) {
         // For critical routes, try to serve the root document
         const rootResponse = await caches.match('/');
@@ -125,11 +125,11 @@ async function networkFirstStrategy(request) {
           return rootResponse;
         }
       }
-      
+
       // If not a critical route or no root document, show offline page
       return caches.match(OFFLINE_URL);
     }
-    
+
     // If all fails, return an error response
     return new Response('Network error occurred', {
       status: 503,
@@ -147,7 +147,7 @@ async function cacheFirstStrategy(request) {
   if (cachedResponse) {
     return cachedResponse;
   }
-  
+
   try {
     const networkResponse = await fetch(request);
     const cache = await caches.open(CACHE_NAME);
@@ -163,12 +163,12 @@ async function cacheFirstStrategy(request) {
 async function dynamicCacheStrategy(request) {
   // Check for special cache API requests
   const url = new URL(request.url);
-  
+
   if (url.pathname.startsWith('/__cache/')) {
     try {
       const cache = await caches.open(DYNAMIC_CACHE_NAME);
       const cachedResponse = await cache.match(request);
-      
+
       if (cachedResponse) {
         return cachedResponse;
       }
@@ -176,7 +176,7 @@ async function dynamicCacheStrategy(request) {
       console.error('Error reading from dynamic cache:', error);
     }
   }
-  
+
   // Otherwise use network-first as default
   return networkFirstStrategy(request);
 }
@@ -184,7 +184,7 @@ async function dynamicCacheStrategy(request) {
 // Fetch event - implement strategy based on request type
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
-  
+
   // Skip cross-origin requests
   if (event.request.method !== 'GET' || !url.origin.includes(self.location.origin)) {
     return;
@@ -195,7 +195,7 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(dynamicCacheStrategy(event.request));
     return;
   }
-  
+
   // Use cache first for static assets
   if (
     url.pathname.endsWith('.css') ||
@@ -209,7 +209,7 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(cacheFirstStrategy(event.request));
     return;
   }
-  
+
   // Use network first for everything else
   event.respondWith(networkFirstStrategy(event.request));
 });
@@ -228,20 +228,20 @@ async function retryFailedRequests() {
   if (failedRequests.size === 0) {
     return;
   }
-  
+
   console.log(`Retrying ${failedRequests.size} failed requests`);
-  
+
   // Create a copy to iterate through while potentially modifying the original
   const requestsToRetry = Array.from(failedRequests.entries());
-  
+
   for (const [key, request] of requestsToRetry) {
     try {
       const response = await fetch(request);
-      
+
       if (response.ok) {
         console.log('Successfully retried:', key);
         failedRequests.delete(key);
-        
+
         // Update cache with new response
         const cache = await caches.open(CACHE_NAME);
         await cache.put(request, response);
@@ -272,15 +272,15 @@ async function syncData() {
     const db = await openDB();
     const tx = db.transaction('pendingActions', 'readwrite');
     const store = tx.objectStore('pendingActions');
-    
+
     const actions = await store.getAll();
-    
+
     if (actions.length === 0) {
       return;
     }
-    
+
     console.log(`Processing ${actions.length} pending actions...`);
-    
+
     // Process each action
     for (const action of actions) {
       try {
@@ -301,7 +301,7 @@ async function syncData() {
           default:
             console.log('Unknown action type:', action.type);
         }
-        
+
         // If successful, delete the action from store
         await store.delete(action.id);
       } catch (error) {
@@ -338,13 +338,13 @@ async function processPaymentAction(action) {
 // Function to periodically sync content
 async function syncContent() {
   console.log('Periodic content sync started');
-  
+
   try {
     // Update core cached pages
     await updateCacheForCriticalRoutes();
-    
+
     // You could also refresh any API data in dynamic cache here
-    
+
     console.log('Periodic content sync completed');
   } catch (error) {
     console.error('Error during periodic content sync:', error);
@@ -353,7 +353,7 @@ async function syncContent() {
 
 async function updateCacheForCriticalRoutes() {
   const cache = await caches.open(CACHE_NAME);
-  
+
   for (const route of CRITICAL_ROUTES) {
     try {
       const response = await fetch(route);
@@ -369,30 +369,49 @@ async function updateCacheForCriticalRoutes() {
 // Helper function to open IndexedDB
 function openDB() {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open('docOClockOfflineDB', 1);
-    
-    request.onerror = () => reject(request.error);
-    request.onsuccess = () => resolve(request.result);
-    
-    request.onupgradeneeded = (event) => {
-      const db = event.target.result;
-      if (!db.objectStoreNames.contains('pendingActions')) {
-        db.createObjectStore('pendingActions', { keyPath: 'id' });
-      }
-      if (!db.objectStoreNames.contains('offlineData')) {
-        db.createObjectStore('offlineData', { keyPath: 'key' });
-      }
-    };
+    try {
+      const request = indexedDB.open('docOClockOfflineDB', 1);
+      let timeout = null;
+
+      request.onerror = () => {
+        if (timeout) clearTimeout(timeout);
+        reject(request.error);
+      };
+      request.onsuccess = () => {
+        if (timeout) clearTimeout(timeout);
+        resolve(request.result);
+      };
+      request.onblocked = () => {
+        console.warn('IndexedDB open blocked');
+      };
+
+      request.onupgradeneeded = (event) => {
+        const db = event.target.result;
+        if (!db.objectStoreNames.contains('pendingActions')) {
+          db.createObjectStore('pendingActions', { keyPath: 'id' });
+        }
+        if (!db.objectStoreNames.contains('offlineData')) {
+          db.createObjectStore('offlineData', { keyPath: 'key' });
+        }
+      };
+
+      // Timeout after 3 seconds
+      timeout = setTimeout(() => {
+        reject(new Error('IndexedDB open timeout'));
+      }, 3000);
+    } catch (e) {
+      reject(new Error('IndexedDB not available'));
+    }
   });
 }
 
 // Listen for push notifications
 self.addEventListener('push', (event) => {
   if (!event.data) return;
-  
+
   try {
     const data = event.data.json();
-    
+
     const options = {
       body: data.body || 'New notification',
       icon: '/logo192.png',
@@ -401,7 +420,7 @@ self.addEventListener('push', (event) => {
       vibrate: [100, 50, 100],
       actions: data.actions || []
     };
-    
+
     event.waitUntil(
       self.registration.showNotification(data.title || 'Doc\' O Clock', options)
     );
@@ -413,7 +432,7 @@ self.addEventListener('push', (event) => {
 // Handle notification click
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  
+
   event.waitUntil(
     clients.matchAll({ type: 'window' }).then((clientsList) => {
       // If a window client is already open, focus it
@@ -422,7 +441,7 @@ self.addEventListener('notificationclick', (event) => {
           return client.focus();
         }
       }
-      
+
       // Otherwise, open a new window
       if (clients.openWindow) {
         const url = event.notification.data.url || '/';

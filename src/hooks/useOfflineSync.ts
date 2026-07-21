@@ -52,15 +52,32 @@ function openDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
     try {
       const req = indexedDB.open(DB_NAME, DB_VERSION);
+      let timeout: NodeJS.Timeout | null = null;
+
       req.onupgradeneeded = () => {
         const db = req.result;
         if (!db.objectStoreNames.contains(STORE_NAME)) {
           db.createObjectStore(STORE_NAME, { keyPath: 'id' });
         }
       };
-      req.onsuccess = () => resolve(req.result);
-      req.onerror = () => reject(req.error);
-    } catch {
+      req.onsuccess = () => {
+        if (timeout) clearTimeout(timeout);
+        resolve(req.result);
+      };
+      req.onerror = () => {
+        if (timeout) clearTimeout(timeout);
+        reject(req.error);
+      };
+      req.onblocked = () => {
+        if (timeout) clearTimeout(timeout);
+        console.warn('IndexedDB open blocked');
+      };
+
+      // Timeout after 3 seconds
+      timeout = setTimeout(() => {
+        reject(new Error('IndexedDB open timeout'));
+      }, 3000);
+    } catch (e) {
       reject(new Error('IndexedDB not available'));
     }
   });
@@ -89,7 +106,21 @@ export function useOfflineSync() {
       const tx = db.transaction(STORE_NAME, 'readonly');
       const store = tx.objectStore(STORE_NAME);
       const countReq = store.count();
-      countReq.onsuccess = () => setPendingCount(countReq.result);
+
+      return new Promise<void>((resolve) => {
+        countReq.onsuccess = () => {
+          setPendingCount(countReq.result);
+          resolve();
+        };
+        countReq.onerror = () => {
+          setPendingCount(0);
+          resolve();
+        };
+        tx.onerror = () => {
+          setPendingCount(0);
+          resolve();
+        };
+      });
     } catch {
       setPendingCount(0);
     }
@@ -103,11 +134,27 @@ export function useOfflineSync() {
       const tx = db.transaction(STORE_NAME, 'readwrite');
       const store = tx.objectStore(STORE_NAME);
       const id = crypto.randomUUID?.() || Date.now().toString();
-      store.put({ ...action, id, createdAt: new Date().toISOString() });
-      await new Promise((res, rej) => { tx.oncomplete = res; tx.onerror = rej; });
-      countPending();
-      return true;
-    } catch {
+      const putReq = store.put({ ...action, id, createdAt: new Date().toISOString() });
+
+      return new Promise<boolean>((resolve) => {
+        tx.oncomplete = () => {
+          countPending();
+          resolve(true);
+        };
+        tx.onerror = () => {
+          console.error('Transaction error:', tx.error);
+          resolve(false);
+        };
+        putReq.onerror = () => {
+          console.error('Put error:', putReq.error);
+          resolve(false);
+        };
+
+        // Timeout safeguard
+        setTimeout(() => resolve(false), 2000);
+      });
+    } catch (e) {
+      console.error('Queue action error:', e);
       return false;
     }
   }, [countPending]);
@@ -123,8 +170,21 @@ export function useOfflineSync() {
       const store = tx.objectStore(STORE_NAME);
       const allReq = store.getAll();
 
-      await new Promise((res) => { allReq.onsuccess = res; });
-      const actions: PendingAction[] = allReq.result || [];
+      const actions = await new Promise<PendingAction[]>((resolve) => {
+        allReq.onsuccess = () => resolve(allReq.result || []);
+        allReq.onerror = () => {
+          console.error('GetAll error:', allReq.error);
+          resolve([]);
+        };
+        tx.onerror = () => {
+          console.error('Sync transaction error:', tx.error);
+          resolve([]);
+        };
+
+        // Timeout safeguard
+        setTimeout(() => resolve([]), 3000);
+      });
+
 
       for (const action of actions) {
         let error: any = null;
@@ -155,8 +215,23 @@ export function useOfflineSync() {
 
         if (drop || !error) {
           const delTx = db.transaction(STORE_NAME, 'readwrite');
-          delTx.objectStore(STORE_NAME).delete(action.id);
-          await new Promise((res) => { delTx.oncomplete = res; });
+          const store = delTx.objectStore(STORE_NAME);
+          const delReq = store.delete(action.id);
+
+          await new Promise<void>((resolve) => {
+            delTx.oncomplete = () => resolve();
+            delTx.onerror = () => {
+              console.error('Delete transaction error:', delTx.error);
+              resolve();
+            };
+            delReq.onerror = () => {
+              console.error('Delete error:', delReq.error);
+              resolve();
+            };
+
+            // Timeout safeguard
+            setTimeout(() => resolve(), 1000);
+          });
         }
       }
 

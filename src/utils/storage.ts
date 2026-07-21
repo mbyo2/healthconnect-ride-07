@@ -93,19 +93,55 @@ export const openIndexedDB = (name = 'appIndexedDB', version = 1): Promise<IDBDa
       if (typeof indexedDB === 'undefined' || indexedDB === null) return resolve(null);
 
       const request = indexedDB.open(name, version);
+      let timeout: NodeJS.Timeout | null = null;
 
       request.onerror = () => {
+        if (timeout) clearTimeout(timeout);
         console.warn('openIndexedDB error:', request.error);
         resolve(null);
       };
 
       request.onsuccess = () => {
-        resolve(request.result);
+        if (timeout) clearTimeout(timeout);
+        const db = request.result;
+        // Ensure object stores exist
+        try {
+          if (!db.objectStoreNames.contains('pendingActions')) {
+            db.close();
+            const upgradeReq = indexedDB.open(name, version + 1);
+            upgradeReq.onupgradeneeded = (e) => {
+              const upgradeDb = (e.target as IDBOpenDBRequest).result;
+              if (!upgradeDb.objectStoreNames.contains('pendingActions')) {
+                upgradeDb.createObjectStore('pendingActions', { keyPath: 'id' });
+              }
+              if (!upgradeDb.objectStoreNames.contains('offlineData')) {
+                upgradeDb.createObjectStore('offlineData', { keyPath: 'key' });
+              }
+            };
+            upgradeReq.onsuccess = () => resolve(upgradeReq.result);
+            upgradeReq.onerror = () => resolve(null);
+          } else {
+            resolve(db);
+          }
+        } catch (e) {
+          resolve(db);
+        }
       };
 
-      // Caller can still implement onupgradeneeded if needed after resolving
-      request.onupgradeneeded = () => {
-        // No-op: callers that need schema should open their own DB or handle upgrade
+      // Timeout after 5 seconds
+      timeout = setTimeout(() => {
+        console.warn('openIndexedDB timeout');
+        resolve(null);
+      }, 5000);
+
+      request.onupgradeneeded = (e) => {
+        const db = (e.target as IDBOpenDBRequest).result;
+        if (!db.objectStoreNames.contains('pendingActions')) {
+          db.createObjectStore('pendingActions', { keyPath: 'id' });
+        }
+        if (!db.objectStoreNames.contains('offlineData')) {
+          db.createObjectStore('offlineData', { keyPath: 'key' });
+        }
       };
     } catch (err) {
       console.warn('openIndexedDB blocked:', err);

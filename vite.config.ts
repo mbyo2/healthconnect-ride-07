@@ -64,26 +64,17 @@ export default defineConfig(({ mode }) => ({
     outDir: 'dist',
     rollupOptions: {
       output: {
-        // manualChunks: {
-        //   'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-        //   'ui-vendor': ['@radix-ui/react-slot', '@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu'],
-        //   'supabase-vendor': ['@supabase/supabase-js', '@supabase/auth-helpers-react'],
-        //   'utils-vendor': ['clsx', 'tailwind-merge', 'date-fns', 'lucide-react']
-        // },
-        // assetFileNames: (assetInfo) => {
-        //   if (!assetInfo.name) return `assets/[name]-[hash][extname]`;
-        //   const info = assetInfo.name.split('.');
-        //   const ext = info[info.length - 1];
-        //   if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(ext)) {
-        //     return `assets/images/[name]-[hash][extname]`;
-        //   }
-        //   if (/woff2?|eot|ttf|otf/i.test(ext)) {
-        //     return `assets/fonts/[name]-[hash][extname]`;
-        //   }
-        //   return `assets/[name]-[hash][extname]`;
-        // },
-        // chunkFileNames: 'assets/js/[name]-[hash].js',
-        // entryFileNames: 'assets/js/[name]-[hash].js',
+        manualChunks(id: string) {
+          // Rolldown (used by Vite 8) accepts a function here, unlike the
+          // Rollup object shorthand used by older Vite releases.
+          if (!id.includes('node_modules')) return;
+          if (id.includes('node_modules/react-dom/') || id.includes('node_modules/react-router-dom/') || id.includes('node_modules/react/')) return 'vendor-react';
+          if (id.includes('@supabase/')) return 'vendor-supabase';
+          if (id.includes('@radix-ui/')) return 'vendor-ui';
+          if (id.includes('node_modules/recharts/')) return 'vendor-charts';
+          if (id.includes('node_modules/leaflet/') || id.includes('node_modules/react-leaflet/')) return 'vendor-maps';
+          if (id.includes('node_modules/date-fns/') || id.includes('node_modules/lucide-react/') || id.includes('node_modules/clsx/') || id.includes('node_modules/tailwind-merge/')) return 'vendor-utils';
+        },
       },
     },
     minify: 'terser',
@@ -93,6 +84,7 @@ export default defineConfig(({ mode }) => ({
         drop_debugger: mode === 'production',
         pure_funcs: mode === 'production' ? ['console.log', 'console.info'] : [],
         passes: 1,
+        sequences: false, // Reduce compression complexity
       },
       mangle: {
         safari10: true,
@@ -101,9 +93,10 @@ export default defineConfig(({ mode }) => ({
         comments: false,
       },
     },
-    chunkSizeWarningLimit: 800,
+    chunkSizeWarningLimit: 1000,
     cssCodeSplit: true,
-    assetsInlineLimit: 4096,
+    assetsInlineLimit: 8192,
+    reportCompressedSize: false,
   },
   optimizeDeps: {
     include: [
