@@ -2,7 +2,7 @@ import { Helmet } from "react-helmet-async";
 import { useState, useEffect } from "react";
 import { LandingHeader } from "@/components/landing/LandingHeader";
 import { LandingHero } from "@/components/landing/LandingHero";
-import { HowItWorks, Features, ForProviders } from "@/components/landing/LandingFeatures";
+import { CareExperience, HowItWorks, Features, ForProviders } from "@/components/landing/LandingFeatures";
 import { Testimonials } from "@/components/landing/LandingTestimonials";
 import { BrowseSpecialties, CTASection, LandingFooter } from "@/components/landing/LandingFooter";
 
@@ -41,6 +41,7 @@ const Landing = () => {
         <main>
           <LandingHero />
           <HowItWorks />
+          <CareExperience />
           <Features />
           <Testimonials />
           <ForProviders />

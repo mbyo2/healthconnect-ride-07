@@ -5,6 +5,36 @@ import {
   Search, Calendar, Video, Shield, Zap, Building2,
   ChevronRight, Star, CheckCircle, ArrowRight, Activity
 } from "lucide-react";
+import { CareOrbit } from "@/components/landing/CareOrbit";
+
+export const CareExperience = () => (
+  <section className="overflow-hidden py-12 md:py-14 lg:py-20">
+    <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:px-8">
+      <div className="relative order-2 lg:order-1">
+        <CareOrbit />
+      </div>
+      <div className="order-1 lg:order-2">
+        <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-primary">Connected care</p>
+        <h2 className="mb-5 text-3xl font-bold tracking-tight md:text-4xl">One care journey, designed around you.</h2>
+        <p className="mb-7 max-w-xl text-muted-foreground leading-relaxed">
+          Move naturally between finding a provider, booking a visit, managing prescriptions, and keeping your health information close.
+        </p>
+        <div className="overflow-hidden rounded-3xl border border-border/50 bg-card shadow-xl shadow-primary/5">
+          <img
+            src="https://images.unsplash.com/photo-1758691462743-f9fc9e430d39?auto=format&fit=crop&w=1200&q=85"
+            alt="Doctor providing a telehealth consultation to a Black patient"
+            loading="lazy"
+            className="h-52 w-full object-cover sm:h-60"
+          />
+          <div className="p-5">
+            <p className="text-sm font-semibold">Care that meets you where you are</p>
+            <p className="mt-1 text-sm text-muted-foreground">In person, by video, or through your trusted pharmacy.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+);
 
 export const HowItWorks = () => {
   const navigate = useNavigate();
@@ -125,6 +155,12 @@ export const ForProviders = () => {
             <div className="relative">
               <Card className="border-border/40 shadow-2xl shadow-primary/5 bg-card overflow-hidden">
                 <div className="h-1.5 bg-gradient-to-r from-primary via-primary/80 to-primary/50" />
+                <img
+                  src="https://images.unsplash.com/photo-1666886573440-16ac24f89e31?auto=format&fit=crop&w=1200&q=85"
+                  alt="Black healthcare professional and patient reviewing care on a tablet"
+                  loading="lazy"
+                  className="h-44 w-full object-cover"
+                />
                 <CardContent className="p-8">
                   <div className="flex items-center gap-4 mb-8">
                     <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center">
