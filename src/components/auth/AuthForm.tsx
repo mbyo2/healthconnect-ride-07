@@ -145,7 +145,7 @@ export const AuthForm = ({ mode = 'login' }: AuthFormProps) => {
               <Input
                 id="login-email"
                 type="email"
-                placeholder="you@example.com"
+                placeholder="you@example.online"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -180,7 +180,7 @@ export const AuthForm = ({ mode = 'login' }: AuthFormProps) => {
               <Input
                 id="register-email"
                 type="email"
-                placeholder="you@example.com"
+                placeholder="you@example.online"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required

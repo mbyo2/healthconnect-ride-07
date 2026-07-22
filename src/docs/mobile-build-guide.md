@@ -174,5 +174,5 @@ For automated builds, consider setting up:
 ## Support
 
 For issues specific to the mobile builds of HealthConnect Teledoc, contact:
-- Email: support@healthconnect-teledoc.com
+- Email: support@dococlock.online
 - Developer portal: https://developers.healthconnect-teledoc.com

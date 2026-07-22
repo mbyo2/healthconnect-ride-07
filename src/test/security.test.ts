@@ -124,7 +124,7 @@ describe('Security: Input Validation', () => {
   it('should validate email format', () => {
     const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     
-    expect(isValidEmail('user@example.com')).toBe(true);
+    expect(isValidEmail('user@example.online')).toBe(true);
     expect(isValidEmail('invalid')).toBe(false);
     expect(isValidEmail('user@')).toBe(false);
     expect(isValidEmail('@domain.com')).toBe(false);

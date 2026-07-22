@@ -144,7 +144,7 @@ export const HealthPersonnelApplicationForm = () => {
           <Input
             id="email"
             type="email"
-            placeholder="your.email@example.com"
+            placeholder="your.email@example.online"
             value={formData.email}
             onChange={(e) => handleInputChange('email', e.target.value)}
             className={errors.email ? "border-destructive" : ""}

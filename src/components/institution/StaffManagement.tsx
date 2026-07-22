@@ -386,7 +386,7 @@ export const StaffManagement = ({ institutionId }: { institutionId: string }) =>
   };
 
   const handleDownloadTemplate = () => {
-    const csv = "email,role,department,specialty\njohn@example.com,doctor,Cardiology,Cardiologist\njane@example.com,nurse,ICU,Critical Care";
+    const csv = "email,role,department,specialty\njohn@example.online,doctor,Cardiology,Cardiologist\njane@example.online,nurse,ICU,Critical Care";
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -458,7 +458,7 @@ export const StaffManagement = ({ institutionId }: { institutionId: string }) =>
                 <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
                   <DialogHeader><DialogTitle>Add Existing User as Staff</DialogTitle></DialogHeader>
                   <div className="space-y-3 py-2">
-                    <div><Label>Email *</Label><Input placeholder="user@example.com" value={addEmail} onChange={e => setAddEmail(e.target.value)} /></div>
+                    <div><Label>Email *</Label><Input placeholder="user@example.online" value={addEmail} onChange={e => setAddEmail(e.target.value)} /></div>
                     <div className="grid grid-cols-2 gap-3">
                       <div><Label>Role *</Label>
                         <Select value={addRole} onValueChange={setAddRole}>
@@ -503,7 +503,7 @@ export const StaffManagement = ({ institutionId }: { institutionId: string }) =>
                 <DialogContent>
                   <DialogHeader><DialogTitle>Invite Staff by Email</DialogTitle></DialogHeader>
                   <div className="space-y-3 py-2">
-                    <div><Label>Email *</Label><Input placeholder="staff@email.com" value={inviteEmail} onChange={e => setInviteEmail(e.target.value)} /></div>
+                    <div><Label>Email *</Label><Input placeholder="staff@email.online" value={inviteEmail} onChange={e => setInviteEmail(e.target.value)} /></div>
                     <div><Label>Role</Label>
                       <Select value={inviteRole} onValueChange={setInviteRole}>
                         <SelectTrigger><SelectValue /></SelectTrigger>

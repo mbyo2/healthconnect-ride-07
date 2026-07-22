@@ -131,7 +131,7 @@ export const PersonnelManagement = ({ institutionId }: { institutionId: string }
                                 <label className="text-sm font-medium">Email Address</label>
                                 <div className="flex gap-2">
                                     <Input
-                                        placeholder="user@example.com"
+                                        placeholder="user@example.online"
                                         value={searchEmail}
                                         onChange={(e) => setSearchEmail(e.target.value)}
                                     />

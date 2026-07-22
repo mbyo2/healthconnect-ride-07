@@ -196,8 +196,8 @@ const Privacy = () => {
             <div className="mb-4">
               <p>Doc&apos; O Clock Privacy Team</p>
               <p>
-                Email: <a href="mailto:privacy@docOclock.com" className="text-primary hover:underline">
-                  privacy@docOclock.com
+                Email: <a href="mailto:privacy@dococlock.online" className="text-primary hover:underline">
+                  privacy@dococlock.online
                 </a>
               </p>
               <p>Address: 123 Healthcare Avenue, Medical District, ZM 10001</p>

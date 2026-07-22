@@ -57,7 +57,7 @@ export const ProviderTeamCard = ({ specialtyIds = [] }: ProviderTeamCardProps) =
             <div className="space-y-4">
               <div>
                 <Label>Email</Label>
-                <Input type="email" placeholder="team@example.com" value={email} onChange={e => setEmail(e.target.value)} />
+                <Input type="email" placeholder="team@example.online" value={email} onChange={e => setEmail(e.target.value)} />
               </div>
               {roles && roles.length > 0 ? (
                 <div>

@@ -137,7 +137,7 @@ serve(async (req) => {
         Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "Doc' O Clock <notifications@docloclock.com>",
+        from: "Doc' O Clock <notifications@dococlock.online>",
         to: emailRequest.to,
         subject,
         html,

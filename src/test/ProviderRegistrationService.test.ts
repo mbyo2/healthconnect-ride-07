@@ -217,7 +217,7 @@ describe('ProviderRegistrationService Property Tests', () => {
     const { supabase } = await import('@/integrations/supabase/client');
     vi.clearAllMocks();
     
-    const mockUser = { id: 'test-user-id', email: 'test@example.com' };
+    const mockUser = { id: 'test-user-id', email: 'test@example.online' };
     const mockDeleteChain = { delete: vi.fn().mockResolvedValue({ error: null }) };
     const mockFromChain = {
       upsert: vi.fn().mockResolvedValue({ error: null }),
@@ -231,7 +231,7 @@ describe('ProviderRegistrationService Property Tests', () => {
     (supabase.auth.signInWithPassword as any).mockResolvedValue({ error: null });
     
     const registrationData: ProviderRegistrationData = {
-      email: 'test@example.com',
+      email: 'test@example.online',
       password: 'password123',
       confirmPassword: 'password123',
       full_name: 'Test User',
@@ -280,7 +280,7 @@ describe('ProviderRegistrationService Property Tests', () => {
     const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     
     const registrationData: ProviderRegistrationData = {
-      email: 'test@example.com',
+      email: 'test@example.online',
       password: 'password123',
       confirmPassword: 'password123',
       full_name: 'Test User',
@@ -291,7 +291,7 @@ describe('ProviderRegistrationService Property Tests', () => {
       documents_url: []
     };
     
-    const mockUser = { id: 'test-user-id', email: 'test@example.com' };
+    const mockUser = { id: 'test-user-id', email: 'test@example.online' };
     
     // Test retry then success scenario
     (supabase.auth.signUp as any)
@@ -347,7 +347,7 @@ describe('ProviderRegistrationService Property Tests', () => {
     vi.clearAllMocks();
     
     const registrationData: ProviderRegistrationData = {
-      email: 'test@example.com',
+      email: 'test@example.online',
       password: 'password123',
       confirmPassword: 'password123',
       full_name: 'Test Provider',

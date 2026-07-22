@@ -227,7 +227,7 @@ const SuperAdminDashboard = () => {
                     type="email"
                     value={newAdminEmail}
                     onChange={(e) => setNewAdminEmail(e.target.value)}
-                    placeholder="admin@example.com"
+                    placeholder="admin@example.online"
                     className="col-span-3"
                   />
                 </div>

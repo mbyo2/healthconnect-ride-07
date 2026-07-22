@@ -25,7 +25,7 @@ interface TestAccount {
 const testAccounts: TestAccount[] = [
   // SuperAdmin
   {
-    email: 'superadmin@doc-o-clock.com',
+    email: 'superadmin@doc-o-clock.online',
     password: '',
     firstName: 'Super',
     lastName: 'Admin',
@@ -40,7 +40,7 @@ const testAccounts: TestAccount[] = [
   
   // Regular Admin
   {
-    email: 'admin@doc-o-clock.com',
+    email: 'admin@doc-o-clock.online',
     password: '',
     firstName: 'Regular',
     lastName: 'Admin',
@@ -55,7 +55,7 @@ const testAccounts: TestAccount[] = [
 
   // Health Personnel - Doctor
   {
-    email: 'dr.smith@doc-o-clock.com',
+    email: 'dr.smith@doc-o-clock.online',
     password: '',
     firstName: 'Dr. John',
     lastName: 'Smith',
@@ -71,7 +71,7 @@ const testAccounts: TestAccount[] = [
 
   // Health Personnel - Nurse
   {
-    email: 'nurse.johnson@doc-o-clock.com',
+    email: 'nurse.johnson@doc-o-clock.online',
     password: '',
     firstName: 'Sarah',
     lastName: 'Johnson',
@@ -87,7 +87,7 @@ const testAccounts: TestAccount[] = [
 
   // Health Personnel - Pharmacist
   {
-    email: 'pharmacist.brown@doc-o-clock.com',
+    email: 'pharmacist.brown@doc-o-clock.online',
     password: '',
     firstName: 'Michael',
     lastName: 'Brown',
@@ -103,7 +103,7 @@ const testAccounts: TestAccount[] = [
 
   // Patients
   {
-    email: 'patient.doe@example.com',
+    email: 'patient.doe@example.online',
     password: '',
     firstName: 'John',
     lastName: 'Doe',
@@ -116,7 +116,7 @@ const testAccounts: TestAccount[] = [
   },
 
   {
-    email: 'patient.jane@example.com',
+    email: 'patient.jane@example.online',
     password: '',
     firstName: 'Jane',
     lastName: 'Miller',
@@ -130,7 +130,7 @@ const testAccounts: TestAccount[] = [
 
   // Institution Admin
   {
-    email: 'hospital.admin@example.com',
+    email: 'hospital.admin@example.online',
     password: '',
     firstName: 'Robert',
     lastName: 'Wilson',

@@ -345,7 +345,7 @@ export const AccountApprovalGate = ({ children }: { children: React.ReactNode })
               </p>
               {user && <DocumentUploadSection userId={user.id} userRole={effectiveRole} />}
               <p className="text-xs text-center text-muted-foreground">
-                Or contact support at support@dococlockzm.com
+                Or contact support at support@dococlock.online
               </p>
             </div>
           )}
