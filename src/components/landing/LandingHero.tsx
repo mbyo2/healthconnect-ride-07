@@ -55,7 +55,7 @@ export const LandingHero = () => {
           <div className="relative mx-auto w-full max-w-lg">
             <div className="absolute -inset-4 rounded-[2rem] bg-primary/10 blur-2xl" />
             <div className="relative overflow-hidden rounded-[1.75rem] border border-border/60 bg-card p-2 shadow-2xl shadow-primary/15">
-              <img src="https://images.unsplash.com/photo-1536064479547-7ee40b74b807?auto=format&fit=crop&w=1200&q=85" alt="Black African healthcare professional consulting with a young patient" className="h-[390px] w-full rounded-[1.35rem] object-cover sm:h-[470px]" />
+              <img src="https://images.unsplash.com/photo-1666886573440-16ac24f89e31?auto=format&fit=crop&w=1200&q=85" alt="Black healthcare professional and patient reviewing care together" className="h-[390px] w-full rounded-[1.35rem] object-cover sm:h-[470px]" />
               <div className="absolute inset-x-6 bottom-6 rounded-2xl border border-white/30 bg-background/95 p-4 shadow-lg backdrop-blur sm:inset-x-8 sm:bottom-8">
                 <div className="flex items-center gap-3">
                   <img src="https://images.unsplash.com/photo-1666886573681-a8fbe983a3fd?auto=format&fit=crop&w=160&q=80" alt="Black African healthcare professional" className="h-11 w-11 rounded-full object-cover" />

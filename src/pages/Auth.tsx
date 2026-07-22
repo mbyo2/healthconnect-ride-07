@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Eye, EyeOff, ArrowLeft, Building2, User, Stethoscope, ChevronRight } from "lucide-react";
 import { LoadingScreen } from "@/components/LoadingScreen";
@@ -221,8 +221,10 @@ export const Auth = () => {
     <div className="min-h-[100dvh] bg-gradient-to-b from-background to-muted flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
       <div className="w-full max-w-md space-y-4 py-8">
         <div className="text-center space-y-2">
-          <img src="/d0c-icon.svg" className="h-16 w-16 mx-auto mb-2" alt="Logo" />
-          <h1 className="text-2xl font-bold text-primary">Doc' O Clock</h1>
+          <Link to="/" className="mx-auto inline-flex flex-col items-center rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" aria-label="Return to Doc' O Clock home page">
+            <img src="/d0c-icon.svg" className="mb-2 h-16 w-16 transition-transform duration-200 hover:scale-105" alt="Doc' O Clock" />
+            <h1 className="text-2xl font-bold text-primary">Doc' O Clock</h1>
+          </Link>
           <p className="text-xs text-muted-foreground">Healthcare for Everyone</p>
         </div>
 
@@ -422,6 +424,9 @@ export const Auth = () => {
             </TabsContent>
           </Tabs>
         </Card>
+        <p className="px-4 text-center text-xs leading-relaxed text-muted-foreground">
+          By continuing, you agree to our <Link to="/terms" className="font-medium text-primary hover:underline">Terms and Conditions</Link> and <Link to="/privacy" className="font-medium text-primary hover:underline">Privacy Policy</Link>.
+        </p>
       </div>
     </div>
   );
