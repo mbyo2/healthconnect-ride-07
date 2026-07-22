@@ -55,6 +55,7 @@ const HealthcareApplication = lazyWithRetry(() => import('@/pages/HealthcareAppl
 const PharmacyInventory = lazyWithRetry(() => import('@/pages/PharmacyInventory'));
 const Terms = lazyWithRetry(() => import('@/pages/Terms'));
 const Privacy = lazyWithRetry(() => import('@/pages/Privacy'));
+const About = lazyWithRetry(() => import('@/pages/About'));
 const Contact = lazyWithRetry(() => import('@/pages/Contact'));
 const PaymentSuccess = lazyWithRetry(() => import('@/pages/PaymentSuccess'));
 const PaymentCancel = lazyWithRetry(() => import('@/pages/PaymentCancel'));
@@ -140,6 +141,7 @@ const AppContent = () => {
             <Route path="/healthcare-institutions" element={<HealthcareInstitutions />} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/privacy" element={<Privacy />} />
+            <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/register" element={<Register />} />
             <Route path="/accept-invitation" element={<AcceptInvitation />} />

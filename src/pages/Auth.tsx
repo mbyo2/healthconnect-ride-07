@@ -29,6 +29,7 @@ const patientSchema = z.object({
   phone: z.string().optional(),
   password: z.string().min(6, "Min 6 characters"),
   confirmPassword: z.string().min(6),
+  termsAccepted: z.boolean().refine((value) => value, "You must accept the Terms and Conditions to continue"),
 }).refine(d => d.password === d.confirmPassword, { message: "Passwords don't match", path: ["confirmPassword"] });
 
 const providerSchema = z.object({
@@ -42,6 +43,7 @@ const providerSchema = z.object({
   yearsExperience: z.string().optional(),
   password: z.string().min(6, "Min 6 characters"),
   confirmPassword: z.string().min(6),
+  termsAccepted: z.boolean().refine((value) => value, "You must accept the Terms and Conditions to continue"),
 }).refine(d => d.password === d.confirmPassword, { message: "Passwords don't match", path: ["confirmPassword"] });
 
 const businessSchema = z.object({
@@ -56,6 +58,7 @@ const businessSchema = z.object({
   licenseNumber: z.string().optional(),
   password: z.string().min(6, "Min 6 characters"),
   confirmPassword: z.string().min(6),
+  termsAccepted: z.boolean().refine((value) => value, "You must accept the Terms and Conditions to continue"),
 }).refine(d => d.password === d.confirmPassword, { message: "Passwords don't match", path: ["confirmPassword"] });
 
 // ---------- Constants ----------
@@ -80,6 +83,29 @@ const BUSINESS_TYPES = [
 ];
 
 type SignupPath = null | 'patient' | 'provider' | 'business';
+
+interface TermsAcceptanceProps {
+  checked: boolean;
+  error?: string;
+  onChange: (checked: boolean) => void;
+}
+
+const TermsAcceptance = ({ checked, error, onChange }: TermsAcceptanceProps) => (
+  <div>
+    <label className="flex cursor-pointer items-start gap-2 rounded-lg border border-border/60 bg-muted/30 p-3 text-xs leading-relaxed text-muted-foreground">
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={(event) => onChange(event.target.checked)}
+        className="mt-0.5 h-4 w-4 shrink-0 rounded border-input text-primary accent-primary"
+      />
+      <span>
+        I have read and agree to the <Link to="/terms" className="font-medium text-primary hover:underline">Terms and Conditions</Link> and <Link to="/privacy" className="font-medium text-primary hover:underline">Privacy Policy</Link>.
+      </span>
+    </label>
+    {error && <p className="mt-1 text-xs font-medium text-destructive">{error}</p>}
+  </div>
+);
 
 export const Auth = () => {
   const navigate = useNavigate();
@@ -106,9 +132,9 @@ export const Auth = () => {
     resolver: zodResolver(loginSchema),
     defaultValues: { email: searchParams.get("email") || "", password: "" },
   });
-  const patientForm = useForm<z.infer<typeof patientSchema>>({ resolver: zodResolver(patientSchema), mode: "onBlur" });
-  const providerForm = useForm<z.infer<typeof providerSchema>>({ resolver: zodResolver(providerSchema), mode: "onBlur" });
-  const businessForm = useForm<z.infer<typeof businessSchema>>({ resolver: zodResolver(businessSchema), mode: "onBlur" });
+  const patientForm = useForm<z.infer<typeof patientSchema>>({ resolver: zodResolver(patientSchema), mode: "onBlur", defaultValues: { termsAccepted: false } });
+  const providerForm = useForm<z.infer<typeof providerSchema>>({ resolver: zodResolver(providerSchema), mode: "onBlur", defaultValues: { termsAccepted: false } });
+  const businessForm = useForm<z.infer<typeof businessSchema>>({ resolver: zodResolver(businessSchema), mode: "onBlur", defaultValues: { termsAccepted: false } });
 
   // ---------- Handlers ----------
   const onLogin = async (data: z.infer<typeof loginSchema>) => {
@@ -306,6 +332,7 @@ export const Auth = () => {
                       <FormItem><FormLabel className="text-xs">Confirm Password</FormLabel><FormControl><Input type="password" {...field} /></FormControl><FormMessage /></FormItem>
                     )} />
                     <p className="text-[10px] text-muted-foreground">✨ Free forever — you only pay for consultations</p>
+                    <TermsAcceptance checked={patientForm.watch("termsAccepted")} onChange={(checked) => patientForm.setValue("termsAccepted", checked, { shouldValidate: true })} error={patientForm.formState.errors.termsAccepted?.message} />
                     <AnimatedButton type="submit" className="w-full h-12" loading={localLoading}>Create Patient Account</AnimatedButton>
                   </form>
                 </Form>
@@ -360,6 +387,7 @@ export const Auth = () => {
                       <FormItem><FormLabel className="text-xs">Confirm Password</FormLabel><FormControl><Input type="password" {...field} /></FormControl><FormMessage /></FormItem>
                     )} />
                     <p className="text-[10px] text-muted-foreground">💼 Free listing — pay only per new patient booking</p>
+                    <TermsAcceptance checked={providerForm.watch("termsAccepted")} onChange={(checked) => providerForm.setValue("termsAccepted", checked, { shouldValidate: true })} error={providerForm.formState.errors.termsAccepted?.message} />
                     <AnimatedButton type="submit" className="w-full h-12" loading={localLoading}>Create Professional Account</AnimatedButton>
                   </form>
                 </Form>
@@ -417,6 +445,7 @@ export const Auth = () => {
                       <FormItem><FormLabel className="text-xs">Confirm Password</FormLabel><FormControl><Input type="password" {...field} /></FormControl><FormMessage /></FormItem>
                     )} />
                     <p className="text-[10px] text-muted-foreground">🏥 Set up your facility after registration — HMS, POS & more included</p>
+                    <TermsAcceptance checked={businessForm.watch("termsAccepted")} onChange={(checked) => businessForm.setValue("termsAccepted", checked, { shouldValidate: true })} error={businessForm.formState.errors.termsAccepted?.message} />
                     <AnimatedButton type="submit" className="w-full h-12" loading={localLoading}>Register Business</AnimatedButton>
                   </form>
                 </Form>
@@ -425,7 +454,7 @@ export const Auth = () => {
           </Tabs>
         </Card>
         <p className="px-4 text-center text-xs leading-relaxed text-muted-foreground">
-          By continuing, you agree to our <Link to="/terms" className="font-medium text-primary hover:underline">Terms and Conditions</Link> and <Link to="/privacy" className="font-medium text-primary hover:underline">Privacy Policy</Link>.
+          By continuing, you agree to our <Link to="/terms" className="font-medium text-primary hover:underline">Terms and Conditions</Link> and <Link to="/privacy" className="font-medium text-primary hover:underline">Privacy Policy</Link>. Learn more <Link to="/about" className="font-medium text-primary hover:underline">About Doc&apos; O Clock</Link>.
         </p>
       </div>
     </div>
