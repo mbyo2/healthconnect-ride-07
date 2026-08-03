@@ -2026,6 +2026,39 @@ export type Database = {
           },
         ]
       }
+      data_subject_requests: {
+        Row: {
+          completed_at: string | null
+          id: string
+          metadata: Json
+          notes: string | null
+          request_type: string
+          requested_at: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          id?: string
+          metadata?: Json
+          notes?: string | null
+          request_type: string
+          requested_at?: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          id?: string
+          metadata?: Json
+          notes?: string | null
+          request_type?: string
+          requested_at?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       day_care_procedures: {
         Row: {
           bed_number: string | null
