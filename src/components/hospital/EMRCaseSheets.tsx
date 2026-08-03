@@ -1,4 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { ListSkeleton } from '@/components/ui/list-skeleton';
+import { EmptyState } from '@/components/ui/empty-state';
+import { useHospitalModule } from '@/hooks/useHospitalModule';
+import { usePatientNames } from '@/hooks/usePatientNames';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -31,11 +37,39 @@ export const EMRCaseSheets = ({ hospital, departments }: Props) => {
     icd_code: '',
   });
 
-  const [recentCases] = useState([
-    { id: 1, patient: 'John Mwale', uhid: 'UH-2024-001', date: '2026-03-04', doctor: 'Dr. Banda', department: 'General Medicine', status: 'in_progress' },
-    { id: 2, patient: 'Mary Phiri', uhid: 'UH-2024-002', date: '2026-03-04', doctor: 'Dr. Tembo', department: 'Orthopedics', status: 'completed' },
-    { id: 3, patient: 'Peter Zulu', uhid: 'UH-2024-003', date: '2026-03-03', doctor: 'Dr. Mulenga', department: 'Cardiology', status: 'in_progress' },
-  ]);
+  const { data: recentCases, loading, error, refresh } = useHospitalModule<any>(
+    'comprehensive_medical_records', 'institution_id', hospital?.id, { orderBy: 'visit_date', ascending: false }
+  );
+  const { nameFor } = usePatientNames(recentCases.map((c: any) => c.patient_id));
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (!activeCase) return;
+    const cd = (activeCase.clinical_data && typeof activeCase.clinical_data === 'object') ? activeCase.clinical_data : {};
+    setCaseSheet(prev => ({ ...prev, ...cd, vitals: { ...prev.vitals, ...(cd.vitals || {}) } }));
+  }, [activeCase]);
+
+  const filteredCases = recentCases.filter((c: any) =>
+    nameFor(c.patient_id).toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (c.title || '').toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const saveCaseSheet = async () => {
+    if (!activeCase) return;
+    setSaving(true);
+    try {
+      const { error: err } = await (supabase.from('comprehensive_medical_records' as any) as any)
+        .update({ clinical_data: caseSheet, description: caseSheet.provisional_diagnosis || activeCase.description })
+        .eq('id', activeCase.id);
+      if (err) throw err;
+      toast.success('Case sheet saved');
+      refresh();
+    } catch (e: any) {
+      toast.error(e?.message || 'Failed to save case sheet');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -59,16 +93,20 @@ export const EMRCaseSheets = ({ hospital, departments }: Props) => {
             </div>
           </CardHeader>
           <CardContent className="space-y-2 max-h-[500px] overflow-y-auto">
-            {recentCases.map(c => (
+            {loading ? (
+              <ListSkeleton count={3} variant="compact" />
+            ) : error ? (
+              <EmptyState icon={FileText} title="Could not load records" description={error} actionLabel="Retry" onAction={refresh} />
+            ) : filteredCases.length === 0 ? (
+              <EmptyState icon={FileText} title="No case sheets" description="Consultation records created at this facility appear here." />
+            ) : filteredCases.map((c: any) => (
               <div key={c.id} onClick={() => setActiveCase(c)} className={`p-3 rounded-lg border cursor-pointer transition-all hover:shadow-sm ${activeCase?.id === c.id ? 'border-primary bg-primary/5' : 'border-border'}`}>
                 <div className="flex items-center justify-between">
-                  <span className="font-medium text-sm text-foreground">{c.patient}</span>
-                  <Badge variant={c.status === 'completed' ? 'default' : 'secondary'} className="text-[10px]">
-                    {c.status === 'completed' ? 'Done' : 'In Progress'}
-                  </Badge>
+                  <span className="font-medium text-sm text-foreground">{nameFor(c.patient_id)}</span>
+                  <Badge variant={c.status === 'completed' ? 'default' : 'secondary'} className="text-[10px] capitalize">{c.status || 'active'}</Badge>
                 </div>
-                <div className="text-xs text-muted-foreground mt-1">UHID: {c.uhid} • {c.department}</div>
-                <div className="text-xs text-muted-foreground">{c.doctor} • {c.date}</div>
+                <div className="text-xs text-muted-foreground mt-1">{c.title || c.record_type}</div>
+                <div className="text-xs text-muted-foreground">{c.visit_date ? new Date(c.visit_date).toLocaleDateString() : ''}</div>
               </div>
             ))}
           </CardContent>
@@ -79,7 +117,7 @@ export const EMRCaseSheets = ({ hospital, departments }: Props) => {
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
               <FileText className="h-5 w-5 text-primary" />
-              {activeCase ? `Case Sheet — ${activeCase.patient}` : 'Select a Patient'}
+              {activeCase ? `Case Sheet — ${nameFor(activeCase.patient_id)}` : 'Select a Patient'}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -163,9 +201,8 @@ export const EMRCaseSheets = ({ hospital, departments }: Props) => {
                 </TabsContent>
 
                 <div className="flex gap-2 pt-2">
-                  <Button className="gap-2"><Save className="h-4 w-4" /> Save Case Sheet</Button>
-                  <Button variant="outline">Print</Button>
-                  <Button variant="outline">Share with Patient</Button>
+                  <Button className="gap-2" disabled={saving} onClick={saveCaseSheet}><Save className="h-4 w-4" /> Save Case Sheet</Button>
+                  <Button variant="outline" onClick={() => window.print()}>Print</Button>
                 </div>
               </Tabs>
             ) : (
