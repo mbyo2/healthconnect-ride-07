@@ -1,117 +1,156 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { FileText, Search, Printer, Save, CheckCircle2, Clock } from 'lucide-react';
+import { FileText, Printer, Save, CheckCircle2 } from 'lucide-react';
+import { EmptyState } from '@/components/ui/empty-state';
+import { usePatientNames } from '@/hooks/usePatientNames';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+
+const EMPTY = {
+  admission_diagnosis: '',
+  discharge_diagnosis: '',
+  procedures_performed: '',
+  course_in_hospital: '',
+  investigations_summary: '',
+  discharge_medications: '',
+  diet_advice: '',
+  follow_up_instructions: '',
+};
 
 export const DischargeSummary = ({ hospital, admissions }: { hospital: any; admissions: any[] }) => {
-  const [selectedPatient, setSelectedPatient] = useState<any>(null);
-  const [summary, setSummary] = useState({
-    admission_diagnosis: '',
-    discharge_diagnosis: '',
-    procedures_performed: '',
-    course_in_hospital: '',
-    condition_at_discharge: 'stable',
-    discharge_medications: '',
-    diet_advice: '',
-    follow_up_instructions: '',
-    investigations_summary: '',
-    doctor_notes: '',
-  });
+  const [selected, setSelected] = useState<any>(null);
+  const [search, setSearch] = useState('');
+  const [summary, setSummary] = useState({ ...EMPTY });
+  const [saving, setSaving] = useState(false);
 
-  const [discharges] = useState([
-    { id: 1, patient: 'John Mwale', uhid: 'UH-001', admDate: '2026-02-28', dischDate: '2026-03-04', dept: 'General Medicine', doctor: 'Dr. Banda', status: 'pending' },
-    { id: 2, patient: 'Sarah Tembo', uhid: 'UH-005', admDate: '2026-03-01', dischDate: '2026-03-03', dept: 'Surgery', doctor: 'Dr. Chanda', status: 'completed' },
-    { id: 3, patient: 'James Kapota', uhid: 'UH-008', admDate: '2026-03-02', dischDate: '2026-03-04', dept: 'Orthopedics', doctor: 'Dr. Mulenga', status: 'draft' },
-  ]);
+  const rows = (admissions || []).filter((a: any) => a.hospital_id ? a.hospital_id === hospital?.id : true);
+  const { nameFor } = usePatientNames(rows.map((a: any) => a.patient_id));
+
+  const filtered = rows.filter((a: any) =>
+    nameFor(a.patient_id).toLowerCase().includes(search.toLowerCase()) ||
+    (a.admission_number || '').toLowerCase().includes(search.toLowerCase())
+  );
+
+  useEffect(() => {
+    if (!selected) return;
+    let parsed = { ...EMPTY };
+    try {
+      if (selected.discharge_summary) parsed = { ...EMPTY, ...JSON.parse(selected.discharge_summary) };
+    } catch {
+      parsed = { ...EMPTY, course_in_hospital: selected.discharge_summary || '' };
+    }
+    setSummary(parsed);
+  }, [selected]);
+
+  const save = async (finalize: boolean) => {
+    if (!selected) return;
+    setSaving(true);
+    try {
+      const patch: any = { discharge_summary: JSON.stringify(summary) };
+      if (finalize) {
+        patch.status = 'discharged';
+        patch.discharge_date = new Date().toISOString();
+      }
+      const { error } = await (supabase.from('hospital_admissions' as any) as any)
+        .update(patch).eq('id', selected.id);
+      if (error) throw error;
+      toast.success(finalize ? 'Discharge summary finalized' : 'Draft saved');
+      setSelected({ ...selected, ...patch });
+    } catch (e: any) {
+      toast.error(e?.message || 'Failed to save discharge summary');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const field = (label: string, key: keyof typeof EMPTY, rows_ = 2) => (
+    <div>
+      <label className="text-xs font-medium text-foreground">{label}</label>
+      <Textarea
+        rows={rows_}
+        value={summary[key]}
+        onChange={e => setSummary(p => ({ ...p, [key]: e.target.value }))}
+      />
+    </div>
+  );
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row gap-3 justify-between">
-        <div>
-          <h3 className="text-lg font-semibold text-foreground">Discharge Summary</h3>
-          <p className="text-sm text-muted-foreground">Structured discharge documentation with medication & follow-up</p>
-        </div>
+      <div>
+        <h3 className="text-lg font-semibold text-foreground">Discharge Summary</h3>
+        <p className="text-sm text-muted-foreground">Structured discharge documentation for admitted patients</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Patient List */}
         <Card className="lg:col-span-1">
           <CardContent className="pt-4 space-y-2 max-h-[500px] overflow-y-auto">
-            <Input placeholder="Search discharges..." className="mb-2" />
-            {discharges.map(d => (
-              <div key={d.id} onClick={() => setSelectedPatient(d)} className={`p-3 rounded-lg border cursor-pointer transition-all hover:shadow-sm ${selectedPatient?.id === d.id ? 'border-primary bg-primary/5' : 'border-border'}`}>
-                <div className="flex items-center justify-between">
-                  <span className="font-medium text-sm text-foreground">{d.patient}</span>
-                  <Badge variant={d.status === 'completed' ? 'default' : d.status === 'draft' ? 'outline' : 'secondary'} className="text-[10px] capitalize">{d.status}</Badge>
+            <Input placeholder="Search admissions..." value={search} onChange={e => setSearch(e.target.value)} className="mb-2" />
+            {filtered.length === 0 ? (
+              <EmptyState icon={FileText} title="No admissions" description="Admitted patients appear here for discharge documentation." />
+            ) : (
+              filtered.map((a: any) => (
+                <div
+                  key={a.id}
+                  onClick={() => setSelected(a)}
+                  className={`p-3 rounded-lg border cursor-pointer transition-all hover:shadow-sm ${selected?.id === a.id ? 'border-primary bg-primary/5' : 'border-border'}`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium text-sm text-foreground">{nameFor(a.patient_id)}</span>
+                    <Badge variant={a.status === 'discharged' ? 'default' : 'secondary'} className="text-[10px] capitalize">{a.status}</Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground">{a.admission_number} • {a.admission_type || 'Admission'}</p>
+                  <p className="text-xs text-muted-foreground">
+                    Adm: {a.admission_date ? new Date(a.admission_date).toLocaleDateString() : '—'}
+                    {a.discharge_date ? ` → Dis: ${new Date(a.discharge_date).toLocaleDateString()}` : ''}
+                  </p>
                 </div>
-                <p className="text-xs text-muted-foreground">{d.uhid} • {d.dept} • {d.doctor}</p>
-                <p className="text-xs text-muted-foreground">Adm: {d.admDate} → Dis: {d.dischDate}</p>
-              </div>
-            ))}
+              ))
+            )}
           </CardContent>
         </Card>
 
-        {/* Discharge Form */}
         <Card className="lg:col-span-2">
           <CardContent className="pt-4">
-            {selectedPatient ? (
+            {selected ? (
               <div className="space-y-4">
                 <div className="bg-muted/50 p-3 rounded-lg">
-                  <p className="font-medium text-sm text-foreground">{selectedPatient.patient} ({selectedPatient.uhid})</p>
-                  <p className="text-xs text-muted-foreground">{selectedPatient.dept} • {selectedPatient.doctor} • Admitted: {selectedPatient.admDate}</p>
+                  <p className="font-medium text-sm text-foreground">{nameFor(selected.patient_id)} ({selected.admission_number})</p>
+                  <p className="text-xs text-muted-foreground">
+                    Diagnosis on admission: {selected.diagnosis || '—'}
+                  </p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-xs font-medium text-foreground">Admission Diagnosis</label>
-                    <Textarea rows={2} placeholder="Diagnosis at admission..." value={summary.admission_diagnosis} onChange={e => setSummary(p => ({ ...p, admission_diagnosis: e.target.value }))} />
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-foreground">Discharge Diagnosis</label>
-                    <Textarea rows={2} placeholder="Final diagnosis..." value={summary.discharge_diagnosis} onChange={e => setSummary(p => ({ ...p, discharge_diagnosis: e.target.value }))} />
-                  </div>
+                  {field('Admission Diagnosis', 'admission_diagnosis')}
+                  {field('Discharge Diagnosis', 'discharge_diagnosis')}
                 </div>
-                <div>
-                  <label className="text-xs font-medium text-foreground">Procedures Performed</label>
-                  <Textarea rows={2} placeholder="Surgeries, procedures..." value={summary.procedures_performed} onChange={e => setSummary(p => ({ ...p, procedures_performed: e.target.value }))} />
-                </div>
-                <div>
-                  <label className="text-xs font-medium text-foreground">Course in Hospital</label>
-                  <Textarea rows={3} placeholder="Treatment timeline..." value={summary.course_in_hospital} onChange={e => setSummary(p => ({ ...p, course_in_hospital: e.target.value }))} />
-                </div>
-                <div>
-                  <label className="text-xs font-medium text-foreground">Investigations Summary</label>
-                  <Textarea rows={2} placeholder="Key lab/imaging results..." value={summary.investigations_summary} onChange={e => setSummary(p => ({ ...p, investigations_summary: e.target.value }))} />
-                </div>
-                <div>
-                  <label className="text-xs font-medium text-foreground">Discharge Medications</label>
-                  <Textarea rows={3} placeholder="Medications with dosage & duration..." value={summary.discharge_medications} onChange={e => setSummary(p => ({ ...p, discharge_medications: e.target.value }))} />
-                </div>
+                {field('Procedures Performed', 'procedures_performed')}
+                {field('Course in Hospital', 'course_in_hospital', 3)}
+                {field('Investigations Summary', 'investigations_summary')}
+                {field('Discharge Medications', 'discharge_medications', 3)}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-xs font-medium text-foreground">Diet Advice</label>
-                    <Textarea rows={2} placeholder="Dietary instructions..." value={summary.diet_advice} onChange={e => setSummary(p => ({ ...p, diet_advice: e.target.value }))} />
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-foreground">Follow-up Instructions</label>
-                    <Textarea rows={2} placeholder="Next visit, precautions..." value={summary.follow_up_instructions} onChange={e => setSummary(p => ({ ...p, follow_up_instructions: e.target.value }))} />
-                  </div>
+                  {field('Diet Advice', 'diet_advice')}
+                  {field('Follow-up Instructions', 'follow_up_instructions')}
                 </div>
 
-                <div className="flex gap-2 pt-2">
-                  <Button className="gap-2"><Save className="h-4 w-4" /> Save Draft</Button>
-                  <Button variant="outline" className="gap-2"><CheckCircle2 className="h-4 w-4" /> Finalize</Button>
-                  <Button variant="outline" className="gap-2"><Printer className="h-4 w-4" /> Print</Button>
+                <div className="flex gap-2 pt-2 flex-wrap">
+                  <Button className="gap-2" disabled={saving} onClick={() => save(false)}>
+                    <Save className="h-4 w-4" /> Save Draft
+                  </Button>
+                  <Button variant="outline" className="gap-2" disabled={saving} onClick={() => save(true)}>
+                    <CheckCircle2 className="h-4 w-4" /> Finalize & Discharge
+                  </Button>
+                  <Button variant="outline" className="gap-2" onClick={() => window.print()}>
+                    <Printer className="h-4 w-4" /> Print
+                  </Button>
                 </div>
               </div>
             ) : (
-              <div className="text-center py-12 text-muted-foreground">
-                <FileText className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                <p>Select a patient to create or view their discharge summary</p>
-              </div>
+              <EmptyState icon={FileText} title="Select an admission" description="Choose a patient on the left to create or view their discharge summary." />
             )}
           </CardContent>
         </Card>

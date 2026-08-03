@@ -1,106 +1,138 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Image, Monitor, Clock, CheckCircle2, Plus, FileText, Printer, Calendar } from 'lucide-react';
+import { Image, Clock, CheckCircle2, FileText } from 'lucide-react';
+import { ListSkeleton } from '@/components/ui/list-skeleton';
+import { EmptyState } from '@/components/ui/empty-state';
+import { useHospitalModule } from '@/hooks/useHospitalModule';
+import { usePatientNames } from '@/hooks/usePatientNames';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 export const RadiologyImaging = ({ hospital }: { hospital: any }) => {
-  const [orders] = useState([
-    { id: 'RAD-001', patient: 'John Mwale', modality: 'X-Ray', bodyPart: 'Chest PA', doctor: 'Dr. Banda', scheduled: '2026-03-04 11:00', status: 'scheduled', priority: 'routine', room: 'X-Ray Room 1' },
-    { id: 'RAD-002', patient: 'Mary Phiri', modality: 'CT Scan', bodyPart: 'Abdomen', doctor: 'Dr. Tembo', scheduled: '2026-03-04 14:00', status: 'in_progress', priority: 'urgent', room: 'CT Suite' },
-    { id: 'RAD-003', patient: 'Peter Zulu', modality: 'Ultrasound', bodyPart: 'Abdomen', doctor: 'Dr. Mulenga', scheduled: '2026-03-04 09:30', status: 'completed', priority: 'routine', room: 'USG Room 2' },
-    { id: 'RAD-004', patient: 'Grace Banda', modality: 'MRI', bodyPart: 'Brain', doctor: 'Dr. Chanda', scheduled: '2026-03-04 16:00', status: 'report_pending', priority: 'urgent', room: 'MRI Suite' },
-    { id: 'RAD-005', patient: 'David Mumba', modality: 'X-Ray', bodyPart: 'Left Knee AP/Lat', doctor: 'Dr. Banda', scheduled: '2026-03-04 10:15', status: 'reported', priority: 'routine', room: 'X-Ray Room 1' },
-  ]);
-
-  const [modalities] = useState([
-    { name: 'X-Ray', rooms: 2, queue: 3, available: true },
-    { name: 'CT Scan', rooms: 1, queue: 1, available: true },
-    { name: 'MRI', rooms: 1, queue: 2, available: true },
-    { name: 'Ultrasound', rooms: 3, queue: 4, available: true },
-    { name: 'Mammography', rooms: 1, queue: 0, available: true },
-    { name: 'Fluoroscopy', rooms: 1, queue: 0, available: false },
-  ]);
+  const { data: orders, loading, error, refresh } = useHospitalModule<any>(
+    'radiology_requests', 'hospital_id', hospital?.id, { orderBy: 'request_date', ascending: false }
+  );
+  const { nameFor } = usePatientNames(orders.map(o => o.patient_id));
 
   const statusColors: Record<string, 'outline' | 'secondary' | 'default' | 'destructive'> = {
+    requested: 'outline',
     scheduled: 'outline',
     in_progress: 'secondary',
     completed: 'default',
     report_pending: 'secondary',
     reported: 'default',
+    cancelled: 'destructive',
   };
+
+  // Modality mix is derived from the actual order book, not a fixed list
+  const modalities = Array.from(new Set(orders.map(o => o.exam_type).filter(Boolean))).map(m => ({
+    name: m,
+    queue: orders.filter(o => o.exam_type === m && !['reported', 'completed', 'cancelled'].includes(o.status)).length,
+    total: orders.filter(o => o.exam_type === m).length,
+  }));
+
+  const setStatus = async (row: any, status: string) => {
+    try {
+      const { error: err } = await (supabase.from('radiology_requests' as any) as any)
+        .update({ status, ...(status === 'reported' ? { report_date: new Date().toISOString() } : {}) })
+        .eq('id', row.id);
+      if (err) throw err;
+      toast.success(`Study marked ${status.replace('_', ' ')}`);
+      refresh();
+    } catch (e: any) {
+      toast.error(e?.message || 'Failed to update study');
+    }
+  };
+
+  const pending = orders.filter(o => !['reported', 'cancelled'].includes(o.status)).length;
+  const reported = orders.filter(o => o.status === 'reported').length;
 
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row gap-3 justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-foreground">Radiology & Imaging (RIS)</h3>
-          <p className="text-sm text-muted-foreground">Modality scheduling, image capture & radiology reporting</p>
+          <h3 className="text-lg font-semibold text-foreground">Radiology & Imaging</h3>
+          <p className="text-sm text-muted-foreground">Order book, scheduling and reporting</p>
         </div>
-        <Button size="sm" className="gap-2"><Plus className="h-4 w-4" /> New Imaging Order</Button>
+        <Button size="sm" variant="outline" onClick={refresh}>Refresh</Button>
       </div>
 
-      {/* Modality Status */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-        {modalities.map(m => (
-          <Card key={m.name} className={!m.available ? 'opacity-50' : ''}>
-            <CardContent className="pt-3 pb-3 text-center">
-              <Monitor className="h-5 w-5 mx-auto text-primary mb-1" />
-              <p className="text-xs font-medium text-foreground">{m.name}</p>
-              <p className="text-[10px] text-muted-foreground">{m.rooms} rooms • {m.queue} in queue</p>
-              <Badge variant={m.available ? 'default' : 'destructive'} className="text-[10px] mt-1">
-                {m.available ? 'Active' : 'Down'}
-              </Badge>
-            </CardContent>
-          </Card>
-        ))}
+      <div className="grid grid-cols-3 gap-3">
+        <Card><CardContent className="pt-4 text-center">
+          <Image className="h-5 w-5 mx-auto text-primary mb-1" />
+          <p className="text-2xl font-bold text-foreground">{orders.length}</p>
+          <p className="text-xs text-muted-foreground">Total Studies</p>
+        </CardContent></Card>
+        <Card><CardContent className="pt-4 text-center">
+          <Clock className="h-5 w-5 mx-auto text-amber-500 mb-1" />
+          <p className="text-2xl font-bold text-foreground">{pending}</p>
+          <p className="text-xs text-muted-foreground">Pending</p>
+        </CardContent></Card>
+        <Card><CardContent className="pt-4 text-center">
+          <CheckCircle2 className="h-5 w-5 mx-auto text-emerald-500 mb-1" />
+          <p className="text-2xl font-bold text-foreground">{reported}</p>
+          <p className="text-xs text-muted-foreground">Reported</p>
+        </CardContent></Card>
       </div>
 
-      <Tabs defaultValue="worklist">
-        <TabsList>
-          <TabsTrigger value="worklist" className="text-xs">Worklist</TabsTrigger>
-          <TabsTrigger value="schedule" className="text-xs">Schedule</TabsTrigger>
-          <TabsTrigger value="reports" className="text-xs">Reports</TabsTrigger>
-        </TabsList>
+      {modalities.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {modalities.map(m => (
+            <Badge key={m.name} variant="outline" className="text-[10px]">
+              {m.name}: {m.queue} in queue / {m.total} total
+            </Badge>
+          ))}
+        </div>
+      )}
 
-        <TabsContent value="worklist" className="space-y-3">
+      {loading ? (
+        <ListSkeleton count={4} variant="row" />
+      ) : error ? (
+        <EmptyState icon={Image} title="Could not load imaging orders" description={error} actionLabel="Retry" onAction={refresh} />
+      ) : orders.length === 0 ? (
+        <EmptyState
+          icon={Image}
+          title="No imaging orders yet"
+          description="Radiology requests raised from OPD, IPD or theatre appear here."
+        />
+      ) : (
+        <div className="space-y-3">
           {orders.map(o => (
-            <Card key={o.id} className={o.priority === 'urgent' ? 'border-amber-500/40' : ''}>
+            <Card key={o.id}>
               <CardContent className="pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <div className="flex-1">
+                <div>
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-medium text-sm text-foreground">{o.patient}</span>
-                    <Badge variant={statusColors[o.status]} className="text-[10px] capitalize">{o.status.replace('_', ' ')}</Badge>
-                    {o.priority === 'urgent' && <Badge variant="destructive" className="text-[10px]">URGENT</Badge>}
+                    <span className="font-medium text-sm text-foreground">{nameFor(o.patient_id)}</span>
+                    <Badge variant={statusColors[o.status] || 'outline'} className="text-[10px] capitalize">
+                      {(o.status || '').replace('_', ' ')}
+                    </Badge>
+                    {o.priority && <Badge variant="outline" className="text-[10px] capitalize">{o.priority}</Badge>}
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {o.id} • {o.modality}: {o.bodyPart} • {o.doctor} • {o.room}
+                    {o.request_number} • {o.exam_type} — {o.exam_name || o.body_part || 'Study'}
+                    {o.scheduled_date ? ` • ${o.scheduled_date}${o.scheduled_time ? ` ${o.scheduled_time}` : ''}` : ''}
                   </p>
-                  <p className="text-xs text-muted-foreground">Scheduled: {o.scheduled}</p>
                 </div>
                 <div className="flex gap-1">
-                  {o.status === 'scheduled' && <Button size="sm" variant="outline" className="text-xs">Start Exam</Button>}
-                  {o.status === 'in_progress' && <Button size="sm" className="text-xs">Complete</Button>}
-                  {o.status === 'report_pending' && <Button size="sm" className="text-xs">Write Report</Button>}
-                  {o.status === 'reported' && <Button size="sm" variant="outline" className="text-xs gap-1"><Printer className="h-3 w-3" /> Print</Button>}
+                  {['requested', 'scheduled'].includes(o.status) && (
+                    <Button size="sm" className="text-xs" onClick={() => setStatus(o, 'in_progress')}>Start</Button>
+                  )}
+                  {o.status === 'in_progress' && (
+                    <Button size="sm" className="text-xs" onClick={() => setStatus(o, 'report_pending')}>Finish Scan</Button>
+                  )}
+                  {o.status === 'report_pending' && (
+                    <Button size="sm" className="text-xs gap-1" onClick={() => setStatus(o, 'reported')}>
+                      <FileText className="h-3 w-3" /> Sign Report
+                    </Button>
+                  )}
                 </div>
               </CardContent>
             </Card>
           ))}
-        </TabsContent>
-
-        <TabsContent value="schedule" className="text-center py-8">
-          <Calendar className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
-          <p className="text-sm text-muted-foreground">Modality schedule calendar view — configure time slots per room</p>
-          <Button variant="outline" className="mt-3">Open Schedule Calendar</Button>
-        </TabsContent>
-
-        <TabsContent value="reports" className="text-center py-8">
-          <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
-          <p className="text-sm text-muted-foreground">View completed radiology reports with DICOM viewer integration</p>
-        </TabsContent>
-      </Tabs>
+        </div>
+      )}
     </div>
   );
 };

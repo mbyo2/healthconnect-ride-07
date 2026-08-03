@@ -1,113 +1,132 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Shield, Clock, CheckCircle2, XCircle, Plus, FileText, DollarSign, AlertTriangle } from 'lucide-react';
+import { Clock, CheckCircle2, FileText, DollarSign } from 'lucide-react';
+import { ListSkeleton } from '@/components/ui/list-skeleton';
+import { EmptyState } from '@/components/ui/empty-state';
+import { useHospitalModule } from '@/hooks/useHospitalModule';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 export const InsuranceTPA = ({ hospital }: { hospital: any }) => {
-  const [preAuths] = useState([
-    { id: 'PA-001', patient: 'John Mwale', insurer: 'ZSIC', policyNo: 'ZS-2024-1234', procedure: 'Appendectomy', estCost: 15000, status: 'approved', date: '2026-03-02' },
-    { id: 'PA-002', patient: 'Mary Phiri', insurer: 'Madison General', policyNo: 'MG-2024-5678', procedure: 'MRI Brain', estCost: 5000, status: 'pending', date: '2026-03-04' },
-    { id: 'PA-003', patient: 'Grace Banda', insurer: 'Professional Insurance', policyNo: 'PI-2024-9012', procedure: 'Knee Replacement', estCost: 45000, status: 'rejected', date: '2026-03-01' },
-  ]);
+  const { data: claims, loading, error, refresh } = useHospitalModule<any>(
+    'insurance_claims', 'institution_id', hospital?.id, { orderBy: 'created_at', ascending: false }
+  );
 
-  const [claims] = useState([
-    { id: 'CLM-001', patient: 'Peter Zulu', insurer: 'ZSIC', amount: 12500, submitted: '2026-02-20', status: 'paid', paidAmount: 10000 },
-    { id: 'CLM-002', patient: 'David Mumba', insurer: 'Madison General', amount: 8000, submitted: '2026-02-25', status: 'processing', paidAmount: 0 },
-    { id: 'CLM-003', patient: 'Sarah Tembo', insurer: 'Professional Insurance', amount: 22000, submitted: '2026-02-15', status: 'disputed', paidAmount: 0 },
-    { id: 'CLM-004', patient: 'James Kapota', insurer: 'ZSIC', amount: 3500, submitted: '2026-03-01', status: 'submitted', paidAmount: 0 },
-  ]);
+  const open = claims.filter(c => ['draft', 'submitted', 'processing', 'pending'].includes(c.status));
+  const settled = claims.filter(c => ['paid', 'approved'].includes(c.status));
+  const disputed = claims.filter(c => ['disputed', 'rejected'].includes(c.status));
+  const receivable = claims
+    .filter(c => !['paid'].includes(c.status))
+    .reduce((s, c) => s + Number(c.claim_amount || 0), 0);
 
-  const stats = {
-    pendingAuth: preAuths.filter(p => p.status === 'pending').length,
-    approvedAuth: preAuths.filter(p => p.status === 'approved').length,
-    pendingClaims: claims.filter(c => ['submitted', 'processing'].includes(c.status)).length,
-    totalReceivable: claims.filter(c => c.status !== 'paid').reduce((s, c) => s + c.amount, 0),
+  const setStatus = async (row: any, status: string) => {
+    try {
+      const patch: any = { status };
+      if (status === 'submitted') patch.submitted_at = new Date().toISOString();
+      if (['paid', 'approved', 'rejected'].includes(status)) patch.processed_at = new Date().toISOString();
+      const { error: err } = await (supabase.from('insurance_claims' as any) as any).update(patch).eq('id', row.id);
+      if (err) throw err;
+      toast.success(`Claim ${status}`);
+      refresh();
+    } catch (e: any) {
+      toast.error(e?.message || 'Failed to update claim');
+    }
   };
+
+  const ClaimCard = ({ c }: { c: any }) => (
+    <Card key={c.id}>
+      <CardContent className="pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="font-medium text-sm text-foreground">{c.patient_name || 'Patient'}</span>
+            <Badge
+              variant={['paid', 'approved'].includes(c.status) ? 'default' : ['rejected', 'disputed'].includes(c.status) ? 'destructive' : 'secondary'}
+              className="text-[10px] capitalize"
+            >
+              {c.status}
+            </Badge>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            {c.insurance_provider || 'Insurer'}{c.policy_number ? ` (${c.policy_number})` : ''} • Claimed: K{Number(c.claim_amount || 0).toLocaleString()}
+          </p>
+          <p className="text-xs text-muted-foreground">
+            {c.submitted_at ? `Submitted ${new Date(c.submitted_at).toLocaleDateString()}` : 'Not submitted'}
+            {Number(c.approved_amount || 0) > 0 ? ` • Approved: K${Number(c.approved_amount).toLocaleString()}` : ''}
+            {c.rejection_reason ? ` • ${c.rejection_reason}` : ''}
+          </p>
+        </div>
+        <div className="flex gap-1">
+          {['draft', 'pending'].includes(c.status) && (
+            <Button size="sm" className="text-xs" onClick={() => setStatus(c, 'submitted')}>Submit</Button>
+          )}
+          {['submitted', 'processing'].includes(c.status) && (
+            <Button size="sm" variant="outline" className="text-xs" onClick={() => setStatus(c, 'paid')}>Mark Paid</Button>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
 
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row gap-3 justify-between">
         <div>
           <h3 className="text-lg font-semibold text-foreground">Insurance & TPA Management</h3>
-          <p className="text-sm text-muted-foreground">Pre-authorization, claims processing & settlement tracking</p>
+          <p className="text-sm text-muted-foreground">Claims processing and settlement tracking</p>
         </div>
-        <Button size="sm" className="gap-2"><Plus className="h-4 w-4" /> New Pre-Auth</Button>
+        <Button size="sm" variant="outline" onClick={refresh}>Refresh</Button>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <Card><CardContent className="pt-4 text-center">
           <Clock className="h-5 w-5 mx-auto text-amber-500 mb-1" />
-          <p className="text-2xl font-bold text-foreground">{stats.pendingAuth}</p>
-          <p className="text-xs text-muted-foreground">Pending Auth</p>
+          <p className="text-2xl font-bold text-foreground">{open.length}</p>
+          <p className="text-xs text-muted-foreground">Open Claims</p>
         </CardContent></Card>
         <Card><CardContent className="pt-4 text-center">
           <CheckCircle2 className="h-5 w-5 mx-auto text-emerald-500 mb-1" />
-          <p className="text-2xl font-bold text-foreground">{stats.approvedAuth}</p>
-          <p className="text-xs text-muted-foreground">Approved</p>
+          <p className="text-2xl font-bold text-foreground">{settled.length}</p>
+          <p className="text-xs text-muted-foreground">Settled</p>
         </CardContent></Card>
         <Card><CardContent className="pt-4 text-center">
-          <FileText className="h-5 w-5 mx-auto text-primary mb-1" />
-          <p className="text-2xl font-bold text-foreground">{stats.pendingClaims}</p>
-          <p className="text-xs text-muted-foreground">Pending Claims</p>
+          <FileText className="h-5 w-5 mx-auto text-destructive mb-1" />
+          <p className="text-2xl font-bold text-foreground">{disputed.length}</p>
+          <p className="text-xs text-muted-foreground">Rejected/Disputed</p>
         </CardContent></Card>
         <Card><CardContent className="pt-4 text-center">
           <DollarSign className="h-5 w-5 mx-auto text-amber-500 mb-1" />
-          <p className="text-2xl font-bold text-foreground">K{(stats.totalReceivable / 1000).toFixed(0)}k</p>
+          <p className="text-2xl font-bold text-foreground">K{(receivable / 1000).toFixed(1)}k</p>
           <p className="text-xs text-muted-foreground">Receivable</p>
         </CardContent></Card>
       </div>
 
-      <Tabs defaultValue="preauth">
-        <TabsList>
-          <TabsTrigger value="preauth" className="text-xs">Pre-Authorization</TabsTrigger>
-          <TabsTrigger value="claims" className="text-xs">Claims</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="preauth" className="space-y-3">
-          {preAuths.map(pa => (
-            <Card key={pa.id} className={pa.status === 'rejected' ? 'border-destructive/30' : pa.status === 'approved' ? 'border-emerald-500/30' : ''}>
-              <CardContent className="pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <div>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-medium text-sm text-foreground">{pa.patient}</span>
-                    <Badge variant={pa.status === 'approved' ? 'default' : pa.status === 'rejected' ? 'destructive' : 'secondary'} className="text-[10px] capitalize">{pa.status}</Badge>
-                  </div>
-                  <p className="text-xs text-muted-foreground">{pa.id} • {pa.insurer} ({pa.policyNo}) • {pa.procedure}</p>
-                  <p className="text-xs text-muted-foreground">Est. Cost: K{pa.estCost.toLocaleString()} • {pa.date}</p>
-                </div>
-                <div className="flex gap-1">
-                  {pa.status === 'pending' && <Button size="sm" variant="outline" className="text-xs">Follow Up</Button>}
-                  {pa.status === 'rejected' && <Button size="sm" variant="outline" className="text-xs">Appeal</Button>}
-                  <Button size="sm" variant="outline" className="text-xs">View Details</Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </TabsContent>
-
-        <TabsContent value="claims" className="space-y-3">
-          {claims.map(cl => (
-            <Card key={cl.id}>
-              <CardContent className="pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <div>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-medium text-sm text-foreground">{cl.patient}</span>
-                    <Badge variant={cl.status === 'paid' ? 'default' : cl.status === 'disputed' ? 'destructive' : 'secondary'} className="text-[10px] capitalize">{cl.status}</Badge>
-                  </div>
-                  <p className="text-xs text-muted-foreground">{cl.id} • {cl.insurer} • Claimed: K{cl.amount.toLocaleString()}</p>
-                  <p className="text-xs text-muted-foreground">Submitted: {cl.submitted} {cl.paidAmount > 0 && `• Paid: K${cl.paidAmount.toLocaleString()}`}</p>
-                </div>
-                <div className="flex gap-1">
-                  {cl.status === 'disputed' && <Button size="sm" variant="outline" className="text-xs">Resolve</Button>}
-                  <Button size="sm" variant="outline" className="text-xs">Details</Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </TabsContent>
-      </Tabs>
+      {loading ? (
+        <ListSkeleton count={4} variant="row" />
+      ) : error ? (
+        <EmptyState icon={FileText} title="Could not load claims" description={error} actionLabel="Retry" onAction={refresh} />
+      ) : claims.length === 0 ? (
+        <EmptyState icon={FileText} title="No insurance claims" description="Claims raised from billing appear here for submission and settlement." />
+      ) : (
+        <Tabs defaultValue="open">
+          <TabsList>
+            <TabsTrigger value="open" className="text-xs">Open</TabsTrigger>
+            <TabsTrigger value="settled" className="text-xs">Settled</TabsTrigger>
+            <TabsTrigger value="disputed" className="text-xs">Disputed</TabsTrigger>
+          </TabsList>
+          <TabsContent value="open" className="space-y-3 pt-3">
+            {open.length === 0 ? <EmptyState icon={FileText} title="No open claims" /> : open.map(c => <ClaimCard key={c.id} c={c} />)}
+          </TabsContent>
+          <TabsContent value="settled" className="space-y-3 pt-3">
+            {settled.length === 0 ? <EmptyState icon={FileText} title="No settled claims" /> : settled.map(c => <ClaimCard key={c.id} c={c} />)}
+          </TabsContent>
+          <TabsContent value="disputed" className="space-y-3 pt-3">
+            {disputed.length === 0 ? <EmptyState icon={FileText} title="No disputed claims" /> : disputed.map(c => <ClaimCard key={c.id} c={c} />)}
+          </TabsContent>
+        </Tabs>
+      )}
     </div>
   );
 };
