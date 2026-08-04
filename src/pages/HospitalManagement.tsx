@@ -209,7 +209,7 @@ const HospitalManagement = () => {
         <TabsContent value="opd"><OPDManagement hospital={hospital} departments={departments} /></TabsContent>
         <TabsContent value="ipd"><IPDManagement hospital={hospital} patients={patients} departments={departments} beds={beds} admissions={admissions} onRefresh={refreshAll} /></TabsContent>
         <TabsContent value="emergency"><EmergencyTriage hospital={hospital} /></TabsContent>
-        <TabsContent value="ot"><OTManagement /></TabsContent>
+        <TabsContent value="ot"><OTManagement hospital={hospital} /></TabsContent>
         <TabsContent value="daycare"><DayCareManagement hospital={hospital} /></TabsContent>
         <TabsContent value="lab"><HospitalLab hospital={hospital} /></TabsContent>
         <TabsContent value="radiology"><RadiologyImaging hospital={hospital} /></TabsContent>

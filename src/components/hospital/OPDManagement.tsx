@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -7,84 +7,138 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Plus, Search, UserPlus, Clock, Hash, Stethoscope } from 'lucide-react';
+import { Search, UserPlus, Clock, Hash, Stethoscope } from 'lucide-react';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+import { useHospitalModule } from '@/hooks/useHospitalModule';
 
 interface OPDProps {
   hospital: any;
   departments: any[];
 }
 
-interface OPDPatient {
+interface QueueToken {
   id: string;
-  tokenNumber: number;
-  name: string;
-  phone: string;
+  token_number: string;
+  patient_name: string;
   department: string;
-  doctor: string;
-  status: 'waiting' | 'in-consultation' | 'completed' | 'referred';
-  registeredAt: string;
-  vitals?: { bp?: string; temp?: string; pulse?: string; weight?: string };
+  priority: string;
+  status: string;
+  check_in_time: string;
+  notes: string | null;
 }
+
+const parseVitals = (notes: string | null) => {
+  if (!notes) return null;
+  try {
+    const parsed = JSON.parse(notes);
+    if (parsed && typeof parsed === 'object' && parsed.vitals) return parsed.vitals as Record<string, string>;
+  } catch {
+    /* plain-text note */
+  }
+  return null;
+};
+
+const parseDoctor = (notes: string | null) => {
+  if (!notes) return '';
+  try {
+    const parsed = JSON.parse(notes);
+    return parsed?.doctor || '';
+  } catch {
+    return '';
+  }
+};
 
 export const OPDManagement = ({ hospital, departments }: OPDProps) => {
   const [showRegDialog, setShowRegDialog] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [opdQueue, setOpdQueue] = useState<OPDPatient[]>([]);
-  const [tokenCounter, setTokenCounter] = useState(1);
+  const [saving, setSaving] = useState(false);
   const [newPatient, setNewPatient] = useState({
     name: '', phone: '', department: '', doctor: '',
     bp: '', temp: '', pulse: '', weight: ''
   });
 
-  const registerPatient = () => {
+  const { data: opdQueue, loading, refresh } = useHospitalModule<QueueToken>(
+    'queue_tokens',
+    'institution_id',
+    hospital?.id,
+    { orderBy: 'check_in_time', ascending: true }
+  );
+
+  const todayQueue = useMemo(() => {
+    const today = new Date().toDateString();
+    return opdQueue.filter(t => new Date(t.check_in_time).toDateString() === today);
+  }, [opdQueue]);
+
+  const registerPatient = async () => {
     if (!newPatient.name || !newPatient.department) {
       toast.error('Please fill required fields');
       return;
     }
-    const patient: OPDPatient = {
-      id: crypto.randomUUID(),
-      tokenNumber: tokenCounter,
-      name: newPatient.name,
-      phone: newPatient.phone,
-      department: newPatient.department,
-      doctor: newPatient.doctor,
-      status: 'waiting',
-      registeredAt: new Date().toLocaleTimeString(),
-      vitals: {
-        bp: newPatient.bp || undefined,
-        temp: newPatient.temp || undefined,
-        pulse: newPatient.pulse || undefined,
-        weight: newPatient.weight || undefined,
-      }
-    };
-    setOpdQueue(prev => [...prev, patient]);
-    setTokenCounter(prev => prev + 1);
-    setNewPatient({ name: '', phone: '', department: '', doctor: '', bp: '', temp: '', pulse: '', weight: '' });
-    setShowRegDialog(false);
-    toast.success(`Token #${patient.tokenNumber} issued for ${patient.name}`);
+    if (!hospital?.id) {
+      toast.error('No hospital context available');
+      return;
+    }
+    setSaving(true);
+    try {
+      const { data: userData } = await supabase.auth.getUser();
+      const vitals: Record<string, string> = {};
+      if (newPatient.bp) vitals.bp = newPatient.bp;
+      if (newPatient.temp) vitals.temp = newPatient.temp;
+      if (newPatient.pulse) vitals.pulse = newPatient.pulse;
+      if (newPatient.weight) vitals.weight = newPatient.weight;
+
+      const { error } = await (supabase.from('queue_tokens' as any) as any).insert({
+        institution_id: hospital.id,
+        patient_name: newPatient.name,
+        department: newPatient.department,
+        priority: 'normal',
+        status: 'waiting',
+        created_by: userData?.user?.id,
+        notes: JSON.stringify({ phone: newPatient.phone || undefined, doctor: newPatient.doctor || undefined, vitals }),
+      });
+      if (error) throw error;
+
+      setNewPatient({ name: '', phone: '', department: '', doctor: '', bp: '', temp: '', pulse: '', weight: '' });
+      setShowRegDialog(false);
+      toast.success(`Token issued for ${newPatient.name}`);
+      refresh();
+    } catch (e: any) {
+      toast.error(e?.message || 'Failed to register patient');
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const updateStatus = (id: string, status: OPDPatient['status']) => {
-    setOpdQueue(prev => prev.map(p => p.id === id ? { ...p, status } : p));
-    toast.success(`Patient status updated to ${status}`);
+  const updateStatus = async (id: string, status: 'serving' | 'completed' | 'cancelled') => {
+    try {
+      const patch: Record<string, any> = { status };
+      if (status === 'serving') patch.serving_start_time = new Date().toISOString();
+      if (status === 'completed') patch.completed_time = new Date().toISOString();
+      const { error } = await (supabase.from('queue_tokens' as any) as any).update(patch).eq('id', id);
+      if (error) throw error;
+      toast.success(`Patient status updated to ${status}`);
+      refresh();
+    } catch (e: any) {
+      toast.error(e?.message || 'Failed to update status');
+    }
   };
 
-  const waitingCount = opdQueue.filter(p => p.status === 'waiting').length;
-  const inConsultation = opdQueue.filter(p => p.status === 'in-consultation').length;
-  const completed = opdQueue.filter(p => p.status === 'completed').length;
+  const waitingCount = todayQueue.filter(p => p.status === 'waiting').length;
+  const inConsultation = todayQueue.filter(p => p.status === 'serving').length;
+  const completed = todayQueue.filter(p => p.status === 'completed').length;
 
-  const filteredQueue = opdQueue.filter(p =>
-    p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    p.tokenNumber.toString().includes(searchTerm)
+  const filteredQueue = todayQueue.filter(p =>
+    p.patient_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    p.token_number?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'waiting': return 'secondary';
-      case 'in-consultation': return 'default';
+      case 'serving': return 'default';
       case 'completed': return 'outline';
-      case 'referred': return 'destructive';
+      case 'cancelled': return 'destructive';
       default: return 'outline';
     }
   };
@@ -96,7 +150,7 @@ export const OPDManagement = ({ hospital, departments }: OPDProps) => {
         <Card>
           <CardContent className="pt-4">
             <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-yellow-500" />
+              <Clock className="h-4 w-4 text-primary" />
               <div>
                 <p className="text-2xl font-bold">{waitingCount}</p>
                 <p className="text-xs text-muted-foreground">Waiting</p>
@@ -145,7 +199,9 @@ export const OPDManagement = ({ hospital, departments }: OPDProps) => {
           </div>
         </CardHeader>
         <CardContent>
-          {filteredQueue.length > 0 ? (
+          {loading ? (
+            <div className="py-8 text-center text-muted-foreground text-sm">Loading OPD queue…</div>
+          ) : filteredQueue.length > 0 ? (
             <Table>
               <TableHeader>
                 <TableRow>
@@ -159,48 +215,52 @@ export const OPDManagement = ({ hospital, departments }: OPDProps) => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredQueue.map(patient => (
-                  <TableRow key={patient.id}>
-                    <TableCell>
-                      <Badge variant="outline" className="font-mono text-sm">#{patient.tokenNumber}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="font-medium">{patient.name}</div>
-                      {patient.phone && <div className="text-xs text-muted-foreground">{patient.phone}</div>}
-                    </TableCell>
-                    <TableCell className="text-sm">{patient.department}</TableCell>
-                    <TableCell className="text-sm">{patient.registeredAt}</TableCell>
-                    <TableCell>
-                      <div className="text-xs space-y-0.5">
-                        {patient.vitals?.bp && <span className="block">BP: {patient.vitals.bp}</span>}
-                        {patient.vitals?.temp && <span className="block">Temp: {patient.vitals.temp}°C</span>}
-                        {patient.vitals?.pulse && <span className="block">Pulse: {patient.vitals.pulse}</span>}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={getStatusColor(patient.status) as any}>{patient.status}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-1">
-                        {patient.status === 'waiting' && (
-                          <Button size="sm" variant="outline" onClick={() => updateStatus(patient.id, 'in-consultation')}>
-                            Start
-                          </Button>
-                        )}
-                        {patient.status === 'in-consultation' && (
-                          <>
-                            <Button size="sm" variant="outline" onClick={() => updateStatus(patient.id, 'completed')}>
-                              Complete
+                {filteredQueue.map(patient => {
+                  const vitals = parseVitals(patient.notes);
+                  const doctor = parseDoctor(patient.notes);
+                  return (
+                    <TableRow key={patient.id}>
+                      <TableCell>
+                        <Badge variant="outline" className="font-mono text-sm">{patient.token_number}</Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="font-medium">{patient.patient_name}</div>
+                        {doctor && <div className="text-xs text-muted-foreground">Dr. {doctor}</div>}
+                      </TableCell>
+                      <TableCell className="text-sm">{patient.department}</TableCell>
+                      <TableCell className="text-sm">{new Date(patient.check_in_time).toLocaleTimeString()}</TableCell>
+                      <TableCell>
+                        <div className="text-xs space-y-0.5">
+                          {vitals?.bp && <span className="block">BP: {vitals.bp}</span>}
+                          {vitals?.temp && <span className="block">Temp: {vitals.temp}°C</span>}
+                          {vitals?.pulse && <span className="block">Pulse: {vitals.pulse}</span>}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={getStatusColor(patient.status) as any}>{patient.status}</Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-1">
+                          {patient.status === 'waiting' && (
+                            <Button size="sm" variant="outline" onClick={() => updateStatus(patient.id, 'serving')}>
+                              Start
                             </Button>
-                            <Button size="sm" variant="destructive" onClick={() => updateStatus(patient.id, 'referred')}>
-                              Refer
-                            </Button>
-                          </>
-                        )}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                          )}
+                          {patient.status === 'serving' && (
+                            <>
+                              <Button size="sm" variant="outline" onClick={() => updateStatus(patient.id, 'completed')}>
+                                Complete
+                              </Button>
+                              <Button size="sm" variant="destructive" onClick={() => updateStatus(patient.id, 'cancelled')}>
+                                Cancel
+                              </Button>
+                            </>
+                          )}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           ) : (
@@ -272,8 +332,8 @@ export const OPDManagement = ({ hospital, departments }: OPDProps) => {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowRegDialog(false)}>Cancel</Button>
-            <Button onClick={registerPatient}>
-              <Hash className="h-4 w-4 mr-2" /> Issue Token #{tokenCounter}
+            <Button onClick={registerPatient} disabled={saving}>
+              <Hash className="h-4 w-4 mr-2" /> {saving ? 'Issuing…' : 'Issue Token'}
             </Button>
           </DialogFooter>
         </DialogContent>
