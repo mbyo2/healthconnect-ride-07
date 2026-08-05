@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
+import { resolveServicePrice, assertTrustedAmount, PriceMismatchError } from '../_shared/price-guard.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -108,13 +109,30 @@ serve(async (req) => {
       );
     }
 
-    const { amount, currency, providerId, serviceId, redirectUrl } = validationResult.data;
+    const { amount: clientAmount, currency, providerId, serviceId, redirectUrl } = validationResult.data;
     // FORCE patientId to the authenticated user
     const patientId = user.id;
 
     const isWalletTopUp = serviceId === 'wallet_topup';
 
+    // Resolve the authoritative price server-side — never trust the client amount
+    // (wallet top-ups are self-funding, so the user-chosen amount is allowed there).
+    let amount: number;
+    try {
+      const trusted = isWalletTopUp ? null : await resolveServicePrice(supabaseClient as any, serviceId);
+      amount = assertTrustedAmount(clientAmount, trusted, isWalletTopUp);
+    } catch (e) {
+      if (e instanceof PriceMismatchError) {
+        return new Response(
+          JSON.stringify({ success: false, error: 'Payment amount does not match the authoritative price', expectedAmount: e.expected }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      throw e;
+    }
+
     console.log('Payment request details:', {
+
       isWalletTopUp,
       patientId,
       providerId,
