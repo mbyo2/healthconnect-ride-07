@@ -13024,6 +13024,7 @@ export type Database = {
           provider_id: string
           scheduled_end: string
           scheduled_start: string
+          service_code: string | null
           status: string
         }
         Insert: {
@@ -13035,6 +13036,7 @@ export type Database = {
           provider_id: string
           scheduled_end: string
           scheduled_start: string
+          service_code?: string | null
           status: string
         }
         Update: {
@@ -13046,6 +13048,7 @@ export type Database = {
           provider_id?: string
           scheduled_end?: string
           scheduled_start?: string
+          service_code?: string | null
           status?: string
         }
         Relationships: [
