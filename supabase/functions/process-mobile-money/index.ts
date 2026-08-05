@@ -51,14 +51,32 @@ serve(async (req) => {
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
-    const { amount, phoneNumber, provider, providerId, serviceId, orderId, description } = parsed.data;
+    const { amount: clientAmount, phoneNumber, provider, providerId, serviceId, orderId, description } = parsed.data;
     // FORCE patientId to the authenticated user
     const patientId = user.id;
 
     // Validate amount (minimum 1 ZMW)
-    if (amount < 1) {
+    if (clientAmount < 1) {
       throw new Error('Minimum payment amount is K1.00');
     }
+
+    // Resolve the authoritative price server-side — never trust the client amount
+    let amount: number;
+    try {
+      const trusted = orderId
+        ? await resolveReferenceAmount(supabaseClient as any, 'order', orderId)
+        : await resolveServicePrice(supabaseClient as any, serviceId);
+      amount = assertTrustedAmount(clientAmount, trusted);
+    } catch (e) {
+      if (e instanceof PriceMismatchError) {
+        return new Response(
+          JSON.stringify({ success: false, error: 'Payment amount does not match the authoritative price', expectedAmount: e.expected }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      throw e;
+    }
+
 
     // Format phone number for Zambian mobile money
     const formatZambianPhone = (phone: string): string => {
