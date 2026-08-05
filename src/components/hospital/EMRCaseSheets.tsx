@@ -78,10 +78,52 @@ export const EMRCaseSheets = ({ hospital, departments }: Props) => {
           <h3 className="text-lg font-semibold text-foreground">Electronic Medical Records & Case Sheets</h3>
           <p className="text-sm text-muted-foreground">Create and manage patient consultation records</p>
         </div>
-        <Button className="gap-2" size="sm">
+        <Button className="gap-2" size="sm" onClick={() => setNewOpen(true)}>
           <Plus className="h-4 w-4" /> New Case Sheet
         </Button>
       </div>
+
+      <Dialog open={newOpen} onOpenChange={setNewOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>New Case Sheet</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <HospitalPatientSelect
+              patients={patients}
+              loading={patientsLoading}
+              value={newPatientId}
+              onChange={setNewPatientId}
+              emptyHint="No patients are registered at this facility yet. Register a walk-in through OPD Management or admit a patient in IPD, then create their case sheet here."
+            />
+            <div className="space-y-1.5">
+              <Label>Visit title</Label>
+              <Input value={newTitle} onChange={(e) => setNewTitle(e.target.value)} placeholder="e.g. OPD consultation — chest pain" />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Department</Label>
+              <Select value={newDepartment} onValueChange={setNewDepartment}>
+                <SelectTrigger><SelectValue placeholder={departments.length ? 'Select department' : 'No departments configured'} /></SelectTrigger>
+                <SelectContent>
+                  {departments.map((d: any) => (
+                    <SelectItem key={d.id} value={d.name}>{d.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {departments.length === 0 && (
+                <p className="text-xs text-muted-foreground">Add departments in Department Management to categorise case sheets.</p>
+              )}
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setNewOpen(false)}>Cancel</Button>
+            <Button onClick={createCaseSheet} disabled={creating || !newPatientId}>
+              {creating ? 'Creating…' : 'Create case sheet'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Patient List Panel */}
