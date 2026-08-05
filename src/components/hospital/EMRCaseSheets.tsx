@@ -12,6 +12,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { HospitalPatientSelect } from '@/components/hospital/HospitalPatientSelect';
+import { useHospitalPatients } from '@/hooks/useHospitalPatients';
 import { FileText, Plus, Search, User, Clock, Stethoscope, Save } from 'lucide-react';
 
 interface Props {
@@ -42,6 +46,51 @@ export const EMRCaseSheets = ({ hospital, departments }: Props) => {
   );
   const { nameFor } = usePatientNames(recentCases.map((c: any) => c.patient_id));
   const [saving, setSaving] = useState(false);
+
+  const { patients, loading: patientsLoading } = useHospitalPatients(hospital?.id);
+  const [newOpen, setNewOpen] = useState(false);
+  const [newPatientId, setNewPatientId] = useState('');
+  const [newTitle, setNewTitle] = useState('');
+  const [newDepartment, setNewDepartment] = useState('');
+  const [creating, setCreating] = useState(false);
+
+  const createCaseSheet = async () => {
+    if (!newPatientId) {
+      toast.error('Select a patient first');
+      return;
+    }
+    setCreating(true);
+    try {
+      const { data: auth } = await supabase.auth.getUser();
+      const { data, error: err } = await (supabase.from('comprehensive_medical_records' as any) as any)
+        .insert({
+          patient_id: newPatientId,
+          provider_id: auth?.user?.id,
+          institution_id: hospital?.id,
+          record_type: 'consultation',
+          title: newTitle || 'Consultation case sheet',
+          description: newDepartment ? `Department: ${newDepartment}` : null,
+          visit_date: new Date().toISOString(),
+          status: 'active',
+          clinical_data: {},
+        })
+        .select()
+        .single();
+      if (err) throw err;
+      toast.success('Case sheet created');
+      setNewOpen(false);
+      setNewPatientId('');
+      setNewTitle('');
+      setNewDepartment('');
+      setActiveCase(data);
+      refresh();
+    } catch (e: any) {
+      toast.error(e?.message || 'Could not create case sheet');
+    } finally {
+      setCreating(false);
+    }
+  };
+
 
   useEffect(() => {
     if (!activeCase) return;
@@ -78,10 +127,52 @@ export const EMRCaseSheets = ({ hospital, departments }: Props) => {
           <h3 className="text-lg font-semibold text-foreground">Electronic Medical Records & Case Sheets</h3>
           <p className="text-sm text-muted-foreground">Create and manage patient consultation records</p>
         </div>
-        <Button className="gap-2" size="sm">
+        <Button className="gap-2" size="sm" onClick={() => setNewOpen(true)}>
           <Plus className="h-4 w-4" /> New Case Sheet
         </Button>
       </div>
+
+      <Dialog open={newOpen} onOpenChange={setNewOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>New Case Sheet</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <HospitalPatientSelect
+              patients={patients}
+              loading={patientsLoading}
+              value={newPatientId}
+              onChange={setNewPatientId}
+              emptyHint="No patients are registered at this facility yet. Register a walk-in through OPD Management or admit a patient in IPD, then create their case sheet here."
+            />
+            <div className="space-y-1.5">
+              <Label>Visit title</Label>
+              <Input value={newTitle} onChange={(e) => setNewTitle(e.target.value)} placeholder="e.g. OPD consultation — chest pain" />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Department</Label>
+              <Select value={newDepartment} onValueChange={setNewDepartment}>
+                <SelectTrigger><SelectValue placeholder={departments.length ? 'Select department' : 'No departments configured'} /></SelectTrigger>
+                <SelectContent>
+                  {departments.map((d: any) => (
+                    <SelectItem key={d.id} value={d.name}>{d.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {departments.length === 0 && (
+                <p className="text-xs text-muted-foreground">Add departments in Department Management to categorise case sheets.</p>
+              )}
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setNewOpen(false)}>Cancel</Button>
+            <Button onClick={createCaseSheet} disabled={creating || !newPatientId}>
+              {creating ? 'Creating…' : 'Create case sheet'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Patient List Panel */}
