@@ -18,9 +18,13 @@ import { HospitalPatientSelect } from '@/components/hospital/HospitalPatientSele
 import { ListSkeleton } from '@/components/ui/list-skeleton';
 
 export const ReferralManagement = ({ hospital }: { hospital: any }) => {
-  const { data: referrals, loading, error, refresh } = useHospitalModule<any>(
+  const { data: outgoing, loading, error, refresh } = useHospitalModule<any>(
     'referrals', 'hospital_id', hospital?.id, { orderBy: 'referral_date', ascending: false }
   );
+  const { data: incoming, refresh: refreshIncoming } = useHospitalModule<any>(
+    'referrals', 'referred_to_hospital_id', hospital?.id, { orderBy: 'referral_date', ascending: false }
+  );
+  const referrals = [...outgoing, ...incoming];
 
   const { nameFor } = usePatientNames(referrals.map((r: any) => r.patient_id));
   const { patients, loading: patientsLoading } = useHospitalPatients(hospital?.id);
@@ -36,9 +40,6 @@ export const ReferralManagement = ({ hospital }: { hospital: any }) => {
     priority: 'routine',
     notes: '',
   });
-
-  const outgoing = referrals.filter((r: any) => r.hospital_id === hospital?.id);
-  const incoming = referrals.filter((r: any) => r.referred_to_hospital_id === hospital?.id);
 
   const submit = async () => {
     if (!form.patient_id) {
@@ -71,6 +72,7 @@ export const ReferralManagement = ({ hospital }: { hospital: any }) => {
       setOpen(false);
       setForm({ patient_id: '', referred_to_department: '', referred_to_doctor: '', reason_for_referral: '', diagnosis: '', priority: 'routine', notes: '' });
       refresh();
+      refreshIncoming();
     } catch (e: any) {
       toast.error(e?.message || 'Could not create referral');
     } finally {
@@ -84,6 +86,7 @@ export const ReferralManagement = ({ hospital }: { hospital: any }) => {
       if (err) throw err;
       toast.success(`Referral marked ${status}`);
       refresh();
+      refreshIncoming();
     } catch (e: any) {
       toast.error(e?.message || 'Could not update referral');
     }
@@ -96,7 +99,7 @@ export const ReferralManagement = ({ hospital }: { hospital: any }) => {
     </div>
   );
 
-  const ReferralRow = ({ ref: r, actions }: { ref: any; actions?: React.ReactNode }) => (
+  const ReferralRow = ({ item: r, actions }: { item: any; actions?: React.ReactNode }) => (
     <Card key={r.id}>
       <CardContent className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
@@ -209,7 +212,7 @@ export const ReferralManagement = ({ hospital }: { hospital: any }) => {
           ) : outgoing.map((r: any) => (
             <ReferralRow
               key={r.id}
-              ref={r}
+              item={r}
               actions={r.status === 'pending' ? (
                 <Button size="sm" variant="outline" onClick={() => updateStatus(r.id, 'completed')}>Close</Button>
               ) : null}
@@ -223,7 +226,7 @@ export const ReferralManagement = ({ hospital }: { hospital: any }) => {
           ) : incoming.map((r: any) => (
             <ReferralRow
               key={r.id}
-              ref={r}
+              item={r}
               actions={r.status === 'pending' ? (
                 <Button size="sm" onClick={() => updateStatus(r.id, 'accepted')}>Accept</Button>
               ) : null}
