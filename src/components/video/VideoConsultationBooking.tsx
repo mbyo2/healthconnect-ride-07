@@ -111,7 +111,9 @@ export const VideoConsultationBooking = ({ onBookingComplete }: VideoConsultatio
           scheduled_end: endDateTime.toISOString(),
           status: 'scheduled',
           notes: notes || null,
-          duration: consultationData.duration
+          duration: consultationData.duration,
+          service_code: (consultationData as any).serviceCode
+
         })
         .select()
         .single();
