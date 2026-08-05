@@ -47,6 +47,51 @@ export const EMRCaseSheets = ({ hospital, departments }: Props) => {
   const { nameFor } = usePatientNames(recentCases.map((c: any) => c.patient_id));
   const [saving, setSaving] = useState(false);
 
+  const { patients, loading: patientsLoading } = useHospitalPatients(hospital?.id);
+  const [newOpen, setNewOpen] = useState(false);
+  const [newPatientId, setNewPatientId] = useState('');
+  const [newTitle, setNewTitle] = useState('');
+  const [newDepartment, setNewDepartment] = useState('');
+  const [creating, setCreating] = useState(false);
+
+  const createCaseSheet = async () => {
+    if (!newPatientId) {
+      toast.error('Select a patient first');
+      return;
+    }
+    setCreating(true);
+    try {
+      const { data: auth } = await supabase.auth.getUser();
+      const { data, error: err } = await (supabase.from('comprehensive_medical_records' as any) as any)
+        .insert({
+          patient_id: newPatientId,
+          provider_id: auth?.user?.id,
+          institution_id: hospital?.id,
+          record_type: 'consultation',
+          title: newTitle || 'Consultation case sheet',
+          description: newDepartment ? `Department: ${newDepartment}` : null,
+          visit_date: new Date().toISOString(),
+          status: 'active',
+          clinical_data: {},
+        })
+        .select()
+        .single();
+      if (err) throw err;
+      toast.success('Case sheet created');
+      setNewOpen(false);
+      setNewPatientId('');
+      setNewTitle('');
+      setNewDepartment('');
+      setActiveCase(data);
+      refresh();
+    } catch (e: any) {
+      toast.error(e?.message || 'Could not create case sheet');
+    } finally {
+      setCreating(false);
+    }
+  };
+
+
   useEffect(() => {
     if (!activeCase) return;
     const cd = (activeCase.clinical_data && typeof activeCase.clinical_data === 'object') ? activeCase.clinical_data : {};
