@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
+import { resolveServicePrice, assertTrustedAmount, PriceMismatchError } from '../_shared/price-guard.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -134,7 +135,7 @@ serve(async (req) => {
       );
     }
 
-    const { amount, currency, providerId, serviceId, redirectUrl, paymentMethod } = validationResult.data;
+    const { amount: clientAmount, currency, providerId, serviceId, redirectUrl, paymentMethod } = validationResult.data;
     // FORCE patientId to the authenticated user — never trust client-supplied value
     const patientId = user.id;
 
@@ -145,6 +146,22 @@ serve(async (req) => {
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
+    // Resolve the authoritative price server-side — never trust the client amount
+    let amount: number;
+    try {
+      const trusted = await resolveServicePrice(supabaseClient as any, serviceId);
+      amount = assertTrustedAmount(clientAmount, trusted);
+    } catch (e) {
+      if (e instanceof PriceMismatchError) {
+        return new Response(
+          JSON.stringify({ success: false, error: 'Payment amount does not match the service price', expectedAmount: e.expected }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      throw e;
+    }
+
 
     console.log('Processing payment request:', { amount, currency, patientId, providerId, serviceId, paymentMethod });
 
