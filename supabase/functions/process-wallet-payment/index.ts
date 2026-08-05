@@ -45,13 +45,29 @@ serve(async (req) => {
     );
 
     const body = await req.json() as PaymentRequest;
-    const { amount, currency, providerId, serviceId } = body;
+    const { amount: clientAmount, currency, providerId, serviceId } = body;
     // FORCE patientId to the authenticated user — never trust client-supplied value
     const patientId = user.id;
-    if (!amount || amount <= 0 || !providerId || !serviceId) {
+    if (!clientAmount || clientAmount <= 0 || !providerId || !serviceId) {
       return new Response(JSON.stringify({ error: 'Invalid input' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
+
+    // Resolve the authoritative price server-side — never trust the client amount
+    let amount: number;
+    try {
+      const trusted = await resolveServicePrice(supabaseClient as any, serviceId);
+      amount = assertTrustedAmount(clientAmount, trusted);
+    } catch (e) {
+      if (e instanceof PriceMismatchError) {
+        return new Response(
+          JSON.stringify({ success: false, error: 'Payment amount does not match the service price', expectedAmount: e.expected }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      throw e;
+    }
     console.log('Processing wallet payment:', { amount, patientId, providerId, serviceId });
+
 
     // Process wallet transaction using database function
     try {
