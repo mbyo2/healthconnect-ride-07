@@ -54,7 +54,27 @@ export const VideoConsultationBooking = ({ onBookingComplete }: VideoConsultatio
 
   const timeSlots = TIME_SLOTS;
 
-  const consultationTypes = CONSULTATION_TYPES;
+  // Prices come from the server-side price list; config only provides labels/durations.
+  const { data: pricing = [] } = useQuery({
+    queryKey: ['video-consultation-pricing'],
+    queryFn: async () => {
+      const { data, error } = await (supabase as any)
+        .from('service_pricing')
+        .select('service_code, base_price')
+        .eq('category', 'video_consultation')
+        .eq('is_active', true)
+        .is('institution_id', null);
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  const consultationTypes = CONSULTATION_TYPES.map((type) => {
+    const serviceCode = `video_consultation_${type.id}`;
+    const row = (pricing as any[]).find((p) => p.service_code === serviceCode);
+    return { ...type, serviceCode, price: row ? Number(row.base_price) : type.price };
+  });
+
 
   const handleBookConsultation = async () => {
     if (!user || !selectedDate || !selectedTime || !selectedProvider || !consultationType) {
