@@ -13498,6 +13498,11 @@ export type Database = {
         Args: { p_code: string; p_context?: string }
         Returns: Json
       }
+      resolve_payment_amount: {
+        Args: { _reference_id: string; _reference_type: string }
+        Returns: number
+      }
+      resolve_service_price: { Args: { _service_id: string }; Returns: number }
     }
     Enums: {
       admin_level: "admin" | "institution_admin" | "superadmin"
