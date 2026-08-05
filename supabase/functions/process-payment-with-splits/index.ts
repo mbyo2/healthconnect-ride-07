@@ -86,7 +86,7 @@ serve(async (req) => {
       );
     }
 
-    const { amount, currency, patientId, providerId, serviceId, institutionId, paymentMethod, paymentType } = validationResult.data;
+    const { amount: clientAmount, currency, patientId, providerId, serviceId, institutionId, paymentMethod, paymentType } = validationResult.data;
 
     // CRITICAL: Verify the authenticated user is the patient making the payment
     if (user.id !== patientId) {
@@ -105,7 +105,25 @@ serve(async (req) => {
       );
     }
 
+    // Resolve the authoritative price server-side — never trust the client amount
+    let amount: number;
+    try {
+      const trusted = paymentType === 'pharmacy'
+        ? await resolveReferenceAmount(supabase as any, 'order', serviceId)
+        : await resolveServicePrice(supabase as any, serviceId);
+      amount = assertTrustedAmount(clientAmount, trusted);
+    } catch (e) {
+      if (e instanceof PriceMismatchError) {
+        return new Response(
+          JSON.stringify({ success: false, error: 'Payment amount does not match the authoritative price', expectedAmount: e.expected }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      throw e;
+    }
+
     console.log('Processing payment with splits:', { authenticatedUserId: user.id, amount, currency, patientId, providerId, serviceId, institutionId, paymentMethod, paymentType });
+
 
     // First, deduct from patient's wallet
     const walletResult = await supabase.rpc('process_wallet_transaction', {
