@@ -12,6 +12,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { HospitalPatientSelect } from '@/components/hospital/HospitalPatientSelect';
+import { useHospitalPatients } from '@/hooks/useHospitalPatients';
 import { FileText, Plus, Search, User, Clock, Stethoscope, Save } from 'lucide-react';
 
 interface Props {
