@@ -23,15 +23,15 @@ const Landing = () => {
         <meta property="og:title" content="Doc' O Clock — Healthcare at Your Fingertips" />
         <meta property="og:description" content="Book appointments, order medicine, and access emergency services anywhere in Zambia." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://dococlockapp.com" />
+        <meta property="og:url" content="https://doc0clock.online" />
         <meta property="og:image" content="/og-image.png" />
-        <link rel="canonical" href="https://dococlockapp.com" />
+        <link rel="canonical" href="https://doc0clock.online" />
         <script type="application/ld+json">{JSON.stringify({
           "@context": "https://schema.org",
           "@type": "MedicalBusiness",
           "name": "Doc' O Clock",
           "description": "Zambia's trusted healthcare platform",
-          "url": "https://dococlockapp.com",
+          "url": "https://doc0clock.online",
           "areaServed": { "@type": "Country", "name": "Zambia" },
           "serviceType": ["Telemedicine", "Medical Appointments", "Pharmacy Delivery"]
         })}</script>

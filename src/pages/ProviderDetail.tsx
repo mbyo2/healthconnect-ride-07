@@ -109,7 +109,7 @@ const ProviderDetail = () => {
         <meta name="description" content={`Book an appointment with ${providerName}, a verified ${providerSpecialty} on Doc' O Clock. View reviews, availability, and credentials.`} />
         <meta property="og:title" content={`${providerName} — ${providerSpecialty}`} />
         <meta property="og:description" content={`Book with ${providerName} on Doc' O Clock.`} />
-        <link rel="canonical" href={`https://dococlockapp.com/provider/${id}`} />
+        <link rel="canonical" href={`https://doc0clock.online/provider/${id}`} />
         <script type="application/ld+json">{JSON.stringify({
           "@context": "https://schema.org",
           "@type": "Physician",

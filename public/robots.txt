@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+
+Disallow: /admin-dashboard
+Disallow: /super-admin
+Disallow: /institution-dashboard
+Disallow: /provider-dashboard
+Disallow: /pharmacy-portal
+Disallow: /profile
+Disallow: /settings
+Disallow: /medical-records
+Disallow: /chat
+
+Sitemap: https://doc0clock.online/sitemap.xml
