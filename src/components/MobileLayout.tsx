@@ -42,7 +42,7 @@ export const MobileLayout = ({ children, isLoading }: MobileLayoutProps) => {
         <div className="flex flex-col min-h-screen bg-background w-full">
           <DesktopNav />
           <main id="main-content" className="flex-1 overflow-auto">
-            <div className="mx-auto max-w-screen-xl px-6 lg:px-8 py-6 space-y-6">
+            <div className="mx-auto max-w-[1600px] px-6 lg:px-8 xl:px-12 2xl:px-16 py-6 space-y-6">
               {children}
             </div>
           </main>
@@ -64,7 +64,7 @@ export const MobileLayout = ({ children, isLoading }: MobileLayoutProps) => {
           "min-h-0"
         )}
       >
-        <div className="mx-auto max-w-screen-xl px-4 py-4 space-y-6">
+        <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8 py-4 space-y-6">
           {children}
         </div>
       </main>

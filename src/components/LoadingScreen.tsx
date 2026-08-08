@@ -28,8 +28,8 @@ export const LoadingScreen = React.memo<LoadingScreenProps>(({
 
   return (
     <div className="fixed inset-0 bg-background flex flex-col items-center justify-center z-50">
-      <div className="flex flex-col items-center gap-6 max-w-sm text-center px-6">
-        <img src="/d0c-icon.svg" alt="Doc' O Clock" className="w-16 h-16 object-contain" />
+      <div className="flex flex-col items-center gap-6 max-w-sm text-center px-6 animate-fade-in">
+        <img src="/d0c-icon.svg" alt="Doc' O Clock" className="w-16 h-16 object-contain animate-float" />
         <div className="space-y-2">
           <h1 className="text-xl font-bold text-foreground">Doc' O Clock</h1>
           <p className="text-sm text-muted-foreground">{message}</p>
@@ -37,7 +37,7 @@ export const LoadingScreen = React.memo<LoadingScreenProps>(({
         <LoadingSpinner size="lg" className="text-primary" />
 
         {showRetry && (
-          <Button onClick={handleRefresh} variant="outline" size="sm" className="mt-4">
+          <Button onClick={handleRefresh} variant="outline" size="sm" className="mt-4 animate-slide-up">
             Taking too long? Retry
           </Button>
         )}

@@ -218,9 +218,9 @@ export function DesktopNav() {
 
   return (
     <header className="bg-background sticky top-0 z-50 border-b border-border" role="banner">
-      <div className="mx-auto flex items-center justify-between h-16 px-4 md:px-6 lg:px-8 xl:px-12 max-w-screen-2xl">
+      <div className="mx-auto flex items-center justify-between h-16 px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 max-w-[1600px]">
         {/* Left: Logo + Nav */}
-        <div className="flex items-center gap-8">
+        <div className="flex items-center gap-6 lg:gap-8">
           <AppLogo size="sm" className="shrink-0" />
 
           <nav className="hidden lg:flex items-center gap-1" role="navigation" aria-label="Main navigation">
@@ -229,10 +229,10 @@ export function DesktopNav() {
                 key={item.to}
                 to={item.to}
                 aria-current={item.active ? "page" : undefined}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                   item.active
-                    ? "bg-primary/10 text-primary"
-                    : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                    ? "bg-primary/10 text-primary shadow-sm"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent/80"
                 }`}
               >
                 {item.icon}
@@ -245,13 +245,13 @@ export function DesktopNav() {
         </div>
 
         {/* Right: Search + Actions */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 lg:gap-3">
           <form onSubmit={handleSearchSubmit} className="relative hidden md:block" role="search">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
               placeholder="Search doctors, specialties..."
-              className="w-[220px] lg:w-[280px] xl:w-[340px] pl-9 h-9 rounded-lg bg-muted/50 border-transparent focus:bg-background focus:border-border"
+              className="w-[200px] lg:w-[280px] xl:w-[340px] 2xl:w-[400px] pl-9 h-9 rounded-lg bg-muted/50 border-transparent focus:bg-background focus:border-border transition-all duration-200"
               value={searchTerm}
               onChange={handleSearchChange}
             />
@@ -264,7 +264,7 @@ export function DesktopNav() {
             <DesktopUserMenu user={user} profile={profile} onLogout={handleLogout} />
           ) : (
             <div className="flex items-center gap-2">
-              <Button variant="ghost" size="sm" asChild>
+              <Button variant="ghost" size="sm" asChild className="hidden sm:flex">
                 <Link to="/auth">Sign In</Link>
               </Button>
               <Button size="sm" asChild>
