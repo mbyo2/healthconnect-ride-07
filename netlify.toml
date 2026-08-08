@@ -11,12 +11,10 @@
   VITE_SUPABASE_PROJECT_ID = "tthzcijscedgxjfnfnky"
   VITE_SITE_URL = "https://doc0clock.online"
 
-# Force the apex domain as canonical
-[[redirects]]
-  from = "https://www.doc0clock.online/*"
-  to = "https://doc0clock.online/:splat"
-  status = 301
-  force = true
+# NOTE: Do NOT add a www -> apex (or apex -> www) redirect here.
+# The host provider's dashboard already owns the canonical-domain redirect.
+# Defining it in both places creates an infinite redirect loop (ERR_TOO_MANY_REDIRECTS).
+
 
 # SPA fallback (must stay last)
 [[redirects]]

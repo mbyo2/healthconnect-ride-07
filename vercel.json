@@ -71,19 +71,8 @@
             ]
         }
     ],
-    "redirects": [
-        {
-            "source": "/(.*)",
-            "has": [
-                {
-                    "type": "host",
-                    "value": "www.doc0clock.online"
-                }
-            ],
-            "destination": "https://doc0clock.online/$1",
-            "permanent": true
-        }
-    ],
+    "redirects": [],
+
     "rewrites": [
         {
             "source": "/(.*)",
