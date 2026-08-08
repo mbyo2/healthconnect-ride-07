@@ -407,7 +407,7 @@ export const PricingPage = () => {
         <meta name="description" content="Free for patients. Pay-per-booking for providers. Transparent pricing for pharmacies and hospitals." />
         <meta property="og:title" content="Pricing | Doc' O Clock" />
         <meta property="og:description" content="Simple, transparent healthcare pricing." />
-        <link rel="canonical" href="https://dococlockapp.com/pricing" />
+        <link rel="canonical" href="https://doc0clock.online/pricing" />
       </Helmet>
     <div className="container mx-auto py-8 space-y-10">
       <div className="text-center space-y-4">

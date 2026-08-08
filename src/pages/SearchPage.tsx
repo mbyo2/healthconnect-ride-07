@@ -61,7 +61,7 @@ const SearchPage = () => {
       <Helmet>
         <title>Find Doctors & Specialists | Doc' O Clock</title>
         <meta name="description" content="Search and book appointments with verified doctors, specialists, hospitals, and clinics on Doc' O Clock." />
-        <link rel="canonical" href="https://dococlockapp.com/search" />
+        <link rel="canonical" href="https://doc0clock.online/search" />
       </Helmet>
 
       <div className="space-y-6">

@@ -2,11 +2,20 @@
     "buildCommand": "npm run build",
     "outputDirectory": "dist",
     "framework": "vite",
-    "installCommand": "npm ci",
+    "installCommand": "npm install --legacy-peer-deps",
     "devCommand": "npm run dev",
+    "build": {
+        "env": {
+            "VITE_SUPABASE_URL": "https://tthzcijscedgxjfnfnky.supabase.co",
+            "VITE_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0aHpjaWpzY2VkZ3hqZm5mbmt5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQxMDU3ODgsImV4cCI6MjA0OTY4MTc4OH0.aum1F7Q4Eqrjf-eHkwyYBd9KDoZs2JaxN3l_vFDcWwY",
+            "VITE_SUPABASE_PUBLISHABLE_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0aHpjaWpzY2VkZ3hqZm5mbmt5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQxMDU3ODgsImV4cCI6MjA0OTY4MTc4OH0.aum1F7Q4Eqrjf-eHkwyYBd9KDoZs2JaxN3l_vFDcWwY",
+            "VITE_SUPABASE_PROJECT_ID": "tthzcijscedgxjfnfnky",
+            "VITE_SITE_URL": "https://doc0clock.online"
+        }
+    },
     "headers": [
         {
-            "source": "/assets/js/(.*)",
+            "source": "/assets/(.*)",
             "headers": [
                 {
                     "key": "Cache-Control",
@@ -28,6 +37,18 @@
                 {
                     "key": "X-XSS-Protection",
                     "value": "1; mode=block"
+                },
+                {
+                    "key": "Referrer-Policy",
+                    "value": "strict-origin-when-cross-origin"
+                },
+                {
+                    "key": "Strict-Transport-Security",
+                    "value": "max-age=31536000; includeSubDomains; preload"
+                },
+                {
+                    "key": "Content-Security-Policy",
+                    "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.gpteng.co; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https:; font-src 'self' https://fonts.gstatic.com data:; media-src 'self' blob: https:; frame-src 'self' https://secure.3gdirectpay.com; form-action 'self' https://secure.3gdirectpay.com https://www.paypal.com; connect-src 'self' https://tthzcijscedgxjfnfnky.supabase.co wss://tthzcijscedgxjfnfnky.supabase.co https://secure.3gdirectpay.com https://api.ipapi.co https://ipapi.co https://*.tile.openstreetmap.org https://nominatim.openstreetmap.org;"
                 }
             ]
         },
@@ -39,8 +60,19 @@
                     "value": "no-cache, no-store, must-revalidate"
                 }
             ]
+        },
+        {
+            "source": "/(service-worker|sw).js",
+            "headers": [
+                {
+                    "key": "Cache-Control",
+                    "value": "no-cache, no-store, must-revalidate"
+                }
+            ]
         }
     ],
+    "redirects": [],
+
     "rewrites": [
         {
             "source": "/(.*)",

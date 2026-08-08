@@ -165,13 +165,13 @@ export const useMarketplace = () => {
         throw new Error('Prescription required for one or more items');
       }
 
-      // Create order
+      // Create order — prices/totals are enforced server-side by triggers
       const { data: order, error: orderError } = await supabase
         .from('orders')
         .insert({
           patient_id: user.id,
           pharmacy_id: orderData.pharmacy_id,
-          total_amount: cart.total,
+          total_amount: 0,
           status: 'pending',
           prescription_id: orderData.prescription_id,
           delivery_address: orderData.delivery_address,
@@ -183,14 +183,16 @@ export const useMarketplace = () => {
 
       if (orderError) throw orderError;
 
-      // Create order items
+      // Create order items — unit_price/total_price are overwritten by the
+      // server-side price integrity triggers, never trusted from the client
       const orderItems = cart.items.map(item => ({
         order_id: order.id,
         product_id: item.product.id,
         quantity: item.quantity,
-        unit_price: item.product.price,
-        total_price: item.subtotal
+        unit_price: 0,
+        total_price: 0
       }));
+
 
       const { error: itemsError } = await supabase
         .from('order_items')

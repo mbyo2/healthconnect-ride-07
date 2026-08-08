@@ -1,5 +1,6 @@
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 import { createClient } from 'npm:@supabase/supabase-js@2';
+import { resolveReferenceAmount, assertTrustedAmount, PriceMismatchError } from '../_shared/price-guard.ts';
 
 const DPO_API_URL = Deno.env.get('DPO_API_URL') || 'https://secure.3gdirectpay.com/API/v6/';
 const DPO_PAYMENT_URL = Deno.env.get('DPO_PAYMENT_URL') || 'https://secure.3gdirectpay.com/payv3.php';
@@ -44,7 +45,7 @@ Deno.serve(async (req) => {
     const userEmail = (claims.claims.email as string) || '';
 
     const body = await req.json().catch(() => ({}));
-    const amount = Number(body.amount);
+    const clientAmount = Number(body.amount);
     const currency = String(body.currency || 'ZMW').toUpperCase();
     const referenceType = String(body.reference_type || 'booking_fee');
     const referenceId = body.reference_id || null;
@@ -55,14 +56,32 @@ Deno.serve(async (req) => {
     const customerLastName = String(body.customer_last_name || '').slice(0, 40);
     const customerPhone = String(body.customer_phone || '').slice(0, 20);
 
-    if (!amount || amount <= 0 || !Number.isFinite(amount)) {
+    if (!clientAmount || clientAmount <= 0 || !Number.isFinite(clientAmount)) {
       return new Response(JSON.stringify({ error: 'Invalid amount' }), {
         status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
     const admin = createClient(supabaseUrl, serviceKey);
+
+    // Resolve the authoritative amount server-side. Wallet top-ups are
+    // self-funding so the user-chosen amount is allowed there only.
+    let amount: number;
+    try {
+      const trusted = await resolveReferenceAmount(admin as any, referenceType, referenceId);
+      amount = assertTrustedAmount(clientAmount, trusted, referenceType === 'wallet_topup');
+    } catch (e) {
+      if (e instanceof PriceMismatchError) {
+        return new Response(
+          JSON.stringify({ error: 'Payment amount does not match the authoritative price', expectedAmount: e.expected }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      throw e;
+    }
+
     const transRef = `D0C-${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
+
     const nowUtc = new Date();
     const pad = (n: number) => String(n).padStart(2, '0');
     const paymentDate = `${nowUtc.getUTCFullYear()}/${pad(nowUtc.getUTCMonth() + 1)}/${pad(nowUtc.getUTCDate()) } ${pad(nowUtc.getUTCHours())}:${pad(nowUtc.getUTCMinutes())}`;

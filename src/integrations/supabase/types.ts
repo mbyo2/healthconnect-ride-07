@@ -2026,6 +2026,39 @@ export type Database = {
           },
         ]
       }
+      data_subject_requests: {
+        Row: {
+          completed_at: string | null
+          id: string
+          metadata: Json
+          notes: string | null
+          request_type: string
+          requested_at: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          id?: string
+          metadata?: Json
+          notes?: string | null
+          request_type: string
+          requested_at?: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          id?: string
+          metadata?: Json
+          notes?: string | null
+          request_type?: string
+          requested_at?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       day_care_procedures: {
         Row: {
           bed_number: string | null
@@ -12991,6 +13024,7 @@ export type Database = {
           provider_id: string
           scheduled_end: string
           scheduled_start: string
+          service_code: string | null
           status: string
         }
         Insert: {
@@ -13002,6 +13036,7 @@ export type Database = {
           provider_id: string
           scheduled_end: string
           scheduled_start: string
+          service_code?: string | null
           status: string
         }
         Update: {
@@ -13013,6 +13048,7 @@ export type Database = {
           provider_id?: string
           scheduled_end?: string
           scheduled_start?: string
+          service_code?: string | null
           status?: string
         }
         Relationships: [
@@ -13465,6 +13501,11 @@ export type Database = {
         Args: { p_code: string; p_context?: string }
         Returns: Json
       }
+      resolve_payment_amount: {
+        Args: { _reference_id: string; _reference_type: string }
+        Returns: number
+      }
+      resolve_service_price: { Args: { _service_id: string }; Returns: number }
     }
     Enums: {
       admin_level: "admin" | "institution_admin" | "superadmin"
