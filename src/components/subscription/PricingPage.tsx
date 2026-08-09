@@ -292,49 +292,15 @@ const PharmacySection = () => {
   );
 };
 
-/* ─── Static Institution Plans ─── */
-const staticInstitutionPlans = [
-  {
-    name: 'Clinic Basic',
-    price: 20000,
-    description: 'Perfect for small clinics and practices',
-    highlight: false,
-    features: ['Up to 20 beds', 'Up to 10 staff', 'Basic HMS modules', 'Patient management', 'Appointment scheduling', 'Basic reporting'],
-    badges: [{ label: '20 beds' }, { label: '10 staff' }],
-  },
-  {
-    name: 'Hospital Standard',
-    price: 45000,
-    description: 'For mid-size hospitals needing full HMS',
-    highlight: true,
-    features: ['Up to 100 beds', 'Up to 50 staff', 'Full HMS suite', 'Lab & radiology integration', 'Billing & invoicing', 'Advanced analytics', 'Telemedicine support'],
-    badges: [{ label: '100 beds' }, { label: '50 staff' }],
-  },
-  {
-    name: 'Hospital Enterprise',
-    price: 80000,
-    description: 'For large hospitals with advanced needs',
-    highlight: false,
-    features: ['Up to 500 beds', 'Up to 200 staff', 'Full HMS + CXO dashboards', 'Multi-department management', 'IoT device integration', 'Custom reporting', 'Priority support', 'API access'],
-    badges: [{ label: '500 beds' }, { label: '200 staff' }],
-  },
-  {
-    name: 'Custom / Unlimited',
-    price: -1,
-    description: 'Tailored for large networks & government',
-    highlight: false,
-    features: ['Unlimited beds & staff', 'Multi-facility management', 'Dedicated account manager', 'Custom integrations', 'On-premise deployment option', 'SLA guarantees', 'Training & onboarding'],
-    badges: [{ label: 'Unlimited capacity' }],
-  },
-];
-
-const StaticInstitutionCard = ({ plan }: { plan: typeof staticInstitutionPlans[0] }) => {
+/* ─── Institution (Hospital) Section — free listing + monthly HMS fee ─── */
+const InstitutionPlanCard = ({ plan }: { plan: SubscriptionPlan }) => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const isContactUs = plan.price === -1;
+  const monthly = Number(plan.price_monthly) || 0;
+  const annual = Number(plan.price_annual) || 0;
 
   return (
-    <Card className={`relative flex flex-col ${plan.highlight ? 'border-primary shadow-lg shadow-primary/10 scale-[1.02]' : 'border-border'}`}>
+    <Card className={`relative flex flex-col ${plan.highlight ? 'border-primary shadow-lg shadow-primary/10 lg:scale-[1.02]' : 'border-border'}`}>
       {plan.highlight && (
         <div className="absolute -top-3 left-1/2 -translate-x-1/2">
           <Badge className="bg-primary text-primary-foreground gap-1"><Sparkles className="h-3 w-3" /> Most Popular</Badge>
@@ -346,25 +312,25 @@ const StaticInstitutionCard = ({ plan }: { plan: typeof staticInstitutionPlans[0
       </CardHeader>
       <CardContent className="flex-1 space-y-4">
         <div className="text-center">
-          {isContactUs ? (
-            <span className="text-3xl font-bold">Contact Us</span>
-          ) : (
-            <>
-              <div className="flex items-baseline justify-center gap-1">
-                <span className="text-4xl font-bold">{formatKwacha(plan.price)}</span>
-                <span className="text-muted-foreground">/year</span>
-              </div>
-              <p className="text-xs text-muted-foreground mt-1">~{formatKwacha(Math.round(plan.price / 12))}/month</p>
-            </>
+          <div className="flex items-baseline justify-center gap-1">
+            <span className="text-4xl font-bold">{formatKwacha(monthly)}</span>
+            <span className="text-muted-foreground">/month</span>
+          </div>
+          {annual > 0 && (
+            <p className="text-xs text-muted-foreground mt-1">
+              or {formatKwacha(annual)}/year — save {formatKwacha(Math.max(0, monthly * 12 - annual))}
+            </p>
           )}
+          <Badge variant="secondary" className="mt-2 text-xs gap-1">
+            <Check className="h-3 w-3" /> K0 to list your facility
+          </Badge>
         </div>
         <div className="flex flex-wrap gap-2 justify-center">
-          {plan.badges.map((b, i) => (
-            <Badge key={i} variant="outline" className="text-xs">{b.label}</Badge>
-          ))}
+          {plan.max_beds ? <Badge variant="outline" className="text-xs">{plan.max_beds} beds</Badge> : <Badge variant="outline" className="text-xs">Unlimited beds</Badge>}
+          {plan.max_users ? <Badge variant="outline" className="text-xs">{plan.max_users} staff</Badge> : <Badge variant="outline" className="text-xs">Unlimited staff</Badge>}
         </div>
         <ul className="space-y-2">
-          {plan.features.map((feature, i) => (
+          {(plan.features || []).map((feature, i) => (
             <li key={i} className="flex items-start gap-2 text-sm">
               <Check className="h-4 w-4 text-primary shrink-0 mt-0.5" /><span>{feature}</span>
             </li>
@@ -372,18 +338,81 @@ const StaticInstitutionCard = ({ plan }: { plan: typeof staticInstitutionPlans[0
         </ul>
       </CardContent>
       <CardFooter>
-        {isContactUs ? (
-          <Button className="w-full" variant="outline" onClick={() => navigate('/contact')}>
-            Contact Sales
-          </Button>
-        ) : (
-          <Button className="w-full" variant={plan.highlight ? 'default' : 'outline'}
-            onClick={() => !user ? navigate('/auth?tab=signup&path=business') : navigate('/institution-dashboard')}>
-            {user ? 'Go to Dashboard' : 'Get Started'}
-          </Button>
-        )}
+        <Button className="w-full" variant={plan.highlight ? 'default' : 'outline'}
+          onClick={() => !user ? navigate('/auth?tab=signup&path=business') : navigate('/institution-dashboard')}>
+          {user ? 'Go to Dashboard' : 'Get Started'}
+        </Button>
       </CardFooter>
     </Card>
+  );
+};
+
+const InstitutionSection = () => {
+  const navigate = useNavigate();
+  const { data: plans, isLoading } = useSubscriptionPlans('institution');
+
+  return (
+    <div className="space-y-6">
+      <Card className="max-w-4xl mx-auto border-primary/20 bg-gradient-to-br from-primary/5 to-background">
+        <CardHeader className="text-center">
+          <div className="flex justify-center mb-3">
+            <div className="p-3 rounded-full bg-primary/10"><Building2 className="h-8 w-8 text-primary" /></div>
+          </div>
+          <CardTitle className="text-2xl">Free to List — Pay Monthly for the HMS</CardTitle>
+          <CardDescription className="text-base max-w-xl mx-auto">
+            Listing your hospital or clinic on Doc' O Clock costs <strong>K0</strong>. You only pay a monthly
+            subscription for the Hospital Management System, billed monthly or annually.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="text-center p-4 rounded-lg bg-background border">
+              <DollarSign className="h-6 w-6 text-primary mx-auto mb-2" />
+              <p className="font-semibold text-sm">K0 to List</p>
+              <p className="text-xs text-muted-foreground">Free profile & patient bookings</p>
+            </div>
+            <div className="text-center p-4 rounded-lg bg-background border">
+              <Building2 className="h-6 w-6 text-primary mx-auto mb-2" />
+              <p className="font-semibold text-sm">Monthly HMS Fee</p>
+              <p className="text-xs text-muted-foreground">Based on beds & staff</p>
+            </div>
+            <div className="text-center p-4 rounded-lg bg-background border">
+              <Clock className="h-6 w-6 text-primary mx-auto mb-2" />
+              <p className="font-semibold text-sm">Annual Option</p>
+              <p className="text-xs text-muted-foreground">Pay yearly and save 2 months</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {isLoading ? (
+        <div className="flex justify-center py-10"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+          {(plans || []).map((plan) => <InstitutionPlanCard key={plan.id} plan={plan} />)}
+          <Card className="flex flex-col">
+            <CardHeader className="text-center pb-2">
+              <CardTitle className="text-xl">Custom / Unlimited</CardTitle>
+              <CardDescription className="text-sm">Tailored for large networks & government</CardDescription>
+            </CardHeader>
+            <CardContent className="flex-1 space-y-4">
+              <div className="text-center"><span className="text-3xl font-bold">Contact Us</span></div>
+              <ul className="space-y-2">
+                {['Unlimited beds & staff', 'Multi-facility management', 'Dedicated account manager',
+                  'Custom integrations & API access', 'On-premise deployment option', 'SLA guarantees'].map((f, i) => (
+                  <li key={i} className="flex items-start gap-2 text-sm">
+                    <Check className="h-4 w-4 text-primary shrink-0 mt-0.5" /><span>{f}</span>
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+            <CardFooter>
+              <Button className="w-full" variant="outline" onClick={() => navigate('/contact')}>Contact Sales</Button>
+            </CardFooter>
+          </Card>
+        </div>
+      )}
+    </div>
   );
 };
 
