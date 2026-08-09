@@ -458,20 +458,7 @@ export const PricingPage = () => {
         <TabsContent value="provider"><ProviderPayPerBookingSection /></TabsContent>
         <TabsContent value="pharmacy"><PharmacySection /></TabsContent>
 
-        <TabsContent value="institution">
-          <div className="space-y-4">
-            <div className="text-center space-y-2">
-              <p className="text-sm text-muted-foreground">
-                HMS subscription only — you manage your own billing & pricing. Marketplace listing is optional.
-              </p>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-              {staticInstitutionPlans.map((plan, i) => (
-                <StaticInstitutionCard key={i} plan={plan} />
-              ))}
-            </div>
-          </div>
-        </TabsContent>
+        <TabsContent value="institution"><InstitutionSection /></TabsContent>
       </Tabs>
 
       <div className="text-center text-sm text-muted-foreground space-y-1">
