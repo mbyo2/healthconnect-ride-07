@@ -207,7 +207,7 @@ CRITICAL: If symptoms suggest emergency, immediately advise to call emergency se
     }
     
     // Call HuggingFace Inference API with chat template
-    const response = await fetch('https://api-inference.huggingface.co/models/google/medgemma-1.5-4b-it', {
+    const response = await fetch(MEDGEMMA_ENDPOINT, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${HF_TOKEN}`,
@@ -256,7 +256,7 @@ CRITICAL: If symptoms suggest emergency, immediately advise to call emergency se
       JSON.stringify({
         reply,
         timestamp: new Date().toISOString(),
-        model: 'medgemma-1.5-4b-it',
+        model: MEDGEMMA_MODEL_LABEL,
         analysisType,
         imageCount: images?.length || 0,
         capabilities: {

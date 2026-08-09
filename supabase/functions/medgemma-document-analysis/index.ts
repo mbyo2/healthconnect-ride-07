@@ -178,7 +178,7 @@ ${userRole === 'health_personnel' ? 'Provide clinical-grade extraction suitable 
       }
     ];
 
-    const response = await fetch('https://api-inference.huggingface.co/models/google/medgemma-1.5-4b-it', {
+    const response = await fetch(MEDGEMMA_ENDPOINT, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${HF_TOKEN}`,
@@ -225,7 +225,7 @@ ${userRole === 'health_personnel' ? 'Provide clinical-grade extraction suitable 
         extractedData,
         documentType,
         timestamp: new Date().toISOString(),
-        model: 'medgemma-1.5-4b-it',
+        model: MEDGEMMA_MODEL_LABEL,
         capabilities: {
           document_understanding: true,
           structured_extraction: true
