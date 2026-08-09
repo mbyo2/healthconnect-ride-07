@@ -1,3 +1,4 @@
+import { MEDGEMMA_ENDPOINT } from '../_shared/medgemma.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
