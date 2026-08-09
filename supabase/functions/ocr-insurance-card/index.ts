@@ -1,3 +1,4 @@
+import { MEDGEMMA_ENDPOINT } from '../_shared/medgemma.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
@@ -57,21 +58,33 @@ Deno.serve(async (req) => {
     
     If a field is not visible, set it to null.`;
 
-    // Use the general AI model to analyze the image
-    const response = await fetch(
-      'https://api-inference.huggingface.co/models/Salesforce/blip2-opt-2.7b',
-      {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${hfToken}`,
-          'Content-Type': 'application/json',
+    // Use the latest MedGemma multimodal model for document understanding
+    const response = await fetch(MEDGEMMA_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${hfToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        inputs: {
+          messages: [
+            {
+              role: 'system',
+              content:
+                'You extract structured data from insurance cards. Respond with a single JSON object only, no commentary.',
+            },
+            {
+              role: 'user',
+              content: [
+                { type: 'image', image: imageBase64 || imageUrl },
+                { type: 'text', text: prompt },
+              ],
+            },
+          ],
         },
-        body: JSON.stringify({
-          inputs: imageBase64 || imageUrl,
-          parameters: { max_new_tokens: 500 },
-        }),
-      }
-    );
+        parameters: { max_new_tokens: 500, temperature: 0.2, return_full_text: false },
+      }),
+    });
 
     let extractedData: any = {};
 

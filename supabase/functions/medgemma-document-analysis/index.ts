@@ -1,3 +1,4 @@
+import { MEDGEMMA_ENDPOINT, MEDGEMMA_MODEL_LABEL } from '../_shared/medgemma.ts';
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
@@ -178,7 +179,7 @@ ${userRole === 'health_personnel' ? 'Provide clinical-grade extraction suitable 
       }
     ];
 
-    const response = await fetch('https://api-inference.huggingface.co/models/google/medgemma-1.5-4b-it', {
+    const response = await fetch(MEDGEMMA_ENDPOINT, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${HF_TOKEN}`,
@@ -225,7 +226,7 @@ ${userRole === 'health_personnel' ? 'Provide clinical-grade extraction suitable 
         extractedData,
         documentType,
         timestamp: new Date().toISOString(),
-        model: 'medgemma-1.5-4b-it',
+        model: MEDGEMMA_MODEL_LABEL,
         capabilities: {
           document_understanding: true,
           structured_extraction: true

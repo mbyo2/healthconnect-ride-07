@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
+import { MEDGEMMA_MODEL, MEDGEMMA_MODEL_LABEL } from '../_shared/medgemma.ts';
 import { HfInference } from "https://esm.sh/@huggingface/inference@2.3.2";
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
 
@@ -185,7 +186,7 @@ Provide:
 
     // Call AI model via Hugging Face
     const response = await hf.textGeneration({
-      model: 'google/medgemma-7b',
+      model: MEDGEMMA_MODEL,
       inputs: `${systemContext}\n\n${prompt}`,
       parameters: {
         max_new_tokens: 1000,

@@ -1,3 +1,4 @@
+import { MEDGEMMA_ENDPOINT, MEDGEMMA_MODEL_LABEL } from '../_shared/medgemma.ts';
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
@@ -207,7 +208,7 @@ CRITICAL: If symptoms suggest emergency, immediately advise to call emergency se
     }
     
     // Call HuggingFace Inference API with chat template
-    const response = await fetch('https://api-inference.huggingface.co/models/google/medgemma-1.5-4b-it', {
+    const response = await fetch(MEDGEMMA_ENDPOINT, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${HF_TOKEN}`,
@@ -256,7 +257,7 @@ CRITICAL: If symptoms suggest emergency, immediately advise to call emergency se
       JSON.stringify({
         reply,
         timestamp: new Date().toISOString(),
-        model: 'medgemma-1.5-4b-it',
+        model: MEDGEMMA_MODEL_LABEL,
         analysisType,
         imageCount: images?.length || 0,
         capabilities: {

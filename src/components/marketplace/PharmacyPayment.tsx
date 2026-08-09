@@ -69,14 +69,10 @@ export const PharmacyPayment = ({ order, onPaymentSuccess }: PharmacyPaymentProp
             <span>Order Total:</span>
             <span className="font-medium">{formatPrice(order?.total_amount ?? 0)}</span>
           </div>
-          <div className="flex justify-between text-sm text-muted-foreground">
-            <span>Platform Commission (2.5%):</span>
-            <span>{formatPrice(order.total_amount * 0.025)}</span>
-          </div>
-          <div className="flex justify-between text-sm text-muted-foreground">
-            <span>Pharmacy Revenue (97.5%):</span>
-            <span>{formatPrice(order.total_amount * 0.975)}</span>
-          </div>
+          <p className="text-xs text-muted-foreground">
+            You pay the order total only — Doc' O Clock adds no fee for patients. The platform's marketplace commission
+            is deducted from the pharmacy's payout.
+          </p>
         </div>
         
         <Separator />
