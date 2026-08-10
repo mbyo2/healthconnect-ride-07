@@ -71,7 +71,7 @@ export const SUPPORTED_CURRENCIES = Object.entries(CURRENCY_SYMBOLS).map(([code,
 export const useCurrency = () => {
   const [currency, setCurrencyState] = useState<string>(() => {
     const saved = safeLocalGet(STORAGE_KEY);
-    return saved || 'USD';
+    return saved || 'ZMW';
   });
   const [loading, setLoading] = useState(true);
   const [detectedCountry, setDetectedCountry] = useState<string | null>(null);
@@ -87,7 +87,7 @@ export const useCurrency = () => {
       }
 
       try {
-        // Use a free IP geolocation API to detect country
+        // Use IP geolocation API to detect country
         const response = await fetch('https://ipapi.co/json/', { 
           signal: AbortSignal.timeout(5000) 
         });
@@ -102,14 +102,14 @@ export const useCurrency = () => {
             setCurrencyState(mapped.code);
             safeLocalSet(STORAGE_KEY, mapped.code);
           } else {
-            // Default to USD for unmapped countries
-            setCurrencyState('USD');
-            safeLocalSet(STORAGE_KEY, 'USD');
+            // Primary launch country default: ZMW
+            setCurrencyState('ZMW');
+            safeLocalSet(STORAGE_KEY, 'ZMW');
           }
         }
       } catch (error) {
-        console.warn('Could not detect location for currency, defaulting to USD:', error);
-        setCurrencyState('USD');
+        console.warn('Could not detect location for currency, defaulting to ZMW:', error);
+        setCurrencyState('ZMW');
       } finally {
         setLoading(false);
       }
