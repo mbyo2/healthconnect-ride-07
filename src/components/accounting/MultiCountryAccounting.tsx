@@ -27,7 +27,9 @@ export interface CountryTaxConfig {
 }
 
 const DEFAULT_COUNTRIES: CountryTaxConfig[] = [
-  { countryCode: 'ZM', countryName: 'Zambia', currency: 'ZMW', vatRate: 16, payeTaxRate: 25, pensionRate: 5, healthLevyRate: 1 },
+  // Zambia — ZRA/NAPSA/NHIMA verified 2024/2025 rates
+  // PAYE top band: 37% (>K9,200/month), NAPSA: 5% employee share, NHIMA: 1% of basic salary
+  { countryCode: 'ZM', countryName: 'Zambia', currency: 'ZMW', vatRate: 16, payeTaxRate: 37, pensionRate: 5, healthLevyRate: 1 },
   { countryCode: 'US', countryName: 'United States', currency: 'USD', vatRate: 8.5, payeTaxRate: 22, pensionRate: 6.2, healthLevyRate: 1.45 },
   { countryCode: 'GB', countryName: 'United Kingdom', currency: 'GBP', vatRate: 20, payeTaxRate: 20, pensionRate: 5, healthLevyRate: 12 },
   { countryCode: 'KE', countryName: 'Kenya', currency: 'KES', vatRate: 16, payeTaxRate: 30, pensionRate: 6, healthLevyRate: 2.75 },
