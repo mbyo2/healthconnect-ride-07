@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { exportToCSV, exportToJSON, parseCSVFile, printStyledPDF } from '@/utils/pdfExport';
+import { buildZambiaPayslip, formatKwacha } from '@/utils/zambiaPayroll';
 
 export interface CountryTaxConfig {
   countryCode: string;
@@ -27,8 +28,8 @@ export interface CountryTaxConfig {
 }
 
 const DEFAULT_COUNTRIES: CountryTaxConfig[] = [
-  // Zambia — ZRA/NAPSA/NHIMA verified 2024/2025 rates
-  // PAYE top band: 37% (>K9,200/month), NAPSA: 5% employee share, NHIMA: 1% of basic salary
+  // Zambia — ZRA/NAPSA/NHIMA/SDL verified 2024/2025 rates
+  // PAYE: progressive bands 0%/20%/30%/37% | NAPSA: 5% employee (cap K29,816) | NHIMA: 1% of TOTAL gross | SDL: 1% employer if payroll >K1m/yr
   { countryCode: 'ZM', countryName: 'Zambia', currency: 'ZMW', vatRate: 16, payeTaxRate: 37, pensionRate: 5, healthLevyRate: 1 },
   { countryCode: 'US', countryName: 'United States', currency: 'USD', vatRate: 8.5, payeTaxRate: 22, pensionRate: 6.2, healthLevyRate: 1.45 },
   { countryCode: 'GB', countryName: 'United Kingdom', currency: 'GBP', vatRate: 20, payeTaxRate: 20, pensionRate: 5, healthLevyRate: 12 },
@@ -311,15 +312,40 @@ export const MultiCountryAccounting = () => {
             </div>
 
             <div>
-              <Label className="text-xs">PAYE Tax %</Label>
+              <Label className="text-xs">PAYE Top Rate %</Label>
               <Input type="number" value={customRates.payeTaxRate} onChange={e => setCustomRates({ ...customRates, payeTaxRate: Number(e.target.value) })} className="h-8 text-xs" />
             </div>
 
             <div>
-              <Label className="text-xs">Pension / SS %</Label>
+              <Label className="text-xs">Pension / NAPSA %</Label>
               <Input type="number" value={customRates.pensionRate} onChange={e => setCustomRates({ ...customRates, pensionRate: Number(e.target.value) })} className="h-8 text-xs" />
             </div>
           </div>
+
+          {/* Zambia-specific: show full band breakdown */}
+          {customRates.countryCode === 'ZM' && (
+            <div className="mt-3 p-3 rounded-lg bg-primary/5 border border-primary/20 text-xs space-y-2">
+              <p className="font-semibold text-primary text-[11px] uppercase tracking-wide">🇿🇲 Zambia ZRA Statutory Rules (2024/2025)</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <p className="font-semibold text-foreground mb-1">PAYE Monthly Bands (progressive)</p>
+                  <div className="space-y-0.5 text-muted-foreground">
+                    <p>K0 – K5,100 → <span className="text-emerald-600 font-medium">0%</span> (tax-free)</p>
+                    <p>K5,101 – K7,100 → <span className="font-medium">20%</span></p>
+                    <p>K7,101 – K9,200 → <span className="font-medium">30%</span></p>
+                    <p>Above K9,200 → <span className="text-destructive font-medium">37%</span></p>
+                  </div>
+                </div>
+                <div className="space-y-1 text-muted-foreground">
+                  <p><span className="font-semibold text-foreground">NAPSA:</span> 5% employee + 5% employer of gross, cap K29,816/month. <span className="text-primary">Reduces PAYE taxable income.</span></p>
+                  <p><span className="font-semibold text-foreground">NHIMA:</span> 1% employee + 1% employer of <span className="underline">total gross</span> (no cap). <span className="text-amber-600">Does NOT reduce PAYE taxable income.</span></p>
+                  <p><span className="font-semibold text-foreground">SDL:</span> 1% employer on total payroll (if annual payroll &gt; K1,000,000).</p>
+                  <p><span className="font-semibold text-foreground">VAT:</span> 16% standard rate (ZRA Smart Invoice required).</p>
+                  <p className="text-[10px] text-muted-foreground">⏰ All remittances due by 10th of following month.</p>
+                </div>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 

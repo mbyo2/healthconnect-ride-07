@@ -1,15 +1,14 @@
 -- ============================================================
 -- Migration: Multi-Country HRMS & General Ledger Accounting System
--- Date: 2026-08-10
--- FIX: 'type' renamed to 'account_type', 'date' renamed to 'entry_date'
---      (both are reserved keywords in PostgreSQL)
--- Zambia statutory rates verified from ZRA, NAPSA, NHIMA (2024/2025)
+-- Date: 2026-08-10 (updated with SDL, NHIMA gross basis, NAPSA reduces PAYE)
+-- Zambia ZRA/NAPSA/NHIMA/SDL verified 2024/2025 rates
 -- ============================================================
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- -----------------------------------------------------------
--- 1. CHART OF ACCOUNTS TABLE
+-- 1. CHART OF ACCOUNTS
+-- account_type used instead of 'type' (reserved keyword)
 -- -----------------------------------------------------------
 CREATE TABLE IF NOT EXISTS public.chart_of_accounts (
   id              UUID           PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -34,7 +33,7 @@ CREATE INDEX IF NOT EXISTS idx_chart_of_accounts_type ON public.chart_of_account
 
 -- -----------------------------------------------------------
 -- 2. GENERAL LEDGER JOURNAL ENTRIES
--- NOTE: 'date' renamed to 'entry_date' — reserved keyword in PostgreSQL
+-- entry_date used instead of 'date' (reserved keyword)
 -- -----------------------------------------------------------
 CREATE TABLE IF NOT EXISTS public.journal_entries (
   id              UUID           PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -61,35 +60,77 @@ CREATE INDEX IF NOT EXISTS idx_journal_entries_date ON public.journal_entries(en
 
 -- -----------------------------------------------------------
 -- 3. COUNTRY STATUTORY & TAX CONFIGURATION
--- Zambia defaults verified from official sources (2024/2025):
---   VAT:     16%  — ZRA standard rate
---   PAYE:    Progressive bands (0%/20%/30%/37%)
---   NAPSA:   5% employee + 5% employer, capped at K29,816/month
---   NHIMA:   1% employee + 1% employer, on BASIC salary only
+--
+-- Zambia ZRA / NAPSA / NHIMA / SDL verified 2024/2025:
+--
+-- VAT:    16% standard rate (ZRA)
+--
+-- PAYE (progressive monthly bands):
+--   K0     – K5,100   → 0%  (tax-free threshold)
+--   K5,101 – K7,100   → 20%
+--   K7,101 – K9,200   → 30%
+--   Above K9,200      → 37%
+--   Taxable income = Gross - NAPSA_employee (NAPSA reduces PAYE base)
+--
+-- NAPSA (National Pension Scheme Authority):
+--   Employee: 5% of gross, capped at K29,816/month
+--   Employer: 5% of gross, capped at K29,816/month
+--   ✅ NAPSA employee share REDUCES taxable income for PAYE
+--
+-- NHIMA (National Health Insurance Management Authority):
+--   Employee: 1% of TOTAL gross (no ceiling/cap)
+--   Employer: 1% of TOTAL gross (no ceiling/cap)
+--   ❌ NHIMA does NOT reduce taxable income for PAYE
+--
+-- SDL (Skills Development Levy):
+--   Employer only: 1% of gross monthly payroll
+--   Triggered only when annual payroll > ZMW 1,000,000
+--
+-- All remittances due by 10th of following month
 -- -----------------------------------------------------------
 CREATE TABLE IF NOT EXISTS public.country_statutory_configs (
-  id                    UUID          PRIMARY KEY DEFAULT gen_random_uuid(),
-  institution_id        UUID          REFERENCES public.healthcare_institutions(id) ON DELETE CASCADE,
-  country_code          TEXT          NOT NULL DEFAULT 'ZM',
-  country_name          TEXT          NOT NULL DEFAULT 'Zambia',
-  currency              TEXT          NOT NULL DEFAULT 'ZMW',
-  vat_rate              DECIMAL(5,2)  DEFAULT 16.00,
-  paye_tax_rate         DECIMAL(5,2)  DEFAULT 37.00,
-  paye_band_1_limit     DECIMAL(10,2) DEFAULT 5100.00,
-  paye_band_2_limit     DECIMAL(10,2) DEFAULT 7100.00,
-  paye_band_3_limit     DECIMAL(10,2) DEFAULT 9200.00,
-  paye_band_1_rate      DECIMAL(5,2)  DEFAULT 0.00,
-  paye_band_2_rate      DECIMAL(5,2)  DEFAULT 20.00,
-  paye_band_3_rate      DECIMAL(5,2)  DEFAULT 30.00,
-  napsa_employee_rate   DECIMAL(5,2)  DEFAULT 5.00,
-  napsa_employer_rate   DECIMAL(5,2)  DEFAULT 5.00,
-  napsa_ceiling         DECIMAL(10,2) DEFAULT 29816.00,
-  nhima_employee_rate   DECIMAL(5,2)  DEFAULT 1.00,
-  nhima_employer_rate   DECIMAL(5,2)  DEFAULT 1.00,
-  pension_rate          DECIMAL(5,2)  DEFAULT 5.00,
-  health_levy_rate      DECIMAL(5,2)  DEFAULT 1.00,
-  created_at            TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
-  updated_at            TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+  id                        UUID          PRIMARY KEY DEFAULT gen_random_uuid(),
+  institution_id            UUID          REFERENCES public.healthcare_institutions(id) ON DELETE CASCADE,
+  country_code              TEXT          NOT NULL DEFAULT 'ZM',
+  country_name              TEXT          NOT NULL DEFAULT 'Zambia',
+  currency                  TEXT          NOT NULL DEFAULT 'ZMW',
+
+  -- VAT
+  vat_rate                  DECIMAL(5,2)  DEFAULT 16.00,
+
+  -- PAYE progressive bands
+  paye_tax_rate             DECIMAL(5,2)  DEFAULT 37.00,    -- top marginal rate
+  paye_band_1_limit         DECIMAL(10,2) DEFAULT 5100.00,  -- 0%  up to this amount
+  paye_band_2_limit         DECIMAL(10,2) DEFAULT 7100.00,  -- 20% up to this amount
+  paye_band_3_limit         DECIMAL(10,2) DEFAULT 9200.00,  -- 30% up to this amount
+  paye_band_1_rate          DECIMAL(5,2)  DEFAULT 0.00,
+  paye_band_2_rate          DECIMAL(5,2)  DEFAULT 20.00,
+  paye_band_3_rate          DECIMAL(5,2)  DEFAULT 30.00,
+
+  -- NAPSA (reduces PAYE taxable income)
+  napsa_employee_rate       DECIMAL(5,2)  DEFAULT 5.00,
+  napsa_employer_rate       DECIMAL(5,2)  DEFAULT 5.00,
+  napsa_ceiling             DECIMAL(10,2) DEFAULT 29816.00, -- K29,816/month (2024)
+  napsa_reduces_paye        BOOLEAN       DEFAULT true,
+
+  -- NHIMA (does NOT reduce PAYE; no ceiling; on total gross)
+  nhima_employee_rate       DECIMAL(5,2)  DEFAULT 1.00,
+  nhima_employer_rate       DECIMAL(5,2)  DEFAULT 1.00,
+  nhima_has_ceiling         BOOLEAN       DEFAULT false,
+  nhima_reduces_paye        BOOLEAN       DEFAULT false,
+
+  -- SDL (employer only; triggered when annual payroll > threshold)
+  sdl_rate                  DECIMAL(5,2)  DEFAULT 1.00,
+  sdl_annual_threshold      DECIMAL(14,2) DEFAULT 1000000.00,
+  sdl_enabled               BOOLEAN       DEFAULT true,
+
+  -- Legacy aliases (for backward compatibility)
+  pension_rate              DECIMAL(5,2)  DEFAULT 5.00,
+  health_levy_rate          DECIMAL(5,2)  DEFAULT 1.00,
+
+  created_at                TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+  updated_at                TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+
   CONSTRAINT unique_statutory_config_per_inst UNIQUE (institution_id)
 );
 
@@ -99,10 +140,12 @@ CREATE POLICY "Authenticated users access country statutory configs"
   ON public.country_statutory_configs FOR ALL TO authenticated USING (true);
 
 -- ============================================================
--- ZAMBIA STATUTORY SUMMARY (ZRA/NAPSA/NHIMA 2024/2025):
--- VAT:   16% standard rate on taxable goods & services (ZRA)
--- PAYE:  0% on K0-5,100 | 20% on K5,101-7,100 | 30% on K7,101-9,200 | 37% above K9,200
--- NAPSA: Employee 5% + Employer 5% = 10% total, capped at K29,816/month gross
--- NHIMA: Employee 1% + Employer 1% = 2% total, on BASIC salary only
--- Remittance: All due by 10th of following month
+-- ZAMBIA STATUTORY SUMMARY (ZRA/NAPSA/NHIMA 2024/2025)
+-- VAT:   16% — standard rate on all taxable supply (ZRA)
+-- PAYE:  Progressive: 0%|20%|30%|37% on K0-5100|5101-7100|7101-9200|>9200
+--        Taxable income = Gross MINUS NAPSA employee share
+-- NAPSA: 5%+5% (emp+employer), cap K29,816/mo. Reduces PAYE base.
+-- NHIMA: 1%+1% (emp+employer), NO cap, on total gross. Does NOT reduce PAYE.
+-- SDL:   1% employer only, triggered if annual payroll > K1,000,000
+-- Remit: All by 10th of following month
 -- ============================================================
