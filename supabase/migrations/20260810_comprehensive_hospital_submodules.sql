@@ -69,6 +69,10 @@ CREATE TABLE IF NOT EXISTS public.blood_bank_inventory (
   updated_at      TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
 );
 
+-- Ensure blood_group column exists if table pre-existed
+ALTER TABLE public.blood_bank_inventory
+  ADD COLUMN IF NOT EXISTS blood_group TEXT NOT NULL DEFAULT 'O+';
+
 ALTER TABLE public.blood_bank_inventory ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "Authenticated users access blood bank inventory" ON public.blood_bank_inventory;
@@ -95,6 +99,10 @@ CREATE TABLE IF NOT EXISTS public.blood_bank_requests (
   created_at       TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
   updated_at       TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
 );
+
+-- Ensure blood_group column exists if table pre-existed
+ALTER TABLE public.blood_bank_requests
+  ADD COLUMN IF NOT EXISTS blood_group TEXT NOT NULL DEFAULT 'O+';
 
 ALTER TABLE public.blood_bank_requests ENABLE ROW LEVEL SECURITY;
 
