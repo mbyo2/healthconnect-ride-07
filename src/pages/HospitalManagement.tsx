@@ -34,6 +34,7 @@ import { InfectionManagement } from '@/components/clinical/InfectionManagement';
 import { NotificationCenter } from '@/components/hospital/NotificationCenter';
 import { PatientFeedback } from '@/components/hospital/PatientFeedback';
 import { SecurityManagement } from '@/components/hospital/SecurityManagement';
+import { TariffAndPriceManager } from '@/components/pricing/TariffAndPriceManager';
 
 const HospitalManagement = () => {
   const { user } = useAuth();
@@ -184,6 +185,7 @@ const HospitalManagement = () => {
             <TabsTrigger value="pharmacy" className="text-xs">Pharmacy</TabsTrigger>
             <TabsTrigger value="beds" className="text-xs">Beds</TabsTrigger>
             <TabsTrigger value="billing" className="text-xs">Billing</TabsTrigger>
+            <TabsTrigger value="tariffs" className="text-xs">🏷️ Tariff &amp; Price Manager</TabsTrigger>
             <TabsTrigger value="insurance" className="text-xs">Insurance</TabsTrigger>
             <TabsTrigger value="discharge" className="text-xs">Discharge</TabsTrigger>
             <TabsTrigger value="queue" className="text-xs">Queue</TabsTrigger>
@@ -216,6 +218,7 @@ const HospitalManagement = () => {
         <TabsContent value="pharmacy"><HospitalPharmacy hospital={hospital} /></TabsContent>
         <TabsContent value="beds"><BedWardManagement hospital={hospital} departments={departments} beds={beds} onRefresh={refreshAll} /></TabsContent>
         <TabsContent value="billing"><HospitalBilling hospital={hospital} admissions={admissions} invoices={invoices} onRefresh={refreshAll} /></TabsContent>
+        <TabsContent value="tariffs"><TariffAndPriceManager /></TabsContent>
         <TabsContent value="insurance"><InsuranceTPA hospital={hospital} /></TabsContent>
         <TabsContent value="discharge"><DischargeSummary hospital={hospital} admissions={admissions} /></TabsContent>
         <TabsContent value="queue"><PatientQueue hospital={hospital} departments={departments} /></TabsContent>
