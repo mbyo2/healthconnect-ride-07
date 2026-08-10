@@ -8,10 +8,12 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
-import { DollarSign, FileText, CreditCard, BarChart3, Receipt, Shield, Loader2, Plus, Trash2 } from 'lucide-react';
+import { DollarSign, FileText, CreditCard, BarChart3, Receipt, Shield, Loader2, Plus, Trash2, Printer, Globe } from 'lucide-react';
 import { useBillingModule, BillingInvoice } from '@/hooks/useBillingModule';
 import { format } from 'date-fns';
 import { InsuranceClaimWorkflow } from '@/components/billing/InsuranceClaimWorkflow';
+import { MultiCountryAccounting } from '@/components/accounting/MultiCountryAccounting';
+import { exportInvoicePDF } from '@/utils/pdfExport';
 
 const STATUS_CONFIG: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
   draft: { label: 'Draft', variant: 'outline' },
@@ -183,6 +185,34 @@ export const BillingStaffWorkflow = () => {
               <Badge variant={status.variant}>{status.label}</Badge>
             </div>
             <div className="flex items-center gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => exportInvoicePDF({
+                  invoiceNumber: invoice.invoice_number,
+                  date: format(new Date(invoice.created_at || Date.now()), 'yyyy-MM-dd'),
+                  patientName: invoice.patient_name,
+                  items: Array.isArray(invoice.items) ? invoice.items.map((i: any) => ({
+                    description: i.description || 'Medical Service',
+                    quantity: i.quantity || 1,
+                    unitPrice: i.unit_price || 0,
+                    total: i.total || (i.quantity || 1) * (i.unit_price || 0),
+                  })) : [{ description: 'Hospital Services', quantity: 1, unitPrice: invoice.total_amount || 0, total: invoice.total_amount || 0 }],
+                  subtotal: invoice.subtotal || invoice.total_amount || 0,
+                  tax: invoice.tax || 0,
+                  discount: invoice.discount || 0,
+                  total: invoice.total_amount || 0,
+                  paidAmount: invoice.paid_amount || 0,
+                  balance: invoice.balance || 0,
+                  notes: invoice.notes,
+                }, {
+                  title: 'Official Invoice',
+                  institutionName: 'Doc-O-Clock Healthcare',
+                  currency: 'ZMW'
+                })}
+              >
+                <Printer className="h-3 w-3 mr-1" /> PDF
+              </Button>
               {invoice.balance > 0 && (
                 <Button size="sm" onClick={() => openPaymentDialog(invoice)}>
                   <CreditCard className="h-3 w-3 mr-1" /> Pay
@@ -372,6 +402,7 @@ export const BillingStaffWorkflow = () => {
       <Tabs defaultValue="invoices">
         <TabsList>
           <TabsTrigger value="invoices"><Receipt className="h-4 w-4 mr-1" /> Invoices ({invoices.length})</TabsTrigger>
+          <TabsTrigger value="accounting"><Globe className="h-4 w-4 mr-1" /> Multi-Country Accounting</TabsTrigger>
           <TabsTrigger value="claims"><Shield className="h-4 w-4 mr-1" /> Insurance Claims ({claims.length})</TabsTrigger>
           <TabsTrigger value="tpa"><Shield className="h-4 w-4 mr-1" /> TPA Workflow</TabsTrigger>
         </TabsList>
@@ -384,6 +415,10 @@ export const BillingStaffWorkflow = () => {
           ) : (
             invoices.map(inv => <InvoiceCard key={inv.id} invoice={inv} />)
           )}
+        </TabsContent>
+
+        <TabsContent value="accounting" className="mt-4">
+          <MultiCountryAccounting />
         </TabsContent>
 
         <TabsContent value="claims" className="space-y-3 mt-4">

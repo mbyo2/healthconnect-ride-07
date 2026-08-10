@@ -8,11 +8,12 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
-import { Users, Calendar, Clock, FileText, DollarSign, ClipboardCheck, CheckCircle, XCircle, Loader2, Plus, Upload } from 'lucide-react';
+import { Users, Calendar, Clock, FileText, DollarSign, ClipboardCheck, CheckCircle, XCircle, Loader2, Plus, Upload, Printer } from 'lucide-react';
 import { useHRModule, LeaveRequest } from '@/hooks/useHRModule';
 import { format } from 'date-fns';
 import { BulkAttendanceImport } from '@/components/hr/BulkAttendanceImport';
 import { ShiftScheduleCalendar } from '@/components/hr/ShiftScheduleCalendar';
+import { exportPayslipPDF } from '@/utils/pdfExport';
 
 const LEAVE_TYPE_LABELS: Record<string, string> = {
   annual: 'Annual Leave', sick: 'Sick Leave', maternity: 'Maternity', paternity: 'Paternity',
@@ -245,7 +246,34 @@ export const HRManagerWorkflow = () => {
                         Basic: {record.currency} {record.basic_salary.toLocaleString()} | Net: {record.currency} {record.net_salary.toLocaleString()}
                       </p>
                     </div>
-                    <Badge variant={record.status === 'paid' ? 'default' : 'secondary'}>{record.status}</Badge>
+                    <div className="flex items-center gap-2">
+                      <Badge variant={record.status === 'paid' ? 'default' : 'secondary'}>{record.status}</Badge>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => exportPayslipPDF({
+                          payslipNumber: `PS-${record.id.slice(0, 8).toUpperCase()}`,
+                          payPeriod: `${format(new Date(record.period_start), 'dd MMM')} – ${format(new Date(record.period_end), 'dd MMM yyyy')}`,
+                          staffName: `Staff (${record.staff_id.slice(0, 8)})`,
+                          staffId: record.staff_id,
+                          basicSalary: record.basic_salary,
+                          allowances: [{ name: 'Housing & Transport Allowance', amount: record.allowances || (record.basic_salary * 0.15) }],
+                          deductions: [{ name: 'Statutory Welfare Fund', amount: record.deductions || 0 }],
+                          taxDeducted: record.tax_deducted || (record.basic_salary * 0.15),
+                          pensionDeducted: record.pension_deducted || (record.basic_salary * 0.05),
+                          healthInsuranceDeducted: record.health_insurance_deducted || (record.basic_salary * 0.01),
+                          netPay: record.net_salary,
+                          currency: record.currency || 'ZMW',
+                          paymentDate: format(new Date(record.created_at || Date.now()), 'yyyy-MM-dd'),
+                        }, {
+                          title: 'Payslip',
+                          institutionName: 'Doc-O-Clock Healthcare',
+                          currency: record.currency || 'ZMW',
+                        })}
+                      >
+                        <Printer className="h-3.5 w-3.5 mr-1" /> Payslip PDF
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
