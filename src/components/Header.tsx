@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Menu, Search } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { CurrencyToggle } from "@/components/CurrencyToggle";
 import { useSearch } from "@/context/SearchContext";
 import { useDeviceType } from "@/hooks/use-device-type";
 import { AppLogo } from "@/components/ui/AppLogo";
@@ -54,6 +55,7 @@ export function Header() {
             </>
           )}
 
+          <CurrencyToggle />
           <ThemeToggle />
 
           <DropdownMenu>

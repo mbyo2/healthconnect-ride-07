@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { CurrencyToggle } from "@/components/CurrencyToggle";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useState, useCallback, useMemo } from "react";
@@ -257,6 +258,7 @@ export function DesktopNav() {
             />
           </form>
 
+          <CurrencyToggle />
           <ThemeToggle />
           {isAuthenticated && <NotificationBell />}
 
