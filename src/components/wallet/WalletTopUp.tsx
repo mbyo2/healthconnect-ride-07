@@ -4,17 +4,23 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
 import { Loader2, DollarSign, CreditCard, ShieldCheck } from "lucide-react";
 import { useCurrency } from "@/hooks/use-currency";
+import { useDPOPayment } from "@/hooks/useDPOPayment";
+
+type PaymentMethod = 'paypal' | 'dpo';
 
 export const WalletTopUp = () => {
     const { user } = useAuth();
     const [amount, setAmount] = useState<string>('50');
     const [isLoading, setIsLoading] = useState(false);
+    const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('paypal');
     const { currency, getSymbol } = useCurrency();
+    const { redirectToCheckout: redirectToDPOCheckout } = useDPOPayment();
 
     const handleTopUp = async () => {
         if (!user) {
@@ -30,28 +36,49 @@ export const WalletTopUp = () => {
 
         setIsLoading(true);
         try {
-            console.log('Initiating PayPal top-up for:', { amount: numAmount, userId: user.id });
+            if (paymentMethod === 'paypal') {
+                console.log('Initiating PayPal top-up for:', { amount: numAmount, userId: user.id });
 
-            const { data, error } = await supabase.functions.invoke('process-paypal-payment', {
-                body: {
-                    amount: numAmount,
-                    currency,
-                    patientId: user.id,
-                    providerId: '00000000-0000-0000-0000-000000000000', // System/Platform provider ID
-                    serviceId: 'wallet_topup',
-                    redirectUrl: `${window.location.origin}/payment-success`,
-                    paymentMethod: 'paypal'
+                const { data, error } = await supabase.functions.invoke('process-paypal-payment', {
+                    body: {
+                        amount: numAmount,
+                        currency,
+                        patientId: user.id,
+                        providerId: '00000000-0000-0000-0000-000000000000', // System/Platform provider ID
+                        serviceId: 'wallet_topup',
+                        redirectUrl: `${window.location.origin}/payment-success`,
+                        paymentMethod: 'paypal'
+                    }
+                });
+
+                if (error) throw error;
+
+                if (data && data.success && data.paymentUrl) {
+                    toast.success("Redirecting to PayPal...");
+                    window.location.href = data.paymentUrl;
+                } else {
+                    throw new Error(data?.error || "Failed to initiate PayPal payment");
                 }
-            });
+            } else if (paymentMethod === 'dpo') {
+                console.log('Initiating DPO top-up for:', { amount: numAmount, userId: user.id });
 
-            if (error) throw error;
+                const profile = await supabase.from('profiles').select('first_name, last_name, phone').eq('id', user.id).single();
+                
+                const success = await redirectToDPOCheckout({
+                    amount: numAmount,
+                    currency: currency || 'ZMW',
+                    reference_type: 'wallet_topup',
+                    reference_id: user.id,
+                    description: 'Wallet Top Up',
+                    customer_first_name: profile.data?.first_name || '',
+                    customer_last_name: profile.data?.last_name || '',
+                    customer_phone: profile.data?.phone || '',
+                    redirect_url: `${window.location.origin}/payment-return`,
+                });
 
-            if (data && data.success && data.paymentUrl) {
-                toast.success("Redirecting to PayPal...");
-                // Redirect to PayPal approval URL
-                window.location.href = data.paymentUrl;
-            } else {
-                throw new Error(data?.error || "Failed to initiate PayPal payment");
+                if (!success) {
+                    throw new Error("Failed to initiate DPO payment");
+                }
             }
         } catch (error) {
             console.error('Top up error:', error);
@@ -71,10 +98,24 @@ export const WalletTopUp = () => {
                     Top Up Wallet
                 </CardTitle>
                 <CardDescription>
-                    Add funds to your wallet using PayPal
+                    Add funds to your wallet using PayPal or DPO Pay
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
+                <div className="space-y-4">
+                    <Label className="text-sm font-semibold text-muted-foreground">Select Payment Method</Label>
+                    <RadioGroup value={paymentMethod} onValueChange={(value) => setPaymentMethod(value as PaymentMethod)} className="grid grid-cols-2 gap-3">
+                        <div className="flex items-center space-x-2 space-y-0">
+                            <RadioGroupItem value="paypal" id="paypal" />
+                            <Label htmlFor="paypal" className="font-normal cursor-pointer">PayPal</Label>
+                        </div>
+                        <div className="flex items-center space-x-2 space-y-0">
+                            <RadioGroupItem value="dpo" id="dpo" />
+                            <Label htmlFor="dpo" className="font-normal cursor-pointer">DPO Pay</Label>
+                        </div>
+                    </RadioGroup>
+                </div>
+
                 <div className="space-y-4">
                     <Label htmlFor="amount" className="text-sm font-semibold text-muted-foreground">Select or enter amount</Label>
                     <div className="grid grid-cols-3 gap-2">
@@ -128,7 +169,7 @@ export const WalletTopUp = () => {
                         </>
                     ) : (
                         <>
-                            Pay with PayPal
+                            Pay with {paymentMethod === 'paypal' ? 'PayPal' : 'DPO Pay'}
                         </>
                     )}
                 </Button>
