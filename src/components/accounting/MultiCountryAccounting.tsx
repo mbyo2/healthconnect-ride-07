@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { exportToCSV, exportToJSON, parseCSVFile, printStyledPDF } from '@/utils/pdfExport';
-import { buildZambiaPayslip, formatKwacha } from '@/utils/zambiaPayroll';
+import { calculateUniversalPayroll, COUNTRY_CONFIGS, formatCurrency } from '@/utils/universalPayroll';
 
 export interface CountryTaxConfig {
   countryCode: string;
@@ -92,6 +92,23 @@ export const MultiCountryAccounting = () => {
 
   const [newAccount, setNewAccount] = useState({ code: '', name: '', type: 'Asset' as AccountItem['type'], balance: 0 });
   const [newJournal, setNewJournal] = useState({ reference: '', description: '', debitAccount: '1010', creditAccount: '4010', amount: 0 });
+
+  // Payroll Calculator state
+  const [payrollGross, setPayrollGross] = useState<number>(10000);
+  const [annualPayroll, setAnnualPayroll] = useState<number>(1200000);
+
+  // Live payroll calculation for selected country
+  const countryConfig = COUNTRY_CONFIGS[customRates.countryCode] || COUNTRY_CONFIGS['ZM'];
+  const payrollResult = calculateUniversalPayroll(payrollGross, {
+    ...countryConfig,
+    vatRate: customRates.vatRate,
+    payeTaxRate: customRates.payeTaxRate,
+    pensionEmployeeRate: customRates.pensionRate,
+    pensionEmployerRate: customRates.pensionRate,
+    healthEmployeeRate: customRates.healthLevyRate,
+    healthEmployerRate: customRates.healthLevyRate,
+  }, annualPayroll);
+
 
   // Country selection handler
   const handleCountryChange = (code: string) => {
@@ -382,10 +399,11 @@ export const MultiCountryAccounting = () => {
 
       {/* Main Accounting Tabs */}
       <Tabs defaultValue="coa" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-3 max-w-xl">
-          <TabsTrigger value="coa" className="text-xs"><BookOpen className="h-3.5 w-3.5 mr-1" /> Chart of Accounts</TabsTrigger>
-          <TabsTrigger value="journals" className="text-xs"><Layers className="h-3.5 w-3.5 mr-1" /> Journal Entries</TabsTrigger>
-          <TabsTrigger value="pnl" className="text-xs"><TrendingUp className="h-3.5 w-3.5 mr-1" /> Profit & Loss Statement</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-4 max-w-2xl">
+          <TabsTrigger value="coa" className="text-xs"><BookOpen className="h-3.5 w-3.5 mr-1" /> Accounts</TabsTrigger>
+          <TabsTrigger value="journals" className="text-xs"><Layers className="h-3.5 w-3.5 mr-1" /> Journals</TabsTrigger>
+          <TabsTrigger value="pnl" className="text-xs"><TrendingUp className="h-3.5 w-3.5 mr-1" /> P&amp;L</TabsTrigger>
+          <TabsTrigger value="payroll" className="text-xs"><Calculator className="h-3.5 w-3.5 mr-1" /> Payroll Calc</TabsTrigger>
         </TabsList>
 
         {/* Chart of Accounts Tab */}
@@ -526,6 +544,95 @@ export const MultiCountryAccounting = () => {
                 <div className="flex justify-between text-amber-600 dark:text-amber-400"><span>Estimated Statutory VAT ({customRates.vatRate}%)</span><span>-{customRates.currency} {estimatedVatTax.toLocaleString()}</span></div>
                 <div className="flex justify-between text-lg font-bold text-emerald-600 dark:text-emerald-400 pt-2 border-t"><span>Net Income (After Statutory Levy)</span><span>{customRates.currency} {netProfit.toLocaleString()}</span></div>
               </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Payroll Calculator Tab — works for ALL countries */}
+        <TabsContent value="payroll" className="space-y-4">
+          <Card className="border-border">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                <Calculator className="h-4 w-4 text-primary" />
+                Live Payroll Calculator — {customRates.countryName} ({customRates.currency})
+              </CardTitle>
+              <CardDescription className="text-xs">Enter a gross salary to see exact statutory deductions per {customRates.countryName} law</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4 text-xs">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label className="text-xs">Monthly Gross Salary ({customRates.currency})</Label>
+                  <Input type="number" value={payrollGross} onChange={e => setPayrollGross(Number(e.target.value))} className="h-8 text-xs font-bold" min={0} />
+                </div>
+                <div>
+                  <Label className="text-xs">Employer Annual Payroll ({customRates.currency}) — for SDL</Label>
+                  <Input type="number" value={annualPayroll} onChange={e => setAnnualPayroll(Number(e.target.value))} className="h-8 text-xs" min={0} />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Employee Payslip */}
+                <div className="space-y-1 border rounded-lg p-3 bg-muted/20">
+                  <p className="font-semibold text-foreground text-[11px] uppercase mb-2">Employee Payslip</p>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Gross Salary</span>
+                    <span className="font-bold text-foreground">{formatCurrency(payrollResult.grossSalary, customRates.currency)}</span>
+                  </div>
+                  <div className="flex justify-between text-amber-600 dark:text-amber-400">
+                    <span>Pension / {customRates.countryCode === 'ZM' ? 'NAPSA' : 'Social Security'} ({customRates.pensionRate}%)</span>
+                    <span>- {formatCurrency(payrollResult.pensionEmployee, customRates.currency)}</span>
+                  </div>
+                  {payrollResult.taxBreakdown?.filter(b => b.amount > 0).map((b, i) => (
+                    <div key={i} className="flex justify-between text-red-600 dark:text-red-400">
+                      <span className="truncate pr-2">Income Tax: {b.label}</span>
+                      <span className="shrink-0">- {formatCurrency(b.amount, customRates.currency)}</span>
+                    </div>
+                  ))}
+                  <div className="flex justify-between text-orange-600 dark:text-orange-400">
+                    <span>{customRates.countryCode === 'ZM' ? 'NHIMA' : 'Health Levy'} ({customRates.healthLevyRate}%)</span>
+                    <span>- {formatCurrency(payrollResult.healthEmployee, customRates.currency)}</span>
+                  </div>
+                  <div className="flex justify-between font-bold text-sm text-emerald-600 dark:text-emerald-400 pt-2 border-t mt-2">
+                    <span>NET PAY</span>
+                    <span>{formatCurrency(payrollResult.netPay, customRates.currency)}</span>
+                  </div>
+                </div>
+
+                {/* Employer Cost */}
+                <div className="space-y-1 border rounded-lg p-3 bg-muted/20">
+                  <p className="font-semibold text-foreground text-[11px] uppercase mb-2">Employer Cost Summary</p>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Gross Salary Paid</span>
+                    <span className="font-medium">{formatCurrency(payrollResult.grossSalary, customRates.currency)}</span>
+                  </div>
+                  <div className="flex justify-between text-amber-600 dark:text-amber-400">
+                    <span>Pension Employer Share ({customRates.pensionRate}%)</span>
+                    <span>{formatCurrency(payrollResult.pensionEmployer, customRates.currency)}</span>
+                  </div>
+                  <div className="flex justify-between text-orange-600 dark:text-orange-400">
+                    <span>Health Levy Employer Share ({customRates.healthLevyRate}%)</span>
+                    <span>{formatCurrency(payrollResult.healthEmployer, customRates.currency)}</span>
+                  </div>
+                  {payrollResult.sdlApplicable && (
+                    <div className="flex justify-between text-purple-600 dark:text-purple-400">
+                      <span>SDL (Skills Dev Levy 1%)</span>
+                      <span>{formatCurrency(payrollResult.sdlAmount, customRates.currency)}</span>
+                    </div>
+                  )}
+                  {!payrollResult.sdlApplicable && customRates.countryCode === 'ZM' && (
+                    <div className="flex justify-between text-muted-foreground">
+                      <span>SDL (annual payroll &lt; K1,000,000)</span>
+                      <span>Not applicable</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between font-bold text-sm text-primary pt-2 border-t mt-2">
+                    <span>TOTAL EMPLOYER COST</span>
+                    <span>{formatCurrency(payrollResult.totalEmployerCost, customRates.currency)}</span>
+                  </div>
+                </div>
+              </div>
+
+              <p className="text-[10px] text-muted-foreground text-center">Calculated using verified {customRates.countryName} statutory rates. Adjust rates in the configurator above to update calculations.</p>
             </CardContent>
           </Card>
         </TabsContent>
