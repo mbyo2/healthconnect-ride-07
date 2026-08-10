@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS public.chart_of_accounts (
   institution_id  UUID           REFERENCES public.healthcare_institutions(id) ON DELETE CASCADE,
   code            TEXT           NOT NULL,
   name            TEXT           NOT NULL,
-  type            TEXT           NOT NULL CHECK (type IN ('Asset', 'Liability', 'Equity', 'Revenue', 'Expense')),
+  account_type    TEXT           NOT NULL CHECK (account_type IN ('Asset', 'Liability', 'Equity', 'Revenue', 'Expense')),
   balance         DECIMAL(12,2)  NOT NULL DEFAULT 0.00,
   created_at      TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
   updated_at      TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
@@ -31,7 +31,8 @@ CREATE POLICY "Authenticated users access chart of accounts"
   ON public.chart_of_accounts FOR ALL TO authenticated USING (true);
 
 CREATE INDEX IF NOT EXISTS idx_chart_of_accounts_inst ON public.chart_of_accounts(institution_id);
-CREATE INDEX IF NOT EXISTS idx_chart_of_accounts_type ON public.chart_of_accounts(type);
+CREATE INDEX IF NOT EXISTS idx_chart_of_accounts_type ON public.chart_of_accounts(account_type);
+
 
 
 -- -----------------------------------------------------------
