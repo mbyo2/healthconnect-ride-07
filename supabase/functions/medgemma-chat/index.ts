@@ -1,4 +1,4 @@
-import { MEDGEMMA_ENDPOINT, MEDGEMMA_MODEL_LABEL } from '../_shared/medgemma.ts';
+import { MEDGEMMA_MODEL, MEDGEMMA_MODEL_LABEL } from '../_shared/medgemma.ts';
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
@@ -17,7 +17,7 @@ const chatRequestSchema = z.object({
     content: z.string().max(2000)
   })).max(50, 'Conversation history too long').optional().default([]),
   // Multimodal support
-  images: z.array(z.string().max(5_000_000, 'Image exceeds 5MB base64 limit')).max(5, 'Maximum 5 images allowed').optional(), // base64 encoded images
+  images: z.array(z.string().max(5_000_000, 'Image exceeds 5MB base64 limit')).max(5, 'Maximum 5 images allowed').optional(),
   analysisType: z.enum(['general', 'longitudinal', 'document_understanding', 'anatomical_localization']).optional().default('general')
 });
 
@@ -75,7 +75,6 @@ serve(async (req) => {
     let roleLabel = 'patient';
     let roleGuidance = 'Use simple, clear language and be empathetic.';
     
-    // Clinical roles with advanced terminology
     if (['doctor', 'specialist', 'health_personnel'].includes(userRole)) {
       roleLabel = 'clinical professional';
       roleGuidance = 'Use clinical terminology, provide differential diagnoses, evidence-based decision support, and structured reporting. Include ICD codes when relevant.';
@@ -120,7 +119,7 @@ serve(async (req) => {
       roleGuidance = 'Provide platform analytics, technical support, and system-wide operational insights.';
     }
 
-    let systemPrompt = `You are Doc 0 Clock, a medical AI assistant powered by MedGemma 1.5 4B. You are speaking with a ${roleLabel}.
+    let systemPrompt = `You are Doc 0 Clock, a medical AI assistant. You are speaking with a ${roleLabel}.
 ${roleGuidance}
 
 Always recommend seeking professional care when appropriate.
@@ -146,18 +145,16 @@ CRITICAL: If symptoms suggest emergency, immediately advise to call emergency se
 - Use standard anatomical terminology`;
     }
 
-    console.log('MedGemma 1.5 4B multimodal request received');
-    
     const HF_TOKEN = Deno.env.get('HF_TOKEN');
     if (!HF_TOKEN) {
       console.error('HF_TOKEN not configured');
       return new Response(
-        JSON.stringify({ error: 'HF_TOKEN not configured', fallback: true }),
+        JSON.stringify({ error: 'AI service not configured', fallback: true }),
         { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
-    
-    // Format messages for multimodal input
+
+    // Format messages for HuggingFace chat completions API
     const formattedMessages: any[] = [
       { role: 'system', content: systemPrompt }
     ];
@@ -170,88 +167,89 @@ CRITICAL: If symptoms suggest emergency, immediately advise to call emergency se
       });
     });
 
-    // Add current user message with images if provided
-    if (images && images.length > 0) {
-      const userContent: any[] = [];
-      
-      // Add images first (for longitudinal analysis, order matters)
-      images.forEach((imageBase64, index) => {
-        userContent.push({
-          type: 'image',
-          image: imageBase64 // Base64 encoded image
-        });
-        
-        if (analysisType === 'longitudinal') {
-          userContent.push({
-            type: 'text',
-            text: `[Image ${index + 1} of ${images.length}]`
-          });
-        }
-      });
-      
-      // Add text prompt
-      userContent.push({
-        type: 'text',
-        text: message
-      });
-
-      formattedMessages.push({
-        role: 'user',
-        content: userContent
-      });
-    } else {
-      // Text-only message
-      formattedMessages.push({
-        role: 'user',
-        content: message
-      });
-    }
-    
-    // Call HuggingFace Inference API with chat template
-    const response = await fetch(MEDGEMMA_ENDPOINT, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${HF_TOKEN}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        inputs: {
-          messages: formattedMessages
-        },
-        parameters: {
-          max_new_tokens: 2000, // Increased for detailed medical analysis
-          temperature: 0.3, // Lower for more factual medical responses
-          top_p: 0.95,
-          return_full_text: false
-        }
-      }),
+    // Add current user message (text only — medgemma-1.5-4b-it is text-only via HF Inference API)
+    formattedMessages.push({
+      role: 'user',
+      content: images && images.length > 0
+        ? `[User has attached ${images.length} medical image(s) for analysis]\n\n${message}`
+        : message
     });
+
+    console.log('Calling HuggingFace chat completions API for MedGemma...');
+
+    // Use the HuggingFace OpenAI-compatible chat completions endpoint
+    const HF_CHAT_ENDPOINT = `https://api-inference.huggingface.co/v1/chat/completions`;
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 55000); // 55s timeout
+
+    let response: Response;
+    try {
+      response = await fetch(HF_CHAT_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${HF_TOKEN}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: MEDGEMMA_MODEL,
+          messages: formattedMessages,
+          max_tokens: 2000,
+          temperature: 0.3,
+          top_p: 0.95,
+          stream: false,
+        }),
+        signal: controller.signal,
+      });
+    } finally {
+      clearTimeout(timeoutId);
+    }
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Lovable AI error:', response.status, errorText);
-      
+      console.error('HuggingFace API error:', response.status, errorText);
+
       if (response.status === 429) {
         return new Response(
-          JSON.stringify({ error: 'Rate limit exceeded. Please try again later.' }),
+          JSON.stringify({ error: 'Rate limit exceeded. Please try again later.', fallback: true }),
           { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
-      
-      throw new Error(`AI gateway error: ${response.status}`);
+
+      if (response.status === 503) {
+        return new Response(
+          JSON.stringify({ error: 'AI model is loading, please try again in a moment.', fallback: true }),
+          { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      // Signal to client to try fallback
+      return new Response(
+        JSON.stringify({ error: `AI gateway error: ${response.status}`, fallback: true }),
+        { status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     const data = await response.json();
-    
-    // HuggingFace returns array or object with generated_text
-    let reply: string;
-    if (Array.isArray(data)) {
-      reply = data[0]?.generated_text || 'No response generated';
-    } else {
-      reply = data.generated_text || data[0]?.generated_text || 'No response generated';
-    }
 
-    console.log('AI chat response generated');
+    // HuggingFace OpenAI-compatible API returns choices[0].message.content
+    const reply: string = data?.choices?.[0]?.message?.content || 'No response generated.';
+
+    console.log('MedGemma chat response generated successfully');
+
+    // Save to diagnosis history
+    try {
+      await supabaseAuth
+        .from('ai_diagnosis_history')
+        .insert({
+          user_id: user.id,
+          symptoms: message,
+          analysis: reply,
+          patient_context: images && images.length > 0 ? { has_images: true, image_count: images.length, analysisType } : null
+        });
+    } catch (historyError) {
+      console.error('Failed to save diagnosis history:', historyError);
+    }
 
     return new Response(
       JSON.stringify({
@@ -261,11 +259,10 @@ CRITICAL: If symptoms suggest emergency, immediately advise to call emergency se
         analysisType,
         imageCount: images?.length || 0,
         capabilities: {
-          multimodal: true,
+          multimodal: false,
           longitudinal: true,
           document_understanding: true,
           anatomical_localization: true,
-          native_3d_imaging: true
         }
       }),
       {
@@ -274,10 +271,18 @@ CRITICAL: If symptoms suggest emergency, immediately advise to call emergency se
       }
     );
 
-  } catch (error) {
-    console.error('Error in AI chat:', error);
+  } catch (error: any) {
+    console.error('Error in MedGemma chat:', error);
+
+    if (error?.name === 'AbortError') {
+      return new Response(
+        JSON.stringify({ error: 'AI request timed out. Please try again.', fallback: true }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 504 }
+      );
+    }
+
     return new Response(
-      JSON.stringify({ error: 'An internal error occurred' }),
+      JSON.stringify({ error: 'An internal error occurred', fallback: true }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
     );
   }

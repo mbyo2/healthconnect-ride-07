@@ -507,8 +507,13 @@ serve(async (req) => {
     const { message, image, conversationHistory } = validationResult.data;
 
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    if (!LOVABLE_API_KEY) {
-      throw new Error('LOVABLE_API_KEY not configured');
+    const HF_TOKEN = Deno.env.get('HF_TOKEN');
+
+    if (!LOVABLE_API_KEY && !HF_TOKEN) {
+      return new Response(
+        JSON.stringify({ error: 'AI service not configured. Please set LOVABLE_API_KEY or HF_TOKEN.', fallback: true }),
+        { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     // Verify the user's role from the DB — never trust client-supplied userRole
@@ -552,31 +557,67 @@ serve(async (req) => {
       messages.push({ role: 'user', content: message });
     }
 
-    console.log('Calling Lovable AI...');
+    let reply: string;
 
-    // Call Lovable AI Gateway with vision-capable model
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'google/gemini-2.5-flash', // Supports both text and vision
-        messages,
-        temperature: 0.4,
-        max_tokens: 1200, // Increased for detailed image analysis
-      }),
-    });
+    if (LOVABLE_API_KEY) {
+      console.log('Calling Lovable AI...');
+      // Call Lovable AI Gateway with vision-capable model
+      const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'google/gemini-2.5-flash', // Supports both text and vision
+          messages,
+          temperature: 0.4,
+          max_tokens: 1200,
+        }),
+      });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Lovable AI error:', response.status, errorText);
-      throw new Error(`AI gateway error: ${response.status}`);
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Lovable AI error:', response.status, errorText);
+        throw new Error(`AI gateway error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      reply = data.choices[0].message.content;
+    } else {
+      // Fallback: HuggingFace MedGemma
+      console.log('Falling back to HuggingFace MedGemma...');
+      const { MEDGEMMA_MODEL } = await import('../_shared/medgemma.ts');
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 55000);
+      let hfResponse: Response;
+      try {
+        hfResponse = await fetch('https://api-inference.huggingface.co/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${HF_TOKEN}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: MEDGEMMA_MODEL,
+            messages,
+            max_tokens: 1200,
+            temperature: 0.4,
+            stream: false,
+          }),
+          signal: controller.signal,
+        });
+      } finally {
+        clearTimeout(timeoutId);
+      }
+      if (!hfResponse.ok) {
+        const errorText = await hfResponse.text();
+        console.error('HuggingFace fallback error:', hfResponse.status, errorText);
+        throw new Error(`HuggingFace error: ${hfResponse.status}`);
+      }
+      const hfData = await hfResponse.json();
+      reply = hfData?.choices?.[0]?.message?.content || 'No response generated';
     }
-
-    const data = await response.json();
-    const reply = data.choices[0].message.content;
 
     console.log('Doc 0 Clock response generated');
 

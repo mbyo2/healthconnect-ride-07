@@ -72,10 +72,12 @@ export const SearchFilters = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="">All types</SelectItem>
-                    <SelectItem value="doctor">Doctor</SelectItem>
+                    <SelectItem value="doctor">Doctor / Specialist</SelectItem>
                     <SelectItem value="hospital">Hospital</SelectItem>
                     <SelectItem value="clinic">Clinic</SelectItem>
                     <SelectItem value="pharmacy">Pharmacy</SelectItem>
+                    <SelectItem value="diagnostic_center">Standalone Diagnostic Center / Lab</SelectItem>
+                    <SelectItem value="imaging_center">Radiology & Imaging Center</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -104,6 +106,9 @@ export const SearchFilters = () => {
                     <SelectItem value="Psychiatry">Psychiatry</SelectItem>
                     <SelectItem value="General Dentistry">General Dentistry</SelectItem>
                     <SelectItem value="Emergency Medicine">Emergency Medicine</SelectItem>
+                    <SelectItem value="Pathology & Diagnostics">Pathology & Diagnostics</SelectItem>
+                    <SelectItem value="Radiology & Imaging">Radiology & Imaging</SelectItem>
+                    <SelectItem value="Phlebotomy & Home Tests">Phlebotomy & Home Tests</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

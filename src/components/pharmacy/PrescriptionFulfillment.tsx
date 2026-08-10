@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import {
   Card,
@@ -25,7 +24,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Loader2, AlertTriangle, Pill } from 'lucide-react';
 import { useInstitutionContext } from '@/hooks/useInstitutionContext';
 
-// Type definition for prescriptions
 interface Prescription {
   id: string;
   patient_id: string;
@@ -38,9 +36,8 @@ interface Prescription {
   notes?: string;
   created_at?: string;
   updated_at?: string;
-  // Add custom fields that we'll manage separately
   fulfillment_status?: 'pending' | 'filled' | 'partially_filled' | 'cancelled';
-  patient_name?: string; // Join field
+  patient_name?: string;
 }
 
 export function PrescriptionFulfillment() {
@@ -55,7 +52,6 @@ export function PrescriptionFulfillment() {
       try {
         setLoading(true);
 
-        // First try to get cached data if offline
         if (!isOnline) {
           const cachedData = await getOfflineCache('pharmacy_prescriptions');
           if (cachedData) {
@@ -70,44 +66,37 @@ export function PrescriptionFulfillment() {
           }
         }
 
-        if (!institutionId) {
-          setPrescriptions([]);
-          return;
-        }
-
-        // The prescription's status is the authoritative dispensing state.
-        const { data: prescriptionsData, error } = await supabase
+        // Query active prescriptions (both assigned to this pharmacy and open unassigned ones)
+        let query = (supabase as any)
           .from('comprehensive_prescriptions')
           .select(`
             *,
             profiles:patient_id(first_name, last_name),
             provider:provider_id(first_name, last_name)
-          `)
-          .eq('pharmacy_id', institutionId);
+          `);
+
+        if (institutionId) {
+          query = query.or(`pharmacy_id.eq.${institutionId},pharmacy_id.is.null`);
+        }
+
+        const { data: prescriptionsData, error } = await query.order('prescribed_date', { ascending: false });
 
         if (error) throw error;
 
-        // Transform the data
-        const prescriptionsWithStatus = prescriptionsData.map((prescription: any) => {
-          return {
-            id: prescription.id,
-            patient_id: prescription.patient_id,
-            medication_name: prescription.medication_name,
-            dosage: prescription.dosage,
-            frequency: prescription.instructions, // Map instructions to frequency for display
-            prescribed_by: prescription.provider ? `Dr. ${prescription.provider.first_name} ${prescription.provider.last_name}` : 'Unknown Provider',
-            prescribed_date: prescription.prescribed_date,
-            notes: prescription.notes,
-            fulfillment_status: prescription.status as 'pending' | 'filled' | 'partially_filled' | 'cancelled',
-            patient_name: prescription.profiles ?
-              `${prescription.profiles.first_name} ${prescription.profiles.last_name}` :
-              'Unknown Patient'
-          };
-        });
+        const prescriptionsWithStatus = (prescriptionsData || []).map((prescription: any) => ({
+          id: prescription.id,
+          patient_id: prescription.patient_id,
+          medication_name: prescription.medication_name,
+          dosage: prescription.dosage,
+          frequency: prescription.instructions,
+          prescribed_by: prescription.provider ? `Dr. ${prescription.provider.first_name} ${prescription.provider.last_name}` : 'Unknown Provider',
+          prescribed_date: prescription.prescribed_date,
+          notes: prescription.notes,
+          fulfillment_status: prescription.status as 'pending' | 'filled' | 'partially_filled' | 'cancelled',
+          patient_name: prescription.profiles ? `${prescription.profiles.first_name} ${prescription.profiles.last_name}` : 'Unknown Patient'
+        }));
 
         setPrescriptions(prescriptionsWithStatus);
-
-        // Cache data for offline use
         await cacheForOffline('pharmacy_prescriptions', prescriptionsWithStatus);
 
       } catch (error) {
@@ -142,10 +131,7 @@ export function PrescriptionFulfillment() {
           id: safeCryptoUUID(),
           type: 'UPDATE_PRESCRIPTION_STATUS',
           table: 'comprehensive_prescriptions',
-          data: {
-            id: prescriptionId,
-            status: newStatus
-          }
+          data: { id: prescriptionId, status: newStatus }
         });
 
         toast({
@@ -155,12 +141,10 @@ export function PrescriptionFulfillment() {
         return;
       }
 
-      if (!institutionId) throw new Error('No pharmacy institution is associated with this account.');
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('comprehensive_prescriptions')
         .update({ status: newStatus })
-        .eq('id', prescriptionId)
-        .eq('pharmacy_id', institutionId);
+        .eq('id', prescriptionId);
       if (error) throw error;
 
       toast({
@@ -295,10 +279,6 @@ export function PrescriptionFulfillment() {
                   <SelectItem value="cancelled">Cancelled</SelectItem>
                 </SelectContent>
               </Select>
-
-              <Button variant="outline" onClick={() => console.log('View details', prescription.id)}>
-                View Details
-              </Button>
             </CardFooter>
           </Card>
         ))}

@@ -1,5 +1,5 @@
-
 import { useUserRoles } from '@/context/UserRolesContext';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -9,83 +9,82 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
 import { UserRole } from '@/types/user';
-import { ChevronDown, User, Stethoscope, ShieldCheck, Building2 } from 'lucide-react';
+import { ROLE_META } from '@/config/roleConfig';
+import { ChevronDown, User, Stethoscope, ShieldCheck, Building, Building2, FlaskConical, Pill, Heart, Award, Scan, UserCheck, Droplet, Microscope, Phone, Users, Crown, Scissors, Receipt, Package, AlertTriangle, Wrench, Truck, Headphones, Shield } from 'lucide-react';
+
+const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
+  User,
+  Stethoscope,
+  ShieldCheck,
+  Building,
+  Building2,
+  FlaskConical,
+  Pill,
+  Heart,
+  Award,
+  Scan,
+  UserCheck,
+  Droplet,
+  Microscope,
+  Phone,
+  Users,
+  Crown,
+  Scissors,
+  Receipt,
+  Package,
+  AlertTriangle,
+  Wrench,
+  Truck,
+  Shield,
+  Headphones,
+};
 
 export const RoleSwitcher = () => {
-  const { userRole, adminLevel, isAdmin, isHealthPersonnel, currentRole, availableRoles, switchRole } = useUserRoles();
+  const { currentRole, availableRoles, switchRole } = useUserRoles();
+  const navigate = useNavigate();
 
-  if (!userRole) return null;
+  if (!availableRoles || availableRoles.length <= 1) return null;
 
-  const getRoleIcon = (role: UserRole | 'admin') => {
-    switch (role) {
-      case 'patient':
-        return <User className="h-4 w-4" />;
-      case 'health_personnel':
-        return <Stethoscope className="h-4 w-4" />;
-      case 'admin':
-        return <ShieldCheck className="h-4 w-4" />;
-      case 'institution_admin':
-        return <Building2 className="h-4 w-4" />;
-      default:
-        return <User className="h-4 w-4" />;
-    }
+  const getRoleIcon = (role: UserRole) => {
+    const meta = ROLE_META[role];
+    const IconComponent = meta ? ICON_MAP[meta.icon] || User : User;
+    return <IconComponent className="h-4 w-4" />;
   };
 
-  const getRoleLabel = (role: UserRole | 'admin') => {
-    switch (role) {
-      case 'patient':
-        return 'Patient View';
-      case 'health_personnel':
-        return 'Provider View';
-      case 'admin':
-        return 'Admin View';
-      case 'institution_admin':
-        return 'Institution View';
-      default:
-        return 'Patient View';
-    }
+  const getRoleLabel = (role: UserRole) => {
+    const meta = ROLE_META[role];
+    return meta ? `${meta.label} View` : `${role} View`;
   };
 
-  const availableViews: { role: UserRole | 'admin'; label: string }[] = [
-    { role: 'patient', label: 'Patient View' },
-  ];
+  const handleRoleSwitch = (role: UserRole) => {
+    switchRole(role);
+    const landing = ROLE_META[role]?.landingPage || '/dashboard';
+    navigate(landing);
+  };
 
-  if (isHealthPersonnel) {
-    availableViews.push({ role: 'health_personnel', label: 'Provider View' });
-  }
-
-  if (isAdmin) {
-    availableViews.push({ role: 'admin', label: 'Admin View' });
-  }
-
-  if (userRole === 'institution_admin') {
-    availableViews.push({ role: 'institution_admin', label: 'Institution View' });
-  }
-
-  if (availableViews.length <= 1) return null;
-
-  const currentViewRole = isAdmin && currentRole !== 'health_personnel' && currentRole !== 'institution_admin' ? 'admin' : currentRole;
-  const currentViewLabel = getRoleLabel(currentViewRole || 'patient');
+  const activeRole = currentRole || availableRoles[0];
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-2">
-          {getRoleIcon(currentViewRole || 'patient')}
-          <Badge variant="secondary">{currentViewLabel}</Badge>
-          <ChevronDown className="h-4 w-4" />
+        <Button variant="outline" size="sm" className="gap-2 text-xs font-medium">
+          {getRoleIcon(activeRole)}
+          <Badge variant="secondary" className="text-[10px] capitalize">
+            {getRoleLabel(activeRole)}
+          </Badge>
+          <ChevronDown className="h-3 w-3 opacity-60" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        {availableViews.map((view) => (
+      <DropdownMenuContent align="end" className="w-52 max-h-80 overflow-y-auto">
+        {availableRoles.map((role) => (
           <DropdownMenuItem
-            key={view.role}
-            onClick={() => switchRole(view.role as UserRole)}
-            className={currentViewRole === view.role ? 'bg-accent' : ''}
+            key={role}
+            onClick={() => handleRoleSwitch(role)}
+            className={`cursor-pointer ${activeRole === role ? 'bg-accent font-semibold' : ''}`}
           >
-            <div className="flex items-center gap-2">
-              {getRoleIcon(view.role)}
-              {view.label}
+            <div className="flex items-center gap-2 text-xs">
+              {getRoleIcon(role)}
+              <span>{ROLE_META[role]?.label || role}</span>
             </div>
           </DropdownMenuItem>
         ))}

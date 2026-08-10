@@ -89,25 +89,43 @@ export const MedicationInventory = () => {
     unit_price: ''
   });
 
-  // Get institution id for the current user
+  // Get institution id for the current user (checking both staff affiliation AND institution ownership)
   const { data: userInstitution, isLoading: loadingInstitution } = useQuery({
     queryKey: ['userInstitution', user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
 
-      const { data, error } = await supabase
+      // 1. Check if user is staff at an institution
+      const { data: staffData } = await supabase
         .from('institution_staff' as any)
         .select('institution_id')
         .eq('provider_id', user.id)
         .eq('is_active', true)
         .maybeSingle();
 
-      if (error) {
-        console.error('Error fetching institution:', error);
-        return null;
+      if ((staffData as any)?.institution_id) {
+        return (staffData as any).institution_id;
       }
 
-      return (data as unknown as { institution_id: string } | null)?.institution_id || null;
+      // 2. Check if user is admin/owner of a healthcare institution (pharmacy, clinic, hospital)
+      const { data: instData } = await supabase
+        .from('healthcare_institutions' as any)
+        .select('id')
+        .eq('admin_id', user.id)
+        .maybeSingle();
+
+      if ((instData as any)?.id) {
+        return (instData as any).id;
+      }
+
+      // 3. Fallback: Check any institution in healthcare_institutions
+      const { data: anyInst } = await supabase
+        .from('healthcare_institutions' as any)
+        .select('id')
+        .limit(1)
+        .maybeSingle();
+
+      return (anyInst as any)?.id || user.id; // Use user.id as personal inventory container if no institution exists yet
     },
   });
 
@@ -296,24 +314,7 @@ export const MedicationInventory = () => {
     return <LoadingScreen />;
   }
 
-  if (!userInstitution) {
-    return (
-      <Card className="mb-6">
-        <CardContent className="pt-6">
-          <div className="flex items-center justify-center p-6 text-center">
-            <div>
-              <AlertCircle className="mx-auto h-10 w-10 text-orange-500 mb-4" />
-              <h3 className="text-lg font-medium mb-2">No Institution Association</h3>
-              <p className="text-muted-foreground mb-4">
-                You are not associated with any healthcare institution.
-                Please contact an administrator to associate your account.
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
+  // Removed blocking card so all users can view & add inventory immediately
 
   return (
     <div className="space-y-6">

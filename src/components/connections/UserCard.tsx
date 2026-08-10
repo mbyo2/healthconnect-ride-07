@@ -218,18 +218,30 @@ export function UserCard({ user, onConnect, isConnecting }: UserCardProps) {
             <User className="h-3 w-3 mr-1" />
             Connect
           </Button>
-          <Button size="sm" variant="outline">
+          <Button 
+            size="sm" 
+            variant="outline"
+            onClick={() => window.location.href = `/chat?receiver=${user.id}`}
+          >
             <MessageCircle className="h-3 w-3 mr-1" />
             Chat
           </Button>
           {user.role === 'health_personnel' && (
-            <Button size="sm" variant="outline">
+            <Button 
+              size="sm" 
+              variant="outline"
+              onClick={() => window.location.href = `/provider/${user.id}`}
+            >
               <Calendar className="h-3 w-3 mr-1" />
               Book
             </Button>
           )}
           {user.products && user.products.length > 0 && (
-            <Button size="sm" variant="outline">
+            <Button 
+              size="sm" 
+              variant="outline"
+              onClick={() => window.location.href = '/user-marketplace'}
+            >
               <ShoppingCart className="h-3 w-3 mr-1" />
               Shop
             </Button>

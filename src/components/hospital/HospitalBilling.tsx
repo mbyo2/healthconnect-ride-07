@@ -27,6 +27,63 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
   const [selectedVerification, setSelectedVerification] = useState<any>(null);
+  const [pendingPatientCharges, setPendingPatientCharges] = useState<any[]>([]);
+  const [isLoadingCharges, setIsLoadingCharges] = useState(false);
+
+  // Auto-fetch unbilled patient charges when a patient is selected
+  const handlePatientSelect = async (patientId: string) => {
+    setSelectedPatientId(patientId);
+    if (!patientId) return;
+
+    setIsLoadingCharges(true);
+    try {
+      // Query unbilled appointments, lab tests, prescriptions
+      const [apptsRes, labsRes, rxsRes] = await Promise.all([
+        supabase.from('appointments').select('id, type, date, time').eq('patient_id', patientId).eq('status', 'completed'),
+        supabase.from('lab_tests').select('id, test_type, price, total_amount').eq('patient_id', patientId).eq('payment_status', 'pending'),
+        supabase.from('comprehensive_prescriptions').select('id, medication_name, quantity').eq('patient_id', patientId).eq('status', 'active'),
+      ]);
+
+      const charges: any[] = [];
+      let calculatedTotal = 0;
+
+      // Add completed appointments (default K150 fee)
+      (apptsRes.data || []).forEach((a: any) => {
+        const fee = 150;
+        calculatedTotal += fee;
+        charges.push({ description: `Consultation (${a.type?.replace('_', ' ') || 'General'}) - ${a.date}`, amount: fee });
+      });
+
+      // Add pending lab tests
+      (labsRes.data || []).forEach((l: any) => {
+        const fee = l.price || l.total_amount || 200;
+        calculatedTotal += fee;
+        charges.push({ description: `Lab Test: ${l.test_type}`, amount: fee });
+      });
+
+      // Add prescriptions (default K50 fee per item)
+      (rxsRes.data || []).forEach((r: any) => {
+        const fee = 50 * (r.quantity || 1);
+        calculatedTotal += fee;
+        charges.push({ description: `Rx: ${r.medication_name}`, amount: fee });
+      });
+
+      if (charges.length > 0) {
+        setPendingPatientCharges(charges);
+        setAmount(calculatedTotal.toString());
+        setDescription(charges.map(c => c.description).join(', '));
+        toast.info(`Auto-populated ${charges.length} pending charges from system`);
+      } else {
+        setPendingPatientCharges([]);
+        setAmount('150');
+        setDescription('General Hospital Services');
+      }
+    } catch (e) {
+      console.error('Error fetching patient charges:', e);
+    } finally {
+      setIsLoadingCharges(false);
+    }
+  };
 
   const totalRevenue = invoices?.reduce((s: number, i: any) => s + (i.total_amount || 0), 0) || 0;
   const paidAmount = invoices?.filter((i: any) => i.payment_status === 'paid')
@@ -152,7 +209,7 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
           <div className="space-y-4">
             <div className="space-y-2">
               <Label>Patient</Label>
-              <Select value={selectedPatientId} onValueChange={setSelectedPatientId}>
+              <Select value={selectedPatientId} onValueChange={handlePatientSelect}>
                 <SelectTrigger><SelectValue placeholder="Select patient" /></SelectTrigger>
                 <SelectContent>
                   {admissions?.map((a: any) => (
@@ -163,6 +220,22 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
                 </SelectContent>
               </Select>
             </div>
+            {isLoadingCharges && (
+              <div className="flex items-center gap-2 text-xs text-muted-foreground p-2 bg-muted/50 rounded">
+                <Loader2 className="h-3.5 w-3.5 animate-spin" /> Fetching patient system charges...
+              </div>
+            )}
+            {pendingPatientCharges.length > 0 && (
+              <div className="p-2.5 bg-primary/5 border border-primary/20 rounded-lg text-xs space-y-1">
+                <p className="font-semibold text-primary">System Charges Auto-Populated:</p>
+                {pendingPatientCharges.map((c, i) => (
+                  <div key={i} className="flex justify-between text-muted-foreground">
+                    <span>• {c.description}</span>
+                    <span className="font-mono">{formatPrice(c.amount)}</span>
+                  </div>
+                ))}
+              </div>
+            )}
             <div className="space-y-2">
               <Label>Amount ({currency === 'USD' ? '$' : 'K'})</Label>
               <Input type="number" value={amount} onChange={e => setAmount(e.target.value)} placeholder="0.00" />

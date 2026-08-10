@@ -45,6 +45,56 @@ export const BillingStaffWorkflow = () => {
     insurance_provider: '',
   });
 
+  const [loadingCharges, setLoadingCharges] = useState(false);
+
+  // Auto-fill charges from system for selected patient name
+  const autoFillPatientSystemCharges = async (patientName: string) => {
+    if (!patientName.trim()) return;
+    setLoadingCharges(true);
+    try {
+      // Find patient profile
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name')
+        .or(`first_name.ilike.%${patientName}%,last_name.ilike.%${patientName}%`)
+        .limit(1);
+
+      if (profiles && profiles.length > 0) {
+        const patientId = profiles[0].id;
+        const [apptsRes, labsRes, rxsRes] = await Promise.all([
+          supabase.from('appointments').select('id, type, date').eq('patient_id', patientId).eq('status', 'completed'),
+          supabase.from('lab_tests').select('id, test_type, price, total_amount').eq('patient_id', patientId).eq('payment_status', 'pending'),
+          supabase.from('comprehensive_prescriptions').select('id, medication_name, quantity').eq('patient_id', patientId).eq('status', 'active'),
+        ]);
+
+        const fetchedItems: Array<{ description: string; quantity: number; unit_price: number; total: number }> = [];
+
+        (apptsRes.data || []).forEach((a: any) => {
+          fetchedItems.push({ description: `Consultation (${a.type?.replace('_', ' ') || 'General'})`, quantity: 1, unit_price: 150, total: 150 });
+        });
+        (labsRes.data || []).forEach((l: any) => {
+          const price = l.price || l.total_amount || 200;
+          fetchedItems.push({ description: `Lab Test: ${l.test_type}`, quantity: 1, unit_price: price, total: price });
+        });
+        (rxsRes.data || []).forEach((r: any) => {
+          const qty = r.quantity || 1;
+          fetchedItems.push({ description: `Rx: ${r.medication_name}`, quantity: qty, unit_price: 50, total: 50 * qty });
+        });
+
+        if (fetchedItems.length > 0) {
+          setInvoiceForm(prev => ({ ...prev, items: fetchedItems }));
+          toast.success(`Auto-filled ${fetchedItems.length} line items from patient system charges`);
+        } else {
+          toast.info('No pending system charges found for this patient');
+        }
+      }
+    } catch (e) {
+      console.error('Error auto-filling patient charges:', e);
+    } finally {
+      setLoadingCharges(false);
+    }
+  };
+
   const [paymentForm, setPaymentForm] = useState({
     amount: 0,
     payment_mode: 'cash' as 'cash' | 'card' | 'mobile_money' | 'insurance' | 'bank_transfer' | 'cheque',
@@ -168,8 +218,23 @@ export const BillingStaffWorkflow = () => {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label>Patient Name *</Label>
-                  <Input value={invoiceForm.patient_name} onChange={e => setInvoiceForm(prev => ({ ...prev, patient_name: e.target.value }))} />
+                  <div className="flex items-center justify-between">
+                    <Label>Patient Name *</Label>
+                    {invoiceForm.patient_name.trim().length >= 2 && (
+                      <Button
+                        type="button"
+                        variant="link"
+                        size="sm"
+                        className="h-auto p-0 text-xs text-primary"
+                        onClick={() => autoFillPatientSystemCharges(invoiceForm.patient_name)}
+                        disabled={loadingCharges}
+                      >
+                        {loadingCharges ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : null}
+                        Auto-fill charges from system
+                      </Button>
+                    )}
+                  </div>
+                  <Input value={invoiceForm.patient_name} onChange={e => setInvoiceForm(prev => ({ ...prev, patient_name: e.target.value }))} placeholder="Enter or search patient name..." />
                 </div>
                 <div>
                   <Label>Insurance Provider</Label>

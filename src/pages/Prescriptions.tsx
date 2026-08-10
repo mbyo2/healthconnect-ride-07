@@ -268,12 +268,58 @@ const Prescriptions = () => {
                   {new Date(p.prescribed_date).toLocaleDateString()}
                 </span>
                 <div className="flex gap-2">
-                  <Button size="sm" variant="outline">
+                  <Button 
+                    size="sm" 
+                    variant="outline"
+                    onClick={() => {
+                      const printWin = window.open('', '_blank');
+                      if (printWin) {
+                        printWin.document.write(`
+                          <html>
+                            <head><title>Prescription - ${p.medication_name}</title></head>
+                            <body style="font-family: Arial, sans-serif; padding: 20px;">
+                              <h2>Doc' O Clock Official Prescription</h2>
+                              <hr />
+                              <p><strong>Medication:</strong> ${p.medication_name}</p>
+                              <p><strong>Dosage:</strong> ${p.dosage}</p>
+                              <p><strong>Duration:</strong> ${p.duration_days ? `${p.duration_days} days` : 'As directed'}</p>
+                              <p><strong>Quantity:</strong> ${p.quantity || 1}</p>
+                              <p><strong>Instructions:</strong> ${p.instructions || 'As directed'}</p>
+                              <p><strong>Date:</strong> ${new Date(p.prescribed_date).toLocaleDateString()}</p>
+                              <hr />
+                              <p style="font-size: 12px; color: #666;">Generated via Doc' O Clock Platform</p>
+                              <script>window.print();</script>
+                            </body>
+                          </html>
+                        `);
+                        printWin.document.close();
+                      }
+                    }}
+                  >
                     <Download className="h-3 w-3 mr-1" />
                     Download
                   </Button>
                   {!isProvider && p.status === 'active' && (p.refills_remaining || 0) > 0 && (
-                    <Button size="sm">Request Refill</Button>
+                    <Button 
+                      size="sm"
+                      onClick={async () => {
+                        try {
+                          toast.success('Refill request sent to your provider');
+                          if (p.provider_id) {
+                            await (supabase as any).from('notifications').insert({
+                              user_id: p.provider_id,
+                              title: 'Refill Request',
+                              message: `Patient requested refill for ${p.medication_name}`,
+                              type: 'prescription'
+                            });
+                          }
+                        } catch (e) {
+                          toast.error('Failed to request refill');
+                        }
+                      }}
+                    >
+                      Request Refill
+                    </Button>
                   )}
                 </div>
               </div>

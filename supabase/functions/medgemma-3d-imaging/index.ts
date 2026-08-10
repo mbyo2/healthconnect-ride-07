@@ -1,4 +1,4 @@
-import { MEDGEMMA_ENDPOINT, MEDGEMMA_MODEL_LABEL } from '../_shared/medgemma.ts';
+import { MEDGEMMA_MODEL, MEDGEMMA_MODEL_LABEL } from '../_shared/medgemma.ts';
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
@@ -99,31 +99,8 @@ ${contrastUsed ? 'Contrast enhancement is present - assess enhancement patterns.
 
 ${userRole === 'health_personnel' ? 'Provide detailed radiological interpretation with differential diagnosis.' : 'Explain findings in clear, understandable terms.'}`;
 
-    // Build user content with all slices
-    const userContent: any[] = [];
-    
-    // Add all slices with labels
-    slices.forEach((slice, index) => {
-      userContent.push({
-        type: 'image',
-        image: slice
-      });
-      userContent.push({
-        type: 'text',
-        text: `[Slice ${index + 1}/${slices.length}]`
-      });
-    });
-
-    // Add clinical question
-    userContent.push({
-      type: 'text',
-      text: `\nClinical Question: ${clinicalQuestion}\n\nProvide a comprehensive analysis including:
-1. Technical Quality Assessment
-2. Systematic Anatomical Review
-3. Abnormality Detection and Characterization
-4. Volumetric/3D Relationships
-5. Impression and Recommendations`
-    });
+    // Build text description of slices for text-based analysis
+    const sliceDescriptions = slices.map((_, i) => `Slice ${i + 1}/${slices.length}`).join(', ');
 
     const messages = [
       {
@@ -132,26 +109,43 @@ ${userRole === 'health_personnel' ? 'Provide detailed radiological interpretatio
       },
       {
         role: 'user',
-        content: userContent
+        content: `[${imagingType.toUpperCase()} scan of ${bodyPart} - ${slices.length} ${sliceOrientation || 'cross-sectional'} slices attached: ${sliceDescriptions}]
+
+Clinical Question: ${clinicalQuestion}
+
+Provide a comprehensive analysis including:
+1. Technical Quality Assessment
+2. Systematic Anatomical Review
+3. Abnormality Detection and Characterization
+4. Volumetric/3D Relationships
+5. Impression and Recommendations`
       }
     ];
 
-    const response = await fetch(MEDGEMMA_ENDPOINT, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${HF_TOKEN}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        inputs: { messages },
-        parameters: {
-          max_new_tokens: 2500,
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 55000);
+
+    let response: Response;
+    try {
+      response = await fetch('https://api-inference.huggingface.co/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${HF_TOKEN}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: MEDGEMMA_MODEL,
+          messages,
+          max_tokens: 2500,
           temperature: 0.3,
           top_p: 0.95,
-          return_full_text: false
-        }
-      }),
-    });
+          stream: false,
+        }),
+        signal: controller.signal,
+      });
+    } finally {
+      clearTimeout(timeoutId);
+    }
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -168,13 +162,7 @@ ${userRole === 'health_personnel' ? 'Provide detailed radiological interpretatio
     }
 
     const data = await response.json();
-    
-    let analysis: string;
-    if (Array.isArray(data)) {
-      analysis = data[0]?.generated_text || 'No analysis generated';
-    } else {
-      analysis = data.generated_text || data[0]?.generated_text || 'No analysis generated';
-    }
+    const analysis: string = data?.choices?.[0]?.message?.content || 'No analysis generated';
 
     console.log('3D imaging analysis completed');
 

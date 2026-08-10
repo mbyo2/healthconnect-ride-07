@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Droplets, AlertTriangle } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Droplets, AlertTriangle, Plus, Loader2 } from 'lucide-react';
 import { ListSkeleton } from '@/components/ui/list-skeleton';
 import { EmptyState } from '@/components/ui/empty-state';
 import { useHospitalModule } from '@/hooks/useHospitalModule';
@@ -14,6 +17,11 @@ import { toast } from 'sonner';
 const BLOOD_TYPES = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
 
 export const BloodBank = ({ hospital }: { hospital: any }) => {
+  const [showAddStock, setShowAddStock] = useState(false);
+  const [showNewRequest, setShowNewRequest] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [stockForm, setStockForm] = useState({ blood_type: 'O+', component_type: 'whole_blood', units_available: 1, expiry_date: '' });
+  const [reqForm, setReqForm] = useState({ patient_name: '', blood_type: 'O+', component_type: 'prbc', units_required: 1, urgency: 'routine' });
   const { data: inventory, loading, error, refresh } = useHospitalModule<any>(
     'blood_bank_inventory', 'hospital_id', hospital?.id, { orderBy: 'blood_type', ascending: true }
   );
@@ -44,6 +52,48 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
   const tracked = byType.filter(t => t.hasRows);
   const criticalCount = tracked.filter(t => t.status === 'critical').length;
 
+  const handleAddStock = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      const { error: err } = await (supabase.from('blood_bank_inventory' as any) as any).insert({
+        hospital_id: hospital.id,
+        blood_type: stockForm.blood_type,
+        component_type: stockForm.component_type,
+        units_available: Number(stockForm.units_available),
+        expiry_date: stockForm.expiry_date || null,
+      });
+      if (err) throw err;
+      toast.success('Blood stock added');
+      setShowAddStock(false);
+      refresh();
+    } catch (e: any) { toast.error(e?.message || 'Failed to add stock'); }
+    finally { setIsSubmitting(false); }
+  };
+
+  const handleNewRequest = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      const reqNum = `BBR-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+      const { error: err } = await (supabase.from('blood_bank_requests' as any) as any).insert({
+        hospital_id: hospital.id,
+        request_number: reqNum,
+        blood_type: reqForm.blood_type,
+        component_type: reqForm.component_type,
+        units_required: Number(reqForm.units_required),
+        urgency: reqForm.urgency,
+        status: 'pending',
+        request_date: new Date().toISOString(),
+      });
+      if (err) throw err;
+      toast.success(`Blood request ${reqNum} created`);
+      setShowNewRequest(false);
+      refreshRequests();
+    } catch (e: any) { toast.error(e?.message || 'Failed to create request'); }
+    finally { setIsSubmitting(false); }
+  };
+
   const updateRequest = async (row: any, status: string) => {
     try {
       const { error: err } = await (supabase.from('blood_bank_requests' as any) as any)
@@ -59,12 +109,20 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row gap-3 justify-between">
+      <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center">
         <div>
           <h3 className="text-lg font-semibold text-foreground">Blood Bank Management</h3>
           <p className="text-sm text-muted-foreground">Live stock levels and transfusion requests</p>
         </div>
-        <Button size="sm" variant="outline" onClick={() => { refresh(); refreshRequests(); }}>Refresh</Button>
+        <div className="flex gap-2">
+          <Button size="sm" variant="outline" onClick={() => { refresh(); refreshRequests(); }}>Refresh</Button>
+          <Button size="sm" variant="outline" onClick={() => setShowAddStock(true)} className="gap-1">
+            <Plus className="h-4 w-4" /> Add Stock
+          </Button>
+          <Button size="sm" onClick={() => setShowNewRequest(true)} className="gap-1">
+            <Plus className="h-4 w-4" /> New Request
+          </Button>
+        </div>
       </div>
 
       {criticalCount > 0 && (
@@ -153,6 +211,75 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
           )}
         </TabsContent>
       </Tabs>
+
+      {/* Add Blood Stock Dialog */}
+      <Dialog open={showAddStock} onOpenChange={setShowAddStock}>
+        <DialogContent className="sm:max-w-[380px]">
+          <DialogHeader><DialogTitle>Add Blood Stock</DialogTitle></DialogHeader>
+          <form onSubmit={handleAddStock} className="space-y-3 py-2">
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <Label>Blood Type</Label>
+                <select className="w-full h-10 border rounded-md px-3 bg-background text-sm" value={stockForm.blood_type} onChange={e => setStockForm({...stockForm, blood_type: e.target.value})}>
+                  {['A+','A-','B+','B-','AB+','AB-','O+','O-'].map(t => <option key={t}>{t}</option>)}
+                </select>
+              </div>
+              <div>
+                <Label>Component</Label>
+                <select className="w-full h-10 border rounded-md px-3 bg-background text-sm" value={stockForm.component_type} onChange={e => setStockForm({...stockForm, component_type: e.target.value})}>
+                  <option value="whole_blood">Whole Blood</option>
+                  <option value="prbc">PRBC</option>
+                  <option value="ffp">FFP</option>
+                  <option value="platelets">Platelets</option>
+                </select>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div><Label>Units</Label><Input type="number" value={stockForm.units_available} onChange={e => setStockForm({...stockForm, units_available: Number(e.target.value)})} /></div>
+              <div><Label>Expiry Date</Label><Input type="date" value={stockForm.expiry_date} onChange={e => setStockForm({...stockForm, expiry_date: e.target.value})} /></div>
+            </div>
+            <DialogFooter><Button type="button" variant="outline" onClick={() => setShowAddStock(false)}>Cancel</Button><Button type="submit" disabled={isSubmitting}>{isSubmitting ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}Add Stock</Button></DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* New Blood Request Dialog */}
+      <Dialog open={showNewRequest} onOpenChange={setShowNewRequest}>
+        <DialogContent className="sm:max-w-[380px]">
+          <DialogHeader><DialogTitle>New Blood Transfusion Request</DialogTitle></DialogHeader>
+          <form onSubmit={handleNewRequest} className="space-y-3 py-2">
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <Label>Blood Type</Label>
+                <select className="w-full h-10 border rounded-md px-3 bg-background text-sm" value={reqForm.blood_type} onChange={e => setReqForm({...reqForm, blood_type: e.target.value})}>
+                  {['A+','A-','B+','B-','AB+','AB-','O+','O-'].map(t => <option key={t}>{t}</option>)}
+                </select>
+              </div>
+              <div>
+                <Label>Component</Label>
+                <select className="w-full h-10 border rounded-md px-3 bg-background text-sm" value={reqForm.component_type} onChange={e => setReqForm({...reqForm, component_type: e.target.value})}>
+                  <option value="prbc">PRBC</option>
+                  <option value="ffp">FFP</option>
+                  <option value="platelets">Platelets</option>
+                  <option value="whole_blood">Whole Blood</option>
+                </select>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div><Label>Units Required</Label><Input type="number" value={reqForm.units_required} onChange={e => setReqForm({...reqForm, units_required: Number(e.target.value)})} /></div>
+              <div>
+                <Label>Urgency</Label>
+                <select className="w-full h-10 border rounded-md px-3 bg-background text-sm" value={reqForm.urgency} onChange={e => setReqForm({...reqForm, urgency: e.target.value})}>
+                  <option value="routine">Routine</option>
+                  <option value="urgent">Urgent</option>
+                  <option value="emergency">Emergency</option>
+                </select>
+              </div>
+            </div>
+            <DialogFooter><Button type="button" variant="outline" onClick={() => setShowNewRequest(false)}>Cancel</Button><Button type="submit" disabled={isSubmitting}>{isSubmitting ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}Submit Request</Button></DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

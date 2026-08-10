@@ -1,7 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 import { MEDGEMMA_MODEL, MEDGEMMA_MODEL_LABEL } from '../_shared/medgemma.ts';
-import { HfInference } from "https://esm.sh/@huggingface/inference@2.3.2";
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
 
 const stripCtl = (s: string) => s.replace(/[\u0000-\u001F\u007F]/g, ' ').slice(0, 2000);
@@ -99,10 +98,7 @@ serve(async (req) => {
       throw new Error('HF_TOKEN not configured');
     }
 
-    const hf = new HfInference(HF_TOKEN);
-    
-    let prompt = '';
-    let systemContext = `You are Doc 0 Clock, a medical AI assistant available 24/7. Provide accurate, evidence-based medical insights. 
+    const systemContext = `You are Doc 0 Clock, a medical AI assistant available 24/7. Provide accurate, evidence-based medical insights. 
 Always include:
 1. Clear analysis
 2. Specific recommendations
@@ -111,9 +107,11 @@ Always include:
 
 IMPORTANT: State that this is for informational purposes and not a replacement for professional medical advice.`;
 
+    let userPrompt = '';
+
     switch (analysisType) {
       case 'symptom_analysis':
-        prompt = `Analyze these symptoms: ${data.symptoms}
+        userPrompt = `Analyze these symptoms: ${data.symptoms}
 Patient context: Age ${data.age || 'unknown'}, Gender: ${data.gender || 'unknown'}
 Urgency level indicated: ${data.urgency}
 
@@ -126,7 +124,7 @@ Provide:
         break;
 
       case 'risk_assessment':
-        prompt = `Assess health risks based on:
+        userPrompt = `Assess health risks based on:
 - Vitals: ${JSON.stringify(data.vitals || {})}
 - Age: ${data.age}
 - Gender: ${data.gender}
@@ -142,7 +140,7 @@ Provide cardiovascular and diabetes risk assessment with:
         break;
 
       case 'medication_interaction':
-        prompt = `Check for interactions and optimization opportunities:
+        userPrompt = `Check for interactions and optimization opportunities:
 Current medications: ${JSON.stringify(data.medications)}
 New medication being considered: ${data.newMedication || 'none'}
 
@@ -154,7 +152,7 @@ Provide:
         break;
 
       case 'trend_analysis':
-        prompt = `Analyze health trends from data:
+        userPrompt = `Analyze health trends from data:
 ${JSON.stringify(data.healthMetrics)}
 
 Provide:
@@ -165,7 +163,7 @@ Provide:
         break;
 
       case 'preventive_care':
-        prompt = `Recommend preventive care for:
+        userPrompt = `Recommend preventive care for:
 - Age: ${data.age}
 - Gender: ${data.gender}
 - Last checkup: ${data.lastCheckup || 'unknown'}
@@ -182,27 +180,51 @@ Provide:
         throw new Error('Invalid analysis type');
     }
 
-    console.log('Calling AI health analysis...');
+    console.log('Calling HuggingFace chat completions API for health analysis...');
 
-    // Call AI model via Hugging Face
-    const response = await hf.textGeneration({
-      model: MEDGEMMA_MODEL,
-      inputs: `${systemContext}\n\n${prompt}`,
-      parameters: {
-        max_new_tokens: 1000,
-        temperature: 0.3,
-        top_p: 0.9,
-        return_full_text: false,
-      },
-    });
+    // Use HuggingFace OpenAI-compatible chat completions endpoint
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 55000);
 
-    const analysis = response.generated_text;
+    let response: Response;
+    try {
+      response = await fetch('https://api-inference.huggingface.co/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${HF_TOKEN}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: MEDGEMMA_MODEL,
+          messages: [
+            { role: 'system', content: systemContext },
+            { role: 'user', content: userPrompt }
+          ],
+          max_tokens: 1000,
+          temperature: 0.3,
+          top_p: 0.9,
+          stream: false,
+        }),
+        signal: controller.signal,
+      });
+    } finally {
+      clearTimeout(timeoutId);
+    }
+
+    if (!response.ok) {
+      const errText = await response.text();
+      console.error('HuggingFace API error:', response.status, errText);
+      throw new Error(`HuggingFace API error: ${response.status}`);
+    }
+
+    const responseData = await response.json();
+    const analysis = responseData?.choices?.[0]?.message?.content || 'No analysis generated.';
 
     // Parse and structure the response
     const structuredResponse = {
       analysis,
       timestamp: new Date().toISOString(),
-      model: 'doc-oclock-ai',
+      model: MEDGEMMA_MODEL_LABEL,
       analysisType,
       confidence: 0.85,
       disclaimer: 'This analysis is for informational purposes only and does not constitute medical advice. Always consult with a qualified healthcare professional for medical decisions.'
@@ -218,13 +240,12 @@ Provide:
       }
     );
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error in AI analysis:', error);
     
     return new Response(
       JSON.stringify({ 
         error: 'An error occurred processing your request',
-        
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

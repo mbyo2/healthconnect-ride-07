@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Clock, CheckCircle2, FileText, DollarSign } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Clock, CheckCircle2, FileText, DollarSign, Plus, Loader2 } from 'lucide-react';
 import { ListSkeleton } from '@/components/ui/list-skeleton';
 import { EmptyState } from '@/components/ui/empty-state';
 import { useHospitalModule } from '@/hooks/useHospitalModule';
@@ -11,6 +14,18 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 export const InsuranceTPA = ({ hospital }: { hospital: any }) => {
+  const [showNewClaim, setShowNewClaim] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [claimForm, setClaimForm] = useState({
+    patient_name: '',
+    insurance_provider: '',
+    policy_number: '',
+    claim_amount: '',
+    pre_auth_number: '',
+    diagnosis: '',
+    admission_date: '',
+    discharge_date: '',
+  });
   const { data: claims, loading, error, refresh } = useHospitalModule<any>(
     'insurance_claims', 'institution_id', hospital?.id, { orderBy: 'created_at', ascending: false }
   );
@@ -21,6 +36,39 @@ export const InsuranceTPA = ({ hospital }: { hospital: any }) => {
   const receivable = claims
     .filter(c => !['paid'].includes(c.status))
     .reduce((s, c) => s + Number(c.claim_amount || 0), 0);
+
+  const handleNewClaim = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!claimForm.patient_name || !claimForm.insurance_provider || !claimForm.claim_amount) {
+      toast.error('Please fill required fields');
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      const { error: err } = await (supabase.from('insurance_claims' as any) as any).insert({
+        institution_id: hospital.id,
+        patient_name: claimForm.patient_name,
+        insurance_provider: claimForm.insurance_provider,
+        policy_number: claimForm.policy_number,
+        claim_amount: Number(claimForm.claim_amount),
+        pre_auth_number: claimForm.pre_auth_number || null,
+        diagnosis_code: claimForm.diagnosis,
+        admission_date: claimForm.admission_date || null,
+        discharge_date: claimForm.discharge_date || null,
+        status: 'draft',
+        created_at: new Date().toISOString(),
+      });
+      if (err) throw err;
+      toast.success('Insurance claim created as draft');
+      setShowNewClaim(false);
+      setClaimForm({ patient_name: '', insurance_provider: '', policy_number: '', claim_amount: '', pre_auth_number: '', diagnosis: '', admission_date: '', discharge_date: '' });
+      refresh();
+    } catch (e: any) {
+      toast.error(e?.message || 'Failed to create claim');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const setStatus = async (row: any, status: string) => {
     try {
@@ -72,12 +120,17 @@ export const InsuranceTPA = ({ hospital }: { hospital: any }) => {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row gap-3 justify-between">
+      <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center">
         <div>
           <h3 className="text-lg font-semibold text-foreground">Insurance & TPA Management</h3>
           <p className="text-sm text-muted-foreground">Claims processing and settlement tracking</p>
         </div>
-        <Button size="sm" variant="outline" onClick={refresh}>Refresh</Button>
+        <div className="flex gap-2">
+          <Button size="sm" variant="outline" onClick={refresh}>Refresh</Button>
+          <Button size="sm" onClick={() => setShowNewClaim(true)} className="gap-1">
+            <Plus className="h-4 w-4" /> New Claim
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -127,6 +180,39 @@ export const InsuranceTPA = ({ hospital }: { hospital: any }) => {
           </TabsContent>
         </Tabs>
       )}
+
+      {/* New Insurance Claim Dialog */}
+      <Dialog open={showNewClaim} onOpenChange={setShowNewClaim}>
+        <DialogContent className="sm:max-w-[480px]">
+          <DialogHeader><DialogTitle>New Insurance Claim</DialogTitle></DialogHeader>
+          <form onSubmit={handleNewClaim} className="space-y-3 py-2">
+            <div className="grid grid-cols-2 gap-2">
+              <div><Label>Patient Name *</Label><Input value={claimForm.patient_name} onChange={e => setClaimForm({...claimForm, patient_name: e.target.value})} placeholder="Full name" required /></div>
+              <div><Label>Insurance Provider *</Label><Input value={claimForm.insurance_provider} onChange={e => setClaimForm({...claimForm, insurance_provider: e.target.value})} placeholder="e.g. NHIMA, Zambia Life" required /></div>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div><Label>Policy Number</Label><Input value={claimForm.policy_number} onChange={e => setClaimForm({...claimForm, policy_number: e.target.value})} placeholder="Policy/Member No." /></div>
+              <div><Label>Pre-Auth Number</Label><Input value={claimForm.pre_auth_number} onChange={e => setClaimForm({...claimForm, pre_auth_number: e.target.value})} placeholder="If applicable" /></div>
+            </div>
+            <div>
+              <Label>Claim Amount (K) *</Label>
+              <Input type="number" value={claimForm.claim_amount} onChange={e => setClaimForm({...claimForm, claim_amount: e.target.value})} placeholder="0.00" required />
+            </div>
+            <div>
+              <Label>Diagnosis / ICD Code</Label>
+              <Input value={claimForm.diagnosis} onChange={e => setClaimForm({...claimForm, diagnosis: e.target.value})} placeholder="e.g. J18.9 - Pneumonia" />
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div><Label>Admission Date</Label><Input type="date" value={claimForm.admission_date} onChange={e => setClaimForm({...claimForm, admission_date: e.target.value})} /></div>
+              <div><Label>Discharge Date</Label><Input type="date" value={claimForm.discharge_date} onChange={e => setClaimForm({...claimForm, discharge_date: e.target.value})} /></div>
+            </div>
+            <DialogFooter className="pt-2">
+              <Button type="button" variant="outline" onClick={() => setShowNewClaim(false)}>Cancel</Button>
+              <Button type="submit" disabled={isSubmitting}>{isSubmitting ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}Create Claim</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

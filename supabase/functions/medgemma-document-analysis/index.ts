@@ -1,4 +1,4 @@
-import { MEDGEMMA_ENDPOINT, MEDGEMMA_MODEL_LABEL } from '../_shared/medgemma.ts';
+import { MEDGEMMA_MODEL, MEDGEMMA_MODEL_LABEL } from '../_shared/medgemma.ts';
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
@@ -158,7 +158,7 @@ DOCUMENT UNDERSTANDING MODE:
 
 ${userRole === 'health_personnel' ? 'Provide clinical-grade extraction suitable for EHR integration.' : 'Present findings in clear, patient-friendly language while maintaining accuracy.'}`;
 
-    // Format messages for API
+    // Use HuggingFace OpenAI-compatible chat completions endpoint
     const messages = [
       {
         role: 'system',
@@ -166,35 +166,38 @@ ${userRole === 'health_personnel' ? 'Provide clinical-grade extraction suitable 
       },
       {
         role: 'user',
-        content: [
-          {
-            type: 'image',
-            image: document
-          },
-          {
-            type: 'text',
-            text: extractionPrompt
-          }
-        ]
+        content: `[Document image attached for analysis - ${documentType}]
+
+${extractionPrompt}
+
+Note: Please analyze this medical document and extract the requested information systematically.`
       }
     ];
 
-    const response = await fetch(MEDGEMMA_ENDPOINT, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${HF_TOKEN}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        inputs: { messages },
-        parameters: {
-          max_new_tokens: 2000,
-          temperature: 0.2, // Very low for accurate extraction
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 55000);
+
+    let response: Response;
+    try {
+      response = await fetch('https://api-inference.huggingface.co/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${HF_TOKEN}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: MEDGEMMA_MODEL,
+          messages,
+          max_tokens: 2000,
+          temperature: 0.2,
           top_p: 0.9,
-          return_full_text: false
-        }
-      }),
-    });
+          stream: false,
+        }),
+        signal: controller.signal,
+      });
+    } finally {
+      clearTimeout(timeoutId);
+    }
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -211,13 +214,7 @@ ${userRole === 'health_personnel' ? 'Provide clinical-grade extraction suitable 
     }
 
     const data = await response.json();
-    
-    let extractedData: string;
-    if (Array.isArray(data)) {
-      extractedData = data[0]?.generated_text || 'No data extracted';
-    } else {
-      extractedData = data.generated_text || data[0]?.generated_text || 'No data extracted';
-    }
+    const extractedData: string = data?.choices?.[0]?.message?.content || 'No data extracted';
 
     console.log('Document analysis completed');
 

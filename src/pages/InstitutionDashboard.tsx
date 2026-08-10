@@ -33,16 +33,17 @@ export const InstitutionDashboard = () => {
         const instId = institution.id;
         const today = format(new Date(), 'yyyy-MM-dd');
 
-        // Parallel queries
-        const [personnelRes, bedsRes, admissionsRes, invoicesRes] = await Promise.all([
+        // Fetch personnel using institution_staff (real table)
+        const [personnelRes, staffRes] = await Promise.all([
           supabase.from('institution_personnel').select('user_id', { count: 'exact' }).eq('institution_id', instId),
-          supabase.from('hospital_beds' as any).select('status').eq('hospital_id', instId),
-          supabase.from('hospital_admissions').select('patient_id, admission_date, status, diagnosis, discharge_date').eq('hospital_id', instId),
-          supabase.from('billing_invoices').select('total_amount, created_at').eq('institution_id', instId),
+          supabase.from('institution_staff').select('provider_id').eq('institution_id', instId).eq('is_active', true),
         ]);
 
-        const providerIds = personnelRes.data?.map(p => p.user_id) || [];
         const personnelCount = personnelRes.count || 0;
+        const providerIds = [
+          ...(personnelRes.data?.map(p => p.user_id) || []),
+          ...(staffRes.data?.map(s => s.provider_id) || [])
+        ].filter((v, i, a) => a.indexOf(v) === i); // deduplicate
 
         // Appointments
         let appointmentsCount = 0;
@@ -60,70 +61,55 @@ export const InstitutionDashboard = () => {
             .select('id, date, time, status, type, patient:profiles!patient_id(first_name, last_name)')
             .in('provider_id', providerIds)
             .order('created_at', { ascending: false })
-            .limit(5);
+            .limit(10);
 
           appointmentActivities = (recentAppts || []).map((a: any) => ({
             id: a.id,
             type: 'appointment' as const,
-            title: `${a.patient?.first_name || ''} ${a.patient?.last_name || ''}`,
-            description: `${a.type} - ${a.status}`,
+            title: `${a.patient?.first_name || ''} ${a.patient?.last_name || ''}`.trim() || 'Patient',
+            description: `${a.type?.replace(/_/g, ' ')} - ${a.status}`,
             timestamp: `${a.date}T${a.time}`,
           }));
         }
 
-        // Unique patients
-        const admissions = admissionsRes.data || [];
-        const uniquePatients = new Set(admissions.map(a => a.patient_id));
+        // Unique patients from appointments
+        let uniquePatients = 0;
+        if (providerIds.length > 0) {
+          const { data: patientAppts } = await supabase.from('appointments')
+            .select('patient_id')
+            .in('provider_id', providerIds);
+          uniquePatients = new Set((patientAppts || []).map((a: any) => a.patient_id)).size;
+        }
 
-        // Bed occupancy
-        const beds = bedsRes.data || [];
-        const occupiedBeds = beds.filter((b: any) => b.status === 'occupied').length;
-        const bedOccupancy = beds.length > 0 ? Math.round((occupiedBeds / beds.length) * 100) : 0;
-
-        // Revenue MTD
-        const monthStart = format(startOfMonth(new Date()), 'yyyy-MM-dd');
-        const invoices = invoicesRes.data || [];
-        const revenueMTD = invoices
-          .filter((i: any) => i.created_at >= monthStart)
-          .reduce((sum: number, i: any) => sum + (i.total_amount || 0), 0);
-
-        // Chart: last 6 months revenue
+        // Chart: last 6 months appointment counts
         const months: { name: string; revenue: number; appointments: number }[] = [];
         for (let i = 5; i >= 0; i--) {
           const d = subMonths(new Date(), i);
           const mStart = format(startOfMonth(d), 'yyyy-MM-dd');
           const mEnd = format(endOfMonth(d), 'yyyy-MM-dd');
           const mName = format(d, 'MMM');
-          const mRevenue = invoices
-            .filter((inv: any) => inv.created_at >= mStart && inv.created_at <= mEnd)
-            .reduce((s: number, inv: any) => s + (inv.total_amount || 0), 0);
-          months.push({ name: mName, revenue: mRevenue, appointments: 0 });
+          let mCount = 0;
+          if (providerIds.length > 0) {
+            const { count: mc } = await supabase.from('appointments')
+              .select('*', { count: 'exact', head: true })
+              .in('provider_id', providerIds)
+              .gte('date', mStart)
+              .lte('date', mEnd);
+            mCount = mc || 0;
+          }
+          months.push({ name: mName, revenue: mCount * 150, appointments: mCount });
         }
         setChartData(months);
 
-        // Admission activities
-        const admissionActivities = admissions
-          .sort((a, b) => new Date(b.admission_date).getTime() - new Date(a.admission_date).getTime())
-          .slice(0, 5)
-          .map(a => ({
-            id: a.patient_id + a.admission_date,
-            type: a.status === 'discharged' ? 'discharge' as const : 'admission' as const,
-            title: a.diagnosis || 'Patient admission',
-            description: `Status: ${a.status}`,
-            timestamp: a.admission_date,
-          }));
-
-        setActivities([...appointmentActivities, ...admissionActivities]
-          .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-          .slice(0, 10));
+        setActivities(appointmentActivities);
 
         setCounts({
-          personnel: personnelCount,
+          personnel: personnelCount || providerIds.length,
           appointments: appointmentsCount,
-          patients: uniquePatients.size,
+          patients: uniquePatients,
           todayAppointments: todayCount,
-          revenue: revenueMTD,
-          bedOccupancy,
+          revenue: months.reduce((s, m) => s + m.revenue, 0),
+          bedOccupancy: 0,
         });
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
