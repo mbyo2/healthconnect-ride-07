@@ -14,6 +14,7 @@ import { format } from 'date-fns';
 import { InsuranceClaimWorkflow } from '@/components/billing/InsuranceClaimWorkflow';
 import { MultiCountryAccounting } from '@/components/accounting/MultiCountryAccounting';
 import { exportInvoicePDF } from '@/utils/pdfExport';
+import { useCurrency } from '@/hooks/use-currency';
 
 const STATUS_CONFIG: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
   draft: { label: 'Draft', variant: 'outline' },
@@ -31,6 +32,7 @@ export const BillingStaffWorkflow = () => {
     todayCollections, pendingInvoices, pendingClaims,
     createInvoice, recordPayment, submitInsuranceClaim,
   } = useBillingModule();
+  const { currency } = useCurrency();
 
   const [isInvoiceDialogOpen, setIsInvoiceDialogOpen] = useState(false);
   const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
@@ -208,7 +210,7 @@ export const BillingStaffWorkflow = () => {
                 }, {
                   title: 'Official Invoice',
                   institutionName: 'Doc-O-Clock Healthcare',
-                  currency: 'ZMW'
+                  currency: currency
                 })}
               >
                 <Printer className="h-3 w-3 mr-1" /> PDF

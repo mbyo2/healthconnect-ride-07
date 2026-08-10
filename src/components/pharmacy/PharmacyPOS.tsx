@@ -43,7 +43,7 @@ interface InventoryItem {
 
 export const PharmacyPOS = () => {
   const { user } = useAuth();
-  const { formatPrice } = useCurrency();
+  const { formatPrice, currency, getSymbol } = useCurrency();
   const queryClient = useQueryClient();
 
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -316,7 +316,7 @@ export const PharmacyPOS = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label>Opening Cash Balance (ZMW)</Label>
+              <Label>Opening Cash Balance ({getSymbol()})</Label>
               <Input type="number" value={openingBalanceInput} onChange={e => setOpeningBalanceInput(e.target.value)} />
             </div>
             <Button className="w-full" onClick={() => openRegister.mutate(parseFloat(openingBalanceInput) || 0)}>
@@ -489,7 +489,7 @@ export const PharmacyPOS = () => {
           <DialogHeader><DialogTitle>Add Custom Item</DialogTitle></DialogHeader>
           <div className="space-y-3">
             <div><Label>Item Name</Label><Input value={customItemName} onChange={e => setCustomItemName(e.target.value)} /></div>
-            <div><Label>Price (ZMW)</Label><Input type="number" value={customItemPrice} onChange={e => setCustomItemPrice(e.target.value)} /></div>
+            <div><Label>Price ({getSymbol()})</Label><Input type="number" value={customItemPrice} onChange={e => setCustomItemPrice(e.target.value)} /></div>
           </div>
           <DialogFooter>
             <Button onClick={addCustomItem} disabled={!customItemName || !customItemPrice}>Add to Cart</Button>
@@ -515,7 +515,7 @@ export const PharmacyPOS = () => {
                 </div>
               </div>
             )}
-            <div><Label>Actual Closing Balance (ZMW)</Label><Input type="number" value={closingBalanceInput} onChange={e => setClosingBalanceInput(e.target.value)} /></div>
+            <div><Label>Actual Closing Balance ({getSymbol()})</Label><Input type="number" value={closingBalanceInput} onChange={e => setClosingBalanceInput(e.target.value)} /></div>
           </div>
           <DialogFooter>
             <Button onClick={() => { closeRegister.mutate(parseFloat(closingBalanceInput) || 0); setShowCloseDialog(false); }}>

@@ -17,6 +17,7 @@ import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useDPOPayment } from '@/hooks/useDPOPayment';
+import { useCurrency } from '@/hooks/use-currency';
 
 interface VideoConsultationBookingProps {
   onBookingComplete?: (consultationId: string) => void;
@@ -25,6 +26,7 @@ interface VideoConsultationBookingProps {
 export const VideoConsultationBooking = ({ onBookingComplete }: VideoConsultationBookingProps) => {
   const { user } = useAuth();
   const { redirectToCheckout, loading: paymentLoading } = useDPOPayment();
+  const { currency, formatPrice } = useCurrency();
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [selectedTime, setSelectedTime] = useState('');
   const [selectedProvider, setSelectedProvider] = useState('');
@@ -129,7 +131,7 @@ export const VideoConsultationBooking = ({ onBookingComplete }: VideoConsultatio
       // Kick off DPO Pay hosted checkout for the consultation fee
       await redirectToCheckout({
         amount: consultationData.price,
-        currency: 'ZMW',
+        currency: currency,
         reference_type: 'consultation',
         reference_id: data?.id,
         description: `${consultationData.name} - Dr. ${provider.first_name || ''} ${provider.last_name || ''}`.trim(),
@@ -268,7 +270,7 @@ export const VideoConsultationBooking = ({ onBookingComplete }: VideoConsultatio
             <div className="space-y-1 text-sm">
               <p><strong>Type:</strong> {selectedConsultationType.name}</p>
               <p><strong>Duration:</strong> {selectedConsultationType.duration} minutes</p>
-              <p><strong>Cost:</strong> ${selectedConsultationType.price}</p>
+              <p><strong>Cost:</strong> {formatPrice(selectedConsultationType.price)}</p>
               {selectedDate && selectedTime && (
                 <p><strong>Date & Time:</strong> {format(selectedDate, 'PPP')} at {selectedTime}</p>
               )}
@@ -282,7 +284,7 @@ export const VideoConsultationBooking = ({ onBookingComplete }: VideoConsultatio
           className="w-full"
           size="lg"
         >
-          {isLoading || paymentLoading ? 'Processing…' : `Book & Pay${selectedConsultationType ? ` $${selectedConsultationType.price}` : ''}`}
+          {isLoading || paymentLoading ? 'Processing…' : `Book & Pay${selectedConsultationType ? ` ${formatPrice(selectedConsultationType.price)}` : ''}`}
         </Button>
       </CardContent>
     </Card>

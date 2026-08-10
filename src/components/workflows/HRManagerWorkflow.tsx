@@ -14,6 +14,7 @@ import { format } from 'date-fns';
 import { BulkAttendanceImport } from '@/components/hr/BulkAttendanceImport';
 import { ShiftScheduleCalendar } from '@/components/hr/ShiftScheduleCalendar';
 import { exportPayslipPDF } from '@/utils/pdfExport';
+import { useCurrency } from '@/hooks/use-currency';
 
 const LEAVE_TYPE_LABELS: Record<string, string> = {
   annual: 'Annual Leave', sick: 'Sick Leave', maternity: 'Maternity', paternity: 'Paternity',
@@ -33,6 +34,7 @@ export const HRManagerWorkflow = () => {
     pendingLeaves, todayAttendance,
     createLeaveRequest, approveLeave, recordAttendance,
   } = useHRModule();
+  const { currency } = useCurrency();
   const [isLeaveDialogOpen, setIsLeaveDialogOpen] = useState(false);
   const [creating, setCreating] = useState(false);
   const [leaveForm, setLeaveForm] = useState({
@@ -263,12 +265,12 @@ export const HRManagerWorkflow = () => {
                           pensionDeducted: record.pension_deducted || (record.basic_salary * 0.05),
                           healthInsuranceDeducted: record.health_insurance_deducted || (record.basic_salary * 0.01),
                           netPay: record.net_salary,
-                          currency: record.currency || 'ZMW',
+                          currency: record.currency || currency,
                           paymentDate: format(new Date(record.created_at || Date.now()), 'yyyy-MM-dd'),
                         }, {
                           title: 'Payslip',
                           institutionName: 'Doc-O-Clock Healthcare',
-                          currency: record.currency || 'ZMW',
+                          currency: record.currency || currency,
                         })}
                       >
                         <Printer className="h-3.5 w-3.5 mr-1" /> Payslip PDF
