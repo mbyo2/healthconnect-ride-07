@@ -535,8 +535,8 @@ const LabManagement = () => {
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-4">
-                                {testCatalog.map((test, i) => (
-                                    <div key={i} className="flex items-center justify-between p-3 border rounded-lg">
+                                {testCatalog.map((test) => (
+                                    <div key={test.code} className="flex items-center justify-between p-3 border rounded-lg">
                                         <div>
                                             <h4 className="font-medium">{test.name}</h4>
                                             <p className="text-xs text-muted-foreground">{test.code} • {test.category}</p>

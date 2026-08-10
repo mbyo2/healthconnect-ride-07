@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useUserRoles } from '@/context/UserRolesContext';
+import { REGULATORY_REQUIREMENTS, getCountryRequirements, validateDocumentUpload, type DocumentRequirement } from '@/config/regulatoryRequirements';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { Check, X, Loader2, FileText, ExternalLink } from "lucide-react";
+import { Check, X, Loader2, FileText, ExternalLink, CheckCircle } from "lucide-react";
 
 interface InstitutionApplication {
   id: string;
@@ -37,6 +40,9 @@ export const InstitutionApplications = () => {
   const [notes, setNotes] = useState("");
   const [processing, setProcessing] = useState(false);
   const [docUrls, setDocUrls] = useState<Array<{ name: string; url: string }>>([]);
+  const [documentChecks, setDocumentChecks] = useState<Record<string, boolean>>({});
+  const { isAdmin, isSuperAdmin } = useUserRoles();
+  const canReview = isAdmin || isSuperAdmin;
 
   const fetchApps = async () => {
     setLoading(true);
@@ -51,7 +57,7 @@ export const InstitutionApplications = () => {
       const ids = (data as any[] || []).map(a => a.applicant_id);
       const [{ data: profiles }, { data: institutions }] = await Promise.all([
         ids.length
-          ? supabase.from('profiles').select('id, first_name, last_name, email').in('id', ids)
+          ? supabase.from('profiles').select('id, first_name, last_name, email, country').in('id', ids)
           : Promise.resolve({ data: [] as any[] }),
         ids.length
           ? supabase.from('healthcare_institutions').select('id, admin_id, license_number, address, city, country, phone, email, is_verified').in('admin_id', ids)
@@ -73,10 +79,33 @@ export const InstitutionApplications = () => {
 
   useEffect(() => { fetchApps(); }, [filter]);
 
+  if (!canReview) {
+    return (
+      <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-6 text-sm text-destructive">
+        You do not have permission to review institution applications. Only admin and superadmin users can verify and approve institution submissions.
+      </div>
+    );
+  }
+
   const openReview = async (app: InstitutionApplication) => {
     setSelected(app);
     setNotes(app.reviewer_notes || "");
     setDocUrls([]);
+    setDocumentChecks({});
+    
+    // Get country and determine entity type
+    const country = (app.institution?.country) || (app.applicant as any)?.country || 'ZM';
+    const isPharmacy = app.institution_type?.toLowerCase().includes('pharm');
+    const entityType = isPharmacy ? 'pharmacies' : 'institutions';
+    const requirements = getCountryRequirements(country, entityType);
+    
+    // Initialize document checks
+    const checks: Record<string, boolean> = {};
+    requirements.forEach(req => {
+      checks[req.id] = false;
+    });
+    setDocumentChecks(checks);
+    
     // List documents in storage under applicant_id folder
     const { data: files } = await supabase.storage
       .from('registration_documents')
@@ -95,6 +124,26 @@ export const InstitutionApplications = () => {
 
   const decide = async (status: 'approved' | 'rejected') => {
     if (!selected) return;
+    if (!canReview) {
+      toast.error('Only admin or superadmin users can approve institution applications.');
+      return;
+    }
+    
+    // Check that all required documents are verified before approving
+    if (status === 'approved') {
+      const country = (selected.institution?.country) || (selected.applicant as any)?.country || 'ZM';
+      const isPharmacy = selected.institution_type?.toLowerCase().includes('pharm');
+      const entityType = isPharmacy ? 'pharmacies' : 'institutions';
+      const requirements = getCountryRequirements(country, entityType);
+      const requiredDocs = requirements.filter(req => req.required);
+      
+      const allRequiredChecked = requiredDocs.every(req => documentChecks[req.id] === true);
+      if (!allRequiredChecked) {
+        toast.error('Please verify all required documents before approving.');
+        return;
+      }
+    }
+    
     setProcessing(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -147,6 +196,14 @@ export const InstitutionApplications = () => {
       setProcessing(false);
     }
   };
+
+  if (!canReview) {
+    return (
+      <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-6 text-sm text-destructive">
+        You do not have permission to review institution applications. Only admin and superadmin users can verify and approve institution submissions.
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
@@ -202,6 +259,42 @@ export const InstitutionApplications = () => {
                 <div><strong>License #:</strong> {selected.institution?.license_number || '—'}</div>
                 <div><strong>Phone:</strong> {selected.institution?.phone || '—'}</div>
                 <div className="col-span-2"><strong>Address:</strong> {selected.institution?.address || '—'}, {selected.institution?.city || ''} {selected.institution?.country || ''}</div>
+              </div>
+
+              <div>
+                <h4 className="font-semibold mb-3 text-sm">Document Verification Checklist</h4>
+                <div className="space-y-2">
+                  {(() => {
+                    const country = (selected.institution?.country) || (selected.applicant as any)?.country || 'ZM';
+                    const isPharmacy = selected.institution_type?.toLowerCase().includes('pharm');
+                    const entityType = isPharmacy ? 'pharmacies' : 'institutions';
+                    return getCountryRequirements(country, entityType).map((req) => (
+                      <div key={req.id} className="flex items-start gap-3 p-3 border rounded-lg">
+                        <Checkbox
+                          id={`doc-check-${req.id}`}
+                          checked={documentChecks[req.id] || false}
+                          onCheckedChange={(checked) => 
+                            setDocumentChecks(prev => ({ ...prev, [req.id]: checked as boolean }))
+                          }
+                          disabled={processing}
+                        />
+                        <div className="flex-1">
+                          <label
+                            htmlFor={`doc-check-${req.id}`}
+                            className="font-medium text-sm cursor-pointer flex items-center gap-2"
+                          >
+                            {req.name}
+                            {req.required && <span className="text-destructive">*</span>}
+                          </label>
+                          <p className="text-xs text-muted-foreground mt-1">{req.description}</p>
+                        </div>
+                        {documentChecks[req.id] && (
+                          <CheckCircle className="h-5 w-5 text-green-600" />
+                        )}
+                      </div>
+                    ));
+                  })()}
+                </div>
               </div>
 
               <div>

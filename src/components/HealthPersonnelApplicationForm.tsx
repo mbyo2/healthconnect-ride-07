@@ -3,10 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Loader2, Eye, EyeOff } from "lucide-react";
+import { Loader2, Eye, EyeOff, Upload, X, CheckCircle, AlertCircle } from "lucide-react";
 import { ProviderRegistrationService, type ProviderRegistrationData, type ValidationErrors } from "@/services/ProviderRegistrationService";
 import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { REGULATORY_REQUIREMENTS, getCountryRequirements, validateDocumentUpload, type DocumentRequirement } from "@/config/regulatoryRequirements";
 
 export const HealthPersonnelApplicationForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -27,6 +29,9 @@ export const HealthPersonnelApplicationForm = () => {
     years_of_experience: 0,
     documents_url: [],
   });
+  const [selectedCountry, setSelectedCountry] = useState<string>("ZM");
+  const [uploadedDocuments, setUploadedDocuments] = useState<Record<string, string>>({});
+  const [documentValidation, setDocumentValidation] = useState<{ valid: boolean; missing: string[] }>({ valid: true, missing: [] });
   
   const [errors, setErrors] = useState<ValidationErrors>({});
 
@@ -61,36 +66,87 @@ export const HealthPersonnelApplicationForm = () => {
 
   const isFormValid = () => {
     const currentErrors = ProviderRegistrationService.validateRegistrationData(formData);
-    return !ProviderRegistrationService.hasValidationErrors(currentErrors);
+    const hasFormErrors = ProviderRegistrationService.hasValidationErrors(currentErrors);
+    const hasDocumentErrors = !documentValidation.valid;
+    return !hasFormErrors && !hasDocumentErrors;
+  };
+
+  const handleDocumentUpload = async (requirement: DocumentRequirement, file: File) => {
+    // Validate file type
+    if (requirement.fileType && !requirement.fileType.includes(file.type)) {
+      toast.error(`Invalid file type. Allowed: ${requirement.fileType.join(', ')}`);
+      return;
+    }
+
+    // Validate file size
+    if (requirement.maxSizeMB && file.size > requirement.maxSizeMB * 1024 * 1024) {
+      toast.error(`File too large. Maximum size: ${requirement.maxSizeMB}MB`);
+      return;
+    }
+
+    // In production, upload to Supabase Storage
+    // For now, store as base64 for demo
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const base64 = e.target?.result as string;
+      setUploadedDocuments(prev => ({ ...prev, [requirement.id]: base64 }));
+      toast.success(`${requirement.name} uploaded successfully`);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removeDocument = (requirementId: string) => {
+    setUploadedDocuments(prev => {
+      const updated = { ...prev };
+      delete updated[requirementId];
+      return updated;
+    });
+  };
+
+  const validateDocuments = () => {
+    const requirements = getCountryRequirements(selectedCountry, 'healthcareProfessionals');
+    const validation = validateDocumentUpload(uploadedDocuments, requirements);
+    setDocumentValidation(validation);
+    return validation.valid;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
+    if (!validateDocuments()) {
+      toast.error("Please upload all required documents");
+      return;
+    }
 
     setIsSubmitting(true);
     setRegistrationStage("Creating account...");
+
+    // Include uploaded documents in form data
+    const formDataWithDocs = {
+      ...formData,
+      documents_url: Object.values(uploadedDocuments)
+    };
 
     try {
       // Show loading indicator with stage information (Requirement 4.1)
       toast.loading("Creating your account...", { id: "registration" });
 
       // Use the complete registration workflow
-      const result = await ProviderRegistrationService.registerProvider(formData);
+      const result = await ProviderRegistrationService.registerProvider(formDataWithDocs);
 
       if (result.success) {
         setRegistrationStage("Registration successful!");
         
-        // Show success message before redirection (Requirement 4.2)
-        toast.success("Registration successful! Redirecting to your dashboard...", { id: "registration" });
+        // Show success message before redirection
+        toast.success("Registration successful! Your application is pending admin review.", { id: "registration" });
         
         // Refresh the user profile to include new role data
         setRegistrationStage("Setting up your profile...");
         await refreshProfile();
         
-        // Redirect to provider dashboard
+        // Redirect to application status so the user can track review progress
         setTimeout(() => {
-          navigate("/provider-dashboard");
+          navigate("/application-status");
         }, 1500);
       } else {
         // Comprehensive error messaging system (Requirement 4.3)
@@ -260,6 +316,30 @@ export const HealthPersonnelApplicationForm = () => {
         <h3 className="text-lg font-semibold">Professional Information</h3>
         
         <div>
+          <Label htmlFor="country">Country of Practice *</Label>
+          <Select
+            value={selectedCountry}
+            onValueChange={(value) => {
+              setSelectedCountry(value);
+              setUploadedDocuments({}); // Clear documents when country changes
+              validateDocuments();
+            }}
+            disabled={isSubmitting}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select country" />
+            </SelectTrigger>
+            <SelectContent>
+              {Object.entries(REGULATORY_REQUIREMENTS).map(([code, country]) => (
+                <SelectItem key={code} value={code}>
+                  {country.countryName}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        
+        <div>
           <Label htmlFor="license_number">License Number *</Label>
           <Input
             id="license_number"
@@ -308,6 +388,90 @@ export const HealthPersonnelApplicationForm = () => {
             <p className="text-sm text-destructive mt-1">{errors.years_of_experience}</p>
           )}
         </div>
+      </div>
+
+      {/* Document Upload Section */}
+      <div className="space-y-4 border-t pt-4 mt-4">
+        <h3 className="text-lg font-semibold">Regulatory Documents</h3>
+        <p className="text-sm text-muted-foreground">
+          Upload required documents for {REGULATORY_REQUIREMENTS[selectedCountry]?.countryName}. 
+          All required documents must be uploaded before submission.
+        </p>
+
+        {getCountryRequirements(selectedCountry, 'healthcareProfessionals').map((requirement) => (
+          <div key={requirement.id} className="border rounded-lg p-4 space-y-2">
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <Label className="flex items-center gap-2">
+                  {requirement.name}
+                  {requirement.required && <span className="text-destructive">*</span>}
+                </Label>
+                <p className="text-sm text-muted-foreground mt-1">{requirement.description}</p>
+                {requirement.maxSizeMB && (
+                  <p className="text-xs text-muted-foreground">Max size: {requirement.maxSizeMB}MB</p>
+                )}
+              </div>
+              {uploadedDocuments[requirement.id] ? (
+                <div className="flex items-center gap-2 text-green-600">
+                  <CheckCircle className="h-5 w-5" />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removeDocument(requirement.id)}
+                    disabled={isSubmitting}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  {requirement.required && !uploadedDocuments[requirement.id] && (
+                    <AlertCircle className="h-5 w-5 text-amber-500" />
+                  )}
+                </div>
+              )}
+            </div>
+
+            {!uploadedDocuments[requirement.id] && (
+              <div className="relative">
+                <Input
+                  type="file"
+                  id={`doc-${requirement.id}`}
+                  accept={requirement.fileType?.join(',')}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleDocumentUpload(requirement, file);
+                  }}
+                  disabled={isSubmitting}
+                  className="hidden"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => document.getElementById(`doc-${requirement.id}`)?.click()}
+                  disabled={isSubmitting}
+                  className="w-full"
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  Upload Document
+                </Button>
+              </div>
+            )}
+          </div>
+        ))}
+
+        {!documentValidation.valid && documentValidation.missing.length > 0 && (
+          <div className="bg-destructive/10 border border-destructive rounded-lg p-4">
+            <p className="text-sm font-semibold text-destructive mb-2">Missing Required Documents:</p>
+            <ul className="text-sm text-destructive list-disc list-inside space-y-1">
+              {documentValidation.missing.map((doc) => (
+                <li key={doc}>{doc}</li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
 
       <Button

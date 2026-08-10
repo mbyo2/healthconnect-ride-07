@@ -7,10 +7,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2, Upload, X, CheckCircle, AlertCircle } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 import { SpecialtySelector } from "./SpecialtySelector";
 import { saveInstitutionSpecialties } from "@/hooks/useClinicSpecialties";
+import { REGULATORY_REQUIREMENTS, getCountryRequirements, validateDocumentUpload, type DocumentRequirement } from "@/config/regulatoryRequirements";
 
 type HealthcareInstitution = Database['public']['Tables']['healthcare_institutions']['Insert'];
 
@@ -58,8 +59,19 @@ export const HealthcareInstitutionForm = () => {
   const [errors, setErrors] = useState<FormErrors>({});
   const [selectedSpecialties, setSelectedSpecialties] = useState<string[]>([]);
   const [primarySpecialtyId, setPrimarySpecialtyId] = useState<string>();
+  const [selectedCountry, setSelectedCountry] = useState<string>("ZM");
+  const [uploadedDocuments, setUploadedDocuments] = useState<Record<string, string>>({});
+  const [documentValidation, setDocumentValidation] = useState<{ valid: boolean; missing: string[] }>({ valid: true, missing: [] });
 
   const isClinicType = ['clinic', 'dental_clinic', 'eye_clinic', 'skin_clinic', 'specialty_clinic'].includes(formData.type);
+  const isInstitutionType = ['hospital', 'clinic', 'nursing_home'].includes(formData.type);
+  const isPharmacyType = formData.type === 'pharmacy';
+
+  const getEntityType = (): 'healthcareProfessionals' | 'pharmacies' | 'institutions' => {
+    if (isPharmacyType) return 'pharmacies';
+    if (isInstitutionType) return 'institutions';
+    return 'institutions';
+  };
 
   const validateForm = () => {
     const newErrors: FormErrors = {};
@@ -88,9 +100,48 @@ export const HealthcareInstitutionForm = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  const handleDocumentUpload = async (requirement: DocumentRequirement, file: File) => {
+    if (requirement.fileType && !requirement.fileType.includes(file.type)) {
+      toast.error(`Invalid file type. Allowed: ${requirement.fileType.join(', ')}`);
+      return;
+    }
+
+    if (requirement.maxSizeMB && file.size > requirement.maxSizeMB * 1024 * 1024) {
+      toast.error(`File too large. Maximum size: ${requirement.maxSizeMB}MB`);
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const base64 = e.target?.result as string;
+      setUploadedDocuments(prev => ({ ...prev, [requirement.id]: base64 }));
+      toast.success(`${requirement.name} uploaded successfully`);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removeDocument = (requirementId: string) => {
+    setUploadedDocuments(prev => {
+      const updated = { ...prev };
+      delete updated[requirementId];
+      return updated;
+    });
+  };
+
+  const validateDocuments = () => {
+    const requirements = getCountryRequirements(selectedCountry, getEntityType());
+    const validation = validateDocumentUpload(uploadedDocuments, requirements);
+    setDocumentValidation(validation);
+    return validation.valid;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
+    if (!validateDocuments()) {
+      toast.error("Please upload all required documents");
+      return;
+    }
 
     setIsSubmitting(true);
 
@@ -108,7 +159,8 @@ export const HealthcareInstitutionForm = () => {
         type: formData.type as any,
         admin_id: user.id,
         is_verified: false,
-        operating_hours: {}
+        operating_hours: {},
+        documents_url: Object.values(uploadedDocuments)
       };
 
       const { data: institutionData, error: institutionError } = await supabase
@@ -268,13 +320,27 @@ export const HealthcareInstitutionForm = () => {
           </div>
 
           <div>
-            <Label htmlFor="country">Country</Label>
-            <Input
-              id="country"
-              value={formData.country}
-              onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-              disabled={isSubmitting}
-            />
+            <Label htmlFor="country">Country <span className="text-destructive">*</span></Label>
+            <Select
+              value={selectedCountry}
+              onValueChange={(value) => {
+                setFormData({ ...formData, country: value });
+                setSelectedCountry(value);
+                setUploadedDocuments({});
+                validateDocuments();
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select country" />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.entries(REGULATORY_REQUIREMENTS).map(([code, country]) => (
+                  <SelectItem key={code} value={code}>
+                    {country.countryName}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div>
@@ -336,6 +402,90 @@ export const HealthcareInstitutionForm = () => {
             disabled={isSubmitting}
           />
         </div>
+      </div>
+
+      {/* Document Upload Section */}
+      <div className="space-y-4 border-t pt-4 mt-4">
+        <h3 className="text-lg font-semibold">Regulatory Documents</h3>
+        <p className="text-sm text-muted-foreground">
+          Upload required documents for {REGULATORY_REQUIREMENTS[selectedCountry]?.countryName}. 
+          All required documents must be uploaded before submission.
+        </p>
+
+        {getCountryRequirements(selectedCountry, getEntityType()).map((requirement) => (
+          <div key={requirement.id} className="border rounded-lg p-4 space-y-2">
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <Label className="flex items-center gap-2">
+                  {requirement.name}
+                  {requirement.required && <span className="text-destructive">*</span>}
+                </Label>
+                <p className="text-sm text-muted-foreground mt-1">{requirement.description}</p>
+                {requirement.maxSizeMB && (
+                  <p className="text-xs text-muted-foreground">Max size: {requirement.maxSizeMB}MB</p>
+                )}
+              </div>
+              {uploadedDocuments[requirement.id] ? (
+                <div className="flex items-center gap-2 text-green-600">
+                  <CheckCircle className="h-5 w-5" />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removeDocument(requirement.id)}
+                    disabled={isSubmitting}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  {requirement.required && !uploadedDocuments[requirement.id] && (
+                    <AlertCircle className="h-5 w-5 text-amber-500" />
+                  )}
+                </div>
+              )}
+            </div>
+
+            {!uploadedDocuments[requirement.id] && (
+              <div className="relative">
+                <Input
+                  type="file"
+                  id={`doc-${requirement.id}`}
+                  accept={requirement.fileType?.join(',')}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleDocumentUpload(requirement, file);
+                  }}
+                  disabled={isSubmitting}
+                  className="hidden"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => document.getElementById(`doc-${requirement.id}`)?.click()}
+                  disabled={isSubmitting}
+                  className="w-full"
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  Upload Document
+                </Button>
+              </div>
+            )}
+          </div>
+        ))}
+
+        {!documentValidation.valid && documentValidation.missing.length > 0 && (
+          <div className="bg-destructive/10 border border-destructive rounded-lg p-4">
+            <p className="text-sm font-semibold text-destructive mb-2">Missing Required Documents:</p>
+            <ul className="text-sm text-destructive list-disc list-inside space-y-1">
+              {documentValidation.missing.map((doc) => (
+                <li key={doc}>{doc}</li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
 
       <Button
