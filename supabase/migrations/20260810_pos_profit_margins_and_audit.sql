@@ -89,10 +89,12 @@ CREATE TABLE IF NOT EXISTS public.stock_writeoffs (
 ALTER TABLE public.stock_writeoffs ENABLE ROW LEVEL SECURITY;
 
 -- Admins and institution staff can see write-offs
+DROP POLICY IF EXISTS "Authenticated users can view stock writeoffs" ON public.stock_writeoffs;
 CREATE POLICY "Authenticated users can view stock writeoffs"
   ON public.stock_writeoffs FOR SELECT
   TO authenticated USING (true);
 
+DROP POLICY IF EXISTS "Authenticated users can insert stock writeoffs" ON public.stock_writeoffs;
 CREATE POLICY "Authenticated users can insert stock writeoffs"
   ON public.stock_writeoffs FOR INSERT
   TO authenticated WITH CHECK (true);
