@@ -35,35 +35,35 @@ html {
 
 @layer base {
   :root {
-    /* Monday.com inspired color system */
+    /* Blue color system matching logo */
     --background: 0 0% 100%;
     --foreground: 220 15% 15%;
     --card: 0 0% 100%;
     --card-foreground: 220 15% 15%;
     --popover: 0 0% 100%;
     --popover-foreground: 220 15% 15%;
-    --primary: 265 85% 55%;
+    --primary: 217 91% 60%;
     --primary-foreground: 0 0% 100%;
     --secondary: 220 10% 96%;
     --secondary-foreground: 220 15% 15%;
     --muted: 220 10% 96%;
     --muted-foreground: 220 8% 45%;
-    --accent: 265 85% 55%;
+    --accent: 217 91% 60%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
     --border: 220 13% 91%;
     --input: 220 13% 91%;
-    --ring: 265 85% 55%;
+    --ring: 217 91% 60%;
     --radius: 0.5rem;
 
-    /* Monday.com brand colors */
-    --monday-blue: 265 85% 55%;
-    --monday-green: 142 71% 45%;
-    --monday-yellow: 45 93% 47%;
-    --monday-red: 0 72% 51%;
-    --monday-purple: 265 85% 55%;
-    --monday-orange: 24 95% 53%;
+    /* Brand colors */
+    --brand-blue: 217 91% 60%;
+    --brand-green: 142 71% 45%;
+    --brand-yellow: 45 93% 47%;
+    --brand-red: 0 72% 51%;
+    --brand-purple: 265 85% 55%;
+    --brand-orange: 24 95% 53%;
 
     /* Trust blue palette (RGB for opacity support) */
     --trust-50: 239, 246, 255;
@@ -91,19 +91,19 @@ html {
     --card-foreground: 220 10% 95%;
     --popover: 220 15% 12%;
     --popover-foreground: 220 10% 95%;
-    --primary: 265 85% 55%;
+    --primary: 217 91% 60%;
     --primary-foreground: 0 0% 100%;
     --secondary: 220 15% 18%;
     --secondary-foreground: 220 10% 95%;
     --muted: 220 15% 18%;
     --muted-foreground: 220 10% 60%;
-    --accent: 265 85% 55%;
+    --accent: 217 91% 60%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 62% 40%;
     --destructive-foreground: 220 10% 95%;
     --border: 220 15% 20%;
     --input: 220 15% 20%;
-    --ring: 265 85% 55%;
+    --ring: 217 91% 60%;
 
     --trust-50: 15, 23, 42;
     --trust-100: 30, 41, 59;
@@ -154,6 +154,24 @@ html {
   .animate-fade-in-up {
     animation: fadeInUp 0.4s ease-out;
   }
+  .animate-bounce-in {
+    animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+  .animate-scale-in {
+    animation: scaleIn 0.3s ease-out;
+  }
+  .animate-pulse-glow {
+    animation: pulseGlow 2s ease-in-out infinite;
+  }
+  .animate-shimmer {
+    animation: shimmer 2s linear infinite;
+  }
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+  .animate-rotate-slow {
+    animation: rotateSlow 20s linear infinite;
+  }
 }
 
 @keyframes slideUp {
@@ -164,6 +182,38 @@ html {
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(16px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes bounceIn {
+  0% { opacity: 0; transform: scale(0.3); }
+  50% { opacity: 1; transform: scale(1.05); }
+  70% { transform: scale(0.9); }
+  100% { transform: scale(1); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 5px hsl(var(--primary) / 0.3); }
+  50% { box-shadow: 0 0 20px hsl(var(--primary) / 0.6); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -1000px 0; }
+  100% { background-position: 1000px 0; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes rotateSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 /* Touch targets on mobile */

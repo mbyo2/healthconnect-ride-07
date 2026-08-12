@@ -46,14 +46,23 @@ const SuperAdminDashboard = () => {
     try {
       setIsLoading(true);
       const { data, error } = await supabase
-        .from('profiles')
-        .select('id, email, first_name, last_name, admin_level, created_at')
-        .in('admin_level', ['admin', 'superadmin'])
-        .order('created_at', { ascending: false });
+        .from('user_roles')
+        .select('user_id, role, profiles(id, email, first_name, last_name, created_at)')
+        .in('role', ['admin', 'super_admin'])
+        .order('profiles(created_at)', { ascending: false });
 
       if (error) throw error;
 
-      setAdmins((data || []) as AdminUser[]);
+      const formattedAdmins = (data || []).map((item: any) => ({
+        id: item.user_id,
+        email: item.profiles?.email,
+        first_name: item.profiles?.first_name,
+        last_name: item.profiles?.last_name,
+        admin_level: item.role === 'super_admin' ? 'superadmin' : 'admin',
+        created_at: item.profiles?.created_at
+      }));
+
+      setAdmins(formattedAdmins);
     } catch (error) {
       console.error("Error fetching admin users:", error);
       toast.error("Failed to load admin users");
@@ -61,7 +70,6 @@ const SuperAdminDashboard = () => {
       setIsLoading(false);
     }
   };
-
 
   const handleCreateAdmin = async () => {
     try {
@@ -104,18 +112,18 @@ const SuperAdminDashboard = () => {
     try {
       setIsSubmitting(true);
 
-      const newLevel = currentLevel === 'admin' ? 'superadmin' : 'admin';
+      const newLevel = currentLevel === 'admin' ? 'super_admin' : 'admin';
 
       const { error } = await supabase
-        .from('profiles')
+        .from('user_roles')
         .update({
-          admin_level: newLevel
+          role: newLevel
         })
-        .eq('id', id);
+        .eq('user_id', id);
 
       if (error) throw error;
 
-      toast.success(`Admin ${newLevel === 'superadmin' ? 'promoted to Superadmin' : 'changed to Admin'}`);
+      toast.success(`Admin ${newLevel === 'super_admin' ? 'promoted to Superadmin' : 'changed to Admin'}`);
 
       // Refresh admin list
       fetchAdmins();
