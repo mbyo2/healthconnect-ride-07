@@ -18,7 +18,7 @@ export const WalletTopUp = () => {
     const { user } = useAuth();
     const [amount, setAmount] = useState<string>('50');
     const [isLoading, setIsLoading] = useState(false);
-    const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('paypal');
+    const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('dpo');
     const { currency, getSymbol } = useCurrency();
     const { redirectToCheckout: redirectToDPOCheckout } = useDPOPayment();
 
@@ -98,7 +98,7 @@ export const WalletTopUp = () => {
                     Top Up Wallet
                 </CardTitle>
                 <CardDescription>
-                    Add funds to your wallet using PayPal or DPO Pay
+                    Add funds to your wallet using DPO Pay (card & mobile money)
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -153,7 +153,7 @@ export const WalletTopUp = () => {
                         Secure Payment
                     </div>
                     <p className="text-xs text-muted-foreground leading-relaxed">
-                        Your payment is processed securely via PayPal. Funds will be available in your wallet immediately after successful payment.
+                        Your payment is processed securely via DPO Pay. Supports card payments and mobile money (MTN, Airtel, etc.). Funds will be available in your wallet immediately after successful payment.
                     </p>
                 </div>
 

@@ -5,8 +5,9 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Loader2, Pill, DollarSign } from "lucide-react";
+import { Loader2, Pill, DollarSign, CreditCard, Smartphone } from "lucide-react";
 import { useCurrency } from "@/hooks/use-currency";
+import { useDPOPayment } from "@/hooks/useDPOPayment";
 import type { Order } from "@/types/marketplace";
 
 interface PharmacyPaymentProps {
@@ -17,36 +18,22 @@ interface PharmacyPaymentProps {
 export const PharmacyPayment = ({ order, onPaymentSuccess }: PharmacyPaymentProps) => {
   const [loading, setLoading] = useState(false);
   const { currency, formatPrice } = useCurrency();
+  const { redirectToCheckout } = useDPOPayment();
 
   const handlePayment = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('process-payment-with-splits', {
-        body: {
-          amount: order?.total_amount ?? 0,
-          currency,
-          patientId: order?.patient_id,
-          providerId: order?.pharmacy_id, // Pharmacy as provider
-          serviceId: order?.id,
-          institutionId: order?.pharmacy_id,
-          paymentMethod: 'wallet',
-          paymentType: 'pharmacy'
-        }
+      await redirectToCheckout({
+        amount: order?.total_amount ?? 0,
+        currency,
+        reference_type: 'pharmacy_sale',
+        reference_id: order?.id,
+        description: `Medicine Order Payment - Order #${order?.id}`,
+        customer_phone: order?.patient_phone,
       });
-
-      if (error) throw error;
-
-      if (data && (data as any).success) {
-        toast.success('Payment processed successfully!');
-        onPaymentSuccess();
-      } else {
-        const msg = (data && (data as any).error) || 'Payment failed';
-        throw new Error(msg);
-      }
     } catch (error) {
       console.error('Payment error:', error);
       toast.error(error instanceof Error ? error.message : 'Payment failed');
-    } finally {
       setLoading(false);
     }
   };
@@ -77,11 +64,21 @@ export const PharmacyPayment = ({ order, onPaymentSuccess }: PharmacyPaymentProp
         
         <Separator />
         
-        <div className="flex items-center justify-between">
-          <span className="font-medium">Payment Status:</span>
-          <Badge variant={order.status === 'pending' ? 'secondary' : 'default'}>
-            {order.status}
-          </Badge>
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="font-medium">Payment Status:</span>
+            <Badge variant={order.status === 'pending' ? 'secondary' : 'default'}>
+              {order.status}
+            </Badge>
+          </div>
+          
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <CreditCard className="h-4 w-4" />
+            <span>Card payments</span>
+            <span className="mx-1">•</span>
+            <Smartphone className="h-4 w-4" />
+            <span>Mobile money</span>
+          </div>
         </div>
         
         <Button 
@@ -97,7 +94,7 @@ export const PharmacyPayment = ({ order, onPaymentSuccess }: PharmacyPaymentProp
           ) : (
             <>
               <DollarSign className="h-4 w-4 mr-2" />
-              Pay {formatPrice(order.total_amount)}
+              Pay with DPOpay
             </>
           )}
         </Button>

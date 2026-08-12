@@ -7,23 +7,30 @@ export const BrowseSpecialties = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="py-12 md:py-14 lg:py-20">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-10">
-          <p className="text-sm font-semibold text-primary uppercase tracking-widest mb-3">Specialties</p>
-          <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Find Care by Specialty</h2>
+    <section className="py-16 md:py-20 lg:py-24 bg-gradient-to-br from-primary/5 via-background to-primary/5 relative overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(var(--primary),0.08),transparent)]" />
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative">
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-xs font-semibold text-primary mb-4 border border-primary/20">
+            <Smartphone className="h-3.5 w-3.5" />
+            Specialties
+          </div>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-4">Find Care by Specialty</h2>
+          <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
+            Browse our network of specialists across Zambia
+          </p>
         </div>
 
-        <div className="flex flex-wrap justify-center gap-3 max-w-3xl mx-auto">
+        <div className="flex flex-wrap justify-center gap-3 max-w-4xl mx-auto">
           {[
             "General Practice", "Cardiology", "Dermatology", "Pediatrics",
             "Gynecology", "Orthopedics", "Psychiatry", "Dentistry",
             "Ophthalmology", "ENT", "Neurology", "Urology"
-          ].map((specialty) => (
+          ].map((specialty, idx) => (
             <Button
               key={specialty}
               variant="outline"
-              className="rounded-full border-border/50 hover:border-primary/30 hover:bg-primary/5 hover:text-primary transition-all"
+              className="rounded-full border-border/50 hover:border-primary/50 hover:bg-primary/10 hover:text-primary hover:shadow-lg hover:shadow-primary/20 transition-all duration-300 hover:scale-105"
               onClick={() => navigate(`/search?specialty=${encodeURIComponent(specialty)}`)}
             >
               {specialty}
@@ -31,9 +38,9 @@ export const BrowseSpecialties = () => {
           ))}
         </div>
 
-        <div className="text-center mt-8">
-          <Button variant="link" onClick={() => navigate("/search")} className="gap-1 text-primary font-medium">
-            View all specialties <ArrowRight className="h-4 w-4" />
+        <div className="text-center mt-10">
+          <Button variant="link" onClick={() => navigate("/search")} className="gap-2 text-primary font-semibold text-lg hover:text-primary/80 transition-colors">
+            View all specialties <ArrowRight className="h-5 w-5" />
           </Button>
         </div>
       </div>
@@ -45,37 +52,39 @@ export const CTASection = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="py-12 md:py-14 lg:py-20">
+    <section className="py-16 md:py-20 lg:py-24 relative overflow-hidden">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="relative rounded-3xl overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary to-primary/80" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.15),transparent)]" />
+        <div className="relative rounded-[2.5rem] overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/90 to-primary/80" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.2),transparent)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(0,0,0,0.1),transparent)]" />
           
-          <div className="relative p-10 md:p-16 lg:p-20 text-center">
-            <div className="max-w-2xl mx-auto">
-              <div className="inline-flex items-center gap-2 rounded-full bg-primary-foreground/15 px-4 py-1.5 text-xs font-medium text-primary-foreground/90 mb-6 backdrop-blur-sm">
-                <Smartphone className="h-3.5 w-3.5" />
+          <div className="relative p-12 md:p-16 lg:p-24 text-center">
+            <div className="max-w-3xl mx-auto">
+              <div className="inline-flex items-center gap-2 rounded-full bg-primary-foreground/20 px-5 py-2 text-sm font-semibold text-primary-foreground mb-8 backdrop-blur-sm border border-primary-foreground/30 animate-pulse-glow">
+                <Smartphone className="h-4 w-4" />
                 Works on any device
               </div>
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-primary-foreground mb-5 tracking-tight">
-                Your Health, Simplified
+              <h2 className="text-3xl md:text-4xl lg:text-6xl font-bold text-primary-foreground mb-6 tracking-tight leading-tight">
+                Your Health, <br />
+                <span className="text-primary-foreground/90">Simplified</span>
               </h2>
-              <p className="text-primary-foreground/80 text-lg mb-10 max-w-lg mx-auto leading-relaxed">
+              <p className="text-primary-foreground/85 text-lg md:text-xl mb-12 max-w-2xl mx-auto leading-relaxed">
                 Join thousands of Zambians who've made the switch to smarter healthcare. It's free to get started.
               </p>
-              <div className="flex flex-wrap justify-center gap-3">
+              <div className="flex flex-wrap justify-center gap-4">
                 <Button
                   size="lg"
                   variant="secondary"
-                  className="rounded-xl gap-2 font-medium h-12 px-8 shadow-lg"
+                  className="rounded-xl gap-2 font-semibold h-14 px-10 shadow-2xl hover:scale-105 transition-transform"
                   onClick={() => navigate("/auth?tab=signup")}
                 >
-                  Get Started Free <ArrowRight className="h-4 w-4" />
+                  Get Started Free <ArrowRight className="h-5 w-5" />
                 </Button>
                 <Button
                   size="lg"
                   variant="outline"
-                  className="rounded-xl border-2 border-primary-foreground/50 text-primary-foreground hover:bg-primary-foreground/15 font-medium h-12 px-8 bg-primary-foreground/10"
+                  className="rounded-xl border-2 border-primary-foreground/40 text-primary-foreground hover:bg-primary-foreground/15 font-semibold h-14 px-10 bg-primary-foreground/10 backdrop-blur-sm hover:scale-105 transition-transform"
                   onClick={() => navigate("/search")}
                 >
                   Browse Doctors
