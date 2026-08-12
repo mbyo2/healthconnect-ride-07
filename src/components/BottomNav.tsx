@@ -326,8 +326,8 @@ export function BottomNav() {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 safe-area-pb">
-      <div className="absolute inset-0 bg-background/95 backdrop-blur-lg border-t border-border" />
-      <div className="relative flex items-center justify-evenly h-16 px-1 max-w-lg mx-auto">
+      <div className="absolute inset-0 bg-background/95 backdrop-blur-xl border-t-2 border-border/50 shadow-[0_-4px_20px_rgba(0,0,0,0.1)]" />
+      <div className="relative flex items-center justify-evenly h-20 px-2 max-w-lg mx-auto">
         {navItems.map((item, index) => (
           <BottomNavItem key={index} {...item} />
         ))}

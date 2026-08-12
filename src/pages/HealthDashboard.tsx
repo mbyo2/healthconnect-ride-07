@@ -97,91 +97,94 @@ export default function HealthDashboard() {
   }
 
   return (
-    <div className="container mx-auto py-8 space-y-8">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Health Dashboard</h1>
-          <p className="text-muted-foreground mt-2">
-            Monitor your health metrics and track your wellness goals
-          </p>
-        </div>
-        <Button onClick={() => navigate('/ai-diagnostics')} className="mt-4 md:mt-0 gap-2">
-          <Bot className="h-4 w-4" />
-          AI Health Assistant
-          <Sparkles className="h-3 w-3" />
-        </Button>
-      </div>
-
-      {/* AI Insights Widget */}
-      <AIInsightsWidget
-        context="health"
-        data={{
-          stats: healthStats,
-          goals: healthGoals
-        }}
-      />
-
-      {/* Health Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {healthStats.length > 0 ? healthStats.map((stat, index) => (
-          <Card key={index}>
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <div className="p-2 bg-blue-100 dark:bg-blue-950/20 rounded-lg">
-                  {getIconComponent(stat.icon)}
-                </div>
-                {getTrendIcon(stat.trend)}
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <h3 className="font-semibold text-sm">{stat.title}</h3>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-2xl font-bold">{stat.value}</span>
-                  <span className="text-sm text-muted-foreground">{stat.unit}</span>
-                </div>
-                <Badge className={getStatusColor(stat.status)}>
-                  {stat.status}
-                </Badge>
-              </div>
-            </CardContent>
-          </Card>
-        )) : (
-          <div className="col-span-full text-center py-8">
-            <p className="text-muted-foreground">No health metrics recorded yet. Start tracking your health!</p>
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
+      <div className="container mx-auto py-8 px-4 md:px-6 lg:px-8 space-y-8">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-4xl font-bold tracking-tight">Health Dashboard</h1>
+            <p className="text-muted-foreground mt-2 text-lg">
+              Monitor your health metrics and track your wellness goals
+            </p>
           </div>
-        )}
-      </div>
+          <Button onClick={() => navigate('/ai-diagnostics')} className="mt-4 md:mt-0 gap-2 h-12 px-6 text-base">
+            <Bot className="h-5 w-5" />
+            AI Health Assistant
+            <Sparkles className="h-4 w-4" />
+          </Button>
+        </div>
+
+        {/* AI Insights Widget */}
+        <AIInsightsWidget
+          context="health"
+          data={{
+            stats: healthStats,
+            goals: healthGoals
+          }}
+        />
+
+        {/* Health Stats - Monday.com Style Widget Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {healthStats.length > 0 ? healthStats.map((stat, index) => (
+            <Card key={index} className="hover:shadow-xl transition-all duration-300 border-2 border-border/50">
+              <CardHeader className="pb-4">
+                <div className="flex items-center justify-between">
+                  <div className="p-3 bg-primary/10 rounded-xl">
+                    {getIconComponent(stat.icon)}
+                  </div>
+                  {getTrendIcon(stat.trend)}
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <h3 className="font-semibold text-base">{stat.title}</h3>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-3xl font-bold">{stat.value}</span>
+                    <span className="text-sm text-muted-foreground">{stat.unit}</span>
+                  </div>
+                  <Badge className={getStatusColor(stat.status)} variant="secondary">
+                    {stat.status}
+                  </Badge>
+                </div>
+              </CardContent>
+            </Card>
+          )) : (
+            <div className="col-span-full text-center py-12">
+              <p className="text-muted-foreground text-lg">No health metrics recorded yet. Start tracking your health!</p>
+            </div>
+          )}
+        </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Health Goals */}
-        <Card>
+        <Card className="hover:shadow-xl transition-all duration-300 border-2 border-border/50">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Target className="h-5 w-5" />
+            <CardTitle className="flex items-center gap-2 text-xl">
+              <Target className="h-6 w-6 text-primary" />
               Daily Goals
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-base">
               Track your progress towards daily health targets
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             {healthGoals.length > 0 ? healthGoals.map((goal, index) => (
-              <div key={index} className="space-y-2">
+              <div key={index} className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    {getIconComponent(goal.icon)}
-                    <span className="font-medium">{goal.title}</span>
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-primary/10 rounded-lg">
+                      {getIconComponent(goal.icon)}
+                    </div>
+                    <span className="font-semibold text-base">{goal.title}</span>
                   </div>
-                  <span className="text-sm text-muted-foreground">
+                  <span className="text-sm font-medium text-muted-foreground">
                     {goal.current}/{goal.target}
                   </span>
                 </div>
-                <Progress value={(goal.current / goal.target) * 100} className="h-2" />
+                <Progress value={(goal.current / goal.target) * 100} className="h-3" />
               </div>
             )) : (
-              <p className="text-muted-foreground text-center py-4">
+              <p className="text-muted-foreground text-center py-8 text-base">
                 No health goals set yet. Create your first goal!
               </p>
             )}
@@ -189,37 +192,37 @@ export default function HealthDashboard() {
         </Card>
 
         {/* Upcoming Appointments */}
-        <Card>
+        <Card className="hover:shadow-xl transition-all duration-300 border-2 border-border/50">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="h-5 w-5" />
+            <CardTitle className="flex items-center gap-2 text-xl">
+              <Calendar className="h-6 w-6 text-primary" />
               Upcoming Appointments
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-base">
               Your scheduled healthcare appointments
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {upcomingAppointments.length > 0 ? upcomingAppointments.map((appointment, index) => (
-              <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
-                <div>
-                  <h3 className="font-semibold">{appointment.type}</h3>
-                  <p className="text-sm text-muted-foreground">{appointment.provider}</p>
+              <div key={index} className="flex items-center justify-between p-4 border-2 border-border/50 rounded-xl hover:border-primary/50 transition-colors">
+                <div className="flex-1">
+                  <h3 className="font-semibold text-base">{appointment.type}</h3>
+                  <p className="text-sm text-muted-foreground mt-1">{appointment.provider}</p>
                   <p className="text-sm text-muted-foreground">
                     {appointment.date} at {appointment.time}
                   </p>
                 </div>
-                <Button variant="outline" size="sm" onClick={() => navigate(`/appointments/${index}`)}>
+                <Button variant="outline" size="sm" onClick={() => navigate(`/appointments/${index}`)} className="ml-4">
                   View Details
                 </Button>
               </div>
             )) : (
-              <p className="text-muted-foreground text-center py-4">
+              <p className="text-muted-foreground text-center py-8 text-base">
                 No upcoming appointments scheduled.
               </p>
             )}
             <Button
-              className="w-full"
+              className="w-full h-12 text-base"
               variant="outline"
               onClick={() => navigate('/search')}
             >
@@ -230,45 +233,45 @@ export default function HealthDashboard() {
       </div>
 
       {/* Quick Actions - Responsive Grid */}
-      <Card>
+      <Card className="hover:shadow-xl transition-all duration-300 border-2 border-border/50">
         <CardHeader>
-          <CardTitle>Quick Actions</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-xl">Quick Actions</CardTitle>
+          <CardDescription className="text-base">
             Common health management tasks
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <Button
               variant="outline"
-              className="flex items-center justify-start gap-2 h-auto py-3"
+              className="flex items-center justify-start gap-3 h-12 text-base"
               onClick={() => navigate('/symptoms')}
             >
-              <Activity className="h-4 w-4 flex-shrink-0" />
+              <Activity className="h-5 w-5 flex-shrink-0" />
               <span className="text-left">Log Symptoms</span>
             </Button>
             <Button
               variant="outline"
-              className="flex items-center justify-start gap-2 h-auto py-3"
+              className="flex items-center justify-start gap-3 h-12 text-base"
               onClick={() => navigate('/iot-monitoring')}
             >
-              <Heart className="h-4 w-4 flex-shrink-0" />
+              <Heart className="h-5 w-5 flex-shrink-0" />
               <span className="text-left">Record Vitals</span>
             </Button>
             <Button
               variant="outline"
-              className="flex items-center justify-start gap-2 h-auto py-3"
+              className="flex items-center justify-start gap-3 h-12 text-base"
               onClick={() => navigate('/appointments')}
             >
-              <Calendar className="h-4 w-4 flex-shrink-0" />
+              <Calendar className="h-5 w-5 flex-shrink-0" />
               <span className="text-left">Book Appointment</span>
             </Button>
             <Button
               variant="outline"
-              className="flex items-center justify-start gap-2 h-auto py-3"
+              className="flex items-center justify-start gap-3 h-12 text-base"
               onClick={() => navigate('/health-analytics')}
             >
-              <Target className="h-4 w-4 flex-shrink-0" />
+              <Target className="h-5 w-5 flex-shrink-0" />
               <span className="text-left">Set New Goal</span>
             </Button>
           </div>
@@ -277,6 +280,7 @@ export default function HealthDashboard() {
 
       {/* Gamification / Achievements */}
       <GamificationSection />
+      </div>
     </div>
   );
 }
@@ -289,22 +293,22 @@ function GamificationSection() {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <Card>
+      <Card className="hover:shadow-xl transition-all duration-300 border-2 border-border/50">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Trophy className="h-5 w-5 text-yellow-500 dark:text-yellow-400" />
+          <CardTitle className="flex items-center gap-2 text-xl">
+            <Trophy className="h-6 w-6 text-yellow-500 dark:text-yellow-400" />
             Your Badges
           </CardTitle>
-          <CardDescription>Earn badges by staying healthy</CardDescription>
+          <CardDescription className="text-base">Earn badges by staying healthy</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-3">
             {badges.length > 0 ? badges.map((userBadge) => (
-              <div key={userBadge.id} className="flex flex-col items-center p-2 border rounded-lg bg-yellow-50/50 dark:bg-yellow-950/10" title={userBadge.badge.description}>
-                <div className="p-2 bg-yellow-100 dark:bg-yellow-950/20 rounded-full mb-1">
-                  <Award className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
+              <div key={userBadge.id} className="flex flex-col items-center p-3 border-2 border-border/50 rounded-xl bg-yellow-50/50 dark:bg-yellow-950/10 hover:border-yellow-500/50 transition-colors" title={userBadge.badge.description}>
+                <div className="p-3 bg-yellow-100 dark:bg-yellow-950/20 rounded-full mb-2">
+                  <Award className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
                 </div>
-                <span className="text-xs font-medium">{userBadge.badge.name}</span>
+                <span className="text-xs font-semibold">{userBadge.badge.name}</span>
               </div>
             )) : (
               <p className="text-sm text-muted-foreground">No badges earned yet. Keep tracking!</p>
@@ -313,22 +317,22 @@ function GamificationSection() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="hover:shadow-xl transition-all duration-300 border-2 border-border/50">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Target className="h-5 w-5 text-blue-500 dark:text-blue-400" />
+          <CardTitle className="flex items-center gap-2 text-xl">
+            <Target className="h-6 w-6 text-primary" />
             Achievements
           </CardTitle>
-          <CardDescription>Progress towards milestones</CardDescription>
+          <CardDescription className="text-base">Progress towards milestones</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {achievements.length > 0 ? achievements.map((achievement) => (
-            <div key={achievement.id} className="space-y-1">
+            <div key={achievement.id} className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span className="font-medium capitalize">{achievement.achievement_type.replace('_', ' ')}</span>
-                <span className="text-muted-foreground">{achievement.progress}/{achievement.target}</span>
+                <span className="font-semibold capitalize text-base">{achievement.achievement_type.replace('_', ' ')}</span>
+                <span className="text-muted-foreground font-medium">{achievement.progress}/{achievement.target}</span>
               </div>
-              <Progress value={(achievement.progress / achievement.target) * 100} className="h-2" />
+              <Progress value={(achievement.progress / achievement.target) * 100} className="h-3" />
             </div>
           )) : (
             <p className="text-sm text-muted-foreground">No active achievements.</p>

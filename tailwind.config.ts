@@ -148,7 +148,7 @@ export default {
         'button-hover': '0 2px 4px 0 rgba(0, 0, 0, 0.1)',
       },
       fontFamily: {
-        sans: ['Amazon Ember', 'Helvetica Neue', 'Arial', 'sans-serif'],
+        sans: ['Figtree', 'Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
       },
       spacing: {
         '18': '4.5rem',

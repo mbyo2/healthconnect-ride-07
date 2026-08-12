@@ -39,10 +39,10 @@ export const MobileLayout = ({ children, isLoading }: MobileLayoutProps) => {
   if (isDesktop) {
     return (
       <SidebarProvider>
-        <div className="flex flex-col min-h-screen bg-background w-full">
+        <div className="flex flex-col min-h-screen bg-gradient-to-br from-background via-background to-primary/5 w-full">
           <DesktopNav />
           <main id="main-content" className="flex-1 overflow-auto">
-            <div className="mx-auto max-w-[1600px] px-6 lg:px-8 xl:px-12 2xl:px-16 py-6 space-y-6">
+            <div className="mx-auto max-w-[1600px] px-6 lg:px-8 xl:px-12 2xl:px-16 py-8 space-y-8">
               {children}
             </div>
           </main>
@@ -53,7 +53,7 @@ export const MobileLayout = ({ children, isLoading }: MobileLayoutProps) => {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
       <Header />
       <main
         id="main-content"
@@ -64,7 +64,7 @@ export const MobileLayout = ({ children, isLoading }: MobileLayoutProps) => {
           "min-h-0"
         )}
       >
-        <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8 py-4 space-y-6">
+        <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8 py-6 space-y-8">
           {children}
         </div>
       </main>

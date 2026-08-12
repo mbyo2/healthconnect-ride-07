@@ -21,20 +21,22 @@ const HealthAnalytics = () => {
 
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-background via-green-50/20 to-background dark:via-green-950/10 p-4 md:p-6 lg:p-8">
-            <div className="max-w-7xl mx-auto space-y-6">
+        <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
+            <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-8 space-y-8">
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div>
-                        <h1 className="text-3xl md:text-4xl font-bold tracking-tight flex items-center gap-3">
-                            <BarChart3 className="w-10 h-10 text-green-600 dark:text-green-400" />
+                        <h1 className="text-4xl font-bold tracking-tight flex items-center gap-3">
+                            <div className="p-3 bg-primary/10 rounded-xl">
+                                <BarChart3 className="w-8 h-8 text-primary" />
+                            </div>
                             Health Data Analytics
                         </h1>
-                        <p className="text-muted-foreground mt-1">Comprehensive insights into your health trends</p>
+                        <p className="text-muted-foreground mt-2 text-lg">Comprehensive insights into your health trends</p>
                     </div>
                     <div className="flex gap-3">
                         <Select value={timeRange} onValueChange={setTimeRange}>
-                            <SelectTrigger className="w-[150px]">
+                            <SelectTrigger className="w-[180px] h-12">
                                 <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -44,8 +46,8 @@ const HealthAnalytics = () => {
                                 <SelectItem value="1year">Last Year</SelectItem>
                             </SelectContent>
                         </Select>
-                        <Button variant="outline">
-                            <Download className="w-4 h-4 mr-2" />
+                        <Button variant="outline" className="h-12 px-6 text-base">
+                            <Download className="w-5 h-5 mr-2" />
                             Export Report
                         </Button>
                     </div>
@@ -63,25 +65,25 @@ const HealthAnalytics = () => {
                 />
 
                 {/* Analytics Tabs */}
-                <Card>
+                <Card className="hover:shadow-xl transition-all duration-300 border-2 border-border/50">
                     <CardHeader>
-                        <CardTitle>Detailed Analytics</CardTitle>
-                        <CardDescription>Explore your health metrics over time</CardDescription>
+                        <CardTitle className="text-2xl">Detailed Analytics</CardTitle>
+                        <CardDescription className="text-base">Explore your health metrics over time</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <Tabs defaultValue="heart-rate">
-                            <TabsList className="grid w-full grid-cols-4">
-                                <TabsTrigger value="heart-rate">Heart Rate</TabsTrigger>
-                                <TabsTrigger value="activity">Activity</TabsTrigger>
-                                <TabsTrigger value="sleep">Sleep</TabsTrigger>
-                                <TabsTrigger value="vitals">Vitals</TabsTrigger>
+                            <TabsList className="grid w-full grid-cols-4 h-12">
+                                <TabsTrigger value="heart-rate" className="text-base font-semibold">Heart Rate</TabsTrigger>
+                                <TabsTrigger value="activity" className="text-base font-semibold">Activity</TabsTrigger>
+                                <TabsTrigger value="sleep" className="text-base font-semibold">Sleep</TabsTrigger>
+                                <TabsTrigger value="vitals" className="text-base font-semibold">Vitals</TabsTrigger>
                             </TabsList>
 
                             <TabsContent value="heart-rate" className="mt-6">
                                 <div className="space-y-4">
                                     <div className="flex items-center justify-between">
-                                        <h3 className="text-lg font-semibold">Heart Rate Trends</h3>
-                                        <div className="flex items-center gap-4 text-sm">
+                                        <h3 className="text-xl font-semibold">Heart Rate Trends</h3>
+                                        <div className="flex items-center gap-4 text-sm font-medium">
                                             <div className="flex items-center gap-2">
                                                 <div className="w-3 h-3 rounded-full bg-blue-500"></div>
                                                 <span>Average</span>
@@ -96,16 +98,16 @@ const HealthAnalytics = () => {
                                             </div>
                                         </div>
                                     </div>
-                                    <ResponsiveContainer width="100%" height={350}>
+                                    <ResponsiveContainer width="100%" height={400}>
                                         <LineChart data={heartRateData}>
-                                            <CartesianGrid strokeDasharray="3 3" />
+                                            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                                             <XAxis dataKey="date" />
                                             <YAxis />
                                             <Tooltip />
                                             <Legend />
-                                            <Line type="monotone" dataKey="avg" stroke="#3b82f6" strokeWidth={2} name="Average" />
-                                            <Line type="monotone" dataKey="min" stroke="#22c55e" strokeWidth={1} name="Min" />
-                                            <Line type="monotone" dataKey="max" stroke="#ef4444" strokeWidth={1} name="Max" />
+                                            <Line type="monotone" dataKey="avg" stroke="hsl(var(--primary))" strokeWidth={3} name="Average" />
+                                            <Line type="monotone" dataKey="min" stroke="#22c55e" strokeWidth={2} name="Min" />
+                                            <Line type="monotone" dataKey="max" stroke="#ef4444" strokeWidth={2} name="Max" />
                                         </LineChart>
                                     </ResponsiveContainer>
                                 </div>
@@ -113,16 +115,16 @@ const HealthAnalytics = () => {
 
                             <TabsContent value="activity" className="mt-6">
                                 <div className="space-y-4">
-                                    <h3 className="text-lg font-semibold">Daily Activity</h3>
-                                    <ResponsiveContainer width="100%" height={350}>
+                                    <h3 className="text-xl font-semibold">Daily Activity</h3>
+                                    <ResponsiveContainer width="100%" height={400}>
                                         <BarChart data={activityData}>
-                                            <CartesianGrid strokeDasharray="3 3" />
+                                            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                                             <XAxis dataKey="date" />
                                             <YAxis />
                                             <Tooltip />
                                             <Legend />
-                                            <Bar dataKey="steps" fill="#3b82f6" name="Steps" />
-                                            <Bar dataKey="calories" fill="#22c55e" name="Calories" />
+                                            <Bar dataKey="steps" fill="hsl(var(--primary))" name="Steps" radius={[4, 4, 0, 0]} />
+                                            <Bar dataKey="calories" fill="#22c55e" name="Calories" radius={[4, 4, 0, 0]} />
                                         </BarChart>
                                     </ResponsiveContainer>
                                 </div>
@@ -130,16 +132,16 @@ const HealthAnalytics = () => {
 
                             <TabsContent value="sleep" className="mt-6">
                                 <div className="space-y-4">
-                                    <h3 className="text-lg font-semibold">Sleep Quality</h3>
-                                    <ResponsiveContainer width="100%" height={350}>
+                                    <h3 className="text-xl font-semibold">Sleep Quality</h3>
+                                    <ResponsiveContainer width="100%" height={400}>
                                         <AreaChart data={sleepData}>
-                                            <CartesianGrid strokeDasharray="3 3" />
+                                            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                                             <XAxis dataKey="date" />
                                             <YAxis />
                                             <Tooltip />
                                             <Legend />
                                             <Area type="monotone" dataKey="deep" stackId="1" stroke="#8b5cf6" fill="#8b5cf6" name="Deep Sleep" />
-                                            <Area type="monotone" dataKey="light" stackId="1" stroke="#3b82f6" fill="#3b82f6" name="Light Sleep" />
+                                            <Area type="monotone" dataKey="light" stackId="1" stroke="hsl(var(--primary))" fill="hsl(var(--primary))" name="Light Sleep" />
                                             <Area type="monotone" dataKey="rem" stackId="1" stroke="#22c55e" fill="#22c55e" name="REM Sleep" />
                                         </AreaChart>
                                     </ResponsiveContainer>
@@ -148,59 +150,67 @@ const HealthAnalytics = () => {
 
                             <TabsContent value="vitals" className="mt-6">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <Card>
+                                    <Card className="hover:shadow-xl transition-all duration-300 border-2 border-border/50">
                                         <CardHeader>
-                                            <CardTitle className="text-base flex items-center gap-2">
-                                                <Heart className="w-4 h-4 text-red-500 dark:text-red-400" />
+                                            <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                                                <div className="p-2 bg-red-100 dark:bg-red-950/20 rounded-lg">
+                                                    <Heart className="w-5 h-5 text-red-500 dark:text-red-400" />
+                                                </div>
                                                 Blood Pressure
                                             </CardTitle>
                                         </CardHeader>
                                         <CardContent>
-                                            <div className="text-3xl font-bold">{vitalsData.bloodPressure}</div>
-                                            <p className="text-sm text-muted-foreground mt-1">mmHg - Normal</p>
-                                            <p className="text-xs text-green-600 dark:text-green-400 mt-2">↓ 2% from last week</p>
+                                            <div className="text-4xl font-bold">{vitalsData.bloodPressure}</div>
+                                            <p className="text-sm text-muted-foreground mt-2">mmHg - Normal</p>
+                                            <p className="text-sm text-green-600 dark:text-green-400 mt-2 font-medium">↓ 2% from last week</p>
                                         </CardContent>
                                     </Card>
 
-                                    <Card>
+                                    <Card className="hover:shadow-xl transition-all duration-300 border-2 border-border/50">
                                         <CardHeader>
-                                            <CardTitle className="text-base flex items-center gap-2">
-                                                <Droplet className="w-4 h-4 text-blue-500 dark:text-blue-400" />
+                                            <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                                                <div className="p-2 bg-blue-100 dark:bg-blue-950/20 rounded-lg">
+                                                    <Droplet className="w-5 h-5 text-blue-500 dark:text-blue-400" />
+                                                </div>
                                                 Oxygen Saturation
                                             </CardTitle>
                                         </CardHeader>
                                         <CardContent>
-                                            <div className="text-3xl font-bold">{vitalsData.oxygenSaturation}</div>
-                                            <p className="text-sm text-muted-foreground mt-1">SpO2 - Excellent</p>
-                                            <p className="text-xs text-green-600 dark:text-green-400 mt-2">Stable</p>
+                                            <div className="text-4xl font-bold">{vitalsData.oxygenSaturation}</div>
+                                            <p className="text-sm text-muted-foreground mt-2">SpO2 - Excellent</p>
+                                            <p className="text-sm text-green-600 dark:text-green-400 mt-2 font-medium">Stable</p>
                                         </CardContent>
                                     </Card>
 
-                                    <Card>
+                                    <Card className="hover:shadow-xl transition-all duration-300 border-2 border-border/50">
                                         <CardHeader>
-                                            <CardTitle className="text-base flex items-center gap-2">
-                                                <Weight className="w-4 h-4 text-purple-500 dark:text-purple-400" />
+                                            <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                                                <div className="p-2 bg-purple-100 dark:bg-purple-950/20 rounded-lg">
+                                                    <Weight className="w-5 h-5 text-purple-500 dark:text-purple-400" />
+                                                </div>
                                                 Weight
                                             </CardTitle>
                                         </CardHeader>
                                         <CardContent>
-                                            <div className="text-3xl font-bold">{vitalsData.weight}</div>
-                                            <p className="text-sm text-muted-foreground mt-1">BMI: 22.5 - Healthy</p>
-                                            <p className="text-xs text-green-600 dark:text-green-400 mt-2">↓ 0.5 kg this month</p>
+                                            <div className="text-4xl font-bold">{vitalsData.weight}</div>
+                                            <p className="text-sm text-muted-foreground mt-2">BMI: 22.5 - Healthy</p>
+                                            <p className="text-sm text-green-600 dark:text-green-400 mt-2 font-medium">↓ 0.5 kg this month</p>
                                         </CardContent>
                                     </Card>
 
-                                    <Card>
+                                    <Card className="hover:shadow-xl transition-all duration-300 border-2 border-border/50">
                                         <CardHeader>
-                                            <CardTitle className="text-base flex items-center gap-2">
-                                                <Activity className="w-4 h-4 text-orange-500 dark:text-orange-400" />
+                                            <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                                                <div className="p-2 bg-orange-100 dark:bg-orange-950/20 rounded-lg">
+                                                    <Activity className="w-5 h-5 text-orange-500 dark:text-orange-400" />
+                                                </div>
                                                 Resting Heart Rate
                                             </CardTitle>
                                         </CardHeader>
                                         <CardContent>
-                                            <div className="text-3xl font-bold">{vitalsData.restingHeartRate}</div>
-                                            <p className="text-sm text-muted-foreground mt-1">Excellent fitness level</p>
-                                            <p className="text-xs text-green-600 dark:text-green-400 mt-2">↓ 3 bpm this month</p>
+                                            <div className="text-4xl font-bold">{vitalsData.restingHeartRate}</div>
+                                            <p className="text-sm text-muted-foreground mt-2">Excellent fitness level</p>
+                                            <p className="text-sm text-green-600 dark:text-green-400 mt-2 font-medium">↓ 3 bpm this month</p>
                                         </CardContent>
                                     </Card>
                                 </div>
