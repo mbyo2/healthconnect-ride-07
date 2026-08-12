@@ -11,20 +11,10 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { getDocumentLabels, areRequiredDocumentsComplete } from '@/config/documentRequirements';
+import type { CountryCode } from '@/config/documentRequirements';
 
-const REQUIRED_DOCS_BY_ROLE: Record<string, string[]> = {
-  doctor: ['Medical License', 'Medical Degree Certificate', 'ID / Passport'],
-  nurse: ['Nursing License', 'Nursing Certificate', 'ID / Passport'],
-  pharmacist: ['Pharmacy License', 'Pharmacy Degree', 'ID / Passport'],
-  lab_technician: ['Lab Technician Certificate', 'ID / Passport'],
-  radiologist: ['Radiology License', 'Medical Degree', 'ID / Passport'],
-  health_personnel: ['Professional License', 'ID / Passport'],
-  pharmacy: ['Pharmacy Business License', 'Tax Registration', 'Premises Certificate'],
-  lab: ['Laboratory License', 'Accreditation Certificate', 'Tax Registration'],
-  institution_admin: ['Business Registration', 'Operating License', 'Tax Registration', 'Accreditation Certificate'],
-};
-
-const DocumentUploadSection = ({ userId, userRole }: { userId: string; userRole: string }) => {
+const DocumentUploadSection = ({ userId, userRole, countryCode = 'ZM' }: { userId: string; userRole: string; countryCode?: CountryCode }) => {
   const [uploading, setUploading] = useState(false);
   const queryClient = useQueryClient();
 
@@ -39,7 +29,8 @@ const DocumentUploadSection = ({ userId, userRole }: { userId: string; userRole:
     },
   });
 
-  const requiredDocs = REQUIRED_DOCS_BY_ROLE[userRole] || REQUIRED_DOCS_BY_ROLE['health_personnel'];
+  // Get country-specific document labels for the role
+  const requiredDocs = getDocumentLabels(countryCode, userRole);
 
   const handleFileUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>, docLabel: string) => {
     const file = e.target.files?.[0];
@@ -219,6 +210,8 @@ export const AccountApprovalGate = ({ children }: { children: React.ReactNode })
   const navigate = useNavigate();
 
   const isPatient = currentRole === 'patient' || profile?.role === 'patient';
+  // Get user's country from profile, default to Zambia
+  const userCountry = (profile?.address?.split(',').pop()?.trim() as CountryCode) || 'ZM';
 
   // Check application status for providers
   const { data: application, isLoading: appLoading } = useQuery({
@@ -267,7 +260,12 @@ export const AccountApprovalGate = ({ children }: { children: React.ReactNode })
   const status = application?.status || (institution ? 'pending' : 'pending');
   const isRejected = status === 'rejected';
   const effectiveRole = currentRole || 'health_personnel';
-  const hasDocuments = application?.documents_url && application.documents_url.length > 0;
+  // Build uploaded labels from stored paths
+  const uploadedLabels: string[] = (application?.documents_url || []).map((p: string) => {
+    const name = p.split('/').pop() || p;
+    return name.replace(/_\d+\./, '.').replace(/_/g, ' ');
+  });
+  const hasDocuments = areRequiredDocumentsComplete(userCountry, effectiveRole, uploadedLabels);
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center p-4">
@@ -310,11 +308,14 @@ export const AccountApprovalGate = ({ children }: { children: React.ReactNode })
                 {application.review_notes}
               </div>
             )}
+            <p className="text-sm text-muted-foreground mt-2">
+              An admin or superadmin will verify your uploaded documents before approving your account.
+            </p>
           </div>
 
           {/* Document Upload Section */}
           {user && !isRejected && (
-            <DocumentUploadSection userId={user.id} userRole={effectiveRole} />
+            <DocumentUploadSection userId={user.id} userRole={effectiveRole} countryCode={userCountry} />
           )}
 
           {/* What you can do */}
@@ -343,7 +344,7 @@ export const AccountApprovalGate = ({ children }: { children: React.ReactNode })
               <p className="text-xs text-center text-muted-foreground">
                 You may re-upload corrected documents and request a re-review.
               </p>
-              {user && <DocumentUploadSection userId={user.id} userRole={effectiveRole} />}
+              {user && <DocumentUploadSection userId={user.id} userRole={effectiveRole} countryCode={userCountry} />}
               <p className="text-xs text-center text-muted-foreground">
                 Or contact support at support@dococlock.online
               </p>

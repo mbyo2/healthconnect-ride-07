@@ -190,7 +190,7 @@ export class ProviderRegistrationService {
         specialty: data.specialty,
         years_of_experience: data.years_of_experience,
         documents_url: data.documents_url || [],
-        status: 'approved' // Auto-approve for seamless onboarding
+        status: 'pending'
       };
 
       const { error: applicationError } = await this.retryOperation(

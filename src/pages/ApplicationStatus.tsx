@@ -16,6 +16,7 @@ interface Application {
   submitted_at: string;
   reviewed_at?: string;
   notes?: string;
+  name: string;
 }
 
 const ApplicationStatus = () => {
@@ -52,14 +53,43 @@ const ApplicationStatus = () => {
     if (!user) return;
 
     try {
-      const { data, error } = await supabase
-        .from('applications' as any)
-        .select('*')
-        .eq('user_id', user.id)
-        .order('submitted_at', { ascending: false });
+      const [providerResponse, institutionResponse] = await Promise.all([
+        supabase
+          .from('health_personnel_applications')
+          .select('id, status, created_at, reviewed_at, review_notes')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false }),
+        supabase
+          .from('institution_applications' as any)
+          .select('id, status, submitted_at, reviewed_at, reviewer_notes, institution_name')
+          .eq('applicant_id', user.id)
+          .order('submitted_at', { ascending: false }),
+      ]);
 
-      if (error) throw error;
-      setApplications(data as any || []);
+      if (providerResponse.error) throw providerResponse.error;
+      if (institutionResponse.error) throw institutionResponse.error;
+
+      const providerApps = (providerResponse.data || []).map((app: any) => ({
+        id: app.id,
+        application_type: 'Provider application',
+        status: app.status,
+        submitted_at: app.created_at,
+        reviewed_at: app.reviewed_at || undefined,
+        notes: app.review_notes || undefined,
+        name: 'Health personnel verification',
+      }));
+
+      const institutionApps = (institutionResponse.data || []).map((app: any) => ({
+        id: app.id,
+        application_type: 'Institution application',
+        status: app.status,
+        submitted_at: app.submitted_at,
+        reviewed_at: app.reviewed_at || undefined,
+        notes: app.reviewer_notes || undefined,
+        name: app.institution_name || 'Institution verification',
+      }));
+
+      setApplications([...providerApps, ...institutionApps].sort((a, b) => new Date(b.submitted_at).getTime() - new Date(a.submitted_at).getTime()));
     } catch (error) {
       console.error('Error fetching applications:', error);
       toast.error('Failed to load applications');
@@ -138,7 +168,7 @@ const ApplicationStatus = () => {
                     {getStatusIcon(application.status)}
                     <div>
                       <CardTitle className="text-lg capitalize">
-                        {application.application_type.replace('_', ' ')}
+                        {application.application_type}
                       </CardTitle>
                       <CardDescription>
                         Submitted {format(new Date(application.submitted_at), 'PPP')}

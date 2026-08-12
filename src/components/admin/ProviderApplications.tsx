@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useUserRoles } from '@/context/UserRolesContext';
+import { REGULATORY_REQUIREMENTS, getCountryRequirements, validateDocumentUpload, type DocumentRequirement } from '@/config/regulatoryRequirements';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { Check, X, Loader2, FileText, ExternalLink } from "lucide-react";
+import { Check, X, Loader2, FileText, ExternalLink, AlertCircle } from "lucide-react";
 
 interface ProviderApp {
   id: string;
@@ -29,6 +32,9 @@ export const ProviderApplications = () => {
   const [notes, setNotes] = useState("");
   const [processing, setProcessing] = useState(false);
   const [docUrls, setDocUrls] = useState<Record<string, string>>({});
+  const [documentChecks, setDocumentChecks] = useState<Record<string, boolean>>({});
+  const { isAdmin, isSuperAdmin } = useUserRoles();
+  const canReview = isAdmin || isSuperAdmin;
 
   const fetchApps = async () => {
     setLoading(true);
@@ -42,7 +48,7 @@ export const ProviderApplications = () => {
 
       const userIds = (data || []).map((a: any) => a.user_id);
       const { data: profiles } = userIds.length
-        ? await supabase.from('profiles').select('id, first_name, last_name, email, phone').in('id', userIds)
+        ? await supabase.from('profiles').select('id, first_name, last_name, email, phone, country, provider_type, role').in('id', userIds)
         : { data: [] as any[] };
 
       const merged = (data || []).map((a: any) => ({
@@ -59,10 +65,31 @@ export const ProviderApplications = () => {
 
   useEffect(() => { fetchApps(); }, [filter]);
 
+  if (!canReview) {
+    return (
+      <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-6 text-sm text-destructive">
+        You do not have permission to review provider applications. Only admin and superadmin users can verify and approve provider submissions.
+      </div>
+    );
+  }
+
   const openReview = async (app: ProviderApp) => {
     setSelected(app);
     setNotes(app.review_notes || "");
     setDocUrls({});
+    setDocumentChecks({});
+    
+    // Get country from profile (use app.profile since selected is being set)
+    const country = (app.profile as any)?.country || 'ZM';
+    const requirements = getCountryRequirements(country, 'healthcareProfessionals');
+    
+    // Initialize document checks
+    const checks: Record<string, boolean> = {};
+    requirements.forEach(req => {
+      checks[req.id] = false;
+    });
+    setDocumentChecks(checks);
+    
     if (app.documents_url?.length) {
       const urls: Record<string, string> = {};
       for (const path of app.documents_url) {
@@ -75,6 +102,24 @@ export const ProviderApplications = () => {
 
   const decide = async (status: 'approved' | 'rejected') => {
     if (!selected) return;
+    if (!canReview) {
+      toast.error('Only admin or superadmin users can approve applications.');
+      return;
+    }
+    
+    // Check that all required documents are verified before approving
+    if (status === 'approved') {
+      const country = (selected.profile as any)?.country || 'ZM';
+      const requirements = getCountryRequirements(country, 'healthcareProfessionals');
+      const requiredDocs = requirements.filter(req => req.required);
+      
+      const allRequiredChecked = requiredDocs.every(req => documentChecks[req.id] === true);
+      if (!allRequiredChecked) {
+        toast.error('Please verify all required documents before approving.');
+        return;
+      }
+    }
+    
     setProcessing(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -168,6 +213,37 @@ export const ProviderApplications = () => {
                 <div><strong>Specialty:</strong> {selected.specialty}</div>
                 <div><strong>License #:</strong> {selected.license_number || '—'}</div>
                 <div><strong>Years:</strong> {selected.years_of_experience}</div>
+              </div>
+
+              <div>
+                <h4 className="font-semibold mb-3 text-sm">Document Verification Checklist</h4>
+                <div className="space-y-2">
+                  {getCountryRequirements((selected.profile as any)?.country || 'ZM', 'healthcareProfessionals').map((req) => (
+                    <div key={req.id} className="flex items-start gap-3 p-3 border rounded-lg">
+                      <Checkbox
+                        id={`doc-check-${req.id}`}
+                        checked={documentChecks[req.id] || false}
+                        onCheckedChange={(checked) => 
+                          setDocumentChecks(prev => ({ ...prev, [req.id]: checked as boolean }))
+                        }
+                        disabled={processing}
+                      />
+                      <div className="flex-1">
+                        <label
+                          htmlFor={`doc-check-${req.id}`}
+                          className="font-medium text-sm cursor-pointer flex items-center gap-2"
+                        >
+                          {req.name}
+                          {req.required && <span className="text-destructive">*</span>}
+                        </label>
+                        <p className="text-xs text-muted-foreground mt-1">{req.description}</p>
+                      </div>
+                      {documentChecks[req.id] && (
+                        <CheckCircle className="h-5 w-5 text-green-600" />
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
 
               <div>

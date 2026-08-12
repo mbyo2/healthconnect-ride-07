@@ -1,7 +1,7 @@
 
 import { NavigateFunction } from 'react-router-dom';
 import { VOICE_COMMANDS } from './voice-command-constants';
-import { readPageContent } from './voice-command-speech';
+import { readPageContent, speak } from './voice-command-speech';
 
 // Types for search context functionality
 interface SearchContext {
@@ -189,9 +189,7 @@ export const executeCommand = ({
 }: ExecuteCommandProps) => {
   // Helper function to speak messages
   const speakMessage = (message: string) => {
-    import('./voice-command-speech').then(({ speak }) => {
-      speak(message, setIsSpeaking);
-    });
+    speak(message, setIsSpeaking);
   };
 
   const normalizedCommand = command.toLowerCase().trim();
