@@ -127,10 +127,20 @@ export const SearchFilters = () => {
                     <SelectValue placeholder="All insurance" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All insurance</SelectItem>
-                    <SelectItem value="none">No Insurance</SelectItem>
-                    <SelectItem value="government">Government</SelectItem>
-                    <SelectItem value="private">Private</SelectItem>
+                    <SelectItem value="">All insurance networks</SelectItem>
+                    <SelectItem value="none">Self-Pay / Cash Only</SelectItem>
+                    <SelectItem value="nhima">NHIMA (National Health Insurance)</SelectItem>
+                    <SelectItem value="madison">Madison Health Insurance</SelectItem>
+                    <SelectItem value="ses">SES Uniting Health</SelectItem>
+                    <SelectItem value="professional_life">Professional Life Assurance</SelectItem>
+                    <SelectItem value="medland">Medland Health Plan</SelectItem>
+                    <SelectItem value="liberty">Liberty Health Cover</SelectItem>
+                    <SelectItem value="aetna">Aetna International</SelectItem>
+                    <SelectItem value="cigna">Cigna Global</SelectItem>
+                    <SelectItem value="bupa">Bupa Global</SelectItem>
+                    <SelectItem value="alliance">Alliance Health</SelectItem>
+                    <SelectItem value="sanlam">Sanlam Health</SelectItem>
+                    <SelectItem value="prudential">Prudential Life & Health</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

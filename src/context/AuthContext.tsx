@@ -61,6 +61,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     );
 
+    // Fail-safe maximum load timer (2.5 seconds max) to guarantee loading state is unblocked
+    const loadGuardTimer = setTimeout(() => {
+      setIsLoading((prev) => {
+        if (prev) {
+          console.warn('Auth state initialization timed out — unblocking app loading state');
+          return false;
+        }
+        return prev;
+      });
+    }, 2500);
+
     // THEN check for existing session
     supabase.auth.getSession().then(async ({ data: { session: currentSession } }) => {
       setSession(currentSession);
@@ -71,17 +82,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // and let the fresh profile fetch happen in the background
         if (safeLocalGet('doc_oclock_profile')) {
           setIsLoading(false);
+          clearTimeout(loadGuardTimer);
           fetchProfile(currentSession.user.id); // Fetch fresh data in background
         } else {
-          await fetchProfile(currentSession.user.id);
-          setIsLoading(false);
+          try {
+            await fetchProfile(currentSession.user.id);
+          } catch (err) {
+            console.error('Error in fetchProfile during initial auth check:', err);
+          } finally {
+            setIsLoading(false);
+            clearTimeout(loadGuardTimer);
+          }
         }
       } else {
         setIsLoading(false);
+        clearTimeout(loadGuardTimer);
       }
+    }).catch((err) => {
+      console.error('Failed to retrieve session from Supabase:', err);
+      setIsLoading(false);
+      clearTimeout(loadGuardTimer);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+      clearTimeout(loadGuardTimer);
+    };
   }, []);
 
   const fetchProfile = async (userId: string, retryCount = 0) => {

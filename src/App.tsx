@@ -14,15 +14,24 @@ import { TwoFactorGate } from '@/components/auth/TwoFactorGate';
 import { useAndroidBackButton } from '@/hooks/use-android-back-button';
 import { usePageTracking } from '@/hooks/use-analytics';
 
-// Retry wrapper for lazy imports to handle stale chunk errors
+// Bounded retry wrapper for lazy imports to handle stale chunk errors without hanging indefinitely
 const lazyWithRetry = (importFn: () => Promise<any>) =>
-  lazy(() =>
-    importFn().catch(() =>
-      new Promise<any>((resolve) =>
-        setTimeout(() => resolve(importFn()), 1500)
-      )
-    )
-  );
+  lazy(async () => {
+    let retries = 2;
+    while (retries > 0) {
+      try {
+        return await importFn();
+      } catch (err) {
+        retries -= 1;
+        if (retries === 0) {
+          console.error('Failed to load page component chunk after retries:', err);
+          throw err;
+        }
+        await new Promise((r) => setTimeout(r, 800));
+      }
+    }
+    return importFn();
+  });
 
 // EAGERLY import the Landing page — it's the primary entry point for all visitors
 import LandingPage from '@/pages/Landing';
@@ -325,7 +334,5 @@ const App: React.FC = () => {
     </HelmetProvider>
   );
 };
-
-
 
 export default App;

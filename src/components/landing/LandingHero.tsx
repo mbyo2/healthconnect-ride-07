@@ -35,12 +35,12 @@ export const LandingHero = () => {
             </p>
 
             <form onSubmit={handleSearch} className="mx-auto mb-8 max-w-xl lg:mx-0">
-              <div className="flex gap-2 rounded-2xl border border-border/60 bg-card p-1.5 shadow-2xl shadow-primary/10">
+              <div className="flex gap-2 rounded-3xl border border-border/60 bg-card p-2 shadow-card">
                 <div className="relative flex-1">
-                  <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input type="text" placeholder="Doctor, specialty, or condition" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="h-12 border-0 bg-transparent pl-10 shadow-none focus-visible:ring-0 text-base" />
+                  <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input type="text" placeholder="Doctor, specialty, or condition" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="h-12 border-0 bg-transparent pl-11 shadow-none focus-visible:ring-0 text-base" />
                 </div>
-                <Button type="submit" className="h-12 rounded-xl px-8 font-semibold">Search</Button>
+                <Button type="submit" className="h-12 rounded-full px-8 font-semibold">Search</Button>
               </div>
             </form>
 
@@ -68,19 +68,19 @@ export const LandingHero = () => {
 
           <div className="relative mx-auto w-full max-w-lg animate-scale-in">
             <div className="absolute -inset-6 rounded-[2.5rem] bg-gradient-to-br from-primary/20 via-primary/10 to-transparent blur-3xl" />
-            <div className="relative overflow-hidden rounded-[2rem] border border-border/60 bg-card p-3 shadow-2xl shadow-primary/15">
+            <div className="relative overflow-hidden rounded-[2rem] border border-border/60 bg-card p-3 shadow-card">
               <div className="relative rounded-[1.75rem] overflow-hidden">
                 <img src="https://images.unsplash.com/photo-1666886573440-16ac24f89e31?auto=format&fit=crop&w=1200&q=85" alt="Black healthcare professional and patient reviewing care together" className="h-[400px] w-full object-cover sm:h-[500px]" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
               </div>
-              <div className="absolute bottom-6 left-6 right-6 rounded-2xl border border-white/20 bg-background/95 p-5 shadow-2xl backdrop-blur-sm">
+              <div className="absolute bottom-6 left-6 right-6 rounded-3xl border border-white/20 bg-background/95 p-5 shadow-card backdrop-blur-sm">
                 <div className="flex items-center gap-4">
                   <img src="https://images.unsplash.com/photo-1666886573681-a8fbe983a3fd?auto=format&fit=crop&w=160&q=80" alt="Black African healthcare professional" className="h-12 w-12 rounded-full object-cover ring-2 ring-primary/20" />
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-semibold">Care that fits your life</p>
                     <p className="text-xs text-muted-foreground">Clinics, hospitals, specialists, and pharmacy care</p>
                   </div>
-                  <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
                     <Video className="h-5 w-5 text-primary" />
                   </div>
                 </div>
@@ -96,7 +96,7 @@ export const LandingHero = () => {
             { value: formatStat(stats.pharmacies), label: "Pharmacies", icon: Pill },
             { value: `${stats.rating}★`, label: "Average Rating", icon: Star },
           ].map((stat) => (
-            <div key={stat.label} className="group relative overflow-hidden rounded-2xl border border-border/40 bg-card p-5 text-center shadow-sm hover:shadow-lg hover:border-primary/30 transition-all duration-300">
+            <div key={stat.label} className="group relative overflow-hidden rounded-3xl border border-border/40 bg-card p-6 text-center shadow-card hover:shadow-card-hover hover:border-primary/30 transition-all duration-300">
               <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
               <stat.icon className="mx-auto mb-3 h-6 w-6 text-primary group-hover:scale-110 transition-transform" />
               <div className="text-3xl font-bold">{stat.value}</div>

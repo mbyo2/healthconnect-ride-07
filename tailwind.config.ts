@@ -52,6 +52,16 @@ export default {
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
+          50: "#EFF6FF",
+          100: "#DBEAFE",
+          200: "#BFDBFE",
+          300: "#93C5FD",
+          400: "#60A5FA",
+          500: "#3B82F6",
+          600: "#2563EB",
+          700: "#1D4ED8",
+          800: "#1E40AF",
+          900: "#1E3A8A",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
@@ -76,6 +86,36 @@ export default {
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
+        },
+        // Modern healthcare color palette
+        slate: {
+          50: "#F8FAFC",
+          100: "#F1F5F9",
+          200: "#E2E8F0",
+          300: "#CBD5E1",
+          400: "#94A3B8",
+          500: "#64748B",
+          600: "#475569",
+          700: "#334155",
+          800: "#1E293B",
+          900: "#0F172A",
+        },
+        // Pastel accent colors
+        success: {
+          50: "#F0FDF4",
+          100: "#DCFCE7",
+          200: "#BBF7D0",
+          300: "#86EFAC",
+          400: "#4ADE80",
+          500: "#22C55E",
+        },
+        alert: {
+          50: "#FEF2F2",
+          100: "#FEE2E2",
+          200: "#FECACA",
+          300: "#FCA5A5",
+          400: "#F87171",
+          500: "#EF4444",
         },
         // Modern e-commerce color palette
         trust: {
@@ -142,10 +182,11 @@ export default {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
       },
       boxShadow: {
-        'card': '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
-        'card-hover': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+        'card': '0 10px 40px rgba(0, 0, 0, 0.04)',
+        'card-hover': '0 20px 60px rgba(0, 0, 0, 0.08)',
         'button': '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
         'button-hover': '0 2px 4px 0 rgba(0, 0, 0, 0.1)',
+        'glass': '0 8px 32px rgba(0, 0, 0, 0.08)',
       },
       fontFamily: {
         sans: ['Figtree', 'Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],

@@ -113,20 +113,15 @@ async function networkFirstStrategy(request) {
       return cachedResponse;
     }
 
-    // Check if this is a navigation request for a critical route
+    // Check if this is a navigation request
     if (request.mode === 'navigate') {
-      const url = new URL(request.url);
-      const pathname = url.pathname;
-
-      if (CRITICAL_ROUTES.includes(pathname)) {
-        // For critical routes, try to serve the root document
-        const rootResponse = await caches.match('/');
-        if (rootResponse) {
-          return rootResponse;
-        }
+      // For SPA navigation, attempt to serve the root document or index.html shell
+      const rootResponse = (await caches.match('/index.html')) || (await caches.match('/'));
+      if (rootResponse) {
+        return rootResponse;
       }
 
-      // If not a critical route or no root document, show offline page
+      // If no cached SPA document exists, show offline page
       return caches.match(OFFLINE_URL);
     }
 

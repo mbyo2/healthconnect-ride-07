@@ -10,7 +10,7 @@ import { useSearch } from "@/context/SearchContext";
 import {
   Home, Calendar, MessageSquare, Users, ShoppingCart, Heart, Settings, User, Brain,
   Shield, Activity, BarChart3, AlertTriangle, Zap, Package, Pill, Stethoscope,
-  Building2, Wallet
+  Building2, Wallet, ShieldCheck, Calculator, Bell, Clock
 } from "lucide-react";
 import { DesktopNavMenu } from "@/components/navigation/DesktopNavMenu";
 import { DesktopUserMenu } from "@/components/navigation/DesktopUserMenu";
@@ -205,6 +205,10 @@ export function DesktopNav() {
     // Default: Patient
     return [
       { to: "/appointments", label: "My Appointments", icon: <Calendar className="h-4 w-4 mr-2" /> },
+      { to: "/insurance-cards", label: "Insurance Cards", icon: <ShieldCheck className="h-4 w-4 mr-2" /> },
+      { to: "/cost-estimator", label: "Cost Estimator", icon: <Calculator className="h-4 w-4 mr-2" /> },
+      { to: "/waitlist", label: "My Waitlists", icon: <Bell className="h-4 w-4 mr-2" /> },
+      { to: "/appointment-reminders", label: "Reminders & Sync", icon: <Clock className="h-4 w-4 mr-2" /> },
       { to: "/emergency", label: "Emergency Help", icon: <AlertTriangle className="h-4 w-4 mr-2" /> },
       { to: "/marketplace", label: "Buy Medicine", icon: <Pill className="h-4 w-4 mr-2" /> },
       { to: "/prescriptions", label: "Prescriptions", icon: <Heart className="h-4 w-4 mr-2" /> },
@@ -218,22 +222,22 @@ export function DesktopNav() {
   }, [isHealthPersonnel, isAdmin, availableRoles, isInstitutionAffiliated]);
 
   return (
-    <header className="bg-background/95 backdrop-blur-xl sticky top-0 z-50 border-b-2 border-border/50 shadow-sm" role="banner">
-      <div className="mx-auto flex items-center justify-between h-20 px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 max-w-[1600px]">
+    <header className="bg-background/80 backdrop-blur-xl sticky top-0 z-50 shadow-sm" role="banner">
+      <div className="mx-auto flex items-center justify-between h-20 px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20 max-w-[1600px]">
         {/* Left: Logo + Nav */}
-        <div className="flex items-center gap-8 lg:gap-10">
+        <div className="flex items-center gap-10 lg:gap-12">
           <AppLogo size="sm" className="shrink-0" />
 
-          <nav className="hidden lg:flex items-center gap-1" role="navigation" aria-label="Main navigation">
+          <nav className="hidden lg:flex items-center gap-2" role="navigation" aria-label="Main navigation">
             {mainNavItems.map((item) => (
               <Link
                 key={item.to}
                 to={item.to}
                 aria-current={item.active ? "page" : undefined}
-                className={`flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                className={`flex items-center gap-2.5 px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${
                   item.active
-                    ? "bg-primary/10 text-primary shadow-md"
-                    : "text-muted-foreground hover:text-foreground hover:bg-accent/80"
+                    ? "bg-primary text-primary-foreground shadow-button"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent"
                 }`}
               >
                 {item.icon}
@@ -246,13 +250,13 @@ export function DesktopNav() {
         </div>
 
         {/* Right: Search + Actions */}
-        <div className="flex items-center gap-3 lg:gap-4">
+        <div className="flex items-center gap-4">
           <form onSubmit={handleSearchSubmit} className="relative hidden md:block" role="search">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
               placeholder="Search doctors, specialties..."
-              className="w-[200px] lg:w-[280px] xl:w-[340px] 2xl:w-[400px] pl-10 h-11 rounded-xl bg-muted/50 border-2 border-transparent focus:bg-background focus:border-primary transition-all duration-200"
+              className="w-[220px] lg:w-[300px] xl:w-[360px] 2xl:w-[420px] pl-11 h-12 rounded-full bg-muted/50 border-2 border-transparent focus:bg-background focus:border-primary transition-all duration-300"
               value={searchTerm}
               onChange={handleSearchChange}
             />
@@ -266,10 +270,10 @@ export function DesktopNav() {
             <DesktopUserMenu user={user} profile={profile} onLogout={handleLogout} />
           ) : (
             <div className="flex items-center gap-3">
-              <Button variant="ghost" size="sm" asChild className="hidden sm:flex h-11 px-5 text-base font-semibold">
+              <Button variant="ghost" size="sm" asChild className="hidden sm:flex h-12 px-6 text-base font-medium">
                 <Link to="/auth">Sign In</Link>
               </Button>
-              <Button size="sm" asChild className="h-11 px-5 text-base font-semibold">
+              <Button size="sm" asChild className="h-12 px-6 text-base font-medium">
                 <Link to="/auth?tab=signup">Get Started</Link>
               </Button>
             </div>

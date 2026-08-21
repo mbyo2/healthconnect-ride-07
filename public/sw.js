@@ -201,11 +201,19 @@ async function handleNavigationRequest(request) {
       return networkResponse;
     }
     
-    // Serve offline page if network fails
+    // Serve SPA index.html shell for client-side routing fallback
+    const cachedAppShell = await caches.match('/index.html') || await caches.match('/');
+    if (cachedAppShell) {
+      return cachedAppShell;
+    }
     const offlinePage = await caches.match('/offline.html');
     return offlinePage || new Response('Offline', { status: 503 });
   } catch (error) {
     console.error('[SW] Navigation request failed:', error);
+    const cachedAppShell = await caches.match('/index.html') || await caches.match('/');
+    if (cachedAppShell) {
+      return cachedAppShell;
+    }
     const offlinePage = await caches.match('/offline.html');
     return offlinePage || new Response('Offline', { status: 503 });
   }

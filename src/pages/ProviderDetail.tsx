@@ -7,12 +7,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   MapPin, Phone, Clock, Star, CalendarPlus, Video, Shield, 
   Award, GraduationCap, Languages, Heart, CheckCircle, 
-  MessageSquare, Share2, Building2
+  MessageSquare, Share2, Building2, Bell, Calculator
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ProviderReviews } from "@/components/reviews/ProviderReviews";
 import { BookingModal } from "@/components/booking/BookingModal";
+import { WaitlistSignup } from "@/components/booking/WaitlistSignup";
 import { useState } from "react";
 import { Provider } from "@/types/provider";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -21,6 +22,7 @@ const ProviderDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [isBookingOpen, setIsBookingOpen] = useState(false);
+  const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
 
   const { data: provider, isLoading, error } = useQuery({
     queryKey: ['provider-detail', id],
@@ -199,10 +201,14 @@ const ProviderDetail = () => {
         </div>
 
         {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row gap-3 mt-6">
+        <div className="flex flex-col sm:flex-row flex-wrap gap-3 mt-6">
           <Button size="lg" className="flex-1 sm:flex-none gap-2" onClick={() => setIsBookingOpen(true)}>
             <CalendarPlus className="h-5 w-5" />
             Book Appointment
+          </Button>
+          <Button size="lg" variant="outline" className="flex-1 sm:flex-none gap-2" onClick={() => setIsWaitlistOpen(true)}>
+            <Bell className="h-5 w-5 text-primary" />
+            Join Waitlist
           </Button>
           <Button size="lg" variant="outline" className="flex-1 sm:flex-none gap-2" onClick={() => navigate('/chat')}>
             <MessageSquare className="h-5 w-5" />
@@ -392,6 +398,10 @@ const ProviderDetail = () => {
               <Button className="w-full" size="lg" onClick={() => setIsBookingOpen(true)}>
                 View Available Times
               </Button>
+              <Button variant="outline" className="w-full gap-2" size="sm" onClick={() => setIsWaitlistOpen(true)}>
+                <Bell className="h-4 w-4 text-primary" />
+                Join Waitlist for Earlier Slot
+              </Button>
             </CardContent>
           </Card>
 
@@ -414,14 +424,23 @@ const ProviderDetail = () => {
 
           {/* Insurance */}
           <Card>
-            <CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-lg flex items-center gap-2">
                 <Shield className="h-5 w-5 text-primary" />
                 Insurance Accepted
               </CardTitle>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-xs text-primary flex items-center gap-1"
+                onClick={() => navigate('/cost-estimator')}
+              >
+                <Calculator className="h-3.5 w-3.5" />
+                Estimate Out-of-Pocket
+              </Button>
             </CardHeader>
             <CardContent>
-              <div className="space-y-2">
+              <div className="space-y-2 mt-2">
                 {provider.accepted_insurances && provider.accepted_insurances.length > 0 ? (
                   provider.accepted_insurances.map((insurance: string, index: number) => (
                     <div key={index} className="flex items-center gap-2 text-sm">
@@ -451,13 +470,20 @@ const ProviderDetail = () => {
         </div>
       </div>
 
-      {/* Booking Modal */}
+      {/* Booking & Waitlist Modals */}
       {provider && (
-        <BookingModal 
-          provider={provider as Provider}
-          isOpen={isBookingOpen}
-          onClose={() => setIsBookingOpen(false)}
-        />
+        <>
+          <BookingModal 
+            provider={provider as Provider}
+            isOpen={isBookingOpen}
+            onClose={() => setIsBookingOpen(false)}
+          />
+          <WaitlistSignup
+            provider={provider as Provider}
+            isOpen={isWaitlistOpen}
+            onClose={() => setIsWaitlistOpen(false)}
+          />
+        </>
       )}
     </div>
     </>

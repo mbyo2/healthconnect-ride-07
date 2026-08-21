@@ -24,22 +24,55 @@ export function TwoFactorGate({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     let cancelled = false;
-    (async () => {
-      if (!user || !session) { setStatus('ok'); return; }
-      // If already verified for this session token, allow through.
-      if (isTwoFactorVerifiedThisSession(session.access_token)) {
-        setStatus('ok'); return;
+    // Fail-safe timer (2 seconds max) to prevent TwoFactorGate from hanging on loading screen
+    const gateTimer = setTimeout(() => {
+      if (!cancelled) {
+        setStatus((prev) => (prev === 'loading' ? 'ok' : prev));
       }
-      const { data } = await supabase
-        .from('user_two_factor')
-        .select('enabled')
-        .eq('user_id', user.id)
-        .maybeSingle();
-      if (cancelled) return;
-      if ((data as any)?.enabled) setStatus('required');
-      else setStatus('ok');
+    }, 2000);
+
+    (async () => {
+      try {
+        if (!user || !session) {
+          if (!cancelled) setStatus('ok');
+          return;
+        }
+        // If already verified for this session token, allow through.
+        if (isTwoFactorVerifiedThisSession(session.access_token)) {
+          if (!cancelled) setStatus('ok');
+          return;
+        }
+        const { data, error } = await supabase
+          .from('user_two_factor')
+          .select('enabled')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (cancelled) return;
+
+        if (error) {
+          console.warn('Unable to query 2FA state, defaulting to allowed:', error);
+          setStatus('ok');
+          return;
+        }
+
+        if ((data as any)?.enabled) {
+          setStatus('required');
+        } else {
+          setStatus('ok');
+        }
+      } catch (err) {
+        console.error('Unexpected error checking 2FA state:', err);
+        if (!cancelled) setStatus('ok');
+      } finally {
+        clearTimeout(gateTimer);
+      }
     })();
-    return () => { cancelled = true; };
+
+    return () => {
+      cancelled = true;
+      clearTimeout(gateTimer);
+    };
   }, [user?.id, session?.access_token]);
 
   if (status === 'loading') return <LoadingScreen />;

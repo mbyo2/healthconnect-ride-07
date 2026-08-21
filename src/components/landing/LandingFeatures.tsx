@@ -27,7 +27,7 @@ export const CareExperience = () => (
         <p className="max-w-xl text-muted-foreground leading-relaxed text-lg">
           Move naturally between finding a provider, booking a visit, managing prescriptions, and keeping your health information close.
         </p>
-        <div className="overflow-hidden rounded-3xl border border-border/60 bg-card shadow-2xl shadow-primary/10 group hover:shadow-primary/20 transition-shadow duration-500">
+        <div className="overflow-hidden rounded-3xl border border-border/60 bg-card shadow-card group hover:shadow-card-hover transition-all duration-300">
           <div className="relative">
             <img
               src="https://images.unsplash.com/photo-1758691462743-f9fc9e430d39?auto=format&fit=crop&w=1200&q=85"
@@ -72,10 +72,10 @@ export const HowItWorks = () => {
             { step: "04", title: "Visit", desc: "See your doctor in-person or via video", icon: Video, color: "from-orange-500/20 to-orange-500/5" },
           ].map((item, idx) => (
             <div key={idx} className="relative group">
-              <div className={`relative overflow-hidden rounded-3xl border border-border/40 bg-gradient-to-br ${item.color} p-8 text-center transition-all duration-300 hover:shadow-xl hover:scale-105`}>
+              <div className={`relative overflow-hidden rounded-3xl border border-border/40 bg-gradient-to-br ${item.color} p-8 text-center transition-all duration-300 hover:shadow-card-hover hover:scale-105`}>
                 <div className="absolute top-0 right-0 w-20 h-20 bg-primary/10 rounded-full blur-2xl group-hover:bg-primary/20 transition-colors" />
                 <div className="relative">
-                  <div className="mx-auto mb-6 w-16 h-16 rounded-2xl bg-background shadow-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <div className="mx-auto mb-6 w-16 h-16 rounded-2xl bg-background shadow-card flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                     <item.icon className="h-8 w-8 text-primary" />
                   </div>
                   <div className="text-xs font-bold text-primary mb-3 tracking-widest">STEP {item.step}</div>
@@ -118,10 +118,10 @@ export const Features = () => (
           { icon: Zap, title: "Digital Prescriptions", desc: "E-prescriptions sent directly to your nearest pharmacy for pickup or delivery.", gradient: "from-rose-500/10 to-rose-500/5" },
           { icon: Building2, title: "Hospital Management", desc: "Full HMS for hospitals — EMR, billing, admissions, lab, and pharmacy in one system.", gradient: "from-cyan-500/10 to-cyan-500/5" },
         ].map((f, idx) => (
-          <Card key={idx} className="border-border/40 bg-card hover:shadow-2xl hover:border-primary/30 transition-all duration-500 group overflow-hidden">
+          <Card key={idx} className="border-border/40 bg-card hover:shadow-card-hover hover:border-primary/30 transition-all duration-300 group overflow-hidden">
             <div className={`absolute inset-0 bg-gradient-to-br ${f.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
             <CardContent className="p-8 relative">
-              <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center mb-5 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 border border-primary/20">
+              <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center mb-5 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 border border-primary/20">
                 <f.icon className="h-7 w-7 text-primary" />
               </div>
               <h3 className="font-bold text-lg mb-3">{f.title}</h3>
@@ -174,10 +174,10 @@ export const ForProviders = () => {
               ))}
             </div>
             <div className="flex flex-wrap gap-4 pt-4">
-              <Button onClick={() => navigate("/auth?tab=signup")} className="rounded-xl gap-2 font-medium bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/25">
+              <Button onClick={() => navigate("/auth?tab=signup")} className="rounded-full gap-2 font-medium bg-primary text-primary-foreground hover:bg-primary/90 shadow-button">
                 Join as Provider <ArrowRight className="h-4 w-4" />
               </Button>
-              <Button variant="outline" onClick={() => navigate("/pricing")} className="rounded-xl font-medium border-slate-600 text-white hover:bg-slate-800 hover:border-slate-500">
+              <Button variant="outline" onClick={() => navigate("/pricing")} className="rounded-full font-medium border-slate-600 text-white hover:bg-slate-800 hover:border-slate-500">
                 View Pricing
               </Button>
             </div>
@@ -185,7 +185,7 @@ export const ForProviders = () => {
 
           <div className="hidden lg:block">
             <div className="relative">
-              <Card className="border-slate-700/50 shadow-2xl bg-slate-800/50 backdrop-blur-sm overflow-hidden">
+              <Card className="border-slate-700/50 shadow-card bg-slate-800/50 backdrop-blur-sm overflow-hidden">
                 <div className="h-1.5 bg-gradient-to-r from-primary via-primary/80 to-primary/50" />
                 <img
                   src="https://images.unsplash.com/photo-1666886573440-16ac24f89e31?auto=format&fit=crop&w=1200&q=85"
@@ -210,7 +210,7 @@ export const ForProviders = () => {
                       { label: "Revenue", value: "K 24,500", trend: "+8%" },
                       { label: "Satisfaction", value: "98%", trend: "↑" },
                     ].map((stat) => (
-                      <div key={stat.label} className="p-5 rounded-xl bg-slate-700/50 border border-slate-600/50 hover:border-primary/50 transition-colors">
+                      <div key={stat.label} className="p-5 rounded-2xl bg-slate-700/50 border border-slate-600/50 hover:border-primary/50 transition-colors">
                         <div className="flex items-baseline gap-2">
                           <span className="text-3xl font-bold text-white">{stat.value}</span>
                           <span className="text-xs text-primary font-medium">{stat.trend}</span>
@@ -221,7 +221,7 @@ export const ForProviders = () => {
                   </div>
                 </CardContent>
               </Card>
-              <div className="absolute -top-4 -right-4 bg-primary text-primary-foreground px-5 py-2.5 rounded-xl text-sm font-semibold border border-primary/30 shadow-xl shadow-primary/20 flex items-center gap-2">
+              <div className="absolute -top-4 -right-4 bg-primary text-primary-foreground px-5 py-2.5 rounded-full text-sm font-semibold border border-primary/30 shadow-card flex items-center gap-2">
                 <Shield className="h-4 w-4" /> NHIMA Verified
               </div>
             </div>

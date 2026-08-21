@@ -50,8 +50,8 @@ const TestimonialCard = ({ testimonial: t, index }: { testimonial: typeof ZAMBIA
   ];
   
   return (
-    <Card className={`border-border/40 bg-card hover:shadow-2xl hover:border-primary/30 transition-all duration-500 group overflow-hidden relative`}>
-      <div className={`absolute inset-0 bg-gradient-to-br ${gradients[index % gradients.length]} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+    <Card className={`border-border/40 bg-card hover:shadow-card-hover hover:border-primary/30 transition-all duration-300 group overflow-hidden relative`}>
+      <div className={`absolute inset-0 bg-gradient-to-br ${gradients[index % gradients.length]} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
       <CardContent className="p-8 relative">
         <div className="flex gap-1 mb-4">
           {[...Array(5)].map((_, i) => (

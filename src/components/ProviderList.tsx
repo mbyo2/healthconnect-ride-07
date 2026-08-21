@@ -2,7 +2,7 @@ import { Provider } from "@/types/provider";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Star, CalendarPlus, Video, CheckCircle, Clock } from "lucide-react";
+import { MapPin, Star, CalendarPlus, Video, CheckCircle, Clock, ShieldCheck, Calculator } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface ProviderListProps {
@@ -96,6 +96,10 @@ export const ProviderList = ({ providers, onProviderSelect, selectedProvider }: 
                   <Video className="h-3 w-3 mr-1" />
                   Video Visits
                 </Badge>
+                <Badge variant="secondary" className="text-xs bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20">
+                  <ShieldCheck className="h-3 w-3 mr-1" />
+                  Insurance Accepted
+                </Badge>
                 {provider.distance !== undefined && (
                   <Badge variant="outline" className="text-xs">
                     <MapPin className="h-3 w-3 mr-1" />
@@ -137,7 +141,19 @@ export const ProviderList = ({ providers, onProviderSelect, selectedProvider }: 
                   <span className="font-medium">Available Today</span>
                 </div>
                 
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    className="text-xs flex items-center gap-1"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate('/cost-estimator');
+                    }}
+                  >
+                    <Calculator className="h-3.5 w-3.5 text-primary" />
+                    Estimate Cost
+                  </Button>
                   <Button 
                     variant="outline" 
                     size="sm"

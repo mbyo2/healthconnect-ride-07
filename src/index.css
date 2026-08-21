@@ -35,33 +35,33 @@ html {
 
 @layer base {
   :root {
-    /* Blue color system matching logo */
-    --background: 0 0% 100%;
-    --foreground: 220 15% 15%;
+    /* Modern healthcare color palette - light, cool-toned background */
+    --background: 210 40% 98%;
+    --foreground: 222 47% 11%;
     --card: 0 0% 100%;
-    --card-foreground: 220 15% 15%;
+    --card-foreground: 222 47% 11%;
     --popover: 0 0% 100%;
-    --popover-foreground: 220 15% 15%;
-    --primary: 217 91% 60%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 221 83% 53%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 220 10% 96%;
-    --secondary-foreground: 220 15% 15%;
-    --muted: 220 10% 96%;
-    --muted-foreground: 220 8% 45%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
     --accent: 217 91% 60%;
     --accent-foreground: 0 0% 100%;
-    --destructive: 0 72% 51%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 217 91% 60%;
-    --radius: 0.5rem;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 221 83% 53%;
+    --radius: 1rem;
 
     /* Brand colors */
-    --brand-blue: 217 91% 60%;
+    --brand-blue: 221 83% 53%;
     --brand-green: 142 71% 45%;
     --brand-yellow: 45 93% 47%;
-    --brand-red: 0 72% 51%;
+    --brand-red: 0 84% 60%;
     --brand-purple: 265 85% 55%;
     --brand-orange: 24 95% 53%;
 
@@ -85,24 +85,24 @@ html {
   }
 
   .dark {
-    --background: 220 15% 10%;
-    --foreground: 220 10% 95%;
-    --card: 220 15% 12%;
-    --card-foreground: 220 10% 95%;
-    --popover: 220 15% 12%;
-    --popover-foreground: 220 10% 95%;
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
+    --card: 222 47% 15%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222 47% 15%;
+    --popover-foreground: 210 40% 98%;
     --primary: 217 91% 60%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 220 15% 18%;
-    --secondary-foreground: 220 10% 95%;
-    --muted: 220 15% 18%;
-    --muted-foreground: 220 10% 60%;
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
     --accent: 217 91% 60%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 62% 40%;
-    --destructive-foreground: 220 10% 95%;
-    --border: 220 15% 20%;
-    --input: 220 15% 20%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
     --ring: 217 91% 60%;
 
     --trust-50: 15, 23, 42;

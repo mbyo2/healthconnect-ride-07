@@ -406,6 +406,10 @@ const AppointmentDetails = () => {
             <CardTitle>Actions</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-wrap gap-3">
+            <Button onClick={() => navigate(`/intake-form?appointment=${id}`)} className="gap-2">
+              <FileText className="h-4 w-4" />
+              Complete Pre-Check-in Form
+            </Button>
             {appointment.type === 'video' && (
               <Button onClick={() => window.location.href = `/video-call/${id}`}>
                 <Video className="h-4 w-4 mr-2" />

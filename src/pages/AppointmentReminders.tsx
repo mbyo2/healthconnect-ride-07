@@ -75,6 +75,34 @@ const AppointmentRemindersPage = () => {
     toast.success("Reminder preferences saved");
   };
 
+  const downloadIcs = (apt: any) => {
+    const title = `Medical Visit (${apt.type || 'Consultation'}) — Doc' O Clock`;
+    const startDateStr = `${apt.date.replace(/[-]/g, '')}T${(apt.time || '09:00').replace(/[:]/g, '')}00`;
+    const icsContent = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Doc O Clock Healthcare System//EN',
+      'BEGIN:VEVENT',
+      `SUMMARY:${title}`,
+      `DESCRIPTION:Your upcoming visit with Doc' O Clock. Manage at https://doc0clock.online/appointments/${apt.id}`,
+      `DTSTART:${startDateStr}`,
+      `DTEND:${startDateStr}`,
+      'STATUS:CONFIRMED',
+      'END:VEVENT',
+      'END:VCALENDAR'
+    ].join('\r\n');
+
+    const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `appointment-${apt.date}.ics`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success('Calendar event (.ics) saved!');
+  };
+
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-background">
@@ -83,7 +111,7 @@ const AppointmentRemindersPage = () => {
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-foreground">Appointment Reminders</h1>
             <p className="text-muted-foreground text-sm mt-1">
-              Choose how you'd like to be reminded about upcoming appointments.
+              Choose how you'd like to be reminded about upcoming appointments and sync them to your calendar.
             </p>
           </div>
 
@@ -94,7 +122,7 @@ const AppointmentRemindersPage = () => {
                 Reminder Channels
               </CardTitle>
               <CardDescription>
-                We'll send a reminder 24 hours and 1 hour before each appointment.
+                We'll send automated reminders 24 hours and 1 hour before each appointment.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -114,7 +142,7 @@ const AppointmentRemindersPage = () => {
                   <MessageSquare className="h-5 w-5 text-muted-foreground" />
                   <div>
                     <Label className="text-base font-medium">SMS reminders</Label>
-                    <p className="text-xs text-muted-foreground">Text message to your phone</p>
+                    <p className="text-xs text-muted-foreground">Text message to your mobile number</p>
                   </div>
                 </div>
                 <Switch checked={smsReminders} onCheckedChange={setSmsReminders} />
@@ -141,10 +169,10 @@ const AppointmentRemindersPage = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Calendar className="h-5 w-5 text-primary" />
-                Upcoming Appointments
+                Upcoming Appointments & Sync
               </CardTitle>
               <CardDescription>
-                Reminders are scheduled automatically for these visits.
+                Reminders are scheduled automatically. Sync your visits directly to Google Calendar or Apple iCal.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -161,21 +189,36 @@ const AppointmentRemindersPage = () => {
                   {upcoming.map((apt: any) => (
                     <div
                       key={apt.id}
-                      className="flex items-center justify-between p-3 rounded-lg bg-muted/40 hover:bg-muted/70 cursor-pointer transition-colors"
-                      onClick={() => navigate(`/appointments/${apt.id}`)}
+                      className="flex items-center justify-between p-3.5 rounded-lg bg-muted/40 hover:bg-muted/70 transition-colors flex-wrap gap-2"
                     >
-                      <div className="flex items-center gap-3">
+                      <div 
+                        className="flex items-center gap-3 cursor-pointer flex-1 min-w-0"
+                        onClick={() => navigate(`/appointments/${apt.id}`)}
+                      >
                         <div className="p-2 bg-primary/10 rounded-lg">
                           <Clock className="h-4 w-4 text-primary" />
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-foreground">{apt.type || "Appointment"}</p>
+                          <p className="text-sm font-medium text-foreground">{apt.type || "Medical Consultation"}</p>
                           <p className="text-xs text-muted-foreground">
                             {new Date(apt.date).toLocaleDateString()} at {apt.time}
                           </p>
                         </div>
                       </div>
-                      <Bell className="h-4 w-4 text-muted-foreground" />
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-xs flex items-center gap-1"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            downloadIcs(apt);
+                          }}
+                        >
+                          <Calendar className="h-3.5 w-3.5 text-primary" />
+                          Add to Calendar
+                        </Button>
+                      </div>
                     </div>
                   ))}
                 </div>

@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User, Calendar, Users, Settings, Heart, Stethoscope, Shield, Building2, Package, Activity, Wallet } from "lucide-react";
+import { User, Calendar, Users, Settings, Heart, Stethoscope, Shield, Building2, Package, Activity, Wallet, ShieldCheck, Calculator, Bell, Clock } from "lucide-react";
 import { User as SupabaseUser } from "@supabase/supabase-js";
 import { useUserRoles } from "@/context/UserRolesContext";
 import { useInstitutionAffiliation } from "@/hooks/useInstitutionAffiliation";
@@ -99,6 +99,10 @@ export function DesktopUserMenu({ user, profile, onLogout }: DesktopUserMenuProp
     return [
       { to: "/profile", label: "My Profile", icon: <User className="h-4 w-4" /> },
       { to: "/appointments", label: "My Appointments", icon: <Calendar className="h-4 w-4" /> },
+      { to: "/insurance-cards", label: "Insurance Cards", icon: <ShieldCheck className="h-4 w-4" /> },
+      { to: "/cost-estimator", label: "Cost Estimator", icon: <Calculator className="h-4 w-4" /> },
+      { to: "/waitlist", label: "My Waitlists", icon: <Bell className="h-4 w-4" /> },
+      { to: "/appointment-reminders", label: "Reminders & Sync", icon: <Clock className="h-4 w-4" /> },
       { to: "/connections", label: "My Providers", icon: <Users className="h-4 w-4" /> },
       { to: "/settings", label: "Settings", icon: <Settings className="h-4 w-4" /> },
     ];
