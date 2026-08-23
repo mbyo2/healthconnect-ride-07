@@ -36,7 +36,7 @@ const Landing = () => {
           "serviceType": ["Telemedicine", "Medical Appointments", "Pharmacy Delivery", "Clinical WorkOS"]
         })}</script>
       </Helmet>
-      <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors">
+      <div className="min-h-screen bg-slate-950 text-white font-sans transition-colors">
         <LandingHeader scrolled={scrolled} />
         <main>
           <LandingHero />
