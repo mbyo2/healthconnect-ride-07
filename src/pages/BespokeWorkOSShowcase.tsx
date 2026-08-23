@@ -6,7 +6,9 @@ import { WorkOSKanbanBoard } from "@/components/workos/WorkOSKanbanBoard";
 import { WorkOSTimelineView } from "@/components/workos/WorkOSTimelineView";
 import { WorkOSWidgetsGrid } from "@/components/workos/WorkOSWidgetsGrid";
 import { WorkOSAICopilotBar } from "@/components/workos/WorkOSAICopilotBar";
-import { X, Plus, Sparkles, HeartPulse, User, MapPin, DollarSign, Activity, CheckCircle2, ShieldAlert } from "lucide-react";
+import { WorkOSSidebar } from "@/components/workos/WorkOSSidebar";
+import { WorkOSFunnelView } from "@/components/workos/WorkOSFunnelView";
+import { X, Plus, Sparkles, HeartPulse, User, MapPin, DollarSign, Activity, CheckCircle2, ShieldAlert, Zap, Layers, Check } from "lucide-react";
 
 // Mock Data featuring realistic Zambian healthcare records
 const INITIAL_PATIENTS: PatientRecord[] = [
@@ -164,6 +166,14 @@ export const BespokeWorkOSShowcase = () => {
   const [targetAddGroup, setTargetAddGroup] = useState("Emergency Triage");
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
+  // Monday Sidebar State
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [activeBoardId, setActiveBoardId] = useState("main-triage");
+
+  // Monday Automations & Integrations Modals
+  const [isAutomationsModalOpen, setIsAutomationsModalOpen] = useState(false);
+  const [isIntegrationsModalOpen, setIsIntegrationsModalOpen] = useState(false);
+
   // New Patient Form State
   const [newPatientName, setNewPatientName] = useState("");
   const [newPatientAge, setNewPatientAge] = useState("30M");
@@ -247,88 +257,218 @@ export const BespokeWorkOSShowcase = () => {
   return (
     <>
       <Helmet>
-        <title>Monday WorkOS Healthcare Board | Doc' O Clock</title>
-        <meta name="description" content="Bespoke monday.com-inspired clinical WorkOS operations dashboard for emergency triage, bed allocations, and AI telehealth." />
+        <title>Monday CRM Healthcare Board | Doc' O Clock</title>
+        <meta name="description" content="Bespoke monday.com CRM clinical operations dashboard for emergency triage, bed allocations, and AI telehealth." />
       </Helmet>
 
-      <div className={`min-h-screen flex flex-col font-sans transition-colors duration-200 ${
+      <div className={`min-h-screen flex font-sans transition-colors duration-200 ${
         isDarkMode ? "bg-slate-950 text-slate-100" : "bg-[#f5f6f8] text-slate-900"
       }`}>
-        {/* Board Header Bar */}
-        <WorkOSBoardHeader
-          currentView={currentView}
-          onViewChange={setCurrentView}
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          selectedGroupFilter={selectedGroupFilter}
-          onGroupFilterChange={setSelectedGroupFilter}
-          selectedPriorityFilter={selectedPriorityFilter}
-          onPriorityFilterChange={setSelectedPriorityFilter}
-          onAddNewItem={() => {
-            setTargetAddGroup("Emergency Triage");
-            setIsAddModalOpen(true);
-          }}
+        {/* Monday Workspace Navigation Sidebar */}
+        <WorkOSSidebar
+          isCollapsed={isSidebarCollapsed}
+          onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
           isDarkMode={isDarkMode}
-          onToggleDarkMode={() => setIsDarkMode(!isDarkMode)}
-          stats={stats}
+          activeBoardId={activeBoardId}
+          onSelectBoard={(id) => {
+            setActiveBoardId(id);
+            showToast(`Switched to board: ${id}`);
+          }}
         />
 
-        {/* Toast Notification Banner */}
-        {toastMessage && (
-          <div className="fixed bottom-6 right-6 z-50 px-4 py-3 rounded-xl bg-slate-900 text-white shadow-2xl border border-blue-500/40 flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4">
-            <CheckCircle2 className="h-5 w-5 text-emerald-400" />
-            <span className="text-xs font-bold font-mono">{toastMessage}</span>
+        {/* Main Content Area */}
+        <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+          {/* Board Header Bar */}
+          <WorkOSBoardHeader
+            currentView={currentView}
+            onViewChange={setCurrentView}
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            selectedGroupFilter={selectedGroupFilter}
+            onGroupFilterChange={setSelectedGroupFilter}
+            selectedPriorityFilter={selectedPriorityFilter}
+            onPriorityFilterChange={setSelectedPriorityFilter}
+            onAddNewItem={() => {
+              setTargetAddGroup("Emergency Triage");
+              setIsAddModalOpen(true);
+            }}
+            isDarkMode={isDarkMode}
+            onToggleDarkMode={() => setIsDarkMode(!isDarkMode)}
+            stats={stats}
+            onOpenAutomationsModal={() => setIsAutomationsModalOpen(true)}
+            onOpenIntegrationsModal={() => setIsIntegrationsModalOpen(true)}
+          />
+
+          {/* Toast Notification Banner */}
+          {toastMessage && (
+            <div className="fixed bottom-6 right-6 z-50 px-4 py-3 rounded-xl bg-slate-900 text-white shadow-2xl border border-blue-500/40 flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4">
+              <CheckCircle2 className="h-5 w-5 text-emerald-400" />
+              <span className="text-xs font-bold font-mono">{toastMessage}</span>
+            </div>
+          )}
+
+          {/* Main Board View Container */}
+          <main className="flex-1 w-full overflow-hidden">
+            {currentView === "table" && (
+              <WorkOSTableBoard
+                patients={filteredPatients}
+                isDarkMode={isDarkMode}
+                onStatusChange={handleStatusChange}
+                onPriorityChange={handlePriorityChange}
+                onSelectPatient={setSelectedPatient}
+                onAddNewPatientInGroup={(grp) => {
+                  setTargetAddGroup(grp);
+                  setIsAddModalOpen(true);
+                }}
+              />
+            )}
+
+            {currentView === "kanban" && (
+              <WorkOSKanbanBoard
+                patients={filteredPatients}
+                isDarkMode={isDarkMode}
+                onStatusChange={handleStatusChange}
+                onSelectPatient={setSelectedPatient}
+                onAddNewItem={() => {
+                  setTargetAddGroup("Emergency Triage");
+                  setIsAddModalOpen(true);
+                }}
+              />
+            )}
+
+            {currentView === "timeline" && (
+              <WorkOSTimelineView
+                patients={filteredPatients}
+                isDarkMode={isDarkMode}
+                onSelectPatient={setSelectedPatient}
+              />
+            )}
+
+            {currentView === "funnel" && (
+              <WorkOSFunnelView
+                patients={filteredPatients}
+                isDarkMode={isDarkMode}
+                onSelectPatient={setSelectedPatient}
+              />
+            )}
+
+            {currentView === "widgets" && (
+              <WorkOSWidgetsGrid isDarkMode={isDarkMode} stats={stats} />
+            )}
+
+            {currentView === "ai" && (
+              <WorkOSAICopilotBar
+                isDarkMode={isDarkMode}
+                onExecutePrompt={(prompt) => showToast(`Executed AI Command: ${prompt}`)}
+              />
+            )}
+          </main>
+        </div>
+
+        {/* Modal: Monday Automations Center */}
+        {isAutomationsModalOpen && (
+          <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className={`w-full max-w-xl rounded-2xl border p-6 shadow-2xl animate-in zoom-in-95 ${
+              isDarkMode ? "bg-slate-900 border-slate-800 text-slate-100" : "bg-white border-slate-200 text-slate-900"
+            }`}>
+              <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800">
+                <div className="flex items-center gap-2 text-amber-500">
+                  <Zap className="h-5 w-5" />
+                  <h3 className="font-extrabold text-lg">Monday CRM Automations Center</h3>
+                </div>
+                <button
+                  onClick={() => setIsAutomationsModalOpen(false)}
+                  className="p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-400"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              <div className="mt-4 space-y-3">
+                <div className={`p-3.5 rounded-xl border flex items-center justify-between ${
+                  isDarkMode ? "bg-slate-950 border-slate-800" : "bg-slate-50 border-slate-200"
+                }`}>
+                  <div>
+                    <div className="font-bold text-xs">When <span className="text-rose-500">Status changes to Stuck / Critical</span></div>
+                    <div className="text-[11px] text-slate-400">Send instant SMS alert to On-Call Chief Doctor & page ICU staff</div>
+                  </div>
+                  <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-mono text-[10px] font-bold">ACTIVE</span>
+                </div>
+
+                <div className={`p-3.5 rounded-xl border flex items-center justify-between ${
+                  isDarkMode ? "bg-slate-950 border-slate-800" : "bg-slate-50 border-slate-200"
+                }`}>
+                  <div>
+                    <div className="font-bold text-xs">When <span className="text-blue-500">Patient intake completes</span></div>
+                    <div className="text-[11px] text-slate-400">Trigger MedGemma AI diagnostic triage classification & assign bed</div>
+                  </div>
+                  <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-mono text-[10px] font-bold">ACTIVE</span>
+                </div>
+
+                <div className={`p-3.5 rounded-xl border flex items-center justify-between ${
+                  isDarkMode ? "bg-slate-950 border-slate-800" : "bg-slate-50 border-slate-200"
+                }`}>
+                  <div>
+                    <div className="font-bold text-xs">When <span className="text-[#00c875]">Status changes to Done</span></div>
+                    <div className="text-[11px] text-slate-400">Move patient item to Discharge Pipeline & generate PDF invoice</div>
+                  </div>
+                  <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-mono text-[10px] font-bold">ACTIVE</span>
+                </div>
+              </div>
+
+              <div className="mt-6 flex justify-end">
+                <button
+                  onClick={() => setIsAutomationsModalOpen(false)}
+                  className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md"
+                >
+                  Done
+                </button>
+              </div>
+            </div>
           </div>
         )}
 
-        {/* Main Board View Container */}
-        <main className="flex-1 w-full overflow-hidden">
-          {currentView === "table" && (
-            <WorkOSTableBoard
-              patients={filteredPatients}
-              isDarkMode={isDarkMode}
-              onStatusChange={handleStatusChange}
-              onPriorityChange={handlePriorityChange}
-              onSelectPatient={setSelectedPatient}
-              onAddNewPatientInGroup={(grp) => {
-                setTargetAddGroup(grp);
-                setIsAddModalOpen(true);
-              }}
-            />
-          )}
+        {/* Modal: Monday Integrations Center */}
+        {isIntegrationsModalOpen && (
+          <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className={`w-full max-w-xl rounded-2xl border p-6 shadow-2xl animate-in zoom-in-95 ${
+              isDarkMode ? "bg-slate-900 border-slate-800 text-slate-100" : "bg-white border-slate-200 text-slate-900"
+            }`}>
+              <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800">
+                <div className="flex items-center gap-2 text-indigo-400">
+                  <Layers className="h-5 w-5" />
+                  <h3 className="font-extrabold text-lg">Monday CRM Integrations Hub</h3>
+                </div>
+                <button
+                  onClick={() => setIsIntegrationsModalOpen(false)}
+                  className="p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-400"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
 
-          {currentView === "kanban" && (
-            <WorkOSKanbanBoard
-              patients={filteredPatients}
-              isDarkMode={isDarkMode}
-              onStatusChange={handleStatusChange}
-              onSelectPatient={setSelectedPatient}
-              onAddNewItem={() => {
-                setTargetAddGroup("Emergency Triage");
-                setIsAddModalOpen(true);
-              }}
-            />
-          )}
+              <div className="mt-4 grid grid-cols-2 gap-3">
+                {["Supabase Realtime Sync", "Twilio WhatsApp & SMS", "DPO & PayPal Payments", "HuggingFace MedGemma AI", "Zapier Webhooks"].map((app, i) => (
+                  <div key={i} className={`p-3 rounded-xl border flex items-center justify-between ${
+                    isDarkMode ? "bg-slate-950 border-slate-800" : "bg-slate-50 border-slate-200"
+                  }`}>
+                    <span className="text-xs font-bold">{app}</span>
+                    <Check className="h-4 w-4 text-emerald-400" />
+                  </div>
+                ))}
+              </div>
 
-          {currentView === "timeline" && (
-            <WorkOSTimelineView
-              patients={filteredPatients}
-              isDarkMode={isDarkMode}
-              onSelectPatient={setSelectedPatient}
-            />
-          )}
-
-          {currentView === "widgets" && (
-            <WorkOSWidgetsGrid isDarkMode={isDarkMode} stats={stats} />
-          )}
-
-          {currentView === "ai" && (
-            <WorkOSAICopilotBar
-              isDarkMode={isDarkMode}
-              onExecutePrompt={(prompt) => showToast(`Executed AI Command: ${prompt}`)}
-            />
-          )}
-        </main>
+              <div className="mt-6 flex justify-end">
+                <button
+                  onClick={() => setIsIntegrationsModalOpen(false)}
+                  className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md"
+                >
+                  Done
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Modal: New Patient Intake */}
         {isAddModalOpen && (

@@ -95,17 +95,21 @@ export const WorkOSKanbanBoard: React.FC<WorkOSKanbanBoardProps> = ({
                         {/* Top patient line */}
                         <div className="flex items-start justify-between gap-2 mt-1">
                           <div>
-                            <span className="text-[10px] font-mono font-semibold uppercase text-slate-400">
-                              {patient.groupName}
-                            </span>
+                            <div className="flex items-center gap-1.5 text-[10px] font-mono font-semibold uppercase text-slate-400">
+                              <span>{patient.groupName}</span>
+                              <span className="text-slate-300 dark:text-slate-700">•</span>
+                              <span className="text-blue-400 font-bold">{patient.id}</span>
+                            </div>
                             <h4 className="font-extrabold text-sm text-slate-900 dark:text-slate-100 group-hover:text-blue-500 transition-colors">
                               {patient.name}
                             </h4>
                           </div>
 
-                          <span className={`px-2 py-0.5 rounded text-[10px] ${priorityConfig.bg}`}>
-                            {patient.priority}
-                          </span>
+                          <div className="flex items-center gap-1.5">
+                            <span className={`px-2 py-0.5 rounded text-[10px] ${priorityConfig.bg} ${priorityConfig.text}`}>
+                              {patient.priority}
+                            </span>
+                          </div>
                         </div>
 
                         {/* Symptoms */}

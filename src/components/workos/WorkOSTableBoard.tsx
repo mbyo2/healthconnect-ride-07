@@ -81,10 +81,10 @@ export const WORKOS_STATUS_CONFIG: Record<PatientStatus, { bg: string; text: str
 };
 
 export const WORKOS_PRIORITY_CONFIG: Record<PriorityLevel, { bg: string; text: string }> = {
-  "Urgent !!!": { bg: "bg-red-600/90 text-white font-extrabold" },
-  "High": { bg: "bg-amber-500/90 text-white font-bold" },
-  "Medium": { bg: "bg-blue-500/90 text-white font-bold" },
-  "Routine": { bg: "bg-slate-400/80 text-white font-medium" },
+  "Urgent !!!": { bg: "bg-red-600/90", text: "text-white font-extrabold" },
+  "High": { bg: "bg-amber-500/90", text: "text-white font-bold" },
+  "Medium": { bg: "bg-blue-500/90", text: "text-white font-bold" },
+  "Routine": { bg: "bg-slate-400/80", text: "text-white font-medium" },
 };
 
 const GROUP_COLORS: Record<string, string> = {
@@ -172,16 +172,20 @@ export const WorkOSTableBoard: React.FC<WorkOSTableBoardProps> = ({
                   <table className="w-full text-left border-collapse">
                     <thead>
                       <tr className={`text-[11px] font-extrabold uppercase tracking-wider border-b ${isDarkMode ? "bg-slate-900/60 border-slate-800 text-slate-400" : "bg-slate-50 border-slate-200 text-slate-500"}`}>
-                        <th className="py-2.5 px-4 w-[240px]">Patient & Clinical Profile</th>
-                        <th className="py-2.5 px-3 w-[150px] text-center">Status</th>
-                        <th className="py-2.5 px-3 w-[120px] text-center">Priority</th>
+                        <th className="py-2.5 px-4 w-[260px]">Patient & Clinical Profile</th>
+                        <th className="py-2.5 px-3 w-[160px] text-center">Status</th>
+                        <th className="py-2.5 px-3 w-[130px] text-center">Priority</th>
                         <th className="py-2.5 px-3 w-[170px]">Assigned Doctor</th>
                         <th className="py-2.5 px-3 w-[130px]">Bed / Unit</th>
                         <th className="py-2.5 px-3 w-[130px]">Vitals Telemetry</th>
                         <th className="py-2.5 px-3 w-[140px]">Treatment Progress</th>
                         <th className="py-2.5 px-3 w-[130px] text-right">Est. Cost (ZMW)</th>
                         <th className="py-2.5 px-3 w-[160px]">AI Clinical Copilot</th>
-                        <th className="py-2.5 px-2 w-[40px] text-center"></th>
+                        <th className="py-2.5 px-2 w-[40px] text-center">
+                          <button title="Add Column" className="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-400">
+                            <Plus className="h-3.5 w-3.5" />
+                          </button>
+                        </th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-200/60 dark:divide-slate-800/60 text-xs">
@@ -197,16 +201,31 @@ export const WorkOSTableBoard: React.FC<WorkOSTableBoardProps> = ({
                             }`}
                             onClick={() => onSelectPatient(patient)}
                           >
-                            {/* Patient Info */}
+                            {/* Patient Info with Comment Bubble */}
                             <td className="py-3 px-4">
                               <div className="flex items-center gap-2.5">
                                 <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center font-black text-xs shadow-sm flex-shrink-0">
                                   {patient.name.charAt(0)}
                                 </div>
-                                <div className="min-w-0">
-                                  <div className="font-bold text-sm tracking-tight text-slate-900 dark:text-slate-100 group-hover:text-blue-600 transition-colors flex items-center gap-1.5">
-                                    <span>{patient.name}</span>
-                                    <span className="text-[10px] font-mono text-slate-400 font-normal">({patient.ageGender})</span>
+                                <div className="min-w-0 flex-1">
+                                  <div className="font-bold text-sm tracking-tight text-slate-900 dark:text-slate-100 group-hover:text-blue-600 transition-colors flex items-center justify-between">
+                                    <div className="flex items-center gap-1.5 truncate">
+                                      <span>{patient.name}</span>
+                                      <span className="text-[10px] font-mono text-slate-400 font-normal">({patient.ageGender})</span>
+                                    </div>
+
+                                    {/* Monday Comment Speech Bubble */}
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        onSelectPatient(patient);
+                                      }}
+                                      title="Open Item Activity & Updates"
+                                      className="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-blue-500/10 text-blue-500 hover:bg-blue-500/20 text-[10px] font-mono font-bold transition-all"
+                                    >
+                                      <FileText className="h-3 w-3" />
+                                      <span>2</span>
+                                    </button>
                                   </div>
                                   <div className="text-[11px] text-slate-500 dark:text-slate-400 truncate max-w-[190px]">
                                     {patient.symptoms}
@@ -269,7 +288,7 @@ export const WorkOSTableBoard: React.FC<WorkOSTableBoardProps> = ({
                                         onPriorityChange(patient.id, pr);
                                         setActivePriorityPopoverId(null);
                                       }}
-                                      className={`w-full text-left px-2.5 py-1 rounded-md text-xs font-bold my-0.5 transition-all ${WORKOS_PRIORITY_CONFIG[pr].bg}`}
+                                      className={`w-full text-left px-2.5 py-1 rounded-md text-xs font-bold my-0.5 transition-all ${WORKOS_PRIORITY_CONFIG[pr].bg} ${WORKOS_PRIORITY_CONFIG[pr].text}`}
                                     >
                                       {pr}
                                     </button>
@@ -354,21 +373,51 @@ export const WorkOSTableBoard: React.FC<WorkOSTableBoardProps> = ({
                     </tbody>
                   </table>
 
-                  {/* Monday.com Group Summary Footer */}
-                  <div className={`px-4 py-2.5 border-t flex items-center justify-between text-xs font-semibold ${
-                    isDarkMode ? "bg-slate-900/40 border-slate-800 text-slate-400" : "bg-slate-50/80 border-slate-200 text-slate-600"
+                  {/* Monday.com Group Summary Footer with Status Battery Bar */}
+                  <div className={`px-4 py-3 border-t flex items-center justify-between text-xs font-semibold ${
+                    isDarkMode ? "bg-slate-900/60 border-slate-800 text-slate-300" : "bg-slate-50 border-slate-200 text-slate-700"
                   }`}>
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-6">
                       <span>Group Total: <strong>{groupPatients.length} items</strong></span>
-                      <div className="hidden sm:flex items-center gap-1">
-                        <span className="w-2.5 h-2.5 rounded-full bg-[#00c875]" /> {doneCount} Done
-                        <span className="w-2.5 h-2.5 rounded-full bg-[#fdab3d] ml-2" /> {inProgressCount} Active
-                        <span className="w-2.5 h-2.5 rounded-full bg-[#e2445c] ml-2" /> {stuckCount} Critical
+                      
+                      {/* Iconic Monday Status Battery Bar */}
+                      <div className="flex items-center gap-2">
+                        <span className="text-[11px] font-mono text-slate-400 font-bold">Status Battery:</span>
+                        <div className="h-4 w-44 rounded-md overflow-hidden bg-slate-200 dark:bg-slate-800 flex p-0.5 shadow-inner">
+                          {doneCount > 0 && (
+                            <div
+                              style={{ width: `${(doneCount / groupPatients.length) * 100}%` }}
+                              className="h-full bg-[#00c875] first:rounded-l-[3px] last:rounded-r-[3px]"
+                              title={`Done: ${doneCount} (${Math.round((doneCount / groupPatients.length) * 100)}%)`}
+                            />
+                          )}
+                          {inProgressCount > 0 && (
+                            <div
+                              style={{ width: `${(inProgressCount / groupPatients.length) * 100}%` }}
+                              className="h-full bg-[#fdab3d] first:rounded-l-[3px] last:rounded-r-[3px]"
+                              title={`In Progress: ${inProgressCount} (${Math.round((inProgressCount / groupPatients.length) * 100)}%)`}
+                            />
+                          )}
+                          {stuckCount > 0 && (
+                            <div
+                              style={{ width: `${(stuckCount / groupPatients.length) * 100}%` }}
+                              className="h-full bg-[#e2445c] first:rounded-l-[3px] last:rounded-r-[3px]"
+                              title={`Stuck / Critical: ${stuckCount} (${Math.round((stuckCount / groupPatients.length) * 100)}%)`}
+                            />
+                          )}
+                          {groupPatients.length - doneCount - inProgressCount - stuckCount > 0 && (
+                            <div
+                              style={{ width: `${((groupPatients.length - doneCount - inProgressCount - stuckCount) / groupPatients.length) * 100}%` }}
+                              className="h-full bg-[#579bfc] first:rounded-l-[3px] last:rounded-r-[3px]"
+                              title={`Scheduled / Review: ${groupPatients.length - doneCount - inProgressCount - stuckCount}`}
+                            />
+                          )}
+                        </div>
                       </div>
                     </div>
 
                     <div className="font-mono text-emerald-600 dark:text-emerald-400 font-bold">
-                      Subtotal: ZMW K{totalBilling.toLocaleString()}
+                      SUM: ZMW K{totalBilling.toLocaleString()}
                     </div>
                   </div>
                 </div>

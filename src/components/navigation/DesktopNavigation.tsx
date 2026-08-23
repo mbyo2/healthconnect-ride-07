@@ -261,18 +261,18 @@ export const DesktopNavigation = () => {
   }, [isAuthenticated, isHealthPersonnel, isAdmin, isPatient, availableRoles, isInstitutionAffiliated]);
 
   return (
-    <div className="hidden md:flex items-center space-x-2">
+    <div className="hidden md:flex items-center gap-1.5 lg:gap-2 flex-wrap min-w-0">
       {navItems.map((item, index) => (
         <Button 
           key={index} 
           variant={location.pathname === item.to ? "default" : "ghost"} 
           asChild
           size="sm"
-          className="flex items-center"
+          className="flex items-center text-xs lg:text-sm px-2.5 lg:px-3 py-1.5"
         >
           <Link to={item.to}>
             {item.icon}
-            {item.label}
+            <span className="truncate">{item.label}</span>
           </Link>
         </Button>
       ))}

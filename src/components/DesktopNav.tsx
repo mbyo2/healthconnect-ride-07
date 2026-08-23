@@ -224,25 +224,25 @@ export function DesktopNav() {
 
   return (
     <header className="bg-background/80 backdrop-blur-xl sticky top-0 z-50 shadow-sm" role="banner">
-      <div className="mx-auto flex items-center justify-between h-20 px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20 max-w-[1600px]">
+      <div className="mx-auto flex items-center justify-between h-16 lg:h-20 px-4 md:px-6 lg:px-8 xl:px-12 max-w-[1600px] min-w-0">
         {/* Left: Logo + Nav */}
-        <div className="flex items-center gap-10 lg:gap-12">
+        <div className="flex items-center gap-4 lg:gap-8 xl:gap-10 min-w-0">
           <AppLogo size="sm" className="shrink-0" />
 
-          <nav className="hidden lg:flex items-center gap-2" role="navigation" aria-label="Main navigation">
+          <nav className="hidden md:flex items-center gap-1 lg:gap-2 min-w-0" role="navigation" aria-label="Main navigation">
             {mainNavItems.map((item) => (
               <Link
                 key={item.to}
                 to={item.to}
                 aria-current={item.active ? "page" : undefined}
-                className={`flex items-center gap-2.5 px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${
+                className={`flex items-center gap-2 px-3 lg:px-4 py-2 rounded-full text-xs lg:text-sm font-medium transition-all duration-300 whitespace-nowrap ${
                   item.active
                     ? "bg-primary text-primary-foreground shadow-button"
                     : "text-muted-foreground hover:text-foreground hover:bg-accent"
                 }`}
               >
                 {item.icon}
-                {item.label}
+                <span className="truncate">{item.label}</span>
               </Link>
             ))}
 
@@ -251,13 +251,13 @@ export function DesktopNav() {
         </div>
 
         {/* Right: Search + Actions */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 lg:gap-4 shrink-0">
           <form onSubmit={handleSearchSubmit} className="relative hidden md:block" role="search">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
               placeholder="Search doctors, specialties..."
-              className="w-[220px] lg:w-[300px] xl:w-[360px] 2xl:w-[420px] pl-11 h-12 rounded-full bg-muted/50 border-2 border-transparent focus:bg-background focus:border-primary transition-all duration-300"
+              className="w-36 md:w-44 lg:w-56 xl:w-72 2xl:w-96 pl-10 h-10 lg:h-12 rounded-full bg-muted/50 border-2 border-transparent focus:bg-background focus:border-primary transition-all duration-300 text-xs lg:text-sm"
               value={searchTerm}
               onChange={handleSearchChange}
             />
@@ -270,11 +270,11 @@ export function DesktopNav() {
           {isAuthenticated && user ? (
             <DesktopUserMenu user={user} profile={profile} onLogout={handleLogout} />
           ) : (
-            <div className="flex items-center gap-3">
-              <Button variant="ghost" size="sm" asChild className="hidden sm:flex h-12 px-6 text-base font-medium">
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="sm" asChild className="hidden sm:flex h-10 lg:h-12 px-4 lg:px-6 text-sm font-medium">
                 <Link to="/auth">Sign In</Link>
               </Button>
-              <Button size="sm" asChild className="h-12 px-6 text-base font-medium">
+              <Button size="sm" asChild className="h-10 lg:h-12 px-4 lg:px-6 text-sm font-medium">
                 <Link to="/auth?tab=signup">Get Started</Link>
               </Button>
             </div>

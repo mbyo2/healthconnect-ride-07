@@ -48,19 +48,29 @@ export function useDPOPayment() {
         },
       });
       if (error) {
-        const errorMsg = error?.message || (data && data.error) || "DPO Payment Gateway error";
-        console.error("DPO createCheckout API error:", errorMsg);
-        toast.error(`DPO Payment Error: ${errorMsg}. Please try Mobile Money or Wallet payment.`);
+        let errorDetails = error?.message || "DPO Payment Gateway unavailable";
+        try {
+          if (error && 'context' in error && error.context) {
+            const body = await (error.context as Response).json();
+            if (body?.message || body?.error) {
+              errorDetails = body.message ? `${body.error} (${body.message})` : body.error;
+            }
+          }
+        } catch {
+          // Keep original errorDetails
+        }
+        console.error("DPO createCheckout API error:", errorDetails);
+        toast.error(`DPO Payment Unavailable: ${errorDetails}. Please try Mobile Money or Wallet balance.`);
         return null;
       }
       if (!data?.redirect_url) {
-        toast.error("Unable to generate DPO payment checkout link. Please try again or use Mobile Money.");
+        toast.error("Unable to generate DPO payment checkout link. Please try Mobile Money or Wallet balance.");
         return null;
       }
       return data as DPOCheckoutResult;
     } catch (e: any) {
       console.error("DPO createCheckout error", e);
-      toast.error(`Payment Error: ${e?.message || "Failed to start payment"}. Please try Mobile Money.`);
+      toast.error(`Payment Error: ${e?.message || "Failed to start payment"}. Please try Mobile Money or Wallet balance.`);
       return null;
     } finally {
       setLoading(false);

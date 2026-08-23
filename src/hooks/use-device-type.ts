@@ -24,7 +24,7 @@ export function useDeviceType(): {
       cancelAnimationFrame(rafId);
       rafId = requestAnimationFrame(() => {
         const newWidth = window.innerWidth;
-        if (Math.abs(newWidth - widthRef.current) > 50) {
+        if (newWidth !== widthRef.current) {
           setWidth(newWidth);
         }
       });

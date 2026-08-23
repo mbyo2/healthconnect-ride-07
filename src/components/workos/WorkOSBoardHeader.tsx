@@ -17,10 +17,14 @@ import {
   Clock,
   Download,
   Share2,
-  ChevronDown
+  ChevronDown,
+  Zap,
+  Layers,
+  Users,
+  Eye
 } from "lucide-react";
 
-export type BoardViewMode = "table" | "kanban" | "timeline" | "widgets" | "ai";
+export type BoardViewMode = "table" | "kanban" | "timeline" | "funnel" | "widgets" | "ai";
 
 interface WorkOSBoardHeaderProps {
   currentView: BoardViewMode;
@@ -40,6 +44,8 @@ interface WorkOSBoardHeaderProps {
     avgTriageMinutes: number;
     icuOccupancyPercent: number;
   };
+  onOpenAutomationsModal?: () => void;
+  onOpenIntegrationsModal?: () => void;
 }
 
 export const WorkOSBoardHeader: React.FC<WorkOSBoardHeaderProps> = ({
@@ -55,75 +61,75 @@ export const WorkOSBoardHeader: React.FC<WorkOSBoardHeaderProps> = ({
   isDarkMode,
   onToggleDarkMode,
   stats,
+  onOpenAutomationsModal,
+  onOpenIntegrationsModal,
 }) => {
   return (
     <div className={`border-b transition-colors duration-200 ${isDarkMode ? "bg-slate-900/90 border-slate-800 text-slate-100" : "bg-white border-slate-200 text-slate-900"}`}>
-      {/* Top Workspace Header */}
+      {/* Top Workspace Header Bar */}
       <div className="px-4 sm:px-6 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        {/* Title & Status */}
+        {/* Title & Brand Icon */}
         <div className="flex items-start gap-3">
-          <div className="h-11 w-11 rounded-xl bg-gradient-to-br from-blue-600 via-indigo-600 to-emerald-500 p-0.5 shadow-md flex items-center justify-center text-white flex-shrink-0">
-            <div className="w-full h-full bg-slate-950/20 backdrop-blur-sm rounded-[10px] flex items-center justify-center">
+          <div className="h-11 w-11 rounded-2xl bg-gradient-to-br from-[#0073ea] via-[#a25ddc] to-[#00c875] p-0.5 shadow-md flex items-center justify-center text-white flex-shrink-0">
+            <div className="w-full h-full bg-slate-950/20 backdrop-blur-sm rounded-[14px] flex items-center justify-center">
               <Activity className="h-6 w-6 text-white animate-pulse" />
             </div>
           </div>
           <div>
             <div className="flex items-center gap-2.5 flex-wrap">
-              <h1 className="text-xl sm:text-2xl font-black tracking-tight font-sans">
-                Patient Triage & Operations WorkOS
+              <h1 className="text-xl sm:text-2xl font-black tracking-tight font-sans flex items-center gap-2">
+                <span>Patient Triage & Operations</span>
+                <span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/10 text-[#0073ea] font-mono font-bold border border-blue-500/20">
+                  CRM Board
+                </span>
               </h1>
               <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
                 Live Sync
               </span>
-              <span className="text-xs font-mono px-2 py-0.5 rounded bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
-                v3.8 • Zambia National Hub
-              </span>
             </div>
             <p className={`text-xs sm:text-sm mt-0.5 ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}>
-              Monday.com-style high-velocity clinical queue, bed allocation & multi-modal AI dispatch
+              Monday.com CRM high-velocity clinical queue, bed allocation & multi-modal AI dispatch
             </p>
           </div>
         </div>
 
-        {/* Top Actions & Quick Stats */}
+        {/* Top Right Actions & Monday Automation Badges */}
         <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
-          {/* Quick Metrics Bar */}
-          <div className={`hidden lg:flex items-center gap-4 px-3 py-1.5 rounded-xl border text-xs font-medium ${isDarkMode ? "bg-slate-800/60 border-slate-700/60" : "bg-slate-100/80 border-slate-200/80"}`}>
-            <div className="flex items-center gap-1.5">
-              <UserCheck className="h-3.5 w-3.5 text-blue-500" />
-              <span>Patients: <strong className="font-mono text-blue-500">{stats.totalPatients}</strong></span>
-            </div>
-            <div className="h-3 w-px bg-slate-300 dark:bg-slate-700" />
-            <div className="flex items-center gap-1.5">
-              <AlertTriangle className="h-3.5 w-3.5 text-rose-500" />
-              <span>Critical: <strong className="font-mono text-rose-500">{stats.criticalAlerts}</strong></span>
-            </div>
-            <div className="h-3 w-px bg-slate-300 dark:bg-slate-700" />
-            <div className="flex items-center gap-1.5">
-              <Clock className="h-3.5 w-3.5 text-amber-500" />
-              <span>Triage: <strong className="font-mono text-amber-500">{stats.avgTriageMinutes}m avg</strong></span>
-            </div>
-          </div>
+          {/* Monday Automations Badge */}
+          <button
+            onClick={onOpenAutomationsModal}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 text-xs font-bold transition-all shadow-xs"
+          >
+            <Zap className="h-4 w-4" />
+            <span>Automate</span>
+            <span className="px-1.5 py-0.2 rounded-full bg-amber-500 text-slate-950 font-mono text-[10px] font-extrabold">
+              3
+            </span>
+          </button>
 
-          {/* New Patient Button */}
+          {/* Monday Integrations Badge */}
+          <button
+            onClick={onOpenIntegrationsModal}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 text-xs font-bold transition-all shadow-xs"
+          >
+            <Layers className="h-4 w-4" />
+            <span>Integrate</span>
+            <span className="px-1.5 py-0.2 rounded-full bg-indigo-500 text-white font-mono text-[10px] font-extrabold">
+              5
+            </span>
+          </button>
+
+          {/* New Patient Intake Split-Button */}
           <button
             onClick={onAddNewItem}
-            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold text-xs sm:text-sm rounded-xl shadow-sm hover:shadow-md transition-all active:scale-[0.98]"
+            className="flex items-center gap-2 px-4 py-2 bg-[#0073ea] hover:bg-blue-600 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md transition-all active:scale-[0.98]"
           >
             <Plus className="h-4 w-4" />
-            <span>New Patient Intake</span>
+            <span>New Patient</span>
           </button>
 
-          {/* Export / Share */}
-          <button
-            title="Export Board Data"
-            className={`p-2 rounded-xl border transition-colors ${isDarkMode ? "bg-slate-800 border-slate-700 hover:bg-slate-700 text-slate-300" : "bg-slate-100 border-slate-200 hover:bg-slate-200 text-slate-700"}`}
-          >
-            <Download className="h-4 w-4" />
-          </button>
-
-          {/* Dark / Light Toggle */}
+          {/* Dark / Light Mode Toggle */}
           <button
             onClick={onToggleDarkMode}
             title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
@@ -142,7 +148,7 @@ export const WorkOSBoardHeader: React.FC<WorkOSBoardHeaderProps> = ({
             onClick={() => onViewChange("table")}
             className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               currentView === "table"
-                ? "bg-blue-600 text-white shadow-sm"
+                ? "bg-[#0073ea] text-white shadow-sm font-bold"
                 : isDarkMode ? "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50" : "text-slate-600 hover:text-slate-900 hover:bg-white"
             }`}
           >
@@ -154,7 +160,7 @@ export const WorkOSBoardHeader: React.FC<WorkOSBoardHeaderProps> = ({
             onClick={() => onViewChange("kanban")}
             className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               currentView === "kanban"
-                ? "bg-blue-600 text-white shadow-sm"
+                ? "bg-[#0073ea] text-white shadow-sm font-bold"
                 : isDarkMode ? "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50" : "text-slate-600 hover:text-slate-900 hover:bg-white"
             }`}
           >
@@ -166,7 +172,7 @@ export const WorkOSBoardHeader: React.FC<WorkOSBoardHeaderProps> = ({
             onClick={() => onViewChange("timeline")}
             className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               currentView === "timeline"
-                ? "bg-blue-600 text-white shadow-sm"
+                ? "bg-[#0073ea] text-white shadow-sm font-bold"
                 : isDarkMode ? "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50" : "text-slate-600 hover:text-slate-900 hover:bg-white"
             }`}
           >
@@ -175,10 +181,22 @@ export const WorkOSBoardHeader: React.FC<WorkOSBoardHeaderProps> = ({
           </button>
 
           <button
+            onClick={() => onViewChange("funnel")}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              currentView === "funnel"
+                ? "bg-[#0073ea] text-white shadow-sm font-bold"
+                : isDarkMode ? "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50" : "text-slate-600 hover:text-slate-900 hover:bg-white"
+            }`}
+          >
+            <Filter className="h-3.5 w-3.5" />
+            <span>Clinical Funnel</span>
+          </button>
+
+          <button
             onClick={() => onViewChange("widgets")}
             className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               currentView === "widgets"
-                ? "bg-blue-600 text-white shadow-sm"
+                ? "bg-[#0073ea] text-white shadow-sm font-bold"
                 : isDarkMode ? "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50" : "text-slate-600 hover:text-slate-900 hover:bg-white"
             }`}
           >
@@ -190,11 +208,11 @@ export const WorkOSBoardHeader: React.FC<WorkOSBoardHeaderProps> = ({
             onClick={() => onViewChange("ai")}
             className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               currentView === "ai"
-                ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-sm"
+                ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-sm font-bold"
                 : isDarkMode ? "text-purple-400 hover:text-purple-300 hover:bg-purple-950/30" : "text-purple-700 hover:text-purple-900 hover:bg-purple-50"
             }`}
           >
-            <Sparkles className="h-3.5 w-3.5 animate-spin-slow text-amber-300" />
+            <Sparkles className="h-3.5 w-3.5 text-amber-300" />
             <span>AI Copilot</span>
           </button>
         </div>
@@ -206,7 +224,7 @@ export const WorkOSBoardHeader: React.FC<WorkOSBoardHeaderProps> = ({
             <Search className={`absolute left-3 top-2.5 h-3.5 w-3.5 ${isDarkMode ? "text-slate-400" : "text-slate-400"}`} />
             <input
               type="text"
-              placeholder="Search patients, doctors, diagnosis..."
+              placeholder="Search board items..."
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
               className={`w-full pl-9 pr-3 py-1.5 rounded-xl border text-xs font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
