@@ -120,6 +120,7 @@ const CostEstimatorPage = lazyWithRetry(() => import('@/pages/CostEstimatorPage'
 const WaitlistPage = lazyWithRetry(() => import('@/pages/WaitlistPage'));
 const AppointmentReminders = lazyWithRetry(() => import('@/pages/AppointmentReminders'));
 const AcceptInvitation = lazyWithRetry(() => import('@/pages/AcceptInvitation'));
+const BespokeWorkOSShowcase = lazyWithRetry(() => import('@/pages/BespokeWorkOSShowcase'));
 
 import { RoleRedirect } from '@/components/auth/RoleRedirect';
 
@@ -161,6 +162,8 @@ const AppContent = () => {
             <Route path="/provider/:id" element={<ProviderDetail />} />
             <Route path="/emergency" element={<Emergency />} />
             <Route path="/pricing" element={<Pricing />} />
+            <Route path="/workos" element={<BespokeWorkOSShowcase />} />
+            <Route path="/showcase" element={<BespokeWorkOSShowcase />} />
             <Route path="/booking-confirmed" element={<RouteGuard><BookingConfirmed /></RouteGuard>} />
             <Route path="/payment-return" element={<Suspense fallback={<LoadingScreen />}><PaymentReturn /></Suspense>} />
             <Route path="/payment-cancelled" element={<Suspense fallback={<LoadingScreen />}><PaymentCancelled /></Suspense>} />

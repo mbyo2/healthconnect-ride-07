@@ -47,12 +47,20 @@ export function useDPOPayment() {
           back_url: input.back_url || `${window.location.origin}/payment-cancelled`,
         },
       });
-      if (error) throw error;
-      if (!data?.redirect_url) throw new Error("No redirect URL returned");
+      if (error) {
+        const errorMsg = error?.message || (data && data.error) || "DPO Payment Gateway error";
+        console.error("DPO createCheckout API error:", errorMsg);
+        toast.error(`DPO Payment Error: ${errorMsg}. Please try Mobile Money or Wallet payment.`);
+        return null;
+      }
+      if (!data?.redirect_url) {
+        toast.error("Unable to generate DPO payment checkout link. Please try again or use Mobile Money.");
+        return null;
+      }
       return data as DPOCheckoutResult;
     } catch (e: any) {
       console.error("DPO createCheckout error", e);
-      toast.error(e?.message || "Failed to start payment");
+      toast.error(`Payment Error: ${e?.message || "Failed to start payment"}. Please try Mobile Money.`);
       return null;
     } finally {
       setLoading(false);

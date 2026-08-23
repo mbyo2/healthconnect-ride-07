@@ -11,7 +11,7 @@ const corsHeaders = {
 // Input validation schema
 const paypalPaymentSchema = z.object({
   amount: z.number().positive().max(1000000, 'Amount exceeds maximum'),
-  currency: z.enum(['USD', 'EUR', 'GBP', 'KES', 'UGX', 'TZS']),
+  currency: z.enum(['USD', 'EUR', 'GBP', 'KES', 'UGX', 'TZS', 'ZMW']),
   patientId: z.string().uuid('Invalid patient ID'),
   providerId: z.string().uuid('Invalid provider ID'),
   serviceId: z.string().max(200, 'Service ID too long'),
@@ -228,13 +228,17 @@ serve(async (req) => {
       const tokenData: PayPalAccessTokenResponse = await tokenResponse.json();
 
       // Create PayPal order
+      const isZMW = (currency || '').toUpperCase() === 'ZMW';
+      const paypalCurrency = isZMW ? 'USD' : (currency || 'USD');
+      const paypalValue = isZMW ? Math.max(1, Math.round(amount * 0.037 * 100) / 100) : amount;
+
       const orderPayload = {
         intent: 'CAPTURE',
         purchase_units: [{
           reference_id: payment.id,
           amount: {
-            currency_code: currency || 'USD',
-            value: amount.toFixed(2)
+            currency_code: paypalCurrency,
+            value: paypalValue.toFixed(2)
           },
           description: `HealthConnect Payment - ${payment.invoice_number}`
         }],

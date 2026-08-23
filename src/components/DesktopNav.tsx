@@ -54,6 +54,7 @@ export function DesktopNav() {
     if (!isAuthenticated) {
       return [
         { to: "/", label: "Home", icon: <Home className="h-4 w-4" />, active: location.pathname === "/" || location.pathname === "/home" },
+        { to: "/workos", label: "Monday WorkOS", icon: <BarChart3 className="h-4 w-4 text-emerald-500" />, active: location.pathname === "/workos" },
         { to: "/search", label: "Find Care", icon: <Search className="h-4 w-4" />, active: location.pathname === "/search" },
       ];
     }
