@@ -1,33 +1,13 @@
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import {
-  Bell,
-  Shield,
-  User,
-  Loader2,
-  Globe,
-  Clock,
-  Type,
-  Palette,
-  Monitor
-} from "lucide-react";
+import { Bell, Shield, User, Loader2, Globe, Clock, Type, Palette, Settings as SettingsIcon } from "lucide-react";
 import { useSuccessFeedback } from "@/hooks/use-success-feedback";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useAccessibility } from "@/context/AccessibilityContext";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { subscribeToNotifications, unsubscribeFromNotifications } from "@/utils/notification-service";
 
 const Settings = () => {
@@ -38,7 +18,6 @@ const Settings = () => {
   const [profileVisibility, setProfileVisibility] = useState(true);
   const [twoFactor, setTwoFactor] = useState(false);
 
-  // Regional Settings
   const [language, setLanguage] = useState("en");
   const [timezone, setTimezone] = useState("UTC");
   const [dateFormat, setDateFormat] = useState("MM/DD/YYYY");
@@ -53,33 +32,26 @@ const Settings = () => {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
 
-        // Fetch profile settings
         const { data: profile } = await supabase
-          .from('profiles' as any)
-          .select('show_in_search')
-          .eq('id', user.id)
+          .from("profiles" as any)
+          .select("show_in_search")
+          .eq("id", user.id)
           .single();
 
-        if (profile) {
-          setProfileVisibility((profile as any).show_in_search ?? true);
-        }
+        if (profile) setProfileVisibility((profile as any).show_in_search ?? true);
 
-        // Fetch 2FA settings
         const { data: tfa } = await supabase
-          .from('user_two_factor' as any)
-          .select('enabled')
-          .eq('user_id', user.id)
+          .from("user_two_factor" as any)
+          .select("enabled")
+          .eq("user_id", user.id)
           .single();
 
-        if (tfa) {
-          setTwoFactor((tfa as any).enabled ?? false);
-        }
+        if (tfa) setTwoFactor((tfa as any).enabled ?? false);
 
-        // Fetch notification settings
         const { data: notifSettings } = await supabase
-          .from('notification_settings')
-          .select('*')
-          .eq('user_id', user.id)
+          .from("notification_settings")
+          .select("*")
+          .eq("user_id", user.id)
           .single();
 
         if (notifSettings) {
@@ -88,11 +60,10 @@ const Settings = () => {
           setSmsReminders(notifSettings.appointment_reminders ?? false);
         }
 
-        // Fetch regional settings from user_settings
         const { data: userSettings } = await supabase
-          .from('user_settings' as any)
-          .select('*')
-          .eq('user_id', user.id)
+          .from("user_settings" as any)
+          .select("*")
+          .eq("user_id", user.id)
           .single();
 
         if (userSettings) {
@@ -116,22 +87,16 @@ const Settings = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      await supabase
-        .from('notification_settings')
-        .update({ push_notifications: checked })
-        .eq('user_id', user.id);
+      await supabase.from("notification_settings").update({ push_notifications: checked }).eq("user_id", user.id);
 
       if (checked) {
         const success = await subscribeToNotifications();
-        if (!success) {
-          setNotifications(false);
-          return;
-        }
+        if (!success) { setNotifications(false); return; }
       } else {
         await unsubscribeFromNotifications();
       }
 
-      showSuccess({ message: `Push notifications ${checked ? 'enabled' : 'disabled'}` });
+      showSuccess({ message: `Push notifications ${checked ? "enabled" : "disabled"}` });
     } catch (error) {
       toast.error("Failed to update notification settings");
     }
@@ -142,13 +107,8 @@ const Settings = () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
-
-      await supabase
-        .from('notification_settings')
-        .update({ email_notifications: checked })
-        .eq('user_id', user.id);
-
-      showSuccess({ message: `Email notifications ${checked ? 'enabled' : 'disabled'}` });
+      await supabase.from("notification_settings").update({ email_notifications: checked }).eq("user_id", user.id);
+      showSuccess({ message: `Email notifications ${checked ? "enabled" : "disabled"}` });
     } catch (error) {
       toast.error("Failed to update email settings");
     }
@@ -159,13 +119,8 @@ const Settings = () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
-
-      await supabase
-        .from('notification_settings')
-        .update({ appointment_reminders: checked })
-        .eq('user_id', user.id);
-
-      showSuccess({ message: `SMS reminders ${checked ? 'enabled' : 'disabled'}` });
+      await supabase.from("notification_settings").update({ appointment_reminders: checked }).eq("user_id", user.id);
+      showSuccess({ message: `SMS reminders ${checked ? "enabled" : "disabled"}` });
     } catch (error) {
       toast.error("Failed to update SMS settings");
     }
@@ -176,37 +131,25 @@ const Settings = () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
-
-      await supabase
-        .from('profiles' as any)
-        .update({ show_in_search: checked })
-        .eq('id', user.id);
-
-      showSuccess({ message: `Profile visibility set to ${checked ? 'public' : 'private'}` });
+      await supabase.from("profiles" as any).update({ show_in_search: checked }).eq("id", user.id);
+      showSuccess({ message: `Profile visibility set to ${checked ? "public" : "private"}` });
     } catch (error) {
       toast.error("Failed to update profile visibility");
     }
   };
 
-  const handleTwoFactorToggle = async (_checked: boolean) => {
-    // 2FA enable/disable requires TOTP verification via the security page.
+  const handleTwoFactorToggle = async () => {
     toast.info("Manage two-factor authentication from Privacy & Security.");
     navigate("/privacy-security");
   };
-
 
   const handleLanguageChange = async (value: string) => {
     setLanguage(value);
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
-
-      await supabase
-        .from('user_settings' as any)
-        .update({ language: value })
-        .eq('user_id', user.id);
-
-      showSuccess({ message: `Language updated to ${value === 'en' ? 'English' : value === 'fr' ? 'French' : 'Spanish'}` });
+      await supabase.from("user_settings" as any).update({ language: value }).eq("user_id", user.id);
+      showSuccess({ message: `Language updated to ${value === "en" ? "English" : value === "fr" ? "French" : "Spanish"}` });
     } catch (error) {
       toast.error("Failed to update language");
     }
@@ -217,12 +160,7 @@ const Settings = () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
-
-      await supabase
-        .from('user_settings' as any)
-        .update({ timezone: value })
-        .eq('user_id', user.id);
-
+      await supabase.from("user_settings" as any).update({ timezone: value }).eq("user_id", user.id);
       showSuccess({ message: `Timezone updated to ${value}` });
     } catch (error) {
       toast.error("Failed to update timezone");
@@ -234,12 +172,7 @@ const Settings = () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
-
-      await supabase
-        .from('user_settings' as any)
-        .update({ date_format: value })
-        .eq('user_id', user.id);
-
+      await supabase.from("user_settings" as any).update({ date_format: value }).eq("user_id", user.id);
       showSuccess({ message: `Date format updated to ${value}` });
     } catch (error) {
       toast.error("Failed to update date format");
@@ -250,12 +183,8 @@ const Settings = () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        await supabase
-          .from('user_settings' as any)
-          .update({ accessibility_mode: checked })
-          .eq('user_id', user.id);
+        await supabase.from("user_settings" as any).update({ accessibility_mode: checked }).eq("user_id", user.id);
       }
-
       if (checked) {
         enableEasyReading();
         showSuccess({ message: "Accessibility mode enabled" });
@@ -270,210 +199,137 @@ const Settings = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 flex items-center justify-center p-6">
+        <Loader2 className="h-8 w-8 animate-spin text-[#0073ea]" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto pb-10">
-      <div className="text-center space-y-2">
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-trust-600 to-trust-400 bg-clip-text text-transparent">
-          Settings
-        </h1>
-        <p className="text-sm sm:text-base text-muted-foreground">
-          Customize your Doc' O Clock experience
-        </p>
+    <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors pb-16">
+      {/* Sticky Monday Top Header */}
+      <div className="bg-white dark:bg-slate-900 border-b border-[#e6e9ef] dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
+        <div className="max-w-[1500px] mx-auto flex items-center gap-3">
+          <div className="h-10 w-10 rounded-xl bg-[#0073ea] text-white flex items-center justify-center font-black text-sm shadow-xs">
+            <SettingsIcon className="h-5 w-5" />
+          </div>
+          <div>
+            <h1 className="text-xl font-extrabold tracking-tight flex items-center gap-2">
+              System Preferences & WorkOS Settings
+              <span className="w-2 h-2 rounded-full bg-[#00c875] animate-ping" />
+            </h1>
+            <p className="text-xs text-[#676879] dark:text-slate-400 font-medium">
+              Configure profile visibility, security, push notifications, and regional localization
+            </p>
+          </div>
+        </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <div className="space-y-6">
-          {/* Account Settings */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-foreground">
-                <User className="h-5 w-5" />
-                Account
-              </CardTitle>
-              <CardDescription>
-                Manage your account preferences and security
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
+      <div className="max-w-[1500px] mx-auto px-4 sm:px-6 pt-6">
+        <div className="grid gap-6 md:grid-cols-2">
+          {/* Column 1 */}
+          <div className="space-y-6">
+            {/* Account Settings */}
+            <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
+              <h2 className="font-extrabold text-sm flex items-center gap-2 border-b border-[#e6e9ef] pb-3">
+                <User className="h-4 w-4 text-[#0073ea]" /> Account Preferences
+              </h2>
               <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label className="text-base">Profile Visibility</Label>
-                  <div className="text-sm text-muted-foreground">
-                    Make your profile visible to healthcare providers
-                  </div>
+                <div>
+                  <p className="font-bold text-xs">Directory Profile Visibility</p>
+                  <p className="text-[11px] text-[#676879]">Visible to verified patient search & provider index</p>
                 </div>
                 <Switch checked={profileVisibility} onCheckedChange={handleVisibilityToggle} />
               </div>
-
-              <Separator />
-
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label className="text-base">Two-Factor Authentication</Label>
-                  <div className="text-sm text-muted-foreground">
-                    Add an extra layer of security to your account
-                  </div>
+              <div className="flex items-center justify-between pt-2 border-t border-[#e6e9ef]">
+                <div>
+                  <p className="font-bold text-xs">Two-Factor Authentication (2FA)</p>
+                  <p className="text-[11px] text-[#676879]">TOTP authenticator app verification</p>
                 </div>
                 <Switch checked={twoFactor} onCheckedChange={handleTwoFactorToggle} />
               </div>
-            </CardContent>
-          </Card>
+            </div>
 
-          {/* Appearance Settings */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-foreground">
-                <Palette className="h-5 w-5" />
-                Appearance
-              </CardTitle>
-              <CardDescription>
-                Customize how the app looks and feels
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
+            {/* Appearance Settings */}
+            <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
+              <h2 className="font-extrabold text-sm flex items-center gap-2 border-b border-[#e6e9ef] pb-3">
+                <Palette className="h-4 w-4 text-[#a25ddc]" /> Theme & Accessibility
+              </h2>
               <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label className="text-base">Theme</Label>
-                  <div className="text-sm text-muted-foreground">
-                    Switch between light and dark mode
-                  </div>
+                <div>
+                  <p className="font-bold text-xs">Dark / Light Interface Theme</p>
+                  <p className="text-[11px] text-[#676879]">Toggle WorkOS dark mode styling</p>
                 </div>
                 <ThemeToggle />
               </div>
-
-              <Separator />
-
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label className="text-base">Accessibility Mode</Label>
-                  <div className="text-sm text-muted-foreground">
-                    Enable high contrast and larger touch targets
-                  </div>
+              <div className="flex items-center justify-between pt-2 border-t border-[#e6e9ef]">
+                <div>
+                  <p className="font-bold text-xs">Accessibility Easy Reading</p>
+                  <p className="text-[11px] text-[#676879]">High-contrast text and enlarged touch targets</p>
                 </div>
                 <Switch checked={isEasyReadingEnabled} onCheckedChange={handleAccessibilityToggle} />
               </div>
-            </CardContent>
-          </Card>
+            </div>
 
-          {/* Privacy & Security */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-foreground">
-                <Shield className="h-5 w-5" />
-                Privacy & Security
-              </CardTitle>
-              <CardDescription>
-                Manage your privacy settings and data
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <Button
-                variant="outline"
-                className="w-full justify-start"
-                onClick={() => toast.info("Data export request initiated. You will receive an email when it's ready.")}
+            {/* Privacy & Data */}
+            <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-3">
+              <h2 className="font-extrabold text-sm flex items-center gap-2 border-b border-[#e6e9ef] pb-3">
+                <Shield className="h-4 w-4 text-[#00c875]" /> Privacy & Data Rights
+              </h2>
+              <button
+                onClick={() => toast.info("Data export request initiated. You will receive an email when ready.")}
+                className="w-full py-2.5 rounded-xl border border-[#c3c6d4] bg-white font-bold text-xs text-slate-800 hover:bg-[#f0f2f7] text-left px-3"
               >
-                Download My Data
-              </Button>
-              <Button
-                variant="outline"
-                className="w-full justify-start text-destructive hover:text-destructive"
+                Request Export of All Personal Data
+              </button>
+              <button
                 onClick={() => navigate("/privacy-security")}
+                className="w-full py-2.5 rounded-xl border border-[#e2445c]/30 bg-[#e2445c]/5 font-bold text-xs text-[#e2445c] hover:bg-[#e2445c]/10 text-left px-3"
               >
-                Delete Account
-              </Button>
-              <Button
-                variant="outline"
-                className="w-full justify-start"
-                onClick={() => navigate("/privacy")}
-              >
-                Privacy Policy
-              </Button>
-              <Button
-                variant="outline"
-                className="w-full justify-start"
-                onClick={() => navigate("/terms")}
-              >
-                Terms of Service
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
+                Delete Account & Purge Records
+              </button>
+            </div>
+          </div>
 
-        <div className="space-y-6">
-          {/* Notification Settings */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-foreground">
-                <Bell className="h-5 w-5" />
-                Notifications
-              </CardTitle>
-              <CardDescription>
-                Control how you receive notifications
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
+          {/* Column 2 */}
+          <div className="space-y-6">
+            {/* Notification Controls */}
+            <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
+              <h2 className="font-extrabold text-sm flex items-center gap-2 border-b border-[#e6e9ef] pb-3">
+                <Bell className="h-4 w-4 text-[#fdab3d]" /> Notification Telemetry
+              </h2>
               <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label className="text-base">Push Notifications</Label>
-                  <div className="text-sm text-muted-foreground">
-                    Receive notifications about appointments and messages
-                  </div>
+                <div>
+                  <p className="font-bold text-xs">Browser Push Notifications</p>
+                  <p className="text-[11px] text-[#676879]">Instant alerts for messages, calls & lab updates</p>
                 </div>
                 <Switch checked={notifications} onCheckedChange={handleNotificationToggle} />
               </div>
-
-              <Separator />
-
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label className="text-base">Email Notifications</Label>
-                  <div className="text-sm text-muted-foreground">
-                    Get important updates via email
-                  </div>
+              <div className="flex items-center justify-between pt-2 border-t border-[#e6e9ef]">
+                <div>
+                  <p className="font-bold text-xs">Email Broadcasts</p>
+                  <p className="text-[11px] text-[#676879]">Consultation receipts and appointment confirmations</p>
                 </div>
                 <Switch checked={emailNotifications} onCheckedChange={handleEmailToggle} />
               </div>
-
-              <Separator />
-
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label className="text-base">SMS Reminders</Label>
-                  <div className="text-sm text-muted-foreground">
-                    Receive appointment reminders via text
-                  </div>
+              <div className="flex items-center justify-between pt-2 border-t border-[#e6e9ef]">
+                <div>
+                  <p className="font-bold text-xs">SMS Reminders</p>
+                  <p className="text-[11px] text-[#676879]">Text reminders 1 hour prior to appointments</p>
                 </div>
                 <Switch checked={smsReminders} onCheckedChange={handleSmsToggle} />
               </div>
-            </CardContent>
-          </Card>
+            </div>
 
-          {/* Regional Settings */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-foreground">
-                <Globe className="h-5 w-5" />
-                Regional
-              </CardTitle>
-              <CardDescription>
-                Manage your language and regional preferences
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label className="flex items-center gap-2">
-                  <Globe className="h-4 w-4" /> Language
-                </Label>
+            {/* Regional Localization */}
+            <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
+              <h2 className="font-extrabold text-sm flex items-center gap-2 border-b border-[#e6e9ef] pb-3">
+                <Globe className="h-4 w-4 text-[#0073ea]" /> Regional Localization
+              </h2>
+              <div className="space-y-1.5">
+                <label className="text-xs font-extrabold text-[#676879] uppercase">Display Language</label>
                 <Select value={language} onValueChange={handleLanguageChange}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select Language" />
-                  </SelectTrigger>
+                  <SelectTrigger className="border-[#c3c6d4] text-xs font-bold"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="en">English</SelectItem>
                     <SelectItem value="fr">French</SelectItem>
@@ -482,31 +338,23 @@ const Settings = () => {
                 </Select>
               </div>
 
-              <div className="space-y-2">
-                <Label className="flex items-center gap-2">
-                  <Clock className="h-4 w-4" /> Timezone
-                </Label>
+              <div className="space-y-1.5">
+                <label className="text-xs font-extrabold text-[#676879] uppercase">System Timezone</label>
                 <Select value={timezone} onValueChange={handleTimezoneChange}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select Timezone" />
-                  </SelectTrigger>
+                  <SelectTrigger className="border-[#c3c6d4] text-xs font-bold"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="UTC">UTC</SelectItem>
+                    <SelectItem value="CAT">Central Africa Time (CAT / Lusaka)</SelectItem>
                     <SelectItem value="EST">Eastern Time</SelectItem>
-                    <SelectItem value="PST">Pacific Time</SelectItem>
                     <SelectItem value="GMT">Greenwich Mean Time</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
-              <div className="space-y-2">
-                <Label className="flex items-center gap-2">
-                  <Type className="h-4 w-4" /> Date Format
-                </Label>
+              <div className="space-y-1.5">
+                <label className="text-xs font-extrabold text-[#676879] uppercase">Date Display Format</label>
                 <Select value={dateFormat} onValueChange={handleDateFormatChange}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select Date Format" />
-                  </SelectTrigger>
+                  <SelectTrigger className="border-[#c3c6d4] text-xs font-bold"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="MM/DD/YYYY">MM/DD/YYYY</SelectItem>
                     <SelectItem value="DD/MM/YYYY">DD/MM/YYYY</SelectItem>
@@ -514,8 +362,8 @@ const Settings = () => {
                   </SelectContent>
                 </Select>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       </div>
     </div>

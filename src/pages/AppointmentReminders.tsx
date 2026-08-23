@@ -1,10 +1,6 @@
 import { useEffect, useState } from "react";
-import { Header } from "@/components/Header";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
 import { Bell, Mail, MessageSquare, Smartphone, Calendar, Clock } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -20,7 +16,6 @@ const AppointmentRemindersPage = () => {
   const [pushReminders, setPushReminders] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  // Load existing preferences
   useEffect(() => {
     if (!user) return;
     (async () => {
@@ -37,7 +32,6 @@ const AppointmentRemindersPage = () => {
     })();
   }, [user]);
 
-  // Upcoming appointments
   const { data: upcoming = [] } = useQuery({
     queryKey: ["upcoming-appointments-reminders", user?.id],
     queryFn: async () => {
@@ -61,12 +55,15 @@ const AppointmentRemindersPage = () => {
     setSaving(true);
     const { error } = await (supabase as any)
       .from("notification_settings")
-      .upsert({
-        user_id: user.id,
-        email_notifications: emailReminders,
-        appointment_reminders: smsReminders,
-        push_notifications: pushReminders,
-      }, { onConflict: "user_id" });
+      .upsert(
+        {
+          user_id: user.id,
+          email_notifications: emailReminders,
+          appointment_reminders: smsReminders,
+          push_notifications: pushReminders,
+        },
+        { onConflict: "user_id" }
+      );
     setSaving(false);
     if (error) {
       toast.error("Failed to save preferences");
@@ -76,156 +73,157 @@ const AppointmentRemindersPage = () => {
   };
 
   const downloadIcs = (apt: any) => {
-    const title = `Medical Visit (${apt.type || 'Consultation'}) — Doc' O Clock`;
-    const startDateStr = `${apt.date.replace(/[-]/g, '')}T${(apt.time || '09:00').replace(/[:]/g, '')}00`;
+    const title = `Medical Visit (${apt.type || "Consultation"}) — Doc' O Clock`;
+    const startDateStr = `${apt.date.replace(/[-]/g, "")}T${(apt.time || "09:00").replace(/[:]/g, "")}00`;
     const icsContent = [
-      'BEGIN:VCALENDAR',
-      'VERSION:2.0',
-      'PRODID:-//Doc O Clock Healthcare System//EN',
-      'BEGIN:VEVENT',
+      "BEGIN:VCALENDAR",
+      "VERSION:2.0",
+      "PRODID:-//Doc O Clock Healthcare System//EN",
+      "BEGIN:VEVENT",
       `SUMMARY:${title}`,
       `DESCRIPTION:Your upcoming visit with Doc' O Clock. Manage at https://doc0clock.online/appointments/${apt.id}`,
       `DTSTART:${startDateStr}`,
       `DTEND:${startDateStr}`,
-      'STATUS:CONFIRMED',
-      'END:VEVENT',
-      'END:VCALENDAR'
-    ].join('\r\n');
+      "STATUS:CONFIRMED",
+      "END:VEVENT",
+      "END:VCALENDAR",
+    ].join("\r\n");
 
-    const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8;' });
+    const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = url;
-    link.setAttribute('download', `appointment-${apt.date}.ics`);
+    link.setAttribute("download", `appointment-${apt.date}.ics`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    toast.success('Calendar event (.ics) saved!');
+    toast.success("Calendar event (.ics) saved!");
   };
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-background">
-        <Header />
-        <main className="container mx-auto px-4 pt-20 pb-24 max-w-3xl space-y-6">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-foreground">Appointment Reminders</h1>
-            <p className="text-muted-foreground text-sm mt-1">
-              Choose how you'd like to be reminded about upcoming appointments and sync them to your calendar.
-            </p>
+      <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors pb-16">
+        {/* Sticky Monday Top Header */}
+        <div className="bg-white dark:bg-slate-900 border-b border-[#e6e9ef] dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
+          <div className="max-w-[1500px] mx-auto flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-[#0073ea] text-white flex items-center justify-center font-black text-sm shadow-xs">
+              <Bell className="h-5 w-5" />
+            </div>
+            <div>
+              <h1 className="text-xl font-extrabold tracking-tight flex items-center gap-2">
+                Automated Appointment Reminders & Calendar Sync
+                <span className="w-2 h-2 rounded-full bg-[#00c875] animate-ping" />
+              </h1>
+              <p className="text-xs text-[#676879] dark:text-slate-400 font-medium">
+                Configure 24-hour and 1-hour pre-visit alerts via Push, Email, SMS, and iCal / Google Calendar sync
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="max-w-[1500px] mx-auto px-4 sm:px-6 pt-6 space-y-6">
+          {/* Reminder Channel Preferences */}
+          <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
+            <h2 className="font-extrabold text-sm flex items-center gap-2 border-b border-[#e6e9ef] pb-3">
+              <Bell className="h-4 w-4 text-[#0073ea]" /> Automated Reminder Dispatch Channels
+            </h2>
+
+            <div className="flex items-center justify-between p-3.5 rounded-xl border border-[#e6e9ef] bg-[#f5f6f8]">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-xl bg-white text-[#0073ea]">
+                  <Mail className="h-4 w-4" />
+                </div>
+                <div>
+                  <p className="font-extrabold text-xs">Email Notifications</p>
+                  <p className="text-[11px] text-[#676879]">Sent to registered patient email address</p>
+                </div>
+              </div>
+              <Switch checked={emailReminders} onCheckedChange={setEmailReminders} />
+            </div>
+
+            <div className="flex items-center justify-between p-3.5 rounded-xl border border-[#e6e9ef] bg-[#f5f6f8]">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-xl bg-white text-[#00c875]">
+                  <MessageSquare className="h-4 w-4" />
+                </div>
+                <div>
+                  <p className="font-extrabold text-xs">SMS Text Reminders</p>
+                  <p className="text-[11px] text-[#676879]">Cellular SMS text dispatched to mobile phone</p>
+                </div>
+              </div>
+              <Switch checked={smsReminders} onCheckedChange={setSmsReminders} />
+            </div>
+
+            <div className="flex items-center justify-between p-3.5 rounded-xl border border-[#e6e9ef] bg-[#f5f6f8]">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-xl bg-white text-[#a25ddc]">
+                  <Smartphone className="h-4 w-4" />
+                </div>
+                <div>
+                  <p className="font-extrabold text-xs">Push Notifications</p>
+                  <p className="text-[11px] text-[#676879]">Browser push & mobile app push alerts</p>
+                </div>
+              </div>
+              <Switch checked={pushReminders} onCheckedChange={setPushReminders} />
+            </div>
+
+            <button
+              onClick={savePreferences}
+              disabled={saving}
+              className="w-full py-3 rounded-xl bg-[#0073ea] hover:bg-[#0060c4] text-white font-extrabold text-xs shadow-xs transition-all"
+            >
+              {saving ? "Saving Dispatch Settings..." : "Save Dispatch Preferences"}
+            </button>
           </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Bell className="h-5 w-5 text-primary" />
-                Reminder Channels
-              </CardTitle>
-              <CardDescription>
-                We'll send automated reminders 24 hours and 1 hour before each appointment.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between p-3 rounded-lg border border-border">
-                <div className="flex items-center gap-3">
-                  <Mail className="h-5 w-5 text-muted-foreground" />
-                  <div>
-                    <Label className="text-base font-medium">Email reminders</Label>
-                    <p className="text-xs text-muted-foreground">Sent to your account email</p>
-                  </div>
-                </div>
-                <Switch checked={emailReminders} onCheckedChange={setEmailReminders} />
+          {/* Upcoming Visits & Calendar Sync */}
+          <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
+            <h2 className="font-extrabold text-sm flex items-center gap-2 border-b border-[#e6e9ef] pb-3">
+              <Calendar className="h-4 w-4 text-[#00c875]" /> Upcoming Visits & iCal Export
+            </h2>
+
+            {upcoming.length === 0 ? (
+              <div className="text-center py-10 text-xs text-[#676879]">
+                <Calendar className="h-10 w-10 mx-auto mb-2 opacity-30 text-[#0073ea]" />
+                <p className="font-bold">No upcoming appointments scheduled.</p>
+                <button
+                  onClick={() => navigate("/search")}
+                  className="mt-2 text-xs font-bold text-[#0073ea] hover:underline"
+                >
+                  Book an appointment now
+                </button>
               </div>
-
-              <div className="flex items-center justify-between p-3 rounded-lg border border-border">
-                <div className="flex items-center gap-3">
-                  <MessageSquare className="h-5 w-5 text-muted-foreground" />
-                  <div>
-                    <Label className="text-base font-medium">SMS reminders</Label>
-                    <p className="text-xs text-muted-foreground">Text message to your mobile number</p>
-                  </div>
-                </div>
-                <Switch checked={smsReminders} onCheckedChange={setSmsReminders} />
-              </div>
-
-              <div className="flex items-center justify-between p-3 rounded-lg border border-border">
-                <div className="flex items-center gap-3">
-                  <Smartphone className="h-5 w-5 text-muted-foreground" />
-                  <div>
-                    <Label className="text-base font-medium">Push notifications</Label>
-                    <p className="text-xs text-muted-foreground">In-app & mobile notifications</p>
-                  </div>
-                </div>
-                <Switch checked={pushReminders} onCheckedChange={setPushReminders} />
-              </div>
-
-              <Button onClick={savePreferences} disabled={saving} className="w-full">
-                {saving ? "Saving..." : "Save Preferences"}
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-primary" />
-                Upcoming Appointments & Sync
-              </CardTitle>
-              <CardDescription>
-                Reminders are scheduled automatically. Sync your visits directly to Google Calendar or Apple iCal.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {upcoming.length === 0 ? (
-                <div className="text-center py-6 text-muted-foreground">
-                  <Calendar className="h-8 w-8 mx-auto mb-2 opacity-40" />
-                  <p className="text-sm">No upcoming appointments</p>
-                  <Button onClick={() => navigate("/search")} variant="link" size="sm" className="mt-2">
-                    Book an appointment
-                  </Button>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  {upcoming.map((apt: any) => (
-                    <div
-                      key={apt.id}
-                      className="flex items-center justify-between p-3.5 rounded-lg bg-muted/40 hover:bg-muted/70 transition-colors flex-wrap gap-2"
-                    >
-                      <div 
-                        className="flex items-center gap-3 cursor-pointer flex-1 min-w-0"
-                        onClick={() => navigate(`/appointments/${apt.id}`)}
-                      >
-                        <div className="p-2 bg-primary/10 rounded-lg">
-                          <Clock className="h-4 w-4 text-primary" />
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium text-foreground">{apt.type || "Medical Consultation"}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {new Date(apt.date).toLocaleDateString()} at {apt.time}
-                          </p>
-                        </div>
+            ) : (
+              <div className="space-y-3">
+                {upcoming.map((apt: any) => (
+                  <div
+                    key={apt.id}
+                    className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 rounded-xl border border-[#e6e9ef] bg-[#f5f6f8] gap-3"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="p-2.5 bg-white rounded-xl text-[#0073ea] border border-[#e6e9ef]">
+                        <Clock className="h-4 w-4" />
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="text-xs flex items-center gap-1"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            downloadIcs(apt);
-                          }}
-                        >
-                          <Calendar className="h-3.5 w-3.5 text-primary" />
-                          Add to Calendar
-                        </Button>
+                      <div>
+                        <p className="font-extrabold text-xs text-slate-900">{apt.type || "Medical Consultation"}</p>
+                        <p className="text-[11px] text-[#676879] font-medium">
+                          {new Date(apt.date).toLocaleDateString()} at {apt.time}
+                        </p>
                       </div>
                     </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </main>
+                    <button
+                      onClick={() => downloadIcs(apt)}
+                      className="px-4 py-2 rounded-xl bg-white border border-[#c3c6d4] text-[#0073ea] font-extrabold text-xs flex items-center gap-1.5 hover:bg-[#e5f0ff]"
+                    >
+                      <Calendar className="h-3.5 w-3.5" />
+                      <span>Sync to Calendar (.ics)</span>
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </ProtectedRoute>
   );

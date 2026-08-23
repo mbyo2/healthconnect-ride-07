@@ -18,9 +18,9 @@ const Landing = () => {
   return (
     <>
       <Helmet>
-        <title>Doc' O Clock — Book Doctors & Healthcare in Zambia</title>
-        <meta name="description" content="Zambia's trusted healthcare platform. Book appointments with verified doctors, order medications, access telemedicine, and manage your health — all in one place." />
-        <meta property="og:title" content="Doc' O Clock — Healthcare at Your Fingertips" />
+        <title>Doc' O Clock WorkOS — Healthcare Platform in Zambia</title>
+        <meta name="description" content="Zambia's trusted healthcare WorkOS platform. Book appointments with verified doctors, track emergency triage, order medications, and manage clinical operations." />
+        <meta property="og:title" content="Doc' O Clock WorkOS — Healthcare at Your Fingertips" />
         <meta property="og:description" content="Book appointments, order medicine, and access emergency services anywhere in Zambia." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://doc0clock.online" />
@@ -29,14 +29,14 @@ const Landing = () => {
         <script type="application/ld+json">{JSON.stringify({
           "@context": "https://schema.org",
           "@type": "MedicalBusiness",
-          "name": "Doc' O Clock",
+          "name": "Doc' O Clock WorkOS",
           "description": "Zambia's trusted healthcare platform",
           "url": "https://doc0clock.online",
           "areaServed": { "@type": "Country", "name": "Zambia" },
-          "serviceType": ["Telemedicine", "Medical Appointments", "Pharmacy Delivery"]
+          "serviceType": ["Telemedicine", "Medical Appointments", "Pharmacy Delivery", "Clinical WorkOS"]
         })}</script>
       </Helmet>
-      <div className="min-h-screen bg-background text-foreground">
+      <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors">
         <LandingHeader scrolled={scrolled} />
         <main>
           <LandingHero />

@@ -1,9 +1,6 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Loader2, Eye, EyeOff, Upload, X, CheckCircle, AlertCircle } from "lucide-react";
+import { Loader2, Eye, EyeOff, Upload, X, CheckCircle, AlertCircle, UserCheck } from "lucide-react";
 import { ProviderRegistrationService, type ProviderRegistrationData, type ValidationErrors } from "@/services/ProviderRegistrationService";
 import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -17,7 +14,7 @@ export const HealthPersonnelApplicationForm = () => {
   const [registrationStage, setRegistrationStage] = useState<string>("");
   const { refreshProfile } = useAuth();
   const navigate = useNavigate();
-  
+
   const [formData, setFormData] = useState<ProviderRegistrationData>({
     email: "",
     password: "",
@@ -32,79 +29,49 @@ export const HealthPersonnelApplicationForm = () => {
   const [selectedCountry, setSelectedCountry] = useState<string>("ZM");
   const [uploadedDocuments, setUploadedDocuments] = useState<Record<string, string>>({});
   const [documentValidation, setDocumentValidation] = useState<{ valid: boolean; missing: string[] }>({ valid: true, missing: [] });
-  
   const [errors, setErrors] = useState<ValidationErrors>({});
 
-  // Real-time validation
   const validateField = (field: keyof ProviderRegistrationData, value: any) => {
     const tempData = { ...formData, [field]: value };
     const fieldErrors = ProviderRegistrationService.validateRegistrationData(tempData);
-    
-    setErrors(prev => ({
-      ...prev,
-      [field]: fieldErrors[field]
-    }));
+    setErrors(prev => ({ ...prev, [field]: fieldErrors[field] }));
   };
 
   const handleInputChange = (field: keyof ProviderRegistrationData, value: string | number) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-    
-    // Clear error for this field if it exists
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: undefined }));
-    }
-    
-    // Perform real-time validation
+    if (errors[field]) setErrors(prev => ({ ...prev, [field]: undefined }));
     setTimeout(() => validateField(field, value), 100);
-  };
-
-  const validateForm = () => {
-    const newErrors = ProviderRegistrationService.validateRegistrationData(formData);
-    setErrors(newErrors);
-    return !ProviderRegistrationService.hasValidationErrors(newErrors);
   };
 
   const isFormValid = () => {
     const currentErrors = ProviderRegistrationService.validateRegistrationData(formData);
-    const hasFormErrors = ProviderRegistrationService.hasValidationErrors(currentErrors);
-    const hasDocumentErrors = !documentValidation.valid;
-    return !hasFormErrors && !hasDocumentErrors;
+    return !ProviderRegistrationService.hasValidationErrors(currentErrors) && documentValidation.valid;
   };
 
   const handleDocumentUpload = async (requirement: DocumentRequirement, file: File) => {
-    // Validate file type
     if (requirement.fileType && !requirement.fileType.includes(file.type)) {
-      toast.error(`Invalid file type. Allowed: ${requirement.fileType.join(', ')}`);
+      toast.error(`Invalid file type. Allowed: ${requirement.fileType.join(", ")}`);
       return;
     }
-
-    // Validate file size
     if (requirement.maxSizeMB && file.size > requirement.maxSizeMB * 1024 * 1024) {
-      toast.error(`File too large. Maximum size: ${requirement.maxSizeMB}MB`);
+      toast.error(`File too large. Max: ${requirement.maxSizeMB}MB`);
       return;
     }
-
-    // In production, upload to Supabase Storage
-    // For now, store as base64 for demo
     const reader = new FileReader();
     reader.onload = (e) => {
       const base64 = e.target?.result as string;
       setUploadedDocuments(prev => ({ ...prev, [requirement.id]: base64 }));
-      toast.success(`${requirement.name} uploaded successfully`);
+      toast.success(`${requirement.name} uploaded`);
     };
     reader.readAsDataURL(file);
   };
 
   const removeDocument = (requirementId: string) => {
-    setUploadedDocuments(prev => {
-      const updated = { ...prev };
-      delete updated[requirementId];
-      return updated;
-    });
+    setUploadedDocuments(prev => { const updated = { ...prev }; delete updated[requirementId]; return updated; });
   };
 
   const validateDocuments = () => {
-    const requirements = getCountryRequirements(selectedCountry, 'healthcareProfessionals');
+    const requirements = getCountryRequirements(selectedCountry, "healthcareProfessionals");
     const validation = validateDocumentUpload(uploadedDocuments, requirements);
     setDocumentValidation(validation);
     return validation.valid;
@@ -112,382 +79,220 @@ export const HealthPersonnelApplicationForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validateForm()) return;
-    if (!validateDocuments()) {
-      toast.error("Please upload all required documents");
-      return;
-    }
+    const newErrors = ProviderRegistrationService.validateRegistrationData(formData);
+    setErrors(newErrors);
+    if (ProviderRegistrationService.hasValidationErrors(newErrors)) return;
+    if (!validateDocuments()) { toast.error("Please upload all required documents"); return; }
 
     setIsSubmitting(true);
     setRegistrationStage("Creating account...");
-
-    // Include uploaded documents in form data
-    const formDataWithDocs = {
-      ...formData,
-      documents_url: Object.values(uploadedDocuments)
-    };
+    const formDataWithDocs = { ...formData, documents_url: Object.values(uploadedDocuments) };
 
     try {
-      // Show loading indicator with stage information (Requirement 4.1)
       toast.loading("Creating your account...", { id: "registration" });
-
-      // Use the complete registration workflow
       const result = await ProviderRegistrationService.registerProvider(formDataWithDocs);
-
       if (result.success) {
         setRegistrationStage("Registration successful!");
-        
-        // Show success message before redirection
-        toast.success("Registration successful! Your application is pending admin review.", { id: "registration" });
-        
-        // Refresh the user profile to include new role data
+        toast.success("Registration successful! Application is pending admin review.", { id: "registration" });
         setRegistrationStage("Setting up your profile...");
         await refreshProfile();
-        
-        // Redirect to application status so the user can track review progress
-        setTimeout(() => {
-          navigate("/application-status");
-        }, 1500);
+        setTimeout(() => navigate("/application-status"), 1500);
       } else {
-        // Comprehensive error messaging system (Requirement 4.3)
-        const errorMessage = result.error || "Registration failed";
-        
-        // Provide specific error messages based on transaction state
-        let detailedError = errorMessage;
-        if (result.transaction) {
-          const { profileCreated, roleAssigned, applicationCreated, authenticationComplete } = result.transaction;
-          
-          if (!profileCreated && !roleAssigned && !applicationCreated && !authenticationComplete) {
-            detailedError = "Account creation failed. Please check your email and try again.";
-          } else if (profileCreated && !roleAssigned) {
-            detailedError = "Account created but role assignment failed. Please contact support.";
-          } else if (profileCreated && roleAssigned && !applicationCreated) {
-            detailedError = "Account created but application submission failed. Please try again.";
-          } else if (profileCreated && roleAssigned && applicationCreated && !authenticationComplete) {
-            detailedError = "Registration completed but automatic login failed. Please try logging in manually.";
-          }
-        }
-        
-        throw new Error(detailedError);
+        throw new Error(result.error || "Registration failed");
       }
     } catch (error: any) {
-      console.error("Error during registration:", error);
-      
-      // Comprehensive error messaging (Requirement 4.3, 4.4)
-      const userFriendlyMessage = error.message || "Failed to complete registration. Please try again.";
-      toast.error(userFriendlyMessage, { 
-        id: "registration",
-        duration: 6000 // Longer duration for error messages
-      });
-      
+      toast.error(error.message || "Failed to complete registration.", { id: "registration", duration: 6000 });
       setRegistrationStage("");
-      
-      // Form data is automatically preserved in state (Requirement 4.5)
-      // No need to clear form data on error - it remains in formData state
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  const inputCls = (hasError?: string) =>
+    `w-full p-2.5 rounded-md border ${hasError ? "border-[#e2445c]" : "border-[#c3c6d4]"} text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#0073ea]`;
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 w-full max-w-lg mx-auto p-4">
-      {/* User Account Fields */}
-      <div className="space-y-4 border-b pb-4 mb-4">
-        <h3 className="text-lg font-semibold">Account Information</h3>
-        
-        <div>
-          <Label htmlFor="email">Email Address *</Label>
-          <Input
-            id="email"
-            type="email"
-            placeholder="your.email@example.online"
-            value={formData.email}
-            onChange={(e) => handleInputChange('email', e.target.value)}
-            className={errors.email ? "border-destructive" : ""}
-            disabled={isSubmitting}
-            required
-          />
-          {errors.email && (
-            <p className="text-sm text-destructive mt-1">{errors.email}</p>
-          )}
-        </div>
-
-        <div>
-          <Label htmlFor="full_name">Full Name *</Label>
-          <Input
-            id="full_name"
-            placeholder="Dr. John Smith"
-            value={formData.full_name}
-            onChange={(e) => handleInputChange('full_name', e.target.value)}
-            className={errors.full_name ? "border-destructive" : ""}
-            disabled={isSubmitting}
-            required
-          />
-          {errors.full_name && (
-            <p className="text-sm text-destructive mt-1">{errors.full_name}</p>
-          )}
-        </div>
-
-        <div>
-          <Label htmlFor="password">Password *</Label>
-          <div className="relative">
-            <Input
-              id="password"
-              type={showPassword ? "text" : "password"}
-              placeholder="Enter a secure password"
-              value={formData.password}
-              onChange={(e) => handleInputChange('password', e.target.value)}
-              className={errors.password ? "border-destructive pr-10" : "pr-10"}
-              disabled={isSubmitting}
-              required
-            />
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-              onClick={() => setShowPassword(!showPassword)}
-              disabled={isSubmitting}
-            >
-              {showPassword ? (
-                <EyeOff className="h-4 w-4" />
-              ) : (
-                <Eye className="h-4 w-4" />
-              )}
-            </Button>
-          </div>
-          {errors.password && (
-            <p className="text-sm text-destructive mt-1">{errors.password}</p>
-          )}
-        </div>
-
-        <div>
-          <Label htmlFor="confirmPassword">Confirm Password *</Label>
-          <div className="relative">
-            <Input
-              id="confirmPassword"
-              type={showConfirmPassword ? "text" : "password"}
-              placeholder="Confirm your password"
-              value={formData.confirmPassword}
-              onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-              className={errors.confirmPassword ? "border-destructive pr-10" : "pr-10"}
-              disabled={isSubmitting}
-              required
-            />
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              disabled={isSubmitting}
-            >
-              {showConfirmPassword ? (
-                <EyeOff className="h-4 w-4" />
-              ) : (
-                <Eye className="h-4 w-4" />
-              )}
-            </Button>
-          </div>
-          {errors.confirmPassword && (
-            <p className="text-sm text-destructive mt-1">{errors.confirmPassword}</p>
-          )}
-        </div>
-
-        <div>
-          <Label htmlFor="phone_number">Phone Number</Label>
-          <Input
-            id="phone_number"
-            type="tel"
-            placeholder="+1 (555) 123-4567"
-            value={formData.phone_number}
-            onChange={(e) => handleInputChange('phone_number', e.target.value)}
-            className={errors.phone_number ? "border-destructive" : ""}
-            disabled={isSubmitting}
-          />
-          {errors.phone_number && (
-            <p className="text-sm text-destructive mt-1">{errors.phone_number}</p>
-          )}
-        </div>
-      </div>
-
-      {/* Professional Information */}
+    <form onSubmit={handleSubmit} className="w-full max-w-xl mx-auto p-6 space-y-6 font-sans text-slate-900 dark:text-slate-100">
+      {/* Section 1: Account */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Professional Information</h3>
-        
-        <div>
-          <Label htmlFor="country">Country of Practice *</Label>
-          <Select
-            value={selectedCountry}
-            onValueChange={(value) => {
-              setSelectedCountry(value);
-              setUploadedDocuments({}); // Clear documents when country changes
-              validateDocuments();
-            }}
-            disabled={isSubmitting}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select country" />
-            </SelectTrigger>
-            <SelectContent>
-              {Object.entries(REGULATORY_REQUIREMENTS).map(([code, country]) => (
-                <SelectItem key={code} value={code}>
-                  {country.countryName}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        
-        <div>
-          <Label htmlFor="license_number">License Number *</Label>
-          <Input
-            id="license_number"
-            placeholder="e.g., MD123456 or RN789012"
-            value={formData.license_number}
-            onChange={(e) => handleInputChange('license_number', e.target.value)}
-            className={errors.license_number ? "border-destructive" : ""}
-            disabled={isSubmitting}
-            required
-          />
-          {errors.license_number && (
-            <p className="text-sm text-destructive mt-1">{errors.license_number}</p>
-          )}
+        <div className="flex items-center gap-2 border-b border-[#e6e9ef] pb-2">
+          <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#0073ea] text-white text-xs font-black">1</span>
+          <h3 className="font-extrabold text-sm uppercase tracking-wide text-[#676879]">Account Information</h3>
         </div>
 
-        <div>
-          <Label htmlFor="specialty">Specialty *</Label>
-          <Input
-            id="specialty"
-            placeholder="e.g., Cardiology, Pediatrics, General Practice"
-            value={formData.specialty}
-            onChange={(e) => handleInputChange('specialty', e.target.value)}
-            className={errors.specialty ? "border-destructive" : ""}
-            disabled={isSubmitting}
-            required
-          />
-          {errors.specialty && (
-            <p className="text-sm text-destructive mt-1">{errors.specialty}</p>
-          )}
-        </div>
-
-        <div>
-          <Label htmlFor="years_of_experience">Years of Experience *</Label>
-          <Input
-            id="years_of_experience"
-            type="number"
-            placeholder="e.g., 5"
-            value={formData.years_of_experience}
-            onChange={(e) => handleInputChange('years_of_experience', parseInt(e.target.value) || 0)}
-            className={errors.years_of_experience ? "border-destructive" : ""}
-            disabled={isSubmitting}
-            required
-            min="0"
-          />
-          {errors.years_of_experience && (
-            <p className="text-sm text-destructive mt-1">{errors.years_of_experience}</p>
-          )}
-        </div>
-      </div>
-
-      {/* Document Upload Section */}
-      <div className="space-y-4 border-t pt-4 mt-4">
-        <h3 className="text-lg font-semibold">Regulatory Documents</h3>
-        <p className="text-sm text-muted-foreground">
-          Upload required documents for {REGULATORY_REQUIREMENTS[selectedCountry]?.countryName}. 
-          All required documents must be uploaded before submission.
-        </p>
-
-        {getCountryRequirements(selectedCountry, 'healthcareProfessionals').map((requirement) => (
-          <div key={requirement.id} className="border rounded-lg p-4 space-y-2">
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <Label className="flex items-center gap-2">
-                  {requirement.name}
-                  {requirement.required && <span className="text-destructive">*</span>}
-                </Label>
-                <p className="text-sm text-muted-foreground mt-1">{requirement.description}</p>
-                {requirement.maxSizeMB && (
-                  <p className="text-xs text-muted-foreground">Max size: {requirement.maxSizeMB}MB</p>
-                )}
-              </div>
-              {uploadedDocuments[requirement.id] ? (
-                <div className="flex items-center gap-2 text-green-600">
-                  <CheckCircle className="h-5 w-5" />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => removeDocument(requirement.id)}
-                    disabled={isSubmitting}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              ) : (
-                <div className="flex items-center gap-2">
-                  {requirement.required && !uploadedDocuments[requirement.id] && (
-                    <AlertCircle className="h-5 w-5 text-amber-500" />
-                  )}
-                </div>
-              )}
-            </div>
-
-            {!uploadedDocuments[requirement.id] && (
-              <div className="relative">
-                <Input
-                  type="file"
-                  id={`doc-${requirement.id}`}
-                  accept={requirement.fileType?.join(',')}
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) handleDocumentUpload(requirement, file);
-                  }}
-                  disabled={isSubmitting}
-                  className="hidden"
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => document.getElementById(`doc-${requirement.id}`)?.click()}
-                  disabled={isSubmitting}
-                  className="w-full"
-                >
-                  <Upload className="h-4 w-4 mr-2" />
-                  Upload Document
-                </Button>
-              </div>
-            )}
+        {[
+          { id: "email", label: "Email Address", type: "email", placeholder: "your.email@example.online", field: "email" as keyof ProviderRegistrationData },
+          { id: "full_name", label: "Full Name", type: "text", placeholder: "Dr. Jane Smith", field: "full_name" as keyof ProviderRegistrationData },
+          { id: "phone_number", label: "Phone Number", type: "tel", placeholder: "+260 97 123 4567", field: "phone_number" as keyof ProviderRegistrationData },
+        ].map(f => (
+          <div key={f.id}>
+            <label htmlFor={f.id} className="text-xs font-extrabold text-[#676879] uppercase">{f.label} {f.field !== "phone_number" && <span className="text-[#e2445c]">*</span>}</label>
+            <input
+              id={f.id} type={f.type} placeholder={f.placeholder}
+              value={String(formData[f.field])}
+              onChange={(e) => handleInputChange(f.field, e.target.value)}
+              disabled={isSubmitting} required={f.field !== "phone_number"}
+              className={`mt-1 ${inputCls(errors[f.field])}`}
+            />
+            {errors[f.field] && <p className="text-[10px] text-[#e2445c] font-bold mt-1">{errors[f.field]}</p>}
           </div>
         ))}
 
+        {/* Password fields */}
+        {[
+          { id: "password", label: "Password", show: showPassword, toggle: () => setShowPassword(v => !v), field: "password" as keyof ProviderRegistrationData },
+          { id: "confirmPassword", label: "Confirm Password", show: showConfirmPassword, toggle: () => setShowConfirmPassword(v => !v), field: "confirmPassword" as keyof ProviderRegistrationData },
+        ].map(f => (
+          <div key={f.id}>
+            <label htmlFor={f.id} className="text-xs font-extrabold text-[#676879] uppercase">{f.label} <span className="text-[#e2445c]">*</span></label>
+            <div className="relative mt-1">
+              <input
+                id={f.id} type={f.show ? "text" : "password"}
+                placeholder="••••••••"
+                value={String(formData[f.field])}
+                onChange={(e) => handleInputChange(f.field, e.target.value)}
+                disabled={isSubmitting} required
+                className={`pr-10 ${inputCls(errors[f.field])}`}
+              />
+              <button type="button" onClick={f.toggle} disabled={isSubmitting} className="absolute right-2.5 top-2.5 text-[#676879]">
+                {f.show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+            {errors[f.field] && <p className="text-[10px] text-[#e2445c] font-bold mt-1">{errors[f.field]}</p>}
+          </div>
+        ))}
+      </div>
+
+      {/* Section 2: Professional */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2 border-b border-[#e6e9ef] pb-2">
+          <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#a25ddc] text-white text-xs font-black">2</span>
+          <h3 className="font-extrabold text-sm uppercase tracking-wide text-[#676879]">Professional Information</h3>
+        </div>
+
+        <div>
+          <label className="text-xs font-extrabold text-[#676879] uppercase">Country of Practice <span className="text-[#e2445c]">*</span></label>
+          <div className="mt-1">
+            <Select value={selectedCountry} onValueChange={(v) => { setSelectedCountry(v); setUploadedDocuments({}); }} disabled={isSubmitting}>
+              <SelectTrigger className="border border-[#c3c6d4] text-xs font-bold">
+                <SelectValue placeholder="Select country" />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.entries(REGULATORY_REQUIREMENTS).map(([code, country]) => (
+                  <SelectItem key={code} value={code}>{country.countryName}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {[
+          { id: "license_number", label: "License Number", placeholder: "e.g. MD123456", field: "license_number" as keyof ProviderRegistrationData },
+          { id: "specialty", label: "Specialty", placeholder: "e.g. Cardiology, General Practice", field: "specialty" as keyof ProviderRegistrationData },
+        ].map(f => (
+          <div key={f.id}>
+            <label htmlFor={f.id} className="text-xs font-extrabold text-[#676879] uppercase">{f.label} <span className="text-[#e2445c]">*</span></label>
+            <input
+              id={f.id} type="text" placeholder={f.placeholder}
+              value={String(formData[f.field])}
+              onChange={(e) => handleInputChange(f.field, e.target.value)}
+              disabled={isSubmitting} required
+              className={`mt-1 ${inputCls(errors[f.field])}`}
+            />
+            {errors[f.field] && <p className="text-[10px] text-[#e2445c] font-bold mt-1">{errors[f.field]}</p>}
+          </div>
+        ))}
+
+        <div>
+          <label htmlFor="years_of_experience" className="text-xs font-extrabold text-[#676879] uppercase">Years of Experience <span className="text-[#e2445c]">*</span></label>
+          <input
+            id="years_of_experience" type="number" placeholder="e.g. 5" min="0"
+            value={formData.years_of_experience}
+            onChange={(e) => handleInputChange("years_of_experience", parseInt(e.target.value) || 0)}
+            disabled={isSubmitting} required
+            className={`mt-1 ${inputCls(errors.years_of_experience)}`}
+          />
+          {errors.years_of_experience && <p className="text-[10px] text-[#e2445c] font-bold mt-1">{errors.years_of_experience}</p>}
+        </div>
+      </div>
+
+      {/* Section 3: Documents */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2 border-b border-[#e6e9ef] pb-2">
+          <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#00c875] text-white text-xs font-black">3</span>
+          <h3 className="font-extrabold text-sm uppercase tracking-wide text-[#676879]">Regulatory Documents</h3>
+        </div>
+        <p className="text-xs text-[#676879]">
+          Upload required documents for <strong>{REGULATORY_REQUIREMENTS[selectedCountry]?.countryName}</strong>. All required docs must be uploaded before submission.
+        </p>
+
+        <div className="space-y-3">
+          {getCountryRequirements(selectedCountry, "healthcareProfessionals").map((requirement) => (
+            <div key={requirement.id} className="p-3 rounded-xl border border-[#e6e9ef] bg-[#f5f6f8]">
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex-1">
+                  <p className="font-extrabold text-xs flex items-center gap-1">
+                    {requirement.name}
+                    {requirement.required && <span className="text-[#e2445c]">*</span>}
+                  </p>
+                  <p className="text-[10px] text-[#676879] mt-0.5">{requirement.description}</p>
+                  {requirement.maxSizeMB && <p className="text-[10px] text-[#676879]">Max: {requirement.maxSizeMB}MB</p>}
+                </div>
+                {uploadedDocuments[requirement.id] ? (
+                  <div className="flex items-center gap-1">
+                    <CheckCircle className="h-4 w-4 text-[#00c875]" />
+                    <button type="button" onClick={() => removeDocument(requirement.id)} disabled={isSubmitting} className="text-[#e2445c]">
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                ) : requirement.required ? (
+                  <AlertCircle className="h-4 w-4 text-[#fdab3d]" />
+                ) : null}
+              </div>
+              {!uploadedDocuments[requirement.id] && (
+                <div className="mt-2">
+                  <input
+                    type="file" id={`doc-${requirement.id}`}
+                    accept={requirement.fileType?.join(",")}
+                    onChange={(e) => { const file = e.target.files?.[0]; if (file) handleDocumentUpload(requirement, file); }}
+                    disabled={isSubmitting} className="hidden"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => document.getElementById(`doc-${requirement.id}`)?.click()}
+                    disabled={isSubmitting}
+                    className="w-full py-1.5 rounded-md border border-[#c3c6d4] bg-white text-xs font-bold flex items-center justify-center gap-1 hover:bg-[#f0f2f7]"
+                  >
+                    <Upload className="h-3.5 w-3.5" /> Upload Document
+                  </button>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
         {!documentValidation.valid && documentValidation.missing.length > 0 && (
-          <div className="bg-destructive/10 border border-destructive rounded-lg p-4">
-            <p className="text-sm font-semibold text-destructive mb-2">Missing Required Documents:</p>
-            <ul className="text-sm text-destructive list-disc list-inside space-y-1">
-              {documentValidation.missing.map((doc) => (
-                <li key={doc}>{doc}</li>
-              ))}
+          <div className="p-3 rounded-xl border border-[#e2445c]/30 bg-[#e2445c]/5">
+            <p className="text-xs font-extrabold text-[#e2445c] mb-1">Missing Required Documents:</p>
+            <ul className="text-xs text-[#e2445c] list-disc list-inside space-y-0.5">
+              {documentValidation.missing.map((doc) => <li key={doc}>{doc}</li>)}
             </ul>
           </div>
         )}
       </div>
 
-      <Button
+      {/* Submit */}
+      <button
         type="submit"
-        className="w-full sm:w-auto"
         disabled={isSubmitting || !isFormValid()}
+        className="w-full py-3 rounded-xl bg-[#0073ea] hover:bg-[#0060c4] disabled:opacity-40 text-white font-extrabold text-sm flex items-center justify-center gap-2 shadow-md transition-all"
       >
         {isSubmitting ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            {registrationStage || "Creating Account..."}
-          </>
+          <><Loader2 className="h-4 w-4 animate-spin" />{registrationStage || "Creating Account..."}</>
         ) : (
-          "Create Provider Account"
+          <><UserCheck className="h-4 w-4" />Create Provider Account</>
         )}
-      </Button>
+      </button>
     </form>
   );
 };

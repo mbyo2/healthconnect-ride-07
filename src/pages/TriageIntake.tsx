@@ -3,15 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Loader2, AlertTriangle, Stethoscope, ShieldCheck, Ambulance } from "lucide-react";
+import { Loader2, AlertTriangle, Stethoscope, ShieldCheck, Ambulance, Activity } from "lucide-react";
 import { LoadingScreen } from "@/components/LoadingScreen";
 
 type TriageResponse = {
@@ -32,25 +25,25 @@ type TriageResponse = {
   }>;
 };
 
-const URGENCY_META: Record<TriageResponse["urgency"], { label: string; className: string; icon: React.ReactNode }> = {
+const URGENCY_META: Record<TriageResponse["urgency"], { label: string; pillColor: string; icon: React.ReactNode }> = {
   emergency: {
-    label: "Emergency",
-    className: "bg-destructive text-destructive-foreground",
+    label: "EMERGENCY DISPATCH",
+    pillColor: "bg-[#e2445c] text-white",
     icon: <Ambulance className="h-4 w-4" />,
   },
   urgent: {
-    label: "Urgent (see today)",
-    className: "bg-orange-500 text-white",
+    label: "Urgent Visit Needed",
+    pillColor: "bg-[#fdab3d] text-white",
     icon: <AlertTriangle className="h-4 w-4" />,
   },
   routine: {
-    label: "Routine",
-    className: "bg-primary text-primary-foreground",
+    label: "Routine Checkup",
+    pillColor: "bg-[#0073ea] text-white",
     icon: <Stethoscope className="h-4 w-4" />,
   },
   self_care: {
-    label: "Self-care",
-    className: "bg-emerald-600 text-white",
+    label: "Self-Care Guidance",
+    pillColor: "bg-[#00c875] text-white",
     icon: <ShieldCheck className="h-4 w-4" />,
   },
 };
@@ -92,7 +85,7 @@ export default function TriageIntake() {
         navigator.geolocation.getCurrentPosition(
           (p) => resolve(p.coords),
           () => resolve(null),
-          { timeout: 3000, maximumAge: 60_000 },
+          { timeout: 3000, maximumAge: 60_000 }
         );
       });
 
@@ -155,7 +148,6 @@ export default function TriageIntake() {
 
       if (error) throw error;
 
-      // Link the appointment back to the triage session.
       await (supabase as any)
         .from("patient_triage_sessions")
         .update({ appointment_id: appt.id, status: "booked" })
@@ -175,117 +167,147 @@ export default function TriageIntake() {
   const meta = result ? URGENCY_META[result.urgency] : null;
 
   return (
-    <div className="container mx-auto max-w-3xl px-4 py-6 space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Doc'O Clock Triage</h1>
-        <p className="text-muted-foreground">
-          Tell us what's going on. Our AI reviews red flags, recommends a specialty, and can book
-          you in — or dispatch emergency help.
-        </p>
+    <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors pb-16">
+      {/* Sticky Monday Top Header */}
+      <div className="bg-white dark:bg-slate-900 border-b border-[#e6e9ef] dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
+        <div className="max-w-[1500px] mx-auto flex items-center gap-3">
+          <div className="h-10 w-10 rounded-xl bg-[#0073ea] text-white flex items-center justify-center font-black text-sm shadow-xs">
+            <Activity className="h-5 w-5" />
+          </div>
+          <div>
+            <h1 className="text-xl font-extrabold tracking-tight flex items-center gap-2">
+              Clinical Symptom Triage & Red Flag Protocol Board
+              <span className="w-2 h-2 rounded-full bg-[#00c875] animate-ping" />
+            </h1>
+            <p className="text-xs text-[#676879] dark:text-slate-400 font-medium">
+              AI-assisted emergency detection, specialty recommendations, and automated provider booking
+            </p>
+          </div>
+        </div>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Symptom intake</CardTitle>
-          <CardDescription>Everything you enter is private to your record.</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-1">
-            <Label htmlFor="cc">Main complaint *</Label>
-            <Input
-              id="cc"
-              placeholder="e.g. chest tightness for the last 2 hours"
-              value={chiefComplaint}
-              onChange={(e) => setChiefComplaint(e.target.value)}
-              maxLength={500}
-            />
+      <div className="max-w-[1500px] mx-auto px-4 sm:px-6 pt-6 space-y-6">
+        {/* Symptom Intake Card */}
+        <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
+          <div className="border-b border-[#e6e9ef] pb-3">
+            <h2 className="font-extrabold text-sm flex items-center gap-2">
+              <Stethoscope className="h-4 w-4 text-[#0073ea]" /> Symptom Intake Form
+            </h2>
+            <p className="text-xs text-[#676879] font-medium mt-0.5">
+              All clinical inputs are encrypted and linked securely to your electronic health record.
+            </p>
           </div>
 
-          <div className="space-y-1">
-            <Label htmlFor="sy">Other symptoms (comma separated)</Label>
-            <Input
-              id="sy"
-              placeholder="shortness of breath, sweating, nausea"
-              value={symptomsText}
-              onChange={(e) => setSymptomsText(e.target.value)}
-            />
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-1">
-              <Label htmlFor="dur">Duration</Label>
-              <Input
-                id="dur"
-                placeholder="e.g. 3 days"
-                value={duration}
-                onChange={(e) => setDuration(e.target.value)}
+          <div className="space-y-3 text-xs">
+            <div>
+              <label htmlFor="cc" className="font-extrabold text-[#676879] uppercase">Main Complaint / Symptom *</label>
+              <input
+                id="cc"
+                placeholder="e.g. Sharp chest tightness for 2 hours, radiating to left shoulder"
+                value={chiefComplaint}
+                onChange={(e) => setChiefComplaint(e.target.value)}
+                maxLength={500}
+                className="w-full mt-1 p-2.5 rounded-md border border-[#c3c6d4] font-medium focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
               />
             </div>
-            <div className="space-y-1">
-              <Label>Severity: {severity}/10</Label>
-              <Slider
-                value={[severity]}
-                onValueChange={(v) => setSeverity(v[0] ?? 0)}
-                min={0}
-                max={10}
-                step={1}
+
+            <div>
+              <label htmlFor="sy" className="font-extrabold text-[#676879] uppercase">Associated Symptoms (comma separated)</label>
+              <input
+                id="sy"
+                placeholder="shortness of breath, sweating, mild nausea"
+                value={symptomsText}
+                onChange={(e) => setSymptomsText(e.target.value)}
+                className="w-full mt-1 p-2.5 rounded-md border border-[#c3c6d4] font-medium focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
               />
             </div>
-          </div>
 
-          <div className="space-y-1">
-            <Label htmlFor="notes">Anything else? (optional)</Label>
-            <Textarea
-              id="notes"
-              placeholder="Medications, allergies, prior conditions…"
-              value={extraNotes}
-              onChange={(e) => setExtraNotes(e.target.value)}
-              maxLength={2000}
-              rows={3}
-            />
-          </div>
-
-          <Button onClick={runAssessment} disabled={assessing} className="w-full">
-            {assessing ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Assessing…
-              </>
-            ) : (
-              "Run AI triage"
-            )}
-          </Button>
-        </CardContent>
-      </Card>
-
-      {result && meta && (
-        <Card>
-          <CardHeader className="space-y-2">
-            <div className="flex items-center justify-between">
-              <CardTitle>Assessment</CardTitle>
-              <Badge className={`gap-1 ${meta.className}`}>
-                {meta.icon}
-                {meta.label}
-              </Badge>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label htmlFor="dur" className="font-extrabold text-[#676879] uppercase">Symptom Duration</label>
+                <input
+                  id="dur"
+                  placeholder="e.g. 3 hours / 2 days"
+                  value={duration}
+                  onChange={(e) => setDuration(e.target.value)}
+                  className="w-full mt-1 p-2.5 rounded-md border border-[#c3c6d4] font-medium focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
+                />
+              </div>
+              <div>
+                <div className="flex justify-between items-center mb-1">
+                  <label className="font-extrabold text-[#676879] uppercase">Discomfort Severity</label>
+                  <span className="font-mono font-black text-sm text-[#0073ea]">{severity}/10</span>
+                </div>
+                <Slider
+                  value={[severity]}
+                  onValueChange={(v) => setSeverity(v[0] ?? 0)}
+                  min={0}
+                  max={10}
+                  step={1}
+                  className="mt-2"
+                />
+              </div>
             </div>
-            <CardDescription>Recommended specialty: <strong>{result.recommended_specialty}</strong></CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
+
+            <div>
+              <label htmlFor="notes" className="font-extrabold text-[#676879] uppercase">Relevant Medical Background (optional)</label>
+              <textarea
+                id="notes"
+                placeholder="Current medications, known allergies, prior cardiac or chronic conditions..."
+                value={extraNotes}
+                onChange={(e) => setExtraNotes(e.target.value)}
+                maxLength={2000}
+                rows={3}
+                className="w-full mt-1 p-2.5 rounded-md border border-[#c3c6d4] font-medium text-xs focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
+              />
+            </div>
+
+            <button
+              onClick={runAssessment}
+              disabled={assessing}
+              className="w-full py-3 rounded-xl bg-[#0073ea] hover:bg-[#0060c4] text-white font-extrabold text-xs shadow-xs transition-all flex items-center justify-center gap-2"
+            >
+              {assessing ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span>Evaluating Clinical Triage Model...</span>
+                </>
+              ) : (
+                "Run AI Clinical Triage Protocol"
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* Result Assessment Card */}
+        {result && meta && (
+          <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
+            <div className="flex items-center justify-between border-b border-[#e6e9ef] pb-3">
+              <div>
+                <h2 className="font-extrabold text-sm text-slate-900">Triage Assessment Results</h2>
+                <p className="text-xs text-[#676879] mt-0.5">Recommended specialty: <strong>{result.recommended_specialty}</strong></p>
+              </div>
+              <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1.5 ${meta.pillColor}`}>
+                {meta.icon} {meta.label}
+              </span>
+            </div>
+
             {result.urgency === "emergency" && (
-              <Alert variant="destructive">
-                <AlertTriangle className="h-4 w-4" />
-                <AlertTitle>Emergency response initiated</AlertTitle>
-                <AlertDescription>
-                  {result.recommended_action} If you can, call your local emergency number now.
-                  Our team has been alerted{result.emergency_event_id ? " with your location" : ""}.
-                </AlertDescription>
-              </Alert>
+              <div className="p-4 rounded-xl border border-[#e2445c]/30 bg-[#e2445c]/10 flex items-start gap-3">
+                <AlertTriangle className="h-5 w-5 text-[#e2445c] flex-shrink-0 mt-0.5" />
+                <div>
+                  <h3 className="font-extrabold text-sm text-[#e2445c]">Emergency Response Dispatched</h3>
+                  <p className="text-xs text-slate-700 mt-1">
+                    {result.recommended_action} Call local emergency services (112 / 911) immediately.
+                  </p>
+                </div>
+              </div>
             )}
 
             {result.red_flags.length > 0 && (
-              <div>
-                <div className="text-sm font-medium mb-1">Red flags noted</div>
-                <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
+              <div className="p-3.5 rounded-xl border border-[#fdab3d]/30 bg-[#fdab3d]/5 text-xs">
+                <p className="font-extrabold text-[#fdab3d] mb-1">Clinical Red Flags Detected:</p>
+                <ul className="list-disc list-inside text-slate-700 space-y-0.5">
                   {result.red_flags.map((rf, i) => (
                     <li key={i}>{rf}</li>
                   ))}
@@ -293,57 +315,55 @@ export default function TriageIntake() {
               </div>
             )}
 
-            <div className="text-sm">
-              <div className="font-medium mb-1">Recommendation</div>
-              <p className="text-muted-foreground">{result.recommended_action}</p>
+            <div className="text-xs space-y-1">
+              <p className="font-extrabold text-[#676879] uppercase">Clinical Protocol Recommendation</p>
+              <p className="text-slate-800 font-medium">{result.recommended_action}</p>
             </div>
 
             {result.reasoning && (
-              <div className="text-xs text-muted-foreground italic">Reasoning: {result.reasoning}</div>
+              <p className="text-[11px] text-[#676879] italic bg-[#f5f6f8] p-3 rounded-xl border border-[#e6e9ef]">
+                Reasoning: {result.reasoning}
+              </p>
             )}
 
             {result.urgency !== "emergency" && (
-              <div className="pt-2 space-y-2">
-                <div className="text-sm font-medium">
-                  {result.providers.length > 0
-                    ? "Book with a recommended provider"
-                    : "No matching verified providers right now"}
-                </div>
+              <div className="pt-2 space-y-3">
+                <p className="text-xs font-extrabold text-slate-900 uppercase">
+                  {result.providers.length > 0 ? "Recommended Verified Specialists" : "No matching providers online"}
+                </p>
                 {result.providers.length === 0 && (
-                  <Button variant="outline" className="w-full" onClick={() => navigate("/providers")}>
-                    Browse all providers
-                  </Button>
+                  <button
+                    onClick={() => navigate("/search")}
+                    className="w-full py-2.5 rounded-xl border border-[#c3c6d4] bg-white font-bold text-xs text-[#0073ea] hover:bg-[#f0f2f7]"
+                  >
+                    Browse All Providers Index
+                  </button>
                 )}
                 {result.providers.map((p) => {
                   const name = `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim() || "Provider";
                   return (
-                    <div
-                      key={p.id}
-                      className="flex items-center justify-between rounded-lg border p-3"
-                    >
-                      <div className="min-w-0">
-                        <div className="font-medium truncate">Dr. {name}</div>
-                        <div className="text-xs text-muted-foreground truncate">
-                          {p.specialty ?? result.recommended_specialty}
-                          {p.city ? ` · ${p.city}` : ""}
-                          {p.rating ? ` · ★ ${p.rating.toFixed(1)}` : ""}
-                        </div>
+                    <div key={p.id} className="flex items-center justify-between p-3.5 rounded-xl border border-[#e6e9ef] bg-[#f5f6f8]">
+                      <div>
+                        <p className="font-extrabold text-xs text-[#0073ea]">Dr. {name}</p>
+                        <p className="text-[11px] text-[#676879]">
+                          {p.specialty ?? result.recommended_specialty} {p.city ? `• ${p.city}` : ""} {p.rating ? `• ★ ${p.rating.toFixed(1)}` : ""}
+                        </p>
                       </div>
-                      <Button
-                        size="sm"
+                      <button
                         onClick={() => bookProvider(p.id)}
                         disabled={booking === p.id}
+                        className="px-4 py-1.5 rounded-md bg-[#0073ea] hover:bg-[#0060c4] text-white text-xs font-extrabold flex items-center gap-1 shadow-xs"
                       >
-                        {booking === p.id ? <Loader2 className="h-4 w-4 animate-spin" /> : "Book"}
-                      </Button>
+                        {booking === p.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Book Appointment"}
+                      </button>
                     </div>
                   );
                 })}
               </div>
             )}
-          </CardContent>
-        </Card>
-      )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

@@ -41,7 +41,7 @@ export function Header() {
   if (isDesktop) return null;
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 w-full bg-background/95 backdrop-blur-xl border-b-2 border-border/50 shadow-sm">
+    <header className="fixed top-0 left-0 right-0 z-50 w-full bg-white dark:bg-slate-900 backdrop-blur-xl border-b border-[#e6e9ef] dark:border-slate-800 shadow-xs">
       <div className="flex h-16 items-center justify-between px-4">
         <AppLogo size="sm" className="gap-2 shrink-0" />
 
@@ -62,9 +62,9 @@ export function Header() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl ml-2">
                 {user ? (
-                  <Avatar className="h-9 w-9 ring-2 ring-border">
+                  <Avatar className="h-9 w-9 ring-2 ring-[#0073ea]">
                     <AvatarImage src={profile?.avatar_url || ""} alt={user?.email || "Avatar"} />
-                    <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
+                    <AvatarFallback className="bg-[#e5f0ff] text-[#0073ea] text-xs font-extrabold">
                       {user?.email?.[0]?.toUpperCase() || "U"}
                     </AvatarFallback>
                   </Avatar>
@@ -73,7 +73,7 @@ export function Header() {
                 )}
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 z-[60] border-2 border-border/50 rounded-xl">
+            <DropdownMenuContent align="end" className="w-56 z-[60] border border-[#e6e9ef] rounded-xl bg-white dark:bg-slate-900 shadow-lg">
               {user ? (
                 <>
                   <DropdownMenuLabel>
@@ -81,6 +81,7 @@ export function Header() {
                     <div className="text-xs text-muted-foreground">My Account</div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild><Link to="/workos" className="font-medium text-[#0073ea]">Monday WorkOS Board</Link></DropdownMenuItem>
                   <DropdownMenuItem asChild><Link to="/profile" className="font-medium">Profile & Settings</Link></DropdownMenuItem>
                   <DropdownMenuItem asChild><Link to="/appointments" className="font-medium">My Appointments</Link></DropdownMenuItem>
                   <DropdownMenuItem asChild><Link to="/documentation" className="font-medium">Help & Support</Link></DropdownMenuItem>

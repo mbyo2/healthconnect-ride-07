@@ -1,22 +1,14 @@
 import { useState, useMemo } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScheduleManager } from "@/components/provider/ScheduleManager";
-import { WaitlistManager as ProviderWaitlistOld } from "@/components/provider/WaitlistManager";
 import { DigitalSignature } from "@/components/provider/DigitalSignature";
 import { PatientRecords } from "@/components/provider/PatientRecords";
 import { ProviderAnalyticsDashboard } from "@/components/provider/ProviderAnalyticsDashboard";
-import { PromotedListingManager } from "@/components/provider/PromotedListingManager";
-import { BookingWidgetManager } from "@/components/provider/BookingWidgetManager";
 import { WaitlistManager } from "@/components/booking/WaitlistManager";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { 
-  Bot, Brain, Sparkles, ArrowRight, BarChart3, 
+import {
+  Bot, Brain, Sparkles, ArrowRight, BarChart3,
   Calendar, Users, Clock, FileText, Video, Stethoscope,
-  ClipboardList, Wallet, MessageSquare,
-  TrendingUp, Heart, Pill, Thermometer, Home as HomeIcon,
-  Image, Scan, MonitorDot
+  ClipboardList, Wallet, MessageSquare, TrendingUp, Heart, Pill, Thermometer, ExternalLink
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -26,328 +18,243 @@ import { useCurrency } from "@/hooks/use-currency";
 import { useUserRoles } from "@/context/UserRolesContext";
 import { useInstitutionAffiliation } from "@/hooks/useInstitutionAffiliation";
 
-const ProviderDashboard = () => {
+export const ProviderDashboard = () => {
   const navigate = useNavigate();
   const today = new Date();
   const { formatPrice } = useCurrency();
   const { availableRoles, isHealthPersonnel } = useUserRoles();
   const { isInstitutionAffiliated } = useInstitutionAffiliation();
 
-  // Determine specific provider type
-  const isDoctor = availableRoles.includes('doctor');
-  const isNurse = availableRoles.includes('nurse');
-  const isRadiologist = availableRoles.includes('radiologist');
+  const isDoctor = availableRoles.includes("doctor");
+  const isNurse = availableRoles.includes("nurse");
+  const isRadiologist = availableRoles.includes("radiologist");
 
-  // Role-specific dashboard title and subtitle
   const dashboardMeta = useMemo(() => {
-    if (isRadiologist) return { title: "Radiologist Dashboard", subtitle: "Imaging reads, reports & AI analysis", color: "from-violet-500/10 to-violet-500/5" };
-    if (isNurse) return { title: "Nurse Dashboard", subtitle: "Patient care, vitals & home visits", color: "from-teal-500/10 to-teal-500/5" };
-    if (isDoctor) return { title: "Doctor Dashboard", subtitle: "Consultations, prescriptions & clinical tools", color: "from-blue-500/10 to-blue-500/5" };
-    return { title: "Provider Dashboard", subtitle: "Manage your practice and patient care", color: "from-primary/10 to-primary/5" };
+    if (isRadiologist) return { title: "Radiologist Command Console", subtitle: "Diagnostic imaging reads, telemetry & MedGemma AI analysis" };
+    if (isNurse) return { title: "Nurse Triage Console", subtitle: "Ward rounds, vitals telemetry & home visits" };
+    if (isDoctor) return { title: "Clinical Doctor WorkOS", subtitle: "Consultations, digital prescriptions & patient triage queue" };
+    return { title: "Healthcare Provider Workspace", subtitle: "Practice management, patient queue & telehealth" };
   }, [isDoctor, isNurse, isRadiologist]);
 
   const { data: todayAppointments = [] } = useQuery({
-    queryKey: ['provider-today-appointments'],
+    queryKey: ["provider-today-appointments"],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return [];
       const { data } = await supabase
-        .from('appointments')
+        .from("appointments")
         .select(`id, date, time, status, type, patient:profiles!appointments_patient_id_fkey (first_name, last_name)`)
-        .eq('provider_id', user.id)
-        .eq('date', format(today, 'yyyy-MM-dd'))
-        .order('time');
+        .eq("provider_id", user.id)
+        .eq("date", format(today, "yyyy-MM-dd"))
+        .order("time");
       return data || [];
-    }
+    },
   });
 
   const { data: weekStats } = useQuery({
-    queryKey: ['provider-week-stats'],
+    queryKey: ["provider-week-stats"],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return { total: 0, completed: 0, pending: 0, revenue: 0 };
-      const weekStart = format(startOfWeek(today, { weekStartsOn: 1 }), 'yyyy-MM-dd');
-      const weekEnd = format(endOfWeek(today, { weekStartsOn: 1 }), 'yyyy-MM-dd');
+      const weekStart = format(startOfWeek(today, { weekStartsOn: 1 }), "yyyy-MM-dd");
+      const weekEnd = format(endOfWeek(today, { weekStartsOn: 1 }), "yyyy-MM-dd");
       const { data } = await supabase
-        .from('appointments')
-        .select('id, status')
-        .eq('provider_id', user.id)
-        .gte('date', weekStart)
-        .lte('date', weekEnd);
+        .from("appointments")
+        .select("id, status")
+        .eq("provider_id", user.id)
+        .gte("date", weekStart)
+        .lte("date", weekEnd);
       const appointments = data || [];
       return {
         total: appointments.length,
-        completed: appointments.filter(a => a.status === 'completed').length,
-        pending: appointments.filter(a => a.status === 'scheduled').length,
-        revenue: appointments.filter(a => a.status === 'completed').length * 150
+        completed: appointments.filter((a) => a.status === "completed").length,
+        pending: appointments.filter((a) => a.status === "scheduled").length,
+        revenue: appointments.filter((a) => a.status === "completed").length * 150,
       };
-    }
+    },
   });
 
-  const scheduledToday = todayAppointments.filter((a: any) => a.status === 'scheduled');
-  const completedToday = todayAppointments.filter((a: any) => a.status === 'completed');
-
-  // Role-specific quick actions
-  const quickActions = useMemo(() => {
-    if (isRadiologist) {
-      return [
-        { icon: Calendar, label: "Schedule", route: "/provider-calendar", color: "text-blue-600 dark:text-blue-400 bg-blue-500/10" },
-        { icon: ClipboardList, label: "Queue", route: "/appointments", color: "text-purple-600 dark:text-purple-400 bg-purple-500/10" },
-        { icon: Image, label: "Imaging", route: "/medical-records", color: "text-violet-600 dark:text-violet-400 bg-violet-500/10" },
-        { icon: Brain, label: "AI Analysis", route: "/ai-diagnostics", color: "text-pink-600 dark:text-pink-400 bg-pink-500/10" },
-        { icon: FileText, label: "Reports", route: "/medical-records", color: "text-emerald-600 dark:text-emerald-400 bg-emerald-500/10" },
-        { icon: MessageSquare, label: "Chat", route: "/chat", color: "text-cyan-600 dark:text-cyan-400 bg-cyan-500/10" },
-      ];
-    }
-    if (isNurse) {
-      return [
-        { icon: Calendar, label: "Schedule", route: "/provider-calendar", color: "text-blue-600 dark:text-blue-400 bg-blue-500/10" },
-        { icon: ClipboardList, label: "Visits", route: "/appointments", color: "text-purple-600 dark:text-purple-400 bg-purple-500/10" },
-        { icon: Thermometer, label: "Vitals", route: "/medical-records", color: "text-rose-600 dark:text-rose-400 bg-rose-500/10" },
-        { icon: Pill, label: "Meds", route: "/medications", color: "text-emerald-600 dark:text-emerald-400 bg-emerald-500/10" },
-        { icon: Heart, label: "Care Plans", route: "/medical-records", color: "text-pink-600 dark:text-pink-400 bg-pink-500/10" },
-        { icon: MessageSquare, label: "Chat", route: "/chat", color: "text-cyan-600 dark:text-cyan-400 bg-cyan-500/10" },
-      ];
-    }
-    // Doctor / generic health_personnel
-    return [
-      { icon: Calendar, label: "Schedule", route: "/provider-calendar", color: "text-blue-600 dark:text-blue-400 bg-blue-500/10" },
-      { icon: ClipboardList, label: "Queue", route: "/appointments", color: "text-purple-600 dark:text-purple-400 bg-purple-500/10" },
-      { icon: FileText, label: "Prescribe", route: "/prescriptions", color: "text-emerald-600 dark:text-emerald-400 bg-emerald-500/10" },
-      { icon: Video, label: "Video", route: "/video-consultations", color: "text-orange-600 dark:text-orange-400 bg-orange-500/10" },
-      { icon: Stethoscope, label: "Records", route: "/medical-records", color: "text-pink-600 dark:text-pink-400 bg-pink-500/10" },
-      { icon: MessageSquare, label: "Chat", route: "/chat", color: "text-cyan-600 dark:text-cyan-400 bg-cyan-500/10" },
-    ];
-  }, [isDoctor, isNurse, isRadiologist]);
-
-  // Stats - conditionally show revenue based on institution affiliation
-  const statsCards = useMemo(() => {
-    const base = [
-      { label: "Today", value: todayAppointments.length, sub: `${scheduledToday.length} pending · ${completedToday.length} done`, icon: Users, color: "border-l-blue-500", iconBg: "bg-blue-500/10", iconColor: "text-blue-600 dark:text-blue-400" },
-      { label: "This Week", value: weekStats?.total || 0, sub: `${weekStats?.completed || 0} completed`, icon: TrendingUp, color: "border-l-emerald-500", iconBg: "bg-emerald-500/10", iconColor: "text-emerald-600 dark:text-emerald-400" },
-      { label: "Pending", value: weekStats?.pending || 0, sub: "Awaiting consult", icon: Clock, color: "border-l-orange-500", iconBg: "bg-orange-500/10", iconColor: "text-orange-600 dark:text-orange-400" },
-    ];
-    if (!isInstitutionAffiliated) {
-      base.push({ label: "Revenue", value: formatPrice(weekStats?.revenue || 0) as any, sub: "+12% vs last week", icon: Wallet, color: "border-l-purple-500", iconBg: "bg-purple-500/10", iconColor: "text-purple-600 dark:text-purple-400" });
-    }
-    return base;
-  }, [todayAppointments, scheduledToday, completedToday, weekStats, isInstitutionAffiliated, formatPrice]);
-
-  // Role-specific tabs
-  const tabConfig = useMemo(() => {
-    const base = [
-      { value: "schedule", label: "Schedule" },
-      { value: "patients", label: "Patients" },
-      { value: "waitlist", label: "Waitlist" },
-      { value: "analytics", label: "Analytics", icon: <BarChart3 className="h-3 w-3" /> },
-    ];
-    if (isDoctor || isHealthPersonnel) {
-      base.push({ value: "signatures", label: "Signatures" });
-    }
-    return base;
-  }, [isDoctor, isHealthPersonnel]);
+  const scheduledToday = todayAppointments.filter((a: any) => a.status === "scheduled");
+  const completedToday = todayAppointments.filter((a: any) => a.status === "completed");
 
   return (
-    <div className="space-y-5 max-w-7xl mx-auto">
-      {/* Header */}
-      <div className="flex flex-col gap-3">
-        <div>
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">{dashboardMeta.title}</h1>
-          <p className="text-sm text-muted-foreground">{format(today, 'EEEE, MMMM d, yyyy')}</p>
-        </div>
-        <div className="flex gap-2">
-          {(isDoctor || isRadiologist || isHealthPersonnel) && (
-            <Button variant="outline" size="sm" onClick={() => navigate('/ai-diagnostics')} className="gap-1.5 text-xs">
-              <Bot className="h-3.5 w-3.5" /> AI Assistant
-            </Button>
-          )}
-          <Button size="sm" onClick={() => navigate('/provider-calendar')} className="gap-1.5 text-xs">
-            <Calendar className="h-3.5 w-3.5" /> Calendar
-          </Button>
-        </div>
-      </div>
-
-      {/* Stats */}
-      <div className="flex gap-3 overflow-x-auto pb-1 -mx-1 px-1 snap-x">
-        {statsCards.map((stat) => (
-          <Card key={stat.label} className={`border-l-4 ${stat.color} min-w-[160px] flex-1 snap-start`}>
-            <CardContent className="p-3 sm:p-4">
-              <div className="flex items-start justify-between gap-2">
-                <div className="min-w-0">
-                  <p className="text-[11px] sm:text-xs text-muted-foreground truncate">{stat.label}</p>
-                  <p className="text-lg sm:text-2xl font-bold text-foreground">{stat.value}</p>
-                </div>
-                <div className={`p-2 rounded-full ${stat.iconBg} shrink-0`}>
-                  <stat.icon className={`h-4 w-4 ${stat.iconColor}`} />
-                </div>
-              </div>
-              <p className="text-[10px] sm:text-xs text-muted-foreground mt-1 truncate">{stat.sub}</p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* Quick Actions */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 sm:gap-3">
-        {quickActions.map((action, idx) => (
-          <Card 
-            key={idx} 
-            className="cursor-pointer hover:shadow-md transition-all active:scale-95"
-            onClick={() => navigate(action.route)}
-          >
-            <CardContent className="p-3 sm:p-4 flex items-center sm:flex-col sm:text-center gap-3 sm:gap-0">
-              <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl ${action.color} flex items-center justify-center shrink-0 sm:mx-auto sm:mb-2`}>
-                <action.icon className="h-5 w-5 sm:h-6 sm:w-6" />
-              </div>
-              <p className="text-xs font-medium text-foreground">{action.label}</p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* AI Banner — only for clinical roles */}
-      {(isDoctor || isRadiologist || isHealthPersonnel) && (
-        <Card className="border-primary/30 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5">
-          <CardContent className="p-4">
-            <div className="flex items-start gap-3">
-              <div className="p-2.5 rounded-full bg-primary/20 shrink-0">
-                <Brain className="h-5 w-5 text-primary" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1.5 mb-0.5">
-                  <h3 className="font-semibold text-sm text-foreground">
-                    {isRadiologist ? "Imaging AI" : "Clinical AI"}
-                  </h3>
-                  <Sparkles className="h-3.5 w-3.5 text-primary" />
-                </div>
-                <p className="text-xs text-muted-foreground leading-relaxed mb-3">
-                  {isRadiologist 
-                    ? "AI-assisted anomaly detection and imaging analysis."
-                    : "AI-powered clinical insights and evidence-based recommendations."
-                  }
-                </p>
-                <Button size="sm" onClick={() => navigate('/ai-diagnostics')} className="gap-1.5 text-xs">
-                  Open <ArrowRight className="h-3 w-3" />
-                </Button>
-              </div>
+    <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors pb-16">
+      {/* Sticky Top Bar */}
+      <div className="bg-white dark:bg-slate-900 border-b border-[#e6e9ef] dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-2xs">
+        <div className="max-w-[1500px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-[#0073ea] text-white flex items-center justify-center font-black text-sm shadow-xs">
+              <Stethoscope className="h-5 w-5" />
             </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Today's Queue */}
-      <Card>
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="flex items-center gap-2 text-base">
-                <ClipboardList className="h-4 w-4 text-primary" />
-                {isNurse ? "Today's Visits" : isRadiologist ? "Today's Reads" : "Today's Queue"}
-              </CardTitle>
-              <CardDescription className="text-xs">{format(today, 'MMMM d')}</CardDescription>
-            </div>
-            <Button variant="outline" size="sm" onClick={() => navigate('/appointments')} className="text-xs">
-              View All
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          {todayAppointments.length === 0 ? (
-            <div className="text-center py-6 text-muted-foreground">
-              <Calendar className="h-10 w-10 mx-auto mb-2 opacity-50" />
-              <p className="text-sm">
-                {isNurse ? "No visits today" : isRadiologist ? "No reads scheduled today" : "No appointments today"}
+              <h1 className="text-xl font-extrabold tracking-tight flex items-center gap-2">
+                {dashboardMeta.title}
+                <span className="w-2 h-2 rounded-full bg-[#00c875] animate-ping" />
+              </h1>
+              <p className="text-xs text-[#676879] dark:text-slate-400 font-medium">
+                {dashboardMeta.subtitle} • {format(today, "EEEE, MMMM d, yyyy")}
               </p>
-              <Button variant="link" size="sm" onClick={() => navigate('/provider-calendar')} className="text-xs">
-                View calendar
-              </Button>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              onClick={() => navigate("/ai-diagnostics")}
+              className="px-3.5 py-1.5 rounded-md bg-purple-600 hover:bg-purple-700 text-white font-extrabold text-xs shadow-xs transition-all flex items-center gap-1.5"
+            >
+              <Bot className="h-3.5 w-3.5" />
+              <span>MedGemma AI</span>
+            </button>
+            <button
+              onClick={() => navigate("/provider-calendar")}
+              className="px-3.5 py-1.5 rounded-md bg-[#0073ea] hover:bg-[#0060c4] text-white font-extrabold text-xs shadow-xs transition-all flex items-center gap-1.5"
+            >
+              <Calendar className="h-3.5 w-3.5" />
+              <span>Calendar</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-[1500px] mx-auto px-4 sm:px-6 pt-6 space-y-6">
+        {/* Bento Telemetry Stats Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+            <div className="text-xs font-extrabold text-[#676879] dark:text-slate-400 uppercase">Today's Consultations</div>
+            <div className="text-3xl font-black font-mono text-[#0073ea] mt-1">{todayAppointments.length}</div>
+            <div className="text-[11px] font-bold text-emerald-500 mt-1">{completedToday.length} Done • {scheduledToday.length} Pending</div>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+            <div className="text-xs font-extrabold text-[#676879] dark:text-slate-400 uppercase">Weekly Patient Volume</div>
+            <div className="text-3xl font-black font-mono text-purple-600 mt-1">{weekStats?.total || 0}</div>
+            <div className="text-[11px] font-bold text-slate-500 mt-1">{weekStats?.completed || 0} Completed Total</div>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+            <div className="text-xs font-extrabold text-[#676879] dark:text-slate-400 uppercase">Active Queue Status</div>
+            <div className="text-3xl font-black font-mono text-[#fdab3d] mt-1">{weekStats?.pending || 0}</div>
+            <div className="text-[11px] font-bold text-amber-500 mt-1">Awaiting Triage</div>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+            <div className="text-xs font-extrabold text-[#676879] dark:text-slate-400 uppercase">Shift Earnings (ZMW)</div>
+            <div className="text-3xl font-black font-mono text-[#00c875] mt-1">{formatPrice(weekStats?.revenue || 0)}</div>
+            <div className="text-[11px] font-bold text-emerald-500 mt-1">+14% Shift Growth</div>
+          </div>
+        </div>
+
+        {/* Quick WorkOS Action Pills Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+          {[
+            { label: "Calendar", route: "/provider-calendar", icon: Calendar },
+            { label: "Patient Queue", route: "/appointments", icon: ClipboardList },
+            { label: "Write Rx", route: "/prescriptions", icon: FileText },
+            { label: "Telehealth", route: "/video-dashboard", icon: Video },
+            { label: "Medical EMR", route: "/medical-records", icon: Stethoscope },
+            { label: "Chat Console", route: "/chat", icon: MessageSquare },
+          ].map((act) => (
+            <button
+              key={act.label}
+              onClick={() => navigate(act.route)}
+              className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 hover:border-[#0073ea] hover:shadow-xs transition-all flex items-center gap-2.5 text-xs font-extrabold text-slate-800 dark:text-slate-200"
+            >
+              <div className="p-2 rounded-lg bg-[#e5f0ff] dark:bg-blue-950 text-[#0073ea]">
+                <act.icon className="h-4 w-4" />
+              </div>
+              <span>{act.label}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* Today's Queue Section */}
+        <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs overflow-hidden">
+          <div className="px-4 py-3 bg-[#e5f0ff] dark:bg-blue-950/40 border-b border-[#e6e9ef] dark:border-slate-800 flex items-center justify-between border-l-4 border-l-[#0073ea]">
+            <div className="flex items-center gap-2">
+              <h2 className="font-extrabold text-sm text-[#0073ea]">Today's Scheduled Consultations</h2>
+              <span className="px-2 py-0.5 rounded-full text-xs font-mono font-bold bg-[#0073ea] text-white">
+                {todayAppointments.length}
+              </span>
+            </div>
+            <button
+              onClick={() => navigate("/appointments")}
+              className="text-xs font-bold text-[#0073ea] hover:underline flex items-center gap-1"
+            >
+              <span>View All Board Records</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </button>
+          </div>
+
+          {todayAppointments.length === 0 ? (
+            <div className="p-8 text-center text-xs text-[#676879] dark:text-slate-400">
+              No appointments scheduled for today
             </div>
           ) : (
-            <div className="space-y-2">
-              {todayAppointments.slice(0, 8).map((appointment: any) => (
-                <div 
-                  key={appointment.id} 
-                  className="flex items-center justify-between p-2.5 bg-muted/50 rounded-lg hover:bg-muted transition-colors gap-2"
-                >
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-medium text-primary shrink-0">
-                      {appointment.patient?.first_name?.[0]}{appointment.patient?.last_name?.[0]}
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-sm font-medium text-foreground truncate">
-                        {appointment.patient?.first_name} {appointment.patient?.last_name}
-                      </p>
-                      <p className="text-[11px] text-muted-foreground">
-                        {appointment.time} · {appointment.type === 'video_consultation' ? 'Video' : 'In-Person'}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    <Badge 
-                      variant={appointment.status === 'completed' ? 'outline' : 'default'}
-                      className={`text-[10px] px-1.5 py-0.5 ${appointment.status === 'scheduled' ? 'bg-blue-500' : ''}`}
-                    >
-                      {appointment.status}
-                    </Badge>
-                    {appointment.status === 'scheduled' && appointment.type === 'video_consultation' && (
-                      <Button 
-                        size="sm" 
-                        className="h-7 px-2 text-[11px] bg-emerald-600 hover:bg-emerald-700 gap-1"
-                        onClick={(e) => { e.stopPropagation(); navigate(`/video-call/${appointment.id}`); }}
-                      >
-                        <Video className="h-3 w-3" /> Start
-                      </Button>
-                    )}
-                    {appointment.status === 'scheduled' && appointment.type !== 'video_consultation' && (
-                      <Button 
-                        size="sm"
-                        className="h-7 px-2 text-[11px] gap-1"
-                        onClick={(e) => { e.stopPropagation(); navigate(`/appointments/${appointment.id}`); }}
-                      >
-                        <Stethoscope className="h-3 w-3" /> Go
-                      </Button>
-                    )}
-                    {appointment.status !== 'scheduled' && (
-                      <Button 
-                        size="sm" 
-                        variant="outline"
-                        className="h-7 px-2 text-[11px]"
-                        onClick={() => navigate(`/appointments/${appointment.id}`)}
-                      >
-                        View
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              ))}
-              {todayAppointments.length > 8 && (
-                <Button variant="link" className="w-full text-xs" onClick={() => navigate('/appointments')}>
-                  View all {todayAppointments.length} appointments
-                </Button>
-              )}
+            <div className="w-full overflow-x-auto">
+              <table className="w-full text-left border-collapse min-w-[850px]">
+                <thead>
+                  <tr className="text-[11px] font-extrabold uppercase text-[#676879] dark:text-slate-400 border-b border-[#e6e9ef] dark:border-slate-800 bg-[#f5f6f8] dark:bg-slate-950">
+                    <th className="py-2.5 px-4 w-[240px]">Patient Name</th>
+                    <th className="py-2.5 px-3 w-[130px] text-center">Status</th>
+                    <th className="py-2.5 px-3 w-[150px]">Consult Time</th>
+                    <th className="py-2.5 px-3 w-[140px]">Mode</th>
+                    <th className="py-2.5 px-3 w-[150px] text-center">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#e6e9ef] dark:divide-slate-800 text-xs">
+                  {todayAppointments.map((app: any) => (
+                    <tr key={app.id} className="hover:bg-[#f0f2f7] dark:hover:bg-slate-800/60 transition-colors">
+                      <td className="py-3 px-4 font-extrabold text-slate-900 dark:text-slate-100">
+                        {app.patient?.first_name} {app.patient?.last_name}
+                      </td>
+                      <td className="py-3 px-3 text-center">
+                        {app.status === "completed" ? (
+                          <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-[#00c875]">Completed</span>
+                        ) : (
+                          <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-[#579bfc]">Scheduled</span>
+                        )}
+                      </td>
+                      <td className="py-3 px-3 font-mono font-bold text-slate-700 dark:text-slate-300">
+                        {app.time}
+                      </td>
+                      <td className="py-3 px-3">
+                        <span className="inline-block px-2 py-0.5 rounded bg-[#f0f2f7] dark:bg-slate-800 font-semibold text-[11px]">
+                          {app.type === "video_consultation" ? "Video Call" : "In-Person"}
+                        </span>
+                      </td>
+                      <td className="py-3 px-3 text-center">
+                        <button
+                          onClick={() => navigate(`/appointments`)}
+                          className="px-3 py-1 rounded-md bg-[#0073ea] text-white text-[11px] font-bold hover:bg-[#0060c4]"
+                        >
+                          Open EMR Case Sheet
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
-        </CardContent>
-      </Card>
-      
-      {/* Tabs */}
-      <Tabs defaultValue="schedule" className="space-y-4">
-        <TabsList className="w-full overflow-x-auto flex justify-start gap-1 h-auto p-1">
-          {tabConfig.map(tab => (
-            <TabsTrigger key={tab.value} value={tab.value} className="text-xs px-3 py-1.5 shrink-0 gap-1">
-              {tab.icon}{tab.label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
+        </div>
 
-        <TabsContent value="schedule"><ScheduleManager /></TabsContent>
-        <TabsContent value="patients"><PatientRecords /></TabsContent>
-        <TabsContent value="waitlist"><WaitlistManager /></TabsContent>
-        <TabsContent value="analytics"><ProviderAnalyticsDashboard /></TabsContent>
-        {(isDoctor || isHealthPersonnel) && (
-          <TabsContent value="signatures"><DigitalSignature /></TabsContent>
-        )}
-      </Tabs>
+        {/* Detailed Provider Modules Tabs */}
+        <Tabs defaultValue="schedule" className="space-y-4">
+          <TabsList className="flex items-center gap-1 p-1 bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 rounded-xl">
+            <TabsTrigger value="schedule" className="text-xs font-extrabold px-4 py-1.5 rounded-md data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">Schedule Manager</TabsTrigger>
+            <TabsTrigger value="patients" className="text-xs font-extrabold px-4 py-1.5 rounded-md data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">Patient Directory</TabsTrigger>
+            <TabsTrigger value="waitlist" className="text-xs font-extrabold px-4 py-1.5 rounded-md data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">Waitlist Triage</TabsTrigger>
+            <TabsTrigger value="analytics" className="text-xs font-extrabold px-4 py-1.5 rounded-md data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">Analytics</TabsTrigger>
+          </TabsList>
+
+          <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
+            <TabsContent value="schedule"><ScheduleManager /></TabsContent>
+            <TabsContent value="patients"><PatientRecords /></TabsContent>
+            <TabsContent value="waitlist"><WaitlistManager /></TabsContent>
+            <TabsContent value="analytics"><ProviderAnalyticsDashboard /></TabsContent>
+          </div>
+        </Tabs>
+      </div>
     </div>
   );
 };

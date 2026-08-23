@@ -201,72 +201,62 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
   );
 
   return (
-    <div className="space-y-4">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center bg-gradient-to-r from-primary/10 via-primary/5 to-background p-4 rounded-xl border border-primary/20">
+    <div className="space-y-4 font-sans text-slate-900 dark:text-slate-100">
+      {/* Monday Header Bar */}
+      <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center p-4 rounded-xl bg-white dark:bg-slate-900 border border-[#e6e9ef] shadow-xs">
         <div>
-          <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
-            <Pill className="h-5 w-5 text-primary" /> In-Hospital Pharmacy
+          <h3 className="text-base font-extrabold flex items-center gap-2">
+            <Pill className="h-5 w-5 text-[#0073ea]" /> In-Hospital Pharmacy
           </h3>
-          <p className="text-xs text-muted-foreground">Dispensing • Stock Management • Profit Margins • Damage Audit</p>
+          <p className="text-xs text-[#676879] font-medium">Dispensing • Stock Management • Profit Margins • Damage Audit</p>
         </div>
         <div className="flex gap-1.5 flex-wrap">
-          <Button size="sm" variant="outline" className="text-xs h-7 gap-1" onClick={() => { refresh(); refreshRx(); }}>
-            <RefreshCw className="h-3 w-3" /> Refresh
-          </Button>
-          <Button size="sm" variant="outline" className="text-xs h-7 gap-1" onClick={() => setShowAddDrug(true)}>
-            <Plus className="h-3 w-3" /> Add Drug
-          </Button>
-          <Button size="sm" className="text-xs h-7 gap-1" onClick={() => setShowAddRx(true)}>
-            <Plus className="h-3 w-3" /> New Prescription
-          </Button>
-          <Button size="sm" variant="destructive" className="text-xs h-7 gap-1" onClick={() => setShowWriteOff(true)}>
-            <ShieldAlert className="h-3 w-3" /> Write-Off
-          </Button>
+          <button className="px-3 py-1.5 rounded-md bg-[#f0f2f7] font-bold text-xs flex items-center gap-1" onClick={() => { refresh(); refreshRx(); }}>
+            <RefreshCw className="h-3.5 w-3.5" /> Refresh
+          </button>
+          <button className="px-3 py-1.5 rounded-md border border-[#c3c6d4] font-bold text-xs flex items-center gap-1" onClick={() => setShowAddDrug(true)}>
+            <Plus className="h-3.5 w-3.5" /> Add Drug
+          </button>
+          <button className="px-3 py-1.5 rounded-md bg-[#0073ea] text-white font-extrabold text-xs flex items-center gap-1" onClick={() => setShowAddRx(true)}>
+            <Plus className="h-3.5 w-3.5" /> New Prescription
+          </button>
+          <button className="px-3 py-1.5 rounded-md bg-[#e2445c] text-white font-extrabold text-xs flex items-center gap-1" onClick={() => setShowWriteOff(true)}>
+            <ShieldAlert className="h-3.5 w-3.5" /> Write-Off
+          </button>
         </div>
       </div>
 
-      {/* Summary Cards */}
+      {/* KPI Strip */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-        <Card><CardContent className="pt-4 text-center">
-          <Package className="h-5 w-5 mx-auto text-primary mb-1" />
-          <p className="text-xl font-bold text-foreground">{inventory.length}</p>
-          <p className="text-[10px] text-muted-foreground">Stock Items</p>
-        </CardContent></Card>
-
-        <Card className="border-emerald-500/20 bg-emerald-500/5"><CardContent className="pt-4 text-center">
-          <ArrowUpRight className="h-5 w-5 mx-auto text-emerald-600 dark:text-emerald-400 mb-1" />
-          <p className="text-xl font-bold text-emerald-600 dark:text-emerald-400">+{avgMarginPct}%</p>
-          <p className="text-[10px] text-muted-foreground">Avg Profit Margin</p>
-        </CardContent></Card>
-
-        <Card className="border-amber-500/20 bg-amber-500/5"><CardContent className="pt-4 text-center">
-          <TrendingDown className="h-5 w-5 mx-auto text-amber-500 mb-1" />
-          <p className="text-xl font-bold text-amber-500">{lowStock.length}</p>
-          <p className="text-[10px] text-muted-foreground">Low Stock</p>
-        </CardContent></Card>
-
-        <Card className="border-destructive/20 bg-destructive/5"><CardContent className="pt-4 text-center">
-          <AlertTriangle className="h-5 w-5 mx-auto text-destructive mb-1" />
-          <p className="text-xl font-bold text-destructive">{expiredItems.length + nearExpiry.length}</p>
-          <p className="text-[10px] text-muted-foreground">Expired/Near Expiry</p>
-        </CardContent></Card>
-
-        <Card><CardContent className="pt-4 text-center">
-          <Pill className="h-5 w-5 mx-auto text-emerald-500 mb-1" />
-          <p className="text-xl font-bold text-foreground">{pendingRx.length}</p>
-          <p className="text-[10px] text-muted-foreground">Open Prescriptions</p>
-        </CardContent></Card>
+        {[
+          { label: "Stock Items", value: inventory.length, color: "#0073ea", icon: <Package className="h-5 w-5" /> },
+          { label: "Avg Margin", value: `+${avgMarginPct}%`, color: "#00c875", icon: <ArrowUpRight className="h-5 w-5" /> },
+          { label: "Low Stock", value: lowStock.length, color: "#fdab3d", icon: <TrendingDown className="h-5 w-5" /> },
+          { label: "Expiry Alerts", value: expiredItems.length + nearExpiry.length, color: "#e2445c", icon: <AlertTriangle className="h-5 w-5" /> },
+          { label: "Open Rx", value: pendingRx.length, color: "#a25ddc", icon: <Pill className="h-5 w-5" /> },
+        ].map((c) => (
+          <div key={c.label} className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-[#e6e9ef] text-center shadow-xs">
+            <div style={{ color: c.color }} className="flex justify-center mb-1">{c.icon}</div>
+            <p className="text-xl font-black font-mono" style={{ color: c.color }}>{c.value}</p>
+            <p className="text-[10px] text-[#676879] font-bold uppercase">{c.label}</p>
+          </div>
+        ))}
       </div>
 
       {/* Tabs */}
       <Tabs defaultValue="orders">
-        <TabsList className="flex flex-wrap gap-1 h-auto">
-          <TabsTrigger value="orders" className="text-xs h-7">Prescriptions ({pendingRx.length})</TabsTrigger>
-          <TabsTrigger value="pos" className="text-xs h-7">POS Dispensing</TabsTrigger>
-          <TabsTrigger value="inventory" className="text-xs h-7">Inventory & Margins ({inventory.length})</TabsTrigger>
-          <TabsTrigger value="alerts" className="text-xs h-7">Alerts & Audit</TabsTrigger>
-        </TabsList>
+        <div className="overflow-x-auto p-1 bg-white dark:bg-slate-900 rounded-xl border border-[#e6e9ef] shadow-xs">
+          <TabsList className="inline-flex w-auto min-w-full h-auto gap-1 bg-transparent p-1">
+            {[
+              { val: "orders", label: `Prescriptions (${pendingRx.length})` },
+              { val: "pos", label: "POS Dispensing" },
+              { val: "inventory", label: `Inventory & Margins (${inventory.length})` },
+              { val: "alerts", label: "Alerts & Audit" },
+            ].map((t) => (
+              <TabsTrigger key={t.val} value={t.val} className="text-xs font-extrabold px-3 py-1.5 rounded-md data-[state=active]:bg-[#0073ea] data-[state=active]:text-white transition-all">{t.label}</TabsTrigger>
+            ))}
+          </TabsList>
+        </div>
 
         {/* Prescriptions Tab */}
         <TabsContent value="orders" className="space-y-3 pt-3">
@@ -275,23 +265,36 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
           ) : pendingRx.length === 0 ? (
             <EmptyState icon={Pill} title="No prescriptions to dispense" description="Prescriptions will appear here once routed." actionLabel="Write Prescription" onAction={() => setShowAddRx(true)} />
           ) : (
-            pendingRx.map(rx => (
-              <Card key={rx.id}>
-                <CardContent className="pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                  <div>
-                    <p className="font-medium text-sm text-foreground">{nameFor(rx.patient_id) || rx.patient_name || 'Hospital Patient'}</p>
-                    <p className="text-xs text-muted-foreground">{rx.medication_name} {rx.strength || rx.dosage || ''} • Qty {rx.quantity ?? '1'}</p>
-                    {rx.instructions && <p className="text-xs text-muted-foreground">{rx.instructions}</p>}
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Badge variant="secondary" className="text-xs capitalize">{rx.status}</Badge>
-                    <Button size="sm" className="gap-1 text-xs" onClick={() => dispense(rx, 'completed')}>
-                      <CheckCircle2 className="h-3 w-3" /> Dispense
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))
+            <div className="w-full overflow-x-auto rounded-xl border border-[#e6e9ef] bg-white dark:bg-slate-900">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="border-b border-[#e6e9ef] bg-[#f5f6f8] text-[11px] font-extrabold uppercase text-[#676879]">
+                    <th className="py-2.5 px-4">Patient</th>
+                    <th className="py-2.5 px-3">Medication</th>
+                    <th className="py-2.5 px-3">Dosage</th>
+                    <th className="py-2.5 px-3">Qty</th>
+                    <th className="py-2.5 px-3 text-center">Status</th>
+                    <th className="py-2.5 px-3 text-center">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#e6e9ef]">
+                  {pendingRx.map(rx => (
+                    <tr key={rx.id} className="hover:bg-[#f0f2f7] transition-colors">
+                      <td className="py-3 px-4 font-bold text-[#0073ea]">{nameFor(rx.patient_id) || rx.patient_name || 'Hospital Patient'}</td>
+                      <td className="py-3 px-3 font-bold text-slate-900 dark:text-slate-100">{rx.medication_name}</td>
+                      <td className="py-3 px-3 text-[#676879]">{rx.strength || rx.dosage || '—'}</td>
+                      <td className="py-3 px-3 font-extrabold">{rx.quantity ?? '1'}</td>
+                      <td className="py-3 px-3 text-center"><span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold text-white bg-[#fdab3d] capitalize">{rx.status}</span></td>
+                      <td className="py-3 px-3 text-center">
+                        <button onClick={() => dispense(rx, 'completed')} className="px-3 py-1 rounded-md bg-[#00c875] text-white text-[10px] font-extrabold flex items-center gap-1 mx-auto">
+                          <CheckCircle2 className="h-3 w-3" /> Dispense
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </TabsContent>
 
@@ -415,22 +418,22 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
           ) : inventory.length === 0 ? (
             <EmptyState icon={Pill} title="No pharmacy stock" description="Add drugs to enable dispensing and margin tracking." actionLabel="Add First Drug" onAction={() => setShowAddDrug(true)} />
           ) : (
-            <div className="overflow-x-auto">
+            <div className="w-full overflow-x-auto rounded-xl border border-[#e6e9ef] bg-white dark:bg-slate-900">
               <table className="w-full text-xs">
                 <thead>
-                  <tr className="border-b bg-muted/30 text-left text-muted-foreground font-semibold">
-                    <th className="p-2">Drug Name</th>
-                    <th className="p-2">Category</th>
-                    <th className="p-2">Batch</th>
-                    <th className="p-2">Qty</th>
-                    <th className="p-2">Cost Price</th>
-                    <th className="p-2">Sell Price</th>
-                    <th className="p-2">Margin</th>
-                    <th className="p-2">Expiry</th>
-                    <th className="p-2">Status</th>
+                  <tr className="border-b border-[#e6e9ef] bg-[#f5f6f8] text-[11px] font-extrabold uppercase text-[#676879]">
+                    <th className="py-2.5 px-4">Drug Name</th>
+                    <th className="py-2.5 px-3">Category</th>
+                    <th className="py-2.5 px-3">Batch</th>
+                    <th className="py-2.5 px-3 text-right">Qty</th>
+                    <th className="py-2.5 px-3 text-right">Cost</th>
+                    <th className="py-2.5 px-3 text-right">Price</th>
+                    <th className="py-2.5 px-3 text-center">Margin</th>
+                    <th className="py-2.5 px-3">Expiry</th>
+                    <th className="py-2.5 px-3 text-center">Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border">
+                <tbody className="divide-y divide-[#e6e9ef]">
                   {filteredInventory.map(i => {
                     const cost = Number(i.cost_price || i.unit_price * 0.6);
                     const price = Number(i.unit_price);
@@ -438,26 +441,24 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
                     const marginPct = cost > 0 ? ((margin / cost) * 100).toFixed(1) : '0';
                     const isExpired = i.expiry_date && new Date(i.expiry_date).getTime() <= Date.now();
                     return (
-                      <tr key={i.id} className="hover:bg-muted/20">
-                        <td className="p-2 font-medium text-foreground">{i.product_name}</td>
-                        <td className="p-2 text-muted-foreground">{i.category || '—'}</td>
-                        <td className="p-2 text-muted-foreground">{i.batch_number || '—'}</td>
-                        <td className="p-2 font-bold text-foreground">{i.quantity ?? 0}</td>
-                        <td className="p-2 text-muted-foreground">K{cost.toFixed(2)}</td>
-                        <td className="p-2 font-semibold text-foreground">K{price.toFixed(2)}</td>
-                        <td className="p-2">
-                          <Badge variant="outline" className="text-[9px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20">
-                            +{marginPct}%
-                          </Badge>
+                      <tr key={i.id} className="hover:bg-[#f0f2f7] transition-colors">
+                        <td className="py-3 px-4 font-bold text-slate-900 dark:text-slate-100">{i.product_name}</td>
+                        <td className="py-3 px-3 text-[#676879]">{i.category || '—'}</td>
+                        <td className="py-3 px-3 text-[#676879] font-mono">{i.batch_number || '—'}</td>
+                        <td className="py-3 px-3 font-extrabold text-right">{i.quantity ?? 0}</td>
+                        <td className="py-3 px-3 text-[#676879] text-right">K{cost.toFixed(2)}</td>
+                        <td className="py-3 px-3 font-bold text-right">K{price.toFixed(2)}</td>
+                        <td className="py-3 px-3 text-center">
+                          <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold text-white bg-[#00c875]">+{marginPct}%</span>
                         </td>
-                        <td className="p-2 text-muted-foreground">{i.expiry_date || '—'}</td>
-                        <td className="p-2">
+                        <td className="py-3 px-3 text-[#676879]">{i.expiry_date || '—'}</td>
+                        <td className="py-3 px-3 text-center">
                           {isExpired ? (
-                            <Badge variant="destructive" className="text-[9px]">Expired</Badge>
+                            <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold text-white bg-[#e2445c]">Expired</span>
                           ) : (i.quantity ?? 0) <= (i.reorder_level ?? 20) ? (
-                            <Badge variant="destructive" className="text-[9px]">Low</Badge>
+                            <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold text-white bg-[#fdab3d]">Low</span>
                           ) : (
-                            <Badge variant="outline" className="text-[9px]">OK</Badge>
+                            <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold text-white bg-[#00c875]">OK</span>
                           )}
                         </td>
                       </tr>
@@ -472,10 +473,10 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
         {/* Alerts & Audit Tab */}
         <TabsContent value="alerts" className="space-y-3 pt-3">
           <div className="flex justify-between items-center">
-            <h4 className="text-sm font-semibold text-foreground">Stock Alerts & Damage Audit</h4>
-            <Button size="sm" variant="destructive" className="text-xs h-7 gap-1" onClick={() => setShowWriteOff(true)}>
-              <ShieldAlert className="h-3 w-3" /> Log Write-Off
-            </Button>
+            <h4 className="text-sm font-extrabold text-slate-900 dark:text-slate-100 flex items-center gap-2"><AlertTriangle className="h-4 w-4 text-[#fdab3d]" />Stock Alerts & Damage Audit</h4>
+            <button className="px-3 py-1.5 rounded-md bg-[#e2445c] text-white text-xs font-extrabold flex items-center gap-1" onClick={() => setShowWriteOff(true)}>
+              <ShieldAlert className="h-3.5 w-3.5" /> Log Write-Off
+            </button>
           </div>
 
           {lowStock.length === 0 && nearExpiry.length === 0 && expiredItems.length === 0 ? (
@@ -483,41 +484,35 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
           ) : null}
 
           {expiredItems.map(i => (
-            <Card key={`exp-${i.id}`} className="border-destructive/40 bg-destructive/5">
-              <CardContent className="pt-3 flex items-center gap-3">
-                <AlertTriangle className="h-5 w-5 text-destructive flex-shrink-0" />
-                <div className="flex-1">
-                  <p className="text-sm font-semibold text-foreground">{i.product_name} — EXPIRED</p>
-                  <p className="text-xs text-muted-foreground">Expiry: {i.expiry_date} • Qty: {i.quantity} • Batch: {i.batch_number || '—'}</p>
-                </div>
-                <Badge variant="destructive">Action Needed</Badge>
-              </CardContent>
-            </Card>
+            <div key={`exp-${i.id}`} className="flex items-center gap-3 p-3.5 rounded-xl border border-[#e2445c]/30 bg-[#e2445c]/5">
+              <AlertTriangle className="h-5 w-5 text-[#e2445c] flex-shrink-0" />
+              <div className="flex-1">
+                <p className="text-sm font-extrabold text-slate-900 dark:text-slate-100">{i.product_name} — EXPIRED</p>
+                <p className="text-xs text-[#676879]">Expiry: {i.expiry_date} • Qty: {i.quantity} • Batch: {i.batch_number || '—'}</p>
+              </div>
+              <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold text-white bg-[#e2445c]">Action Needed</span>
+            </div>
           ))}
 
           {nearExpiry.map(i => (
-            <Card key={`near-${i.id}`} className="border-amber-500/30 bg-amber-500/5">
-              <CardContent className="pt-3 flex items-center gap-3">
-                <AlertTriangle className="h-5 w-5 text-amber-500 flex-shrink-0" />
-                <div className="flex-1">
-                  <p className="text-sm font-semibold text-foreground">{i.product_name} — Expiring Soon</p>
-                  <p className="text-xs text-muted-foreground">Expiry: {i.expiry_date} • Qty: {i.quantity} • Batch: {i.batch_number || '—'}</p>
-                </div>
-                <Badge variant="outline" className="text-amber-600 border-amber-500/30">Near Expiry</Badge>
-              </CardContent>
-            </Card>
+            <div key={`near-${i.id}`} className="flex items-center gap-3 p-3.5 rounded-xl border border-[#fdab3d]/30 bg-[#fdab3d]/5">
+              <AlertTriangle className="h-5 w-5 text-[#fdab3d] flex-shrink-0" />
+              <div className="flex-1">
+                <p className="text-sm font-extrabold text-slate-900 dark:text-slate-100">{i.product_name} — Expiring Soon</p>
+                <p className="text-xs text-[#676879]">Expiry: {i.expiry_date} • Qty: {i.quantity} • Batch: {i.batch_number || '—'}</p>
+              </div>
+              <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold text-white bg-[#fdab3d]">Near Expiry</span>
+            </div>
           ))}
 
           {lowStock.map(i => (
-            <Card key={i.id} className="border-amber-500/30">
-              <CardContent className="pt-3 flex items-center gap-3">
-                <TrendingDown className="h-5 w-5 text-amber-500 flex-shrink-0" />
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-foreground">{i.product_name} — Low Stock</p>
-                  <p className="text-xs text-muted-foreground">Current: {i.quantity ?? 0} | Reorder Level: {i.reorder_level ?? 20}</p>
-                </div>
-              </CardContent>
-            </Card>
+            <div key={i.id} className="flex items-center gap-3 p-3.5 rounded-xl border border-[#fdab3d]/30 bg-[#f5f6f8]">
+              <TrendingDown className="h-5 w-5 text-[#fdab3d] flex-shrink-0" />
+              <div className="flex-1">
+                <p className="text-sm font-extrabold text-slate-900 dark:text-slate-100">{i.product_name} — Low Stock</p>
+                <p className="text-xs text-[#676879]">Current: {i.quantity ?? 0} | Reorder Level: {i.reorder_level ?? 20}</p>
+              </div>
+            </div>
           ))}
         </TabsContent>
       </Tabs>

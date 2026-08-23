@@ -1,79 +1,105 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { UserManagement } from '@/components/admin/UserManagement';
-import { SecurityAuditLogs } from '@/components/admin/SecurityAuditLogs';
-import { TestAccountSetup } from '@/components/admin/TestAccountSetup';
-import { RevenueAnalyticsDashboard } from '@/components/admin/RevenueAnalyticsDashboard';
-import { InstitutionApplications } from '@/components/admin/InstitutionApplications';
-import { ProviderApplications } from '@/components/admin/ProviderApplications';
-import { RoleManagement } from '@/components/admin/RoleManagement';
-import { PromoCodeManager } from '@/components/admin/PromoCodeManager';
-import { CommissionSettings } from '@/components/admin/CommissionSettings';
-import { SecurityDashboard } from '@/components/admin/SecurityDashboard';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { UserManagement } from "@/components/admin/UserManagement";
+import { SecurityAuditLogs } from "@/components/admin/SecurityAuditLogs";
+import { TestAccountSetup } from "@/components/admin/TestAccountSetup";
+import { RevenueAnalyticsDashboard } from "@/components/admin/RevenueAnalyticsDashboard";
+import { InstitutionApplications } from "@/components/admin/InstitutionApplications";
+import { ProviderApplications } from "@/components/admin/ProviderApplications";
+import { RoleManagement } from "@/components/admin/RoleManagement";
+import { PromoCodeManager } from "@/components/admin/PromoCodeManager";
+import { CommissionSettings } from "@/components/admin/CommissionSettings";
+import { SecurityDashboard } from "@/components/admin/SecurityDashboard";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Shield, Users, Activity, DollarSign, Building2, Stethoscope,
-  UserCog, Ticket, Percent, Lock,
-} from 'lucide-react';
-import { useSearchParams } from 'react-router-dom';
+  UserCog, Ticket, Percent, Lock, Sparkles, RefreshCw
+} from "lucide-react";
+import { useSearchParams } from "react-router-dom";
 
 const TABS = [
-  { value: 'users', label: 'Users', icon: Users },
-  { value: 'roles', label: 'Roles', icon: UserCog },
-  { value: 'providers', label: 'Providers', icon: Stethoscope },
-  { value: 'applications', label: 'Institutions', icon: Building2 },
-  { value: 'revenue', label: 'Revenue', icon: DollarSign },
-  { value: 'commissions', label: 'Commissions', icon: Percent },
-  { value: 'promos', label: 'Promos', icon: Ticket },
-  { value: 'security', label: 'Security', icon: Lock },
-  { value: 'audit', label: 'Audit', icon: Activity },
-  { value: 'test', label: 'Test', icon: Shield },
+  { value: "users", label: "Users", icon: Users },
+  { value: "roles", label: "Roles", icon: UserCog },
+  { value: "providers", label: "Providers", icon: Stethoscope },
+  { value: "applications", label: "Institutions", icon: Building2 },
+  { value: "revenue", label: "Revenue", icon: DollarSign },
+  { value: "commissions", label: "Commissions", icon: Percent },
+  { value: "promos", label: "Promos", icon: Ticket },
+  { value: "security", label: "Security", icon: Lock },
+  { value: "audit", label: "Audit Logs", icon: Activity },
+  { value: "test", label: "Test Setup", icon: Shield },
 ];
 
-const AdminDashboard = () => {
+export const AdminDashboard = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const activeTab = searchParams.get('tab') || 'users';
+  const activeTab = searchParams.get("tab") || "users";
   const setTab = (v: string) => setSearchParams({ tab: v });
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Admin Dashboard</h1>
-          <p className="text-muted-foreground">
-            Manage users, roles, revenue, promotions and security
-          </p>
+    <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors pb-16">
+      {/* Monday Sticky Top Bar */}
+      <div className="bg-white dark:bg-slate-900 border-b border-[#e6e9ef] dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-2xs">
+        <div className="max-w-[1600px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-[#0073ea] text-white flex items-center justify-center font-black text-sm shadow-xs">
+              <Shield className="h-5 w-5" />
+            </div>
+            <div>
+              <h1 className="text-xl font-extrabold tracking-tight flex items-center gap-2">
+                Executive Admin WorkOS
+                <span className="w-2 h-2 rounded-full bg-[#00c875] animate-ping" />
+              </h1>
+              <p className="text-xs text-[#676879] dark:text-slate-400 font-medium">
+                System-wide governance, security audit logs, platform revenue & accreditation controls
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="px-3 py-1 rounded-full text-xs font-bold text-white bg-[#00c875]">
+              Active System Governance
+            </span>
+          </div>
         </div>
-        <Shield className="h-12 w-12 text-primary" />
       </div>
 
-      <Tabs value={activeTab} onValueChange={setTab} className="space-y-4">
-        <TabsList className="flex w-full flex-wrap h-auto justify-start gap-1">
-          {TABS.map(({ value, label, icon: Icon }) => (
-            <TabsTrigger key={value} value={value} className="flex items-center gap-2">
-              <Icon className="h-4 w-4" /> {label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
+      {/* Main Board Content */}
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 pt-6">
+        <Tabs value={activeTab} onValueChange={setTab} className="space-y-4">
+          <div className="overflow-x-auto p-1 bg-white dark:bg-slate-900 rounded-xl border border-[#e6e9ef] dark:border-slate-800">
+            <TabsList className="inline-flex w-auto min-w-full flex-wrap h-auto gap-1 bg-transparent p-1">
+              {TABS.map(({ value, label, icon: Icon }) => (
+                <TabsTrigger
+                  key={value}
+                  value={value}
+                  className="text-xs font-extrabold px-3.5 py-1.5 rounded-md data-[state=active]:bg-[#0073ea] data-[state=active]:text-white flex items-center gap-1.5 transition-all"
+                >
+                  <Icon className="h-3.5 w-3.5" />
+                  <span>{label}</span>
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </div>
 
-        <TabsContent value="users"><UserManagement /></TabsContent>
-        <TabsContent value="roles"><RoleManagement /></TabsContent>
-        <TabsContent value="providers"><ProviderApplications /></TabsContent>
-        <TabsContent value="applications"><InstitutionApplications /></TabsContent>
-        <TabsContent value="revenue"><RevenueAnalyticsDashboard /></TabsContent>
-        <TabsContent value="commissions"><CommissionSettings /></TabsContent>
-        <TabsContent value="promos"><PromoCodeManager /></TabsContent>
-        <TabsContent value="security"><SecurityDashboard /></TabsContent>
-        <TabsContent value="audit"><SecurityAuditLogs /></TabsContent>
-        <TabsContent value="test">
-          <Card>
-            <CardHeader>
-              <CardTitle>Test Account Setup</CardTitle>
-              <CardDescription>Create test accounts for development and testing</CardDescription>
-            </CardHeader>
-            <CardContent><TestAccountSetup /></CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+          <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-6 shadow-xs">
+            <TabsContent value="users"><UserManagement /></TabsContent>
+            <TabsContent value="roles"><RoleManagement /></TabsContent>
+            <TabsContent value="providers"><ProviderApplications /></TabsContent>
+            <TabsContent value="applications"><InstitutionApplications /></TabsContent>
+            <TabsContent value="revenue"><RevenueAnalyticsDashboard /></TabsContent>
+            <TabsContent value="commissions"><CommissionSettings /></TabsContent>
+            <TabsContent value="promos"><PromoCodeManager /></TabsContent>
+            <TabsContent value="security"><SecurityDashboard /></TabsContent>
+            <TabsContent value="audit"><SecurityAuditLogs /></TabsContent>
+            <TabsContent value="test">
+              <div className="space-y-2">
+                <h3 className="font-extrabold text-base">Test Account Diagnostics</h3>
+                <p className="text-xs text-[#676879]">Create test credentials for development and QA validation</p>
+                <TestAccountSetup />
+              </div>
+            </TabsContent>
+          </div>
+        </Tabs>
+      </div>
     </div>
   );
 };

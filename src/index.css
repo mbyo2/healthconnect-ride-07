@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700;800;900&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -35,91 +35,62 @@ html {
 
 @layer base {
   :root {
-    /* Modern healthcare color palette - light, cool-toned background */
-    --background: 210 40% 98%;
-    --foreground: 222 47% 11%;
-    --card: 0 0% 100%;
+    /* Monday.com WorkOS palette - Crisp ultra-light canvas */
+    --background: 210 20% 97%; /* #f5f6f8 */
+    --foreground: 222 47% 11%; /* #111827 */
+    --card: 0 0% 100%;        /* #ffffff */
     --card-foreground: 222 47% 11%;
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
-    --primary: 221 83% 53%;
+    --primary: 211 100% 46%;  /* #0073ea Monday Blue */
     --primary-foreground: 0 0% 100%;
-    --secondary: 210 40% 96%;
+    --secondary: 210 20% 95%;
     --secondary-foreground: 222 47% 11%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
-    --accent: 217 91% 60%;
+    --muted: 210 20% 95%;
+    --muted-foreground: 215 16% 47%; /* #676879 */
+    --accent: 211 100% 46%;
     --accent-foreground: 0 0% 100%;
-    --destructive: 0 84% 60%;
+    --destructive: 350 78% 57%; /* #e2445c */
     --destructive-foreground: 0 0% 100%;
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 221 83% 53%;
-    --radius: 1rem;
+    --border: 220 20% 92%;     /* #e6e9ef */
+    --input: 220 20% 92%;
+    --ring: 211 100% 46%;
+    --radius: 0.375rem;       /* 6px Monday Soft Rounded */
 
-    /* Brand colors */
-    --brand-blue: 221 83% 53%;
-    --brand-green: 142 71% 45%;
-    --brand-yellow: 45 93% 47%;
-    --brand-red: 0 84% 60%;
-    --brand-purple: 265 85% 55%;
-    --brand-orange: 24 95% 53%;
+    /* Monday Brand Saturated Statuses */
+    --brand-blue: 211 100% 46%; /* #0073ea */
+    --brand-green: 155 100% 39%; /* #00c875 */
+    --brand-yellow: 35 97% 62%; /* #fdab3d */
+    --brand-red: 350 78% 57%;  /* #e2445c */
+    --brand-purple: 272 65% 61%; /* #a25ddc */
+    --brand-cyan: 215 96% 66%;  /* #579bfc */
 
-    /* Trust blue palette (RGB for opacity support) */
-    --trust-50: 239, 246, 255;
-    --trust-100: 219, 234, 254;
-    --trust-200: 191, 219, 254;
-    --trust-300: 147, 197, 253;
-    --trust-400: 96, 165, 250;
-    --trust-500: 59, 130, 246;
-    --trust-600: 37, 99, 235;
-    --trust-700: 29, 78, 216;
-    --trust-800: 30, 64, 175;
-    --trust-900: 30, 58, 138;
-
-    /* Semantic aliases */
-    --success: 142 71% 45%;
+    --success: 155 100% 39%;
     --success-foreground: 0 0% 100%;
-    --warning: 45 93% 47%;
+    --warning: 35 97% 62%;
     --warning-foreground: 0 0% 100%;
   }
 
   .dark {
-    --background: 222 47% 11%;
+    --background: 222 47% 8%; /* #0f172a */
     --foreground: 210 40% 98%;
-    --card: 222 47% 15%;
+    --card: 222 47% 11%;
     --card-foreground: 210 40% 98%;
-    --popover: 222 47% 15%;
+    --popover: 222 47% 11%;
     --popover-foreground: 210 40% 98%;
-    --primary: 217 91% 60%;
+    --primary: 211 100% 55%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 217 33% 17%;
+    --secondary: 217 33% 15%;
     --secondary-foreground: 210 40% 98%;
-    --muted: 217 33% 17%;
+    --muted: 217 33% 15%;
     --muted-foreground: 215 20% 65%;
-    --accent: 217 91% 60%;
+    --accent: 211 100% 55%;
     --accent-foreground: 0 0% 100%;
-    --destructive: 0 62% 40%;
+    --destructive: 350 78% 57%;
     --destructive-foreground: 210 40% 98%;
     --border: 217 33% 17%;
     --input: 217 33% 17%;
-    --ring: 217 91% 60%;
-
-    --trust-50: 15, 23, 42;
-    --trust-100: 30, 41, 59;
-    --trust-200: 51, 65, 85;
-    --trust-300: 71, 85, 105;
-    --trust-400: 100, 116, 139;
-    --trust-500: 96, 165, 250;
-    --trust-600: 147, 197, 253;
-    --trust-700: 191, 219, 254;
-    --trust-800: 219, 234, 254;
-    --trust-900: 239, 246, 255;
-
-    --success: 142 71% 45%;
-    --success-foreground: 0 0% 100%;
-    --warning: 45 93% 47%;
-    --warning-foreground: 0 0% 100%;
+    --ring: 211 100% 55%;
   }
 }
 
@@ -130,7 +101,7 @@ html {
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Figtree', 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: 'Figtree', system-ui, -apple-system, sans-serif;
     font-feature-settings: 'cv11', 'ss01';
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -138,97 +109,31 @@ html {
 }
 
 @layer components {
+  /* Reusable Monday.com Status Pill Badges (Borderless, Saturated, Rounded-Full) */
+  .monday-pill-done {
+    @apply bg-[#00c875] text-white font-extrabold rounded-full border-0 px-3 py-1 text-xs shadow-2xs;
+  }
+  .monday-pill-working {
+    @apply bg-[#fdab3d] text-white font-extrabold rounded-full border-0 px-3 py-1 text-xs shadow-2xs;
+  }
+  .monday-pill-stuck {
+    @apply bg-[#e2445c] text-white font-extrabold rounded-full border-0 px-3 py-1 text-xs shadow-2xs;
+  }
+  .monday-pill-scheduled {
+    @apply bg-[#579bfc] text-white font-extrabold rounded-full border-0 px-3 py-1 text-xs shadow-2xs;
+  }
+  .monday-pill-review {
+    @apply bg-[#a25ddc] text-white font-extrabold rounded-full border-0 px-3 py-1 text-xs shadow-2xs;
+  }
+  .monday-row-hover {
+    @apply hover:bg-[#f0f2f7] dark:hover:bg-slate-800/60 transition-colors cursor-pointer;
+  }
+
   .modern-header {
-    @apply sticky top-0 z-50 bg-background/95 backdrop-blur-lg border-b border-border;
+    @apply sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-[#e6e9ef] dark:border-slate-800;
   }
 
   .container-modern {
     @apply container mx-auto px-4 sm:px-6 lg:px-8;
-  }
-}
-
-@layer utilities {
-  .animate-slide-up {
-    animation: slideUp 0.3s ease-out;
-  }
-  .animate-fade-in-up {
-    animation: fadeInUp 0.4s ease-out;
-  }
-  .animate-bounce-in {
-    animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  }
-  .animate-scale-in {
-    animation: scaleIn 0.3s ease-out;
-  }
-  .animate-pulse-glow {
-    animation: pulseGlow 2s ease-in-out infinite;
-  }
-  .animate-shimmer {
-    animation: shimmer 2s linear infinite;
-  }
-  .animate-float {
-    animation: float 3s ease-in-out infinite;
-  }
-  .animate-rotate-slow {
-    animation: rotateSlow 20s linear infinite;
-  }
-}
-
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(16px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes bounceIn {
-  0% { opacity: 0; transform: scale(0.3); }
-  50% { opacity: 1; transform: scale(1.05); }
-  70% { transform: scale(0.9); }
-  100% { transform: scale(1); }
-}
-
-@keyframes scaleIn {
-  from { opacity: 0; transform: scale(0.9); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-@keyframes pulseGlow {
-  0%, 100% { box-shadow: 0 0 5px hsl(var(--primary) / 0.3); }
-  50% { box-shadow: 0 0 20px hsl(var(--primary) / 0.6); }
-}
-
-@keyframes shimmer {
-  0% { background-position: -1000px 0; }
-  100% { background-position: 1000px 0; }
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-}
-
-@keyframes rotateSlow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-/* Touch targets on mobile */
-@media (max-width: 768px) {
-  .container-modern { @apply px-4; }
-  button, [role="button"], input, select, textarea {
-    @apply min-h-[44px];
-  }
-}
-
-/* Reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
   }
 }

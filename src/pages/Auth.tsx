@@ -1,10 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { Card } from "@/components/ui/card";
-import { Eye, EyeOff, ArrowLeft, Building2, User, Stethoscope, ChevronRight } from "lucide-react";
+import { Eye, EyeOff, ArrowLeft, Building2, User, Stethoscope, ChevronRight, ShieldCheck } from "lucide-react";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { z } from "zod";
@@ -16,7 +14,6 @@ import { AnimatedButton } from "@/components/ui/animated-button";
 import { useFeedbackSystem } from "@/hooks/use-feedback-system";
 import { ForgotPasswordDialog } from "@/components/auth/ForgotPasswordDialog";
 
-// ---------- Schemas ----------
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
@@ -30,7 +27,7 @@ const patientSchema = z.object({
   password: z.string().min(6, "Min 6 characters"),
   confirmPassword: z.string().min(6),
   termsAccepted: z.boolean().refine((value) => value, "You must accept the Terms and Conditions to continue"),
-}).refine(d => d.password === d.confirmPassword, { message: "Passwords don't match", path: ["confirmPassword"] });
+}).refine((d) => d.password === d.confirmPassword, { message: "Passwords don't match", path: ["confirmPassword"] });
 
 const providerSchema = z.object({
   firstName: z.string().min(2, "Required"),
@@ -44,7 +41,7 @@ const providerSchema = z.object({
   password: z.string().min(6, "Min 6 characters"),
   confirmPassword: z.string().min(6),
   termsAccepted: z.boolean().refine((value) => value, "You must accept the Terms and Conditions to continue"),
-}).refine(d => d.password === d.confirmPassword, { message: "Passwords don't match", path: ["confirmPassword"] });
+}).refine((d) => d.password === d.confirmPassword, { message: "Passwords don't match", path: ["confirmPassword"] });
 
 const businessSchema = z.object({
   businessName: z.string().min(2, "Business name required"),
@@ -59,9 +56,8 @@ const businessSchema = z.object({
   password: z.string().min(6, "Min 6 characters"),
   confirmPassword: z.string().min(6),
   termsAccepted: z.boolean().refine((value) => value, "You must accept the Terms and Conditions to continue"),
-}).refine(d => d.password === d.confirmPassword, { message: "Passwords don't match", path: ["confirmPassword"] });
+}).refine((d) => d.password === d.confirmPassword, { message: "Passwords don't match", path: ["confirmPassword"] });
 
-// ---------- Constants ----------
 const PROVIDER_TYPES = [
   { value: "doctor", label: "Doctor" },
   { value: "nurse", label: "Nurse" },
@@ -82,7 +78,7 @@ const BUSINESS_TYPES = [
   { value: "diagnostic_center", label: "Diagnostic / Imaging Center" },
 ];
 
-type SignupPath = null | 'patient' | 'provider' | 'business';
+type SignupPath = null | "patient" | "provider" | "business";
 
 interface TermsAcceptanceProps {
   checked: boolean;
@@ -92,18 +88,18 @@ interface TermsAcceptanceProps {
 
 const TermsAcceptance = ({ checked, error, onChange }: TermsAcceptanceProps) => (
   <div>
-    <label className="flex cursor-pointer items-start gap-2 rounded-lg border border-border/60 bg-muted/30 p-3 text-xs leading-relaxed text-muted-foreground">
+    <label className="flex cursor-pointer items-start gap-2 rounded-xl border border-[#e6e9ef] bg-[#f5f6f8] p-3 text-xs leading-relaxed text-[#676879]">
       <input
         type="checkbox"
         checked={checked}
         onChange={(event) => onChange(event.target.checked)}
-        className="mt-0.5 h-4 w-4 shrink-0 rounded border-input text-primary accent-primary"
+        className="mt-0.5 h-4 w-4 shrink-0 rounded border-[#c3c6d4] accent-[#0073ea]"
       />
       <span>
-        I have read and agree to the <Link to="/terms" className="font-medium text-primary hover:underline">Terms and Conditions</Link> and <Link to="/privacy" className="font-medium text-primary hover:underline">Privacy Policy</Link>.
+        I agree to the <Link to="/terms" className="font-bold text-[#0073ea] hover:underline">Terms of Service</Link> and <Link to="/privacy" className="font-bold text-[#0073ea] hover:underline">Privacy Policy</Link>.
       </span>
     </label>
-    {error && <p className="mt-1 text-xs font-medium text-destructive">{error}</p>}
+    {error && <p className="mt-1 text-[10px] font-bold text-[#e2445c]">{error}</p>}
   </div>
 );
 
@@ -136,7 +132,6 @@ export const Auth = () => {
   const providerForm = useForm<z.infer<typeof providerSchema>>({ resolver: zodResolver(providerSchema), mode: "onBlur", defaultValues: { termsAccepted: false } });
   const businessForm = useForm<z.infer<typeof businessSchema>>({ resolver: zodResolver(businessSchema), mode: "onBlur", defaultValues: { termsAccepted: false } });
 
-  // ---------- Handlers ----------
   const onLogin = async (data: z.infer<typeof loginSchema>) => {
     setLocalLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email: data.email, password: data.password });
@@ -182,15 +177,15 @@ export const Auth = () => {
       },
     });
     if (error) showError(error.message);
-    else { showSuccess("Account created! Your application is under review. Check your email to verify."); setActiveTab("signin"); }
+    else { showSuccess("Account created! Your application is under review."); setActiveTab("signin"); }
     setLocalLoading(false);
   };
 
   const onBusinessSignup = async (data: z.infer<typeof businessSchema>) => {
     setLocalLoading(true);
-    const role = data.businessType === 'pharmacy' ? 'pharmacy'
-      : data.businessType === 'laboratory' ? 'lab'
-      : 'institution_admin';
+    const role = data.businessType === "pharmacy" ? "pharmacy"
+      : data.businessType === "laboratory" ? "lab"
+      : "institution_admin";
     const { error } = await supabase.auth.signUp({
       email: data.email,
       password: data.password,
@@ -209,253 +204,240 @@ export const Auth = () => {
       },
     });
     if (error) showError(error.message);
-    else { showSuccess("Business registered! Your account is under review. Check your email to verify."); setActiveTab("signin"); }
+    else { showSuccess("Business registered! Account under review."); setActiveTab("signin"); }
     setLocalLoading(false);
   };
 
   if (authLoading) return <LoadingScreen timeout={1000} />;
 
-  // ---------- Signup Path Selector ----------
   const SignupPathSelector = () => (
-    <div className="space-y-3">
-      <p className="text-sm text-muted-foreground text-center mb-4">What best describes you?</p>
+    <div className="space-y-3 font-sans">
+      <p className="text-xs font-extrabold text-[#676879] text-center mb-4 uppercase tracking-wider">Select Account Type</p>
       {[
-        { path: 'patient' as SignupPath, icon: <User className="h-5 w-5" />, title: "Patient", desc: "Book appointments, track health, access records" },
-        { path: 'provider' as SignupPath, icon: <Stethoscope className="h-5 w-5" />, title: "Healthcare Professional", desc: "Doctor, nurse, pharmacist, lab tech, etc." },
-        { path: 'business' as SignupPath, icon: <Building2 className="h-5 w-5" />, title: "Healthcare Business", desc: "Pharmacy, clinic, hospital, lab, etc." },
-      ].map(item => (
+        { path: "patient" as SignupPath, icon: <User className="h-5 w-5 text-[#0073ea]" />, title: "Patient Account", desc: "Book appointments, view medical records, and consult AI" },
+        { path: "provider" as SignupPath, icon: <Stethoscope className="h-5 w-5 text-[#00c875]" />, title: "Healthcare Professional", desc: "Doctors, Nurses, Pharmacists, Lab Techs & Specialists" },
+        { path: "business" as SignupPath, icon: <Building2 className="h-5 w-5 text-[#a25ddc]" />, title: "Healthcare Institution", desc: "Pharmacies, Clinics, Hospitals, Laboratories & Care Homes" },
+      ].map((item) => (
         <button
           key={item.path}
           onClick={() => setSignupPath(item.path)}
-          className="w-full flex items-center gap-3 p-4 rounded-lg border border-border hover:border-primary/50 hover:bg-primary/5 transition-all text-left group"
+          className="w-full flex items-center gap-3 p-4 rounded-xl border border-[#e6e9ef] bg-[#f5f6f8] hover:bg-[#e5f0ff] hover:border-[#0073ea] transition-all text-left group"
         >
-          <div className="p-2 rounded-lg bg-primary/10 text-primary group-hover:bg-primary/20 transition-colors">
+          <div className="p-2.5 rounded-xl bg-white border border-[#e6e9ef] shadow-xs">
             {item.icon}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-medium text-sm">{item.title}</p>
-            <p className="text-xs text-muted-foreground">{item.desc}</p>
+            <p className="font-extrabold text-xs text-slate-900">{item.title}</p>
+            <p className="text-[11px] text-[#676879] font-medium">{item.desc}</p>
           </div>
-          <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+          <ChevronRight className="h-4 w-4 text-[#676879] group-hover:text-[#0073ea] transition-colors" />
         </button>
       ))}
     </div>
   );
 
-  // ---------- Render ----------
   return (
-    <div className="min-h-[100dvh] bg-gradient-to-b from-background to-muted flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
-      <div className="w-full max-w-md space-y-4 py-8">
+    <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 flex items-center justify-center p-4 font-sans text-slate-900 dark:text-slate-100">
+      <div className="w-full max-w-md space-y-6 py-8">
         <div className="text-center space-y-2">
-          <Link to="/" className="mx-auto inline-flex flex-col items-center rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" aria-label="Return to Doc' O Clock home page">
-            <img src="/d0c-icon.svg" className="mb-2 h-16 w-16 transition-transform duration-200 hover:scale-105" alt="Doc' O Clock" />
-            <h1 className="text-2xl font-bold text-primary">Doc' O Clock</h1>
+          <Link to="/" className="mx-auto inline-flex flex-col items-center">
+            <img src="/d0c-icon.svg" className="h-14 w-14 mb-1" alt="Doc' O Clock" />
+            <h1 className="text-2xl font-black text-slate-900 dark:text-slate-100 tracking-tight">Doc' O Clock</h1>
           </Link>
-          <p className="text-xs text-muted-foreground">Healthcare for Everyone</p>
+          <p className="text-xs text-[#676879] font-extrabold uppercase tracking-wider">Enterprise Healthcare Platform</p>
         </div>
 
-        <Card className="p-4 shadow-xl border-t-4 border-t-primary">
+        <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-md">
           <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v); setSignupPath(null); }}>
-            <TabsList className="grid w-full grid-cols-2 mb-6">
-              <TabsTrigger value="signin">Sign In</TabsTrigger>
-              <TabsTrigger value="signup">Register</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 mb-6 p-1 bg-[#f5f6f8] dark:bg-slate-950 rounded-xl border border-[#e6e9ef]">
+              <TabsTrigger value="signin" className="text-xs font-extrabold py-2 rounded-lg data-[state=active]:bg-[#0073ea] data-[state=active]:text-white transition-all">
+                Sign In
+              </TabsTrigger>
+              <TabsTrigger value="signup" className="text-xs font-extrabold py-2 rounded-lg data-[state=active]:bg-[#0073ea] data-[state=active]:text-white transition-all">
+                Register
+              </TabsTrigger>
             </TabsList>
 
             {/* ---- SIGN IN ---- */}
-            <TabsContent value="signin" className="animate-in fade-in duration-300">
+            <TabsContent value="signin">
               <Form {...loginForm}>
                 <form onSubmit={loginForm.handleSubmit(onLogin)} className="space-y-4">
                   <FormField control={loginForm.control} name="email" render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl><Input placeholder="Email" {...field} type="email" /></FormControl>
-                      <FormMessage />
+                      <FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Email Address</FormLabel>
+                      <FormControl><Input placeholder="you@example.online" {...field} type="email" className="h-10 text-xs font-medium border-[#c3c6d4]" /></FormControl>
+                      <FormMessage className="text-[10px] font-bold text-[#e2445c]" />
                     </FormItem>
                   )} />
                   <FormField control={loginForm.control} name="password" render={({ field }) => (
                     <FormItem>
                       <div className="flex items-center justify-between">
-                        <FormLabel>Password</FormLabel>
+                        <FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Password</FormLabel>
                         <ForgotPasswordDialog />
                       </div>
                       <FormControl>
                         <div className="relative">
-                          <Input type={showPassword ? "text" : "password"} placeholder="Password" {...field} />
+                          <Input type={showPassword ? "text" : "password"} placeholder="••••••••" {...field} className="h-10 text-xs font-medium border-[#c3c6d4] pr-10" />
                           <button type="button" onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#676879]">
                             {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                           </button>
                         </div>
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage className="text-[10px] font-bold text-[#e2445c]" />
                     </FormItem>
                   )} />
-                  <AnimatedButton type="submit" className="w-full h-12" loading={localLoading}>Sign In</AnimatedButton>
+                  <button type="submit" disabled={localLoading} className="w-full py-3 rounded-xl bg-[#0073ea] hover:bg-[#0060c4] text-white font-extrabold text-sm shadow-md transition-all">
+                    {localLoading ? "Signing In..." : "Sign In to WorkOS"}
+                  </button>
                 </form>
               </Form>
             </TabsContent>
 
             {/* ---- SIGN UP ---- */}
-            <TabsContent value="signup" className="animate-in fade-in duration-300">
+            <TabsContent value="signup">
               {!signupPath && <SignupPathSelector />}
 
               {signupPath && (
                 <button onClick={() => setSignupPath(null)}
-                  className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground mb-4 transition-colors">
-                  <ArrowLeft className="h-3 w-3" /> Back to options
+                  className="flex items-center gap-1 text-xs font-bold text-[#0073ea] hover:underline mb-4">
+                  <ArrowLeft className="h-3.5 w-3.5" /> Back to account options
                 </button>
               )}
 
               {/* Patient Form */}
-              {signupPath === 'patient' && (
+              {signupPath === "patient" && (
                 <Form {...patientForm}>
                   <form onSubmit={patientForm.handleSubmit(onPatientSignup)} className="space-y-3">
-                    <p className="text-xs font-semibold text-primary uppercase tracking-wide">Patient Registration</p>
+                    <p className="text-xs font-extrabold text-[#0073ea] uppercase tracking-wide">Patient Account Details</p>
                     <div className="grid grid-cols-2 gap-2">
                       <FormField control={patientForm.control} name="firstName" render={({ field }) => (
-                        <FormItem><FormLabel className="text-xs">First Name</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">First Name</FormLabel><FormControl><Input {...field} className="h-9 text-xs border-[#c3c6d4]" /></FormControl><FormMessage /></FormItem>
                       )} />
                       <FormField control={patientForm.control} name="lastName" render={({ field }) => (
-                        <FormItem><FormLabel className="text-xs">Last Name</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Last Name</FormLabel><FormControl><Input {...field} className="h-9 text-xs border-[#c3c6d4]" /></FormControl><FormMessage /></FormItem>
                       )} />
                     </div>
                     <FormField control={patientForm.control} name="email" render={({ field }) => (
-                      <FormItem><FormLabel className="text-xs">Email</FormLabel><FormControl><Input {...field} type="email" /></FormControl><FormMessage /></FormItem>
+                      <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Email</FormLabel><FormControl><Input {...field} type="email" className="h-9 text-xs border-[#c3c6d4]" /></FormControl><FormMessage /></FormItem>
                     )} />
                     <FormField control={patientForm.control} name="phone" render={({ field }) => (
-                      <FormItem><FormLabel className="text-xs">Phone (optional)</FormLabel><FormControl><Input {...field} type="tel" placeholder="+260..." /></FormControl></FormItem>
+                      <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Phone</FormLabel><FormControl><Input {...field} type="tel" placeholder="+260..." className="h-9 text-xs border-[#c3c6d4]" /></FormControl></FormItem>
                     )} />
                     <FormField control={patientForm.control} name="password" render={({ field }) => (
-                      <FormItem><FormLabel className="text-xs">Password</FormLabel><FormControl><Input type="password" {...field} /></FormControl><FormMessage /></FormItem>
+                      <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Password</FormLabel><FormControl><Input type="password" {...field} className="h-9 text-xs border-[#c3c6d4]" /></FormControl><FormMessage /></FormItem>
                     )} />
                     <FormField control={patientForm.control} name="confirmPassword" render={({ field }) => (
-                      <FormItem><FormLabel className="text-xs">Confirm Password</FormLabel><FormControl><Input type="password" {...field} /></FormControl><FormMessage /></FormItem>
+                      <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Confirm Password</FormLabel><FormControl><Input type="password" {...field} className="h-9 text-xs border-[#c3c6d4]" /></FormControl><FormMessage /></FormItem>
                     )} />
-                    <p className="text-[10px] text-muted-foreground">✨ Free forever — you only pay for consultations</p>
                     <TermsAcceptance checked={patientForm.watch("termsAccepted")} onChange={(checked) => patientForm.setValue("termsAccepted", checked, { shouldValidate: true })} error={patientForm.formState.errors.termsAccepted?.message} />
-                    <AnimatedButton type="submit" className="w-full h-12" loading={localLoading}>Create Patient Account</AnimatedButton>
+                    <button type="submit" disabled={localLoading} className="w-full py-3 rounded-xl bg-[#0073ea] hover:bg-[#0060c4] text-white font-extrabold text-sm shadow-md transition-all">
+                      Create Patient Account
+                    </button>
                   </form>
                 </Form>
               )}
 
               {/* Provider Form */}
-              {signupPath === 'provider' && (
+              {signupPath === "provider" && (
                 <Form {...providerForm}>
                   <form onSubmit={providerForm.handleSubmit(onProviderSignup)} className="space-y-3">
-                    <p className="text-xs font-semibold text-primary uppercase tracking-wide">Professional Registration</p>
+                    <p className="text-xs font-extrabold text-[#00c875] uppercase tracking-wide">Healthcare Professional Registration</p>
                     <div className="grid grid-cols-2 gap-2">
                       <FormField control={providerForm.control} name="firstName" render={({ field }) => (
-                        <FormItem><FormLabel className="text-xs">First Name</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">First Name</FormLabel><FormControl><Input {...field} className="h-9 text-xs border-[#c3c6d4]" /></FormControl><FormMessage /></FormItem>
                       )} />
                       <FormField control={providerForm.control} name="lastName" render={({ field }) => (
-                        <FormItem><FormLabel className="text-xs">Last Name</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Last Name</FormLabel><FormControl><Input {...field} className="h-9 text-xs border-[#c3c6d4]" /></FormControl><FormMessage /></FormItem>
                       )} />
                     </div>
                     <FormField control={providerForm.control} name="providerType" render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs">I am a...</FormLabel>
+                        <FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Profession</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl><SelectTrigger><SelectValue placeholder="Select your profession" /></SelectTrigger></FormControl>
+                          <FormControl><SelectTrigger className="h-9 border-[#c3c6d4] text-xs font-bold"><SelectValue placeholder="Select profession" /></SelectTrigger></FormControl>
                           <SelectContent>
-                            {PROVIDER_TYPES.map(t => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
+                            {PROVIDER_TYPES.map((t) => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
                           </SelectContent>
                         </Select>
                         <FormMessage />
                       </FormItem>
                     )} />
-                    <FormField control={providerForm.control} name="specialty" render={({ field }) => (
-                      <FormItem><FormLabel className="text-xs">Specialty (optional)</FormLabel><FormControl><Input {...field} placeholder="e.g. Cardiology, Pediatrics" /></FormControl></FormItem>
+                    <FormField control={providerForm.control} name="licenseNumber" render={({ field }) => (
+                      <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">License / Reg. Number</FormLabel><FormControl><Input {...field} className="h-9 text-xs border-[#c3c6d4]" /></FormControl><FormMessage /></FormItem>
                     )} />
-                    <div className="grid grid-cols-2 gap-2">
-                      <FormField control={providerForm.control} name="licenseNumber" render={({ field }) => (
-                        <FormItem><FormLabel className="text-xs">License / Reg. Number</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
-                      )} />
-                      <FormField control={providerForm.control} name="yearsExperience" render={({ field }) => (
-                        <FormItem><FormLabel className="text-xs">Years Experience</FormLabel><FormControl><Input {...field} type="number" min="0" placeholder="e.g. 5" /></FormControl></FormItem>
-                      )} />
-                    </div>
                     <FormField control={providerForm.control} name="email" render={({ field }) => (
-                      <FormItem><FormLabel className="text-xs">Email</FormLabel><FormControl><Input {...field} type="email" /></FormControl><FormMessage /></FormItem>
-                    )} />
-                    <FormField control={providerForm.control} name="phone" render={({ field }) => (
-                      <FormItem><FormLabel className="text-xs">Phone (optional)</FormLabel><FormControl><Input {...field} type="tel" placeholder="+260..." /></FormControl></FormItem>
+                      <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Email</FormLabel><FormControl><Input {...field} type="email" className="h-9 text-xs border-[#c3c6d4]" /></FormControl><FormMessage /></FormItem>
                     )} />
                     <FormField control={providerForm.control} name="password" render={({ field }) => (
-                      <FormItem><FormLabel className="text-xs">Password</FormLabel><FormControl><Input type="password" {...field} /></FormControl><FormMessage /></FormItem>
+                      <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Password</FormLabel><FormControl><Input type="password" {...field} className="h-9 text-xs border-[#c3c6d4]" /></FormControl><FormMessage /></FormItem>
                     )} />
                     <FormField control={providerForm.control} name="confirmPassword" render={({ field }) => (
-                      <FormItem><FormLabel className="text-xs">Confirm Password</FormLabel><FormControl><Input type="password" {...field} /></FormControl><FormMessage /></FormItem>
+                      <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Confirm Password</FormLabel><FormControl><Input type="password" {...field} className="h-9 text-xs border-[#c3c6d4]" /></FormControl><FormMessage /></FormItem>
                     )} />
-                    <p className="text-[10px] text-muted-foreground">💼 Free listing — pay only per new patient booking</p>
                     <TermsAcceptance checked={providerForm.watch("termsAccepted")} onChange={(checked) => providerForm.setValue("termsAccepted", checked, { shouldValidate: true })} error={providerForm.formState.errors.termsAccepted?.message} />
-                    <AnimatedButton type="submit" className="w-full h-12" loading={localLoading}>Create Professional Account</AnimatedButton>
+                    <button type="submit" disabled={localLoading} className="w-full py-3 rounded-xl bg-[#00c875] hover:bg-[#00b368] text-white font-extrabold text-sm shadow-md transition-all">
+                      Create Professional Account
+                    </button>
                   </form>
                 </Form>
               )}
 
               {/* Business Form */}
-              {signupPath === 'business' && (
+              {signupPath === "business" && (
                 <Form {...businessForm}>
                   <form onSubmit={businessForm.handleSubmit(onBusinessSignup)} className="space-y-3">
-                    <p className="text-xs font-semibold text-primary uppercase tracking-wide">Business Registration</p>
+                    <p className="text-xs font-extrabold text-[#a25ddc] uppercase tracking-wide">Healthcare Facility Registration</p>
                     <FormField control={businessForm.control} name="businessType" render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs">Business Type</FormLabel>
+                        <FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Facility Type</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl><SelectTrigger><SelectValue placeholder="What type of facility?" /></SelectTrigger></FormControl>
+                          <FormControl><SelectTrigger className="h-9 border-[#c3c6d4] text-xs font-bold"><SelectValue placeholder="Facility type" /></SelectTrigger></FormControl>
                           <SelectContent>
-                            {BUSINESS_TYPES.map(t => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
+                            {BUSINESS_TYPES.map((t) => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
                           </SelectContent>
                         </Select>
                         <FormMessage />
                       </FormItem>
                     )} />
                     <FormField control={businessForm.control} name="businessName" render={({ field }) => (
-                      <FormItem><FormLabel className="text-xs">Business Name</FormLabel><FormControl><Input {...field} placeholder="e.g. MedPharm Pharmacy" /></FormControl><FormMessage /></FormItem>
+                      <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Facility Name</FormLabel><FormControl><Input {...field} placeholder="e.g. MedPharm Healthcare" className="h-9 text-xs border-[#c3c6d4]" /></FormControl><FormMessage /></FormItem>
                     )} />
                     <div className="grid grid-cols-2 gap-2">
                       <FormField control={businessForm.control} name="adminFirstName" render={({ field }) => (
-                        <FormItem><FormLabel className="text-xs">Admin First Name</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Admin First Name</FormLabel><FormControl><Input {...field} className="h-9 text-xs border-[#c3c6d4]" /></FormControl><FormMessage /></FormItem>
                       )} />
                       <FormField control={businessForm.control} name="adminLastName" render={({ field }) => (
-                        <FormItem><FormLabel className="text-xs">Admin Last Name</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Admin Last Name</FormLabel><FormControl><Input {...field} className="h-9 text-xs border-[#c3c6d4]" /></FormControl><FormMessage /></FormItem>
                       )} />
                     </div>
                     <FormField control={businessForm.control} name="email" render={({ field }) => (
-                      <FormItem><FormLabel className="text-xs">Business Email</FormLabel><FormControl><Input {...field} type="email" /></FormControl><FormMessage /></FormItem>
-                    )} />
-                    <FormField control={businessForm.control} name="phone" render={({ field }) => (
-                      <FormItem><FormLabel className="text-xs">Phone (optional)</FormLabel><FormControl><Input {...field} type="tel" placeholder="+260..." /></FormControl></FormItem>
+                      <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Facility Email</FormLabel><FormControl><Input {...field} type="email" className="h-9 text-xs border-[#c3c6d4]" /></FormControl><FormMessage /></FormItem>
                     )} />
                     <div className="grid grid-cols-2 gap-2">
                       <FormField control={businessForm.control} name="city" render={({ field }) => (
-                        <FormItem><FormLabel className="text-xs">City</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">City</FormLabel><FormControl><Input {...field} className="h-9 text-xs border-[#c3c6d4]" /></FormControl><FormMessage /></FormItem>
                       )} />
                       <FormField control={businessForm.control} name="country" render={({ field }) => (
-                        <FormItem><FormLabel className="text-xs">Country</FormLabel><FormControl><Input {...field} defaultValue="Zambia" /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Country</FormLabel><FormControl><Input {...field} defaultValue="Zambia" className="h-9 text-xs border-[#c3c6d4]" /></FormControl><FormMessage /></FormItem>
                       )} />
                     </div>
-                    <FormField control={businessForm.control} name="licenseNumber" render={({ field }) => (
-                      <FormItem><FormLabel className="text-xs">License Number (optional)</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>
-                    )} />
                     <FormField control={businessForm.control} name="password" render={({ field }) => (
-                      <FormItem><FormLabel className="text-xs">Password</FormLabel><FormControl><Input type="password" {...field} /></FormControl><FormMessage /></FormItem>
+                      <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Password</FormLabel><FormControl><Input type="password" {...field} className="h-9 text-xs border-[#c3c6d4]" /></FormControl><FormMessage /></FormItem>
                     )} />
                     <FormField control={businessForm.control} name="confirmPassword" render={({ field }) => (
-                      <FormItem><FormLabel className="text-xs">Confirm Password</FormLabel><FormControl><Input type="password" {...field} /></FormControl><FormMessage /></FormItem>
+                      <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Confirm Password</FormLabel><FormControl><Input type="password" {...field} className="h-9 text-xs border-[#c3c6d4]" /></FormControl><FormMessage /></FormItem>
                     )} />
-                    <p className="text-[10px] text-muted-foreground">🏥 Set up your facility after registration — HMS, POS & more included</p>
                     <TermsAcceptance checked={businessForm.watch("termsAccepted")} onChange={(checked) => businessForm.setValue("termsAccepted", checked, { shouldValidate: true })} error={businessForm.formState.errors.termsAccepted?.message} />
-                    <AnimatedButton type="submit" className="w-full h-12" loading={localLoading}>Register Business</AnimatedButton>
+                    <button type="submit" disabled={localLoading} className="w-full py-3 rounded-xl bg-[#a25ddc] hover:bg-[#8e49c7] text-white font-extrabold text-sm shadow-md transition-all">
+                      Register Business
+                    </button>
                   </form>
                 </Form>
               )}
             </TabsContent>
           </Tabs>
-        </Card>
-        <p className="px-4 text-center text-xs leading-relaxed text-muted-foreground">
-          By continuing, you agree to our <Link to="/terms" className="font-medium text-primary hover:underline">Terms and Conditions</Link> and <Link to="/privacy" className="font-medium text-primary hover:underline">Privacy Policy</Link>. Learn more <Link to="/about" className="font-medium text-primary hover:underline">About Doc&apos; O Clock</Link>.
-        </p>
+        </div>
       </div>
     </div>
   );

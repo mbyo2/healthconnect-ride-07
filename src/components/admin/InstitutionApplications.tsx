@@ -1,15 +1,11 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useUserRoles } from '@/context/UserRolesContext';
-import { REGULATORY_REQUIREMENTS, getCountryRequirements, validateDocumentUpload, type DocumentRequirement } from '@/config/regulatoryRequirements';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Textarea } from "@/components/ui/textarea";
+import { useUserRoles } from "@/context/UserRolesContext";
+import { getCountryRequirements } from "@/config/regulatoryRequirements";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { Check, X, Loader2, FileText, ExternalLink, CheckCircle } from "lucide-react";
+import { Check, X, Loader2, FileText, ExternalLink, CheckCircle, Building2 } from "lucide-react";
 
 interface InstitutionApplication {
   id: string;
@@ -35,7 +31,7 @@ interface InstitutionApplication {
 export const InstitutionApplications = () => {
   const [apps, setApps] = useState<InstitutionApplication[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<'pending' | 'approved' | 'rejected'>('pending');
+  const [filter, setFilter] = useState<"pending" | "approved" | "rejected">("pending");
   const [selected, setSelected] = useState<InstitutionApplication | null>(null);
   const [notes, setNotes] = useState("");
   const [processing, setProcessing] = useState(false);
@@ -48,23 +44,23 @@ export const InstitutionApplications = () => {
     setLoading(true);
     try {
       const { data, error } = await supabase
-        .from('institution_applications' as any)
-        .select('*')
-        .eq('status', filter)
-        .order('submitted_at', { ascending: false });
+        .from("institution_applications" as any)
+        .select("*")
+        .eq("status", filter)
+        .order("submitted_at", { ascending: false });
       if (error) throw error;
 
-      const ids = (data as any[] || []).map(a => a.applicant_id);
+      const ids = (data as any[] || []).map((a) => a.applicant_id);
       const [{ data: profiles }, { data: institutions }] = await Promise.all([
         ids.length
-          ? supabase.from('profiles').select('id, first_name, last_name, email, country').in('id', ids)
+          ? supabase.from("profiles").select("id, first_name, last_name, email, country").in("id", ids)
           : Promise.resolve({ data: [] as any[] }),
         ids.length
-          ? supabase.from('healthcare_institutions').select('id, admin_id, license_number, address, city, country, phone, email, is_verified').in('admin_id', ids)
+          ? supabase.from("healthcare_institutions").select("id, admin_id, license_number, address, city, country, phone, email, is_verified").in("admin_id", ids)
           : Promise.resolve({ data: [] as any[] }),
       ]);
 
-      const merged = (data as any[] || []).map(a => ({
+      const merged = (data as any[] || []).map((a) => ({
         ...a,
         applicant: (profiles || []).find((p: any) => p.id === a.applicant_id) || null,
         institution: (institutions || []).find((i: any) => i.admin_id === a.applicant_id) || null,
@@ -79,115 +75,71 @@ export const InstitutionApplications = () => {
 
   useEffect(() => { fetchApps(); }, [filter]);
 
-  if (!canReview) {
-    return (
-      <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-6 text-sm text-destructive">
-        You do not have permission to review institution applications. Only admin and superadmin users can verify and approve institution submissions.
-      </div>
-    );
-  }
-
   const openReview = async (app: InstitutionApplication) => {
     setSelected(app);
     setNotes(app.reviewer_notes || "");
     setDocUrls([]);
     setDocumentChecks({});
-    
-    // Get country and determine entity type
-    const country = (app.institution?.country) || (app.applicant as any)?.country || 'ZM';
-    const isPharmacy = app.institution_type?.toLowerCase().includes('pharm');
-    const entityType = isPharmacy ? 'pharmacies' : 'institutions';
+
+    const country = app.institution?.country || (app.applicant as any)?.country || "ZM";
+    const isPharmacy = app.institution_type?.toLowerCase().includes("pharm");
+    const entityType = isPharmacy ? "pharmacies" : "institutions";
     const requirements = getCountryRequirements(country, entityType);
-    
-    // Initialize document checks
+
     const checks: Record<string, boolean> = {};
-    requirements.forEach(req => {
-      checks[req.id] = false;
-    });
+    requirements.forEach((req) => { checks[req.id] = false; });
     setDocumentChecks(checks);
-    
-    // List documents in storage under applicant_id folder
-    const { data: files } = await supabase.storage
-      .from('registration_documents')
-      .list(app.applicant_id, { limit: 50 });
+
+    const { data: files } = await supabase.storage.from("registration_documents").list(app.applicant_id, { limit: 50 });
     if (files?.length) {
       const out: Array<{ name: string; url: string }> = [];
       for (const f of files) {
-        const { data } = await supabase.storage
-          .from('registration_documents')
-          .createSignedUrl(`${app.applicant_id}/${f.name}`, 3600);
+        const { data } = await supabase.storage.from("registration_documents").createSignedUrl(`${app.applicant_id}/${f.name}`, 3600);
         if (data?.signedUrl) out.push({ name: f.name, url: data.signedUrl });
       }
       setDocUrls(out);
     }
   };
 
-  const decide = async (status: 'approved' | 'rejected') => {
-    if (!selected) return;
-    if (!canReview) {
-      toast.error('Only admin or superadmin users can approve institution applications.');
-      return;
-    }
-    
-    // Check that all required documents are verified before approving
-    if (status === 'approved') {
-      const country = (selected.institution?.country) || (selected.applicant as any)?.country || 'ZM';
-      const isPharmacy = selected.institution_type?.toLowerCase().includes('pharm');
-      const entityType = isPharmacy ? 'pharmacies' : 'institutions';
+  const decide = async (status: "approved" | "rejected") => {
+    if (!selected || !canReview) return;
+
+    if (status === "approved") {
+      const country = selected.institution?.country || (selected.applicant as any)?.country || "ZM";
+      const isPharmacy = selected.institution_type?.toLowerCase().includes("pharm");
+      const entityType = isPharmacy ? "pharmacies" : "institutions";
       const requirements = getCountryRequirements(country, entityType);
-      const requiredDocs = requirements.filter(req => req.required);
-      
-      const allRequiredChecked = requiredDocs.every(req => documentChecks[req.id] === true);
+      const requiredDocs = requirements.filter((req) => req.required);
+      const allRequiredChecked = requiredDocs.every((req) => documentChecks[req.id] === true);
       if (!allRequiredChecked) {
-        toast.error('Please verify all required documents before approving.');
+        toast.error("Please verify all required documents before approving.");
         return;
       }
     }
-    
+
     setProcessing(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
-
-      const { error: appErr } = await supabase
-        .from('institution_applications' as any)
-        .update({
-          status,
-          reviewer_notes: notes || null,
-          reviewed_at: new Date().toISOString(),
-        })
-        .eq('id', selected.id);
+      const { error: appErr } = await supabase.from("institution_applications" as any).update({ status, reviewer_notes: notes || null, reviewed_at: new Date().toISOString() }).eq("id", selected.id);
       if (appErr) throw appErr;
 
-      if (status === 'approved') {
-        await supabase
-          .from('healthcare_institutions')
-          .update({ is_verified: true })
-          .eq('admin_id', selected.applicant_id);
-        await supabase.from('profiles').update({ is_verified: true }).eq('id', selected.applicant_id);
+      if (status === "approved") {
+        await supabase.from("healthcare_institutions").update({ is_verified: true }).eq("admin_id", selected.applicant_id);
+        await supabase.from("profiles").update({ is_verified: true }).eq("id", selected.applicant_id);
       }
 
-      await supabase.from('audit_logs' as any).insert({
+      await supabase.from("audit_logs" as any).insert({
         user_id: user?.id,
-        action: status === 'approved' ? 'approve_institution' : 'reject_institution',
-        resource: 'institution_application',
+        action: status === "approved" ? "approve_institution" : "reject_institution",
+        resource: "institution_application",
         resource_id: selected.id,
         details: { institution_name: selected.institution_name, notes },
-        category: 'admin_action',
-        outcome: 'success',
-        severity: 'info',
+        category: "admin_action",
+        outcome: "success",
+        severity: "info",
       });
 
-      await supabase.from('notifications' as any).insert({
-        user_id: selected.applicant_id,
-        title: status === 'approved' ? 'Institution Approved' : 'Institution Rejected',
-        message: status === 'approved'
-          ? `Your application for ${selected.institution_name} has been approved.`
-          : `Your application for ${selected.institution_name} was rejected. ${notes || ''}`,
-        type: 'system',
-        read: false,
-      });
-
-      toast.success(`Application ${status}`);
+      toast.success(`Institution Application ${status === "approved" ? "Approved ✓" : "Rejected"}`);
       setSelected(null);
       fetchApps();
     } catch (e: any) {
@@ -199,98 +151,117 @@ export const InstitutionApplications = () => {
 
   if (!canReview) {
     return (
-      <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-6 text-sm text-destructive">
-        You do not have permission to review institution applications. Only admin and superadmin users can verify and approve institution submissions.
+      <div className="rounded-xl border border-[#e2445c]/20 bg-[#e2445c]/5 p-6 text-sm text-[#e2445c] font-bold">
+        You do not have permission to review institution applications. Only Admin and Super Admin users can approve submissions.
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-2">
-        <h2 className="text-xl font-semibold mr-auto">Institution Applications</h2>
-        {(['pending', 'approved', 'rejected'] as const).map(f => (
-          <Button key={f} size="sm" variant={filter === f ? 'default' : 'outline'} onClick={() => setFilter(f)}>{f}</Button>
-        ))}
+    <div className="space-y-4 font-sans text-slate-900 dark:text-slate-100">
+      {/* Header */}
+      <div className="flex items-center gap-3 border-b border-[#e6e9ef] pb-3">
+        <h2 className="text-base font-extrabold flex items-center gap-2 mr-auto">
+          <Building2 className="h-5 w-5 text-[#0073ea]" />
+          Institution Accreditation Applications
+        </h2>
+        <div className="flex items-center gap-1 p-1 bg-white dark:bg-slate-900 border border-[#e6e9ef] rounded-xl">
+          {(["pending", "approved", "rejected"] as const).map((f) => (
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              className={`px-3 py-1.5 rounded-md text-xs font-extrabold capitalize transition-all ${
+                filter === f
+                  ? f === "approved" ? "bg-[#00c875] text-white" : f === "rejected" ? "bg-[#e2445c] text-white" : "bg-[#0073ea] text-white"
+                  : "text-[#676879] hover:bg-[#f0f2f7]"
+              }`}
+            >
+              {f}
+            </button>
+          ))}
+        </div>
       </div>
 
       {loading ? (
-        <div className="flex justify-center p-6"><Loader2 className="animate-spin" /></div>
+        <div className="flex justify-center p-8"><Loader2 className="animate-spin text-[#0073ea]" /></div>
       ) : apps.length === 0 ? (
-        <p className="text-muted-foreground">No {filter} applications.</p>
+        <div className="text-center py-8 text-xs text-[#676879] font-bold">No {filter} institution applications found.</div>
       ) : (
-        <div className="grid gap-3">
-          {apps.map(app => (
-            <Card key={app.id}>
-              <CardHeader className="pb-2 flex flex-row items-center justify-between">
-                <CardTitle className="text-base">
-                  {app.institution_name}
-                  <span className="ml-2 text-sm font-normal text-muted-foreground">{app.applicant?.email}</span>
-                </CardTitle>
-                <Badge variant="outline" className="capitalize">{app.institution_type}</Badge>
-              </CardHeader>
-              <CardContent className="flex justify-between items-center text-sm">
-                <div className="space-y-1">
-                  <div><span className="text-muted-foreground">License:</span> {app.institution?.license_number || '—'}</div>
-                  <div><span className="text-muted-foreground">Location:</span> {app.institution?.city || '—'}, {app.institution?.country || '—'}</div>
-                  <div><span className="text-muted-foreground">Submitted:</span> {new Date(app.submitted_at).toLocaleDateString()}</div>
-                </div>
-                <Button size="sm" onClick={() => openReview(app)}>
-                  <FileText className="h-4 w-4 mr-1" /> Review
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
+        <div className="w-full overflow-x-auto rounded-xl border border-[#e6e9ef] bg-white dark:bg-slate-900 shadow-xs">
+          <table className="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr className="border-b border-[#e6e9ef] bg-[#f5f6f8] text-[11px] font-extrabold uppercase text-[#676879]">
+                <th className="py-2.5 px-4">Institution Name</th>
+                <th className="py-2.5 px-3">Type</th>
+                <th className="py-2.5 px-3">Applicant Email</th>
+                <th className="py-2.5 px-3">Location</th>
+                <th className="py-2.5 px-3">License #</th>
+                <th className="py-2.5 px-3">Submitted</th>
+                <th className="py-2.5 px-3 text-center">Action</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#e6e9ef]">
+              {apps.map((app) => (
+                <tr key={app.id} className="hover:bg-[#f0f2f7] transition-colors">
+                  <td className="py-3 px-4 font-extrabold text-slate-900">{app.institution_name}</td>
+                  <td className="py-3 px-3 text-[#676879] capitalize">{app.institution_type}</td>
+                  <td className="py-3 px-3 text-[#0073ea] font-bold">{app.applicant?.email || "—"}</td>
+                  <td className="py-3 px-3 text-slate-500">{app.institution?.city || "—"}, {app.institution?.country || "—"}</td>
+                  <td className="py-3 px-3 font-mono">{app.institution?.license_number || "—"}</td>
+                  <td className="py-3 px-3 text-slate-500">{new Date(app.submitted_at).toLocaleDateString()}</td>
+                  <td className="py-3 px-3 text-center">
+                    <button
+                      onClick={() => openReview(app)}
+                      className="px-3 py-1 rounded-md bg-[#0073ea] text-white text-[10px] font-bold flex items-center gap-1 mx-auto"
+                    >
+                      <FileText className="h-3 w-3" /> Review
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
 
+      {/* Review Dialog */}
       <Dialog open={!!selected} onOpenChange={(o) => !o && setSelected(null)}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white border border-[#e6e9ef]">
           <DialogHeader>
-            <DialogTitle>Review Institution Application</DialogTitle>
+            <DialogTitle className="font-extrabold text-base">Review — {selected?.institution_name}</DialogTitle>
           </DialogHeader>
           {selected && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                <div><strong>Institution:</strong> {selected.institution_name}</div>
-                <div><strong>Type:</strong> {selected.institution_type}</div>
-                <div><strong>Applicant:</strong> {selected.applicant?.first_name} {selected.applicant?.last_name}</div>
-                <div><strong>Email:</strong> {selected.applicant?.email}</div>
-                <div><strong>License #:</strong> {selected.institution?.license_number || '—'}</div>
-                <div><strong>Phone:</strong> {selected.institution?.phone || '—'}</div>
-                <div className="col-span-2"><strong>Address:</strong> {selected.institution?.address || '—'}, {selected.institution?.city || ''} {selected.institution?.country || ''}</div>
+            <div className="space-y-4 text-xs">
+              <div className="grid grid-cols-2 gap-3 p-4 rounded-xl bg-[#f5f6f8]">
+                <div><span className="font-extrabold text-[#676879] uppercase">Applicant</span><div className="font-bold mt-1">{selected.applicant?.first_name} {selected.applicant?.last_name}</div></div>
+                <div><span className="font-extrabold text-[#676879] uppercase">Email</span><div className="font-bold text-[#0073ea] mt-1">{selected.applicant?.email}</div></div>
+                <div><span className="font-extrabold text-[#676879] uppercase">License #</span><div className="font-bold mt-1">{selected.institution?.license_number || "—"}</div></div>
+                <div><span className="font-extrabold text-[#676879] uppercase">Phone</span><div className="font-bold mt-1">{selected.institution?.phone || "—"}</div></div>
+                <div className="col-span-2"><span className="font-extrabold text-[#676879] uppercase">Address</span><div className="font-bold mt-1">{selected.institution?.address || "—"}, {selected.institution?.city || ""} {selected.institution?.country || ""}</div></div>
               </div>
 
               <div>
-                <h4 className="font-semibold mb-3 text-sm">Document Verification Checklist</h4>
+                <h4 className="font-extrabold text-[#676879] uppercase mb-2">Document Verification Checklist</h4>
                 <div className="space-y-2">
                   {(() => {
-                    const country = (selected.institution?.country) || (selected.applicant as any)?.country || 'ZM';
-                    const isPharmacy = selected.institution_type?.toLowerCase().includes('pharm');
-                    const entityType = isPharmacy ? 'pharmacies' : 'institutions';
+                    const country = selected.institution?.country || (selected.applicant as any)?.country || "ZM";
+                    const isPharmacy = selected.institution_type?.toLowerCase().includes("pharm");
+                    const entityType = isPharmacy ? "pharmacies" : "institutions";
                     return getCountryRequirements(country, entityType).map((req) => (
-                      <div key={req.id} className="flex items-start gap-3 p-3 border rounded-lg">
+                      <div key={req.id} className="flex items-start gap-3 p-3 border border-[#e6e9ef] rounded-xl bg-white">
                         <Checkbox
                           id={`doc-check-${req.id}`}
                           checked={documentChecks[req.id] || false}
-                          onCheckedChange={(checked) => 
-                            setDocumentChecks(prev => ({ ...prev, [req.id]: checked as boolean }))
-                          }
+                          onCheckedChange={(checked) => setDocumentChecks((prev) => ({ ...prev, [req.id]: checked as boolean }))}
                           disabled={processing}
                         />
                         <div className="flex-1">
-                          <label
-                            htmlFor={`doc-check-${req.id}`}
-                            className="font-medium text-sm cursor-pointer flex items-center gap-2"
-                          >
-                            {req.name}
-                            {req.required && <span className="text-destructive">*</span>}
+                          <label htmlFor={`doc-check-${req.id}`} className="font-extrabold cursor-pointer flex items-center gap-2">
+                            {req.name} {req.required && <span className="text-[#e2445c]">*</span>}
                           </label>
-                          <p className="text-xs text-muted-foreground mt-1">{req.description}</p>
+                          <p className="text-[#676879] mt-0.5">{req.description}</p>
                         </div>
-                        {documentChecks[req.id] && (
-                          <CheckCircle className="h-5 w-5 text-green-600" />
-                        )}
+                        {documentChecks[req.id] && <CheckCircle className="h-4 w-4 text-[#00c875]" />}
                       </div>
                     ));
                   })()}
@@ -298,40 +269,56 @@ export const InstitutionApplications = () => {
               </div>
 
               <div>
-                <h4 className="font-semibold mb-2 text-sm">Uploaded Documents</h4>
+                <h4 className="font-extrabold text-[#676879] uppercase mb-2">Uploaded Documents ({docUrls.length})</h4>
                 {docUrls.length ? (
                   <ul className="space-y-1">
-                    {docUrls.map(d => (
-                      <li key={d.name} className="flex items-center justify-between text-sm border rounded p-2">
-                        <span className="truncate flex-1">{d.name}</span>
-                        <a href={d.url} target="_blank" rel="noopener" className="text-primary hover:underline flex items-center gap-1">
+                    {docUrls.map((d) => (
+                      <li key={d.name} className="flex items-center justify-between p-2 border border-[#e6e9ef] rounded-md">
+                        <span className="truncate flex-1 font-bold">{d.name}</span>
+                        <a href={d.url} target="_blank" rel="noopener" className="text-[#0073ea] font-bold flex items-center gap-1 ml-2">
                           View <ExternalLink className="h-3 w-3" />
                         </a>
                       </li>
                     ))}
                   </ul>
                 ) : (
-                  <p className="text-sm text-muted-foreground">No documents uploaded.</p>
+                  <p className="text-[#676879]">No documents uploaded yet.</p>
                 )}
               </div>
 
               <div>
-                <label className="text-sm font-semibold">Review Notes</label>
-                <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} placeholder="Reason / notes (required for rejection)" />
+                <label className="font-extrabold text-[#676879] uppercase">Review Notes</label>
+                <textarea
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  rows={3}
+                  placeholder="Reason / notes (required for rejection)"
+                  className="w-full mt-1 p-2 rounded-md border border-[#c3c6d4] font-medium text-xs"
+                />
               </div>
             </div>
           )}
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setSelected(null)} disabled={processing}>Cancel</Button>
-            <Button variant="destructive" onClick={() => decide('rejected')} disabled={processing || !notes.trim()}>
-              <X className="h-4 w-4 mr-1" /> Reject
-            </Button>
-            <Button onClick={() => decide('approved')} disabled={processing || docUrls.length === 0}>
-              <Check className="h-4 w-4 mr-1" /> Approve
-            </Button>
+          <DialogFooter className="gap-2 pt-2">
+            <button onClick={() => setSelected(null)} disabled={processing} className="px-3 py-1.5 text-xs font-bold text-slate-500">Cancel</button>
+            <button
+              onClick={() => decide("rejected")}
+              disabled={processing || !notes.trim()}
+              className="px-4 py-1.5 rounded-md bg-[#e2445c] text-white text-xs font-bold flex items-center gap-1"
+            >
+              <X className="h-3.5 w-3.5" /> Reject
+            </button>
+            <button
+              onClick={() => decide("approved")}
+              disabled={processing || docUrls.length === 0}
+              className="px-4 py-1.5 rounded-md bg-[#00c875] text-white text-xs font-bold flex items-center gap-1"
+            >
+              <Check className="h-3.5 w-3.5" /> Approve Institution
+            </button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
   );
 };
+
+export default InstitutionApplications;

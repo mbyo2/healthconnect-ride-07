@@ -3,43 +3,61 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   Search, Calendar, Video, Shield, Zap, Building2,
-  ChevronRight, Star, CheckCircle, ArrowRight, Activity
+  ChevronRight, Star, CheckCircle, ArrowRight, Activity, Pill, UserCheck
 } from "lucide-react";
-import { CareOrbit } from "@/components/landing/CareOrbit";
 
 export const CareExperience = () => (
-  <section className="overflow-hidden py-16 md:py-20 lg:py-24 bg-gradient-to-b from-primary/5 via-background to-background relative">
-    <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top_left,rgba(var(--primary),0.1),transparent)]" />
-    <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:gap-20 lg:px-8 relative">
-      <div className="relative order-2 lg:order-1">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent rounded-3xl blur-3xl" />
-        <CareOrbit />
-      </div>
-      <div className="order-1 lg:order-2 space-y-6">
-        <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-xs font-semibold text-primary border border-primary/20">
-          <Activity className="h-3.5 w-3.5" />
-          Connected Care
+  <section className="py-16 bg-[#ffffff] dark:bg-slate-900 border-t border-[#e6e9ef] dark:border-slate-800 transition-colors">
+    <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
+      <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="space-y-4">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-xs font-bold">
+            <Activity className="h-3.5 w-3.5" />
+            <span>Connected Healthcare WorkOS</span>
+          </div>
+          <h2 className="text-2xl sm:text-4xl font-black text-slate-900 dark:text-slate-100 tracking-tight leading-tight">
+            One Unified Care Journey, <br />
+            <span className="text-[#0073ea]">Engineered for Simplicity.</span>
+          </h2>
+          <p className="text-sm text-[#676879] dark:text-slate-400 leading-relaxed font-medium">
+            Seamlessly navigate between searching verified specialists, locking in appointment slots, managing pharmacy orders, and tracking vitals.
+          </p>
+
+          <div className="grid grid-cols-2 gap-3 pt-2">
+            <div className="p-3.5 rounded-xl border border-[#e6e9ef] dark:border-slate-800 bg-[#f5f6f8] dark:bg-slate-950">
+              <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white bg-[#00c875] mb-2">
+                Verified
+              </span>
+              <div className="font-extrabold text-sm text-slate-900 dark:text-slate-100">In-Person & Telehealth</div>
+              <div className="text-xs text-[#676879] dark:text-slate-400 mt-0.5">Real-time doctor calendar availability</div>
+            </div>
+
+            <div className="p-3.5 rounded-xl border border-[#e6e9ef] dark:border-slate-800 bg-[#f5f6f8] dark:bg-slate-950">
+              <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white bg-[#579bfc] mb-2">
+                Automated
+              </span>
+              <div className="font-extrabold text-sm text-slate-900 dark:text-slate-100">Digital Prescriptions</div>
+              <div className="text-xs text-[#676879] dark:text-slate-400 mt-0.5">Direct dispatch to local pharmacies</div>
+            </div>
+          </div>
         </div>
-        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight leading-tight">
-          One care journey, <br />
-          <span className="text-primary">designed around you.</span>
-        </h2>
-        <p className="max-w-xl text-muted-foreground leading-relaxed text-lg">
-          Move naturally between finding a provider, booking a visit, managing prescriptions, and keeping your health information close.
-        </p>
-        <div className="overflow-hidden rounded-3xl border border-border/60 bg-card shadow-card group hover:shadow-card-hover transition-all duration-300">
-          <div className="relative">
+
+        <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-[#f5f6f8] dark:bg-slate-950 p-4 shadow-sm">
+          <div className="rounded-xl overflow-hidden border border-[#c3c6d4] dark:border-slate-800 relative">
             <img
               src="https://images.unsplash.com/photo-1758691462743-f9fc9e430d39?auto=format&fit=crop&w=1200&q=85"
-              alt="Doctor providing a telehealth consultation to a Black patient"
-              loading="lazy"
-              className="h-56 w-full object-cover sm:h-64 group-hover:scale-105 transition-transform duration-700"
+              alt="Telehealth consult"
+              className="h-64 w-full object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-          </div>
-          <div className="p-6 bg-card">
-            <p className="font-semibold text-lg">Care that meets you where you are</p>
-            <p className="mt-2 text-muted-foreground">In person, by video, or through your trusted pharmacy.</p>
+            <div className="absolute bottom-3 left-3 right-3 p-3 rounded-lg bg-white/95 dark:bg-slate-900/95 border border-[#e6e9ef] dark:border-slate-800 backdrop-blur-sm flex items-center justify-between">
+              <div>
+                <div className="font-extrabold text-xs text-slate-900 dark:text-slate-100">Lusaka Central Clinic</div>
+                <div className="text-[11px] text-[#676879] dark:text-slate-400">Dr. Sarah Jenkins • HD Teleconsult Active</div>
+              </div>
+              <span className="px-2.5 py-1 rounded-full text-[10px] font-bold text-white bg-[#00c875]">
+                Live Visit
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -51,41 +69,47 @@ export const HowItWorks = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="py-16 md:py-20 lg:py-24 bg-gradient-to-b from-background via-muted/20 to-background relative">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-xs font-semibold text-primary mb-4 border border-primary/20">
-            <Zap className="h-3.5 w-3.5" />
-            Simple Process
-          </div>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-4">Book in 4 Simple Steps</h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            From search to visit, we've made healthcare booking effortless
+    <section className="py-16 bg-[#f5f6f8] dark:bg-slate-950 border-t border-[#e6e9ef] dark:border-slate-800 transition-colors">
+      <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-12">
+          <span className="inline-block px-3 py-1 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 text-xs font-bold border border-blue-500/20 mb-2">
+            Structured Workflow
+          </span>
+          <h2 className="text-2xl sm:text-4xl font-black text-slate-900 dark:text-slate-100 tracking-tight">
+            Book Care in 4 Precise Steps
+          </h2>
+          <p className="text-xs sm:text-sm text-[#676879] dark:text-slate-400 max-w-xl mx-auto font-medium mt-1">
+            Standardized intake flow designed for zero friction
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
           {[
-            { step: "01", title: "Search", desc: "Find by specialty, location, or insurance", icon: Search, color: "from-blue-500/20 to-blue-500/5" },
-            { step: "02", title: "Compare", desc: "Read reviews, check availability & fees", icon: Star, color: "from-purple-500/20 to-purple-500/5" },
-            { step: "03", title: "Book", desc: "Choose a time and confirm instantly", icon: Calendar, color: "from-emerald-500/20 to-emerald-500/5" },
-            { step: "04", title: "Visit", desc: "See your doctor in-person or via video", icon: Video, color: "from-orange-500/20 to-orange-500/5" },
-          ].map((item, idx) => (
-            <div key={idx} className="relative group">
-              <div className={`relative overflow-hidden rounded-3xl border border-border/40 bg-gradient-to-br ${item.color} p-8 text-center transition-all duration-300 hover:shadow-card-hover hover:scale-105`}>
-                <div className="absolute top-0 right-0 w-20 h-20 bg-primary/10 rounded-full blur-2xl group-hover:bg-primary/20 transition-colors" />
-                <div className="relative">
-                  <div className="mx-auto mb-6 w-16 h-16 rounded-2xl bg-background shadow-card flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                    <item.icon className="h-8 w-8 text-primary" />
-                  </div>
-                  <div className="text-xs font-bold text-primary mb-3 tracking-widest">STEP {item.step}</div>
-                  <h3 className="font-bold text-xl mb-3">{item.title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
-                </div>
+            { step: "01", title: "Search", desc: "Filter by specialty, insurance, and city", icon: Search, route: "/search", statusTag: "Instant Search", color: "bg-[#0073ea]" },
+            { step: "02", title: "Compare", desc: "Inspect verified ratings & consultation fees", icon: Star, route: "/providers", statusTag: "Ratings Verified", color: "bg-[#a25ddc]" },
+            { step: "03", title: "Book", desc: "Select time slot and confirm instantly", icon: Calendar, route: "/appointments", statusTag: "Auto-Confirmed", color: "bg-[#00c875]" },
+            { step: "04", title: "Consult", desc: "In-person visit or HD Video consultation", icon: Video, route: "/video-dashboard", statusTag: "HD Encrypted", color: "bg-[#fdab3d]" },
+          ].map((item) => (
+            <div
+              key={item.step}
+              onClick={() => navigate(item.route)}
+              className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 hover:border-[#0073ea] transition-all cursor-pointer space-y-3 shadow-2xs"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono font-bold text-slate-400">STEP {item.step}</span>
+                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white ${item.color}`}>
+                  {item.statusTag}
+                </span>
               </div>
-              {idx < 3 && (
-                <ArrowRight className="hidden lg:block absolute top-1/2 -right-3 h-6 w-6 text-muted-foreground/30 -translate-y-1/2" />
-              )}
+
+              <div className="h-10 w-10 rounded-xl bg-[#f0f2f7] dark:bg-slate-800 flex items-center justify-center text-[#0073ea]">
+                <item.icon className="h-5 w-5" />
+              </div>
+
+              <div>
+                <h3 className="font-extrabold text-base text-slate-900 dark:text-slate-100">{item.title}</h3>
+                <p className="text-xs text-[#676879] dark:text-slate-400 font-medium mt-1">{item.desc}</p>
+              </div>
             </div>
           ))}
         </div>
@@ -95,39 +119,47 @@ export const HowItWorks = () => {
 };
 
 export const Features = () => (
-  <section className="py-16 md:py-20 lg:py-24 bg-background relative overflow-hidden">
-    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,rgba(var(--primary),0.08),transparent)]" />
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative">
-      <div className="text-center mb-16">
-        <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary/10 to-primary/5 px-4 py-1.5 text-xs font-semibold text-primary mb-4 border border-primary/20">
-          <Shield className="h-3.5 w-3.5" />
-          Comprehensive Platform
-        </div>
-        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-4">Everything in One Place</h2>
-        <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-          For patients, doctors, pharmacies, and hospitals — one unified platform.
+  <section className="py-16 bg-[#ffffff] dark:bg-slate-900 border-t border-[#e6e9ef] dark:border-slate-800 transition-colors">
+    <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
+      <div className="text-center mb-12">
+        <span className="inline-block px-3 py-1 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400 text-xs font-bold border border-purple-500/20 mb-2">
+          Integrated Modules
+        </span>
+        <h2 className="text-2xl sm:text-4xl font-black text-slate-900 dark:text-slate-100 tracking-tight">
+          Comprehensive Healthcare Infrastructure
+        </h2>
+        <p className="text-xs sm:text-sm text-[#676879] dark:text-slate-400 max-w-xl mx-auto font-medium mt-1">
+          Everything patients, doctors, pharmacies, and hospital administrators need
         </p>
       </div>
 
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {[
-          { icon: Search, title: "Smart Doctor Search", desc: "Find the right doctor by specialty, condition, insurance, location, and verified ratings.", gradient: "from-blue-500/10 to-blue-500/5" },
-          { icon: Calendar, title: "Instant Booking", desc: "Real-time availability with same-day appointments. No phone calls needed.", gradient: "from-emerald-500/10 to-emerald-500/5" },
-          { icon: Video, title: "Video Consultations", desc: "Secure HD video visits from anywhere in Zambia. No downloads required.", gradient: "from-purple-500/10 to-purple-500/5" },
-          { icon: Shield, title: "Insurance Verified", desc: "NHIMA partner with automatic coverage checks before you book.", gradient: "from-amber-500/10 to-amber-500/5" },
-          { icon: Zap, title: "Digital Prescriptions", desc: "E-prescriptions sent directly to your nearest pharmacy for pickup or delivery.", gradient: "from-rose-500/10 to-rose-500/5" },
-          { icon: Building2, title: "Hospital Management", desc: "Full HMS for hospitals — EMR, billing, admissions, lab, and pharmacy in one system.", gradient: "from-cyan-500/10 to-cyan-500/5" },
+          { icon: Search, title: "Smart Provider Directory", desc: "Search verified doctors by specialty, location, and accepted insurance.", badge: "Real-time" },
+          { icon: Calendar, title: "Automated Scheduling", desc: "Instant online appointment confirmations with calendar reminders.", badge: "24/7 Available" },
+          { icon: Video, title: "HD Video Consultations", desc: "Browser-based video visits with screen share & digital chart notes.", badge: "Encrypted" },
+          { icon: Shield, title: "NHIMA & Insurance Verified", desc: "Automated eligibility checking before appointment confirmation.", badge: "Verified" },
+          { icon: Zap, title: "E-Prescriptions & Pharmacy POS", desc: "Direct electronic prescription dispatches to local pharmacies.", badge: "Auto-Fulfill" },
+          { icon: Building2, title: "Hospital Operations Suite", desc: "Full EMR, bed occupancy, ICU telemetry, and billing management.", badge: "WorkOS HMS" },
         ].map((f, idx) => (
-          <Card key={idx} className="border-border/40 bg-card hover:shadow-card-hover hover:border-primary/30 transition-all duration-300 group overflow-hidden">
-            <div className={`absolute inset-0 bg-gradient-to-br ${f.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
-            <CardContent className="p-8 relative">
-              <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center mb-5 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 border border-primary/20">
-                <f.icon className="h-7 w-7 text-primary" />
+          <div
+            key={idx}
+            className="p-5 rounded-2xl bg-[#f5f6f8] dark:bg-slate-950 border border-[#e6e9ef] dark:border-slate-800 hover:border-[#0073ea] transition-all space-y-3"
+          >
+            <div className="flex items-center justify-between">
+              <div className="h-9 w-9 rounded-lg bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 flex items-center justify-center text-[#0073ea]">
+                <f.icon className="h-4 w-4" />
               </div>
-              <h3 className="font-bold text-lg mb-3">{f.title}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">{f.desc}</p>
-            </CardContent>
-          </Card>
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#00c875] text-white">
+                {f.badge}
+              </span>
+            </div>
+
+            <div>
+              <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">{f.title}</h3>
+              <p className="text-xs text-[#676879] dark:text-slate-400 font-medium mt-1 leading-relaxed">{f.desc}</p>
+            </div>
+          </div>
         ))}
       </div>
     </div>
@@ -138,91 +170,79 @@ export const ForProviders = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="py-16 md:py-20 lg:py-24 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(var(--primary),0.15),transparent)]" />
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
-          <div className="text-white space-y-8">
-            <div className="inline-flex items-center gap-2 rounded-full bg-primary/20 px-4 py-1.5 text-xs font-semibold text-primary-foreground border border-primary/30">
-              <Building2 className="h-3.5 w-3.5" />
-              For Healthcare Providers
-            </div>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight leading-tight">
-              Grow Your Practice <br />
-              <span className="text-primary">with Doc' O Clock</span>
+    <section className="py-16 bg-[#f5f6f8] dark:bg-slate-950 border-t border-[#e6e9ef] dark:border-slate-800 transition-colors">
+      <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div className="space-y-5">
+            <span className="inline-block px-3 py-1 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 text-xs font-bold border border-blue-500/20">
+              For Healthcare Professionals & Clinics
+            </span>
+
+            <h2 className="text-2xl sm:text-4xl font-black text-slate-900 dark:text-slate-100 tracking-tight leading-tight">
+              Power Your Clinical Practice <br />
+              <span className="text-[#0073ea]">With Doc' O Clock WorkOS</span>
             </h2>
-            <p className="text-slate-300 leading-relaxed text-lg max-w-md">
-              Whether you're a solo practitioner, pharmacy, or hospital — 
-              get the tools to manage patients, streamline operations, and increase revenue.
+
+            <p className="text-xs sm:text-sm text-[#676879] dark:text-slate-400 leading-relaxed font-medium">
+              Empower your clinic, pharmacy, or hospital with modern operational tools to manage patient appointments, digital charts, inventory, and billing revenue.
             </p>
-            <div className="space-y-5">
+
+            <div className="space-y-3 pt-2">
               {[
-                { title: "Zero upfront fees", desc: "Only pay when new patients book through us" },
-                { title: "Full practice management", desc: "Appointments, EMR, prescriptions, billing" },
-                { title: "Video consultations", desc: "Reach patients anywhere in Zambia" },
-                { title: "Pharmacy POS & inventory", desc: "Complete pharmacy management system" },
+                { title: "Zero Upfront Platform Cost", desc: "No hidden setup fees — pay only on confirmed bookings." },
+                { title: "Complete EMR & Billing Suite", desc: "Track patient history, write prescriptions, and invoice insurance." },
+                { title: "Telehealth HD Video Suite", desc: "Reach patients across all provinces in Zambia directly." },
               ].map((item) => (
-                <div key={item.title} className="flex gap-4 group">
-                  <div className="mt-1 h-6 w-6 rounded-full bg-primary/20 flex items-center justify-center shrink-0 group-hover:bg-primary group-hover:scale-110 transition-all">
-                    <CheckCircle className="h-3.5 w-3.5 text-primary group-hover:text-primary-foreground transition-colors" />
-                  </div>
+                <div key={item.title} className="flex items-start gap-3 p-3 rounded-xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800">
+                  <CheckCircle className="h-4 w-4 text-[#00c875] mt-0.5 flex-shrink-0" />
                   <div>
-                    <div className="font-semibold text-white">{item.title}</div>
-                    <div className="text-sm text-slate-400">{item.desc}</div>
+                    <div className="font-extrabold text-xs text-slate-900 dark:text-slate-100">{item.title}</div>
+                    <div className="text-[11px] text-[#676879] dark:text-slate-400">{item.desc}</div>
                   </div>
                 </div>
               ))}
             </div>
-            <div className="flex flex-wrap gap-4 pt-4">
-              <Button onClick={() => navigate("/auth?tab=signup")} className="rounded-full gap-2 font-medium bg-primary text-primary-foreground hover:bg-primary/90 shadow-button">
-                Join as Provider <ArrowRight className="h-4 w-4" />
-              </Button>
-              <Button variant="outline" onClick={() => navigate("/pricing")} className="rounded-full font-medium border-slate-600 text-white hover:bg-slate-800 hover:border-slate-500">
-                View Pricing
-              </Button>
+
+            <div className="flex items-center gap-3 pt-3">
+              <button
+                onClick={() => navigate("/auth?tab=signup")}
+                className="px-5 py-2.5 rounded-md bg-[#0073ea] hover:bg-[#0060c4] text-white font-extrabold text-xs shadow-sm transition-all flex items-center gap-1.5"
+              >
+                <span>Register Practice</span>
+                <ArrowRight className="h-4 w-4" />
+              </button>
+
+              <button
+                onClick={() => navigate("/pricing")}
+                className="px-5 py-2.5 rounded-md bg-white dark:bg-slate-900 border border-[#c3c6d4] dark:border-slate-800 text-slate-800 dark:text-slate-200 font-extrabold text-xs hover:bg-[#f0f2f7] transition-all"
+              >
+                View Tariff Rates
+              </button>
             </div>
           </div>
 
-          <div className="hidden lg:block">
-            <div className="relative">
-              <Card className="border-slate-700/50 shadow-card bg-slate-800/50 backdrop-blur-sm overflow-hidden">
-                <div className="h-1.5 bg-gradient-to-r from-primary via-primary/80 to-primary/50" />
-                <img
-                  src="https://images.unsplash.com/photo-1666886573440-16ac24f89e31?auto=format&fit=crop&w=1200&q=85"
-                  alt="Black healthcare professional and patient reviewing care on a tablet"
-                  loading="lazy"
-                  className="h-52 w-full object-cover opacity-90"
-                />
-                <CardContent className="p-8">
-                  <div className="flex items-center gap-4 mb-8">
-                    <div className="h-14 w-14 rounded-2xl bg-primary/20 flex items-center justify-center border border-primary/30">
-                      <Activity className="h-7 w-7 text-primary" />
-                    </div>
-                    <div>
-                      <div className="font-semibold text-white text-lg">Provider Dashboard</div>
-                      <div className="text-xs text-slate-400">Real-time practice overview</div>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    {[
-                      { label: "Today's Patients", value: "12", trend: "+3" },
-                      { label: "This Week", value: "67", trend: "+12" },
-                      { label: "Revenue", value: "K 24,500", trend: "+8%" },
-                      { label: "Satisfaction", value: "98%", trend: "↑" },
-                    ].map((stat) => (
-                      <div key={stat.label} className="p-5 rounded-2xl bg-slate-700/50 border border-slate-600/50 hover:border-primary/50 transition-colors">
-                        <div className="flex items-baseline gap-2">
-                          <span className="text-3xl font-bold text-white">{stat.value}</span>
-                          <span className="text-xs text-primary font-medium">{stat.trend}</span>
-                        </div>
-                        <div className="text-xs text-slate-400 mt-1">{stat.label}</div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-              <div className="absolute -top-4 -right-4 bg-primary text-primary-foreground px-5 py-2.5 rounded-full text-sm font-semibold border border-primary/30 shadow-card flex items-center gap-2">
-                <Shield className="h-4 w-4" /> NHIMA Verified
+          <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-[#e6e9ef] dark:border-slate-800">
+              <div className="flex items-center gap-2">
+                <Activity className="h-5 w-5 text-[#0073ea]" />
+                <h3 className="font-extrabold text-sm">Provider Telemetry Overview</h3>
+              </div>
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white bg-[#00c875]">
+                Live Board
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="p-3 rounded-xl bg-[#f5f6f8] dark:bg-slate-950 border border-[#e6e9ef] dark:border-slate-800">
+                <div className="text-[11px] text-[#676879] font-bold uppercase">Today's Visits</div>
+                <div className="text-2xl font-black font-mono text-[#0073ea] mt-1">18</div>
+                <div className="text-[10px] text-emerald-500 font-bold mt-1">+4 via Telehealth</div>
+              </div>
+
+              <div className="p-3 rounded-xl bg-[#f5f6f8] dark:bg-slate-950 border border-[#e6e9ef] dark:border-slate-800">
+                <div className="text-[11px] text-[#676879] font-bold uppercase">Weekly Revenue</div>
+                <div className="text-2xl font-black font-mono text-emerald-600 mt-1">K24,500</div>
+                <div className="text-[10px] text-emerald-500 font-bold mt-1">+12% vs last week</div>
               </div>
             </div>
           </div>

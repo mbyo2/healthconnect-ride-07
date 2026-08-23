@@ -1,20 +1,7 @@
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import {
-  FileText,
-  Download,
-  Upload,
-  Calendar,
-  User,
-  Heart,
-  Activity,
-  ClipboardList,
-  Pill,
-  Bot,
-  Sparkles
+  FileText, Download, Upload, Calendar, User, Heart, Activity,
+  ClipboardList, Pill, Bot, Sparkles, FolderHeart
 } from "lucide-react";
 import { getMedicalRecords, getHealthMetrics, type MedicalRecord, type HealthMetric } from "@/services/medicalRecords";
 import { useNavigate } from "react-router-dom";
@@ -41,7 +28,7 @@ export default function MedicalRecords() {
         setRecords(recordsData);
         setHealthMetrics(metricsData);
       } catch (error) {
-        console.error('Error fetching medical records:', error);
+        console.error("Error fetching medical records:", error);
       } finally {
         setLoading(false);
       }
@@ -50,215 +37,219 @@ export default function MedicalRecords() {
     fetchData();
   }, []);
 
-  const getStatusColor = (status: string) => {
+  const getStatusPill = (status: string) => {
     switch (status) {
       case "Normal":
-        return "bg-green-100 dark:bg-green-950/20 text-green-800 dark:text-green-200";
-      case "Active":
-        return "bg-blue-100 dark:bg-blue-950/20 text-blue-800 dark:text-blue-200";
       case "Complete":
-        return "bg-muted text-muted-foreground";
+        return <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold text-white bg-[#00c875]">{status}</span>;
+      case "Active":
+        return <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold text-white bg-[#0073ea]">{status}</span>;
       default:
-        return "bg-muted text-muted-foreground";
+        return <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold text-white bg-[#676879]">{status}</span>;
     }
   };
 
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case "Examination":
-        return <User className="h-4 w-4" />;
-      case "Lab Results":
-        return <Activity className="h-4 w-4" />;
-      case "Consultation":
-        return <Heart className="h-4 w-4" />;
-      case "Prescription":
-        return <Pill className="h-4 w-4" />;
-      default:
-        return <FileText className="h-4 w-4" />;
+      case "Examination": return <User className="h-4 w-4 text-[#0073ea]" />;
+      case "Lab Results": return <Activity className="h-4 w-4 text-[#a25ddc]" />;
+      case "Consultation": return <Heart className="h-4 w-4 text-[#00c875]" />;
+      case "Prescription": return <Pill className="h-4 w-4 text-[#fdab3d]" />;
+      default: return <FileText className="h-4 w-4 text-[#0073ea]" />;
     }
   };
 
   if (loading) {
     return (
-      <div className="container mx-auto py-8 flex items-center justify-center">
-        <div className="text-center">Loading your medical records...</div>
+      <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 flex items-center justify-center p-6 font-sans">
+        <div className="text-center font-bold text-xs text-[#676879]">
+          Loading WorkOS Electronic Health Records...
+        </div>
       </div>
     );
   }
 
   return (
     <ProtectedRoute>
-      <div className="container mx-auto py-8 space-y-8">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold">Medical Records</h1>
-            <p className="text-muted-foreground mt-2">
-              Access and manage your complete health information
-            </p>
-          </div>
-          <div className="flex gap-2 mt-4 md:mt-0">
-            <Button variant="outline" onClick={() => navigate('/ai-diagnostics')}>
-              <Bot className="h-4 w-4 mr-2" />
-              AI Analysis
-            </Button>
-            <Button variant="outline">
-              <Upload className="h-4 w-4 mr-2" />
-              Upload
-            </Button>
-            <Button>
-              <Download className="h-4 w-4 mr-2" />
-              Export
-            </Button>
-          </div>
-        </div>
-
-        {/* AI Insights for Medical Records */}
-        <AIInsightsWidget
-          context="records"
-          data={{
-            recordCount: records.length,
-            metricsCount: healthMetrics.length
-          }}
-        />
-
-        {/* Comprehensive Medical Records Section */}
-        <ComprehensiveMedicalRecords />
-
-        <Separator />
-
-        {/* Lab results + medication administration (live data) */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <PatientLabResults />
-          <PatientMAR />
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Recent Records */}
-          <div className="lg:col-span-2">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <ClipboardList className="h-5 w-5" />
-                  Recent Records
-                </CardTitle>
-                <CardDescription>
-                  Your latest medical documents and reports
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {records.length > 0 ? records.map((record) => (
-                  <div key={record.id} className="flex items-center justify-between p-4 border rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-blue-100 dark:bg-blue-950/20 rounded-lg">
-                        {getTypeIcon(record.type)}
-                      </div>
-                      <div>
-                        <h3 className="font-semibold">{record.title}</h3>
-                        <p className="text-sm text-muted-foreground">
-                          {record.provider} • {new Date(record.date).toLocaleDateString()}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge className={getStatusColor(record.status)}>
-                        {record.status}
-                      </Badge>
-                      <Button variant="ghost" size="sm">
-                        <Download className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                )) : (
-                  <div className="text-center py-8">
-                    <p className="text-muted-foreground">No medical records found. Upload your first record!</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Health Metrics & FHIR Export */}
-          <div className="space-y-6">
-            <FHIRExportPanel />
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Activity className="h-5 w-5" />
-                  Health Metrics
-                </CardTitle>
-                <CardDescription>
-                  Your latest vital signs and test results
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {healthMetrics.length > 0 ? healthMetrics.map((metric, index) => (
-                  <div key={index}>
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <p className="font-medium">{metric.label}</p>
-                        <p className="text-2xl font-bold">{metric.value}</p>
-                        <p className="text-xs text-muted-foreground">{metric.date}</p>
-                      </div>
-                      <Badge className={getStatusColor(metric.status)}>
-                        {metric.status}
-                      </Badge>
-                    </div>
-                    {index < healthMetrics.length - 1 && <Separator className="mt-4" />}
-                  </div>
-                )) : (
-                  <div className="text-center py-4">
-                    <p className="text-muted-foreground text-sm">No health metrics recorded yet.</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-
-        {/* Quick Actions - Responsive Grid */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-            <CardDescription>
-              Common tasks for managing your medical records
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-              <Button
-                variant="outline"
-                className="flex items-center justify-start gap-2 h-auto py-3"
-                onClick={() => navigate('/appointments')}
-              >
-                <Calendar className="h-4 w-4 flex-shrink-0" />
-                <span className="text-left">Schedule Checkup</span>
-              </Button>
-              <Button
-                variant="outline"
-                className="flex items-center justify-start gap-2 h-auto py-3"
-              >
-                <FileText className="h-4 w-4 flex-shrink-0" />
-                <span className="text-left">Request Records</span>
-              </Button>
-              <Button
-                variant="outline"
-                className="flex items-center justify-start gap-2 h-auto py-3"
-              >
-                <Upload className="h-4 w-4 flex-shrink-0" />
-                <span className="text-left">Upload Document</span>
-              </Button>
-              <Button
-                variant="outline"
-                className="flex items-center justify-start gap-2 h-auto py-3"
-                onClick={() => navigate('/health-dashboard')}
-              >
-                <Heart className="h-4 w-4 flex-shrink-0" />
-                <span className="text-left">Health Summary</span>
-              </Button>
+      <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors pb-16">
+        {/* Sticky Monday Top Header */}
+        <div className="bg-white dark:bg-slate-900 border-b border-[#e6e9ef] dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
+          <div className="max-w-[1500px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-xl bg-[#0073ea] text-white flex items-center justify-center font-black text-sm shadow-xs">
+                <FolderHeart className="h-5 w-5" />
+              </div>
+              <div>
+                <h1 className="text-xl font-extrabold tracking-tight flex items-center gap-2">
+                  Patient Health Records Board
+                  <span className="w-2 h-2 rounded-full bg-[#00c875] animate-ping" />
+                </h1>
+                <p className="text-xs text-[#676879] dark:text-slate-400 font-medium">
+                  Centralized electronic medical records, lab results, prescriptions, and FHIR interoperability
+                </p>
+              </div>
             </div>
-          </CardContent>
-        </Card>
+
+            <div className="flex items-center gap-2 flex-wrap">
+              <button
+                onClick={() => navigate('/ai-diagnostics')}
+                className="px-3.5 py-2 rounded-md bg-[#f0f2f7] dark:bg-slate-800 hover:bg-[#e5f0ff] font-bold text-xs text-slate-800 dark:text-slate-200 flex items-center gap-1.5 transition-colors"
+              >
+                <Bot className="h-4 w-4 text-[#0073ea]" />
+                <span>AI Diagnostics</span>
+              </button>
+              <button className="px-3.5 py-2 rounded-md border border-[#c3c6d4] dark:border-slate-700 bg-white dark:bg-slate-900 font-bold text-xs text-slate-800 dark:text-slate-200 flex items-center gap-1.5 hover:bg-[#f5f6f8]">
+                <Upload className="h-4 w-4 text-[#676879]" />
+                <span>Upload Document</span>
+              </button>
+              <button className="px-3.5 py-2 rounded-md bg-[#0073ea] hover:bg-[#0060c4] text-white font-extrabold text-xs flex items-center gap-1.5 shadow-xs transition-all">
+                <Download className="h-4 w-4" />
+                <span>Export EHR Data</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Content Body */}
+        <div className="max-w-[1500px] mx-auto px-4 sm:px-6 pt-6 space-y-6">
+          {/* AI Insights for Medical Records */}
+          <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
+            <AIInsightsWidget
+              context="records"
+              data={{
+                recordCount: records.length,
+                metricsCount: healthMetrics.length
+              }}
+            />
+          </div>
+
+          {/* Comprehensive Medical Records Section */}
+          <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
+            <ComprehensiveMedicalRecords />
+          </div>
+
+          {/* Lab results + medication administration (live data) */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
+              <PatientLabResults />
+            </div>
+            <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
+              <PatientMAR />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Recent Records */}
+            <div className="lg:col-span-2 rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
+              <div className="flex items-center justify-between border-b border-[#e6e9ef] dark:border-slate-800 pb-3 mb-4">
+                <h2 className="font-extrabold text-sm flex items-center gap-2">
+                  <ClipboardList className="h-4 w-4 text-[#0073ea]" />
+                  Recent Diagnostic & Consultation Records
+                </h2>
+                <span className="text-xs text-[#676879] font-bold">{records.length} records</span>
+              </div>
+
+              <div className="space-y-2">
+                {records.length > 0 ? (
+                  records.map((record) => (
+                    <div
+                      key={record.id}
+                      className="flex items-center justify-between p-3.5 rounded-xl border border-[#e6e9ef] dark:border-slate-800 bg-[#f5f6f8] dark:bg-slate-950 hover:bg-[#e5f0ff] dark:hover:bg-slate-800/80 transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="p-2.5 bg-white dark:bg-slate-900 rounded-lg border border-[#e6e9ef] dark:border-slate-800">
+                          {getTypeIcon(record.type)}
+                        </div>
+                        <div>
+                          <h3 className="font-extrabold text-xs text-slate-900 dark:text-slate-100">{record.title}</h3>
+                          <p className="text-[11px] text-[#676879] dark:text-slate-400 font-medium mt-0.5">
+                            {record.provider} • {new Date(record.date).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        {getStatusPill(record.status)}
+                        <button className="p-1.5 rounded-lg border border-[#c3c6d4] text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800">
+                          <Download className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-10 text-xs text-[#676879] font-medium">
+                    No medical records found. Upload your first record!
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Health Metrics & FHIR Export */}
+            <div className="space-y-6">
+              <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
+                <FHIRExportPanel />
+              </div>
+
+              <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
+                <div className="flex items-center justify-between border-b border-[#e6e9ef] dark:border-slate-800 pb-3 mb-4">
+                  <h2 className="font-extrabold text-sm flex items-center gap-2">
+                    <Activity className="h-4 w-4 text-[#00c875]" />
+                    Vital Sign Metrics
+                  </h2>
+                </div>
+
+                <div className="space-y-3">
+                  {healthMetrics.length > 0 ? (
+                    healthMetrics.map((metric, index) => (
+                      <div key={index} className="p-3 rounded-xl border border-[#e6e9ef] dark:border-slate-800 bg-[#f5f6f8] dark:bg-slate-950 flex justify-between items-center">
+                        <div>
+                          <p className="font-bold text-xs text-slate-700 dark:text-slate-300">{metric.label}</p>
+                          <p className="text-xl font-black font-mono text-[#0073ea]">{metric.value}</p>
+                          <p className="text-[10px] text-[#676879] mt-0.5">{metric.date}</p>
+                        </div>
+                        <div>
+                          {getStatusPill(metric.status)}
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-6 text-xs text-[#676879]">
+                      No health metrics recorded yet.
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Actions */}
+          <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
+            <h2 className="font-extrabold text-sm mb-3">Quick EHR Actions</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              <button
+                onClick={() => navigate('/appointments')}
+                className="flex items-center gap-2 p-3 rounded-xl border border-[#e6e9ef] dark:border-slate-800 bg-[#f5f6f8] dark:bg-slate-950 hover:bg-[#e5f0ff] dark:hover:bg-slate-800 transition-colors text-xs font-extrabold"
+              >
+                <Calendar className="h-4 w-4 text-[#0073ea]" />
+                <span>Schedule Checkup</span>
+              </button>
+              <button className="flex items-center gap-2 p-3 rounded-xl border border-[#e6e9ef] dark:border-slate-800 bg-[#f5f6f8] dark:bg-slate-950 hover:bg-[#e5f0ff] dark:hover:bg-slate-800 transition-colors text-xs font-extrabold">
+                <FileText className="h-4 w-4 text-[#a25ddc]" />
+                <span>Request Records</span>
+              </button>
+              <button className="flex items-center gap-2 p-3 rounded-xl border border-[#e6e9ef] dark:border-slate-800 bg-[#f5f6f8] dark:bg-slate-950 hover:bg-[#e5f0ff] dark:hover:bg-slate-800 transition-colors text-xs font-extrabold">
+                <Upload className="h-4 w-4 text-[#fdab3d]" />
+                <span>Upload Document</span>
+              </button>
+              <button
+                onClick={() => navigate('/health-dashboard')}
+                className="flex items-center gap-2 p-3 rounded-xl border border-[#e6e9ef] dark:border-slate-800 bg-[#f5f6f8] dark:bg-slate-950 hover:bg-[#e5f0ff] dark:hover:bg-slate-800 transition-colors text-xs font-extrabold"
+              >
+                <Heart className="h-4 w-4 text-[#e2445c]" />
+                <span>Health Summary</span>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </ProtectedRoute>
   );

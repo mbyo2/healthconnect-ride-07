@@ -4,10 +4,7 @@ import { SymptomCollector } from "@/components/SymptomCollector";
 import { AIDiagnosisHistory } from "@/components/AIDiagnosisHistory";
 import { DocumentAnalysisUploader } from "@/components/ai/DocumentAnalysisUploader";
 import { Imaging3DUploader } from "@/components/ai/Imaging3DUploader";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Brain, MessageSquare, ClipboardList, Shield, History, FileText, Layers } from "lucide-react";
-
+import { Brain, MessageSquare, ClipboardList, Shield, History, FileText, Layers, AlertCircle } from "lucide-react";
 import { useState } from "react";
 import { ClinicalAction } from "@/components/ai/ClinicalDecisionCard";
 
@@ -15,194 +12,147 @@ const AIDiagnostics = () => {
   const [activeTab, setActiveTab] = useState("chat");
 
   const handleActionClick = (action: ClinicalAction) => {
-    if (action.route === 'tab:history') {
+    if (action.route === "tab:history") {
       setActiveTab("history");
-    } else if (action.route === 'tab:symptoms') {
+    } else if (action.route === "tab:symptoms") {
       setActiveTab("symptoms");
     }
   };
+
   return (
     <>
       <Helmet>
-        <title>AI Diagnostic Assistant | Doc' O Clock</title>
-        <meta name="description" content="Get AI-powered health analysis and medical insights from Doc' O Clock AI. Analyze symptoms, get health recommendations, and chat with our intelligent medical assistant." />
-        <meta name="keywords" content="AI diagnosis, medical AI, symptom checker, health analysis, Doc O Clock AI, medical assistant" />
+        <title>AI Diagnostic Assistant | Doc&apos; O Clock</title>
+        <meta name="description" content="Get AI-powered health analysis and medical insights from Doc' O Clock AI." />
       </Helmet>
 
-      <div className="container mx-auto px-4 py-2 sm:py-8 max-w-7xl">
-        <div className="space-y-3 sm:space-y-6">
-          {/* Header */}
-          <div className="space-y-2">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-              <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                <Brain className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+      <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors pb-16">
+        {/* Sticky Monday Top Header */}
+        <div className="bg-white dark:bg-slate-900 border-b border-[#e6e9ef] dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
+          <div className="max-w-[1500px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-xl bg-[#0073ea] text-white flex items-center justify-center font-black text-sm shadow-xs">
+                <Brain className="h-5 w-5" />
               </div>
               <div>
-                <h1 className="text-xl sm:text-3xl font-bold">AI Diagnostic Assistant</h1>
-                <p className="text-xs sm:text-base text-muted-foreground">
-                  Powered by Doc' O Clock AI Assistant - Multimodal Medical AI
+                <h1 className="text-xl font-extrabold tracking-tight flex items-center gap-2">
+                  Multimodal Medical AI Diagnostic Workspace
+                  <span className="w-2 h-2 rounded-full bg-[#00c875] animate-ping" />
+                </h1>
+                <p className="text-xs text-[#676879] dark:text-slate-400 font-medium">
+                  Evidence-based clinical decision support powered by MedGemma 27B & 3D Volumetric Imaging
                 </p>
               </div>
             </div>
+
+            <div className="flex items-center gap-2">
+              <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-[#a25ddc]">
+                Clinical AI Engine Active
+              </span>
+            </div>
           </div>
 
-          {/* Feature Cards */}
-          <div className="flex overflow-x-auto pb-4 gap-3 sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:gap-4 sm:pb-0 snap-x">
-            <Card
-              className="min-w-[240px] sm:min-w-0 snap-center cursor-pointer hover:bg-accent/50 transition-colors"
-              onClick={() => setActiveTab("chat")}
-            >
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm sm:text-base flex items-center gap-2">
-                  <MessageSquare className="h-4 w-4 text-primary" />
-                  AI Chat
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-xs sm:text-sm text-muted-foreground">
-                  Chat & upload multiple medical images for AI analysis
-                </p>
-              </CardContent>
-            </Card>
+          {/* Navigation Tabs */}
+          <div className="max-w-[1500px] mx-auto mt-4 flex items-center gap-2">
+            {[
+              { id: "chat", label: "AI Consultation", icon: <MessageSquare className="h-3.5 w-3.5" /> },
+              { id: "documents", label: "Document OCR", icon: <FileText className="h-3.5 w-3.5" /> },
+              { id: "imaging", label: "3D DICOM Imaging", icon: <Layers className="h-3.5 w-3.5" /> },
+              { id: "symptoms", label: "Symptom Collector", icon: <ClipboardList className="h-3.5 w-3.5" /> },
+              { id: "history", label: "History Log", icon: <History className="h-3.5 w-3.5" /> },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-extrabold transition-all ${
+                  activeTab === tab.id
+                    ? "bg-[#0073ea] text-white shadow-xs"
+                    : "bg-white dark:bg-slate-900 border border-[#e6e9ef] text-[#676879] hover:bg-[#f0f2f7]"
+                }`}
+              >
+                {tab.icon}
+                <span>{tab.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
 
-            <Card
-              className="min-w-[240px] sm:min-w-0 snap-center cursor-pointer hover:bg-accent/50 transition-colors"
-              onClick={() => setActiveTab("documents")}
-            >
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm sm:text-base flex items-center gap-2">
-                  <FileText className="h-4 w-4 text-primary" />
-                  Document Analysis
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-xs sm:text-sm text-muted-foreground">
-                  Extract data from lab reports & prescriptions
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card
-              className="min-w-[240px] sm:min-w-0 snap-center cursor-pointer hover:bg-accent/50 transition-colors"
-              onClick={() => setActiveTab("imaging")}
-            >
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm sm:text-base flex items-center gap-2">
-                  <Layers className="h-4 w-4 text-primary" />
-                  3D Imaging
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-xs sm:text-sm text-muted-foreground">
-                  Volumetric CT/MRI/PET-CT analysis
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card
-              className="min-w-[240px] sm:min-w-0 snap-center cursor-pointer hover:bg-accent/50 transition-colors"
-              onClick={() => setActiveTab("symptoms")}
-            >
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm sm:text-base flex items-center gap-2">
-                  <ClipboardList className="h-4 w-4 text-primary" />
-                  Symptom Analysis
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-xs sm:text-sm text-muted-foreground">
-                  Get detailed analysis of your symptoms
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card
-              className="min-w-[240px] sm:min-w-0 snap-center cursor-pointer hover:bg-accent/50 transition-colors"
-              onClick={() => setActiveTab("history")}
-            >
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm sm:text-base flex items-center gap-2">
-                  <History className="h-4 w-4 text-primary" />
-                  History
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-xs sm:text-sm text-muted-foreground">
-                  View your past AI consultations
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="min-w-[240px] sm:min-w-0 snap-center">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm sm:text-base flex items-center gap-2">
-                  <Shield className="h-4 w-4 text-primary" />
-                  Evidence-Based
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-xs sm:text-sm text-muted-foreground">
-                  Based on medical research & guidelines
-                </p>
-              </CardContent>
-            </Card>
+        <div className="max-w-[1500px] mx-auto px-4 sm:px-6 pt-6 space-y-6">
+          {/* Feature Quick-Access Bento Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+            {[
+              { id: "chat", title: "AI Assistant", sub: "Chat & image analysis", color: "#0073ea", icon: <MessageSquare className="h-5 w-5" /> },
+              { id: "documents", title: "Doc OCR", sub: "Lab & Rx data extraction", color: "#00c875", icon: <FileText className="h-5 w-5" /> },
+              { id: "imaging", title: "3D Volumetric", sub: "CT / MRI / PET-CT", color: "#a25ddc", icon: <Layers className="h-5 w-5" /> },
+              { id: "symptoms", title: "Symptom Analysis", sub: "Guided intake collector", color: "#fdab3d", icon: <ClipboardList className="h-5 w-5" /> },
+              { id: "history", title: "Consult History", sub: "Past AI audit logs", color: "#676879", icon: <History className="h-5 w-5" /> },
+            ].map((card) => (
+              <div
+                key={card.id}
+                onClick={() => setActiveTab(card.id)}
+                className={`p-3.5 rounded-xl border transition-all cursor-pointer ${
+                  activeTab === card.id
+                    ? "border-[#0073ea] bg-white shadow-xs"
+                    : "border-[#e6e9ef] bg-white dark:bg-slate-900 hover:border-[#0073ea]"
+                }`}
+              >
+                <div style={{ color: card.color }} className="mb-2">{card.icon}</div>
+                <p className="font-extrabold text-xs text-slate-900 dark:text-slate-100">{card.title}</p>
+                <p className="text-[10px] text-[#676879] mt-0.5 font-medium">{card.sub}</p>
+              </div>
+            ))}
           </div>
 
-          {/* Main Content */}
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full max-w-4xl mx-auto grid-cols-5">
-              <TabsTrigger value="chat" className="text-xs sm:text-sm">AI Chat</TabsTrigger>
-              <TabsTrigger value="documents" className="text-xs sm:text-sm">Documents</TabsTrigger>
-              <TabsTrigger value="imaging" className="text-xs sm:text-sm">3D Imaging</TabsTrigger>
-              <TabsTrigger value="symptoms" className="text-xs sm:text-sm">Symptoms</TabsTrigger>
-              <TabsTrigger value="history" className="text-xs sm:text-sm">History</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="chat" className="mt-3 sm:mt-6">
+          {/* Main Active Tab Body */}
+          {activeTab === "chat" && (
+            <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
               <DocOClockAIChat onActionClick={handleActionClick} />
-            </TabsContent>
+            </div>
+          )}
 
-            <TabsContent value="documents" className="mt-3 sm:mt-6">
+          {activeTab === "documents" && (
+            <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
               <DocumentAnalysisUploader />
-            </TabsContent>
+            </div>
+          )}
 
-            <TabsContent value="imaging" className="mt-3 sm:mt-6">
+          {activeTab === "imaging" && (
+            <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
               <Imaging3DUploader />
-            </TabsContent>
+            </div>
+          )}
 
-            <TabsContent value="symptoms" className="mt-4 sm:mt-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg sm:text-xl">Symptom Analysis</CardTitle>
-                  <CardDescription className="text-xs sm:text-sm">
-                    Describe your symptoms and get an AI-powered analysis from Doc' O Clock AI
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <SymptomCollector />
-                </CardContent>
-              </Card>
-            </TabsContent>
+          {activeTab === "symptoms" && (
+            <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
+              <div className="border-b border-[#e6e9ef] pb-3">
+                <h2 className="font-extrabold text-sm flex items-center gap-2">
+                  <ClipboardList className="h-4 w-4 text-[#fdab3d]" />
+                  Guided Clinical Symptom Analysis
+                </h2>
+                <p className="text-xs text-[#676879] font-medium mt-0.5">
+                  Describe symptoms, duration, and severity to generate an evidence-based clinical differential.
+                </p>
+              </div>
+              <SymptomCollector />
+            </div>
+          )}
 
-            <TabsContent value="history" className="mt-4 sm:mt-6">
+          {activeTab === "history" && (
+            <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
               <AIDiagnosisHistory />
-            </TabsContent>
-          </Tabs>
+            </div>
+          )}
 
-          {/* Disclaimer */}
-          <Card className="border-yellow-500/50 bg-yellow-500/5">
-            <CardContent className="pt-4 sm:pt-6">
-              <h3 className="font-semibold mb-2 text-xs sm:text-sm">⚠️ Important Medical Disclaimer</h3>
-              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                This AI assistant is for informational and educational purposes only. It does not provide
-                medical advice, diagnosis, or treatment. Always seek the advice of your physician or other
-                qualified health provider with any questions you may have regarding a medical condition.
-                Never disregard professional medical advice or delay in seeking it because of something you
-                have read here. If you think you may have a medical emergency, call your doctor or emergency
-                services immediately.
+          {/* Medical Disclaimer Banner */}
+          <div className="rounded-2xl border border-[#fdab3d]/30 bg-[#fff9f0] p-4 flex items-start gap-3 text-xs">
+            <AlertCircle className="h-5 w-5 text-[#fdab3d] flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="font-extrabold text-slate-900">Clinical Decision Support Disclaimer</p>
+              <p className="text-[#676879] mt-0.5 leading-relaxed font-medium">
+                This AI assistant is designed for decision support and informational purposes. It does not replace professional medical judgment, diagnosis, or emergency triage. For life-threatening symptoms, dial emergency services immediately.
               </p>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       </div>
     </>

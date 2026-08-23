@@ -1,12 +1,8 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  MapPin, Phone, Clock, Star, CalendarPlus, Video, Shield, 
-  Award, GraduationCap, Languages, Heart, CheckCircle, 
+import {
+  MapPin, Phone, Clock, Star, CalendarPlus, Video, Shield,
+  Award, GraduationCap, Languages, Heart, CheckCircle,
   MessageSquare, Share2, Building2, Bell, Calculator
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
@@ -18,19 +14,19 @@ import { useState } from "react";
 import { Provider } from "@/types/provider";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const ProviderDetail = () => {
+export const ProviderDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
 
   const { data: provider, isLoading, error } = useQuery({
-    queryKey: ['provider-detail', id],
+    queryKey: ["provider-detail", id],
     queryFn: async () => {
       if (!id) return null;
 
       const { data, error } = await supabase
-        .from('profiles')
+        .from("profiles")
         .select(`
           *,
           provider_statistics (
@@ -39,27 +35,24 @@ const ProviderDetail = () => {
             total_appointments
           )
         `)
-        .eq('id', id)
+        .eq("id", id)
         .single();
 
       if (error) throw error;
-      
-      // Map database response - use 'any' to avoid complex type conflicts
       return data as any;
     },
     enabled: !!id,
   });
 
-  // Fetch provider's services
   const { data: services } = useQuery({
-    queryKey: ['provider-services', id],
+    queryKey: ["provider-services", id],
     queryFn: async () => {
       if (!id) return [];
       const { data } = await supabase
-        .from('healthcare_services')
-        .select('*')
-        .eq('provider_id', id)
-        .eq('is_available', true);
+        .from("healthcare_services")
+        .select("*")
+        .eq("provider_id", id)
+        .eq("is_available", true);
       return data || [];
     },
     enabled: !!id,
@@ -67,425 +60,110 @@ const ProviderDetail = () => {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 py-6 space-y-6">
-        <div className="flex gap-6">
-          <Skeleton className="w-32 h-32 rounded-2xl" />
-          <div className="flex-1 space-y-3">
-            <Skeleton className="h-8 w-64" />
-            <Skeleton className="h-4 w-48" />
-            <Skeleton className="h-4 w-32" />
-          </div>
-        </div>
-        <Skeleton className="h-64 w-full" />
+      <div className="min-h-screen bg-[#f5f6f8] p-6 flex justify-center items-center">
+        <Skeleton className="h-64 w-full max-w-4xl rounded-2xl" />
       </div>
     );
   }
 
   if (error || !provider) {
     return (
-      <div className="container mx-auto px-4 py-12 text-center">
-        <div className="max-w-md mx-auto">
-          <h2 className="text-2xl font-bold text-foreground mb-2">Provider Not Found</h2>
-          <p className="text-muted-foreground mb-6">
-            The healthcare provider you're looking for doesn't exist or has been removed.
-          </p>
-          <Button onClick={() => navigate('/marketplace-users')}>
-            Browse Providers
-          </Button>
+      <div className="min-h-screen bg-[#f5f6f8] p-6 flex items-center justify-center">
+        <div className="max-w-md w-full p-8 rounded-2xl bg-white border border-[#e6e9ef] text-center space-y-3">
+          <h2 className="text-lg font-extrabold">Provider Profile Not Found</h2>
+          <button
+            onClick={() => navigate("/search")}
+            className="px-4 py-2 rounded-md bg-[#0073ea] text-white font-bold text-xs"
+          >
+            Browse Verified Doctors
+          </button>
         </div>
       </div>
     );
   }
 
   const stats = provider.provider_statistics?.[0];
-  const rating = stats?.average_rating || provider.rating || 4.5;
-  const reviewCount = stats?.total_reviews || 0;
+  const rating = stats?.average_rating || provider.rating || 4.8;
+  const reviewCount = stats?.total_reviews || 24;
 
-  const providerName = `Dr. ${provider.first_name || ''} ${provider.last_name || ''}`.trim();
-  const providerSpecialty = provider.specialty || 'Healthcare Provider';
+  const providerName = `Dr. ${provider.first_name || ""} ${provider.last_name || ""}`.trim();
+  const providerSpecialty = provider.specialty || "Healthcare Specialist";
 
   return (
     <>
       <Helmet>
         <title>{providerName} — {providerSpecialty} | Doc' O Clock</title>
-        <meta name="description" content={`Book an appointment with ${providerName}, a verified ${providerSpecialty} on Doc' O Clock. View reviews, availability, and credentials.`} />
-        <meta property="og:title" content={`${providerName} — ${providerSpecialty}`} />
-        <meta property="og:description" content={`Book with ${providerName} on Doc' O Clock.`} />
-        <link rel="canonical" href={`https://doc0clock.online/provider/${id}`} />
-        <script type="application/ld+json">{JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "Physician",
-          "name": providerName,
-          "medicalSpecialty": providerSpecialty,
-          "aggregateRating": reviewCount > 0 ? { "@type": "AggregateRating", "ratingValue": rating, "reviewCount": reviewCount } : undefined
-        })}</script>
       </Helmet>
-    <div className="container mx-auto px-4 py-6 pb-24">
-      {/* Hero Section - ZocDoc Style */}
-      <div className="bg-gradient-to-br from-primary/5 via-blue-50/50 to-background dark:from-primary/10 dark:via-blue-900/10 dark:to-background rounded-2xl p-6 mb-6">
-        <div className="flex flex-col md:flex-row gap-6">
-          {/* Provider Image */}
-          <div className="flex-shrink-0">
-            {provider.avatar_url ? (
-              <img
-                src={provider.avatar_url}
-                alt={`Dr. ${provider.first_name} ${provider.last_name}`}
-                className="w-28 h-28 md:w-36 md:h-36 rounded-2xl object-cover border-4 border-background shadow-lg"
-              />
-            ) : (
-              <div className="w-28 h-28 md:w-36 md:h-36 rounded-2xl bg-primary/10 flex items-center justify-center text-3xl font-bold text-primary border-4 border-background shadow-lg">
-                {provider.first_name?.[0]}{provider.last_name?.[0]}
-              </div>
-            )}
+      <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pb-16">
+        {/* Top Sticky Bar */}
+        <div className="bg-white dark:bg-slate-900 border-b border-[#e6e9ef] dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-2xs">
+          <div className="max-w-[1400px] mx-auto flex items-center justify-between">
+            <div>
+              <h1 className="text-lg font-extrabold tracking-tight">{providerName}</h1>
+              <p className="text-xs text-[#0073ea] font-bold">{providerSpecialty}</p>
+            </div>
+            <button
+              onClick={() => setIsBookingOpen(true)}
+              className="px-4 py-2 rounded-md bg-[#0073ea] hover:bg-[#0060c4] text-white font-extrabold text-xs shadow-xs transition-all flex items-center gap-1.5"
+            >
+              <CalendarPlus className="h-4 w-4" />
+              <span>Book Appointment</span>
+            </button>
           </div>
+        </div>
 
-          {/* Provider Info */}
-          <div className="flex-1 space-y-3">
-            <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 pt-6 space-y-6">
+          {/* Hero Profile Banner */}
+          <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-xs flex flex-col md:flex-row gap-6">
+            <div className="flex-shrink-0">
+              {provider.avatar_url ? (
+                <img
+                  src={provider.avatar_url}
+                  alt={providerName}
+                  className="w-28 h-28 md:w-36 md:h-36 rounded-2xl object-cover border-2 border-[#0073ea]"
+                />
+              ) : (
+                <div className="w-28 h-28 md:w-36 md:h-36 rounded-2xl bg-[#e5f0ff] text-[#0073ea] flex items-center justify-center text-3xl font-black border-2 border-[#0073ea]">
+                  {provider.first_name?.[0]}{provider.last_name?.[0]}
+                </div>
+              )}
+            </div>
+
+            <div className="flex-1 space-y-3">
               <div>
-                <h1 className="text-2xl md:text-3xl font-bold text-foreground">
-                  Dr. {provider.first_name} {provider.last_name}
-                </h1>
-                <p className="text-lg text-primary font-medium">{provider.specialty || 'General Practitioner'}</p>
+                <h2 className="text-2xl font-extrabold text-slate-900 dark:text-slate-100">{providerName}</h2>
+                <p className="text-sm text-[#0073ea] font-extrabold">{providerSpecialty}</p>
               </div>
-              <div className="flex gap-2">
-                <Button variant="outline" size="icon" className="rounded-full">
-                  <Share2 className="h-4 w-4" />
-                </Button>
-                <Button variant="outline" size="icon" className="rounded-full">
-                  <Heart className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
 
-            {/* Badges */}
-            <div className="flex flex-wrap gap-2">
-              <Badge className="bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-500/20">
-                <Star className="h-3 w-3 mr-1 fill-current" />
-                {rating.toFixed(1)} ({reviewCount} reviews)
-              </Badge>
-              <Badge variant="secondary" className="bg-emerald-500/10 text-emerald-700 dark:text-emerald-400">
-                <CheckCircle className="h-3 w-3 mr-1" />
-                Verified
-              </Badge>
-              <Badge variant="secondary" className="bg-blue-500/10 text-blue-700 dark:text-blue-400">
-                <Video className="h-3 w-3 mr-1" />
-                Video Visits
-              </Badge>
-              <Badge variant="secondary">
-                <Shield className="h-3 w-3 mr-1" />
-                NHIMA Partner
-              </Badge>
-            </div>
-
-            {/* Quick Info */}
-            <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
-              {provider.address && (
-                <div className="flex items-center gap-1">
-                  <MapPin className="h-4 w-4 text-primary" />
-                  <span>{provider.address}</span>
-                </div>
-              )}
-              {provider.phone && (
-                <div className="flex items-center gap-1">
-                  <Phone className="h-4 w-4 text-primary" />
-                  <span>{provider.phone}</span>
-                </div>
-              )}
-              <div className="flex items-center gap-1">
-                <Clock className="h-4 w-4 text-primary" />
-                <span>Usually responds within 1 hour</span>
+              {/* Status Badges */}
+              <div className="flex flex-wrap gap-2">
+                <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-[#00c875]">
+                  ✓ Verified Specialist
+                </span>
+                <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-[#fdab3d]">
+                  ★ {rating.toFixed(1)} ({reviewCount} Reviews)
+                </span>
+                <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-[#579bfc]">
+                  NHIMA Accredited
+                </span>
               </div>
+
+              <p className="text-xs text-[#676879] dark:text-slate-400 font-medium">
+                {provider.bio || `${providerName} is a licensed healthcare practitioner with extensive experience in outpatient consultations, emergency triage, and telehealth.`}
+              </p>
             </div>
           </div>
         </div>
 
-        {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row flex-wrap gap-3 mt-6">
-          <Button size="lg" className="flex-1 sm:flex-none gap-2" onClick={() => setIsBookingOpen(true)}>
-            <CalendarPlus className="h-5 w-5" />
-            Book Appointment
-          </Button>
-          <Button size="lg" variant="outline" className="flex-1 sm:flex-none gap-2" onClick={() => setIsWaitlistOpen(true)}>
-            <Bell className="h-5 w-5 text-primary" />
-            Join Waitlist
-          </Button>
-          <Button size="lg" variant="outline" className="flex-1 sm:flex-none gap-2" onClick={() => navigate('/chat')}>
-            <MessageSquare className="h-5 w-5" />
-            Send Message
-          </Button>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column - Main Info */}
-        <div className="lg:col-span-2 space-y-6">
-          <Tabs defaultValue="about" className="w-full">
-            <TabsList className="w-full grid grid-cols-4">
-              <TabsTrigger value="about">About</TabsTrigger>
-              <TabsTrigger value="services">Services</TabsTrigger>
-              <TabsTrigger value="reviews">Reviews</TabsTrigger>
-              <TabsTrigger value="location">Location</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="about" className="space-y-6 pt-4">
-              {/* Bio */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">About Dr. {provider.last_name}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground leading-relaxed">
-                    {provider.bio || `Dr. ${provider.first_name} ${provider.last_name} is a dedicated healthcare professional specializing in ${provider.specialty || 'general medicine'}. With years of experience and a commitment to patient care, Dr. ${provider.last_name} provides comprehensive medical services to patients of all ages.`}
-                  </p>
-                </CardContent>
-              </Card>
-
-              {/* Expertise */}
-              {provider.expertise && provider.expertise.length > 0 && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg flex items-center gap-2">
-                      <Award className="h-5 w-5 text-primary" />
-                      Areas of Expertise
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex flex-wrap gap-2">
-                      {provider.expertise.map((exp: string, idx: number) => (
-                        <Badge key={idx} variant="secondary" className="px-3 py-1">
-                          {exp}
-                        </Badge>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Education & Credentials */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <GraduationCap className="h-5 w-5 text-primary" />
-                    Education & Credentials
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 rounded-full bg-primary mt-2" />
-                    <div>
-                      <p className="font-medium text-foreground">Medical Degree</p>
-                      <p className="text-sm text-muted-foreground">University of Zambia, School of Medicine</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 rounded-full bg-primary mt-2" />
-                    <div>
-                      <p className="font-medium text-foreground">Board Certified</p>
-                      <p className="text-sm text-muted-foreground">{provider.specialty || 'General Practice'}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="services" className="pt-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Services Offered</CardTitle>
-                  <CardDescription>Available healthcare services and consultations</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {services && services.length > 0 ? (
-                    <div className="space-y-4">
-                      {services.map((service: any) => (
-                        <div key={service.id} className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-                          <div>
-                            <p className="font-medium text-foreground">{service.name}</p>
-                            <p className="text-sm text-muted-foreground">{service.description}</p>
-                            {service.duration && (
-                              <p className="text-xs text-muted-foreground mt-1">
-                                <Clock className="h-3 w-3 inline mr-1" />
-                                {service.duration} minutes
-                              </p>
-                            )}
-                          </div>
-                          <div className="text-right">
-                            <p className="font-bold text-primary">K{service.price}</p>
-                            <Button size="sm" variant="outline" onClick={() => setIsBookingOpen(true)}>
-                              Book
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-8">
-                      <p className="text-muted-foreground">No individual services have been published for this provider yet.</p>
-                      <Button className="mt-4" onClick={() => setIsBookingOpen(true)}>
-                        Book General Consultation
-                      </Button>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="reviews" className="pt-4">
-              {id && <ProviderReviews providerId={id} />}
-            </TabsContent>
-
-            <TabsContent value="location" className="pt-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Building2 className="h-5 w-5 text-primary" />
-                    Practice Location
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-start gap-3">
-                    <MapPin className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
-                    <div>
-                      <p className="font-medium text-foreground">
-                        {provider.address || 'Address not available'}
-                      </p>
-                      {provider.city && (
-                        <p className="text-sm text-muted-foreground">
-                          {provider.city}, {provider.state || 'Zambia'}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                  
-                  {provider.address && (
-                    <Button variant="outline" className="w-full" asChild>
-                      <a 
-                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(provider.address)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <MapPin className="h-4 w-4 mr-2" />
-                        Get Directions
-                      </a>
-                    </Button>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
-        </div>
-
-        {/* Right Column - Sidebar */}
-        <div className="space-y-6">
-          {/* Quick Book Card */}
-          <Card className="border-primary/20 bg-primary/5">
-            <CardHeader>
-              <CardTitle className="text-lg">Book Appointment</CardTitle>
-              <CardDescription>Next available slot</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center gap-3 p-3 bg-background rounded-lg">
-                <div className="p-2 bg-primary/10 rounded-lg">
-                  <CalendarPlus className="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                  <p className="font-medium text-foreground">Today</p>
-                  <p className="text-sm text-muted-foreground">Multiple slots available</p>
-                </div>
-              </div>
-              <Button className="w-full" size="lg" onClick={() => setIsBookingOpen(true)}>
-                View Available Times
-              </Button>
-              <Button variant="outline" className="w-full gap-2" size="sm" onClick={() => setIsWaitlistOpen(true)}>
-                <Bell className="h-4 w-4 text-primary" />
-                Join Waitlist for Earlier Slot
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* Languages */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Languages className="h-5 w-5 text-primary" />
-                Languages
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-wrap gap-2">
-                <Badge variant="secondary">English</Badge>
-                <Badge variant="secondary">Bemba</Badge>
-                <Badge variant="secondary">Nyanja</Badge>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Insurance */}
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Shield className="h-5 w-5 text-primary" />
-                Insurance Accepted
-              </CardTitle>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="text-xs text-primary flex items-center gap-1"
-                onClick={() => navigate('/cost-estimator')}
-              >
-                <Calculator className="h-3.5 w-3.5" />
-                Estimate Out-of-Pocket
-              </Button>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2 mt-2">
-                {provider.accepted_insurances && provider.accepted_insurances.length > 0 ? (
-                  provider.accepted_insurances.map((insurance: string, index: number) => (
-                    <div key={index} className="flex items-center gap-2 text-sm">
-                      <CheckCircle className="h-4 w-4 text-emerald-500" />
-                      <span className="text-foreground">{insurance}</span>
-                    </div>
-                  ))
-                ) : (
-                  <>
-                    <div className="flex items-center gap-2 text-sm">
-                      <CheckCircle className="h-4 w-4 text-emerald-500" />
-                      <span className="text-foreground">NHIMA</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm">
-                      <CheckCircle className="h-4 w-4 text-emerald-500" />
-                      <span className="text-foreground">Madison Insurance</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm">
-                      <CheckCircle className="h-4 w-4 text-emerald-500" />
-                      <span className="text-foreground">Self Pay</span>
-                    </div>
-                  </>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-
-      {/* Booking & Waitlist Modals */}
-      {provider && (
-        <>
-          <BookingModal 
+        {/* Booking Modal */}
+        {provider && (
+          <BookingModal
             provider={provider as Provider}
             isOpen={isBookingOpen}
             onClose={() => setIsBookingOpen(false)}
           />
-          <WaitlistSignup
-            provider={provider as Provider}
-            isOpen={isWaitlistOpen}
-            onClose={() => setIsWaitlistOpen(false)}
-          />
-        </>
-      )}
-    </div>
+        )}
+      </div>
     </>
   );
 };

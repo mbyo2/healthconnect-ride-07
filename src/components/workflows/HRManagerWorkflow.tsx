@@ -1,48 +1,44 @@
-import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Textarea } from '@/components/ui/textarea';
-import { Users, Calendar, Clock, FileText, DollarSign, ClipboardCheck, CheckCircle, XCircle, Loader2, Plus, Upload, Printer } from 'lucide-react';
-import { useHRModule, LeaveRequest } from '@/hooks/useHRModule';
-import { format } from 'date-fns';
-import { BulkAttendanceImport } from '@/components/hr/BulkAttendanceImport';
-import { ShiftScheduleCalendar } from '@/components/hr/ShiftScheduleCalendar';
-import { exportPayslipPDF } from '@/utils/pdfExport';
-import { useCurrency } from '@/hooks/use-currency';
-import { calculateZambiaPayroll } from '@/utils/zambiaPayroll';
+import React, { useState } from "react";
+import { Users, Calendar, Clock, FileText, DollarSign, ClipboardCheck, CheckCircle, XCircle, Loader2, Plus, Upload, Printer, Building2 } from "lucide-react";
+import { useHRModule, LeaveRequest } from "@/hooks/useHRModule";
+import { format } from "date-fns";
+import { BulkAttendanceImport } from "@/components/hr/BulkAttendanceImport";
+import { ShiftScheduleCalendar } from "@/components/hr/ShiftScheduleCalendar";
+import { exportPayslipPDF } from "@/utils/pdfExport";
+import { useCurrency } from "@/hooks/use-currency";
+import { calculateZambiaPayroll } from "@/utils/zambiaPayroll";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 const LEAVE_TYPE_LABELS: Record<string, string> = {
-  annual: 'Annual Leave', sick: 'Sick Leave', maternity: 'Maternity', paternity: 'Paternity',
-  unpaid: 'Unpaid Leave', compassionate: 'Compassionate', study: 'Study Leave',
-};
-
-const STATUS_CONFIG: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
-  pending: { label: 'Pending', variant: 'secondary' },
-  approved: { label: 'Approved', variant: 'default' },
-  rejected: { label: 'Rejected', variant: 'destructive' },
-  cancelled: { label: 'Cancelled', variant: 'outline' },
+  annual: "Annual Leave",
+  sick: "Sick Leave",
+  maternity: "Maternity",
+  paternity: "Paternity",
+  unpaid: "Unpaid Leave",
+  compassionate: "Compassionate",
+  study: "Study Leave",
 };
 
 export const HRManagerWorkflow = () => {
   const {
-    leaveRequests, attendance, payroll, loading,
-    pendingLeaves, todayAttendance,
-    createLeaveRequest, approveLeave, recordAttendance,
+    leaveRequests,
+    attendance,
+    payroll,
+    loading,
+    pendingLeaves,
+    todayAttendance,
+    createLeaveRequest,
+    approveLeave,
   } = useHRModule();
   const { currency } = useCurrency();
+  const [activeTab, setActiveTab] = useState("leaves");
   const [isLeaveDialogOpen, setIsLeaveDialogOpen] = useState(false);
   const [creating, setCreating] = useState(false);
   const [leaveForm, setLeaveForm] = useState({
-    leave_type: 'annual' as LeaveRequest['leave_type'],
-    start_date: '',
-    end_date: '',
-    reason: '',
+    leave_type: "annual" as LeaveRequest["leave_type"],
+    start_date: "",
+    end_date: "",
+    reason: "",
   });
 
   const handleCreateLeave = async () => {
@@ -50,250 +46,265 @@ export const HRManagerWorkflow = () => {
     setCreating(true);
     const result = await createLeaveRequest(leaveForm);
     if (result) {
-      setLeaveForm({ leave_type: 'annual', start_date: '', end_date: '', reason: '' });
+      setLeaveForm({ leave_type: "annual", start_date: "", end_date: "", reason: "" });
       setIsLeaveDialogOpen(false);
     }
     setCreating(false);
   };
 
-  const handleApproveLeave = async (leaveId: string, approved: boolean) => {
-    await approveLeave(leaveId, approved);
-  };
-
-  const LeaveCard = ({ leave }: { leave: LeaveRequest }) => {
-    const status = STATUS_CONFIG[leave.status] || STATUS_CONFIG.pending;
-    return (
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-              <Badge variant={status.variant}>{status.label}</Badge>
-              <span className="font-medium text-foreground">{LEAVE_TYPE_LABELS[leave.leave_type] || leave.leave_type}</span>
-            </div>
-            {leave.status === 'pending' && (
-              <div className="flex gap-1">
-                <Button size="sm" variant="default" onClick={() => handleApproveLeave(leave.id, true)}>
-                  <CheckCircle className="h-3 w-3 mr-1" /> Approve
-                </Button>
-                <Button size="sm" variant="destructive" onClick={() => handleApproveLeave(leave.id, false)}>
-                  <XCircle className="h-3 w-3 mr-1" /> Reject
-                </Button>
-              </div>
-            )}
-          </div>
-          <div className="text-sm text-muted-foreground">
-            <p>{format(new Date(leave.start_date), 'dd MMM yyyy')} → {format(new Date(leave.end_date), 'dd MMM yyyy')}</p>
-            {leave.reason && <p className="mt-1">Reason: {leave.reason}</p>}
-          </div>
-        </CardContent>
-      </Card>
-    );
-  };
-
-  const AttendanceStatusBadge = ({ status }: { status: string }) => {
-    const config: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
-      present: 'default', absent: 'destructive', late: 'secondary', half_day: 'outline', on_leave: 'outline',
-    };
-    return <Badge variant={config[status] || 'outline'}>{status.replace('_', ' ')}</Badge>;
+  const getStatusPill = (status: string) => {
+    switch (status) {
+      case "approved":
+        return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-[#00c875]">Approved</span>;
+      case "rejected":
+        return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-[#e2445c]">Rejected</span>;
+      default:
+        return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-[#fdab3d]">Pending Review</span>;
+    }
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6 text-slate-900 dark:text-slate-100 font-sans">
+      {/* Top Controls Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-[#e6e9ef] pb-4">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">HR & Payroll Dashboard</h1>
-          <p className="text-muted-foreground">Staff management, attendance, payroll & leave tracking</p>
+          <h1 className="text-xl font-extrabold tracking-tight flex items-center gap-2">
+            <Building2 className="h-5 w-5 text-[#0073ea]" />
+            HR & Payroll WorkOS Workspace
+          </h1>
+          <p className="text-xs text-[#676879] dark:text-slate-400 font-medium">
+            Shift rostering, biometric attendance, ZRA/NAPSA statutory payroll, and leave management
+          </p>
         </div>
+
         <Dialog open={isLeaveDialogOpen} onOpenChange={setIsLeaveDialogOpen}>
           <DialogTrigger asChild>
-            <Button><Plus className="h-4 w-4 mr-2" /> Request Leave</Button>
+            <button className="px-4 py-2 rounded-md bg-[#0073ea] hover:bg-[#0060c4] text-white font-extrabold text-xs shadow-xs transition-all flex items-center gap-1.5">
+              <Plus className="h-4 w-4" />
+              <span>Submit Leave Request</span>
+            </button>
           </DialogTrigger>
-          <DialogContent>
-            <DialogHeader><DialogTitle>Submit Leave Request</DialogTitle></DialogHeader>
-            <div className="space-y-4">
+          <DialogContent className="bg-white dark:bg-slate-900 border border-[#e6e9ef]">
+            <DialogHeader>
+              <DialogTitle className="font-extrabold text-base">Submit Leave Request</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-3 py-2 text-xs">
               <div>
-                <Label>Leave Type</Label>
-                <Select value={leaveForm.leave_type} onValueChange={v => setLeaveForm(prev => ({ ...prev, leave_type: v as any }))}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {Object.entries(LEAVE_TYPE_LABELS).map(([key, label]) => (
-                      <SelectItem key={key} value={key}>{label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <label className="font-extrabold text-[#676879] uppercase">Leave Category *</label>
+                <select
+                  value={leaveForm.leave_type}
+                  onChange={(e) => setLeaveForm((p) => ({ ...p, leave_type: e.target.value as any }))}
+                  className="w-full mt-1 p-2 rounded-md border border-[#c3c6d4] bg-white dark:bg-slate-950 font-bold"
+                >
+                  {Object.entries(LEAVE_TYPE_LABELS).map(([k, label]) => (
+                    <option key={k} value={k}>{label}</option>
+                  ))}
+                </select>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+
+              <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <Label>Start Date</Label>
-                  <Input type="date" value={leaveForm.start_date} onChange={e => setLeaveForm(prev => ({ ...prev, start_date: e.target.value }))} />
+                  <label className="font-extrabold text-[#676879] uppercase">Start Date *</label>
+                  <input
+                    type="date"
+                    value={leaveForm.start_date}
+                    onChange={(e) => setLeaveForm((p) => ({ ...p, start_date: e.target.value }))}
+                    className="w-full mt-1 p-2 rounded-md border border-[#c3c6d4] bg-white dark:bg-slate-950 font-bold"
+                  />
                 </div>
                 <div>
-                  <Label>End Date</Label>
-                  <Input type="date" value={leaveForm.end_date} onChange={e => setLeaveForm(prev => ({ ...prev, end_date: e.target.value }))} />
+                  <label className="font-extrabold text-[#676879] uppercase">End Date *</label>
+                  <input
+                    type="date"
+                    value={leaveForm.end_date}
+                    onChange={(e) => setLeaveForm((p) => ({ ...p, end_date: e.target.value }))}
+                    className="w-full mt-1 p-2 rounded-md border border-[#c3c6d4] bg-white dark:bg-slate-950 font-bold"
+                  />
                 </div>
               </div>
+
               <div>
-                <Label>Reason</Label>
-                <Textarea value={leaveForm.reason} onChange={e => setLeaveForm(prev => ({ ...prev, reason: e.target.value }))} rows={2} />
+                <label className="font-extrabold text-[#676879] uppercase">Reason Notes</label>
+                <textarea
+                  rows={2}
+                  value={leaveForm.reason}
+                  onChange={(e) => setLeaveForm((p) => ({ ...p, reason: e.target.value }))}
+                  className="w-full mt-1 p-2 rounded-md border border-[#c3c6d4] bg-white dark:bg-slate-950 font-medium"
+                />
               </div>
-              <Button onClick={handleCreateLeave} disabled={creating || !leaveForm.start_date || !leaveForm.end_date} className="w-full">
-                {creating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
-                Submit Leave Request
-              </Button>
+
+              <button
+                onClick={handleCreateLeave}
+                disabled={creating || !leaveForm.start_date || !leaveForm.end_date}
+                className="w-full py-2.5 rounded-md bg-[#0073ea] text-white font-extrabold text-xs shadow-xs transition-all disabled:opacity-40"
+              >
+                Submit Request
+              </button>
             </div>
           </DialogContent>
         </Dialog>
       </div>
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="border-primary/20 bg-primary/5">
-          <CardContent className="p-4 text-center">
-            <Users className="h-5 w-5 text-primary mx-auto mb-1" />
-            <p className="text-3xl font-bold text-primary">{todayAttendance.filter(a => a.status === 'present').length}</p>
-            <p className="text-sm text-muted-foreground">Present Today</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4 text-center">
-            <Clock className="h-5 w-5 mx-auto mb-1 text-muted-foreground" />
-            <p className="text-3xl font-bold text-foreground">{todayAttendance.filter(a => a.status === 'late').length}</p>
-            <p className="text-sm text-muted-foreground">Late Today</p>
-          </CardContent>
-        </Card>
-        <Card className="border-destructive/20 bg-destructive/5">
-          <CardContent className="p-4 text-center">
-            <FileText className="h-5 w-5 text-destructive mx-auto mb-1" />
-            <p className="text-3xl font-bold text-destructive">{pendingLeaves.length}</p>
-            <p className="text-sm text-muted-foreground">Pending Leaves</p>
-          </CardContent>
-        </Card>
-        <Card className="border-accent/20 bg-accent/5">
-          <CardContent className="p-4 text-center">
-            <DollarSign className="h-5 w-5 mx-auto mb-1 text-accent-foreground" />
-            <p className="text-3xl font-bold text-accent-foreground">{payroll.filter(p => p.status === 'draft').length}</p>
-            <p className="text-sm text-muted-foreground">Pending Payroll</p>
-          </CardContent>
-        </Card>
+      {/* Telemetry Telemetry Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-[#e6e9ef] shadow-xs">
+          <div className="text-xs font-extrabold text-[#676879] uppercase">Staff Present Today</div>
+          <div className="text-3xl font-black font-mono text-[#00c875] mt-1">
+            {todayAttendance.filter((a) => a.status === "present").length}
+          </div>
+          <div className="text-[10px] text-emerald-500 font-bold mt-0.5">Biometric Clocked-In</div>
+        </div>
+
+        <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-[#e6e9ef] shadow-xs">
+          <div className="text-xs font-extrabold text-[#676879] uppercase">Late Arrivals</div>
+          <div className="text-3xl font-black font-mono text-[#fdab3d] mt-1">
+            {todayAttendance.filter((a) => a.status === "late").length}
+          </div>
+          <div className="text-[10px] text-amber-500 font-bold mt-0.5">Grace period exceeded</div>
+        </div>
+
+        <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-[#e6e9ef] shadow-xs">
+          <div className="text-xs font-extrabold text-[#676879] uppercase">Pending Leaves</div>
+          <div className="text-3xl font-black font-mono text-[#0073ea] mt-1">{pendingLeaves.length}</div>
+          <div className="text-[10px] text-blue-500 font-bold mt-0.5">Awaiting Approval</div>
+        </div>
+
+        <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-[#e6e9ef] shadow-xs">
+          <div className="text-xs font-extrabold text-[#676879] uppercase">Active Payroll Items</div>
+          <div className="text-3xl font-black font-mono text-purple-600 mt-1">{payroll.length}</div>
+          <div className="text-[10px] text-purple-500 font-bold mt-0.5">ZRA/NAPSA Statutories</div>
+        </div>
       </div>
 
-      {/* Tabs */}
-      <Tabs defaultValue="leaves">
-        <TabsList>
-          <TabsTrigger value="leaves"><ClipboardCheck className="h-4 w-4 mr-1" /> Leave Requests ({leaveRequests.length})</TabsTrigger>
-          <TabsTrigger value="attendance"><Clock className="h-4 w-4 mr-1" /> Attendance ({todayAttendance.length})</TabsTrigger>
-          <TabsTrigger value="shifts"><Calendar className="h-4 w-4 mr-1" /> Shifts</TabsTrigger>
-          <TabsTrigger value="bulk_import"><Upload className="h-4 w-4 mr-1" /> Bulk Import</TabsTrigger>
-          <TabsTrigger value="payroll"><DollarSign className="h-4 w-4 mr-1" /> Payroll ({payroll.length})</TabsTrigger>
-        </TabsList>
+      {/* Tabs bar */}
+      <div className="flex items-center gap-1.5 p-1 bg-white dark:bg-slate-900 border border-[#e6e9ef] rounded-xl overflow-x-auto">
+        {[
+          { id: "leaves", label: `Leave Requests (${leaveRequests.length})`, icon: ClipboardCheck },
+          { id: "attendance", label: `Attendance (${todayAttendance.length})`, icon: Clock },
+          { id: "shifts", label: "Shift Roster", icon: Calendar },
+          { id: "payroll", label: `Statutory Payroll (${payroll.length})`, icon: DollarSign },
+        ].map((t) => (
+          <button
+            key={t.id}
+            onClick={() => setActiveTab(t.id)}
+            className={`flex items-center gap-1.5 px-4 py-1.5 rounded-md text-xs font-extrabold transition-all whitespace-nowrap ${
+              activeTab === t.id
+                ? "bg-[#0073ea] text-white shadow-xs"
+                : "text-[#676879] hover:bg-[#f0f2f7]"
+            }`}
+          >
+            <t.icon className="h-3.5 w-3.5" />
+            <span>{t.label}</span>
+          </button>
+        ))}
+      </div>
 
-        <TabsContent value="leaves" className="space-y-3 mt-4">
-          {loading ? (
-            <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
-          ) : leaveRequests.length === 0 ? (
-            <Card><CardContent className="p-8 text-center text-muted-foreground">No leave requests found.</CardContent></Card>
-          ) : (
-            leaveRequests.map(leave => <LeaveCard key={leave.id} leave={leave} />)
-          )}
-        </TabsContent>
+      {/* Main Tab Views */}
+      {activeTab === "leaves" && (
+        <div className="rounded-2xl border border-[#e6e9ef] bg-white dark:bg-slate-900 overflow-hidden shadow-xs">
+          <div className="w-full overflow-x-auto">
+            <table className="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr className="border-b border-[#e6e9ef] bg-[#f5f6f8] text-[11px] font-extrabold uppercase text-[#676879]">
+                  <th className="py-2.5 px-4">Leave Category</th>
+                  <th className="py-2.5 px-3 text-center">Status</th>
+                  <th className="py-2.5 px-3">Duration</th>
+                  <th className="py-2.5 px-3">Reason</th>
+                  <th className="py-2.5 px-3 text-center">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#e6e9ef]">
+                {leaveRequests.map((l) => (
+                  <tr key={l.id} className="hover:bg-[#f0f2f7] transition-colors">
+                    <td className="py-3 px-4 font-bold text-slate-900 dark:text-slate-100">
+                      {LEAVE_TYPE_LABELS[l.leave_type] || l.leave_type}
+                    </td>
+                    <td className="py-3 px-3 text-center">{getStatusPill(l.status)}</td>
+                    <td className="py-3 px-3 font-mono font-semibold">
+                      {format(new Date(l.start_date), "MMM d")} → {format(new Date(l.end_date), "MMM d, yyyy")}
+                    </td>
+                    <td className="py-3 px-3 text-slate-600 truncate max-w-[200px]">{l.reason || "—"}</td>
+                    <td className="py-3 px-3 text-center">
+                      {l.status === "pending" && (
+                        <div className="flex items-center justify-center gap-1.5">
+                          <button
+                            onClick={() => approveLeave(l.id, true)}
+                            className="px-2.5 py-1 rounded-md bg-[#00c875] text-white text-[11px] font-bold"
+                          >
+                            Approve
+                          </button>
+                          <button
+                            onClick={() => approveLeave(l.id, false)}
+                            className="px-2.5 py-1 rounded-md bg-[#e2445c] text-white text-[11px] font-bold"
+                          >
+                            Reject
+                          </button>
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
-        <TabsContent value="attendance" className="space-y-3 mt-4">
-          {loading ? (
-            <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
-          ) : todayAttendance.length === 0 ? (
-            <Card><CardContent className="p-8 text-center text-muted-foreground">No attendance records for today. Records will appear as staff clock in.</CardContent></Card>
-          ) : (
-            <div className="space-y-2">
-              {todayAttendance.map(record => (
-                <Card key={record.id}>
-                  <CardContent className="p-4 flex items-center justify-between">
-                    <div>
-                      <p className="font-medium text-foreground">Staff: {record.staff_id.slice(0, 8)}...</p>
-                      <p className="text-sm text-muted-foreground">
-                        {record.clock_in && `In: ${format(new Date(record.clock_in), 'HH:mm')}`}
-                        {record.clock_out && ` | Out: ${format(new Date(record.clock_out), 'HH:mm')}`}
-                        {record.hours_worked && ` | ${record.hours_worked}h`}
-                      </p>
-                    </div>
-                    <AttendanceStatusBadge status={record.status} />
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
-        </TabsContent>
+      {activeTab === "shifts" && <ShiftScheduleCalendar />}
 
-        <TabsContent value="shifts" className="mt-4">
-          <ShiftScheduleCalendar />
-        </TabsContent>
-
-        <TabsContent value="bulk_import" className="mt-4">
-          <BulkAttendanceImport onComplete={() => {}} />
-        </TabsContent>
-
-        <TabsContent value="payroll" className="space-y-3 mt-4">
-          {loading ? (
-            <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
-          ) : payroll.length === 0 ? (
-            <Card><CardContent className="p-8 text-center text-muted-foreground">No payroll records found. Payroll processing will appear here.</CardContent></Card>
-          ) : (
-            payroll.map(record => (
-              <Card key={record.id}>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium text-foreground">
-                        {format(new Date(record.period_start), 'dd MMM')} – {format(new Date(record.period_end), 'dd MMM yyyy')}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        Basic: {record.currency} {record.basic_salary.toLocaleString()} | Net: {record.currency} {record.net_salary.toLocaleString()}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant={record.status === 'paid' ? 'default' : 'secondary'}>{record.status}</Badge>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => {
-                          // Use verified Zambia ZRA/NAPSA/NHIMA calculator
-                          const zm = calculateZambiaPayroll(record.basic_salary);
-                          exportPayslipPDF({
-                            payslipNumber: `PS-${record.id.slice(0, 8).toUpperCase()}`,
-                            payPeriod: `${format(new Date(record.period_start), 'dd MMM')} – ${format(new Date(record.period_end), 'dd MMM yyyy')}`,
-                            staffName: `Staff (${record.staff_id.slice(0, 8)})`,
-                            staffId: record.staff_id,
-                            basicSalary: record.basic_salary,
-                            allowances: [{ name: 'Housing & Transport Allowance', amount: record.allowances || 0 }],
-                            deductions: [
-                              { name: 'NAPSA Employee (5%, cap K29,816)', amount: zm.napsaEmployee },
-                              { name: `PAYE Band 2 (20%: K5,101–K7,100)`, amount: zm.payeBand2Tax },
-                              { name: `PAYE Band 3 (30%: K7,101–K9,200)`, amount: zm.payeBand3Tax },
-                              { name: `PAYE Band 4 (37%: >K9,200)`, amount: zm.payeBand4Tax },
-                              { name: 'NHIMA Employee (1% of gross)', amount: zm.nhimaEmployee },
-                            ],
-                            taxDeducted: zm.totalPaye,
-                            pensionDeducted: zm.napsaEmployee,
-                            healthInsuranceDeducted: zm.nhimaEmployee,
-                            netPay: zm.netPay,
-                            currency: record.currency || currency,
-                            paymentDate: format(new Date(record.created_at || Date.now()), 'yyyy-MM-dd'),
-                          }, {
-                            title: 'Payslip',
-                            institutionName: 'Doc-O-Clock Healthcare',
-                            currency: record.currency || currency,
-                          });
-                        }}
-                      >
-                        <Printer className="h-3.5 w-3.5 mr-1" /> Payslip PDF
-                      </Button>
-                    </div>
+      {activeTab === "payroll" && (
+        <div className="rounded-2xl border border-[#e6e9ef] bg-white dark:bg-slate-900 p-4 space-y-3 shadow-xs">
+          {payroll.map((p) => {
+            const zm = calculateZambiaPayroll(p.basic_salary);
+            return (
+              <div key={p.id} className="p-3.5 rounded-xl border border-[#e6e9ef] bg-[#f5f6f8] flex items-center justify-between text-xs">
+                <div>
+                  <div className="font-extrabold text-slate-900">
+                    Pay Period: {format(new Date(p.period_start), "MMM d")} - {format(new Date(p.period_end), "MMM d, yyyy")}
                   </div>
-                </CardContent>
-              </Card>
-            ))
-          )}
-        </TabsContent>
-      </Tabs>
+                  <div className="text-[11px] font-mono text-[#676879] mt-0.5">
+                    Basic: ZMW K{p.basic_salary.toLocaleString()} • Net Due: <strong className="text-[#00c875]">ZMW K{zm.netPay.toLocaleString()}</strong>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => {
+                    exportPayslipPDF({
+                      payslipNumber: `PS-${p.id.slice(0, 8).toUpperCase()}`,
+                      payPeriod: `${format(new Date(p.period_start), "dd MMM")} – ${format(new Date(p.period_end), "dd MMM yyyy")}`,
+                      staffName: `Staff (${p.staff_id.slice(0, 8)})`,
+                      staffId: p.staff_id,
+                      basicSalary: p.basic_salary,
+                      allowances: [{ name: "Transport Allowance", amount: p.allowances || 0 }],
+                      deductions: [
+                        { name: "NAPSA Employee (5%)", amount: zm.napsaEmployee },
+                        { name: "PAYE Income Tax", amount: zm.totalPaye },
+                        { name: "NHIMA Insurance (1%)", amount: zm.nhimaEmployee },
+                      ],
+                      taxDeducted: zm.totalPaye,
+                      pensionDeducted: zm.napsaEmployee,
+                      healthInsuranceDeducted: zm.nhimaEmployee,
+                      netPay: zm.netPay,
+                      currency: p.currency || currency,
+                      paymentDate: format(new Date(), "yyyy-MM-dd"),
+                    }, {
+                      title: "ZRA/NAPSA Official Payslip",
+                      institutionName: "Doc-O-Clock Health WorkOS",
+                      currency: p.currency || currency,
+                    });
+                  }}
+                  className="px-3 py-1.5 rounded-md bg-[#0073ea] text-white font-bold text-[11px] flex items-center gap-1"
+                >
+                  <Printer className="h-3.5 w-3.5" />
+                  PDF Payslip
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };
+
+export default HRManagerWorkflow;
