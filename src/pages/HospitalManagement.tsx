@@ -147,7 +147,7 @@ export const HospitalManagement = () => {
           <Building2 className="h-12 w-12 mx-auto text-[#0073ea]" />
           <h3 className="text-lg font-extrabold text-slate-900 dark:text-slate-100">No Institution Associated</h3>
           <p className="text-xs text-[#676879] dark:text-slate-400 font-medium">
-            Register or link your healthcare facility to activate the Monday.com Hospital Operating System.
+            Register or link your healthcare facility to activate the Doc' O Clock Hospital Operating System.
           </p>
         </div>
       </div>

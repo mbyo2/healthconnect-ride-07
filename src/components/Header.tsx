@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
+import { useUserRoles } from "@/context/UserRolesContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,13 +22,21 @@ import { NotificationBell } from "@/components/NotificationBell";
 
 export function Header() {
   const { user, signOut, profile } = useAuth();
+  const { isHealthPersonnel, isAdmin, availableRoles } = useUserRoles();
   const location = useLocation();
   const navigate = useNavigate();
   const { setSearchQuery } = useSearch();
   const { isDesktop } = useDeviceType();
 
-  const userRole = profile?.role ?? null;
-  const adminLevel = profile?.admin_level ?? null;
+  const isInstitutionUser = availableRoles.some((r) =>
+    ["institution_admin", "institution_staff"].includes(r)
+  );
+  const isPharmacyUser = availableRoles.some((r) =>
+    ["pharmacy", "pharmacist"].includes(r)
+  );
+  const isLabUser = availableRoles.some((r) =>
+    ["lab", "lab_technician"].includes(r)
+  );
 
   const handleSignOut = useCallback(async () => {
     try {
@@ -81,15 +90,24 @@ export function Header() {
                     <div className="text-xs text-muted-foreground">My Account</div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild><Link to="/workos" className="font-medium text-[#0073ea]">Monday WorkOS Board</Link></DropdownMenuItem>
+                  <DropdownMenuItem asChild><Link to="/workos" className="font-medium text-[#0073ea]">Clinical WorkOS Board</Link></DropdownMenuItem>
                   <DropdownMenuItem asChild><Link to="/profile" className="font-medium">Profile & Settings</Link></DropdownMenuItem>
                   <DropdownMenuItem asChild><Link to="/appointments" className="font-medium">My Appointments</Link></DropdownMenuItem>
                   <DropdownMenuItem asChild><Link to="/documentation" className="font-medium">Help & Support</Link></DropdownMenuItem>
-                  {userRole === "health_personnel" && (
+                  {isHealthPersonnel && (
                     <DropdownMenuItem asChild><Link to="/provider-dashboard" className="font-medium">Provider Dashboard</Link></DropdownMenuItem>
                   )}
-                  {(adminLevel === "admin" || adminLevel === "superadmin") && (
+                  {isAdmin && (
                     <DropdownMenuItem asChild><Link to="/admin-dashboard" className="font-medium">Admin Dashboard</Link></DropdownMenuItem>
+                  )}
+                  {isInstitutionUser && (
+                    <DropdownMenuItem asChild><Link to="/institution-dashboard" className="font-medium">Institution Dashboard</Link></DropdownMenuItem>
+                  )}
+                  {isPharmacyUser && (
+                    <DropdownMenuItem asChild><Link to="/pharmacy-portal" className="font-medium">Pharmacy Portal</Link></DropdownMenuItem>
+                  )}
+                  {isLabUser && (
+                    <DropdownMenuItem asChild><Link to="/lab-management" className="font-medium">Lab Management</Link></DropdownMenuItem>
                   )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleSignOut} className="text-destructive font-medium">Sign out</DropdownMenuItem>

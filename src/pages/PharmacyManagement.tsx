@@ -154,7 +154,7 @@ export const PharmacyManagement = () => {
           <Package className="h-12 w-12 mx-auto text-[#0073ea]" />
           <h3 className="text-lg font-extrabold">Pharmacy POS Board</h3>
           <p className="text-xs text-[#676879] dark:text-slate-400">
-            Link your pharmacy account to activate the Monday.com inventory & POS system.
+            Link your pharmacy account to activate the Doc' O Clock inventory & POS system.
           </p>
         </div>
       </div>

@@ -267,7 +267,7 @@ export const AppointmentsPage = () => {
         <div className="max-w-[1500px] mx-auto px-4 sm:px-6 pt-6">
           {isLoading ? (
             <div className="p-8 text-center bg-white dark:bg-slate-900 rounded-2xl border border-[#e6e9ef] font-bold text-xs text-slate-400">
-              Loading Monday.com appointment board...
+              Loading appointment board...
             </div>
           ) : (
             <div className="space-y-6">

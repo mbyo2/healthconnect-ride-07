@@ -21,7 +21,7 @@ const chatRequestSchema = z.object({
   analysisType: z.enum(['general', 'longitudinal', 'document_understanding', 'anatomical_localization']).optional().default('general')
 });
 
-serve(async (req) => {
+serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }

@@ -63,7 +63,7 @@ const getErrorMessage = (err: unknown): string => {
 
 const ZERO_UUID = '00000000-0000-0000-0000-000000000000';
 
-serve(async (req) => {
+serve(async (req: Request) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });

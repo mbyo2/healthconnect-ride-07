@@ -35,14 +35,14 @@ html {
 
 @layer base {
   :root {
-    /* Monday.com WorkOS palette - Crisp ultra-light canvas */
+    /* Doc' O Clock WorkOS palette - Crisp ultra-light canvas */
     --background: 210 20% 97%; /* #f5f6f8 */
     --foreground: 222 47% 11%; /* #111827 */
     --card: 0 0% 100%;        /* #ffffff */
     --card-foreground: 222 47% 11%;
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
-    --primary: 211 100% 46%;  /* #0073ea Monday Blue */
+    --primary: 211 100% 46%;  /* #0073ea Primary Blue */
     --primary-foreground: 0 0% 100%;
     --secondary: 210 20% 95%;
     --secondary-foreground: 222 47% 11%;
@@ -55,9 +55,9 @@ html {
     --border: 220 20% 92%;     /* #e6e9ef */
     --input: 220 20% 92%;
     --ring: 211 100% 46%;
-    --radius: 0.375rem;       /* 6px Monday Soft Rounded */
+    --radius: 0.375rem;       /* 6px Soft Rounded */
 
-    /* Monday Brand Saturated Statuses */
+    /* Doc' O Clock Saturated Statuses */
     --brand-blue: 211 100% 46%; /* #0073ea */
     --brand-green: 155 100% 39%; /* #00c875 */
     --brand-yellow: 35 97% 62%; /* #fdab3d */

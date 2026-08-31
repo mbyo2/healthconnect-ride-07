@@ -43,7 +43,7 @@ export const WorkOSAICopilotBar: React.FC<WorkOSAICopilotBarProps> = ({ isDarkMo
           </div>
           <div>
             <h2 className="text-lg font-black tracking-tight flex items-center gap-2">
-              Doc' O Clock Monday AI Assistant
+              Doc' O Clock Clinical AI Assistant
               <span className="text-xs px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400 font-mono font-bold border border-purple-500/20">
                 MedGemma Neural Agent
               </span>
@@ -90,7 +90,7 @@ export const WorkOSAICopilotBar: React.FC<WorkOSAICopilotBarProps> = ({ isDarkMo
         <div className="mt-5 relative">
           <input
             type="text"
-            placeholder="Ask Monday AI to filter, summarize, or re-assign board items..."
+            placeholder="Ask AI Copilot to filter, summarize, or re-assign board items..."
             value={customPrompt}
             onChange={(e) => setCustomPrompt(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && customPrompt && handleRun(customPrompt)}

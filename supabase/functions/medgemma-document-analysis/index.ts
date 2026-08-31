@@ -25,7 +25,7 @@ const documentAnalysisSchema = z.object({
   userRole: z.string().max(50).optional().default('patient')
 });
 
-serve(async (req) => {
+serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }

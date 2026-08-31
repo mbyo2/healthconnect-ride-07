@@ -18,6 +18,7 @@ import { AppLogo } from "@/components/ui/AppLogo";
 import { NotificationBell } from "@/components/NotificationBell";
 import { useUserRoles } from "@/context/UserRolesContext";
 import { useInstitutionAffiliation } from "@/hooks/useInstitutionAffiliation";
+import { hasRoutePermission } from "@/utils/rolePermissions";
 
 export function DesktopNav() {
   const location = useLocation();
@@ -54,7 +55,7 @@ export function DesktopNav() {
     if (!isAuthenticated) {
       return [
         { to: "/", label: "Home", icon: <Home className="h-4 w-4" />, active: location.pathname === "/" || location.pathname === "/home" },
-        { to: "/workos", label: "Monday WorkOS", icon: <BarChart3 className="h-4 w-4 text-emerald-500" />, active: location.pathname === "/workos" },
+        { to: "/workos", label: "Clinical WorkOS", icon: <BarChart3 className="h-4 w-4 text-emerald-500" />, active: location.pathname === "/workos" },
         { to: "/search", label: "Find Care", icon: <Search className="h-4 w-4" />, active: location.pathname === "/search" },
       ];
     }
@@ -222,6 +223,10 @@ export function DesktopNav() {
     ];
   }, [isHealthPersonnel, isAdmin, availableRoles, isInstitutionAffiliated]);
 
+  const filteredSecondaryNavItems = useMemo(() => {
+    return secondaryNavItems.filter((item) => hasRoutePermission(availableRoles, item.to));
+  }, [secondaryNavItems, availableRoles]);
+
   return (
     <header className="bg-background/80 backdrop-blur-xl sticky top-0 z-50 shadow-sm" role="banner">
       <div className="mx-auto flex items-center justify-between h-16 lg:h-20 px-4 md:px-6 lg:px-8 xl:px-12 max-w-[1600px] min-w-0">
@@ -246,7 +251,7 @@ export function DesktopNav() {
               </Link>
             ))}
 
-            {isAuthenticated && <DesktopNavMenu secondaryNavItems={secondaryNavItems} />}
+            {isAuthenticated && <DesktopNavMenu secondaryNavItems={filteredSecondaryNavItems} />}
           </nav>
         </div>
 

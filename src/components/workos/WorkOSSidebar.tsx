@@ -19,7 +19,8 @@ import {
   Zap,
   Activity,
   Layers,
-  ChevronDown
+  ChevronDown,
+  ShieldCheck
 } from "lucide-react";
 
 interface WorkOSSidebarProps {
@@ -42,10 +43,12 @@ export const WorkOSSidebar: React.FC<WorkOSSidebarProps> = ({
 
   const boards = [
     { id: "main-triage", name: "Patient Triage & Operations", icon: Table, color: "text-[#0073ea]", count: 7, isFavorite: true },
-    { id: "icu-pipeline", name: "ICU & Bed Allocation", icon: Layers, color: "text-[#a25ddc]", count: 4, isFavorite: true },
+    { id: "insurance-claims", name: "NHIMA Insurance & Claims", icon: ShieldCheck, color: "text-[#00c875]", count: 8, isFavorite: true },
+    { id: "accounting-ledger", name: "Accounting & Doctor Splits", icon: BarChart2, color: "text-[#fdab3d]", count: 14, isFavorite: true },
+    { id: "hrms-roster", name: "HRMS Staff Roster & HPCZ", icon: Users, color: "text-[#a25ddc]", count: 6, isFavorite: true },
+    { id: "icu-pipeline", name: "ICU & Bed Allocation", icon: Layers, color: "text-[#a25ddc]", count: 4, isFavorite: false },
     { id: "telehealth-crm", name: "Outpatient Telehealth Queue", icon: Activity, color: "text-[#00c875]", count: 12, isFavorite: false },
     { id: "discharge-hub", name: "Discharge & Billing Pipeline", icon: BarChart2, color: "text-[#ff3d57]", count: 3, isFavorite: false },
-    { id: "referral-leads", name: "Doctor Referrals & Leads", icon: Users, color: "text-[#fdab3d]", count: 9, isFavorite: false },
   ];
 
   const filteredBoards = boards.filter((b) =>
@@ -75,10 +78,10 @@ export const WorkOSSidebar: React.FC<WorkOSSidebarProps> = ({
         {isCollapsed ? <ChevronRight className="h-3.5 w-3.5" /> : <ChevronLeft className="h-3.5 w-3.5" />}
       </button>
 
-      {/* Monday Logo & Workspace Selector Header */}
+      {/* WorkOS Logo & Workspace Selector Header */}
       <div className="p-3.5 border-b border-slate-700/60 flex items-center justify-between">
         <div className="flex items-center gap-2.5 overflow-hidden">
-          {/* Monday 3-Dots Iconic Logo Icon */}
+          {/* WorkOS 3-Dots Iconic Status Icon */}
           <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-[#0073ea] via-[#a25ddc] to-[#00c875] p-0.5 flex-shrink-0 shadow-md flex items-center justify-center">
             <div className="w-full h-full bg-slate-950/30 rounded-[10px] flex items-center justify-center gap-0.5">
               <span className="w-1.5 h-1.5 rounded-full bg-[#ff3d57]" />
@@ -90,12 +93,12 @@ export const WorkOSSidebar: React.FC<WorkOSSidebarProps> = ({
           {!isCollapsed && (
             <div className="min-w-0">
               <div className="flex items-center gap-1">
-                <span className="font-extrabold text-sm tracking-tight truncate">monday CRM</span>
+                <span className="font-extrabold text-sm tracking-tight truncate">Clinical WorkOS</span>
                 <span className="text-[9px] font-mono px-1.5 py-0.2 bg-blue-500/20 text-blue-400 rounded font-bold uppercase">
-                  WORKOS
+                  CRM
                 </span>
               </div>
-              <p className="text-[10px] text-slate-400 truncate">Main Healthcare Hub</p>
+              <p className="text-[10px] text-slate-400 truncate">Doc' O Clock Hub</p>
             </div>
           )}
         </div>

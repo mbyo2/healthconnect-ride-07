@@ -46,6 +46,8 @@ interface WorkOSBoardHeaderProps {
   };
   onOpenAutomationsModal?: () => void;
   onOpenIntegrationsModal?: () => void;
+  boardTitle?: string;
+  boardSubtitle?: string;
 }
 
 export const WorkOSBoardHeader: React.FC<WorkOSBoardHeaderProps> = ({
@@ -63,6 +65,8 @@ export const WorkOSBoardHeader: React.FC<WorkOSBoardHeaderProps> = ({
   stats,
   onOpenAutomationsModal,
   onOpenIntegrationsModal,
+  boardTitle = "Patient Triage & Operations",
+  boardSubtitle = "High-velocity clinical queue, bed allocation & multi-modal AI dispatch",
 }) => {
   return (
     <div className={`border-b transition-colors duration-200 ${isDarkMode ? "bg-slate-900/90 border-slate-800 text-slate-100" : "bg-white border-slate-200 text-slate-900"}`}>
@@ -78,7 +82,7 @@ export const WorkOSBoardHeader: React.FC<WorkOSBoardHeaderProps> = ({
           <div>
             <div className="flex items-center gap-2.5 flex-wrap">
               <h1 className="text-xl sm:text-2xl font-black tracking-tight font-sans flex items-center gap-2">
-                <span>Patient Triage & Operations</span>
+                <span>{boardTitle}</span>
                 <span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/10 text-[#0073ea] font-mono font-bold border border-blue-500/20">
                   CRM Board
                 </span>
@@ -89,14 +93,14 @@ export const WorkOSBoardHeader: React.FC<WorkOSBoardHeaderProps> = ({
               </span>
             </div>
             <p className={`text-xs sm:text-sm mt-0.5 ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}>
-              Monday.com CRM high-velocity clinical queue, bed allocation & multi-modal AI dispatch
+              {boardSubtitle}
             </p>
           </div>
         </div>
 
-        {/* Top Right Actions & Monday Automation Badges */}
+        {/* Top Right Actions & Automations Badges */}
         <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
-          {/* Monday Automations Badge */}
+          {/* Automations Badge */}
           <button
             onClick={onOpenAutomationsModal}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 text-xs font-bold transition-all shadow-xs"
@@ -108,7 +112,7 @@ export const WorkOSBoardHeader: React.FC<WorkOSBoardHeaderProps> = ({
             </span>
           </button>
 
-          {/* Monday Integrations Badge */}
+          {/* Integrations Badge */}
           <button
             onClick={onOpenIntegrationsModal}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 text-xs font-bold transition-all shadow-xs"

@@ -241,12 +241,9 @@ export const BespokeWorkOSShowcase = () => {
       p.id.toLowerCase().includes(searchQuery.toLowerCase());
 
     const matchesGroup = selectedGroupFilter === "all" || p.groupName === selectedGroupFilter;
-    const matchesPriority = selectedPriorityFilter === "all" || p.priority === selectedPriorityFilter;
-
-    return matchesSearch && matchesGroup && matchesPriority;
+    return matchesSearch && matchesGroup;
   });
 
-  // Calculate statistics
   const stats = {
     totalPatients: patients.length,
     criticalAlerts: patients.filter((p) => p.status === "Stuck / Critical" || p.priority === "Urgent !!!").length,
@@ -254,17 +251,53 @@ export const BespokeWorkOSShowcase = () => {
     icuOccupancyPercent: 90,
   };
 
+  const BOARD_METADATA: Record<string, { title: string; subtitle: string }> = {
+    "main-triage": {
+      title: "Patient Triage & Operations",
+      subtitle: "High-velocity clinical queue, bed allocation & multi-modal AI dispatch",
+    },
+    "insurance-claims": {
+      title: "NHIMA Insurance & Claims Engine",
+      subtitle: "Instant policy verification, automated ICD-10 coding & batch submission",
+    },
+    "accounting-ledger": {
+      title: "Hospital Accounting & Doctor Splits",
+      subtitle: "General ledger, 16% VAT invoices, doctor revenue splits & payment settlements",
+    },
+    "hrms-roster": {
+      title: "HRMS Staff Roster & HPCZ Credentialing",
+      subtitle: "Doctor & nurse shift planning, attendance tracking & HPCZ license renewals",
+    },
+    "icu-pipeline": {
+      title: "ICU & Bed Allocation Hub",
+      subtitle: "Real-time occupancy monitoring and critical care dispatch",
+    },
+    "telehealth-crm": {
+      title: "Outpatient Telehealth Queue",
+      subtitle: "Encrypted HD teleconsultations and digital prescription routing",
+    },
+    "discharge-hub": {
+      title: "Discharge & Billing Pipeline",
+      subtitle: "Patient exit clearance, pharmacy fulfillment and payment confirmation",
+    },
+  };
+
+  const currentBoardInfo = BOARD_METADATA[activeBoardId] || {
+    title: "Clinical WorkOS Workspace",
+    subtitle: "Unified healthcare operations CRM",
+  };
+
   return (
     <>
       <Helmet>
-        <title>Monday CRM Healthcare Board | Doc' O Clock</title>
-        <meta name="description" content="Bespoke monday.com CRM clinical operations dashboard for emergency triage, bed allocations, and AI telehealth." />
+        <title>Clinical WorkOS Board | Doc' O Clock</title>
+        <meta name="description" content="Doc' O Clock bespoke clinical operations dashboard for emergency triage, bed allocations, and AI telehealth." />
       </Helmet>
 
       <div className={`min-h-screen flex font-sans transition-colors duration-200 ${
         isDarkMode ? "bg-slate-950 text-slate-100" : "bg-[#f5f6f8] text-slate-900"
       }`}>
-        {/* Monday Workspace Navigation Sidebar */}
+        {/* WorkOS Workspace Navigation Sidebar */}
         <WorkOSSidebar
           isCollapsed={isSidebarCollapsed}
           onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
@@ -297,6 +330,8 @@ export const BespokeWorkOSShowcase = () => {
             stats={stats}
             onOpenAutomationsModal={() => setIsAutomationsModalOpen(true)}
             onOpenIntegrationsModal={() => setIsIntegrationsModalOpen(true)}
+            boardTitle={currentBoardInfo.title}
+            boardSubtitle={currentBoardInfo.subtitle}
           />
 
           {/* Toast Notification Banner */}
@@ -365,7 +400,7 @@ export const BespokeWorkOSShowcase = () => {
           </main>
         </div>
 
-        {/* Modal: Monday Automations Center */}
+        {/* Modal: Clinical Automations Center */}
         {isAutomationsModalOpen && (
           <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
             <div className={`w-full max-w-xl rounded-2xl border p-6 shadow-2xl animate-in zoom-in-95 ${
@@ -374,7 +409,7 @@ export const BespokeWorkOSShowcase = () => {
               <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800">
                 <div className="flex items-center gap-2 text-amber-500">
                   <Zap className="h-5 w-5" />
-                  <h3 className="font-extrabold text-lg">Monday CRM Automations Center</h3>
+                  <h3 className="font-extrabold text-lg">Clinical Automations Center</h3>
                 </div>
                 <button
                   onClick={() => setIsAutomationsModalOpen(false)}
@@ -428,7 +463,7 @@ export const BespokeWorkOSShowcase = () => {
           </div>
         )}
 
-        {/* Modal: Monday Integrations Center */}
+        {/* Modal: Clinical Integrations Center */}
         {isIntegrationsModalOpen && (
           <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
             <div className={`w-full max-w-xl rounded-2xl border p-6 shadow-2xl animate-in zoom-in-95 ${
@@ -437,7 +472,7 @@ export const BespokeWorkOSShowcase = () => {
               <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800">
                 <div className="flex items-center gap-2 text-indigo-400">
                   <Layers className="h-5 w-5" />
-                  <h3 className="font-extrabold text-lg">Monday CRM Integrations Hub</h3>
+                  <h3 className="font-extrabold text-lg">Clinical Integrations Hub</h3>
                 </div>
                 <button
                   onClick={() => setIsIntegrationsModalOpen(false)}

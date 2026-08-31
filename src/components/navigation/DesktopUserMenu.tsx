@@ -16,6 +16,8 @@ import { useUserRoles } from "@/context/UserRolesContext";
 import { useInstitutionAffiliation } from "@/hooks/useInstitutionAffiliation";
 import { useMemo } from "react";
 
+import { hasRoutePermission } from "@/utils/rolePermissions";
+
 interface Profile {
   role?: string;
   admin_level?: string;
@@ -108,6 +110,10 @@ export function DesktopUserMenu({ user, profile, onLogout }: DesktopUserMenuProp
     ];
   }, [availableRoles, isHealthPersonnel, isAdmin, isInstitutionAffiliated]);
 
+  const filteredMenuItems = useMemo(() => {
+    return menuItems.filter((item) => hasRoutePermission(availableRoles, item.to));
+  }, [menuItems, availableRoles]);
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -126,7 +132,7 @@ export function DesktopUserMenu({ user, profile, onLogout }: DesktopUserMenuProp
           <div className="text-xs text-muted-foreground">My Account</div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        {menuItems.map((item) => (
+        {filteredMenuItems.map((item) => (
           <DropdownMenuItem key={item.to} asChild>
             <Link to={item.to} className="flex items-center gap-2">
               {item.icon} {item.label}

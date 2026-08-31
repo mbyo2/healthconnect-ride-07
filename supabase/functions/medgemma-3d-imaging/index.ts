@@ -16,7 +16,7 @@ const imaging3DSchema = z.object({
   slices: z.array(z.string().max(MAX_SLICE_BYTES, 'Each slice must be at most 10MB (base64)'))
     .min(1, 'At least one slice required')
     .max(50, 'Maximum 50 slices allowed')
-    .refine((arr) => arr.reduce((s, x) => s + x.length, 0) <= MAX_TOTAL_BYTES, {
+    .refine((arr: string[]) => arr.reduce((s: number, x: string) => s + x.length, 0) <= MAX_TOTAL_BYTES, {
       message: 'Combined slice payload exceeds 50MB',
     }),
   imagingType: z.enum(['ct', 'mri', 'pet_ct']),
@@ -27,7 +27,7 @@ const imaging3DSchema = z.object({
   userRole: z.string().optional().default('patient')
 });
 
-serve(async (req) => {
+serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -100,7 +100,7 @@ ${contrastUsed ? 'Contrast enhancement is present - assess enhancement patterns.
 ${userRole === 'health_personnel' ? 'Provide detailed radiological interpretation with differential diagnosis.' : 'Explain findings in clear, understandable terms.'}`;
 
     // Build text description of slices for text-based analysis
-    const sliceDescriptions = slices.map((_, i) => `Slice ${i + 1}/${slices.length}`).join(', ');
+    const sliceDescriptions = slices.map((_: string, i: number) => `Slice ${i + 1}/${slices.length}`).join(', ');
 
     const messages = [
       {
