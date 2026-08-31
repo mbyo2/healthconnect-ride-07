@@ -18,23 +18,31 @@ const Landing = () => {
   return (
     <>
       <Helmet>
-        <title>Doc' O Clock WorkOS — Healthcare Platform in Zambia</title>
-        <meta name="description" content="Zambia's trusted healthcare WorkOS platform. Book appointments with verified doctors, track emergency triage, order medications, and manage clinical operations." />
-        <meta property="og:title" content="Doc' O Clock WorkOS — Healthcare at Your Fingertips" />
-        <meta property="og:description" content="Book appointments, order medicine, and access emergency services anywhere in Zambia." />
+        <title>Doc' O Clock — Connect with Your Doctor Anytime, Anywhere</title>
+        <meta
+          name="description"
+          content="Zambia's #1 healthcare app. Connect with verified doctors, book clinic visits, attend video consultations, receive digital prescriptions, and order medications — all in one app."
+        />
+        <meta property="og:title" content="Doc' O Clock — Connect with Your Doctor Anytime, Anywhere" />
+        <meta
+          property="og:description"
+          content="Book appointments with verified doctors, order medicine, and access healthcare anywhere in Zambia."
+        />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://doc0clock.online" />
         <meta property="og:image" content="/og-image.png" />
         <link rel="canonical" href="https://doc0clock.online" />
-        <script type="application/ld+json">{JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "MedicalBusiness",
-          "name": "Doc' O Clock WorkOS",
-          "description": "Zambia's trusted healthcare platform",
-          "url": "https://doc0clock.online",
-          "areaServed": { "@type": "Country", "name": "Zambia" },
-          "serviceType": ["Telemedicine", "Medical Appointments", "Pharmacy Delivery", "Clinical WorkOS"]
-        })}</script>
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "MedicalBusiness",
+            "name": "Doc' O Clock",
+            "description": "Zambia's trusted healthcare and doctor booking platform",
+            "url": "https://doc0clock.online",
+            "areaServed": { "@type": "Country", "name": "Zambia" },
+            "serviceType": ["Telemedicine", "Medical Appointments", "Pharmacy Delivery", "Doctor Consultations"],
+          })}
+        </script>
       </Helmet>
       <div className="min-h-screen bg-slate-950 text-white font-sans transition-colors">
         <LandingHeader scrolled={scrolled} />

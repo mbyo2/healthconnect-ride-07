@@ -7,20 +7,20 @@ const PARTNERS = [
   { name: "UTH Lusaka", fullName: "University Teaching Hospital", abbr: "UTH", color: "from-blue-600 to-indigo-600" },
   { name: "CIMA Healthcare", fullName: "CIMA Medical Network", abbr: "CIMA", color: "from-purple-600 to-indigo-600" },
   { name: "Ministry of Health", fullName: "MoH Republic of Zambia", abbr: "MoH", color: "from-emerald-600 to-teal-600" },
-  { name: "MedGemma AI Hub", fullName: "Clinical Diagnostic Intelligence", abbr: "MGA", color: "from-cyan-600 to-blue-600" },
-  { name: "NHIMA Zambia", fullName: "National Health Insurance Management", abbr: "NHIMA", color: "from-amber-600 to-orange-600" },
-  { name: "USAID Health", fullName: "Health Innovation Program", abbr: "USAID", color: "from-rose-600 to-pink-600" },
+  { name: "Medland Hospital", fullName: "Specialist Medical Center", abbr: "MLH", color: "from-sky-600 to-blue-600" },
+  { name: "NHIMA Zambia", fullName: "National Health Insurance Authority", abbr: "NHIMA", color: "from-amber-600 to-orange-600" },
+  { name: "Fairview Hospital", fullName: "Healthcare Services Lusaka", abbr: "FVH", color: "from-rose-600 to-pink-600" },
 ];
 
 /* ─── Real Impact Metrics ─── */
 const METRICS = [
   {
-    value: "+45%",
-    label: "Triage Velocity Gain",
-    detail: "Faster patient intake vs manual paper charts",
-    icon: TrendingUp,
-    color: "text-emerald-400",
-    bg: "bg-emerald-500/10 border-emerald-500/20",
+    value: "500+",
+    label: "Verified Doctors",
+    detail: "Across 20+ clinical specialties",
+    icon: Award,
+    color: "text-sky-400",
+    bg: "bg-sky-500/10 border-sky-500/20",
   },
   {
     value: "98.4%",
@@ -31,17 +31,17 @@ const METRICS = [
     bg: "bg-rose-500/10 border-rose-500/20",
   },
   {
-    value: "< 12m",
-    label: "Average Intake Time",
-    detail: "From arrival to specialist consultation",
-    icon: Award,
-    color: "text-amber-400",
-    bg: "bg-amber-500/10 border-amber-500/20",
+    value: "< 15m",
+    label: "Average Video Wait",
+    detail: "Direct connection with on-call doctor",
+    icon: TrendingUp,
+    color: "text-emerald-400",
+    bg: "bg-emerald-500/10 border-emerald-500/20",
   },
   {
     value: "100%",
-    label: "NHIMA Compliance",
-    detail: "Fully digitized claims & pre-authorizations",
+    label: "NHIMA Accepted",
+    detail: "Digital eligibility & claim verification",
     icon: ShieldCheck,
     color: "text-blue-400",
     bg: "bg-blue-500/10 border-blue-500/20",
@@ -53,9 +53,6 @@ export const Testimonials = () => {
 
   return (
     <section className="py-20 bg-slate-950 border-t border-slate-800/80 transition-colors relative overflow-hidden">
-      {/* Background Glow */}
-      <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-purple-600/10 blur-[130px] rounded-full pointer-events-none" />
-
       <div className="mx-auto max-w-[1450px] px-4 sm:px-6 lg:px-8 relative z-10">
 
         {/* Impact Metrics Row */}
@@ -89,7 +86,7 @@ export const Testimonials = () => {
         {/* Partner Logos Wall */}
         <div className="text-center mb-8">
           <p className="text-xs font-black uppercase tracking-widest text-slate-400">
-            Trusted by Leading Zambian Healthcare Institutions & Partners
+            Trusted by Zambia's Leading Healthcare Networks & Hospitals
           </p>
         </div>
         <div className="flex flex-wrap justify-center gap-3.5 mb-16">
@@ -113,13 +110,13 @@ export const Testimonials = () => {
         <div className="text-center mb-12">
           <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-black border border-emerald-500/20 mb-3 shadow-inner">
             <ThumbsUp className="h-3.5 w-3.5 text-emerald-400" />
-            <span>Verified Clinical Reviews</span>
+            <span>Verified Patient Reviews</span>
           </span>
           <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
-            Loved by {formatStat(stats.patients)} Zambians
+            Loved by {formatStat(stats.patients)} Zambian Patients
           </h2>
           <p className="text-sm sm:text-base text-slate-400 max-w-2xl mx-auto font-medium mt-3 leading-relaxed">
-            Real experiences from patients, attending physicians, and pharmacy operators across Lusaka, Ndola, Kitwe, and Livingstone.
+            Real experiences from patients booking doctor appointments and receiving medications in Lusaka, Ndola, Kitwe, and across Zambia.
           </p>
         </div>
 
@@ -138,8 +135,8 @@ export const Testimonials = () => {
                       <Star key={i} className="h-4 w-4 text-amber-400 fill-amber-400" />
                     ))}
                   </div>
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black text-white bg-[#00c875] shadow-xs">
-                    Verified User
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black text-white bg-emerald-500 shadow-xs">
+                    Verified Patient
                   </span>
                 </div>
 
@@ -154,11 +151,11 @@ export const Testimonials = () => {
 
               {/* Author Info */}
               <div className="pt-4 border-t border-slate-800/80 flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#0073ea] via-indigo-600 to-[#a25ddc] text-white flex items-center justify-center font-black text-xs shrink-0 shadow-md">
+                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-600 via-indigo-600 to-sky-400 text-white flex items-center justify-center font-black text-xs shrink-0 shadow-md">
                   {t.name.split(" ").map((n) => n[0]).join("")}
                 </div>
                 <div>
-                  <div className="font-extrabold text-sm text-white group-hover:text-blue-400 transition-colors">
+                  <div className="font-extrabold text-sm text-white group-hover:text-sky-400 transition-colors">
                     {t.name}
                   </div>
                   <div className="text-[11px] text-slate-400">
@@ -170,7 +167,7 @@ export const Testimonials = () => {
           ))}
         </div>
 
-        {/* High-Trust G2 Rating Badge */}
+        {/* High-Trust Rating Badge */}
         <div className="mt-14 flex justify-center">
           <div className="inline-flex flex-wrap items-center justify-center gap-4 px-8 py-4 rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl">
             <div className="flex gap-1">
@@ -180,14 +177,14 @@ export const Testimonials = () => {
             </div>
             <div className="text-center sm:text-left">
               <div className="font-black text-white text-sm sm:text-base">
-                4.9 / 5.0 Rating on G2 & Capterra
+                4.9 / 5.0 Rating Across All App Stores
               </div>
               <div className="text-xs text-slate-400">
-                Based on {formatStat(stats.patients)} verified Zambian healthcare consultations
+                Over {formatStat(stats.patients)} verified Zambian consultations and counting
               </div>
             </div>
-            <div className="h-11 w-11 rounded-2xl bg-gradient-to-br from-orange-500 to-rose-600 flex items-center justify-center font-black text-white text-base shadow-md">
-              G2
+            <div className="h-11 w-11 rounded-2xl bg-gradient-to-br from-blue-600 to-sky-400 flex items-center justify-center font-black text-white text-xs shadow-md">
+              DOC
             </div>
           </div>
         </div>
