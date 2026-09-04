@@ -46,7 +46,7 @@ html {
     --secondary:        40 6% 96%;        /* #f5f5f4 — Bone */
     --secondary-foreground: 24 10% 10%;
     --muted:            40 6% 96%;
-    --muted-foreground: 25 5% 45%;        /* pebble */
+    --muted-foreground: 24 10% 35%;       /* darker for better contrast - WCAG AA compliant */
     --accent:           18 91% 52%;       /* #f55c15 — Ember */
     --accent-foreground: 0 0% 100%;
     --destructive:      0 100% 50%;
@@ -90,7 +90,7 @@ html {
     --secondary:        24 8% 14%;
     --secondary-foreground: 40 10% 98%;
     --muted:            24 8% 14%;
-    --muted-foreground: 25 5% 60%;
+    --muted-foreground: 25 5% 70%;        /* lighter in dark mode for better contrast */
     --accent:           18 91% 55%;
     --accent-foreground: 0 0% 100%;
     --destructive:      0 72% 51%;

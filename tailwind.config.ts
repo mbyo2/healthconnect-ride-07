@@ -101,19 +101,19 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // Editorial neutrals (Voiceflow graphite scale)
+        // Editorial neutrals (Voiceflow graphite scale) - Updated for better contrast
         graphite: {
           50: "#fafafa",
           100: "#f5f5f4",
           200: "#e7e5e4",
           300: "#d6d3d1",
           400: "#a8a29e",
-          500: "#78716c",
-          600: "#57534e",
-          700: "#44403c",
-          800: "#292524",
-          900: "#1c1917",
-          950: "#0c0a09",
+          500: "#57534e",  // Darker for better contrast
+          600: "#44403c",  // Darker for better contrast
+          700: "#292524",  // Darker for better contrast
+          800: "#1c1917",
+          900: "#0c0a09",
+          950: "#000000",
         },
         canvas: {
           DEFAULT: "#ffffff",
