@@ -19,21 +19,21 @@ const Wallet = () => {
     }
 
     return (
-        <div className="min-h-screen bg-[#f5f7fa] dark:bg-slate-950 py-8 px-4 sm:px-6 font-sans">
-            <div className="max-w-5xl mx-auto space-y-6">
+        <div className="min-h-screen bg-canvas py-8 px-4 sm:px-6 font-sans">
+            <div className="max-w-content mx-auto space-y-6">
                 {/* Header Banner */}
-                <div className="rounded-3xl bg-[#0f172a] text-white p-6 sm:p-8 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="vf-card !p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
-                        <div className="h-14 w-14 rounded-2xl bg-[#0073ea] text-white flex items-center justify-center font-black shadow-md">
+                        <div className="h-14 w-14 rounded-2xl bg-primary-500 text-white flex items-center justify-center shadow-button">
                             <WalletIcon className="h-7 w-7" />
                         </div>
                         <div>
-                            <div className="flex items-center gap-2">
-                                <span className="w-2 h-2 rounded-full bg-[#00a86b] animate-pulse" />
-                                <span className="text-[11px] font-black uppercase tracking-wider text-slate-300">Financial Suite</span>
+                            <div className="vf-eyebrow mb-2">
+                                <WalletIcon className="h-3.5 w-3.5 text-accent-500" />
+                                Financial Suite
                             </div>
-                            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white mt-0.5">Healthcare Wallet</h1>
-                            <p className="text-xs text-slate-400 font-medium">
+                            <h1 className="font-display text-3xl font-medium tracking-tight text-midnight">Healthcare Wallet</h1>
+                            <p className="text-sm text-graphite-500 font-medium tracking-wide">
                                 Manage medical balances, consultation escrow &amp; digital payment methods
                             </p>
                         </div>

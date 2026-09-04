@@ -141,38 +141,38 @@ const SuperAdminDashboard = () => {
   if (isLoading) return <LoadingScreen />;
 
   return (
-    <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pb-16">
-      {/* Monday Sticky Top Bar */}
-      <div className="bg-white dark:bg-slate-900 border-b border-[#e6e9ef] dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
-        <div className="max-w-[1600px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="min-h-screen bg-canvas text-midnight font-sans pb-16">
+      {/* Top Bar */}
+      <div className="bg-white border-b border-canvas-silk px-4 sm:px-6 py-5 sticky top-0 z-30 shadow-sm">
+        <div className="max-w-content mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-[#a25ddc] text-white flex items-center justify-center shadow-xs">
+            <div className="h-10 w-10 rounded-xl bg-accent-500 text-white flex items-center justify-center shadow-button">
               <Shield className="h-5 w-5" />
             </div>
             <div>
-              <h1 className="text-xl font-extrabold tracking-tight flex items-center gap-2">
+              <h1 className="font-display text-2xl font-medium tracking-tight flex items-center gap-2">
                 Super Admin WorkOS
-                <span className="w-2 h-2 rounded-full bg-[#00c875] animate-ping" />
+                <span className="w-2 h-2 rounded-full bg-success-500 animate-ping" />
               </h1>
-              <p className="text-xs text-[#676879] font-medium">Root-level governance, admin provisioning, and platform payments oversight</p>
+              <p className="text-sm text-graphite-500 font-medium tracking-wide">Root-level governance, admin provisioning, and platform payments oversight</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={() => navigate("/admin-dashboard")} className="px-3 py-1.5 rounded-md bg-[#f0f2f7] font-bold text-xs">
+            <button onClick={() => navigate("/admin-dashboard")} className="vf-btn-secondary text-sm">
               Admin Dashboard
             </button>
             <Dialog open={isAddAdminOpen} onOpenChange={setIsAddAdminOpen}>
               <DialogTrigger asChild>
-                <button className="px-4 py-1.5 rounded-md bg-[#0073ea] text-white font-extrabold text-xs flex items-center gap-1 shadow-xs">
+                <button className="vf-btn-primary gap-1.5 text-sm">
                   <UserPlus className="h-3.5 w-3.5" /> Add Admin
                 </button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px] bg-white border border-[#e6e9ef]">
+              <DialogContent className="sm:max-w-[425px] bg-white border border-canvas-silk rounded-card">
                 <DialogHeader>
-                  <DialogTitle className="font-extrabold text-base">Create New Admin</DialogTitle>
-                  <DialogDescription className="text-xs text-[#676879]">Create an admin user with access to the Admin Dashboard.</DialogDescription>
+                  <DialogTitle className="font-medium text-lg text-midnight">Create New Admin</DialogTitle>
+                  <DialogDescription className="text-sm text-graphite-500">Create an admin user with access to the Admin Dashboard.</DialogDescription>
                 </DialogHeader>
-                <div className="space-y-3 py-2 text-xs">
+                <div className="space-y-4 py-2 text-sm">
                   {[
                     { id: "email", label: "Email", type: "email", val: newAdminEmail, set: setNewAdminEmail, ph: "admin@example.online" },
                     { id: "password", label: "Password", type: "password", val: newAdminPassword, set: setNewAdminPassword, ph: "••••••••" },
@@ -180,18 +180,18 @@ const SuperAdminDashboard = () => {
                     { id: "lastName", label: "Last Name", type: "text", val: newAdminLastName, set: setNewAdminLastName, ph: "Doe" },
                   ].map(f => (
                     <div key={f.id}>
-                      <label className="font-extrabold text-[#676879] uppercase">{f.label}</label>
+                      <label className="font-medium text-graphite-600 text-xs uppercase">{f.label}</label>
                       <input
                         id={f.id} type={f.type} value={f.val} placeholder={f.ph}
                         onChange={(e) => f.set(e.target.value)}
-                        className="w-full mt-1 p-2 rounded-md border border-[#c3c6d4] font-bold"
+                        className="w-full mt-2 px-4 py-2.5 rounded-xl border border-canvas-silk font-medium focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
                       />
                     </div>
                   ))}
                 </div>
                 <DialogFooter>
-                  <button onClick={() => setIsAddAdminOpen(false)} disabled={isSubmitting} className="px-3 py-1.5 text-xs font-bold text-slate-500">Cancel</button>
-                  <button onClick={handleCreateAdmin} disabled={isSubmitting || !newAdminEmail || !newAdminPassword} className="px-4 py-1.5 rounded-md bg-[#0073ea] text-white text-xs font-bold">
+                  <button onClick={() => setIsAddAdminOpen(false)} disabled={isSubmitting} className="px-4 py-2 text-sm font-medium text-graphite-500 hover:text-midnight">Cancel</button>
+                  <button onClick={handleCreateAdmin} disabled={isSubmitting || !newAdminEmail || !newAdminPassword} className="vf-btn-primary text-sm">
                     {isSubmitting ? "Creating..." : "Create Admin"}
                   </button>
                 </DialogFooter>
