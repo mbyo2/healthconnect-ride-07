@@ -78,20 +78,20 @@ export const ProviderDashboard = () => {
   const completedToday = todayAppointments.filter((a: any) => a.status === "completed");
 
   return (
-    <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors pb-16">
-      {/* Sticky Top Bar */}
-      <div className="bg-white dark:bg-slate-900 border-b border-[#e6e9ef] dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-2xs">
-        <div className="max-w-[1500px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="min-h-screen bg-canvas text-midnight font-sans transition-colors pb-16">
+      {/* Top Bar */}
+      <div className="bg-white border-b border-canvas-silk px-4 sm:px-6 py-5 sticky top-0 z-30 shadow-sm">
+        <div className="max-w-content mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-[#0073ea] text-white flex items-center justify-center font-black text-sm shadow-xs">
+            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-button">
               <Stethoscope className="h-5 w-5" />
             </div>
             <div>
-              <h1 className="text-xl font-extrabold tracking-tight flex items-center gap-2">
+              <h1 className="font-display text-2xl font-medium tracking-tight flex items-center gap-2">
                 {dashboardMeta.title}
-                <span className="w-2 h-2 rounded-full bg-[#00c875] animate-ping" />
+                <span className="w-2 h-2 rounded-full bg-success-500 animate-ping" />
               </h1>
-              <p className="text-xs text-[#676879] dark:text-slate-400 font-medium">
+              <p className="text-sm text-graphite-500 font-medium tracking-wide">
                 {dashboardMeta.subtitle} • {format(today, "EEEE, MMMM d, yyyy")}
               </p>
             </div>
@@ -100,14 +100,14 @@ export const ProviderDashboard = () => {
           <div className="flex items-center gap-2 flex-wrap">
             <button
               onClick={() => navigate("/ai-diagnostics")}
-              className="px-3.5 py-1.5 rounded-md bg-purple-600 hover:bg-purple-700 text-white font-extrabold text-xs shadow-xs transition-all flex items-center gap-1.5"
+              className="vf-btn-secondary gap-2 text-sm"
             >
               <Bot className="h-3.5 w-3.5" />
               <span>MedGemma AI</span>
             </button>
             <button
               onClick={() => navigate("/provider-calendar")}
-              className="px-3.5 py-1.5 rounded-md bg-[#0073ea] hover:bg-[#0060c4] text-white font-extrabold text-xs shadow-xs transition-all flex items-center gap-1.5"
+              className="vf-btn-primary gap-2 text-sm"
             >
               <Calendar className="h-3.5 w-3.5" />
               <span>Calendar</span>
@@ -116,28 +116,28 @@ export const ProviderDashboard = () => {
         </div>
       </div>
 
-      <div className="max-w-[1500px] mx-auto px-4 sm:px-6 pt-6 space-y-6">
-        {/* Bento Telemetry Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-xs">
-            <div className="text-xs font-extrabold text-[#676879] dark:text-slate-400 uppercase">Today's Consultations</div>
-            <div className="text-3xl font-black font-mono text-[#0073ea] mt-1">{todayAppointments.length}</div>
-            <div className="text-[11px] font-bold text-emerald-500 mt-1">{completedToday.length} Done • {scheduledToday.length} Pending</div>
+      <div className="max-w-content mx-auto px-4 sm:px-6 pt-6 space-y-6">
+        {/* Stats Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+          <div className="vf-card space-y-3">
+            <div className="text-xs font-medium text-graphite-500 uppercase tracking-wide">Today's Consultations</div>
+            <div className="text-3xl font-display font-medium text-primary-500">{todayAppointments.length}</div>
+            <div className="text-xs font-medium text-success-500">{completedToday.length} Done • {scheduledToday.length} Pending</div>
           </div>
 
-          <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-xs">
-            <div className="text-xs font-extrabold text-[#676879] dark:text-slate-400 uppercase">Weekly Patient Volume</div>
-            <div className="text-3xl font-black font-mono text-purple-600 mt-1">{weekStats?.total || 0}</div>
-            <div className="text-[11px] font-bold text-slate-500 mt-1">{weekStats?.completed || 0} Completed Total</div>
+          <div className="vf-card space-y-3">
+            <div className="text-xs font-medium text-graphite-500 uppercase tracking-wide">Weekly Patient Volume</div>
+            <div className="text-3xl font-display font-medium text-accent-500">{weekStats?.total || 0}</div>
+            <div className="text-xs font-medium text-graphite-500">{weekStats?.completed || 0} Completed Total</div>
           </div>
 
-          <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-xs">
-            <div className="text-xs font-extrabold text-[#676879] dark:text-slate-400 uppercase">Active Queue Status</div>
-            <div className="text-3xl font-black font-mono text-[#fdab3d] mt-1">{weekStats?.pending || 0}</div>
-            <div className="text-[11px] font-bold text-amber-500 mt-1">Awaiting Triage</div>
+          <div className="vf-card space-y-3">
+            <div className="text-xs font-medium text-graphite-500 uppercase tracking-wide">Active Queue Status</div>
+            <div className="text-3xl font-display font-medium text-warning-500">{weekStats?.pending || 0}</div>
+            <div className="text-xs font-medium text-warning-500">Awaiting Triage</div>
           </div>
 
-          <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+          <div className="vf-card space-y-3">
             <div className="text-xs font-extrabold text-[#676879] dark:text-slate-400 uppercase">Shift Earnings (ZMW)</div>
             <div className="text-3xl font-black font-mono text-[#00c875] mt-1">{formatPrice(weekStats?.revenue || 0)}</div>
             <div className="text-[11px] font-bold text-emerald-500 mt-1">+14% Shift Growth</div>

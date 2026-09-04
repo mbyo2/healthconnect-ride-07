@@ -41,21 +41,21 @@ export default function MedicalRecords() {
     switch (status) {
       case "Normal":
       case "Complete":
-        return <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold text-white bg-[#00c875]">{status}</span>;
+        return <span className="inline-block px-3 py-1 rounded-pill text-xs font-medium text-success-500 bg-success-50 border border-success-100">{status}</span>;
       case "Active":
-        return <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold text-white bg-[#0073ea]">{status}</span>;
+        return <span className="inline-block px-3 py-1 rounded-pill text-xs font-medium text-primary-500 bg-primary-50 border border-primary-100">{status}</span>;
       default:
-        return <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold text-white bg-[#676879]">{status}</span>;
+        return <span className="inline-block px-3 py-1 rounded-pill text-xs font-medium text-graphite-500 bg-graphite-50 border border-graphite-200">{status}</span>;
     }
   };
 
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case "Examination": return <User className="h-4 w-4 text-[#0073ea]" />;
-      case "Lab Results": return <Activity className="h-4 w-4 text-[#a25ddc]" />;
-      case "Consultation": return <Heart className="h-4 w-4 text-[#00c875]" />;
-      case "Prescription": return <Pill className="h-4 w-4 text-[#fdab3d]" />;
-      default: return <FileText className="h-4 w-4 text-[#0073ea]" />;
+      case "Examination": return <User className="h-4 w-4 text-primary-500" />;
+      case "Lab Results": return <Activity className="h-4 w-4 text-accent-500" />;
+      case "Consultation": return <Heart className="h-4 w-4 text-success-500" />;
+      case "Prescription": return <Pill className="h-4 w-4 text-warning-500" />;
+      default: return <FileText className="h-4 w-4 text-primary-500" />;
     }
   };
 
@@ -71,20 +71,20 @@ export default function MedicalRecords() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors pb-16">
-        {/* Sticky Monday Top Header */}
-        <div className="bg-white dark:bg-slate-900 border-b border-[#e6e9ef] dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
-          <div className="max-w-[1500px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="min-h-screen bg-canvas text-midnight font-sans transition-colors pb-16">
+        {/* Top Header */}
+        <div className="bg-white border-b border-canvas-silk px-4 sm:px-6 py-5 sticky top-0 z-30 shadow-sm">
+          <div className="max-w-content mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-[#0073ea] text-white flex items-center justify-center font-black text-sm shadow-xs">
+              <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-button">
                 <FolderHeart className="h-5 w-5" />
               </div>
               <div>
-                <h1 className="text-xl font-extrabold tracking-tight flex items-center gap-2">
+                <h1 className="font-display text-2xl font-medium tracking-tight flex items-center gap-2">
                   Patient Health Records Board
-                  <span className="w-2 h-2 rounded-full bg-[#00c875] animate-ping" />
+                  <span className="w-2 h-2 rounded-full bg-success-500 animate-ping" />
                 </h1>
-                <p className="text-xs text-[#676879] dark:text-slate-400 font-medium">
+                <p className="text-sm text-graphite-500 font-medium tracking-wide">
                   Centralized electronic medical records, lab results, prescriptions, and FHIR interoperability
                 </p>
               </div>
@@ -93,9 +93,9 @@ export default function MedicalRecords() {
             <div className="flex items-center gap-2 flex-wrap">
               <button
                 onClick={() => navigate('/ai-diagnostics')}
-                className="px-3.5 py-2 rounded-md bg-[#f0f2f7] dark:bg-slate-800 hover:bg-[#e5f0ff] font-bold text-xs text-slate-800 dark:text-slate-200 flex items-center gap-1.5 transition-colors"
+                className="vf-btn-secondary gap-2 text-sm"
               >
-                <Bot className="h-4 w-4 text-[#0073ea]" />
+                <Bot className="h-4 w-4" />
                 <span>AI Diagnostics</span>
               </button>
               <button className="px-3.5 py-2 rounded-md border border-[#c3c6d4] dark:border-slate-700 bg-white dark:bg-slate-900 font-bold text-xs text-slate-800 dark:text-slate-200 flex items-center gap-1.5 hover:bg-[#f5f6f8]">
