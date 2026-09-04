@@ -37,7 +37,7 @@ export const AppLogo = ({
       />
       {showText && (
         <span className={cn(
-          "font-bold text-foreground whitespace-nowrap tracking-tight",
+          "font-display font-medium text-midnight whitespace-nowrap tracking-tight",
           textSizeClasses[size]
         )}>
           Doc&apos; O Clock

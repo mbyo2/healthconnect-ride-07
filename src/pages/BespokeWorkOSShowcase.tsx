@@ -23,7 +23,7 @@ const INITIAL_PATIENTS: PatientRecord[] = [
     doctor: {
       name: "Dr. Mutale Mwansa",
       specialty: "Chief Cardiology",
-      avatarUrl: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=100&auto=format&fit=crop&q=80",
+      avatarUrl: "https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=100&auto=format&fit=crop&q=80",
     },
     location: "Lusaka ER-B1",
     vitalScore: "88% SpO2 • 145/95",
@@ -63,7 +63,7 @@ const INITIAL_PATIENTS: PatientRecord[] = [
     doctor: {
       name: "Dr. Mutale Mwansa",
       specialty: "Chief Cardiology",
-      avatarUrl: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=100&auto=format&fit=crop&q=80",
+      avatarUrl: "https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=100&auto=format&fit=crop&q=80",
     },
     location: "UTH ICU Bed 3",
     vitalScore: "97% SpO2 • 122/80",
@@ -83,7 +83,7 @@ const INITIAL_PATIENTS: PatientRecord[] = [
     doctor: {
       name: "Dr. Chisamba Banda",
       specialty: "Neurology & ICU",
-      avatarUrl: "https://images.unsplash.com/photo-1537368910025-700350fe46c7?w=100&auto=format&fit=crop&q=80",
+      avatarUrl: "https://images.unsplash.com/photo-1527613426441-4da17471b66d?w=100&auto=format&fit=crop&q=80",
     },
     location: "UTH ICU Bed 7",
     vitalScore: "89% SpO2 • 138/90",
@@ -103,7 +103,7 @@ const INITIAL_PATIENTS: PatientRecord[] = [
     doctor: {
       name: "Dr. Elena Rostova",
       specialty: "General Medicine",
-      avatarUrl: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=100&auto=format&fit=crop&q=80",
+      avatarUrl: "https://images.unsplash.com/photo-1638202993928-7267aad84c31?w=100&auto=format&fit=crop&q=80",
     },
     location: "Ndola Telehub",
     vitalScore: "98% SpO2 • 130/85",
@@ -123,7 +123,7 @@ const INITIAL_PATIENTS: PatientRecord[] = [
     doctor: {
       name: "Dr. Elena Rostova",
       specialty: "General Medicine",
-      avatarUrl: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=100&auto=format&fit=crop&q=80",
+      avatarUrl: "https://images.unsplash.com/photo-1638202993928-7267aad84c31?w=100&auto=format&fit=crop&q=80",
     },
     location: "Kitwe Clinic",
     vitalScore: "99% SpO2 • 115/70",

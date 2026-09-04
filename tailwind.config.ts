@@ -38,6 +38,8 @@ export default {
       maxWidth: {
         '8xl': '88rem',
         '9xl': '96rem',
+        // Editorial content width (Voiceflow-inspired)
+        'content': '75rem',
       },
       height: {
         '18': '4.5rem',
@@ -49,19 +51,35 @@ export default {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        // Signal Blue — primary actions (Voiceflow-inspired)
         primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
-          50: "#EFF6FF",
-          100: "#DBEAFE",
-          200: "#BFDBFE",
-          300: "#93C5FD",
-          400: "#60A5FA",
-          500: "#3B82F6",
-          600: "#2563EB",
-          700: "#1D4ED8",
-          800: "#1E40AF",
-          900: "#1E3A8A",
+          DEFAULT: "#397dff",
+          foreground: "#ffffff",
+          50: "#f0f5ff",
+          100: "#e0ebff",
+          200: "#c2d7ff",
+          300: "#94bfff",
+          400: "#5da3ff",
+          500: "#397dff",
+          600: "#2563eb",
+          700: "#1d4ed8",
+          800: "#1e40af",
+          900: "#1e3a8a",
+        },
+        // Ember Stroke — accents (Voiceflow-inspired)
+        accent: {
+          DEFAULT: "#f55c15",
+          foreground: "#ffffff",
+          50: "#fff0eb",
+          100: "#ffe0d4",
+          200: "#ffc0a9",
+          300: "#ff9a7e",
+          400: "#ff7453",
+          500: "#f55c15",
+          600: "#d94a0e",
+          700: "#b83d0c",
+          800: "#97310a",
+          900: "#7b2509",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
@@ -75,10 +93,6 @@ export default {
           DEFAULT: "hsl(var(--muted))",
           foreground: "hsl(var(--muted-foreground))",
         },
-        accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
-        },
         popover: {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",
@@ -87,7 +101,28 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // Modern healthcare color palette
+        // Editorial neutrals (Voiceflow graphite scale)
+        graphite: {
+          50: "#fafafa",
+          100: "#f5f5f4",
+          200: "#e7e5e4",
+          300: "#d6d3d1",
+          400: "#a8a29e",
+          500: "#78716c",
+          600: "#57534e",
+          700: "#44403c",
+          800: "#292524",
+          900: "#1c1917",
+          950: "#0c0a09",
+        },
+        canvas: {
+          DEFAULT: "#ffffff",
+          bone: "#f5f5f4",
+          mist: "#edeeee",
+          silk: "#e5e5e5",
+        },
+        midnight: "#171717",
+        charcoal: "#262626",
         slate: {
           50: "#F8FAFC",
           100: "#F1F5F9",
@@ -100,7 +135,6 @@ export default {
           800: "#1E293B",
           900: "#0F172A",
         },
-        // Pastel accent colors
         success: {
           50: "#F0FDF4",
           100: "#DCFCE7",
@@ -117,7 +151,6 @@ export default {
           400: "#F87171",
           500: "#EF4444",
         },
-        // Modern e-commerce color palette
         trust: {
           50: "rgb(var(--trust-50))",
           100: "rgb(var(--trust-100))",
@@ -130,7 +163,6 @@ export default {
           800: "rgb(var(--trust-800))",
           900: "rgb(var(--trust-900))",
         },
-        // E-commerce specific colors
         amazon: {
           orange: "rgb(255, 153, 0)",
           blue: "rgb(35, 47, 62)",
@@ -142,6 +174,9 @@ export default {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        pill: "999px",
+        card: "20px",
+        nav: "100px",
       },
       keyframes: {
         "accordion-down": {
@@ -167,6 +202,14 @@ export default {
         "float": {
           "0%, 100%": { transform: "translateY(0px)" },
           "50%": { transform: "translateY(-10px)" }
+        },
+        "heroRise": {
+          "0%": { opacity: "0", transform: "translateY(28px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" }
+        },
+        "softPulse": {
+          "0%, 100%": { opacity: "0.55" },
+          "50%": { opacity: "1" }
         }
       },
       animation: {
@@ -176,10 +219,13 @@ export default {
         "slideIn": "slideIn 0.4s ease-out",
         "bounceIn": "bounceIn 1s ease-out",
         "float": "float 3s ease-in-out infinite",
+        "hero-rise": "heroRise 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards",
+        "soft-pulse": "softPulse 3.5s ease-in-out infinite",
       },
       backgroundImage: {
         'grid-pattern': "linear-gradient(to right, #f3f4f6 1px, transparent 1px), linear-gradient(to bottom, #f3f4f6 1px, transparent 1px)",
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+        'hero-wash': 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(57,125,255,0.08), transparent 60%), radial-gradient(ellipse 50% 40% at 90% 20%, rgba(245,92,21,0.06), transparent 50%)',
       },
       boxShadow: {
         'card': '0 10px 40px rgba(0, 0, 0, 0.04)',
@@ -187,17 +233,35 @@ export default {
         'button': '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
         'button-hover': '0 2px 4px 0 rgba(0, 0, 0, 0.1)',
         'glass': '0 8px 32px rgba(0, 0, 0, 0.08)',
+        'pill-nav': '0 8px 32px rgba(23, 23, 23, 0.08), 0 1px 0 rgba(255,255,255,0.8) inset',
       },
       fontFamily: {
-        sans: ['Figtree', 'Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        // Fraunces ≈ Tiempos editorial serif; Figtree ≈ Selecta humanist sans
+        serif: ['Fraunces', 'Georgia', 'Times New Roman', 'serif'],
+        sans: ['Figtree', 'system-ui', '-apple-system', 'sans-serif'],
+        display: ['Fraunces', 'Georgia', 'serif'],
+      },
+      fontSize: {
+        'display': ['4rem', { lineHeight: '1', fontWeight: '300', letterSpacing: '-0.02em' }],
+        'heading-lg': ['3.5rem', { lineHeight: '1.14', fontWeight: '300', letterSpacing: '-0.015em' }],
+        '4xl': '2.25rem',
+        '5xl': '3rem',
+        '6xl': '3.75rem',
+        '7xl': '4.5rem',
+        'base': '1rem',
+      },
+      letterSpacing: {
+        'wide': '0.025em',
+        'wider': '0.05em',
       },
       spacing: {
         '18': '4.5rem',
         '88': '22rem',
-      },
-      screens: {
-        'xs': '480px',
-        '5xl': '2560px',
+        'section': '6rem',
+        'section-lg': '7.5rem',
+        'card': '1.5rem',
+        'gap': '0.75rem',
+        'gap-lg': '1.5rem',
       },
     },
   },

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=Figtree:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -21,79 +21,87 @@ html {
   flex-direction: column;
 }
 
-/* Scrollbar */
+/* ─── Scrollbar ─── */
 .scrollbar-thin { scrollbar-width: thin; }
-.scrollbar-thumb-gray-300::-webkit-scrollbar-thumb { background-color: hsl(var(--muted-foreground) / 0.3); border-radius: 6px; }
-.scrollbar-track-gray-100::-webkit-scrollbar-track { background-color: hsl(var(--muted)); }
+.scrollbar-thumb-gray-300::-webkit-scrollbar-thumb { background-color: #c4cada; border-radius: 6px; }
+.scrollbar-track-gray-100::-webkit-scrollbar-track { background-color: #f0f2f7; }
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 .scrollbar-hide::-webkit-scrollbar { display: none; }
-
 * { -webkit-overflow-scrolling: touch; }
-
 .safe-area-pb { padding-bottom: env(safe-area-inset-bottom); }
 .safe-area-pt { padding-top: env(safe-area-inset-top); }
 
+/* ─── Design Tokens ─── */
 @layer base {
   :root {
-    /* Doc' O Clock WorkOS palette - Crisp ultra-light canvas */
-    --background: 210 20% 97%; /* #f5f6f8 */
-    --foreground: 222 47% 11%; /* #111827 */
-    --card: 0 0% 100%;        /* #ffffff */
-    --card-foreground: 222 47% 11%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
-    --primary: 211 100% 46%;  /* #0073ea Primary Blue */
+    /* ── Voiceflow-inspired Doc' O Clock canvas ── */
+    --background:       40 10% 98%;       /* #fafafa — warm near-white */
+    --foreground:       24 10% 10%;       /* #1c1917 — graphite */
+    --card:             0 0% 100%;        /* #ffffff */
+    --card-foreground:  24 10% 10%;
+    --popover:          0 0% 100%;
+    --popover-foreground: 24 10% 10%;
+    --primary:          219 100% 61%;     /* #397dff — Signal Blue */
     --primary-foreground: 0 0% 100%;
-    --secondary: 210 20% 95%;
-    --secondary-foreground: 222 47% 11%;
-    --muted: 210 20% 95%;
-    --muted-foreground: 215 16% 47%; /* #676879 */
-    --accent: 211 100% 46%;
+    --secondary:        40 6% 96%;        /* #f5f5f4 — Bone */
+    --secondary-foreground: 24 10% 10%;
+    --muted:            40 6% 96%;
+    --muted-foreground: 25 5% 45%;        /* pebble */
+    --accent:           18 91% 52%;       /* #f55c15 — Ember */
     --accent-foreground: 0 0% 100%;
-    --destructive: 350 78% 57%; /* #e2445c */
+    --destructive:      0 100% 50%;
     --destructive-foreground: 0 0% 100%;
-    --border: 220 20% 92%;     /* #e6e9ef */
-    --input: 220 20% 92%;
-    --ring: 211 100% 46%;
-    --radius: 0.375rem;       /* 6px Soft Rounded */
+    --border:           0 0% 90%;         /* #e5e5e5 silk */
+    --input:            0 0% 90%;
+    --ring:             219 100% 61%;
+    --radius:           1.25rem;          /* 20px card radius */
 
-    /* Doc' O Clock Saturated Statuses */
-    --brand-blue: 211 100% 46%; /* #0073ea */
-    --brand-green: 155 100% 39%; /* #00c875 */
-    --brand-yellow: 35 97% 62%; /* #fdab3d */
-    --brand-red: 350 78% 57%;  /* #e2445c */
-    --brand-purple: 272 65% 61%; /* #a25ddc */
-    --brand-cyan: 215 96% 66%;  /* #579bfc */
+    /* ── Brand Color Tokens ── */
+    --doc-blue:         #397dff;
+    --doc-blue-light:   #e0ebff;
+    --doc-blue-mid:     #c2d7ff;
+    --doc-blue-dark:    #2563eb;
+    --doc-ember:        #f55c15;
+    --doc-green:        #00a86b;
+    --doc-red:          #e2445c;
+    --doc-amber:        #f59e0b;
+    --doc-bg:           #fafafa;
+    --doc-card:         #ffffff;
+    --doc-border:       #e5e5e5;
+    --doc-muted:        #737373;
+    --doc-midnight:     #171717;
+    --doc-charcoal:     #262626;
 
-    --success: 155 100% 39%;
+    --success: 155 80% 35%;
     --success-foreground: 0 0% 100%;
-    --warning: 35 97% 62%;
+    --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
   }
 
   .dark {
-    --background: 222 47% 8%; /* #0f172a */
-    --foreground: 210 40% 98%;
-    --card: 222 47% 11%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222 47% 11%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 211 100% 55%;
+    --background:       24 10% 6%;
+    --foreground:       40 10% 98%;
+    --card:             24 8% 10%;
+    --card-foreground:  40 10% 98%;
+    --popover:          24 8% 10%;
+    --popover-foreground: 40 10% 98%;
+    --primary:          219 100% 65%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 217 33% 15%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217 33% 15%;
-    --muted-foreground: 215 20% 65%;
-    --accent: 211 100% 55%;
+    --secondary:        24 8% 14%;
+    --secondary-foreground: 40 10% 98%;
+    --muted:            24 8% 14%;
+    --muted-foreground: 25 5% 60%;
+    --accent:           18 91% 55%;
     --accent-foreground: 0 0% 100%;
-    --destructive: 350 78% 57%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217 33% 17%;
-    --input: 217 33% 17%;
-    --ring: 211 100% 55%;
+    --destructive:      0 72% 51%;
+    --destructive-foreground: 40 10% 98%;
+    --border:           24 8% 18%;
+    --input:            24 8% 18%;
+    --ring:             219 100% 65%;
   }
 }
 
+/* ─── Base Resets ─── */
 @layer base {
   * {
     @apply border-border;
@@ -105,35 +113,248 @@ html {
     font-feature-settings: 'cv11', 'ss01';
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    letter-spacing: 0.01em;
+  }
+
+  h1, h2, h3, .font-display {
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 400;
+    letter-spacing: -0.02em;
   }
 }
 
+/* ─── Landing / marketing utilities (Voiceflow-inspired) ─── */
 @layer components {
-  /* Reusable Monday.com Status Pill Badges (Borderless, Saturated, Rounded-Full) */
-  .monday-pill-done {
-    @apply bg-[#00c875] text-white font-extrabold rounded-full border-0 px-3 py-1 text-xs shadow-2xs;
+  .vf-pill-nav {
+    @apply rounded-nav border border-canvas-silk bg-white/90 shadow-pill-nav backdrop-blur-xl;
   }
-  .monday-pill-working {
-    @apply bg-[#fdab3d] text-white font-extrabold rounded-full border-0 px-3 py-1 text-xs shadow-2xs;
+  .vf-btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-pill bg-primary-500 px-6 py-3 text-sm font-medium tracking-wide text-white shadow-button transition-all hover:bg-primary-600 hover:shadow-button-hover;
   }
-  .monday-pill-stuck {
-    @apply bg-[#e2445c] text-white font-extrabold rounded-full border-0 px-3 py-1 text-xs shadow-2xs;
+  .vf-btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-pill border border-graphite-300 bg-white px-6 py-3 text-sm font-medium tracking-wide text-charcoal transition-all hover:border-graphite-400 hover:bg-graphite-50;
   }
-  .monday-pill-scheduled {
-    @apply bg-[#579bfc] text-white font-extrabold rounded-full border-0 px-3 py-1 text-xs shadow-2xs;
+  .vf-card {
+    @apply rounded-card border border-canvas-silk bg-white p-6 shadow-card transition-all hover:shadow-card-hover;
   }
-  .monday-pill-review {
-    @apply bg-[#a25ddc] text-white font-extrabold rounded-full border-0 px-3 py-1 text-xs shadow-2xs;
+  .vf-section {
+    @apply py-section lg:py-section-lg;
   }
-  .monday-row-hover {
-    @apply hover:bg-[#f0f2f7] dark:hover:bg-slate-800/60 transition-colors cursor-pointer;
+  .vf-eyebrow {
+    @apply inline-flex items-center gap-2 rounded-pill border border-canvas-silk bg-white px-4 py-1.5 text-xs font-medium tracking-wide text-graphite-600;
+  }
+}
+
+/* ─── Global Doc' O Clock Component Classes ─── */
+@layer components {
+
+  /* ── App-wide white card with blue border and subtle shadow ── */
+  .doc-card {
+    @apply bg-white dark:bg-slate-900 rounded-3xl border border-[#e6e9ef] dark:border-slate-800 shadow-sm hover:shadow-md transition-all;
   }
 
-  .modern-header {
-    @apply sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-[#e6e9ef] dark:border-slate-800;
+  /* ── High-contrast Dark Highlight Banner (Screen 2 & 3: Next Appointment, Prescriptions) ── */
+  .doc-dark-banner {
+    @apply bg-[#0f172a] text-white rounded-3xl p-4 sm:p-5 shadow-xl shadow-slate-900/10 border border-slate-800 relative overflow-hidden transition-all;
   }
 
-  .container-modern {
-    @apply container mx-auto px-4 sm:px-6 lg:px-8;
+  /* ── Care Mode Toggle Switch (Online / Offline) ── */
+  .doc-mode-toggle {
+    @apply p-1 rounded-2xl bg-[#f0f2f7] dark:bg-slate-800/80 border border-[#e6e9ef] dark:border-slate-700 inline-flex items-center;
   }
+  .doc-mode-toggle-btn {
+    @apply px-4 py-2 rounded-xl text-xs sm:text-sm font-black transition-all;
+  }
+  .doc-mode-toggle-btn-active {
+    @apply bg-white dark:bg-slate-900 text-[#0073ea] shadow-sm border border-[#e6e9ef] dark:border-slate-700;
+  }
+  .doc-mode-toggle-btn-inactive {
+    @apply text-slate-500 hover:text-slate-800 dark:hover:text-slate-200;
+  }
+
+  /* ── Specialty Squircle Card (Screen 2: Dentistry, Cardiology, etc.) ── */
+  .doc-specialty-card {
+    @apply p-3.5 sm:p-4 rounded-3xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-sm hover:shadow-md hover:border-[#0073ea]/40 hover:-translate-y-0.5 active:scale-95 transition-all text-center flex flex-col items-center justify-center gap-2 cursor-pointer;
+  }
+  .doc-specialty-card-active {
+    @apply bg-[#e5f0ff] dark:bg-blue-950/40 border-[#0073ea]/50 ring-2 ring-[#0073ea]/20;
+  }
+
+  /* ── Doctor Card with Selectable Time Slots ── */
+  .doc-doctor-box {
+    @apply p-4 sm:p-5 rounded-3xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-sm hover:shadow-md transition-all;
+  }
+
+  /* ── Time Slot Pills (Screen 2: 8:00 a.m., 9:00 a.m. [active dark], 10:00 a.m.) ── */
+  .doc-time-slot {
+    @apply px-3 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-black transition-all cursor-pointer text-center border;
+  }
+  .doc-time-slot-idle {
+    @apply bg-[#f8fafc] dark:bg-slate-800/60 border-[#e6e9ef] dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-[#0073ea]/40 hover:bg-white;
+  }
+  .doc-time-slot-active {
+    @apply bg-[#0f172a] text-white border-[#0f172a] shadow-sm;
+  }
+  .doc-time-slot-blue {
+    @apply bg-[#0073ea] text-white border-[#0073ea] shadow-sm shadow-[#0073ea]/25;
+  }
+
+  /* ── Appointment Card (Screen 3) ── */
+  .doc-appt-card {
+    @apply p-4 sm:p-5 rounded-3xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-sm hover:shadow-md transition-all space-y-3;
+  }
+
+  /* ── Section container ── */
+  .doc-section {
+    @apply py-12 sm:py-16 bg-[#f5f7fa] dark:bg-slate-950;
+  }
+  .doc-section-white {
+    @apply py-12 sm:py-16 bg-white dark:bg-slate-900 border-t border-[#e6e9ef] dark:border-slate-800;
+  }
+
+  /* ── Max-width page wrapper ── */
+  .doc-container {
+    @apply max-w-[1480px] mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  /* ── Primary blue button ── */
+  .doc-btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl sm:rounded-full bg-[#0073ea] hover:bg-[#0060c7] text-white font-black text-sm shadow-md hover:shadow-lg active:scale-95 transition-all;
+  }
+  .doc-btn-dark {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl sm:rounded-full bg-[#0f172a] hover:bg-slate-800 text-white font-black text-sm shadow-md active:scale-95 transition-all;
+  }
+  .doc-btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-2xl sm:rounded-full bg-white dark:bg-slate-900 border-2 border-[#0073ea] text-[#0073ea] font-black text-sm hover:bg-[#e5f0ff] dark:hover:bg-slate-800 active:scale-95 transition-all;
+  }
+  .doc-btn-outline {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-white dark:bg-slate-800 border border-[#e6e9ef] dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-extrabold hover:border-[#0073ea]/40 hover:text-[#0073ea] active:scale-95 transition-all;
+  }
+  .doc-btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-extrabold text-slate-600 dark:text-slate-400 hover:bg-[#f0f4ff] dark:hover:bg-slate-800 hover:text-[#0073ea] transition-all;
+  }
+
+  /* ── Status Pill Badges ── */
+  .doc-pill {
+    @apply px-3 py-1 rounded-full text-xs font-black inline-flex items-center gap-1;
+  }
+  .doc-pill-blue {
+    @apply doc-pill bg-[#e5f0ff] dark:bg-blue-950/40 text-[#0073ea] dark:text-blue-400;
+  }
+  .doc-pill-dark {
+    @apply doc-pill bg-[#0f172a] text-white;
+  }
+  .doc-pill-green {
+    @apply doc-pill bg-[#dcfce7] dark:bg-emerald-950/40 text-[#15803d] dark:text-emerald-400;
+  }
+  .doc-pill-red {
+    @apply doc-pill bg-[#fee2e2] dark:bg-rose-950/40 text-[#dc2626] dark:text-rose-400;
+  }
+  .doc-pill-amber {
+    @apply doc-pill bg-[#fef3c7] dark:bg-amber-950/40 text-[#d97706] dark:text-amber-400;
+  }
+  .doc-pill-solid-blue {
+    @apply doc-pill bg-[#0073ea] text-white;
+  }
+
+  /* ── Nav Active State ── */
+  .doc-nav-active {
+    @apply bg-[#e5f0ff] dark:bg-blue-950/50 text-[#0073ea] dark:text-blue-400 font-extrabold;
+  }
+  .doc-nav-inactive {
+    @apply text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-[#f5f7fa] dark:hover:bg-slate-800 font-medium;
+  }
+
+  /* ── Page header (sticky white bar) ── */
+  .doc-header {
+    @apply sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-b border-[#e6e9ef] dark:border-slate-800 shadow-xs;
+  }
+
+  /* ── Section heading styles ── */
+  .doc-badge {
+    @apply inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#e5f0ff] dark:bg-blue-950/50 text-[#0073ea] dark:text-blue-400 text-xs font-black;
+  }
+  .doc-h1 {
+    @apply text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 dark:text-slate-100 leading-[1.1];
+  }
+  .doc-h2 {
+    @apply text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-slate-900 dark:text-slate-100;
+  }
+  .doc-h3 {
+    @apply text-lg sm:text-xl font-black text-slate-900 dark:text-slate-100;
+  }
+  .doc-body {
+    @apply text-sm sm:text-base text-slate-500 dark:text-slate-400 font-medium leading-relaxed;
+  }
+  .doc-body-sm {
+    @apply text-xs sm:text-sm text-slate-400 dark:text-slate-500 leading-relaxed;
+  }
+
+  /* ── Blue gradient text ── */
+  .doc-gradient-text {
+    @apply bg-gradient-to-r from-[#0073ea] via-[#2563eb] to-[#38bdf8] bg-clip-text text-transparent;
+  }
+
+  /* ── Doctor / specialty card ── */
+  .doc-doctor-card {
+    @apply doc-card p-4 flex items-start gap-3 cursor-pointer hover:border-[#0073ea]/40 transition-all;
+  }
+
+  /* ── Appointment card pill ── */
+  .doc-appointment-row {
+    @apply flex items-center justify-between p-4 rounded-3xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 hover:border-[#0073ea]/40 hover:shadow-md transition-all cursor-pointer;
+  }
+
+  /* ── Bottom nav floating pill ── */
+  .doc-bottom-nav {
+    @apply fixed bottom-4 left-1/2 -translate-x-1/2 z-50 flex items-center justify-around gap-1 px-4 py-2 rounded-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-[#e6e9ef] dark:border-slate-800 shadow-xl shadow-slate-900/10;
+  }
+
+  /* ── Mobile phone frame (for showcase) ── */
+  .doc-phone-frame {
+    @apply bg-white dark:bg-slate-900 rounded-[44px] border-[5px] border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden;
+  }
+
+  /* ── Input field ── */
+  .doc-input {
+    @apply w-full px-4 py-3 rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-[#f5f7fa] dark:bg-slate-800/60 text-slate-900 dark:text-slate-100 text-sm placeholder:text-slate-400 focus:outline-none focus:border-[#0073ea] focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-[#0073ea]/20 transition-all;
+  }
+
+  /* ── Search bar pill ── */
+  .doc-search {
+    @apply flex items-center gap-2 px-4 py-2.5 rounded-full bg-[#f5f7fa] dark:bg-slate-800/60 border border-[#e6e9ef] dark:border-slate-700 hover:border-[#0073ea]/40 hover:bg-white dark:hover:bg-slate-900 focus-within:border-[#0073ea] focus-within:ring-2 focus-within:ring-[#0073ea]/15 transition-all;
+  }
+
+  /* ── Metric / KPI card ── */
+  .doc-metric-card {
+    @apply doc-card p-5 sm:p-6 flex flex-col gap-2;
+  }
+
+  /* ── Avatar with blue ring ── */
+  .doc-avatar-ring {
+    @apply ring-2 ring-[#0073ea]/30 ring-offset-2 ring-offset-white dark:ring-offset-slate-900;
+  }
+
+  /* ── Responsive grid layouts ── */
+  .doc-grid-2 { @apply grid grid-cols-1 sm:grid-cols-2 gap-4; }
+  .doc-grid-3 { @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4; }
+  .doc-grid-4 { @apply grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4; }
+
+  /* ── Animations ── */
+  .doc-fade-up {
+    @apply animate-in fade-in slide-in-from-bottom-4 duration-500;
+  }
+  .doc-fade-in {
+    @apply animate-in fade-in duration-300;
+  }
+
+  /* ── Legacy monday-pill compatibility ── */
+  .monday-pill-done    { @apply doc-pill bg-[#dcfce7] text-[#15803d]; }
+  .monday-pill-working { @apply doc-pill bg-[#fef3c7] text-[#d97706]; }
+  .monday-pill-stuck   { @apply doc-pill bg-[#fee2e2] text-[#dc2626]; }
+  .monday-pill-scheduled { @apply doc-pill bg-[#dbeafe] text-[#1d4ed8]; }
+  .monday-pill-review  { @apply doc-pill bg-[#f3e8ff] text-[#7c3aed]; }
+  .monday-row-hover    { @apply hover:bg-[#f0f4ff] transition-colors cursor-pointer; }
+  .modern-header       { @apply doc-header; }
+  .container-modern    { @apply doc-container; }
 }

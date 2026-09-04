@@ -1,14 +1,28 @@
 User-agent: *
 Allow: /
 
+# Private / authenticated areas
 Disallow: /admin-dashboard
 Disallow: /super-admin
 Disallow: /institution-dashboard
 Disallow: /provider-dashboard
+Disallow: /provider-portal
 Disallow: /pharmacy-portal
 Disallow: /profile
 Disallow: /settings
 Disallow: /medical-records
 Disallow: /chat
+Disallow: /wallet
+Disallow: /auth
+Disallow: /dashboard
+
+# Crawl hints
+Crawl-delay: 0
 
 Sitemap: https://doc0clock.online/sitemap.xml
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /

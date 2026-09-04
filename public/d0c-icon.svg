@@ -1,46 +1,19 @@
-<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Doc O Clock Logo">
-  <title>Doc' O Clock - Healthcare App</title>
-  <defs>
-    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#3B82F6"/>
-      <stop offset="100%" stop-color="#1D4ED8"/>
-    </linearGradient>
-    <linearGradient id="clockGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#FFFFFF"/>
-      <stop offset="100%" stop-color="#E0E7FF"/>
-    </linearGradient>
-  </defs>
-  
-  <!-- Background Circle -->
-  <circle cx="256" cy="256" r="240" fill="url(#bgGradient)"/>
-  
-  <!-- Clock Face -->
-  <circle cx="256" cy="256" r="160" fill="url(#clockGradient)" opacity="0.95"/>
-  
-  <!-- Clock Border -->
-  <circle cx="256" cy="256" r="160" stroke="#3B82F6" stroke-width="8" fill="none"/>
-  
-  <!-- Hour Markers -->
-  <circle cx="256" cy="116" r="8" fill="#3B82F6"/>
-  <circle cx="376" cy="176" r="6" fill="#3B82F6"/>
-  <circle cx="396" cy="256" r="8" fill="#3B82F6"/>
-  <circle cx="376" cy="336" r="6" fill="#3B82F6"/>
-  <circle cx="256" cy="396" r="8" fill="#3B82F6"/>
-  <circle cx="136" cy="336" r="6" fill="#3B82F6"/>
-  <circle cx="116" cy="256" r="8" fill="#3B82F6"/>
-  <circle cx="136" cy="176" r="6" fill="#3B82F6"/>
-  
-  <!-- Hour Hand -->
-  <line x1="256" y1="256" x2="256" y2="160" stroke="#1E40AF" stroke-width="12" stroke-linecap="round"/>
-  
-  <!-- Minute Hand -->
-  <line x1="256" y1="256" x2="330" y2="200" stroke="#3B82F6" stroke-width="8" stroke-linecap="round"/>
-  
-  <!-- Center Dot -->
-  <circle cx="256" cy="256" r="16" fill="#1E40AF"/>
-  <circle cx="256" cy="256" r="8" fill="#FFFFFF"/>
-  
-  <!-- Medical Cross Accent -->
-  <rect x="340" y="80" width="60" height="20" rx="4" fill="#FFFFFF"/>
-  <rect x="360" y="60" width="20" height="60" rx="4" fill="#FFFFFF"/>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Doc' O Clock">
+  <title>Doc' O Clock</title>
+  <rect width="512" height="512" rx="128" fill="#397DFF"/>
+  <circle cx="256" cy="268" r="148" fill="#FFFFFF"/>
+  <circle cx="256" cy="268" r="132" fill="none" stroke="#E0EBFF" stroke-width="10"/>
+  <!-- 12 ember medical cross -->
+  <rect x="236" y="48" width="40" height="88" rx="10" fill="#F55C15"/>
+  <rect x="212" y="72" width="88" height="40" rx="10" fill="#F55C15"/>
+  <!-- hour marks -->
+  <circle cx="256" cy="156" r="7" fill="#397DFF"/>
+  <circle cx="356" cy="268" r="7" fill="#397DFF"/>
+  <circle cx="256" cy="380" r="7" fill="#397DFF"/>
+  <circle cx="156" cy="268" r="7" fill="#397DFF"/>
+  <!-- hands ~10:10 -->
+  <line x1="256" y1="268" x2="210" y2="188" stroke="#171717" stroke-width="16" stroke-linecap="round"/>
+  <line x1="256" y1="268" x2="332" y2="196" stroke="#397DFF" stroke-width="12" stroke-linecap="round"/>
+  <circle cx="256" cy="268" r="18" fill="#171717"/>
+  <circle cx="256" cy="268" r="8" fill="#FFFFFF"/>
 </svg>

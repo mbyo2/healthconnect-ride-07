@@ -24,7 +24,7 @@ const About = () => (
           </p>
         </section>
         <img
-          src="https://images.unsplash.com/photo-1666886573440-16ac24f89e31?auto=format&fit=crop&w=1000&q=85"
+          src="https://images.unsplash.com/photo-1527613426441-4da17471b66d?auto=format&fit=crop&w=1000&q=85"
           alt="Healthcare professional and patient reviewing care together"
           className="h-64 w-full rounded-3xl object-cover shadow-xl shadow-primary/10"
         />
