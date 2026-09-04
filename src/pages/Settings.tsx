@@ -199,65 +199,65 @@ const Settings = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 flex items-center justify-center p-6">
-        <Loader2 className="h-8 w-8 animate-spin text-[#0073ea]" />
+      <div className="min-h-screen bg-canvas flex items-center justify-center p-6">
+        <Loader2 className="h-8 w-8 animate-spin text-primary-500" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors pb-16">
-      {/* Sticky Monday Top Header */}
-      <div className="bg-white dark:bg-slate-900 border-b border-[#e6e9ef] dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
-        <div className="max-w-[1500px] mx-auto flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-[#0073ea] text-white flex items-center justify-center font-black text-sm shadow-xs">
+    <div className="min-h-screen bg-canvas text-midnight font-sans transition-colors pb-16">
+      {/* Top Header */}
+      <div className="bg-white border-b border-canvas-silk px-4 sm:px-6 py-5 sticky top-0 z-30 shadow-sm">
+        <div className="max-w-content mx-auto flex items-center gap-3">
+          <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-button">
             <SettingsIcon className="h-5 w-5" />
           </div>
           <div>
-            <h1 className="text-xl font-extrabold tracking-tight flex items-center gap-2">
+            <h1 className="font-display text-2xl font-medium tracking-tight flex items-center gap-2">
               System Preferences & WorkOS Settings
-              <span className="w-2 h-2 rounded-full bg-[#00c875] animate-ping" />
+              <span className="w-2 h-2 rounded-full bg-success-500 animate-ping" />
             </h1>
-            <p className="text-xs text-[#676879] dark:text-slate-400 font-medium">
+            <p className="text-sm text-graphite-500 font-medium tracking-wide">
               Configure profile visibility, security, push notifications, and regional localization
             </p>
           </div>
         </div>
       </div>
 
-      <div className="max-w-[1500px] mx-auto px-4 sm:px-6 pt-6">
+      <div className="max-w-content mx-auto px-4 sm:px-6 pt-6">
         <div className="grid gap-6 md:grid-cols-2">
           {/* Column 1 */}
           <div className="space-y-6">
             {/* Account Settings */}
-            <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
-              <h2 className="font-extrabold text-sm flex items-center gap-2 border-b border-[#e6e9ef] pb-3">
-                <User className="h-4 w-4 text-[#0073ea]" /> Account Preferences
+            <div className="vf-card space-y-4">
+              <h2 className="font-medium text-base flex items-center gap-2 border-b border-canvas-silk pb-3">
+                <User className="h-4 w-4 text-primary-500" /> Account Preferences
               </h2>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-bold text-xs">Directory Profile Visibility</p>
-                  <p className="text-[11px] text-[#676879]">Visible to verified patient search & provider index</p>
+                  <p className="font-medium text-sm text-midnight">Directory Profile Visibility</p>
+                  <p className="text-xs text-graphite-500">Visible to verified patient search & provider index</p>
                 </div>
                 <Switch checked={profileVisibility} onCheckedChange={handleVisibilityToggle} />
               </div>
-              <div className="flex items-center justify-between pt-2 border-t border-[#e6e9ef]">
+              <div className="flex items-center justify-between pt-2 border-t border-canvas-silk">
                 <div>
-                  <p className="font-bold text-xs">Two-Factor Authentication (2FA)</p>
-                  <p className="text-[11px] text-[#676879]">TOTP authenticator app verification</p>
+                  <p className="font-medium text-sm text-midnight">Two-Factor Authentication (2FA)</p>
+                  <p className="text-xs text-graphite-500">TOTP authenticator app verification</p>
                 </div>
                 <Switch checked={twoFactor} onCheckedChange={handleTwoFactorToggle} />
               </div>
             </div>
 
             {/* Appearance Settings */}
-            <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
-              <h2 className="font-extrabold text-sm flex items-center gap-2 border-b border-[#e6e9ef] pb-3">
-                <Palette className="h-4 w-4 text-[#a25ddc]" /> Theme & Accessibility
+            <div className="vf-card space-y-4">
+              <h2 className="font-medium text-base flex items-center gap-2 border-b border-canvas-silk pb-3">
+                <Palette className="h-4 w-4 text-accent-500" /> Theme & Accessibility
               </h2>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-bold text-xs">Dark / Light Interface Theme</p>
+                  <p className="font-medium text-sm text-midnight">Dark / Light Interface Theme</p>
                   <p className="text-[11px] text-[#676879]">Toggle WorkOS dark mode styling</p>
                 </div>
                 <ThemeToggle />

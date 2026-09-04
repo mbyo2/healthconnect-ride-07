@@ -249,12 +249,12 @@ export const InstitutionDashboard = () => {
 
   if (!institution) {
     return (
-      <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 flex items-center justify-center p-6">
-        <div className="max-w-md w-full p-8 rounded-2xl bg-white dark:bg-slate-900 border border-[#e6e9ef] text-center space-y-3">
-          <Building2 className="h-12 w-12 mx-auto text-[#0073ea]" />
-          <h2 className="text-xl font-extrabold">Setting Up Your Dashboard</h2>
-          <p className="text-xs text-[#676879]">Your institution workspace is being prepared. Please refresh in a moment.</p>
-          <button onClick={() => window.location.reload()} className="px-4 py-2 rounded-md bg-[#0073ea] text-white text-xs font-bold">
+      <div className="min-h-screen bg-canvas flex items-center justify-center p-6">
+        <div className="max-w-md w-full vf-card text-center space-y-4">
+          <Building2 className="h-12 w-12 mx-auto text-primary-500" />
+          <h2 className="font-display text-xl font-medium text-midnight">Setting Up Your Dashboard</h2>
+          <p className="text-sm text-graphite-500">Your institution workspace is being prepared. Please refresh in a moment.</p>
+          <button onClick={() => window.location.reload()} className="vf-btn-primary mx-auto">
             Refresh
           </button>
         </div>
@@ -265,29 +265,29 @@ export const InstitutionDashboard = () => {
   const cfg = TYPE_CONFIG[institution.type] || DEFAULT_CONFIG;
 
   const kpiCards = [
-    { label: "Staff & Personnel", value: counts.personnel, sub: "Active members", color: "#0073ea", icon: <Users className="h-5 w-5" /> },
-    { label: "Total Appointments", value: counts.appointments, sub: `${counts.todayAppointments} today`, color: "#a25ddc", icon: <Calendar className="h-5 w-5" /> },
-    { label: "Unique Patients", value: counts.patients, sub: "All time", color: "#00c875", icon: <UserRound className="h-5 w-5" /> },
-    { label: "Est. Revenue (6mo)", value: `${institution.currency || "ZMW"} ${(counts.revenue / 1000).toFixed(1)}k`, sub: "Activity-based", color: "#fdab3d", icon: <TrendingUp className="h-5 w-5" /> },
+    { label: "Staff & Personnel", value: counts.personnel, sub: "Active members", color: "primary", icon: <Users className="h-5 w-5" /> },
+    { label: "Total Appointments", value: counts.appointments, sub: `${counts.todayAppointments} today`, color: "accent", icon: <Calendar className="h-5 w-5" /> },
+    { label: "Unique Patients", value: counts.patients, sub: "All time", color: "success", icon: <UserRound className="h-5 w-5" /> },
+    { label: "Est. Revenue (6mo)", value: `${institution.currency || "ZMW"} ${(counts.revenue / 1000).toFixed(1)}k`, sub: "Activity-based", color: "warning", icon: <TrendingUp className="h-5 w-5" /> },
   ];
 
   return (
-    <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pb-16">
+    <div className="min-h-screen bg-canvas text-midnight font-sans pb-16">
       {/* Header */}
-      <div className="bg-white dark:bg-slate-900 border-b border-[#e6e9ef] dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
-        <div className="max-w-[1600px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-3">
+      <div className="bg-white border-b border-canvas-silk px-4 sm:px-6 py-5 sticky top-0 z-30 shadow-sm">
+        <div className="max-w-content mx-auto flex flex-col md:flex-row md:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl text-white flex items-center justify-center shadow-xs" style={{ background: cfg.color }}>
+            <div className="h-10 w-10 rounded-xl text-white flex items-center justify-center shadow-button" style={{ background: cfg.color }}>
               {cfg.icon}
             </div>
             <div>
-              <h1 className="text-xl font-extrabold flex items-center gap-2">
+              <h1 className="font-display text-2xl font-medium flex items-center gap-2">
                 {institution.name}
-                <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white ${institution.is_verified ? "bg-[#00c875]" : "bg-[#fdab3d]"}`}>
+                <span className={`inline-block px-3 py-1 rounded-pill text-xs font-medium ${institution.is_verified ? "bg-success-50 text-success-500 border border-success-100" : "bg-warning-50 text-warning-500 border border-warning-100"}`}>
                   {institution.is_verified ? "Verified" : "Pending"}
                 </span>
               </h1>
-              <p className="text-xs text-[#676879] font-medium">{cfg.label} Dashboard • ERPNext Integrated</p>
+              <p className="text-sm text-graphite-500 font-medium tracking-wide">{cfg.label} Dashboard • ERPNext Integrated</p>
             </div>
           </div>
 
@@ -295,19 +295,19 @@ export const InstitutionDashboard = () => {
             <button
               onClick={() => navigate("/kiosk")}
               target="_blank"
-              className="px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs flex items-center gap-1 shadow-xs"
+              className="vf-btn-secondary gap-1.5 text-sm"
             >
               <Ticket className="h-3.5 w-3.5" /> Self-Service Kiosk
             </button>
             <button
               onClick={() => navigate("/queue-display")}
               target="_blank"
-              className="px-3 py-1.5 rounded-xl bg-slate-900 dark:bg-slate-800 text-white font-bold text-xs flex items-center gap-1 shadow-xs"
+              className="vf-btn-secondary gap-1.5 text-sm"
             >
               <Tv className="h-3.5 w-3.5" /> Public TV Screen
             </button>
             {isAdmin && (
-              <button onClick={() => navigate("/institution/settings")} className="px-3 py-1.5 rounded-xl bg-[#f0f2f7] dark:bg-slate-800 font-bold text-xs flex items-center gap-1">
+              <button onClick={() => navigate("/institution/settings")} className="vf-btn-secondary gap-1.5 text-sm">
                 <Settings className="h-3.5 w-3.5" /> Settings
               </button>
             )}
@@ -316,8 +316,8 @@ export const InstitutionDashboard = () => {
       </div>
 
       {/* Main Suite Tab Navigation */}
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 pt-4">
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-2 border-b border-[#e6e9ef] dark:border-slate-800 scrollbar-none">
+      <div className="max-w-content mx-auto px-4 sm:px-6 pt-4">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-2 border-b border-canvas-silk scrollbar-none">
           {[
             { id: "overview", label: "Dashboard Overview", icon: Building2 },
             { id: "patients", label: "Patient Hub (Central MRN)", icon: UserRound },
