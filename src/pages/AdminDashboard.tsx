@@ -35,27 +35,27 @@ export const AdminDashboard = () => {
   const setTab = (v: string) => setSearchParams({ tab: v });
 
   return (
-    <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors pb-16">
-      {/* Monday Sticky Top Bar */}
-      <div className="bg-white dark:bg-slate-900 border-b border-[#e6e9ef] dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-2xs">
-        <div className="max-w-[1600px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="min-h-screen bg-canvas text-midnight font-sans transition-colors pb-16">
+      {/* Top Bar */}
+      <div className="bg-white border-b border-canvas-silk px-4 sm:px-6 py-5 sticky top-0 z-30 shadow-sm">
+        <div className="max-w-content mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-[#0073ea] text-white flex items-center justify-center font-black text-sm shadow-xs">
+            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-button">
               <Shield className="h-5 w-5" />
             </div>
             <div>
-              <h1 className="text-xl font-extrabold tracking-tight flex items-center gap-2">
+              <h1 className="font-display text-2xl font-medium tracking-tight flex items-center gap-2">
                 Executive Admin WorkOS
-                <span className="w-2 h-2 rounded-full bg-[#00c875] animate-ping" />
+                <span className="w-2 h-2 rounded-full bg-success-500 animate-ping" />
               </h1>
-              <p className="text-xs text-[#676879] dark:text-slate-400 font-medium">
+              <p className="text-sm text-graphite-500 font-medium tracking-wide">
                 System-wide governance, security audit logs, platform revenue & accreditation controls
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="px-3 py-1 rounded-full text-xs font-bold text-white bg-[#00c875]">
+            <span className="px-3 py-1 rounded-pill text-xs font-medium text-white bg-success-500">
               Active System Governance
             </span>
           </div>
