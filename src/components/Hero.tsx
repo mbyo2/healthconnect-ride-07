@@ -95,6 +95,7 @@ export const Hero = () => {
 
           {/* Right column */}
           <div className="relative">
+            {/* Mobile quick actions */}
             <div className="grid grid-cols-2 gap-3 md:hidden mb-6">
               {quickActions.map((action, idx) => (
                 <button
@@ -108,6 +109,36 @@ export const Hero = () => {
               ))}
             </div>
 
+            {/* Mobile diverse clinicians */}
+            <div className="md:hidden mb-6 p-4 bg-card border border-border rounded-xl">
+              <p className="text-xs font-medium text-graphite-600 mb-3">Trusted by diverse African clinicians</p>
+              <div className="flex items-center justify-center -space-x-3">
+                <img
+                  src="https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=80&auto=format&fit=crop&q=85"
+                  alt="African female doctor"
+                  className="w-12 h-12 rounded-full border-3 border-white object-cover"
+                />
+                <img
+                  src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=80&auto=format&fit=crop&q=85"
+                  alt="African clinician with fair skin"
+                  className="w-12 h-12 rounded-full border-3 border-white object-cover"
+                />
+                <img
+                  src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=80&auto=format&fit=crop&q=85"
+                  alt="African male doctor"
+                  className="w-12 h-12 rounded-full border-3 border-white object-cover"
+                />
+                <img
+                  src="https://images.unsplash.com/photo-1651008376811-b90baee60c1f?w=80&auto=format&fit=crop&q=85"
+                  alt="African healthcare professional with light skin"
+                  className="w-12 h-12 rounded-full border-3 border-white object-cover"
+                />
+                <div className="w-12 h-12 rounded-full border-3 border-white bg-primary-500 flex items-center justify-center text-white text-sm font-bold">
+                  500+
+                </div>
+              </div>
+            </div>
+
             <div className="hidden md:block bg-card border border-border rounded-2xl shadow-lg p-8 max-w-md mx-auto">
               <div className="text-center mb-6">
                 <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-primary/10 flex items-center justify-center">
@@ -115,6 +146,37 @@ export const Hero = () => {
                 </div>
                 <h3 className="text-lg font-semibold text-foreground mb-1">Your Health, Our Priority</h3>
                 <p className="text-sm text-muted-foreground">Quality healthcare accessible anywhere</p>
+              </div>
+
+              {/* Diverse African Clinicians */}
+              <div className="mb-6">
+                <p className="text-xs font-medium text-graphite-500 mb-3">Trusted by African clinicians</p>
+                <div className="flex items-center -space-x-3 mb-2">
+                  <img
+                    src="https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=80&auto=format&fit=crop&q=85"
+                    alt="African female doctor"
+                    className="w-10 h-10 rounded-full border-2 border-white object-cover"
+                  />
+                  <img
+                    src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=80&auto=format&fit=crop&q=85"
+                    alt="African clinician with fair skin"
+                    className="w-10 h-10 rounded-full border-2 border-white object-cover"
+                  />
+                  <img
+                    src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=80&auto=format&fit=crop&q=85"
+                    alt="African male doctor"
+                    className="w-10 h-10 rounded-full border-2 border-white object-cover"
+                  />
+                  <img
+                    src="https://images.unsplash.com/photo-1651008376811-b90baee60c1f?w=80&auto=format&fit=crop&q=85"
+                    alt="African healthcare professional with light skin"
+                    className="w-10 h-10 rounded-full border-2 border-white object-cover"
+                  />
+                  <div className="w-10 h-10 rounded-full border-2 border-white bg-primary-500 flex items-center justify-center text-white text-xs font-medium">
+                    500+
+                  </div>
+                </div>
+                <p className="text-xs text-graphite-500">Diverse healthcare professionals across Africa</p>
               </div>
 
               <div className="space-y-2.5">
