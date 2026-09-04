@@ -163,32 +163,32 @@ export const AppointmentsPage = () => {
   const getStatusPill = (status: string) => {
     switch (status) {
       case "completed":
-        return <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-black bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/40">✓ Completed</span>;
+        return <span className="inline-flex items-center gap-1 px-3 py-1 rounded-pill text-xs font-medium bg-success-50 text-success-500 border border-success-100">✓ Completed</span>;
       case "cancelled":
-        return <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-black bg-rose-100 dark:bg-rose-950/50 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-900/40">✕ Cancelled</span>;
+        return <span className="inline-flex items-center gap-1 px-3 py-1 rounded-pill text-xs font-medium bg-error-50 text-error-500 border border-error-100">✕ Cancelled</span>;
       case "in_progress":
-        return <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-black bg-amber-100 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-900/40">● In Progress</span>;
+        return <span className="inline-flex items-center gap-1 px-3 py-1 rounded-pill text-xs font-medium bg-warning-50 text-warning-500 border border-warning-100">● In Progress</span>;
       default:
-        return <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-black bg-[#e5f0ff] dark:bg-blue-950/50 text-[#0073ea] dark:text-blue-400 border border-[#0073ea]/20">◉ Scheduled</span>;
+        return <span className="inline-flex items-center gap-1 px-3 py-1 rounded-pill text-xs font-medium bg-primary-50 text-primary-500 border border-primary-100">◉ Scheduled</span>;
     }
   };
 
   return (
     <NetworkErrorBoundary>
-      <div className="min-h-screen bg-[#f5f7fa] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors pb-16">
-        {/* Top Sticky Header */}
-        <div className="bg-white dark:bg-slate-900 border-b border-[#e6e9ef] dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
-          <div className="max-w-[1500px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="min-h-screen bg-canvas text-midnight font-sans transition-colors pb-16">
+        {/* Top Header */}
+        <div className="bg-white border-b border-canvas-silk px-4 sm:px-6 py-5 sticky top-0 z-30 shadow-sm">
+          <div className="max-w-content mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="h-11 w-11 rounded-2xl bg-[#0073ea] text-white flex items-center justify-center font-black shadow-sm shadow-[#0073ea]/30">
+              <div className="h-11 w-11 rounded-2xl bg-primary-500 text-white flex items-center justify-center shadow-button">
                 <Calendar className="h-5 w-5" />
               </div>
               <div>
-                <h1 className="text-xl font-black tracking-tight flex items-center gap-2.5 text-slate-900 dark:text-slate-100">
+                <h1 className="font-display text-2xl font-medium tracking-tight flex items-center gap-2.5 text-midnight">
                   {isProvider ? "Appointment Workspace" : "My Appointments"}
-                  <span className="w-2 h-2 rounded-full bg-[#00a86b]" />
+                  <span className="w-2 h-2 rounded-full bg-success-500" />
                 </h1>
-                <p className="text-xs text-slate-400 dark:text-slate-500 font-medium">
+                <p className="text-sm text-graphite-500 font-medium tracking-wide">
                   {isProvider ? "Manage clinic visits, video consultations & e-intake" : "Upcoming visits, video links & prescription notes"}
                 </p>
               </div>
@@ -198,7 +198,7 @@ export const AppointmentsPage = () => {
               {!isProvider && (
                 <button
                   onClick={() => navigate("/search")}
-                  className="px-4 py-2 rounded-md bg-[#0073ea] hover:bg-[#0060c4] text-white font-extrabold text-xs shadow-xs transition-all flex items-center gap-1.5 active:scale-95"
+                  className="vf-btn-primary text-sm gap-2 active:scale-95"
                 >
                   <CalendarPlus className="h-4 w-4" />
                   <span>Book New Appointment</span>
@@ -208,15 +208,15 @@ export const AppointmentsPage = () => {
           </div>
 
           {/* Views & Filters Bar */}
-          <div className="max-w-[1500px] mx-auto mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 border-t border-[#e6e9ef] dark:border-slate-800">
+          <div className="max-w-content mx-auto mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 border-t border-canvas-silk">
             {/* View Tabs */}
-            <div className="flex items-center gap-1 p-1 rounded-lg bg-[#f5f6f8] dark:bg-slate-950 border border-[#e6e9ef] dark:border-slate-800">
+            <div className="flex items-center gap-1 p-1 rounded-xl bg-canvas-bone border border-canvas-silk">
               <button
                 onClick={() => setViewMode("table")}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-extrabold transition-all ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                   viewMode === "table"
-                    ? "bg-[#0073ea] text-white shadow-xs"
-                    : "text-[#676879] dark:text-slate-400 hover:text-slate-900 hover:bg-white dark:hover:bg-slate-800"
+                    ? "bg-primary-500 text-white shadow-button"
+                    : "text-graphite-500 hover:text-midnight hover:bg-white"
                 }`}
               >
                 <Table className="h-3.5 w-3.5" />
@@ -225,10 +225,10 @@ export const AppointmentsPage = () => {
 
               <button
                 onClick={() => setViewMode("kanban")}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-extrabold transition-all ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                   viewMode === "kanban"
-                    ? "bg-[#0073ea] text-white shadow-xs"
-                    : "text-[#676879] dark:text-slate-400 hover:text-slate-900 hover:bg-white dark:hover:bg-slate-800"
+                    ? "bg-primary-500 text-white shadow-button"
+                    : "text-graphite-500 hover:text-midnight hover:bg-white"
                 }`}
               >
                 <Kanban className="h-3.5 w-3.5" />

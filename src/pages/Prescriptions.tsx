@@ -363,20 +363,20 @@ export const Prescriptions = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f5f7fa] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors pb-16">
+    <div className="min-h-screen bg-canvas text-midnight font-sans transition-colors pb-16">
       {/* Top Bar */}
-      <div className="bg-white dark:bg-slate-900 border-b border-[#e6e9ef] dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
-        <div className="max-w-[1500px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white border-b border-canvas-silk px-4 sm:px-6 py-5 sticky top-0 z-30 shadow-sm">
+        <div className="max-w-content mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-11 w-11 rounded-2xl bg-[#0073ea] text-white flex items-center justify-center font-black shadow-sm shadow-[#0073ea]/30">
+            <div className="h-11 w-11 rounded-2xl bg-primary-500 text-white flex items-center justify-center shadow-button">
               <Pill className="h-5 w-5" />
             </div>
             <div>
-              <h1 className="text-xl font-black tracking-tight flex items-center gap-2.5 text-slate-900 dark:text-slate-100">
+              <h1 className="font-display text-2xl font-medium tracking-tight flex items-center gap-2.5 text-midnight">
                 {isProvider ? "Prescription & Dispensing Board" : "My Medication Prescriptions"}
-                <span className="w-2 h-2 rounded-full bg-[#00a86b]" />
+                <span className="w-2 h-2 rounded-full bg-success-500" />
               </h1>
-              <p className="text-xs text-slate-400 dark:text-slate-500 font-medium">
+              <p className="text-sm text-graphite-500 font-medium tracking-wide">
                 {isProvider ? "Write single or multi-medication digital prescriptions & dispense orders" : "Track dosage instructions, active refills & digital prescriptions"}
               </p>
             </div>
@@ -386,57 +386,57 @@ export const Prescriptions = () => {
             {isProvider && (
               <Dialog open={showNewPrescription} onOpenChange={setShowNewPrescription}>
                 <DialogTrigger asChild>
-                  <button className="px-5 py-2.5 rounded-full bg-[#0073ea] hover:bg-[#0060c7] text-white font-extrabold text-xs shadow-sm shadow-[#0073ea]/30 transition-all flex items-center gap-2 active:scale-95">
+                  <button className="vf-btn-primary gap-2 text-sm active:scale-95">
                     <Plus className="h-4 w-4" />
-                    <span>Write E-Prescription (Multi-Drug)</span>
+                    <span>Write E-Prescription</span>
                   </button>
                 </DialogTrigger>
-                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 rounded-3xl p-6">
+                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white border border-canvas-silk rounded-card p-6">
                   <DialogHeader>
-                    <DialogTitle className="font-black text-xl text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                      <Pill className="h-6 w-6 text-[#0073ea]" />
+                    <DialogTitle className="font-display text-xl font-medium text-midnight flex items-center gap-2">
+                      <Pill className="h-6 w-6 text-primary-500" />
                       Write Multi-Medication E-Prescription
                     </DialogTitle>
                   </DialogHeader>
 
-                  <div className="space-y-4 py-2 text-xs">
+                  <div className="space-y-4 py-2 text-sm">
                     {/* Patient Selector */}
                     <div>
-                      <label className="font-bold text-[#676879] uppercase">1. Select Patient *</label>
+                      <label className="font-medium text-graphite-600 uppercase text-xs">1. Select Patient *</label>
                       <input
-                        className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4] dark:border-slate-800 bg-white dark:bg-slate-950 font-medium"
+                        className="w-full mt-2 px-4 py-2.5 rounded-xl border border-canvas-silk bg-white font-medium focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
                         placeholder="Search patient by name or email..."
                         value={searchPatient}
                         onChange={(e) => setSearchPatient(e.target.value)}
                       />
                       {patients.length > 0 && !selectedPatient && (
-                        <div className="mt-1 border rounded-xl max-h-36 overflow-y-auto bg-white dark:bg-slate-900 shadow-md">
+                        <div className="mt-2 border rounded-xl max-h-36 overflow-y-auto bg-white shadow-card">
                           {patients.map((p: any) => (
                             <button
                               key={p.id}
                               type="button"
-                              className="w-full text-left px-3 py-2.5 text-xs hover:bg-[#f0f2f7] dark:hover:bg-slate-800 flex items-center justify-between border-b last:border-b-0"
+                              className="w-full text-left px-4 py-3 text-sm hover:bg-canvas transition-colors flex items-center justify-between border-b last:border-b-0"
                               onClick={() => {
                                 setSelectedPatient({ id: p.id, name: `${p.first_name || ""} ${p.last_name || ""}`.trim() || p.email, email: p.email });
                                 setSearchPatient(`${p.first_name || ""} ${p.last_name || ""}`.trim() || p.email);
                               }}
                             >
                               <div>
-                                <p className="font-bold text-slate-900 dark:text-slate-100">{p.first_name} {p.last_name}</p>
-                                <p className="text-[10px] text-slate-400">{p.email}</p>
+                                <p className="font-medium text-midnight">{p.first_name} {p.last_name}</p>
+                                <p className="text-xs text-graphite-500">{p.email}</p>
                               </div>
-                              <span className="text-[10px] font-bold text-[#0073ea]">Select →</span>
+                              <span className="text-xs font-medium text-primary-500">Select →</span>
                             </button>
                           ))}
                         </div>
                       )}
                       {selectedPatient && (
-                        <div className="mt-2 p-2.5 rounded-xl bg-[#0073ea]/10 border border-[#0073ea]/30 flex items-center justify-between">
-                          <span className="font-bold text-[#0073ea]">Patient: {selectedPatient.name}</span>
+                        <div className="mt-2 p-3 rounded-xl bg-primary-50 border border-primary-100 flex items-center justify-between">
+                          <span className="font-medium text-primary-500">Patient: {selectedPatient.name}</span>
                           <button
                             type="button"
                             onClick={() => { setSelectedPatient(null); setSearchPatient(""); }}
-                            className="text-[10px] font-bold text-rose-500 hover:underline"
+                            className="text-xs font-medium text-error-500 hover:underline"
                           >
                             Change
                           </button>
