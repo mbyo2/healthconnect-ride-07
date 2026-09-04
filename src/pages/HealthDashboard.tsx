@@ -97,17 +97,21 @@ export default function HealthDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
-      <div className="container mx-auto py-8 px-4 md:px-6 lg:px-8 space-y-8">
+    <div className="min-h-screen bg-canvas">
+      <div className="mx-auto max-w-content px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-4xl font-bold tracking-tight">Health Dashboard</h1>
-            <p className="text-muted-foreground mt-2 text-lg">
+            <div className="vf-eyebrow mb-4">
+              <Heart className="h-3.5 w-3.5 text-accent-500" />
+              Your Health Journey
+            </div>
+            <h1 className="font-display text-4xl sm:text-5xl font-medium text-midnight tracking-tight mb-3">Health Dashboard</h1>
+            <p className="text-base text-graphite-500 leading-relaxed tracking-wide max-w-2xl">
               Monitor your health metrics and track your wellness goals
             </p>
           </div>
-          <Button onClick={() => navigate('/ai-diagnostics')} className="mt-4 md:mt-0 gap-2 h-12 px-6 text-base">
+          <Button onClick={() => navigate('/ai-diagnostics')} className="vf-btn-primary mt-4 md:mt-0 gap-2 h-12 px-6">
             <Bot className="h-5 w-5" />
             AI Health Assistant
             <Sparkles className="h-4 w-4" />
@@ -123,11 +127,16 @@ export default function HealthDashboard() {
           }}
         />
 
-        {/* Health Stats - Monday.com Style Widget Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Health Stats - Modern Card Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
           {healthStats.length > 0 ? healthStats.map((stat, index) => (
-            <Card key={index} className="hover:shadow-xl transition-all duration-300 border-2 border-border/50">
-              <CardHeader className="pb-4">
+            <div key={index} className="vf-card space-y-3 group">
+              <div className="flex items-center justify-between">
+                <div className="p-2.5 rounded-2xl bg-primary-50 border border-primary-100">
+                  {getIconComponent(stat.icon)}
+                </div>
+                {getTrendIcon(stat.trend)}
+              </div>
                 <div className="flex items-center justify-between">
                   <div className="p-3 bg-primary/10 rounded-xl">
                     {getIconComponent(stat.icon)}

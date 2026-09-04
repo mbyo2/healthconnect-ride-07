@@ -53,21 +53,21 @@ const Profile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f5f7fa] dark:bg-slate-950 py-8 px-4 sm:px-6 font-sans">
+    <div className="min-h-screen bg-canvas py-8 px-4 sm:px-6 font-sans">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Profile Header Card */}
-        <div className="rounded-3xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-sm">
+        <div className="vf-card !p-8">
           <div className="flex flex-col sm:flex-row items-center gap-6 sm:gap-8">
             <div className="relative">
-              <Avatar className="h-28 w-28 ring-4 ring-[#0073ea]/20 shadow-md">
+              <Avatar className="h-28 w-28 ring-4 ring-primary-500/20 shadow-card">
                 <AvatarImage src={profile?.avatar_url || ""} />
-                <AvatarFallback className="bg-[#e5f0ff] dark:bg-blue-950 text-[#0073ea] dark:text-blue-400 text-2xl font-black">
+                <AvatarFallback className="bg-primary-50 text-primary-500 text-2xl font-display font-medium">
                   {formData.firstName?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || "U"}
                 </AvatarFallback>
               </Avatar>
               <button
                 type="button"
-                className="absolute -bottom-1 -right-1 h-9 w-9 rounded-full bg-[#0073ea] text-white flex items-center justify-center shadow-md hover:bg-[#0060c7] transition-transform active:scale-95"
+                className="absolute -bottom-1 -right-1 h-9 w-9 rounded-full bg-primary-500 text-white flex items-center justify-center shadow-button hover:bg-primary-600 transition-transform active:scale-95"
                 title="Change Photo"
               >
                 <Camera className="h-4 w-4" />
@@ -76,28 +76,28 @@ const Profile = () => {
             
             <div className="flex-1 text-center sm:text-left space-y-2">
               <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
-                <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight">
+                <h1 className="font-display text-3xl font-medium text-midnight tracking-tight">
                   {formData.firstName} {formData.lastName || "Account"}
                 </h1>
-                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-black bg-[#e5f0ff] dark:bg-blue-950 text-[#0073ea] dark:text-blue-400 border border-[#0073ea]/20">
+                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-pill text-xs font-medium bg-success-50 text-success-500 border border-success-100">
                   <ShieldCheck className="h-3.5 w-3.5" />
                   {profile?.role === 'health_personnel' || profile?.role === 'doctor' ? 'Verified Practitioner' : 'Verified Patient'}
                 </span>
               </div>
-              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 text-xs font-medium text-slate-500 dark:text-slate-400">
+              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 text-sm text-graphite-500">
                 <span className="flex items-center gap-1.5">
-                  <Mail className="h-4 w-4 text-[#0073ea]" />
+                  <Mail className="h-4 w-4 text-primary-500" />
                   {formData.email}
                 </span>
                 {formData.phone && (
                   <span className="flex items-center gap-1.5">
-                    <Phone className="h-4 w-4 text-[#0073ea]" />
+                    <Phone className="h-4 w-4 text-primary-500" />
                     {formData.phone}
                   </span>
                 )}
                 {formData.location && (
                   <span className="flex items-center gap-1.5">
-                    <MapPin className="h-4 w-4 text-[#0073ea]" />
+                    <MapPin className="h-4 w-4 text-primary-500" />
                     {formData.location}
                   </span>
                 )}
