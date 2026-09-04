@@ -43,7 +43,7 @@ const INITIAL_PATIENTS: PatientRecord[] = [
     doctor: {
       name: "Dr. Sarah Jenkins",
       specialty: "Emergency Trauma",
-      avatarUrl: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=100&auto=format&fit=crop&q=85",
+      avatarUrl: "https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=100&auto=format&fit=crop&q=85",
     },
     location: "Lusaka ER-B4",
     vitalScore: "95% SpO2 • 118/75",
@@ -143,7 +143,7 @@ const INITIAL_PATIENTS: PatientRecord[] = [
     doctor: {
       name: "Dr. Sarah Jenkins",
       specialty: "Emergency Trauma",
-      avatarUrl: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=100&auto=format&fit=crop&q=85",
+      avatarUrl: "https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=100&auto=format&fit=crop&q=85",
     },
     location: "Ward 4B Bed 12",
     vitalScore: "98% SpO2 • 120/78",
@@ -215,7 +215,7 @@ export const BespokeWorkOSShowcase = () => {
       doctor: {
         name: "Dr. Sarah Jenkins",
         specialty: "Emergency Trauma",
-        avatarUrl: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=100&auto=format&fit=crop&q=85",
+        avatarUrl: "https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=100&auto=format&fit=crop&q=85",
       },
       location: "Lusaka Triage-New",
       vitalScore: "96% SpO2 • 120/80",

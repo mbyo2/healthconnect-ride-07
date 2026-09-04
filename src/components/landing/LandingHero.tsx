@@ -91,8 +91,8 @@ export const LandingHero = () => {
           </div>
           <div className="relative">
             <img
-              src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=2000&q=85"
-              alt="African healthcare professional in white coat consulting with patient - Doc' O Clock telemedicine platform"
+              src="https://images.unsplash.com/photo-1581594693702-fbdc51b2763b?auto=format&fit=crop&w=2000&q=85"
+              alt="Black African female doctor attending to patient - Doc' O Clock live care consultation platform"
               className="h-[38vh] w-full object-cover object-center sm:h-[48vh] lg:h-[54vh]"
               width={2000}
               height={1125}

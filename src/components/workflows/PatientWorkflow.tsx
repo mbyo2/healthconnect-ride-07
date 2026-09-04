@@ -84,7 +84,7 @@ const FEATURED_DOCTORS = [
     experience: '9 years experience • Online',
     rating: 4.9,
     reviews: 188,
-    avatar: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&w=240&q=85',
+    avatar: 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?auto=format&fit=crop&w=240&q=85',
     timeSlots: ['10:00 a.m.', '11:30 a.m.', '1:00 p.m.', '3:30 p.m.'],
     price: 'K300',
     mode: 'online'

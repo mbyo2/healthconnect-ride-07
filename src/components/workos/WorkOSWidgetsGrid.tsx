@@ -174,7 +174,7 @@ export const WorkOSWidgetsGrid: React.FC<WorkOSWidgetsGridProps> = ({ isDarkMode
           <div className="space-y-3">
             {[
               { name: "Dr. Mutale Mwansa", role: "Chief Cardiologist", status: "In Surgery", avatar: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=100&auto=format&fit=crop&q=85" },
-              { name: "Dr. Sarah Jenkins", role: "Emergency Trauma Lead", status: "On Duty", avatar: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=100&auto=format&fit=crop&q=85" },
+              { name: "Dr. Sarah Jenkins", role: "Emergency Trauma Lead", status: "On Duty", avatar: "https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=100&auto=format&fit=crop&q=85" },
               { name: "Dr. Chisamba Banda", role: "Neurologist", status: "On Duty", avatar: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=100&auto=format&fit=crop&q=85" },
               { name: "Dr. Aisha Nkomo", role: "Pediatric Specialist", status: "In Teleconsult", avatar: "https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=100&auto=format&fit=crop&q=85" },
             ].map((doc) => (
