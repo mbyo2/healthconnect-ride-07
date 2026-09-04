@@ -203,7 +203,7 @@ export const ProviderPortal = () => {
               />
             </TabsContent>
           </Tabs>
-        </Card>
+        </div>
 
         <div className="text-center space-y-4">
           <p className="text-sm text-muted-foreground">

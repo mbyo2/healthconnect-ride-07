@@ -137,26 +137,17 @@ export default function HealthDashboard() {
                 </div>
                 {getTrendIcon(stat.trend)}
               </div>
-                <div className="flex items-center justify-between">
-                  <div className="p-3 bg-primary/10 rounded-xl">
-                    {getIconComponent(stat.icon)}
-                  </div>
-                  {getTrendIcon(stat.trend)}
+              <div className="space-y-3">
+                <h3 className="font-semibold text-base">{stat.title}</h3>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-3xl font-bold">{stat.value}</span>
+                  <span className="text-sm text-muted-foreground">{stat.unit}</span>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <h3 className="font-semibold text-base">{stat.title}</h3>
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-3xl font-bold">{stat.value}</span>
-                    <span className="text-sm text-muted-foreground">{stat.unit}</span>
-                  </div>
-                  <Badge className={getStatusColor(stat.status)} variant="secondary">
-                    {stat.status}
-                  </Badge>
-                </div>
-              </CardContent>
-            </Card>
+                <Badge className={getStatusColor(stat.status)} variant="secondary">
+                  {stat.status}
+                </Badge>
+              </div>
+            </div>
           )) : (
             <div className="col-span-full text-center py-12">
               <p className="text-muted-foreground text-lg">No health metrics recorded yet. Start tracking your health!</p>
