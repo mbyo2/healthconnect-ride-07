@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
+import { useInstitutionContext } from '@/hooks/useInstitutionContext';
 import { useCurrency } from '@/hooks/use-currency';
 import { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
@@ -14,22 +15,9 @@ const COLORS = ['hsl(var(--primary))', 'hsl(var(--secondary))', '#10b981', '#f59
 
 export const PharmacySalesReport = () => {
   const { user } = useAuth();
+  const { institutionId: pharmacyId } = useInstitutionContext();
   const { formatPrice } = useCurrency();
   const [period, setPeriod] = useState<'today' | 'week' | 'month'>('today');
-
-  const { data: pharmacyId } = useQuery({
-    queryKey: ['pharmacy-institution', user?.id],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from('institution_staff')
-        .select('institution_id')
-        .eq('provider_id', user!.id)
-        .eq('is_active', true)
-        .maybeSingle();
-      return data?.institution_id || null;
-    },
-    enabled: !!user,
-  });
 
   const getDateFilter = () => {
     const now = new Date();

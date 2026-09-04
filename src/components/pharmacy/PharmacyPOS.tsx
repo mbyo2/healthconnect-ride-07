@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
+import { useInstitutionContext } from "@/hooks/useInstitutionContext";
 import { toast } from "sonner";
 import { useCurrency } from "@/hooks/use-currency";
 import {
@@ -35,6 +36,7 @@ interface InventoryItem {
 
 export const PharmacyPOS = () => {
   const { user } = useAuth();
+  const { institutionId: pharmacyId } = useInstitutionContext();
   const { formatPrice, getSymbol } = useCurrency();
   const queryClient = useQueryClient();
 
@@ -53,15 +55,6 @@ export const PharmacyPOS = () => {
   const [openingBalanceInput, setOpeningBalanceInput] = useState("0");
   const [closingBalanceInput, setClosingBalanceInput] = useState("0");
   const [showCloseDialog, setShowCloseDialog] = useState(false);
-
-  const { data: pharmacyId } = useQuery({
-    queryKey: ["pharmacy-institution", user?.id],
-    queryFn: async () => {
-      const { data } = await supabase.from("institution_staff").select("institution_id").eq("provider_id", user!.id).eq("is_active", true).maybeSingle();
-      return data?.institution_id || null;
-    },
-    enabled: !!user,
-  });
 
   const { data: inventory } = useQuery({
     queryKey: ["pos-inventory", pharmacyId, searchQuery],

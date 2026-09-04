@@ -122,9 +122,10 @@ export const CareExperience = () => {
           <div className="rounded-card border border-canvas-silk bg-white p-5 sm:p-6 shadow-card overflow-hidden">
             <div className="rounded-2xl overflow-hidden relative">
               <img
-                src="https://images.unsplash.com/photo-1594824813566-88855ce78905?auto=format&fit=crop&w=1200&q=85"
-                alt="Black woman doctor ready for a Doc' O Clock video consult"
+                src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&w=1200&q=85"
+                alt="African woman doctor in consultation ready for Doc' O Clock video telemedicine"
                 className="h-64 sm:h-80 w-full object-cover"
+                loading="lazy"
               />
               <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-midnight/80 to-transparent">
                 <div className="flex items-center justify-between gap-3">

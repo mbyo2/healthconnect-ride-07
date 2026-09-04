@@ -24,9 +24,10 @@ const About = () => (
           </p>
         </section>
         <img
-          src="https://images.unsplash.com/photo-1527613426441-4da17471b66d?auto=format&fit=crop&w=1000&q=85"
-          alt="Healthcare professional and patient reviewing care together"
+          src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1000&q=85"
+          alt="African healthcare professional and patient reviewing care together - Doc' O Clock platform"
           className="h-64 w-full rounded-3xl object-cover shadow-xl shadow-primary/10"
+          loading="lazy"
         />
       </div>
 

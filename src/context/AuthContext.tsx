@@ -153,6 +153,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         const { data: { user: currentUser } } = await supabase.auth.getUser();
         const userEmail = currentUser?.email;
+        const metaRole = currentUser?.user_metadata?.role || currentUser?.user_metadata?.business_type || 'patient';
+        const metaBusinessName = currentUser?.user_metadata?.business_name;
+        const metaProviderType = currentUser?.user_metadata?.providerType;
+
+        // Determine proper role
+        let profileRole = metaRole;
+        if (metaProviderType) profileRole = metaProviderType;
+        if (profileRole === 'business') profileRole = 'institution_admin';
 
         const { error: createError } = await supabase
           .from('profiles')
@@ -160,7 +168,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             id: userId,
             email: userEmail,
             is_profile_complete: false,
-            role: 'patient' // Default role for new profiles
+            role: profileRole
           });
 
         if (createError) {
@@ -170,8 +178,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setTimeout(() => fetchProfile(userId, retryCount + 1), 2000);
           }
         } else {
+          // Seed user_roles table with the resolved role
+          const rolesToInsert = [{ user_id: userId, role: profileRole as any }];
+          // Expand pharmacy → also add pharmacist; lab → also add lab_technician
+          if (profileRole === 'pharmacy') rolesToInsert.push({ user_id: userId, role: 'pharmacist' as any });
+          if (profileRole === 'laboratory' || profileRole === 'lab') rolesToInsert.push({ user_id: userId, role: 'lab_technician' as any });
+          
+          await supabase.from('user_roles').upsert(rolesToInsert, { onConflict: 'user_id,role' });
+
           // Fetch the newly created profile
-          const { data: newProfile, error: fetchNewError } = await supabase
+          const { data: newProfile } = await supabase
             .from('profiles')
             .select('*')
             .eq('id', userId)
@@ -180,14 +196,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (newProfile) {
             setProfile({
               ...newProfile,
-              role: roleData || 'patient'
+              role: roleData || profileRole
             });
             safeLocalSet('doc_oclock_profile', JSON.stringify({
               ...newProfile,
-              role: roleData || 'patient'
+              role: roleData || profileRole
             }));
-          } else if (fetchNewError) {
-            console.error('Error fetching newly created profile:', fetchNewError);
           }
         }
       }

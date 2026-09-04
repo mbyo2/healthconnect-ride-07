@@ -38,55 +38,55 @@ export function BottomNavMenu({ user, menuItems }: BottomNavMenuProps) {
     <Sheet>
       <SheetTrigger asChild>
         <button
-          className="flex flex-1 flex-col items-center justify-center gap-1 py-2 px-1 rounded-xl min-h-[52px] text-muted-foreground touch-manipulation"
+          className="relative flex flex-1 flex-col items-center justify-center py-1.5 px-2 rounded-2xl min-h-[50px] text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 touch-manipulation group"
           {...touchFeedbackProps}
           aria-label="More options"
         >
-          <div className="p-1.5 rounded-lg">
+          <div className="p-2 rounded-full transition-all duration-200 flex items-center justify-center group-hover:bg-slate-100 dark:group-hover:bg-slate-800">
             <Menu className="h-5 w-5" />
           </div>
-          <span className="text-[10px] font-medium leading-none">More</span>
+          <span className="text-[10px] font-black leading-none tracking-tight mt-0.5">More</span>
         </button>
       </SheetTrigger>
 
       <SheetContent
         side="right"
-        className="w-[85vw] max-w-sm bg-background border-border flex flex-col h-full"
+        className="w-[82vw] max-w-sm bg-white dark:bg-slate-900 border-l border-[#e6e9ef] dark:border-slate-800 flex flex-col h-full p-0"
       >
-        <SheetHeader className="pb-4 flex-shrink-0">
-          <SheetTitle className="text-lg font-bold">Menu</SheetTitle>
+        <SheetHeader className="pb-0 flex-shrink-0 px-5 pt-6">
+          <SheetTitle className="text-xl font-black text-slate-900 dark:text-slate-100 tracking-tight">Menu</SheetTitle>
           {user && (
-            <div className="flex items-center gap-3 py-3 px-3 bg-muted/50 rounded-xl">
-              <Avatar className="h-10 w-10 ring-2 ring-border">
+            <div className="flex items-center gap-3 mt-4 py-3.5 px-4 bg-[#f5f7fa] dark:bg-slate-800 rounded-3xl border border-[#e6e9ef] dark:border-slate-700">
+              <Avatar className="h-11 w-11 ring-2 ring-[#0073ea]/30 ring-offset-1 ring-offset-[#f5f7fa] dark:ring-offset-slate-800">
                 <AvatarImage src={user?.user_metadata?.avatar_url || ""} />
-                <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                <AvatarFallback className="bg-[#e5f0ff] dark:bg-blue-950 text-[#0073ea] dark:text-blue-400 font-extrabold text-sm">
                   {user?.email?.[0]?.toUpperCase() || "U"}
                 </AvatarFallback>
               </Avatar>
               <div className="flex flex-col flex-1 min-w-0">
-                <span className="font-semibold text-sm truncate">
+                <span className="font-extrabold text-sm text-slate-900 dark:text-slate-100 truncate">
                   {user.user_metadata?.name || user.email?.split('@')[0] || 'User'}
                 </span>
-                <span className="text-xs text-muted-foreground truncate">{user.email}</span>
+                <span className="text-xs text-slate-400 dark:text-slate-500 truncate font-medium">{user.email}</span>
               </div>
             </div>
           )}
         </SheetHeader>
 
-        <ScrollArea className="flex-1 px-1">
-          <div className="space-y-1 pb-6">
+        <ScrollArea className="flex-1 px-5 mt-4">
+          <div className="space-y-1 pb-8">
             {menuItems.map((item, idx) => (
               <SheetClose key={idx} asChild>
                 <Link
                   to={item.to}
-                  className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-accent transition-colors group"
+                  className="flex items-center gap-3.5 w-full p-3.5 rounded-2xl hover:bg-[#f0f4ff] dark:hover:bg-slate-800 transition-all group"
                 >
-                  <div className="p-2 rounded-lg bg-primary/10 text-primary group-hover:bg-primary/15 transition-colors shrink-0">
+                  <div className="p-2.5 rounded-xl bg-[#e5f0ff] dark:bg-blue-950/60 text-[#0073ea] dark:text-blue-400 group-hover:bg-[#0073ea] group-hover:text-white transition-all shrink-0">
                     {item.icon}
                   </div>
                   <div className="flex flex-col min-w-0">
-                    <span className="text-sm font-medium">{item.label}</span>
-                    <span className="text-xs text-muted-foreground truncate">{item.description}</span>
+                    <span className="text-sm font-extrabold text-slate-900 dark:text-slate-100 group-hover:text-[#0073ea] transition-colors">{item.label}</span>
+                    <span className="text-xs text-slate-400 dark:text-slate-500 truncate font-medium">{item.description}</span>
                   </div>
                 </Link>
               </SheetClose>

@@ -50,14 +50,14 @@ export function Header() {
   if (isDesktop) return null;
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 w-full bg-white dark:bg-slate-900 backdrop-blur-xl border-b border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+    <header className="fixed top-0 left-0 right-0 z-50 w-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-b border-canvas-silk dark:border-slate-800">
       <div className="flex h-16 items-center justify-between px-4">
         <AppLogo size="sm" className="gap-2 shrink-0" />
 
         <div className="flex items-center gap-2">
           {user && (
             <>
-              <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl" onClick={() => navigate("/search")}>
+              <Button variant="ghost" size="icon" className="h-10 w-10 rounded-pill" onClick={() => navigate("/search")}>
                 <Search className="h-5 w-5" />
               </Button>
               <NotificationBell />
@@ -69,11 +69,11 @@ export function Header() {
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl ml-2">
+              <Button variant="ghost" size="icon" className="h-10 w-10 rounded-pill ml-2">
                 {user ? (
-                  <Avatar className="h-9 w-9 ring-2 ring-[#0073ea]">
+                  <Avatar className="h-9 w-9 ring-2 ring-primary-500">
                     <AvatarImage src={profile?.avatar_url || ""} alt={user?.email || "Avatar"} />
-                    <AvatarFallback className="bg-[#e5f0ff] text-[#0073ea] text-xs font-extrabold">
+                    <AvatarFallback className="bg-primary-50 text-primary-500 text-xs font-medium">
                       {user?.email?.[0]?.toUpperCase() || "U"}
                     </AvatarFallback>
                   </Avatar>
@@ -90,7 +90,7 @@ export function Header() {
                     <div className="text-xs text-muted-foreground">My Account</div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild><Link to="/workos" className="font-medium text-[#0073ea]">Clinical WorkOS Board</Link></DropdownMenuItem>
+                  <DropdownMenuItem asChild><Link to="/search" className="font-medium text-[#0073ea]">Find Doctors & Care</Link></DropdownMenuItem>
                   <DropdownMenuItem asChild><Link to="/profile" className="font-medium">Profile & Settings</Link></DropdownMenuItem>
                   <DropdownMenuItem asChild><Link to="/appointments" className="font-medium">My Appointments</Link></DropdownMenuItem>
                   <DropdownMenuItem asChild><Link to="/documentation" className="font-medium">Help & Support</Link></DropdownMenuItem>

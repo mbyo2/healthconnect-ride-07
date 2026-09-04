@@ -57,66 +57,132 @@ export function UserRolesProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      if (user && profile) {
+      if (user) {
         setLoading(true);
         try {
-          // Fetch all roles for the user from user_roles table
+          // 1. Fetch roles from user_roles table
           const { data: rolesData, error } = await supabase
             .from('user_roles')
             .select('role')
             .eq('user_id', user.id);
 
-          if (error) {
-            console.error('Error fetching roles:', error);
-            // Fallback to profile role
-            const fallbackRole = (profile.role || 'patient') as UserRole;
-            setUserRole(fallbackRole);
-            setCurrentRole(fallbackRole);
-            setAvailableRoles(fallbackRole ? [fallbackRole] : ['patient']);
-          } else if (rolesData && rolesData.length > 0) {
-            const roles = rolesData.map(r => r.role as UserRole);
-            setAvailableRoles(roles);
+          const rawRoles: string[] = [];
 
-            // Set primary role (super_admin > admin > institution_admin > doctor/nurse/radiologist > health_personnel > pharmacist > pharmacy > lab_technician > lab > patient)
-            const rolePriority: UserRole[] = [
-              'super_admin', 'admin', 'support', 'cxo',
-              'institution_admin', 'institution_staff',
-              'doctor', 'nurse', 'radiologist', 'pathologist', 'specialist', 'health_personnel',
-              'ot_staff', 'triage_staff', 'receptionist', 'hr_manager', 'billing_staff',
-              'pharmacist', 'pharmacy', 'phlebotomist',
-              'lab_technician', 'lab',
-              'inventory_manager', 'maintenance_manager', 'ambulance_staff',
-              'patient'
-            ];
-            const primaryRole = rolePriority.find(r => roles.includes(r)) || roles[0];
+          if (!error && rolesData && rolesData.length > 0) {
+            rolesData.forEach(r => { if (r.role) rawRoles.push(r.role); });
+          }
 
-            setUserRole(primaryRole);
-            setCurrentRole(primaryRole);
+          // 2. Add profile role
+          if (profile?.role) {
+            rawRoles.push(profile.role);
+          }
 
-            // Check admin status by looking at roles
-            const isAdminRole = roles.includes('admin');
+          // 3. Add user_metadata roles
+          const metaRole = user.user_metadata?.role;
+          const metaBusinessType = user.user_metadata?.business_type;
+          const metaProviderType = user.user_metadata?.providerType;
+          if (metaRole) rawRoles.push(metaRole);
+          if (metaBusinessType) {
+            if (metaBusinessType === 'pharmacy') rawRoles.push('pharmacy', 'pharmacist');
+            else if (metaBusinessType === 'laboratory') rawRoles.push('lab', 'lab_technician');
+            else rawRoles.push('institution_admin');
+          }
+          if (metaProviderType) rawRoles.push(metaProviderType);
 
-            if (isAdminRole) {
-              setAdminLevel('admin');
+          // 4. Role Expansion for related capabilities
+          const expandedRoles = new Set<UserRole>();
+          rawRoles.forEach(r => {
+            const roleStr = r.toLowerCase();
+            if (roleStr === 'pharmacy') {
+              expandedRoles.add('pharmacy');
+              expandedRoles.add('pharmacist');
+              expandedRoles.add('institution_admin');
+            } else if (roleStr === 'pharmacist') {
+              expandedRoles.add('pharmacist');
+              expandedRoles.add('pharmacy');
+              expandedRoles.add('health_personnel');
+            } else if (roleStr === 'lab' || roleStr === 'laboratory') {
+              expandedRoles.add('lab');
+              expandedRoles.add('lab_technician');
+              expandedRoles.add('institution_admin');
+            } else if (roleStr === 'lab_technician') {
+              expandedRoles.add('lab_technician');
+              expandedRoles.add('lab');
+              expandedRoles.add('health_personnel');
+            } else if (roleStr === 'doctor') {
+              expandedRoles.add('doctor');
+              expandedRoles.add('health_personnel');
+            } else if (roleStr === 'nurse') {
+              expandedRoles.add('nurse');
+              expandedRoles.add('health_personnel');
+            } else if (roleStr === 'radiologist') {
+              expandedRoles.add('radiologist');
+              expandedRoles.add('health_personnel');
+            } else if (roleStr === 'pathologist') {
+              expandedRoles.add('pathologist');
+              expandedRoles.add('health_personnel');
+            } else if (roleStr === 'institution_admin' || roleStr === 'hospital' || roleStr === 'clinic') {
+              expandedRoles.add('institution_admin');
+              expandedRoles.add('institution_staff');
+            } else if (roleStr === 'superadmin' || roleStr === 'super_admin') {
+              expandedRoles.add('super_admin');
+              expandedRoles.add('admin');
+            } else if (roleStr === 'admin') {
+              expandedRoles.add('admin');
+            } else if (roleStr === 'patient') {
+              expandedRoles.add('patient');
             } else {
-              setAdminLevel(profile.admin_level as AdminLevel);
+              expandedRoles.add(roleStr as UserRole);
             }
+          });
+
+          if (expandedRoles.size === 0) {
+            expandedRoles.add('patient');
+          }
+
+          const roles = Array.from(expandedRoles);
+          setAvailableRoles(roles);
+
+          // Role priority ranking for setting primary role
+          const rolePriority: UserRole[] = [
+            'super_admin', 'admin', 'support', 'cxo',
+            'pharmacy', 'pharmacist',
+            'lab', 'lab_technician',
+            'institution_admin', 'institution_staff',
+            'doctor', 'nurse', 'radiologist', 'pathologist', 'specialist', 'health_personnel',
+            'ot_staff', 'triage_staff', 'receptionist', 'hr_manager', 'billing_staff',
+            'phlebotomist',
+            'inventory_manager', 'maintenance_manager', 'ambulance_staff',
+            'patient'
+          ];
+          const primaryRole = rolePriority.find(r => roles.includes(r)) || roles[0];
+
+          setUserRole(primaryRole);
+          setCurrentRole(primaryRole);
+
+          if (roles.includes('admin') || roles.includes('super_admin')) {
+            setAdminLevel(roles.includes('super_admin') ? 'superadmin' : 'admin');
           } else {
-            // No roles in user_roles table, use profile role as fallback
-            const fallbackRole = (profile.role || 'patient') as UserRole;
-            setUserRole(fallbackRole);
-            setCurrentRole(fallbackRole);
-            setAvailableRoles(fallbackRole ? [fallbackRole] : ['patient']);
+            setAdminLevel(profile?.admin_level as AdminLevel);
+          }
+
+          // Ensure role is recorded in user_roles table in background if missing
+          if (!rolesData || rolesData.length === 0) {
+            supabase.from('user_roles').insert({
+              user_id: user.id,
+              role: primaryRole as any,
+            }).then(() => {});
           }
         } catch (err) {
           console.error('Unexpected error in fetchRoles:', err);
-          setAvailableRoles(['patient']);
-          setUserRole('patient');
+          const fallbackRole = (profile?.role || user.user_metadata?.role || 'patient') as UserRole;
+          setAvailableRoles([fallbackRole]);
+          setUserRole(fallbackRole);
+          setCurrentRole(fallbackRole);
         } finally {
           setLoading(false);
         }
       } else if (!user && !authLoading) {
-        // Only stop loading if auth is also done loading and there's no user
         setUserRole(null);
         setAdminLevel(null);
         setCurrentRole(null);

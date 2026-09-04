@@ -13,10 +13,13 @@ import { InsuranceProvider } from "@/types/healthcare";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
+import { useInstitutionContext } from "@/hooks/useInstitutionContext";
+
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 const InstitutionSettings = () => {
     const { user } = useAuth();
+    const { institution: contextInst, institutionId, loading: instLoading, refreshInstitution } = useInstitutionContext();
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [institution, setInstitution] = useState<any>(null);
@@ -31,24 +34,9 @@ const InstitutionSettings = () => {
     });
 
     useEffect(() => {
-        fetchInstitution();
-    }, [user]);
-
-    const fetchInstitution = async () => {
-        if (!user) return;
-        try {
-            const { data, error } = await supabase
-                .from('healthcare_institutions')
-                .select('*')
-                .eq('admin_id', user.id)
-                .maybeSingle();
-
-            if (error) throw error;
-            if (!data) { setLoading(false); return; }
-            setInstitution(data);
-
-            // Initialize operating hours if empty
-            const hours = data.operating_hours || {};
+        if (contextInst) {
+            setInstitution(contextInst);
+            const hours = (contextInst as any).operating_hours || {};
             DAYS.forEach(day => {
                 if (!hours[day]) {
                     hours[day] = { open: "09:00", close: "17:00", closed: false };
@@ -56,21 +44,19 @@ const InstitutionSettings = () => {
             });
 
             setFormData({
-                name: data.name,
-                address: data.address || "",
-                phone: data.phone || "",
-                email: data.email || "",
-                currency: data.currency || "ZMW",
+                name: contextInst.name || "",
+                address: contextInst.address || "",
+                phone: contextInst.phone || "",
+                email: contextInst.email || "",
+                currency: contextInst.currency || "ZMW",
                 operating_hours: hours,
-                accepted_insurance_providers: data.accepted_insurance_providers || []
+                accepted_insurance_providers: contextInst.accepted_insurance_providers || []
             });
-        } catch (error) {
-            console.error("Error fetching institution:", error);
-            toast.error("Failed to load institution details");
-        } finally {
+            setLoading(false);
+        } else if (!instLoading) {
             setLoading(false);
         }
-    };
+    }, [contextInst, instLoading]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -117,6 +103,7 @@ const InstitutionSettings = () => {
                 .eq('id', institution.id);
 
             if (error) throw error;
+            await refreshInstitution?.();
             toast.success("Settings saved successfully");
         } catch (error) {
             console.error("Error saving settings:", error);

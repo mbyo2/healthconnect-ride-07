@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { useInstitutionContext } from "@/hooks/useInstitutionContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -10,40 +11,34 @@ import { format } from "date-fns";
 
 const InstitutionAppointments = () => {
     const { user } = useAuth();
+    const { institution, institutionId, loading: instLoading } = useInstitutionContext();
     const [loading, setLoading] = useState(true);
     const [appointments, setAppointments] = useState<any[]>([]);
 
     useEffect(() => {
         fetchAppointments();
-    }, [user]);
+    }, [institutionId]);
 
     const fetchAppointments = async () => {
-        if (!user) return;
+        if (!institutionId) { setLoading(false); return; }
         try {
-            // 1. Get Institution
-            const { data: inst, error: instError } = await supabase
-                .from('healthcare_institutions')
-                .select('id')
-                .eq('admin_id', user.id)
-                .maybeSingle();
+            // 1. Get Personnel & Staff
+            const [personnelRes, staffRes] = await Promise.all([
+                supabase.from('institution_personnel').select('user_id').eq('institution_id', institutionId),
+                supabase.from('institution_staff').select('provider_id').eq('institution_id', institutionId).eq('is_active', true),
+            ]);
 
-            if (instError) throw instError;
-            if (!inst) { setLoading(false); return; }
-
-            // 2. Get Personnel
-            const { data: personnel } = await supabase
-                .from('institution_personnel')
-                .select('user_id')
-                .eq('institution_id', inst.id);
-
-            const providerIds = personnel?.map(p => p.user_id) || [];
+            const providerIds = [
+                ...(personnelRes.data?.map(p => p.user_id) || []),
+                ...(staffRes.data?.map(s => s.provider_id) || []),
+            ].filter((v, i, a) => a.indexOf(v) === i);
 
             if (providerIds.length === 0) {
                 setAppointments([]);
                 return;
             }
 
-            // 3. Get Appointments with Patient and Provider details
+            // 2. Get Appointments with Patient and Provider details
             const { data: appts, error: apptsError } = await supabase
                 .from('appointments')
                 .select(`

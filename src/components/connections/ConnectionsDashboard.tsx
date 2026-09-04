@@ -60,107 +60,115 @@ export const ConnectionsDashboard = () => {
   const myProviders = getMyProviders();
 
   return (
-    <div className="container mx-auto py-8 space-y-6">
-      <div className="text-center">
-        <h1 className="text-xl md:text-3xl font-bold mb-2">Healthcare Connections</h1>
-        <p className="text-muted-foreground text-sm md:text-base">
-          Manage connections with providers and patients
-        </p>
-      </div>
-
-      {/* Add marketplace button */}
-      <div className="flex justify-center">
-        <Button
-          onClick={() => navigate('/marketplace-users')}
-          className="flex items-center gap-2"
-        >
-          <Search className="h-4 w-4" />
-          Browse User Marketplace
-        </Button>
-      </div>
-
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="overview" className="text-xs">Overview</TabsTrigger>
-          <TabsTrigger value="connections" className="text-xs">Connect</TabsTrigger>
-          <TabsTrigger value="requests" className="text-xs">Requests</TabsTrigger>
-          <TabsTrigger value="search" className="text-xs">Find</TabsTrigger>
-          <TabsTrigger value="primary" className="text-xs">Primary</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="overview" className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Connections</CardTitle>
-                <Users className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{approvedConnections.length}</div>
-                <p className="text-xs text-muted-foreground">Active connections</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Pending Requests</CardTitle>
-                <Clock className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{pendingRequests.length}</div>
-                <p className="text-xs text-muted-foreground">Awaiting approval</p>
-              </CardContent>
-            </Card>
-
-            {profile?.role === 'health_personnel' && (
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">My Patients</CardTitle>
-                  <UserPlus className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{myPatients.length}</div>
-                  <p className="text-xs text-muted-foreground">Connected patients</p>
-                </CardContent>
-              </Card>
-            )}
-
-            {profile?.role === 'patient' && (
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">My Providers</CardTitle>
-                  <CheckCircle className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{myProviders.length}</div>
-                  <p className="text-xs text-muted-foreground">Connected providers</p>
-                </CardContent>
-              </Card>
-            )}
-
-            {profile?.role === 'patient' && (
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Primary Provider</CardTitle>
-                  <Star className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{primaryProvider ? '1' : '0'}</div>
-                  <p className="text-xs text-muted-foreground">
-                    {primaryProvider ? 'Assigned' : 'Not set'}
-                  </p>
-                </CardContent>
-              </Card>
-            )}
+    <div className="min-h-screen bg-[#f5f7fa] dark:bg-slate-950 py-8 px-4 sm:px-6 font-sans">
+      <div className="max-w-6xl mx-auto space-y-6">
+        {/* Header Banner */}
+        <div className="rounded-3xl bg-[#0f172a] text-white p-6 sm:p-8 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="h-14 w-14 rounded-2xl bg-[#0073ea] text-white flex items-center justify-center font-black shadow-md">
+              <Users className="h-7 w-7" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-[#00a86b] animate-pulse" />
+                <span className="text-[11px] font-black uppercase tracking-wider text-slate-300">Care Network</span>
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white mt-0.5">Healthcare Connections</h1>
+              <p className="text-xs text-slate-400 font-medium">
+                Manage your network of verified doctors, clinics, patients and primary care providers
+              </p>
+            </div>
           </div>
+          <button
+            onClick={() => navigate('/marketplace-users')}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#0073ea] hover:bg-[#0060c7] text-white text-xs font-black shadow-sm shadow-[#0073ea]/30 transition-all active:scale-95 shrink-0"
+          >
+            <Search className="h-4 w-4" />
+            Browse User Marketplace
+          </button>
+        </div>
+
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-6">
+          <TabsList className="grid w-full grid-cols-5 p-1 bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 rounded-2xl shadow-xs">
+            <TabsTrigger value="overview" className="text-xs font-extrabold rounded-xl data-[state=active]:bg-[#0073ea] data-[state=active]:text-white transition-all">Overview</TabsTrigger>
+            <TabsTrigger value="connections" className="text-xs font-extrabold rounded-xl data-[state=active]:bg-[#0073ea] data-[state=active]:text-white transition-all">Network</TabsTrigger>
+            <TabsTrigger value="requests" className="text-xs font-extrabold rounded-xl data-[state=active]:bg-[#0073ea] data-[state=active]:text-white transition-all">Requests</TabsTrigger>
+            <TabsTrigger value="search" className="text-xs font-extrabold rounded-xl data-[state=active]:bg-[#0073ea] data-[state=active]:text-white transition-all">Find</TabsTrigger>
+            <TabsTrigger value="primary" className="text-xs font-extrabold rounded-xl data-[state=active]:bg-[#0073ea] data-[state=active]:text-white transition-all">Primary Care</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="overview" className="space-y-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="rounded-3xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider">Total Connections</span>
+                  <div className="p-2 rounded-xl bg-[#e5f0ff] dark:bg-blue-950 text-[#0073ea]">
+                    <Users className="h-4 w-4" />
+                  </div>
+                </div>
+                <div className="text-3xl font-black text-slate-900 dark:text-slate-100">{approvedConnections.length}</div>
+                <p className="text-xs text-slate-400 font-medium mt-1">Active verified connections</p>
+              </div>
+
+              <div className="rounded-3xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider">Pending Requests</span>
+                  <div className="p-2 rounded-xl bg-amber-50 dark:bg-amber-950 text-amber-600">
+                    <Clock className="h-4 w-4" />
+                  </div>
+                </div>
+                <div className="text-3xl font-black text-slate-900 dark:text-slate-100">{pendingRequests.length}</div>
+                <p className="text-xs text-slate-400 font-medium mt-1">Awaiting confirmation</p>
+              </div>
+
+              {profile?.role === 'health_personnel' && (
+                <div className="rounded-3xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider">My Patients</span>
+                    <div className="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950 text-emerald-600">
+                      <UserPlus className="h-4 w-4" />
+                    </div>
+                  </div>
+                  <div className="text-3xl font-black text-slate-900 dark:text-slate-100">{myPatients.length}</div>
+                  <p className="text-xs text-slate-400 font-medium mt-1">Direct patient roster</p>
+                </div>
+              )}
+
+              {profile?.role === 'patient' && (
+                <div className="rounded-3xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider">My Providers</span>
+                    <div className="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950 text-emerald-600">
+                      <CheckCircle className="h-4 w-4" />
+                    </div>
+                  </div>
+                  <div className="text-3xl font-black text-slate-900 dark:text-slate-100">{myProviders.length}</div>
+                  <p className="text-xs text-slate-400 font-medium mt-1">Approved doctors &amp; specialists</p>
+                </div>
+              )}
+
+              {profile?.role === 'patient' && (
+                <div className="rounded-3xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider">Primary Care</span>
+                    <div className="p-2 rounded-xl bg-[#e5f0ff] dark:bg-blue-950 text-[#0073ea]">
+                      <Star className="h-4 w-4" />
+                    </div>
+                  </div>
+                  <div className="text-3xl font-black text-slate-900 dark:text-slate-100">{primaryProvider ? '1' : '0'}</div>
+                  <p className="text-xs text-slate-400 font-medium mt-1">
+                    {primaryProvider ? 'Primary Physician Assigned' : 'Not yet selected'}
+                  </p>
+                </div>
+              )}
+            </div>
 
           {/* Recent Activity */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Connections</CardTitle>
-              <CardDescription>Your latest approved connections</CardDescription>
-            </CardHeader>
-            <CardContent>
+          <div className="rounded-3xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
+            <div className="border-b border-[#e6e9ef] dark:border-slate-800 pb-4 mb-4">
+              <h2 className="text-lg font-black text-slate-900 dark:text-slate-100">Recent Connections</h2>
+              <p className="text-xs text-slate-400 font-medium">Your latest verified medical connections</p>
+            </div>
               {approvedConnections.length === 0 ? (
                 <p className="text-center text-muted-foreground py-4">
                   No connections yet. Start by searching for providers or sending connection requests.
@@ -177,8 +185,7 @@ export const ConnectionsDashboard = () => {
                   ))}
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
         </TabsContent>
 
         <TabsContent value="connections" className="space-y-4">
@@ -271,6 +278,7 @@ export const ConnectionsDashboard = () => {
           />
         </TabsContent>
       </Tabs>
+      </div>
     </div>
   );
 };

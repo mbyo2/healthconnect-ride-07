@@ -45,11 +45,11 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
 
   const [rxForm, setRxForm] = useState({
     patient_name: '',
-    medication_name: '',
-    dosage: '',
-    quantity: 1,
-    instructions: '',
+    notes: '',
   });
+  const [rxMedications, setRxMedications] = useState<Array<{ id: string; medication_name: string; dosage: string; quantity: number; instructions: string }>>([
+    { id: '1', medication_name: '', dosage: '1 tablet daily', quantity: 10, instructions: 'Take after meals' }
+  ]);
 
   const [writeOffForm, setWriteOffForm] = useState({
     item_id: '',
@@ -123,22 +123,35 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
 
   const handleCreateRx = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!rxForm.medication_name) return;
+    const valid = rxMedications.filter(m => m.medication_name.trim());
+    if (valid.length === 0) {
+      toast.error('Add at least one medication');
+      return;
+    }
     setIsSubmitting(true);
     try {
-      const { error: err } = await (supabase.from('comprehensive_prescriptions' as any) as any).insert({
+      const rxNumber = `RX-HOSP-${Date.now().toString(36).toUpperCase()}`;
+      const prescribedDate = new Date().toISOString().split('T')[0];
+
+      const inserts = valid.map(m => ({
         pharmacy_id: hospital.id,
-        medication_name: rxForm.medication_name,
-        dosage: rxForm.dosage || '1 tablet daily',
-        quantity: Number(rxForm.quantity),
-        instructions: rxForm.instructions || 'Take as directed',
+        prescription_number: rxNumber,
+        medication_name: m.medication_name.trim(),
+        dosage: m.dosage || '1 tablet daily',
+        quantity: Number(m.quantity) || 1,
+        instructions: m.instructions || 'Take as directed',
         status: 'pending',
-        prescribed_date: new Date().toISOString().split('T')[0],
-      });
+        prescribed_date: prescribedDate,
+        notes: rxForm.notes ? `[Patient: ${rxForm.patient_name}] ${rxForm.notes}` : (rxForm.patient_name ? `Patient: ${rxForm.patient_name}` : null)
+      }));
+
+      const { error: err } = await (supabase.from('comprehensive_prescriptions' as any) as any).insert(inserts);
       if (err) throw err;
-      toast.success('Prescription created for pharmacy fulfillment');
+
+      toast.success(`Prescription with ${valid.length} medication(s) logged (Rx #${rxNumber})`);
       setShowAddRx(false);
-      setRxForm({ patient_name: '', medication_name: '', dosage: '', quantity: 1, instructions: '' });
+      setRxForm({ patient_name: '', notes: '' });
+      setRxMedications([{ id: '1', medication_name: '', dosage: '1 tablet daily', quantity: 10, instructions: 'Take after meals' }]);
       refreshRx();
     } catch (e: any) {
       toast.error(e?.message || 'Failed to create prescription');
@@ -580,31 +593,112 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
 
       {/* Write Prescription Dialog */}
       <Dialog open={showAddRx} onOpenChange={setShowAddRx}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader><DialogTitle>Write Hospital Prescription</DialogTitle></DialogHeader>
+        <DialogContent className="sm:max-w-[520px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader><DialogTitle>Write Hospital Prescription (Multi-Drug)</DialogTitle></DialogHeader>
           <form onSubmit={handleCreateRx} className="space-y-3 py-2 text-xs">
             <div>
-              <Label className="text-xs">Medication Name *</Label>
-              <Input value={rxForm.medication_name} onChange={e => setRxForm({ ...rxForm, medication_name: e.target.value })} placeholder="e.g. Paracetamol 500mg" required className="h-8 text-xs" />
+              <Label className="text-xs font-bold">Patient / Inpatient Name</Label>
+              <Input
+                value={rxForm.patient_name}
+                onChange={e => setRxForm({ ...rxForm, patient_name: e.target.value })}
+                placeholder="e.g. Inpatient Jane Doe - Bed #4"
+                className="h-8 text-xs"
+              />
             </div>
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <Label className="text-xs">Dosage</Label>
-                <Input value={rxForm.dosage} onChange={e => setRxForm({ ...rxForm, dosage: e.target.value })} placeholder="1 tab 3x daily" className="h-8 text-xs" />
+
+            <div className="space-y-2 pt-1">
+              <div className="flex items-center justify-between">
+                <Label className="text-xs font-bold uppercase text-slate-500">
+                  Prescription Medications ({rxMedications.length} items)
+                </Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setRxMedications(prev => [...prev, { id: `${Date.now()}`, medication_name: '', dosage: '1 tablet daily', quantity: 10, instructions: 'Take as directed' }])}
+                  className="h-7 text-[11px] text-[#0073ea]"
+                >
+                  <Plus className="h-3 w-3 mr-1" /> Add Drug
+                </Button>
               </div>
-              <div>
-                <Label className="text-xs">Quantity</Label>
-                <Input type="number" value={rxForm.quantity} onChange={e => setRxForm({ ...rxForm, quantity: Number(e.target.value) })} className="h-8 text-xs" />
-              </div>
+
+              {rxMedications.map((item, idx) => (
+                <div key={item.id} className="p-3 border rounded-xl bg-slate-50 dark:bg-slate-900/60 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-[10px] bg-[#0073ea] text-white px-2 py-0.5 rounded">
+                      Drug #{idx + 1}
+                    </span>
+                    {rxMedications.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => setRxMedications(prev => prev.filter(m => m.id !== item.id))}
+                        className="text-slate-400 hover:text-rose-500 text-xs"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
+
+                  <div>
+                    <Label className="text-[11px]">Medication Name *</Label>
+                    <Input
+                      value={item.medication_name}
+                      onChange={e => setRxMedications(prev => prev.map(m => m.id === item.id ? { ...m, medication_name: e.target.value } : m))}
+                      placeholder="e.g. Paracetamol 500mg"
+                      required
+                      className="h-8 text-xs bg-white dark:bg-slate-950"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="col-span-2">
+                      <Label className="text-[11px]">Dosage &amp; Frequency</Label>
+                      <Input
+                        value={item.dosage}
+                        onChange={e => setRxMedications(prev => prev.map(m => m.id === item.id ? { ...m, dosage: e.target.value } : m))}
+                        placeholder="1 tab 3x daily"
+                        className="h-8 text-xs bg-white dark:bg-slate-950"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-[11px]">Quantity</Label>
+                      <Input
+                        type="number"
+                        min={1}
+                        value={item.quantity}
+                        onChange={e => setRxMedications(prev => prev.map(m => m.id === item.id ? { ...m, quantity: Number(e.target.value) } : m))}
+                        className="h-8 text-xs bg-white dark:bg-slate-950"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label className="text-[11px]">Instructions</Label>
+                    <Input
+                      value={item.instructions}
+                      onChange={e => setRxMedications(prev => prev.map(m => m.id === item.id ? { ...m, instructions: e.target.value } : m))}
+                      placeholder="e.g. After meals"
+                      className="h-8 text-xs bg-white dark:bg-slate-950"
+                    />
+                  </div>
+                </div>
+              ))}
             </div>
+
             <div>
-              <Label className="text-xs">Instructions</Label>
-              <Input value={rxForm.instructions} onChange={e => setRxForm({ ...rxForm, instructions: e.target.value })} placeholder="Take after meals" className="h-8 text-xs" />
+              <Label className="text-xs">Clinical Remarks / Ward</Label>
+              <Input
+                value={rxForm.notes}
+                onChange={e => setRxForm({ ...rxForm, notes: e.target.value })}
+                placeholder="Ward notes, doctor instructions..."
+                className="h-8 text-xs"
+              />
             </div>
+
             <DialogFooter className="pt-2">
               <Button type="button" variant="outline" size="sm" onClick={() => setShowAddRx(false)}>Cancel</Button>
               <Button type="submit" size="sm" disabled={isSubmitting}>
-                {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null} Save Prescription
+                {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null} Save ({rxMedications.length} Meds)
               </Button>
             </DialogFooter>
           </form>

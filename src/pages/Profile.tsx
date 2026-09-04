@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,9 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Camera, Edit, Save, MapPin, Phone, Mail, Calendar } from "lucide-react";
+import { Camera, Edit, Save, MapPin, Phone, Mail, User, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
 import { useSuccessFeedback } from "@/hooks/use-success-feedback";
@@ -25,7 +22,7 @@ const Profile = () => {
     email: user?.email || "",
     phone: profile?.phone || "",
     bio: profile?.bio || "",
-    location: profile?.location || ""
+    location: profile?.location || profile?.address || ""
   });
 
   const handleSave = async () => {
@@ -56,148 +53,183 @@ const Profile = () => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Profile Header */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="flex flex-col items-center space-y-4">
+    <div className="min-h-screen bg-[#f5f7fa] dark:bg-slate-950 py-8 px-4 sm:px-6 font-sans">
+      <div className="max-w-4xl mx-auto space-y-6">
+        {/* Profile Header Card */}
+        <div className="rounded-3xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-sm">
+          <div className="flex flex-col sm:flex-row items-center gap-6 sm:gap-8">
             <div className="relative">
-              <Avatar className="h-24 w-24 ring-4 ring-border">
+              <Avatar className="h-28 w-28 ring-4 ring-[#0073ea]/20 shadow-md">
                 <AvatarImage src={profile?.avatar_url || ""} />
-                <AvatarFallback className="bg-primary/10 text-primary text-xl">
+                <AvatarFallback className="bg-[#e5f0ff] dark:bg-blue-950 text-[#0073ea] dark:text-blue-400 text-2xl font-black">
                   {formData.firstName?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || "U"}
                 </AvatarFallback>
               </Avatar>
-              <Button
-                size="icon"
-                variant="secondary"
-                className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full shadow-lg"
+              <button
+                type="button"
+                className="absolute -bottom-1 -right-1 h-9 w-9 rounded-full bg-[#0073ea] text-white flex items-center justify-center shadow-md hover:bg-[#0060c7] transition-transform active:scale-95"
+                title="Change Photo"
               >
                 <Camera className="h-4 w-4" />
-              </Button>
+              </button>
             </div>
             
-            <div className="text-center space-y-2">
-              <h1 className="text-2xl font-bold text-foreground">
-                {formData.firstName} {formData.lastName || "Welcome"}
-              </h1>
-              <div className="flex items-center justify-center gap-2 text-muted-foreground">
-                <Mail className="h-4 w-4" />
-                {formData.email}
+            <div className="flex-1 text-center sm:text-left space-y-2">
+              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
+                <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight">
+                  {formData.firstName} {formData.lastName || "Account"}
+                </h1>
+                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-black bg-[#e5f0ff] dark:bg-blue-950 text-[#0073ea] dark:text-blue-400 border border-[#0073ea]/20">
+                  <ShieldCheck className="h-3.5 w-3.5" />
+                  {profile?.role === 'health_personnel' || profile?.role === 'doctor' ? 'Verified Practitioner' : 'Verified Patient'}
+                </span>
               </div>
-              <Badge variant="secondary" className="bg-primary/10 text-primary">
-                {profile?.role === 'health_personnel' ? 'Healthcare Provider' : 'Patient'}
-              </Badge>
+              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 text-xs font-medium text-slate-500 dark:text-slate-400">
+                <span className="flex items-center gap-1.5">
+                  <Mail className="h-4 w-4 text-[#0073ea]" />
+                  {formData.email}
+                </span>
+                {formData.phone && (
+                  <span className="flex items-center gap-1.5">
+                    <Phone className="h-4 w-4 text-[#0073ea]" />
+                    {formData.phone}
+                  </span>
+                )}
+                {formData.location && (
+                  <span className="flex items-center gap-1.5">
+                    <MapPin className="h-4 w-4 text-[#0073ea]" />
+                    {formData.location}
+                  </span>
+                )}
+              </div>
             </div>
 
             <Button
               onClick={() => setIsEditing(!isEditing)}
-              variant={isEditing ? "default" : "outline"}
-              className="w-full max-w-sm"
+              className={`rounded-full px-6 h-11 text-xs font-extrabold shadow-sm transition-all ${
+                isEditing
+                  ? "bg-slate-900 hover:bg-black text-white"
+                  : "bg-[#0073ea] hover:bg-[#0060c7] text-white"
+              }`}
             >
               {isEditing ? <Save className="h-4 w-4 mr-2" /> : <Edit className="h-4 w-4 mr-2" />}
-              {isEditing ? "Save Changes" : "Edit Profile"}
+              {isEditing ? "Save Profile" : "Edit Details"}
             </Button>
           </div>
-        </CardContent>
-      </Card>
+        </div>
 
-      {/* Profile Details */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Personal Information</CardTitle>
-          <CardDescription>
-            Manage your personal details and preferences
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="firstName">First Name</Label>
+        {/* Profile Details Form */}
+        <div className="rounded-3xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-sm space-y-6">
+          <div className="border-b border-[#e6e9ef] dark:border-slate-800 pb-4">
+            <h2 className="text-lg font-black text-slate-900 dark:text-slate-100 flex items-center gap-2">
+              <User className="h-5 w-5 text-[#0073ea]" />
+              Personal &amp; Clinical Information
+            </h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              Manage your personal information, emergency contact details, and clinical identity.
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="firstName" className="text-xs font-extrabold text-slate-600 dark:text-slate-400 uppercase">First Name</Label>
+                <Input
+                  id="firstName"
+                  value={formData.firstName}
+                  onChange={(e) => handleInputChange("firstName", e.target.value)}
+                  disabled={!isEditing}
+                  className="h-11 rounded-2xl border-2 border-[#e6e9ef] dark:border-slate-800 bg-[#f5f7fa] dark:bg-slate-950 font-medium text-xs focus:border-[#0073ea] focus:bg-white"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="lastName" className="text-xs font-extrabold text-slate-600 dark:text-slate-400 uppercase">Last Name</Label>
+                <Input
+                  id="lastName"
+                  value={formData.lastName}
+                  onChange={(e) => handleInputChange("lastName", e.target.value)}
+                  disabled={!isEditing}
+                  className="h-11 rounded-2xl border-2 border-[#e6e9ef] dark:border-slate-800 bg-[#f5f7fa] dark:bg-slate-950 font-medium text-xs focus:border-[#0073ea] focus:bg-white"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="email" className="text-xs font-extrabold text-slate-600 dark:text-slate-400 uppercase">Email Address (Primary)</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={formData.email}
+                  disabled
+                  className="h-11 rounded-2xl border-2 border-[#e6e9ef] dark:border-slate-800 bg-[#f5f7fa] dark:bg-slate-950 font-medium text-xs opacity-75"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="phone" className="text-xs font-extrabold text-slate-600 dark:text-slate-400 uppercase">Phone Number</Label>
+                <Input
+                  id="phone"
+                  type="tel"
+                  value={formData.phone}
+                  onChange={(e) => handleInputChange("phone", e.target.value)}
+                  disabled={!isEditing}
+                  placeholder="+1 (555) 123-4567"
+                  className="h-11 rounded-2xl border-2 border-[#e6e9ef] dark:border-slate-800 bg-[#f5f7fa] dark:bg-slate-950 font-medium text-xs focus:border-[#0073ea] focus:bg-white"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="location" className="text-xs font-extrabold text-slate-600 dark:text-slate-400 uppercase">Address / Location</Label>
               <Input
-                id="firstName"
-                value={formData.firstName}
-                onChange={(e) => handleInputChange("firstName", e.target.value)}
+                id="location"
+                value={formData.location}
+                onChange={(e) => handleInputChange("location", e.target.value)}
                 disabled={!isEditing}
-                className="disabled:opacity-70"
+                placeholder="City, State, Country"
+                className="h-11 rounded-2xl border-2 border-[#e6e9ef] dark:border-slate-800 bg-[#f5f7fa] dark:bg-slate-950 font-medium text-xs focus:border-[#0073ea] focus:bg-white"
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="lastName">Last Name</Label>
-              <Input
-                id="lastName"
-                value={formData.lastName}
-                onChange={(e) => handleInputChange("lastName", e.target.value)}
+
+            <div className="space-y-1.5">
+              <Label htmlFor="bio" className="text-xs font-extrabold text-slate-600 dark:text-slate-400 uppercase">Bio / Clinical Background</Label>
+              <Textarea
+                id="bio"
+                value={formData.bio}
+                onChange={(e) => handleInputChange("bio", e.target.value)}
                 disabled={!isEditing}
-                className="disabled:opacity-70"
+                rows={3}
+                placeholder="Brief summary of your clinical practice, background, or personal health notes..."
+                className="rounded-2xl border-2 border-[#e6e9ef] dark:border-slate-800 bg-[#f5f7fa] dark:bg-slate-950 font-medium text-xs focus:border-[#0073ea] focus:bg-white resize-none"
               />
             </div>
+
+            {isEditing && (
+              <div className="flex gap-3 pt-4">
+                <Button
+                  onClick={handleSave}
+                  className="flex-1 rounded-full h-11 bg-[#0073ea] hover:bg-[#0060c7] text-white font-extrabold text-xs shadow-sm"
+                >
+                  <Save className="h-4 w-4 mr-2" />
+                  Save Changes
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setIsEditing(false)}
+                  className="flex-1 rounded-full h-11 border-2 border-slate-200 dark:border-slate-800 font-extrabold text-xs"
+                >
+                  Cancel
+                </Button>
+              </div>
+            )}
           </div>
+        </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              value={formData.email}
-              disabled
-              className="disabled:opacity-70"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="phone">Phone</Label>
-            <Input
-              id="phone"
-              type="tel"
-              value={formData.phone}
-              onChange={(e) => handleInputChange("phone", e.target.value)}
-              disabled={!isEditing}
-              className="disabled:opacity-70"
-              placeholder="+1 (555) 123-4567"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="location">Location</Label>
-            <Input
-              id="location"
-              value={formData.location}
-              onChange={(e) => handleInputChange("location", e.target.value)}
-              disabled={!isEditing}
-              className="disabled:opacity-70"
-              placeholder="City, State"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="bio">Bio</Label>
-            <Textarea
-              id="bio"
-              value={formData.bio}
-              onChange={(e) => handleInputChange("bio", e.target.value)}
-              disabled={!isEditing}
-              className="disabled:opacity-70 min-h-[100px]"
-              placeholder="Tell us about yourself..."
-            />
-          </div>
-
-          {isEditing && (
-            <div className="flex gap-2 pt-4">
-              <Button onClick={handleSave} className="flex-1">
-                <Save className="h-4 w-4 mr-2" />
-                Save Changes
-              </Button>
-              <Button variant="outline" onClick={() => setIsEditing(false)} className="flex-1">
-                Cancel
-              </Button>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Quick Stats */}
-      <ProfileStats userId={user?.id} />
+        {/* Quick Stats Widget */}
+        <div className="rounded-3xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
+          <ProfileStats userId={user?.id} />
+        </div>
+      </div>
     </div>
   );
 };

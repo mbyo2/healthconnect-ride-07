@@ -62,18 +62,7 @@ export const ComprehensivePrescriptions = () => {
       setLoading(true);
       let query = supabase
         .from('comprehensive_prescriptions')
-        .select(`
-          *,
-          healthcare_institutions!pharmacy_id (
-            name,
-            phone,
-            address
-          ),
-          profiles!provider_id (
-            first_name,
-            last_name
-          )
-        `)
+        .select('*')
         .eq('patient_id', user?.id);
 
       if (filterStatus !== 'all') {
@@ -86,9 +75,32 @@ export const ComprehensivePrescriptions = () => {
       query = query.order(orderColumn, orderDirection);
 
       const { data, error } = await query;
-
       if (error) throw error;
-      setPrescriptions(data || []);
+
+      // Lookup provider and pharmacy
+      const providerIds = Array.from(new Set((data || []).map((p: any) => p.provider_id).filter(Boolean)));
+      const pharmacyIds = Array.from(new Set((data || []).map((p: any) => p.pharmacy_id).filter(Boolean)));
+
+      let providerMap: Record<string, any> = {};
+      let pharmacyMap: Record<string, any> = {};
+
+      if (providerIds.length > 0) {
+        const { data: profs } = await supabase.from('profiles').select('id, first_name, last_name').in('id', providerIds);
+        (profs || []).forEach((p) => { providerMap[p.id] = p; });
+      }
+
+      if (pharmacyIds.length > 0) {
+        const { data: insts } = await supabase.from('healthcare_institutions').select('id, name, phone, address').in('id', pharmacyIds);
+        (insts || []).forEach((i) => { pharmacyMap[i.id] = i; });
+      }
+
+      const enriched = (data || []).map((p: any) => ({
+        ...p,
+        profiles: providerMap[p.provider_id],
+        healthcare_institutions: pharmacyMap[p.pharmacy_id],
+      }));
+
+      setPrescriptions(enriched);
     } catch (error) {
       console.error('Error fetching prescriptions:', error);
       toast.error('Failed to load prescriptions');

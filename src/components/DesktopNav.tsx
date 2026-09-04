@@ -55,8 +55,10 @@ export function DesktopNav() {
     if (!isAuthenticated) {
       return [
         { to: "/", label: "Home", icon: <Home className="h-4 w-4" />, active: location.pathname === "/" || location.pathname === "/home" },
-        { to: "/workos", label: "Clinical WorkOS", icon: <BarChart3 className="h-4 w-4 text-emerald-500" />, active: location.pathname === "/workos" },
-        { to: "/search", label: "Find Care", icon: <Search className="h-4 w-4" />, active: location.pathname === "/search" },
+        { to: "/search", label: "Find Doctors", icon: <Search className="h-4 w-4" />, active: location.pathname === "/search" },
+        { to: "/video-dashboard", label: "Video Consult", icon: <Stethoscope className="h-4 w-4" />, active: location.pathname === "/video-dashboard" },
+        { to: "/appointments", label: "Appointments", icon: <Calendar className="h-4 w-4" />, active: location.pathname === "/appointments" },
+        { to: "/emergency", label: "Emergency", icon: <AlertTriangle className="h-4 w-4 text-rose-500" />, active: location.pathname === "/emergency" },
       ];
     }
 
@@ -228,22 +230,21 @@ export function DesktopNav() {
   }, [secondaryNavItems, availableRoles]);
 
   return (
-    <header className="bg-background/80 backdrop-blur-xl sticky top-0 z-50 shadow-sm" role="banner">
-      <div className="mx-auto flex items-center justify-between h-16 lg:h-20 px-4 md:px-6 lg:px-8 xl:px-12 max-w-[1600px] min-w-0">
-        {/* Left: Logo + Nav */}
+    <header className="sticky top-0 z-50 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-b border-canvas-silk dark:border-slate-800" role="banner">
+      <div className="mx-auto flex items-center justify-between h-16 lg:h-[4.25rem] px-4 md:px-6 lg:px-8 xl:px-12 max-w-content min-w-0">
         <div className="flex items-center gap-4 lg:gap-8 xl:gap-10 min-w-0">
           <AppLogo size="sm" className="shrink-0" />
 
-          <nav className="hidden md:flex items-center gap-1 lg:gap-2 min-w-0" role="navigation" aria-label="Main navigation">
+          <nav className="hidden md:flex items-center gap-0.5 min-w-0 rounded-nav border border-canvas-silk dark:border-slate-700 bg-canvas-mist/60 dark:bg-slate-800/50 p-1" role="navigation" aria-label="Main navigation">
             {mainNavItems.map((item) => (
               <Link
                 key={item.to}
                 to={item.to}
                 aria-current={item.active ? "page" : undefined}
-                className={`flex items-center gap-2 px-3 lg:px-4 py-2 rounded-full text-xs lg:text-sm font-medium transition-all duration-300 whitespace-nowrap ${
+                className={`flex items-center gap-2 px-3 lg:px-4 py-2 rounded-nav text-xs lg:text-sm font-medium tracking-wide transition-all duration-200 whitespace-nowrap ${
                   item.active
-                    ? "bg-primary text-primary-foreground shadow-button"
-                    : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                    ? "bg-primary-500 text-white shadow-button"
+                    : "text-graphite-600 dark:text-slate-400 hover:text-midnight dark:hover:text-slate-100 hover:bg-white dark:hover:bg-slate-800"
                 }`}
               >
                 {item.icon}
@@ -255,14 +256,13 @@ export function DesktopNav() {
           </nav>
         </div>
 
-        {/* Right: Search + Actions */}
-        <div className="flex items-center gap-2 lg:gap-4 shrink-0">
+        <div className="flex items-center gap-2 lg:gap-3 shrink-0">
           <form onSubmit={handleSearchSubmit} className="relative hidden md:block" role="search">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-graphite-400" />
             <Input
               type="search"
               placeholder="Search doctors, specialties..."
-              className="w-36 md:w-44 lg:w-56 xl:w-72 2xl:w-96 pl-10 h-10 lg:h-12 rounded-full bg-muted/50 border-2 border-transparent focus:bg-background focus:border-primary transition-all duration-300 text-xs lg:text-sm"
+              className="w-36 md:w-48 lg:w-60 xl:w-72 2xl:w-96 pl-10 h-10 lg:h-11 rounded-pill bg-canvas-bone dark:bg-slate-800/60 border border-canvas-silk dark:border-slate-700 focus:bg-white dark:focus:bg-slate-900 focus:border-primary-500 transition-all duration-200 text-xs lg:text-sm font-medium placeholder:text-graphite-400"
               value={searchTerm}
               onChange={handleSearchChange}
             />
@@ -276,10 +276,10 @@ export function DesktopNav() {
             <DesktopUserMenu user={user} profile={profile} onLogout={handleLogout} />
           ) : (
             <div className="flex items-center gap-2">
-              <Button variant="ghost" size="sm" asChild className="hidden sm:flex h-10 lg:h-12 px-4 lg:px-6 text-sm font-medium">
+              <Button variant="ghost" size="sm" asChild className="hidden sm:flex h-10 lg:h-11 px-4 lg:px-6 text-sm font-medium text-graphite-600 hover:text-primary-500 hover:bg-primary-50 rounded-pill">
                 <Link to="/auth">Sign In</Link>
               </Button>
-              <Button size="sm" asChild className="h-10 lg:h-12 px-4 lg:px-6 text-sm font-medium">
+              <Button size="sm" asChild className="h-10 lg:h-11 px-4 lg:px-6 text-sm font-medium rounded-pill bg-primary-500 hover:bg-primary-600 shadow-button">
                 <Link to="/auth?tab=signup">Get Started</Link>
               </Button>
             </div>

@@ -173,10 +173,10 @@ export const WorkOSWidgetsGrid: React.FC<WorkOSWidgetsGridProps> = ({ isDarkMode
 
           <div className="space-y-3">
             {[
-              { name: "Dr. Mutale Mwansa", role: "Chief Cardiologist", status: "In Surgery", avatar: "https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=100&auto=format&fit=crop&q=80" },
-              { name: "Dr. Sarah Jenkins", role: "Emergency Trauma Lead", status: "On Duty", avatar: "https://images.unsplash.com/photo-1594824813566-88855ce78905?w=100&auto=format&fit=crop&q=80" },
-              { name: "Dr. Chisamba Banda", role: "Neurologist", status: "On Duty", avatar: "https://images.unsplash.com/photo-1527613426441-4da17471b66d?w=100&auto=format&fit=crop&q=80" },
-              { name: "Dr. Elena Rostova", role: "Pediatric Specialist", status: "In Teleconsult", avatar: "https://images.unsplash.com/photo-1638202993928-7267aad84c31?w=100&auto=format&fit=crop&q=80" },
+              { name: "Dr. Mutale Mwansa", role: "Chief Cardiologist", status: "In Surgery", avatar: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=100&auto=format&fit=crop&q=85" },
+              { name: "Dr. Sarah Jenkins", role: "Emergency Trauma Lead", status: "On Duty", avatar: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=100&auto=format&fit=crop&q=85" },
+              { name: "Dr. Chisamba Banda", role: "Neurologist", status: "On Duty", avatar: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=100&auto=format&fit=crop&q=85" },
+              { name: "Dr. Aisha Nkomo", role: "Pediatric Specialist", status: "In Teleconsult", avatar: "https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=100&auto=format&fit=crop&q=85" },
             ].map((doc) => (
               <div key={doc.name} className="flex items-center justify-between p-2 rounded-xl border border-slate-100 dark:border-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                 <div className="flex items-center gap-2.5">

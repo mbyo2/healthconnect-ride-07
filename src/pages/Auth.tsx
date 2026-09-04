@@ -58,25 +58,9 @@ const businessSchema = z.object({
   termsAccepted: z.boolean().refine((value) => value, "You must accept the Terms and Conditions to continue"),
 }).refine((d) => d.password === d.confirmPassword, { message: "Passwords don't match", path: ["confirmPassword"] });
 
-const PROVIDER_TYPES = [
-  { value: "doctor", label: "Doctor" },
-  { value: "nurse", label: "Nurse" },
-  { value: "pharmacist", label: "Pharmacist" },
-  { value: "lab_technician", label: "Lab Technician" },
-  { value: "radiologist", label: "Radiologist" },
-  { value: "health_personnel", label: "Other Health Professional" },
-];
-
-const BUSINESS_TYPES = [
-  { value: "pharmacy", label: "Pharmacy" },
-  { value: "clinic", label: "Clinic / Small Practice" },
-  { value: "specialized_clinic", label: "Specialized Clinic" },
-  { value: "hospital", label: "Hospital" },
-  { value: "large_hospital", label: "Large / Teaching Hospital" },
-  { value: "laboratory", label: "Laboratory" },
-  { value: "nursing_home", label: "Nursing / Care Home" },
-  { value: "diagnostic_center", label: "Diagnostic / Imaging Center" },
-];
+// Will be loaded from database
+const PROVIDER_TYPES: Array<{ value: string; label: string }> = [];
+const BUSINESS_TYPES: Array<{ value: string; label: string }> = [];
 
 type SignupPath = null | "patient" | "provider" | "business";
 
@@ -113,6 +97,9 @@ export const Auth = () => {
   const [signupPath, setSignupPath] = useState<SignupPath>(pathParam || null);
   const [showPassword, setShowPassword] = useState(false);
   const { showSuccess, showError } = useFeedbackSystem();
+  const [providerTypes, setProviderTypes] = useState<Array<{ value: string; label: string }>>([]);
+  const [businessTypes, setBusinessTypes] = useState<Array<{ value: string; label: string }>>([]);
+  const [countries, setCountries] = useState<Array<{ value: string; label: string; dialCode: string }>>([]);
 
   const redirectParam = searchParams.get("redirect");
   const redirectTo = redirectParam && redirectParam.startsWith("/") ? redirectParam : "/dashboard";
@@ -123,6 +110,32 @@ export const Auth = () => {
       setAuthLoading(false);
     });
   }, [navigate, redirectTo]);
+
+  useEffect(() => {
+    const fetchDynamicData = async () => {
+      try {
+        const [providerTypesRes, businessTypesRes, countriesRes] = await Promise.all([
+          supabase.from("provider_types").select("code, name").eq("is_active", true).order("display_order"),
+          supabase.from("institution_types").select("code, name").eq("is_active", true).order("display_order"),
+          supabase.from("countries").select("code, name, dial_code").eq("is_active", true).order("name"),
+        ]);
+
+        if (providerTypesRes.data) {
+          setProviderTypes(providerTypesRes.data.map((t) => ({ value: t.code, label: t.name })));
+        }
+        if (businessTypesRes.data) {
+          setBusinessTypes(businessTypesRes.data.map((t) => ({ value: t.code, label: t.name })));
+        }
+        if (countriesRes.data) {
+          setCountries(countriesRes.data.map((c) => ({ value: c.code, label: `${c.flag_emoji} ${c.name}`, dialCode: c.dial_code })));
+        }
+      } catch (error) {
+        console.error("Error fetching dynamic data:", error);
+      }
+    };
+
+    fetchDynamicData();
+  }, []);
 
   const loginForm = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -307,35 +320,41 @@ export const Auth = () => {
 
               {/* Patient Form */}
               {signupPath === "patient" && (
-                <Form {...patientForm}>
-                  <form onSubmit={patientForm.handleSubmit(onPatientSignup)} className="space-y-3">
-                    <p className="text-xs font-extrabold text-[#0073ea] uppercase tracking-wide">Patient Account Details</p>
-                    <div className="grid grid-cols-2 gap-2">
-                      <FormField control={patientForm.control} name="firstName" render={({ field }) => (
-                        <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">First Name</FormLabel><FormControl><Input {...field} className="h-9 text-xs border-[#c3c6d4]" /></FormControl><FormMessage /></FormItem>
+                <div className="space-y-4">
+                  <p className="text-xs font-extrabold text-[#0073ea] uppercase tracking-wide">Patient Account Options</p>
+                  <Link to="/patient-registration" className="block w-full py-3 rounded-xl bg-[#0073ea] hover:bg-[#0060c4] text-white font-extrabold text-sm shadow-md transition-all text-center">
+                    Full Registration with Onboarding
+                  </Link>
+                  <div className="text-center text-xs text-[#676879] font-medium">or quick signup</div>
+                  <Form {...patientForm}>
+                    <form onSubmit={patientForm.handleSubmit(onPatientSignup)} className="space-y-3">
+                      <div className="grid grid-cols-2 gap-2">
+                        <FormField control={patientForm.control} name="firstName" render={({ field }) => (
+                          <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">First Name</FormLabel><FormControl><Input {...field} className="h-9 text-xs border-[#c3c6d4]" /></FormControl><FormMessage /></FormItem>
+                        )} />
+                        <FormField control={patientForm.control} name="lastName" render={({ field }) => (
+                          <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Last Name</FormLabel><FormControl><Input {...field} className="h-9 text-xs border-[#c3c6d4]" /></FormControl><FormMessage /></FormItem>
+                        )} />
+                      </div>
+                      <FormField control={patientForm.control} name="email" render={({ field }) => (
+                        <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Email</FormLabel><FormControl><Input {...field} type="email" className="h-9 text-xs border-[#c3c6d4]" /></FormControl><FormMessage /></FormItem>
                       )} />
-                      <FormField control={patientForm.control} name="lastName" render={({ field }) => (
-                        <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Last Name</FormLabel><FormControl><Input {...field} className="h-9 text-xs border-[#c3c6d4]" /></FormControl><FormMessage /></FormItem>
+                      <FormField control={patientForm.control} name="phone" render={({ field }) => (
+                        <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Phone</FormLabel><FormControl><Input {...field} type="tel" placeholder="+260..." className="h-9 text-xs border-[#c3c6d4]" /></FormControl></FormItem>
                       )} />
-                    </div>
-                    <FormField control={patientForm.control} name="email" render={({ field }) => (
-                      <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Email</FormLabel><FormControl><Input {...field} type="email" className="h-9 text-xs border-[#c3c6d4]" /></FormControl><FormMessage /></FormItem>
-                    )} />
-                    <FormField control={patientForm.control} name="phone" render={({ field }) => (
-                      <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Phone</FormLabel><FormControl><Input {...field} type="tel" placeholder="+260..." className="h-9 text-xs border-[#c3c6d4]" /></FormControl></FormItem>
-                    )} />
-                    <FormField control={patientForm.control} name="password" render={({ field }) => (
-                      <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Password</FormLabel><FormControl><Input type="password" {...field} className="h-9 text-xs border-[#c3c6d4]" /></FormControl><FormMessage /></FormItem>
-                    )} />
-                    <FormField control={patientForm.control} name="confirmPassword" render={({ field }) => (
-                      <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Confirm Password</FormLabel><FormControl><Input type="password" {...field} className="h-9 text-xs border-[#c3c6d4]" /></FormControl><FormMessage /></FormItem>
-                    )} />
-                    <TermsAcceptance checked={patientForm.watch("termsAccepted")} onChange={(checked) => patientForm.setValue("termsAccepted", checked, { shouldValidate: true })} error={patientForm.formState.errors.termsAccepted?.message} />
-                    <button type="submit" disabled={localLoading} className="w-full py-3 rounded-xl bg-[#0073ea] hover:bg-[#0060c4] text-white font-extrabold text-sm shadow-md transition-all">
-                      Create Patient Account
-                    </button>
-                  </form>
-                </Form>
+                      <FormField control={patientForm.control} name="password" render={({ field }) => (
+                        <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Password</FormLabel><FormControl><Input type="password" {...field} className="h-9 text-xs border-[#c3c6d4]" /></FormControl><FormMessage /></FormItem>
+                      )} />
+                      <FormField control={patientForm.control} name="confirmPassword" render={({ field }) => (
+                        <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Confirm Password</FormLabel><FormControl><Input type="password" {...field} className="h-9 text-xs border-[#c3c6d4]" /></FormControl><FormMessage /></FormItem>
+                      )} />
+                      <TermsAcceptance checked={patientForm.watch("termsAccepted")} onChange={(checked) => patientForm.setValue("termsAccepted", checked, { shouldValidate: true })} error={patientForm.formState.errors.termsAccepted?.message} />
+                      <button type="submit" disabled={localLoading} className="w-full py-3 rounded-xl bg-[#0073ea] hover:bg-[#0060c4] text-white font-extrabold text-sm shadow-md transition-all">
+                        Quick Sign Up
+                      </button>
+                    </form>
+                  </Form>
+                </div>
               )}
 
               {/* Provider Form */}
@@ -357,7 +376,7 @@ export const Auth = () => {
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl><SelectTrigger className="h-9 border-[#c3c6d4] text-xs font-bold"><SelectValue placeholder="Select profession" /></SelectTrigger></FormControl>
                           <SelectContent>
-                            {PROVIDER_TYPES.map((t) => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
+                            {providerTypes.map((t) => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -394,7 +413,7 @@ export const Auth = () => {
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl><SelectTrigger className="h-9 border-[#c3c6d4] text-xs font-bold"><SelectValue placeholder="Facility type" /></SelectTrigger></FormControl>
                           <SelectContent>
-                            {BUSINESS_TYPES.map((t) => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
+                            {businessTypes.map((t) => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -419,7 +438,16 @@ export const Auth = () => {
                         <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">City</FormLabel><FormControl><Input {...field} className="h-9 text-xs border-[#c3c6d4]" /></FormControl><FormMessage /></FormItem>
                       )} />
                       <FormField control={businessForm.control} name="country" render={({ field }) => (
-                        <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Country</FormLabel><FormControl><Input {...field} defaultValue="Zambia" className="h-9 text-xs border-[#c3c6d4]" /></FormControl><FormMessage /></FormItem>
+                        <FormItem>
+                          <FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Country</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl><SelectTrigger className="h-9 border-[#c3c6d4] text-xs"><SelectValue placeholder="Select country" /></SelectTrigger></FormControl>
+                            <SelectContent>
+                              {countries.map((c) => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
                       )} />
                     </div>
                     <FormField control={businessForm.control} name="password" render={({ field }) => (

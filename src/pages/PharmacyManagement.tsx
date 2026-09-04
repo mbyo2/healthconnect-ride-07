@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
+import { useInstitutionContext } from "@/hooks/useInstitutionContext";
 import { useCurrency } from "@/hooks/use-currency";
 import {
   Package, ShoppingCart, TrendingUp, AlertTriangle,
@@ -21,6 +22,7 @@ const TAX_RATE = 0.16;
 
 export const PharmacyManagement = () => {
   const { user } = useAuth();
+  const { institution: pharmacy, institutionId: pharmacyId } = useInstitutionContext();
   const { formatPrice } = useCurrency();
   const queryClient = useQueryClient();
 
@@ -39,20 +41,6 @@ export const PharmacyManagement = () => {
     quantity: 1,
     reason: "expired",
     notes: "",
-  });
-
-  const { data: pharmacy } = useQuery({
-    queryKey: ["pharmacy", user?.id],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("healthcare_institutions")
-        .select("*")
-        .eq("admin_id", user?.id)
-        .eq("type", "pharmacy")
-        .maybeSingle();
-      return data;
-    },
-    enabled: !!user,
   });
 
   const { data: inventory = [], refetch: refetchInventory } = useQuery({

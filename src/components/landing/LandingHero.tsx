@@ -91,11 +91,12 @@ export const LandingHero = () => {
           </div>
           <div className="relative">
             <img
-              src="https://images.unsplash.com/photo-1582750433449-648ed127bb54?auto=format&fit=crop&w=2000&q=80"
-              alt="Black physician in a white coat — care on Doc' O Clock"
+              src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=2000&q=85"
+              alt="African healthcare professional in white coat consulting with patient - Doc' O Clock telemedicine platform"
               className="h-[38vh] w-full object-cover object-center sm:h-[48vh] lg:h-[54vh]"
               width={2000}
               height={1125}
+              loading="eager"
             />
             <article className="absolute bottom-5 left-4 right-4 z-20 mx-auto max-w-sm rounded-card border border-white/70 bg-white/95 p-5 shadow-card-hover backdrop-blur-md sm:left-auto sm:right-6 sm:mx-0">
               <p className="font-display text-lg leading-snug text-midnight">

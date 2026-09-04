@@ -23,10 +23,10 @@ export const Hero = () => {
   ];
 
   return (
-    <div className="bg-gradient-to-b from-primary/5 to-background">
-      <div className="container-modern py-12 md:py-20">
+    <div className="bg-hero-wash bg-canvas relative overflow-hidden">
+      <div className="doc-container py-12 md:py-20 relative z-10">
         {/* Trust bar */}
-        <div className="flex flex-wrap justify-center items-center gap-4 md:gap-6 mb-10 text-sm text-muted-foreground">
+        <div className="flex flex-wrap justify-center items-center gap-4 md:gap-6 mb-10 text-sm text-graphite-500 opacity-0 animate-hero-rise" style={{ animationDelay: "0.1s" }}>
           {[
             { icon: Shield, label: "Verified Providers" },
             { icon: CheckCircle, label: "Insurance Support" },
@@ -34,60 +34,60 @@ export const Hero = () => {
             { icon: Clock, label: "24/7 Emergency" },
           ].map(({ icon: Icon, label }) => (
             <div key={label} className="flex items-center gap-1.5">
-              <Icon className="h-4 w-4 text-primary" />
-              <span className="font-medium">{label}</span>
+              <Icon className="h-4 w-4 text-primary-500" />
+              <span className="font-medium tracking-wide">{label}</span>
             </div>
           ))}
         </div>
 
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div className="text-center lg:text-left">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold mb-5 text-foreground leading-tight tracking-tight">
+            <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-medium mb-6 text-midnight leading-[1.1] tracking-tight opacity-0 animate-hero-rise" style={{ animationDelay: "0.15s" }}>
               Healthcare for{" "}
-              <span className="text-primary">Everyone</span>
+              <span className="text-primary-500">Everyone</span>
             </h1>
 
-            <p className="text-lg text-muted-foreground mb-8 leading-relaxed max-w-xl mx-auto lg:mx-0">
-              Find trusted doctors, book instantly, consult via video — all from your most modern healthcare platform.
+            <p className="text-base sm:text-lg text-graphite-500 mb-8 leading-relaxed tracking-wide max-w-xl mx-auto lg:mx-0 opacity-0 animate-hero-rise" style={{ animationDelay: "0.2s" }}>
+              Find trusted doctors, book instantly, consult via video — all from Zambia's most modern healthcare platform.
             </p>
 
             {/* Search */}
-            <form onSubmit={handleSearch} className="flex gap-2 mb-8 max-w-lg mx-auto lg:mx-0">
+            <form onSubmit={handleSearch} className="flex gap-2 mb-8 max-w-lg mx-auto lg:mx-0 opacity-0 animate-hero-rise" style={{ animationDelay: "0.25s" }}>
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-graphite-400" />
                 <Input
                   type="text"
                   placeholder="Search doctors, specialties..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 h-12 rounded-xl"
+                  className="pl-10 h-12 rounded-pill border-canvas-silk bg-white focus:border-primary-500 focus:ring-primary-500/20"
                 />
               </div>
-              <Button type="submit" size="lg" className="h-12 px-6 rounded-xl">
+              <Button type="submit" size="lg" className="vf-btn-primary h-12 px-6">
                 Search
               </Button>
             </form>
 
             {/* Stats */}
-            <div className="grid grid-cols-4 gap-3 mb-8 max-w-md mx-auto lg:mx-0">
+            <div className="grid grid-cols-4 gap-3 mb-8 max-w-md mx-auto lg:mx-0 opacity-0 animate-hero-rise" style={{ animationDelay: "0.3s" }}>
               {[
                 { value: formatStat(stats.doctors), label: "Doctors" },
                 { value: formatStat(stats.hospitals), label: "Hospitals" },
                 { value: formatStat(stats.pharmacies), label: "Pharmacies" },
                 { value: formatStat(stats.patients), label: "Patients" },
               ].map((stat) => (
-                <div key={stat.label} className="text-center p-3 bg-card rounded-xl border border-border">
-                  <div className="text-lg font-bold text-primary">{stat.value}</div>
-                  <div className="text-[10px] text-muted-foreground">{stat.label}</div>
+                <div key={stat.label} className="text-center p-3 vf-card rounded-card">
+                  <div className="text-lg font-display font-medium text-primary-500">{stat.value}</div>
+                  <div className="text-[10px] text-graphite-500 tracking-wide">{stat.label}</div>
                 </div>
               ))}
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Button asChild size="lg" className="flex-1 sm:flex-none rounded-xl h-12">
+            <div className="flex flex-col sm:flex-row gap-3 opacity-0 animate-hero-rise" style={{ animationDelay: "0.35s" }}>
+              <Button asChild size="lg" className="vf-btn-primary flex-1 sm:flex-none h-12">
                 <Link to="/auth?tab=signup">Get Started Free</Link>
               </Button>
-              <Button asChild variant="outline" size="lg" className="flex-1 sm:flex-none rounded-xl h-12">
+              <Button asChild variant="outline" size="lg" className="vf-btn-secondary flex-1 sm:flex-none h-12">
                 <Link to="/auth">Sign In</Link>
               </Button>
             </div>

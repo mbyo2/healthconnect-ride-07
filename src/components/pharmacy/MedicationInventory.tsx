@@ -40,6 +40,7 @@ import {
 } from 'lucide-react';
 import { LoadingScreen } from '@/components/LoadingScreen';
 import { useAuth } from '@/context/AuthContext';
+import { useInstitutionContext } from '@/hooks/useInstitutionContext';
 import { format } from 'date-fns';
 
 // Define the medication type enum to match the database
@@ -68,6 +69,7 @@ const MEDICATION_TYPES: MedicationType[] = [
 
 export const MedicationInventory = () => {
   const { user } = useAuth();
+  const { institutionId: userInstitution, loading: loadingInstitution } = useInstitutionContext();
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -87,46 +89,6 @@ export const MedicationInventory = () => {
     quantity_available: 0,
     minimum_stock_level: 10,
     unit_price: ''
-  });
-
-  // Get institution id for the current user (checking both staff affiliation AND institution ownership)
-  const { data: userInstitution, isLoading: loadingInstitution } = useQuery({
-    queryKey: ['userInstitution', user?.id],
-    queryFn: async () => {
-      if (!user?.id) return null;
-
-      // 1. Check if user is staff at an institution
-      const { data: staffData } = await supabase
-        .from('institution_staff' as any)
-        .select('institution_id')
-        .eq('provider_id', user.id)
-        .eq('is_active', true)
-        .maybeSingle();
-
-      if ((staffData as any)?.institution_id) {
-        return (staffData as any).institution_id;
-      }
-
-      // 2. Check if user is admin/owner of a healthcare institution (pharmacy, clinic, hospital)
-      const { data: instData } = await supabase
-        .from('healthcare_institutions' as any)
-        .select('id')
-        .eq('admin_id', user.id)
-        .maybeSingle();
-
-      if ((instData as any)?.id) {
-        return (instData as any).id;
-      }
-
-      // 3. Fallback: Check any institution in healthcare_institutions
-      const { data: anyInst } = await supabase
-        .from('healthcare_institutions' as any)
-        .select('id')
-        .limit(1)
-        .maybeSingle();
-
-      return (anyInst as any)?.id || user.id; // Use user.id as personal inventory container if no institution exists yet
-    },
   });
 
   // Fetch medication inventory

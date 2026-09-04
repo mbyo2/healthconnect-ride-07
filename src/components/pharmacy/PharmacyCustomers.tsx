@@ -9,27 +9,19 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
+import { useInstitutionContext } from '@/hooks/useInstitutionContext';
 import { useCurrency } from '@/hooks/use-currency';
 import { toast } from 'sonner';
 import { Plus, Search, User, Phone, Mail } from 'lucide-react';
 
 export const PharmacyCustomers = () => {
   const { user } = useAuth();
+  const { institutionId: pharmacyId } = useInstitutionContext();
   const { formatPrice } = useCurrency();
   const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
   const [showAdd, setShowAdd] = useState(false);
   const [form, setForm] = useState({ name: '', phone: '', email: '', insurance_provider: '', insurance_number: '', notes: '' });
-
-  const { data: pharmacyId } = useQuery({
-    queryKey: ['pharmacy-institution', user?.id],
-    queryFn: async () => {
-      const { data } = await supabase.from('institution_staff').select('institution_id')
-        .eq('provider_id', user!.id).eq('is_active', true).maybeSingle();
-      return data?.institution_id || null;
-    },
-    enabled: !!user,
-  });
 
   const { data: customers } = useQuery({
     queryKey: ['pharmacy-customers', pharmacyId, search],

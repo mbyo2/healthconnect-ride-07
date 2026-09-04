@@ -163,33 +163,33 @@ export const AppointmentsPage = () => {
   const getStatusPill = (status: string) => {
     switch (status) {
       case "completed":
-        return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-[#00c875]">Completed</span>;
+        return <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-black bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/40">✓ Completed</span>;
       case "cancelled":
-        return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-[#e2445c]">Cancelled</span>;
+        return <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-black bg-rose-100 dark:bg-rose-950/50 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-900/40">✕ Cancelled</span>;
       case "in_progress":
-        return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-[#fdab3d]">In Progress</span>;
+        return <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-black bg-amber-100 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-900/40">● In Progress</span>;
       default:
-        return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-[#579bfc]">Scheduled</span>;
+        return <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-black bg-[#e5f0ff] dark:bg-blue-950/50 text-[#0073ea] dark:text-blue-400 border border-[#0073ea]/20">◉ Scheduled</span>;
     }
   };
 
   return (
     <NetworkErrorBoundary>
-      <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors pb-16">
+      <div className="min-h-screen bg-[#f5f7fa] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors pb-16">
         {/* Top Sticky Header */}
-        <div className="bg-white dark:bg-slate-900 border-b border-[#e6e9ef] dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-2xs">
+        <div className="bg-white dark:bg-slate-900 border-b border-[#e6e9ef] dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
           <div className="max-w-[1500px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-[#0073ea] text-white flex items-center justify-center font-black text-sm shadow-xs">
+              <div className="h-11 w-11 rounded-2xl bg-[#0073ea] text-white flex items-center justify-center font-black shadow-sm shadow-[#0073ea]/30">
                 <Calendar className="h-5 w-5" />
               </div>
               <div>
-                <h1 className="text-xl font-extrabold tracking-tight flex items-center gap-2">
-                  {isProvider ? "Patient Appointment Workspace" : "My Healthcare Appointments"}
-                  <span className="w-2 h-2 rounded-full bg-[#00c875] animate-ping" />
+                <h1 className="text-xl font-black tracking-tight flex items-center gap-2.5 text-slate-900 dark:text-slate-100">
+                  {isProvider ? "Appointment Workspace" : "My Appointments"}
+                  <span className="w-2 h-2 rounded-full bg-[#00a86b]" />
                 </h1>
-                <p className="text-xs text-[#676879] dark:text-slate-400 font-medium">
-                  {isProvider ? "Manage clinic visits, video consultations, and e-intake forms" : "View upcoming doctor visits, video links, and prescription notes"}
+                <p className="text-xs text-slate-400 dark:text-slate-500 font-medium">
+                  {isProvider ? "Manage clinic visits, video consultations & e-intake" : "Upcoming visits, video links & prescription notes"}
                 </p>
               </div>
             </div>
@@ -272,13 +272,16 @@ export const AppointmentsPage = () => {
           ) : (
             <div className="space-y-6">
               {/* Upcoming Appointments Table Group */}
-              <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs overflow-hidden">
-                <div className="px-4 py-3 bg-[#e5f0ff] dark:bg-blue-950/40 border-b border-[#e6e9ef] dark:border-slate-800 flex items-center justify-between border-l-4 border-l-[#0073ea]">
-                  <div className="flex items-center gap-2">
-                    <h2 className="font-extrabold text-sm text-[#0073ea] dark:text-blue-400">
-                      Upcoming & Active Appointments
-                    </h2>
-                    <span className="px-2 py-0.5 rounded-full text-xs font-mono font-bold bg-[#0073ea] text-white">
+              <div className="rounded-3xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
+                <div className="px-5 py-4 bg-[#0f172a] flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-[#00a86b] animate-pulse" />
+                      <h2 className="font-extrabold text-sm text-white">
+                        Upcoming &amp; Active Appointments
+                      </h2>
+                    </div>
+                    <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-[#0073ea] text-white">
                       {upcoming.length}
                     </span>
                   </div>
@@ -293,12 +296,12 @@ export const AppointmentsPage = () => {
                     <table className="w-full text-left border-collapse min-w-[900px]">
                       <thead>
                         <tr className="text-[11px] font-extrabold uppercase text-[#676879] dark:text-slate-400 border-b border-[#e6e9ef] dark:border-slate-800 bg-[#f5f6f8] dark:bg-slate-950">
-                          <th className="py-2.5 px-4 w-[240px]">Participant</th>
-                          <th className="py-2.5 px-3 w-[140px] text-center">Status</th>
-                          <th className="py-2.5 px-3 w-[150px]">Date & Time</th>
-                          <th className="py-2.5 px-3 w-[130px]">Consult Mode</th>
-                          <th className="py-2.5 px-3 w-[180px]">Location / Contact</th>
-                          <th className="py-2.5 px-3 w-[150px] text-center">Actions</th>
+                          <th className="py-3 px-6 w-[240px]">Participant</th>
+                          <th className="py-3 px-3 w-[140px] text-center">Status</th>
+                          <th className="py-3 px-3 w-[150px]">Date & Time</th>
+                          <th className="py-3 px-3 w-[130px]">Consult Mode</th>
+                          <th className="py-3 px-3 w-[180px]">Location / Contact</th>
+                          <th className="py-3 px-3 w-[150px] text-center">Actions</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-[#e6e9ef] dark:divide-slate-800 text-xs">
@@ -309,67 +312,67 @@ export const AppointmentsPage = () => {
 
                           return (
                             <tr key={app.id} className="hover:bg-[#f0f2f7] dark:hover:bg-slate-800/60 transition-colors">
-                              <td className="py-3 px-4">
-                                <div className="flex items-center gap-2.5">
-                                  <div className="h-8 w-8 rounded-full bg-[#0073ea] text-white font-bold text-xs flex items-center justify-center flex-shrink-0">
+                              <td className="py-4 px-6">
+                                <div className="flex items-center gap-3">
+                                  <div className="h-9 w-9 rounded-full bg-slate-100 text-slate-600 font-black text-xs flex items-center justify-center flex-shrink-0 uppercase">
                                     {person?.first_name?.[0]}{person?.last_name?.[0]}
                                   </div>
                                   <div>
-                                    <div className="font-extrabold text-sm text-slate-900 dark:text-slate-100">
+                                    <div className="font-bold text-sm text-slate-900 dark:text-slate-100">
                                       {isProvider ? "" : "Dr. "}{person?.first_name} {person?.last_name}
                                     </div>
                                     {!isProvider && person?.specialty && (
-                                      <div className="text-[10px] text-[#0073ea] font-semibold">{person.specialty}</div>
+                                      <div className="text-[10px] text-[#0073ea] font-bold uppercase tracking-wide">{person.specialty}</div>
                                     )}
                                   </div>
                                 </div>
                               </td>
 
-                              <td className="py-3 px-3 text-center">
+                              <td className="py-4 px-3 text-center">
                                 {getStatusPill(app.status)}
                               </td>
 
-                              <td className="py-3 px-3 font-mono font-semibold">
-                                <div>{format(apptDate, "EEE, MMM d, yyyy")}</div>
-                                <div className="text-[10px] text-slate-400">{app.time}</div>
+                              <td className="py-4 px-3 font-mono font-bold text-slate-900 dark:text-slate-200">
+                                <div>{format(apptDate, "MMM d, yyyy")}</div>
+                                <div className="text-[10px] text-slate-400 font-medium">{app.time}</div>
                               </td>
 
-                              <td className="py-3 px-3">
-                                <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                                  isVideo ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20" : "bg-blue-500/10 text-blue-600 border border-blue-500/20"
+                              <td className="py-4 px-3">
+                                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                                  isVideo ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-blue-50 text-blue-700 border border-blue-200"
                                 }`}>
                                   {isVideo ? <Video className="h-3 w-3" /> : <MapPin className="h-3 w-3" />}
-                                  <span>{isVideo ? "Video Visit" : "In-Person"}</span>
+                                  <span>{isVideo ? "Video" : "In-Person"}</span>
                                 </span>
                               </td>
 
-                              <td className="py-3 px-3 text-slate-600 dark:text-slate-400 truncate max-w-[180px]">
-                                {person?.address || "Lusaka Medical Facility"}
+                              <td className="py-4 px-3 text-slate-600 dark:text-slate-400 font-medium truncate max-w-[180px]">
+                                {person?.address || "Clinic Facility"}
                               </td>
 
-                              <td className="py-3 px-3 text-center">
-                                <div className="flex items-center justify-center gap-1.5">
+                              <td className="py-4 px-3 text-center">
+                                <div className="flex items-center justify-center gap-2">
                                   {isVideo && isToday(apptDate) && (
                                     <Link
                                       to={`/video-call/${app.id}`}
-                                      className="px-2.5 py-1 rounded-md bg-[#00c875] text-white text-[11px] font-bold hover:bg-[#00b368] transition-all"
+                                      className="px-3 py-1.5 rounded-lg bg-[#00c875] text-white text-[10px] font-black hover:bg-[#00b368] transition-all"
                                     >
-                                      Join Call
+                                      JOIN
                                     </Link>
                                   )}
                                   {isProvider && (
                                     <button
                                       onClick={() => completeAppointment.mutate(app.id)}
-                                      className="px-2 py-1 rounded-md bg-[#00c875] text-white text-[11px] font-bold hover:bg-[#00b368]"
+                                      className="px-3 py-1.5 rounded-lg bg-slate-900 text-white text-[10px] font-black hover:bg-black transition-all active:scale-95"
                                     >
-                                      Complete
+                                      DONE
                                     </button>
                                   )}
                                   <button
                                     onClick={() => cancelAppointment.mutate(app.id)}
-                                    className="px-2 py-1 rounded-md bg-[#e2445c] text-white text-[11px] font-bold hover:bg-[#c9364b]"
+                                    className="px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-600 text-[10px] font-black hover:bg-slate-50 transition-all active:scale-95"
                                   >
-                                    Cancel
+                                    CANCEL
                                   </button>
                                 </div>
                               </td>
@@ -383,13 +386,13 @@ export const AppointmentsPage = () => {
               </div>
 
               {/* Past Appointments Group */}
-              <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs overflow-hidden">
-                <div className="px-4 py-3 bg-[#f5f6f8] dark:bg-slate-950 border-b border-[#e6e9ef] dark:border-slate-800 flex items-center justify-between border-l-4 border-l-[#a25ddc]">
-                  <div className="flex items-center gap-2">
-                    <h2 className="font-extrabold text-sm text-[#a25ddc]">
-                      Past & Completed Appointments
+              <div className="rounded-3xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
+                <div className="px-5 py-4 bg-[#f5f7fa] dark:bg-slate-950 border-b border-[#e6e9ef] dark:border-slate-800 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <h2 className="font-extrabold text-sm text-slate-600 dark:text-slate-400">
+                      Past &amp; Completed
                     </h2>
-                    <span className="px-2 py-0.5 rounded-full text-xs font-mono font-bold bg-[#a25ddc] text-white">
+                    <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
                       {past.length}
                     </span>
                   </div>
@@ -443,9 +446,9 @@ export const AppointmentsPage = () => {
                                 {!isProvider && app.provider_id && (
                                   <button
                                     onClick={() => navigate(`/provider/${app.provider_id}`)}
-                                    className="px-3 py-1 rounded-md bg-[#0073ea] text-white text-[11px] font-bold hover:bg-[#0060c4]"
+                                    className="px-3 py-1.5 rounded-xl bg-[#0073ea] text-white text-[11px] font-black hover:bg-[#0060c7] transition-all active:scale-95"
                                   >
-                                    Re-Book Visit
+                                    Re-Book
                                   </button>
                                 )}
                               </td>

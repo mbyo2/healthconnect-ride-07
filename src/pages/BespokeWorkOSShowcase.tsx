@@ -23,7 +23,7 @@ const INITIAL_PATIENTS: PatientRecord[] = [
     doctor: {
       name: "Dr. Mutale Mwansa",
       specialty: "Chief Cardiology",
-      avatarUrl: "https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=100&auto=format&fit=crop&q=80",
+      avatarUrl: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=100&auto=format&fit=crop&q=85",
     },
     location: "Lusaka ER-B1",
     vitalScore: "88% SpO2 • 145/95",
@@ -43,7 +43,7 @@ const INITIAL_PATIENTS: PatientRecord[] = [
     doctor: {
       name: "Dr. Sarah Jenkins",
       specialty: "Emergency Trauma",
-      avatarUrl: "https://images.unsplash.com/photo-1594824813566-88855ce78905?w=100&auto=format&fit=crop&q=80",
+      avatarUrl: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=100&auto=format&fit=crop&q=85",
     },
     location: "Lusaka ER-B4",
     vitalScore: "95% SpO2 • 118/75",
@@ -63,7 +63,7 @@ const INITIAL_PATIENTS: PatientRecord[] = [
     doctor: {
       name: "Dr. Mutale Mwansa",
       specialty: "Chief Cardiology",
-      avatarUrl: "https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=100&auto=format&fit=crop&q=80",
+      avatarUrl: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=100&auto=format&fit=crop&q=85",
     },
     location: "UTH ICU Bed 3",
     vitalScore: "97% SpO2 • 122/80",
@@ -83,7 +83,7 @@ const INITIAL_PATIENTS: PatientRecord[] = [
     doctor: {
       name: "Dr. Chisamba Banda",
       specialty: "Neurology & ICU",
-      avatarUrl: "https://images.unsplash.com/photo-1527613426441-4da17471b66d?w=100&auto=format&fit=crop&q=80",
+      avatarUrl: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=100&auto=format&fit=crop&q=85",
     },
     location: "UTH ICU Bed 7",
     vitalScore: "89% SpO2 • 138/90",
@@ -103,7 +103,7 @@ const INITIAL_PATIENTS: PatientRecord[] = [
     doctor: {
       name: "Dr. Elena Rostova",
       specialty: "General Medicine",
-      avatarUrl: "https://images.unsplash.com/photo-1638202993928-7267aad84c31?w=100&auto=format&fit=crop&q=80",
+      avatarUrl: "https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=100&auto=format&fit=crop&q=85",
     },
     location: "Ndola Telehub",
     vitalScore: "98% SpO2 • 130/85",
@@ -123,7 +123,7 @@ const INITIAL_PATIENTS: PatientRecord[] = [
     doctor: {
       name: "Dr. Elena Rostova",
       specialty: "General Medicine",
-      avatarUrl: "https://images.unsplash.com/photo-1638202993928-7267aad84c31?w=100&auto=format&fit=crop&q=80",
+      avatarUrl: "https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=100&auto=format&fit=crop&q=85",
     },
     location: "Kitwe Clinic",
     vitalScore: "99% SpO2 • 115/70",
@@ -143,7 +143,7 @@ const INITIAL_PATIENTS: PatientRecord[] = [
     doctor: {
       name: "Dr. Sarah Jenkins",
       specialty: "Emergency Trauma",
-      avatarUrl: "https://images.unsplash.com/photo-1594824813566-88855ce78905?w=100&auto=format&fit=crop&q=80",
+      avatarUrl: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=100&auto=format&fit=crop&q=85",
     },
     location: "Ward 4B Bed 12",
     vitalScore: "98% SpO2 • 120/78",
@@ -215,7 +215,7 @@ export const BespokeWorkOSShowcase = () => {
       doctor: {
         name: "Dr. Sarah Jenkins",
         specialty: "Emergency Trauma",
-        avatarUrl: "https://images.unsplash.com/photo-1594824813566-88855ce78905?w=100&auto=format&fit=crop&q=80",
+        avatarUrl: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=100&auto=format&fit=crop&q=85",
       },
       location: "Lusaka Triage-New",
       vitalScore: "96% SpO2 • 120/80",

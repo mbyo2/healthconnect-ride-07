@@ -75,6 +75,7 @@ const CreateAdmin = lazyWithRetry(() => import('@/pages/CreateAdmin'));
 const Auth = lazyWithRetry(() => import('@/pages/Auth'));
 const AIDiagnostics = lazyWithRetry(() => import('@/pages/AIDiagnostics'));
 const Register = lazyWithRetry(() => import('@/pages/Register'));
+const PatientRegistration = lazyWithRetry(() => import('@/pages/PatientRegistration'));
 const ResetPassword = lazyWithRetry(() => import('@/pages/ResetPassword'));
 const MedicalRecords = lazyWithRetry(() => import('@/pages/MedicalRecords'));
 const VideoConsultations = lazyWithRetry(() => import('@/pages/VideoConsultations'));
@@ -121,6 +122,26 @@ const WaitlistPage = lazyWithRetry(() => import('@/pages/WaitlistPage'));
 const AppointmentReminders = lazyWithRetry(() => import('@/pages/AppointmentReminders'));
 const AcceptInvitation = lazyWithRetry(() => import('@/pages/AcceptInvitation'));
 const BespokeWorkOSShowcase = lazyWithRetry(() => import('@/pages/BespokeWorkOSShowcase'));
+const PublicQueueDisplay = lazyWithRetry(() => import('@/pages/PublicQueueDisplay'));
+const SelfServiceKiosk = lazyWithRetry(() => import('@/pages/SelfServiceKiosk'));
+
+// New Multi-Center & Enhanced Management Pages
+const MultiCenterManagement = lazyWithRetry(() => import('@/pages/MultiCenterManagement'));
+const FinancialControls = lazyWithRetry(() => import('@/pages/FinancialControls'));
+const PatientFlowManagement = lazyWithRetry(() => import('@/pages/PatientFlowManagement'));
+const EnhancedInventory = lazyWithRetry(() => import('@/pages/EnhancedInventory'));
+const ProcedureManagement = lazyWithRetry(() => import('@/pages/ProcedureManagement'));
+const CareTeamManagement = lazyWithRetry(() => import('@/pages/CareTeamManagement'));
+const EnhancedDiagnostics = lazyWithRetry(() => import('@/pages/EnhancedDiagnostics'));
+const ZambiaCompliance = lazyWithRetry(() => import('@/pages/ZambiaCompliance'));
+const EnhancedTelemedicine = lazyWithRetry(() => import('@/pages/EnhancedTelemedicine'));
+const AnalyticsReporting = lazyWithRetry(() => import('@/pages/AnalyticsReporting'));
+
+// Enterprise Accounting & Zambia-Specific Features
+const EnterpriseAccounting = lazyWithRetry(() => import('@/pages/EnterpriseAccounting'));
+const ZraSmartInvoiceIntegration = lazyWithRetry(() => import('@/pages/ZraSmartInvoiceIntegration'));
+const PayeTaxCalculations = lazyWithRetry(() => import('@/pages/PayeTaxCalculations'));
+const MedicalShiftHR = lazyWithRetry(() => import('@/pages/MedicalShiftHR'));
 
 import { RoleRedirect } from '@/components/auth/RoleRedirect';
 
@@ -154,6 +175,7 @@ const AppContent = () => {
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/patient-registration" element={<PatientRegistration />} />
             <Route path="/accept-invitation" element={<AcceptInvitation />} />
             {/* Public search & provider pages (ZocDoc-style) */}
             <Route path="/search" element={<SearchPage />} />
@@ -164,6 +186,8 @@ const AppContent = () => {
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/workos" element={<BespokeWorkOSShowcase />} />
             <Route path="/showcase" element={<BespokeWorkOSShowcase />} />
+            <Route path="/queue-display" element={<Suspense fallback={<LoadingScreen />}><PublicQueueDisplay /></Suspense>} />
+            <Route path="/kiosk" element={<Suspense fallback={<LoadingScreen />}><SelfServiceKiosk /></Suspense>} />
             <Route path="/booking-confirmed" element={<RouteGuard><BookingConfirmed /></RouteGuard>} />
             <Route path="/payment-return" element={<Suspense fallback={<LoadingScreen />}><PaymentReturn /></Suspense>} />
             <Route path="/payment-cancelled" element={<Suspense fallback={<LoadingScreen />}><PaymentCancelled /></Suspense>} />
@@ -286,6 +310,24 @@ const AppContent = () => {
             <Route path="/institution/settings" element={<RouteGuard><InstitutionSettings /></RouteGuard>} />
             <Route path="/institution/devices" element={<RouteGuard><InstitutionDevices /></RouteGuard>} />
             <Route path="/appointments/:id" element={<RouteGuard><AppointmentDetails /></RouteGuard>} />
+
+            {/* Multi-Center & Enhanced Management Routes */}
+            <Route path="/multi-center" element={<RouteGuard><MultiCenterManagement /></RouteGuard>} />
+            <Route path="/financial-controls" element={<RouteGuard><FinancialControls /></RouteGuard>} />
+            <Route path="/patient-flow" element={<RouteGuard><PatientFlowManagement /></RouteGuard>} />
+            <Route path="/enhanced-inventory" element={<RouteGuard><EnhancedInventory /></RouteGuard>} />
+            <Route path="/procedure-management" element={<RouteGuard><ProcedureManagement /></RouteGuard>} />
+            <Route path="/care-team" element={<RouteGuard><CareTeamManagement /></RouteGuard>} />
+            <Route path="/enhanced-diagnostics" element={<RouteGuard><EnhancedDiagnostics /></RouteGuard>} />
+            <Route path="/zambia-compliance" element={<RouteGuard><ZambiaCompliance /></RouteGuard>} />
+            <Route path="/enhanced-telemedicine" element={<RouteGuard><EnhancedTelemedicine /></RouteGuard>} />
+            <Route path="/analytics-reporting" element={<RouteGuard><AnalyticsReporting /></RouteGuard>} />
+
+            {/* Enterprise Accounting & Zambia-Specific Features */}
+            <Route path="/enterprise-accounting" element={<RouteGuard><EnterpriseAccounting /></RouteGuard>} />
+            <Route path="/zra-smart-invoice" element={<RouteGuard><ZraSmartInvoiceIntegration /></RouteGuard>} />
+            <Route path="/paye-calculations" element={<RouteGuard><PayeTaxCalculations /></RouteGuard>} />
+            <Route path="/medical-shift-hr" element={<RouteGuard><MedicalShiftHR /></RouteGuard>} />
 
             {/* Provider & Video */}
             <Route path="/provider-portal" element={<RouteGuard><ProviderPortal /></RouteGuard>} />

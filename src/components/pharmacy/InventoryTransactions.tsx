@@ -41,6 +41,7 @@ import {
 } from 'lucide-react';
 import { LoadingScreen } from '@/components/LoadingScreen';
 import { useAuth } from '@/context/AuthContext';
+import { useInstitutionContext } from '@/hooks/useInstitutionContext';
 import { format } from 'date-fns';
 
 interface MedicationInventoryItem {
@@ -68,6 +69,7 @@ const TRANSACTION_TYPES = ['purchase', 'sale', 'adjustment', 'return', 'expired'
 
 export const InventoryTransactions = () => {
   const { user } = useAuth();
+  const { institutionId: userInstitution, loading: loadingInstitution } = useInstitutionContext();
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -82,28 +84,6 @@ export const InventoryTransactions = () => {
     invoice_number: '',
     notes: '',
     transaction_date: format(new Date(), 'yyyy-MM-dd\'T\'HH:mm')
-  });
-
-  // Get institution id for the current user
-  const { data: userInstitution, isLoading: loadingInstitution } = useQuery({
-    queryKey: ['userInstitution', user?.id],
-    queryFn: async () => {
-      if (!user?.id) return null;
-      
-      const { data, error } = await supabase
-        .from('institution_staff')
-        .select('institution_id')
-        .eq('provider_id', user.id)
-        .eq('is_active', true)
-        .maybeSingle();
-
-      if (error) {
-        console.error('Error fetching institution:', error);
-        return null;
-      }
-      
-      return data?.institution_id;
-    },
   });
 
   // Fetch medication inventory
@@ -262,25 +242,6 @@ export const InventoryTransactions = () => {
 
   if (loadingInstitution || loadingMedications || loadingTransactions) {
     return <LoadingScreen />;
-  }
-
-  if (!userInstitution) {
-    return (
-      <Card className="mb-6">
-        <CardContent className="pt-6">
-          <div className="flex items-center justify-center p-6 text-center">
-            <div>
-              <AlertCircle className="mx-auto h-10 w-10 text-orange-500 mb-4" />
-              <h3 className="text-lg font-medium mb-2">No Institution Association</h3>
-              <p className="text-muted-foreground mb-4">
-                You are not associated with any healthcare institution. 
-                Please contact an administrator to associate your account.
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    );
   }
 
   return (

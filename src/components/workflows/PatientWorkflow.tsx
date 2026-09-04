@@ -60,7 +60,7 @@ const FEATURED_DOCTORS = [
     experience: '12 years experience • Online',
     rating: 4.8,
     reviews: 142,
-    avatar: 'https://images.unsplash.com/photo-1582750433449-648ed127bb54?auto=format&fit=crop&w=240&q=80',
+    avatar: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=240&q=85',
     timeSlots: ['8:00 a.m.', '9:00 a.m.', '10:00 a.m.', '2:30 p.m.'],
     price: 'K350',
     mode: 'online'
@@ -72,7 +72,7 @@ const FEATURED_DOCTORS = [
     experience: '15 years experience • Lusaka Hospital',
     rating: 4.9,
     reviews: 210,
-    avatar: 'https://images.unsplash.com/photo-1527613426441-4da17471b66d?auto=format&fit=crop&w=240&q=80',
+    avatar: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=240&q=85',
     timeSlots: ['9:30 a.m.', '11:00 a.m.', '3:00 p.m.', '4:15 p.m.'],
     price: 'K450',
     mode: 'both'
@@ -84,7 +84,7 @@ const FEATURED_DOCTORS = [
     experience: '9 years experience • Online',
     rating: 4.9,
     reviews: 188,
-    avatar: 'https://images.unsplash.com/photo-1594824813566-88855ce78905?auto=format&fit=crop&w=240&q=80',
+    avatar: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&w=240&q=85',
     timeSlots: ['10:00 a.m.', '11:30 a.m.', '1:00 p.m.', '3:30 p.m.'],
     price: 'K300',
     mode: 'online'

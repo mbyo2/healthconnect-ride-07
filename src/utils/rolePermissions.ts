@@ -475,10 +475,18 @@ export const hasAnyRole = (userRoles: UserRole[] | null, roles: UserRole[]): boo
 export const getRoleLandingPage = (userRoles: UserRole[] | null): string => {
   if (!userRoles || userRoles.length === 0) return '/auth';
 
-  // Priority order: admin > institution_admin > health_personnel > pharmacy > lab > patient
-  if (userRoles.includes(USER_ROLES.ADMIN) || userRoles.includes(USER_ROLES.SUPER_ADMIN)) return '/admin-dashboard';
+  // Priority order: admin > pharmacy/lab (specific portals) > institution_admin > clinical providers > patient
+  if (userRoles.includes(USER_ROLES.SUPER_ADMIN)) return '/admin-dashboard';
+  if (userRoles.includes(USER_ROLES.ADMIN)) return '/admin-dashboard';
   if (userRoles.includes(USER_ROLES.CXO)) return '/institution-dashboard';
-  if (userRoles.includes(USER_ROLES.INSTITUTION_ADMIN)) return '/institution-portal';
+
+  // Specific institution portals FIRST (before generic institution_admin)
+  if (userRoles.includes(USER_ROLES.PHARMACY) || userRoles.includes(USER_ROLES.PHARMACIST)) return '/pharmacy-portal';
+  if (userRoles.includes(USER_ROLES.LAB) || userRoles.includes(USER_ROLES.LAB_TECHNICIAN)) return '/lab-management';
+  if (userRoles.includes(USER_ROLES.PATHOLOGIST) || userRoles.includes(USER_ROLES.PHLEBOTOMIST)) return '/lab-management';
+
+  // Generic institution admin/staff routes
+  if (userRoles.includes(USER_ROLES.INSTITUTION_ADMIN)) return '/institution-dashboard';
   if (userRoles.includes(USER_ROLES.INSTITUTION_STAFF)) return '/institution-dashboard';
   if (userRoles.includes(USER_ROLES.RECEPTIONIST)) return '/institution-dashboard';
   if (userRoles.includes(USER_ROLES.HR_MANAGER)) return '/institution-dashboard';
@@ -488,10 +496,9 @@ export const getRoleLandingPage = (userRoles: UserRole[] | null): string => {
   if (userRoles.includes(USER_ROLES.MAINTENANCE_MANAGER)) return '/institution-dashboard';
   if (userRoles.includes(USER_ROLES.INVENTORY_MANAGER)) return '/institution-dashboard';
   if (userRoles.includes(USER_ROLES.AMBULANCE_STAFF)) return '/institution-dashboard';
+
+  // Clinical providers
   if (userRoles.includes(USER_ROLES.HEALTH_PERSONNEL) || userRoles.includes(USER_ROLES.DOCTOR) || userRoles.includes(USER_ROLES.NURSE) || userRoles.includes(USER_ROLES.RADIOLOGIST) || userRoles.includes(USER_ROLES.SPECIALIST)) return '/provider-dashboard';
-  if (userRoles.includes(USER_ROLES.PATHOLOGIST) || userRoles.includes(USER_ROLES.PHLEBOTOMIST)) return '/lab-management';
-  if (userRoles.includes(USER_ROLES.PHARMACY) || userRoles.includes(USER_ROLES.PHARMACIST)) return '/pharmacy-portal';
-  if (userRoles.includes(USER_ROLES.LAB) || userRoles.includes(USER_ROLES.LAB_TECHNICIAN)) return '/lab-management';
   if (userRoles.includes(USER_ROLES.PATIENT)) return '/home';
 
   return '/home';
@@ -535,20 +542,24 @@ export const getRoleNavigation = (userRoles: UserRole[] | null) => {
     { path: '/provider-portal', label: 'Provider Portal', icon: 'Building2', roles: ['health_personnel', 'doctor', 'nurse', 'radiologist', 'super_admin'] },
     { path: '/provider-calendar', label: 'Schedule', icon: 'Calendar', roles: ['health_personnel', 'doctor', 'nurse', 'radiologist', 'super_admin'] },
 
-    // ── Pharmacy routes (pharmacy/pharmacist ONLY) ──
-    { path: '/pharmacy-portal', label: 'Pharmacy Portal', icon: 'Building2', roles: ['pharmacy', 'pharmacist', 'super_admin'] },
+    // ── Pharmacy routes (pharmacy/pharmacist) ──
+    { path: '/pharmacy-portal', label: 'Pharmacy Portal', icon: 'Building2', roles: ['pharmacy', 'pharmacist', 'institution_admin', 'super_admin'] },
+    { path: '/pharmacy-management', label: 'Pharmacy Management', icon: 'Pill', roles: ['pharmacy', 'pharmacist', 'institution_admin', 'super_admin'] },
     { path: '/pharmacy-inventory', label: 'Inventory', icon: 'Package', roles: ['pharmacy', 'pharmacist', 'institution_admin', 'institution_staff', 'super_admin'] },
 
-    // ── Lab routes (lab/lab_technician ONLY) ──
-    { path: '/lab-management', label: 'Lab Management', icon: 'FlaskConical', roles: ['lab', 'lab_technician', 'admin', 'super_admin'] },
+    // ── Lab routes (lab/lab_technician) ──
+    { path: '/lab-management', label: 'Lab Management', icon: 'FlaskConical', roles: ['lab', 'lab_technician', 'pathologist', 'phlebotomist', 'institution_admin', 'admin', 'super_admin'] },
 
-    // ── Institution routes ──
-    { path: '/institution-portal', label: 'Institution Portal', icon: 'Building', roles: ['institution_admin', 'institution_staff', 'super_admin'] },
-    { path: '/institution-dashboard', label: 'Institution Dashboard', icon: 'LayoutDashboard', roles: ['institution_admin', 'institution_staff', 'super_admin'] },
-    { path: '/institution/patients', label: 'Patients', icon: 'Users', roles: ['institution_admin', 'institution_staff', 'super_admin'] },
-    { path: '/institution/reports', label: 'Reports', icon: 'BarChart', roles: ['institution_admin', 'institution_staff', 'super_admin'] },
-    { path: '/institution/appointments', label: 'Appointments', icon: 'Calendar', roles: ['institution_admin', 'institution_staff', 'super_admin'] },
+    // ── Hospital/Clinic/Nursing Home routes ──
     { path: '/hospital-management', label: 'Hospital Management', icon: 'Building', roles: ['admin', 'institution_admin', 'institution_staff', 'super_admin'] },
+
+    // ── General Institution routes ──
+    { path: '/institution-dashboard', label: 'Institution Dashboard', icon: 'LayoutDashboard', roles: ['institution_admin', 'institution_staff', 'cxo', 'receptionist', 'hr_manager', 'billing_staff', 'triage_staff', 'ot_staff', 'maintenance_manager', 'inventory_manager', 'ambulance_staff', 'super_admin'] },
+    { path: '/institution/personnel', label: 'Personnel', icon: 'Users', roles: ['institution_admin', 'institution_staff', 'hr_manager', 'super_admin'] },
+    { path: '/institution/patients', label: 'Patients', icon: 'Users', roles: ['institution_admin', 'institution_staff', 'super_admin'] },
+    { path: '/institution/reports', label: 'Reports', icon: 'BarChart', roles: ['institution_admin', 'institution_staff', 'cxo', 'billing_staff', 'super_admin'] },
+    { path: '/institution/appointments', label: 'Appointments', icon: 'Calendar', roles: ['institution_admin', 'institution_staff', 'receptionist', 'triage_staff', 'super_admin'] },
+    { path: '/institution/settings', label: 'Settings', icon: 'Settings', roles: ['institution_admin', 'super_admin'] },
 
     // ── Admin routes ──
     { path: '/admin-dashboard', label: 'Admin Dashboard', icon: 'LayoutDashboard', roles: ['admin', 'support', 'super_admin'] },

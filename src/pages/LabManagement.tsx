@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
+import { useInstitutionContext } from "@/hooks/useInstitutionContext";
 import { useCurrency } from "@/hooks/use-currency";
 import {
   FlaskConical, Search, Plus, Clock, CheckCircle2, AlertCircle, FileText, Microscope, Loader2
@@ -16,6 +17,7 @@ import { dispatchNotification } from "@/hooks/useNotifications";
 
 const LabManagement = () => {
   const { user } = useAuth();
+  const { institutionId: contextInstitutionId } = useInstitutionContext();
   const { formatPrice } = useCurrency();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRequest, setSelectedRequest] = useState<LabRequest | null>(null);
@@ -97,19 +99,21 @@ const LabManagement = () => {
         });
       } catch (e) { console.error("lab_results push failed", e); }
 
-      let institutionId: string | undefined;
+      let institutionId: string | undefined = contextInstitutionId || undefined;
       try {
         const patientName = (selectedRequest as any).patient
           ? `${(selectedRequest as any).patient.first_name ?? ""} ${(selectedRequest as any).patient.last_name ?? ""}`.trim()
           : "Unknown Patient";
-        const { data: staffRow } = await supabase
-          .from("institution_staff")
-          .select("institution_id")
-          .eq("provider_id", user?.id ?? "")
-          .eq("is_active", true)
-          .limit(1)
-          .maybeSingle();
-        institutionId = staffRow?.institution_id;
+        if (!institutionId) {
+          const { data: staffRow } = await supabase
+            .from("institution_staff")
+            .select("institution_id")
+            .eq("provider_id", user?.id ?? "")
+            .eq("is_active", true)
+            .limit(1)
+            .maybeSingle();
+          institutionId = staffRow?.institution_id;
+        }
         if (institutionId) {
           await (supabase.from("pathologist_reviews" as any) as any).insert({
             institution_id: institutionId,

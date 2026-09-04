@@ -30,7 +30,7 @@ FOR UPDATE
 USING (auth.uid() = patient_id);
 
 -- Create delivery zones table for pharmacy deliveries
-CREATE TABLE public.delivery_zones (
+CREATE TABLE IF NOT EXISTS public.delivery_zones (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   pharmacy_id UUID NOT NULL,
   zone_name TEXT NOT NULL,
@@ -41,6 +41,22 @@ CREATE TABLE public.delivery_zones (
   is_active BOOLEAN NOT NULL DEFAULT true,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );
+
+-- Fix existing table if it has incorrect ARRAY syntax
+DO $$
+BEGIN
+  -- Check if table exists and has the incorrect restrictions column
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'delivery_zones'
+    AND column_name = 'restrictions'
+    AND data_type = 'ARRAY'
+  ) THEN
+    -- Drop and recreate the column with correct syntax
+    ALTER TABLE public.delivery_zones DROP COLUMN restrictions;
+    ALTER TABLE public.delivery_zones ADD COLUMN restrictions TEXT[];
+  END IF;
+END $$;
 
 -- Enable RLS
 ALTER TABLE public.delivery_zones ENABLE ROW LEVEL SECURITY;

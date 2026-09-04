@@ -48,34 +48,57 @@ export const DoctorWorkflow = () => {
   ];
 
   return (
-    <div className="space-y-6 px-4 py-6 max-w-7xl mx-auto">
+    <div className="space-y-6 px-4 py-8 max-w-7xl mx-auto font-sans">
       <ApplicationStatusBanner />
       <ProfileCompleteBanner />
-      <div className="text-center space-y-2">
-        <h2 className="text-xl md:text-2xl font-bold text-foreground">Doctor Dashboard</h2>
-        <p className="text-muted-foreground text-sm md:text-base px-4">
-          Clinical tools, prescriptions, patient management & decision support
-        </p>
+
+      {/* Header Banner */}
+      <div className="rounded-3xl bg-[#0f172a] text-white p-6 sm:p-8 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <div className="h-14 w-14 rounded-2xl bg-[#0073ea] text-white flex items-center justify-center font-black shadow-md">
+            <Stethoscope className="h-7 w-7" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[#00a86b] animate-pulse" />
+              <span className="text-[11px] font-black uppercase tracking-wider text-slate-300">Doctor Clinical Workspace</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white mt-0.5">Physician Dashboard</h1>
+            <p className="text-xs text-slate-400 font-medium">
+              Clinical operations, patient queue, digital prescriptions &amp; CDSS tools
+            </p>
+          </div>
+        </div>
       </div>
 
-      <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      {/* Workspace Grid */}
+      <div className="grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {workflowSteps.map((step, index) => (
-          <Card key={index} className="cursor-pointer hover:shadow-md transition-all active:scale-95 touch-manipulation bg-card border-border"
-            onClick={() => handleNavigation(step.route, step.title)}>
-            <CardContent className="p-4">
+          <div
+            key={index}
+            className="group cursor-pointer rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs hover:border-[#0073ea] hover:shadow-md transition-all active:scale-[0.98] touch-manipulation flex flex-col justify-between"
+            onClick={() => handleNavigation(step.route, step.title)}
+          >
+            <div>
               <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 bg-primary/10 dark:bg-primary/20 rounded-lg shrink-0">
+                <div className="p-2.5 bg-[#e5f0ff] dark:bg-blue-950/60 text-[#0073ea] dark:text-blue-400 rounded-xl shrink-0 group-hover:bg-[#0073ea] group-hover:text-white transition-colors">
                   {step.icon}
                 </div>
-                <div className="min-w-0">
-                  <h3 className="text-sm font-semibold text-foreground truncate">{step.title}</h3>
-                  <p className="text-xs text-muted-foreground line-clamp-1">{step.description}</p>
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-xs font-black text-slate-900 dark:text-slate-100 group-hover:text-[#0073ea] transition-colors truncate">
+                    {step.title}
+                  </h3>
+                  <p className="text-[11px] text-slate-400 font-medium line-clamp-1">{step.description}</p>
                 </div>
               </div>
-              <Button onClick={(e) => { e.stopPropagation(); handleNavigation(step.route, step.title); }}
-                size="sm" className="w-full text-xs mt-2">Open</Button>
-            </CardContent>
-          </Card>
+            </div>
+            <button
+              onClick={(e) => { e.stopPropagation(); handleNavigation(step.route, step.title); }}
+              className="w-full mt-2 py-1.5 rounded-xl bg-[#f5f7fa] dark:bg-slate-800 text-slate-700 dark:text-slate-300 group-hover:bg-[#0073ea] group-hover:text-white text-[11px] font-black transition-all"
+            >
+              Open Module
+            </button>
+          </div>
         ))}
       </div>
     </div>

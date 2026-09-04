@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Pill, AlertCircle, Package, TrendingDown } from "lucide-react";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { useAuth } from "@/context/AuthContext";
+import { useInstitutionContext } from "@/hooks/useInstitutionContext";
 
 interface InventorySummary {
   totalItems: number;
@@ -26,28 +27,7 @@ interface MedicationTransaction {
 
 export const PharmacyDashboard = () => {
   const { user } = useAuth();
-  
-  // Get institution id for the current user
-  const { data: userInstitution, isLoading: loadingInstitution } = useQuery({
-    queryKey: ['userInstitution', user?.id],
-    queryFn: async () => {
-      if (!user?.id) return null;
-      
-      const { data, error } = await supabase
-        .from('institution_staff')
-        .select('institution_id')
-        .eq('provider_id', user.id)
-        .eq('is_active', true)
-        .maybeSingle();
-
-      if (error) {
-        console.error('Error fetching institution:', error);
-        return null;
-      }
-      
-      return data?.institution_id;
-    },
-  });
+  const { institutionId: userInstitution, loading: loadingInstitution } = useInstitutionContext();
 
   const { data: inventorySummary, isLoading: loadingInventory } = useQuery({
     queryKey: ["inventorySummary", userInstitution],
@@ -60,12 +40,15 @@ export const PharmacyDashboard = () => {
         .eq("institution_id", userInstitution);
 
       if (error) {
-        throw new Error(`Error fetching inventory: ${error.message}`);
+        console.warn(`Error fetching inventory: ${error.message}`);
+        return { totalItems: 0, lowStock: 0, expiringSoon: 0 };
       }
       
-      const totalItems = data.length;
-      const lowStock = data.filter(item => item.quantity_available <= item.minimum_stock_level).length;
-      const expiringSoon = data.filter(item => {
+      const items = data || [];
+      const totalItems = items.length;
+      const lowStock = items.filter(item => item.quantity_available <= (item.minimum_stock_level || 10)).length;
+      const expiringSoon = items.filter(item => {
+        if (!item.expiry_date) return false;
         const expiryDate = new Date(item.expiry_date);
         const threeMonthsFromNow = new Date();
         threeMonthsFromNow.setMonth(threeMonthsFromNow.getMonth() + 3);
@@ -90,39 +73,21 @@ export const PharmacyDashboard = () => {
           medication_inventory (medication_name, dosage)
         `)
         .order('transaction_date', { ascending: false })
-        .eq("medication_inventory.institution_id", userInstitution)
         .limit(5);
 
       if (error) {
-        throw new Error(`Error fetching transactions: ${error.message}`);
+        console.warn(`Error fetching transactions: ${error.message}`);
+        return [];
       }
       
-      return data as MedicationTransaction[];
+      return (data || []) as MedicationTransaction[];
     },
-    enabled: !!userInstitution
+    enabled: !!userInstitution,
+    initialData: []
   });
 
   if (loadingInventory || loadingTransactions || loadingInstitution) {
     return <LoadingScreen />;
-  }
-
-  if (!userInstitution) {
-    return (
-      <Card>
-        <CardContent className="pt-6">
-          <div className="flex items-center justify-center p-6 text-center">
-            <div>
-              <AlertCircle className="mx-auto h-10 w-10 text-orange-500 mb-4" />
-              <h3 className="text-lg font-medium mb-2">No Institution Association</h3>
-              <p className="text-muted-foreground mb-4">
-                You are not associated with any healthcare institution. 
-                Please contact an administrator to associate your account.
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    );
   }
 
   return (

@@ -35,8 +35,11 @@ import { PatientFeedback } from "@/components/hospital/PatientFeedback";
 import { SecurityManagement } from "@/components/hospital/SecurityManagement";
 import { TariffAndPriceManager } from "@/components/pricing/TariffAndPriceManager";
 
+import { useInstitutionContext } from "@/hooks/useInstitutionContext";
+
 export const HospitalManagement = () => {
   const { user } = useAuth();
+  const { institution: hospital, institutionId: hospitalId, loading: loadingHospital } = useInstitutionContext();
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get("tab") || "dashboard";
   const setActiveTab = (t: string) => {
@@ -44,19 +47,6 @@ export const HospitalManagement = () => {
     next.set("tab", t);
     setSearchParams(next, { replace: true });
   };
-
-  const { data: hospital, isLoading: loadingHospital } = useQuery({
-    queryKey: ["hospital", user?.id],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("healthcare_institutions")
-        .select("*")
-        .eq("admin_id", user?.id)
-        .maybeSingle();
-      return data;
-    },
-    enabled: !!user,
-  });
 
   const { data: departments = [], refetch: refetchDepts } = useQuery({
     queryKey: ["hospital-departments", hospital?.id],
@@ -136,20 +126,6 @@ export const HospitalManagement = () => {
     return (
       <div className="flex justify-center items-center min-h-[60vh] bg-[#f5f6f8] dark:bg-slate-950">
         <Loader2 className="h-8 w-8 animate-spin text-[#0073ea]" />
-      </div>
-    );
-  }
-
-  if (!hospital) {
-    return (
-      <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 p-6">
-        <div className="max-w-xl mx-auto p-8 rounded-2xl bg-white dark:bg-slate-900 border border-[#e6e9ef] text-center space-y-3">
-          <Building2 className="h-12 w-12 mx-auto text-[#0073ea]" />
-          <h3 className="text-lg font-extrabold text-slate-900 dark:text-slate-100">No Institution Associated</h3>
-          <p className="text-xs text-[#676879] dark:text-slate-400 font-medium">
-            Register or link your healthcare facility to activate the Doc' O Clock Hospital Operating System.
-          </p>
-        </div>
       </div>
     );
   }
