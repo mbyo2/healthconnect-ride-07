@@ -72,18 +72,18 @@ interface TermsAcceptanceProps {
 
 const TermsAcceptance = ({ checked, error, onChange }: TermsAcceptanceProps) => (
   <div>
-    <label className="flex cursor-pointer items-start gap-2 rounded-xl border border-[#e6e9ef] bg-[#f5f6f8] p-3 text-xs leading-relaxed text-[#676879]">
+    <label className="flex cursor-pointer items-start gap-2 rounded-xl border border-canvas-silk bg-canvas-bone p-3 text-sm leading-relaxed text-graphite-600">
       <input
         type="checkbox"
         checked={checked}
         onChange={(event) => onChange(event.target.checked)}
-        className="mt-0.5 h-4 w-4 shrink-0 rounded border-[#c3c6d4] accent-[#0073ea]"
+        className="mt-0.5 h-4 w-4 shrink-0 rounded border-canvas-silk accent-primary-500"
       />
       <span>
-        I agree to the <Link to="/terms" className="font-bold text-[#0073ea] hover:underline">Terms of Service</Link> and <Link to="/privacy" className="font-bold text-[#0073ea] hover:underline">Privacy Policy</Link>.
+        I agree to the <Link to="/terms" className="font-medium text-primary-500 hover:underline">Terms of Service</Link> and <Link to="/privacy" className="font-medium text-primary-500 hover:underline">Privacy Policy</Link>.
       </span>
     </label>
-    {error && <p className="mt-1 text-[10px] font-bold text-[#e2445c]">{error}</p>}
+    {error && <p className="mt-1 text-xs font-medium text-error-500">{error}</p>}
   </div>
 );
 
@@ -225,48 +225,48 @@ export const Auth = () => {
 
   const SignupPathSelector = () => (
     <div className="space-y-3 font-sans">
-      <p className="text-xs font-extrabold text-[#676879] text-center mb-4 uppercase tracking-wider">Select Account Type</p>
+      <p className="text-sm font-medium text-graphite-500 text-center mb-4">Select Account Type</p>
       {[
-        { path: "patient" as SignupPath, icon: <User className="h-5 w-5 text-[#0073ea]" />, title: "Patient Account", desc: "Book appointments, view medical records, and consult AI" },
-        { path: "provider" as SignupPath, icon: <Stethoscope className="h-5 w-5 text-[#00c875]" />, title: "Healthcare Professional", desc: "Doctors, Nurses, Pharmacists, Lab Techs & Specialists" },
-        { path: "business" as SignupPath, icon: <Building2 className="h-5 w-5 text-[#a25ddc]" />, title: "Healthcare Institution", desc: "Pharmacies, Clinics, Hospitals, Laboratories & Care Homes" },
+        { path: "patient" as SignupPath, icon: <User className="h-5 w-5 text-primary-500" />, title: "Patient Account", desc: "Book appointments, view medical records, and consult AI" },
+        { path: "provider" as SignupPath, icon: <Stethoscope className="h-5 w-5 text-success-500" />, title: "Healthcare Professional", desc: "Doctors, Nurses, Pharmacists, Lab Techs & Specialists" },
+        { path: "business" as SignupPath, icon: <Building2 className="h-5 w-5 text-accent-500" />, title: "Healthcare Institution", desc: "Pharmacies, Clinics, Hospitals, Laboratories & Care Homes" },
       ].map((item) => (
         <button
           key={item.path}
           onClick={() => setSignupPath(item.path)}
-          className="w-full flex items-center gap-3 p-4 rounded-xl border border-[#e6e9ef] bg-[#f5f6f8] hover:bg-[#e5f0ff] hover:border-[#0073ea] transition-all text-left group"
+          className="w-full flex items-center gap-3 p-4 rounded-xl border border-canvas-silk bg-canvas-bone hover:bg-primary-50 hover:border-primary-200 transition-all text-left group"
         >
-          <div className="p-2.5 rounded-xl bg-white border border-[#e6e9ef] shadow-xs">
+          <div className="p-2.5 rounded-xl bg-white border border-canvas-silk shadow-sm">
             {item.icon}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-extrabold text-xs text-slate-900">{item.title}</p>
-            <p className="text-[11px] text-[#676879] font-medium">{item.desc}</p>
+            <p className="font-medium text-sm text-midnight">{item.title}</p>
+            <p className="text-xs text-graphite-500 font-medium">{item.desc}</p>
           </div>
-          <ChevronRight className="h-4 w-4 text-[#676879] group-hover:text-[#0073ea] transition-colors" />
+          <ChevronRight className="h-4 w-4 text-graphite-400 group-hover:text-primary-500 transition-colors" />
         </button>
       ))}
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 flex items-center justify-center p-4 font-sans text-slate-900 dark:text-slate-100">
+    <div className="min-h-screen bg-canvas flex items-center justify-center p-4 font-sans text-midnight">
       <div className="w-full max-w-md space-y-6 py-8">
         <div className="text-center space-y-2">
           <Link to="/" className="mx-auto inline-flex flex-col items-center">
             <img src="/d0c-icon.svg" className="h-14 w-14 mb-1" alt="Doc' O Clock" />
-            <h1 className="text-2xl font-black text-slate-900 dark:text-slate-100 tracking-tight">Doc' O Clock</h1>
+            <h1 className="font-display text-3xl font-medium text-midnight tracking-tight">Doc' O Clock</h1>
           </Link>
-          <p className="text-xs text-[#676879] font-extrabold uppercase tracking-wider">Enterprise Healthcare Platform</p>
+          <p className="text-sm text-graphite-500 font-medium tracking-wide">Enterprise Healthcare Platform</p>
         </div>
 
-        <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-md">
+        <div className="vf-card !p-6 shadow-card">
           <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v); setSignupPath(null); }}>
-            <TabsList className="grid w-full grid-cols-2 mb-6 p-1 bg-[#f5f6f8] dark:bg-slate-950 rounded-xl border border-[#e6e9ef]">
-              <TabsTrigger value="signin" className="text-xs font-extrabold py-2 rounded-lg data-[state=active]:bg-[#0073ea] data-[state=active]:text-white transition-all">
+            <TabsList className="grid w-full grid-cols-2 mb-6 p-1 bg-canvas-bone rounded-xl border border-canvas-silk">
+              <TabsTrigger value="signin" className="text-sm font-medium py-2 rounded-lg data-[state=active]:bg-primary-500 data-[state=active]:text-white transition-all">
                 Sign In
               </TabsTrigger>
-              <TabsTrigger value="signup" className="text-xs font-extrabold py-2 rounded-lg data-[state=active]:bg-[#0073ea] data-[state=active]:text-white transition-all">
+              <TabsTrigger value="signup" className="text-sm font-medium py-2 rounded-lg data-[state=active]:bg-primary-500 data-[state=active]:text-white transition-all">
                 Register
               </TabsTrigger>
             </TabsList>
@@ -277,30 +277,30 @@ export const Auth = () => {
                 <form onSubmit={loginForm.handleSubmit(onLogin)} className="space-y-4">
                   <FormField control={loginForm.control} name="email" render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Email Address</FormLabel>
-                      <FormControl><Input placeholder="you@example.online" {...field} type="email" className="h-10 text-xs font-medium border-[#c3c6d4]" /></FormControl>
-                      <FormMessage className="text-[10px] font-bold text-[#e2445c]" />
+                      <FormLabel className="text-sm font-medium text-graphite-600">Email Address</FormLabel>
+                      <FormControl><Input placeholder="you@example.online" {...field} type="email" className="h-11 text-sm font-medium border-canvas-silk focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20" /></FormControl>
+                      <FormMessage className="text-xs font-medium text-error-500" />
                     </FormItem>
                   )} />
                   <FormField control={loginForm.control} name="password" render={({ field }) => (
                     <FormItem>
                       <div className="flex items-center justify-between">
-                        <FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Password</FormLabel>
+                        <FormLabel className="text-sm font-medium text-graphite-600">Password</FormLabel>
                         <ForgotPasswordDialog />
                       </div>
                       <FormControl>
                         <div className="relative">
-                          <Input type={showPassword ? "text" : "password"} placeholder="••••••••" {...field} className="h-10 text-xs font-medium border-[#c3c6d4] pr-10" />
+                          <Input type={showPassword ? "text" : "password"} placeholder="••••••••" {...field} className="h-11 text-sm font-medium border-canvas-silk focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 pr-10" />
                           <button type="button" onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#676879]">
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-graphite-400">
                             {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                           </button>
                         </div>
                       </FormControl>
-                      <FormMessage className="text-[10px] font-bold text-[#e2445c]" />
+                      <FormMessage className="text-xs font-medium text-error-500" />
                     </FormItem>
                   )} />
-                  <button type="submit" disabled={localLoading} className="w-full py-3 rounded-xl bg-[#0073ea] hover:bg-[#0060c4] text-white font-extrabold text-sm shadow-md transition-all">
+                  <button type="submit" disabled={localLoading} className="vf-btn-primary w-full h-12 text-sm">
                     {localLoading ? "Signing In..." : "Sign In to WorkOS"}
                   </button>
                 </form>
