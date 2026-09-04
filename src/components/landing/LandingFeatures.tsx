@@ -122,8 +122,8 @@ export const CareExperience = () => {
           <div className="rounded-card border border-canvas-silk bg-white p-5 sm:p-6 shadow-card overflow-hidden">
             <div className="rounded-2xl overflow-hidden relative">
               <img
-                src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&w=1200&q=85"
-                alt="African woman doctor in consultation ready for Doc' O Clock video telemedicine"
+                src="https://images.unsplash.com/photo-1594824476967-48c8b964273f?auto=format&fit=crop&w=1200&q=85"
+                alt="Black African female doctor Dr. Sarah Jenkins in video consultation - Doc' O Clock telemedicine"
                 className="h-64 sm:h-80 w-full object-cover"
                 loading="lazy"
               />
