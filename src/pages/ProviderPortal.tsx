@@ -104,25 +104,25 @@ export const ProviderPortal = () => {
 
   if (isRedirecting) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-background to-muted flex items-center justify-center p-4">
+      <div className="min-h-screen bg-canvas flex items-center justify-center p-4">
         <LoadingScreen />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted flex items-center justify-center p-4">
+    <div className="min-h-screen bg-canvas flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-8">
-        <div className="text-center space-y-2">
+        <div className="text-center space-y-3">
           <div className="flex justify-center">
-            <div className="bg-primary/10 p-3 rounded-full">
-              <Heart className="h-8 w-8 text-primary" />
+            <div className="bg-primary-50 p-3 rounded-2xl border border-primary-100">
+              <Heart className="h-8 w-8 text-primary-500" />
             </div>
           </div>
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+          <h1 className="font-display text-3xl font-medium text-midnight">
             Doc&apos; O Clock Healthcare Provider Portal
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-base text-graphite-500 tracking-wide">
             Access your provider dashboard and manage appointments
           </p>
         </div>
@@ -133,13 +133,13 @@ export const ProviderPortal = () => {
           </Alert>
         )}
 
-        <Alert className="mb-4">
-          <AlertDescription>
-            <strong>Note:</strong> Healthcare provider accounts require verification by an administrator before you can access all features.
+        <Alert className="mb-4 border-primary-100 bg-primary-50">
+          <AlertDescription className="text-graphite-600">
+            <strong className="font-medium">Note:</strong> Healthcare provider accounts require verification by an administrator before you can access all features.
           </AlertDescription>
         </Alert>
 
-        <Card className="p-6 shadow-lg">
+        <div className="vf-card !p-6 shadow-card">
           <Tabs defaultValue="signin">
             <TabsList className="grid w-full grid-cols-2 mb-4">
               <TabsTrigger value="signin">Sign In</TabsTrigger>

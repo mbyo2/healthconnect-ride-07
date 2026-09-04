@@ -69,20 +69,20 @@ const SearchPage = () => {
         <link rel="canonical" href="https://doc0clock.online/search" />
       </Helmet>
 
-      <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors pb-16">
-        {/* Sticky Monday Search Header */}
-        <div className="bg-white dark:bg-slate-900 border-b border-[#e6e9ef] dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
-          <div className="max-w-[1500px] mx-auto space-y-3">
+      <div className="min-h-screen bg-canvas text-midnight font-sans transition-colors pb-16">
+        {/* Search Header */}
+        <div className="bg-white border-b border-canvas-silk px-4 sm:px-6 py-5 sticky top-0 z-30 shadow-sm">
+          <div className="max-w-content mx-auto space-y-4">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-[#0073ea] text-white flex items-center justify-center font-black text-sm shadow-xs">
+              <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-button">
                 <Stethoscope className="h-5 w-5" />
               </div>
               <div>
-                <h1 className="text-xl font-extrabold tracking-tight flex items-center gap-2">
+                <h1 className="font-display text-2xl font-medium tracking-tight flex items-center gap-2">
                   Healthcare Provider Search Board
-                  <span className="w-2 h-2 rounded-full bg-[#00c875] animate-ping" />
+                  <span className="w-2 h-2 rounded-full bg-success-500 animate-ping" />
                 </h1>
-                <p className="text-xs text-[#676879] dark:text-slate-400 font-medium">
+                <p className="text-sm text-graphite-500 font-medium tracking-wide">
                   Locate verified specialists, hospitals, pharmacies, and telemedicine practitioners
                 </p>
               </div>
@@ -90,18 +90,18 @@ const SearchPage = () => {
 
             {/* Search Input Bar */}
             <div className="relative max-w-3xl">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#676879] h-4 w-4" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-graphite-400 h-4 w-4" />
               <input
                 type="text"
                 placeholder="Search by doctor name, specialty, hospital, city, or medical service..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={handleKeyPress}
-                className="w-full pl-10 pr-28 py-2.5 rounded-xl border border-[#c3c6d4] bg-white dark:bg-slate-900 text-xs font-bold text-slate-900 dark:text-slate-100 placeholder:text-[#676879] focus:outline-none focus:ring-2 focus:ring-[#0073ea] shadow-xs"
+                className="w-full pl-11 pr-32 py-3 rounded-pill border border-canvas-silk bg-white text-sm font-medium text-midnight placeholder:text-graphite-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 shadow-sm"
               />
               <button
                 onClick={handleSearch}
-                className="absolute right-1.5 top-1/2 -translate-y-1/2 px-4 py-1.5 rounded-lg bg-[#0073ea] hover:bg-[#0060c4] text-white text-xs font-extrabold shadow-xs transition-all"
+                className="absolute right-2 top-1/2 -translate-y-1/2 vf-btn-primary text-sm"
               >
                 Search Board
               </button>
@@ -109,16 +109,16 @@ const SearchPage = () => {
           </div>
         </div>
 
-        <div className="max-w-[1500px] mx-auto px-4 sm:px-6 pt-6 space-y-6">
-          <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
-            <div className="flex items-center gap-2 border-b border-[#e6e9ef] pb-3 mb-4">
-              <SlidersHorizontal className="h-4 w-4 text-[#0073ea]" />
-              <h2 className="font-extrabold text-xs text-slate-900 uppercase">Provider Filters</h2>
+        <div className="max-w-content mx-auto px-4 sm:px-6 pt-6 space-y-6">
+          <div className="vf-card">
+            <div className="flex items-center gap-2 border-b border-canvas-silk pb-3 mb-4">
+              <SlidersHorizontal className="h-4 w-4 text-primary-500" />
+              <h2 className="font-medium text-base text-midnight">Provider Filters</h2>
             </div>
             <SearchFilters />
           </div>
 
-          <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
+          <div className="vf-card">
             <SearchResults />
           </div>
         </div>
