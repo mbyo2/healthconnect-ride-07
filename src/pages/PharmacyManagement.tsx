@@ -162,7 +162,7 @@ export const PharmacyManagement = () => {
             </div>
             <div>
               <h1 className="text-xl font-extrabold tracking-tight flex items-center gap-2">
-                {pharmacy.name} — Pharmacy WorkOS & POS
+                {pharmacy.name} — Pharmacy Management & POS
                 <span className="w-2 h-2 rounded-full bg-[#00c875] animate-ping" />
               </h1>
               <p className="text-xs text-[#676879] dark:text-slate-400 font-medium">

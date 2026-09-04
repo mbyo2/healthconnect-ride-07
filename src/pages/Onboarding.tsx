@@ -12,7 +12,7 @@ const Onboarding = () => {
 
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold text-[#0073ea] bg-[#e5f0ff] border border-[#0073ea]/20">
             <Sparkles className="h-3.5 w-3.5" />
-            <span>Welcome to Doc' O Clock WorkOS</span>
+            <span>Welcome to Doc' O Clock</span>
           </div>
 
           <div>

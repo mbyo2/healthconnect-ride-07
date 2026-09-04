@@ -63,7 +63,7 @@ export default function MedicalRecords() {
     return (
       <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 flex items-center justify-center p-6 font-sans">
         <div className="text-center font-bold text-xs text-[#676879]">
-          Loading WorkOS Electronic Health Records...
+          Loading Electronic Health Records...
         </div>
       </div>
     );

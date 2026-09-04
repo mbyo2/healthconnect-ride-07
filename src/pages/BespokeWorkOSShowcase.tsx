@@ -283,21 +283,21 @@ export const BespokeWorkOSShowcase = () => {
   };
 
   const currentBoardInfo = BOARD_METADATA[activeBoardId] || {
-    title: "Clinical WorkOS Workspace",
+    title: "Clinical Operations Workspace",
     subtitle: "Unified healthcare operations CRM",
   };
 
   return (
     <>
       <Helmet>
-        <title>Clinical WorkOS Board | Doc' O Clock</title>
+        <title>Clinical Operations Board | Doc' O Clock</title>
         <meta name="description" content="Doc' O Clock bespoke clinical operations dashboard for emergency triage, bed allocations, and AI telehealth." />
       </Helmet>
 
       <div className={`min-h-screen flex font-sans transition-colors duration-200 ${
         isDarkMode ? "bg-slate-950 text-slate-100" : "bg-[#f5f6f8] text-slate-900"
       }`}>
-        {/* WorkOS Workspace Navigation Sidebar */}
+        {/* Workspace Navigation Sidebar */}
         <WorkOSSidebar
           isCollapsed={isSidebarCollapsed}
           onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}

@@ -215,7 +215,7 @@ const Settings = () => {
           </div>
           <div>
             <h1 className="font-display text-2xl font-medium tracking-tight flex items-center gap-2">
-              System Preferences & WorkOS Settings
+              System Preferences & Settings
               <span className="w-2 h-2 rounded-full bg-success-500 animate-ping" />
             </h1>
             <p className="text-sm text-graphite-500 font-medium tracking-wide">
@@ -258,7 +258,7 @@ const Settings = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium text-sm text-midnight">Dark / Light Interface Theme</p>
-                  <p className="text-[11px] text-[#676879]">Toggle WorkOS dark mode styling</p>
+                  <p className="text-[11px] text-[#676879]">Toggle dark mode styling</p>
                 </div>
                 <ThemeToggle />
               </div>

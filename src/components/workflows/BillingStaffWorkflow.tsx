@@ -253,7 +253,7 @@ export const BillingStaffWorkflow = () => {
     <div className="space-y-6 font-sans">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-extrabold tracking-tight">Billing & Accounts WorkOS Dashboard</h1>
+          <h1 className="text-xl font-extrabold tracking-tight">Billing & Accounts Dashboard</h1>
           <p className="text-xs text-[#676879] font-medium">Invoicing, payments, insurance claims & financial reconciliation</p>
         </div>
         <Dialog open={isInvoiceDialogOpen} onOpenChange={setIsInvoiceDialogOpen}>
@@ -466,7 +466,7 @@ export const BillingStaffWorkflow = () => {
         </div>
       </div>
 
-      {/* WorkOS Module Tabs */}
+      {/* Module Tabs */}
       <Tabs defaultValue="invoices">
         <TabsList className="flex items-center gap-1 p-1 bg-white border border-[#e6e9ef] rounded-xl">
           <TabsTrigger value="invoices" className="text-xs font-extrabold px-4 py-1.5 rounded-md data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">

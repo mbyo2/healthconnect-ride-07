@@ -32,7 +32,7 @@ export const ProviderDashboard = () => {
   const dashboardMeta = useMemo(() => {
     if (isRadiologist) return { title: "Radiologist Command Console", subtitle: "Diagnostic imaging reads, telemetry & MedGemma AI analysis" };
     if (isNurse) return { title: "Nurse Triage Console", subtitle: "Ward rounds, vitals telemetry & home visits" };
-    if (isDoctor) return { title: "Clinical Doctor WorkOS", subtitle: "Consultations, digital prescriptions & patient triage queue" };
+    if (isDoctor) return { title: "Clinical Doctor Dashboard", subtitle: "Consultations, digital prescriptions & patient triage queue" };
     return { title: "Healthcare Provider Workspace", subtitle: "Practice management, patient queue & telehealth" };
   }, [isDoctor, isNurse, isRadiologist]);
 
@@ -144,7 +144,7 @@ export const ProviderDashboard = () => {
           </div>
         </div>
 
-        {/* Quick WorkOS Action Pills Grid */}
+        {/* Quick Action Pills Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
           {[
             { label: "Calendar", route: "/provider-calendar", icon: Calendar },

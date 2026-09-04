@@ -26,7 +26,7 @@ export const WorkOSAICopilotBar: React.FC<WorkOSAICopilotBarProps> = ({ isDarkMo
     setTimeout(() => {
       setIsAnalyzing(false);
       setAiOutput(
-        `AI WorkOS Telemetry Execution Complete:\n• Prompt: "${promptText}"\n• Action: Re-indexed 12 patient records across 4 group sections.\n• Recommendation: Reallocated 2 beds in Ward 4B for Dr. Mutale's cardiac admissions.\n• Risk Score: Low (Confidence 98.4%).`
+        `AI Telemetry Execution Complete:\n• Prompt: "${promptText}"\n• Action: Re-indexed 12 patient records across 4 group sections.\n• Recommendation: Reallocated 2 beds in Ward 4B for Dr. Mutale's cardiac admissions.\n• Risk Score: Low (Confidence 98.4%).`
       );
     }, 1200);
   };

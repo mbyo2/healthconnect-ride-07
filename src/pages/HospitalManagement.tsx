@@ -147,7 +147,7 @@ export const HospitalManagement = () => {
                 </span>
               </div>
               <p className="text-xs text-[#676879] dark:text-slate-400 font-medium">
-                Hospital WorkOS • {hospital.type} • Lusaka Command Center
+                Hospital Dashboard • {hospital.type} • Lusaka Command Center
               </p>
             </div>
           </div>

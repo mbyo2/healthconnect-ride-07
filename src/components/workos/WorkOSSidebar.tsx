@@ -78,10 +78,10 @@ export const WorkOSSidebar: React.FC<WorkOSSidebarProps> = ({
         {isCollapsed ? <ChevronRight className="h-3.5 w-3.5" /> : <ChevronLeft className="h-3.5 w-3.5" />}
       </button>
 
-      {/* WorkOS Logo & Workspace Selector Header */}
+      {/* Doc' O Clock Logo & Workspace Selector Header */}
       <div className="p-3.5 border-b border-slate-700/60 flex items-center justify-between">
         <div className="flex items-center gap-2.5 overflow-hidden">
-          {/* WorkOS 3-Dots Iconic Status Icon */}
+          {/* Status Icon */}
           <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-[#0073ea] via-[#a25ddc] to-[#00c875] p-0.5 flex-shrink-0 shadow-md flex items-center justify-center">
             <div className="w-full h-full bg-slate-950/30 rounded-[10px] flex items-center justify-center gap-0.5">
               <span className="w-1.5 h-1.5 rounded-full bg-[#ff3d57]" />
@@ -93,7 +93,7 @@ export const WorkOSSidebar: React.FC<WorkOSSidebarProps> = ({
           {!isCollapsed && (
             <div className="min-w-0">
               <div className="flex items-center gap-1">
-                <span className="font-extrabold text-sm tracking-tight truncate">Clinical WorkOS</span>
+                <span className="font-extrabold text-sm tracking-tight truncate">Clinical Dashboard</span>
                 <span className="text-[9px] font-mono px-1.5 py-0.2 bg-blue-500/20 text-blue-400 rounded font-bold uppercase">
                   CRM
                 </span>

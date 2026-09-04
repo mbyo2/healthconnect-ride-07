@@ -301,7 +301,7 @@ export const Auth = () => {
                     </FormItem>
                   )} />
                   <button type="submit" disabled={localLoading} className="vf-btn-primary w-full h-12 text-sm">
-                    {localLoading ? "Signing In..." : "Sign In to WorkOS"}
+                    {localLoading ? "Signing In..." : "Sign In"}
                   </button>
                 </form>
               </Form>
