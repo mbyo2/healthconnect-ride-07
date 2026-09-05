@@ -263,7 +263,7 @@ CREATE INDEX IF NOT EXISTS idx_institutions_location ON healthcare_institutions(
 -- Enable RLS on application_extended_data
 ALTER TABLE application_extended_data ENABLE ROW LEVEL SECURITY;
 
--- Policy: Admins and super admins can view all extended data
+-- Policy: Admins can view all extended data
 CREATE POLICY admin_view_extended_data ON application_extended_data
   FOR SELECT
   TO authenticated
@@ -271,11 +271,11 @@ CREATE POLICY admin_view_extended_data ON application_extended_data
     EXISTS (
       SELECT 1 FROM profiles
       WHERE profiles.id = auth.uid()
-      AND profiles.role IN ('admin', 'super_admin')
+      AND profiles.role = 'admin'
     )
   );
 
--- Policy: Admins and super admins can insert/update extended data
+-- Policy: Admins can insert/update extended data
 CREATE POLICY admin_manage_extended_data ON application_extended_data
   FOR ALL
   TO authenticated
@@ -283,7 +283,7 @@ CREATE POLICY admin_manage_extended_data ON application_extended_data
     EXISTS (
       SELECT 1 FROM profiles
       WHERE profiles.id = auth.uid()
-      AND profiles.role IN ('admin', 'super_admin')
+      AND profiles.role = 'admin'
     )
   );
 
@@ -303,7 +303,7 @@ CREATE POLICY public_view_institutions ON healthcare_institutions
     EXISTS (
       SELECT 1 FROM profiles
       WHERE profiles.id = auth.uid()
-      AND profiles.role IN ('admin', 'super_admin')
+      AND profiles.role = 'admin'
     )
   );
 
@@ -325,7 +325,7 @@ BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM profiles
     WHERE id = auth.uid()
-    AND role IN ('admin', 'super_admin')
+    AND role = 'admin'
   ) THEN
     RAISE EXCEPTION 'Unauthorized: Admin access required';
   END IF;
@@ -358,7 +358,7 @@ BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM profiles
     WHERE id = auth.uid()
-    AND role IN ('admin', 'super_admin')
+    AND role = 'admin'
   ) THEN
     RAISE EXCEPTION 'Unauthorized: Admin access required';
   END IF;
