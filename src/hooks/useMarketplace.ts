@@ -34,15 +34,18 @@ export const useMarketplace = () => {
   const { data: products = [], isLoading: productsLoading } = useQuery({
     queryKey: ['marketplace-products'],
     queryFn: async () => {
+      // Only surface products from pharmacies that were approved AND opted into public listing
       const { data, error } = await supabase
         .from('marketplace_products')
         .select(`
           *,
-          pharmacy:healthcare_institutions!marketplace_products_pharmacy_id_fkey(
-            id, name, address, phone, email
+          pharmacy:healthcare_institutions!marketplace_products_pharmacy_id_fkey!inner(
+            id, name, address, phone, email, is_verified, list_in_marketplace
           )
         `)
         .eq('is_active', true)
+        .eq('pharmacy.is_verified', true)
+        .eq('pharmacy.list_in_marketplace', true)
         .order('medication_name');
 
       if (error) throw error;
