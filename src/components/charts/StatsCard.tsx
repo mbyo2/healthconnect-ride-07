@@ -5,7 +5,7 @@ interface StatsCardProps {
   label: string;
   value: string | number;
   change?: {
-    value: string;
+    value: string | number;
     isPositive: boolean;
   };
   icon?: LucideIcon;

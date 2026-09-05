@@ -1,8 +1,8 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 
 interface DonutChartProps {
-  data: Array<{ label: string; value: number; color: string }>;
-  title: string;
+  data: Array<{ label?: string; name?: string; value?: number; color?: string; [key: string]: any }>;
+  title?: string;
   subtitle?: string;
   height?: number;
   centerLabel?: string;
@@ -17,7 +17,13 @@ export const DonutChart = ({
   centerLabel,
   centerValue
 }: DonutChartProps) => {
-  const total = data.reduce((sum, item) => sum + item.value, 0);
+  const rows = (data || []).map((d) => ({
+    ...d,
+    label: d.label ?? d.name ?? '',
+    value: typeof d.value === 'number' ? d.value : 0,
+    color: d.color || '#397dff',
+  }));
+  const total = rows.reduce((sum, item) => sum + item.value, 0) || 1;
 
   return (
     <div className="vf-card p-5">
@@ -29,7 +35,7 @@ export const DonutChart = ({
         <ResponsiveContainer width="100%" height={height}>
           <PieChart>
             <Pie
-              data={data}
+              data={rows}
               cx="50%"
               cy="50%"
               innerRadius="60%"
@@ -37,7 +43,7 @@ export const DonutChart = ({
               paddingAngle={2}
               dataKey="value"
             >
-              {data.map((entry, index) => (
+              {rows.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.color} />
               ))}
             </Pie>
@@ -64,7 +70,7 @@ export const DonutChart = ({
         )}
       </div>
       <div className="mt-4 grid grid-cols-2 gap-3">
-        {data.map((item, idx) => (
+        {rows.map((item, idx) => (
           <div key={idx} className="flex items-center gap-2">
             <div 
               className="w-3 h-3 rounded-sm flex-shrink-0"

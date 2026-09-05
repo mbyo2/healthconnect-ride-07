@@ -5,7 +5,8 @@ interface QuickAction {
   icon: LucideIcon;
   onClick: () => void;
   color?: string;
-  badge?: string;
+  badge?: string | number;
+  variant?: string;
 }
 
 interface QuickActionsProps {
