@@ -55,11 +55,36 @@ export const HealthcareInstitutionForm = () => {
     address: "",
     city: "",
     state: "",
-    country: "",
+    country: "ZM",
     postal_code: "",
     phone: "",
     email: "",
     website: "",
+    // New fields for comprehensive review
+    list_in_marketplace: true, // Default to true for being listed
+    operational_since: "",
+    number_of_beds: "",
+    number_of_staff: "",
+    emergency_services: false,
+    ambulance_services: false,
+    accreditation_body: "",
+    accreditation_number: "",
+    tax_id: "",
+    business_registration_number: "",
+    bank_name: "",
+    bank_account_number: "",
+    insurance_providers: [] as string[],
+    services_offered: [] as string[],
+    equipment_available: [] as string[],
+    opening_hours: {
+      monday: { open: "08:00", close: "17:00", closed: false },
+      tuesday: { open: "08:00", close: "17:00", closed: false },
+      wednesday: { open: "08:00", close: "17:00", closed: false },
+      thursday: { open: "08:00", close: "17:00", closed: false },
+      friday: { open: "08:00", close: "17:00", closed: false },
+      saturday: { open: "08:00", close: "13:00", closed: false },
+      sunday: { open: "", close: "", closed: true },
+    },
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [selectedSpecialties, setSelectedSpecialties] = useState<string[]>([]);
