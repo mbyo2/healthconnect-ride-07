@@ -127,7 +127,7 @@ export const Auth = () => {
           setBusinessTypes(businessTypesRes.data.map((t) => ({ value: t.code, label: t.name })));
         }
         if (countriesRes.data) {
-          setCountries(countriesRes.data.map((c) => ({ value: c.code, label: `${c.flag_emoji} ${c.name}`, dialCode: c.dial_code })));
+          setCountries(countriesRes.data.map((c) => ({ value: c.code, label: `${(c as any).flag_emoji ?? ''} ${c.name}`.trim(), dialCode: c.dial_code })));
         }
       } catch (error) {
         console.error("Error fetching dynamic data:", error);

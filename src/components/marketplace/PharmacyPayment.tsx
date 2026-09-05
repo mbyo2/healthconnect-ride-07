@@ -29,7 +29,7 @@ export const PharmacyPayment = ({ order, onPaymentSuccess }: PharmacyPaymentProp
         reference_type: 'pharmacy_sale',
         reference_id: order?.id,
         description: `Medicine Order Payment - Order #${order?.id}`,
-        customer_phone: order?.patient_phone,
+        customer_phone: (order as any)?.patient_phone,
       });
     } catch (error) {
       console.error('Payment error:', error);

@@ -64,7 +64,7 @@ export const WalletTopUp = () => {
 
                 const profile = await supabase.from('profiles').select('first_name, last_name, phone').eq('id', user.id).single();
                 
-                const success = await redirectToDPOCheckout({
+                await redirectToDPOCheckout({
                     amount: numAmount,
                     currency: currency || 'ZMW',
                     reference_type: 'wallet_topup',
@@ -76,9 +76,6 @@ export const WalletTopUp = () => {
                     redirect_url: `${window.location.origin}/payment-return`,
                 });
 
-                if (!success) {
-                    throw new Error("Failed to initiate DPO payment");
-                }
             }
         } catch (error) {
             console.error('Top up error:', error);
