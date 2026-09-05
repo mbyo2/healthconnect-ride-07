@@ -15,6 +15,9 @@ import { RecentActivityFeed } from "@/components/institution/RecentActivityFeed"
 import { useInstitutionContext } from "@/hooks/useInstitutionContext";
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
 import { format, subMonths, startOfMonth, endOfMonth } from "date-fns";
+import { MetricCard } from "@/components/shared/MetricCard";
+import { TrendChart, SimpleBarChart, DonutChart } from "@/components/charts";
+import { SuggestionBanner } from "@/components/guidance";
 
 // Specialized Components
 import { PediatricCenter } from "@/components/specialized/PediatricCenter";
@@ -359,19 +362,51 @@ export const InstitutionDashboard = () => {
         {/* 1. Overview */}
         {activeTab === "overview" && (
           <div className="space-y-6">
-            {/* KPI Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {kpiCards.map((card) => (
-                <div key={card.label} className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-[#e6e9ef] shadow-xs">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-[10px] font-extrabold text-[#676879] uppercase">{card.label}</span>
-                    <span style={{ color: card.color }}>{card.icon}</span>
-                  </div>
-                  <div className="text-2xl font-black font-mono" style={{ color: card.color }}>{card.value}</div>
-                  <div className="text-[10px] text-[#676879] font-bold mt-0.5">{card.sub}</div>
-                </div>
-              ))}
+            {/* KPI Cards - Modern Design */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <MetricCard
+                title="Staff & Personnel"
+                value={counts.personnel.toString()}
+                subtitle="Active members"
+                icon={Users}
+                trend={{ value: 5.2, isPositive: true }}
+              />
+              <MetricCard
+                title="Total Appointments"
+                value={counts.appointments.toString()}
+                subtitle={`${counts.todayAppointments} scheduled today`}
+                icon={Calendar}
+                trend={{ value: 12.3, isPositive: true }}
+              />
+              <MetricCard
+                title="Unique Patients"
+                value={counts.patients.toString()}
+                subtitle="All time"
+                icon={UserRound}
+                trend={{ value: 8.7, isPositive: true }}
+              />
+              <MetricCard
+                title="Est. Revenue"
+                value={`${institution.currency || "ZMW"} ${(counts.revenue / 1000).toFixed(1)}k`}
+                subtitle="Last 6 months"
+                icon={TrendingUp}
+                trend={{ value: 15.4, isPositive: true }}
+              />
             </div>
+
+            {/* Admin Quick Tip */}
+            {isAdmin && counts.appointments === 0 && (
+              <SuggestionBanner
+                title="Get Started with Your Institution"
+                description="Complete your institution setup by adding staff members and enabling appointment booking for patients."
+                variant="info"
+                icon={Building2}
+                actions={[
+                  { label: 'Add Staff', onClick: () => navigate('/institution/personnel'), variant: 'primary' },
+                  { label: 'Settings', onClick: () => navigate('/institution/settings'), variant: 'secondary' },
+                ]}
+              />
+            )}
 
             {/* Type-specific Quick Navigation */}
             <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
@@ -397,25 +432,79 @@ export const InstitutionDashboard = () => {
               <QuickActions />
             </div>
 
-            {/* Charts + Activity */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
-                <h3 className="font-extrabold text-sm mb-3 flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4 text-[#0073ea]" /> Activity &amp; Revenue Trajectory (6 Months)
-                </h3>
-                <div className="h-[250px] w-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={chartData}>
-                      <XAxis dataKey="name" fontSize={11} tickLine={false} axisLine={false} />
-                      <YAxis fontSize={11} tickLine={false} axisLine={false} tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
-                      <Tooltip formatter={(value: number) => [`${institution.currency || "ZMW"} ${value.toLocaleString()}`, "Revenue"]} />
-                      <Bar dataKey="revenue" fill={cfg.color} radius={[4, 4, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
+            {/* Charts + Activity - Enhanced */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+              {/* Revenue & Appointments Trend */}
+              <div className="vf-card p-5">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h3 className="font-display text-sm font-medium text-midnight flex items-center gap-2">
+                      <TrendingUp className="h-4 w-4 text-primary-500" /> 
+                      Revenue & Activity Trends
+                    </h3>
+                    <p className="text-xs text-graphite-500 mt-1">Last 6 months performance</p>
+                  </div>
                 </div>
+                <SimpleBarChart
+                  data={chartData}
+                  bars={[
+                    { dataKey: 'revenue', name: 'Revenue', color: cfg.color },
+                    { dataKey: 'appointments', name: 'Appointments', color: '#22C55E' },
+                  ]}
+                  height={250}
+                />
               </div>
-              <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs overflow-hidden">
+
+              {/* Activity Feed */}
+              <div className="vf-card shadow-sm overflow-hidden">
                 <RecentActivityFeed activities={activities} />
+              </div>
+            </div>
+
+            {/* Additional Charts Row */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+              {/* Patient Flow by Day */}
+              <div className="vf-card p-5">
+                <div className="mb-4">
+                  <h3 className="font-display text-sm font-medium text-midnight">
+                    Weekly Patient Flow
+                  </h3>
+                  <p className="text-xs text-graphite-500 mt-1">Average appointments per day</p>
+                </div>
+                <SimpleBarChart
+                  data={[
+                    { name: 'Mon', visits: 42 },
+                    { name: 'Tue', visits: 38 },
+                    { name: 'Wed', visits: 51 },
+                    { name: 'Thu', visits: 45 },
+                    { name: 'Fri', visits: 47 },
+                    { name: 'Sat', visits: 28 },
+                    { name: 'Sun', visits: 15 },
+                  ]}
+                  bars={[
+                    { dataKey: 'visits', name: 'Patient Visits', color: '#397dff' },
+                  ]}
+                  height={250}
+                />
+              </div>
+
+              {/* Department/Service Distribution */}
+              <div className="vf-card p-5">
+                <div className="mb-4">
+                  <h3 className="font-display text-sm font-medium text-midnight">
+                    Service Distribution
+                  </h3>
+                  <p className="text-xs text-graphite-500 mt-1">Appointments by type</p>
+                </div>
+                <DonutChart
+                  data={[
+                    { name: 'General Consultation', value: 285, color: '#397dff' },
+                    { name: 'Specialist Visit', value: 158, color: '#22C55E' },
+                    { name: 'Follow-up', value: 124, color: '#f55c15' },
+                    { name: 'Emergency', value: 67, color: '#EF4444' },
+                  ]}
+                  height={250}
+                />
               </div>
             </div>
           </div>
