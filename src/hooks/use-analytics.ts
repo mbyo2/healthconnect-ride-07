@@ -49,7 +49,9 @@ async function flushEvents() {
 
     // Persist locally for offline + sandbox resilience
     try {
-      const existing = JSON.parse(sessionStorage.getItem('doc_analytics') || '[]');
+      const raw = sessionStorage.getItem('doc_analytics') || '[]';
+      const cleanRaw = raw.trim().replace(/^\uFEFF/, '');
+      const existing = JSON.parse(cleanRaw);
       sessionStorage.setItem('doc_analytics', JSON.stringify([...existing, ...batch].slice(-100)));
     } catch {
       // sessionStorage may be unavailable in some sandboxed contexts

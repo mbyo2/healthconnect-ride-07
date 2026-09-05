@@ -191,7 +191,8 @@ export const saveForOfflineSync = async (action: any) => {
     // Fallback: persist to safe local storage queue when IndexedDB unavailable
     try {
       const raw = safeLocalGet('offline_pending_actions') || '[]';
-      const queue = JSON.parse(raw);
+      const cleanRaw = raw.trim().replace(/^\uFEFF/, '');
+      const queue = JSON.parse(cleanRaw);
       queue.push({ ...action, id: Date.now().toString(), timestamp: new Date().toISOString() });
       safeLocalSet('offline_pending_actions', JSON.stringify(queue));
       return true;

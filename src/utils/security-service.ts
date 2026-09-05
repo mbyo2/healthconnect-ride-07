@@ -72,9 +72,12 @@ export const detectSuspiciousActivity = (action: string, context?: any): boolean
   // Check for rapid successive actions
   let recentActions: number[] = [];
   try {
-    recentActions = JSON.parse(safeLocalGet('recentActions') || '[]');
+    const raw = safeLocalGet('recentActions') || '[]';
+    const cleanRaw = raw.trim().replace(/^\uFEFF/, '');
+    recentActions = JSON.parse(cleanRaw);
   } catch (e) {
     recentActions = [];
+    safeLocalSet('recentActions', '[]'); // Reset to valid JSON
   }
   const now = Date.now();
   const fiveMinutesAgo = now - 5 * 60 * 1000;

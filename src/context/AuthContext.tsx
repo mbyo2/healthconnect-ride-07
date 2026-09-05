@@ -32,11 +32,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const cachedProfile = safeLocalGet('doc_oclock_profile');
     if (cachedProfile) {
       try {
-        const parsed = JSON.parse(cachedProfile);
+        const cleanCache = cachedProfile.trim().replace(/^\uFEFF/, '');
+        const parsed = JSON.parse(cleanCache);
         // Strip role from cache — always trust server for authorization
         setProfile({ ...parsed, role: parsed.role }); // display only, overwritten by fetchProfile
       } catch (e) {
         console.error('Error parsing cached profile', e);
+        safeLocalRemove('doc_oclock_profile'); // Clear corrupted cache
       }
     }
 

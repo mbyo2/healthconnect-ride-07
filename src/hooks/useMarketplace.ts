@@ -17,7 +17,8 @@ export const useMarketplace = () => {
     try {
       const raw = safeLocalGet('hc_cart_v1');
       if (raw) {
-        const parsed = JSON.parse(raw) as Cart;
+        const cleanRaw = raw.trim().replace(/^\uFEFF/, '');
+        const parsed = JSON.parse(cleanRaw) as Cart;
         // Basic shape check
         if (parsed && Array.isArray(parsed.items)) {
           setCart(parsed);

@@ -111,7 +111,8 @@ export class Logger {
     if (typeof window !== 'undefined') {
       try {
         const storedLogs = safeLocalGet('app_logs') || '[]';
-        const logs = JSON.parse(storedLogs as string);
+        const cleanLogs = (storedLogs as string).trim().replace(/^\uFEFF/, '');
+        const logs = JSON.parse(cleanLogs);
         logs.push(entry);
 
         // Keep only last 100 logs in localStorage

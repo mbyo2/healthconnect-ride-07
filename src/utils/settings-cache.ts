@@ -23,7 +23,9 @@ export const getSettingFromCache = (settingKey: string): any | null => {
     const raw = safeLocalGet(SETTINGS_CACHE_KEY);
     if (!raw) return null;
 
-    const cache: SettingsCacheData = JSON.parse(raw);
+    // Trim and clean the raw data to handle BOM and whitespace
+    const cleanRaw = raw.trim().replace(/^\uFEFF/, '');
+    const cache: SettingsCacheData = JSON.parse(cleanRaw);
     const setting = cache[settingKey];
 
     if (!setting) return null;
@@ -53,7 +55,8 @@ export const cacheSettingValue = (
 ): void => {
   try {
     const raw = safeLocalGet(SETTINGS_CACHE_KEY) || '{}';
-    const cache: SettingsCacheData = JSON.parse(raw);
+    const cleanRaw = raw.trim().replace(/^\uFEFF/, '');
+    const cache: SettingsCacheData = JSON.parse(cleanRaw);
 
     cache[settingKey] = {
       key: settingKey,
@@ -87,7 +90,8 @@ export const removeSettingFromCache = (settingKey: string): void => {
     const raw = safeLocalGet(SETTINGS_CACHE_KEY);
     if (!raw) return;
 
-    const cache: SettingsCacheData = JSON.parse(raw);
+    const cleanRaw = raw.trim().replace(/^\uFEFF/, '');
+    const cache: SettingsCacheData = JSON.parse(cleanRaw);
     delete cache[settingKey];
     safeLocalSet(SETTINGS_CACHE_KEY, JSON.stringify(cache));
   } catch (err) {
