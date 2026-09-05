@@ -177,69 +177,6 @@ export const HMSDashboard = ({ hospital, departments, beds, admissions, invoices
           />
         </div>
       </div>
-            <div className="text-2xl font-bold">{departments?.length || 0}</div>
-            <p className="text-xs text-muted-foreground">Active departments</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Department Quick View */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm">Department Overview</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {departments && departments.length > 0 ? (
-              <div className="space-y-3">
-                {departments.slice(0, 6).map((dept: any) => {
-                  const deptBeds = beds?.filter((b: any) => b.department_id === dept.id) || [];
-                  const deptOccupied = deptBeds.filter((b: any) => b.status === 'occupied').length;
-                  return (
-                    <div key={dept.id} className="flex items-center justify-between p-2 rounded-lg hover:bg-accent/50">
-                      <div>
-                        <p className="font-medium text-sm">{dept.name}</p>
-                        <p className="text-xs text-muted-foreground">Code: {dept.code}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-sm font-medium">{deptOccupied}/{deptBeds.length}</p>
-                        <p className="text-xs text-muted-foreground">beds</p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <p className="text-sm text-muted-foreground text-center py-4">No departments configured</p>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm">Recent Admissions</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {admissions && admissions.length > 0 ? (
-              <div className="space-y-3">
-                {admissions.slice(0, 6).map((admission: any) => (
-                  <div key={admission.id} className="flex items-center justify-between p-2 rounded-lg hover:bg-accent/50">
-                    <div>
-                      <p className="font-medium text-sm">
-                        {admission.patient?.first_name} {admission.patient?.last_name}
-                      </p>
-                      <p className="text-xs text-muted-foreground">{admission.department?.name}</p>
-                    </div>
-                    <Badge variant="secondary" className="text-[10px]">{admission.admission_type}</Badge>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-muted-foreground text-center py-4">No active admissions</p>
-            )}
-          </CardContent>
-        </Card>
-      </div>
     </div>
   );
 };
