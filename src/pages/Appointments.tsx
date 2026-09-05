@@ -7,6 +7,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { NetworkErrorBoundary } from "@/components/errors/NetworkErrorBoundary";
 import { useApiQuery } from "@/hooks/use-api-query";
 import { useUserRoles } from "@/context/UserRolesContext";
+import { EmptyState, LoadingSkeleton } from "@/components/shared";
+import { SuggestionBanner, HealthTipCard } from "@/components/guidance";
 import {
   Calendar,
   Clock,
@@ -24,7 +26,8 @@ import {
   ExternalLink,
   ChevronDown,
   ChevronRight,
-  Plus
+  Plus,
+  Info
 } from "lucide-react";
 
 export const AppointmentsPage = () => {
@@ -266,11 +269,34 @@ export const AppointmentsPage = () => {
         {/* Main Board Body */}
         <div className="max-w-[1500px] mx-auto px-4 sm:px-6 pt-6">
           {isLoading ? (
-            <div className="p-8 text-center bg-white dark:bg-slate-900 rounded-2xl border border-[#e6e9ef] font-bold text-xs text-slate-400">
-              Loading appointment board...
+            <div className="space-y-4">
+              <LoadingSkeleton variant="card" count={3} />
             </div>
           ) : (
             <div className="space-y-6">
+              {/* Contextual Guidance - Only for Patients */}
+              {!isProvider && upcoming.length === 0 && (
+                <SuggestionBanner
+                  title="Get Started with Your Healthcare Journey"
+                  description="Book your first appointment with a qualified healthcare provider. Browse by specialty or search for doctors near you."
+                  variant="info"
+                  icon={Info}
+                  actions={[
+                    { label: 'Find a Doctor', onClick: () => navigate('/search'), variant: 'primary' },
+                  ]}
+                />
+              )}
+
+              {/* Health Tip for Patients */}
+              {!isProvider && upcoming.length > 0 && (
+                <HealthTipCard
+                  title="Prepare for Your Appointment"
+                  tip="Write down your symptoms, current medications, and questions before your visit. This helps your doctor provide better care."
+                  category="wellness"
+                  source="Doc' O Clock Health Team"
+                />
+              )}
+
               {/* Upcoming Appointments Table Group */}
               <div className="rounded-3xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
                 <div className="px-5 py-4 bg-[#0f172a] flex items-center justify-between">
@@ -288,8 +314,17 @@ export const AppointmentsPage = () => {
                 </div>
 
                 {upcoming.length === 0 ? (
-                  <div className="p-8 text-center text-xs text-[#676879] dark:text-slate-400">
-                    No upcoming appointments scheduled
+                  <div className="p-8">
+                    <EmptyState
+                      icon={Calendar}
+                      title={isProvider ? "No upcoming appointments" : "No appointments scheduled yet"}
+                      description={isProvider 
+                        ? "You don't have any upcoming patient appointments at this time."
+                        : "Start your healthcare journey by booking an appointment with a qualified provider."
+                      }
+                      actionLabel={isProvider ? undefined : "Browse Doctors"}
+                      onAction={isProvider ? undefined : () => navigate('/search')}
+                    />
                   </div>
                 ) : (
                   <div className="w-full overflow-x-auto">
@@ -399,8 +434,12 @@ export const AppointmentsPage = () => {
                 </div>
 
                 {past.length === 0 ? (
-                  <div className="p-8 text-center text-xs text-[#676879] dark:text-slate-400">
-                    No past appointment history
+                  <div className="p-8">
+                    <EmptyState
+                      icon={Clock}
+                      title="No past appointments"
+                      description="Your appointment history will appear here once you complete visits."
+                    />
                   </div>
                 ) : (
                   <div className="w-full overflow-x-auto">

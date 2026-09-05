@@ -2,7 +2,7 @@ import React, { useState, useMemo } from "react";
 import {
   Pill, Calendar, User, Clock, Download, Plus, FileText, Search,
   ExternalLink, Filter, CheckCircle2, AlertTriangle, Trash2, ShieldAlert,
-  Printer, ArrowRight, Sparkles
+  Printer, ArrowRight, Sparkles, Info
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useUserRoles } from "@/context/UserRolesContext";
@@ -12,6 +12,8 @@ import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { checkInteractions } from "@/utils/drug-interactions";
+import { EmptyState, LoadingSkeleton } from "@/components/shared";
+import { SuggestionBanner, HealthTipCard, NextStepsCard } from "@/components/guidance";
 
 interface MedicationItem {
   id: string;
@@ -628,11 +630,64 @@ export const Prescriptions = () => {
       {/* Main Board Area */}
       <div className="max-w-[1500px] mx-auto px-4 sm:px-6 pt-6">
         {isLoading ? (
-          <div className="p-12 text-center bg-white dark:bg-slate-900 rounded-3xl border border-[#e6e9ef] dark:border-slate-800 font-bold text-xs text-slate-400">
-            Loading prescription board...
+          <div className="space-y-4">
+            <LoadingSkeleton variant="card" count={2} />
           </div>
         ) : (
-          <div className="rounded-3xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
+          <div className="space-y-5">
+            {/* Guidance for Patients */}
+            {!isProvider && filteredPrescriptions.length === 0 && (
+              <SuggestionBanner
+                title="No Active Prescriptions"
+                description="Your prescriptions will appear here after your doctor prescribes medications during consultations."
+                variant="info"
+                icon={Info}
+                actions={[
+                  { label: 'Book Appointment', onClick: () => window.location.href = '/appointments', variant: 'primary' },
+                ]}
+              />
+            )}
+
+            {/* Medication Safety Tip */}
+            {!isProvider && filteredPrescriptions.length > 0 && (
+              <HealthTipCard
+                title="Take Medications as Prescribed"
+                tip="Always complete the full course of antibiotics even if you feel better. Never share prescriptions with others, and store medications in a cool, dry place away from children."
+                category="prevention"
+                source="Pharmacy Safety Guidelines"
+                dismissible={true}
+              />
+            )}
+
+            {/* Refill Reminder for Patients */}
+            {!isProvider && filteredPrescriptions.some((p: any) => (p.refills_remaining || 0) <= 1 && p.status === 'active') && (
+              <NextStepsCard
+                title="Prescription Refills Needed"
+                steps={[
+                  {
+                    id: 'check-refills',
+                    label: 'Check refills remaining',
+                    description: 'Review which medications need refills soon',
+                    completed: false,
+                    onClick: () => setStatusFilter('active'),
+                  },
+                  {
+                    id: 'contact-doctor',
+                    label: 'Contact your doctor',
+                    description: 'Request prescription renewals if needed',
+                    completed: false,
+                  },
+                  {
+                    id: 'order-refills',
+                    label: 'Order refills in advance',
+                    description: 'Don\'t wait until you run out completely',
+                    completed: false,
+                  },
+                ]}
+              />
+            )}
+
+            <div className="rounded-3xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
             <div className="px-5 py-4 bg-[#0f172a] flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2">
@@ -646,8 +701,24 @@ export const Prescriptions = () => {
             </div>
 
             {filteredPrescriptions.length === 0 ? (
-              <div className="p-12 text-center text-xs text-[#676879] dark:text-slate-400">
-                No prescription records found matching filter.
+              <div className="p-8">
+                <EmptyState
+                  icon={Pill}
+                  title={isProvider ? "No prescriptions found" : "No prescriptions yet"}
+                  description={isProvider 
+                    ? "No prescription records match your current filters. Try adjusting the search or status filter."
+                    : "Your medication prescriptions will appear here after your doctor prescribes them during consultations."
+                  }
+                  actionLabel={isProvider ? "Clear Filters" : "Find a Doctor"}
+                  onAction={() => {
+                    if (isProvider) {
+                      setSearchQuery("");
+                      setStatusFilter("all");
+                    } else {
+                      window.location.href = '/search';
+                    }
+                  }}
+                />
               </div>
             ) : (
               <div className="w-full overflow-x-auto">
@@ -742,6 +813,7 @@ export const Prescriptions = () => {
                 </table>
               </div>
             )}
+          </div>
           </div>
         )}
       </div>
