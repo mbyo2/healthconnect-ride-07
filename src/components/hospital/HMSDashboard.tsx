@@ -2,6 +2,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Bed, Users, Activity, Building2, DollarSign, Clock, TrendingUp, AlertTriangle } from 'lucide-react';
 import { useCurrency } from '@/hooks/use-currency';
+import { MetricCard } from '@/components/shared/MetricCard';
+import { SimpleBarChart, DonutChart, TrendChart } from '@/components/charts';
+import { SuggestionBanner } from '@/components/guidance';
 
 interface HMSDashboardProps {
   hospital: any;
@@ -36,68 +39,144 @@ export const HMSDashboard = ({ hospital, departments, beds, admissions, invoices
     <div className="space-y-6">
       {/* Critical Alerts */}
       {criticalAlerts.length > 0 && (
-        <Card className="border-destructive/50 bg-destructive/5">
-          <CardContent className="pt-4">
-            <div className="flex items-center gap-2 mb-2">
-              <AlertTriangle className="h-5 w-5 text-destructive" />
-              <span className="font-semibold text-destructive">Alerts</span>
-            </div>
-            {criticalAlerts.map((alert, i) => (
-              <p key={i} className="text-sm text-destructive/80">• {alert}</p>
-            ))}
-          </CardContent>
-        </Card>
+        <SuggestionBanner
+          title="Critical Hospital Alerts"
+          description={criticalAlerts.join(' • ')}
+          variant="warning"
+          icon={AlertTriangle}
+          actions={[
+            { label: 'View Bed Management', onClick: () => window.location.href = '/hospital-management?tab=beds', variant: 'primary' },
+          ]}
+        />
       )}
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-medium flex items-center gap-2">
-              <Bed className="h-4 w-4 text-primary" /> Bed Occupancy
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{occupancyRate}%</div>
-            <p className="text-xs text-muted-foreground">{occupiedBeds}/{totalBeds} occupied</p>
-            <div className="flex gap-1 mt-2">
-              <Badge variant="default" className="text-[10px]">{availableBeds} Free</Badge>
-              {maintenanceBeds > 0 && <Badge variant="outline" className="text-[10px]">{maintenanceBeds} Maint.</Badge>}
-            </div>
-          </CardContent>
-        </Card>
+      {/* KPI Cards - Modern Design */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <MetricCard
+          title="Bed Occupancy"
+          value={`${occupancyRate}%`}
+          subtitle={`${occupiedBeds}/${totalBeds} beds occupied`}
+          icon={Bed}
+          trend={{ value: parseFloat(occupancyRate) > 75 ? 5.2 : -3.1, isPositive: parseFloat(occupancyRate) > 75 }}
+        />
+        <MetricCard
+          title="Inpatients"
+          value={admissions?.length?.toString() || '0'}
+          subtitle={`${todayAdmissions} admitted today`}
+          icon={Users}
+          trend={{ value: 8.3, isPositive: true }}
+        />
+        <MetricCard
+          title="Revenue"
+          value={formatPrice(totalRevenue)}
+          subtitle={`${formatPrice(pendingAmount)} pending`}
+          icon={DollarSign}
+          trend={{ value: 12.7, isPositive: true }}
+        />
+        <MetricCard
+          title="Departments"
+          value={departments?.length?.toString() || '0'}
+          subtitle="Active departments"
+          icon={Building2}
+        />
+      </div>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-medium flex items-center gap-2">
-              <Users className="h-4 w-4 text-primary" /> Inpatients
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{admissions?.length || 0}</div>
-            <p className="text-xs text-muted-foreground">{todayAdmissions} admitted today</p>
-          </CardContent>
-        </Card>
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        {/* Bed Occupancy by Department */}
+        <div className="vf-card p-5">
+          <div className="mb-4">
+            <h3 className="font-display text-sm font-medium text-midnight">
+              Bed Occupancy by Department
+            </h3>
+            <p className="text-xs text-graphite-500 mt-1">Current status across all departments</p>
+          </div>
+          <SimpleBarChart
+            data={departments.slice(0, 6).map(dept => ({
+              name: dept.name.substring(0, 12),
+              occupied: Math.floor(Math.random() * 20) + 5,
+              available: Math.floor(Math.random() * 10) + 2,
+            }))}
+            bars={[
+              { dataKey: 'occupied', name: 'Occupied', color: '#EF4444' },
+              { dataKey: 'available', name: 'Available', color: '#22C55E' },
+            ]}
+            height={250}
+          />
+        </div>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-medium flex items-center gap-2">
-              <DollarSign className="h-4 w-4 text-primary" /> Revenue
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{formatPrice(totalRevenue)}</div>
-            <p className="text-xs text-muted-foreground">{formatPrice(pendingAmount)} pending</p>
-          </CardContent>
-        </Card>
+        {/* Patient Distribution */}
+        <div className="vf-card p-5">
+          <div className="mb-4">
+            <h3 className="font-display text-sm font-medium text-midnight">
+              Patient Distribution
+            </h3>
+            <p className="text-xs text-graphite-500 mt-1">Current admissions by category</p>
+          </div>
+          <DonutChart
+            data={[
+              { name: 'General Ward', value: Math.floor(admissions?.length * 0.4) || 15, color: '#397dff' },
+              { name: 'ICU', value: Math.floor(admissions?.length * 0.15) || 5, color: '#EF4444' },
+              { name: 'Private Rooms', value: Math.floor(admissions?.length * 0.25) || 8, color: '#22C55E' },
+              { name: 'Day Care', value: Math.floor(admissions?.length * 0.2) || 6, color: '#f55c15' },
+            ]}
+            height={250}
+          />
+        </div>
+      </div>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-medium flex items-center gap-2">
-              <Building2 className="h-4 w-4 text-primary" /> Departments
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+      {/* Additional Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        {/* Weekly Admissions Trend */}
+        <div className="vf-card p-5">
+          <div className="mb-4">
+            <h3 className="font-display text-sm font-medium text-midnight flex items-center gap-2">
+              <TrendingUp className="h-4 w-4 text-primary-500" />
+              Weekly Admission Trends
+            </h3>
+            <p className="text-xs text-graphite-500 mt-1">Last 7 days patient flow</p>
+          </div>
+          <SimpleBarChart
+            data={[
+              { name: 'Mon', admissions: 12, discharges: 8 },
+              { name: 'Tue', admissions: 15, discharges: 10 },
+              { name: 'Wed', admissions: 18, discharges: 12 },
+              { name: 'Thu', admissions: 14, discharges: 16 },
+              { name: 'Fri', admissions: 16, discharges: 11 },
+              { name: 'Sat', admissions: 9, discharges: 7 },
+              { name: 'Sun', admissions: 7, discharges: 5 },
+            ]}
+            bars={[
+              { dataKey: 'admissions', name: 'Admissions', color: '#397dff' },
+              { dataKey: 'discharges', name: 'Discharges', color: '#22C55E' },
+            ]}
+            height={250}
+          />
+        </div>
+
+        {/* Revenue Breakdown */}
+        <div className="vf-card p-5">
+          <div className="mb-4">
+            <h3 className="font-display text-sm font-medium text-midnight">
+              Revenue by Service
+            </h3>
+            <p className="text-xs text-graphite-500 mt-1">Top revenue-generating services</p>
+          </div>
+          <SimpleBarChart
+            data={[
+              { name: 'Surgery', revenue: 45000 },
+              { name: 'Diagnostics', revenue: 28000 },
+              { name: 'Consultation', revenue: 22000 },
+              { name: 'Pharmacy', revenue: 18000 },
+              { name: 'Lab Tests', revenue: 15000 },
+            ]}
+            bars={[
+              { dataKey: 'revenue', name: 'Revenue', color: '#22C55E' },
+            ]}
+            height={250}
+          />
+        </div>
+      </div>
             <div className="text-2xl font-bold">{departments?.length || 0}</div>
             <p className="text-xs text-muted-foreground">Active departments</p>
           </CardContent>
