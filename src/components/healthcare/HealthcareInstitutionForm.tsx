@@ -66,7 +66,7 @@ export const HealthcareInstitutionForm = () => {
     website: "",
     
     // Marketplace Listing Control
-    list_in_marketplace: true,
+    list_in_marketplace: false,
     
     // Operational Details
     operational_since: "",
