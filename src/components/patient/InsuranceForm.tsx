@@ -74,7 +74,7 @@ export const InsuranceForm = () => {
               <SelectValue placeholder="Select Insurance Provider" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="" disabled>Select Insurance Provider</SelectItem>
+              <SelectItem value="placeholder" disabled>Select Insurance Provider</SelectItem>
               
               {/* Zambian Insurance Providers Group */}
               <div className="px-2 py-1.5 text-sm font-semibold">Zambian Providers</div>

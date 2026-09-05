@@ -370,7 +370,7 @@ export const PatientRegistration = () => {
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl><SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Select blood type" /></SelectTrigger></FormControl>
                     <SelectContent>
-                      <SelectItem value="">Unknown</SelectItem>
+                      <SelectItem value="unknown">Unknown</SelectItem>
                       {bloodTypes.map((b) => <SelectItem key={b.id} value={b.code}>{b.name}</SelectItem>)}
                     </SelectContent>
                   </Select>

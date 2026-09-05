@@ -71,7 +71,7 @@ export const SearchFilters = () => {
                     <SelectValue placeholder="All types" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All types</SelectItem>
+                    <SelectItem value="all">All types</SelectItem>
                     <SelectItem value="doctor">Doctor / Specialist</SelectItem>
                     <SelectItem value="hospital">Hospital</SelectItem>
                     <SelectItem value="clinic">Clinic</SelectItem>
@@ -96,7 +96,7 @@ export const SearchFilters = () => {
                     <SelectValue placeholder="All specialties" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All specialties</SelectItem>
+                    <SelectItem value="all">All specialties</SelectItem>
                     <SelectItem value="General Practice">General Practice</SelectItem>
                     <SelectItem value="Cardiology">Cardiology</SelectItem>
                     <SelectItem value="Dermatology">Dermatology</SelectItem>
@@ -127,7 +127,7 @@ export const SearchFilters = () => {
                     <SelectValue placeholder="All insurance" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All insurance networks</SelectItem>
+                    <SelectItem value="all">All insurance networks</SelectItem>
                     <SelectItem value="none">Self-Pay / Cash Only</SelectItem>
                     <SelectItem value="nhima">NHIMA (National Health Insurance)</SelectItem>
                     <SelectItem value="madison">Madison Health Insurance</SelectItem>
