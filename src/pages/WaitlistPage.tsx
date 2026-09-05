@@ -80,8 +80,8 @@ const WaitlistPage = () => {
         <main className="container mx-auto px-4 pt-20 pb-24 max-w-3xl">
           <div className="mb-6 flex items-start justify-between gap-4 flex-wrap">
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-foreground">My Waitlists</h1>
-              <p className="text-muted-foreground text-sm mt-1">
+              <h1 className="font-display text-2xl md:text-3xl font-medium text-midnight">My Waitlists</h1>
+              <p className="text-sm text-graphite-500 mt-1">
                 Get notified when earlier slots open with providers you've waitlisted with.
               </p>
             </div>
