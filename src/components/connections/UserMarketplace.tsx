@@ -93,8 +93,8 @@ export const UserMarketplace = () => {
         `)
         .neq('id', session.user.id);
 
-      // Always exclude patients from the marketplace view
-      baseQuery = baseQuery.neq('role', 'patient');
+      // Always exclude patients from the marketplace view, and only show approved accounts
+      baseQuery = baseQuery.neq('role', 'patient').eq('is_verified', true);
 
       // Filter by role if specific tab is selected
       if (activeTab !== 'all') {
