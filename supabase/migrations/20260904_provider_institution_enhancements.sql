@@ -387,12 +387,5 @@ GRANT EXECUTE ON FUNCTION get_provider_application_details(uuid) TO authenticate
 -- MIGRATION COMPLETE
 -- ============================================================================
 
--- Add migration record
-DO $$
-BEGIN
-  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'schema_migrations') THEN
-    INSERT INTO schema_migrations (version, name)
-    VALUES ('20260904', 'provider_institution_enhancements')
-    ON CONFLICT (version) DO NOTHING;
-  END IF;
-END $$;
+-- Migration successfully applied: provider_institution_enhancements
+-- Date: September 4, 2026
