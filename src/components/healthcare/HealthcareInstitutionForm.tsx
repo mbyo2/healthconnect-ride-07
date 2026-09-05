@@ -565,9 +565,12 @@ export const HealthcareInstitutionForm = () => {
             disabled={isSubmitting}
           />
         </div>
-      </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-      {/* Document Upload Section */}
+        {/* DOCUMENTS TAB */}
+        <TabsContent value="documents" className="space-y-4">
       <div className="space-y-4 border-t pt-4 mt-4">
         <h3 className="text-lg font-semibold">Regulatory Documents</h3>
         <p className="text-sm text-muted-foreground">
