@@ -5,9 +5,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Loader2, Upload, X, CheckCircle, AlertCircle } from "lucide-react";
+import { Loader2, Upload, X, CheckCircle, AlertCircle, Building2, FileText, DollarSign, Clock, Stethoscope, Info } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 import { SpecialtySelector } from "./SpecialtySelector";
 import { saveInstitutionSpecialties } from "@/hooks/useClinicSpecialties";
@@ -49,6 +52,7 @@ export const HealthcareInstitutionForm = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
+    // Basic Information
     name: "",
     type: "",
     license_number: "",
@@ -60,23 +64,38 @@ export const HealthcareInstitutionForm = () => {
     phone: "",
     email: "",
     website: "",
-    // New fields for comprehensive review
-    list_in_marketplace: true, // Default to true for being listed
+    
+    // Marketplace Listing Control
+    list_in_marketplace: true,
+    
+    // Operational Details
     operational_since: "",
     number_of_beds: "",
     number_of_staff: "",
     emergency_services: false,
     ambulance_services: false,
+    is_24_7: false,
+    
+    // Accreditation & Compliance
     accreditation_body: "",
     accreditation_number: "",
+    accreditation_expiry_date: "",
     tax_id: "",
     business_registration_number: "",
+    
+    // Financial Information
     bank_name: "",
     bank_account_number: "",
-    insurance_providers: [] as string[],
+    bank_account_name: "",
+    swift_code: "",
+    
+    // Services & Capabilities
     services_offered: [] as string[],
     equipment_available: [] as string[],
-    opening_hours: {
+    languages_spoken: [] as string[],
+    
+    // Operating Hours
+    operating_hours: {
       monday: { open: "08:00", close: "17:00", closed: false },
       tuesday: { open: "08:00", close: "17:00", closed: false },
       wednesday: { open: "08:00", close: "17:00", closed: false },
@@ -86,6 +105,8 @@ export const HealthcareInstitutionForm = () => {
       sunday: { open: "", close: "", closed: true },
     },
   });
+  
+  const [currentTab, setCurrentTab] = useState("basic");
   const [errors, setErrors] = useState<FormErrors>({});
   const [selectedSpecialties, setSelectedSpecialties] = useState<string[]>([]);
   const [primarySpecialtyId, setPrimarySpecialtyId] = useState<string>();
@@ -234,28 +255,140 @@ export const HealthcareInstitutionForm = () => {
     }
   };
 
-  return (
-    <form onSubmit={handleSubmit} className="space-y-6 w-full max-w-2xl mx-auto p-6">
-      <h2 className="text-2xl font-bold">Register Healthcare Institution</h2>
+  // Handle multi-value inputs (services, equipment, languages)
+  const [servicesInput, setServicesInput] = useState("");
+  const [equipmentInput, setEquipmentInput] = useState("");
+  const [languagesInput, setLanguagesInput] = useState("");
 
-      <div className="space-y-4">
-        <div>
-          <Label htmlFor="name">Institution Name <span className="text-destructive">*</span></Label>
-          <Input
-            id="name"
-            value={formData.name}
-            onChange={(e) => {
-              setFormData({ ...formData, name: e.target.value });
-              if (errors.name) setErrors({ ...errors, name: undefined });
-            }}
-            className={errors.name ? "border-destructive" : ""}
-            disabled={isSubmitting}
-            required
-          />
-          {errors.name && (
-            <p className="text-sm text-destructive mt-1">{errors.name}</p>
-          )}
-        </div>
+  const addService = () => {
+    if (servicesInput.trim() && !formData.services_offered.includes(servicesInput.trim())) {
+      setFormData({ ...formData, services_offered: [...formData.services_offered, servicesInput.trim()] });
+      setServicesInput("");
+    }
+  };
+
+  const removeService = (service: string) => {
+    setFormData({ ...formData, services_offered: formData.services_offered.filter(s => s !== service) });
+  };
+
+  const addEquipment = () => {
+    if (equipmentInput.trim() && !formData.equipment_available.includes(equipmentInput.trim())) {
+      setFormData({ ...formData, equipment_available: [...formData.equipment_available, equipmentInput.trim()] });
+      setEquipmentInput("");
+    }
+  };
+
+  const removeEquipment = (equipment: string) => {
+    setFormData({ ...formData, equipment_available: formData.equipment_available.filter(e => e !== equipment) });
+  };
+
+  const addLanguage = () => {
+    if (languagesInput.trim() && !formData.languages_spoken.includes(languagesInput.trim())) {
+      setFormData({ ...formData, languages_spoken: [...formData.languages_spoken, languagesInput.trim()] });
+      setLanguagesInput("");
+    }
+  };
+
+  const removeLanguage = (language: string) => {
+    setFormData({ ...formData, languages_spoken: formData.languages_spoken.filter(l => l !== language) });
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-6 w-full max-w-4xl mx-auto p-6">
+      <div className="space-y-2">
+        <h2 className="text-2xl font-bold">Register Healthcare Institution</h2>
+        <p className="text-muted-foreground">
+          Complete all sections to register your institution. Choose whether to list in the public marketplace or use HMS only.
+        </p>
+      </div>
+
+      <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="basic">
+            <Building2 className="h-4 w-4 mr-2" />
+            Basic Info
+          </TabsTrigger>
+          <TabsTrigger value="operational">
+            <Stethoscope className="h-4 w-4 mr-2" />
+            Operational
+          </TabsTrigger>
+          <TabsTrigger value="compliance">
+            <FileText className="h-4 w-4 mr-2" />
+            Compliance
+          </TabsTrigger>
+          <TabsTrigger value="financial">
+            <DollarSign className="h-4 w-4 mr-2" />
+            Financial
+          </TabsTrigger>
+          <TabsTrigger value="documents">
+            <Upload className="h-4 w-4 mr-2" />
+            Documents
+          </TabsTrigger>
+        </TabsList>
+
+        {/* BASIC INFORMATION TAB */}
+        <TabsContent value="basic" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Marketplace Listing</CardTitle>
+              <CardDescription>
+                Choose whether your institution will be publicly searchable
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-start space-x-3 p-4 bg-muted/50 rounded-lg">
+                <Checkbox
+                  id="list_in_marketplace"
+                  checked={formData.list_in_marketplace}
+                  onCheckedChange={(checked) =>
+                    setFormData({ ...formData, list_in_marketplace: checked as boolean })
+                  }
+                  disabled={isSubmitting}
+                />
+                <div className="space-y-1">
+                  <label
+                    htmlFor="list_in_marketplace"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                  >
+                    List my institution in public marketplace
+                  </label>
+                  <p className="text-sm text-muted-foreground">
+                    {formData.list_in_marketplace ? (
+                      <>Your institution will be searchable by patients and appear in public listings. You'll need to provide comprehensive information for review.</>
+                    ) : (
+                      <>Your institution will only have HMS (Hospital Management System) access without being publicly searchable. Basic compliance information is still required.</>
+                    )}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Basic Information</CardTitle>
+              <CardDescription>
+                Essential details about your institution
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label htmlFor="name">Institution Name <span className="text-destructive">*</span></Label>
+                <Input
+                  id="name"
+                  value={formData.name}
+                  onChange={(e) => {
+                    setFormData({ ...formData, name: e.target.value });
+                    if (errors.name) setErrors({ ...errors, name: undefined });
+                  }}
+                  className={errors.name ? "border-destructive" : ""}
+                  disabled={isSubmitting}
+                  required
+                />
+                {errors.name && (
+                  <p className="text-sm text-destructive mt-1">{errors.name}</p>
+                )}
+              </div>
 
         <div>
           <Label htmlFor="type">Institution Type <span className="text-destructive">*</span></Label>
