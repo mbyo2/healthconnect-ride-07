@@ -217,7 +217,20 @@ export const SecurityDashboard = () => {
                                 View Details
                               </summary>
                               <pre className="mt-2 p-2 bg-muted rounded text-xs overflow-auto">
-                                {JSON.stringify(JSON.parse(event.event_data), null, 2)}
+                                {(() => {
+                                  try {
+                                    // If event_data is already an object, stringify it directly
+                                    if (typeof event.event_data === 'object') {
+                                      return JSON.stringify(event.event_data, null, 2);
+                                    }
+                                    // If it's a string, clean and parse it
+                                    const cleanData = event.event_data.trim().replace(/^\uFEFF/, '');
+                                    return JSON.stringify(JSON.parse(cleanData), null, 2);
+                                  } catch (e) {
+                                    // Fallback: display raw data
+                                    return String(event.event_data);
+                                  }
+                                })()}
                               </pre>
                             </details>
                           )}
