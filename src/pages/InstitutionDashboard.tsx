@@ -297,14 +297,12 @@ export const InstitutionDashboard = () => {
           <div className="flex items-center gap-2 flex-wrap">
             <button
               onClick={() => navigate("/kiosk")}
-              target="_blank"
               className="vf-btn-secondary gap-1.5 text-sm"
             >
               <Ticket className="h-3.5 w-3.5" /> Self-Service Kiosk
             </button>
             <button
               onClick={() => navigate("/queue-display")}
-              target="_blank"
               className="vf-btn-secondary gap-1.5 text-sm"
             >
               <Tv className="h-3.5 w-3.5" /> Public TV Screen

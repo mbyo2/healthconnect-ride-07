@@ -173,7 +173,7 @@ export const ApplicationReviewModal = ({
     setProcessing(true);
     try {
       // Save verification checklist to extended data
-      await supabase.from('application_extended_data').upsert({
+      await (supabase.from('application_extended_data') as any).upsert({
         application_id: application.id,
         application_type: applicationType,
         verification_checklist: verificationChecklist,

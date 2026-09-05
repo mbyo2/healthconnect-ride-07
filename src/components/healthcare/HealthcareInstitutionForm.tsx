@@ -303,22 +303,10 @@ export const HealthcareInstitutionForm = () => {
       </div>
 
       <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="basic">
             <Building2 className="h-4 w-4 mr-2" />
             Basic Info
-          </TabsTrigger>
-          <TabsTrigger value="operational">
-            <Stethoscope className="h-4 w-4 mr-2" />
-            Operational
-          </TabsTrigger>
-          <TabsTrigger value="compliance">
-            <FileText className="h-4 w-4 mr-2" />
-            Compliance
-          </TabsTrigger>
-          <TabsTrigger value="financial">
-            <DollarSign className="h-4 w-4 mr-2" />
-            Financial
           </TabsTrigger>
           <TabsTrigger value="documents">
             <Upload className="h-4 w-4 mr-2" />
@@ -565,9 +553,12 @@ export const HealthcareInstitutionForm = () => {
             disabled={isSubmitting}
           />
         </div>
-      </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-      {/* Document Upload Section */}
+        {/* DOCUMENTS TAB */}
+        <TabsContent value="documents" className="space-y-4">
       <div className="space-y-4 border-t pt-4 mt-4">
         <h3 className="text-lg font-semibold">Regulatory Documents</h3>
         <p className="text-sm text-muted-foreground">
@@ -650,6 +641,10 @@ export const HealthcareInstitutionForm = () => {
           </div>
         )}
       </div>
+        </TabsContent>
+      </Tabs>
+
+
 
       <Button
         type="submit"

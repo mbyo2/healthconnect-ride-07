@@ -1,8 +1,8 @@
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis, Area, AreaChart } from 'recharts';
 
 interface TrendChartProps {
-  data: Array<{ label: string; value: number }>;
-  title: string;
+  data: Array<{ label?: string; name?: string; value?: number; [key: string]: any }>;
+  title?: string;
   subtitle?: string;
   color?: string;
   height?: number;
@@ -21,8 +21,13 @@ export const TrendChart = ({
   prefix = '',
   suffix = ''
 }: TrendChartProps) => {
-  const ChartComponent = showArea ? AreaChart : LineChart;
-  const DataComponent = showArea ? Area : Line;
+  const ChartComponent: any = showArea ? AreaChart : LineChart;
+  const DataComponent: any = showArea ? Area : Line;
+  const rows = (data || []).map((d) => ({
+    ...d,
+    label: d.label ?? d.name ?? '',
+    value: typeof d.value === 'number' ? d.value : 0,
+  }));
 
   return (
     <div className="vf-card p-5">
@@ -31,7 +36,7 @@ export const TrendChart = ({
         {subtitle && <p className="text-xs text-graphite-500">{subtitle}</p>}
       </div>
       <ResponsiveContainer width="100%" height={height}>
-        <ChartComponent data={data}>
+        <ChartComponent data={rows}>
           <defs>
             <linearGradient id={`gradient-${color}`} x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor={color} stopOpacity={0.3}/>

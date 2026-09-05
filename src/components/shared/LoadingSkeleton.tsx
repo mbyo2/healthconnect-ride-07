@@ -1,12 +1,15 @@
 interface LoadingSkeletonProps {
   type?: 'card' | 'text' | 'circle' | 'chart' | 'table';
+  /** Alias for type */
+  variant?: string;
   count?: number;
   className?: string;
 }
 
-export const LoadingSkeleton = ({ type = 'card', count = 1, className = '' }: LoadingSkeletonProps) => {
+export const LoadingSkeleton = ({ type, variant, count = 1, className = '' }: LoadingSkeletonProps) => {
+  const resolvedType = (type ?? (variant as LoadingSkeletonProps['type']) ?? 'card');
   const renderSkeleton = () => {
-    switch (type) {
+    switch (resolvedType) {
       case 'card':
         return (
           <div className={`vf-card p-5 animate-pulse ${className}`}>

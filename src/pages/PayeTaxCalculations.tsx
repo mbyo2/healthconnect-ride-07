@@ -196,7 +196,7 @@ export const PayeTaxCalculations = () => {
         calculation_month: calcForm.calculation_month,
         gross_income: calcForm.gross_income,
         tax_exempt_amount: calcForm.tax_exempt_amount,
-        taxable_income,
+        taxable_income: taxableIncome,
         total_paye_tax: totalTax,
         slab_applied: slabApplied,
         calculated_by: (await supabase.auth.getUser()).data.user?.id,

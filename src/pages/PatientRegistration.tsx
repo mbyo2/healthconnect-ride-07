@@ -768,7 +768,7 @@ export const PatientRegistration = () => {
           <Progress value={(currentStep / totalSteps) * 100} className="h-2" />
         </CardHeader>
         <CardContent className="pt-4">
-          <Form>{renderStep()}</Form>
+          <div>{renderStep()}</div>
 
           <div className="flex justify-between mt-6">
             <Button

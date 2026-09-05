@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   ShieldCheck, DollarSign, AlertTriangle, CheckCircle, TrendingUp,
   Settings, Eye, Download, Filter, Search, Calendar, FileText,
-  Clock, User, Building2, ArrowUpRight, ArrowDownRight, RefreshCw
+  Clock, User, Building2, ArrowUpRight, ArrowDownRight, RefreshCw, Plus
 } from "lucide-react";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { Button } from "@/components/ui/button";

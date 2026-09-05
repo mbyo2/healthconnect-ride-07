@@ -1,8 +1,18 @@
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis, Cell } from 'recharts';
 
+export interface ChartDatum {
+  label?: string;
+  name?: string;
+  value?: number;
+  color?: string;
+  [key: string]: any;
+}
+
 interface SimpleBarChartProps {
-  data: Array<{ label: string; value: number; color?: string }>;
-  title: string;
+  data: ChartDatum[];
+  /** Optional multi-series definition */
+  bars?: Array<{ dataKey: string; name?: string; color?: string }>;
+  title?: string;
   subtitle?: string;
   height?: number;
   defaultColor?: string;
@@ -10,11 +20,18 @@ interface SimpleBarChartProps {
 
 export const SimpleBarChart = ({ 
   data, 
+  bars,
   title, 
   subtitle, 
   height = 200,
   defaultColor = '#397dff'
 }: SimpleBarChartProps) => {
+  const rows = (data || []).map((d) => ({
+    ...d,
+    label: d.label ?? d.name ?? '',
+    value: typeof d.value === 'number' ? d.value : 0,
+  }));
+
   return (
     <div className="vf-card p-5">
       <div className="mb-4">
@@ -22,7 +39,7 @@ export const SimpleBarChart = ({
         {subtitle && <p className="text-xs text-graphite-500">{subtitle}</p>}
       </div>
       <ResponsiveContainer width="100%" height={height}>
-        <BarChart data={data}>
+        <BarChart data={rows}>
           <XAxis 
             dataKey="label" 
             stroke="#94a3b8"
@@ -47,14 +64,23 @@ export const SimpleBarChart = ({
             }}
             cursor={{ fill: 'rgba(59, 130, 246, 0.1)' }}
           />
-          <Bar 
-            dataKey="value" 
-            radius={[8, 8, 0, 0]}
-          >
-            {data.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={entry.color || defaultColor} />
-            ))}
-          </Bar>
+          {bars && bars.length > 0 ? (
+            bars.map((b) => (
+              <Bar
+                key={b.dataKey}
+                dataKey={b.dataKey}
+                name={b.name || b.dataKey}
+                fill={b.color || defaultColor}
+                radius={[8, 8, 0, 0]}
+              />
+            ))
+          ) : (
+            <Bar dataKey="value" radius={[8, 8, 0, 0]}>
+              {rows.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={entry.color || defaultColor} />
+              ))}
+            </Bar>
+          )}
         </BarChart>
       </ResponsiveContainer>
     </div>

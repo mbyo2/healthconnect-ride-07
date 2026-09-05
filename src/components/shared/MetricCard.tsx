@@ -2,12 +2,14 @@ import { LucideIcon } from 'lucide-react';
 import { ReactNode } from 'react';
 
 interface MetricCardProps {
-  label: string;
+  label?: string;
+  /** Alias for label */
+  title?: string;
   value: string | number;
   subtitle?: string;
   icon?: LucideIcon;
   trend?: {
-    value: string;
+    value: string | number;
     isPositive: boolean;
   };
   color?: string;
@@ -15,7 +17,8 @@ interface MetricCardProps {
 }
 
 export const MetricCard = ({ 
-  label, 
+  label,
+  title,
   value, 
   subtitle, 
   icon: Icon, 
@@ -31,7 +34,7 @@ export const MetricCard = ({
       <div className="flex items-start justify-between mb-2">
         <div className="flex-1">
           <p className="text-xs font-medium text-graphite-500 uppercase tracking-wide mb-1">
-            {label}
+            {label ?? title}
           </p>
           <p className="text-2xl font-display font-medium text-midnight">
             {value}
