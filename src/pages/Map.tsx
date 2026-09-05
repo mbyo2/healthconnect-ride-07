@@ -32,13 +32,23 @@ const MapPage = () => {
         await Promise.all([
           supabase
             .from('profiles')
-            .select(`id, first_name, last_name, specialty, bio, avatar_url,
-                     provider_locations ( latitude, longitude )`)
-            .in('role', PROVIDER_ROLES as any),
+            .select(`
+              id, first_name, last_name, specialty, bio, avatar_url,
+              telemedicine_available, consultation_fee_min, consultation_fee_max,
+              typical_wait_time, subspecialties,
+              provider_locations ( latitude, longitude )
+            `)
+            .in('role', PROVIDER_ROLES as any)
+            .eq('is_verified', true),
           supabase
             .from('healthcare_institutions')
-            .select('id, name, institution_type, description, logo_url, latitude, longitude, address')
-            .eq('is_verified', true as any),
+            .select(`
+              id, name, type, logo_url, latitude, longitude, address, city,
+              services_offered, emergency_services, is_24_7,
+              telemedicine_available, accreditation_body
+            `)
+            .eq('is_verified', true)
+            .eq('list_in_marketplace', true),   // only marketplace-listed institutions
         ]);
       if (profErr) throw profErr;
       if (instErr) throw instErr;
@@ -50,7 +60,11 @@ const MapPage = () => {
         specialty: p.specialty || 'General Practice',
         bio: p.bio,
         avatar_url: p.avatar_url,
-        expertise: ['General Medicine', 'Primary Care'],
+        expertise: p.subspecialties?.length ? p.subspecialties : ['General Practice'],
+        telemedicine_available: p.telemedicine_available,
+        consultation_fee_min: p.consultation_fee_min,
+        consultation_fee_max: p.consultation_fee_max,
+        typical_wait_time: p.typical_wait_time,
         location: p.provider_locations?.[0]
           ? {
               latitude: p.provider_locations[0].latitude ? Number(p.provider_locations[0].latitude) : -15.3875,
@@ -63,10 +77,12 @@ const MapPage = () => {
         id: i.id,
         first_name: i.name || 'Institution',
         last_name: '',
-        specialty: i.institution_type || 'Healthcare Institution',
-        bio: i.description || i.address,
+        specialty: i.type || 'Healthcare Institution',
+        bio: [i.address, i.city].filter(Boolean).join(', '),
         avatar_url: i.logo_url,
-        expertise: [i.institution_type || 'Healthcare'],
+        expertise: i.services_offered?.length ? i.services_offered.slice(0, 3) : [i.type || 'Healthcare'],
+        // surface emergency / 24-7 as pseudo-fields for the selected-card
+        telemedicine_available: i.telemedicine_available,
         location: {
           latitude: i.latitude ? Number(i.latitude) : -15.3875,
           longitude: i.longitude ? Number(i.longitude) : 28.3228,
@@ -233,15 +249,37 @@ const MapPage = () => {
                     className="w-12 h-12 rounded-full object-cover"
                   />
                 )}
-                <div className="flex-1">
-                  <h3 className="font-semibold text-lg">
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-base truncate">
                     {selectedProvider.first_name} {selectedProvider.last_name}
                   </h3>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedProvider.specialty}
-                  </p>
+                  <p className="text-sm text-muted-foreground">{selectedProvider.specialty}</p>
+                  <div className="flex flex-wrap gap-1.5 mt-1.5">
+                    {selectedProvider.telemedicine_available && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-primary/10 text-primary">
+                        📹 Telemedicine
+                      </span>
+                    )}
+                    {selectedProvider.consultation_fee_min && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-700">
+                        💰 From K{selectedProvider.consultation_fee_min}
+                      </span>
+                    )}
+                    {selectedProvider.typical_wait_time && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-700">
+                        ⏱ {selectedProvider.typical_wait_time}
+                      </span>
+                    )}
+                  </div>
+                  {(selectedProvider.expertise || []).length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-1.5">
+                      {(selectedProvider.expertise || []).slice(0, 3).map(e => (
+                        <span key={e} className="px-1.5 py-0.5 rounded bg-muted text-[10px] font-medium">{e}</span>
+                      ))}
+                    </div>
+                  )}
                   {selectedProvider.bio && (
-                    <p className="text-sm mt-2">{selectedProvider.bio}</p>
+                    <p className="text-xs mt-2 text-muted-foreground line-clamp-2">{selectedProvider.bio}</p>
                   )}
                 </div>
               </div>

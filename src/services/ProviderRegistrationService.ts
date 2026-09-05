@@ -7,15 +7,30 @@ export interface ProviderRegistrationData {
   password: string;
   confirmPassword: string;
   full_name: string;
-  
+
   // Profile Fields
   phone_number?: string;
-  
+
   // Provider-Specific Fields
   license_number: string;
   specialty: string;
   years_of_experience: number;
   documents_url?: string[];
+
+  // ── New practice detail fields (Section 4) ──
+  medical_school?: string;
+  graduation_year?: number;
+  primary_practice_location?: string;
+  subspecialties?: string[];
+  board_certifications?: string[];
+  languages_spoken?: string[];
+  telemedicine_available?: boolean;
+  home_visits_available?: boolean;
+  consultation_fee_min?: number;
+  consultation_fee_max?: number;
+  accepts_insurance?: boolean;
+  insurance_providers_accepted?: string[];
+  typical_wait_time?: string;
 }
 
 export interface RegistrationTransaction {
@@ -154,7 +169,21 @@ export class ProviderRegistrationService {
         phone: data.phone_number || null,
         is_profile_complete: true,
         role: 'health_personnel',
-        specialty: data.specialty
+        specialty: data.specialty,
+        // new practice detail fields
+        ...(data.medical_school !== undefined && { medical_school: data.medical_school } as any),
+        ...(data.graduation_year !== undefined && { graduation_year: data.graduation_year } as any),
+        ...(data.primary_practice_location !== undefined && { primary_practice_location: data.primary_practice_location } as any),
+        ...(data.subspecialties !== undefined && { subspecialties: data.subspecialties } as any),
+        ...(data.board_certifications !== undefined && { board_certifications: data.board_certifications } as any),
+        ...(data.languages_spoken !== undefined && { languages_spoken: data.languages_spoken } as any),
+        ...(data.telemedicine_available !== undefined && { telemedicine_available: data.telemedicine_available } as any),
+        ...(data.home_visits_available !== undefined && { home_visits_available: data.home_visits_available } as any),
+        ...(data.consultation_fee_min !== undefined && { consultation_fee_min: data.consultation_fee_min } as any),
+        ...(data.consultation_fee_max !== undefined && { consultation_fee_max: data.consultation_fee_max } as any),
+        ...(data.accepts_insurance !== undefined && { accepts_insurance: data.accepts_insurance } as any),
+        ...(data.insurance_providers_accepted !== undefined && { insurance_providers_accepted: data.insurance_providers_accepted } as any),
+        ...(data.typical_wait_time !== undefined && { typical_wait_time: data.typical_wait_time } as any),
       };
 
       const { error: profileError } = await this.retryOperation(

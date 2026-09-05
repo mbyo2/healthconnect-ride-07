@@ -70,7 +70,9 @@ export const AppointmentsPage = () => {
           .select(`
             *,
             provider:profiles!appointments_provider_id_fkey (
-              first_name, last_name, specialty, avatar_url, phone, address
+              first_name, last_name, specialty, avatar_url, phone, address,
+              consultation_fee_min, consultation_fee_max,
+              telemedicine_available, typical_wait_time
             )
           `)
           .eq("patient_id", user.id)
@@ -359,6 +361,28 @@ export const AppointmentsPage = () => {
                                     {!isProvider && person?.specialty && (
                                       <div className="text-[10px] text-[#0073ea] font-bold uppercase tracking-wide">{person.specialty}</div>
                                     )}
+                                    {/* New: fee + telemedicine + wait time for patient view */}
+                                    {!isProvider && (
+                                      <div className="flex flex-wrap gap-1 mt-1">
+                                        {(person?.consultation_fee_min || person?.consultation_fee_max) && (
+                                          <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-[9px] font-black bg-[#e5f0ff] text-[#0073ea]">
+                                            💰 {person.consultation_fee_min && person.consultation_fee_max
+                                              ? `K${person.consultation_fee_min}–K${person.consultation_fee_max}`
+                                              : `From K${person.consultation_fee_min ?? person.consultation_fee_max}`}
+                                          </span>
+                                        )}
+                                        {person?.telemedicine_available && (
+                                          <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-[9px] font-black bg-emerald-50 text-emerald-700">
+                                            📹 Telemedicine
+                                          </span>
+                                        )}
+                                        {person?.typical_wait_time && (
+                                          <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-[9px] font-black bg-amber-50 text-amber-700">
+                                            ⏱ {person.typical_wait_time}
+                                          </span>
+                                        )}
+                                      </div>
+                                    )}
                                   </div>
                                 </div>
                               </td>
@@ -462,7 +486,26 @@ export const AppointmentsPage = () => {
                           return (
                             <tr key={app.id} className="hover:bg-[#f0f2f7] dark:hover:bg-slate-800/60 transition-colors">
                               <td className="py-3 px-4 font-bold text-slate-800 dark:text-slate-200">
-                                {isProvider ? "" : "Dr. "}{person?.first_name} {person?.last_name}
+                                <div>
+                                  <div>{isProvider ? "" : "Dr. "}{person?.first_name} {person?.last_name}</div>
+                                  {!isProvider && person?.specialty && (
+                                    <div className="text-[10px] text-[#0073ea] font-bold mt-0.5">{person.specialty}</div>
+                                  )}
+                                  {!isProvider && (person?.consultation_fee_min || person?.telemedicine_available) && (
+                                    <div className="flex flex-wrap gap-1 mt-1">
+                                      {person?.consultation_fee_min && (
+                                        <span className="text-[9px] font-black px-1.5 py-0.5 rounded-md bg-[#e5f0ff] text-[#0073ea]">
+                                          💰 From K{person.consultation_fee_min}
+                                        </span>
+                                      )}
+                                      {person?.telemedicine_available && (
+                                        <span className="text-[9px] font-black px-1.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700">
+                                          📹 Telemedicine
+                                        </span>
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
                               </td>
 
                               <td className="py-3 px-3 text-center">

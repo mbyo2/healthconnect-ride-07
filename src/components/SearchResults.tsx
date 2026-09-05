@@ -26,10 +26,18 @@ export const SearchResults = () => {
   
   const handleReadResults = useCallback(() => {
     if (speak && providers.length > 0) {
-      const providerSummaries = providers.slice(0, 5).map(provider => 
-        `${provider.first_name} ${provider.last_name}, ${provider.specialty}, ${provider.distance} kilometers away`
-      ).join(". Next, ");
-      
+      const providerSummaries = providers.slice(0, 5).map(provider => {
+        const distancePart = provider.distance !== undefined ? `, ${provider.distance.toFixed(1)} kilometres away` : "";
+        const feePart = provider.consultation_fee_min
+          ? `, consultation fee from ${provider.consultation_fee_min} kwacha`
+          : provider.consultation_fee
+          ? `, consultation fee ${provider.consultation_fee} kwacha`
+          : "";
+        const telemedPart = provider.telemedicine_available ? ", telemedicine available" : "";
+        const waitPart = provider.typical_wait_time ? `, typical wait ${provider.typical_wait_time}` : "";
+        return `${provider.first_name} ${provider.last_name}, ${provider.specialty}${distancePart}${feePart}${telemedPart}${waitPart}`;
+      }).join(". Next, ");
+
       speak(`Top results: ${providerSummaries}${providers.length > 5 ? ". There are more results available." : ""}`);
     } else if (speak) {
       speak("No healthcare providers found matching your search criteria.");

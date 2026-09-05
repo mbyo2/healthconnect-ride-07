@@ -191,6 +191,7 @@ const Providers = () => {
   const fetchProviders = async () => {
     setLoading(true);
     try {
+      // Query profiles table — provider enhancement fields live here per migration
       const PROVIDER_ROLES = [
         'provider', 'health_personnel', 'doctor', 'nurse',
         'specialist', 'pharmacist', 'radiologist', 'pathologist',
@@ -198,26 +199,39 @@ const Providers = () => {
 
       let profQuery = supabase
         .from('profiles')
-        .select('*', { count: 'exact' })
-        .in('role', PROVIDER_ROLES as any);
+        .select(
+          'id, first_name, last_name, specialty, subspecialties, bio, avatar_url, ' +
+          'years_experience, rating, primary_practice_location, ' +
+          'consultation_fee_min, consultation_fee_max, ' +
+          'telemedicine_available, home_visits_available, medical_school',
+          { count: 'exact' }
+        )
+        .in('role', PROVIDER_ROLES as any)
+        .eq('is_verified', true);
 
       if (filters.specialty) profQuery = profQuery.eq('specialty', filters.specialty);
       if (filters.rating > 0) profQuery = profQuery.gte('rating', filters.rating);
       if (filters.searchTerm) {
         profQuery = profQuery.or(
-          `first_name.ilike.%${filters.searchTerm}%,last_name.ilike.%${filters.searchTerm}%,specialty.ilike.%${filters.searchTerm}%`
+          `first_name.ilike.%${filters.searchTerm}%,` +
+          `last_name.ilike.%${filters.searchTerm}%,` +
+          `specialty.ilike.%${filters.searchTerm}%`
         );
       }
+
       const from = (currentPage - 1) * 10;
       profQuery = profQuery.range(from, from + 9);
 
+      // Only show institutions that opted into the marketplace
       let instQuery = supabase
         .from('healthcare_institutions')
-        .select('*')
-        .eq('is_verified', true as any);
+        .select('id, name, type, address, latitude, longitude, logo_url')
+        .eq('is_verified', true)
+        .eq('list_in_marketplace', true);
+
       if (filters.searchTerm) {
         instQuery = instQuery.or(
-          `name.ilike.%${filters.searchTerm}%,institution_type.ilike.%${filters.searchTerm}%`
+          `name.ilike.%${filters.searchTerm}%,type.ilike.%${filters.searchTerm}%`
         );
       }
 
@@ -231,9 +245,9 @@ const Providers = () => {
         first_name: p.first_name || '',
         last_name: p.last_name || '',
         specialty: p.specialty || 'General Practice',
-        bio: p.bio || '',
+        bio: p.bio || (p.medical_school ? `${p.medical_school}` : ''),
         avatar_url: p.avatar_url || '',
-        location: { latitude: p.latitude || 0, longitude: p.longitude || 0 },
+        location: { latitude: 0, longitude: 0 },
         rating: p.rating || 0,
       }));
 
@@ -241,11 +255,11 @@ const Providers = () => {
         id: i.id,
         first_name: i.name || 'Institution',
         last_name: '',
-        specialty: i.institution_type || 'Healthcare Institution',
-        bio: i.description || i.address || '',
+        specialty: i.type || 'Healthcare Institution',
+        bio: i.address || '',
         avatar_url: i.logo_url || '',
         location: { latitude: i.latitude || 0, longitude: i.longitude || 0 },
-        rating: i.rating || 0,
+        rating: 0,
       }));
 
       setProviders([...fromProfiles, ...fromInstitutions]);

@@ -281,6 +281,127 @@ export const HealthPersonnelApplicationForm = () => {
         )}
       </div>
 
+      {/* Section 4: Practice Details (optional but recommended) */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2 border-b border-[#e6e9ef] pb-2">
+          <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#fdab3d] text-white text-xs font-black">4</span>
+          <h3 className="font-extrabold text-sm uppercase tracking-wide text-[#676879]">Practice Details <span className="text-[10px] normal-case font-medium">(optional — can be completed after approval)</span></h3>
+        </div>
+
+        {/* Medical School & Graduation */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="text-xs font-extrabold text-[#676879] uppercase">Medical School</label>
+            <input
+              type="text"
+              placeholder="e.g. UNZA School of Medicine"
+              value={(formData as any).medical_school || ""}
+              onChange={e => setFormData(prev => ({ ...prev, medical_school: e.target.value }))}
+              disabled={isSubmitting}
+              className="mt-1 w-full px-3 py-2 rounded-xl border border-[#c3c6d4] text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
+            />
+          </div>
+          <div>
+            <label className="text-xs font-extrabold text-[#676879] uppercase">Graduation Year</label>
+            <input
+              type="number"
+              min="1960"
+              max="2030"
+              placeholder="e.g. 2015"
+              value={(formData as any).graduation_year || ""}
+              onChange={e => setFormData(prev => ({ ...prev, graduation_year: parseInt(e.target.value) || undefined }))}
+              disabled={isSubmitting}
+              className="mt-1 w-full px-3 py-2 rounded-xl border border-[#c3c6d4] text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
+            />
+          </div>
+        </div>
+
+        {/* Practice Location */}
+        <div>
+          <label className="text-xs font-extrabold text-[#676879] uppercase">Primary Practice Location</label>
+          <input
+            type="text"
+            placeholder="e.g. Woodlands Clinic, Lusaka"
+            value={(formData as any).primary_practice_location || ""}
+            onChange={e => setFormData(prev => ({ ...prev, primary_practice_location: e.target.value }))}
+            disabled={isSubmitting}
+            className="mt-1 w-full px-3 py-2 rounded-xl border border-[#c3c6d4] text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
+          />
+        </div>
+
+        {/* Consultation Fees */}
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="text-xs font-extrabold text-[#676879] uppercase">Min Consultation Fee (ZMW)</label>
+            <input
+              type="number"
+              min="0"
+              placeholder="e.g. 200"
+              value={(formData as any).consultation_fee_min || ""}
+              onChange={e => setFormData(prev => ({ ...prev, consultation_fee_min: parseFloat(e.target.value) || undefined }))}
+              disabled={isSubmitting}
+              className="mt-1 w-full px-3 py-2 rounded-xl border border-[#c3c6d4] text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
+            />
+          </div>
+          <div>
+            <label className="text-xs font-extrabold text-[#676879] uppercase">Max Consultation Fee (ZMW)</label>
+            <input
+              type="number"
+              min="0"
+              placeholder="e.g. 500"
+              value={(formData as any).consultation_fee_max || ""}
+              onChange={e => setFormData(prev => ({ ...prev, consultation_fee_max: parseFloat(e.target.value) || undefined }))}
+              disabled={isSubmitting}
+              className="mt-1 w-full px-3 py-2 rounded-xl border border-[#c3c6d4] text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
+            />
+          </div>
+        </div>
+
+        {/* Typical Wait Time */}
+        <div>
+          <label className="text-xs font-extrabold text-[#676879] uppercase">Typical Wait Time</label>
+          <Select
+            value={(formData as any).typical_wait_time || ""}
+            onValueChange={v => setFormData(prev => ({ ...prev, typical_wait_time: v }))}
+            disabled={isSubmitting}
+          >
+            <SelectTrigger className="mt-1 border-[#c3c6d4] text-xs font-bold">
+              <SelectValue placeholder="Select typical wait time" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Same day">Same day</SelectItem>
+              <SelectItem value="1–2 days">1–2 days</SelectItem>
+              <SelectItem value="3–5 days">3–5 days</SelectItem>
+              <SelectItem value="1–2 weeks">1–2 weeks</SelectItem>
+              <SelectItem value="2+ weeks">2+ weeks</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Service toggles */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {([
+            { key: "telemedicine_available", label: "Telemedicine Available" },
+            { key: "home_visits_available", label: "Home Visits Available" },
+            { key: "accepts_insurance", label: "Accepts Insurance" },
+          ] as const).map(item => (
+            <div key={item.key} className="flex items-center justify-between p-3 border border-[#e6e9ef] rounded-xl">
+              <label className="text-xs font-bold text-slate-700">{item.label}</label>
+              <div
+                role="checkbox"
+                aria-checked={(formData as any)[item.key] ?? false}
+                tabIndex={0}
+                onClick={() => !isSubmitting && setFormData(prev => ({ ...prev, [item.key]: !(prev as any)[item.key] }))}
+                onKeyDown={e => e.key === " " && !isSubmitting && setFormData(prev => ({ ...prev, [item.key]: !(prev as any)[item.key] }))}
+                className={`w-10 h-5 rounded-full transition-all cursor-pointer flex items-center px-0.5 ${(formData as any)[item.key] ? 'bg-[#0073ea] justify-end' : 'bg-slate-200 justify-start'}`}
+              >
+                <div className="w-4 h-4 rounded-full bg-white shadow-sm" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Submit */}
       <button
         type="submit"

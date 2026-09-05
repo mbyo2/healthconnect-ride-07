@@ -4,10 +4,7 @@ import type { Provider } from '@/types/provider';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 
-type Coordinates = {
-  latitude: number;
-  longitude: number;
-} | null;
+type Coordinates = { latitude: number; longitude: number } | null;
 
 type SearchContextType = {
   searchQuery: string;
@@ -24,6 +21,15 @@ type SearchContextType = {
   setMaxDistance: React.Dispatch<React.SetStateAction<number>>;
   useUserLocation: boolean;
   setUseUserLocation: React.Dispatch<React.SetStateAction<boolean>>;
+  // ── new filter state ──
+  telemedicineOnly: boolean;
+  setTelemedicineOnly: React.Dispatch<React.SetStateAction<boolean>>;
+  homeVisitsOnly: boolean;
+  setHomeVisitsOnly: React.Dispatch<React.SetStateAction<boolean>>;
+  selectedLanguage: string | null;
+  setSelectedLanguage: React.Dispatch<React.SetStateAction<string | null>>;
+  feeMax: number | null;
+  setFeeMax: React.Dispatch<React.SetStateAction<number | null>>;
   refreshProviders: () => void;
   providers: Provider[];
   isLoading: boolean;
@@ -37,7 +43,6 @@ type SearchContextType = {
 const SearchContext = createContext<SearchContextType | undefined>(undefined);
 
 export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // State variables
   const [searchQuery, setSearchQuery] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState<HealthcareProviderType | null>(null);
@@ -45,6 +50,11 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [selectedInsurance, setSelectedInsurance] = useState<InsuranceProvider | null>(null);
   const [maxDistance, setMaxDistance] = useState(50);
   const [useUserLocation, setUseUserLocation] = useState(false);
+  const [telemedicineOnly, setTelemedicineOnly] = useState(false);
+  const [homeVisitsOnly, setHomeVisitsOnly] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null);
+  const [feeMax, setFeeMax] = useState<number | null>(null);
+
   const [providers, setProviders] = useState<Provider[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [userLocation, setUserLocation] = useState<Coordinates>(null);
@@ -54,59 +64,29 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const { user } = useAuth();
 
-  // Get user location effect
+  // Geolocation effect
   useEffect(() => {
-    if (useUserLocation && navigator.geolocation && window.isSecureContext) {
-      try {
-        navigator.geolocation.getCurrentPosition(
-          position => {
-            setUserLocation({
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude,
-            });
-          },
-          error => {
-            console.error('Error getting location:', error);
-            setUseUserLocation(false);
-          },
-          {
-            enableHighAccuracy: false,
-            timeout: 5000,
-            maximumAge: 0
-          }
-        );
-      } catch (error) {
-        console.error('Geolocation error:', error);
-        setUseUserLocation(false);
-      }
-    } else if (useUserLocation && !window.isSecureContext) {
-      console.warn('Geolocation requires a secure context (HTTPS)');
+    if (!useUserLocation) return;
+    if (!window.isSecureContext) {
+      console.warn('Geolocation requires HTTPS');
       setUseUserLocation(false);
+      return;
     }
+    navigator.geolocation?.getCurrentPosition(
+      pos => setUserLocation({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }),
+      err => { console.error('Location error:', err); setUseUserLocation(false); },
+      { enableHighAccuracy: false, timeout: 5000, maximumAge: 0 }
+    );
   }, [useUserLocation]);
 
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
-    const R = 6371; // km
+    const R = 6371;
     const dLat = ((lat2 - lat1) * Math.PI) / 180;
     const dLon = ((lon2 - lon1) * Math.PI) / 180;
     const a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return Math.round(R * c * 100) / 100;
-  };
-
-  const stringToInsuranceProvider = (insuranceStrings: string[] | null): InsuranceProvider[] => {
-    if (!insuranceStrings || !Array.isArray(insuranceStrings)) return [];
-    return insuranceStrings
-      .filter(ins => Object.values(InsuranceProvider).includes(ins as any))
-      .map(ins => {
-        const found = Object.values(InsuranceProvider).find(val => val === ins);
-        return (found as InsuranceProvider) ?? InsuranceProvider.NONE;
-      });
+      Math.sin(dLat / 2) ** 2 +
+      Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLon / 2) ** 2;
+    return Math.round(6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)) * 100) / 100;
   };
 
   const fetchProviders = async () => {
@@ -115,66 +95,101 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       let query = supabase
         .from('profiles' as any)
         .select(`
-          id,
-          first_name,
-          last_name,
-          specialty,
+          id, first_name, last_name, specialty, bio, provider_type, avatar_url,
+          years_experience, rating,
           accepted_insurances,
-          bio,
-          provider_type,
-          avatar_url,
-          provider_locations (
-            latitude,
-            longitude
-          )
+          medical_school, graduation_year, board_certifications, subspecialties,
+          primary_practice_location, affiliated_hospitals,
+          consultation_fee_min, consultation_fee_max,
+          accepts_insurance, insurance_providers_accepted,
+          telemedicine_available, home_visits_available,
+          languages_spoken, typical_wait_time, appointment_types,
+          availability_schedule,
+          provider_locations ( latitude, longitude )
         `, { count: 'exact' })
         .eq('role', 'health_personnel');
 
-      if (selectedSpecialty) {
+      if (selectedSpecialty && selectedSpecialty !== 'all' as any) {
         query = query.eq('specialty', selectedSpecialty);
       }
-
-      if (selectedType) {
+      if (selectedType && selectedType !== 'all' as any) {
         query = query.eq('provider_type', selectedType);
       }
-
       if (searchTerm) {
-        query = query.or(`first_name.ilike.%${searchTerm}%,last_name.ilike.%${searchTerm}%,specialty.ilike.%${searchTerm}%`);
+        query = query.or(
+          `first_name.ilike.%${searchTerm}%,` +
+          `last_name.ilike.%${searchTerm}%,` +
+          `specialty.ilike.%${searchTerm}%`
+        );
+      }
+      // ── new filters ──
+      if (telemedicineOnly) {
+        query = query.eq('telemedicine_available', true);
+      }
+      if (homeVisitsOnly) {
+        query = query.eq('home_visits_available', true);
+      }
+      if (selectedInsurance && selectedInsurance !== 'all' as any && selectedInsurance !== 'none' as any) {
+        query = query.eq('accepts_insurance', true);
+        query = query.contains('insurance_providers_accepted', [selectedInsurance]);
+      }
+      if (selectedLanguage) {
+        query = query.contains('languages_spoken', [selectedLanguage]);
+      }
+      if (feeMax !== null && feeMax > 0) {
+        query = query.lte('consultation_fee_min', feeMax);
       }
 
       const { data, error, count } = await query
+        .order('rating', { ascending: false, nullsFirst: false })
         .limit(10)
         .range((currentPage - 1) * 10, currentPage * 10 - 1);
 
-      if (error) {
-        console.error('Supabase error:', error);
-        throw error;
-      }
+      if (error) throw error;
 
-      const mappedProviders: Provider[] = (data ?? []).map((profile: any) => ({
-        id: profile.id,
-        first_name: profile.first_name ?? '',
-        last_name: profile.last_name ?? '',
-        specialty: profile.specialty ?? 'General Practice',
-        bio: profile.bio ?? '',
-        provider_type: profile.provider_type ?? 'doctor',
-        avatar_url: profile.avatar_url,
-        accepted_insurances: stringToInsuranceProvider(profile.accepted_insurances),
-        expertise: profile.specialty ? [profile.specialty, 'Healthcare'] : ['General Practice'],
-        location: profile.provider_locations?.[0]
+      const mappedProviders: Provider[] = (data ?? []).map((p: any) => ({
+        id: p.id,
+        first_name: p.first_name ?? '',
+        last_name: p.last_name ?? '',
+        specialty: p.specialty ?? 'General Practice',
+        bio: p.bio ?? '',
+        provider_type: p.provider_type ?? 'doctor',
+        avatar_url: p.avatar_url,
+        rating: p.rating,
+        years_experience: p.years_experience,
+        accepted_insurances: p.accepted_insurances || [],
+        expertise: p.specialty ? [p.specialty] : ['General Practice'],
+        // new fields
+        medical_school: p.medical_school,
+        graduation_year: p.graduation_year,
+        board_certifications: p.board_certifications || [],
+        subspecialties: p.subspecialties || [],
+        primary_practice_location: p.primary_practice_location,
+        affiliated_hospitals: p.affiliated_hospitals || [],
+        consultation_fee_min: p.consultation_fee_min,
+        consultation_fee_max: p.consultation_fee_max,
+        accepts_insurance: p.accepts_insurance,
+        insurance_providers_accepted: p.insurance_providers_accepted || [],
+        telemedicine_available: p.telemedicine_available,
+        home_visits_available: p.home_visits_available,
+        languages_spoken: p.languages_spoken || [],
+        typical_wait_time: p.typical_wait_time,
+        appointment_types: p.appointment_types || [],
+        availability_schedule: p.availability_schedule,
+        location: p.provider_locations?.[0]
           ? {
-            latitude: Number(profile.provider_locations[0].latitude),
-            longitude: Number(profile.provider_locations[0].longitude),
-          }
+              latitude: Number(p.provider_locations[0].latitude),
+              longitude: Number(p.provider_locations[0].longitude),
+            }
           : null,
         distance:
-          userLocation && profile.provider_locations?.[0]
+          userLocation && p.provider_locations?.[0]
             ? calculateDistance(
-              userLocation.latitude,
-              userLocation.longitude,
-              Number(profile.provider_locations[0].latitude),
-              Number(profile.provider_locations[0].longitude)
-            )
+                userLocation.latitude,
+                userLocation.longitude,
+                Number(p.provider_locations[0].latitude),
+                Number(p.provider_locations[0].longitude)
+              )
             : undefined,
       }));
 
@@ -182,7 +197,6 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       setTotalCount(count || mappedProviders.length);
       setHasMore((count || 0) > currentPage * 10);
 
-      // Log search action
       if (user?.id) {
         await supabase.from('audit_logs' as any).insert({
           user_id: user.id,
@@ -213,48 +227,35 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     fetchProviders();
   };
 
-  const loadMore = () => {
-    setCurrentPage(prev => prev + 1);
-  };
+  const loadMore = () => setCurrentPage(prev => prev + 1);
 
-  // Refetch when page changes
   useEffect(() => {
     fetchProviders();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage]);
 
   const contextValue: SearchContextType = {
-    searchQuery,
-    setSearchQuery,
-    searchTerm,
-    setSearchTerm,
-    selectedType,
-    setSelectedType,
-    selectedSpecialty,
-    setSelectedSpecialty,
-    selectedInsurance,
-    setSelectedInsurance,
-    maxDistance,
-    setMaxDistance,
-    useUserLocation,
-    setUseUserLocation,
+    searchQuery, setSearchQuery,
+    searchTerm, setSearchTerm,
+    selectedType, setSelectedType,
+    selectedSpecialty, setSelectedSpecialty,
+    selectedInsurance, setSelectedInsurance,
+    maxDistance, setMaxDistance,
+    useUserLocation, setUseUserLocation,
+    telemedicineOnly, setTelemedicineOnly,
+    homeVisitsOnly, setHomeVisitsOnly,
+    selectedLanguage, setSelectedLanguage,
+    feeMax, setFeeMax,
     refreshProviders,
-    providers,
-    isLoading,
-    userLocation,
-    totalCount,
-    currentPage,
-    hasMore,
-    loadMore,
+    providers, isLoading, userLocation,
+    totalCount, currentPage, hasMore, loadMore,
   };
 
   return <SearchContext.Provider value={contextValue}>{children}</SearchContext.Provider>;
 };
 
 export const useSearch = () => {
-  const context = useContext(SearchContext);
-  if (!context) {
-    throw new Error('useSearch must be used within a SearchProvider');
-  }
-  return context;
+  const ctx = useContext(SearchContext);
+  if (!ctx) throw new Error('useSearch must be used within a SearchProvider');
+  return ctx;
 };
