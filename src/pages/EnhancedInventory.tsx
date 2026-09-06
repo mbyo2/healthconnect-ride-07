@@ -595,7 +595,7 @@ export const EnhancedInventory = () => {
                       </div>
                     </div>
                     <div className="flex items-center justify-between pt-2 border-t border-[#e6e9ef] dark:border-slate-800">
-                      <div className="text-xs text-[#676879]">{reconciliation.notes || "No notes"}</div>
+                      <div className="text-xs text-[#676879]">{(reconciliation as any).notes || "No notes"}</div>
                       <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
                         <Eye className="h-3 w-3" />
                       </Button>

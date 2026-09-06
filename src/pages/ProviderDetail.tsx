@@ -441,8 +441,7 @@ export const ProviderDetail = () => {
         )}
         {provider && (
           <WaitlistSignup
-            providerId={id!}
-            providerName={providerName}
+            provider={provider as any}
             isOpen={isWaitlistOpen}
             onClose={() => setIsWaitlistOpen(false)}
           />

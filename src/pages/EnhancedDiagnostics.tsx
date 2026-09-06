@@ -131,8 +131,8 @@ export const EnhancedDiagnostics = () => {
           .limit(50),
       ]);
 
-      if (ordersRes.data) setOrders(ordersRes.data);
-      if (schedulesRes.data) setSchedules(schedulesRes.data);
+      if (ordersRes.data) setOrders(ordersRes.data as any);
+      if (schedulesRes.data) setSchedules(schedulesRes.data as any);
     } catch (error) {
       console.error("Error fetching diagnostics data:", error);
     } finally {

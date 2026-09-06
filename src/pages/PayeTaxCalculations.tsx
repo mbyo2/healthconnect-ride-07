@@ -137,7 +137,7 @@ export const PayeTaxCalculations = () => {
       ]);
 
       if (slabsRes.data) setTaxSlabs(slabsRes.data);
-      if (calculationsRes.data) setCalculations(calculationsRes.data);
+      if (calculationsRes.data) setCalculations(calculationsRes.data as any);
       if (payrollRes.data) setPayroll(payrollRes.data);
     } catch (error) {
       console.error("Error fetching PAYE data:", error);

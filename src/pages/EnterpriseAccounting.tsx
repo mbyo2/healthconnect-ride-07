@@ -144,7 +144,7 @@ export const EnterpriseAccounting = () => {
 
       if (glRes.data) setGlEntries(glRes.data);
       if (assetsRes.data) setAssets(assetsRes.data);
-      if (reconciliationsRes.data) setReconciliations(reconciliationsRes.data);
+      if (reconciliationsRes.data) setReconciliations(reconciliationsRes.data as any);
     } catch (error) {
       console.error("Error fetching accounting data:", error);
     } finally {
@@ -156,7 +156,7 @@ export const EnterpriseAccounting = () => {
     if (!institution) return;
 
     try {
-      const { error } = await supabase.from("general_ledger_entries").insert({
+      const { error } = await (supabase.from("general_ledger_entries") as any).insert({
         institution_id: institution.id,
         entry_number: `GL-${Date.now()}`,
         created_by: (await supabase.auth.getUser()).data.user?.id,
