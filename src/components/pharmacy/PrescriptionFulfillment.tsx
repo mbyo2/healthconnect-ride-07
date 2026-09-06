@@ -94,7 +94,7 @@ export function PrescriptionFulfillment() {
         const { data: profiles } = await supabase
           .from("profiles")
           .select("id, first_name, last_name, email")
-          .in("id", allProfileIds);
+          .in("id", allProfileIds as string[]);
         (profiles || []).forEach((prof) => {
           profileMap[prof.id] = prof;
         });
