@@ -82,7 +82,7 @@ export const AnalyticsReporting = () => {
     if (!institution) return;
 
     try {
-      const { error } = await (supabase.from("analytics_reports") as any).insert({
+      const { error } = await (supabase as any).from("analytics_reports").insert({
         institution_id: institution.id,
         generated_by: (await supabase.auth.getUser()).data.user?.id,
         ...reportForm,
