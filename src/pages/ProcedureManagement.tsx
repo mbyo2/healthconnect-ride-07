@@ -130,9 +130,9 @@ export const ProcedureManagement = () => {
           : Promise.resolve({ data: [] }),
       ]);
 
-      if (proceduresRes.data) setProcedures(proceduresRes.data);
-      if (pricingRes.data) setPricing(pricingRes.data);
-      if (executionsRes.data) setExecutions(executionsRes.data);
+      if (proceduresRes.data) setProcedures(proceduresRes.data as any);
+      if (pricingRes.data) setPricing(pricingRes.data as any);
+      if (executionsRes.data) setExecutions(executionsRes.data as any);
     } catch (error) {
       console.error("Error fetching procedure data:", error);
     } finally {

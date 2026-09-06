@@ -166,9 +166,9 @@ export const EnhancedTelemedicine = () => {
           .limit(50),
       ]);
 
-      if (workflowsRes.data) setWorkflows(workflowsRes.data);
-      if (tasksRes.data) setTasks(tasksRes.data);
-      if (ordersRes.data) setOrders(ordersRes.data);
+      if (workflowsRes.data) setWorkflows(workflowsRes.data as any);
+      if (tasksRes.data) setTasks(tasksRes.data as any);
+      if (ordersRes.data) setOrders(ordersRes.data as any);
     } catch (error) {
       console.error("Error fetching telemedicine data:", error);
     } finally {

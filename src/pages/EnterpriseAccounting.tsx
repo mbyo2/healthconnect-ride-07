@@ -144,7 +144,7 @@ export const EnterpriseAccounting = () => {
 
       if (glRes.data) setGlEntries(glRes.data);
       if (assetsRes.data) setAssets(assetsRes.data);
-      if (reconciliationsRes.data) setReconciliations(reconciliationsRes.data);
+      if (reconciliationsRes.data) setReconciliations(reconciliationsRes.data as any);
     } catch (error) {
       console.error("Error fetching accounting data:", error);
     } finally {

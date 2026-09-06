@@ -134,10 +134,10 @@ export const ZambiaCompliance = () => {
         supabase.from("zambia_health_regulations").select("*").eq("is_active", true).order("regulation_code"),
       ]);
 
-      if (nhimaRes.data) setNhimaConfig(nhimaRes.data);
-      if (councilRes.data) setMedicalCouncilConfig(councilRes.data);
+      if (nhimaRes.data) setNhimaConfig(nhimaRes.data as any);
+      if (councilRes.data) setMedicalCouncilConfig(councilRes.data as any);
       if (taxRes.data) setTaxConfig(taxRes.data);
-      if (regulationsRes.data) setRegulations(regulationsRes.data);
+      if (regulationsRes.data) setRegulations(regulationsRes.data as any);
     } catch (error) {
       console.error("Error fetching compliance data:", error);
     } finally {

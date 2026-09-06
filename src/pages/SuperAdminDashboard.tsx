@@ -51,7 +51,7 @@ const SuperAdminDashboard = () => {
         admin_level: item.role === "super_admin" ? "superadmin" : "admin",
         created_at: item.profiles?.created_at,
       }));
-      setAdmins(formattedAdmins);
+      setAdmins(formattedAdmins as any);
     } catch (error) {
       toast.error("Failed to load admin users");
     } finally {

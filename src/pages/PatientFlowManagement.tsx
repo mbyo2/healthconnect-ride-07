@@ -118,8 +118,8 @@ export const PatientFlowManagement = () => {
         supabase.from("patient_capacity").select("*").eq("institution_id", institution.id).eq("date", today),
       ]);
 
-      if (stagesRes.data) setStages(stagesRes.data);
-      if (flowsRes.data) setActiveFlows(flowsRes.data);
+      if (stagesRes.data) setStages(stagesRes.data as any);
+      if (flowsRes.data) setActiveFlows(flowsRes.data as any);
       if (capacityRes.data) setCapacity(capacityRes.data);
     } catch (error) {
       console.error("Error fetching flow data:", error);

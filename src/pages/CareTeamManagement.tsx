@@ -142,9 +142,9 @@ export const CareTeamManagement = () => {
           .limit(50),
       ]);
 
-      if (rolesRes.data) setRoles(rolesRes.data);
-      if (assignmentsRes.data) setAssignments(assignmentsRes.data);
-      if (tasksRes.data) setTasks(tasksRes.data);
+      if (rolesRes.data) setRoles(rolesRes.data as any);
+      if (assignmentsRes.data) setAssignments(assignmentsRes.data as any);
+      if (tasksRes.data) setTasks(tasksRes.data as any);
     } catch (error) {
       console.error("Error fetching care team data:", error);
     } finally {

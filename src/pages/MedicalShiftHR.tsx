@@ -161,8 +161,8 @@ export const MedicalShiftHR = () => {
         supabase.from("biometric_devices").select("*").eq("institution_id", institution.id),
       ]);
 
-      if (shiftsRes.data) setShifts(shiftsRes.data);
-      if (assignmentsRes.data) setAssignments(assignmentsRes.data);
+      if (shiftsRes.data) setShifts(shiftsRes.data as any);
+      if (assignmentsRes.data) setAssignments(assignmentsRes.data as any);
       if (attendanceRes.data) setAttendance(attendanceRes.data);
       if (devicesRes.data) setDevices(devicesRes.data);
     } catch (error) {
