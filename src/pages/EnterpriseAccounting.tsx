@@ -156,7 +156,7 @@ export const EnterpriseAccounting = () => {
     if (!institution) return;
 
     try {
-      const { error } = await supabase.from("general_ledger_entries").insert({
+      const { error } = await (supabase.from("general_ledger_entries") as any).insert({
         institution_id: institution.id,
         entry_number: `GL-${Date.now()}`,
         created_by: (await supabase.auth.getUser()).data.user?.id,

@@ -64,13 +64,13 @@ export const AnalyticsReporting = () => {
 
     try {
       const reportsRes = await supabase
-        .from("analytics_reports")
+        .from("analytics_reports" as any)
         .select("*")
         .eq("institution_id", institution.id)
         .order("generated_at", { ascending: false })
         .limit(50);
 
-      if (reportsRes.data) setReports(reportsRes.data);
+      if (reportsRes.data) setReports(reportsRes.data as any);
     } catch (error) {
       console.error("Error fetching analytics data:", error);
     } finally {
@@ -82,7 +82,7 @@ export const AnalyticsReporting = () => {
     if (!institution) return;
 
     try {
-      const { error } = await supabase.from("analytics_reports").insert({
+      const { error } = await (supabase.from("analytics_reports") as any).insert({
         institution_id: institution.id,
         generated_by: (await supabase.auth.getUser()).data.user?.id,
         ...reportForm,

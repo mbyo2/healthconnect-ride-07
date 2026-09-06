@@ -2,6 +2,8 @@ import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis, Area, Area
 
 interface TrendChartProps {
   data: Array<{ label?: string; name?: string; value?: number; [key: string]: any }>;
+  /** Optional multi-series definition */
+  lines?: Array<{ dataKey: string; name?: string; color?: string }>;
   title?: string;
   subtitle?: string;
   color?: string;
@@ -13,6 +15,7 @@ interface TrendChartProps {
 
 export const TrendChart = ({ 
   data, 
+  lines,
   title, 
   subtitle, 
   color = '#397dff',
@@ -67,15 +70,31 @@ export const TrendChart = ({
             }}
             formatter={(value: any) => [`${prefix}${value}${suffix}`, 'Value']}
           />
-          <DataComponent 
-            type="monotone" 
-            dataKey="value" 
-            stroke={color}
-            strokeWidth={2}
-            fill={showArea ? `url(#gradient-${color})` : 'none'}
-            dot={{ fill: color, strokeWidth: 2, r: 4 }}
-            activeDot={{ r: 6 }}
-          />
+          {lines && lines.length > 0 ? (
+            lines.map((l) => (
+              <DataComponent
+                key={l.dataKey}
+                type="monotone"
+                dataKey={l.dataKey}
+                name={l.name || l.dataKey}
+                stroke={l.color || color}
+                strokeWidth={2}
+                fill="none"
+                dot={{ fill: l.color || color, strokeWidth: 2, r: 3 }}
+                activeDot={{ r: 6 }}
+              />
+            ))
+          ) : (
+            <DataComponent 
+              type="monotone" 
+              dataKey="value" 
+              stroke={color}
+              strokeWidth={2}
+              fill={showArea ? `url(#gradient-${color})` : 'none'}
+              dot={{ fill: color, strokeWidth: 2, r: 4 }}
+              activeDot={{ r: 6 }}
+            />
+          )}
         </ChartComponent>
       </ResponsiveContainer>
     </div>

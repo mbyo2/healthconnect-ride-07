@@ -196,7 +196,7 @@ export const ProviderProfileEnhanced = () => {
           typical_wait_time: formData.typical_wait_time || null,
           appointment_types: formData.appointment_types,
           availability_schedule: formData.availability_schedule,
-          professional_references: formData.professional_references,
+          professional_references: formData.professional_references as any,
         })
         .eq("id", user.id);
 
