@@ -280,8 +280,8 @@ export const ZambiaCompliance = () => {
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="flex items-center gap-3 p-4 rounded-xl bg-[#f0f2f7] dark:bg-slate-800">
-                <div className={`h-10 w-10 rounded-lg ${nhimaConfig?.is_nhis_accredited ? "bg-[#00c875]" : "bg-[#e44258]"} text-white flex items-center justify-center`}>
-                  {nhimaConfig?.is_nhis_accredited ? <CheckCircle className="h-5 w-5" /> : <AlertTriangle className="h-5 w-5" />}
+                <div className={`h-10 w-10 rounded-lg ${nhimaConfig?.is_nhima_accredited ? "bg-[#00c875]" : "bg-[#e44258]"} text-white flex items-center justify-center`}>
+                  {nhimaConfig?.is_nhima_accredited ? <CheckCircle className="h-5 w-5" /> : <AlertTriangle className="h-5 w-5" />}
                 </div>
                 <div>
                   <div className="text-xs font-bold">NHIMA Accreditation</div>
@@ -316,9 +316,9 @@ export const ZambiaCompliance = () => {
           </CardContent>
         </Card>
 
-        <Tabs defaultValue="nhis" className="space-y-6">
+        <Tabs defaultValue="nhima" className="space-y-6">
           <TabsList className="bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 p-1">
-            <TabsTrigger value="nhis" className="data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">
+            <TabsTrigger value="nhima" className="data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">
               <Globe className="h-4 w-4 mr-2" /> NHIMA Configuration
             </TabsTrigger>
             <TabsTrigger value="council" className="data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">
@@ -333,10 +333,10 @@ export const ZambiaCompliance = () => {
           </TabsList>
 
           {/* NHIMA Configuration Tab */}
-          <TabsContent value="nhis" className="space-y-4">
+          <TabsContent value="nhima" className="space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-extrabold">National Health Insurance Scheme Configuration</h3>
-              <Dialog open={showNhimaDialog} onOpenChange={setShowNhisDialog}>
+              <Dialog open={showNhimaDialog} onOpenChange={setShowNhimaDialog}>
                 <DialogTrigger asChild>
                   <Button className="bg-[#0073ea] hover:bg-[#0056b3] text-white font-bold text-xs">
                     <Settings className="h-4 w-4 mr-1" /> Configure NHIMA
@@ -350,8 +350,8 @@ export const ZambiaCompliance = () => {
                     <div>
                       <Label className="text-xs font-bold">NHIMA Provider Code</Label>
                       <Input
-                        value={nhimaForm.nhis_provider_code}
-                        onChange={(e) => setNhisForm({ ...nhimaForm, nhis_provider_code: e.target.value })}
+                        value={nhimaForm.nhima_provider_code}
+                        onChange={(e) => setNhimaForm({ ...nhimaForm, nhima_provider_code: e.target.value })}
                         placeholder="e.g., NHIMA-001"
                         className="mt-1"
                       />
@@ -359,8 +359,8 @@ export const ZambiaCompliance = () => {
                     <div>
                       <Label className="text-xs font-bold">Facility Type</Label>
                       <Select
-                        value={nhimaForm.nhis_facility_type}
-                        onValueChange={(value) => setNhisForm({ ...nhimaForm, nhis_facility_type: value })}
+                        value={nhimaForm.nhima_facility_type}
+                        onValueChange={(value) => setNhimaForm({ ...nhimaForm, nhima_facility_type: value })}
                       >
                         <SelectTrigger className="mt-1">
                           <SelectValue />
@@ -376,8 +376,8 @@ export const ZambiaCompliance = () => {
                     <div>
                       <Label className="text-xs font-bold">Accreditation Number</Label>
                       <Input
-                        value={nhimaForm.nhis_accreditation_number}
-                        onChange={(e) => setNhisForm({ ...nhimaForm, nhis_accreditation_number: e.target.value })}
+                        value={nhimaForm.nhima_accreditation_number}
+                        onChange={(e) => setNhimaForm({ ...nhimaForm, nhima_accreditation_number: e.target.value })}
                         placeholder="e.g., ACC-2024-001"
                         className="mt-1"
                       />
@@ -385,8 +385,8 @@ export const ZambiaCompliance = () => {
                     <div>
                       <Label className="text-xs font-bold">Claim Submission Method</Label>
                       <Select
-                        value={nhimaForm.nhis_claim_submission_method}
-                        onValueChange={(value) => setNhisForm({ ...nhimaForm, nhis_claim_submission_method: value })}
+                        value={nhimaForm.nhima_claim_submission_method}
+                        onValueChange={(value) => setNhimaForm({ ...nhimaForm, nhima_claim_submission_method: value })}
                       >
                         <SelectTrigger className="mt-1">
                           <SelectValue />
@@ -403,8 +403,8 @@ export const ZambiaCompliance = () => {
                         <Label className="text-xs font-bold">Claim Processing Days</Label>
                         <Input
                           type="number"
-                          value={nhimaForm.nhis_claim_processing_days}
-                          onChange={(e) => setNhisForm({ ...nhimaForm, nhis_claim_processing_days: parseInt(e.target.value) })}
+                          value={nhimaForm.nhima_claim_processing_days}
+                          onChange={(e) => setNhimaForm({ ...nhimaForm, nhima_claim_processing_days: parseInt(e.target.value) })}
                           className="mt-1"
                         />
                       </div>
@@ -412,8 +412,8 @@ export const ZambiaCompliance = () => {
                         <Label className="text-xs font-bold">Co-Payment %</Label>
                         <Input
                           type="number"
-                          value={nhimaForm.nhis_co_payment_percentage}
-                          onChange={(e) => setNhisForm({ ...nhimaForm, nhis_co_payment_percentage: parseFloat(e.target.value) })}
+                          value={nhimaForm.nhima_co_payment_percentage}
+                          onChange={(e) => setNhimaForm({ ...nhimaForm, nhima_co_payment_percentage: parseFloat(e.target.value) })}
                           className="mt-1"
                         />
                       </div>
@@ -421,8 +421,8 @@ export const ZambiaCompliance = () => {
                     <div>
                       <Label className="text-xs font-bold">Service Tariff Version</Label>
                       <Input
-                        value={nhimaForm.nhis_service_tariff_version}
-                        onChange={(e) => setNhisForm({ ...nhimaForm, nhis_service_tariff_version: e.target.value })}
+                        value={nhimaForm.nhima_service_tariff_version}
+                        onChange={(e) => setNhimaForm({ ...nhimaForm, nhima_service_tariff_version: e.target.value })}
                         placeholder="e.g., 2024-v1"
                         className="mt-1"
                       />
@@ -444,24 +444,24 @@ export const ZambiaCompliance = () => {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <div className="text-[10px] text-[#676879]">Provider Code</div>
-                      <div className="text-sm font-bold">{nhimaConfig.nhis_provider_code || "Not Set"}</div>
+                      <div className="text-sm font-bold">{nhimaConfig.nhima_provider_code || "Not Set"}</div>
                     </div>
                     <div>
                       <div className="text-[10px] text-[#676879]">Facility Type</div>
-                      <div className="text-sm font-bold">{nhimaConfig.nhis_facility_type || "Not Set"}</div>
+                      <div className="text-sm font-bold">{nhimaConfig.nhima_facility_type || "Not Set"}</div>
                     </div>
                     <div>
                       <div className="text-[10px] text-[#676879]">Accreditation #</div>
-                      <div className="text-sm font-bold">{nhimaConfig.nhis_accreditation_number || "Not Set"}</div>
+                      <div className="text-sm font-bold">{nhimaConfig.nhima_accreditation_number || "Not Set"}</div>
                     </div>
                     <div>
                       <div className="text-[10px] text-[#676879]">Processing Days</div>
-                      <div className="text-sm font-bold">{nhimaConfig.nhis_claim_processing_days} days</div>
+                      <div className="text-sm font-bold">{nhimaConfig.nhima_claim_processing_days} days</div>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 pt-2 border-t border-[#e6e9ef] dark:border-slate-800">
-                    <Badge className={nhimaConfig.is_nhis_accredited ? "bg-[#00c875] text-white text-[10px]" : "bg-[#e44258] text-white text-[10px]"}>
-                      {nhimaConfig.is_nhis_accredited ? "Accredited" : "Not Accredited"}
+                    <Badge className={nhimaConfig.is_nhima_accredited ? "bg-[#00c875] text-white text-[10px]" : "bg-[#e44258] text-white text-[10px]"}>
+                      {nhimaConfig.is_nhima_accredited ? "Accredited" : "Not Accredited"}
                     </Badge>
                   </div>
                 </CardContent>
@@ -472,7 +472,7 @@ export const ZambiaCompliance = () => {
                   <Globe className="h-12 w-12 mx-auto text-[#0073ea] mb-4" />
                   <h3 className="text-sm font-extrabold mb-2">NHIMA Not Configured</h3>
                   <p className="text-xs text-[#676879] mb-4">Configure your NHIMA settings to enable insurance claims</p>
-                  <Button onClick={() => setShowNhisDialog(true)} className="bg-[#0073ea] hover:bg-[#0056b3]">
+                  <Button onClick={() => setShowNhimaDialog(true)} className="bg-[#0073ea] hover:bg-[#0056b3]">
                     Configure NHIMA
                   </Button>
                 </CardContent>
