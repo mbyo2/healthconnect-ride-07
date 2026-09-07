@@ -193,21 +193,22 @@ export const HospitalManagement = () => {
           <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-6 shadow-xs">
             <TabsContent value="dashboard"><HMSDashboard hospital={hospital} departments={departments} beds={beds} admissions={admissions} invoices={invoices} /></TabsContent>
             <TabsContent value="notifications"><NotificationCenter hospitalId={hospital.id} /></TabsContent>
-            <TabsContent value="emr"><EMRCaseSheets hospital={hospital} departments={departments} /></TabsContent>
-            <TabsContent value="opd"><OPDManagement hospital={hospital} departments={departments} /></TabsContent>
-            <TabsContent value="ipd"><IPDManagement hospital={hospital} patients={patients} departments={departments} beds={beds} admissions={admissions} onRefresh={refreshAll} /></TabsContent>
-            <TabsContent value="emergency"><EmergencyTriage hospital={hospital} /></TabsContent>
-            <TabsContent value="ot"><OTManagement hospital={hospital} /></TabsContent>
-            <TabsContent value="lab"><HospitalLab hospital={hospital} /></TabsContent>
-            <TabsContent value="radiology"><RadiologyImaging hospital={hospital} /></TabsContent>
-            <TabsContent value="pharmacy"><HospitalPharmacy hospital={hospital} /></TabsContent>
-            <TabsContent value="beds"><BedWardManagement hospital={hospital} departments={departments} beds={beds} onRefresh={refreshAll} /></TabsContent>
-            <TabsContent value="billing"><HospitalBilling hospital={hospital} admissions={admissions} invoices={invoices} onRefresh={refreshAll} /></TabsContent>
-            <TabsContent value="tariffs"><TariffAndPriceManager /></TabsContent>
-            <TabsContent value="insurance"><InsuranceTPA hospital={hospital} /></TabsContent>
-            <TabsContent value="discharge"><DischargeSummary hospital={hospital} admissions={admissions} /></TabsContent>
-            <TabsContent value="staff"><StaffRoster hospital={hospital} departments={departments} /></TabsContent>
-            <TabsContent value="mis"><MISReports hospital={hospital} /></TabsContent>
+            <TabsContent value="emr">{mod("emr", <EMRCaseSheets hospital={hospital} departments={departments} />)}</TabsContent>
+            <TabsContent value="opd">{mod("opd", <OPDManagement hospital={hospital} departments={departments} />)}</TabsContent>
+            <TabsContent value="ipd">{mod("ipd", <IPDManagement hospital={hospital} patients={patients} departments={departments} beds={beds} admissions={admissions} onRefresh={refreshAll} />)}</TabsContent>
+            <TabsContent value="emergency">{mod("emergency", <EmergencyTriage hospital={hospital} />)}</TabsContent>
+            <TabsContent value="ot">{mod("ot", <OTManagement hospital={hospital} />)}</TabsContent>
+            <TabsContent value="lab">{mod("lab", <HospitalLab hospital={hospital} />)}</TabsContent>
+            <TabsContent value="radiology">{mod("radiology", <RadiologyImaging hospital={hospital} />)}</TabsContent>
+            <TabsContent value="pharmacy">{mod("pharmacy", <HospitalPharmacy hospital={hospital} />)}</TabsContent>
+            <TabsContent value="beds">{mod("beds", <BedWardManagement hospital={hospital} departments={departments} beds={beds} onRefresh={refreshAll} />)}</TabsContent>
+            <TabsContent value="billing">{mod("billing", <HospitalBilling hospital={hospital} admissions={admissions} invoices={invoices} onRefresh={refreshAll} />)}</TabsContent>
+            <TabsContent value="tariffs">{mod("tariffs", <TariffAndPriceManager />)}</TabsContent>
+            <TabsContent value="insurance">{mod("insurance", <InsuranceTPA hospital={hospital} />)}</TabsContent>
+            <TabsContent value="discharge">{mod("discharge", <DischargeSummary hospital={hospital} admissions={admissions} />)}</TabsContent>
+            <TabsContent value="staff">{mod("staff", <StaffRoster hospital={hospital} departments={departments} />)}</TabsContent>
+            <TabsContent value="mis">{mod("mis", <MISReports hospital={hospital} />)}</TabsContent>
+
           </div>
         </Tabs>
       </div>
