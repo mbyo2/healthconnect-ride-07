@@ -186,8 +186,10 @@ export const HospitalManagement = () => {
                 </span>
               </div>
               <p className="text-xs text-[#676879] dark:text-slate-400 font-medium">
-                Hospital Dashboard • {hospital.type} • Lusaka Command Center
+                {facilityProfile.label}
+                {hospital.city ? ` • ${hospital.city}` : ""}
               </p>
+
             </div>
           </div>
 
