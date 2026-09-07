@@ -1,5 +1,7 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useInstitutionContext } from "@/hooks/useInstitutionContext";
+import { getFacilityProfile } from "@/config/facilityProfiles";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -476,7 +478,7 @@ export const StaffManagement = ({ institutionId }: { institutionId: string }) =>
                       <div><Label>Role *</Label>
                         <Select value={addRole} onValueChange={setAddRole}>
                           <SelectTrigger><SelectValue /></SelectTrigger>
-                          <SelectContent>{STAFF_ROLES.map(r => <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>)}</SelectContent>
+                          <SelectContent>{orderedStaffRoles.map(r => <SelectItem key={r.value} value={r.value}>{r.label}{r.typical ? "" : " (uncommon here)"}</SelectItem>)}</SelectContent>
                         </Select>
                       </div>
                       <div><Label>Staff Type</Label>
@@ -520,7 +522,7 @@ export const StaffManagement = ({ institutionId }: { institutionId: string }) =>
                     <div><Label>Role</Label>
                       <Select value={inviteRole} onValueChange={setInviteRole}>
                         <SelectTrigger><SelectValue /></SelectTrigger>
-                        <SelectContent>{STAFF_ROLES.map(r => <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>)}</SelectContent>
+                        <SelectContent>{orderedStaffRoles.map(r => <SelectItem key={r.value} value={r.value}>{r.label}{r.typical ? "" : " (uncommon here)"}</SelectItem>)}</SelectContent>
                       </Select>
                     </div>
                     <div><Label>Department</Label><Input placeholder="Department name" value={inviteDept} onChange={e => setInviteDept(e.target.value)} /></div>
