@@ -232,7 +232,11 @@ export const HospitalManagement = () => {
           </div>
 
           <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-6 shadow-xs">
-            <TabsContent value="dashboard"><HMSDashboard hospital={hospital} departments={departments} beds={beds} admissions={admissions} invoices={invoices} /></TabsContent>
+            <TabsContent value="dashboard" className="space-y-6">
+              <HMSDashboard hospital={hospital} departments={departments} beds={beds} admissions={admissions} invoices={invoices} />
+              <FacilityJourneyCard facilityType={hospital.type} />
+            </TabsContent>
+
             <TabsContent value="notifications"><NotificationCenter hospitalId={hospital.id} /></TabsContent>
             <TabsContent value="emr">{mod("emr", <EMRCaseSheets hospital={hospital} departments={departments} />)}</TabsContent>
             <TabsContent value="opd">{mod("opd", <OPDManagement hospital={hospital} departments={departments} />)}</TabsContent>
