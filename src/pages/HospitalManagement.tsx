@@ -36,8 +36,32 @@ import { SecurityManagement } from "@/components/hospital/SecurityManagement";
 import { TariffAndPriceManager } from "@/components/pricing/TariffAndPriceManager";
 
 import { useInstitutionContext } from "@/hooks/useInstitutionContext";
+import { getFacilityProfile, type HmsModule } from "@/config/facilityProfiles";
+import { ModuleRelevanceNotice } from "@/components/hospital/ModuleRelevanceNotice";
+import { FacilityJourneyCard } from "@/components/hospital/FacilityJourneyCard";
+
+const MODULE_TABS: { val: HmsModule; label: string }[] = [
+  { val: "dashboard", label: "Dashboard" },
+  { val: "notifications", label: "🔔 Alerts" },
+  { val: "emr", label: "EMR" },
+  { val: "opd", label: "OPD Queue" },
+  { val: "ipd", label: "IPD / ADT" },
+  { val: "emergency", label: "A&E Triage" },
+  { val: "ot", label: "OT Surgery" },
+  { val: "lab", label: "Lab LIMS" },
+  { val: "radiology", label: "Radiology" },
+  { val: "pharmacy", label: "Pharmacy POS" },
+  { val: "beds", label: "Bed Wards" },
+  { val: "billing", label: "Billing" },
+  { val: "tariffs", label: "Tariff Rates" },
+  { val: "insurance", label: "Insurance TPA" },
+  { val: "discharge", label: "Discharge" },
+  { val: "staff", label: "Staff Roster" },
+  { val: "mis", label: "MIS Reports" },
+];
 
 export const HospitalManagement = () => {
+
   const { user } = useAuth();
   const { institution: hospital, institutionId: hospitalId, loading: loadingHospital } = useInstitutionContext();
   const [searchParams, setSearchParams] = useSearchParams();
