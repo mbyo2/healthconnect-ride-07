@@ -36,8 +36,32 @@ import { SecurityManagement } from "@/components/hospital/SecurityManagement";
 import { TariffAndPriceManager } from "@/components/pricing/TariffAndPriceManager";
 
 import { useInstitutionContext } from "@/hooks/useInstitutionContext";
+import { getFacilityProfile, type HmsModule } from "@/config/facilityProfiles";
+import { ModuleRelevanceNotice } from "@/components/hospital/ModuleRelevanceNotice";
+import { FacilityJourneyCard } from "@/components/hospital/FacilityJourneyCard";
+
+const MODULE_TABS: { val: HmsModule; label: string }[] = [
+  { val: "dashboard", label: "Dashboard" },
+  { val: "notifications", label: "🔔 Alerts" },
+  { val: "emr", label: "EMR" },
+  { val: "opd", label: "OPD Queue" },
+  { val: "ipd", label: "IPD / ADT" },
+  { val: "emergency", label: "A&E Triage" },
+  { val: "ot", label: "OT Surgery" },
+  { val: "lab", label: "Lab LIMS" },
+  { val: "radiology", label: "Radiology" },
+  { val: "pharmacy", label: "Pharmacy POS" },
+  { val: "beds", label: "Bed Wards" },
+  { val: "billing", label: "Billing" },
+  { val: "tariffs", label: "Tariff Rates" },
+  { val: "insurance", label: "Insurance TPA" },
+  { val: "discharge", label: "Discharge" },
+  { val: "staff", label: "Staff Roster" },
+  { val: "mis", label: "MIS Reports" },
+];
 
 export const HospitalManagement = () => {
+
   const { user } = useAuth();
   const { institution: hospital, institutionId: hospitalId, loading: loadingHospital } = useInstitutionContext();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -122,6 +146,21 @@ export const HospitalManagement = () => {
     refetchInvoices();
   };
 
+  // Facility profile drives which modules matter for this kind of facility.
+  const facilityProfile = getFacilityProfile(hospital?.type);
+  const mod = (key: HmsModule, node: React.ReactNode) => (
+    <ModuleRelevanceNotice
+      facilityType={hospital?.type}
+      facilityId={hospital?.id}
+      module={key}
+      moduleLabel={MODULE_TABS.find((t) => t.val === key)?.label ?? key}
+      relevance={facilityProfile.modules[key]}
+    >
+      {node}
+    </ModuleRelevanceNotice>
+  );
+
+
   if (loadingHospital) {
     return (
       <div className="flex justify-center items-center min-h-[60vh] bg-[#f5f6f8] dark:bg-slate-950">
@@ -147,8 +186,10 @@ export const HospitalManagement = () => {
                 </span>
               </div>
               <p className="text-xs text-[#676879] dark:text-slate-400 font-medium">
-                Hospital Dashboard • {hospital.type} • Lusaka Command Center
+                {facilityProfile.label}
+                {hospital.city ? ` • ${hospital.city}` : ""}
               </p>
+
             </div>
           </div>
 
@@ -167,54 +208,52 @@ export const HospitalManagement = () => {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
           <div className="overflow-x-auto p-1 bg-white dark:bg-slate-900 rounded-xl border border-[#e6e9ef] dark:border-slate-800">
             <TabsList className="inline-flex w-auto min-w-full flex-wrap h-auto gap-1 bg-transparent p-1">
-              {[
-                { val: "dashboard", label: "Dashboard" },
-                { val: "notifications", label: "🔔 Alerts" },
-                { val: "emr", label: "EMR" },
-                { val: "opd", label: "OPD Queue" },
-                { val: "ipd", label: "IPD / ADT" },
-                { val: "emergency", label: "A&E Triage" },
-                { val: "ot", label: "OT Surgery" },
-                { val: "lab", label: "Lab LIMS" },
-                { val: "radiology", label: "Radiology" },
-                { val: "pharmacy", label: "Pharmacy POS" },
-                { val: "beds", label: "Bed Wards" },
-                { val: "billing", label: "Billing" },
-                { val: "tariffs", label: "Tariff Rates" },
-                { val: "insurance", label: "Insurance TPA" },
-                { val: "discharge", label: "Discharge" },
-                { val: "staff", label: "Staff Roster" },
-                { val: "mis", label: "MIS Reports" },
-              ].map((t) => (
-                <TabsTrigger
-                  key={t.val}
-                  value={t.val}
-                  className="text-xs font-extrabold px-3 py-1.5 rounded-md data-[state=active]:bg-[#0073ea] data-[state=active]:text-white transition-all"
-                >
-                  {t.label}
-                </TabsTrigger>
-              ))}
+              {MODULE_TABS.map((t) => {
+                const relevance = facilityProfile.modules[t.val];
+                return (
+                  <TabsTrigger
+                    key={t.val}
+                    value={t.val}
+                    title={
+                      relevance === "atypical"
+                        ? `Not usually used by a ${facilityProfile.label.toLowerCase()} — you can still open it`
+                        : undefined
+                    }
+                    className={`text-xs font-extrabold px-3 py-1.5 rounded-md data-[state=active]:bg-[#0073ea] data-[state=active]:text-white transition-all ${
+                      relevance === "atypical" ? "opacity-45 hover:opacity-80" : ""
+                    }`}
+                  >
+                    {t.label}
+                  </TabsTrigger>
+                );
+              })}
+
             </TabsList>
           </div>
 
           <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-6 shadow-xs">
-            <TabsContent value="dashboard"><HMSDashboard hospital={hospital} departments={departments} beds={beds} admissions={admissions} invoices={invoices} /></TabsContent>
+            <TabsContent value="dashboard" className="space-y-6">
+              <HMSDashboard hospital={hospital} departments={departments} beds={beds} admissions={admissions} invoices={invoices} />
+              <FacilityJourneyCard facilityType={hospital.type} />
+            </TabsContent>
+
             <TabsContent value="notifications"><NotificationCenter hospitalId={hospital.id} /></TabsContent>
-            <TabsContent value="emr"><EMRCaseSheets hospital={hospital} departments={departments} /></TabsContent>
-            <TabsContent value="opd"><OPDManagement hospital={hospital} departments={departments} /></TabsContent>
-            <TabsContent value="ipd"><IPDManagement hospital={hospital} patients={patients} departments={departments} beds={beds} admissions={admissions} onRefresh={refreshAll} /></TabsContent>
-            <TabsContent value="emergency"><EmergencyTriage hospital={hospital} /></TabsContent>
-            <TabsContent value="ot"><OTManagement hospital={hospital} /></TabsContent>
-            <TabsContent value="lab"><HospitalLab hospital={hospital} /></TabsContent>
-            <TabsContent value="radiology"><RadiologyImaging hospital={hospital} /></TabsContent>
-            <TabsContent value="pharmacy"><HospitalPharmacy hospital={hospital} /></TabsContent>
-            <TabsContent value="beds"><BedWardManagement hospital={hospital} departments={departments} beds={beds} onRefresh={refreshAll} /></TabsContent>
-            <TabsContent value="billing"><HospitalBilling hospital={hospital} admissions={admissions} invoices={invoices} onRefresh={refreshAll} /></TabsContent>
-            <TabsContent value="tariffs"><TariffAndPriceManager /></TabsContent>
-            <TabsContent value="insurance"><InsuranceTPA hospital={hospital} /></TabsContent>
-            <TabsContent value="discharge"><DischargeSummary hospital={hospital} admissions={admissions} /></TabsContent>
-            <TabsContent value="staff"><StaffRoster hospital={hospital} departments={departments} /></TabsContent>
-            <TabsContent value="mis"><MISReports hospital={hospital} /></TabsContent>
+            <TabsContent value="emr">{mod("emr", <EMRCaseSheets hospital={hospital} departments={departments} />)}</TabsContent>
+            <TabsContent value="opd">{mod("opd", <OPDManagement hospital={hospital} departments={departments} />)}</TabsContent>
+            <TabsContent value="ipd">{mod("ipd", <IPDManagement hospital={hospital} patients={patients} departments={departments} beds={beds} admissions={admissions} onRefresh={refreshAll} />)}</TabsContent>
+            <TabsContent value="emergency">{mod("emergency", <EmergencyTriage hospital={hospital} />)}</TabsContent>
+            <TabsContent value="ot">{mod("ot", <OTManagement hospital={hospital} />)}</TabsContent>
+            <TabsContent value="lab">{mod("lab", <HospitalLab hospital={hospital} />)}</TabsContent>
+            <TabsContent value="radiology">{mod("radiology", <RadiologyImaging hospital={hospital} />)}</TabsContent>
+            <TabsContent value="pharmacy">{mod("pharmacy", <HospitalPharmacy hospital={hospital} />)}</TabsContent>
+            <TabsContent value="beds">{mod("beds", <BedWardManagement hospital={hospital} departments={departments} beds={beds} onRefresh={refreshAll} />)}</TabsContent>
+            <TabsContent value="billing">{mod("billing", <HospitalBilling hospital={hospital} admissions={admissions} invoices={invoices} onRefresh={refreshAll} />)}</TabsContent>
+            <TabsContent value="tariffs">{mod("tariffs", <TariffAndPriceManager />)}</TabsContent>
+            <TabsContent value="insurance">{mod("insurance", <InsuranceTPA hospital={hospital} />)}</TabsContent>
+            <TabsContent value="discharge">{mod("discharge", <DischargeSummary hospital={hospital} admissions={admissions} />)}</TabsContent>
+            <TabsContent value="staff">{mod("staff", <StaffRoster hospital={hospital} departments={departments} />)}</TabsContent>
+            <TabsContent value="mis">{mod("mis", <MISReports hospital={hospital} />)}</TabsContent>
+
           </div>
         </Tabs>
       </div>
