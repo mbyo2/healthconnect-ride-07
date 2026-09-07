@@ -146,6 +146,21 @@ export const HospitalManagement = () => {
     refetchInvoices();
   };
 
+  // Facility profile drives which modules matter for this kind of facility.
+  const facilityProfile = getFacilityProfile(hospital?.type);
+  const mod = (key: HmsModule, node: React.ReactNode) => (
+    <ModuleRelevanceNotice
+      facilityType={hospital?.type}
+      facilityId={hospital?.id}
+      module={key}
+      moduleLabel={MODULE_TABS.find((t) => t.val === key)?.label ?? key}
+      relevance={facilityProfile.modules[key]}
+    >
+      {node}
+    </ModuleRelevanceNotice>
+  );
+
+
   if (loadingHospital) {
     return (
       <div className="flex justify-center items-center min-h-[60vh] bg-[#f5f6f8] dark:bg-slate-950">
