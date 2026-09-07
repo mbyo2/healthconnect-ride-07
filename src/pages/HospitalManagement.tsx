@@ -167,33 +167,26 @@ export const HospitalManagement = () => {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
           <div className="overflow-x-auto p-1 bg-white dark:bg-slate-900 rounded-xl border border-[#e6e9ef] dark:border-slate-800">
             <TabsList className="inline-flex w-auto min-w-full flex-wrap h-auto gap-1 bg-transparent p-1">
-              {[
-                { val: "dashboard", label: "Dashboard" },
-                { val: "notifications", label: "🔔 Alerts" },
-                { val: "emr", label: "EMR" },
-                { val: "opd", label: "OPD Queue" },
-                { val: "ipd", label: "IPD / ADT" },
-                { val: "emergency", label: "A&E Triage" },
-                { val: "ot", label: "OT Surgery" },
-                { val: "lab", label: "Lab LIMS" },
-                { val: "radiology", label: "Radiology" },
-                { val: "pharmacy", label: "Pharmacy POS" },
-                { val: "beds", label: "Bed Wards" },
-                { val: "billing", label: "Billing" },
-                { val: "tariffs", label: "Tariff Rates" },
-                { val: "insurance", label: "Insurance TPA" },
-                { val: "discharge", label: "Discharge" },
-                { val: "staff", label: "Staff Roster" },
-                { val: "mis", label: "MIS Reports" },
-              ].map((t) => (
-                <TabsTrigger
-                  key={t.val}
-                  value={t.val}
-                  className="text-xs font-extrabold px-3 py-1.5 rounded-md data-[state=active]:bg-[#0073ea] data-[state=active]:text-white transition-all"
-                >
-                  {t.label}
-                </TabsTrigger>
-              ))}
+              {MODULE_TABS.map((t) => {
+                const relevance = facilityProfile.modules[t.val];
+                return (
+                  <TabsTrigger
+                    key={t.val}
+                    value={t.val}
+                    title={
+                      relevance === "atypical"
+                        ? `Not usually used by a ${facilityProfile.label.toLowerCase()} — you can still open it`
+                        : undefined
+                    }
+                    className={`text-xs font-extrabold px-3 py-1.5 rounded-md data-[state=active]:bg-[#0073ea] data-[state=active]:text-white transition-all ${
+                      relevance === "atypical" ? "opacity-45 hover:opacity-80" : ""
+                    }`}
+                  >
+                    {t.label}
+                  </TabsTrigger>
+                );
+              })}
+
             </TabsList>
           </div>
 
