@@ -100,6 +100,19 @@ const EMPLOYMENT_TYPES = [
 ];
 
 export const StaffManagement = ({ institutionId }: { institutionId: string }) => {
+  const { institution } = useInstitutionContext();
+  const facilityProfile = getFacilityProfile(institution?.type);
+  // Roles this kind of facility typically employs come first in the pickers.
+  const orderedStaffRoles = useMemo(() => {
+    const preferred = facilityProfile.staffRoles;
+    return [...STAFF_ROLES]
+      .map((r) => {
+        const rank = preferred.indexOf(r.value);
+        return { ...r, typical: rank >= 0, rank: rank >= 0 ? rank : 999 };
+      })
+      .sort((a, b) => a.rank - b.rank);
+  }, [facilityProfile]);
+
   const [staff, setStaff] = useState<StaffMember[]>([]);
   const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [shifts, setShifts] = useState<Shift[]>([]);
