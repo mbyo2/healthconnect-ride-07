@@ -1,4 +1,4 @@
-import { MEDGEMMA_MODEL, MEDGEMMA_MODEL_LABEL } from '../_shared/medgemma.ts';
+import { resolveAIProvider, AI_MODEL_LABEL } from '../_shared/ai.ts';
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
@@ -145,9 +145,10 @@ CRITICAL: If symptoms suggest emergency, immediately advise to call emergency se
 - Use standard anatomical terminology`;
     }
 
-    const HF_TOKEN = Deno.env.get('HF_TOKEN');
+    const aiProvider = resolveAIProvider();
+    const HF_TOKEN = aiProvider ? 'configured' : '';
     if (!HF_TOKEN) {
-      console.error('HF_TOKEN not configured');
+      console.error('No AI provider configured (OPENROUTER_API_KEY / HF_TOKEN missing)');
       return new Response(
         JSON.stringify({ error: 'AI service not configured', fallback: true }),
         { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -178,7 +179,7 @@ CRITICAL: If symptoms suggest emergency, immediately advise to call emergency se
     console.log('Calling HuggingFace chat completions API for MedGemma...');
 
     // Use the HuggingFace OpenAI-compatible chat completions endpoint
-    const HF_CHAT_ENDPOINT = `https://api-inference.huggingface.co/v1/chat/completions`;
+    const HF_CHAT_ENDPOINT = aiProvider!.endpoint;
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 55000); // 55s timeout
@@ -188,11 +189,10 @@ CRITICAL: If symptoms suggest emergency, immediately advise to call emergency se
       response = await fetch(HF_CHAT_ENDPOINT, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${HF_TOKEN}`,
-          'Content-Type': 'application/json',
+          ...aiProvider!.headers,
         },
         body: JSON.stringify({
-          model: MEDGEMMA_MODEL,
+          model: aiProvider!.model,
           messages: formattedMessages,
           max_tokens: 2000,
           temperature: 0.3,
@@ -255,7 +255,7 @@ CRITICAL: If symptoms suggest emergency, immediately advise to call emergency se
       JSON.stringify({
         reply,
         timestamp: new Date().toISOString(),
-        model: MEDGEMMA_MODEL_LABEL,
+        model: AI_MODEL_LABEL,
         analysisType,
         imageCount: images?.length || 0,
         capabilities: {

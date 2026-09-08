@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
-import { MEDGEMMA_MODEL, MEDGEMMA_MODEL_LABEL } from '../_shared/medgemma.ts';
+import { resolveAIProvider, AI_MODEL_LABEL } from '../_shared/ai.ts';
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
 
 const stripCtl = (s: string) => s.replace(/[\u0000-\u001F\u007F]/g, ' ').slice(0, 2000);
@@ -93,9 +93,10 @@ serve(async (req: Request) => {
     }
     const { analysisType, data } = parsed.data as any;
     
-    const HF_TOKEN = Deno.env.get('HF_TOKEN');
+    const aiProvider = resolveAIProvider();
+    const HF_TOKEN = aiProvider ? 'configured' : '';
     if (!HF_TOKEN) {
-      throw new Error('HF_TOKEN not configured');
+      throw new Error('AI service not configured');
     }
 
     const systemContext = `You are Doc 0 Clock, a medical AI assistant available 24/7. Provide accurate, evidence-based medical insights. 
@@ -188,14 +189,13 @@ Provide:
 
     let response: Response;
     try {
-      response = await fetch('https://api-inference.huggingface.co/v1/chat/completions', {
+      response = await fetch(aiProvider!.endpoint, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${HF_TOKEN}`,
-          'Content-Type': 'application/json',
+          ...aiProvider!.headers,
         },
         body: JSON.stringify({
-          model: MEDGEMMA_MODEL,
+          model: aiProvider!.model,
           messages: [
             { role: 'system', content: systemContext },
             { role: 'user', content: userPrompt }
@@ -224,7 +224,7 @@ Provide:
     const structuredResponse = {
       analysis,
       timestamp: new Date().toISOString(),
-      model: MEDGEMMA_MODEL_LABEL,
+      model: AI_MODEL_LABEL,
       analysisType,
       confidence: 0.85,
       disclaimer: 'This analysis is for informational purposes only and does not constitute medical advice. Always consult with a qualified healthcare professional for medical decisions.'

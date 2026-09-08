@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
+import { resolveAIProvider } from '../_shared/ai.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -507,14 +508,15 @@ serve(async (req: Request) => {
     const { message, image, conversationHistory } = validationResult.data;
 
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    const HF_TOKEN = Deno.env.get('HF_TOKEN');
+    const aiProvider = resolveAIProvider();
 
-    if (!LOVABLE_API_KEY && !HF_TOKEN) {
+    if (!aiProvider && !LOVABLE_API_KEY) {
       return new Response(
-        JSON.stringify({ error: 'AI service not configured. Please set LOVABLE_API_KEY or HF_TOKEN.', fallback: true }),
+        JSON.stringify({ error: 'AI service not configured. Please set OPENROUTER_API_KEY.', fallback: true }),
         { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
 
     // Verify the user's role from the DB — never trust client-supplied userRole
     const { data: profile } = await supabaseAuth
@@ -559,9 +561,33 @@ serve(async (req: Request) => {
 
     let reply: string;
 
-    if (LOVABLE_API_KEY) {
-      console.log('Calling Lovable AI...');
-      // Call Lovable AI Gateway with vision-capable model
+    // Images need a vision-capable model, which the primary text model is not,
+    // so those go through the Lovable AI gateway when it is available.
+    const useVisionGateway = Boolean(image && LOVABLE_API_KEY);
+
+    if (aiProvider && !useVisionGateway) {
+      console.log(`Calling Doc' O Clock AI (${aiProvider.provider})...`);
+      const response = await fetch(aiProvider.endpoint, {
+        method: 'POST',
+        headers: aiProvider.headers,
+        body: JSON.stringify({
+          model: aiProvider.model,
+          messages,
+          temperature: 0.4,
+          max_tokens: 1200,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('AI provider error:', response.status, errorText);
+        throw new Error(`AI provider error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      reply = data?.choices?.[0]?.message?.content || 'No response generated';
+    } else {
+      console.log('Calling Lovable AI gateway (vision)...');
       const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -583,41 +609,9 @@ serve(async (req: Request) => {
       }
 
       const data = await response.json();
-      reply = data.choices[0].message.content;
-    } else {
-      // Fallback: HuggingFace MedGemma
-      console.log('Falling back to HuggingFace MedGemma...');
-      const { MEDGEMMA_MODEL } = await import('../_shared/medgemma.ts');
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 55000);
-      let hfResponse: Response;
-      try {
-        hfResponse = await fetch('https://api-inference.huggingface.co/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${HF_TOKEN}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            model: MEDGEMMA_MODEL,
-            messages,
-            max_tokens: 1200,
-            temperature: 0.4,
-            stream: false,
-          }),
-          signal: controller.signal,
-        });
-      } finally {
-        clearTimeout(timeoutId);
-      }
-      if (!hfResponse.ok) {
-        const errorText = await hfResponse.text();
-        console.error('HuggingFace fallback error:', hfResponse.status, errorText);
-        throw new Error(`HuggingFace error: ${hfResponse.status}`);
-      }
-      const hfData = await hfResponse.json();
-      reply = hfData?.choices?.[0]?.message?.content || 'No response generated';
+      reply = data?.choices?.[0]?.message?.content || 'No response generated';
     }
+
 
     console.log('Doc 0 Clock response generated');
 

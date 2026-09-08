@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
+import { resolveAIProvider, AI_MODEL_LABEL } from '../_shared/ai.ts';
 
 const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -53,13 +54,12 @@ serve(async (req) => {
 
     const { message, conversationHistory } = validationResult.data;
 
-    // Get OpenAI API key from environment
-    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
-    if (!OPENAI_API_KEY) {
-      console.error('OPENAI_API_KEY not configured');
+    const aiProvider = resolveAIProvider();
+    if (!aiProvider) {
+      console.error('No AI provider configured');
       return new Response(
         JSON.stringify({
-          error: 'OPENAI_API_KEY not configured. Please configure it in Supabase Edge Functions settings.',
+          error: 'AI service not configured. Please set OPENROUTER_API_KEY in Supabase Edge Function secrets.',
           fallback: true
         }),
         { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -93,17 +93,13 @@ CRITICAL: If symptoms suggest emergency (chest pain, difficulty breathing, sever
             { role: 'user', content: message }
         ];
 
-        console.log('Calling OpenAI API...');
+        console.log(`Calling Doc' O Clock AI (${aiProvider.provider})...`);
 
-        // Call OpenAI API
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        const response = await fetch(aiProvider.endpoint, {
             method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${OPENAI_API_KEY}`,
-                'Content-Type': 'application/json',
-            },
+            headers: aiProvider.headers,
             body: JSON.stringify({
-                model: 'gpt-3.5-turbo',
+                model: aiProvider.model,
                 messages,
                 temperature: 0.4,
                 max_tokens: 800,
@@ -112,12 +108,12 @@ CRITICAL: If symptoms suggest emergency (chest pain, difficulty breathing, sever
 
         if (!response.ok) {
             const errorText = await response.text();
-            console.error('OpenAI API error:', response.status, errorText);
-            throw new Error(`OpenAI API error: ${response.status}`);
+            console.error('AI provider error:', response.status, errorText);
+            throw new Error(`AI provider error: ${response.status}`);
         }
 
         const data = await response.json();
-        const reply = data.choices[0].message.content;
+        const reply = data?.choices?.[0]?.message?.content || 'No response generated';
 
         console.log('Med AI response generated');
 
@@ -125,7 +121,7 @@ CRITICAL: If symptoms suggest emergency (chest pain, difficulty breathing, sever
             JSON.stringify({
                 reply,
                 timestamp: new Date().toISOString(),
-                model: 'gpt-3.5-turbo'
+                model: AI_MODEL_LABEL
             }),
             {
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' },
