@@ -507,14 +507,15 @@ serve(async (req: Request) => {
     const { message, image, conversationHistory } = validationResult.data;
 
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    const HF_TOKEN = Deno.env.get('HF_TOKEN');
+    const aiProvider = resolveAIProvider();
 
-    if (!LOVABLE_API_KEY && !HF_TOKEN) {
+    if (!aiProvider && !LOVABLE_API_KEY) {
       return new Response(
-        JSON.stringify({ error: 'AI service not configured. Please set LOVABLE_API_KEY or HF_TOKEN.', fallback: true }),
+        JSON.stringify({ error: 'AI service not configured. Please set OPENROUTER_API_KEY.', fallback: true }),
         { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
 
     // Verify the user's role from the DB — never trust client-supplied userRole
     const { data: profile } = await supabaseAuth
