@@ -1,4 +1,3 @@
-import { MEDGEMMA_ENDPOINT } from '../_shared/medgemma.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
@@ -37,8 +36,9 @@ Deno.serve(async (req) => {
       );
     }
 
-    const hfToken = Deno.env.get('HF_TOKEN');
-    if (!hfToken) throw new Error('HF_TOKEN not configured');
+    // Card reading needs a vision model, served through the Lovable AI gateway.
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    if (!LOVABLE_API_KEY) throw new Error('AI service not configured');
 
     // Use HuggingFace inference for document understanding
     const prompt = `Extract the following information from this insurance card image. Return ONLY a JSON object with these fields:
@@ -58,31 +58,30 @@ Deno.serve(async (req) => {
     
     If a field is not visible, set it to null.`;
 
-    // Use the latest MedGemma multimodal model for document understanding
-    const response = await fetch(MEDGEMMA_ENDPOINT, {
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${hfToken}`,
+        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        inputs: {
-          messages: [
-            {
-              role: 'system',
-              content:
-                'You extract structured data from insurance cards. Respond with a single JSON object only, no commentary.',
-            },
-            {
-              role: 'user',
-              content: [
-                { type: 'image', image: imageBase64 || imageUrl },
-                { type: 'text', text: prompt },
-              ],
-            },
-          ],
-        },
-        parameters: { max_new_tokens: 500, temperature: 0.2, return_full_text: false },
+        model: 'google/gemini-2.5-flash',
+        messages: [
+          {
+            role: 'system',
+            content:
+              'You extract structured data from insurance cards. Respond with a single JSON object only, no commentary.',
+          },
+          {
+            role: 'user',
+            content: [
+              { type: 'text', text: prompt },
+              { type: 'image_url', image_url: { url: imageBase64 || imageUrl } },
+            ],
+          },
+        ],
+        temperature: 0.2,
+        max_tokens: 700,
       }),
     });
 
@@ -90,8 +89,10 @@ Deno.serve(async (req) => {
 
     if (response.ok) {
       const result = await response.json();
-      // Parse the VQA response into structured data
-      const text = Array.isArray(result) ? result[0]?.generated_text : result?.generated_text;
+      const text = (result?.choices?.[0]?.message?.content ?? '')
+        .replace(/^```(?:json)?/i, '')
+        .replace(/```$/, '')
+        .trim();
       
       try {
         // Try to parse as JSON if model returned JSON
