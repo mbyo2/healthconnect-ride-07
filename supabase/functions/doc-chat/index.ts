@@ -560,9 +560,33 @@ serve(async (req: Request) => {
 
     let reply: string;
 
-    if (LOVABLE_API_KEY) {
-      console.log('Calling Lovable AI...');
-      // Call Lovable AI Gateway with vision-capable model
+    // Images need a vision-capable model, which the primary text model is not,
+    // so those go through the Lovable AI gateway when it is available.
+    const useVisionGateway = Boolean(image && LOVABLE_API_KEY);
+
+    if (aiProvider && !useVisionGateway) {
+      console.log(`Calling Doc' O Clock AI (${aiProvider.provider})...`);
+      const response = await fetch(aiProvider.endpoint, {
+        method: 'POST',
+        headers: aiProvider.headers,
+        body: JSON.stringify({
+          model: aiProvider.model,
+          messages,
+          temperature: 0.4,
+          max_tokens: 1200,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('AI provider error:', response.status, errorText);
+        throw new Error(`AI provider error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      reply = data?.choices?.[0]?.message?.content || 'No response generated';
+    } else {
+      console.log('Calling Lovable AI gateway (vision)...');
       const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -584,41 +608,9 @@ serve(async (req: Request) => {
       }
 
       const data = await response.json();
-      reply = data.choices[0].message.content;
-    } else {
-      // Fallback: HuggingFace MedGemma
-      console.log('Falling back to HuggingFace MedGemma...');
-      const { MEDGEMMA_MODEL } = await import('../_shared/medgemma.ts');
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 55000);
-      let hfResponse: Response;
-      try {
-        hfResponse = await fetch('https://api-inference.huggingface.co/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${HF_TOKEN}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            model: MEDGEMMA_MODEL,
-            messages,
-            max_tokens: 1200,
-            temperature: 0.4,
-            stream: false,
-          }),
-          signal: controller.signal,
-        });
-      } finally {
-        clearTimeout(timeoutId);
-      }
-      if (!hfResponse.ok) {
-        const errorText = await hfResponse.text();
-        console.error('HuggingFace fallback error:', hfResponse.status, errorText);
-        throw new Error(`HuggingFace error: ${hfResponse.status}`);
-      }
-      const hfData = await hfResponse.json();
-      reply = hfData?.choices?.[0]?.message?.content || 'No response generated';
+      reply = data?.choices?.[0]?.message?.content || 'No response generated';
     }
+
 
     console.log('Doc 0 Clock response generated');
 
