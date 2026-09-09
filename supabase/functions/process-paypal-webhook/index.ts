@@ -177,26 +177,49 @@ serve(async (req) => {
 
       console.log('Payment updated to completed:', data);
 
-      // Process wallet transaction if applicable
+      // Settle the payment: platform fee to the app owner wallet, the rest to
+      // the single payee (institution, provider or pharmacy). Commission rates
+      // come from commission_settings, never hardcoded here.
       if (data) {
-        const { error: walletError } = await supabaseClient.rpc('process_wallet_transaction', {
-          p_user_id: data.provider_id,
-          p_transaction_type: 'credit',
-          p_amount: data.amount * 0.85, // 85% goes to provider (15% platform fee)
-          p_description: `Payment for consultation - Order ${orderId}`,
-          p_payment_id: data.id
-        });
+        const { data: existingSplits } = await supabaseClient
+          .from('payment_splits')
+          .select('id')
+          .eq('payment_id', data.id)
+          .limit(1);
 
-        if (walletError) {
-          console.error('Error crediting provider wallet:', walletError);
-          return new Response(
-            JSON.stringify({ error: 'Failed to credit wallet' }),
-            { 
-              status: 500,
-              headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-            }
-          );
+        if (!existingSplits || existingSplits.length === 0) {
+          const { data: institution } = await supabaseClient
+            .from('healthcare_institutions')
+            .select('id, type')
+            .eq('id', data.provider_id)
+            .maybeSingle();
+
+          const refType = (data.metadata as any)?.reference_type ?? '';
+          const isPharmacy =
+            (institution?.type || '').toLowerCase().includes('pharmac') ||
+            refType === 'order' ||
+            refType === 'pharmacy_sale';
+
+          const { error: walletError } = await supabaseClient.rpc('process_payment_with_splits', {
+            p_payment_id: data.id,
+            p_total_amount: data.amount,
+            p_provider_id: institution ? null : data.provider_id,
+            p_institution_id: institution ? institution.id : null,
+            p_payment_type: isPharmacy ? 'pharmacy' : 'consultation'
+          });
+
+          if (walletError) {
+            console.error('Error settling payment splits:', walletError);
+            return new Response(
+              JSON.stringify({ error: 'Failed to credit wallet' }),
+              {
+                status: 500,
+                headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+              }
+            );
+          }
         }
+
 
         console.log('Provider wallet credited successfully');
       }
