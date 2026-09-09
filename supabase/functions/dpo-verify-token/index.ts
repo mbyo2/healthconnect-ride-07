@@ -68,11 +68,36 @@ Deno.serve(async (req) => {
       .select()
       .maybeSingle();
 
+    // Money confirmed by DPO — book it into the platform ledger and wallets.
+    let settlement: unknown = null;
+    if (status === 'paid' && updated) {
+      const alreadySettled = (updated.metadata as any)?.settlement?.settled === true;
+      if (!alreadySettled) {
+        settlement = await settlePayment(admin as any, {
+          gateway: 'dpo',
+          externalRef: transToken,
+          payerId: updated.user_id,
+          amount: Number(updated.amount),
+          currency: updated.currency || 'ZMW',
+          referenceType: updated.reference_type,
+          referenceId: updated.reference_id,
+          description: (updated.metadata as any)?.description,
+        });
+        await admin
+          .from('dpo_payments')
+          .update({ metadata: { ...(updated.metadata as any ?? {}), settlement } })
+          .eq('id', updated.id);
+      } else {
+        settlement = (updated.metadata as any).settlement;
+      }
+    }
+
     return new Response(JSON.stringify({
       status,
       code: result,
       message: resultExplanation,
       payment: updated,
+      settlement,
     }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   } catch (e) {
     console.error('dpo-verify-token error', e);
