@@ -223,11 +223,44 @@ serve(async (req) => {
           p_transaction_type: 'credit',
           p_amount: payment.amount,
           p_description: `PayPal wallet top-up - ${payment.invoice_number}`,
-          p_reference_id: payment.id
+          p_payment_id: payment.id
         });
 
         if (walletError) {
           console.error('Error crediting wallet:', walletError);
+        }
+      } else {
+        // Real money received: pay out the provider / pharmacy / institution
+        // share and the platform fee. Idempotent via payment_splits.
+        const { data: existingSplits } = await supabaseClient
+          .from('payment_splits')
+          .select('id')
+          .eq('payment_id', payment.id)
+          .limit(1);
+
+        if (!existingSplits || existingSplits.length === 0) {
+          const { data: institution } = await supabaseClient
+            .from('healthcare_institutions')
+            .select('id, type')
+            .eq('id', payment.provider_id)
+            .maybeSingle();
+
+          const isPharmacy =
+            (institution?.type || '').toLowerCase().includes('pharmac') ||
+            (payment.metadata as any)?.reference_type === 'order' ||
+            (payment.metadata as any)?.reference_type === 'pharmacy_sale';
+
+          const { error: splitError } = await supabaseClient.rpc('process_payment_with_splits', {
+            p_payment_id: payment.id,
+            p_total_amount: payment.amount,
+            p_provider_id: institution ? null : payment.provider_id,
+            p_institution_id: institution ? institution.id : null,
+            p_payment_type: isPharmacy ? 'pharmacy' : 'consultation'
+          });
+
+          if (splitError) {
+            console.error('Error settling payment splits:', splitError);
+          }
         }
       }
 
