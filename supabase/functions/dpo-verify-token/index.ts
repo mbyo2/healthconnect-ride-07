@@ -1,5 +1,6 @@
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 import { createClient } from 'npm:@supabase/supabase-js@2';
+import { settlePayment } from '../_shared/settle.ts';
 
 const DPO_API_URL = Deno.env.get('DPO_API_URL') || 'https://secure.3gdirectpay.com/API/v6/';
 const DPO_COMPANY_TOKEN = Deno.env.get('DPO_COMPANY_TOKEN')!;
