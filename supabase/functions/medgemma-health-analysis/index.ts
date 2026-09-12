@@ -181,44 +181,18 @@ Provide:
         throw new Error('Invalid analysis type');
     }
 
-    console.log('Calling HuggingFace chat completions API for health analysis...');
+    console.log("Calling Doc' O Clock AI for health analysis...");
 
-    // Use HuggingFace OpenAI-compatible chat completions endpoint
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 55000);
+    const { text: analysis } = await chatComplete({
+      messages: [
+        { role: 'system', content: systemContext },
+        { role: 'user', content: userPrompt }
+      ],
+      maxTokens: 1200,
+      temperature: 0.3,
+      topP: 0.9,
+    });
 
-    let response: Response;
-    try {
-      response = await fetch(aiProvider!.endpoint, {
-        method: 'POST',
-        headers: {
-          ...aiProvider!.headers,
-        },
-        body: JSON.stringify({
-          model: aiProvider!.model,
-          messages: [
-            { role: 'system', content: systemContext },
-            { role: 'user', content: userPrompt }
-          ],
-          max_tokens: 1000,
-          temperature: 0.3,
-          top_p: 0.9,
-          stream: false,
-        }),
-        signal: controller.signal,
-      });
-    } finally {
-      clearTimeout(timeoutId);
-    }
-
-    if (!response.ok) {
-      const errText = await response.text();
-      console.error('HuggingFace API error:', response.status, errText);
-      throw new Error(`HuggingFace API error: ${response.status}`);
-    }
-
-    const responseData = await response.json();
-    const analysis = responseData?.choices?.[0]?.message?.content || 'No analysis generated.';
 
     // Parse and structure the response
     const structuredResponse = {
