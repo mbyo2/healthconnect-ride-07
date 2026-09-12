@@ -93,27 +93,14 @@ CRITICAL: If symptoms suggest emergency (chest pain, difficulty breathing, sever
             { role: 'user', content: message }
         ];
 
-        console.log(`Calling Doc' O Clock AI (${aiProvider.provider})...`);
+        console.log(`Calling Doc' O Clock AI...`);
 
-        const response = await fetch(aiProvider.endpoint, {
-            method: 'POST',
-            headers: aiProvider.headers,
-            body: JSON.stringify({
-                model: aiProvider.model,
-                messages,
-                temperature: 0.4,
-                max_tokens: 800,
-            }),
+        const { text: reply } = await chatComplete({
+            messages: messages as any,
+            temperature: 0.4,
+            maxTokens: 800,
         });
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error('AI provider error:', response.status, errorText);
-            throw new Error(`AI provider error: ${response.status}`);
-        }
-
-        const data = await response.json();
-        const reply = data?.choices?.[0]?.message?.content || 'No response generated';
 
         console.log('Med AI response generated');
 
