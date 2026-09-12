@@ -123,46 +123,13 @@ Provide a comprehensive analysis including:
       }
     ];
 
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 55000);
+    const { text: analysis } = await chatComplete({
+      messages,
+      maxTokens: 2500,
+      temperature: 0.3,
+      topP: 0.95,
+    });
 
-    let response: Response;
-    try {
-      response = await fetch(aiProvider!.endpoint, {
-        method: 'POST',
-        headers: {
-          ...aiProvider!.headers,
-        },
-        body: JSON.stringify({
-          model: aiProvider!.model,
-          messages,
-          max_tokens: 2500,
-          temperature: 0.3,
-          top_p: 0.95,
-          stream: false,
-        }),
-        signal: controller.signal,
-      });
-    } finally {
-      clearTimeout(timeoutId);
-    }
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('HuggingFace API error:', response.status, errorText);
-      
-      if (response.status === 429) {
-        return new Response(
-          JSON.stringify({ error: 'Rate limit exceeded. Please try again later.' }),
-          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-      
-      throw new Error(`AI gateway error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    const analysis: string = data?.choices?.[0]?.message?.content || 'No analysis generated';
 
     console.log('3D imaging analysis completed');
 
