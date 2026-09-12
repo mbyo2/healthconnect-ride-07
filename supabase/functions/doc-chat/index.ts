@@ -565,27 +565,14 @@ serve(async (req: Request) => {
     // so those go through the Lovable AI gateway when it is available.
     const useVisionGateway = Boolean(image && LOVABLE_API_KEY);
 
-    if (aiProvider && !useVisionGateway) {
-      console.log(`Calling Doc' O Clock AI (${aiProvider.provider})...`);
-      const response = await fetch(aiProvider.endpoint, {
-        method: 'POST',
-        headers: aiProvider.headers,
-        body: JSON.stringify({
-          model: aiProvider.model,
-          messages,
-          temperature: 0.4,
-          max_tokens: 1200,
-        }),
+    if (!useVisionGateway) {
+      const result = await chatComplete({
+        messages: messages as any,
+        temperature: 0.4,
+        maxTokens: 1200,
       });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('AI provider error:', response.status, errorText);
-        throw new Error(`AI provider error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      reply = data?.choices?.[0]?.message?.content || 'No response generated';
+      console.log(`Doc' O Clock AI replied via ${result.provider}/${result.model}`);
+      reply = result.text;
     } else {
       console.log('Calling Lovable AI gateway (vision)...');
       const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
@@ -605,12 +592,13 @@ serve(async (req: Request) => {
       if (!response.ok) {
         const errorText = await response.text();
         console.error('Lovable AI error:', response.status, errorText);
-        throw new Error(`AI gateway error: ${response.status}`);
+        throw new AIError('The assistant is temporarily unavailable.', response.status);
       }
 
       const data = await response.json();
-      reply = data?.choices?.[0]?.message?.content || 'No response generated';
+      reply = extractAIText(data) || 'No response generated';
     }
+
 
 
     console.log('Doc 0 Clock response generated');
