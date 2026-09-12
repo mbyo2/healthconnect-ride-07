@@ -17,15 +17,21 @@ serve(async (req) => {
     });
   }
 
+  let requested: string | undefined;
+  try {
+    requested = (await req.json())?.model;
+  } catch { /* ignore */ }
+
   const res = await fetch(provider.endpoint, {
     method: "POST",
     headers: provider.headers,
     body: JSON.stringify({
-      model: provider.model,
+      model: requested || provider.model,
       messages: [{ role: "user", content: "Say OK" }],
-      max_tokens: 20,
+      max_tokens: 200,
     }),
   });
+
   const text = await res.text();
 
   return new Response(
