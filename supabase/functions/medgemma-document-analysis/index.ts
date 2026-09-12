@@ -1,4 +1,4 @@
-import { resolveAIProvider, AI_MODEL_LABEL } from '../_shared/ai.ts';
+import { resolveAIProvider, chatComplete, AIError, AI_MODEL_LABEL } from '../_shared/ai.ts';
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
@@ -175,46 +175,13 @@ Note: Please analyze this medical document and extract the requested information
       }
     ];
 
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 55000);
+    const { text: extractedData } = await chatComplete({
+      messages,
+      maxTokens: 2000,
+      temperature: 0.2,
+      topP: 0.9,
+    });
 
-    let response: Response;
-    try {
-      response = await fetch(aiProvider!.endpoint, {
-        method: 'POST',
-        headers: {
-          ...aiProvider!.headers,
-        },
-        body: JSON.stringify({
-          model: aiProvider!.model,
-          messages,
-          max_tokens: 2000,
-          temperature: 0.2,
-          top_p: 0.9,
-          stream: false,
-        }),
-        signal: controller.signal,
-      });
-    } finally {
-      clearTimeout(timeoutId);
-    }
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('HuggingFace API error:', response.status, errorText);
-      
-      if (response.status === 429) {
-        return new Response(
-          JSON.stringify({ error: 'Rate limit exceeded. Please try again later.' }),
-          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-      
-      throw new Error(`AI gateway error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    const extractedData: string = data?.choices?.[0]?.message?.content || 'No data extracted';
 
     console.log('Document analysis completed');
 
