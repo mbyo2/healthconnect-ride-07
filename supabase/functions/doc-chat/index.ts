@@ -621,7 +621,7 @@ serve(async (req: Request) => {
       JSON.stringify({
         reply,
         timestamp: new Date().toISOString(),
-        model: 'gemini-2.5-flash'
+        model: AI_MODEL_LABEL
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -629,8 +629,14 @@ serve(async (req: Request) => {
       }
     );
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error in Doc 0 Clock chat:', error);
+    if (error?.name === 'AIError') {
+      return new Response(
+        JSON.stringify({ error: error.message }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: error.status >= 400 && error.status < 600 ? error.status : 503 }
+      );
+    }
     return new Response(
       JSON.stringify({ error: 'An internal error occurred' }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
