@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
-import { resolveAIProvider, AI_MODEL_LABEL } from '../_shared/ai.ts';
+import { resolveAIProvider, chatComplete, AI_MODEL_LABEL } from '../_shared/ai.ts';
 
 const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -116,17 +116,17 @@ CRITICAL: If symptoms suggest emergency (chest pain, difficulty breathing, sever
             }
         );
 
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error in Med AI:', error);
 
+        const status = error?.name === 'AIError' && error.status >= 400 && error.status < 600 ? error.status : 500;
         return new Response(
             JSON.stringify({
-                error: 'An error occurred processing your request',
-                
+                error: error?.name === 'AIError' ? error.message : 'An error occurred processing your request',
             }),
             {
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-                status: 500
+                status
             }
         );
     }

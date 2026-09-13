@@ -1,4 +1,4 @@
-import { resolveAIProvider, AI_MODEL_LABEL } from '../_shared/ai.ts';
+import { resolveAIProvider, chatComplete, AI_MODEL_LABEL } from '../_shared/ai.ts';
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
@@ -176,64 +176,31 @@ CRITICAL: If symptoms suggest emergency, immediately advise to call emergency se
         : message
     });
 
-    console.log('Calling HuggingFace chat completions API for MedGemma...');
+    console.log("Calling Doc' O Clock AI for chat...");
 
-    // Use the HuggingFace OpenAI-compatible chat completions endpoint
-    const HF_CHAT_ENDPOINT = aiProvider!.endpoint;
-
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 55000); // 55s timeout
-
-    let response: Response;
+    let reply: string;
     try {
-      response = await fetch(HF_CHAT_ENDPOINT, {
-        method: 'POST',
-        headers: {
-          ...aiProvider!.headers,
-        },
-        body: JSON.stringify({
-          model: aiProvider!.model,
-          messages: formattedMessages,
-          max_tokens: 2000,
-          temperature: 0.3,
-          top_p: 0.95,
-          stream: false,
-        }),
-        signal: controller.signal,
+      const result = await chatComplete({
+        messages: formattedMessages,
+        maxTokens: 2000,
+        temperature: 0.3,
+        topP: 0.95,
       });
-    } finally {
-      clearTimeout(timeoutId);
-    }
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('HuggingFace API error:', response.status, errorText);
-
-      if (response.status === 429) {
-        return new Response(
-          JSON.stringify({ error: 'Rate limit exceeded. Please try again later.', fallback: true }),
-          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-
-      if (response.status === 503) {
-        return new Response(
-          JSON.stringify({ error: 'AI model is loading, please try again in a moment.', fallback: true }),
-          { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-
-      // Signal to client to try fallback
+      reply = result.text;
+      console.log(`Reply generated via ${result.provider}/${result.model}`);
+    } catch (aiError: any) {
+      const status = aiError?.name === 'AIError' && aiError.status >= 400 && aiError.status < 600
+        ? aiError.status
+        : 502;
       return new Response(
-        JSON.stringify({ error: `AI gateway error: ${response.status}`, fallback: true }),
-        { status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({
+          error: aiError?.message || 'The assistant is temporarily unavailable.',
+          fallback: true,
+        }),
+        { status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    const data = await response.json();
-
-    // HuggingFace OpenAI-compatible API returns choices[0].message.content
-    const reply: string = data?.choices?.[0]?.message?.content || 'No response generated.';
 
     console.log('MedGemma chat response generated successfully');
 
