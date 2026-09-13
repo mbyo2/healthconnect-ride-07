@@ -116,17 +116,17 @@ CRITICAL: If symptoms suggest emergency (chest pain, difficulty breathing, sever
             }
         );
 
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error in Med AI:', error);
 
+        const status = error?.name === 'AIError' && error.status >= 400 && error.status < 600 ? error.status : 500;
         return new Response(
             JSON.stringify({
-                error: 'An error occurred processing your request',
-                
+                error: error?.name === 'AIError' ? error.message : 'An error occurred processing your request',
             }),
             {
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-                status: 500
+                status
             }
         );
     }
