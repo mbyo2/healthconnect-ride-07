@@ -1,103 +1,75 @@
-# Device Bridge + Full Role Workflow Sweep
+# Launch Readiness Plan — Doc' O Clock
 
-`patient_triage_sessions` is already live in the database, so no migration is needed. This plan covers the two remaining tracks.
+The app builds cleanly and there are no type errors. What is left is real-money setup, messaging setup, a role-by-role workflow pass, and a short list of unfinished items.
 
-## Track A — `/device-bridge` Node package
+## 1. Blockers that need something from you
 
-A standalone Node package (installed on-site at the hospital / diagnostic center) that speaks the native protocols of medical devices and forwards normalized readings to Doc'O Clock via Supabase.
+These cannot be finished from inside the app.
 
-### Package layout
+| Item | What is needed |
+|------|----------------|
+| Live DPO account | Live company token + service type (the current ones are the sandbox pair). Until then no real money moves. |
+| Live PayPal account | Live client ID and secret (currently sandbox). |
+| Text messages (SMS) | An SMS provider account. Reminders, OTP and critical-result texts currently go nowhere. |
+| Email | An email sending key. Receipts, invitations, appointment confirmations currently do not send. |
+| Leaked-password protection | One toggle in the Supabase dashboard: Authentication → Providers → Password settings. |
+| Login/redirect URLs | Set doc0clock.online as the site URL and allowed redirect in Supabase, so sign-in works on the live domain. |
+| Domain routing | On the host: doc0clock.online as primary with no redirect; www redirects to it. |
 
-```text
-device-bridge/
-  package.json          ── name: @doc-o-clock/device-bridge
-  README.md
-  .env.example          ── SUPABASE_URL, SUPABASE_SERVICE_ROLE, INSTITUTION_ID, BRIDGE_TOKEN
-  src/
-    index.ts            ── CLI entry, loads adapters, opens listeners
-    config.ts           ── loads .env and device manifest
-    supabase.ts         ── service-role client, insert into device_data_feeds + device_alerts
-    normalizer.ts       ── vendor payload → canonical { device_id, metric, value, unit, ts, patient_id? }
-    adapters/
-      hl7-mllp.ts       ── TCP MLLP listener (0x0B/0x1C/0x0D framing), parses ORU^R01
-      philips-intellivue.ts   ── IntelliVue Data Export (serial/TCP)
-      ge-carescape.ts   ── Unity Network / S/5 protocol
-      draeger-medibus.ts── Dräger Medibus over serial
-      nihon-kohden.ts   ── OrgNet gateway (HL7 wrapper)
-      mindray-benevision.ts   ── HL7 v2.4
-      welch-allyn.ts    ── Connex Spot / VSM over BLE + HL7
-    devices.json        ── per-site device inventory (IP, port, brand, model, room)
-  tests/                ── vitest with fixture HL7 messages
-```
+I will ask for each credential one at a time, with instructions on where to get it, and store it securely.
 
-### Supported brands & protocols (Phase 1)
+## 2. Payments — finish end to end
 
-| Brand | Model family | Transport | Payload |
-|-------|--------------|-----------|---------|
-| Philips | IntelliVue MX/MP | TCP or RS-232 | IntelliVue Data Export XML |
-| GE Healthcare | CARESCAPE B450/B650/B850 | TCP | Unity Network HL7 v2.4 |
-| Dräger | Infinity, Evita, Perseus | RS-232 | Medibus / Medibus.X |
-| Nihon Kohden | Life Scope | TCP | HL7 v2.4 via OrgNet |
-| Mindray | BeneVision N-series | TCP | HL7 v2.4 |
-| Welch Allyn | Connex VSM, Spot LXi | TCP + Bluetooth | HL7 v2.4 |
+- Switch DPO and PayPal to live mode behind a single environment flag so sandbox stays testable.
+- Full test of every paying path: consultation booking, pharmacy order, wallet top-up, hospital/pharmacy subscription fee, refund.
+- Confirm each payment lands as: platform fee + exactly one payee (provider or pharmacy), matching the pricing page (K30–K120 per booking, K0 to list; pharmacy K200/mo or K2,000/yr with 2.5% per order; hospitals free listing, monthly fee).
+- Receipts generated and downloadable after every successful payment.
+- Prepare Lenco as a third payment engine so it can become the default later.
 
-Fallback for everything else: raw HL7/MLLP on TCP 2575.
+## 3. Role-by-role workflow pass
 
-### Data flow
+Walk every screen for every role against the live app, complete the headline journey, fix whatever breaks, and record the result:
 
-```text
-[Device] --HL7/vendor--> [device-bridge on-site]
-    -> normalizer.ts (vendor → canonical)
-    -> supabase.insert('device_data_feeds', {...})
-       + supabase.insert('device_alerts', ...) when out-of-range
-       + realtime channel push for live dashboards
-```
+1. Patient — register, book, pay, video visit, prescription, results
+2. Doctor / specialist — queue, notes, prescription, interaction warning, referral
+3. Nurse — vitals, medication administration, rounds
+4. Pharmacist — order in, dispense, stock, expiry alerts
+5. Lab / pathology / radiology — order, sample, result, critical-result alert
+6. Facility admin — staff, services, pricing, billing, reports
+7. Solo provider — availability, bookings, earnings
+8. Admin and superadmin — approvals, verification, plans, platform reports
 
-Uses the existing `device_data_feeds` and `device_alerts` tables. No new tables needed.
+Each role gets a pass/fail row with screenshots and no console errors left behind.
 
-### Deliverables
+## 4. Known unfinished items to close
 
-1. `device-bridge/` package with `hl7-mllp` and the six vendor adapters (adapters share a common `DeviceAdapter` interface).
-2. `docker-compose.yml` so on-site IT can run `docker compose up -d`.
-3. `docs/DEVICE_BRIDGE.md` — pairing steps: how to register a device in Doc'O Clock (Institution → Devices), copy the `BRIDGE_TOKEN`, and drop it in `.env`.
-4. Vitest suite covering HL7 parsing, MLLP framing, and canonical normalization.
+- Business profile form: one section of the institution form has a broken layout that needs tidying.
+- Remaining hardcoded values in a handful of hospital modules to switch to live records.
+- Empty-state and "do this first" guidance on any screen that still shows a dead button.
+- Approval badge visible on every public listing so patients can see a facility was approved.
+- Notification centre: make sure in-app, push, email and SMS all fire from the same events.
+- Cleanup: remove leftover audit and status markdown files from the project root.
 
-## Track B — Role-by-role workflow sweep
+## 5. Pre-launch checks
 
-For each role, walk every navigable page, run the primary workflow end-to-end against the live app with Playwright, fix any breakage found, and record the pass in `docs/RELEASE_QA.md`.
+- Mobile pass on phone and tablet widths for the busiest screens.
+- Speed pass: first load under two seconds on the landing, dashboard and booking pages.
+- Accessibility pass: labels, contrast, keyboard navigation.
+- Titles, descriptions, sitemap and robots for the public pages.
+- Final security scan with no unresolved findings.
+- Seeded demo facility so the hospital can trial the system with realistic data.
 
-Roles covered (in this order):
+## Suggested order
 
-1. Patient
-2. Doctor / Specialist
-3. Nurse
-4. Pharmacist + Pharmacy staff
-5. Lab technician + Pathologist + Radiologist
-6. Institution admin (Hospital / Clinic / Diagnostic Center)
-7. Solo Provider
-8. Admin
-9. Superadmin
+1. Payments live + messaging keys (needs your credentials)
+2. Unfinished items in section 4
+3. Role-by-role pass with fixes
+4. Pre-launch checks, then publish
 
-For each role I will:
+## Technical notes
 
-- Log in, hit every menu item, capture a screenshot per screen.
-- Complete the headline workflow (e.g. Doctor → open appointment → write prescription → drug interaction check fires → MAR entry → discharge).
-- File and fix any runtime error, RLS denial, missing empty-state, or broken CTA on the spot.
-- Verify realtime updates on the counterpart role (patient sees the prescription immediately, etc.).
-
-Exit criteria: every role has a green row in `docs/RELEASE_QA.md` with the screenshot bundle and no unresolved console errors.
-
-## Technical details
-
-- Device bridge is a **separate Node package**, not part of the Vite app. It talks to Supabase over service-role with a per-institution `BRIDGE_TOKEN` header (validated by a small `device-bridge-ingest` edge function that maps token → `institution_id` before allowing the insert).
-- New edge function `device-bridge-ingest` (auth: `verify_jwt = false`, validates `x-bridge-token`) so the bridge never ships the raw service role key to on-site machines.
-- HL7 parsing uses `simple-hl7` (MIT, actively maintained). MLLP framing is implemented directly (~30 LOC) rather than pulling a heavier dep.
-- Playwright QA runs headless in the sandbox against `http://localhost:8080` using the injected Supabase session; per-role sessions are minted through the existing `LOVABLE_BROWSER_SUPABASE_*` flow.
-- No schema changes. `device_data_feeds`, `device_alerts`, `iot_devices`, and `institution_devices` already cover the ingest side.
-
-## Order of execution
-
-1. `device-bridge-ingest` edge function + token check (small, unblocks the package).
-2. `device-bridge/` package with `hl7-mllp` + Philips + GE adapters, tests, Docker.
-3. Remaining four vendor adapters.
-4. Role sweep (patient → superadmin), fixing issues as they surface.
+- Live/sandbox switching via a `PAYMENTS_MODE` secret read in the DPO and PayPal edge functions; no code branches duplicated per provider.
+- Settlement stays centralised in `_shared/settle.ts` → `process_payment_with_splits`, idempotent on the gateway reference.
+- Lenco added as another adapter behind the same settle contract.
+- Role pass driven headless against `http://localhost:8080` with per-role sessions, results logged in `docs/RELEASE_QA.md`.
+- AI stays on the shared `_shared/ai.ts` chain (OpenRouter primary, fallbacks already wired).
