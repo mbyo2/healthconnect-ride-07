@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -64,58 +65,9 @@ const FILTER_TABS = [
   { key: 'nursing_home',     label: 'Nursing Homes' },
 ];
 
-// Sample data used only when the database returns nothing
-const SAMPLE_INSTITUTIONS: Institution[] = [
-  {
-    id: 'sample-1',
-    name: "Doc' O Clock Central Hospital",
-    institution_type: 'hospital',
-    location: 'Great East Road, Lusaka',
-    phone: '+260 97 1234567',
-    is_verified: true,
-    services_offered: ['Emergency Care', 'ICU / Critical Care', 'Surgery', 'Specialist Clinics'],
-    equipment_available: ['MRI Scanner', 'CT Scanner', 'Ventilators', 'ICU Equipment'],
-    languages_spoken: ['English', 'Bemba', 'Nyanja'],
-    emergency_services: true,
-    ambulance_services: true,
-    is_24_7: true,
-    number_of_beds: 250,
-  },
-  {
-    id: 'sample-2',
-    name: 'CarePoint Community Pharmacy',
-    institution_type: 'pharmacy',
-    location: 'Cairo Road, Lusaka',
-    phone: '+260 96 2345678',
-    is_verified: true,
-    services_offered: ['Pharmacy', 'Outpatient Care'],
-    languages_spoken: ['English', 'Nyanja'],
-    is_24_7: false,
-  },
-  {
-    id: 'sample-3',
-    name: 'Apex Diagnostic & Molecular Lab',
-    institution_type: 'laboratory',
-    location: 'Kabulonga, Lusaka',
-    phone: '+260 95 3456789',
-    is_verified: true,
-    services_offered: ['Laboratory Services', 'Radiology & Imaging'],
-    equipment_available: ['CT Scanner', 'X-Ray Machine', 'Laboratory Equipment'],
-    languages_spoken: ['English'],
-    accreditation_body: 'HPCZ',
-  },
-  {
-    id: 'sample-4',
-    name: 'Woodlands Family Health Clinic',
-    institution_type: 'clinic',
-    location: 'Woodlands, Lusaka',
-    phone: '+260 97 4567890',
-    is_verified: true,
-    services_offered: ['General Practice', 'Pediatrics', 'Maternity & Obstetrics'],
-    languages_spoken: ['English', 'Bemba'],
-    telemedicine_available: true,
-  },
-];
+// NOTE: no sample/fake facilities — the directory only ever shows real,
+// verified, marketplace-listed institutions. An empty result renders an
+// honest empty state (see below), never invented hospitals.
 
 // ── component ─────────────────────────────────────────────────────────────────
 
@@ -144,7 +96,6 @@ export const HealthcareInstitutions = () => {
           ambulance_services,
           is_24_7,
           number_of_beds,
-          telemedicine_available,
           accreditation_body
         `)
         .eq('list_in_marketplace', true)
@@ -171,15 +122,15 @@ export const HealthcareInstitutions = () => {
         ambulance_services: item.ambulance_services ?? false,
         is_24_7: item.is_24_7 ?? false,
         number_of_beds: item.number_of_beds,
-        telemedicine_available: item.telemedicine_available ?? false,
+        telemedicine_available: (item as any).telemedicine_available ?? false,
         accreditation_body: item.accreditation_body,
       }));
 
-      setInstitutions(mapped.length > 0 ? mapped : SAMPLE_INSTITUTIONS);
+      setInstitutions(mapped);
     } catch (error) {
       console.error('Error fetching institutions:', error);
       toast.error('Failed to load healthcare institutions');
-      setInstitutions(SAMPLE_INSTITUTIONS);
+      setInstitutions([]);
     } finally {
       setLoading(false);
     }
@@ -207,6 +158,14 @@ export const HealthcareInstitutions = () => {
 
   return (
     <div className="min-h-screen bg-[#f5f7fa] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pb-20">
+      <Helmet>
+        <title>Hospitals, Clinics & Pharmacies in Zambia | Doc' O Clock</title>
+        <meta
+          name="description"
+          content="Explore accredited hospitals, clinics, pharmacies, and laboratories across Zambia. Check services, emergency care, beds, and book appointments."
+        />
+        <link rel="canonical" href="https://doc0clock.online/healthcare-institutions" />
+      </Helmet>
 
       {/* ── Hero Banner ── */}
       <div className="bg-[#0f172a] text-white border-b border-slate-800 px-4 sm:px-6 py-10 sm:py-14">

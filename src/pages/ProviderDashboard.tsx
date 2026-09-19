@@ -23,6 +23,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { format, startOfWeek, endOfWeek } from "date-fns";
 import { useCurrency } from "@/hooks/use-currency";
 import { useUserRoles } from "@/context/UserRolesContext";
+import { ROLE_META } from "@/config/roleConfig";
 import { useInstitutionAffiliation } from "@/hooks/useInstitutionAffiliation";
 import { toast } from "sonner";
 
@@ -377,16 +378,26 @@ export const ProviderDashboard = () => {
   const { availableRoles, isHealthPersonnel } = useUserRoles();
   const { isInstitutionAffiliated } = useInstitutionAffiliation();
 
-  const isDoctor = availableRoles.includes("doctor");
-  const isNurse = availableRoles.includes("nurse");
-  const isRadiologist = availableRoles.includes("radiologist");
-
+  // Dashboard identity follows the taxonomy — every cadre gets a named
+  // console derived from its role metadata, never a hardcoded trio.
   const dashboardMeta = useMemo(() => {
-    if (isRadiologist) return { title: "Radiologist Command Console", subtitle: "Diagnostic imaging reads, telemetry & MedGemma AI analysis" };
-    if (isNurse) return { title: "Nurse Triage Console", subtitle: "Ward rounds, vitals telemetry & home visits" };
-    if (isDoctor) return { title: "Clinical Doctor Dashboard", subtitle: "Consultations, digital prescriptions & patient triage queue" };
-    return { title: "Healthcare Provider Workspace", subtitle: "Practice management, patient queue & telehealth" };
-  }, [isDoctor, isNurse, isRadiologist]);
+    const subtitleByCategory: Record<string, string> = {
+      clinical: "Consultations, digital prescriptions & patient triage queue",
+      nursing: "Ward rounds, vitals telemetry & home visits",
+      allied: "Sessions, care plans & patient queue",
+      community: "Field visits, household screening & referrals",
+      pharmacy: "Dispensing, stock & patient counselling",
+      lab: "Test queue, results & verification",
+    };
+    const pick = availableRoles
+      .map((r) => ROLE_META[r as keyof typeof ROLE_META])
+      .find((m) => m && m.category !== 'patient' && m.category !== 'admin' && m.category !== 'institution');
+    if (!pick) return { title: "Healthcare Provider Workspace", subtitle: "Practice management, patient queue & telehealth" };
+    return {
+      title: `${pick.label} Console`,
+      subtitle: subtitleByCategory[pick.category] || "Practice management, patient queue & telehealth",
+    };
+  }, [availableRoles]);
 
   const { data: todayAppointments = [] } = useQuery({
     queryKey: ["provider-today-appointments"],
@@ -410,18 +421,28 @@ export const ProviderDashboard = () => {
       if (!user) return { total: 0, completed: 0, pending: 0, revenue: 0 };
       const weekStart = format(startOfWeek(today, { weekStartsOn: 1 }), "yyyy-MM-dd");
       const weekEnd = format(endOfWeek(today, { weekStartsOn: 1 }), "yyyy-MM-dd");
-      const { data } = await supabase
-        .from("appointments")
-        .select("id, status")
-        .eq("provider_id", user.id)
-        .gte("date", weekStart)
-        .lte("date", weekEnd);
+      const [{ data }, { data: paidRows }] = await Promise.all([
+        supabase
+          .from("appointments")
+          .select("id, status")
+          .eq("provider_id", user.id)
+          .gte("date", weekStart)
+          .lte("date", weekEnd),
+        // Real collected revenue from the payments ledger.
+        supabase
+          .from("payments")
+          .select("amount")
+          .eq("provider_id", user.id)
+          .in("status", ["paid", "completed"])
+          .gte("created_at", weekStart)
+          .lte("created_at", weekEnd),
+      ]);
       const appointments = data || [];
       return {
         total: appointments.length,
         completed: appointments.filter(a => a.status === "completed").length,
         pending: appointments.filter(a => a.status === "scheduled").length,
-        revenue: appointments.filter(a => a.status === "completed").length * 150,
+        revenue: (paidRows || []).reduce((s: number, p: any) => s + (Number(p.amount) || 0), 0),
       };
     },
   });

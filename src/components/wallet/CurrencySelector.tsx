@@ -4,7 +4,7 @@ import { Globe } from "lucide-react";
 import { useCurrency, SUPPORTED_CURRENCIES } from "@/hooks/use-currency";
 
 export const CurrencySelector = () => {
-  const { currency, setCurrency, detectedCountry } = useCurrency();
+  const { currency, setCurrency, ratesLive, ratesUpdatedAt } = useCurrency();
 
   return (
     <div className="space-y-2">
@@ -24,11 +24,12 @@ export const CurrencySelector = () => {
           ))}
         </SelectContent>
       </Select>
-      {detectedCountry && (
-        <p className="text-xs text-muted-foreground">
-          Auto-detected from your location ({detectedCountry})
-        </p>
-      )}
+      <p className="text-xs text-muted-foreground">
+        All charges settle in Zambian Kwacha (ZMW)
+        {ratesLive && ratesUpdatedAt
+          ? ` · live bank rates updated ${new Date(ratesUpdatedAt).toLocaleDateString()}`
+          : ' · live rates loading…'}
+      </p>
     </div>
   );
 };

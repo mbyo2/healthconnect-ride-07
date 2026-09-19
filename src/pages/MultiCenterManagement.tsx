@@ -530,7 +530,7 @@ export const MultiCenterManagement = () => {
                 </SelectTrigger>
                 <SelectContent>
                   {/* This would be populated with available institutions */}
-                  <SelectItem value="placeholder">Select institution</SelectItem>
+                  <SelectItem value="placeholder" disabled>No institutions available yet</SelectItem>
                 </SelectContent>
               </Select>
             </div>

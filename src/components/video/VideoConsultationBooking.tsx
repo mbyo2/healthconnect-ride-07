@@ -11,12 +11,14 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Badge } from '@/components/ui/badge';
 import { useQuery } from '@tanstack/react-query';
 import { TIME_SLOTS, CONSULTATION_TYPES } from '@/config/videoConsultations';
-import { CalendarIcon, Clock, Video, User, DollarSign } from 'lucide-react';
+import { CalendarIcon, Clock, Video, User, DollarSign, Wallet, CreditCard } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { CONSULTABLE_PROVIDER_ROLES } from '@/config/roleConfig';
 import { useDPOPayment } from '@/hooks/useDPOPayment';
+import { useWalletPayment } from '@/hooks/useWalletPayment';
 import { useCurrency } from '@/hooks/use-currency';
 
 interface VideoConsultationBookingProps {
@@ -26,7 +28,7 @@ interface VideoConsultationBookingProps {
 export const VideoConsultationBooking = ({ onBookingComplete }: VideoConsultationBookingProps) => {
   const { user } = useAuth();
   const { redirectToCheckout, loading: paymentLoading } = useDPOPayment();
-  const { currency, formatPrice } = useCurrency();
+  const { formatPrice, convertForCharge } = useCurrency();
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [selectedTime, setSelectedTime] = useState('');
   const [selectedProvider, setSelectedProvider] = useState('');
@@ -34,22 +36,45 @@ export const VideoConsultationBooking = ({ onBookingComplete }: VideoConsultatio
   const [notes, setNotes] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  const { balance: walletBalance, paying: walletPaying, pay: payWithWallet } = useWalletPayment();
+  const [payMethod, setPayMethod] = useState<'dpo' | 'wallet'>('dpo');
+
+  const resetForm = () => {
+    setSelectedDate(undefined);
+    setSelectedTime('');
+    setSelectedProvider('');
+    setConsultationType('');
+    setNotes('');
+  };
+
   const { data: providers = [], isLoading: isLoadingProviders } = useQuery({
     queryKey: ['video-consultation-providers'],
     queryFn: async () => {
       if (!user) return [];
 
-      const { data, error } = await supabase
+      // Every consultable cadre (doctors, clinical officers, nurses,
+      // midwives, dentists, therapists…) — verified and still practising.
+      // neq(false) instead of eq(true) so legacy rows with NULL are kept.
+      const base = supabase
         .from('profiles')
-        .select('id, first_name, last_name, specialty')
-        .eq('role', 'health_personnel');
+        .select('id, first_name, last_name, specialty, telemedicine_available')
+        .in('role', CONSULTABLE_PROVIDER_ROLES as any)
+        .eq('is_verified', true)
+        .neq('accepting_patients', false)
+        .order('rating', { ascending: false, nullsFirst: false })
+        .limit(100);
 
+      const { data, error } = await base;
       if (error) {
         console.error('Error fetching providers for video consultation:', error);
         throw error;
       }
 
-      return data || [];
+      // Prefer clinicians who explicitly offer telemedicine, keep the rest
+      // as fallback so the list is never misleadingly empty.
+      const rows = data || [];
+      const withTele = rows.filter((p: any) => p.telemedicine_available);
+      return withTele.length > 0 ? withTele : rows;
     },
     enabled: !!user,
   });
@@ -89,9 +114,15 @@ export const VideoConsultationBooking = ({ onBookingComplete }: VideoConsultatio
     try {
       const consultationData = consultationTypes.find(type => type.id === consultationType);
       const provider = providers.find((p: any) => p.id === selectedProvider);
-      
+
       if (!consultationData || !provider) {
         throw new Error('Invalid consultation type or provider');
+      }
+
+      if (payMethod === 'wallet' && walletBalance < consultationData.price) {
+        toast.error('Insufficient wallet balance — top up or choose DPO.');
+        setIsLoading(false);
+        return;
       }
 
       // Calculate end time
@@ -102,36 +133,57 @@ export const VideoConsultationBooking = ({ onBookingComplete }: VideoConsultatio
       const endDateTime = new Date(startDateTime);
       endDateTime.setMinutes(endDateTime.getMinutes() + consultationData.duration);
 
-      // Create video consultation record
+      // Create video consultation record (columns match the
+      // video_consultations table: no title/duration columns exist —
+      // that detail travels in notes + service_code).
+      const visitSummary =
+        `${consultationData.name} (${consultationData.duration} min) with ` +
+        `${provider.first_name || ''} ${provider.last_name || ''}`.trim();
       const { data, error } = await supabase
         .from('video_consultations')
         .insert({
           patient_id: user.id,
           provider_id: selectedProvider,
-          title: `${consultationData.name} with ${provider.first_name || ''} ${provider.last_name || ''}`.trim(),
           scheduled_start: startDateTime.toISOString(),
           scheduled_end: endDateTime.toISOString(),
           status: 'scheduled',
-          notes: notes || null,
-          duration: consultationData.duration,
-          service_code: (consultationData as any).serviceCode
-
+          notes: [visitSummary, notes?.trim()].filter(Boolean).join(' — ') || null,
+          service_code: (consultationData as any).serviceCode,
         })
         .select()
         .single();
 
       if (error) throw error;
 
-      toast.success('Consultation reserved — redirecting to secure payment…');
-
       if (onBookingComplete && data) {
         onBookingComplete(data.id);
       }
 
+      if (payMethod === 'wallet') {
+        // Instant settlement from the ZMW-denominated wallet — no redirect.
+        const ok = await payWithWallet({
+          amount: consultationData.price,
+          currency: 'ZMW',
+          providerId: selectedProvider,
+          serviceId: (consultationData as any).serviceCode,
+          description: `${consultationData.name} - Dr. ${provider.first_name || ''} ${provider.last_name || ''}`.trim(),
+        });
+        if (ok) {
+          toast.success('Consultation booked and paid from wallet.');
+          resetForm();
+        }
+        return;
+      }
+
+      toast.success('Consultation reserved — redirecting to secure payment…');
+
+      // Amount + currency must always travel as a converted pair so the
+      // gateway charges exactly what was displayed (ZMW-canonical price).
+      const charge = convertForCharge(consultationData.price);
       // Kick off DPO Pay hosted checkout for the consultation fee
       await redirectToCheckout({
-        amount: consultationData.price,
-        currency: currency,
+        amount: charge.amount,
+        currency: charge.currency,
         reference_type: 'consultation',
         reference_id: data?.id,
         description: `${consultationData.name} - Dr. ${provider.first_name || ''} ${provider.last_name || ''}`.trim(),
@@ -278,13 +330,42 @@ export const VideoConsultationBooking = ({ onBookingComplete }: VideoConsultatio
           </div>
         )}
 
-        <Button 
+        <div className="space-y-2">
+          <Label>Payment Method</Label>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => setPayMethod('dpo')}
+              className={`flex items-center justify-center gap-2 p-3 rounded-xl border text-xs font-bold transition-all ${payMethod === 'dpo' ? 'border-primary-500 bg-primary-50 text-primary-600' : 'border-canvas-silk text-graphite-500'}`}
+            >
+              <CreditCard className="h-4 w-4" /> Card / MoMo (DPO)
+            </button>
+            <button
+              type="button"
+              onClick={() => setPayMethod('wallet')}
+              className={`flex items-center justify-center gap-2 p-3 rounded-xl border text-xs font-bold transition-all ${payMethod === 'wallet' ? 'border-primary-500 bg-primary-50 text-primary-600' : 'border-canvas-silk text-graphite-500'}`}
+            >
+              <Wallet className="h-4 w-4" /> Wallet ({formatPrice(walletBalance)})
+            </button>
+          </div>
+          {payMethod === 'wallet' && selectedConsultationType && walletBalance < selectedConsultationType.price && (
+            <p className="text-xs font-medium text-error-500">
+              Insufficient balance — top up your wallet or pay with DPO.
+            </p>
+          )}
+        </div>
+
+        <Button
           onClick={handleBookConsultation}
-          disabled={!selectedDate || !selectedTime || !selectedProvider || !consultationType || isLoading || paymentLoading}
+          disabled={!selectedDate || !selectedTime || !selectedProvider || !consultationType || isLoading || paymentLoading || walletPaying}
           className="w-full"
           size="lg"
         >
-          {isLoading || paymentLoading ? 'Processing…' : `Book & Pay${selectedConsultationType ? ` ${formatPrice(selectedConsultationType.price)}` : ''}`}
+          {isLoading || paymentLoading || walletPaying
+            ? 'Processing…'
+            : payMethod === 'wallet'
+              ? `Book & Pay from Wallet${selectedConsultationType ? ` ${formatPrice(selectedConsultationType.price)}` : ''}`
+              : `Book & Pay${selectedConsultationType ? ` ${formatPrice(selectedConsultationType.price)}` : ''}`}
         </Button>
       </CardContent>
     </Card>

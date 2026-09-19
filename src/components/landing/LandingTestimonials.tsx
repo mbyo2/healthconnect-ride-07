@@ -67,7 +67,9 @@ export const Testimonials = () => {
             Verified Patient Reviews
           </div>
           <h2 className="font-display text-3xl sm:text-5xl font-medium text-midnight tracking-tight">
-            Loved by {formatStat(stats.patients)} Zambian patients
+            {stats.patients > 0
+              ? <>Loved by {formatStat(stats.patients)} Zambian patients</>
+              : <>Built for Zambian patients</>}
           </h2>
           <p className="text-base text-graphite-500 max-w-xl mx-auto font-normal mt-4 leading-relaxed tracking-wide">
             Real experiences from patients booking appointments in Lusaka, Ndola, Kitwe, and across Zambia.
@@ -117,7 +119,11 @@ export const Testimonials = () => {
             </div>
             <div className="text-center sm:text-left">
               <div className="font-medium text-midnight text-sm sm:text-base">4.9 / 5.0 Rating Across All App Stores</div>
-              <div className="text-xs text-graphite-400">Over {formatStat(stats.patients)} verified Zambian consultations</div>
+              <div className="text-xs text-graphite-400">
+                {stats.patients > 0
+                  ? <>Over {formatStat(stats.patients)} verified Zambian consultations</>
+                  : <>Verified Zambian consultations</>}
+              </div>
             </div>
           </div>
         </div>

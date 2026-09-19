@@ -281,7 +281,7 @@ export const EmergencyProtocols = () => {
       <Alert className="border-red-200 bg-red-50">
         <AlertTriangle className="h-4 w-4" />
         <AlertDescription className="text-red-800">
-          <strong>Important:</strong> In case of a life-threatening emergency, always call 911 immediately. 
+          <strong>Important:</strong> In case of a life-threatening emergency, always call 991 (or 112) immediately. 
           These protocols are for informational purposes and should not replace emergency medical services.
         </AlertDescription>
       </Alert>

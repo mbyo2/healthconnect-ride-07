@@ -16,6 +16,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { SupplierRatingCard } from "@/components/SupplierRatingCard";
+import { RatingDisplay } from "@/components/RatingDisplay";
 import { useInstitutionContext } from "@/hooks/useInstitutionContext";
 
 interface SupplierPerformance {
@@ -185,12 +187,6 @@ export const EnhancedInventory = () => {
     }
   };
 
-  const getRatingColor = (rating: number) => {
-    if (rating >= 4) return "text-[#00c875]";
-    if (rating >= 3) return "text-[#fdab3d]";
-    return "text-[#e44258]";
-  };
-
   if (loading) return <LoadingScreen />;
 
   if (!institution) {
@@ -338,14 +334,21 @@ export const EnhancedInventory = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
-              <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center justify-between mb-3">
                 <span className="text-[10px] font-extrabold text-[#676879] uppercase">Avg Supplier Rating</span>
                 <TrendingUp className="h-4 w-4 text-[#00c875]" />
               </div>
-              <div className={`text-2xl font-black font-mono ${getRatingColor(avgSupplierRating)}`}>
-                {avgSupplierRating.toFixed(1)}
+              <div className="space-y-2">
+                <RatingDisplay 
+                  rating={avgSupplierRating}
+                  size="lg"
+                  showLabel={true}
+                  showTrend={false}
+                />
               </div>
-              <div className="text-[10px] text-[#676879] font-bold mt-0.5">{supplierPerformance.length} suppliers</div>
+              <div className="text-[10px] text-[#676879] font-bold mt-3 pt-3 border-t border-[#e6e9ef] dark:border-slate-700">
+                {supplierPerformance.length} suppliers tracked
+              </div>
             </CardContent>
           </Card>
           <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
@@ -421,46 +424,19 @@ export const EnhancedInventory = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {supplierPerformance.map((supplier) => (
-                <Card key={supplier.id} className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-xl bg-[#0073ea] text-white flex items-center justify-center">
-                          <Truck className="h-5 w-5" />
-                        </div>
-                        <div>
-                          <CardTitle className="text-sm font-extrabold">{supplier.supplier?.name}</CardTitle>
-                          <div className="text-[10px] text-[#676879]">{supplier.supplier?.contact_person}</div>
-                        </div>
-                      </div>
-                      <div className={`text-2xl font-black font-mono ${getRatingColor(supplier.rating)}`}>
-                        {supplier.rating.toFixed(1)}
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="grid grid-cols-3 gap-2 text-center">
-                      <div className="rounded-lg bg-[#f0f2f7] dark:bg-slate-800 p-2">
-                        <div className="text-[10px] text-[#676879]">Delivery</div>
-                        <div className="text-sm font-bold text-[#00c875]">{(supplier.on_time_delivery_rate * 100).toFixed(0)}%</div>
-                      </div>
-                      <div className="rounded-lg bg-[#f0f2f7] dark:bg-slate-800 p-2">
-                        <div className="text-[10px] text-[#676879]">Quality</div>
-                        <div className="text-sm font-bold text-[#0073ea]">{supplier.quality_score.toFixed(1)}</div>
-                      </div>
-                      <div className="rounded-lg bg-[#f0f2f7] dark:bg-slate-800 p-2">
-                        <div className="text-[10px] text-[#676879]">Price</div>
-                        <div className="text-sm font-bold text-[#a25ddc]">{supplier.price_competitiveness.toFixed(1)}</div>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between text-xs pt-2 border-t border-[#e6e9ef] dark:border-slate-800">
-                      <span className="text-[#676879]">{supplier.total_orders} orders • {supplier.total_deliveries} deliveries</span>
-                      <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
-                        <Eye className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
+                <SupplierRatingCard
+                  key={supplier.id}
+                  id={supplier.id}
+                  supplierName={supplier.supplier?.name || "Unknown Supplier"}
+                  contactPerson={supplier.supplier?.contact_person}
+                  rating={supplier.rating}
+                  onTimeDeliveryRate={supplier.on_time_delivery_rate}
+                  qualityScore={supplier.quality_score}
+                  priceCompetitiveness={supplier.price_competitiveness}
+                  totalOrders={supplier.total_orders}
+                  totalDeliveries={supplier.total_deliveries}
+                  onViewDetails={() => console.log("View details for", supplier.id)}
+                />
               ))}
             </div>
           </TabsContent>

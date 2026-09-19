@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -15,6 +15,10 @@ interface Props {
   admissionId: string;
   patientId: string;
   onComplete?: () => void;
+  /** Reports clearance state upward so parents can gate actions.
+   *  `unavailable` is true when the checklist itself can't load —
+   *  parents should NOT deadlock discharge in that case. */
+  onStatusChange?: (allCleared: boolean, unavailable: boolean) => void;
 }
 
 interface ChecklistItem {
@@ -34,22 +38,23 @@ const checklistItems: ChecklistItem[] = [
   { key: 'billing_clearance', label: 'Billing Clearance', icon: DollarSign, clearedByField: 'billing_cleared_by', clearedAtField: 'billing_cleared_at' },
 ];
 
-export const DischargeChecklist = ({ hospital, admissionId, patientId, onComplete }: Props) => {
+export const DischargeChecklist = ({ hospital, admissionId, patientId, onComplete, onStatusChange }: Props) => {
   const queryClient = useQueryClient();
   const [staffName, setStaffName] = useState('');
 
-  const { data: checklist } = useQuery({
+  const { data: checklist, isError } = useQuery({
     queryKey: ['discharge-checklist', admissionId],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data, error: fetchError } = await supabase
         .from('discharge_checklists' as any)
         .select('*')
         .eq('admission_id', admissionId)
         .maybeSingle();
+      if (fetchError) throw fetchError;
 
       if (!data) {
         // Create checklist if not exists
-        const { data: newChecklist } = await supabase
+        const { data: newChecklist, error: insertError } = await supabase
           .from('discharge_checklists' as any)
           .insert({
             hospital_id: hospital.id,
@@ -58,12 +63,29 @@ export const DischargeChecklist = ({ hospital, admissionId, patientId, onComplet
           })
           .select()
           .single();
+        if (insertError) throw insertError;
         return newChecklist as any;
       }
       return data as any;
     },
     enabled: !!admissionId,
+    retry: 1,
   });
+
+  const allClearedNow = !!checklist?.all_cleared;
+  useEffect(() => {
+    onStatusChange?.(allClearedNow, isError);
+  }, [allClearedNow, isError, onStatusChange]);
+
+  if (isError) {
+    return (
+      <Card className="border-muted">
+        <CardContent className="pt-4 text-xs text-muted-foreground">
+          Discharge checklist is unavailable right now — discharge can still proceed and clearances can be recorded later.
+        </CardContent>
+      </Card>
+    );
+  }
 
   const toggleItem = async (key: string, clearedByField: string, clearedAtField: string) => {
     if (!checklist) return;

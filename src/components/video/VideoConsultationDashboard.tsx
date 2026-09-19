@@ -20,6 +20,7 @@ export const VideoConsultationDashboard = () => {
     queryFn: async () => {
       if (!user) throw new Error('Not authenticated');
 
+      // Both sides of the visit — providers see their own schedule too.
       const { data, error } = await supabase
         .from('video_consultations')
         .select(`
@@ -28,9 +29,13 @@ export const VideoConsultationDashboard = () => {
             first_name,
             last_name,
             specialty
+          ),
+          patient:profiles!video_consultations_patient_id_fkey(
+            first_name,
+            last_name
           )
         `)
-        .eq('patient_id', user.id)
+        .or(`patient_id.eq.${user.id},provider_id.eq.${user.id}`)
         .order('scheduled_start', { ascending: true });
 
       if (error) throw error;

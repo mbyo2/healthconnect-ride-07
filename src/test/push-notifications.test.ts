@@ -32,14 +32,16 @@ describe('PushNotificationService', () => {
         error: null,
       } as any);
 
-      const mockFrom = vi.fn().mockReturnValue({
-        upsert: vi.fn().mockResolvedValue({ error: null }),
-      });
-      vi.mocked(supabase.from).mockReturnValue(mockFrom as any);
+      const mockUpsert = vi.fn().mockResolvedValue({ error: null });
+      const mockFromResult = {
+        upsert: mockUpsert,
+      };
+      vi.mocked(supabase.from).mockReturnValue(mockFromResult as any);
 
       const result = await PushNotificationService.subscribe(mockSubscription);
       expect(result).toBe(true);
       expect(supabase.from).toHaveBeenCalledWith('push_subscriptions');
+      expect(mockUpsert).toHaveBeenCalled();
     });
 
     it('should return false if user is not authenticated', async () => {
@@ -63,13 +65,17 @@ describe('PushNotificationService', () => {
         error: null,
       } as any);
 
-      const mockFrom = vi.fn().mockReturnValue({
-        delete: vi.fn().mockResolvedValue({ error: null }),
+      const mockDelete = vi.fn().mockReturnValue({
+        eq: vi.fn().mockResolvedValue({ error: null }),
       });
-      vi.mocked(supabase.from).mockReturnValue(mockFrom as any);
+      const mockFromResult = {
+        delete: mockDelete,
+      };
+      vi.mocked(supabase.from).mockReturnValue(mockFromResult as any);
 
       const result = await PushNotificationService.unsubscribe();
       expect(result).toBe(true);
+      expect(mockDelete).toHaveBeenCalled();
     });
   });
 
@@ -80,17 +86,18 @@ describe('PushNotificationService', () => {
         error: null,
       } as any);
 
-      const mockFrom = vi.fn().mockReturnValue({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            single: vi.fn().mockResolvedValue({ data: { id: 'sub-1' }, error: null }),
-          }),
-        }),
-      });
-      vi.mocked(supabase.from).mockReturnValue(mockFrom as any);
+      const mockSingle = vi.fn().mockResolvedValue({ data: { id: 'sub-1' }, error: null });
+      const mockEq = vi.fn().mockReturnValue({ single: mockSingle });
+      const mockSelect = vi.fn().mockReturnValue({ eq: mockEq });
+      const mockFromResult = {
+        select: mockSelect,
+      };
+      vi.mocked(supabase.from).mockReturnValue(mockFromResult as any);
 
       const result = await PushNotificationService.isEnabled();
       expect(result).toBe(true);
+      expect(mockSelect).toHaveBeenCalledWith('id');
+      expect(mockEq).toHaveBeenCalledWith('user_id', 'user-123');
     });
 
     it('should return false if user has no subscription', async () => {

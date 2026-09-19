@@ -5,7 +5,7 @@ import {
   Building2, Settings, Users, Calendar, UserRound,
   TrendingUp, FlaskConical, Pill, Heart, Stethoscope,
   Package, ShoppingCart, BarChart3, Truck, ClipboardList, Activity,
-  Baby, Dumbbell, Ticket, Share2, Layers, ShieldCheck, Tv,
+  Baby, Dumbbell, Ticket, Share2, Layers, Tv,
   DollarSign, Wrench, FileCode, Clock, CreditCard, Network,
   BookOpen, FileText, Calculator
 } from "lucide-react";
@@ -13,6 +13,7 @@ import { LoadingScreen } from "@/components/LoadingScreen";
 import { QuickActions } from "@/components/institution/QuickActions";
 import { RecentActivityFeed } from "@/components/institution/RecentActivityFeed";
 import { useInstitutionContext } from "@/hooks/useInstitutionContext";
+import { getFacilityArchetype } from "@/config/facilityProfiles";
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
 import { format, subMonths, startOfMonth, endOfMonth } from "date-fns";
 import { MetricCard } from "@/components/shared/MetricCard";
@@ -34,72 +35,68 @@ import { UnifiedPatientHub } from "@/components/patient/UnifiedPatientHub";
 import AdvancedRevenueCycle from "@/components/rcm/AdvancedRevenueCycle";
 import MultiCenterAuditSuite from "@/components/governance/MultiCenterAuditSuite";
 
-// Per-type action configs
-const TYPE_CONFIG: Record<string, {
+// Per-archetype action configs — keyed by facility ARCHETYPE (see
+// facilityProfiles.ts), never by raw type strings, so every MOH Zambia
+// level and private type resolves to a tailored dashboard.
+interface ArchetypeConfig {
   label: string; color: string; icon: React.ReactNode;
   primaryAction: { label: string; path: string; icon: React.ReactNode };
   quickLinks: { label: string; path: string; icon: React.ReactNode }[];
-}> = {
+}
+
+const TYPE_CONFIG: Record<string, ArchetypeConfig> = {
+  solo_practice: {
+    label: "Solo Practice", color: "#0ea5e9", icon: <Stethoscope className="h-5 w-5" />,
+    primaryAction: { label: "Day List", path: "/institution/appointments", icon: <Calendar className="h-3.5 w-3.5" /> },
+    quickLinks: [
+      { label: "Day List", path: "/institution/appointments", icon: <Calendar className="h-4 w-4" /> },
+      { label: "Queue Desk", path: "/institution-dashboard?tab=queue", icon: <Ticket className="h-4 w-4" /> },
+      { label: "Patients", path: "/institution/patients", icon: <UserRound className="h-4 w-4" /> },
+      { label: "Prescriptions", path: "/prescriptions", icon: <Pill className="h-4 w-4" /> },
+      { label: "Video Consults", path: "/video-consultations", icon: <Activity className="h-4 w-4" /> },
+      { label: "Settings", path: "/institution/settings", icon: <Settings className="h-4 w-4" /> },
+    ],
+  },
   pharmacy: {
     label: "Pharmacy", color: "#0073ea", icon: <Pill className="h-5 w-5" />,
     primaryAction: { label: "Pharmacy Portal", path: "/pharmacy-portal", icon: <ShoppingCart className="h-3.5 w-3.5" /> },
     quickLinks: [
       { label: "POS Billing", path: "/pharmacy-portal", icon: <ShoppingCart className="h-4 w-4" /> },
+      { label: "Fast Dispense", path: "/institution-dashboard?tab=dispensary", icon: <Pill className="h-4 w-4" /> },
       { label: "Inventory", path: "/pharmacy-portal", icon: <Package className="h-4 w-4" /> },
       { label: "Deliveries", path: "/pharmacy-portal", icon: <Truck className="h-4 w-4" /> },
       { label: "Sales Report", path: "/pharmacy-portal", icon: <BarChart3 className="h-4 w-4" /> },
-      { label: "Patients", path: "/institution/patients", icon: <UserRound className="h-4 w-4" /> },
-      { label: "Settings", path: "/institution/settings", icon: <Settings className="h-4 w-4" /> },
-    ],
-  },
-  dispensary: {
-    label: "Community Dispensary", color: "#00c875", icon: <Pill className="h-5 w-5" />,
-    primaryAction: { label: "Dispensary POS", path: "/institution-dashboard?tab=dispensary", icon: <Pill className="h-3.5 w-3.5" /> },
-    quickLinks: [
-      { label: "Fast Dispense", path: "/institution-dashboard?tab=dispensary", icon: <Pill className="h-4 w-4" /> },
-      { label: "Stock Ledger", path: "/institution-dashboard?tab=erp_stock", icon: <Package className="h-4 w-4" /> },
       { label: "Queue Desk", path: "/institution-dashboard?tab=queue", icon: <Ticket className="h-4 w-4" /> },
       { label: "Patients", path: "/institution/patients", icon: <UserRound className="h-4 w-4" /> },
       { label: "Settings", path: "/institution/settings", icon: <Settings className="h-4 w-4" /> },
     ],
   },
-  pediatric_center: {
-    label: "Pediatric Center", color: "#ec4899", icon: <Baby className="h-5 w-5" />,
-    primaryAction: { label: "Child Health Center", path: "/institution-dashboard?tab=pediatrics", icon: <Baby className="h-3.5 w-3.5" /> },
+  wholesale_pharmacy: {
+    label: "Wholesale Distribution", color: "#7c3aed", icon: <Truck className="h-5 w-5" />,
+    primaryAction: { label: "Stock Control", path: "/pharmacy-inventory", icon: <Package className="h-3.5 w-3.5" /> },
     quickLinks: [
-      { label: "Growth Curves", path: "/institution-dashboard?tab=pediatrics", icon: <Baby className="h-4 w-4" /> },
-      { label: "Vaccines", path: "/institution-dashboard?tab=pediatrics", icon: <ShieldCheck className="h-4 w-4" /> },
-      { label: "Dosage Calc", path: "/institution-dashboard?tab=pediatrics", icon: <Activity className="h-4 w-4" /> },
-      { label: "Queue Desk", path: "/institution-dashboard?tab=queue", icon: <Ticket className="h-4 w-4" /> },
-      { label: "Patients", path: "/institution/patients", icon: <UserRound className="h-4 w-4" /> },
+      { label: "Warehouse Stock", path: "/pharmacy-inventory", icon: <Package className="h-4 w-4" /> },
+      { label: "Supply Orders", path: "/marketplace", icon: <ShoppingCart className="h-4 w-4" /> },
+      { label: "ERP Stock", path: "/institution-dashboard?tab=erp_stock", icon: <Layers className="h-4 w-4" /> },
+      { label: "Revenue", path: "/wallet", icon: <DollarSign className="h-4 w-4" /> },
+      { label: "Staff", path: "/institution/personnel", icon: <Users className="h-4 w-4" /> },
       { label: "Settings", path: "/institution/settings", icon: <Settings className="h-4 w-4" /> },
     ],
   },
-  physiotherapy: {
-    label: "Physiotherapy & Rehab", color: "#6366f1", icon: <Dumbbell className="h-5 w-5" />,
-    primaryAction: { label: "Rehab Center", path: "/institution-dashboard?tab=physio", icon: <Dumbbell className="h-3.5 w-3.5" /> },
-    quickLinks: [
-      { label: "ROM Goniometry", path: "/institution-dashboard?tab=physio", icon: <Activity className="h-4 w-4" /> },
-      { label: "Exercise Rx", path: "/institution-dashboard?tab=physio", icon: <Dumbbell className="h-4 w-4" /> },
-      { label: "Sessions", path: "/institution-dashboard?tab=physio", icon: <ClipboardList className="h-4 w-4" /> },
-      { label: "Queue Desk", path: "/institution-dashboard?tab=queue", icon: <Ticket className="h-4 w-4" /> },
-      { label: "Patients", path: "/institution/patients", icon: <UserRound className="h-4 w-4" /> },
-      { label: "Settings", path: "/institution/settings", icon: <Settings className="h-4 w-4" /> },
-    ],
-  },
-  laboratory: {
-    label: "Laboratory", color: "#a25ddc", icon: <FlaskConical className="h-5 w-5" />,
+  diagnostics: {
+    label: "Laboratory & Diagnostics", color: "#a25ddc", icon: <FlaskConical className="h-5 w-5" />,
     primaryAction: { label: "Lab Management", path: "/lab-management", icon: <FlaskConical className="h-3.5 w-3.5" /> },
     quickLinks: [
       { label: "Test Requests", path: "/lab-management", icon: <ClipboardList className="h-4 w-4" /> },
       { label: "LIS Suite", path: "/institution-dashboard?tab=lis_ris", icon: <FlaskConical className="h-4 w-4" /> },
       { label: "Results", path: "/lab-management", icon: <Activity className="h-4 w-4" /> },
+      { label: "Queue Desk", path: "/institution-dashboard?tab=queue", icon: <Ticket className="h-4 w-4" /> },
       { label: "Personnel", path: "/institution/personnel", icon: <Users className="h-4 w-4" /> },
       { label: "Patients", path: "/institution/patients", icon: <UserRound className="h-4 w-4" /> },
       { label: "Settings", path: "/institution/settings", icon: <Settings className="h-4 w-4" /> },
     ],
   },
-  hospital: {
+  general_hospital: {
     label: "Hospital", color: "#e44258", icon: <Heart className="h-5 w-5" />,
     primaryAction: { label: "Full HMS", path: "/hospital-management", icon: <Building2 className="h-3.5 w-3.5" /> },
     quickLinks: [
@@ -133,8 +130,8 @@ const TYPE_CONFIG: Record<string, {
       { label: "Settings", path: "/institution/settings", icon: <Settings className="h-4 w-4" /> },
     ],
   },
-  specialized_clinic: {
-    label: "Specialised Clinic", color: "#00c875", icon: <Stethoscope className="h-5 w-5" />,
+  specialty_hospital: {
+    label: "Specialised Facility", color: "#0d9488", icon: <Stethoscope className="h-5 w-5" />,
     primaryAction: { label: "HMS Portal", path: "/hospital-management", icon: <Building2 className="h-3.5 w-3.5" /> },
     quickLinks: [
       { label: "Appointments", path: "/institution/appointments", icon: <Calendar className="h-4 w-4" /> },
@@ -142,14 +139,16 @@ const TYPE_CONFIG: Record<string, {
       { label: "Procedure Management", path: "/procedure-management", icon: <Activity className="h-4 w-4" /> },
       { label: "Care Team", path: "/care-team", icon: <Users className="h-4 w-4" /> },
       { label: "Enhanced Diagnostics", path: "/enhanced-diagnostics", icon: <FlaskConical className="h-4 w-4" /> },
+      { label: "Pediatric Center", path: "/institution-dashboard?tab=pediatrics", icon: <Baby className="h-4 w-4" /> },
+      { label: "Rehab Center", path: "/institution-dashboard?tab=physio", icon: <Dumbbell className="h-4 w-4" /> },
       { label: "Patients", path: "/institution/patients", icon: <UserRound className="h-4 w-4" /> },
       { label: "Personnel", path: "/institution/personnel", icon: <Users className="h-4 w-4" /> },
       { label: "Reports", path: "/institution/reports", icon: <BarChart3 className="h-4 w-4" /> },
       { label: "Settings", path: "/institution/settings", icon: <Settings className="h-4 w-4" /> },
     ],
   },
-  nursing_home: {
-    label: "Nursing Home", color: "#fdab3d", icon: <Heart className="h-5 w-5" />,
+  long_term_care: {
+    label: "Long-Term Care", color: "#fdab3d", icon: <Heart className="h-5 w-5" />,
     primaryAction: { label: "Care Management", path: "/institution-dashboard?tab=care", icon: <Building2 className="h-3.5 w-3.5" /> },
     quickLinks: [
       { label: "Residents", path: "/institution/patients", icon: <UserRound className="h-4 w-4" /> },
@@ -163,6 +162,16 @@ const TYPE_CONFIG: Record<string, {
 };
 
 const DEFAULT_CONFIG = TYPE_CONFIG.clinic;
+
+/** Month-over-month trend from a 6-point series (real data, never static). */
+function monthTrend(series: number[]): { value: number; isPositive: boolean } | undefined {
+  if (series.length < 2) return undefined;
+  const prev = series[series.length - 2] || 0;
+  const last = series[series.length - 1] || 0;
+  if (prev === 0) return last > 0 ? { value: 100, isPositive: true } : undefined;
+  const pct = Math.round(((last - prev) / prev) * 1000) / 10;
+  return { value: Math.abs(pct), isPositive: pct >= 0 };
+}
 
 export const InstitutionDashboard = () => {
   const navigate = useNavigate();
@@ -222,6 +231,23 @@ export const InstitutionDashboard = () => {
           uniquePatients = new Set((patientAppts || []).map((a: any) => a.patient_id)).size;
         }
 
+        // Real collected revenue from the payments ledger (no per-visit estimates).
+        let paidByMonth = new Map<string, number>();
+        if (providerIds.length > 0) {
+          const sixMonthsAgo = format(startOfMonth(subMonths(new Date(), 5)), "yyyy-MM-dd");
+          const { data: paidRows } = await supabase
+            .from("payments")
+            .select("amount, created_at")
+            .in("provider_id", providerIds)
+            .in("status", ["paid", "completed"])
+            .gte("created_at", sixMonthsAgo)
+            .limit(2000);
+          (paidRows || []).forEach((p: any) => {
+            const key = format(new Date(p.created_at), "MMM");
+            paidByMonth.set(key, (paidByMonth.get(key) || 0) + (Number(p.amount) || 0));
+          });
+        }
+
         const months: { name: string; revenue: number; appointments: number }[] = [];
         for (let i = 5; i >= 0; i--) {
           const d = subMonths(new Date(), i);
@@ -233,7 +259,7 @@ export const InstitutionDashboard = () => {
             const { count: mc } = await supabase.from("appointments").select("*", { count: "exact", head: true }).in("provider_id", providerIds).gte("date", mStart).lte("date", mEnd);
             mCount = mc || 0;
           }
-          months.push({ name: mName, revenue: mCount * 150, appointments: mCount });
+          months.push({ name: mName, revenue: paidByMonth.get(mName) || 0, appointments: mCount });
         }
         setChartData(months);
         setActivities(appointmentActivities);
@@ -265,13 +291,18 @@ export const InstitutionDashboard = () => {
     );
   }
 
-  const cfg = TYPE_CONFIG[institution.type] || DEFAULT_CONFIG;
+  // Resolve by facility archetype so every MOH level & private type lands
+  // on a tailored dashboard; wholesale distributors get their own config.
+  const cfg =
+    institution.type === 'wholesale_pharmacy'
+      ? TYPE_CONFIG.wholesale_pharmacy
+      : TYPE_CONFIG[getFacilityArchetype(institution.type)] || DEFAULT_CONFIG;
 
   const kpiCards = [
     { label: "Staff & Personnel", value: counts.personnel, sub: "Active members", color: "primary", icon: <Users className="h-5 w-5" /> },
     { label: "Total Appointments", value: counts.appointments, sub: `${counts.todayAppointments} today`, color: "accent", icon: <Calendar className="h-5 w-5" /> },
     { label: "Unique Patients", value: counts.patients, sub: "All time", color: "success", icon: <UserRound className="h-5 w-5" /> },
-    { label: "Est. Revenue (6mo)", value: `${institution.currency || "ZMW"} ${(counts.revenue / 1000).toFixed(1)}k`, sub: "Activity-based", color: "warning", icon: <TrendingUp className="h-5 w-5" /> },
+    { label: "Revenue Collected (6mo)", value: `${institution.currency || "ZMW"} ${(counts.revenue / 1000).toFixed(1)}k`, sub: "Payments ledger", color: "warning", icon: <TrendingUp className="h-5 w-5" /> },
   ];
 
   return (
@@ -367,28 +398,26 @@ export const InstitutionDashboard = () => {
                 value={counts.personnel.toString()}
                 subtitle="Active members"
                 icon={Users}
-                trend={{ value: 5.2, isPositive: true }}
               />
               <MetricCard
                 title="Total Appointments"
                 value={counts.appointments.toString()}
                 subtitle={`${counts.todayAppointments} scheduled today`}
                 icon={Calendar}
-                trend={{ value: 12.3, isPositive: true }}
+                trend={monthTrend(chartData.map((m) => m.appointments))}
               />
               <MetricCard
                 title="Unique Patients"
                 value={counts.patients.toString()}
                 subtitle="All time"
                 icon={UserRound}
-                trend={{ value: 8.7, isPositive: true }}
               />
               <MetricCard
-                title="Est. Revenue"
+                title="Revenue Collected"
                 value={`${institution.currency || "ZMW"} ${(counts.revenue / 1000).toFixed(1)}k`}
                 subtitle="Last 6 months"
                 icon={TrendingUp}
-                trend={{ value: 15.4, isPositive: true }}
+                trend={monthTrend(chartData.map((m) => m.revenue))}
               />
             </div>
 

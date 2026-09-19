@@ -62,12 +62,22 @@ export function DesktopNav() {
       ];
     }
 
-    // Nurse (solo)
-    if (availableRoles.includes('nurse') && !availableRoles.some(r => ['institution_admin', 'institution_staff'].includes(r))) {
+    // Nurse / Midwife — solo (NMCZ cadres)
+    if (availableRoles.some(r => ['nurse', 'registered_nurse', 'enrolled_nurse', 'midwife'].includes(r)) && !availableRoles.some(r => ['institution_admin', 'institution_staff'].includes(r))) {
       return [
         { to: "/provider-dashboard", label: "Dashboard", icon: <Stethoscope className="h-4 w-4" />, active: location.pathname === "/provider-dashboard" },
         { to: "/appointments", label: "Visits", icon: <Calendar className="h-4 w-4" />, active: location.pathname === "/appointments" },
         { to: "/medical-records", label: "Care", icon: <Heart className="h-4 w-4" />, active: location.pathname === "/medical-records" },
+        { to: "/chat", label: "Messages", icon: <MessageSquare className="h-4 w-4" />, active: location.pathname === "/chat" },
+      ];
+    }
+
+    // Community & public-health field roles
+    if (availableRoles.some(r => ['environmental_health_officer', 'community_health_worker', 'traditional_practitioner'].includes(r))) {
+      return [
+        { to: "/provider-dashboard", label: "Fieldwork", icon: <Stethoscope className="h-4 w-4" />, active: location.pathname === "/provider-dashboard" },
+        { to: "/appointments", label: "Visits", icon: <Calendar className="h-4 w-4" />, active: location.pathname === "/appointments" },
+        { to: "/connections", label: "Community", icon: <Users className="h-4 w-4" />, active: location.pathname === "/connections" },
         { to: "/chat", label: "Messages", icon: <MessageSquare className="h-4 w-4" />, active: location.pathname === "/chat" },
       ];
     }
@@ -82,8 +92,16 @@ export function DesktopNav() {
       ];
     }
 
-    // Pharmacy / Pharmacist
-    if (availableRoles.some(r => ['pharmacy', 'pharmacist'].includes(r))) {
+    // Pharmacy — retail, wholesale & professionals
+    if (availableRoles.some(r => ['pharmacy', 'wholesale_pharmacy', 'pharmacist', 'pharmacy_technologist'].includes(r))) {
+      if (availableRoles.includes('wholesale_pharmacy')) {
+        return [
+          { to: "/pharmacy-portal", label: "Portal", icon: <Package className="h-4 w-4" />, active: location.pathname === "/pharmacy-portal" },
+          { to: "/pharmacy-inventory", label: "Stock", icon: <Pill className="h-4 w-4" />, active: location.pathname === "/pharmacy-inventory" },
+          { to: "/marketplace", label: "Supply", icon: <ShoppingCart className="h-4 w-4" />, active: location.pathname === "/marketplace" },
+          { to: "/wallet", label: "Revenue", icon: <Wallet className="h-4 w-4" />, active: location.pathname === "/wallet" },
+        ];
+      }
       return [
         { to: "/pharmacy-portal", label: "Portal", icon: <Package className="h-4 w-4" />, active: location.pathname === "/pharmacy-portal" },
         { to: "/pharmacy-inventory", label: "Inventory", icon: <Pill className="h-4 w-4" />, active: location.pathname === "/pharmacy-inventory" },
@@ -101,8 +119,8 @@ export function DesktopNav() {
       ];
     }
 
-    // Institution Admin/Staff
-    if (availableRoles.some(r => ['institution_admin', 'institution_staff'].includes(r))) {
+    // Institution Admin/Staff (+ medical records officers)
+    if (availableRoles.some(r => ['institution_admin', 'institution_staff', 'medical_records_officer'].includes(r))) {
       return [
         { to: "/institution-dashboard", label: "Dashboard", icon: <Building2 className="h-4 w-4" />, active: location.pathname === "/institution-dashboard" },
         { to: "/institution/appointments", label: "Appointments", icon: <Calendar className="h-4 w-4" />, active: location.pathname === "/institution/appointments" },
@@ -111,8 +129,8 @@ export function DesktopNav() {
       ];
     }
 
-    // Lab / Lab Technician
-    if (availableRoles.some(r => ['lab', 'lab_technician'].includes(r))) {
+    // Lab — facility, technicians, pathologists, phlebotomists
+    if (availableRoles.some(r => ['lab', 'lab_technician', 'pathologist', 'phlebotomist'].includes(r))) {
       return [
         { to: "/lab-management", label: "Lab", icon: <Activity className="h-4 w-4" />, active: location.pathname === "/lab-management" },
         { to: "/medical-records", label: "Records", icon: <Heart className="h-4 w-4" />, active: location.pathname === "/medical-records" },
@@ -131,14 +149,26 @@ export function DesktopNav() {
 
   // Role-specific "More" menu items
   const secondaryNavItems = useMemo(() => {
-    // Nurse (solo)
-    if (availableRoles.includes('nurse') && !availableRoles.some(r => ['institution_admin', 'institution_staff'].includes(r))) {
+    // Nurse / Midwife — solo (NMCZ cadres)
+    if (availableRoles.some(r => ['nurse', 'registered_nurse', 'enrolled_nurse', 'midwife'].includes(r)) && !availableRoles.some(r => ['institution_admin', 'institution_staff'].includes(r))) {
       return [
         { to: "/provider-calendar", label: "My Schedule", icon: <Calendar className="h-4 w-4 mr-2" /> },
         { to: "/medications", label: "Medication Admin", icon: <Pill className="h-4 w-4 mr-2" /> },
         { to: "/connections", label: "My Patients", icon: <Users className="h-4 w-4 mr-2" /> },
         ...(!isInstitutionAffiliated ? [{ to: "/wallet", label: "Earnings", icon: <Wallet className="h-4 w-4 mr-2" /> }] : []),
         { to: "/emergency", label: "Emergency", icon: <AlertTriangle className="h-4 w-4 mr-2" /> },
+        { to: "/profile", label: "Profile", icon: <User className="h-4 w-4 mr-2" /> },
+        { to: "/settings", label: "Settings", icon: <Settings className="h-4 w-4 mr-2" /> },
+      ];
+    }
+
+    // Community & public-health field roles
+    if (availableRoles.some(r => ['environmental_health_officer', 'community_health_worker', 'traditional_practitioner'].includes(r))) {
+      return [
+        { to: "/appointments", label: "Field Visits", icon: <Calendar className="h-4 w-4 mr-2" /> },
+        { to: "/connections", label: "My Community", icon: <Users className="h-4 w-4 mr-2" /> },
+        { to: "/medical-records", label: "Field Records", icon: <Heart className="h-4 w-4 mr-2" /> },
+        { to: "/map", label: "Catchment Map", icon: <Search className="h-4 w-4 mr-2" /> },
         { to: "/profile", label: "Profile", icon: <User className="h-4 w-4 mr-2" /> },
         { to: "/settings", label: "Settings", icon: <Settings className="h-4 w-4 mr-2" /> },
       ];
@@ -196,8 +226,8 @@ export function DesktopNav() {
       ];
     }
 
-    // Lab / Lab Technician
-    if (availableRoles.some(r => ['lab', 'lab_technician'].includes(r))) {
+    // Lab — facility, technicians, pathologists, phlebotomists
+    if (availableRoles.some(r => ['lab', 'lab_technician', 'pathologist', 'phlebotomist'].includes(r))) {
       return [
         { to: "/wallet", label: "Revenue", icon: <Wallet className="h-4 w-4 mr-2" /> },
         { to: "/connections", label: "Patients", icon: <Users className="h-4 w-4 mr-2" /> },
@@ -229,6 +259,13 @@ export function DesktopNav() {
     return secondaryNavItems.filter((item) => hasRoutePermission(availableRoles, item.to));
   }, [secondaryNavItems, availableRoles]);
 
+  // Safety net: never show a top-bar link the user may not open.
+  const filteredMainNavItems = useMemo(() => {
+    if (!isAuthenticated) return mainNavItems;
+    const filtered = mainNavItems.filter((item) => hasRoutePermission(availableRoles, item.to));
+    return filtered.length > 0 ? filtered : mainNavItems;
+  }, [mainNavItems, availableRoles, isAuthenticated]);
+
   return (
     <header className="sticky top-0 z-50 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-b border-canvas-silk dark:border-slate-800" role="banner">
       <div className="mx-auto flex items-center justify-between h-16 lg:h-[4.25rem] px-4 md:px-6 lg:px-8 xl:px-12 max-w-content min-w-0">
@@ -236,7 +273,7 @@ export function DesktopNav() {
           <AppLogo size="sm" className="shrink-0" />
 
           <nav className="hidden md:flex items-center gap-0.5 min-w-0 rounded-nav border border-canvas-silk dark:border-slate-700 bg-canvas-mist/60 dark:bg-slate-800/50 p-1" role="navigation" aria-label="Main navigation">
-            {mainNavItems.map((item) => (
+            {filteredMainNavItems.map((item) => (
               <Link
                 key={item.to}
                 to={item.to}

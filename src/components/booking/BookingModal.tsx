@@ -79,7 +79,7 @@ export const BookingModal = ({ provider, isOpen, onClose }: BookingModalProps) =
 
     setIsSubmitting(true);
     try {
-      const { error } = await supabase.from('appointments').insert({
+      const { data: booked, error } = await supabase.from('appointments').insert({
         patient_id: user.id,
         provider_id: provider.id,
         date: format(selectedDate, 'yyyy-MM-dd'),
@@ -89,24 +89,39 @@ export const BookingModal = ({ provider, isOpen, onClose }: BookingModalProps) =
         notes: reason || null,
         duration: visitType === 'new' ? 45 : 30,
         patient_visit_type: visitType
-      });
+      }).select('id').single();
 
       if (error) throw error;
 
+      // Pay-per-new-booking model: first-time patients generate a pending
+      // booking fee for the provider (settled against their wallet/plan —
+      // never charged to the patient).
+      if (visitType === 'new' && booked?.id) {
+        try {
+          let feeAmount = 60; // platform default when no specialty fee exists
+          const { data: feeRow } = await (supabase as any)
+            .from('specialty_booking_fees')
+            .select('booking_fee')
+            .eq('is_active', true)
+            .eq('specialty', (provider as any).specialty || 'General Practice')
+            .maybeSingle();
+          if (feeRow?.booking_fee) feeAmount = Number(feeRow.booking_fee);
+          await (supabase as any).from('booking_fees').insert({
+            provider_id: provider.id,
+            patient_id: user.id,
+            appointment_id: booked.id,
+            amount: feeAmount,
+            currency: 'ZMW',
+            status: 'pending',
+          });
+        } catch (feeErr) {
+          // Non-fatal: the appointment stands; the fee can be backfilled.
+          console.error('Booking fee record failed (non-fatal):', feeErr);
+        }
+      }
+
       toast.success("Appointment booked successfully!");
       onClose();
-      // Get the inserted appointment ID from a follow-up query
-      const { data: booked } = await supabase
-        .from('appointments')
-        .select('id')
-        .eq('patient_id', user.id)
-        .eq('provider_id', provider.id)
-        .eq('date', format(selectedDate, 'yyyy-MM-dd'))
-        .eq('time', selectedTime)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .single();
-      
       if (booked?.id) {
         navigate(`/booking-confirmed?id=${booked.id}`);
       } else {

@@ -6,6 +6,26 @@ import { useAuth } from "@/context/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 
+// Keywords mapping estimator services to platform price-book entries.
+// When service_pricing has live rows, their average replaces the static
+// fallback below (marked "live" in the UI).
+const PRICE_KEYWORDS: Record<string, string[]> = {
+  consultation: ['consultation', 'opd', 'general'],
+  specialist: ['specialist'],
+  video_consultation: ['video_consultation', 'telemedicine', 'telehealth'],
+  annual_physical: ['physical', 'wellness', 'checkup'],
+  pediatric_visit: ['pediatric', 'paediatric', 'child'],
+  lab_work: ['lab', 'blood', 'panel'],
+  imaging_xray: ['x-ray', 'xray', 'radiolog'],
+  imaging_mri: ['mri', 'ct'],
+  dental_cleaning: ['dental', 'cleaning'],
+  dental_filling: ['filling', 'dental'],
+  eye_exam: ['eye', 'optometr', 'vision'],
+  physical_therapy: ['physio', 'therapy', 'rehab'],
+  minor_procedure: ['procedure', 'surgery', 'minor'],
+  urgent_care: ['urgent', 'emergency', 'casualty'],
+};
+
 const SERVICE_TYPES = [
   { value: "consultation", label: "General Practice Consultation", avgCost: 150, category: "doctor" },
   { value: "specialist", label: "Specialist Visit (Cardiology, Dermatology, Ortho)", avgCost: 300, category: "doctor" },
@@ -69,8 +89,45 @@ export const CostEstimator = () => {
     enabled: !!insuranceInfo?.id,
   });
 
+  // Live platform price book (service_pricing) layered over static
+  // fallbacks — estimator stays useful with zero rows, exact with data.
+  const { data: livePrices } = useQuery({
+    queryKey: ["estimator-live-prices"],
+    queryFn: async () => {
+      const { data } = await (supabase as any)
+        .from("service_pricing")
+        .select("service_code, base_price, category")
+        .eq("is_active", true)
+        .limit(500);
+      const byService = new Map<string, number[]>();
+      ((data || []) as any[]).forEach((r: any) => {
+        const key = `${r.service_code || ''} ${r.category || ''}`.toLowerCase();
+        const price = Number(r.base_price) || 0;
+        if (price <= 0) return;
+        const entry = SERVICE_TYPES.find(
+          (s) => s.value === r.service_code || (PRICE_KEYWORDS[s.value] || []).some((k) => key.includes(k))
+        );
+        if (!entry) return;
+        if (!byService.has(entry.value)) byService.set(entry.value, []);
+        byService.get(entry.value)!.push(price);
+      });
+      const avg = new Map<string, number>();
+      byService.forEach((prices, value) => {
+        avg.set(value, Math.round(prices.reduce((s, p) => s + p, 0) / prices.length));
+      });
+      return avg;
+    },
+    staleTime: 1000 * 60 * 10,
+  });
+
+  const servicesWithPrices = SERVICE_TYPES.map((s) => ({
+    ...s,
+    avgCost: livePrices?.get(s.value) ?? s.avgCost,
+    live: livePrices?.has(s.value) || false,
+  }));
+
   const calculateEstimate = () => {
-    const service = SERVICE_TYPES.find((s) => s.value === serviceType);
+    const service = servicesWithPrices.find((s) => s.value === serviceType);
     if (!service) return;
 
     setEstimating(true);
@@ -123,9 +180,15 @@ export const CostEstimator = () => {
               <div className="text-[11px] text-[#676879]">Policy: {insuranceInfo.policy_number}</div>
             </div>
           </div>
-          <span className="px-3 py-1 rounded-full text-xs font-bold text-white bg-[#00c875]">
-            Verified Coverage
-          </span>
+          {verification && (verification.verification_status === 'verified' || verification.status === 'verified') ? (
+            <span className="px-3 py-1 rounded-full text-xs font-bold text-white bg-[#00c875]">
+              Verified Coverage
+            </span>
+          ) : (
+            <span className="px-3 py-1 rounded-full text-xs font-bold text-white bg-[#fdab3d]">
+              Unverified — estimates use plan defaults
+            </span>
+          )}
         </div>
       ) : (
         <div className="flex items-center justify-between p-3 rounded-xl bg-[#f5f6f8] border border-[#e6e9ef]">
@@ -151,11 +214,11 @@ export const CostEstimator = () => {
             <SelectValue placeholder="Choose a medical procedure..." />
           </SelectTrigger>
           <SelectContent>
-            {SERVICE_TYPES.map((s) => (
+            {servicesWithPrices.map((s) => (
               <SelectItem key={s.value} value={s.value}>
                 <div className="flex items-center justify-between w-full gap-4 text-xs font-medium">
-                  <span>{s.label}</span>
-                  <span className="font-mono text-[#0073ea]">${s.avgCost}</span>
+                  <span>{s.label}{s.live ? ' · live rate' : ''}</span>
+                  <span className="font-mono text-[#0073ea]">K{s.avgCost}</span>
                 </div>
               </SelectItem>
             ))}
@@ -175,10 +238,10 @@ export const CostEstimator = () => {
         <div className="p-4 rounded-xl bg-[#f5f6f8] border border-[#e6e9ef] space-y-3">
           <div className="text-xs font-extrabold uppercase text-[#676879]">Financial Breakdown Summary</div>
           <div className="space-y-1.5 text-xs font-medium">
-            <div className="flex justify-between text-slate-600"><span>Standard Fee</span><span>${estimate.total.toFixed(2)}</span></div>
-            <div className="flex justify-between text-emerald-600 font-bold"><span>Insurance Payment</span><span>-${estimate.coverage.toFixed(2)}</span></div>
+            <div className="flex justify-between text-slate-600"><span>Standard Fee</span><span>K{estimate.total.toFixed(2)}</span></div>
+            <div className="flex justify-between text-emerald-600 font-bold"><span>Insurance Payment</span><span>-K{estimate.coverage.toFixed(2)}</span></div>
             <div className="flex justify-between text-slate-900 font-bold border-t border-[#e6e9ef] pt-2 text-sm">
-              <span>Estimated Copay Due</span><span className="font-mono text-[#0073ea]">${estimate.outOfPocket.toFixed(2)}</span>
+              <span>Estimated Copay Due</span><span className="font-mono text-[#0073ea]">K{estimate.outOfPocket.toFixed(2)}</span>
             </div>
           </div>
         </div>

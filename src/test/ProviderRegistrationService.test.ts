@@ -420,7 +420,7 @@ describe('ProviderRegistrationService Property Tests', () => {
       specialty: registrationData.specialty,
       years_of_experience: registrationData.years_of_experience,
       documents_url: registrationData.documents_url,
-      status: 'approved'
+      status: 'pending'
     });
     
     // Verify automatic authentication (Requirement 1.3)

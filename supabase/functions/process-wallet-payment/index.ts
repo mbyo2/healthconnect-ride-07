@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
-import { resolveServicePrice, assertTrustedAmount, PriceMismatchError } from '../_shared/price-guard.ts';
+import { resolveServicePrice, resolveReferenceAmount, assertTrustedAmount, PriceMismatchError } from '../_shared/price-guard.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -13,6 +13,8 @@ interface PaymentRequest {
   patientId: string;
   providerId: string;
   serviceId: string;
+  orderId?: string;
+  description?: string;
   redirectUrl?: string;
 }
 
@@ -45,22 +47,25 @@ serve(async (req) => {
     );
 
     const body = await req.json() as PaymentRequest;
-    const { amount: clientAmount, currency, providerId, serviceId } = body;
+    const { amount: clientAmount, currency, providerId, serviceId, orderId, description } = body;
     // FORCE patientId to the authenticated user — never trust client-supplied value
     const patientId = user.id;
-    if (!clientAmount || clientAmount <= 0 || !providerId || !serviceId) {
+    if (!clientAmount || clientAmount <= 0 || !providerId || (!serviceId && !orderId)) {
       return new Response(JSON.stringify({ error: 'Invalid input' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
-    // Resolve the authoritative price server-side — never trust the client amount
+    // Resolve the authoritative price server-side — never trust the client amount.
+    // Pharmacy orders resolve from the order total; services from the price book.
     let amount: number;
     try {
-      const trusted = await resolveServicePrice(supabaseClient as any, serviceId);
+      const trusted = orderId
+        ? await resolveReferenceAmount(supabaseClient as any, 'order', orderId)
+        : await resolveServicePrice(supabaseClient as any, serviceId);
       amount = assertTrustedAmount(clientAmount, trusted);
     } catch (e) {
       if (e instanceof PriceMismatchError) {
         return new Response(
-          JSON.stringify({ success: false, error: 'Payment amount does not match the service price', expectedAmount: e.expected }),
+          JSON.stringify({ success: false, error: 'Payment amount does not match the authoritative price', expectedAmount: e.expected }),
           { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
@@ -107,7 +112,7 @@ serve(async (req) => {
 
     // Create payment record in database
     const paymentId = `PAY-WALLET-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
-    
+
     const { data: payment, error: paymentError } = await supabaseClient
       .from('payments')
       .insert({
@@ -119,6 +124,7 @@ serve(async (req) => {
         currency: currency,
         status: 'completed',
         payment_method: 'wallet',
+        metadata: orderId ? { reference_type: 'order', reference_id: orderId, description } : { description },
         created_at: new Date().toISOString(),
       })
       .select()

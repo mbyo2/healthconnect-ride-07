@@ -15,18 +15,26 @@ const getIsLocalhost = (): boolean => {
 };
 const isLocalhost = getIsLocalhost();
 
-// Use Supabase URL and key from environment variables only
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+// Use Supabase URL and key from environment variables only.
+// Public anon key is safe to ship; never use service_role here.
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string | undefined;
+const SUPABASE_ANON_KEY = (import.meta.env.VITE_SUPABASE_ANON_KEY ||
+  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY) as string | undefined;
 
 // Log the environment for debugging (development only)
 if (import.meta.env.DEV) {
   console.log('Running in', isLocalhost ? 'local' : 'production', 'mode');
 }
 
-// Validate environment variables
-if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-  console.error('Missing Supabase environment variables. Please check your .env file.');
+// Fail-soft for public launch: never crash the bundle when env is missing.
+// Render a friendly config error instead of throwing inside createClient.
+export const isSupabaseConfigured = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
+
+if (!isSupabaseConfigured) {
+  console.error(
+    'Missing Supabase environment variables (VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY). ' +
+      'Set them in Netlify/Vercel and .env. The app will show a configuration notice instead of crashing.'
+  );
 }
 
 // Custom storage adapter to handle "insecure operation" errors in production
@@ -42,10 +50,15 @@ const customStorageAdapter = {
   },
 };
 
-// Create a single supabase client for interacting with your database
+// Create a single supabase client for interacting with your database.
+// When env is missing (misconfigured deploy), use inert placeholders so the
+// bundle still boots and surfaces a friendly notice instead of white-screening.
+const FALLBACK_URL = 'https://placeholder.supabase.co';
+const FALLBACK_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBsYWNlaG9sZGVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQxMDU3ODgsImV4cCI6MjA0OTY4MTc4OH0.placeholder';
+
 export const supabase = createClient<Database>(
-  SUPABASE_URL,
-  SUPABASE_ANON_KEY,
+  SUPABASE_URL || FALLBACK_URL,
+  SUPABASE_ANON_KEY || FALLBACK_ANON_KEY,
   {
     auth: {
       storage: customStorageAdapter,

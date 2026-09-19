@@ -8,6 +8,7 @@ import { FileText, Printer, Save, CheckCircle2 } from 'lucide-react';
 import { EmptyState } from '@/components/ui/empty-state';
 import { usePatientNames } from '@/hooks/usePatientNames';
 import { supabase } from '@/integrations/supabase/client';
+import { ensureBillingDraft } from '@/services/dischargeWorkflow';
 import { toast } from 'sonner';
 
 const EMPTY = {
@@ -58,6 +59,19 @@ export const DischargeSummary = ({ hospital, admissions }: { hospital: any; admi
       const { error } = await (supabase.from('hospital_admissions' as any) as any)
         .update(patch).eq('id', selected.id);
       if (error) throw error;
+
+      if (finalize) {
+        // Free the bed so Bed Management stays truthful no matter which
+        // screen finalized the discharge (here or IPD).
+        if (selected.bed_id) {
+          await (supabase.from('hospital_beds' as any) as any)
+            .update({ status: 'available', current_patient_id: null })
+            .eq('id', selected.bed_id);
+        }
+        // Open a billing draft linked to this admission so nothing
+        // discharged ever misses invoicing (idempotent per admission).
+        await ensureBillingDraft(hospital?.id, selected);
+      }
       toast.success(finalize ? 'Discharge summary finalized' : 'Draft saved');
       setSelected({ ...selected, ...patch });
     } catch (e: any) {

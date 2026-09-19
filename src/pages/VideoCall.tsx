@@ -1,57 +1,191 @@
-
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useEffect, useState, useCallback } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { VideoRoom } from '@/components/video/VideoRoom';
 import { LoadingScreen } from '@/components/LoadingScreen';
 import { useAuth } from '@/context/AuthContext';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import { supabase } from '@/integrations/supabase/client';
 import { logAnalyticsEvent } from '@/utils/analytics-service';
+import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
+import { VideoOff } from 'lucide-react';
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/**
+ * Video call room — route param is `roomId` (see App.tsx `/video-call/:roomId`).
+ *
+ * Two entry modes, both ending in a real Daily room:
+ *  1. Booked consultation — roomId is the video_consultations UUID. The
+ *     consultation is loaded (patient or provider side), a Daily room is
+ *     minted on demand when missing, and status moves scheduled → in_progress.
+ *  2. Instant room — any other id. An ad-hoc consultation record is created
+ *     for the current user so the call is tracked, billed and reviewable
+ *     like any other visit; the link can be shared to invite the other party.
+ *
+ * On leave, providers close the visit (→ completed); patients simply leave
+ * so they can rejoin while the visit is still live.
+ */
 const VideoCall = () => {
-  const { roomUrl } = useParams();
+  const { roomId } = useParams<{ roomId: string }>();
+  const navigate = useNavigate();
+  const { user, profile } = useAuth();
   const [loading, setLoading] = useState(true);
-  const { user } = useAuth();
+  const [meetingUrl, setMeetingUrl] = useState<string | null>(null);
+  const [consultationId, setConsultationId] = useState<string | null>(null);
+  const [fatalError, setFatalError] = useState<string | null>(null);
   const [userName, setUserName] = useState('');
 
   useEffect(() => {
-    // Set user name for video call
-    if (user?.user_metadata?.full_name) {
-      setUserName(user.user_metadata.full_name);
+    if (profile?.first_name || user?.user_metadata?.full_name) {
+      setUserName(
+        [profile?.first_name, (profile as any)?.last_name].filter(Boolean).join(' ') ||
+          user?.user_metadata?.full_name ||
+          user?.email?.split('@')[0] ||
+          'Guest'
+      );
     } else if (user?.email) {
       setUserName(user.email.split('@')[0]);
     } else {
-      setUserName(`User-${Math.floor(Math.random() * 1000)}`);
+      setUserName('Guest');
     }
-    
-    // Simulate loading
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 1500);
-    
-    // Log analytics event
-    logAnalyticsEvent('video_call_opened', {
-      room: roomUrl,
-      user_id: user?.id,
-      timestamp: new Date().toISOString()
-    });
-    
-    return () => clearTimeout(timer);
-  }, [user, roomUrl]);
+  }, [user, profile]);
 
-  if (!roomUrl) {
-    return <div>Invalid room URL</div>;
-  }
+  useEffect(() => {
+    if (!user || !roomId) return;
+    let cancelled = false;
+
+    const prepare = async () => {
+      setLoading(true);
+      setFatalError(null);
+      try {
+        let consultation: any = null;
+
+        if (UUID_RE.test(roomId)) {
+          // Mode 1 — booked consultation: only participants may open it.
+          const { data, error } = await supabase
+            .from('video_consultations')
+            .select('*')
+            .eq('id', roomId)
+            .maybeSingle();
+          if (error) throw error;
+          if (!data) {
+            setFatalError('This consultation link is invalid or has been removed.');
+            setLoading(false);
+            return;
+          }
+          if (data.patient_id !== user.id && data.provider_id !== user.id) {
+            setFatalError('You are not a participant in this consultation.');
+            setLoading(false);
+            return;
+          }
+          consultation = data;
+        } else {
+          // Mode 2 — instant room: track it as an ad-hoc consultation so it
+          // shows in history and can be billed like a normal visit.
+          const now = new Date();
+          const { data, error } = await supabase
+            .from('video_consultations')
+            .insert({
+              patient_id: user.id,
+              provider_id: user.id,
+              scheduled_start: now.toISOString(),
+              scheduled_end: new Date(now.getTime() + 30 * 60000).toISOString(),
+              status: 'scheduled',
+              notes: `Instant teledoctor room (${roomId})`,
+            })
+            .select()
+            .single();
+          if (error) throw error;
+          consultation = data;
+        }
+
+        if (cancelled) return;
+        setConsultationId(consultation.id);
+
+        // Mint the Daily room on demand when missing.
+        if (!consultation.meeting_url) {
+          toast.loading('Setting up your secure video room…');
+          const { data: fnData, error: fnError } = await supabase.functions.invoke('create-daily-room', {
+            body: { consultation_id: consultation.id },
+          });
+          if (cancelled) return;
+          if (fnError) throw fnError;
+          const url = (fnData as any)?.url;
+          if (!url) throw new Error('Video service did not return a room URL.');
+          toast.dismiss();
+          setMeetingUrl(url);
+        } else {
+          setMeetingUrl(consultation.meeting_url);
+        }
+
+        // Mark the visit live (idempotent).
+        if (consultation.status === 'scheduled') {
+          await supabase
+            .from('video_consultations')
+            .update({ status: 'in_progress' })
+            .eq('id', consultation.id);
+        }
+
+        logAnalyticsEvent('video_call_opened', {
+          consultation_id: consultation.id,
+          user_id: user?.id,
+          timestamp: new Date().toISOString(),
+        });
+      } catch (err: any) {
+        console.error('Failed to prepare video call:', err);
+        toast.dismiss();
+        if (!cancelled) {
+          setFatalError(
+            err?.message || 'Could not start the video call. Check your connection and try again.'
+          );
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+
+    prepare();
+    return () => {
+      cancelled = true;
+    };
+  }, [user, roomId]);
+
+  const handleLeave = useCallback(async () => {
+    logAnalyticsEvent('video_call_ended', { consultation_id: consultationId });
+    // Providers close the visit on leave; patients can rejoin while live.
+    const role = (profile?.role || '').toLowerCase();
+    try {
+      if (consultationId && role !== '' && role !== 'patient') {
+        await supabase
+          .from('video_consultations')
+          .update({ status: 'completed' })
+          .eq('id', consultationId)
+          .eq('status', 'in_progress');
+      }
+    } catch (err) {
+      console.error('Failed to close consultation:', err);
+    }
+    navigate('/video-consultations', { replace: true });
+  }, [consultationId, profile, navigate]);
 
   return (
     <ProtectedRoute>
       {loading ? (
-        <LoadingScreen />
+        <LoadingScreen message="Preparing your secure video room…" />
+      ) : fatalError || !meetingUrl ? (
+        <div className="min-h-screen flex items-center justify-center p-6 bg-canvas">
+          <div className="max-w-sm w-full vf-card text-center space-y-4">
+            <VideoOff className="h-10 w-10 mx-auto text-error-500" />
+            <h1 className="font-display text-xl text-midnight">Cannot join this call</h1>
+            <p className="text-sm text-graphite-500">{fatalError || 'No video room is available for this link.'}</p>
+            <Button onClick={() => navigate('/video-consultations')} className="w-full">
+              Back to Video Consultations
+            </Button>
+          </div>
+        </div>
       ) : (
-        <VideoRoom 
-          roomUrl={roomUrl} 
-          userName={userName} 
-          onLeave={() => logAnalyticsEvent('video_call_ended', { room: roomUrl })} 
-        />
+        <VideoRoom roomUrl={meetingUrl} userName={userName} onLeave={handleLeave} />
       )}
     </ProtectedRoute>
   );

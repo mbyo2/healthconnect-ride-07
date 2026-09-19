@@ -184,8 +184,9 @@ const AppContent = () => {
             <Route path="/provider/:id" element={<ProviderDetail />} />
             <Route path="/emergency" element={<Emergency />} />
             <Route path="/pricing" element={<Pricing />} />
-            <Route path="/workos" element={<BespokeWorkOSShowcase />} />
-            <Route path="/showcase" element={<BespokeWorkOSShowcase />} />
+            {/* Internal ops board — mock clinical data, never public. Super-admin only. */}
+            <Route path="/workos" element={<RouteGuard requireRoles={["super_admin"]}><BespokeWorkOSShowcase /></RouteGuard>} />
+            <Route path="/showcase" element={<RouteGuard requireRoles={["super_admin"]}><BespokeWorkOSShowcase /></RouteGuard>} />
             <Route path="/queue-display" element={<Suspense fallback={<LoadingScreen />}><PublicQueueDisplay /></Suspense>} />
             <Route path="/kiosk" element={<Suspense fallback={<LoadingScreen />}><SelfServiceKiosk /></Suspense>} />
             <Route path="/booking-confirmed" element={<RouteGuard><BookingConfirmed /></RouteGuard>} />
@@ -260,8 +261,11 @@ const AppContent = () => {
             <Route path="/triage" element={<RouteGuard><TriageIntake /></RouteGuard>} />
             <Route path="/doc-o-clock" element={<RouteGuard><TriageIntake /></RouteGuard>} />
             <Route path="/video-dashboard" element={<RouteGuard><VideoDashboard /></RouteGuard>} />
-            <Route path="/testing" element={<RouteGuard><Testing /></RouteGuard>} />
-            <Route path="/documentation" element={<RouteGuard><Documentation /></RouteGuard>} />
+            {/* Legacy alias — role permissions reference /telemedicine; the suite lives at /video-consultations */}
+            <Route path="/telemedicine" element={<RouteGuard><Navigate to="/video-consultations" replace /></RouteGuard>} />
+            {/* Internal QA/dev pages — never linked in public nav. Super-admin only. */}
+            <Route path="/testing" element={<RouteGuard requireRoles={["super_admin"]}><Testing /></RouteGuard>} />
+            <Route path="/documentation" element={<RouteGuard requireRoles={["super_admin"]}><Documentation /></RouteGuard>} />
             {/* marketplace-users and emergency are now public above */}
             <Route path="/map" element={<RouteGuard><Map /></RouteGuard>} />
             <Route path="/marketplace" element={<RouteGuard><Marketplace /></RouteGuard>} />

@@ -24,14 +24,14 @@ const VideoDashboard: React.FC = () => {
             .from("video_consultations")
             .select("id", { count: "exact", head: true })
             .or(`patient_id.eq.${user.id},provider_id.eq.${user.id}`)
-            .gte("scheduled_at", now.toISOString())
-            .lte("scheduled_at", `${sevenDays}T23:59:59`),
+            .gte("scheduled_start", now.toISOString())
+            .lte("scheduled_start", `${sevenDays}T23:59:59`),
           (supabase as any)
             .from("video_consultations")
             .select("id", { count: "exact", head: true })
             .or(`patient_id.eq.${user.id},provider_id.eq.${user.id}`)
-            .gte("scheduled_at", `${today}T00:00:00`)
-            .lt("scheduled_at", `${tomorrow}T00:00:00`),
+            .gte("scheduled_start", `${today}T00:00:00`)
+            .lt("scheduled_start", `${tomorrow}T00:00:00`),
           (supabase as any)
             .from("video_consultations")
             .select("id", { count: "exact", head: true })

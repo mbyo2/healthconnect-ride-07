@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { buildMisReport, downloadCsv } from '@/services/misReports';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -14,6 +15,21 @@ import { toast } from 'sonner';
 export const MISReports = ({ hospital }: { hospital: any }) => {
   const { formatPrice } = useCurrency();
   const hospitalId = hospital?.id;
+  const [generating, setGenerating] = useState<string | null>(null);
+
+  const generateReport = async (title: string) => {
+    if (!hospitalId || generating) return;
+    setGenerating(title);
+    try {
+      const result = await buildMisReport(title, hospitalId);
+      downloadCsv(result.filename, result.rows);
+      toast.success(`${title} exported.`);
+    } catch (e: any) {
+      toast.error(e?.message || 'Failed to generate report');
+    } finally {
+      setGenerating(null);
+    }
+  };
   const today = new Date().toISOString().split('T')[0];
   const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
 
@@ -182,9 +198,10 @@ export const MISReports = ({ hospital }: { hospital: any }) => {
                           size="sm"
                           variant="outline"
                           className="text-[10px] h-6 px-2"
-                          onClick={() => toast.info(`Generating ${r.title}…`)}
+                          onClick={() => generateReport(r.title)}
+                          disabled={generating !== null}
                         >
-                          Generate
+                          {generating === r.title ? 'Building…' : 'Generate'}
                         </Button>
                       </div>
                     </div>

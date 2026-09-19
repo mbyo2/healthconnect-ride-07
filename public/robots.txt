@@ -4,6 +4,7 @@ Allow: /
 # Private / authenticated areas
 Disallow: /admin-dashboard
 Disallow: /super-admin
+Disallow: /super-admin-dashboard
 Disallow: /institution-dashboard
 Disallow: /provider-dashboard
 Disallow: /provider-portal
@@ -15,6 +16,20 @@ Disallow: /chat
 Disallow: /wallet
 Disallow: /auth
 Disallow: /dashboard
+Disallow: /onboarding
+Disallow: /booking-confirmed
+Disallow: /payment-success
+Disallow: /payment-cancel
+Disallow: /payment-return
+Disallow: /payment-cancelled
+
+# Internal / QA — never index
+Disallow: /testing
+Disallow: /documentation
+Disallow: /workos
+Disallow: /showcase
+Disallow: /queue-display
+Disallow: /kiosk
 
 # Crawl hints
 Crawl-delay: 0

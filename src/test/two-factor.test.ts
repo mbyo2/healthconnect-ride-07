@@ -145,17 +145,16 @@ describe('Two-Factor Service', () => {
 
   describe('getTwoFactorStatus', () => {
     it('should return 2FA status when enabled', async () => {
-      const mockFrom = vi.fn().mockReturnValue({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            maybeSingle: vi.fn().mockResolvedValue({
-              data: { enabled: true, backup_codes_remaining: 8 },
-              error: null,
-            }),
-          }),
-        }),
+      const mockMaybeSingle = vi.fn().mockResolvedValue({
+        data: { enabled: true, backup_codes_remaining: 8 },
+        error: null,
       });
-      vi.mocked(supabase.from).mockReturnValue(mockFrom as any);
+      const mockEq = vi.fn().mockReturnValue({ maybeSingle: mockMaybeSingle });
+      const mockSelect = vi.fn().mockReturnValue({ eq: mockEq });
+      
+      vi.mocked(supabase.from).mockReturnValue({
+        select: mockSelect,
+      } as any);
 
       const result = await getTwoFactorStatus('user-123');
       expect(result.enabled).toBe(true);
@@ -163,17 +162,16 @@ describe('Two-Factor Service', () => {
     });
 
     it('should return disabled status when not enabled', async () => {
-      const mockFrom = vi.fn().mockReturnValue({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            maybeSingle: vi.fn().mockResolvedValue({
-              data: null,
-              error: null,
-            }),
-          }),
-        }),
+      const mockMaybeSingle = vi.fn().mockResolvedValue({
+        data: null,
+        error: null,
       });
-      vi.mocked(supabase.from).mockReturnValue(mockFrom as any);
+      const mockEq = vi.fn().mockReturnValue({ maybeSingle: mockMaybeSingle });
+      const mockSelect = vi.fn().mockReturnValue({ eq: mockEq });
+      
+      vi.mocked(supabase.from).mockReturnValue({
+        select: mockSelect,
+      } as any);
 
       const result = await getTwoFactorStatus('user-123');
       expect(result.enabled).toBe(false);

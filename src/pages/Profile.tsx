@@ -17,13 +17,12 @@ import { toast } from "sonner";
 import { useSuccessFeedback } from "@/hooks/use-success-feedback";
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileStats } from "@/components/ProfileStats";
+import { ALL_CLINICIAN_ROLES } from "@/config/roleConfig";
 
 // ── helpers ──────────────────────────────────────────────────────────────────
 
-const PROVIDER_ROLES = [
-  "health_personnel", "doctor", "nurse", "specialist", "pharmacist",
-  "radiologist", "pathologist", "lab_technician", "phlebotomist",
-];
+// Every clinical cadre gets the professional profile sections.
+const PROVIDER_ROLES: readonly string[] = ALL_CLINICIAN_ROLES;
 
 const SUBSPECIALTY_OPTIONS = [
   "Cardiology", "Neurology", "Oncology", "Pediatrics", "Orthopedics",

@@ -7,10 +7,11 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Search, UserPlus, Clock, Hash, Stethoscope } from 'lucide-react';
+import { Search, UserPlus, Clock, Hash, Stethoscope, BedDouble } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useHospitalModule } from '@/hooks/useHospitalModule';
+import { AdmitPatientDialog } from './AdmitPatientDialog';
 
 interface OPDProps {
   hospital: any;
@@ -21,6 +22,7 @@ interface QueueToken {
   id: string;
   token_number: string;
   patient_name: string;
+  patient_id: string | null;
   department: string;
   priority: string;
   status: string;
@@ -58,6 +60,25 @@ export const OPDManagement = ({ hospital, departments }: OPDProps) => {
     bp: '', temp: '', pulse: '', weight: ''
   });
 
+  // OPD → IPD handoff state (shared admit dialog)
+  const [showAdmitDialog, setShowAdmitDialog] = useState(false);
+  const [admitToken, setAdmitToken] = useState<QueueToken | null>(null);
+
+  const openAdmit = (token: QueueToken) => {
+    setAdmitToken(token);
+    setShowAdmitDialog(true);
+  };
+
+  const handleAdmitted = async () => {
+    if (!admitToken) return;
+    // Close the queue token — the patient is now an inpatient.
+    await (supabase.from('queue_tokens' as any) as any)
+      .update({ status: 'completed', completed_time: new Date().toISOString() })
+      .eq('id', admitToken.id);
+    setAdmitToken(null);
+    refresh();
+  };
+
   const { data: opdQueue, loading, refresh } = useHospitalModule<QueueToken>(
     'queue_tokens',
     'institution_id',
@@ -88,8 +109,18 @@ export const OPDManagement = ({ hospital, departments }: OPDProps) => {
       if (newPatient.pulse) vitals.pulse = newPatient.pulse;
       if (newPatient.weight) vitals.weight = newPatient.weight;
 
+      // Human-friendly daily sequence: OPD-20260918-007 (generated
+      // client-side so tokens never depend on a DB default existing).
+      const dayStamp = new Date().toISOString().split('T')[0].replace(/-/g, '');
+      const { count: todayCount } = await (supabase.from('queue_tokens' as any) as any)
+        .select('id', { count: 'exact', head: true })
+        .eq('institution_id', hospital.id)
+        .gte('check_in_time', `${dayStamp.slice(0, 4)}-${dayStamp.slice(4, 6)}-${dayStamp.slice(6, 8)}T00:00:00`);
+      const seq = String((todayCount || 0) + 1).padStart(3, '0');
+
       const { error } = await (supabase.from('queue_tokens' as any) as any).insert({
         institution_id: hospital.id,
+        token_number: `OPD-${dayStamp}-${seq}`,
         patient_name: newPatient.name,
         department: newPatient.department,
         priority: 'normal',
@@ -123,6 +154,8 @@ export const OPDManagement = ({ hospital, departments }: OPDProps) => {
       toast.error(e?.message || 'Failed to update status');
     }
   };
+
+
 
   const waitingCount = todayQueue.filter(p => p.status === 'waiting').length;
   const inConsultation = todayQueue.filter(p => p.status === 'serving').length;
@@ -240,7 +273,7 @@ export const OPDManagement = ({ hospital, departments }: OPDProps) => {
                         <Badge variant={getStatusColor(patient.status) as any}>{patient.status}</Badge>
                       </TableCell>
                       <TableCell>
-                        <div className="flex gap-1">
+                        <div className="flex gap-1 flex-wrap">
                           {patient.status === 'waiting' && (
                             <Button size="sm" variant="outline" onClick={() => updateStatus(patient.id, 'serving')}>
                               Start
@@ -250,6 +283,9 @@ export const OPDManagement = ({ hospital, departments }: OPDProps) => {
                             <>
                               <Button size="sm" variant="outline" onClick={() => updateStatus(patient.id, 'completed')}>
                                 Complete
+                              </Button>
+                              <Button size="sm" variant="outline" onClick={() => openAdmit(patient)}>
+                                <BedDouble className="h-3 w-3 mr-1" /> Admit
                               </Button>
                               <Button size="sm" variant="destructive" onClick={() => updateStatus(patient.id, 'cancelled')}>
                                 Cancel
@@ -271,6 +307,19 @@ export const OPDManagement = ({ hospital, departments }: OPDProps) => {
           )}
         </CardContent>
       </Card>
+
+      {/* Shared admit dialog (OPD → IPD handoff) */}
+      <AdmitPatientDialog
+        hospital={hospital}
+        open={showAdmitDialog}
+        onOpenChange={setShowAdmitDialog}
+        defaultPatientId={admitToken?.patient_id}
+        defaultPatientName={admitToken ? `${admitToken.patient_name} · ${admitToken.department}` : undefined}
+        defaultDiagnosis={admitToken ? `Referred from OPD token ${admitToken.token_number}` : undefined}
+        defaultAdmissionType="scheduled"
+        sourceLabel={admitToken?.token_number}
+        onAdmitted={handleAdmitted}
+      />
 
       {/* Registration Dialog */}
       <Dialog open={showRegDialog} onOpenChange={setShowRegDialog}>

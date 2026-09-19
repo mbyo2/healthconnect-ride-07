@@ -175,15 +175,24 @@ export function useInstitutionContext() {
       }
 
       // 6. Auto-provisioning for institutional roles
+      // (mirrors the taxonomy in roleConfig — any clinical, pharmacy, lab,
+      // community or facility-operations role gets a workspace automatically)
       const userRole = (profile?.role || user.user_metadata?.role || '') as string;
       const businessType = (user.user_metadata?.business_type || '') as string;
       const isInstitutionalRole = [
-        'pharmacy', 'pharmacist', 'hospital', 'clinic', 'specialized_clinic',
+        'pharmacy', 'wholesale_pharmacy', 'pharmacist', 'pharmacy_technologist',
+        'hospital', 'clinic', 'specialized_clinic',
         'laboratory', 'lab', 'lab_technician', 'nursing_home', 'institution_admin',
-        'institution_staff', 'health_personnel', 'doctor', 'nurse', 'radiologist',
-        'phlebotomist', 'cxo', 'support', 'receptionist', 'hr_manager', 'billing_staff',
-        'inventory_manager', 'maintenance_manager', 'specialist', 'ambulance_staff', 'pathologist',
-      ].includes(userRole) || ['pharmacy', 'clinic', 'hospital', 'laboratory', 'nursing_home'].includes(businessType);
+        'institution_staff', 'medical_records_officer', 'health_personnel',
+        'doctor', 'specialist', 'medical_licentiate', 'clinical_officer',
+        'dentist', 'dental_therapist', 'nurse', 'registered_nurse', 'enrolled_nurse',
+        'midwife', 'radiologist', 'radiographer', 'physiotherapist',
+        'occupational_therapist', 'nutritionist', 'optometrist', 'psychologist',
+        'environmental_health_officer', 'community_health_worker',
+        'traditional_practitioner', 'phlebotomist', 'cxo', 'support',
+        'receptionist', 'hr_manager', 'billing_staff',
+        'inventory_manager', 'maintenance_manager', 'ambulance_staff', 'pathologist',
+      ].includes(userRole) || businessType.length > 0;
 
       if (isInstitutionalRole) {
         const institutionName =
@@ -192,15 +201,21 @@ export function useInstitutionContext() {
             ? `${profile.first_name}'s Healthcare Practice`
             : "Doc' O Clock Healthcare Center");
 
+        const roleLower = userRole.toLowerCase();
+        const btLower = businessType.toLowerCase();
         const determinedType =
           businessType ||
-          (['pharmacy', 'pharmacist'].includes(userRole)
-            ? 'pharmacy'
-            : ['laboratory', 'lab', 'lab_technician', 'pathologist'].includes(userRole)
+          (['pharmacy', 'pharmacist', 'pharmacy_technologist'].includes(roleLower)
+            ? 'retail_pharmacy'
+            : ['wholesale_pharmacy', 'wholesale'].includes(roleLower) || btLower.includes('wholesale')
+            ? 'wholesale_pharmacy'
+            : ['laboratory', 'lab', 'lab_technician', 'pathologist', 'phlebotomist'].includes(roleLower)
             ? 'laboratory'
-            : ['nursing_home'].includes(userRole)
+            : roleLower.includes('imaging') || roleLower.includes('radiology')
+            ? 'imaging_centre'
+            : ['nursing_home'].includes(roleLower)
             ? 'nursing_home'
-            : ['hospital'].includes(userRole)
+            : ['hospital'].includes(roleLower)
             ? 'hospital'
             : 'clinic');
 
@@ -227,6 +242,11 @@ export function useInstitutionContext() {
             role: userRole || 'admin',
             is_active: true,
           }).maybeSingle();
+
+          // Provision the HMS workspace in the background (idempotent —
+          // no-op if departments already exist for this institution).
+          const { provisionInstitutionWorkspace } = await import('@/services/institutionProvisioning');
+          provisionInstitutionWorkspace(newInst.id, (newInst as InstitutionData).type).then(() => {}).catch(() => {});
 
           setInstitution(newInst as InstitutionData);
           setIsAdmin(true);

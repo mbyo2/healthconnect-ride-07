@@ -20,6 +20,11 @@ import {
   AlertTriangle, CheckCircle, Clock
 } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { ALL_CLINICIAN_ROLES } from "@/config/roleConfig";
+import { format, subMonths, startOfMonth } from "date-fns";
 
 const TABS = [
   { value: "overview", label: "Overview", icon: Sparkles },
@@ -35,46 +40,101 @@ const TABS = [
   { value: "test", label: "Test Setup", icon: Shield },
 ];
 
-// Sample data - replace with real data from your API
-const userGrowthData = [
-  { name: 'Jan', patients: 245, providers: 38, institutions: 12 },
-  { name: 'Feb', patients: 312, providers: 45, institutions: 15 },
-  { name: 'Mar', patients: 428, providers: 52, institutions: 18 },
-  { name: 'Apr', patients: 567, providers: 61, institutions: 22 },
-  { name: 'May', patients: 698, providers: 73, institutions: 28 },
-  { name: 'Jun', patients: 823, providers: 84, institutions: 31 },
-];
-
-const revenueData = [
-  { name: 'Jan', revenue: 12500, expenses: 8200 },
-  { name: 'Feb', revenue: 15800, expenses: 9100 },
-  { name: 'Mar', revenue: 18400, expenses: 10500 },
-  { name: 'Apr', revenue: 22100, expenses: 11800 },
-  { name: 'May', revenue: 26700, expenses: 13200 },
-  { name: 'Jun', revenue: 31200, expenses: 14500 },
-];
-
-const userTypeDistribution = [
-  { name: 'Patients', value: 823, color: '#397dff' },
-  { name: 'Providers', value: 84, color: '#22C55E' },
-  { name: 'Institutions', value: 31, color: '#f55c15' },
-  { name: 'Admins', value: 5, color: '#F59E0B' },
-];
-
-const securityMetrics = [
-  { name: 'Mon', incidents: 2 },
-  { name: 'Tue', incidents: 1 },
-  { name: 'Wed', incidents: 0 },
-  { name: 'Thu', incidents: 3 },
-  { name: 'Fri', incidents: 1 },
-  { name: 'Sat', incidents: 0 },
-  { name: 'Sun', incidents: 1 },
-];
-
 export const AdminDashboard = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get("tab") || "overview";
   const setTab = (v: string) => setSearchParams({ tab: v });
+
+  // Platform-wide overview — every number below comes from live tables.
+  const { data: platform } = useQuery({
+    queryKey: ['admin-platform-overview'],
+    queryFn: async () => {
+      const [profilesRes, instRes, payRes, secRes, provAppsRes] = await Promise.all([
+        supabase.from('profiles').select('id, role, created_at').limit(5000),
+        supabase.from('healthcare_institutions').select('id, is_verified, created_at').limit(2000),
+        supabase.from('payments').select('amount, status, created_at').in('status', ['paid', 'completed']).limit(5000),
+        supabase.from('security_events').select('id, created_at').gte('created_at', new Date(Date.now() - 7 * 86400000).toISOString()).limit(1000),
+        supabase.from('health_personnel_applications').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+      ]);
+      return {
+        profiles: (profilesRes.data || []) as any[],
+        institutions: (instRes.data || []) as any[],
+        payments: (payRes.data || []) as any[],
+        securityWeek: secRes.data || [],
+        pendingProviders: provAppsRes.count ?? 0,
+      };
+    },
+  });
+
+  const overview = useMemo(() => {
+    const profiles = platform?.profiles || [];
+    const institutions = platform?.institutions || [];
+    const payments = platform?.payments || [];
+    const isClinician = (r: string) => (ALL_CLINICIAN_ROLES as readonly string[]).includes(r);
+    const patients = profiles.filter((p) => p.role === 'patient');
+    const providers = profiles.filter((p) => isClinician(p.role));
+    const admins = profiles.filter((p) => ['admin', 'super_admin'].includes(p.role));
+
+    // Last-6-months growth per cohort from real created_at timestamps.
+    const months: { name: string; start: Date }[] = [];
+    for (let i = 5; i >= 0; i--) {
+      const d = startOfMonth(subMonths(new Date(), i));
+      months.push({ name: format(d, 'MMM'), start: d });
+    }
+    const inMonth = (ts: string | null, idx: number) => {
+      if (!ts) return false;
+      const t = new Date(ts).getTime();
+      const start = months[idx].start.getTime();
+      const end = idx + 1 < months.length ? months[idx + 1].start.getTime() : Date.now() + 1;
+      return t >= start && t < end;
+    };
+    const userGrowthData = months.map((m, i) => ({
+      name: m.name,
+      patients: patients.filter((p) => inMonth(p.created_at, i)).length,
+      providers: providers.filter((p) => inMonth(p.created_at, i)).length,
+      institutions: institutions.filter((x: any) => inMonth(x.created_at, i)).length,
+    }));
+
+    const revenueData = months.map((m, i) => ({
+      name: m.name,
+      revenue: Math.round(
+        payments.filter((p: any) => inMonth(p.created_at, i)).reduce((s: number, p: any) => s + (Number(p.amount) || 0), 0)
+      ),
+    }));
+
+    const userTypeDistribution = [
+      { name: 'Patients', value: patients.length, color: '#397dff' },
+      { name: 'Providers', value: providers.length, color: '#22C55E' },
+      { name: 'Institutions', value: institutions.length, color: '#f55c15' },
+      { name: 'Admins', value: admins.length, color: '#F59E0B' },
+    ];
+
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const securityMetrics = Array.from({ length: 7 }, (_, k) => {
+      const d = new Date(Date.now() - (6 - k) * 86400000);
+      const key = d.toDateString();
+      return {
+        name: dayNames[d.getDay()],
+        incidents: (platform?.securityWeek || []).filter((e: any) => e.created_at && new Date(e.created_at).toDateString() === key).length,
+      };
+    });
+
+    const monthStart = startOfMonth(new Date()).toISOString();
+    return {
+      userGrowthData,
+      revenueData,
+      userTypeDistribution,
+      securityMetrics,
+      totalUsers: profiles.length,
+      providerCount: providers.length,
+      monthRevenue: Math.round(
+        payments.filter((p: any) => p.created_at && p.created_at >= monthStart).reduce((s: number, p: any) => s + (Number(p.amount) || 0), 0)
+      ),
+      incidentsWeek: (platform?.securityWeek || []).length,
+      pendingProviders: platform?.pendingProviders || 0,
+      pendingInstitutions: institutions.filter((x: any) => !x.is_verified).length,
+    };
+  }, [platform]);
 
   return (
     <div className="min-h-screen bg-canvas text-midnight font-sans transition-colors pb-16">
@@ -147,34 +207,30 @@ export const AdminDashboard = () => {
                   ]}
                 />
 
-                {/* Key Metrics */}
+                {/* Key Metrics — live platform counts */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                   <MetricCard
                     title="Total Users"
-                    value="943"
-                    trend={{ value: 18.5, isPositive: true }}
-                    subtitle="Last 30 days"
+                    value={overview.totalUsers.toString()}
+                    subtitle="Registered accounts"
                     icon={Users}
                   />
                   <MetricCard
                     title="Platform Revenue"
-                    value="$31.2K"
-                    trend={{ value: 23.1, isPositive: true }}
-                    subtitle="This month"
+                    value={`K${overview.monthRevenue.toLocaleString()}`}
+                    subtitle="Collected this month"
                     icon={DollarSign}
                   />
                   <MetricCard
-                    title="Active Providers"
-                    value="84"
-                    trend={{ value: 12.8, isPositive: true }}
-                    subtitle="Currently online"
+                    title="Verified Providers"
+                    value={overview.providerCount.toString()}
+                    subtitle="All clinical cadres"
                     icon={Stethoscope}
                   />
                   <MetricCard
                     title="Security Incidents"
-                    value="8"
-                    trend={{ value: 20.0, isPositive: false }}
-                    subtitle="This week"
+                    value={overview.incidentsWeek.toString()}
+                    subtitle="Last 7 days"
                     icon={Shield}
                   />
                 </div>
@@ -197,7 +253,7 @@ export const AdminDashboard = () => {
                       </button>
                     </div>
                     <TrendChart
-                      data={userGrowthData}
+                      data={overview.userGrowthData}
                       lines={[
                         { dataKey: 'patients', name: 'Patients', color: '#397dff' },
                         { dataKey: 'providers', name: 'Providers', color: '#22C55E' },
@@ -207,18 +263,18 @@ export const AdminDashboard = () => {
                     />
                   </div>
 
-                  {/* Revenue vs Expenses */}
+                  {/* Collected Revenue */}
                   <div className="vf-card p-5">
                     <div className="flex items-center justify-between mb-4">
                       <div>
                         <h3 className="font-display text-sm font-medium text-midnight">
-                          Revenue & Expenses
+                          Collected Revenue
                         </h3>
                         <p className="text-xs text-graphite-500 mt-1">
-                          Financial performance tracking
+                          Paid & completed payments per month
                         </p>
                       </div>
-                      <button 
+                      <button
                         onClick={() => setTab('revenue')}
                         className="text-primary-500 hover:text-primary-600 text-xs font-medium"
                       >
@@ -226,10 +282,9 @@ export const AdminDashboard = () => {
                       </button>
                     </div>
                     <SimpleBarChart
-                      data={revenueData}
+                      data={overview.revenueData}
                       bars={[
-                        { dataKey: 'revenue', name: 'Revenue', color: '#22C55E' },
-                        { dataKey: 'expenses', name: 'Expenses', color: '#EF4444' },
+                        { dataKey: 'revenue', name: 'Collected (ZMW)', color: '#22C55E' },
                       ]}
                       height={280}
                     />
@@ -245,7 +300,7 @@ export const AdminDashboard = () => {
                         Breakdown of user roles across the platform
                       </p>
                     </div>
-                    <DonutChart data={userTypeDistribution} height={280} />
+                    <DonutChart data={overview.userTypeDistribution} height={280} />
                   </div>
 
                   {/* Security Incidents */}
@@ -267,7 +322,7 @@ export const AdminDashboard = () => {
                       </button>
                     </div>
                     <SimpleBarChart
-                      data={securityMetrics}
+                      data={overview.securityMetrics}
                       bars={[
                         { dataKey: 'incidents', name: 'Incidents', color: '#EF4444' },
                       ]}
@@ -280,10 +335,10 @@ export const AdminDashboard = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
                   <RecommendationCard
                     title="Review Pending Provider Applications"
-                    description="15 healthcare providers are awaiting verification and approval."
+                    description={`${overview.pendingProviders} healthcare providers and ${overview.pendingInstitutions} institutions are awaiting verification and approval.`}
                     reason="Processing delays may impact provider onboarding and platform growth"
                     icon={Stethoscope}
-                    priority="high"
+                    priority={overview.pendingProviders > 0 || overview.pendingInstitutions > 0 ? "high" : "low"}
                     tags={['Urgent', 'Onboarding']}
                     action={{
                       label: 'Review Applications',

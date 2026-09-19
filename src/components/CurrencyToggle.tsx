@@ -9,10 +9,10 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useCurrency } from '@/hooks/use-currency';
-import { Globe, DollarSign, Check } from 'lucide-react';
+import { Globe, Check } from 'lucide-react';
 
 export function CurrencyToggle() {
-  const { currency, setCurrency } = useCurrency();
+  const { currency, setCurrency, ratesLive } = useCurrency();
 
   return (
     <DropdownMenu>
@@ -24,8 +24,11 @@ export function CurrencyToggle() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48 z-[70] text-xs">
         <DropdownMenuLabel className="text-[11px] font-semibold text-muted-foreground uppercase">
-          Switch Currency
+          Display Currency · ZMW default
         </DropdownMenuLabel>
+        <p className="px-2 pb-1 text-[10px] text-muted-foreground">
+          {ratesLive ? 'Live bank rates · charges settle in ZMW' : 'Loading live rates… · charges settle in ZMW'}
+        </p>
         <DropdownMenuSeparator />
         
         {/* Quick Toggle: ZMW <-> USD */}

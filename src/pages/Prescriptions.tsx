@@ -6,12 +6,15 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useUserRoles } from "@/context/UserRolesContext";
+import { ALL_CLINICIAN_ROLES, PHARMACY_SIDE_ROLES } from "@/config/roleConfig";
 import { useInstitutionContext } from "@/hooks/useInstitutionContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { checkInteractions } from "@/utils/drug-interactions";
+import { DrugInteractionAlert } from "@/components/clinical/DrugInteractionAlert";
+import { AllergyAlertSystem } from "@/components/clinical/AllergyAlertSystem";
 import { EmptyState, LoadingSkeleton } from "@/components/shared";
 import { SuggestionBanner, HealthTipCard, NextStepsCard } from "@/components/guidance";
 
@@ -80,8 +83,11 @@ export const Prescriptions = () => {
     }
   ]);
 
+  // Prescribers, dispensers and facility admins see the provider-side queue.
   const isProvider = availableRoles.some((r) =>
-    ["health_personnel", "doctor", "pharmacist", "pharmacy", "institution_admin"].includes(r)
+    (ALL_CLINICIAN_ROLES as readonly string[]).includes(r) ||
+    (PHARMACY_SIDE_ROLES as readonly string[]).includes(r) ||
+    r === 'institution_admin'
   );
 
   const { data: prescriptions = [], isLoading } = useQuery({
@@ -444,6 +450,12 @@ export const Prescriptions = () => {
                           </button>
                         </div>
                       )}
+                      {/* Enterprise CDS — live allergy profile for the selected patient */}
+                      {selectedPatient && (
+                        <div className="mt-2">
+                          <AllergyAlertSystem patientId={selectedPatient.id} compact />
+                        </div>
+                      )}
                     </div>
 
                     {/* Prescribed Medication Items */}
@@ -550,6 +562,11 @@ export const Prescriptions = () => {
                         </div>
                       ))}
                     </div>
+
+                    {/* Enterprise CDS — interaction + high-risk screening across the whole list */}
+                    <DrugInteractionAlert
+                      prescribedDrugs={medicationItems.map((m) => m.medication_name.trim()).filter(Boolean)}
+                    />
 
                     {/* Drug Interaction Alerts */}
                     {interactionAlerts.length > 0 && (

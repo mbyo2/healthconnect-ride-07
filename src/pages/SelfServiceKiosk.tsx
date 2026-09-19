@@ -81,17 +81,46 @@ export const SelfServiceKiosk: React.FC = () => {
     toast.success(`Registration successful! Token #${tokenNo} printed.`);
   };
 
+  const [billRef, setBillRef] = useState<string | null>(null);
+
+  // Honest kiosk billing: the kiosk is an unattended display — it cannot
+  // move money. It issues a payable bill slip (reference + amount) that the
+  // patient settles at the counter (cash / card / MoMo POS) or in the app.
+  // No fake "approved" state is ever shown.
   const handleProcessPayment = () => {
     if (!payPhone && (payMethod === "mtn" || payMethod === "airtel")) {
       toast.error("Enter your Mobile Money mobile number");
       return;
     }
     setIsProcessingPay(true);
+    const ref = `KB-${new Date().toISOString().split('T')[0].replace(/-/g, '')}-${Math.floor(100 + Math.random() * 900)}`;
     setTimeout(() => {
       setIsProcessingPay(false);
-      toast.success(`Payment of K${billAmount.toFixed(2)} approved! Receipt generated.`);
-      setMode("success");
-    }, 2000);
+      setBillRef(ref);
+      toast.info("Bill slip ready — pay at the counter or in the app.");
+    }, 800);
+  };
+
+  const handlePrintBill = () => {
+    const printWin = window.open("", "_blank");
+    if (printWin) {
+      printWin.document.write(`
+        <html>
+          <body style="font-family: monospace; text-align: center; max-width: 260px; margin: auto; padding: 15px;">
+            <h2 style="margin: 0; font-size: 16px;">DOC' O CLOCK HEALTH</h2>
+            <p style="margin: 2px 0 10px 0; font-size: 10px;">Kiosk Bill Slip (NOT A RECEIPT)</p>
+            <hr style="border-top: 1px dashed #000; margin: 10px 0;"/>
+            <div style="font-size: 13px; font-weight: bold;">Bill Ref: ${billRef || ''}</div>
+            <div style="font-size: 28px; font-weight: bold; margin: 10px 0;">K${billAmount.toFixed(2)}</div>
+            <div style="font-size: 11px;">Method: ${payMethod === "card" ? "Card POS (at counter)" : payMethod === "mtn" ? "MTN MoMo" : "Airtel Money"}${payPhone ? ` (${payPhone})` : ''}</div>
+            <hr style="border-top: 1px dashed #000; margin: 10px 0;"/>
+            <p style="font-size: 9px;">Pay at the billing counter or in the Doc' O Clock app using this reference. Keep this slip.</p>
+            <script>window.print();</script>
+          </body>
+        </html>
+      `);
+      printWin.document.close();
+    }
   };
 
   const handlePrintSlip = () => {
@@ -218,10 +247,10 @@ export const SelfServiceKiosk: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="font-black text-lg text-slate-900 dark:text-slate-100">
-                    Pay Bill / Mobile Money
+                    Bill Slip / Pay Bill
                   </h3>
                   <p className="text-xs text-slate-500 mt-1 font-medium">
-                    Pay for pharmacy medications, lab tests, or consultations via MTN, Airtel, or Card.
+                    Get a payable bill slip for pharmacy, lab, or consultations — settle at the counter or in the app.
                   </p>
                 </div>
                 <div className="mt-6 flex items-center gap-1 text-xs font-black text-purple-600">
@@ -338,8 +367,8 @@ export const SelfServiceKiosk: React.FC = () => {
         {mode === "pay" && (
           <div className="max-w-md mx-auto p-8 rounded-3xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-md space-y-5 text-xs">
             <div className="text-center">
-              <h2 className="text-xl font-black text-slate-900 dark:text-slate-100">Kiosk Express Payment</h2>
-              <p className="text-xs text-slate-500 mt-1">Pay for pharmacy, lab, or consultation</p>
+              <h2 className="text-xl font-black text-slate-900 dark:text-slate-100">Kiosk Bill Slip</h2>
+              <p className="text-xs text-slate-500 mt-1">Pharmacy, lab, or consultation — pay at the counter or in the app</p>
             </div>
 
             <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-[#e6e9ef] flex justify-between items-center">
@@ -398,13 +427,38 @@ export const SelfServiceKiosk: React.FC = () => {
               </div>
             )}
 
-            <button
-              onClick={handleProcessPayment}
-              disabled={isProcessingPay}
-              className="w-full py-3.5 rounded-2xl bg-[#0073ea] hover:bg-[#0060c4] text-white font-extrabold text-sm shadow-sm active:scale-95 transition-all disabled:opacity-50"
-            >
-              {isProcessingPay ? "Authorizing Payment Prompt on Phone..." : `Authorize Payment (K${billAmount.toFixed(2)})`}
-            </button>
+            {billRef ? (
+              <div className="p-5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border-2 border-emerald-500 text-center space-y-2">
+                <p className="text-[10px] font-black uppercase tracking-wider text-slate-500">Bill Slip Ready</p>
+                <p className="text-lg font-black font-mono text-slate-900 dark:text-slate-100">{billRef}</p>
+                <p className="text-2xl font-black text-emerald-600">K{billAmount.toFixed(2)}</p>
+                <p className="text-[11px] text-slate-500 font-medium">
+                  Pay at the billing counter (cash / card / MoMo POS) or in the Doc' O Clock app using this reference.
+                </p>
+                <div className="flex gap-2 pt-1">
+                  <button
+                    onClick={handlePrintBill}
+                    className="flex-1 py-2.5 rounded-2xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-extrabold text-xs"
+                  >
+                    Print Bill Slip
+                  </button>
+                  <button
+                    onClick={() => { setBillRef(null); setMode("menu"); }}
+                    className="flex-1 py-2.5 rounded-2xl border border-[#c3c6d4] font-bold text-xs"
+                  >
+                    Done
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                onClick={handleProcessPayment}
+                disabled={isProcessingPay}
+                className="w-full py-3.5 rounded-2xl bg-[#0073ea] hover:bg-[#0060c4] text-white font-extrabold text-sm shadow-sm active:scale-95 transition-all disabled:opacity-50"
+              >
+                {isProcessingPay ? "Preparing Bill Slip..." : `Get Bill Slip (K${billAmount.toFixed(2)})`}
+              </button>
+            )}
           </div>
         )}
 

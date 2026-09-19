@@ -20,6 +20,8 @@ import { useHospitalModule } from '@/hooks/useHospitalModule';
 import { usePatientNames } from '@/hooks/usePatientNames';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { DrugInteractionAlert } from '@/components/clinical/DrugInteractionAlert';
+import { AllergyAlertSystem } from '@/components/clinical/AllergyAlertSystem';
 
 const DRUG_CATEGORIES = ['Analgesics', 'Antibiotics', 'Antivirals', 'Antihypertensives', 'Antidiabetics', 'Vitamins', 'Antipyretics', 'Antihistamines', 'IV Fluids', 'Controlled', 'Other'];
 
@@ -57,6 +59,34 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
     reason: 'expired',
     notes: ''
   });
+
+  // Dispense safety gate — allergy + interaction screening before release.
+  const [safetyRx, setSafetyRx] = useState<any>(null);
+  const [safetyOthers, setSafetyOthers] = useState<string[]>([]);
+
+  const openDispenseCheck = async (rx: any) => {
+    setSafetyRx(rx);
+    setSafetyOthers([]);
+    if (rx.patient_id) {
+      try {
+        const { data } = await (supabase.from('comprehensive_prescriptions' as any) as any)
+          .select('medication_name')
+          .eq('patient_id', rx.patient_id)
+          .eq('status', 'active')
+          .neq('id', rx.id)
+          .limit(20);
+        setSafetyOthers(((data || []) as any[]).map((r) => r.medication_name).filter(Boolean));
+      } catch {
+        setSafetyOthers([]);
+      }
+    }
+  };
+
+  const confirmDispense = async () => {
+    if (!safetyRx) return;
+    await dispense(safetyRx, 'completed');
+    setSafetyRx(null);
+  };
 
   const { data: inventory, loading, error, refresh } = useHospitalModule<any>(
     'pharmacy_inventory', 'pharmacy_id', hospital?.id, { orderBy: 'product_name', ascending: true }
@@ -299,7 +329,7 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
                       <td className="py-3 px-3 font-extrabold">{rx.quantity ?? '1'}</td>
                       <td className="py-3 px-3 text-center"><span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold text-white bg-[#fdab3d] capitalize">{rx.status}</span></td>
                       <td className="py-3 px-3 text-center">
-                        <button onClick={() => dispense(rx, 'completed')} className="px-3 py-1 rounded-md bg-[#00c875] text-white text-[10px] font-extrabold flex items-center gap-1 mx-auto">
+                        <button onClick={() => openDispenseCheck(rx)} className="px-3 py-1 rounded-md bg-[#00c875] text-white text-[10px] font-extrabold flex items-center gap-1 mx-auto">
                           <CheckCircle2 className="h-3 w-3" /> Dispense
                         </button>
                       </td>
@@ -751,6 +781,41 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
               </Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dispense safety gate — allergy + interaction screening */}
+      <Dialog open={!!safetyRx} onOpenChange={(v) => { if (!v) setSafetyRx(null); }}>
+        <DialogContent className="sm:max-w-[520px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <ShieldAlert className="h-5 w-5 text-amber-500" /> Safety Check Before Dispensing
+            </DialogTitle>
+          </DialogHeader>
+          {safetyRx && (
+            <div className="space-y-3 py-2">
+              <p className="text-sm">
+                <strong>{safetyRx.medication_name}</strong> ({safetyRx.dosage || safetyRx.strength || 'as directed'})
+                {' '}→ {nameFor(safetyRx.patient_id) || 'walk-in patient'}
+              </p>
+              {safetyRx.patient_id ? (
+                <AllergyAlertSystem patientId={safetyRx.patient_id} compact />
+              ) : (
+                <p className="text-xs text-amber-600 font-medium">
+                  No linked patient record — confirm allergies verbally before handing over.
+                </p>
+              )}
+              <DrugInteractionAlert
+                prescribedDrugs={[safetyRx.medication_name, ...safetyOthers].filter(Boolean)}
+              />
+              <div className="flex gap-2 pt-1">
+                <Button variant="outline" className="flex-1" onClick={() => setSafetyRx(null)}>Cancel</Button>
+                <Button className="flex-1 bg-[#00c875] hover:bg-[#00a868] text-white" onClick={confirmDispense}>
+                  <CheckCircle2 className="h-4 w-4 mr-1" /> Confirm Dispense
+                </Button>
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>

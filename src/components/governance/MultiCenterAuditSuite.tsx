@@ -206,7 +206,12 @@ function CryptoAuditTrail() {
             <Hash className="h-5 w-5 text-blue-400" />
           </div>
           <div>
-            <p className="font-semibold text-white text-sm">SHA-256 Hash-Chained Financial Ledger</p>
+            <p className="font-semibold text-white text-sm">
+              SHA-256 Hash-Chained Financial Ledger{' '}
+              <span className="ml-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                DEMO ENTRIES
+              </span>
+            </p>
             <p className="text-xs text-slate-400">
               {chainIntegrityRun ? (
                 <span className={verifiedCount === entries.length ? "text-emerald-400" : "text-red-400"}>

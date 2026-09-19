@@ -54,6 +54,12 @@ export const BedWardManagement = ({ hospital, departments, beds, onRefresh }: Be
   };
 
   const toggleBedStatus = async (bed: any) => {
+    // Occupied beds are owned by the admission workflow — flipping one to
+    // "available" here would orphan the inpatient. Only free beds toggle.
+    if (bed.status === 'occupied') {
+      toast.error(`Bed ${bed.bed_number} is occupied — discharge or transfer the patient first`);
+      return;
+    }
     const newStatus = bed.status === 'available' ? 'maintenance' : 'available';
     try {
       await supabase.from('hospital_beds' as any)

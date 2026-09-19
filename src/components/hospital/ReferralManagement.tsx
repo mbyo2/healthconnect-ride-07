@@ -31,8 +31,10 @@ export const ReferralManagement = ({ hospital }: { hospital: any }) => {
 
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [facilities, setFacilities] = useState<any[]>([]);
   const [form, setForm] = useState({
     patient_id: '',
+    referred_to_hospital_id: '',
     referred_to_department: '',
     referred_to_doctor: '',
     reason_for_referral: '',
@@ -40,6 +42,23 @@ export const ReferralManagement = ({ hospital }: { hospital: any }) => {
     priority: 'routine',
     notes: '',
   });
+
+  // Network directory: verified facilities eligible to receive referrals.
+  // Loaded when the dialog opens so inter-facility routing always works.
+  const loadFacilities = async () => {
+    try {
+      const { data } = await supabase
+        .from('healthcare_institutions')
+        .select('id, name, type, city')
+        .eq('is_verified', true)
+        .neq('id', hospital?.id)
+        .order('name')
+        .limit(200);
+      setFacilities(data || []);
+    } catch {
+      setFacilities([]);
+    }
+  };
 
   const submit = async () => {
     if (!form.patient_id) {
@@ -53,14 +72,16 @@ export const ReferralManagement = ({ hospital }: { hospital: any }) => {
     setSaving(true);
     try {
       const { data: auth } = await supabase.auth.getUser();
+      const dest = facilities.find((f) => f.id === form.referred_to_hospital_id);
       const { error: err } = await (supabase.from('referrals' as any) as any).insert({
         hospital_id: hospital?.id,
         patient_id: form.patient_id,
         referring_doctor_id: auth?.user?.id,
         referral_number: `REF-${Date.now().toString().slice(-8)}`,
         referral_date: new Date().toISOString().slice(0, 10),
+        referred_to_hospital_id: form.referred_to_hospital_id || null,
         referred_to_department: form.referred_to_department || null,
-        referred_to_doctor: form.referred_to_doctor || null,
+        referred_to_doctor: form.referred_to_doctor || dest?.name || null,
         reason_for_referral: form.reason_for_referral,
         diagnosis: form.diagnosis || null,
         priority: form.priority,
@@ -68,9 +89,11 @@ export const ReferralManagement = ({ hospital }: { hospital: any }) => {
         notes: form.notes || null,
       });
       if (err) throw err;
-      toast.success('Referral created');
+      toast.success(
+        dest ? `Referral sent to ${dest.name} — they will see it under Incoming` : 'Referral created'
+      );
       setOpen(false);
-      setForm({ patient_id: '', referred_to_department: '', referred_to_doctor: '', reason_for_referral: '', diagnosis: '', priority: 'routine', notes: '' });
+      setForm({ patient_id: '', referred_to_hospital_id: '', referred_to_department: '', referred_to_doctor: '', reason_for_referral: '', diagnosis: '', priority: 'routine', notes: '' });
       refresh();
       refreshIncoming();
     } catch (e: any) {
@@ -106,7 +129,8 @@ export const ReferralManagement = ({ hospital }: { hospital: any }) => {
           <p className="font-medium text-foreground">{nameFor(r.patient_id)}</p>
           <p className="text-xs text-muted-foreground">{r.reason_for_referral}</p>
           <p className="text-xs text-muted-foreground">
-            {r.referral_number} · {r.referred_to_department || 'No department'} · {r.referral_date}
+            {r.referral_number} · {r.referred_to_department || 'No department'}
+            {r.referred_to_doctor ? ` · → ${r.referred_to_doctor}` : ''} · {r.referral_date}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -130,7 +154,7 @@ export const ReferralManagement = ({ hospital }: { hospital: any }) => {
         </Button>
       </div>
 
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (v) loadFacilities(); }}>
         <DialogContent className="max-h-[85vh] overflow-y-auto">
           <DialogHeader><DialogTitle>Create Referral</DialogTitle></DialogHeader>
           <div className="space-y-4">
@@ -142,12 +166,29 @@ export const ReferralManagement = ({ hospital }: { hospital: any }) => {
               emptyHint="No patients registered at this facility yet. Register a patient in OPD Management or admit one in IPD before creating a referral."
             />
             <div className="space-y-1.5">
+              <Label>Destination facility (network referral)</Label>
+              <Select value={form.referred_to_hospital_id} onValueChange={(v) => setForm({ ...form, referred_to_hospital_id: v === 'none' ? '' : v })}>
+                <SelectTrigger><SelectValue placeholder="Select receiving facility (optional)" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">External / not on network</SelectItem>
+                  {facilities.map((f: any) => (
+                    <SelectItem key={f.id} value={f.id}>
+                      {f.name}{f.city ? ` · ${f.city}` : ''} ({String(f.type || '').replace(/_/g, ' ')})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-[11px] text-muted-foreground">
+                Network facilities receive this referral instantly under their Incoming tab.
+              </p>
+            </div>
+            <div className="space-y-1.5">
               <Label>Refer to department</Label>
               <Input value={form.referred_to_department} onChange={(e) => setForm({ ...form, referred_to_department: e.target.value })} placeholder="e.g. Cardiology" />
             </div>
             <div className="space-y-1.5">
-              <Label>Refer to doctor / facility</Label>
-              <Input value={form.referred_to_doctor} onChange={(e) => setForm({ ...form, referred_to_doctor: e.target.value })} placeholder="e.g. Dr. Banda, UTH" />
+              <Label>Refer to doctor / contact</Label>
+              <Input value={form.referred_to_doctor} onChange={(e) => setForm({ ...form, referred_to_doctor: e.target.value })} placeholder="e.g. Dr. Banda" />
             </div>
             <div className="space-y-1.5">
               <Label>Reason for referral *</Label>

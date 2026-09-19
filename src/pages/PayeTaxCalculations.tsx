@@ -364,7 +364,7 @@ export const PayeTaxCalculations = () => {
                         <SelectValue placeholder="Select employee" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="placeholder">Select employee</SelectItem>
+                        <SelectItem value="placeholder" disabled>No employees available yet</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

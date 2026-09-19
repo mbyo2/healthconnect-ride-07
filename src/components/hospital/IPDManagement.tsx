@@ -13,6 +13,8 @@ import { Plus, Search, UserPlus, Bed, ArrowRightLeft, FileOutput, Loader2 } from
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
+import { DischargeChecklist } from './DischargeChecklist';
+import { ensureBillingDraft } from '@/services/dischargeWorkflow';
 
 interface IPDProps {
   hospital: any;
@@ -20,16 +22,28 @@ interface IPDProps {
   departments: any[];
   beds: any[];
   admissions: any[];
+  discharged?: any[];
   onRefresh: () => void;
 }
 
-export const IPDManagement = ({ hospital, patients, departments, beds, admissions, onRefresh }: IPDProps) => {
+export const IPDManagement = ({ hospital, patients, departments, beds, admissions, discharged = [], onRefresh }: IPDProps) => {
   const [showAdmitDialog, setShowAdmitDialog] = useState(false);
   const [showDischargeDialog, setShowDischargeDialog] = useState(false);
   const [showTransferDialog, setShowTransferDialog] = useState(false);
   const [selectedAdmission, setSelectedAdmission] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // Discharge clearance gate: confirm unlocks when every checklist item is
+  // cleared — or when the checklist itself is unavailable (never deadlock).
+  const [clearance, setClearance] = useState({ cleared: false, unavailable: false });
+  const clearanceOk = clearance.cleared || clearance.unavailable;
+
+  const openDischarge = (admission: any) => {
+    setSelectedAdmission(admission);
+    setClearance({ cleared: false, unavailable: false });
+    setDischargeForm({ dischargeSummary: '', followUpInstructions: '' });
+    setShowDischargeDialog(true);
+  };
 
   const [admitForm, setAdmitForm] = useState({
     patientId: '', admissionType: 'scheduled', departmentId: '',
@@ -106,7 +120,13 @@ export const IPDManagement = ({ hospital, patients, departments, beds, admission
           .eq('id', selectedAdmission.bed_id);
       }
 
-      toast.success('Patient discharged successfully');
+      // Open the billing draft so the visit is never discharged unbilled.
+      const draft = await ensureBillingDraft(hospital?.id, selectedAdmission);
+      toast.success(
+        draft.created
+          ? 'Patient discharged — billing draft opened in the Billing tab'
+          : 'Patient discharged successfully'
+      );
       setShowDischargeDialog(false);
       setDischargeForm({ dischargeSummary: '', followUpInstructions: '' });
       onRefresh();
@@ -209,7 +229,7 @@ export const IPDManagement = ({ hospital, patients, departments, beds, admission
                         <Button variant="outline" size="sm" onClick={() => { setSelectedAdmission(admission); setShowTransferDialog(true); }}>
                           <ArrowRightLeft className="h-3 w-3 mr-1" /> Transfer
                         </Button>
-                        <Button variant="outline" size="sm" onClick={() => { setSelectedAdmission(admission); setShowDischargeDialog(true); }}>
+                        <Button variant="outline" size="sm" onClick={() => openDischarge(admission)}>
                           <FileOutput className="h-3 w-3 mr-1" /> Discharge
                         </Button>
                       </div>
@@ -228,8 +248,37 @@ export const IPDManagement = ({ hospital, patients, departments, beds, admission
 
         <TabsContent value="discharged">
           <Card>
-            <CardContent className="pt-6">
-              <p className="text-sm text-muted-foreground text-center py-4">Discharged patients will appear here after discharge processing.</p>
+            <CardHeader>
+              <CardTitle className="text-base">Discharged Patients ({discharged?.length || 0})</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {(discharged?.length || 0) > 0 ? (
+                <div className="space-y-3">
+                  {discharged.filter(a =>
+                    a.patient?.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    a.patient?.last_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    a.admission_number?.toLowerCase().includes(searchTerm.toLowerCase())
+                  ).map((admission: any) => (
+                    <div key={admission.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg gap-3">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h4 className="font-semibold text-sm">
+                            {admission.patient?.first_name} {admission.patient?.last_name}
+                          </h4>
+                          <Badge variant="outline" className="text-[10px] font-mono">#{admission.admission_number}</Badge>
+                        </div>
+                        <div className="flex items-center gap-4 mt-1 text-xs text-muted-foreground flex-wrap">
+                          <span>Dept: <strong>{admission.department?.name}</strong></span>
+                          <span>Admitted: {admission.admission_date ? format(new Date(admission.admission_date), 'MMM d, yyyy') : '—'}</span>
+                          <span>Discharged: {admission.discharge_date ? format(new Date(admission.discharge_date), 'MMM d, yyyy') : '—'}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground text-center py-4">No discharged patients yet — they appear here after discharge processing.</p>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -312,9 +361,9 @@ export const IPDManagement = ({ hospital, patients, departments, beds, admission
         </DialogContent>
       </Dialog>
 
-      {/* Discharge Dialog */}
+      {/* Discharge Dialog — clearance checklist gates confirmation */}
       <Dialog open={showDischargeDialog} onOpenChange={setShowDischargeDialog}>
-        <DialogContent>
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Discharge Patient</DialogTitle>
             <DialogDescription>
@@ -322,6 +371,14 @@ export const IPDManagement = ({ hospital, patients, departments, beds, admission
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
+            {selectedAdmission && (
+              <DischargeChecklist
+                hospital={hospital}
+                admissionId={selectedAdmission.id}
+                patientId={selectedAdmission.patient_id}
+                onStatusChange={(cleared, unavailable) => setClearance({ cleared, unavailable })}
+              />
+            )}
             <div className="space-y-2">
               <Label>Discharge Summary *</Label>
               <Textarea value={dischargeForm.dischargeSummary} onChange={e => setDischargeForm(p => ({ ...p, dischargeSummary: e.target.value }))}
@@ -332,10 +389,15 @@ export const IPDManagement = ({ hospital, patients, departments, beds, admission
               <Textarea value={dischargeForm.followUpInstructions} onChange={e => setDischargeForm(p => ({ ...p, followUpInstructions: e.target.value }))}
                 placeholder="Follow-up schedule, dietary instructions..." rows={3} />
             </div>
+            {!clearanceOk && (
+              <p className="text-xs text-amber-600 font-medium">
+                Complete all discharge clearances above to enable confirmation.
+              </p>
+            )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowDischargeDialog(false)}>Cancel</Button>
-            <Button onClick={handleDischarge} disabled={isSubmitting}>
+            <Button onClick={handleDischarge} disabled={isSubmitting || !clearanceOk}>
               {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Confirm Discharge
             </Button>
           </DialogFooter>

@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { useDPOPayment } from "@/hooks/useDPOPayment";
+import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, XCircle, Loader2, Clock, RefreshCw } from "lucide-react";
@@ -13,8 +14,39 @@ export default function PaymentReturn() {
   const [message, setMessage] = useState<string>("");
   const [code, setCode] = useState<string>("");
   const [verifying, setVerifying] = useState(false);
+  const [activatedPlan, setActivatedPlan] = useState(false);
 
   const transToken = params.get("TransactionToken") || params.get("trans_token");
+
+  // Paid HMS/subscription checkout → flip the pending subscription active.
+  // Money itself is booked by the settlement layer (app-owner wallet).
+  const activateSubscription = useCallback(async (payment: any) => {
+    try {
+      if (!payment || payment.reference_type !== 'subscription' || !payment.reference_id) return;
+      const { data: sub } = await supabase
+        .from('user_subscriptions')
+        .select('id, status')
+        .eq('id', payment.reference_id)
+        .maybeSingle() as any;
+      if (!sub || sub.status === 'active') {
+        if (sub?.status === 'active') setActivatedPlan(true);
+        return;
+      }
+      const { error } = await (supabase as any)
+        .from('user_subscriptions')
+        .update({ status: 'active' })
+        .eq('id', payment.reference_id)
+        .eq('status', 'pending');
+      if (!error) {
+        setActivatedPlan(true);
+        toast.success('Subscription activated — welcome aboard!');
+      } else {
+        toast.error('Payment received — account activation is pending. Contact support if it takes longer than a few minutes.');
+      }
+    } catch (e) {
+      console.error('Subscription activation failed (non-fatal):', e);
+    }
+  }, []);
 
   const runVerify = useCallback(
     async (silent = false) => {
@@ -26,9 +58,13 @@ export default function PaymentReturn() {
       if (!silent) setVerifying(true);
       try {
         const r = await verifyToken(transToken);
-        setState((r.status as any) || "pending");
+        const next = (r.status as any) || "pending";
+        setState(next);
         setMessage(r.message || "");
         setCode(r.code || "");
+        if (next === 'paid') {
+          await activateSubscription((r as any)?.payment);
+        }
         if (!silent) toast.success("Verification refreshed");
       } catch (e: any) {
         setState("failed");
@@ -38,7 +74,7 @@ export default function PaymentReturn() {
         setVerifying(false);
       }
     },
-    [transToken, verifyToken]
+    [transToken, verifyToken, activateSubscription]
   );
 
   useEffect(() => {
@@ -60,6 +96,11 @@ export default function PaymentReturn() {
         <Icon className={`h-16 w-16 mx-auto ${config.color} ${config.spin ? "animate-spin" : ""}`} />
         <h1 className="text-2xl font-semibold">{config.title}</h1>
         {message && <p className="text-sm text-muted-foreground">{message}</p>}
+        {state === "paid" && activatedPlan && (
+          <p className="text-sm font-medium text-emerald-600">
+            Your HMS subscription is now active — head to your dashboard to continue setup.
+          </p>
+        )}
         {(code || transToken) && (
           <div className="text-xs text-muted-foreground font-mono break-all">
             {code && <div>Code: {code}</div>}

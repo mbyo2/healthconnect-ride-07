@@ -12,6 +12,7 @@ import { MapPin, Navigation, Search, Filter } from 'lucide-react';
 import { toast } from 'sonner';
 import { MobileOptimizedCard } from '@/components/ui/MobileOptimizedCard';
 import { LoadingScreen } from '@/components/LoadingScreen';
+import { ALL_CLINICIAN_ROLES } from '@/config/roleConfig';
 
 const MapPage = () => {
   const [selectedProvider, setSelectedProvider] = useState<Provider | null>(null);
@@ -23,10 +24,8 @@ const MapPage = () => {
   const { data: providers = [], isLoading } = useQuery({
     queryKey: ['providers-map'],
     queryFn: async () => {
-      const PROVIDER_ROLES = [
-        'provider', 'health_personnel', 'doctor', 'nurse',
-        'specialist', 'pharmacist', 'radiologist', 'pathologist',
-      ];
+      // Single source of truth — every clinical cadre appears on the map.
+      const PROVIDER_ROLES = ALL_CLINICIAN_ROLES;
 
       const [{ data: profiles, error: profErr }, { data: institutions, error: instErr }] =
         await Promise.all([
@@ -43,9 +42,9 @@ const MapPage = () => {
           supabase
             .from('healthcare_institutions')
             .select(`
-              id, name, type, logo_url, latitude, longitude, address, city,
+              id, name, type, latitude, longitude, address, city,
               services_offered, emergency_services, is_24_7,
-              telemedicine_available, accreditation_body
+              accreditation_body
             `)
             .eq('is_verified', true)
             .eq('list_in_marketplace', true),   // only marketplace-listed institutions
@@ -79,10 +78,10 @@ const MapPage = () => {
         last_name: '',
         specialty: i.type || 'Healthcare Institution',
         bio: [i.address, i.city].filter(Boolean).join(', '),
-        avatar_url: i.logo_url,
+        avatar_url: (i as any).logo_url ?? (i as any).avatar_url ?? '',
         expertise: i.services_offered?.length ? i.services_offered.slice(0, 3) : [i.type || 'Healthcare'],
         // surface emergency / 24-7 as pseudo-fields for the selected-card
-        telemedicine_available: i.telemedicine_available,
+        telemedicine_available: (i as any).telemedicine_available ?? false,
         location: {
           latitude: i.latitude ? Number(i.latitude) : -15.3875,
           longitude: i.longitude ? Number(i.longitude) : 28.3228,

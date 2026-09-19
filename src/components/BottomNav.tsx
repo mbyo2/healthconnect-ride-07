@@ -148,8 +148,18 @@ export function BottomNav() {
       ];
     }
 
-    // Solo Nurse
-    if (availableRoles.includes('nurse') && !availableRoles.some(r => ['institution_admin', 'institution_staff'].includes(r))) {
+    // Community & public-health field roles (EHO / CHW / traditional)
+    if (availableRoles.some(r => ['environmental_health_officer', 'community_health_worker', 'traditional_practitioner'].includes(r))) {
+      return [
+        { to: "/provider-dashboard", label: "Field", icon: <Stethoscope className="h-5 w-5" />, active: location.pathname === "/provider-dashboard", description: "Field dashboard" },
+        { to: "/appointments", label: "Visits", icon: <Calendar className="h-5 w-5" />, active: location.pathname === "/appointments", description: "Household & field visits" },
+        { to: "/connections", label: "Community", icon: <Users className="h-5 w-5" />, active: location.pathname === "/connections", description: "Households & patients" },
+        { to: "/chat", label: "Chat", icon: <MessageSquare className="h-5 w-5" />, active: location.pathname === "/chat", description: "Care coordination" },
+      ];
+    }
+
+    // Solo Nurse / Midwife (NMCZ cadres)
+    if (availableRoles.some(r => ['nurse', 'registered_nurse', 'enrolled_nurse', 'midwife'].includes(r)) && !availableRoles.some(r => ['institution_admin', 'institution_staff'].includes(r))) {
       return [
         { to: "/provider-dashboard", label: "Dashboard", icon: <Stethoscope className="h-5 w-5" />, active: location.pathname === "/provider-dashboard", description: "Nurse dashboard" },
         { to: "/appointments", label: "Visits", icon: <Calendar className="h-5 w-5" />, active: location.pathname === "/appointments", description: "Patient visits & home calls" },
@@ -168,8 +178,16 @@ export function BottomNav() {
       ];
     }
 
-    // Pharmacy
-    if (availableRoles.some(r => ['pharmacy', 'pharmacist'].includes(r))) {
+    // Pharmacy (retail, wholesale, professionals)
+    if (availableRoles.some(r => ['pharmacy', 'wholesale_pharmacy', 'pharmacist', 'pharmacy_technologist'].includes(r))) {
+      if (availableRoles.includes('wholesale_pharmacy')) {
+        return [
+          { to: "/pharmacy-portal", label: "Portal", icon: <Package className="h-5 w-5" />, active: location.pathname === "/pharmacy-portal", description: "Distribution portal" },
+          { to: "/pharmacy-inventory", label: "Stock", icon: <Pill className="h-5 w-5" />, active: location.pathname === "/pharmacy-inventory", description: "Warehouse stock" },
+          { to: "/marketplace", label: "Supply", icon: <ShoppingCart className="h-5 w-5" />, active: location.pathname === "/marketplace", description: "B2B supply orders" },
+          { to: "/wallet", label: "Revenue", icon: <Wallet className="h-5 w-5" />, active: location.pathname === "/wallet", description: "Revenue & payouts" },
+        ];
+      }
       return [
         { to: "/pharmacy-portal", label: "Portal", icon: <Package className="h-5 w-5" />, active: location.pathname === "/pharmacy-portal", description: "Pharmacy portal" },
         { to: "/pharmacy-inventory", label: "Inventory", icon: <Pill className="h-5 w-5" />, active: location.pathname === "/pharmacy-inventory", description: "Manage inventory" },
@@ -188,8 +206,8 @@ export function BottomNav() {
       ];
     }
 
-    // Institution admin/staff
-    if (availableRoles.some(r => ['institution_admin', 'institution_staff'].includes(r))) {
+    // Institution admin/staff (+ medical records officers)
+    if (availableRoles.some(r => ['institution_admin', 'institution_staff', 'medical_records_officer'].includes(r))) {
       return [
         { to: "/institution-dashboard", label: "Dashboard", icon: <Building2 className="h-5 w-5" />, active: location.pathname === "/institution-dashboard", description: "Institution dashboard" },
         { to: "/institution/appointments", label: "Appointments", icon: <Calendar className="h-5 w-5" />, active: location.pathname === "/institution/appointments", description: "Appointments" },
@@ -198,8 +216,8 @@ export function BottomNav() {
       ];
     }
 
-    // Lab
-    if (availableRoles.some(r => ['lab', 'lab_technician'].includes(r))) {
+    // Lab (facility, technicians, pathologists, phlebotomists)
+    if (availableRoles.some(r => ['lab', 'lab_technician', 'pathologist', 'phlebotomist'].includes(r))) {
       return [
         { to: "/lab-management", label: "Lab", icon: <Activity className="h-5 w-5" />, active: location.pathname === "/lab-management", description: "Lab management" },
         { to: "/medical-records", label: "Records", icon: <Heart className="h-5 w-5" />, active: location.pathname === "/medical-records", description: "Medical records" },
@@ -229,8 +247,8 @@ export function BottomNav() {
       ];
     }
 
-    // Solo Nurse
-    if (availableRoles.includes('nurse') && !availableRoles.some(r => ['institution_admin', 'institution_staff'].includes(r))) {
+    // Solo Nurse / Midwife (NMCZ cadres)
+    if (availableRoles.some(r => ['nurse', 'registered_nurse', 'enrolled_nurse', 'midwife'].includes(r)) && !availableRoles.some(r => ['institution_admin', 'institution_staff'].includes(r))) {
       return [
         { to: "/provider-calendar", label: "My Schedule", description: "View & manage schedule", icon: <Calendar className="h-5 w-5" /> },
         { to: "/medications", label: "Medication Admin", description: "Track medication rounds", icon: <Pill className="h-5 w-5" /> },
@@ -238,6 +256,19 @@ export function BottomNav() {
         ...(!isInstitutionAffiliated ? [{ to: "/wallet", label: "Earnings", description: "Revenue and payouts", icon: <Wallet className="h-5 w-5" /> }] : []),
         { to: "/emergency", label: "Emergency", description: "Emergency protocols", icon: <AlertTriangle className="h-5 w-5 text-red-600" /> },
         { to: "/profile", label: "Profile", description: "Nursing credentials", icon: <User className="h-5 w-5" /> },
+        { to: "/settings", label: "Settings", description: "Preferences", icon: <Settings className="h-5 w-5" /> },
+      ];
+    }
+
+    // Community & public-health field roles
+    if (availableRoles.some(r => ['environmental_health_officer', 'community_health_worker', 'traditional_practitioner'].includes(r))) {
+      return [
+        { to: "/appointments", label: "Field Visits", description: "Household & field visit schedule", icon: <Calendar className="h-5 w-5" /> },
+        { to: "/connections", label: "My Community", description: "Households & patients", icon: <Users className="h-5 w-5" /> },
+        { to: "/medical-records", label: "Field Records", description: "Screening & visit records", icon: <Heart className="h-5 w-5" /> },
+        { to: "/map", label: "Catchment Map", description: "Facilities & households nearby", icon: <Search className="h-5 w-5" /> },
+        { to: "/emergency", label: "Emergency", description: "Emergency protocols", icon: <AlertTriangle className="h-5 w-5 text-red-600" /> },
+        { to: "/profile", label: "Profile", description: "Professional profile", icon: <User className="h-5 w-5" /> },
         { to: "/settings", label: "Settings", description: "Preferences", icon: <Settings className="h-5 w-5" /> },
       ];
     }
@@ -256,8 +287,8 @@ export function BottomNav() {
       ];
     }
 
-    // Pharmacy
-    if (availableRoles.some(r => ['pharmacy', 'pharmacist'].includes(r))) {
+    // Pharmacy (retail, wholesale, professionals)
+    if (availableRoles.some(r => ['pharmacy', 'wholesale_pharmacy', 'pharmacist', 'pharmacy_technologist'].includes(r))) {
       return [
         { to: "/pharmacy-management", label: "Pharmacy Management", description: "Manage pharmacy operations", icon: <ShoppingCart className="h-5 w-5" /> },
         ...(!isInstitutionAffiliated ? [{ to: "/wallet", label: "Revenue", description: "Track sales and revenue", icon: <Wallet className="h-5 w-5" /> }] : []),
@@ -293,8 +324,8 @@ export function BottomNav() {
       ];
     }
 
-    // Lab
-    if (availableRoles.some(r => ['lab', 'lab_technician'].includes(r))) {
+    // Lab (facility, technicians, pathologists, phlebotomists)
+    if (availableRoles.some(r => ['lab', 'lab_technician', 'pathologist', 'phlebotomist'].includes(r))) {
       return [
         { to: "/connections", label: "Patients", description: "Patient lookup", icon: <Users className="h-5 w-5" /> },
         ...(!isInstitutionAffiliated ? [{ to: "/wallet", label: "Revenue", description: "Lab revenue", icon: <Wallet className="h-5 w-5" /> }] : []),
@@ -320,6 +351,12 @@ export function BottomNav() {
     return menuItems.filter(item => hasRoutePermission(availableRoles, item.to));
   }, [menuItems, availableRoles]);
 
+  // Never render a primary tab the user may not open — roles and route
+  // permissions evolve independently, so filter here as a safety net.
+  const filteredNavItems = useMemo(() => {
+    return navItems.filter(item => hasRoutePermission(availableRoles, item.to));
+  }, [navItems, availableRoles]);
+
   if (!isAuthenticated || isDesktop) {
     return null;
   }
@@ -328,7 +365,7 @@ export function BottomNav() {
     <div className="fixed bottom-0 left-0 right-0 z-50 safe-area-pb pointer-events-none">
       <div className="relative mx-auto mb-3 px-4 max-w-md pointer-events-auto">
         <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl shadow-pill-nav border border-canvas-silk dark:border-slate-800 rounded-pill px-2 py-1.5 flex items-center justify-evenly">
-          {navItems.map((item, index) => (
+          {(filteredNavItems.length > 0 ? filteredNavItems : navItems).map((item, index) => (
             <BottomNavItem key={index} {...item} />
           ))}
           <BottomNavMenu user={user} menuItems={filteredMenuItems} />

@@ -578,7 +578,7 @@ export const MedicalShiftHR = () => {
                             <SelectValue placeholder="Select staff" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="placeholder">Select staff member</SelectItem>
+                            <SelectItem value="placeholder" disabled>No staff available yet</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>

@@ -19,7 +19,7 @@ export const WalletTopUp = () => {
     const [amount, setAmount] = useState<string>('50');
     const [isLoading, setIsLoading] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('dpo');
-    const { currency, getSymbol } = useCurrency();
+    const { currency, getSymbol, toZmw, formatPrice } = useCurrency();
     const { redirectToCheckout: redirectToDPOCheckout } = useDPOPayment();
 
     const handleTopUp = async () => {
@@ -37,12 +37,19 @@ export const WalletTopUp = () => {
         setIsLoading(true);
         try {
             if (paymentMethod === 'paypal') {
-                console.log('Initiating PayPal top-up for:', { amount: numAmount, userId: user.id });
+                // Same ZMW-canonical rule as DPO: convert display amount first.
+                const zmwAmount = Math.round(toZmw(numAmount, currency) * 100) / 100;
+                if (!(zmwAmount >= 1)) {
+                    toast.error("Top-up must be at least K1.00");
+                    setIsLoading(false);
+                    return;
+                }
+                console.log('Initiating PayPal top-up for:', { amount: zmwAmount, userId: user.id });
 
                 const { data, error } = await supabase.functions.invoke('process-paypal-payment', {
                     body: {
-                        amount: numAmount,
-                        currency,
+                        amount: zmwAmount,
+                        currency: 'ZMW',
                         patientId: user.id,
                         providerId: '00000000-0000-0000-0000-000000000000', // System/Platform provider ID
                         serviceId: 'wallet_topup',
@@ -60,16 +67,25 @@ export const WalletTopUp = () => {
                     throw new Error(data?.error || "Failed to initiate PayPal payment");
                 }
             } else if (paymentMethod === 'dpo') {
-                console.log('Initiating DPO top-up for:', { amount: numAmount, userId: user.id });
+                // Wallet balances are ZMW-denominated: convert whatever the
+                // user typed in their display currency back to Kwacha first,
+                // otherwise $50 would credit as K50.
+                const zmwAmount = Math.round(toZmw(numAmount, currency) * 100) / 100;
+                if (!(zmwAmount >= 1)) {
+                    toast.error("Top-up must be at least K1.00");
+                    setIsLoading(false);
+                    return;
+                }
+                console.log('Initiating DPO top-up for:', { amount: zmwAmount, displayAmount: numAmount, displayCurrency: currency, userId: user.id });
 
                 const profile = await supabase.from('profiles').select('first_name, last_name, phone').eq('id', user.id).single();
-                
+
                 await redirectToDPOCheckout({
-                    amount: numAmount,
-                    currency: currency || 'ZMW',
+                    amount: zmwAmount,
+                    currency: 'ZMW',
                     reference_type: 'wallet_topup',
                     reference_id: user.id,
-                    description: 'Wallet Top Up',
+                    description: `Wallet Top Up (${formatPrice(zmwAmount, 'ZMW')})`,
                     customer_first_name: profile.data?.first_name || '',
                     customer_last_name: profile.data?.last_name || '',
                     customer_phone: profile.data?.phone || '',

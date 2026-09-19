@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { DollarSign, Edit3, Plus, Save, Search, Tag, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { useCurrency } from "@/hooks/use-currency";
+import { supabase } from "@/integrations/supabase/client";
+import { useInstitutionContext } from "@/hooks/useInstitutionContext";
 
 export interface ServiceTariff {
   id: string;
@@ -31,9 +33,63 @@ const DEFAULT_TARIFFS: ServiceTariff[] = [
   { id: "T-602", code: "WARD-ICU-01", name: "ICU Bed with Ventilator Support (Per Day)", category: "ward", department: "Intensive Care (ICU)", basePrice: 3800, costPrice: 900, insurancePrice: 4200, isAvailable: true },
 ];
 
-export const TariffAndPriceManager = () => {
+/**
+ * Fetch an institution's active tariffs (for billing charge lookup).
+ * Returns [] when the charge book is empty or unreachable — callers must
+ * fall back to their own safe defaults.
+ */
+export async function fetchInstitutionTariffs(institutionId: string): Promise<ServiceTariff[]> {
+  if (!institutionId) return [];
+  const { data, error } = await supabase
+    .from('service_tariffs' as any)
+    .select('*')
+    .eq('institution_id', institutionId)
+    .eq('is_active', true)
+    .order('category')
+    .order('name');
+  if (error || !data) return [];
+  return (data as any[]).map((r) => ({
+    id: r.id,
+    code: r.code,
+    name: r.name,
+    category: r.category,
+    department: r.department || '',
+    basePrice: Number(r.base_price) || 0,
+    costPrice: Number(r.cost_price) || 0,
+    insurancePrice: r.insurance_price != null ? Number(r.insurance_price) : undefined,
+    isAvailable: r.is_active !== false,
+  }));
+}
+
+/**
+ * Resolve a charge from the tariff book: prefer a name match inside the
+ * category, else the first active tariff of that category, else fallback.
+ */
+export function resolveTariffPrice(
+  tariffs: ServiceTariff[],
+  category: ServiceTariff['category'],
+  nameHint: string | undefined,
+  fallback: number
+): number {
+  const inCategory = tariffs.filter((t) => t.category === category && t.isAvailable);
+  if (inCategory.length === 0) return fallback;
+  if (nameHint) {
+    const needle = nameHint.toLowerCase();
+    const hit = inCategory.find(
+      (t) => t.name.toLowerCase().includes(needle) || needle.includes(t.name.toLowerCase())
+    );
+    if (hit) return hit.basePrice;
+  }
+  return inCategory[0].basePrice;
+}
+
+export const TariffAndPriceManager = ({ institutionId: propInstitutionId }: { institutionId?: string } = {}) => {
   const { currency, getSymbol } = useCurrency();
-  const [tariffs, setTariffs] = useState<ServiceTariff[]>(DEFAULT_TARIFFS);
+  const { institution } = useInstitutionContext();
+  const institutionId = propInstitutionId || institution?.id || null;
+  const [tariffs, setTariffs] = useState<ServiceTariff[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [seeding, setSeeding] = useState(false);
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -52,46 +108,138 @@ export const TariffAndPriceManager = () => {
     isAvailable: true,
   });
 
-  const handleSaveInlineEdit = (id: string) => {
-    setTariffs((prev) =>
-      prev.map((t) => {
-        if (t.id === id) {
-          return {
-            ...t,
-            basePrice: editingPrice,
-            costPrice: editingCost,
-            insurancePrice: Math.round(editingPrice * 1.15),
-          };
-        }
-        return t;
-      })
-    );
-    setEditingId(null);
-    toast.success("Updated service price successfully!");
+  const load = useCallback(async () => {
+    if (!institutionId) {
+      setTariffs([]);
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('service_tariffs' as any)
+        .select('*')
+        .eq('institution_id', institutionId)
+        .order('category')
+        .order('name');
+      if (error) throw error;
+      setTariffs(
+        ((data || []) as any[]).map((r) => ({
+          id: r.id,
+          code: r.code,
+          name: r.name,
+          category: r.category,
+          department: r.department || '',
+          basePrice: Number(r.base_price) || 0,
+          costPrice: Number(r.cost_price) || 0,
+          insurancePrice: r.insurance_price != null ? Number(r.insurance_price) : undefined,
+          isAvailable: r.is_active !== false,
+        }))
+      );
+    } catch (e: any) {
+      toast.error(e?.message || 'Failed to load tariffs');
+      setTariffs([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [institutionId]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  // One-click Zambian starter charge book for brand-new facilities.
+  const loadStarterTariffs = async () => {
+    if (!institutionId) return;
+    setSeeding(true);
+    try {
+      const rows = DEFAULT_TARIFFS.map((t) => ({
+        institution_id: institutionId,
+        code: t.code,
+        name: t.name,
+        category: t.category,
+        department: t.department,
+        base_price: t.basePrice,
+        cost_price: t.costPrice || 0,
+        insurance_price: t.insurancePrice ?? Math.round(t.basePrice * 1.15),
+        currency,
+        is_active: true,
+      }));
+      const { error } = await supabase.from('service_tariffs' as any).upsert(rows, { onConflict: 'institution_id,code' });
+      if (error) throw error;
+      toast.success(`Loaded ${rows.length} starter tariffs — adjust them to your fees`);
+      load();
+    } catch (e: any) {
+      toast.error(e?.message || 'Failed to load starter tariffs');
+    } finally {
+      setSeeding(false);
+    }
   };
 
-  const handleAddService = (e: React.FormEvent) => {
+  const handleSaveInlineEdit = async (id: string) => {
+    try {
+      const { error } = await supabase.from('service_tariffs' as any).update({
+        base_price: editingPrice,
+        cost_price: editingCost,
+        insurance_price: Math.round(editingPrice * 1.15),
+      }).eq('id', id);
+      if (error) throw error;
+      setTariffs((prev) =>
+        prev.map((t) => (t.id === id ? { ...t, basePrice: editingPrice, costPrice: editingCost, insurancePrice: Math.round(editingPrice * 1.15) } : t))
+      );
+      setEditingId(null);
+      toast.success('Updated service price successfully!');
+    } catch (e: any) {
+      toast.error(e?.message || 'Failed to save price');
+    }
+  };
+
+  const handleAddService = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newService.name || !newService.basePrice) return;
-    const created: ServiceTariff = {
-      id: `T-${Math.floor(1000 + Math.random() * 9000)}`,
-      code: newService.code || `SRV-${Math.floor(100 + Math.random() * 900)}`,
-      name: newService.name,
-      category: (newService.category as any) || "opd",
-      department: newService.department || "General",
-      basePrice: Number(newService.basePrice),
-      costPrice: Number(newService.costPrice || 0),
-      insurancePrice: Number(newService.insurancePrice || newService.basePrice * 1.15),
-      isAvailable: true,
-    };
-    setTariffs((prev) => [created, ...prev]);
-    setShowAddModal(false);
-    setNewService({ code: "", name: "", category: "opd", department: "General OPD", basePrice: 0, costPrice: 0, insurancePrice: 0, isAvailable: true });
-    toast.success(`Added new service: ${created.name}`);
+    if (!institutionId) {
+      toast.error('No institution context — cannot save tariff');
+      return;
+    }
+    try {
+      const payload = {
+        institution_id: institutionId,
+        code: newService.code || `SRV-${Date.now().toString(36).toUpperCase()}`,
+        name: newService.name,
+        category: (newService.category as any) || 'opd',
+        department: newService.department || 'General',
+        base_price: Number(newService.basePrice),
+        cost_price: Number(newService.costPrice || 0),
+        insurance_price: Number(newService.insurancePrice || Number(newService.basePrice) * 1.15),
+        currency,
+        is_active: true,
+      };
+      const { data, error } = await supabase.from('service_tariffs' as any).insert(payload).select().single();
+      if (error) throw error;
+      const row = data as any;
+      setTariffs((prev) => [{
+        id: row.id, code: row.code, name: row.name, category: row.category,
+        department: row.department || '', basePrice: Number(row.base_price) || 0,
+        costPrice: Number(row.cost_price) || 0,
+        insurancePrice: row.insurance_price != null ? Number(row.insurance_price) : undefined,
+        isAvailable: row.is_active !== false,
+      }, ...prev]);
+      setShowAddModal(false);
+      setNewService({ code: '', name: '', category: 'opd', department: 'General OPD', basePrice: 0, costPrice: 0, insurancePrice: 0, isAvailable: true });
+      toast.success(`Added new service: ${payload.name}`);
+    } catch (e: any) {
+      toast.error(e?.message || 'Failed to add tariff');
+    }
   };
 
-  const toggleAvailability = (id: string) => {
-    setTariffs((prev) => prev.map((t) => (t.id === id ? { ...t, isAvailable: !t.isAvailable } : t)));
+  const toggleAvailability = async (id: string, next: boolean) => {
+    try {
+      const { error } = await supabase.from('service_tariffs' as any).update({ is_active: next }).eq('id', id);
+      if (error) throw error;
+      setTariffs((prev) => prev.map((t) => (t.id === id ? { ...t, isAvailable: next } : t)));
+    } catch (e: any) {
+      toast.error(e?.message || 'Failed to update status');
+    }
   };
 
   const filtered = tariffs.filter((t) => {
@@ -116,14 +264,36 @@ export const TariffAndPriceManager = () => {
             Configure consultation fees, laboratory panels, radiology rates, and ward bed prices
           </p>
         </div>
-        <button
-          onClick={() => setShowAddModal(true)}
-          className="px-3.5 py-1.5 rounded-md bg-[#0073ea] hover:bg-[#0060c4] text-white font-extrabold text-xs shadow-xs flex items-center gap-1"
-        >
-          <Plus className="h-4 w-4" />
-          <span>Add Service Tariff</span>
-        </button>
+        <div className="flex gap-2">
+          {tariffs.length === 0 && !loading && (
+            <button
+              onClick={loadStarterTariffs}
+              disabled={seeding || !institutionId}
+              className="px-3.5 py-1.5 rounded-md border border-[#0073ea] text-[#0073ea] hover:bg-[#e8f1ff] font-extrabold text-xs shadow-xs flex items-center gap-1 disabled:opacity-50"
+            >
+              <Tag className="h-4 w-4" />
+              <span>{seeding ? 'Loading…' : 'Load Starter Tariffs'}</span>
+            </button>
+          )}
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="px-3.5 py-1.5 rounded-md bg-[#0073ea] hover:bg-[#0060c4] text-white font-extrabold text-xs shadow-xs flex items-center gap-1"
+          >
+            <Plus className="h-4 w-4" />
+            <span>Add Service Tariff</span>
+          </button>
+        </div>
       </div>
+
+      {loading ? (
+        <p className="text-xs text-[#676879] py-8 text-center">Loading charge book…</p>
+      ) : tariffs.length === 0 ? (
+        <div className="rounded-xl border border-dashed border-[#c3c6d4] p-8 text-center space-y-2">
+          <Tag className="h-8 w-8 mx-auto text-slate-300" />
+          <p className="text-sm font-extrabold">No tariffs yet</p>
+          <p className="text-xs text-[#676879]">Load the Zambian starter charge book or add your own services — billing uses these rates.</p>
+        </div>
+      ) : null}
 
       {/* Filter Controls */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
@@ -154,6 +324,7 @@ export const TariffAndPriceManager = () => {
       </div>
 
       {/* Main Tariff Table */}
+      {!loading && tariffs.length > 0 && (
       <div className="w-full overflow-x-auto rounded-xl border border-[#e6e9ef] bg-white dark:bg-slate-900 shadow-xs">
         <table className="w-full text-left border-collapse text-xs">
           <thead>
@@ -208,7 +379,7 @@ export const TariffAndPriceManager = () => {
                     +{margin}%
                   </td>
                   <td className="py-3 px-3 text-center">
-                    <button onClick={() => toggleAvailability(t.id)}>
+                    <button onClick={() => toggleAvailability(t.id, !t.isAvailable)}>
                       {t.isAvailable ? (
                         <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-[#00c875]">Active</span>
                       ) : (
@@ -243,6 +414,7 @@ export const TariffAndPriceManager = () => {
           </tbody>
         </table>
       </div>
+      )}
 
       {/* Add Modal */}
       <Dialog open={showAddModal} onOpenChange={setShowAddModal}>

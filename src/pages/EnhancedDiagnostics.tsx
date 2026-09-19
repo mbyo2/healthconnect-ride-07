@@ -277,7 +277,7 @@ export const EnhancedDiagnostics = () => {
                         <SelectValue placeholder="Select patient" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="placeholder">Select patient</SelectItem>
+                        <SelectItem value="placeholder" disabled>No patients available yet</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -367,7 +367,7 @@ export const EnhancedDiagnostics = () => {
                         <SelectValue placeholder="Select staff" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="placeholder">Select staff member</SelectItem>
+                        <SelectItem value="placeholder" disabled>No staff available yet</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

@@ -7,31 +7,35 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Plus, UserPlus, Calendar, Clock, Users } from 'lucide-react';
+import { Plus, UserPlus, Calendar, Clock, Users, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { usePatientNames } from '@/hooks/usePatientNames';
 
 interface StaffRosterProps {
   hospital: any;
   departments: any[];
 }
 
-interface DutyEntry {
-  id: string;
-  staffName: string;
-  department: string;
-  shift: 'morning' | 'afternoon' | 'night';
-  date: string;
-  role: string;
-  status: 'on-duty' | 'off-duty' | 'leave';
-}
+const SHIFT_TIMES = {
+  morning: { start: '06:00', end: '14:00', label: 'Morning (6AM-2PM)' },
+  afternoon: { start: '14:00', end: '22:00', label: 'Afternoon (2PM-10PM)' },
+  night: { start: '22:00', end: '06:00', label: 'Night (10PM-6AM)' },
+} as const;
+
+const STAFF_ROLES = [
+  'Doctor', 'Nurse', 'Clinical Officer', 'Midwife', 'Pharmacist',
+  'Lab Technologist', 'Radiographer', 'Physiotherapist', 'Receptionist', 'Administrator',
+];
 
 export const StaffRoster = ({ hospital, departments }: StaffRosterProps) => {
   const [personnel, setPersonnel] = useState<any[]>([]);
-  const [roster, setRoster] = useState<DutyEntry[]>([]);
+  const [roster, setRoster] = useState<any[]>([]);
+  const [loadingRoster, setLoadingRoster] = useState(true);
   const [showDialog, setShowDialog] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
-    staffName: '', department: '', shift: 'morning' as const, date: new Date().toISOString().split('T')[0], role: 'Doctor'
+    staffId: '', department: '', shift: 'morning' as keyof typeof SHIFT_TIMES, date: new Date().toISOString().split('T')[0], role: 'Doctor'
   });
 
   useEffect(() => {
@@ -46,23 +50,72 @@ export const StaffRoster = ({ hospital, departments }: StaffRosterProps) => {
     fetchPersonnel();
   }, [hospital?.id]);
 
-  const addDuty = () => {
-    if (!form.staffName || !form.department || !form.date) {
-      toast.error('Please fill required fields');
+  const fetchRoster = async () => {
+    if (!hospital?.id) return;
+    setLoadingRoster(true);
+    try {
+      const { data, error } = await supabase
+        .from('staff_schedules' as any)
+        .select('*, department:hospital_departments(name)')
+        .eq('institution_id', hospital.id)
+        .order('shift_date', { ascending: false })
+        .limit(200);
+      if (error) throw error;
+      setRoster((data as any[]) || []);
+    } catch (e) {
+      console.error('Failed to load duty roster:', e);
+    } finally {
+      setLoadingRoster(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRoster();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hospital?.id]);
+
+  const { nameFor } = usePatientNames(roster.map((r: any) => r.staff_id));
+
+  const addDuty = async () => {
+    if (!form.staffId || !form.department || !form.date) {
+      toast.error('Select staff, department and date');
       return;
     }
-    const entry: DutyEntry = {
-      id: crypto.randomUUID(),
-      staffName: form.staffName,
-      department: form.department,
-      shift: form.shift,
-      date: form.date,
-      role: form.role,
-      status: 'on-duty'
-    };
-    setRoster(prev => [...prev, entry]);
-    setShowDialog(false);
-    toast.success('Duty assigned successfully');
+    const dept = (departments || []).find((d: any) => d.name === form.department);
+    const times = SHIFT_TIMES[form.shift];
+    setSaving(true);
+    try {
+      const { error } = await supabase.from('staff_schedules' as any).insert({
+        institution_id: hospital.id,
+        staff_id: form.staffId,
+        department_id: dept?.id || null,
+        shift_date: form.date,
+        shift_start: times.start,
+        shift_end: times.end,
+        shift_type: form.shift,
+        notes: form.role,
+      });
+      if (error) throw error;
+      toast.success('Duty assigned successfully');
+      setShowDialog(false);
+      setForm({ staffId: '', department: '', shift: 'morning', date: new Date().toISOString().split('T')[0], role: 'Doctor' });
+      fetchRoster();
+    } catch (e: any) {
+      toast.error(e?.message || 'Failed to assign duty');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const removeDuty = async (id: string) => {
+    try {
+      const { error } = await supabase.from('staff_schedules' as any).delete().eq('id', id);
+      if (error) throw error;
+      toast.success('Duty assignment removed');
+      fetchRoster();
+    } catch (e: any) {
+      toast.error(e?.message || 'Failed to remove assignment');
+    }
   };
 
   const shiftColors = {
@@ -71,7 +124,8 @@ export const StaffRoster = ({ hospital, departments }: StaffRosterProps) => {
     night: 'outline'
   };
 
-  const todayRoster = roster.filter(r => r.date === new Date().toISOString().split('T')[0]);
+  const todayKey = new Date().toISOString().split('T')[0];
+  const todayRoster = roster.filter((r: any) => r.shift_date === todayKey);
 
   return (
     <div className="space-y-4">
@@ -144,7 +198,9 @@ export const StaffRoster = ({ hospital, departments }: StaffRosterProps) => {
           )}
 
           {/* Roster Table */}
-          {roster.length > 0 ? (
+          {loadingRoster ? (
+            <div className="text-center py-4 text-muted-foreground text-sm">Loading duty roster…</div>
+          ) : roster.length > 0 ? (
             <Table>
               <TableHeader>
                 <TableRow>
@@ -153,21 +209,25 @@ export const StaffRoster = ({ hospital, departments }: StaffRosterProps) => {
                   <TableHead>Department</TableHead>
                   <TableHead>Date</TableHead>
                   <TableHead>Shift</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Action</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {roster.map(entry => (
+                {roster.map((entry: any) => (
                   <TableRow key={entry.id}>
-                    <TableCell className="font-medium">{entry.staffName}</TableCell>
-                    <TableCell>{entry.role}</TableCell>
-                    <TableCell>{entry.department}</TableCell>
-                    <TableCell>{entry.date}</TableCell>
+                    <TableCell className="font-medium">{nameFor(entry.staff_id) || 'Staff'}</TableCell>
+                    <TableCell>{entry.notes || '—'}</TableCell>
+                    <TableCell>{entry.department?.name || 'General'}</TableCell>
+                    <TableCell>{entry.shift_date}</TableCell>
                     <TableCell>
-                      <Badge variant={shiftColors[entry.shift] as any} className="capitalize">{entry.shift}</Badge>
+                      <Badge variant={shiftColors[entry.shift_type] as any} className="capitalize">
+                        {entry.shift_type} ({entry.shift_start}–{entry.shift_end})
+                      </Badge>
                     </TableCell>
-                    <TableCell>
-                      <Badge variant={entry.status === 'on-duty' ? 'default' : 'outline'} className="capitalize">{entry.status}</Badge>
+                    <TableCell className="text-right">
+                      <Button size="sm" variant="ghost" onClick={() => removeDuty(entry.id)} title="Remove assignment">
+                        <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -186,8 +246,20 @@ export const StaffRoster = ({ hospital, departments }: StaffRosterProps) => {
           <DialogHeader><DialogTitle>Assign Duty</DialogTitle></DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label>Staff Name *</Label>
-              <Input value={form.staffName} onChange={e => setForm(p => ({ ...p, staffName: e.target.value }))} placeholder="Staff member name" />
+              <Label>Staff Member *</Label>
+              <Select value={form.staffId} onValueChange={v => setForm(p => ({ ...p, staffId: v }))}>
+                <SelectTrigger><SelectValue placeholder="Select registered staff" /></SelectTrigger>
+                <SelectContent>
+                  {personnel.map((p: any) => (
+                    <SelectItem key={p.user_id} value={p.user_id}>
+                      {[p.profile?.first_name, p.profile?.last_name].filter(Boolean).join(' ') || p.user_id} ({p.role || 'Staff'})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {personnel.length === 0 && (
+                <p className="text-xs text-muted-foreground">No registered personnel yet — add staff under Personnel first.</p>
+              )}
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -195,7 +267,7 @@ export const StaffRoster = ({ hospital, departments }: StaffRosterProps) => {
                 <Select value={form.role} onValueChange={v => setForm(p => ({ ...p, role: v }))}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    {['Doctor', 'Nurse', 'Surgeon', 'Anesthetist', 'Pharmacist', 'Lab Tech', 'Receptionist', 'Ward Boy'].map(r => (
+                    {STAFF_ROLES.map(r => (
                       <SelectItem key={r} value={r}>{r}</SelectItem>
                     ))}
                   </SelectContent>
@@ -234,7 +306,7 @@ export const StaffRoster = ({ hospital, departments }: StaffRosterProps) => {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowDialog(false)}>Cancel</Button>
-            <Button onClick={addDuty}>Assign</Button>
+            <Button onClick={addDuty} disabled={saving}>{saving ? 'Assigning…' : 'Assign'}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
 import { UserRole, AdminLevel } from '@/types/user';
+import { ROLE_PRIORITY } from '@/config/roleConfig';
 import { supabase } from '@/integrations/supabase/client';
 
 interface UserRolesContextType {
@@ -23,6 +24,78 @@ interface UserRolesContextType {
 }
 
 const UserRolesContext = createContext<UserRolesContextType | undefined>(undefined);
+
+/**
+ * Expand raw role strings (DB rows, profile, auth metadata) into the full
+ * capability set. Single implementation used by both the initial fetch and
+ * refreshRoles so the two can never disagree.
+ *
+ * Clinical cadres inherit the legacy 'health_personnel' catch-all so
+ * provider dashboards, calendars and shared components keep working.
+ */
+const CLINICAL_WITH_PERSONNEL = new Set([
+  'doctor', 'specialist', 'medical_licentiate', 'clinical_officer',
+  'dentist', 'dental_therapist', 'radiologist', 'radiographer',
+  'pathologist', 'physiotherapist', 'occupational_therapist',
+  'nutritionist', 'optometrist', 'psychologist',
+  'environmental_health_officer', 'community_health_worker',
+  'traditional_practitioner', 'pharmacist', 'pharmacy_technologist',
+  'lab_technician', 'registered_nurse', 'enrolled_nurse', 'midwife',
+]);
+
+function expandRawRoles(rawRoles: string[]): UserRole[] {
+  const expandedRoles = new Set<UserRole>();
+  rawRoles.forEach(r => {
+    const roleStr = r.toLowerCase();
+    if (roleStr === 'pharmacy') {
+      expandedRoles.add('pharmacy');
+      expandedRoles.add('pharmacist');
+      expandedRoles.add('institution_admin');
+    } else if (roleStr === 'pharmacist') {
+      expandedRoles.add('pharmacist');
+      expandedRoles.add('pharmacy');
+      expandedRoles.add('health_personnel');
+    } else if (roleStr === 'wholesale_pharmacy' || roleStr === 'wholesale') {
+      expandedRoles.add('wholesale_pharmacy');
+    } else if (roleStr === 'lab' || roleStr === 'laboratory') {
+      expandedRoles.add('lab');
+      expandedRoles.add('lab_technician');
+      expandedRoles.add('institution_admin');
+    } else if (roleStr === 'lab_technician') {
+      expandedRoles.add('lab_technician');
+      expandedRoles.add('lab');
+      expandedRoles.add('health_personnel');
+    } else if (roleStr === 'nurse') {
+      // Legacy catch-all nurse → canonical registered nurse cadre
+      expandedRoles.add('nurse');
+      expandedRoles.add('registered_nurse');
+      expandedRoles.add('health_personnel');
+    } else if (CLINICAL_WITH_PERSONNEL.has(roleStr)) {
+      expandedRoles.add(roleStr as UserRole);
+      expandedRoles.add('health_personnel');
+    } else if (roleStr === 'medical_records_officer') {
+      expandedRoles.add('medical_records_officer');
+      expandedRoles.add('institution_staff');
+    } else if (roleStr === 'institution_admin' || roleStr === 'hospital' || roleStr === 'clinic') {
+      expandedRoles.add('institution_admin');
+      expandedRoles.add('institution_staff');
+    } else if (roleStr === 'superadmin' || roleStr === 'super_admin') {
+      expandedRoles.add('super_admin');
+      expandedRoles.add('admin');
+    } else if (roleStr === 'admin') {
+      expandedRoles.add('admin');
+    } else if (roleStr === 'patient') {
+      expandedRoles.add('patient');
+    } else {
+      expandedRoles.add(roleStr as UserRole);
+    }
+  });
+
+  if (expandedRoles.size === 0) {
+    expandedRoles.add('patient');
+  }
+  return Array.from(expandedRoles);
+}
 
 export function UserRolesProvider({ children }: { children: React.ReactNode }) {
   const { profile, user, isLoading: authLoading } = useAuth();
@@ -83,79 +156,20 @@ export function UserRolesProvider({ children }: { children: React.ReactNode }) {
           const metaProviderType = user.user_metadata?.providerType;
           if (metaRole) rawRoles.push(metaRole);
           if (metaBusinessType) {
-            if (metaBusinessType === 'pharmacy') rawRoles.push('pharmacy', 'pharmacist');
-            else if (metaBusinessType === 'laboratory') rawRoles.push('lab', 'lab_technician');
+            const bt = String(metaBusinessType).toLowerCase();
+            if (bt.includes('wholesale')) rawRoles.push('wholesale_pharmacy');
+            else if (bt.includes('pharm')) rawRoles.push('pharmacy', 'pharmacist');
+            else if (bt.includes('lab')) rawRoles.push('lab', 'lab_technician');
             else rawRoles.push('institution_admin');
           }
           if (metaProviderType) rawRoles.push(metaProviderType);
 
-          // 4. Role Expansion for related capabilities
-          const expandedRoles = new Set<UserRole>();
-          rawRoles.forEach(r => {
-            const roleStr = r.toLowerCase();
-            if (roleStr === 'pharmacy') {
-              expandedRoles.add('pharmacy');
-              expandedRoles.add('pharmacist');
-              expandedRoles.add('institution_admin');
-            } else if (roleStr === 'pharmacist') {
-              expandedRoles.add('pharmacist');
-              expandedRoles.add('pharmacy');
-              expandedRoles.add('health_personnel');
-            } else if (roleStr === 'lab' || roleStr === 'laboratory') {
-              expandedRoles.add('lab');
-              expandedRoles.add('lab_technician');
-              expandedRoles.add('institution_admin');
-            } else if (roleStr === 'lab_technician') {
-              expandedRoles.add('lab_technician');
-              expandedRoles.add('lab');
-              expandedRoles.add('health_personnel');
-            } else if (roleStr === 'doctor') {
-              expandedRoles.add('doctor');
-              expandedRoles.add('health_personnel');
-            } else if (roleStr === 'nurse') {
-              expandedRoles.add('nurse');
-              expandedRoles.add('health_personnel');
-            } else if (roleStr === 'radiologist') {
-              expandedRoles.add('radiologist');
-              expandedRoles.add('health_personnel');
-            } else if (roleStr === 'pathologist') {
-              expandedRoles.add('pathologist');
-              expandedRoles.add('health_personnel');
-            } else if (roleStr === 'institution_admin' || roleStr === 'hospital' || roleStr === 'clinic') {
-              expandedRoles.add('institution_admin');
-              expandedRoles.add('institution_staff');
-            } else if (roleStr === 'superadmin' || roleStr === 'super_admin') {
-              expandedRoles.add('super_admin');
-              expandedRoles.add('admin');
-            } else if (roleStr === 'admin') {
-              expandedRoles.add('admin');
-            } else if (roleStr === 'patient') {
-              expandedRoles.add('patient');
-            } else {
-              expandedRoles.add(roleStr as UserRole);
-            }
-          });
-
-          if (expandedRoles.size === 0) {
-            expandedRoles.add('patient');
-          }
-
-          const roles = Array.from(expandedRoles);
+          // 4. Role Expansion for related capabilities (shared helper)
+          const roles = expandRawRoles(rawRoles);
           setAvailableRoles(roles);
 
-          // Role priority ranking for setting primary role
-          const rolePriority: UserRole[] = [
-            'super_admin', 'admin', 'support', 'cxo',
-            'pharmacy', 'pharmacist',
-            'lab', 'lab_technician',
-            'institution_admin', 'institution_staff',
-            'doctor', 'nurse', 'radiologist', 'pathologist', 'specialist', 'health_personnel',
-            'ot_staff', 'triage_staff', 'receptionist', 'hr_manager', 'billing_staff',
-            'phlebotomist',
-            'inventory_manager', 'maintenance_manager', 'ambulance_staff',
-            'patient'
-          ];
-          const primaryRole = rolePriority.find(r => roles.includes(r)) || roles[0];
+          // Primary role follows the central priority order (roleConfig).
+          const primaryRole = ROLE_PRIORITY.find(r => roles.includes(r)) || roles[0];
 
           setUserRole(primaryRole);
           setCurrentRole(primaryRole);
@@ -237,7 +251,8 @@ export function UserRolesProvider({ children }: { children: React.ReactNode }) {
         .eq('user_id', user.id);
 
       if (rolesData && rolesData.length > 0) {
-        const roles = rolesData.map(r => r.role as UserRole);
+        // Same expansion as the initial fetch — never raw rows.
+        const roles = expandRawRoles(rolesData.map(r => String(r.role)));
         setAvailableRoles(roles);
         const primaryRole = roles[0] as UserRole;
         setUserRole(primaryRole);

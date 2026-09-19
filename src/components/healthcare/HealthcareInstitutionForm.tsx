@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -15,6 +15,8 @@ import type { Database } from "@/integrations/supabase/types";
 import { SpecialtySelector } from "./SpecialtySelector";
 import { saveInstitutionSpecialties } from "@/hooks/useClinicSpecialties";
 import { REGULATORY_REQUIREMENTS, getCountryRequirements, validateDocumentUpload, type DocumentRequirement } from "@/config/regulatoryRequirements";
+import { INSTITUTION_TYPE_OPTIONS, type InstitutionTypeOption } from "@/config/facilityProfiles";
+import { provisionInstitutionWorkspace } from "@/services/institutionProvisioning";
 
 type HealthcareInstitution = Database['public']['Tables']['healthcare_institutions']['Insert'];
 
@@ -27,26 +29,14 @@ interface FormErrors {
   email?: string;
 }
 
-const PROVIDER_TYPES = [
-  'hospital',
-  'clinic',
-  'laboratory',
-  'pharmacy',
-  'dispensary',
-  'pediatric_center',
-  'physiotherapy',
-  'nursing_home',
-  'care_home',
-  'diagnostic_center',
-  'dental_clinic',
-  'eye_clinic',
-  'skin_clinic',
-  'specialty_clinic',
-  'dentist',
-  'optician',
-  'dermatology_clinic',
-  'radiology_center',
-] as const;
+// Facility types come from the institution_types table; the full MOH Zambia
+// taxonomy below is the fallback so signup never shows an empty dropdown.
+const TYPE_GROUP_LABELS: Record<InstitutionTypeOption['kind'], string> = {
+  care: 'Hospitals, Clinics & Care Facilities',
+  pharmacy: 'Pharmacies (ZAMRA licensed)',
+  diagnostic: 'Laboratories & Imaging',
+  support: 'Long-Term & Community Care',
+};
 
 export const HealthcareInstitutionForm = () => {
   const navigate = useNavigate();
@@ -113,10 +103,41 @@ export const HealthcareInstitutionForm = () => {
   const [selectedCountry, setSelectedCountry] = useState<string>("ZM");
   const [uploadedDocuments, setUploadedDocuments] = useState<Record<string, string>>({});
   const [documentValidation, setDocumentValidation] = useState<{ valid: boolean; missing: string[] }>({ valid: true, missing: [] });
+  const [typeOptions, setTypeOptions] = useState<InstitutionTypeOption[]>(INSTITUTION_TYPE_OPTIONS);
 
-  const isClinicType = ['clinic', 'dental_clinic', 'eye_clinic', 'skin_clinic', 'specialty_clinic'].includes(formData.type);
-  const isInstitutionType = ['hospital', 'clinic', 'nursing_home'].includes(formData.type);
-  const isPharmacyType = formData.type === 'pharmacy';
+  // Institution types are data, not code — load from the reference table,
+  // fall back to the bundled MOH Zambia taxonomy when offline/empty.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data, error } = await supabase
+          .from('institution_types')
+          .select('code, name, description')
+          .eq('is_active', true)
+          .order('display_order');
+        if (!cancelled && !error && data && data.length > 0) {
+          setTypeOptions(
+            data.map((t: any) => ({
+              code: t.code,
+              name: t.name,
+              description: t.description || '',
+              kind: (/pharm|drug|dispens|health_shop/.test(t.code) ? 'pharmacy'
+                : (/lab|imaging|radiolog|diagnostic|blood/.test(t.code) ? 'diagnostic'
+                : (/nursing|hospice|home|rehab/.test(t.code) ? 'support' : 'care'))) as InstitutionTypeOption['kind'],
+            }))
+          );
+        }
+      } catch {
+        // Fallback list already in state — signup stays usable.
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  const isClinicType = ['clinic', 'dental_clinic', 'eye_clinic', 'skin_clinic', 'specialty_clinic', 'specialty_hospital'].includes(formData.type);
+  const isInstitutionType = !['retail_pharmacy', 'wholesale_pharmacy', 'hospital_pharmacy', 'health_shop', 'pharmacy', 'laboratory', 'imaging_centre', 'diagnostic_centre', 'blood_bank'].includes(formData.type);
+  const isPharmacyType = ['retail_pharmacy', 'wholesale_pharmacy', 'hospital_pharmacy', 'health_shop', 'pharmacy', 'dispensary', 'drug_store'].includes(formData.type);
 
   const getEntityType = (): 'healthcareProfessionals' | 'pharmacies' | 'institutions' => {
     if (isPharmacyType) return 'pharmacies';
@@ -221,6 +242,12 @@ export const HealthcareInstitutionForm = () => {
         .single();
 
       if (institutionError) throw institutionError;
+
+      // Provision the HMS workspace immediately (departments per facility
+      // type) — identical for marketplace-listed and HMS-only facilities.
+      if (institutionData) {
+        await provisionInstitutionWorkspace((institutionData as any).id, formData.type);
+      }
 
       // Save specialties if clinic type
       if (isClinicType && selectedSpecialties.length > 0 && institutionData) {
@@ -342,9 +369,9 @@ export const HealthcareInstitutionForm = () => {
                   </label>
                   <p className="text-sm text-muted-foreground">
                     {formData.list_in_marketplace ? (
-                      <>Your institution will be searchable by patients and appear in public listings. You'll need to provide comprehensive information for review.</>
+                      <>Listed on the Teledoctor Marketplace — patients can find you, book visits and order from you after verification.</>
                     ) : (
-                      <>Your institution will only have HMS (Hospital Management System) access without being publicly searchable. Basic compliance information is still required.</>
+                      <>HMS-only — hidden from all public listings, but your full workspace (departments, queues, beds, staff, billing) is set up exactly the same.</>
                     )}
                   </p>
                 </div>
@@ -390,12 +417,21 @@ export const HealthcareInstitutionForm = () => {
             <SelectTrigger className={errors.type ? "border-destructive" : ""}>
               <SelectValue placeholder="Select type" />
             </SelectTrigger>
-            <SelectContent>
-              {PROVIDER_TYPES.map((type) => (
-                <SelectItem key={type} value={type}>
-                  {type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
-                </SelectItem>
-              ))}
+            <SelectContent className="max-h-80">
+              {(['care', 'pharmacy', 'diagnostic', 'support'] as const).map((kind) => {
+                const group = typeOptions.filter((t) => t.kind === kind);
+                if (group.length === 0) return null;
+                return (
+                  <SelectGroup key={kind}>
+                    <SelectLabel>{TYPE_GROUP_LABELS[kind]}</SelectLabel>
+                    {group.map((t) => (
+                      <SelectItem key={t.code} value={t.code} title={t.description}>
+                        {t.name}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                );
+              })}
             </SelectContent>
           </Select>
           {errors.type && (

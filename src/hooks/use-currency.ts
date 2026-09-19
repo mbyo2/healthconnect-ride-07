@@ -1,55 +1,17 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { safeLocalGet, safeLocalSet } from '@/utils/storage';
+import {
+  BASE_CURRENCY,
+  fromZmw,
+  toZmw as toZmwRaw,
+  roundForCurrency,
+  refreshRates,
+  ratesAreLive,
+  ratesUpdatedAt,
+} from '@/services/exchangeRates';
 
-// Map of country codes to currency codes and symbols
-const COUNTRY_CURRENCY_MAP: Record<string, { code: string; symbol: string }> = {
-  US: { code: 'USD', symbol: '$' },
-  GB: { code: 'GBP', symbol: '£' },
-  EU: { code: 'EUR', symbol: '€' },
-  DE: { code: 'EUR', symbol: '€' },
-  FR: { code: 'EUR', symbol: '€' },
-  IT: { code: 'EUR', symbol: '€' },
-  ES: { code: 'EUR', symbol: '€' },
-  NL: { code: 'EUR', symbol: '€' },
-  BE: { code: 'EUR', symbol: '€' },
-  AT: { code: 'EUR', symbol: '€' },
-  IE: { code: 'EUR', symbol: '€' },
-  PT: { code: 'EUR', symbol: '€' },
-  FI: { code: 'EUR', symbol: '€' },
-  ZM: { code: 'ZMW', symbol: 'K' },
-  ZA: { code: 'ZAR', symbol: 'R' },
-  KE: { code: 'KES', symbol: 'KSh' },
-  NG: { code: 'NGN', symbol: '₦' },
-  GH: { code: 'GHS', symbol: 'GH₵' },
-  TZ: { code: 'TZS', symbol: 'TSh' },
-  UG: { code: 'UGX', symbol: 'USh' },
-  RW: { code: 'RWF', symbol: 'FRw' },
-  ET: { code: 'ETB', symbol: 'Br' },
-  EG: { code: 'EGP', symbol: 'E£' },
-  MA: { code: 'MAD', symbol: 'MAD' },
-  IN: { code: 'INR', symbol: '₹' },
-  CN: { code: 'CNY', symbol: '¥' },
-  JP: { code: 'JPY', symbol: '¥' },
-  AU: { code: 'AUD', symbol: 'A$' },
-  CA: { code: 'CAD', symbol: 'C$' },
-  BR: { code: 'BRL', symbol: 'R$' },
-  MX: { code: 'MXN', symbol: 'MX$' },
-  AE: { code: 'AED', symbol: 'د.إ' },
-  SA: { code: 'SAR', symbol: '﷼' },
-  PK: { code: 'PKR', symbol: '₨' },
-  BD: { code: 'BDT', symbol: '৳' },
-  PH: { code: 'PHP', symbol: '₱' },
-  MY: { code: 'MYR', symbol: 'RM' },
-  SG: { code: 'SGD', symbol: 'S$' },
-  TH: { code: 'THB', symbol: '฿' },
-  MW: { code: 'MWK', symbol: 'MK' },
-  MZ: { code: 'MZN', symbol: 'MT' },
-  BW: { code: 'BWP', symbol: 'P' },
-  ZW: { code: 'ZWL', symbol: 'Z$' },
-  CD: { code: 'CDF', symbol: 'FC' },
-};
-
+// Country list retained for future use; the default is ALWAYS ZMW and is
+// never auto-switched by geolocation (explicit user choice only).
 const CURRENCY_SYMBOLS: Record<string, string> = {
   USD: '$', GBP: '£', EUR: '€', ZMW: 'K', ZAR: 'R',
   KES: 'KSh', NGN: '₦', GHS: 'GH₵', TZS: 'TSh', UGX: 'USh',
@@ -69,69 +31,84 @@ export const SUPPORTED_CURRENCIES = Object.entries(CURRENCY_SYMBOLS).map(([code,
 }));
 
 export const useCurrency = () => {
+  // ZMW is the default for everything. Anything else is an explicit,
+  // persisted user choice — never inferred.
   const [currency, setCurrencyState] = useState<string>(() => {
-    const saved = safeLocalGet(STORAGE_KEY);
-    return saved || 'ZMW';
+    try {
+      return safeLocalGet(STORAGE_KEY) || BASE_CURRENCY;
+    } catch {
+      return BASE_CURRENCY;
+    }
   });
   const [loading, setLoading] = useState(true);
-  const [detectedCountry, setDetectedCountry] = useState<string | null>(null);
+  const [ratesLive, setRatesLive] = useState(false);
+  const [ratesAt, setRatesAt] = useState(0);
 
   useEffect(() => {
-    const detectCurrency = async () => {
-      // If user already has a saved preference, use it
-      const saved = safeLocalGet(STORAGE_KEY);
-      if (saved) {
-        setCurrencyState(saved);
-        setLoading(false);
-        return;
-      }
-
-      try {
-        // Use IP geolocation API to detect country
-        const response = await fetch('https://ipapi.co/json/', { 
-          signal: AbortSignal.timeout(5000) 
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          const countryCode = data.country_code;
-          setDetectedCountry(countryCode);
-          
-          const mapped = COUNTRY_CURRENCY_MAP[countryCode];
-          if (mapped) {
-            setCurrencyState(mapped.code);
-            safeLocalSet(STORAGE_KEY, mapped.code);
-          } else {
-            // Primary launch country default: ZMW
-            setCurrencyState('ZMW');
-            safeLocalSet(STORAGE_KEY, 'ZMW');
-          }
-        }
-      } catch (error) {
-        console.warn('Could not detect location for currency, defaulting to ZMW:', error);
-        setCurrencyState('ZMW');
-      } finally {
-        setLoading(false);
-      }
+    let cancelled = false;
+    // Ensure a stored value; kick off a live-rate refresh in background.
+    if (!safeLocalGet(STORAGE_KEY)) safeLocalSet(STORAGE_KEY, BASE_CURRENCY);
+    refreshRates()
+      .then(() => {
+        if (cancelled) return;
+        setRatesLive(ratesAreLive());
+        setRatesAt(ratesUpdatedAt());
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
     };
-
-    detectCurrency();
   }, []);
 
   const setCurrency = useCallback((newCurrency: string) => {
-    setCurrencyState(newCurrency);
-    safeLocalSet(STORAGE_KEY, newCurrency);
+    const code = (newCurrency || BASE_CURRENCY).toUpperCase();
+    setCurrencyState(code);
+    safeLocalSet(STORAGE_KEY, code);
   }, []);
 
   const getSymbol = useCallback((code?: string) => {
-    return CURRENCY_SYMBOLS[code || currency] || code || currency;
+    const c = (code || currency).toUpperCase();
+    return CURRENCY_SYMBOLS[c] || c;
   }, [currency]);
 
-  const formatPrice = useCallback((amount: number, overrideCurrency?: string) => {
-    const curr = overrideCurrency || currency;
+  /**
+   * Format a canonical ZMW amount in the active display currency,
+   * converting at live bank rates. Unknown currencies fall back to ZMW.
+   */
+  const formatPrice = useCallback((amountZmw: number, overrideCurrency?: string) => {
+    const curr = (overrideCurrency || currency).toUpperCase();
     const symbol = CURRENCY_SYMBOLS[curr] || curr;
-    return `${symbol}${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    const converted = roundForCurrency(fromZmw(Number(amountZmw) || 0, curr), curr);
+    const decimals = ['JPY', 'RWF', 'UGX', 'CDF'].includes(curr) ? 0 : 2;
+    return `${symbol}${converted.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}`;
   }, [currency]);
 
-  return { currency, setCurrency, formatPrice, getSymbol, loading, detectedCountry, supportedCurrencies: SUPPORTED_CURRENCIES };
+  /**
+   * Convert a canonical ZMW amount to a chargeable figure in the given
+   * currency (for payment rails). Always pair amount+currency together.
+   */
+  const convertForCharge = useCallback((amountZmw: number, code?: string) => {
+    const curr = (code || currency).toUpperCase();
+    return { amount: roundForCurrency(fromZmw(Number(amountZmw) || 0, curr), curr), currency: curr };
+  }, [currency]);
+
+  /** Convert a foreign-currency input back to canonical ZMW. */
+  const toZmw = useCallback((amount: number, fromCode?: string) => {
+    return toZmwRaw(Number(amount) || 0, fromCode || currency);
+  }, [currency]);
+
+  return {
+    currency,
+    setCurrency,
+    formatPrice,
+    getSymbol,
+    convertForCharge,
+    toZmw,
+    loading,
+    ratesLive,
+    ratesUpdatedAt: ratesAt,
+    supportedCurrencies: SUPPORTED_CURRENCIES,
+  };
 };

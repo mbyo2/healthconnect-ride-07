@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Helmet } from "react-helmet-async";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Eye, EyeOff, ArrowLeft, Building2, User, Stethoscope, ChevronRight, ShieldCheck } from "lucide-react";
 import { LoadingScreen } from "@/components/LoadingScreen";
@@ -58,9 +59,76 @@ const businessSchema = z.object({
   termsAccepted: z.boolean().refine((value) => value, "You must accept the Terms and Conditions to continue"),
 }).refine((d) => d.password === d.confirmPassword, { message: "Passwords don't match", path: ["confirmPassword"] });
 
-// Will be loaded from database
-const PROVIDER_TYPES: Array<{ value: string; label: string }> = [];
-const BUSINESS_TYPES: Array<{ value: string; label: string }> = [];
+// Static fallbacks so public signup never renders empty dropdowns
+// (e.g. when reference tables are empty or RLS blocks anon reads at launch).
+// Full workforce taxonomy (HPCZ / NMCZ cadres) — mirrors the provider_types
+// seed migration so signup works identically with or without DB rows.
+const FALLBACK_PROVIDER_TYPES: Array<{ value: string; label: string }> = [
+  { value: "doctor", label: "Doctor (Medical Officer / GP)" },
+  { value: "specialist", label: "Specialist / Consultant" },
+  { value: "medical_licentiate", label: "Medical Licentiate Practitioner" },
+  { value: "clinical_officer", label: "Clinical Officer" },
+  { value: "dentist", label: "Dentist (Dental Surgeon)" },
+  { value: "dental_therapist", label: "Dental Therapist / Hygienist" },
+  { value: "registered_nurse", label: "Registered Nurse (RN)" },
+  { value: "enrolled_nurse", label: "Enrolled Nurse (EN)" },
+  { value: "midwife", label: "Midwife (RM / EM)" },
+  { value: "nurse", label: "Nurse (General)" },
+  { value: "pharmacist", label: "Pharmacist" },
+  { value: "pharmacy_technologist", label: "Pharmacy Technologist / Dispenser" },
+  { value: "radiologist", label: "Radiologist" },
+  { value: "radiographer", label: "Radiographer / Imaging Technologist" },
+  { value: "pathologist", label: "Pathologist" },
+  { value: "lab_technician", label: "Lab Technician / Technologist" },
+  { value: "physiotherapist", label: "Physiotherapist" },
+  { value: "occupational_therapist", label: "Occupational Therapist" },
+  { value: "nutritionist", label: "Nutritionist / Dietician" },
+  { value: "optometrist", label: "Optometrist / Optician" },
+  { value: "psychologist", label: "Clinical Psychologist" },
+  { value: "environmental_health_officer", label: "Environmental Health Officer" },
+  { value: "community_health_worker", label: "Community Health Worker" },
+  { value: "traditional_practitioner", label: "Traditional Health Practitioner" },
+  { value: "health_personnel", label: "Other Health Professional" },
+];
+// Facility taxonomy (MOH Zambia pyramid + private + ZAMRA) — mirrors the
+// institution_types seed migration.
+const FALLBACK_BUSINESS_TYPES: Array<{ value: string; label: string }> = [
+  { value: "health_post", label: "Health Post" },
+  { value: "rural_health_centre", label: "Rural Health Centre" },
+  { value: "urban_health_centre", label: "Urban Health Centre" },
+  { value: "mini_hospital", label: "Mini Hospital" },
+  { value: "district_hospital", label: "District Hospital (First-Level)" },
+  { value: "provincial_hospital", label: "Provincial Hospital (Second-Level)" },
+  { value: "tertiary_hospital", label: "Tertiary / Teaching Hospital" },
+  { value: "maternity_hospital", label: "Maternity Hospital" },
+  { value: "children_hospital", label: "Children's Hospital" },
+  { value: "mental_hospital", label: "Mental Health Hospital" },
+  { value: "cancer_hospital", label: "Cancer Hospital" },
+  { value: "cardiac_hospital", label: "Cardiac Hospital" },
+  { value: "eye_hospital", label: "Eye Hospital" },
+  { value: "dialysis_centre", label: "Dialysis Centre" },
+  { value: "clinic", label: "Clinic / Small Practice" },
+  { value: "specialty_clinic", label: "Specialty Clinic" },
+  { value: "dental_clinic", label: "Dental Clinic" },
+  { value: "eye_clinic", label: "Eye Clinic" },
+  { value: "physiotherapy_centre", label: "Physiotherapy Centre" },
+  { value: "hospital", label: "Private Hospital" },
+  { value: "retail_pharmacy", label: "Retail / Community Pharmacy" },
+  { value: "hospital_pharmacy", label: "Hospital Pharmacy" },
+  { value: "wholesale_pharmacy", label: "Wholesale Pharmacy / Distributor" },
+  { value: "health_shop", label: "Health Shop" },
+  { value: "laboratory", label: "Medical Laboratory" },
+  { value: "imaging_centre", label: "Imaging / Radiology Centre" },
+  { value: "diagnostic_centre", label: "Diagnostic Centre (Lab + Imaging)" },
+  { value: "blood_bank", label: "Blood Bank" },
+  { value: "nursing_home", label: "Nursing / Care Home" },
+  { value: "hospice", label: "Hospice / Palliative Care" },
+  { value: "home_care", label: "Home-Based Care Service" },
+  { value: "rehabilitation_centre", label: "Rehabilitation Centre" },
+];
+const FALLBACK_COUNTRIES: Array<{ value: string; label: string; dialCode: string }> = [
+  { value: "ZM", label: "Zambia", dialCode: "+260" },
+];
 
 type SignupPath = null | "patient" | "provider" | "business";
 
@@ -120,17 +188,26 @@ export const Auth = () => {
           supabase.from("countries").select("code, name, dial_code").eq("is_active", true).order("name"),
         ]);
 
-        if (providerTypesRes.data) {
+        if (providerTypesRes.data && providerTypesRes.data.length > 0) {
           setProviderTypes(providerTypesRes.data.map((t) => ({ value: t.code, label: t.name })));
+        } else {
+          setProviderTypes(FALLBACK_PROVIDER_TYPES);
         }
-        if (businessTypesRes.data) {
+        if (businessTypesRes.data && businessTypesRes.data.length > 0) {
           setBusinessTypes(businessTypesRes.data.map((t) => ({ value: t.code, label: t.name })));
+        } else {
+          setBusinessTypes(FALLBACK_BUSINESS_TYPES);
         }
-        if (countriesRes.data) {
+        if (countriesRes.data && countriesRes.data.length > 0) {
           setCountries(countriesRes.data.map((c) => ({ value: c.code, label: `${(c as any).flag_emoji ?? ''} ${c.name}`.trim(), dialCode: c.dial_code })));
+        } else {
+          setCountries(FALLBACK_COUNTRIES);
         }
       } catch (error) {
         console.error("Error fetching dynamic data:", error);
+        setProviderTypes((prev) => (prev.length > 0 ? prev : FALLBACK_PROVIDER_TYPES));
+        setBusinessTypes((prev) => (prev.length > 0 ? prev : FALLBACK_BUSINESS_TYPES));
+        setCountries((prev) => (prev.length > 0 ? prev : FALLBACK_COUNTRIES));
       }
     };
 
@@ -196,9 +273,14 @@ export const Auth = () => {
 
   const onBusinessSignup = async (data: z.infer<typeof businessSchema>) => {
     setLocalLoading(true);
-    const role = data.businessType === "pharmacy" ? "pharmacy"
-      : data.businessType === "laboratory" ? "lab"
-      : "institution_admin";
+    // Map the facility type to its account role (mirrors
+    // institutionTypeToRole in facilityProfiles.ts).
+    const bt = data.businessType.toLowerCase();
+    const role = bt.includes('wholesale') ? 'wholesale_pharmacy'
+      : bt.includes('pharm') || bt.includes('drug') || bt.includes('dispensary') || bt === 'health_shop' ? 'pharmacy'
+      : bt.includes('lab') || bt.includes('blood_bank') ? 'lab'
+      : bt.includes('imaging') || bt.includes('radiolog') || bt.includes('diagnostic') ? 'lab'
+      : 'institution_admin';
     const { error } = await supabase.auth.signUp({
       email: data.email,
       password: data.password,
@@ -250,6 +332,16 @@ export const Auth = () => {
   );
 
   return (
+    <>
+      <Helmet>
+        <title>Sign In or Register | Doc' O Clock Zambia</title>
+        <meta
+          name="description"
+          content="Sign in or create your Doc' O Clock account to book doctors, join video consultations, and manage prescriptions across Zambia."
+        />
+        <meta name="robots" content="noindex, nofollow" />
+        <link rel="canonical" href="https://doc0clock.online/auth" />
+      </Helmet>
     <div className="min-h-screen bg-canvas flex items-center justify-center p-4 font-sans text-midnight">
       <div className="w-full max-w-md space-y-6 py-8">
         <div className="text-center space-y-2">
@@ -468,6 +560,7 @@ export const Auth = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

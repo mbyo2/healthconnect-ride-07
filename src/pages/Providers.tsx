@@ -1,8 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
+import { Helmet } from 'react-helmet-async';
+import { ALL_CLINICIAN_ROLES } from '@/config/roleConfig';
 import { Header } from '@/components/Header';
-import { supabase } from '@/integrations/supabase/client';
-
+import { RatingBadge } from '@/components/RatingBadge';
 // Define Provider interface correctly
 interface Provider {
   id: string;
@@ -103,15 +104,8 @@ const ProviderList = ({ providers, loading }: ProviderListProps) => {
               <div>
                 <h3 className="font-semibold">Dr. {provider.first_name} {provider.last_name}</h3>
                 <p className="text-sm text-muted-foreground">{provider.specialty}</p>
-                <div className="flex items-center mt-1">
-                  <span className="text-sm font-medium">{provider.rating.toFixed(1)}</span>
-                  <div className="flex ml-1">
-                    {[...Array(5)].map((_, i) => (
-                      <svg key={i} className={`w-4 h-4 ${i < Math.floor(provider.rating) ? 'text-yellow-400' : 'text-muted-foreground/30'}`} fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                      </svg>
-                    ))}
-                  </div>
+                <div className="flex items-center mt-2">
+                  <RatingBadge rating={provider.rating} size="md" />
                 </div>
               </div>
             </div>
@@ -191,11 +185,8 @@ const Providers = () => {
   const fetchProviders = async () => {
     setLoading(true);
     try {
-      // Query profiles table — provider enhancement fields live here per migration
-      const PROVIDER_ROLES = [
-        'provider', 'health_personnel', 'doctor', 'nurse',
-        'specialist', 'pharmacist', 'radiologist', 'pathologist',
-      ];
+      // Query profiles table — every clinical cadre, single source of truth
+      const PROVIDER_ROLES = ALL_CLINICIAN_ROLES;
 
       let profQuery = supabase
         .from('profiles')
@@ -225,7 +216,7 @@ const Providers = () => {
       // Only show institutions that opted into the marketplace
       let instQuery = supabase
         .from('healthcare_institutions')
-        .select('id, name, type, address, latitude, longitude, logo_url')
+        .select('id, name, type, address, latitude, longitude')
         .eq('is_verified', true)
         .eq('list_in_marketplace', true);
 
@@ -257,7 +248,7 @@ const Providers = () => {
         last_name: '',
         specialty: i.type || 'Healthcare Institution',
         bio: i.address || '',
-        avatar_url: i.logo_url || '',
+        avatar_url: (i as any).logo_url || '',
         location: { latitude: i.latitude || 0, longitude: i.longitude || 0 },
         rating: 0,
       }));
@@ -282,6 +273,14 @@ const Providers = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>Find Doctors & Hospitals in Zambia | Doc' O Clock</title>
+        <meta
+          name="description"
+          content="Browse verified doctors, clinics, hospitals, and pharmacies across Zambia. Filter by specialty, location, and availability."
+        />
+        <link rel="canonical" href="https://doc0clock.online/providers" />
+      </Helmet>
       <Header />
       <main className="container mx-auto px-4 pt-20 pb-24">
         <h1 className="text-2xl font-bold mb-6">Healthcare Providers</h1>

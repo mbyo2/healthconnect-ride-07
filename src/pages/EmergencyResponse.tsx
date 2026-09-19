@@ -42,10 +42,14 @@ const EmergencyResponse = () => {
 
   const fetchNearbyHospitals = async () => {
     try {
+      // Emergency directory: verified facilities only. Marketplace opt-out
+      // does NOT apply here — in an emergency the nearest approved hospital
+      // must be reachable whether or not it markets itself publicly.
       const { data, error } = await supabase
         .from("healthcare_institutions")
         .select("*")
         .eq("type", "hospital")
+        .eq("is_verified", true)
         .limit(3);
 
       if (error) throw error;
@@ -100,7 +104,7 @@ const EmergencyResponse = () => {
       toast.error("We could not save the emergency event, but you can still place the call.");
     }
 
-    const phoneNumber = (import.meta.env.VITE_EMERGENCY_NUMBER || "112").replace(/[^\d+]/g, "");
+    const phoneNumber = (import.meta.env.VITE_EMERGENCY_NUMBER || "991").replace(/[^\d+]/g, "");
     window.location.assign(`tel:${phoneNumber}`);
   };
 

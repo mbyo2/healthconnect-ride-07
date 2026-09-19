@@ -9,8 +9,9 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Search, UserPlus, UserMinus, Shield, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { USER_ROLES, ROLE_META, type UserRole } from '@/config/roleConfig';
 
-type AppRole = 'admin' | 'health_personnel' | 'patient' | 'pharmacy' | 'institution_admin' | 'institution_staff';
+type AppRole = UserRole;
 
 interface UserWithRoles {
   id: string;
@@ -28,22 +29,28 @@ export const RoleManagement: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRole, setSelectedRole] = useState<AppRole | 'all'>('all');
 
-  const availableRoles: AppRole[] = [
-    'admin',
-    'health_personnel',
-    'patient',
-    'pharmacy',
-    'institution_admin',
-    'institution_staff'
-  ];
+  // Every role in the taxonomy is assignable — driven by roleConfig so new
+  // cadres appear here automatically.
+  const availableRoles: AppRole[] = Object.values(USER_ROLES);
 
-  const roleColors: Record<AppRole, string> = {
-    admin: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 hover:bg-red-100/80 dark:hover:bg-red-900/40',
-    health_personnel: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 hover:bg-blue-100/80 dark:hover:bg-blue-900/40',
-    patient: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 hover:bg-green-100/80 dark:hover:bg-green-900/40',
-    pharmacy: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300 hover:bg-purple-100/80 dark:hover:bg-purple-900/40',
-    institution_admin: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300 hover:bg-orange-100/80 dark:hover:bg-orange-900/40',
-    institution_staff: 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300 hover:bg-cyan-100/80 dark:hover:bg-cyan-900/40'
+  const CATEGORY_STYLES: Record<string, string> = {
+    admin: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
+    clinical: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
+    nursing: 'bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-300',
+    allied: 'bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300',
+    community: 'bg-lime-100 text-lime-800 dark:bg-lime-900/30 dark:text-lime-300',
+    patient: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
+    pharmacy: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300',
+    lab: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300',
+    institution: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300',
+  };
+
+  const roleLabel = (role: string): string =>
+    ROLE_META[role as AppRole]?.label || role.replace(/_/g, ' ');
+
+  const roleColors = (role: string): string => {
+    const category = ROLE_META[role as AppRole]?.category || 'clinical';
+    return CATEGORY_STYLES[category] || CATEGORY_STYLES.clinical;
   };
 
   useEffect(() => {
@@ -202,11 +209,11 @@ export const RoleManagement: React.FC = () => {
               <SelectTrigger className="w-48">
                 <SelectValue placeholder="Filter by role" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="max-h-80">
                 <SelectItem value="all">All Roles</SelectItem>
                 {availableRoles.map(role => (
                   <SelectItem key={role} value={role}>
-                    {role.replace('_', ' ').toUpperCase()}
+                    {roleLabel(role)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -228,8 +235,8 @@ export const RoleManagement: React.FC = () => {
                   <div className="flex flex-wrap gap-2">
                     {userData.roles.length > 0 ? (
                       userData.roles.map(role => (
-                        <Badge key={role} className={roleColors[role]}>
-                          {role.replace('_', ' ')}
+                        <Badge key={role} className={roleColors(role)}>
+                          {roleLabel(role)}
                           <button
                             onClick={() => revokeRole(userData.id, role)}
                             className="ml-2 hover:bg-white/20 rounded-full p-0.5"
@@ -249,18 +256,18 @@ export const RoleManagement: React.FC = () => {
                     <SelectTrigger className="w-48">
                       <SelectValue placeholder="Assign role" />
                     </SelectTrigger>
-                    <SelectContent>
-                      {availableRoles
-                        .filter(role => !userData.roles.includes(role))
-                        .map(role => (
-                          <SelectItem key={role} value={role}>
-                            <div className="flex items-center gap-2">
-                              <UserPlus className="h-4 w-4" />
-                              {role.replace('_', ' ').toUpperCase()}
-                            </div>
-                          </SelectItem>
-                        ))}
-                    </SelectContent>
+                <SelectContent className="max-h-80">
+                  {availableRoles
+                    .filter(role => !userData.roles.includes(role))
+                    .map(role => (
+                      <SelectItem key={role} value={role}>
+                        <div className="flex items-center gap-2">
+                          <UserPlus className="h-4 w-4" />
+                          {roleLabel(role)}
+                        </div>
+                      </SelectItem>
+                    ))}
+                </SelectContent>
                   </Select>
                 </div>
               </div>

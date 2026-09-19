@@ -316,7 +316,7 @@ export const EnhancedTelemedicine = () => {
                         <SelectValue placeholder="Select patient" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="placeholder">Select patient</SelectItem>
+                        <SelectItem value="placeholder" disabled>No patients available yet</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -330,7 +330,7 @@ export const EnhancedTelemedicine = () => {
                         <SelectValue placeholder="Select appointment" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="placeholder">Select appointment</SelectItem>
+                        <SelectItem value="placeholder" disabled>No appointments available yet</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -344,7 +344,7 @@ export const EnhancedTelemedicine = () => {
                         <SelectValue placeholder="Select consultation" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="placeholder">Select consultation</SelectItem>
+                        <SelectItem value="placeholder" disabled>No consultations available yet</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

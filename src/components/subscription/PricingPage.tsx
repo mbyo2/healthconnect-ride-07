@@ -9,7 +9,10 @@ import { useSubscriptionPlans, useSubscribeToPlan, useUserSubscription, Subscrip
 import { useAuth } from '@/context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useDPOPayment } from '@/hooks/useDPOPayment';
+import { useCurrency } from '@/hooks/use-currency';
 
 const formatKwacha = (amount: number) => {
   if (amount === 0) return 'Free';
@@ -293,9 +296,14 @@ const PharmacySection = () => {
 };
 
 /* ─── Institution (Hospital) Section — free listing + monthly HMS fee ─── */
-const InstitutionPlanCard = ({ plan }: { plan: SubscriptionPlan }) => {
+const InstitutionPlanCard = ({ plan, onSubscribe, subscribing }: {
+  plan: SubscriptionPlan;
+  onSubscribe: (planId: string, cycle: 'monthly' | 'annual') => void;
+  subscribing: boolean;
+}) => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [cycle, setCycle] = useState<'monthly' | 'annual'>('monthly');
   const monthly = Number(plan.price_monthly) || 0;
   const annual = Number(plan.price_annual) || 0;
 
@@ -337,10 +345,19 @@ const InstitutionPlanCard = ({ plan }: { plan: SubscriptionPlan }) => {
           ))}
         </ul>
       </CardContent>
-      <CardFooter>
+      <CardFooter className="flex-col gap-2">
+        <div className="grid grid-cols-2 gap-2 w-full">
+          <Button variant={cycle === 'monthly' ? 'default' : 'outline'} size="sm" onClick={() => setCycle('monthly')}>
+            Monthly{monthly > 0 ? ` · K${monthly.toLocaleString()}` : ' · Free'}
+          </Button>
+          <Button variant={cycle === 'annual' ? 'default' : 'outline'} size="sm" onClick={() => setCycle('annual')}>
+            Annual{annual > 0 ? ` · K${annual.toLocaleString()}` : ' · Free'}
+          </Button>
+        </div>
         <Button className="w-full" variant={plan.highlight ? 'default' : 'outline'}
-          onClick={() => !user ? navigate('/auth?tab=signup&path=business') : navigate('/institution-dashboard')}>
-          {user ? 'Go to Dashboard' : 'Get Started'}
+          disabled={subscribing}
+          onClick={() => !user ? navigate('/auth?tab=signup&path=business') : onSubscribe(plan.id, cycle)}>
+          {!user ? 'Get Started' : subscribing ? 'Processing…' : (monthly > 0 || annual > 0) ? 'Subscribe & Pay' : 'Choose Plan'}
         </Button>
       </CardFooter>
     </Card>
@@ -349,7 +366,36 @@ const InstitutionPlanCard = ({ plan }: { plan: SubscriptionPlan }) => {
 
 const InstitutionSection = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { convertForCharge } = useCurrency();
   const { data: plans, isLoading } = useSubscriptionPlans('institution');
+  const subscribeMutation = useSubscribeToPlan();
+  const { redirectToCheckout } = useDPOPayment();
+  const [subscribingId, setSubscribingId] = useState<string | null>(null);
+
+  const handleInstitutionSubscribe = async (planId: string, cycle: 'monthly' | 'annual') => {
+    if (!user) { navigate('/auth'); return; }
+    setSubscribingId(planId);
+    try {
+      const result: any = await subscribeMutation.mutateAsync({ planId, billingCycle: cycle });
+      if (result?.needsPayment) {
+        // Paid HMS plan — collect via DPO in the user's display currency
+        // (converted from the ZMW-canonical plan price), activation on verify.
+        const charge = convertForCharge(Number(result.payAmount) || 0, result.payCurrency || 'ZMW');
+        await redirectToCheckout({
+          amount: charge.amount,
+          currency: charge.currency,
+          reference_type: 'subscription',
+          reference_id: result.id,
+          description: `HMS subscription — ${result.plan?.name || 'plan'} (${cycle})`,
+        });
+      } else {
+        navigate('/institution-dashboard');
+      }
+    } finally {
+      setSubscribingId(null);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -362,6 +408,7 @@ const InstitutionSection = () => {
           <CardDescription className="text-base max-w-xl mx-auto">
             Listing your hospital or clinic on Doc' O Clock costs <strong>K0</strong>. You only pay a monthly
             subscription for the Hospital Management System, billed monthly or annually.
+            HMS-only facilities (not publicly listed) use the exact same plans — listing never affects your price.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -387,9 +434,27 @@ const InstitutionSection = () => {
 
       {isLoading ? (
         <div className="flex justify-center py-10"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
+      ) : (plans || []).length === 0 ? (
+        <Card className="max-w-2xl mx-auto">
+          <CardContent className="py-10 text-center space-y-2">
+            <Building2 className="h-10 w-10 mx-auto text-muted-foreground" />
+            <p className="font-semibold">HMS plans are being configured</p>
+            <p className="text-sm text-muted-foreground">
+              Listing is always free. Our team will help you choose the right HMS plan — talk to us below.
+            </p>
+            <Button variant="outline" onClick={() => navigate('/contact')}>Contact Sales</Button>
+          </CardContent>
+        </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-          {(plans || []).map((plan) => <InstitutionPlanCard key={plan.id} plan={plan} />)}
+          {(plans || []).map((plan) => (
+            <InstitutionPlanCard
+              key={plan.id}
+              plan={plan}
+              onSubscribe={handleInstitutionSubscribe}
+              subscribing={subscribingId === plan.id}
+            />
+          ))}
           <Card className="flex flex-col">
             <CardHeader className="text-center pb-2">
               <CardTitle className="text-xl">Custom / Unlimited</CardTitle>
@@ -420,13 +485,34 @@ const InstitutionSection = () => {
 export const PricingPage = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { convertForCharge } = useCurrency();
   const { data: plans } = useSubscriptionPlans();
   const { data: currentSub } = useUserSubscription();
   const subscribeMutation = useSubscribeToPlan();
+  const { redirectToCheckout } = useDPOPayment();
+  void currentSub;
+  void plans;
 
-  const handleSubscribe = (planId: string, cycle: 'monthly' | 'annual') => {
+  const handleSubscribe = async (planId: string, cycle: 'monthly' | 'annual') => {
     if (!user) { navigate('/auth'); return; }
-    subscribeMutation.mutate({ planId, billingCycle: cycle });
+    try {
+      const result: any = await subscribeMutation.mutateAsync({ planId, billingCycle: cycle });
+      if (result?.needsPayment) {
+        // Paid plan — collect via DPO in display currency; activation on verify.
+        const charge = convertForCharge(Number(result.payAmount) || 0, result.payCurrency || 'ZMW');
+        await redirectToCheckout({
+          amount: charge.amount,
+          currency: charge.currency,
+          reference_type: 'subscription',
+          reference_id: result.id,
+          description: `Subscription — ${result.plan?.name || 'plan'} (${cycle})`,
+        });
+      } else {
+        navigate('/dashboard');
+      }
+    } catch {
+      // Error toast already shown by the mutation.
+    }
   };
 
   return (

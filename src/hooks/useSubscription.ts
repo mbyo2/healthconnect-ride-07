@@ -121,7 +121,7 @@ export const useSubscribeToPlan = () => {
     mutationFn: async ({ planId, billingCycle, promoCodeId, trialDays }: { planId: string; billingCycle: 'monthly' | 'annual'; promoCodeId?: string; trialDays?: number }) => {
       const now = new Date();
       const effectiveTrialDays = trialDays || 0;
-      
+
       // If trial, period starts after trial
       const trialEnd = effectiveTrialDays > 0 ? new Date(now.getTime() + effectiveTrialDays * 86400000) : null;
       const periodStart = trialEnd || now;
@@ -132,12 +132,29 @@ export const useSubscribeToPlan = () => {
         periodEnd.setFullYear(periodEnd.getFullYear() + 1);
       }
 
-      // Cancel existing active subscriptions
-      await (supabase as any)
-        .from('user_subscriptions')
-        .update({ status: 'cancelled', cancelled_at: new Date().toISOString() })
-        .eq('user_id', user!.id)
-        .in('status', ['active', 'trialing']);
+      // Look up the plan price first — paid plans must go through checkout,
+      // never straight to active.
+      const { data: plan, error: planError } = await (supabase as any)
+        .from('subscription_plans')
+        .select('id, price_monthly, price_annual, currency, slug')
+        .eq('id', planId)
+        .maybeSingle();
+      if (planError || !plan) throw planError || new Error('Plan not found');
+
+      const amount = billingCycle === 'monthly' ? Number(plan.price_monthly) || 0 : Number(plan.price_annual) || 0;
+      const needsPayment = amount > 0 && effectiveTrialDays === 0;
+
+      // Paid plans without trial start as PENDING and are activated only
+      // after the gateway confirms payment (see PaymentReturn).
+      // Existing active subscriptions stay untouched until payment succeeds.
+      if (!needsPayment) {
+        // Cancel existing active subscriptions
+        await (supabase as any)
+          .from('user_subscriptions')
+          .update({ status: 'cancelled', cancelled_at: new Date().toISOString() })
+          .eq('user_id', user!.id)
+          .in('status', ['active', 'trialing']);
+      }
 
       const { data, error } = await (supabase as any)
         .from('user_subscriptions')
@@ -147,7 +164,7 @@ export const useSubscribeToPlan = () => {
           billing_cycle: billingCycle,
           current_period_start: periodStart.toISOString(),
           current_period_end: periodEnd.toISOString(),
-          status: effectiveTrialDays > 0 ? 'trialing' : 'active',
+          status: effectiveTrialDays > 0 ? 'trialing' : needsPayment ? 'pending' : 'active',
           trial_start: effectiveTrialDays > 0 ? now.toISOString() : null,
           trial_end: trialEnd?.toISOString() || null,
           promo_code_id: promoCodeId || null,
@@ -157,26 +174,31 @@ export const useSubscribeToPlan = () => {
 
       if (error) throw error;
 
-      // Log revenue event (skip for trials)
-      if (effectiveTrialDays === 0) {
-        const plan = data.plan;
-        const amount = billingCycle === 'monthly' ? plan.price_monthly : plan.price_annual;
-        if (amount > 0) {
-          await (supabase as any).from('revenue_events').insert({
-            user_id: user!.id,
-            event_type: 'subscription_started',
-            amount,
-            currency: plan.currency,
-            source: `subscription_${plan.slug}`,
-            plan_id: planId,
-          });
-        }
+      if (needsPayment) {
+        return { ...data, needsPayment: true as const, payAmount: amount, payCurrency: plan.currency || 'ZMW' };
       }
 
-      return data;
+      // Log revenue event for free activations only (paid money is booked
+      // by the settlement layer on payment success — never double-count).
+      if (effectiveTrialDays === 0 && amount === 0) {
+        await (supabase as any).from('revenue_events').insert({
+          user_id: user!.id,
+          event_type: 'subscription_started',
+          amount: 0,
+          currency: plan.currency,
+          source: `subscription_${plan.slug}`,
+          plan_id: planId,
+        }).then(() => {});
+      }
+
+      return { ...data, needsPayment: false as const };
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ['user-subscription'] });
+      if (data?.needsPayment) {
+        toast.info('Subscription reserved — complete payment to activate.');
+        return;
+      }
       const isTrial = data.status === 'trialing';
       toast.success(isTrial ? 'Free trial activated! Enjoy your 30-day trial.' : 'Subscription activated successfully!');
     },

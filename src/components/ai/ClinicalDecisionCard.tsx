@@ -99,7 +99,7 @@ export const ClinicalDecisionCard = ({ decision, onActionClick, compact = false 
 
     // 2. Handle phone calls
     if (action.type === 'call') {
-      window.location.href = `tel:${action.details || '911'}`;
+      window.location.href = `tel:${action.details || import.meta.env.VITE_EMERGENCY_NUMBER || '991'}`;
       return;
     }
 
@@ -228,7 +228,7 @@ export const parseClinicalDecisions = (aiResponse: string): ClinicalDecision[] =
   const lowerResponse = aiResponse.toLowerCase();
 
   // 1. Emergency detection
-  const emergencyKeywords = ['emergency', 'call 911', 'immediately', 'life-threatening', 'urgent care', 'severe pain', 'difficulty breathing', 'chest pain'];
+  const emergencyKeywords = ['emergency', 'call 991', 'call 112', 'immediately', 'life-threatening', 'urgent care', 'severe pain', 'difficulty breathing', 'chest pain'];
   if (emergencyKeywords.some(k => lowerResponse.includes(k))) {
     decisions.push({
       type: 'emergency',

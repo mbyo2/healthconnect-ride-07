@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Slider } from "@/components/ui/slider";
 import { Loader2, AlertTriangle, Stethoscope, ShieldCheck, Ambulance, Activity } from "lucide-react";
 import { LoadingScreen } from "@/components/LoadingScreen";
+import { RatingBadge } from "@/components/RatingBadge";
 
 type TriageResponse = {
   session_id: string;
@@ -298,7 +299,7 @@ export default function TriageIntake() {
                 <div>
                   <h3 className="font-extrabold text-sm text-[#e2445c]">Emergency Response Dispatched</h3>
                   <p className="text-xs text-slate-700 mt-1">
-                    {result.recommended_action} Call local emergency services (112 / 911) immediately.
+                    {result.recommended_action} Call local emergency services (991 / 112) immediately.
                   </p>
                 </div>
               </div>
@@ -343,16 +344,21 @@ export default function TriageIntake() {
                   const name = `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim() || "Provider";
                   return (
                     <div key={p.id} className="flex items-center justify-between p-3.5 rounded-xl border border-[#e6e9ef] bg-[#f5f6f8]">
-                      <div>
+                      <div className="flex-1">
                         <p className="font-extrabold text-xs text-[#0073ea]">Dr. {name}</p>
-                        <p className="text-[11px] text-[#676879]">
-                          {p.specialty ?? result.recommended_specialty} {p.city ? `• ${p.city}` : ""} {p.rating ? `• ★ ${p.rating.toFixed(1)}` : ""}
-                        </p>
+                        <div className="flex items-center gap-2 mt-1.5">
+                          <p className="text-[11px] text-[#676879]">
+                            {p.specialty ?? result.recommended_specialty} {p.city ? `• ${p.city}` : ""}
+                          </p>
+                          {p.rating && (
+                            <RatingBadge rating={p.rating} size="sm" className="ml-auto" />
+                          )}
+                        </div>
                       </div>
                       <button
                         onClick={() => bookProvider(p.id)}
                         disabled={booking === p.id}
-                        className="px-4 py-1.5 rounded-md bg-[#0073ea] hover:bg-[#0060c4] text-white text-xs font-extrabold flex items-center gap-1 shadow-xs"
+                        className="ml-3 px-4 py-1.5 rounded-md bg-[#0073ea] hover:bg-[#0060c4] text-white text-xs font-extrabold flex items-center gap-1 shadow-xs"
                       >
                         {booking === p.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Book Appointment"}
                       </button>

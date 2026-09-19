@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { Helmet } from 'react-helmet-async';
+import { ALL_CLINICIAN_ROLES } from '@/config/roleConfig';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -45,12 +47,15 @@ const HealthcareProfessionals = () => {
     fetchSpecialties();
   }, []);
 
+  // Single source of truth — every clinical cadre appears in the directory.
+  const PROVIDER_ROLES = ALL_CLINICIAN_ROLES;
+
   const fetchSpecialties = async () => {
     try {
       const { data, error } = await supabase
         .from('profiles')
         .select('specialty')
-        .eq('role', 'health_personnel')
+        .in('role', PROVIDER_ROLES as any)
         .not('specialty', 'is', null);
 
       if (error) throw error;
@@ -90,7 +95,7 @@ const HealthcareProfessionals = () => {
           home_visits_available,
           is_verified
         `)
-        .eq('role', 'health_personnel')
+        .in('role', PROVIDER_ROLES as any)
         .eq('is_verified', true)
         .order('rating', { ascending: false, nullsFirst: false })
         .limit(50);
@@ -157,6 +162,14 @@ const HealthcareProfessionals = () => {
 
   return (
     <div className="container mx-auto p-4 md:p-6 space-y-6">
+      <Helmet>
+        <title>Verified Doctors & Specialists in Zambia | Doc' O Clock</title>
+        <meta
+          name="description"
+          content="Find verified doctors, nurses, and specialists across Zambia. Compare ratings, fees, availability, and book in-clinic or video consultations."
+        />
+        <link rel="canonical" href="https://doc0clock.online/healthcare-professionals" />
+      </Helmet>
       {/* Header */}
       <div>
         <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-3">

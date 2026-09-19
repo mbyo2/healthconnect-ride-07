@@ -7,6 +7,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { NetworkErrorBoundary } from "@/components/errors/NetworkErrorBoundary";
 import { useApiQuery } from "@/hooks/use-api-query";
 import { useUserRoles } from "@/context/UserRolesContext";
+import { ALL_CLINICIAN_ROLES } from "@/config/roleConfig";
 import { EmptyState, LoadingSkeleton } from "@/components/shared";
 import { SuggestionBanner, HealthTipCard } from "@/components/guidance";
 import {
@@ -38,8 +39,9 @@ export const AppointmentsPage = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const { availableRoles } = useUserRoles();
 
+  // Every clinical cadre sees the provider-side schedule.
   const isProvider = availableRoles.some((r) =>
-    ["health_personnel", "doctor", "nurse", "radiologist"].includes(r)
+    (ALL_CLINICIAN_ROLES as readonly string[]).includes(r)
   );
 
   const { data: appointments = [], isLoading } = useApiQuery<any[]>(

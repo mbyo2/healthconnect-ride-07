@@ -163,6 +163,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         let profileRole = metaRole;
         if (metaProviderType) profileRole = metaProviderType;
         if (profileRole === 'business') profileRole = 'institution_admin';
+        // Wholesale distributors get their own business role (ZAMRA)
+        const metaBusinessType = currentUser?.user_metadata?.business_type;
+        if (typeof metaBusinessType === 'string' && metaBusinessType.toLowerCase().includes('wholesale')) {
+          profileRole = 'wholesale_pharmacy';
+        }
 
         const { error: createError } = await supabase
           .from('profiles')

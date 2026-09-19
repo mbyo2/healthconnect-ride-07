@@ -5,6 +5,7 @@ import { Plus, DollarSign, CheckCircle, Loader2, Receipt, TrendingUp, AlertCircl
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useCurrency } from "@/hooks/use-currency";
+import { fetchInstitutionTariffs, resolveTariffPrice } from "@/components/pricing/TariffAndPriceManager";
 import { InstitutionInsuranceVerification } from "@/components/institution/InstitutionInsuranceVerification";
 
 interface BillingProps {
@@ -38,16 +39,49 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
     if (!patientId) return;
     setIsLoadingCharges(true);
     try {
-      const [apptsRes, labsRes, rxsRes] = await Promise.all([
+      const [apptsRes, labsRes, rxsRes, tariffs, procRes] = await Promise.all([
         supabase.from("appointments").select("id, type, date, time").eq("patient_id", patientId).eq("status", "completed"),
         supabase.from("lab_tests").select("id, test_type, price, total_amount").eq("patient_id", patientId).eq("payment_status", "pending"),
         supabase.from("comprehensive_prescriptions").select("id, medication_name, quantity").eq("patient_id", patientId).eq("status", "active"),
+        // Institution's own charge book first — hardcoded fallbacks only
+        // apply when a category has no tariff at all.
+        fetchInstitutionTariffs(hospital.id),
+        // Procedures / treatments executed for this patient at this facility.
+        supabase.from("procedure_executions").select("id, procedure_id, execution_date, procedure:clinical_procedures(procedure_name)").eq("patient_id", patientId).eq("institution_id", hospital.id).limit(100),
       ]);
+      // Institution procedure prices for the executions above.
+      const procIds = [...new Set(((procRes.data || []) as any[]).map((p: any) => p.procedure_id).filter(Boolean))];
+      let procPrices = new Map<string, number>();
+      if (procIds.length > 0) {
+        const { data: pricing } = await supabase.from("institution_procedure_pricing").select("procedure_id, price").eq("institution_id", hospital.id).in("procedure_id", procIds);
+        ((pricing || []) as any[]).forEach((p: any) => procPrices.set(p.procedure_id, Number(p.price) || 0));
+      }
       const charges: any[] = [];
       let calculatedTotal = 0;
-      (apptsRes.data || []).forEach((a: any) => { const fee = 150; calculatedTotal += fee; charges.push({ description: `Consultation (${a.type?.replace("_", " ") || "General"}) - ${a.date}`, amount: fee }); });
-      (labsRes.data || []).forEach((l: any) => { const fee = l.price || l.total_amount || 200; calculatedTotal += fee; charges.push({ description: `Lab Test: ${l.test_type}`, amount: fee }); });
-      (rxsRes.data || []).forEach((r: any) => { const fee = 50 * (r.quantity || 1); calculatedTotal += fee; charges.push({ description: `Rx: ${r.medication_name}`, amount: fee }); });
+      (apptsRes.data || []).forEach((a: any) => {
+        const fee = resolveTariffPrice(tariffs, 'opd', a.type, 150);
+        calculatedTotal += fee;
+        charges.push({ description: `Consultation (${a.type?.replace("_", " ") || "General"}) - ${a.date}`, amount: fee });
+      });
+      (labsRes.data || []).forEach((l: any) => {
+        const fee = l.price || l.total_amount || resolveTariffPrice(tariffs, 'lab', l.test_type, 200);
+        calculatedTotal += fee;
+        charges.push({ description: `Lab Test: ${l.test_type}`, amount: fee });
+      });
+      (rxsRes.data || []).forEach((r: any) => {
+        const unit = resolveTariffPrice(tariffs, 'pharmacy', r.medication_name, 50);
+        const fee = unit * (r.quantity || 1);
+        calculatedTotal += fee;
+        charges.push({ description: `Rx: ${r.medication_name}`, amount: fee });
+      });
+      ((procRes.data || []) as any[]).forEach((p: any) => {
+        const procName = p.procedure?.procedure_name || 'Procedure';
+        const fee = procPrices.get(p.procedure_id) || resolveTariffPrice(tariffs, 'surgery', procName, 0);
+        if (fee > 0) {
+          calculatedTotal += fee;
+          charges.push({ description: `Procedure: ${procName} - ${p.execution_date || ''}`.trim(), amount: fee });
+        }
+      });
       if (charges.length > 0) {
         setPendingPatientCharges(charges);
         setAmount(calculatedTotal.toString());

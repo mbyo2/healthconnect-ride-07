@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
@@ -153,6 +154,14 @@ const Emergency = () => {
 
   return (
     <>
+      <Helmet>
+        <title>Emergency Help in Zambia — Ambulance 991 | Doc' O Clock</title>
+        <meta
+          name="description"
+          content="Emergency help across Zambia: call 991 or 112, alert your contacts, share your location, and find 24h hospitals, ambulances, and pharmacies."
+        />
+        <link rel="canonical" href="https://doc0clock.online/emergency" />
+      </Helmet>
       <div className="min-h-screen bg-background">
         <main className="container mx-auto px-4 py-6 space-y-6 max-w-7xl">
           <div className="space-y-6">

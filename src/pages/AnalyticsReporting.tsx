@@ -16,6 +16,22 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useInstitutionContext } from "@/hooks/useInstitutionContext";
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  LineChart as ReLineChart,
+  Line,
+  PieChart as RePieChart,
+  Pie,
+  Cell,
+  AreaChart,
+  Area,
+} from "recharts";
 
 interface AnalyticsReport {
   id: string;
@@ -158,6 +174,46 @@ export const AnalyticsReporting = () => {
     weekAgo.setDate(weekAgo.getDate() - 7);
     return reportDate > weekAgo;
   }).length;
+
+  // Derived chart data from real reports (launch-safe: renders empty states, never placeholder text).
+  const CATEGORY_COLORS: Record<string, string> = {
+    financial: "#0073ea",
+    operational: "#00c875",
+    clinical: "#a25ddc",
+    patient: "#fdab3d",
+    staff: "#6366f1",
+  };
+  const reportsByCategory = Object.entries(
+    reports.reduce<Record<string, number>>((acc, r) => {
+      const key = r.report_category || "other";
+      acc[key] = (acc[key] ?? 0) + 1;
+      return acc;
+    }, {})
+  ).map(([name, value]) => ({ name, value, fill: CATEGORY_COLORS[name] ?? "#676879" }));
+  const reportsByType = Object.entries(
+    reports.reduce<Record<string, number>>((acc, r) => {
+      const key = r.report_type || "summary";
+      acc[key] = (acc[key] ?? 0) + 1;
+      return acc;
+    }, {})
+  ).map(([name, count]) => ({ name, count }));
+  const reportsOverTime = (() => {
+    const buckets = new Map<string, number>();
+    for (let i = 11; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i * 7);
+      buckets.set(d.toLocaleDateString(undefined, { month: "short", day: "numeric" }), 0);
+    }
+    reports.forEach((r) => {
+      const d = new Date(r.generated_at);
+      if (Number.isNaN(d.getTime())) return;
+      // Bucket into nearest week label
+      const label = d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+      if (buckets.has(label)) buckets.set(label, (buckets.get(label) ?? 0) + 1);
+    });
+    return [...buckets.entries()].map(([week, count]) => ({ week, count }));
+  })();
+  const hasChartData = reports.length > 0;
 
   return (
     <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pb-16">
@@ -354,57 +410,108 @@ export const AnalyticsReporting = () => {
 
           {/* Dashboard Tab */}
           <TabsContent value="dashboard" className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {!hasChartData ? (
               <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
-                <CardHeader>
-                  <CardTitle className="text-sm font-extrabold flex items-center gap-2">
-                    <TrendingUp className="h-4 w-4 text-[#0073ea]" /> Revenue Trend
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-[200px] flex items-center justify-center text-[#676879] text-xs">
-                    Revenue trend chart placeholder - Integrate with your charting library
-                  </div>
+                <CardContent className="p-8 text-center space-y-2">
+                  <BarChart3 className="h-8 w-8 mx-auto text-[#0073ea]" />
+                  <p className="text-sm font-extrabold">No analytics yet</p>
+                  <p className="text-xs text-[#676879]">
+                    Generate your first report to populate revenue, category, and activity trends.
+                  </p>
                 </CardContent>
               </Card>
-              <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
-                <CardHeader>
-                  <CardTitle className="text-sm font-extrabold flex items-center gap-2">
-                    <Users className="h-4 w-4 text-[#00c875]" /> Patient Growth
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-[200px] flex items-center justify-center text-[#676879] text-xs">
-                    Patient growth chart placeholder
-                  </div>
-                </CardContent>
-              </Card>
-              <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
-                <CardHeader>
-                  <CardTitle className="text-sm font-extrabold flex items-center gap-2">
-                    <Activity className="h-4 w-4 text-[#a25ddc]" /> Service Utilization
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-[200px] flex items-center justify-center text-[#676879] text-xs">
-                    Service utilization chart placeholder
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
-              <CardHeader>
-                <CardTitle className="text-sm font-extrabold flex items-center gap-2">
-                  <PieChart className="h-4 w-4 text-[#0073ea]" /> Revenue Breakdown
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-[200px] flex items-center justify-center text-[#676879] text-xs">
-                  Revenue breakdown pie chart placeholder
+            ) : (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+                    <CardHeader>
+                      <CardTitle className="text-sm font-extrabold flex items-center gap-2">
+                        <TrendingUp className="h-4 w-4 text-[#0073ea]" /> Reports Over Time
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="h-[200px]">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <AreaChart data={reportsOverTime}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#e6e9ef" />
+                            <XAxis dataKey="week" tick={{ fontSize: 10 }} interval={2} />
+                            <YAxis allowDecimals={false} tick={{ fontSize: 10 }} />
+                            <Tooltip />
+                            <Area type="monotone" dataKey="count" stroke="#0073ea" fill="#0073ea" fillOpacity={0.2} />
+                          </AreaChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+                    <CardHeader>
+                      <CardTitle className="text-sm font-extrabold flex items-center gap-2">
+                        <Users className="h-4 w-4 text-[#00c875]" /> Reports by Type
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="h-[200px]">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <BarChart data={reportsByType}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#e6e9ef" />
+                            <XAxis dataKey="name" tick={{ fontSize: 10 }} />
+                            <YAxis allowDecimals={false} tick={{ fontSize: 10 }} />
+                            <Tooltip />
+                            <Bar dataKey="count" fill="#00c875" radius={[6, 6, 0, 0]} />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+                    <CardHeader>
+                      <CardTitle className="text-sm font-extrabold flex items-center gap-2">
+                        <Activity className="h-4 w-4 text-[#a25ddc]" /> Reports by Category
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="h-[200px]">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <BarChart data={reportsByCategory} layout="vertical">
+                            <CartesianGrid strokeDasharray="3 3" stroke="#e6e9ef" />
+                            <XAxis type="number" allowDecimals={false} tick={{ fontSize: 10 }} />
+                            <YAxis type="category" dataKey="name" tick={{ fontSize: 10 }} width={80} />
+                            <Tooltip />
+                            <Bar dataKey="value" radius={[0, 6, 6, 0]}>
+                              {reportsByCategory.map((entry, i) => (
+                                <Cell key={i} fill={entry.fill} />
+                              ))}
+                            </Bar>
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
-              </CardContent>
-            </Card>
+
+                <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+                  <CardHeader>
+                    <CardTitle className="text-sm font-extrabold flex items-center gap-2">
+                      <PieChart className="h-4 w-4 text-[#0073ea]" /> Category Breakdown
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="h-[220px]">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <RePieChart>
+                          <Pie data={reportsByCategory} dataKey="value" nameKey="name" outerRadius={80} label>
+                            {reportsByCategory.map((entry, i) => (
+                              <Cell key={i} fill={entry.fill} />
+                            ))}
+                          </Pie>
+                          <Tooltip />
+                        </RePieChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </CardContent>
+                </Card>
+              </>
+            )}
           </TabsContent>
 
           {/* Reports Tab */}
@@ -435,6 +542,17 @@ export const AnalyticsReporting = () => {
               </div>
             </div>
 
+            {reports.length === 0 ? (
+              <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+                <CardContent className="p-8 text-center space-y-2">
+                  <FileText className="h-8 w-8 mx-auto text-[#0073ea]" />
+                  <p className="text-sm font-extrabold">No reports found</p>
+                  <p className="text-xs text-[#676879]">
+                    Generate your first analytics report to see it listed here.
+                  </p>
+                </CardContent>
+              </Card>
+            ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {reports.map((report) => (
                 <Card key={report.id} className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
@@ -470,12 +588,12 @@ export const AnalyticsReporting = () => {
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-[#676879]">Date Range</span>
                       <span className="font-bold">
-                        {new Date(report.date_range_start).toLocaleDateString()} - {new Date(report.date_range_end).toLocaleDateString()}
+                        {report.date_range_start ? new Date(report.date_range_start).toLocaleDateString() : "—"} - {report.date_range_end ? new Date(report.date_range_end).toLocaleDateString() : "—"}
                       </span>
                     </div>
                     <div className="flex items-center justify-between pt-2 border-t border-[#e6e9ef] dark:border-slate-800">
                       <div className="text-xs text-[#676879]">
-                        {report.recipients.length} recipients
+                        {(report.recipients || []).length} recipients
                       </div>
                       <div className="flex items-center gap-1">
                         <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
@@ -490,92 +608,174 @@ export const AnalyticsReporting = () => {
                 </Card>
               ))}
             </div>
+            )}
           </TabsContent>
 
           {/* Financial Analytics Tab */}
           <TabsContent value="financial" className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {!hasChartData ? (
               <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
-                <CardHeader>
-                  <CardTitle className="text-sm font-extrabold flex items-center gap-2">
-                    <DollarSign className="h-4 w-4 text-[#0073ea]" /> Revenue by Service
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-[200px] flex items-center justify-center text-[#676879] text-xs">
-                    Revenue by service chart placeholder
-                  </div>
+                <CardContent className="p-8 text-center space-y-2">
+                  <DollarSign className="h-8 w-8 mx-auto text-[#00c875]" />
+                  <p className="text-sm font-extrabold">No financial reports yet</p>
+                  <p className="text-xs text-[#676879]">
+                    Financial analytics appear here once financial-category reports are generated.
+                  </p>
                 </CardContent>
               </Card>
-              <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
-                <CardHeader>
-                  <CardTitle className="text-sm font-extrabold flex items-center gap-2">
-                    <TrendingUp className="h-4 w-4 text-[#0073ea]" /> Cost Analysis
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-[200px] flex items-center justify-center text-[#676879] text-xs">
-                    Cost analysis chart placeholder
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
-              <CardHeader>
-                <CardTitle className="text-sm font-extrabold flex items-center gap-2">
-                  <LineChart className="h-4 w-4 text-[#0073ea]" /> Profit Margin Trend
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-[200px] flex items-center justify-center text-[#676879] text-xs">
-                  Profit margin trend chart placeholder
+            ) : (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+                    <CardHeader>
+                      <CardTitle className="text-sm font-extrabold flex items-center gap-2">
+                        <DollarSign className="h-4 w-4 text-[#0073ea]" /> Reports by Category
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="h-[200px]">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <BarChart data={reportsByCategory}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#e6e9ef" />
+                            <XAxis dataKey="name" tick={{ fontSize: 10 }} />
+                            <YAxis allowDecimals={false} tick={{ fontSize: 10 }} />
+                            <Tooltip />
+                            <Bar dataKey="value" fill="#0073ea" radius={[6, 6, 0, 0]} />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+                    <CardHeader>
+                      <CardTitle className="text-sm font-extrabold flex items-center gap-2">
+                        <TrendingUp className="h-4 w-4 text-[#0073ea]" /> Scheduled vs Ad-hoc
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="h-[200px]">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <BarChart
+                            data={[
+                              { name: "Scheduled", count: scheduledReports },
+                              { name: "Ad-hoc", count: totalReports - scheduledReports },
+                            ]}
+                          >
+                            <CartesianGrid strokeDasharray="3 3" stroke="#e6e9ef" />
+                            <XAxis dataKey="name" tick={{ fontSize: 10 }} />
+                            <YAxis allowDecimals={false} tick={{ fontSize: 10 }} />
+                            <Tooltip />
+                            <Bar dataKey="count" fill="#00c875" radius={[6, 6, 0, 0]} />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
-              </CardContent>
-            </Card>
+
+                <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+                  <CardHeader>
+                    <CardTitle className="text-sm font-extrabold flex items-center gap-2">
+                      <LineChart className="h-4 w-4 text-[#0073ea]" /> Reporting Activity Trend
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="h-[200px]">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <ReLineChart data={reportsOverTime}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#e6e9ef" />
+                          <XAxis dataKey="week" tick={{ fontSize: 10 }} interval={2} />
+                          <YAxis allowDecimals={false} tick={{ fontSize: 10 }} />
+                          <Tooltip />
+                          <Line type="monotone" dataKey="count" stroke="#0073ea" strokeWidth={2} dot={false} />
+                        </ReLineChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </CardContent>
+                </Card>
+              </>
+            )}
           </TabsContent>
 
           {/* Operational Analytics Tab */}
           <TabsContent value="operational" className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {!hasChartData ? (
               <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
-                <CardHeader>
-                  <CardTitle className="text-sm font-extrabold flex items-center gap-2">
-                    <Activity className="h-4 w-4 text-[#0073ea]" /> Patient Flow Metrics
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-[200px] flex items-center justify-center text-[#676879] text-xs">
-                    Patient flow metrics chart placeholder
-                  </div>
+                <CardContent className="p-8 text-center space-y-2">
+                  <Activity className="h-8 w-8 mx-auto text-[#0073ea]" />
+                  <p className="text-sm font-extrabold">No operational data yet</p>
+                  <p className="text-xs text-[#676879]">
+                    Operational analytics appear here once reports are generated for this institution.
+                  </p>
                 </CardContent>
               </Card>
-              <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
-                <CardHeader>
-                  <CardTitle className="text-sm font-extrabold flex items-center gap-2">
-                    <Users className="h-4 w-4 text-[#0073ea]" /> Staff Performance
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-[200px] flex items-center justify-center text-[#676879] text-xs">
-                    Staff performance chart placeholder
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
-              <CardHeader>
-                <CardTitle className="text-sm font-extrabold flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-[#0073ea]" /> Resource Utilization
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-[200px] flex items-center justify-center text-[#676879] text-xs">
-                  Resource utilization chart placeholder
+            ) : (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+                    <CardHeader>
+                      <CardTitle className="text-sm font-extrabold flex items-center gap-2">
+                        <Activity className="h-4 w-4 text-[#0073ea]" /> Reporting Cadence
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="h-[200px]">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <ReLineChart data={reportsOverTime}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#e6e9ef" />
+                            <XAxis dataKey="week" tick={{ fontSize: 10 }} interval={2} />
+                            <YAxis allowDecimals={false} tick={{ fontSize: 10 }} />
+                            <Tooltip />
+                            <Line type="monotone" dataKey="count" stroke="#a25ddc" strokeWidth={2} dot={false} />
+                          </ReLineChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+                    <CardHeader>
+                      <CardTitle className="text-sm font-extrabold flex items-center gap-2">
+                        <Users className="h-4 w-4 text-[#0073ea]" /> Reports by Type
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="h-[200px]">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <BarChart data={reportsByType}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#e6e9ef" />
+                            <XAxis dataKey="name" tick={{ fontSize: 10 }} />
+                            <YAxis allowDecimals={false} tick={{ fontSize: 10 }} />
+                            <Tooltip />
+                            <Bar dataKey="count" fill="#0073ea" radius={[6, 6, 0, 0]} />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
-              </CardContent>
-            </Card>
+
+                <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+                  <CardHeader>
+                    <CardTitle className="text-sm font-extrabold flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-[#0073ea]" /> Recent Activity (last 12 weeks)
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="h-[200px]">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart data={reportsOverTime}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#e6e9ef" />
+                          <XAxis dataKey="week" tick={{ fontSize: 10 }} interval={2} />
+                          <YAxis allowDecimals={false} tick={{ fontSize: 10 }} />
+                          <Tooltip />
+                          <Area type="monotone" dataKey="count" stroke="#00c875" fill="#00c875" fillOpacity={0.2} />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </CardContent>
+                </Card>
+              </>
+            )}
           </TabsContent>
         </Tabs>
       </div>

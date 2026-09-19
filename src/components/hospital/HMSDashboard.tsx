@@ -31,6 +31,59 @@ export const HMSDashboard = ({ hospital, departments, beds, admissions, invoices
     return new Date(a.admission_date).toDateString() === today;
   }).length || 0;
 
+  // Real per-department bed counts (beds carry their department join).
+  const bedsByDepartment = (departments || []).slice(0, 6).map((dept: any) => {
+    const deptBeds = (beds || []).filter((b: any) => (b.department?.name || b.department_id) === (dept.name || dept.id));
+    return {
+      name: String(dept.name || 'Ward').substring(0, 12),
+      occupied: deptBeds.filter((b: any) => b.status === 'occupied').length,
+      available: deptBeds.filter((b: any) => b.status === 'available').length,
+    };
+  });
+
+  // Real admission mix by department.
+  const admissionsByDepartment = (() => {
+    const groups = new Map<string, number>();
+    (admissions || []).forEach((a: any) => {
+      const key = a.department?.name || 'General';
+      groups.set(key, (groups.get(key) || 0) + 1);
+    });
+    const palette = ['#397dff', '#EF4444', '#22C55E', '#f55c15', '#a25ddc', '#eab308'];
+    const entries = [...groups.entries()].slice(0, 6);
+    if (entries.length === 0) return [{ name: 'No admissions yet', value: 0, color: '#cbd5e1' }];
+    return entries.map(([name, value], i) => ({ name, value, color: palette[i % palette.length] }));
+  })();
+
+  // Real last-7-days admissions vs discharges.
+  const weeklyFlow = (() => {
+    const days: { name: string; key: string }[] = [];
+    const fmt = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(Date.now() - i * 86400000);
+      days.push({ name: fmt[d.getDay()], key: d.toDateString() });
+    }
+    return days.map(({ name, key }) => ({
+      name,
+      admissions: (admissions || []).filter((a: any) => a.admission_date && new Date(a.admission_date).toDateString() === key).length,
+      discharges: (admissions || []).filter((a: any) => a.discharge_date && new Date(a.discharge_date).toDateString() === key).length,
+    }));
+  })();
+
+  // Real billing mix by payment status.
+  const billingByStatus = (() => {
+    const groups = new Map<string, number>();
+    (invoices || []).forEach((inv: any) => {
+      const key = (inv.payment_status || 'pending').toLowerCase();
+      groups.set(key, (groups.get(key) || 0) + (Number(inv.total_amount) || 0));
+    });
+    const entries = [...groups.entries()];
+    if (entries.length === 0) return [{ name: 'No invoices yet', revenue: 0 }];
+    return entries.map(([name, revenue]) => ({
+      name: name.charAt(0).toUpperCase() + name.slice(1),
+      revenue: Math.round(revenue),
+    }));
+  })();
+
   const criticalAlerts = [];
   if (availableBeds < 3) criticalAlerts.push(`Only ${availableBeds} beds available`);
   if (maintenanceBeds > 0) criticalAlerts.push(`${maintenanceBeds} beds under maintenance`);
@@ -57,21 +110,18 @@ export const HMSDashboard = ({ hospital, departments, beds, admissions, invoices
           value={`${occupancyRate}%`}
           subtitle={`${occupiedBeds}/${totalBeds} beds occupied`}
           icon={Bed}
-          trend={{ value: parseFloat(occupancyRate) > 75 ? 5.2 : -3.1, isPositive: parseFloat(occupancyRate) > 75 }}
         />
         <MetricCard
           title="Inpatients"
           value={admissions?.length?.toString() || '0'}
           subtitle={`${todayAdmissions} admitted today`}
           icon={Users}
-          trend={{ value: 8.3, isPositive: true }}
         />
         <MetricCard
           title="Revenue"
           value={formatPrice(totalRevenue)}
           subtitle={`${formatPrice(pendingAmount)} pending`}
           icon={DollarSign}
-          trend={{ value: 12.7, isPositive: true }}
         />
         <MetricCard
           title="Departments"
@@ -92,11 +142,7 @@ export const HMSDashboard = ({ hospital, departments, beds, admissions, invoices
             <p className="text-xs text-graphite-500 mt-1">Current status across all departments</p>
           </div>
           <SimpleBarChart
-            data={departments.slice(0, 6).map(dept => ({
-              name: dept.name.substring(0, 12),
-              occupied: Math.floor(Math.random() * 20) + 5,
-              available: Math.floor(Math.random() * 10) + 2,
-            }))}
+            data={bedsByDepartment}
             bars={[
               { dataKey: 'occupied', name: 'Occupied', color: '#EF4444' },
               { dataKey: 'available', name: 'Available', color: '#22C55E' },
@@ -114,12 +160,7 @@ export const HMSDashboard = ({ hospital, departments, beds, admissions, invoices
             <p className="text-xs text-graphite-500 mt-1">Current admissions by category</p>
           </div>
           <DonutChart
-            data={[
-              { name: 'General Ward', value: Math.floor(admissions?.length * 0.4) || 15, color: '#397dff' },
-              { name: 'ICU', value: Math.floor(admissions?.length * 0.15) || 5, color: '#EF4444' },
-              { name: 'Private Rooms', value: Math.floor(admissions?.length * 0.25) || 8, color: '#22C55E' },
-              { name: 'Day Care', value: Math.floor(admissions?.length * 0.2) || 6, color: '#f55c15' },
-            ]}
+            data={admissionsByDepartment}
             height={250}
           />
         </div>
@@ -137,15 +178,7 @@ export const HMSDashboard = ({ hospital, departments, beds, admissions, invoices
             <p className="text-xs text-graphite-500 mt-1">Last 7 days patient flow</p>
           </div>
           <SimpleBarChart
-            data={[
-              { name: 'Mon', admissions: 12, discharges: 8 },
-              { name: 'Tue', admissions: 15, discharges: 10 },
-              { name: 'Wed', admissions: 18, discharges: 12 },
-              { name: 'Thu', admissions: 14, discharges: 16 },
-              { name: 'Fri', admissions: 16, discharges: 11 },
-              { name: 'Sat', admissions: 9, discharges: 7 },
-              { name: 'Sun', admissions: 7, discharges: 5 },
-            ]}
+            data={weeklyFlow}
             bars={[
               { dataKey: 'admissions', name: 'Admissions', color: '#397dff' },
               { dataKey: 'discharges', name: 'Discharges', color: '#22C55E' },
@@ -158,18 +191,12 @@ export const HMSDashboard = ({ hospital, departments, beds, admissions, invoices
         <div className="vf-card p-5">
           <div className="mb-4">
             <h3 className="font-display text-sm font-medium text-midnight">
-              Revenue by Service
+              Billing by Status
             </h3>
-            <p className="text-xs text-graphite-500 mt-1">Top revenue-generating services</p>
+            <p className="text-xs text-graphite-500 mt-1">Invoiced amounts grouped by payment status</p>
           </div>
           <SimpleBarChart
-            data={[
-              { name: 'Surgery', revenue: 45000 },
-              { name: 'Diagnostics', revenue: 28000 },
-              { name: 'Consultation', revenue: 22000 },
-              { name: 'Pharmacy', revenue: 18000 },
-              { name: 'Lab Tests', revenue: 15000 },
-            ]}
+            data={billingByStatus}
             bars={[
               { dataKey: 'revenue', name: 'Revenue', color: '#22C55E' },
             ]}

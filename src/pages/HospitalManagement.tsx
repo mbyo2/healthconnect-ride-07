@@ -111,6 +111,21 @@ export const HospitalManagement = () => {
     enabled: !!hospital,
   });
 
+  const { data: dischargedAdmissions = [], refetch: refetchDischarged } = useQuery({
+    queryKey: ["hospital-discharged", hospital?.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("hospital_admissions" as any)
+        .select("*, patient:profiles!patient_id(first_name, last_name), department:hospital_departments(name)")
+        .eq("hospital_id", hospital?.id)
+        .eq("status", "discharged")
+        .order("discharge_date", { ascending: false })
+        .limit(200);
+      return (data as any[]) || [];
+    },
+    enabled: !!hospital,
+  });
+
   const { data: patients = [] } = useQuery({
     queryKey: ["hospital-patient-directory", hospital?.id],
     queryFn: async () => {
@@ -143,6 +158,7 @@ export const HospitalManagement = () => {
     refetchDepts();
     refetchBeds();
     refetchAdmissions();
+    refetchDischarged();
     refetchInvoices();
   };
 
@@ -240,7 +256,7 @@ export const HospitalManagement = () => {
             <TabsContent value="notifications"><NotificationCenter hospitalId={hospital.id} /></TabsContent>
             <TabsContent value="emr">{mod("emr", <EMRCaseSheets hospital={hospital} departments={departments} />)}</TabsContent>
             <TabsContent value="opd">{mod("opd", <OPDManagement hospital={hospital} departments={departments} />)}</TabsContent>
-            <TabsContent value="ipd">{mod("ipd", <IPDManagement hospital={hospital} patients={patients} departments={departments} beds={beds} admissions={admissions} onRefresh={refreshAll} />)}</TabsContent>
+            <TabsContent value="ipd">{mod("ipd", <IPDManagement hospital={hospital} patients={patients} departments={departments} beds={beds} admissions={admissions} discharged={dischargedAdmissions} onRefresh={refreshAll} />)}</TabsContent>
             <TabsContent value="emergency">{mod("emergency", <EmergencyTriage hospital={hospital} />)}</TabsContent>
             <TabsContent value="ot">{mod("ot", <OTManagement hospital={hospital} />)}</TabsContent>
             <TabsContent value="lab">{mod("lab", <HospitalLab hospital={hospital} />)}</TabsContent>
