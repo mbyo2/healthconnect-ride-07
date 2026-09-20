@@ -268,6 +268,12 @@ export function DesktopNav() {
 
   return (
     <header className="sticky top-0 z-50 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-b border-canvas-silk dark:border-slate-800" role="banner">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[60] focus:px-4 focus:py-2 focus:rounded-lg focus:bg-primary-500 focus:text-white focus:text-sm focus:font-medium"
+      >
+        Skip to main content
+      </a>
       <div className="mx-auto flex items-center justify-between h-16 lg:h-[4.25rem] px-4 md:px-6 lg:px-8 xl:px-12 max-w-content min-w-0">
         <div className="flex items-center gap-4 lg:gap-8 xl:gap-10 min-w-0">
           <AppLogo size="sm" className="shrink-0" />

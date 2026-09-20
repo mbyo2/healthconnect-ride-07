@@ -35,12 +35,23 @@ export function DesktopUserMenu({ user, profile, onLogout }: DesktopUserMenuProp
   const { isInstitutionAffiliated } = useInstitutionAffiliation();
 
   const menuItems = useMemo(() => {
-    // Nurse (solo)
-    if (availableRoles.includes('nurse') && !availableRoles.some(r => ['institution_admin', 'institution_staff'].includes(r))) {
+    // Nurse / Midwife — solo (NMCZ cadres)
+    if (availableRoles.some(r => ['nurse', 'registered_nurse', 'enrolled_nurse', 'midwife'].includes(r)) && !availableRoles.some(r => ['institution_admin', 'institution_staff'].includes(r))) {
       return [
         { to: "/provider-dashboard", label: "Nurse Dashboard", icon: <Stethoscope className="h-4 w-4" /> },
         { to: "/appointments", label: "Patient Visits", icon: <Calendar className="h-4 w-4" /> },
         ...(!isInstitutionAffiliated ? [{ to: "/wallet", label: "Earnings", icon: <Wallet className="h-4 w-4" /> }] : []),
+        { to: "/profile", label: "Profile", icon: <User className="h-4 w-4" /> },
+        { to: "/settings", label: "Settings", icon: <Settings className="h-4 w-4" /> },
+      ];
+    }
+
+    // Community & public-health field roles
+    if (availableRoles.some(r => ['environmental_health_officer', 'community_health_worker', 'traditional_practitioner'].includes(r))) {
+      return [
+        { to: "/provider-dashboard", label: "Fieldwork", icon: <Stethoscope className="h-4 w-4" /> },
+        { to: "/appointments", label: "Field Visits", icon: <Calendar className="h-4 w-4" /> },
+        { to: "/connections", label: "My Community", icon: <Users className="h-4 w-4" /> },
         { to: "/profile", label: "Profile", icon: <User className="h-4 w-4" /> },
         { to: "/settings", label: "Settings", icon: <Settings className="h-4 w-4" /> },
       ];
@@ -58,8 +69,8 @@ export function DesktopUserMenu({ user, profile, onLogout }: DesktopUserMenuProp
       ];
     }
 
-    // Pharmacy / Pharmacist
-    if (availableRoles.some(r => ['pharmacy', 'pharmacist'].includes(r))) {
+    // Pharmacy — retail, wholesale & professionals
+    if (availableRoles.some(r => ['pharmacy', 'wholesale_pharmacy', 'pharmacist', 'pharmacy_technologist'].includes(r))) {
       return [
         { to: "/pharmacy-portal", label: "Pharmacy Portal", icon: <Package className="h-4 w-4" /> },
         ...(!isInstitutionAffiliated ? [{ to: "/wallet", label: "Revenue", icon: <Wallet className="h-4 w-4" /> }] : []),
@@ -78,8 +89,8 @@ export function DesktopUserMenu({ user, profile, onLogout }: DesktopUserMenuProp
       ];
     }
 
-    // Institution Admin/Staff
-    if (availableRoles.some(r => ['institution_admin', 'institution_staff'].includes(r))) {
+    // Institution Admin/Staff (+ medical records officers)
+    if (availableRoles.some(r => ['institution_admin', 'institution_staff', 'medical_records_officer'].includes(r))) {
       return [
         { to: "/institution-dashboard", label: "Institution Dashboard", icon: <Building2 className="h-4 w-4" /> },
         { to: "/wallet", label: "Finances", icon: <Wallet className="h-4 w-4" /> },
@@ -88,8 +99,8 @@ export function DesktopUserMenu({ user, profile, onLogout }: DesktopUserMenuProp
       ];
     }
 
-    // Lab / Lab Technician
-    if (availableRoles.some(r => ['lab', 'lab_technician'].includes(r))) {
+    // Lab — facility, technicians, pathologists, phlebotomists
+    if (availableRoles.some(r => ['lab', 'lab_technician', 'pathologist', 'phlebotomist'].includes(r))) {
       return [
         { to: "/lab-management", label: "Lab Dashboard", icon: <Activity className="h-4 w-4" /> },
         { to: "/profile", label: "Profile", icon: <User className="h-4 w-4" /> },

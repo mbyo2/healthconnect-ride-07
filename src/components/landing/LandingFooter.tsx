@@ -1,7 +1,6 @@
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { AppLogo } from "@/components/ui/AppLogo";
 import { ArrowRight, Calendar, Phone, HeartPulse, ShieldCheck, Lock, Globe, CheckCircle2 } from "lucide-react";
-import { useState } from "react";
 
 export const BrowseSpecialties = () => {
   const navigate = useNavigate();
@@ -147,22 +146,16 @@ const FOOTER_SECTIONS = [
     links: [
       { label: "About Us", href: "/about" },
       { label: "Contact & Support", href: "/contact" },
-      { label: "Help & FAQs", href: "/documentation" },
+      { label: "Emergency Help", href: "/emergency" },
       { label: "Terms of Service", href: "/terms" },
       { label: "Privacy Policy", href: "/privacy" },
     ],
   },
 ];
 
+const EMERGENCY_TEL = `tel:${import.meta.env.VITE_EMERGENCY_NUMBER || '991'}`;
+
 export const LandingFooter = () => {
-  const [email, setEmail] = useState("");
-  const [subscribed, setSubscribed] = useState(false);
-
-  const handleSubscribe = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (email.trim()) { setSubscribed(true); setEmail(""); }
-  };
-
   return (
     <footer className="border-t border-canvas-silk bg-canvas-bone text-graphite-800">
       <div className="mx-auto max-w-content px-4 sm:px-6 lg:px-8 py-14">
@@ -179,21 +172,23 @@ export const LandingFooter = () => {
               <span className="w-2 h-2 rounded-full bg-success-500 animate-soft-pulse" />
               <span className="text-xs font-medium text-graphite-700">24/7 Zambian Healthcare Network</span>
             </div>
-            <form onSubmit={handleSubscribe} className="space-y-2 pt-1 max-w-sm">
-              <span className="text-xs font-medium text-graphite-600 block">Get healthcare tips & updates</span>
+            <div className="space-y-2 pt-1 max-w-sm">
+              <span className="text-xs font-medium text-graphite-600 block">Need care right now?</span>
               <div className="flex items-center gap-2">
-                <input
-                  type="email"
-                  placeholder="your@email.zm"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="flex-1 px-4 py-2.5 rounded-pill border border-canvas-silk bg-white text-xs text-midnight placeholder:text-graphite-400 focus:outline-none focus:border-primary-500"
-                />
-                <button type="submit" className="px-4 py-2.5 rounded-pill bg-primary-500 hover:bg-primary-600 font-medium text-xs text-white shrink-0 transition-all">
-                  {subscribed ? "Done" : "Subscribe"}
-                </button>
+                <a
+                  href={EMERGENCY_TEL}
+                  className="px-4 py-2.5 rounded-pill bg-destructive hover:opacity-90 font-medium text-xs text-white shrink-0 transition-all"
+                >
+                  Call Emergency
+                </a>
+                <Link
+                  to="/contact"
+                  className="px-4 py-2.5 rounded-pill border border-canvas-silk bg-white font-medium text-xs text-midnight shrink-0 transition-all hover:border-primary-500"
+                >
+                  Contact Support
+                </Link>
               </div>
-            </form>
+            </div>
           </div>
 
           {FOOTER_SECTIONS.map((section) => (
@@ -204,9 +199,9 @@ export const LandingFooter = () => {
               <ul className="space-y-2.5">
                 {section.links.map((link) => (
                   <li key={link.label}>
-                    <a href={link.href} className="text-xs text-graphite-500 hover:text-primary-500 font-medium transition-colors block">
+                    <Link to={link.href} className="text-xs text-graphite-500 hover:text-primary-500 font-medium transition-colors block">
                       {link.label}
-                    </a>
+                    </Link>
                   </li>
                 ))}
               </ul>

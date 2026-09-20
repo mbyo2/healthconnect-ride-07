@@ -37,7 +37,7 @@ export const ZAMBIA_DOCUMENT_REQUIREMENTS: CountryDocumentRequirements = {
       },
       {
         label: 'Medical License / Practice Certificate',
-        description: 'Current GMZ (General Medical Council of Zambia) registration certificate',
+        description: 'Current HPCZ (Health Professions Council of Zambia) registration certificate',
         required: true,
         acceptedFormats: ['pdf', 'jpg', 'png'],
       },
@@ -57,7 +57,7 @@ export const ZAMBIA_DOCUMENT_REQUIREMENTS: CountryDocumentRequirements = {
     nurse: [
       {
         label: 'Nursing License / Registration',
-        description: 'Current NBMZ (Nursing and Midwifery Board of Zambia) registration',
+        description: 'Current NMCZ (Nursing and Midwifery Council of Zambia) registration',
         required: true,
         acceptedFormats: ['pdf', 'jpg', 'png'],
       },
@@ -83,7 +83,7 @@ export const ZAMBIA_DOCUMENT_REQUIREMENTS: CountryDocumentRequirements = {
     pharmacist: [
       {
         label: 'Pharmacy License / Registration',
-        description: 'Current ZPRA (Zambia Pharmaceutical Regulatory Authority) registration',
+        description: 'Current HPCZ registration as pharmacist (premises licensed by ZAMRA)',
         required: true,
         acceptedFormats: ['pdf', 'jpg', 'png'],
       },
@@ -163,7 +163,7 @@ export const ZAMBIA_DOCUMENT_REQUIREMENTS: CountryDocumentRequirements = {
       },
       {
         label: 'Pharmacy License',
-        description: 'ZPRA (Zambia Pharmaceutical Regulatory Authority) pharmacy license',
+        description: 'ZAMRA (Zambia Medicines Regulatory Authority) premises licence',
         required: true,
         acceptedFormats: ['pdf', 'jpg', 'png'],
       },
@@ -225,6 +225,118 @@ export const ZAMBIA_DOCUMENT_REQUIREMENTS: CountryDocumentRequirements = {
         required: false,
         acceptedFormats: ['pdf', 'jpg', 'png'],
       },
+    ],
+    // ── Full workforce taxonomy (HPCZ / NMCZ / ZAMRA / THPCZ) ──
+    specialist: [
+      { label: 'Medical Degree Certificate', description: 'Primary medical qualification', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+      { label: 'HPCZ Specialist Registration', description: 'Entry on the HPCZ specialist register plus postgraduate qualification', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+      { label: 'ID / Passport', description: 'Valid National ID or Passport', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+    ],
+    medical_licentiate: [
+      { label: 'Medical Licentiate Degree', description: 'BSc / ML degree from a recognised university', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+      { label: 'HPCZ Registration', description: 'Current HPCZ registration as Medical Licentiate Practitioner', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+      { label: 'ID / Passport', description: 'Valid National ID or Passport', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+    ],
+    clinical_officer: [
+      { label: 'Clinical Officer Diploma / Degree', description: 'Clinical medicine qualification', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+      { label: 'HPCZ Registration', description: 'Current HPCZ registration as Clinical Officer General', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+      { label: 'ID / Passport', description: 'Valid National ID or Passport', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+    ],
+    dentist: [
+      { label: 'Dental Surgery Degree', description: 'BDS or equivalent dental qualification', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+      { label: 'HPCZ Registration', description: 'Current HPCZ registration as Dental Surgeon', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+      { label: 'ID / Passport', description: 'Valid National ID or Passport', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+    ],
+    dental_therapist: [
+      { label: 'Dental Therapy Qualification', description: 'Diploma/degree in dental therapy, hygiene or technology', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+      { label: 'HPCZ Registration', description: 'Current HPCZ registration in the dental cadre', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+      { label: 'ID / Passport', description: 'Valid National ID or Passport', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+    ],
+    registered_nurse: [
+      { label: 'Nursing Qualification', description: 'Diploma or BScN in nursing', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+      { label: 'NMCZ Registration', description: 'Current NMCZ registration as Registered Nurse', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+      { label: 'ID / Passport', description: 'Valid National ID or Passport', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+    ],
+    enrolled_nurse: [
+      { label: 'Enrolled Nursing Certificate', description: 'Certificate in enrolled nursing', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+      { label: 'NMCZ Enrolment', description: 'Current NMCZ enrolment as Enrolled Nurse', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+      { label: 'ID / Passport', description: 'Valid National ID or Passport', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+    ],
+    midwife: [
+      { label: 'Midwifery Qualification', description: 'Registered/enrolled midwifery qualification', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+      { label: 'NMCZ Registration', description: 'Current NMCZ registration as midwife', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+      { label: 'ID / Passport', description: 'Valid National ID or Passport', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+    ],
+    pharmacy_technologist: [
+      { label: 'Pharmacy Diploma', description: 'Diploma in pharmacy technology or dispensing certificate', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+      { label: 'HPCZ Registration', description: 'Current HPCZ registration as pharmacy technologist/dispenser', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+      { label: 'ID / Passport', description: 'Valid National ID or Passport', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+    ],
+    wholesale_pharmacy: [
+      { label: 'Business Registration', description: 'PACRA business registration certificate', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+      { label: 'ZAMRA Wholesale Licence', description: 'Current ZAMRA pharmaceutical wholesale licence', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+      { label: 'Tax Registration', description: 'Valid ZRA tax identification and certificate', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+      { label: 'Superintendent Pharmacist HPCZ Certificate', description: 'Responsible pharmacist practising certificate', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+    ],
+    radiographer: [
+      { label: 'Radiography Qualification', description: 'Diploma/degree in radiography or imaging technology', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+      { label: 'HPCZ Registration', description: 'Current HPCZ registration as radiographer', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+      { label: 'ID / Passport', description: 'Valid National ID or Passport', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+    ],
+    pathologist: [
+      { label: 'Medical Degree', description: 'Primary medical qualification', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+      { label: 'HPCZ Specialist Registration', description: 'Pathology specialty registration', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+      { label: 'ID / Passport', description: 'Valid National ID or Passport', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+    ],
+    phlebotomist: [
+      { label: 'Phlebotomy Training Certificate', description: 'Certified sample-collection training', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+      { label: 'ID / Passport', description: 'Valid National ID or Passport', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+    ],
+    physiotherapist: [
+      { label: 'Physiotherapy Degree / Diploma', description: 'Recognised physiotherapy qualification', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+      { label: 'HPCZ Registration', description: 'Current HPCZ registration as physiotherapist', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+      { label: 'ID / Passport', description: 'Valid National ID or Passport', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+    ],
+    occupational_therapist: [
+      { label: 'Occupational Therapy Qualification', description: 'Recognised OT qualification', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+      { label: 'HPCZ Registration', description: 'Current HPCZ registration as occupational therapist', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+      { label: 'ID / Passport', description: 'Valid National ID or Passport', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+    ],
+    nutritionist: [
+      { label: 'Nutrition / Dietetics Degree', description: 'Recognised nutrition qualification', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+      { label: 'HPCZ Registration', description: 'Current HPCZ registration as nutritionist/dietician', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+      { label: 'ID / Passport', description: 'Valid National ID or Passport', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+    ],
+    optometrist: [
+      { label: 'Optometry Qualification', description: 'Degree/diploma in optometry or optical dispensing', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+      { label: 'HPCZ Registration', description: 'Current HPCZ registration in the optician cadre', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+      { label: 'ID / Passport', description: 'Valid National ID or Passport', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+    ],
+    psychologist: [
+      { label: 'Psychology Degree', description: 'Degree in clinical psychology or counselling', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+      { label: 'HPCZ Registration', description: 'Current HPCZ registration as clinical psychologist', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+      { label: 'ID / Passport', description: 'Valid National ID or Passport', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+    ],
+    environmental_health_officer: [
+      { label: 'Environmental Health Qualification', description: 'Diploma/degree in environmental health', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+      { label: 'HPCZ Registration', description: 'Current HPCZ registration as EHO/technologist', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+      { label: 'ID / Passport', description: 'Valid National ID or Passport', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+    ],
+    community_health_worker: [
+      { label: 'CHA Training Certificate', description: 'Community Health Assistant training certificate', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+      { label: 'ID / Passport', description: 'Valid National ID or Passport', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+    ],
+    traditional_practitioner: [
+      { label: 'THPCZ Registration', description: 'Traditional Health Practitioners Council of Zambia registration', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+      { label: 'ID / Passport', description: 'Valid National ID or Passport', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+    ],
+    medical_records_officer: [
+      { label: 'Health Information Qualification', description: 'Diploma/certificate in health records or HIM', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+      { label: 'ID / Passport', description: 'Valid National ID or Passport', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+    ],
+    institution_staff: [
+      { label: 'Employment Letter / Staff ID', description: 'Proof of employment at the facility', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
+      { label: 'ID / Passport', description: 'Valid National ID or Passport', required: true, acceptedFormats: ['pdf', 'jpg', 'png'] },
     ],
   },
 };
@@ -431,15 +543,22 @@ export const COUNTRY_DOCUMENT_REQUIREMENTS: Record<CountryCode, CountryDocumentR
 };
 
 /**
- * Get document requirements for a specific country and role
- * Falls back to Zambia if country not found
+ * Get document requirements for a specific country and role.
+ * Falls back to Zambia if country not found, and to the generic health
+ * personnel checklist if the role has no dedicated entry — unknown roles
+ * must NEVER resolve to an empty (auto-passing) checklist.
  */
 export function getDocumentRequirements(
   countryCode: CountryCode = 'ZM',
   roleType: string
 ): DocumentRequirement[] {
   const countryConfig = COUNTRY_DOCUMENT_REQUIREMENTS[countryCode] || COUNTRY_DOCUMENT_REQUIREMENTS['ZM'];
-  return countryConfig.roles[roleType] || [];
+  return (
+    countryConfig.roles[roleType] ||
+    countryConfig.roles['health_personnel'] ||
+    COUNTRY_DOCUMENT_REQUIREMENTS['ZM'].roles['health_personnel'] ||
+    []
+  );
 }
 
 /**

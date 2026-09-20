@@ -31,6 +31,18 @@ import { PathologistWorkflow } from './PathologistWorkflow';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { InfoIcon } from 'lucide-react';
+import { NURSING_ROLES, COMMUNITY_ROLES } from '@/config/roleConfig';
+
+// Prescribing clinicians share the doctor console.
+const DOCTOR_LIKE_ROLES = [
+  'doctor', 'specialist', 'medical_licentiate', 'clinical_officer', 'dentist',
+];
+// Allied & community cadres share the generic clinical console.
+const ALLIED_LIKE_ROLES = [
+  'dental_therapist', 'radiographer', 'physiotherapist', 'occupational_therapist',
+  'nutritionist', 'optometrist', 'psychologist',
+  ...COMMUNITY_ROLES,
+];
 
 export const RoleBasedWorkflow = () => {
   const { currentRole, userRole, isAdmin, isSuperAdmin, availableRoles } = useUserRoles();
@@ -71,6 +83,7 @@ export const RoleBasedWorkflow = () => {
       case 'pathologist':
         return <PathologistWorkflow />;
       case 'pharmacist':
+      case 'pharmacy_technologist':
         return <PharmacistWorkflow />;
       case 'doctor':
         return <DoctorWorkflow />;
@@ -82,6 +95,24 @@ export const RoleBasedWorkflow = () => {
         return <HealthPersonnelWorkflow />;
       default:
         break;
+    }
+
+    // New-taxonomy roles resolve to their closest console (never the
+    // patient workflow — that was the fall-through bug for new cadres).
+    if (activeRole && DOCTOR_LIKE_ROLES.includes(activeRole)) {
+      return <DoctorWorkflow />;
+    }
+    if (activeRole && (NURSING_ROLES as readonly string[]).includes(activeRole)) {
+      return <NurseWorkflow />;
+    }
+    if (activeRole && ALLIED_LIKE_ROLES.includes(activeRole)) {
+      return <HealthPersonnelWorkflow />;
+    }
+    if (activeRole === 'wholesale_pharmacy') {
+      return <PharmacyWorkflow />;
+    }
+    if (activeRole === 'medical_records_officer') {
+      return <InstitutionStaffWorkflow />;
     }
 
     // Pharmacy / Lab business entities
@@ -96,14 +127,14 @@ export const RoleBasedWorkflow = () => {
     }
 
     // Institution admin/staff — check if nursing home type
-    if (activeRole === 'institution_admin' || activeRole === 'institution_staff' ||
-        availableRoles.some(r => ['institution_admin', 'institution_staff'].includes(r))) {
+    if (activeRole === 'institution_admin' || activeRole === 'institution_staff' || activeRole === 'medical_records_officer' ||
+        availableRoles.some(r => ['institution_admin', 'institution_staff', 'medical_records_officer'].includes(r))) {
       const specialty = profile?.specialty?.toLowerCase() || '';
       if (specialty.includes('nursing home') || specialty.includes('care home') || specialty.includes('aged care')) {
         return <NursingHomeWorkflow />;
       }
       // Staff gets reduced-permission UI
-      if (activeRole === 'institution_staff') {
+      if (activeRole === 'institution_staff' || activeRole === 'medical_records_officer') {
         return <InstitutionStaffWorkflow />;
       }
       return <InstitutionAdminWorkflow />;

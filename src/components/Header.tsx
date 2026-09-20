@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { useUserRoles } from "@/context/UserRolesContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -15,33 +15,31 @@ import {
 import { Menu, Search } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { CurrencyToggle } from "@/components/CurrencyToggle";
-import { useSearch } from "@/context/SearchContext";
 import { useDeviceType } from "@/hooks/use-device-type";
 import { AppLogo } from "@/components/ui/AppLogo";
 import { NotificationBell } from "@/components/NotificationBell";
+import { PHARMACY_SIDE_ROLES, LAB_SIDE_ROLES } from "@/config/roleConfig";
 
 export function Header() {
   const { user, signOut, profile } = useAuth();
   const { isHealthPersonnel, isAdmin, availableRoles } = useUserRoles();
-  const location = useLocation();
   const navigate = useNavigate();
-  const { setSearchQuery } = useSearch();
   const { isDesktop } = useDeviceType();
 
   const isInstitutionUser = availableRoles.some((r) =>
-    ["institution_admin", "institution_staff"].includes(r)
+    ["institution_admin", "institution_staff", "medical_records_officer"].includes(r)
   );
   const isPharmacyUser = availableRoles.some((r) =>
-    ["pharmacy", "pharmacist"].includes(r)
+    (PHARMACY_SIDE_ROLES as readonly string[]).includes(r)
   );
   const isLabUser = availableRoles.some((r) =>
-    ["lab", "lab_technician"].includes(r)
+    (LAB_SIDE_ROLES as readonly string[]).includes(r)
   );
 
   const handleSignOut = useCallback(async () => {
     try {
       await signOut();
-      navigate("/login");
+      navigate("/auth", { replace: true });
     } catch (error) {
       console.error("Error signing out:", error);
     }
@@ -51,13 +49,19 @@ export function Header() {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 w-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-b border-canvas-silk dark:border-slate-800">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[60] focus:px-4 focus:py-2 focus:rounded-lg focus:bg-primary-500 focus:text-white focus:text-sm focus:font-medium"
+      >
+        Skip to main content
+      </a>
       <div className="flex h-16 items-center justify-between px-4">
         <AppLogo size="sm" className="gap-2 shrink-0" />
 
         <div className="flex items-center gap-2">
           {user && (
             <>
-              <Button variant="ghost" size="icon" className="h-10 w-10 rounded-pill" onClick={() => navigate("/search")}>
+              <Button variant="ghost" size="icon" aria-label="Search doctors and care" className="h-10 w-10 rounded-pill" onClick={() => navigate("/search")}>
                 <Search className="h-5 w-5" />
               </Button>
               <NotificationBell />
@@ -69,7 +73,7 @@ export function Header() {
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-10 w-10 rounded-pill ml-2">
+              <Button variant="ghost" size="icon" aria-label={user ? "Account menu" : "Open menu"} className="h-10 w-10 rounded-pill ml-2">
                 {user ? (
                   <Avatar className="h-9 w-9 ring-2 ring-primary-500">
                     <AvatarImage src={profile?.avatar_url || ""} alt={user?.email || "Avatar"} />
@@ -93,7 +97,7 @@ export function Header() {
                   <DropdownMenuItem asChild><Link to="/search" className="font-medium text-[#0073ea]">Find Doctors & Care</Link></DropdownMenuItem>
                   <DropdownMenuItem asChild><Link to="/profile" className="font-medium">Profile & Settings</Link></DropdownMenuItem>
                   <DropdownMenuItem asChild><Link to="/appointments" className="font-medium">My Appointments</Link></DropdownMenuItem>
-                  <DropdownMenuItem asChild><Link to="/documentation" className="font-medium">Help & Support</Link></DropdownMenuItem>
+                  <DropdownMenuItem asChild><Link to="/contact" className="font-medium">Help & Support</Link></DropdownMenuItem>
                   {isHealthPersonnel && (
                     <DropdownMenuItem asChild><Link to="/provider-dashboard" className="font-medium">Provider Dashboard</Link></DropdownMenuItem>
                   )}
