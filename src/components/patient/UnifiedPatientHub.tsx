@@ -87,7 +87,7 @@ export const UnifiedPatientHub: React.FC<{ institutionId?: string }> = ({ instit
   return (
     <div className="space-y-6 font-sans text-slate-900 dark:text-slate-100">
       {/* Header Banner */}
-      <div className="p-6 rounded-3xl bg-gradient-to-r from-[#0073ea] via-[#0f172a] to-[#1e293b] text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="p-6 rounded-3xl bg-gradient-to-r from-primary-500 via-slate-900 to-slate-800 text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
           <div className="h-12 w-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center font-black text-xl border border-white/20">
             <Users className="h-6 w-6 text-white" />
@@ -107,7 +107,7 @@ export const UnifiedPatientHub: React.FC<{ institutionId?: string }> = ({ instit
 
         <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
           <DialogTrigger asChild>
-            <button className="px-4 py-2 rounded-xl bg-white text-[#0f172a] font-extrabold text-xs flex items-center gap-1.5 shadow-sm hover:bg-slate-100 transition-all">
+            <button className="px-4 py-2 rounded-xl bg-white text-slate-900 font-extrabold text-xs flex items-center gap-1.5 shadow-sm hover:bg-slate-100 transition-all">
               <UserPlus className="h-4 w-4" /> Register New Patient
             </button>
           </DialogTrigger>
@@ -119,7 +119,7 @@ export const UnifiedPatientHub: React.FC<{ institutionId?: string }> = ({ instit
               <div>
                 <label className="font-bold">Full Name *</label>
                 <input
-                  className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4]"
+                  className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700"
                   value={newPatient.name}
                   onChange={(e) => setNewPatient({ ...newPatient, name: e.target.value })}
                 />
@@ -128,7 +128,7 @@ export const UnifiedPatientHub: React.FC<{ institutionId?: string }> = ({ instit
                 <div>
                   <label className="font-bold">Gender</label>
                   <select
-                    className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4] font-bold"
+                    className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-bold"
                     value={newPatient.gender}
                     onChange={(e) => setNewPatient({ ...newPatient, gender: e.target.value })}
                   >
@@ -141,7 +141,7 @@ export const UnifiedPatientHub: React.FC<{ institutionId?: string }> = ({ instit
                   <label className="font-bold">Age (Years)</label>
                   <input
                     type="number"
-                    className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4]"
+                    className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700"
                     value={newPatient.age}
                     onChange={(e) => setNewPatient({ ...newPatient, age: parseInt(e.target.value) || 1 })}
                   />
@@ -150,7 +150,7 @@ export const UnifiedPatientHub: React.FC<{ institutionId?: string }> = ({ instit
               <div>
                 <label className="font-bold">Phone Number</label>
                 <input
-                  className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4]"
+                  className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700"
                   placeholder="+260 970 000 000"
                   value={newPatient.phone}
                   onChange={(e) => setNewPatient({ ...newPatient, phone: e.target.value })}
@@ -159,7 +159,7 @@ export const UnifiedPatientHub: React.FC<{ institutionId?: string }> = ({ instit
               <div>
                 <label className="font-bold">Allergies (Comma separated)</label>
                 <input
-                  className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4]"
+                  className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700"
                   placeholder="e.g. Penicillin, Peanuts"
                   value={newPatient.allergies}
                   onChange={(e) => setNewPatient({ ...newPatient, allergies: e.target.value })}
@@ -168,7 +168,7 @@ export const UnifiedPatientHub: React.FC<{ institutionId?: string }> = ({ instit
               <div>
                 <label className="font-bold">Chronic Conditions</label>
                 <input
-                  className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4]"
+                  className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700"
                   placeholder="e.g. Hypertension, Asthma"
                   value={newPatient.chronicConditions}
                   onChange={(e) => setNewPatient({ ...newPatient, chronicConditions: e.target.value })}
@@ -177,7 +177,7 @@ export const UnifiedPatientHub: React.FC<{ institutionId?: string }> = ({ instit
             </div>
             <DialogFooter>
               <button onClick={() => setShowAddModal(false)} className="px-4 py-2 font-bold text-slate-500">Cancel</button>
-              <button onClick={handleAddPatient} className="px-5 py-2.5 rounded-xl bg-[#0073ea] text-white font-extrabold">Save &amp; Generate MRN</button>
+              <button onClick={handleAddPatient} className="px-5 py-2.5 rounded-xl bg-primary-500 text-white font-extrabold">Save &amp; Generate MRN</button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -194,7 +194,7 @@ export const UnifiedPatientHub: React.FC<{ institutionId?: string }> = ({ instit
               placeholder="Search by name, MRN #, phone..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-[#c3c6d4] dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-medium focus:outline-none focus:border-[#0073ea]"
+              className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-graphite-300 dark:border-slate-700 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-medium focus:outline-none focus:border-primary-500"
             />
           </div>
 
@@ -207,12 +207,12 @@ export const UnifiedPatientHub: React.FC<{ institutionId?: string }> = ({ instit
                   onClick={() => setSelectedPatient(p)}
                   className={`p-4 rounded-2xl border transition-all cursor-pointer ${
                     isSelected
-                      ? "bg-[#0073ea]/10 border-[#0073ea] shadow-xs"
-                      : "bg-white dark:bg-slate-900 border-[#e6e9ef] dark:border-slate-800 hover:border-slate-300"
+                      ? "bg-primary-500/10 border-primary-500 shadow-xs"
+                      : "bg-white dark:bg-slate-900 border-canvas-silk dark:border-slate-800 hover:border-slate-300"
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="font-mono font-bold text-[10px] text-[#0073ea]">{p.mrn}</span>
+                    <span className="font-mono font-bold text-[10px] text-primary-500">{p.mrn}</span>
                     <span className="text-[10px] text-slate-400 font-medium">Last visit: {p.lastVisit}</span>
                   </div>
                   <h4 className="font-black text-sm text-slate-900 dark:text-slate-100 mt-1">{p.name}</h4>
@@ -228,16 +228,16 @@ export const UnifiedPatientHub: React.FC<{ institutionId?: string }> = ({ instit
         </div>
 
         {/* Right 7 Cols: Detailed Dossier */}
-        <div className="lg:col-span-7 p-6 rounded-3xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs space-y-6 text-xs">
-          <div className="flex items-center justify-between border-b border-[#e6e9ef] dark:border-slate-800 pb-4">
+        <div className="lg:col-span-7 p-6 rounded-3xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs space-y-6 text-xs">
+          <div className="flex items-center justify-between border-b border-canvas-silk dark:border-slate-800 pb-4">
             <div>
-              <span className="font-mono font-bold text-xs text-[#0073ea]">{selectedPatient.mrn}</span>
+              <span className="font-mono font-bold text-xs text-primary-500">{selectedPatient.mrn}</span>
               <h3 className="text-xl font-black text-slate-900 dark:text-slate-100 mt-0.5">{selectedPatient.name}</h3>
               <p className="text-slate-400">{selectedPatient.gender} • {selectedPatient.age} years old • {selectedPatient.phone}</p>
             </div>
             <button
               onClick={() => toast.success(`Exported complete EMR Dossier for ${selectedPatient.name}`)}
-              className="px-4 py-2 rounded-xl bg-[#0073ea] text-white font-extrabold text-xs shadow-xs"
+              className="px-4 py-2 rounded-xl bg-primary-500 text-white font-extrabold text-xs shadow-xs"
             >
               Export Full EMR (PDF)
             </button>
@@ -255,7 +255,7 @@ export const UnifiedPatientHub: React.FC<{ institutionId?: string }> = ({ instit
             </div>
 
             <div className="p-3.5 rounded-2xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900">
-              <span className="text-[10px] font-black uppercase text-[#0073ea] flex items-center gap-1">
+              <span className="text-[10px] font-black uppercase text-primary-500 flex items-center gap-1">
                 <HeartPulse className="h-3.5 w-3.5" /> Chronic Conditions
               </span>
               <div className="mt-1 font-bold text-slate-900 dark:text-slate-100">
@@ -272,7 +272,7 @@ export const UnifiedPatientHub: React.FC<{ institutionId?: string }> = ({ instit
               </span>
               <button
                 onClick={() => toast.success("Document uploaded to patient cloud vault")}
-                className="px-3 py-1 rounded-lg border border-[#c3c6d4] text-[11px] font-bold hover:bg-[#f0f2f7] flex items-center gap-1"
+                className="px-3 py-1 rounded-lg border border-graphite-300 dark:border-slate-700 text-[11px] font-bold hover:bg-canvas-mist dark:hover:bg-slate-800 flex items-center gap-1"
               >
                 <Upload className="h-3 w-3" /> Upload Document
               </button>
@@ -284,9 +284,9 @@ export const UnifiedPatientHub: React.FC<{ institutionId?: string }> = ({ instit
                 { name: "Full_Blood_Count_Result.pdf", type: "Laboratory Report", size: "180 KB" },
                 { name: "Chest_XRay_Digital_Scan.dcm", type: "DICOM Radiology", size: "12.4 MB" },
               ].map((doc, i) => (
-                <div key={i} className="p-3 rounded-xl border border-[#e6e9ef] dark:border-slate-800 flex items-center justify-between">
+                <div key={i} className="p-3 rounded-xl border border-canvas-silk dark:border-slate-800 flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
-                    <FileText className="h-4 w-4 text-[#0073ea]" />
+                    <FileText className="h-4 w-4 text-primary-500" />
                     <div>
                       <div className="font-bold text-slate-900 dark:text-slate-100">{doc.name}</div>
                       <div className="text-[10px] text-slate-400">{doc.type} • {doc.size}</div>
@@ -294,7 +294,7 @@ export const UnifiedPatientHub: React.FC<{ institutionId?: string }> = ({ instit
                   </div>
                   <button
                     onClick={() => toast.success(`Downloading ${doc.name}`)}
-                    className="p-1.5 rounded-lg border hover:bg-[#0073ea] hover:text-white transition-colors"
+                    className="p-1.5 rounded-lg border hover:bg-primary-500 hover:text-white transition-colors"
                   >
                     <Download className="h-3.5 w-3.5" />
                   </button>

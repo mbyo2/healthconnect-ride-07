@@ -81,7 +81,7 @@ export const LISRadiologySuite: React.FC<{ institutionId?: string }> = ({ instit
   return (
     <div className="space-y-6 font-sans text-slate-900 dark:text-slate-100">
       {/* Header Banner */}
-      <div className="p-6 rounded-3xl bg-gradient-to-r from-[#0073ea] via-[#0f172a] to-[#1e293b] text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="p-6 rounded-3xl bg-gradient-to-r from-primary-500 via-slate-900 to-slate-800 text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
           <div className="h-12 w-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center font-black text-xl border border-white/20">
             <TestTube2 className="h-6 w-6 text-white" />
@@ -107,7 +107,7 @@ export const LISRadiologySuite: React.FC<{ institutionId?: string }> = ({ instit
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-2 border-b border-[#e6e9ef] dark:border-slate-800 pb-2 overflow-x-auto">
+      <div className="flex items-center gap-2 border-b border-canvas-silk dark:border-slate-800 pb-2 overflow-x-auto">
         {[
           { id: "lis", label: "LIS Specimen Accessioning & Validation", icon: TestTube2 },
           { id: "ris", label: "RIS Radiology Orders & Worklist", icon: Scan },
@@ -120,8 +120,8 @@ export const LISRadiologySuite: React.FC<{ institutionId?: string }> = ({ instit
               onClick={() => setActiveTab(tab.id as any)}
               className={`px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2 transition-all shrink-0 ${
                 activeTab === tab.id
-                  ? "bg-[#0073ea] text-white shadow-xs"
-                  : "bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-[#f0f2f7]"
+                  ? "bg-primary-500 text-white shadow-xs"
+                  : "bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-canvas-mist dark:hover:bg-slate-800"
               }`}
             >
               <Icon className="h-4 w-4" />
@@ -137,20 +137,20 @@ export const LISRadiologySuite: React.FC<{ institutionId?: string }> = ({ instit
           <div className="flex items-center justify-between">
             <div>
               <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">Laboratory Specimens &amp; Pathologist Worklist</h3>
-              <p className="text-xs text-[#676879] dark:text-slate-400">Automated analyzer interface with critical panic value alerts</p>
+              <p className="text-xs text-graphite-500 dark:text-slate-400">Automated analyzer interface with critical panic value alerts</p>
             </div>
             <button
               onClick={() => toast.success("Batch verified and published 4 lab results")}
-              className="px-4 py-2 rounded-xl bg-[#0073ea] text-white font-extrabold text-xs shadow-xs"
+              className="px-4 py-2 rounded-xl bg-primary-500 text-white font-extrabold text-xs shadow-xs"
             >
               Verify All Results
             </button>
           </div>
 
-          <div className="w-full overflow-x-auto rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
+          <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-[#e6e9ef] dark:border-slate-800 bg-[#f5f6f8] dark:bg-slate-950 text-[11px] font-extrabold uppercase text-[#676879]">
+                <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
                   <th className="py-3 px-4">Sample Barcode</th>
                   <th className="py-3 px-3">Patient Name</th>
                   <th className="py-3 px-3">Test Panel &amp; Specimen</th>
@@ -160,10 +160,10 @@ export const LISRadiologySuite: React.FC<{ institutionId?: string }> = ({ instit
                   <th className="py-3 px-3 text-center">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#e6e9ef] dark:divide-slate-800">
+              <tbody className="divide-y divide-canvas-silk dark:divide-slate-800">
                 {samples.map((s) => (
-                  <tr key={s.id} className="hover:bg-[#f0f2f7] dark:hover:bg-slate-800/60">
-                    <td className="py-3 px-4 font-mono font-bold text-[#0073ea]">{s.barcode}</td>
+                  <tr key={s.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-800/60">
+                    <td className="py-3 px-4 font-mono font-bold text-primary-500">{s.barcode}</td>
                     <td className="py-3 px-3 font-bold text-slate-900 dark:text-slate-100">{s.patientName}</td>
                     <td className="py-3 px-3">
                       <div className="font-extrabold">{s.testName}</div>
@@ -214,7 +214,7 @@ export const LISRadiologySuite: React.FC<{ institutionId?: string }> = ({ instit
           <div className="flex items-center justify-between">
             <div>
               <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">Radiology Information System (RIS) Worklist</h3>
-              <p className="text-xs text-[#676879] dark:text-slate-400">Imaging examinations, technician acquisition, and radiologist reports</p>
+              <p className="text-xs text-graphite-500 dark:text-slate-400">Imaging examinations, technician acquisition, and radiologist reports</p>
             </div>
           </div>
 
@@ -222,33 +222,33 @@ export const LISRadiologySuite: React.FC<{ institutionId?: string }> = ({ instit
             {studies.map((st) => (
               <div
                 key={st.id}
-                className="p-5 rounded-3xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs flex flex-col justify-between space-y-4"
+                className="p-5 rounded-3xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs flex flex-col justify-between space-y-4"
               >
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <span className="px-2.5 py-0.5 rounded-md bg-[#0073ea]/10 text-[#0073ea] font-mono font-black text-[10px]">
+                    <span className="px-2.5 py-0.5 rounded-md bg-primary-500/10 text-primary-500 font-mono font-black text-[10px]">
                       {st.modality}
                     </span>
                     <span className="text-[10px] font-bold text-slate-400">{st.studyDate}</span>
                   </div>
 
                   <h4 className="font-black text-sm text-slate-900 dark:text-slate-100">{st.bodyPart}</h4>
-                  <p className="text-xs text-[#0073ea] font-bold mt-0.5">{st.patientName}</p>
+                  <p className="text-xs text-primary-500 font-bold mt-0.5">{st.patientName}</p>
 
-                  <div className="mt-3 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-[#e6e9ef] text-[11px] text-slate-600 dark:text-slate-300">
+                  <div className="mt-3 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-canvas-silk text-[11px] text-slate-600 dark:text-slate-300">
                     <span className="font-bold text-slate-900 dark:text-slate-100 block mb-1">Radiology Findings:</span>
                     {st.radiologistReport}
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between pt-2 border-t border-[#e6e9ef] dark:border-slate-800">
+                <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
                   <span className="text-[10px] font-bold text-slate-400">{st.slicesCount} DICOM Slices</span>
                   <button
                     onClick={() => {
                       setSelectedStudy(st);
                       setActiveTab("dicom");
                     }}
-                    className="px-3.5 py-1.5 rounded-xl bg-[#0073ea] hover:bg-[#0060c4] text-white font-extrabold text-xs flex items-center gap-1 shadow-xs"
+                    className="px-3.5 py-1.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs flex items-center gap-1 shadow-xs"
                   >
                     <Eye className="h-3.5 w-3.5" /> Launch PACS Viewer
                   </button>
@@ -267,8 +267,8 @@ export const LISRadiologySuite: React.FC<{ institutionId?: string }> = ({ instit
               <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">
                 DICOM-Web PACS Viewer • {selectedStudy.modality}: {selectedStudy.bodyPart}
               </h3>
-              <p className="text-xs text-[#676879] dark:text-slate-400">
-                Patient: <span className="font-bold text-[#0073ea]">{selectedStudy.patientName}</span> • Acc: {selectedStudy.accessionNumber}
+              <p className="text-xs text-graphite-500 dark:text-slate-400">
+                Patient: <span className="font-bold text-primary-500">{selectedStudy.patientName}</span> • Acc: {selectedStudy.accessionNumber}
               </p>
             </div>
 
@@ -276,14 +276,14 @@ export const LISRadiologySuite: React.FC<{ institutionId?: string }> = ({ instit
             <div className="flex items-center gap-1.5 flex-wrap">
               <button
                 onClick={() => setZoomLevel((z) => Math.max(50, z - 25))}
-                className="p-2 rounded-xl bg-white dark:bg-slate-900 border border-[#e6e9ef] text-xs font-bold hover:bg-[#f0f2f7]"
+                className="p-2 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk text-xs font-bold hover:bg-canvas-mist dark:hover:bg-slate-800"
                 title="Zoom Out"
               >
                 <ZoomOut className="h-4 w-4" />
               </button>
               <button
                 onClick={() => setZoomLevel((z) => Math.min(250, z + 25))}
-                className="p-2 rounded-xl bg-white dark:bg-slate-900 border border-[#e6e9ef] text-xs font-bold hover:bg-[#f0f2f7]"
+                className="p-2 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk text-xs font-bold hover:bg-canvas-mist dark:hover:bg-slate-800"
                 title="Zoom In"
               >
                 <ZoomIn className="h-4 w-4" />
@@ -291,7 +291,7 @@ export const LISRadiologySuite: React.FC<{ institutionId?: string }> = ({ instit
               <button
                 onClick={() => setInverted((inv) => !inv)}
                 className={`px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1 ${
-                  inverted ? "bg-[#0073ea] text-white" : "bg-white dark:bg-slate-900"
+                  inverted ? "bg-primary-500 text-white" : "bg-white dark:bg-slate-900"
                 }`}
               >
                 <SunMedium className="h-4 w-4" /> Invert
@@ -309,7 +309,7 @@ export const LISRadiologySuite: React.FC<{ institutionId?: string }> = ({ instit
           </div>
 
           {/* Interactive Screen Display */}
-          <div className="rounded-3xl bg-[#000000] border-4 border-[#0f172a] p-8 shadow-2xl min-h-[420px] flex items-center justify-center relative overflow-hidden">
+          <div className="rounded-3xl bg-black border-4 border-slate-900 p-8 shadow-2xl min-h-[420px] flex items-center justify-center relative overflow-hidden">
             {/* DICOM Overlay Metadata */}
             <div className="absolute top-4 left-4 text-[11px] font-mono text-emerald-400 space-y-0.5 pointer-events-none">
               <div>PATIENT: {selectedStudy.patientName.toUpperCase()}</div>

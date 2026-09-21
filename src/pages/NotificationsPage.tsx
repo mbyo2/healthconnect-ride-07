@@ -118,12 +118,12 @@ const NotificationsPage = () => {
 
   const getNotificationIcon = (type: Notification["type"]) => {
     switch (type) {
-      case "appointment": return <Calendar className="h-5 w-5 text-[#0073ea]" />;
-      case "message": return <MessageSquare className="h-5 w-5 text-[#00c875]" />;
-      case "alert": return <AlertCircle className="h-5 w-5 text-[#e2445c]" />;
-      case "reminder": return <Pill className="h-5 w-5 text-[#fdab3d]" />;
-      case "connection": return <Users className="h-5 w-5 text-[#a25ddc]" />;
-      default: return <FileText className="h-5 w-5 text-[#676879]" />;
+      case "appointment": return <Calendar className="h-5 w-5 text-primary-500" />;
+      case "message": return <MessageSquare className="h-5 w-5 text-success-500" />;
+      case "alert": return <AlertCircle className="h-5 w-5 text-error-500" />;
+      case "reminder": return <Pill className="h-5 w-5 text-warning-500" />;
+      case "connection": return <Users className="h-5 w-5 text-purple-500" />;
+      default: return <FileText className="h-5 w-5 text-graphite-500 dark:text-slate-400" />;
     }
   };
 
@@ -131,30 +131,32 @@ const NotificationsPage = () => {
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   return (
-    <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors pb-16">
+    <div className="min-h-screen bg-canvas dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors pb-16">
       {/* Sticky Monday Header */}
-      <div className="bg-white dark:bg-slate-900 border-b border-[#e6e9ef] dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
+      <div className="bg-white dark:bg-slate-900 border-b border-canvas-silk dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
         <div className="max-w-[1500px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-[#0073ea] text-white flex items-center justify-center font-black text-sm shadow-xs">
+            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-black text-sm shadow-xs">
               <Bell className="h-5 w-5" />
             </div>
             <div>
               <h1 className="text-xl font-extrabold tracking-tight flex items-center gap-2">
                 System Notifications & Real-Time Alerts
-                <span className="w-2 h-2 rounded-full bg-[#00c875] animate-ping" />
+                <span className="w-2 h-2 rounded-full bg-success-500 animate-ping" aria-hidden />
+                <span className="sr-only">Live notifications</span>
               </h1>
-              <p className="text-xs text-[#676879] dark:text-slate-400 font-medium">
-                {unreadCount > 0 ? `${unreadCount} unread system notifications` : "All notifications read"}
+              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
+                {unreadCount > 0 ? `${unreadCount} unread notification${unreadCount === 1 ? '' : 's'}` : "All notifications read"}
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
             {unreadCount > 0 && (
-              <button
+                    <button
                 onClick={markAllAsRead}
-                className="px-4 py-2 rounded-md bg-[#0073ea] hover:bg-[#0060c4] text-white font-extrabold text-xs shadow-xs transition-all flex items-center gap-1.5"
+                aria-label={unreadCount > 0 ? `Mark all ${unreadCount} notifications as read` : 'Mark all as read'}
+                className="px-4 py-2 rounded-md bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs transition-all flex items-center gap-1.5"
               >
                 <CheckCheck className="h-4 w-4" />
                 <span>Mark All Read</span>
@@ -174,8 +176,8 @@ const NotificationsPage = () => {
               onClick={() => setFilter(tab.id as any)}
               className={`px-4 py-2 rounded-xl text-xs font-extrabold transition-all ${
                 filter === tab.id
-                  ? "bg-[#0073ea] text-white shadow-xs"
-                  : "bg-white dark:bg-slate-900 border border-[#e6e9ef] text-[#676879] hover:bg-[#f0f2f7]"
+                  ? "bg-primary-500 text-white shadow-xs"
+                  : "bg-white dark:bg-slate-900 border border-canvas-silk text-graphite-500 dark:text-slate-400 hover:bg-canvas-mist dark:hover:bg-slate-800"
               }`}
             >
               {tab.label}
@@ -185,25 +187,25 @@ const NotificationsPage = () => {
       </div>
 
       <div className="max-w-[1500px] mx-auto px-4 sm:px-6 pt-6">
-        <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs overflow-hidden">
+        <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs overflow-hidden">
           {loading ? (
-            <div className="p-12 text-center text-xs font-bold text-[#676879]">
+            <div className="p-12 text-center text-xs font-bold text-graphite-500 dark:text-slate-400">
               Loading notification stream...
             </div>
           ) : filteredNotifications.length === 0 ? (
-            <div className="p-12 text-center text-xs text-[#676879]">
-              <Bell className="h-10 w-10 mx-auto mb-2 opacity-30 text-[#0073ea]" />
+            <div className="p-12 text-center text-xs text-graphite-500 dark:text-slate-400">
+              <Bell className="h-10 w-10 mx-auto mb-2 opacity-30 text-primary-500" />
               <p className="font-bold">No notifications found.</p>
             </div>
           ) : (
-            <div className="divide-y divide-[#e6e9ef]">
+            <div className="divide-y divide-canvas-silk">
               {filteredNotifications.map((notification) => (
                 <div
                   key={notification.id}
-                  className={`p-4 transition-colors ${!notification.read ? "bg-[#e5f0ff]/40" : "hover:bg-[#f5f6f8]"}`}
+                  className={`p-4 transition-colors ${!notification.read ? "bg-primary-50/40" : "hover:bg-canvas dark:bg-slate-950"}`}
                 >
                   <div className="flex gap-4 items-start">
-                    <div className="p-2.5 rounded-xl bg-white border border-[#e6e9ef] shadow-2xs">
+                    <div className="p-2.5 rounded-xl bg-white border border-canvas-silk shadow-2xs">
                       {getNotificationIcon(notification.type)}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -212,33 +214,35 @@ const NotificationsPage = () => {
                           <h3 className="font-extrabold text-xs text-slate-900 dark:text-slate-100">
                             {notification.title}
                           </h3>
-                          <p className="text-xs text-[#676879] mt-0.5 font-medium">
+                          <p className="text-xs text-graphite-500 dark:text-slate-400 mt-0.5 font-medium">
                             {notification.message}
                           </p>
-                          <p className="text-[10px] text-[#676879] font-bold mt-1">
+                          <p className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-1">
                             {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}
                           </p>
                         </div>
                         {!notification.read && (
-                          <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white bg-[#0073ea]">New</span>
+                          <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white bg-primary-500">New</span>
                         )}
                       </div>
 
                       <div className="flex gap-2 mt-3">
                         {!notification.read && (
-                          <button
-                            onClick={() => markAsRead(notification.id)}
-                            className="px-3 py-1 rounded-md border border-[#c3c6d4] bg-white text-xs font-bold flex items-center gap-1 hover:bg-[#f0f2f7]"
-                          >
-                            <Check className="h-3.5 w-3.5 text-[#00c875]" /> Mark Read
-                          </button>
-                        )}
-                        <button
-                          onClick={() => deleteNotification(notification.id)}
-                          className="px-3 py-1 rounded-md text-[#e2445c] hover:bg-[#ffeef0] text-xs font-bold flex items-center gap-1"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" /> Delete
-                        </button>
+                    <button
+                      onClick={() => markAsRead(notification.id)}
+                      aria-label={`Mark as read: ${notification.title}`}
+                      className="px-3 py-1 rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold flex items-center gap-1 hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-700"
+                    >
+                      <Check className="h-3.5 w-3.5 text-success-500" /> Mark Read
+                    </button>
+                  )}
+                  <button
+                    onClick={() => deleteNotification(notification.id)}
+                    aria-label={`Delete notification: ${notification.title}`}
+                    className="px-3 py-1 rounded-md text-error-500 hover:bg-error-50 dark:hover:bg-rose-950/30 text-xs font-bold flex items-center gap-1"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" /> Delete
+                  </button>
                       </div>
                     </div>
                   </div>

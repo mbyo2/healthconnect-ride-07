@@ -139,7 +139,7 @@ export const AdminDashboard = () => {
   return (
     <div className="min-h-screen bg-canvas text-midnight font-sans transition-colors pb-16">
       {/* Top Bar */}
-      <div className="bg-white border-b border-canvas-silk px-4 sm:px-6 py-5 sticky top-0 z-30 shadow-sm">
+      <div className="bg-white dark:bg-slate-900 border-b border-canvas-silk dark:border-slate-800 px-4 sm:px-6 py-5 sticky top-0 z-30 shadow-sm">
         <div className="max-w-content mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-button">
@@ -167,13 +167,13 @@ export const AdminDashboard = () => {
       {/* Main Board Content */}
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 pt-6">
         <Tabs value={activeTab} onValueChange={setTab} className="space-y-4">
-          <div className="overflow-x-auto p-1 bg-white dark:bg-slate-900 rounded-xl border border-[#e6e9ef] dark:border-slate-800">
+          <div className="overflow-x-auto p-1 bg-white dark:bg-slate-900 rounded-xl border border-canvas-silk dark:border-slate-800">
             <TabsList className="inline-flex w-auto min-w-full flex-wrap h-auto gap-1 bg-transparent p-1">
               {TABS.map(({ value, label, icon: Icon }) => (
                 <TabsTrigger
                   key={value}
                   value={value}
-                  className="text-xs font-extrabold px-3.5 py-1.5 rounded-md data-[state=active]:bg-[#0073ea] data-[state=active]:text-white flex items-center gap-1.5 transition-all"
+                  className="text-xs font-extrabold px-3.5 py-1.5 rounded-md data-[state=active]:bg-primary-500 data-[state=active]:text-white flex items-center gap-1.5 transition-all"
                 >
                   <Icon className="h-3.5 w-3.5" />
                   <span>{label}</span>
@@ -182,7 +182,7 @@ export const AdminDashboard = () => {
             </TabsList>
           </div>
 
-          <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-6 shadow-xs">
+          <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-6 shadow-xs">
             <TabsContent value="overview">
               <div className="space-y-5">
                 {/* Header */}
@@ -404,7 +404,7 @@ export const AdminDashboard = () => {
             <TabsContent value="test">
               <div className="space-y-2">
                 <h3 className="font-extrabold text-base">Test Account Diagnostics</h3>
-                <p className="text-xs text-[#676879]">Create test credentials for development and QA validation</p>
+                <p className="text-xs text-graphite-500 dark:text-slate-400">Create test credentials for development and QA validation</p>
                 <TestAccountSetup />
               </div>
             </TabsContent>

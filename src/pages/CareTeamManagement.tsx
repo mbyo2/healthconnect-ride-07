@@ -200,33 +200,33 @@ export const CareTeamManagement = () => {
 
   const getRoleTypeColor = (type: string) => {
     switch (type) {
-      case "clinical": return "bg-[#0073ea]";
-      case "nursing": return "bg-[#00c875]";
-      case "technical": return "bg-[#a25ddc]";
-      case "administrative": return "bg-[#fdab3d]";
-      case "support": return "bg-[#6366f1]";
-      default: return "bg-[#676879]";
+      case "clinical": return "bg-primary-500";
+      case "nursing": return "bg-success-500";
+      case "technical": return "bg-purple-500";
+      case "administrative": return "bg-warning-500";
+      case "support": return "bg-indigo-500";
+      default: return "bg-graphite-500 dark:bg-slate-600";
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case "urgent": return "bg-[#e44258] text-white";
-      case "high": return "bg-[#fdab3d] text-white";
-      case "normal": return "bg-[#0073ea] text-white";
-      case "low": return "bg-[#676879] text-white";
-      default: return "bg-[#676879] text-white";
+      case "urgent": return "bg-error-500 text-white";
+      case "high": return "bg-warning-500 text-white";
+      case "normal": return "bg-primary-500 text-white";
+      case "low": return "bg-graphite-500 dark:bg-slate-600 text-white";
+      default: return "bg-graphite-500 dark:bg-slate-600 text-white";
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "completed": return "bg-[#00c875] text-white";
-      case "in_progress": return "bg-[#0073ea] text-white";
-      case "pending": return "bg-[#a25ddc] text-white";
-      case "cancelled": return "bg-[#e44258] text-white";
-      case "deferred": return "bg-[#fdab3d] text-white";
-      default: return "bg-[#676879] text-white";
+      case "completed": return "bg-success-500 text-white";
+      case "in_progress": return "bg-primary-500 text-white";
+      case "pending": return "bg-purple-500 text-white";
+      case "cancelled": return "bg-error-500 text-white";
+      case "deferred": return "bg-warning-500 text-white";
+      default: return "bg-graphite-500 dark:bg-slate-600 text-white";
     }
   };
 
@@ -234,13 +234,13 @@ export const CareTeamManagement = () => {
 
   if (!institution) {
     return (
-      <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 flex items-center justify-center p-6">
+      <div className="min-h-screen bg-canvas dark:bg-slate-950 flex items-center justify-center p-6">
         <Card className="max-w-md w-full">
           <CardContent className="p-8 text-center space-y-4">
-            <Building2 className="h-12 w-12 mx-auto text-[#0073ea]" />
+            <Building2 className="h-12 w-12 mx-auto text-primary-500" />
             <h2 className="text-xl font-extrabold">Institution Required</h2>
-            <p className="text-xs text-[#676879]">Please select an institution to access care team management.</p>
-            <Button onClick={() => navigate("/institution-portal")} className="bg-[#0073ea] hover:bg-[#0056b3]">
+            <p className="text-xs text-graphite-500 dark:text-slate-400">Please select an institution to access care team management.</p>
+            <Button onClick={() => navigate("/institution-portal")} className="bg-primary-500 hover:bg-primary-600">
               Go to Institution Portal
             </Button>
           </CardContent>
@@ -258,23 +258,23 @@ export const CareTeamManagement = () => {
   }).length;
 
   return (
-    <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pb-16">
+    <div className="min-h-screen bg-canvas dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pb-16">
       {/* Header */}
-      <div className="bg-white dark:bg-slate-900 border-b border-[#e6e9ef] dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
+      <div className="bg-white dark:bg-slate-900 border-b border-canvas-silk dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
         <div className="max-w-[1600px] mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-[#0073ea] text-white flex items-center justify-center shadow-xs">
+            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-xs">
               <Users className="h-5 w-5" />
             </div>
             <div>
               <h1 className="text-xl font-extrabold">Care Team Management</h1>
-              <p className="text-xs text-[#676879] font-medium">Interdisciplinary Team Coordination</p>
+              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">Interdisciplinary Team Coordination</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <Dialog open={showAssignmentDialog} onOpenChange={setShowAssignmentDialog}>
               <DialogTrigger asChild>
-                <Button className="bg-[#0073ea] hover:bg-[#0056b3] text-white font-bold text-xs flex items-center gap-2">
+                <Button className="bg-primary-500 hover:bg-primary-600 text-white font-bold text-xs flex items-center gap-2">
                   <UserPlus className="h-4 w-4" /> Assign Team
                 </Button>
               </DialogTrigger>
@@ -364,7 +364,7 @@ export const CareTeamManagement = () => {
                       className="mt-1"
                     />
                   </div>
-                  <Button onClick={handleCreateAssignment} className="w-full bg-[#0073ea] hover:bg-[#0056b3] text-white font-bold">
+                  <Button onClick={handleCreateAssignment} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold">
                     Create Assignment
                   </Button>
                 </div>
@@ -471,7 +471,7 @@ export const CareTeamManagement = () => {
                       className="mt-1"
                     />
                   </div>
-                  <Button onClick={handleCreateTask} className="w-full bg-[#0073ea] hover:bg-[#0056b3] text-white font-bold">
+                  <Button onClick={handleCreateTask} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold">
                     Create Task
                   </Button>
                 </div>
@@ -484,60 +484,60 @@ export const CareTeamManagement = () => {
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 pt-6">
         {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-[#676879] uppercase">Active Assignments</span>
-                <Users className="h-4 w-4 text-[#0073ea]" />
+                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Active Assignments</span>
+                <Users className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-[#0073ea]">{activeAssignments}</div>
-              <div className="text-[10px] text-[#676879] font-bold mt-0.5">Current team members</div>
+              <div className="text-2xl font-black font-mono text-primary-500">{activeAssignments}</div>
+              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Current team members</div>
             </CardContent>
           </Card>
-          <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-[#676879] uppercase">Pending Tasks</span>
-                <Clock className="h-4 w-4 text-[#a25ddc]" />
+                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Pending Tasks</span>
+                <Clock className="h-4 w-4 text-purple-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-[#a25ddc]">{pendingTasks}</div>
-              <div className="text-[10px] text-[#676879] font-bold mt-0.5">Awaiting completion</div>
+              <div className="text-2xl font-black font-mono text-purple-500">{pendingTasks}</div>
+              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Awaiting completion</div>
             </CardContent>
           </Card>
-          <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-[#676879] uppercase">Available Roles</span>
-                <Shield className="h-4 w-4 text-[#00c875]" />
+                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Available Roles</span>
+                <Shield className="h-4 w-4 text-success-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-[#00c875]">{totalRoles}</div>
-              <div className="text-[10px] text-[#676879] font-bold mt-0.5">Configured roles</div>
+              <div className="text-2xl font-black font-mono text-success-500">{totalRoles}</div>
+              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Configured roles</div>
             </CardContent>
           </Card>
-          <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-[#676879] uppercase">Overdue Tasks</span>
-                <AlertTriangle className="h-4 w-4 text-[#e44258]" />
+                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Overdue Tasks</span>
+                <AlertTriangle className="h-4 w-4 text-error-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-[#e44258]">{overdueTasks}</div>
-              <div className="text-[10px] text-[#676879] font-bold mt-0.5">Require attention</div>
+              <div className="text-2xl font-black font-mono text-error-500">{overdueTasks}</div>
+              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Require attention</div>
             </CardContent>
           </Card>
         </div>
 
         <Tabs defaultValue="assignments" className="space-y-6">
-          <TabsList className="bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 p-1">
-            <TabsTrigger value="assignments" className="data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">
+          <TabsList className="bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 p-1">
+            <TabsTrigger value="assignments" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <Users className="h-4 w-4 mr-2" /> Team Assignments
             </TabsTrigger>
-            <TabsTrigger value="roles" className="data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">
+            <TabsTrigger value="roles" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <Shield className="h-4 w-4 mr-2" /> Role Definitions
             </TabsTrigger>
-            <TabsTrigger value="tasks" className="data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">
+            <TabsTrigger value="tasks" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <CheckCircle className="h-4 w-4 mr-2" /> Clinical Tasks
             </TabsTrigger>
-            <TabsTrigger value="workflows" className="data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">
+            <TabsTrigger value="workflows" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <Activity className="h-4 w-4 mr-2" /> Workflows
             </TabsTrigger>
           </TabsList>
@@ -562,9 +562,9 @@ export const CareTeamManagement = () => {
               </Button>
             </div>
 
-            <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs overflow-hidden">
+            <Card className="border-canvas-silk dark:border-slate-800 shadow-xs overflow-hidden">
               <table className="w-full">
-                <thead className="bg-[#f0f2f7] dark:bg-slate-800">
+                <thead className="bg-canvas-mist dark:bg-slate-800">
                   <tr>
                     <th className="text-left text-xs font-extrabold px-4 py-3">Patient</th>
                     <th className="text-left text-xs font-extrabold px-4 py-3">Staff Member</th>
@@ -577,7 +577,7 @@ export const CareTeamManagement = () => {
                 </thead>
                 <tbody>
                   {assignments.map((assignment) => (
-                    <tr key={assignment.id} className="border-t border-[#e6e9ef] dark:border-slate-800 hover:bg-[#f8f9fa] dark:hover:bg-slate-800">
+                    <tr key={assignment.id} className="border-t border-canvas-silk dark:border-slate-800 hover:bg-canvas-bone dark:hover:bg-slate-800">
                       <td className="px-4 py-3">
                         <div className="text-xs font-bold">
                           {assignment.patient?.first_name} {assignment.patient?.last_name}
@@ -587,7 +587,7 @@ export const CareTeamManagement = () => {
                         <div className="text-xs font-bold">
                           {assignment.staff?.first_name} {assignment.staff?.last_name}
                         </div>
-                        <div className="text-[10px] text-[#676879]">{assignment.staff?.specialty}</div>
+                        <div className="text-[10px] text-graphite-500 dark:text-slate-400">{assignment.staff?.specialty}</div>
                       </td>
                       <td className="px-4 py-3">
                         <Badge variant="outline" className="text-[10px]">
@@ -599,14 +599,14 @@ export const CareTeamManagement = () => {
                           {assignment.assignment_type}
                         </Badge>
                       </td>
-                      <td className="px-4 py-3 text-xs text-[#676879]">
+                      <td className="px-4 py-3 text-xs text-graphite-500 dark:text-slate-400">
                         {new Date(assignment.assigned_at).toLocaleDateString()}
                       </td>
                       <td className="px-4 py-3">
                         {assignment.is_active ? (
-                          <Badge className="bg-[#00c875] text-white text-[10px]">Active</Badge>
+                          <Badge className="bg-success-500 text-white text-[10px]">Active</Badge>
                         ) : (
-                          <Badge className="bg-[#676879] text-white text-[10px]">Inactive</Badge>
+                          <Badge className="bg-graphite-500 dark:bg-slate-600 text-white text-[10px]">Inactive</Badge>
                         )}
                       </td>
                       <td className="px-4 py-3">
@@ -637,7 +637,7 @@ export const CareTeamManagement = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {roles.map((role) => (
-                <Card key={role.id} className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+                <Card key={role.id} className="border-canvas-silk dark:border-slate-800 shadow-xs">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
@@ -646,7 +646,7 @@ export const CareTeamManagement = () => {
                         </div>
                         <div>
                           <CardTitle className="text-sm font-extrabold">{role.role_name}</CardTitle>
-                          <div className="text-[10px] text-[#676879]">{role.role_type}</div>
+                          <div className="text-[10px] text-graphite-500 dark:text-slate-400">{role.role_type}</div>
                         </div>
                       </div>
                     </div>
@@ -654,20 +654,20 @@ export const CareTeamManagement = () => {
                   <CardContent className="space-y-3">
                     <div className="flex items-center gap-2">
                       {role.can_prescribe && (
-                        <Badge className="bg-[#0073ea] text-white text-[10px]">Can Prescribe</Badge>
+                        <Badge className="bg-primary-500 text-white text-[10px]">Can Prescribe</Badge>
                       )}
                       {role.can_order_tests && (
-                        <Badge className="bg-[#a25ddc] text-white text-[10px]">Can Order Tests</Badge>
+                        <Badge className="bg-purple-500 text-white text-[10px]">Can Order Tests</Badge>
                       )}
                       {role.can_perform_procedures && (
-                        <Badge className="bg-[#00c875] text-white text-[10px]">Can Perform Procedures</Badge>
+                        <Badge className="bg-success-500 text-white text-[10px]">Can Perform Procedures</Badge>
                       )}
                     </div>
-                    <div className="text-xs text-[#676879]">
+                    <div className="text-xs text-graphite-500 dark:text-slate-400">
                       {role.responsibilities.length} responsibilities
                     </div>
-                    <div className="flex items-center justify-between pt-2 border-t border-[#e6e9ef] dark:border-slate-800">
-                      <div className="text-xs text-[#676879]">
+                    <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
+                      <div className="text-xs text-graphite-500 dark:text-slate-400">
                         {role.required_qualifications.length} qualifications required
                       </div>
                       <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
@@ -708,12 +708,12 @@ export const CareTeamManagement = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {tasks.map((task) => (
-                <Card key={task.id} className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+                <Card key={task.id} className="border-canvas-silk dark:border-slate-800 shadow-xs">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div>
                         <CardTitle className="text-sm font-extrabold">{task.task_name}</CardTitle>
-                        <div className="text-[10px] text-[#676879]">{task.task_type}</div>
+                        <div className="text-[10px] text-graphite-500 dark:text-slate-400">{task.task_type}</div>
                       </div>
                       <div className="flex items-center gap-1">
                         <Badge className={getPriorityColor(task.priority) + " text-[10px]"}>
@@ -727,7 +727,7 @@ export const CareTeamManagement = () => {
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-[#676879]">Assigned To</span>
+                      <span className="text-graphite-500 dark:text-slate-400">Assigned To</span>
                       <span className="font-bold">
                         {task.assigned_to_profile
                           ? `${task.assigned_to_profile.first_name} ${task.assigned_to_profile.last_name}`
@@ -736,20 +736,20 @@ export const CareTeamManagement = () => {
                     </div>
                     {task.due_date && (
                       <div className="flex items-center justify-between text-xs">
-                        <span className="text-[#676879]">Due Date</span>
-                        <span className={`font-bold ${new Date(task.due_date) < new Date() && task.status !== "completed" ? "text-[#e44258]" : ""}`}>
+                        <span className="text-graphite-500 dark:text-slate-400">Due Date</span>
+                        <span className={`font-bold ${new Date(task.due_date) < new Date() && task.status !== "completed" ? "text-error-500" : ""}`}>
                           {new Date(task.due_date).toLocaleDateString()}
                         </span>
                       </div>
                     )}
                     {task.estimated_duration_minutes && (
                       <div className="flex items-center justify-between text-xs">
-                        <span className="text-[#676879]">Est. Duration</span>
+                        <span className="text-graphite-500 dark:text-slate-400">Est. Duration</span>
                         <span className="font-bold">{task.estimated_duration_minutes} min</span>
                       </div>
                     )}
-                    <div className="flex items-center justify-between pt-2 border-t border-[#e6e9ef] dark:border-slate-800">
-                      <div className="text-xs text-[#676879]">
+                    <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
+                      <div className="text-xs text-graphite-500 dark:text-slate-400">
                         {task.dependencies.length} dependencies
                       </div>
                       <div className="flex items-center gap-1">
@@ -769,14 +769,14 @@ export const CareTeamManagement = () => {
 
           {/* Workflows Tab */}
           <TabsContent value="workflows" className="space-y-4">
-            <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+            <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
               <CardHeader>
                 <CardTitle className="text-sm font-extrabold flex items-center gap-2">
-                  <Activity className="h-4 w-4 text-[#0073ea]" /> Clinical Workflow Templates
+                  <Activity className="h-4 w-4 text-primary-500" /> Clinical Workflow Templates
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="h-[200px] flex items-center justify-center text-[#676879] text-xs">
+                <div className="h-[200px] flex items-center justify-center text-graphite-500 dark:text-slate-400 text-xs">
                   Workflow template designer placeholder - Create and manage clinical workflows
                 </div>
               </CardContent>

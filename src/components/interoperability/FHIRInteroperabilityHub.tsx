@@ -78,7 +78,7 @@ export const FHIRInteroperabilityHub: React.FC<{ patientId?: string }> = ({ pati
   return (
     <div className="space-y-6 font-sans text-slate-900 dark:text-slate-100">
       {/* Header Banner */}
-      <div className="p-6 rounded-3xl bg-gradient-to-r from-[#0073ea] via-[#0f172a] to-[#1e293b] text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="p-6 rounded-3xl bg-gradient-to-r from-primary-500 via-slate-900 to-slate-800 text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
           <div className="h-12 w-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center font-black text-xl border border-white/20">
             <Share2 className="h-6 w-6 text-white" />
@@ -106,7 +106,7 @@ export const FHIRInteroperabilityHub: React.FC<{ patientId?: string }> = ({ pati
           </button>
           <button
             onClick={handleDownload}
-            className="px-4 py-2 rounded-xl bg-white text-[#0f172a] font-extrabold text-xs flex items-center gap-1.5 shadow-sm hover:bg-slate-100 transition-all"
+            className="px-4 py-2 rounded-xl bg-white text-slate-900 font-extrabold text-xs flex items-center gap-1.5 shadow-sm hover:bg-slate-100 transition-all"
           >
             <Download className="h-4 w-4" /> Download FHIR Bundle
           </button>
@@ -114,7 +114,7 @@ export const FHIRInteroperabilityHub: React.FC<{ patientId?: string }> = ({ pati
       </div>
 
       {/* Resource Selector Pills */}
-      <div className="flex items-center gap-2 border-b border-[#e6e9ef] dark:border-slate-800 pb-2 overflow-x-auto">
+      <div className="flex items-center gap-2 border-b border-canvas-silk dark:border-slate-800 pb-2 overflow-x-auto">
         {[
           { id: "Patient", label: "Patient Resource" },
           { id: "Observation", label: "Observation (Vitals & Labs)" },
@@ -125,8 +125,8 @@ export const FHIRInteroperabilityHub: React.FC<{ patientId?: string }> = ({ pati
             onClick={() => setSelectedResourceType(r.id)}
             className={`px-4 py-2 rounded-xl text-xs font-extrabold transition-all shrink-0 ${
               selectedResourceType === r.id
-                ? "bg-[#0073ea] text-white shadow-xs"
-                : "bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-[#f0f2f7]"
+                ? "bg-primary-500 text-white shadow-xs"
+                : "bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-canvas-mist dark:hover:bg-slate-800"
             }`}
           >
             {r.label}
@@ -135,7 +135,7 @@ export const FHIRInteroperabilityHub: React.FC<{ patientId?: string }> = ({ pati
       </div>
 
       {/* Live FHIR JSON Display */}
-      <div className="rounded-3xl border border-[#e6e9ef] dark:border-slate-800 bg-[#0f172a] text-emerald-400 p-6 shadow-md overflow-hidden font-mono text-xs relative">
+      <div className="rounded-3xl border border-canvas-silk dark:border-slate-800 bg-slate-900 text-emerald-400 p-6 shadow-md overflow-hidden font-mono text-xs relative">
         <div className="flex items-center justify-between border-b border-slate-800 pb-3 mb-4 text-slate-400">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />

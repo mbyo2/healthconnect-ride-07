@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
+import { useCurrency } from "@/hooks/use-currency";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -20,6 +21,7 @@ interface Transaction {
 
 export const WalletHistory = () => {
     const { user } = useAuth();
+    const { formatPrice } = useCurrency();
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
@@ -81,9 +83,11 @@ export const WalletHistory = () => {
                         Transaction History
                     </CardTitle>
                     <div className="relative w-full md:w-64">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" aria-hidden />
                         <Input
+                            type="search"
                             placeholder="Search transactions..."
+                            aria-label="Search transactions"
                             className="pl-9 bg-background/80 border-border focus:ring-primary"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
@@ -128,12 +132,12 @@ export const WalletHistory = () => {
                                         </div>
                                     </div>
                                     <div className="text-right">
-                                        <p className={`font-bold text-lg ${transaction.transaction_type === 'credit' ? 'text-green-600' : 'text-red-600'
+                                        <p className={`font-bold text-lg tnum ${transaction.transaction_type === 'credit' ? 'text-green-600' : 'text-red-600'
                                             }`}>
-                                            {transaction.transaction_type === 'credit' ? '+' : '-'}${Math.abs(transaction.amount).toFixed(2)}
+                                            {transaction.transaction_type === 'credit' ? '+' : '-'}{formatPrice(Math.abs(transaction.amount))}
                                         </p>
-                                        <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
-                                            Balance: ${transaction.balance_after.toFixed(2)}
+                                        <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider tnum">
+                                            Balance: {formatPrice(transaction.balance_after)}
                                         </p>
                                     </div>
                                 </div>

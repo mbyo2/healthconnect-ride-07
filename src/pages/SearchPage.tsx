@@ -71,7 +71,7 @@ const SearchPage = () => {
 
       <div className="min-h-screen bg-canvas text-midnight font-sans transition-colors pb-16">
         {/* Search Header */}
-        <div className="bg-white border-b border-canvas-silk px-4 sm:px-6 py-5 sticky top-0 z-30 shadow-sm">
+        <div className="bg-white dark:bg-slate-900 border-b border-canvas-silk dark:border-slate-800 px-4 sm:px-6 py-5 sticky top-0 z-30 shadow-sm">
           <div className="max-w-content mx-auto space-y-4">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-button">
@@ -97,7 +97,7 @@ const SearchPage = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={handleKeyPress}
-                className="w-full pl-11 pr-32 py-3 rounded-pill border border-canvas-silk bg-white text-sm font-medium text-midnight placeholder:text-graphite-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 shadow-sm"
+                className="w-full pl-11 pr-32 py-3 rounded-pill border border-canvas-silk dark:border-slate-700 bg-white dark:bg-slate-900 text-sm font-medium text-midnight placeholder:text-graphite-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 shadow-sm"
               />
               <button
                 onClick={handleSearch}

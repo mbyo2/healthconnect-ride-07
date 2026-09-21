@@ -102,19 +102,19 @@ const AppointmentRemindersPage = () => {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors pb-16">
+      <div className="min-h-screen bg-canvas dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors pb-16">
         {/* Sticky Monday Top Header */}
-        <div className="bg-white dark:bg-slate-900 border-b border-[#e6e9ef] dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
+        <div className="bg-white dark:bg-slate-900 border-b border-canvas-silk dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
           <div className="max-w-[1500px] mx-auto flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-[#0073ea] text-white flex items-center justify-center font-black text-sm shadow-xs">
+            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-black text-sm shadow-xs">
               <Bell className="h-5 w-5" />
             </div>
             <div>
               <h1 className="text-xl font-extrabold tracking-tight flex items-center gap-2">
                 Automated Appointment Reminders & Calendar Sync
-                <span className="w-2 h-2 rounded-full bg-[#00c875] animate-ping" />
+                <span className="w-2 h-2 rounded-full bg-success-500 animate-ping" />
               </h1>
-              <p className="text-xs text-[#676879] dark:text-slate-400 font-medium">
+              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
                 Configure 24-hour and 1-hour pre-visit alerts via Push, Email, SMS, and iCal / Google Calendar sync
               </p>
             </div>
@@ -123,45 +123,45 @@ const AppointmentRemindersPage = () => {
 
         <div className="max-w-[1500px] mx-auto px-4 sm:px-6 pt-6 space-y-6">
           {/* Reminder Channel Preferences */}
-          <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
-            <h2 className="font-extrabold text-sm flex items-center gap-2 border-b border-[#e6e9ef] pb-3">
-              <Bell className="h-4 w-4 text-[#0073ea]" /> Automated Reminder Dispatch Channels
+          <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
+            <h2 className="font-extrabold text-sm flex items-center gap-2 border-b border-canvas-silk pb-3">
+              <Bell className="h-4 w-4 text-primary-500" /> Automated Reminder Dispatch Channels
             </h2>
 
-            <div className="flex items-center justify-between p-3.5 rounded-xl border border-[#e6e9ef] bg-[#f5f6f8]">
+            <div className="flex items-center justify-between p-3.5 rounded-xl border border-canvas-silk bg-canvas dark:bg-slate-950">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-white text-[#0073ea]">
+                <div className="p-2 rounded-xl bg-white text-primary-500">
                   <Mail className="h-4 w-4" />
                 </div>
                 <div>
                   <p className="font-extrabold text-xs">Email Notifications</p>
-                  <p className="text-[11px] text-[#676879]">Sent to registered patient email address</p>
+                  <p className="text-[11px] text-graphite-500 dark:text-slate-400">Sent to registered patient email address</p>
                 </div>
               </div>
               <Switch checked={emailReminders} onCheckedChange={setEmailReminders} />
             </div>
 
-            <div className="flex items-center justify-between p-3.5 rounded-xl border border-[#e6e9ef] bg-[#f5f6f8]">
+            <div className="flex items-center justify-between p-3.5 rounded-xl border border-canvas-silk bg-canvas dark:bg-slate-950">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-white text-[#00c875]">
+                <div className="p-2 rounded-xl bg-white text-success-500">
                   <MessageSquare className="h-4 w-4" />
                 </div>
                 <div>
                   <p className="font-extrabold text-xs">SMS Text Reminders</p>
-                  <p className="text-[11px] text-[#676879]">Cellular SMS text dispatched to mobile phone</p>
+                  <p className="text-[11px] text-graphite-500 dark:text-slate-400">Cellular SMS text dispatched to mobile phone</p>
                 </div>
               </div>
               <Switch checked={smsReminders} onCheckedChange={setSmsReminders} />
             </div>
 
-            <div className="flex items-center justify-between p-3.5 rounded-xl border border-[#e6e9ef] bg-[#f5f6f8]">
+            <div className="flex items-center justify-between p-3.5 rounded-xl border border-canvas-silk bg-canvas dark:bg-slate-950">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-white text-[#a25ddc]">
+                <div className="p-2 rounded-xl bg-white text-purple-500">
                   <Smartphone className="h-4 w-4" />
                 </div>
                 <div>
                   <p className="font-extrabold text-xs">Push Notifications</p>
-                  <p className="text-[11px] text-[#676879]">Browser push & mobile app push alerts</p>
+                  <p className="text-[11px] text-graphite-500 dark:text-slate-400">Browser push & mobile app push alerts</p>
                 </div>
               </div>
               <Switch checked={pushReminders} onCheckedChange={setPushReminders} />
@@ -170,25 +170,25 @@ const AppointmentRemindersPage = () => {
             <button
               onClick={savePreferences}
               disabled={saving}
-              className="w-full py-3 rounded-xl bg-[#0073ea] hover:bg-[#0060c4] text-white font-extrabold text-xs shadow-xs transition-all"
+              className="w-full py-3 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs transition-all"
             >
               {saving ? "Saving Dispatch Settings..." : "Save Dispatch Preferences"}
             </button>
           </div>
 
           {/* Upcoming Visits & Calendar Sync */}
-          <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
-            <h2 className="font-extrabold text-sm flex items-center gap-2 border-b border-[#e6e9ef] pb-3">
-              <Calendar className="h-4 w-4 text-[#00c875]" /> Upcoming Visits & iCal Export
+          <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
+            <h2 className="font-extrabold text-sm flex items-center gap-2 border-b border-canvas-silk pb-3">
+              <Calendar className="h-4 w-4 text-success-500" /> Upcoming Visits & iCal Export
             </h2>
 
             {upcoming.length === 0 ? (
-              <div className="text-center py-10 text-xs text-[#676879]">
-                <Calendar className="h-10 w-10 mx-auto mb-2 opacity-30 text-[#0073ea]" />
+              <div className="text-center py-10 text-xs text-graphite-500 dark:text-slate-400">
+                <Calendar className="h-10 w-10 mx-auto mb-2 opacity-30 text-primary-500" />
                 <p className="font-bold">No upcoming appointments scheduled.</p>
                 <button
                   onClick={() => navigate("/search")}
-                  className="mt-2 text-xs font-bold text-[#0073ea] hover:underline"
+                  className="mt-2 text-xs font-bold text-primary-500 hover:underline"
                 >
                   Book an appointment now
                 </button>
@@ -198,22 +198,22 @@ const AppointmentRemindersPage = () => {
                 {upcoming.map((apt: any) => (
                   <div
                     key={apt.id}
-                    className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 rounded-xl border border-[#e6e9ef] bg-[#f5f6f8] gap-3"
+                    className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 rounded-xl border border-canvas-silk bg-canvas gap-3"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="p-2.5 bg-white rounded-xl text-[#0073ea] border border-[#e6e9ef]">
+                      <div className="p-2.5 bg-white rounded-xl text-primary-500 border border-canvas-silk dark:border-slate-800">
                         <Clock className="h-4 w-4" />
                       </div>
                       <div>
                         <p className="font-extrabold text-xs text-slate-900">{apt.type || "Medical Consultation"}</p>
-                        <p className="text-[11px] text-[#676879] font-medium">
+                        <p className="text-[11px] text-graphite-500 dark:text-slate-400 font-medium">
                           {new Date(apt.date).toLocaleDateString()} at {apt.time}
                         </p>
                       </div>
                     </div>
                     <button
                       onClick={() => downloadIcs(apt)}
-                      className="px-4 py-2 rounded-xl bg-white border border-[#c3c6d4] text-[#0073ea] font-extrabold text-xs flex items-center gap-1.5 hover:bg-[#e5f0ff]"
+                      className="px-4 py-2 rounded-xl bg-white border border-graphite-300 dark:border-slate-700 text-primary-500 font-extrabold text-xs flex items-center gap-1.5 hover:bg-primary-50 dark:hover:bg-slate-800"
                     >
                       <Calendar className="h-3.5 w-3.5" />
                       <span>Sync to Calendar (.ics)</span>

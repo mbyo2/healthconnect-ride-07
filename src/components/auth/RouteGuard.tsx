@@ -4,6 +4,32 @@ import { useAuth } from '@/context/AuthContext';
 import { useUserRoles } from '@/context/UserRolesContext';
 import { hasRoutePermission, getRoleLandingPage, PUBLIC_ROUTES } from '@/utils/rolePermissions';
 import { LoadingScreen } from '@/components/LoadingScreen';
+import { Button } from '@/components/ui/button';
+import { AlertTriangle } from 'lucide-react';
+
+/**
+ * Circuit breaker against redirect ping-pong (e.g. landing page == current
+ * page with no permission, auth state flapping). If the same redirect
+ * target fires repeatedly within a short window, stop navigating and show
+ * recovery UI instead of bouncing the user forever.
+ */
+const LOOP_KEY = 'doc_route_redirect_log';
+const LOOP_WINDOW_MS = 10_000;
+const LOOP_MAX = 3;
+
+function recordRedirect(target: string): boolean {
+  try {
+    const now = Date.now();
+    const log: { target: string; at: number }[] = JSON.parse(
+      sessionStorage.getItem(LOOP_KEY) || '[]'
+    ).filter((e: { at: number }) => now - e.at < LOOP_WINDOW_MS);
+    log.push({ target, at: now });
+    sessionStorage.setItem(LOOP_KEY, JSON.stringify(log));
+    return log.filter((e) => e.target === target).length > LOOP_MAX;
+  } catch {
+    return false;
+  }
+}
 
 interface RouteGuardProps {
   children: React.ReactNode;
@@ -16,28 +42,39 @@ interface RouteGuardProps {
 }
 
 export const RouteGuard: React.FC<RouteGuardProps> = ({ children, requireRoles }) => {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, signOut } = useAuth();
   const { availableRoles, loading: rolesLoading } = useUserRoles();
   const location = useLocation();
   const navigate = useNavigate();
   const currentPath = location.pathname;
+  const [loopStuck, setLoopStuck] = useState(false);
 
   const hasRequiredRole = !requireRoles || requireRoles.some(r => availableRoles.includes(r as any));
 
   useEffect(() => {
     // Only run checks after loading is complete
-    if (authLoading || rolesLoading) return;
+    if (authLoading || rolesLoading || loopStuck) return;
 
     // Allow access to public routes
     if (PUBLIC_ROUTES.includes(currentPath)) {
       return;
     }
 
+    const guardedNavigate = (target: string, reason: string) => {
+      if (target === currentPath) return; // never bounce to self
+      if (recordRedirect(target)) {
+        console.error(`RouteGuard: redirect loop detected → ${target}. Stopping.`);
+        setLoopStuck(true);
+        return;
+      }
+      console.log(`RouteGuard: ${reason}, redirecting to ${target}`);
+      navigate(target, { replace: true, state: { from: location } });
+    };
+
     // Redirect to auth if not authenticated
     if (!user) {
       if (currentPath !== '/auth') {
-        console.log(`RouteGuard: Not authenticated, redirecting to /auth from ${currentPath}`);
-        navigate('/auth', { replace: true, state: { from: location } });
+        guardedNavigate('/auth', `Not authenticated (from ${currentPath})`);
       }
       return;
     }
@@ -46,7 +83,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children, requireRoles }
     if (requireRoles && !hasRequiredRole) {
       const landingPage = getRoleLandingPage(availableRoles);
       console.warn(`RouteGuard: role-restricted route ${currentPath} blocked. Required: ${requireRoles.join(',')}`);
-      navigate(landingPage, { replace: true });
+      guardedNavigate(landingPage, 'role-restricted route blocked');
       return;
     }
 
@@ -56,19 +93,52 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children, requireRoles }
       const landingPage = getRoleLandingPage(availableRoles);
 
       if (currentPath !== landingPage) {
-        console.log(`RouteGuard: No permission for ${currentPath}, redirecting to ${landingPage}`);
-        navigate(landingPage, { replace: true });
+        guardedNavigate(landingPage, `No permission for ${currentPath}`);
       } else {
         console.warn(`RouteGuard: No permission for ${currentPath} and it is the landing page! Possible loop.`);
         // If we are stuck on a page we don't have permission for, and it's the landing page,
         // something is wrong with rolePermissions.ts or availableRoles.
         // Fallback to home if not already there
         if (currentPath !== '/dashboard') {
-          navigate('/dashboard', { replace: true });
+          guardedNavigate('/dashboard', 'landing page without permission');
         }
       }
     }
-  }, [user, availableRoles, authLoading, rolesLoading, currentPath, navigate, location]);
+  }, [user, availableRoles, authLoading, rolesLoading, currentPath, navigate, location, requireRoles, hasRequiredRole, loopStuck]);
+
+  if (loopStuck) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] p-8 text-center">
+        <AlertTriangle className="h-12 w-12 text-amber-500 mb-4" />
+        <h2 className="text-xl font-semibold mb-2">Navigation got stuck</h2>
+        <p className="text-muted-foreground mb-6 max-w-md text-sm">
+          The app kept redirecting between pages. This usually clears by
+          returning to your dashboard or signing in again.
+        </p>
+        <div className="flex gap-3 flex-wrap justify-center">
+          <Button
+            onClick={() => {
+              try { sessionStorage.removeItem(LOOP_KEY); } catch { /* ignore */ }
+              setLoopStuck(false);
+              navigate('/dashboard', { replace: true });
+            }}
+          >
+            Go to Dashboard
+          </Button>
+          <Button
+            variant="outline"
+            onClick={async () => {
+              try { sessionStorage.removeItem(LOOP_KEY); } catch { /* ignore */ }
+              await signOut();
+              navigate('/auth', { replace: true });
+            }}
+          >
+            Sign Out & Sign In
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   // Show loading ONLY while initial auth/roles are loading
   if (authLoading || rolesLoading) {

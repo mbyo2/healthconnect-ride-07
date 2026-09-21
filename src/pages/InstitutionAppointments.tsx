@@ -21,6 +21,7 @@ const InstitutionAppointments = () => {
 
     const fetchAppointments = async () => {
         if (!institutionId) { setLoading(false); return; }
+        setLoading(true);
         try {
             // 1. Get Personnel & Staff
             const [personnelRes, staffRes] = await Promise.all([
@@ -69,19 +70,33 @@ const InstitutionAppointments = () => {
         }
     };
 
+    if (instLoading) {
+      return <div className="min-h-screen bg-canvas flex items-center justify-center p-6"><div className="h-8 w-8 rounded-full border-2 border-primary-500 border-t-transparent animate-spin" aria-hidden /><span className="sr-only">Loading institution</span></div>;
+    }
+
     if (loading) return <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>;
 
+    if (!institution) {
+      return <div className="min-h-screen bg-canvas flex items-center justify-center p-6 text-center"><p className="text-sm text-graphite-500">No institution linked to your account. Contact support.</p></div>;
+    }
+
     return (
-        <div className="container mx-auto p-6 space-y-6">
-            <h1 className="text-3xl font-bold">Appointments</h1>
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <Calendar className="h-6 w-6" />
-                        All Appointments ({appointments.length})
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
+        <div className="min-h-screen bg-canvas text-midnight font-sans transition-colors pb-16">
+          <div className="bg-white dark:bg-slate-900 border-b border-canvas-silk dark:border-slate-800 px-4 sm:px-6 py-5 sticky top-0 z-30 shadow-sm">
+            <div className="max-w-content mx-auto flex items-center gap-3">
+              <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-button"><Calendar className="h-5 w-5" /></div>
+              <div>
+                <h1 className="font-display text-2xl font-medium tracking-tight">Appointments</h1>
+                <p className="text-sm text-graphite-500 font-medium tracking-wide">{appointments.length} appointment{appointments.length !== 1 ? 's' : ''} · institutional scope</p>
+              </div>
+            </div>
+          </div>
+          <div className="max-w-content mx-auto px-4 sm:px-6 pt-6 space-y-6">
+            <div className="vf-card !p-0 overflow-hidden">
+              <div className="px-5 py-4 border-b border-canvas-silk flex items-center justify-between">
+                <h2 className="font-medium text-base flex items-center gap-2"><Calendar className="h-4 w-4 text-primary-500" /> All Appointments ({appointments.length})</h2>
+              </div>
+              <div className="p-5">
                     {appointments.length === 0 ? (
                         <div className="text-center py-8 text-muted-foreground">
                             No appointments found for this institution.
@@ -116,7 +131,7 @@ const InstitutionAppointments = () => {
                                             <div className="text-xs text-muted-foreground">{appt.patient?.email}</div>
                                         </TableCell>
                                         <TableCell>
-                                            Dr. {appt.provider?.first_name} {appt.provider?.last_name}
+                                            {[appt.provider?.first_name, appt.provider?.last_name].filter(Boolean).join(' ') || 'Provider'}
                                         </TableCell>
                                         <TableCell>{appt.type}</TableCell>
                                         <TableCell>
@@ -129,9 +144,10 @@ const InstitutionAppointments = () => {
                             </TableBody>
                         </Table>
                     )}
-                </CardContent>
-            </Card>
+              </div>
+            </div>
         </div>
+    </div>
     );
 };
 

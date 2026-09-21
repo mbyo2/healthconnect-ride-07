@@ -73,7 +73,13 @@ export const ChatList = () => {
   }, []);
 
   if (loading) {
-    return <div>Loading contacts...</div>;
+    return (
+      <div className="grid gap-2 p-4" aria-label="Loading contacts">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="h-16 rounded-xl bg-muted animate-pulse" aria-hidden />
+        ))}
+      </div>
+    );
   }
 
   return (

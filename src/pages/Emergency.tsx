@@ -218,8 +218,10 @@ const Emergency = () => {
                 />
 
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <MapPin className="h-4 w-4" />
-                  {location ? `📍 Location detected (${location.lat.toFixed(4)}, ${location.lng.toFixed(4)})` : 'Getting your location...'}
+                  <MapPin className="h-4 w-4 shrink-0" />
+                  {location
+                    ? `Location attached (${location.lat.toFixed(4)}, ${location.lng.toFixed(4)})`
+                    : 'Waiting for your location — enable location services so contacts can find you.'}
                 </div>
 
                 <Button
@@ -239,12 +241,22 @@ const Emergency = () => {
                     </>
                   )}
                 </Button>
+                {!location && !isEmergencyActive && (
+                  <p className="text-xs text-center text-muted-foreground">
+                    The alert button unlocks once your location is detected.
+                  </p>
+                )}
 
                 {isEmergencyActive && (
-                  <div className="text-center">
-                    <Badge className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
-                      🚨 Emergency services notified • Help is on the way
-                    </Badge>
+                  <div className="text-center space-y-1.5">
+                    <div>
+                      <Badge className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                        Your emergency contacts have been alerted with your location
+                      </Badge>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      This does not replace calling 991 — if you can, call now.
+                    </p>
                   </div>
                 )}
               </CardContent>

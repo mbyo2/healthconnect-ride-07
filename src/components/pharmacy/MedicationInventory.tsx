@@ -41,6 +41,7 @@ import {
 import { LoadingScreen } from '@/components/LoadingScreen';
 import { useAuth } from '@/context/AuthContext';
 import { useInstitutionContext } from '@/hooks/useInstitutionContext';
+import { useCurrency } from '@/hooks/use-currency';
 import { format } from 'date-fns';
 
 // Define the medication type enum to match the database
@@ -69,6 +70,7 @@ const MEDICATION_TYPES: MedicationType[] = [
 
 export const MedicationInventory = () => {
   const { user } = useAuth();
+  const { formatPrice } = useCurrency();
   const { institutionId: userInstitution, loading: loadingInstitution } = useInstitutionContext();
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -396,8 +398,8 @@ export const MedicationInventory = () => {
                           {format(new Date(item.expiry_date), 'MMM dd, yyyy')}
                         </div>
                       </TableCell>
-                      <TableCell className="text-right">
-                        {item.unit_price ? `$${item.unit_price.toFixed(2)}` : 'N/A'}
+                      <TableCell className="text-right tnum">
+                        {item.unit_price ? formatPrice(item.unit_price) : 'N/A'}
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">

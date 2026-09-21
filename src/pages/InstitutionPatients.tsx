@@ -77,39 +77,46 @@ const InstitutionPatients = () => {
     p.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  if (instLoading || loading) return <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>;
+  if (instLoading || loading) return <div className="min-h-screen bg-canvas flex items-center justify-center p-6" role="status" aria-label="Loading patients"><div className="h-8 w-8 rounded-full border-2 border-primary-500 border-t-transparent animate-spin" aria-hidden /><span className="sr-only">Loading patients</span></div>;
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Patients</h1>
-        <div className="relative w-64">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input placeholder="Search patients..." className="pl-8" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+    <div className="min-h-screen bg-canvas text-midnight font-sans transition-colors pb-16">
+      <div className="bg-white dark:bg-slate-900 border-b border-canvas-silk dark:border-slate-800 px-4 sm:px-6 py-5 sticky top-0 z-30 shadow-sm">
+        <div className="max-w-content mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-button"><Users className="h-5 w-5" /></div>
+            <div>
+              <h1 className="font-display text-2xl font-medium tracking-tight">Patients</h1>
+              <p className="text-sm text-graphite-500 font-medium tracking-wide">{patients.length} patient{patients.length !== 1 ? 's' : ''} · institutional scope</p>
+            </div>
+          </div>
+          <div className="relative w-full sm:w-64">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-graphite-400" aria-hidden />
+            <Input type="search" placeholder="Search patients..." aria-label="Search patients" className="pl-9" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+          </div>
         </div>
       </div>
+      <div className="max-w-content mx-auto px-4 sm:px-6 pt-6 space-y-6">
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Users className="h-6 w-6" />
-            Patient List ({patients.length})
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+      <div className="vf-card !p-0 overflow-hidden">
+        <div className="px-5 py-4 border-b border-canvas-silk flex items-center justify-between">
+          <h2 className="font-medium text-base flex items-center gap-2"><Users className="h-4 w-4 text-primary-500" /> Patient List ({patients.length})</h2>
+        </div>
+        <div className="p-5">
           {patients.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">No patients found.</div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Condition/Type</TableHead>
-                  <TableHead>Last Visit</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
+          <div className="overflow-x-auto">
+          <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Condition/Type</TableHead>
+                    <TableHead>Last Visit</TableHead>
+                    <TableHead><span className="sr-only">Actions</span></TableHead>
+                  </TableRow>
+                </TableHeader>
               <TableBody>
                 {filteredPatients.map((patient) => (
                   <TableRow key={patient.id} className="cursor-pointer hover:bg-accent/50" onClick={() => setSelectedPatientId(patient.id)}>
@@ -126,7 +133,7 @@ const InstitutionPatients = () => {
                     <TableCell>{patient.condition}</TableCell>
                     <TableCell>{patient.last_visit ? format(new Date(patient.last_visit), 'MMM d, yyyy') : 'N/A'}</TableCell>
                     <TableCell>
-                      <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); setSelectedPatientId(patient.id); }}>
+                      <Button variant="ghost" size="sm" aria-label={`View ${patient.first_name || ''} ${patient.last_name || ''}`.trim() || 'View patient'} onClick={(e) => { e.stopPropagation(); setSelectedPatientId(patient.id); }}>
                         <FileText className="h-4 w-4" />
                       </Button>
                     </TableCell>
@@ -134,15 +141,17 @@ const InstitutionPatients = () => {
                 ))}
               </TableBody>
             </Table>
+          </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       <PatientDetailSheet
         patientId={selectedPatientId}
         open={!!selectedPatientId}
         onClose={() => setSelectedPatientId(null)}
       />
+    </div>
     </div>
   );
 };

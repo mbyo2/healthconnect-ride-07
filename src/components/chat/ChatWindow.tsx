@@ -43,8 +43,11 @@ export const ChatWindow = ({ providerId }: ChatWindowProps) => {
       .on('postgres_changes', 
         { event: 'INSERT', schema: 'public', table: 'messages' },
         (payload) => {
-          console.log('New message received:', payload);
-          setMessages(prev => [...prev, payload.new as Message]);
+          setMessages(prev => {
+            const incoming = payload.new as Message;
+            if (prev.some(m => m.id === incoming.id)) return prev;
+            return [...prev, incoming];
+          });
         }
       )
       .subscribe();

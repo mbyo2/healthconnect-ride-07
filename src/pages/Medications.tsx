@@ -141,22 +141,27 @@ const Medications = () => {
   });
 
   return (
-    <div className="container mx-auto p-4 md:p-6 space-y-6">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-3">
-            <Pill className="h-8 w-8 text-primary" />
-            My Medications
-          </h1>
-          <p className="text-muted-foreground">
-            {activeMedications.length} active medication{activeMedications.length !== 1 ? 's' : ''}
-          </p>
-        </div>
+    <div className="min-h-screen bg-canvas text-midnight font-sans transition-colors pb-16">
+      <div className="bg-white dark:bg-slate-900 border-b border-canvas-silk dark:border-slate-800 px-4 sm:px-6 py-5 sticky top-0 z-30 shadow-sm">
+        <div className="max-w-content mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-button">
+              <Pill className="h-5 w-5" />
+            </div>
+            <div>
+              <h1 className="font-display text-2xl font-medium tracking-tight flex items-center gap-2">
+                My Medications
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-primary-500">{activeMedications.length} active</span>
+              </h1>
+              <p className="text-sm text-graphite-500 font-medium tracking-wide">
+                {activeMedications.length} active medication{activeMedications.length !== 1 ? 's' : ''} · reminders & refills
+              </p>
+            </div>
+          </div>
         <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
           <DialogTrigger asChild>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
+            <Button className="vf-btn-primary">
+              <Plus className="h-4 w-4" />
               Add Medication
             </Button>
           </DialogTrigger>
@@ -247,8 +252,10 @@ const Medications = () => {
             </div>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
 
+      <div className="max-w-content mx-auto px-4 sm:px-6 pt-6 space-y-6">
       {/* Refill Alerts */}
       {needsRefillSoon.length > 0 && (
         <Card className="border-yellow-500/50 bg-yellow-500/10 dark:border-yellow-500/50 dark:bg-yellow-500/10">
@@ -273,8 +280,9 @@ const Medications = () => {
 
       {/* Search */}
       <div className="relative max-w-md">
-        <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
+          type="search"
           placeholder="Search medications..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
@@ -284,11 +292,11 @@ const Medications = () => {
 
       {/* Medication Lists */}
       <Tabs defaultValue="active">
-        <TabsList>
-          <TabsTrigger value="active">
+        <TabsList className="bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 p-1">
+          <TabsTrigger value="active" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
             Active ({activeMedications.length})
           </TabsTrigger>
-          <TabsTrigger value="inactive">
+          <TabsTrigger value="inactive" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
             Inactive ({inactiveMedications.length})
           </TabsTrigger>
         </TabsList>
@@ -332,13 +340,12 @@ const Medications = () => {
                     )}
                   </div>
                   <div className="flex gap-2 pt-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
+                    <button
                       onClick={() => toggleMedicationStatus(med.id, med.is_active)}
+                      className="px-4 py-2 rounded-xl border border-canvas-silk dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold hover:bg-canvas dark:hover:bg-slate-700 transition-colors"
                     >
                       Mark Inactive
-                    </Button>
+                    </button>
                   </div>
                 </CardContent>
               </Card>
@@ -367,19 +374,19 @@ const Medications = () => {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <Button
-                    size="sm"
-                    variant="outline"
+                  <button
                     onClick={() => toggleMedicationStatus(med.id, med.is_active)}
+                    className="px-4 py-2 rounded-xl border border-primary-500 text-primary-500 hover:bg-primary-50 dark:hover:bg-slate-800 dark:hover:bg-blue-950/30 text-xs font-bold transition-colors"
                   >
                     Reactivate
-                  </Button>
+                  </button>
                 </CardContent>
               </Card>
             ))
           )}
         </TabsContent>
       </Tabs>
+      </div>
     </div>
   );
 };

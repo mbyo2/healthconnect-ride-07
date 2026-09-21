@@ -11,6 +11,7 @@ import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
 import { format, addDays } from 'date-fns';
 import { Provider } from '@/types/provider';
+import { providerDisplayName } from '@/utils/providerDisplay';
 
 interface WaitlistSignupProps {
   provider: Provider;
@@ -87,7 +88,7 @@ export const WaitlistSignup = ({ provider, isOpen, onClose }: WaitlistSignupProp
             Join Waitlist
           </DialogTitle>
           <DialogDescription>
-            Get notified when an earlier appointment opens with Dr. {provider.first_name} {provider.last_name}
+            Get notified when an earlier appointment opens with {providerDisplayName(provider as any)}
           </DialogDescription>
         </DialogHeader>
 

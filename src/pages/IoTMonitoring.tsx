@@ -61,28 +61,28 @@ const IoTMonitoring = () => {
   });
 
   return (
-    <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors pb-16">
+    <div className="min-h-screen bg-canvas dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors pb-16">
       {/* Sticky Monday Top Header */}
-      <div className="bg-white dark:bg-slate-900 border-b border-[#e6e9ef] dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
+      <div className="bg-white dark:bg-slate-900 border-b border-canvas-silk dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
         <div className="max-w-[1500px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-[#0073ea] text-white flex items-center justify-center font-black text-sm shadow-xs">
+            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-black text-sm shadow-xs">
               <Cpu className="h-5 w-5" />
             </div>
             <div>
               <h1 className="text-xl font-extrabold tracking-tight flex items-center gap-2">
                 IoT Medical Device & Telemetry Board
-                <span className="w-2 h-2 rounded-full bg-[#00c875] animate-ping" />
+                <span className="w-2 h-2 rounded-full bg-success-500 animate-ping" />
               </h1>
-              <p className="text-xs text-[#676879] dark:text-slate-400 font-medium">
+              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
                 Live stream monitoring for wearables, Bluetooth monitors, and continuous vital telemetry
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            <button className="px-3.5 py-2 rounded-md border border-[#c3c6d4] dark:border-slate-700 bg-white dark:bg-slate-900 font-bold text-xs flex items-center gap-1.5 hover:bg-[#f5f6f8]">
-              <Settings className="w-4 h-4 text-[#676879]" />
+            <button className="px-3.5 py-2 rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-900 font-bold text-xs flex items-center gap-1.5 hover:bg-canvas dark:bg-slate-950">
+              <Settings className="w-4 h-4 text-graphite-500 dark:text-slate-400" />
               <span>Device Settings</span>
             </button>
 
@@ -90,7 +90,7 @@ const IoTMonitoring = () => {
               <DropdownMenuTrigger asChild>
                 <button
                   disabled={isScanning}
-                  className="px-4 py-2 rounded-md bg-[#0073ea] hover:bg-[#0060c4] text-white font-extrabold text-xs shadow-xs transition-all flex items-center gap-1.5"
+                  className="px-4 py-2 rounded-md bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs transition-all flex items-center gap-1.5"
                 >
                   {isScanning ? (
                     <>
@@ -105,18 +105,18 @@ const IoTMonitoring = () => {
                   )}
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="border border-[#e6e9ef] bg-white rounded-xl shadow-lg">
+              <DropdownMenuContent align="end" className="border border-canvas-silk bg-white rounded-xl shadow-lg">
                 <DropdownMenuItem onClick={() => scanAndConnectDevice("bluetooth")} className="text-xs font-bold">
-                  <Bluetooth className="w-4 h-4 mr-2 text-[#0073ea]" /> Bluetooth Low Energy
+                  <Bluetooth className="w-4 h-4 mr-2 text-primary-500" /> Bluetooth Low Energy
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => scanAndConnectDevice("usb")} className="text-xs font-bold">
-                  <Usb className="w-4 h-4 mr-2 text-[#00c875]" /> USB Direct Cable
+                  <Usb className="w-4 h-4 mr-2 text-success-500" /> USB Direct Cable
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => scanAndConnectDevice("serial")} className="text-xs font-bold">
-                  <Cable className="w-4 h-4 mr-2 text-[#fdab3d]" /> Serial Port
+                  <Cable className="w-4 h-4 mr-2 text-warning-500" /> Serial Port
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => scanAndConnectDevice("wifi")} className="text-xs font-bold">
-                  <Wifi className="w-4 h-4 mr-2 text-[#a25ddc]" /> Wi-Fi / Cloud Stream
+                  <Wifi className="w-4 h-4 mr-2 text-purple-500" /> Wi-Fi / Cloud Stream
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -126,9 +126,9 @@ const IoTMonitoring = () => {
 
       <div className="max-w-[1500px] mx-auto px-4 sm:px-6 pt-6 space-y-6">
         {/* Connected Devices Grid */}
-        <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
+        <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
           <h2 className="font-extrabold text-sm mb-4 flex items-center gap-2">
-            <Watch className="h-4 w-4 text-[#0073ea]" />
+            <Watch className="h-4 w-4 text-primary-500" />
             Active Connected Devices ({devices.length})
           </h2>
 
@@ -141,34 +141,34 @@ const IoTMonitoring = () => {
                   onClick={() => setSelectedDevice(device.id)}
                   className={`p-4 rounded-xl border transition-all cursor-pointer ${
                     selectedDevice === device.id
-                      ? "border-[#0073ea] bg-[#e5f0ff]/50 shadow-xs"
-                      : "border-[#e6e9ef] dark:border-slate-800 bg-[#f5f6f8] dark:bg-slate-950 hover:border-[#0073ea]"
+                      ? "border-primary-500 bg-primary-50/50 shadow-xs"
+                      : "border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 hover:border-primary-500"
                   }`}
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex gap-2">
-                      <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-[#e6e9ef] text-[#0073ea]">
+                      <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk text-primary-500">
                         <Icon className="w-5 h-5" />
                       </div>
-                      <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-[#e6e9ef] text-[#676879]">
+                      <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk text-graphite-500 dark:text-slate-400">
                         {React.createElement(getConnectionIcon(device.connection_type), { className: "w-4 h-4" })}
                       </div>
                     </div>
                     {device.is_active ? (
-                      <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white bg-[#00c875]">Connected</span>
+                      <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white bg-success-500">Connected</span>
                     ) : (
-                      <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white bg-[#676879]">Offline</span>
+                      <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white bg-graphite-500 dark:bg-slate-600">Offline</span>
                     )}
                   </div>
                   <h3 className="font-extrabold text-xs text-slate-900 dark:text-slate-100">{device.device_name}</h3>
-                  <p className="text-[11px] text-[#676879] capitalize mb-3 font-medium">{device.device_type.replace("_", " ")}</p>
+                  <p className="text-[11px] text-graphite-500 dark:text-slate-400 capitalize mb-3 font-medium">{device.device_type.replace("_", " ")}</p>
                   <div className="space-y-1.5 text-xs">
-                    <div className="flex items-center justify-between font-bold text-[#676879]">
+                    <div className="flex items-center justify-between font-bold text-graphite-500 dark:text-slate-400">
                       <span>Battery Level</span>
                       <span className="text-slate-900">{device.battery_level}%</span>
                     </div>
-                    <Progress value={device.battery_level || 0} className="h-1.5 bg-[#e6e9ef]" />
-                    <p className="text-[10px] text-[#676879] pt-1">
+                    <Progress value={device.battery_level || 0} className="h-1.5 bg-canvas-silk" />
+                    <p className="text-[10px] text-graphite-500 dark:text-slate-400 pt-1">
                       Last sync: {device.last_sync ? new Date(device.last_sync).toLocaleTimeString() : "Never"}
                     </p>
                   </div>
@@ -176,7 +176,7 @@ const IoTMonitoring = () => {
               );
             })}
             {devices.length === 0 && (
-              <div className="col-span-full text-center py-8 text-xs text-[#676879] font-medium">
+              <div className="col-span-full text-center py-8 text-xs text-graphite-500 dark:text-slate-400 font-medium">
                 No active IoT devices connected. Click "Connect Device" above to initiate pairing.
               </div>
             )}
@@ -184,64 +184,64 @@ const IoTMonitoring = () => {
         </div>
 
         {/* Current Vital Signs Bento Grid */}
-        <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
+        <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
           <h2 className="font-extrabold text-sm mb-4 flex items-center gap-2">
-            <Heart className="w-4 h-4 text-[#e2445c]" />
+            <Heart className="w-4 h-4 text-error-500" />
             Real-Time Vital Telemetry
           </h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="p-4 rounded-xl border border-[#e6e9ef] bg-[#f5f6f8] dark:bg-slate-950">
+            <div className="p-4 rounded-xl border border-canvas-silk bg-canvas dark:bg-slate-950">
               <div className="flex items-center justify-between mb-2">
-                <Heart className="w-5 h-5 text-[#e2445c]" />
-                <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white bg-[#00c875]">Normal</span>
+                <Heart className="w-5 h-5 text-error-500" />
+                <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white bg-success-500">Normal</span>
               </div>
-              <p className="text-[10px] font-extrabold text-[#676879] uppercase">Heart Rate</p>
-              <p className="text-3xl font-black font-mono text-[#e2445c] mt-1">{vitalSigns?.heart_rate || "--"}</p>
-              <p className="text-[10px] text-[#676879] font-medium">bpm</p>
+              <p className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Heart Rate</p>
+              <p className="text-3xl font-black font-mono text-error-500 mt-1">{vitalSigns?.heart_rate || "--"}</p>
+              <p className="text-[10px] text-graphite-500 dark:text-slate-400 font-medium">bpm</p>
             </div>
 
-            <div className="p-4 rounded-xl border border-[#e6e9ef] bg-[#f5f6f8] dark:bg-slate-950">
+            <div className="p-4 rounded-xl border border-canvas-silk bg-canvas dark:bg-slate-950">
               <div className="flex items-center justify-between mb-2">
-                <Activity className="w-5 h-5 text-[#0073ea]" />
-                <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white bg-[#00c875]">Normal</span>
+                <Activity className="w-5 h-5 text-primary-500" />
+                <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white bg-success-500">Normal</span>
               </div>
-              <p className="text-[10px] font-extrabold text-[#676879] uppercase">Blood Pressure</p>
-              <p className="text-3xl font-black font-mono text-[#0073ea] mt-1">
+              <p className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Blood Pressure</p>
+              <p className="text-3xl font-black font-mono text-primary-500 mt-1">
                 {vitalSigns?.blood_pressure
                   ? `${vitalSigns.blood_pressure.systolic}/${vitalSigns.blood_pressure.diastolic}`
                   : "--/--"}
               </p>
-              <p className="text-[10px] text-[#676879] font-medium">mmHg</p>
+              <p className="text-[10px] text-graphite-500 dark:text-slate-400 font-medium">mmHg</p>
             </div>
 
-            <div className="p-4 rounded-xl border border-[#e6e9ef] bg-[#f5f6f8] dark:bg-slate-950">
+            <div className="p-4 rounded-xl border border-canvas-silk bg-canvas dark:bg-slate-950">
               <div className="flex items-center justify-between mb-2">
-                <Thermometer className="w-5 h-5 text-[#fdab3d]" />
-                <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white bg-[#00c875]">Normal</span>
+                <Thermometer className="w-5 h-5 text-warning-500" />
+                <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white bg-success-500">Normal</span>
               </div>
-              <p className="text-[10px] font-extrabold text-[#676879] uppercase">Body Temperature</p>
-              <p className="text-3xl font-black font-mono text-[#fdab3d] mt-1">{vitalSigns?.temperature || "--"}</p>
-              <p className="text-[10px] text-[#676879] font-medium">°C</p>
+              <p className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Body Temperature</p>
+              <p className="text-3xl font-black font-mono text-warning-500 mt-1">{vitalSigns?.temperature || "--"}</p>
+              <p className="text-[10px] text-graphite-500 dark:text-slate-400 font-medium">°C</p>
             </div>
 
-            <div className="p-4 rounded-xl border border-[#e6e9ef] bg-[#f5f6f8] dark:bg-slate-950">
+            <div className="p-4 rounded-xl border border-canvas-silk bg-canvas dark:bg-slate-950">
               <div className="flex items-center justify-between mb-2">
-                <Droplet className="w-5 h-5 text-[#a25ddc]" />
-                <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white bg-[#00c875]">Normal</span>
+                <Droplet className="w-5 h-5 text-purple-500" />
+                <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white bg-success-500">Normal</span>
               </div>
-              <p className="text-[10px] font-extrabold text-[#676879] uppercase">Oxygen Saturation</p>
-              <p className="text-3xl font-black font-mono text-[#a25ddc] mt-1">{vitalSigns?.oxygen_saturation || "--"}</p>
-              <p className="text-[10px] text-[#676879] font-medium">% SpO2</p>
+              <p className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Oxygen Saturation</p>
+              <p className="text-3xl font-black font-mono text-purple-500 mt-1">{vitalSigns?.oxygen_saturation || "--"}</p>
+              <p className="text-[10px] text-graphite-500 dark:text-slate-400 font-medium">% SpO2</p>
             </div>
           </div>
         </div>
 
         {/* Charts & Alerts Row */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
+          <div className="lg:col-span-2 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
             <h2 className="font-extrabold text-sm mb-4 flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-[#0073ea]" />
+              <TrendingUp className="w-4 h-4 text-primary-500" />
               24-Hour Continuous Heart Rate Telemetry
             </h2>
             <div className="h-[280px] w-full">
@@ -257,26 +257,26 @@ const IoTMonitoring = () => {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
+          <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
             <h2 className="font-extrabold text-sm mb-4 flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 text-[#fdab3d]" />
+              <AlertCircle className="w-4 h-4 text-warning-500" />
               Device Alerts ({alerts.length})
             </h2>
 
             <div className="space-y-3">
               {alerts.map((alert) => (
-                <div key={alert.id} className="flex items-start gap-3 p-3 rounded-xl border border-[#e6e9ef] bg-[#f5f6f8] text-xs">
-                  <div className={`p-1.5 rounded-full text-white ${alert.severity === "high" ? "bg-[#e2445c]" : alert.severity === "medium" ? "bg-[#fdab3d]" : "bg-[#0073ea]"}`}>
+                <div key={alert.id} className="flex items-start gap-3 p-3 rounded-xl border border-canvas-silk bg-canvas text-xs">
+                  <div className={`p-1.5 rounded-full text-white ${alert.severity === "high" ? "bg-error-500" : alert.severity === "medium" ? "bg-warning-500" : "bg-primary-500"}`}>
                     {alert.severity === "low" ? <CheckCircle2 className="w-3.5 h-3.5" /> : <AlertCircle className="w-3.5 h-3.5" />}
                   </div>
                   <div className="flex-1">
                     <p className="font-bold text-slate-900">{alert.message}</p>
-                    <p className="text-[10px] text-[#676879] mt-0.5">{new Date(alert.triggered_at).toLocaleString()}</p>
+                    <p className="text-[10px] text-graphite-500 dark:text-slate-400 mt-0.5">{new Date(alert.triggered_at).toLocaleString()}</p>
                   </div>
                 </div>
               ))}
               {alerts.length === 0 && (
-                <div className="text-center text-xs text-[#676879] py-8">
+                <div className="text-center text-xs text-graphite-500 dark:text-slate-400 py-8">
                   No active telemetry alerts recorded.
                 </div>
               )}
@@ -285,7 +285,7 @@ const IoTMonitoring = () => {
         </div>
 
         {/* AI Insights Section */}
-        <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
+        <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
           <AIInsightsWidget
             context="iot"
             data={{
@@ -297,17 +297,17 @@ const IoTMonitoring = () => {
         </div>
 
         {/* Connect Device Banner */}
-        <div className="rounded-2xl border border-[#0073ea]/30 bg-[#e5f0ff] p-5 flex items-center justify-between gap-4">
+        <div className="rounded-2xl border border-primary-500/30 bg-primary-50 p-5 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-xl bg-[#0073ea] text-white">
+            <div className="p-3 rounded-xl bg-primary-500 text-white">
               <Smartphone className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="font-extrabold text-sm text-[#0073ea]">Pair Additional Medical Devices</h3>
-              <p className="text-xs text-[#676879] font-medium">Stream continuous EKG, pulse oximetry, and blood glucose directly to your medical team.</p>
+              <h3 className="font-extrabold text-sm text-primary-500">Pair Additional Medical Devices</h3>
+              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">Stream continuous EKG, pulse oximetry, and blood glucose directly to your medical team.</p>
             </div>
           </div>
-          <button onClick={() => navigate("/ai-diagnostics")} className="px-4 py-2 rounded-xl bg-[#0073ea] text-white text-xs font-extrabold flex items-center gap-1 shadow-xs">
+          <button onClick={() => navigate("/ai-diagnostics")} className="px-4 py-2 rounded-xl bg-primary-500 text-white text-xs font-extrabold flex items-center gap-1 shadow-xs">
             <Bot className="w-4 h-4" /> AI Diagnostics
           </button>
         </div>

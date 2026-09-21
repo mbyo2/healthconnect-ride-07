@@ -182,11 +182,11 @@ export const PrescriptionWriter = () => {
   };
 
   return (
-    <Card className="p-6 rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs font-sans">
-      <div className="flex items-center justify-between mb-6 pb-3 border-b border-[#e6e9ef] dark:border-slate-800">
+    <Card className="p-6 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs font-sans">
+      <div className="flex items-center justify-between mb-6 pb-3 border-b border-canvas-silk dark:border-slate-800">
         <div>
           <h2 className="text-xl font-extrabold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-            <Pill className="h-5 w-5 text-[#0073ea]" />
+            <Pill className="h-5 w-5 text-primary-500" />
             Write E-Prescription (Multi-Medication)
           </h2>
           <p className="text-xs text-slate-400">Prescribe multiple medications with safety &amp; interaction screening</p>
@@ -209,21 +209,21 @@ export const PrescriptionWriter = () => {
                 <button
                   key={p.id}
                   type="button"
-                  className="w-full text-left px-3 py-2 text-xs hover:bg-[#f0f2f7] dark:hover:bg-slate-800 flex items-center justify-between border-b last:border-b-0"
+                  className="w-full text-left px-3 py-2 text-xs hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-800 flex items-center justify-between border-b last:border-b-0"
                   onClick={() => {
                     setSelectedPatient({ id: p.id, name: `${p.first_name || ""} ${p.last_name || ""}`.trim() || p.email, email: p.email });
                     setPatientSearch(`${p.first_name || ""} ${p.last_name || ""}`.trim() || p.email);
                   }}
                 >
                   <span className="font-bold">{p.first_name} {p.last_name} ({p.email})</span>
-                  <span className="text-[#0073ea] font-bold">Select</span>
+                  <span className="text-primary-500 font-bold">Select</span>
                 </button>
               ))}
             </div>
           )}
           {selectedPatient && (
-            <div className="mt-2 p-2.5 rounded-xl bg-[#0073ea]/10 border border-[#0073ea]/30 flex items-center justify-between">
-              <span className="font-bold text-[#0073ea]">Patient: {selectedPatient.name}</span>
+            <div className="mt-2 p-2.5 rounded-xl bg-primary-500/10 border border-primary-500/30 flex items-center justify-between">
+              <span className="font-bold text-primary-500">Patient: {selectedPatient.name}</span>
               <button
                 type="button"
                 onClick={() => { setSelectedPatient(null); setPatientSearch(""); }}
@@ -246,16 +246,16 @@ export const PrescriptionWriter = () => {
               variant="outline"
               size="sm"
               onClick={handleAddMed}
-              className="text-[#0073ea] font-bold rounded-xl h-8 text-xs"
+              className="text-primary-500 font-bold rounded-xl h-8 text-xs"
             >
               <Plus className="h-3.5 w-3.5 mr-1" /> Add Medication
             </Button>
           </div>
 
           {medications.map((m, idx) => (
-            <div key={m.id} className="p-4 rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-[#f8fafc] dark:bg-slate-950 space-y-3 relative">
+            <div key={m.id} className="p-4 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-canvas-bone dark:bg-slate-950 space-y-3 relative">
               <div className="flex items-center justify-between">
-                <span className="px-2 py-0.5 rounded-md bg-[#0073ea] text-white font-black text-[10px]">
+                <span className="px-2 py-0.5 rounded-md bg-primary-500 text-white font-black text-[10px]">
                   Medication #{idx + 1}
                 </span>
                 {medications.length > 1 && (
@@ -364,7 +364,7 @@ export const PrescriptionWriter = () => {
         <Button
           type="submit"
           disabled={isSubmitting}
-          className="w-full h-11 bg-[#0073ea] hover:bg-[#0060c4] text-white font-extrabold rounded-xl"
+          className="w-full h-11 bg-primary-500 hover:bg-primary-600 text-white font-extrabold rounded-xl"
         >
           <CheckCircle2 className="h-4 w-4 mr-2" />
           {isSubmitting ? "Issuing Prescription..." : `Issue Multi-Medication E-Prescription (${medications.length} Meds)`}

@@ -72,35 +72,35 @@ export const InventoryPurchase = ({ hospital }: { hospital: any }) => {
 
   const getStatusPill = (qty: number, reorder: number) => {
     if (qty <= reorder) {
-      return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-[#e2445c]">Reorder Required</span>;
+      return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-error-500">Reorder Required</span>;
     }
-    return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-[#00c875]">In Stock</span>;
+    return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-success-500">In Stock</span>;
   };
 
   return (
     <div className="space-y-4 font-sans text-slate-900 dark:text-slate-100">
       {/* Top Action Header */}
-      <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center border-b border-[#e6e9ef] pb-3">
+      <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center border-b border-canvas-silk pb-3">
         <div>
           <h3 className="text-base font-extrabold flex items-center gap-2">
-            <Package className="h-5 w-5 text-[#0073ea]" />
+            <Package className="h-5 w-5 text-primary-500" />
             Hospital Inventory & Stock Purchase Board
           </h3>
-          <p className="text-xs text-[#676879] dark:text-slate-400 font-medium">
+          <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
             Medical supply registers, reorder alerts, and batch expiry monitoring
           </p>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={refresh}
-            className="px-3 py-1.5 rounded-md bg-slate-100 dark:bg-slate-800 hover:bg-[#e5f0ff] font-bold text-xs flex items-center gap-1"
+            className="px-3 py-1.5 rounded-md bg-slate-100 dark:bg-slate-800 hover:bg-primary-50 dark:hover:bg-slate-800 font-bold text-xs flex items-center gap-1"
           >
             <RefreshCw className="h-3.5 w-3.5" />
             Refresh
           </button>
           <button
             onClick={() => setIsAddDialogOpen(true)}
-            className="px-3.5 py-1.5 rounded-md bg-[#0073ea] hover:bg-[#0060c4] text-white font-extrabold text-xs shadow-xs transition-all flex items-center gap-1"
+            className="px-3.5 py-1.5 rounded-md bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs transition-all flex items-center gap-1"
           >
             <Plus className="h-4 w-4" />
             Add Stock Item
@@ -110,31 +110,31 @@ export const InventoryPurchase = ({ hospital }: { hospital: any }) => {
 
       {/* Telemetry Summary Cards */}
       <div className="grid grid-cols-3 gap-3">
-        <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-[#e6e9ef] shadow-xs text-center">
-          <Package className="h-5 w-5 mx-auto text-[#0073ea] mb-1" />
-          <div className="text-2xl font-black font-mono text-[#0073ea]">{supplies.length}</div>
-          <div className="text-[10px] text-[#676879] font-bold uppercase">Total Stock Items</div>
+        <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk shadow-xs text-center">
+          <Package className="h-5 w-5 mx-auto text-primary-500 mb-1" />
+          <div className="text-2xl font-black font-mono text-primary-500">{supplies.length}</div>
+          <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold uppercase">Total Stock Items</div>
         </div>
 
-        <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-[#e6e9ef] shadow-xs text-center">
-          <TrendingDown className="h-5 w-5 mx-auto text-[#fdab3d] mb-1" />
-          <div className="text-2xl font-black font-mono text-[#fdab3d]">{lowStock.length}</div>
-          <div className="text-[10px] text-[#676879] font-bold uppercase">Need Reorder</div>
+        <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk shadow-xs text-center">
+          <TrendingDown className="h-5 w-5 mx-auto text-warning-500 mb-1" />
+          <div className="text-2xl font-black font-mono text-warning-500">{lowStock.length}</div>
+          <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold uppercase">Need Reorder</div>
         </div>
 
-        <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-[#e6e9ef] shadow-xs text-center">
-          <Package className="h-5 w-5 mx-auto text-[#e2445c] mb-1" />
-          <div className="text-2xl font-black font-mono text-[#e2445c]">{expiringSoon.length}</div>
-          <div className="text-[10px] text-[#676879] font-bold uppercase">Expiring ≤ 90d</div>
+        <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk shadow-xs text-center">
+          <Package className="h-5 w-5 mx-auto text-error-500 mb-1" />
+          <div className="text-2xl font-black font-mono text-error-500">{expiringSoon.length}</div>
+          <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold uppercase">Expiring ≤ 90d</div>
         </div>
       </div>
 
       {/* Views Bar */}
-      <div className="flex items-center gap-1.5 p-1 bg-white dark:bg-slate-900 border border-[#e6e9ef] rounded-xl">
+      <div className="flex items-center gap-1.5 p-1 bg-white dark:bg-slate-900 border border-canvas-silk rounded-xl">
         <button
           onClick={() => setActiveTab("stock")}
           className={`px-3.5 py-1.5 rounded-md text-xs font-extrabold transition-all ${
-            activeTab === "stock" ? "bg-[#0073ea] text-white shadow-xs" : "text-[#676879] hover:bg-[#f0f2f7]"
+            activeTab === "stock" ? "bg-primary-500 text-white shadow-xs" : "text-graphite-500 dark:text-slate-400 hover:bg-canvas-mist dark:hover:bg-slate-800"
           }`}
         >
           Stock Register ({supplies.length})
@@ -142,7 +142,7 @@ export const InventoryPurchase = ({ hospital }: { hospital: any }) => {
         <button
           onClick={() => setActiveTab("reorder")}
           className={`px-3.5 py-1.5 rounded-md text-xs font-extrabold transition-all ${
-            activeTab === "reorder" ? "bg-[#0073ea] text-white shadow-xs" : "text-[#676879] hover:bg-[#f0f2f7]"
+            activeTab === "reorder" ? "bg-primary-500 text-white shadow-xs" : "text-graphite-500 dark:text-slate-400 hover:bg-canvas-mist dark:hover:bg-slate-800"
           }`}
         >
           Reorder Alert Queue ({lowStock.length})
@@ -158,14 +158,14 @@ export const InventoryPurchase = ({ hospital }: { hospital: any }) => {
               placeholder="Search hospital inventory items..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-1.5 rounded-md border border-[#c3c6d4] bg-white dark:bg-slate-900 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
+              className="w-full pl-9 pr-3 py-1.5 rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary-500"
             />
           </div>
 
-          <div className="overflow-x-auto rounded-xl border border-[#e6e9ef] bg-white dark:bg-slate-900 shadow-xs">
+          <div className="overflow-x-auto rounded-xl border border-canvas-silk bg-white dark:bg-slate-900 shadow-xs">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-[#e6e9ef] bg-[#f5f6f8] text-[11px] font-extrabold uppercase text-[#676879]">
+                <tr className="border-b border-canvas-silk bg-canvas text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
                   <th className="py-2.5 px-4">Item Name</th>
                   <th className="py-2.5 px-3">Category</th>
                   <th className="py-2.5 px-3">Qty</th>
@@ -175,11 +175,11 @@ export const InventoryPurchase = ({ hospital }: { hospital: any }) => {
                   <th className="py-2.5 px-3 text-center">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#e6e9ef]">
+              <tbody className="divide-y divide-canvas-silk">
                 {filteredSupplies.map((s) => (
-                  <tr key={s.id} className="hover:bg-[#f0f2f7] transition-colors">
+                  <tr key={s.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 transition-colors">
                     <td className="py-3 px-4 font-bold text-slate-900 dark:text-slate-100">{s.item_name}</td>
-                    <td className="py-3 px-3 text-[#676879]">{s.category || "General"}</td>
+                    <td className="py-3 px-3 text-graphite-500 dark:text-slate-400">{s.category || "General"}</td>
                     <td className="py-3 px-3 font-mono font-bold text-slate-900">{s.quantity_available ?? 0}</td>
                     <td className="py-3 px-3 text-slate-500">{s.unit || "boxes"}</td>
                     <td className="py-3 px-3 text-slate-600">{s.supplier || "—"}</td>
@@ -197,38 +197,38 @@ export const InventoryPurchase = ({ hospital }: { hospital: any }) => {
 
       {/* Add Item Modal */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent className="sm:max-w-[450px] bg-white dark:bg-slate-900 border border-[#e6e9ef]">
+        <DialogContent className="sm:max-w-[450px] bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
           <DialogHeader>
             <DialogTitle className="font-extrabold text-base">Add Hospital Inventory Item</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleAddItem} className="space-y-3 py-2 text-xs">
             <div>
-              <label className="font-extrabold text-[#676879] uppercase">Item Name *</label>
+              <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Item Name *</label>
               <input
                 value={newItem.item_name}
                 onChange={(e) => setNewItem({ ...newItem, item_name: e.target.value })}
                 placeholder="e.g. Paracetamol 500mg / Surgical Gloves"
-                className="w-full mt-1 p-2 rounded-md border border-[#c3c6d4] bg-white dark:bg-slate-950 font-bold"
+                className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-950 font-bold"
                 required
               />
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="font-extrabold text-[#676879] uppercase">Quantity</label>
+                <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Quantity</label>
                 <input
                   type="number"
                   value={newItem.quantity_available}
                   onChange={(e) => setNewItem({ ...newItem, quantity_available: Number(e.target.value) })}
-                  className="w-full mt-1 p-2 rounded-md border border-[#c3c6d4] bg-white dark:bg-slate-950 font-bold"
+                  className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-950 font-bold"
                 />
               </div>
               <div>
-                <label className="font-extrabold text-[#676879] uppercase">Reorder Level</label>
+                <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Reorder Level</label>
                 <input
                   type="number"
                   value={newItem.reorder_level}
                   onChange={(e) => setNewItem({ ...newItem, reorder_level: Number(e.target.value) })}
-                  className="w-full mt-1 p-2 rounded-md border border-[#c3c6d4] bg-white dark:bg-slate-950 font-bold"
+                  className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-950 font-bold"
                 />
               </div>
             </div>
@@ -236,7 +236,7 @@ export const InventoryPurchase = ({ hospital }: { hospital: any }) => {
               <button type="button" onClick={() => setIsAddDialogOpen(false)} className="px-3 py-1.5 text-xs font-bold text-slate-500">
                 Cancel
               </button>
-              <button type="submit" disabled={isSubmitting} className="px-4 py-1.5 rounded-md bg-[#0073ea] text-white text-xs font-bold shadow-xs">
+              <button type="submit" disabled={isSubmitting} className="px-4 py-1.5 rounded-md bg-primary-500 text-white text-xs font-bold shadow-xs">
                 {isSubmitting ? "Saving..." : "Add Stock Item"}
               </button>
             </DialogFooter>

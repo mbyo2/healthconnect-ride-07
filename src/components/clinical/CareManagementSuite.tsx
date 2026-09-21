@@ -94,7 +94,7 @@ export const CareManagementSuite: React.FC<{ institutionId?: string }> = ({ inst
   return (
     <div className="space-y-6 font-sans text-slate-900 dark:text-slate-100">
       {/* Header Banner */}
-      <div className="p-6 rounded-3xl bg-gradient-to-r from-[#0073ea] via-[#0f172a] to-[#1e293b] text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="p-6 rounded-3xl bg-gradient-to-r from-primary-500 via-slate-900 to-slate-800 text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
           <div className="h-12 w-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center font-black text-xl border border-white/20">
             <BedDouble className="h-6 w-6 text-white" />
@@ -120,7 +120,7 @@ export const CareManagementSuite: React.FC<{ institutionId?: string }> = ({ inst
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-2 border-b border-[#e6e9ef] dark:border-slate-800 pb-2 overflow-x-auto">
+      <div className="flex items-center gap-2 border-b border-canvas-silk dark:border-slate-800 pb-2 overflow-x-auto">
         {[
           { id: "ipd", label: "IPD Wards & Bed Grid", icon: BedDouble },
           { id: "transfers", label: "Bed Movements & Transfers", icon: ArrowRightLeft },
@@ -133,8 +133,8 @@ export const CareManagementSuite: React.FC<{ institutionId?: string }> = ({ inst
               onClick={() => setActiveTab(tab.id as any)}
               className={`px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2 transition-all shrink-0 ${
                 activeTab === tab.id
-                  ? "bg-[#0073ea] text-white shadow-xs"
-                  : "bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-[#f0f2f7]"
+                  ? "bg-primary-500 text-white shadow-xs"
+                  : "bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-canvas-mist dark:hover:bg-slate-800"
               }`}
             >
               <Icon className="h-4 w-4" />
@@ -150,12 +150,12 @@ export const CareManagementSuite: React.FC<{ institutionId?: string }> = ({ inst
           <div className="flex items-center justify-between">
             <div>
               <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">Live Hospital Ward &amp; Bed Occupancy</h3>
-              <p className="text-xs text-[#676879] dark:text-slate-400">Real-time bed tracking across ICU, Medical, Pediatric, and Surgical Wards</p>
+              <p className="text-xs text-graphite-500 dark:text-slate-400">Real-time bed tracking across ICU, Medical, Pediatric, and Surgical Wards</p>
             </div>
 
             <Dialog open={showTransferModal} onOpenChange={setShowTransferModal}>
               <DialogTrigger asChild>
-                <button className="px-4 py-2 rounded-xl bg-[#0073ea] text-white text-xs font-extrabold flex items-center gap-1.5 shadow-xs">
+                <button className="px-4 py-2 rounded-xl bg-primary-500 text-white text-xs font-extrabold flex items-center gap-1.5 shadow-xs">
                   <ArrowRightLeft className="h-4 w-4" /> Initiate Bed Transfer
                 </button>
               </DialogTrigger>
@@ -167,7 +167,7 @@ export const CareManagementSuite: React.FC<{ institutionId?: string }> = ({ inst
                   <div>
                     <label className="font-bold">Admitted Patient *</label>
                     <input
-                      className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4]"
+                      className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700"
                       value={transferPatient}
                       onChange={(e) => setTransferPatient(e.target.value)}
                     />
@@ -176,7 +176,7 @@ export const CareManagementSuite: React.FC<{ institutionId?: string }> = ({ inst
                     <div>
                       <label className="font-bold">Current Bed *</label>
                       <input
-                        className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4]"
+                        className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700"
                         value={transferFrom}
                         onChange={(e) => setTransferFrom(e.target.value)}
                       />
@@ -184,7 +184,7 @@ export const CareManagementSuite: React.FC<{ institutionId?: string }> = ({ inst
                     <div>
                       <label className="font-bold">Destination Bed *</label>
                       <select
-                        className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4] font-bold bg-white dark:bg-slate-950"
+                        className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-bold bg-white dark:bg-slate-950"
                         value={transferTo}
                         onChange={(e) => setTransferTo(e.target.value)}
                       >
@@ -199,7 +199,7 @@ export const CareManagementSuite: React.FC<{ institutionId?: string }> = ({ inst
                   <div>
                     <label className="font-bold">Clinical Transfer Reason</label>
                     <input
-                      className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4]"
+                      className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700"
                       value={transferReason}
                       onChange={(e) => setTransferReason(e.target.value)}
                     />
@@ -207,7 +207,7 @@ export const CareManagementSuite: React.FC<{ institutionId?: string }> = ({ inst
                 </div>
                 <DialogFooter>
                   <button onClick={() => setShowTransferModal(false)} className="px-4 py-2 font-bold text-slate-500">Cancel</button>
-                  <button onClick={handleBedTransfer} className="px-5 py-2.5 rounded-xl bg-[#0073ea] text-white font-extrabold">Execute Transfer</button>
+                  <button onClick={handleBedTransfer} className="px-5 py-2.5 rounded-xl bg-primary-500 text-white font-extrabold">Execute Transfer</button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
@@ -222,13 +222,13 @@ export const CareManagementSuite: React.FC<{ institutionId?: string }> = ({ inst
                   key={b.bedNumber}
                   className={`p-5 rounded-3xl border transition-all flex flex-col justify-between space-y-3 ${
                     isOccupied
-                      ? "bg-white dark:bg-slate-900 border-[#0073ea]/40 shadow-xs"
-                      : "bg-slate-50/60 dark:bg-slate-950 border-dashed border-[#c3c6d4] dark:border-slate-800"
+                      ? "bg-white dark:bg-slate-900 border-primary-500/40 shadow-xs"
+                      : "bg-slate-50/60 dark:bg-slate-950 border-dashed border-graphite-300 dark:border-slate-700 dark:border-slate-800"
                   }`}
                 >
                   <div>
                     <div className="flex items-center justify-between mb-1">
-                      <span className="font-mono font-black text-xs text-[#0073ea]">{b.bedNumber}</span>
+                      <span className="font-mono font-black text-xs text-primary-500">{b.bedNumber}</span>
                       <span
                         className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase ${
                           isOccupied
@@ -243,10 +243,10 @@ export const CareManagementSuite: React.FC<{ institutionId?: string }> = ({ inst
                     <div className="text-[11px] font-bold text-slate-400">{b.ward}</div>
 
                     {isOccupied ? (
-                      <div className="mt-3 p-2.5 rounded-xl bg-[#0073ea]/5 border border-[#0073ea]/20 text-xs">
+                      <div className="mt-3 p-2.5 rounded-xl bg-primary-500/5 border border-primary-500/20 text-xs">
                         <div className="font-black text-slate-900 dark:text-slate-100">{b.patientName}</div>
                         <div className="text-[10px] text-slate-500">Admitted: {b.admissionDate}</div>
-                        <div className="text-[10px] text-[#0073ea] font-semibold">{b.admittingDoctor}</div>
+                        <div className="text-[10px] text-primary-500 font-semibold">{b.admittingDoctor}</div>
                       </div>
                     ) : (
                       <div className="mt-3 p-4 rounded-xl border border-dashed text-center text-slate-400 text-xs font-semibold">
@@ -258,7 +258,7 @@ export const CareManagementSuite: React.FC<{ institutionId?: string }> = ({ inst
                   {isOccupied && (
                     <button
                       onClick={() => toast.success(`Generated Discharge Summary for ${b.patientName}`)}
-                      className="w-full py-1.5 rounded-xl border border-[#e6e9ef] hover:bg-[#0073ea] hover:text-white text-slate-700 dark:text-slate-300 font-extrabold text-[11px] transition-colors"
+                      className="w-full py-1.5 rounded-xl border border-canvas-silk hover:bg-primary-500 hover:text-white text-slate-700 dark:text-slate-300 font-extrabold text-[11px] transition-colors"
                     >
                       Discharge Patient
                     </button>
@@ -273,10 +273,10 @@ export const CareManagementSuite: React.FC<{ institutionId?: string }> = ({ inst
       {/* 2. Bed Transfers Log */}
       {activeTab === "transfers" && (
         <div className="space-y-4">
-          <div className="w-full overflow-x-auto rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
+          <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-[#e6e9ef] dark:border-slate-800 bg-[#f5f6f8] dark:bg-slate-950 text-[11px] font-extrabold uppercase text-[#676879]">
+                <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
                   <th className="py-3 px-4">Patient Name</th>
                   <th className="py-3 px-3">From Bed</th>
                   <th className="py-3 px-3">To Destination Bed</th>
@@ -284,9 +284,9 @@ export const CareManagementSuite: React.FC<{ institutionId?: string }> = ({ inst
                   <th className="py-3 px-3">Clinical Indication / Reason</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#e6e9ef] dark:divide-slate-800">
+              <tbody className="divide-y divide-canvas-silk dark:divide-slate-800">
                 {transfers.map((tr) => (
-                  <tr key={tr.id} className="hover:bg-[#f0f2f7] dark:hover:bg-slate-800/60">
+                  <tr key={tr.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-800/60">
                     <td className="py-3 px-4 font-bold text-slate-900 dark:text-slate-100">{tr.patientName}</td>
                     <td className="py-3 px-3 font-mono text-rose-600 font-bold">{tr.fromBed}</td>
                     <td className="py-3 px-3 font-mono text-emerald-600 font-bold">{tr.toBed}</td>
@@ -303,14 +303,14 @@ export const CareManagementSuite: React.FC<{ institutionId?: string }> = ({ inst
       {/* 3. Discharge Summaries */}
       {activeTab === "discharge" && (
         <div className="space-y-4">
-          <div className="p-6 rounded-3xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs space-y-4 text-xs">
-            <div className="flex items-center justify-between border-b border-[#e6e9ef] dark:border-slate-800 pb-3">
+          <div className="p-6 rounded-3xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs space-y-4 text-xs">
+            <div className="flex items-center justify-between border-b border-canvas-silk dark:border-slate-800 pb-3">
               <h3 className="font-black text-sm text-slate-900 dark:text-slate-100">
                 Official Electronic Discharge Summary Generator
               </h3>
               <button
                 onClick={() => toast.success("Official Discharge Summary PDF exported")}
-                className="px-4 py-2 rounded-xl bg-[#0073ea] text-white font-extrabold text-xs shadow-xs"
+                className="px-4 py-2 rounded-xl bg-primary-500 text-white font-extrabold text-xs shadow-xs"
               >
                 Export Discharge Summary (PDF)
               </button>
@@ -319,11 +319,11 @@ export const CareManagementSuite: React.FC<{ institutionId?: string }> = ({ inst
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="font-bold">Inpatient Admission No</label>
-                <input className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4]" value="ADM-2026-0491 (Ruth Chiluba)" readOnly />
+                <input className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700" value="ADM-2026-0491 (Ruth Chiluba)" readOnly />
               </div>
               <div>
                 <label className="font-bold">Discharge Status</label>
-                <input className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4]" value="Recovered / Discharged to Outpatient Care" readOnly />
+                <input className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700" value="Recovered / Discharged to Outpatient Care" readOnly />
               </div>
             </div>
 
@@ -331,7 +331,7 @@ export const CareManagementSuite: React.FC<{ institutionId?: string }> = ({ inst
               <label className="font-bold">Hospital Course &amp; Treatment Summary</label>
               <textarea
                 rows={3}
-                className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4]"
+                className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700"
                 defaultValue="Patient underwent Lumbar L4-L5 decompression surgery on 2026-08-31. Post-operative period uneventful. Mobilized on Day 1 with Physiotherapy. Surgical site clean and dry without signs of infection. Oral analgesia prescribed for 7 days."
               />
             </div>

@@ -235,22 +235,22 @@ export const EnhancedTelemedicine = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "completed": return "bg-[#00c875] text-white";
-      case "in_progress": return "bg-[#0073ea] text-white";
-      case "active": return "bg-[#a25ddc] text-white";
-      case "pending": return "bg-[#fdab3d] text-white";
-      case "cancelled": return "bg-[#e44258] text-white";
-      default: return "bg-[#676879] text-white";
+      case "completed": return "bg-success-500 text-white";
+      case "in_progress": return "bg-primary-500 text-white";
+      case "active": return "bg-purple-500 text-white";
+      case "pending": return "bg-warning-500 text-white";
+      case "cancelled": return "bg-error-500 text-white";
+      default: return "bg-graphite-500 dark:bg-slate-600 text-white";
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case "urgent": return "bg-[#e44258] text-white";
-      case "high": return "bg-[#fdab3d] text-white";
-      case "normal": return "bg-[#0073ea] text-white";
-      case "low": return "bg-[#676879] text-white";
-      default: return "bg-[#676879] text-white";
+      case "urgent": return "bg-error-500 text-white";
+      case "high": return "bg-warning-500 text-white";
+      case "normal": return "bg-primary-500 text-white";
+      case "low": return "bg-graphite-500 dark:bg-slate-600 text-white";
+      default: return "bg-graphite-500 dark:bg-slate-600 text-white";
     }
   };
 
@@ -258,13 +258,13 @@ export const EnhancedTelemedicine = () => {
 
   if (!institution) {
     return (
-      <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 flex items-center justify-center p-6">
+      <div className="min-h-screen bg-canvas dark:bg-slate-950 flex items-center justify-center p-6">
         <Card className="max-w-md w-full">
           <CardContent className="p-8 text-center space-y-4">
-            <Building2 className="h-12 w-12 mx-auto text-[#0073ea]" />
+            <Building2 className="h-12 w-12 mx-auto text-primary-500" />
             <h2 className="text-xl font-extrabold">Institution Required</h2>
-            <p className="text-xs text-[#676879]">Please select an institution to access enhanced telemedicine.</p>
-            <Button onClick={() => navigate("/institution-portal")} className="bg-[#0073ea] hover:bg-[#0056b3]">
+            <p className="text-xs text-graphite-500 dark:text-slate-400">Please select an institution to access enhanced telemedicine.</p>
+            <Button onClick={() => navigate("/institution-portal")} className="bg-primary-500 hover:bg-primary-600">
               Go to Institution Portal
             </Button>
           </CardContent>
@@ -281,23 +281,23 @@ export const EnhancedTelemedicine = () => {
   }).length;
 
   return (
-    <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pb-16">
+    <div className="min-h-screen bg-canvas dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pb-16">
       {/* Header */}
-      <div className="bg-white dark:bg-slate-900 border-b border-[#e6e9ef] dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
+      <div className="bg-white dark:bg-slate-900 border-b border-canvas-silk dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
         <div className="max-w-[1600px] mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-[#0073ea] text-white flex items-center justify-center shadow-xs">
+            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-xs">
               <Video className="h-5 w-5" />
             </div>
             <div>
               <h1 className="text-xl font-extrabold">Enhanced Telemedicine</h1>
-              <p className="text-xs text-[#676879] font-medium">Integrated Telemedicine & Workflow Management</p>
+              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">Integrated Telemedicine & Workflow Management</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <Dialog open={showWorkflowDialog} onOpenChange={setShowWorkflowDialog}>
               <DialogTrigger asChild>
-                <Button className="bg-[#0073ea] hover:bg-[#0056b3] text-white font-bold text-xs flex items-center gap-2">
+                <Button className="bg-primary-500 hover:bg-primary-600 text-white font-bold text-xs flex items-center gap-2">
                   <Plus className="h-4 w-4" /> New Workflow
                 </Button>
               </DialogTrigger>
@@ -357,7 +357,7 @@ export const EnhancedTelemedicine = () => {
                       className="mt-1"
                     />
                   </div>
-                  <Button onClick={handleCreateWorkflow} className="w-full bg-[#0073ea] hover:bg-[#0056b3] text-white font-bold">
+                  <Button onClick={handleCreateWorkflow} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold">
                     Start Workflow
                   </Button>
                 </div>
@@ -370,60 +370,60 @@ export const EnhancedTelemedicine = () => {
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 pt-6">
         {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-[#676879] uppercase">Active Workflows</span>
-                <Activity className="h-4 w-4 text-[#0073ea]" />
+                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Active Workflows</span>
+                <Activity className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-[#0073ea]">{activeWorkflows}</div>
-              <div className="text-[10px] text-[#676879] font-bold mt-0.5">Currently running</div>
+              <div className="text-2xl font-black font-mono text-primary-500">{activeWorkflows}</div>
+              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Currently running</div>
             </CardContent>
           </Card>
-          <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-[#676879] uppercase">Pending Tasks</span>
-                <CheckCircle className="h-4 w-4 text-[#a25ddc]" />
+                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Pending Tasks</span>
+                <CheckCircle className="h-4 w-4 text-purple-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-[#a25ddc]">{pendingTasks}</div>
-              <div className="text-[10px] text-[#676879] font-bold mt-0.5">Awaiting completion</div>
+              <div className="text-2xl font-black font-mono text-purple-500">{pendingTasks}</div>
+              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Awaiting completion</div>
             </CardContent>
           </Card>
-          <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-[#676879] uppercase">Diagnostic Orders</span>
-                <FileText className="h-4 w-4 text-[#fdab3d]" />
+                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Diagnostic Orders</span>
+                <FileText className="h-4 w-4 text-warning-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-[#fdab3d]">{pendingOrders}</div>
-              <div className="text-[10px] text-[#676879] font-bold mt-0.5">Remote diagnostics</div>
+              <div className="text-2xl font-black font-mono text-warning-500">{pendingOrders}</div>
+              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Remote diagnostics</div>
             </CardContent>
           </Card>
-          <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-[#676879] uppercase">Completed Today</span>
-                <TrendingUp className="h-4 w-4 text-[#00c875]" />
+                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Completed Today</span>
+                <TrendingUp className="h-4 w-4 text-success-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-[#00c875]">{completedToday}</div>
-              <div className="text-[10px] text-[#676879] font-bold mt-0.5">Workflow sessions</div>
+              <div className="text-2xl font-black font-mono text-success-500">{completedToday}</div>
+              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Workflow sessions</div>
             </CardContent>
           </Card>
         </div>
 
         <Tabs defaultValue="workflows" className="space-y-6">
-          <TabsList className="bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 p-1">
-            <TabsTrigger value="workflows" className="data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">
+          <TabsList className="bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 p-1">
+            <TabsTrigger value="workflows" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <Activity className="h-4 w-4 mr-2" /> Active Workflows
             </TabsTrigger>
-            <TabsTrigger value="tasks" className="data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">
+            <TabsTrigger value="tasks" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <CheckCircle className="h-4 w-4 mr-2" /> Clinical Tasks
             </TabsTrigger>
-            <TabsTrigger value="diagnostics" className="data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">
+            <TabsTrigger value="diagnostics" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <FileText className="h-4 w-4 mr-2" /> Remote Diagnostics
             </TabsTrigger>
-            <TabsTrigger value="integration" className="data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">
+            <TabsTrigger value="integration" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <MonitorSpeaker className="h-4 w-4 mr-2" /> Device Integration
             </TabsTrigger>
           </TabsList>
@@ -455,18 +455,18 @@ export const EnhancedTelemedicine = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {workflows.map((workflow) => (
-                <Card key={workflow.id} className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+                <Card key={workflow.id} className="border-canvas-silk dark:border-slate-800 shadow-xs">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-xl bg-[#0073ea] text-white flex items-center justify-center">
+                        <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center">
                           <Activity className="h-5 w-5" />
                         </div>
                         <div>
                           <CardTitle className="text-sm font-extrabold">
                             {workflow.patient?.first_name} {workflow.patient?.last_name}
                           </CardTitle>
-                          <div className="text-[10px] text-[#676879]">
+                          <div className="text-[10px] text-graphite-500 dark:text-slate-400">
                             Started: {new Date(workflow.started_at).toLocaleString()}
                           </div>
                         </div>
@@ -478,17 +478,17 @@ export const EnhancedTelemedicine = () => {
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-[#676879]">Current Stage</span>
+                      <span className="text-graphite-500 dark:text-slate-400">Current Stage</span>
                       <span className="font-bold">{workflow.current_stage || "Not Started"}</span>
                     </div>
                     {workflow.video_consultation_id && (
                       <div className="flex items-center gap-2 text-xs">
-                        <Video className="h-3 w-3 text-[#0073ea]" />
-                        <span className="text-[#676879]">Associated video consultation</span>
+                        <Video className="h-3 w-3 text-primary-500" />
+                        <span className="text-graphite-500 dark:text-slate-400">Associated video consultation</span>
                       </div>
                     )}
-                    <div className="flex items-center justify-between pt-2 border-t border-[#e6e9ef] dark:border-slate-800">
-                      <div className="text-xs text-[#676879]">
+                    <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
+                      <div className="text-xs text-graphite-500 dark:text-slate-400">
                         {Object.keys(workflow.stage_data || {}).length} stages completed
                       </div>
                       <div className="flex items-center gap-1">
@@ -534,12 +534,12 @@ export const EnhancedTelemedicine = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {tasks.map((task) => (
-                <Card key={task.id} className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+                <Card key={task.id} className="border-canvas-silk dark:border-slate-800 shadow-xs">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div>
                         <CardTitle className="text-sm font-extrabold">{task.task_name}</CardTitle>
-                        <div className="text-[10px] text-[#676879]">{task.task_type}</div>
+                        <div className="text-[10px] text-graphite-500 dark:text-slate-400">{task.task_type}</div>
                       </div>
                       <div className="flex items-center gap-1">
                         <Badge className={getPriorityColor(task.priority) + " text-[10px]"}>
@@ -553,7 +553,7 @@ export const EnhancedTelemedicine = () => {
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-[#676879]">Assigned To</span>
+                      <span className="text-graphite-500 dark:text-slate-400">Assigned To</span>
                       <span className="font-bold">
                         {task.assigned_to_profile
                           ? `${task.assigned_to_profile.first_name} ${task.assigned_to_profile.last_name}`
@@ -562,20 +562,20 @@ export const EnhancedTelemedicine = () => {
                     </div>
                     {task.due_date && (
                       <div className="flex items-center justify-between text-xs">
-                        <span className="text-[#676879]">Due Date</span>
-                        <span className={`font-bold ${new Date(task.due_date) < new Date() && task.status !== "completed" ? "text-[#e44258]" : ""}`}>
+                        <span className="text-graphite-500 dark:text-slate-400">Due Date</span>
+                        <span className={`font-bold ${new Date(task.due_date) < new Date() && task.status !== "completed" ? "text-error-500" : ""}`}>
                           {new Date(task.due_date).toLocaleDateString()}
                         </span>
                       </div>
                     )}
                     {task.estimated_duration_minutes && (
                       <div className="flex items-center justify-between text-xs">
-                        <span className="text-[#676879]">Est. Duration</span>
+                        <span className="text-graphite-500 dark:text-slate-400">Est. Duration</span>
                         <span className="font-bold">{task.estimated_duration_minutes} min</span>
                       </div>
                     )}
-                    <div className="flex items-center justify-between pt-2 border-t border-[#e6e9e9ef] dark:border-slate-800">
-                      <div className="text-xs text-[#676879]">
+                    <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
+                      <div className="text-xs text-graphite-500 dark:text-slate-400">
                         {task.dependencies.length} dependencies
                       </div>
                       <div className="flex items-center gap-1">
@@ -622,18 +622,18 @@ export const EnhancedTelemedicine = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {orders.map((order) => (
-                <Card key={order.id} className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+                <Card key={order.id} className="border-canvas-silk dark:border-slate-800 shadow-xs">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-xl bg-[#a25ddc] text-white flex items-center justify-center">
+                        <div className="h-10 w-10 rounded-xl bg-purple-500 text-white flex items-center justify-center">
                           <FileText className="h-5 w-5" />
                         </div>
                         <div>
                           <CardTitle className="text-sm font-extrabold">
                             {order.patient?.first_name} {order.patient?.last_name}
                           </CardTitle>
-                          <div className="text-[10px] text-[#676879]">{order.order_number}</div>
+                          <div className="text-[10px] text-graphite-500 dark:text-slate-400">{order.order_number}</div>
                         </div>
                       </div>
                       <Badge className={getStatusColor(order.status) + " text-[10px]"}>
@@ -643,17 +643,17 @@ export const EnhancedTelemedicine = () => {
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-[#676879]">Order Type</span>
+                      <span className="text-graphite-500 dark:text-slate-400">Order Type</span>
                       <Badge variant="outline" className="text-[10px]">{order.order_type}</Badge>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-[#676879]">Priority</span>
+                      <span className="text-graphite-500 dark:text-slate-400">Priority</span>
                       <Badge className={getPriorityColor(order.priority) + " text-[10px]"}>
                         {order.priority}
                       </Badge>
                     </div>
-                    <div className="flex items-center justify-between pt-2 border-t border-[#e6e9ef] dark:border-slate-800">
-                      <div className="text-xs text-[#676879]">
+                    <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
+                      <div className="text-xs text-graphite-500 dark:text-slate-400">
                         {order.requested_tests.length} tests requested
                       </div>
                       <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
@@ -668,14 +668,14 @@ export const EnhancedTelemedicine = () => {
 
           {/* Device Integration Tab */}
           <TabsContent value="integration" className="space-y-4">
-            <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+            <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
               <CardHeader>
                 <CardTitle className="text-sm font-extrabold flex items-center gap-2">
-                  <MonitorSpeaker className="h-4 w-4 text-[#0073ea]" /> IoT Device Integration
+                  <MonitorSpeaker className="h-4 w-4 text-primary-500" /> IoT Device Integration
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="h-[200px] flex items-center justify-center text-[#676879] text-xs">
+                <div className="h-[200px] flex items-center justify-center text-graphite-500 dark:text-slate-400 text-xs">
                   IoT device integration interface placeholder - Connect health monitoring devices for remote patient data
                 </div>
               </CardContent>

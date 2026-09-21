@@ -4,10 +4,11 @@ import { ArrowLeft, Building2, HeartPulse, ShieldCheck, Stethoscope } from "luci
 import { Button } from "@/components/ui/button";
 
 const About = () => (
-  <div className="min-h-screen bg-background">
+  <div className="min-h-screen bg-canvas text-midnight font-sans transition-colors">
     <Helmet>
-      <title>About Doc&apos; O Clock</title>
-      <meta name="description" content="Learn how Doc' O Clock connects patients, providers, pharmacies and healthcare institutions." />
+      <title>About Doc&apos; O Clock — Zambia&apos;s Healthcare Platform</title>
+      <meta name="description" content="Learn how Doc' O Clock connects patients, providers, pharmacies and healthcare institutions across Zambia." />
+      <link rel="canonical" href="https://doc0clock.online/about" />
     </Helmet>
 
     <main className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">

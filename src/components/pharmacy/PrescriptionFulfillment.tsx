@@ -334,13 +334,13 @@ export function PrescriptionFulfillment() {
   const getStatusPill = (st: string) => {
     switch (st) {
       case "filled":
-        return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-[#00c875]">Filled</span>;
+        return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-success-500">Filled</span>;
       case "cancelled":
-        return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-[#e2445c]">Cancelled</span>;
+        return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-error-500">Cancelled</span>;
       case "partially_filled":
-        return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-[#a25ddc]">Partially Filled</span>;
+        return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-purple-500">Partially Filled</span>;
       default:
-        return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-[#fdab3d]">Pending Rx</span>;
+        return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-warning-500">Pending Rx</span>;
     }
   };
 
@@ -350,9 +350,9 @@ export function PrescriptionFulfillment() {
 
   return (
     <div className="space-y-4 font-sans text-slate-900 dark:text-slate-100">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#e6e9ef] pb-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-canvas-silk pb-3">
         <div className="flex items-center gap-2">
-          <Pill className="h-5 w-5 text-[#0073ea]" />
+          <Pill className="h-5 w-5 text-primary-500" />
           <h2 className="text-base font-extrabold">Pharmacy Prescription &amp; Dispensing Queue</h2>
           {!isOnline && (
             <span className="px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 flex items-center gap-1">
@@ -363,15 +363,15 @@ export function PrescriptionFulfillment() {
 
         <Dialog open={showNewRxDialog} onOpenChange={setShowNewRxDialog}>
           <DialogTrigger asChild>
-            <button className="px-4 py-2 rounded-xl bg-[#0073ea] hover:bg-[#0060c4] text-white font-extrabold text-xs shadow-xs flex items-center gap-1.5 self-start">
+            <button className="px-4 py-2 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs flex items-center gap-1.5 self-start">
               <Plus className="h-4 w-4" />
               <span>Prescribe &amp; Dispense (Multi-Drug)</span>
             </button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 rounded-3xl p-6">
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 rounded-3xl p-6">
             <DialogHeader>
               <DialogTitle className="font-black text-xl flex items-center gap-2">
-                <Pill className="h-6 w-6 text-[#0073ea]" />
+                <Pill className="h-6 w-6 text-primary-500" />
                 Pharmacy Direct Dispensing (Multi-Medication)
               </DialogTitle>
             </DialogHeader>
@@ -379,9 +379,9 @@ export function PrescriptionFulfillment() {
             <div className="space-y-4 py-2 text-xs">
               {/* Patient Selection */}
               <div>
-                <label className="font-bold text-[#676879] uppercase">Patient / Customer *</label>
+                <label className="font-bold text-graphite-500 dark:text-slate-400 uppercase">Patient / Customer *</label>
                 <input
-                  className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4] dark:border-slate-800 font-medium"
+                  className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 dark:border-slate-800 font-medium"
                   placeholder="Search customer by name or email..."
                   value={patientSearch}
                   onChange={(e) => searchPatients(e.target.value)}
@@ -392,21 +392,21 @@ export function PrescriptionFulfillment() {
                       <button
                         key={p.id}
                         type="button"
-                        className="w-full text-left px-3 py-2 text-xs hover:bg-[#f0f2f7] dark:hover:bg-slate-800 flex items-center justify-between border-b last:border-b-0"
+                        className="w-full text-left px-3 py-2 text-xs hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-800 flex items-center justify-between border-b last:border-b-0"
                         onClick={() => {
                           setSelectedPatient(p);
                           setPatientSearch(`${p.first_name || ""} ${p.last_name || ""}`.trim() || p.email);
                         }}
                       >
                         <span className="font-bold">{p.first_name} {p.last_name} ({p.email})</span>
-                        <span className="text-[#0073ea] font-bold">Select</span>
+                        <span className="text-primary-500 font-bold">Select</span>
                       </button>
                     ))}
                   </div>
                 )}
                 {selectedPatient && (
-                  <div className="mt-2 p-2.5 rounded-xl bg-[#0073ea]/10 border border-[#0073ea]/30 flex items-center justify-between">
-                    <span className="font-bold text-[#0073ea]">Customer: {selectedPatient.first_name} {selectedPatient.last_name}</span>
+                  <div className="mt-2 p-2.5 rounded-xl bg-primary-500/10 border border-primary-500/30 flex items-center justify-between">
+                    <span className="font-bold text-primary-500">Customer: {selectedPatient.first_name} {selectedPatient.last_name}</span>
                     <button
                       type="button"
                       onClick={() => { setSelectedPatient(null); setPatientSearch(""); }}
@@ -421,22 +421,22 @@ export function PrescriptionFulfillment() {
               {/* Medication Items */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <label className="font-bold text-[#676879] uppercase">
+                  <label className="font-bold text-graphite-500 dark:text-slate-400 uppercase">
                     Medications ({medicationItems.length} item{medicationItems.length > 1 ? 's' : ''})
                   </label>
                   <button
                     type="button"
                     onClick={handleAddMedication}
-                    className="px-3 py-1 rounded-full bg-[#0073ea]/10 hover:bg-[#0073ea] hover:text-white text-[#0073ea] font-extrabold text-[11px] flex items-center gap-1"
+                    className="px-3 py-1 rounded-full bg-primary-500/10 hover:bg-primary-500 hover:text-white text-primary-500 font-extrabold text-[11px] flex items-center gap-1"
                   >
                     <Plus className="h-3 w-3" /> Add Another Medication
                   </button>
                 </div>
 
                 {medicationItems.map((item, idx) => (
-                  <div key={item.id} className="p-3.5 rounded-2xl border border-[#e6e9ef] bg-[#f8fafc] dark:bg-slate-950 space-y-2 relative">
+                  <div key={item.id} className="p-3.5 rounded-2xl border border-canvas-silk bg-canvas-bone dark:bg-slate-950 space-y-2 relative">
                     <div className="flex items-center justify-between">
-                      <span className="px-2 py-0.5 rounded-md bg-[#0073ea] text-white font-black text-[10px]">
+                      <span className="px-2 py-0.5 rounded-md bg-primary-500 text-white font-black text-[10px]">
                         Item #{idx + 1}
                       </span>
                       {medicationItems.length > 1 && (
@@ -453,7 +453,7 @@ export function PrescriptionFulfillment() {
                     <div>
                       <label className="font-bold text-slate-700 dark:text-slate-300">Medication Name *</label>
                       <input
-                        className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4] font-medium"
+                        className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-medium"
                         placeholder="e.g. Amoxicillin 500mg"
                         value={item.medication_name}
                         onChange={(e) => handleUpdateMed(item.id, "medication_name", e.target.value)}
@@ -464,7 +464,7 @@ export function PrescriptionFulfillment() {
                       <div>
                         <label className="font-bold text-slate-700 dark:text-slate-300">Dosage *</label>
                         <input
-                          className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4] font-medium"
+                          className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-medium"
                           placeholder="e.g. 1 tab 3x daily"
                           value={item.dosage}
                           onChange={(e) => handleUpdateMed(item.id, "dosage", e.target.value)}
@@ -476,7 +476,7 @@ export function PrescriptionFulfillment() {
                           <input
                             type="number"
                             min={1}
-                            className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4] font-medium"
+                            className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-medium"
                             value={item.quantity}
                             onChange={(e) => handleUpdateMed(item.id, "quantity", parseInt(e.target.value) || 1)}
                           />
@@ -486,7 +486,7 @@ export function PrescriptionFulfillment() {
                           <input
                             type="number"
                             min={1}
-                            className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4] font-medium"
+                            className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-medium"
                             value={item.duration_days}
                             onChange={(e) => handleUpdateMed(item.id, "duration_days", parseInt(e.target.value) || 1)}
                           />
@@ -497,7 +497,7 @@ export function PrescriptionFulfillment() {
                     <div>
                       <label className="font-bold text-slate-700 dark:text-slate-300">Instructions</label>
                       <input
-                        className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4] font-medium"
+                        className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-medium"
                         placeholder="Take after meals"
                         value={item.instructions}
                         onChange={(e) => handleUpdateMed(item.id, "instructions", e.target.value)}
@@ -508,10 +508,10 @@ export function PrescriptionFulfillment() {
               </div>
 
               <div>
-                <label className="font-bold text-[#676879] uppercase">Dispensing Notes</label>
+                <label className="font-bold text-graphite-500 dark:text-slate-400 uppercase">Dispensing Notes</label>
                 <textarea
                   rows={2}
-                  className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4] font-medium"
+                  className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-medium"
                   placeholder="Notes, pharmacist remarks, batch IDs..."
                   value={rxNotes}
                   onChange={(e) => setRxNotes(e.target.value)}
@@ -523,7 +523,7 @@ export function PrescriptionFulfillment() {
               <button
                 type="button"
                 onClick={() => setShowNewRxDialog(false)}
-                className="px-4 py-2 rounded-xl font-bold text-slate-500 hover:bg-[#f0f2f7]"
+                className="px-4 py-2 rounded-xl font-bold text-slate-500 hover:bg-canvas-mist dark:hover:bg-slate-800"
               >
                 Cancel
               </button>
@@ -531,7 +531,7 @@ export function PrescriptionFulfillment() {
                 type="button"
                 disabled={isSubmitting}
                 onClick={handleCreateMultiRx}
-                className="px-5 py-2.5 rounded-xl bg-[#0073ea] hover:bg-[#0060c4] text-white font-extrabold flex items-center gap-1.5"
+                className="px-5 py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-extrabold flex items-center gap-1.5"
               >
                 <CheckCircle2 className="h-4 w-4" />
                 {isSubmitting ? "Dispensing..." : `Dispense (${medicationItems.length} Meds)`}
@@ -541,10 +541,10 @@ export function PrescriptionFulfillment() {
         </Dialog>
       </div>
 
-      <div className="w-full overflow-x-auto rounded-2xl border border-[#e6e9ef] bg-white dark:bg-slate-900 shadow-xs">
+      <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk bg-white dark:bg-slate-900 shadow-xs">
         <table className="w-full text-left border-collapse text-xs">
           <thead>
-            <tr className="border-b border-[#e6e9ef] bg-[#f5f6f8] text-[11px] font-extrabold uppercase text-[#676879]">
+            <tr className="border-b border-canvas-silk bg-canvas text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
               <th className="py-2.5 px-4">Medication Name</th>
               <th className="py-2.5 px-3">Patient</th>
               <th className="py-2.5 px-3 text-center">Fulfillment Status</th>
@@ -553,19 +553,19 @@ export function PrescriptionFulfillment() {
               <th className="py-2.5 px-3 text-center">Action</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#e6e9ef]">
+          <tbody className="divide-y divide-canvas-silk">
             {prescriptions.map((p) => (
-              <tr key={p.id} className="hover:bg-[#f0f2f7] transition-colors">
+              <tr key={p.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 transition-colors">
                 <td className="py-3 px-4 font-extrabold text-slate-900 dark:text-slate-100">
                   <div className="flex items-center gap-1.5">
-                    <Pill className="h-3.5 w-3.5 text-[#0073ea]" />
+                    <Pill className="h-3.5 w-3.5 text-primary-500" />
                     <span>{p.medication_name}</span>
                   </div>
                   {p.quantity && (
                     <span className="text-[10px] text-slate-400 font-normal">Qty: {p.quantity} units</span>
                   )}
                 </td>
-                <td className="py-3 px-3 font-bold text-[#0073ea]">{p.patient_name}</td>
+                <td className="py-3 px-3 font-bold text-primary-500">{p.patient_name}</td>
                 <td className="py-3 px-3 text-center">{getStatusPill(p.fulfillment_status || "pending")}</td>
                 <td className="py-3 px-3">
                   <div className="font-semibold">{p.dosage}</div>
@@ -582,7 +582,7 @@ export function PrescriptionFulfillment() {
                     <select
                       value={p.fulfillment_status || "pending"}
                       onChange={(e) => updateFulfillmentStatus(p.id, e.target.value)}
-                      className="p-1 rounded-lg border border-[#c3c6d4] text-xs font-bold bg-white dark:bg-slate-800"
+                      className="p-1 rounded-lg border border-graphite-300 dark:border-slate-700 text-xs font-bold bg-white dark:bg-slate-800"
                     >
                       <option value="pending">Pending</option>
                       <option value="partially_filled">Partially Filled</option>
@@ -591,7 +591,7 @@ export function PrescriptionFulfillment() {
                     </select>
                     <button
                       onClick={() => handlePrintSlip(p)}
-                      className="p-1.5 rounded-lg border border-[#e6e9ef] hover:bg-[#0073ea] hover:text-white transition-colors"
+                      className="p-1.5 rounded-lg border border-canvas-silk hover:bg-primary-500 hover:text-white transition-colors"
                       title="Print Dispensing Slip"
                     >
                       <Printer className="h-3.5 w-3.5" />

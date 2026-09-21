@@ -370,7 +370,7 @@ export const Auth = () => {
                   <FormField control={loginForm.control} name="email" render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-sm font-medium text-graphite-600">Email Address</FormLabel>
-                      <FormControl><Input placeholder="you@example.online" {...field} type="email" className="h-11 text-sm font-medium border-canvas-silk focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20" /></FormControl>
+                      <FormControl><Input placeholder="you@example.online" {...field} type="email" autoComplete="email" className="h-11 text-sm font-medium border-canvas-silk focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20" /></FormControl>
                       <FormMessage className="text-xs font-medium text-error-500" />
                     </FormItem>
                   )} />
@@ -382,9 +382,11 @@ export const Auth = () => {
                       </div>
                       <FormControl>
                         <div className="relative">
-                          <Input type={showPassword ? "text" : "password"} placeholder="••••••••" {...field} className="h-11 text-sm font-medium border-canvas-silk focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 pr-10" />
+                          <Input type={showPassword ? "text" : "password"} placeholder="••••••••" autoComplete="current-password" {...field} className="h-11 text-sm font-medium border-canvas-silk focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 pr-10" />
                           <button type="button" onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-graphite-400">
+                            aria-label={showPassword ? "Hide password" : "Show password"}
+                            aria-pressed={showPassword}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-md text-graphite-400 hover:text-midnight">
                             {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                           </button>
                         </div>
@@ -405,7 +407,7 @@ export const Auth = () => {
 
               {signupPath && (
                 <button onClick={() => setSignupPath(null)}
-                  className="flex items-center gap-1 text-xs font-bold text-[#0073ea] hover:underline mb-4">
+                  className="flex items-center gap-1 text-xs font-bold text-primary-500 hover:underline mb-4">
                   <ArrowLeft className="h-3.5 w-3.5" /> Back to account options
                 </button>
               )}
@@ -413,35 +415,35 @@ export const Auth = () => {
               {/* Patient Form */}
               {signupPath === "patient" && (
                 <div className="space-y-4">
-                  <p className="text-xs font-extrabold text-[#0073ea] uppercase tracking-wide">Patient Account Options</p>
-                  <Link to="/patient-registration" className="block w-full py-3 rounded-xl bg-[#0073ea] hover:bg-[#0060c4] text-white font-extrabold text-sm shadow-md transition-all text-center">
+                  <p className="text-xs font-extrabold text-primary-500 uppercase tracking-wide">Patient Account Options</p>
+                  <Link to="/patient-registration" className="block w-full py-3 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-sm shadow-md transition-all text-center">
                     Full Registration with Onboarding
                   </Link>
-                  <div className="text-center text-xs text-[#676879] font-medium">or quick signup</div>
+                  <div className="text-center text-xs text-graphite-500 dark:text-slate-400 font-medium">or quick signup</div>
                   <Form {...patientForm}>
                     <form onSubmit={patientForm.handleSubmit(onPatientSignup)} className="space-y-3">
                       <div className="grid grid-cols-2 gap-2">
                         <FormField control={patientForm.control} name="firstName" render={({ field }) => (
-                          <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">First Name</FormLabel><FormControl><Input {...field} className="h-9 text-xs border-[#c3c6d4]" /></FormControl><FormMessage /></FormItem>
+                          <FormItem><FormLabel className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">First Name</FormLabel><FormControl><Input {...field} className="h-9 text-xs border-graphite-300 dark:border-slate-700" /></FormControl><FormMessage /></FormItem>
                         )} />
                         <FormField control={patientForm.control} name="lastName" render={({ field }) => (
-                          <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Last Name</FormLabel><FormControl><Input {...field} className="h-9 text-xs border-[#c3c6d4]" /></FormControl><FormMessage /></FormItem>
+                          <FormItem><FormLabel className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Last Name</FormLabel><FormControl><Input {...field} className="h-9 text-xs border-graphite-300 dark:border-slate-700" /></FormControl><FormMessage /></FormItem>
                         )} />
                       </div>
                       <FormField control={patientForm.control} name="email" render={({ field }) => (
-                        <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Email</FormLabel><FormControl><Input {...field} type="email" className="h-9 text-xs border-[#c3c6d4]" /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Email</FormLabel><FormControl><Input {...field} type="email" className="h-9 text-xs border-graphite-300 dark:border-slate-700" /></FormControl><FormMessage /></FormItem>
                       )} />
                       <FormField control={patientForm.control} name="phone" render={({ field }) => (
-                        <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Phone</FormLabel><FormControl><Input {...field} type="tel" placeholder="+260..." className="h-9 text-xs border-[#c3c6d4]" /></FormControl></FormItem>
+                        <FormItem><FormLabel className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Phone</FormLabel><FormControl><Input {...field} type="tel" placeholder="+260..." className="h-9 text-xs border-graphite-300 dark:border-slate-700" /></FormControl></FormItem>
                       )} />
                       <FormField control={patientForm.control} name="password" render={({ field }) => (
-                        <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Password</FormLabel><FormControl><Input type="password" {...field} className="h-9 text-xs border-[#c3c6d4]" /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Password</FormLabel><FormControl><Input type="password" autoComplete="new-password" {...field} className="h-9 text-xs border-graphite-300 dark:border-slate-700" /></FormControl><FormMessage /></FormItem>
                       )} />
                       <FormField control={patientForm.control} name="confirmPassword" render={({ field }) => (
-                        <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Confirm Password</FormLabel><FormControl><Input type="password" {...field} className="h-9 text-xs border-[#c3c6d4]" /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Confirm Password</FormLabel><FormControl><Input type="password" autoComplete="new-password" {...field} className="h-9 text-xs border-graphite-300 dark:border-slate-700" /></FormControl><FormMessage /></FormItem>
                       )} />
                       <TermsAcceptance checked={patientForm.watch("termsAccepted")} onChange={(checked) => patientForm.setValue("termsAccepted", checked, { shouldValidate: true })} error={patientForm.formState.errors.termsAccepted?.message} />
-                      <button type="submit" disabled={localLoading} className="w-full py-3 rounded-xl bg-[#0073ea] hover:bg-[#0060c4] text-white font-extrabold text-sm shadow-md transition-all">
+                      <button type="submit" disabled={localLoading} className="w-full py-3 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-sm shadow-md transition-all">
                         Quick Sign Up
                       </button>
                     </form>
@@ -453,20 +455,20 @@ export const Auth = () => {
               {signupPath === "provider" && (
                 <Form {...providerForm}>
                   <form onSubmit={providerForm.handleSubmit(onProviderSignup)} className="space-y-3">
-                    <p className="text-xs font-extrabold text-[#00c875] uppercase tracking-wide">Healthcare Professional Registration</p>
+                    <p className="text-xs font-extrabold text-success-500 uppercase tracking-wide">Healthcare Professional Registration</p>
                     <div className="grid grid-cols-2 gap-2">
                       <FormField control={providerForm.control} name="firstName" render={({ field }) => (
-                        <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">First Name</FormLabel><FormControl><Input {...field} className="h-9 text-xs border-[#c3c6d4]" /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">First Name</FormLabel><FormControl><Input {...field} className="h-9 text-xs border-graphite-300 dark:border-slate-700" /></FormControl><FormMessage /></FormItem>
                       )} />
                       <FormField control={providerForm.control} name="lastName" render={({ field }) => (
-                        <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Last Name</FormLabel><FormControl><Input {...field} className="h-9 text-xs border-[#c3c6d4]" /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Last Name</FormLabel><FormControl><Input {...field} className="h-9 text-xs border-graphite-300 dark:border-slate-700" /></FormControl><FormMessage /></FormItem>
                       )} />
                     </div>
                     <FormField control={providerForm.control} name="providerType" render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Profession</FormLabel>
+                        <FormLabel className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Profession</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl><SelectTrigger className="h-9 border-[#c3c6d4] text-xs font-bold"><SelectValue placeholder="Select profession" /></SelectTrigger></FormControl>
+                          <FormControl><SelectTrigger className="h-9 border-graphite-300 dark:border-slate-700 text-xs font-bold"><SelectValue placeholder="Select profession" /></SelectTrigger></FormControl>
                           <SelectContent>
                             {providerTypes.map((t) => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
                           </SelectContent>
@@ -475,19 +477,19 @@ export const Auth = () => {
                       </FormItem>
                     )} />
                     <FormField control={providerForm.control} name="licenseNumber" render={({ field }) => (
-                      <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">License / Reg. Number</FormLabel><FormControl><Input {...field} className="h-9 text-xs border-[#c3c6d4]" /></FormControl><FormMessage /></FormItem>
+                      <FormItem><FormLabel className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">License / Reg. Number</FormLabel><FormControl><Input {...field} className="h-9 text-xs border-graphite-300 dark:border-slate-700" /></FormControl><FormMessage /></FormItem>
                     )} />
                     <FormField control={providerForm.control} name="email" render={({ field }) => (
-                      <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Email</FormLabel><FormControl><Input {...field} type="email" className="h-9 text-xs border-[#c3c6d4]" /></FormControl><FormMessage /></FormItem>
+                      <FormItem><FormLabel className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Email</FormLabel><FormControl><Input {...field} type="email" className="h-9 text-xs border-graphite-300 dark:border-slate-700" /></FormControl><FormMessage /></FormItem>
                     )} />
                     <FormField control={providerForm.control} name="password" render={({ field }) => (
-                      <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Password</FormLabel><FormControl><Input type="password" {...field} className="h-9 text-xs border-[#c3c6d4]" /></FormControl><FormMessage /></FormItem>
+                      <FormItem><FormLabel className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Password</FormLabel><FormControl><Input type="password" autoComplete="new-password" {...field} className="h-9 text-xs border-graphite-300 dark:border-slate-700" /></FormControl><FormMessage /></FormItem>
                     )} />
                     <FormField control={providerForm.control} name="confirmPassword" render={({ field }) => (
-                      <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Confirm Password</FormLabel><FormControl><Input type="password" {...field} className="h-9 text-xs border-[#c3c6d4]" /></FormControl><FormMessage /></FormItem>
+                      <FormItem><FormLabel className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Confirm Password</FormLabel><FormControl><Input type="password" autoComplete="new-password" {...field} className="h-9 text-xs border-graphite-300 dark:border-slate-700" /></FormControl><FormMessage /></FormItem>
                     )} />
                     <TermsAcceptance checked={providerForm.watch("termsAccepted")} onChange={(checked) => providerForm.setValue("termsAccepted", checked, { shouldValidate: true })} error={providerForm.formState.errors.termsAccepted?.message} />
-                    <button type="submit" disabled={localLoading} className="w-full py-3 rounded-xl bg-[#00c875] hover:bg-[#00b368] text-white font-extrabold text-sm shadow-md transition-all">
+                    <button type="submit" disabled={localLoading} className="w-full py-3 rounded-xl bg-success-500 hover:bg-success-500 text-white font-extrabold text-sm shadow-md transition-all">
                       Create Professional Account
                     </button>
                   </form>
@@ -498,12 +500,12 @@ export const Auth = () => {
               {signupPath === "business" && (
                 <Form {...businessForm}>
                   <form onSubmit={businessForm.handleSubmit(onBusinessSignup)} className="space-y-3">
-                    <p className="text-xs font-extrabold text-[#a25ddc] uppercase tracking-wide">Healthcare Facility Registration</p>
+                    <p className="text-xs font-extrabold text-purple-500 uppercase tracking-wide">Healthcare Facility Registration</p>
                     <FormField control={businessForm.control} name="businessType" render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Facility Type</FormLabel>
+                        <FormLabel className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Facility Type</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl><SelectTrigger className="h-9 border-[#c3c6d4] text-xs font-bold"><SelectValue placeholder="Facility type" /></SelectTrigger></FormControl>
+                          <FormControl><SelectTrigger className="h-9 border-graphite-300 dark:border-slate-700 text-xs font-bold"><SelectValue placeholder="Facility type" /></SelectTrigger></FormControl>
                           <SelectContent>
                             {businessTypes.map((t) => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
                           </SelectContent>
@@ -512,28 +514,28 @@ export const Auth = () => {
                       </FormItem>
                     )} />
                     <FormField control={businessForm.control} name="businessName" render={({ field }) => (
-                      <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Facility Name</FormLabel><FormControl><Input {...field} placeholder="e.g. MedPharm Healthcare" className="h-9 text-xs border-[#c3c6d4]" /></FormControl><FormMessage /></FormItem>
+                      <FormItem><FormLabel className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Facility Name</FormLabel><FormControl><Input {...field} placeholder="e.g. MedPharm Healthcare" className="h-9 text-xs border-graphite-300 dark:border-slate-700" /></FormControl><FormMessage /></FormItem>
                     )} />
                     <div className="grid grid-cols-2 gap-2">
                       <FormField control={businessForm.control} name="adminFirstName" render={({ field }) => (
-                        <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Admin First Name</FormLabel><FormControl><Input {...field} className="h-9 text-xs border-[#c3c6d4]" /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Admin First Name</FormLabel><FormControl><Input {...field} className="h-9 text-xs border-graphite-300 dark:border-slate-700" /></FormControl><FormMessage /></FormItem>
                       )} />
                       <FormField control={businessForm.control} name="adminLastName" render={({ field }) => (
-                        <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Admin Last Name</FormLabel><FormControl><Input {...field} className="h-9 text-xs border-[#c3c6d4]" /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Admin Last Name</FormLabel><FormControl><Input {...field} className="h-9 text-xs border-graphite-300 dark:border-slate-700" /></FormControl><FormMessage /></FormItem>
                       )} />
                     </div>
                     <FormField control={businessForm.control} name="email" render={({ field }) => (
-                      <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Facility Email</FormLabel><FormControl><Input {...field} type="email" className="h-9 text-xs border-[#c3c6d4]" /></FormControl><FormMessage /></FormItem>
+                      <FormItem><FormLabel className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Facility Email</FormLabel><FormControl><Input {...field} type="email" className="h-9 text-xs border-graphite-300 dark:border-slate-700" /></FormControl><FormMessage /></FormItem>
                     )} />
                     <div className="grid grid-cols-2 gap-2">
                       <FormField control={businessForm.control} name="city" render={({ field }) => (
-                        <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">City</FormLabel><FormControl><Input {...field} className="h-9 text-xs border-[#c3c6d4]" /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">City</FormLabel><FormControl><Input {...field} className="h-9 text-xs border-graphite-300 dark:border-slate-700" /></FormControl><FormMessage /></FormItem>
                       )} />
                       <FormField control={businessForm.control} name="country" render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Country</FormLabel>
+                          <FormLabel className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Country</FormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl><SelectTrigger className="h-9 border-[#c3c6d4] text-xs"><SelectValue placeholder="Select country" /></SelectTrigger></FormControl>
+                            <FormControl><SelectTrigger className="h-9 border-graphite-300 dark:border-slate-700 text-xs"><SelectValue placeholder="Select country" /></SelectTrigger></FormControl>
                             <SelectContent>
                               {countries.map((c) => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
                             </SelectContent>
@@ -543,13 +545,13 @@ export const Auth = () => {
                       )} />
                     </div>
                     <FormField control={businessForm.control} name="password" render={({ field }) => (
-                      <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Password</FormLabel><FormControl><Input type="password" {...field} className="h-9 text-xs border-[#c3c6d4]" /></FormControl><FormMessage /></FormItem>
+                      <FormItem><FormLabel className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Password</FormLabel><FormControl><Input type="password" autoComplete="new-password" {...field} className="h-9 text-xs border-graphite-300 dark:border-slate-700" /></FormControl><FormMessage /></FormItem>
                     )} />
                     <FormField control={businessForm.control} name="confirmPassword" render={({ field }) => (
-                      <FormItem><FormLabel className="text-xs font-extrabold text-[#676879] uppercase">Confirm Password</FormLabel><FormControl><Input type="password" {...field} className="h-9 text-xs border-[#c3c6d4]" /></FormControl><FormMessage /></FormItem>
+                      <FormItem><FormLabel className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Confirm Password</FormLabel><FormControl><Input type="password" autoComplete="new-password" {...field} className="h-9 text-xs border-graphite-300 dark:border-slate-700" /></FormControl><FormMessage /></FormItem>
                     )} />
                     <TermsAcceptance checked={businessForm.watch("termsAccepted")} onChange={(checked) => businessForm.setValue("termsAccepted", checked, { shouldValidate: true })} error={businessForm.formState.errors.termsAccepted?.message} />
-                    <button type="submit" disabled={localLoading} className="w-full py-3 rounded-xl bg-[#a25ddc] hover:bg-[#8e49c7] text-white font-extrabold text-sm shadow-md transition-all">
+                    <button type="submit" disabled={localLoading} className="w-full py-3 rounded-xl bg-purple-500 hover:bg-purple-600 text-white font-extrabold text-sm shadow-md transition-all">
                       Register Business
                     </button>
                   </form>

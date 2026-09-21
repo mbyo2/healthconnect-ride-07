@@ -32,7 +32,7 @@ export const WorkOSKanbanBoard: React.FC<WorkOSKanbanBoardProps> = ({
   };
 
   return (
-    <div className={`p-4 sm:p-6 overflow-x-auto min-h-[700px] transition-colors ${isDarkMode ? "bg-slate-950 text-slate-100" : "bg-[#f5f6f8] text-slate-900"}`}>
+    <div className={`p-4 sm:p-6 overflow-x-auto min-h-[700px] transition-colors ${isDarkMode ? "bg-slate-950 text-slate-100" : "bg-canvas text-slate-900"}`}>
       <div className="flex items-start gap-4 min-w-[1300px] pb-6">
         {KANBAN_STATUSES.map((status) => {
           const columnPatients = patients.filter((p) => p.status === status);

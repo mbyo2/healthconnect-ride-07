@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -32,6 +32,22 @@ export const EmergencyTriage = ({ hospital }: { hospital: any }) => {
     'emergency_cases', 'hospital_id', hospital?.id, { orderBy: 'arrival_time', ascending: false }
   );
   const { nameFor } = usePatientNames(cases.map(c => c.patient_id));
+
+  // Lives depend on new arrivals appearing instantly — subscribe, don't poll.
+  useEffect(() => {
+    if (!hospital?.id) return;
+    const channel = supabase
+      .channel(`emergency-cases-${hospital.id}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'emergency_cases', filter: `hospital_id=eq.${hospital.id}` },
+        () => refresh()
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [hospital?.id, refresh]);
 
   // New-case intake state
   const [showNewCase, setShowNewCase] = useState(false);

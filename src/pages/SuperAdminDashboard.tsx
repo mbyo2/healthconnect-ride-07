@@ -103,8 +103,8 @@ const SuperAdminDashboard = () => {
       cell: ({ row }) => {
         const level = row.getValue("admin_level") as AdminLevel;
         return level === "superadmin"
-          ? <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold text-white bg-[#a25ddc]">Super Admin</span>
-          : <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold text-white bg-[#0073ea]">Admin</span>;
+          ? <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold text-white bg-purple-500">Super Admin</span>
+          : <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold text-white bg-primary-500">Admin</span>;
       },
     },
     {
@@ -124,13 +124,13 @@ const SuperAdminDashboard = () => {
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="border border-[#e6e9ef] rounded-xl bg-white">
-              <DropdownMenuLabel className="text-xs font-extrabold text-[#676879] uppercase">Actions</DropdownMenuLabel>
+            <DropdownMenuContent align="end" className="border border-canvas-silk rounded-xl bg-white">
+              <DropdownMenuLabel className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Actions</DropdownMenuLabel>
               <DropdownMenuItem onClick={() => toggleAdminLevel(admin.id, admin.admin_level)} className="text-xs font-bold">
                 {admin.admin_level === "admin" ? "Promote to Superadmin" : "Change to Admin"}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-xs font-bold text-[#e2445c]">Remove Admin Access</DropdownMenuItem>
+              <DropdownMenuItem className="text-xs font-bold text-error-500">Remove Admin Access</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         );
@@ -143,7 +143,7 @@ const SuperAdminDashboard = () => {
   return (
     <div className="min-h-screen bg-canvas text-midnight font-sans pb-16">
       {/* Top Bar */}
-      <div className="bg-white border-b border-canvas-silk px-4 sm:px-6 py-5 sticky top-0 z-30 shadow-sm">
+      <div className="bg-white dark:bg-slate-900 border-b border-canvas-silk dark:border-slate-800 px-4 sm:px-6 py-5 sticky top-0 z-30 shadow-sm">
         <div className="max-w-content mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-xl bg-accent-500 text-white flex items-center justify-center shadow-button">
@@ -209,27 +209,27 @@ const SuperAdminDashboard = () => {
             { label: "Access Controls", value: "Active", sub: "Role-based security enabled", color: "#00c875", icon: <Settings className="h-5 w-5" /> },
             { label: "Users Managed", value: "All", sub: "Full platform access", color: "#0073ea", icon: <Users className="h-5 w-5" /> },
           ].map((card) => (
-            <div key={card.label} className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-[#e6e9ef] shadow-xs">
+            <div key={card.label} className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk shadow-xs">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-extrabold text-[#676879] uppercase">{card.label}</span>
+                <span className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">{card.label}</span>
                 <span style={{ color: card.color }}>{card.icon}</span>
               </div>
               <div className="text-2xl font-black font-mono" style={{ color: card.color }}>{card.value}</div>
-              <div className="text-[10px] text-[#676879] font-bold mt-0.5">{card.sub}</div>
+              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">{card.sub}</div>
             </div>
           ))}
         </div>
 
         {/* Admin Management Table */}
-        <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
+        <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
           <h2 className="font-extrabold text-sm mb-4 flex items-center gap-2">
-            <Shield className="h-4 w-4 text-[#a25ddc]" /> Admin & Superadmin Management
+            <Shield className="h-4 w-4 text-purple-500" /> Admin & Superadmin Management
           </h2>
           <DataTable columns={adminColumns} data={admins} searchColumn="email" />
         </div>
 
         {/* DPO Payments Admin */}
-        <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
+        <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
           <DPOPaymentsAdmin />
         </div>
       </div>

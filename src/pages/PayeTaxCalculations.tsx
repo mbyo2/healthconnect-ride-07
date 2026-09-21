@@ -212,10 +212,10 @@ export const PayeTaxCalculations = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "processed": return "bg-[#00c875] text-white";
-      case "pending": return "bg-[#fdab3d] text-white";
-      case "failed": return "bg-[#e44258] text-white";
-      default: return "bg-[#676879] text-white";
+      case "processed": return "bg-success-500 text-white";
+      case "pending": return "bg-warning-500 text-white";
+      case "failed": return "bg-error-500 text-white";
+      default: return "bg-graphite-500 dark:bg-slate-600 text-white";
     }
   };
 
@@ -223,13 +223,13 @@ export const PayeTaxCalculations = () => {
 
   if (!institution) {
     return (
-      <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 flex items-center justify-center p-6">
+      <div className="min-h-screen bg-canvas dark:bg-slate-950 flex items-center justify-center p-6">
         <Card className="max-w-md w-full">
           <CardContent className="p-8 text-center space-y-4">
-            <Building2 className="h-12 w-12 mx-auto text-[#0073ea]" />
+            <Building2 className="h-12 w-12 mx-auto text-primary-500" />
             <h2 className="text-xl font-extrabold">Institution Required</h2>
-            <p className="text-xs text-[#676879]">Please select an institution to access PAYE calculations.</p>
-            <Button onClick={() => navigate("/institution-portal")} className="bg-[#0073ea] hover:bg-[#0056b3]">
+            <p className="text-xs text-graphite-500 dark:text-slate-400">Please select an institution to access PAYE calculations.</p>
+            <Button onClick={() => navigate("/institution-portal")} className="bg-primary-500 hover:bg-primary-600">
               Go to Institution Portal
             </Button>
           </CardContent>
@@ -244,23 +244,23 @@ export const PayeTaxCalculations = () => {
   const pendingPayroll = payroll.filter((p) => p.status === "pending").length;
 
   return (
-    <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pb-16">
+    <div className="min-h-screen bg-canvas dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pb-16">
       {/* Header */}
-      <div className="bg-white dark:bg-slate-900 border-b border-[#e6e9ef] dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
+      <div className="bg-white dark:bg-slate-900 border-b border-canvas-silk dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
         <div className="max-w-[1600px] mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-[#0073ea] text-white flex items-center justify-center shadow-xs">
+            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-xs">
               <Calculator className="h-5 w-5" />
             </div>
             <div>
               <h1 className="text-xl font-extrabold">PAYE Tax Calculations</h1>
-              <p className="text-xs text-[#676879] font-medium">Zambian Pay-As-You-Earn Tax Slabs & Payroll</p>
+              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">Zambian Pay-As-You-Earn Tax Slabs & Payroll</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <Dialog open={showSlabDialog} onOpenChange={setShowSlabDialog}>
               <DialogTrigger asChild>
-                <Button className="bg-[#0073ea] hover:bg-[#0056b3] text-white font-bold text-xs flex items-center gap-2">
+                <Button className="bg-primary-500 hover:bg-primary-600 text-white font-bold text-xs flex items-center gap-2">
                   <Plus className="h-4 w-4" /> Add Tax Slab
                 </Button>
               </DialogTrigger>
@@ -337,7 +337,7 @@ export const PayeTaxCalculations = () => {
                       className="mt-1"
                     />
                   </div>
-                  <Button onClick={handleCreateSlab} className="w-full bg-[#0073ea] hover:bg-[#0056b3] text-white font-bold">
+                  <Button onClick={handleCreateSlab} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold">
                     Add Tax Slab
                   </Button>
                 </div>
@@ -395,7 +395,7 @@ export const PayeTaxCalculations = () => {
                       className="mt-1"
                     />
                   </div>
-                  <Button onClick={handleCalculatePaye} className="w-full bg-[#0073ea] hover:bg-[#0056b3] text-white font-bold">
+                  <Button onClick={handleCalculatePaye} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold">
                     Calculate PAYE
                   </Button>
                 </div>
@@ -408,62 +408,62 @@ export const PayeTaxCalculations = () => {
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 pt-6">
         {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-[#676879] uppercase">Active Tax Slabs</span>
-                <BarChart3 className="h-4 w-4 text-[#0073ea]" />
+                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Active Tax Slabs</span>
+                <BarChart3 className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-[#0073ea]">{activeSlabs}</div>
-              <div className="text-[10px] text-[#676879] font-bold mt-0.5">Configured bands</div>
+              <div className="text-2xl font-black font-mono text-primary-500">{activeSlabs}</div>
+              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Configured bands</div>
             </CardContent>
           </Card>
-          <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-[#676879] uppercase">Total PAYE Collected</span>
-                <DollarSign className="h-4 w-4 text-[#00c875]" />
+                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Total PAYE Collected</span>
+                <DollarSign className="h-4 w-4 text-success-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-[#00c875]">
+              <div className="text-2xl font-black font-mono text-success-500">
                 {institution.currency || "ZMW"} {(totalPayeCollected / 1000).toFixed(1)}k
               </div>
-              <div className="text-[10px] text-[#676879] font-bold mt-0.5">This period</div>
+              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">This period</div>
             </CardContent>
           </Card>
-          <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-[#676879] uppercase">Processed Payroll</span>
-                <CheckCircle className="h-4 w-4 text-[#a25ddc]" />
+                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Processed Payroll</span>
+                <CheckCircle className="h-4 w-4 text-purple-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-[#a25ddc]">{processedPayroll}</div>
-              <div className="text-[10px] text-[#676879] font-bold mt-0.5">Completed runs</div>
+              <div className="text-2xl font-black font-mono text-purple-500">{processedPayroll}</div>
+              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Completed runs</div>
             </CardContent>
           </Card>
-          <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-[#676879] uppercase">Pending Payroll</span>
-                <Clock className="h-4 w-4 text-[#fdab3d]" />
+                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Pending Payroll</span>
+                <Clock className="h-4 w-4 text-warning-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-[#fdab3d]">{pendingPayroll}</div>
-              <div className="text-[10px] text-[#676879] font-bold mt-0.5">Awaiting processing</div>
+              <div className="text-2xl font-black font-mono text-warning-500">{pendingPayroll}</div>
+              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Awaiting processing</div>
             </CardContent>
           </Card>
         </div>
 
         <Tabs defaultValue="slabs" className="space-y-6">
-          <TabsList className="bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 p-1">
-            <TabsTrigger value="slabs" className="data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">
+          <TabsList className="bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 p-1">
+            <TabsTrigger value="slabs" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <BarChart3 className="h-4 w-4 mr-2" /> Tax Slabs
             </TabsTrigger>
-            <TabsTrigger value="calculations" className="data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">
+            <TabsTrigger value="calculations" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <Calculator className="h-4 w-4 mr-2" /> Calculations
             </TabsTrigger>
-            <TabsTrigger value="payroll" className="data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">
+            <TabsTrigger value="payroll" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <FileText className="h-4 w-4 mr-2" /> Payroll
             </TabsTrigger>
-            <TabsTrigger value="statutory" className="data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">
+            <TabsTrigger value="statutory" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <Users className="h-4 w-4 mr-2" /> Statutory Deductions
             </TabsTrigger>
           </TabsList>
@@ -479,39 +479,39 @@ export const PayeTaxCalculations = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {taxSlabs.map((slab) => (
-                <Card key={slab.id} className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+                <Card key={slab.id} className="border-canvas-silk dark:border-slate-800 shadow-xs">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div>
                         <CardTitle className="text-sm font-extrabold">{slab.slab_name}</CardTitle>
-                        <div className="text-[10px] text-[#676879]">
+                        <div className="text-[10px] text-graphite-500 dark:text-slate-400">
                           {new Date(slab.effective_from).toLocaleDateString()}
                         </div>
                       </div>
                       {slab.is_active ? (
-                        <Badge className="bg-[#00c875] text-white text-[10px]">Active</Badge>
+                        <Badge className="bg-success-500 text-white text-[10px]">Active</Badge>
                       ) : (
-                        <Badge className="bg-[#676879] text-white text-[10px]">Inactive</Badge>
+                        <Badge className="bg-graphite-500 dark:bg-slate-600 text-white text-[10px]">Inactive</Badge>
                       )}
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-[#676879]">Income Range</span>
+                      <span className="text-graphite-500 dark:text-slate-400">Income Range</span>
                       <span className="font-bold">
                         ZMW {slab.min_income.toLocaleString()} - {slab.max_income ? slab.max_income.toLocaleString() : "∞"}
                       </span>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-[#676879]">Fixed Amount</span>
+                      <span className="text-graphite-500 dark:text-slate-400">Fixed Amount</span>
                       <span className="font-bold">ZMW {slab.fixed_amount.toFixed(2)}</span>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-[#676879]">Plus % Above Min</span>
-                      <span className="font-bold text-[#a25ddc]">{slab.plus_percentage_above_min}%</span>
+                      <span className="text-graphite-500 dark:text-slate-400">Plus % Above Min</span>
+                      <span className="font-bold text-purple-500">{slab.plus_percentage_above_min}%</span>
                     </div>
-                    <div className="flex items-center justify-between pt-2 border-t border-[#e6e9ef] dark:border-slate-800">
-                      <div className="text-xs text-[#676879]">
+                    <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
+                      <div className="text-xs text-graphite-500 dark:text-slate-400">
                         {slab.description || "No description"}
                       </div>
                       <div className="flex items-center gap-1">
@@ -547,9 +547,9 @@ export const PayeTaxCalculations = () => {
               </Button>
             </div>
 
-            <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs overflow-hidden">
+            <Card className="border-canvas-silk dark:border-slate-800 shadow-xs overflow-hidden">
               <table className="w-full">
-                <thead className="bg-[#f0f2f7] dark:bg-slate-800">
+                <thead className="bg-canvas-mist dark:bg-slate-800">
                   <tr>
                     <th className="text-left text-xs font-extrabold px-4 py-3">Employee</th>
                     <th className="text-left text-xs font-extrabold px-4 py-3">Month</th>
@@ -562,13 +562,13 @@ export const PayeTaxCalculations = () => {
                 </thead>
                 <tbody>
                   {calculations.map((calc) => (
-                    <tr key={calc.id} className="border-t border-[#e6e9ef] dark:border-slate-800 hover:bg-[#f8f9fa] dark:hover:bg-slate-800">
+                    <tr key={calc.id} className="border-t border-canvas-silk dark:border-slate-800 hover:bg-canvas-bone dark:hover:bg-slate-800">
                       <td className="px-4 py-3">
                         <div className="text-xs font-bold">
                           {calc.employee?.first_name} {calc.employee?.last_name}
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-xs text-[#676879]">
+                      <td className="px-4 py-3 text-xs text-graphite-500 dark:text-slate-400">
                         {calc.calculation_month}
                       </td>
                       <td className="px-4 py-3 text-xs font-bold">
@@ -577,10 +577,10 @@ export const PayeTaxCalculations = () => {
                       <td className="px-4 py-3 text-xs font-bold">
                         {institution.currency || "ZMW"} {calc.taxable_income.toFixed(2)}
                       </td>
-                      <td className="px-4 py-3 text-xs font-bold text-[#e44258]">
+                      <td className="px-4 py-3 text-xs font-bold text-error-500">
                         {institution.currency || "ZMW"} {calc.total_paye_tax.toFixed(2)}
                       </td>
-                      <td className="px-4 py-3 text-xs text-[#676879]">
+                      <td className="px-4 py-3 text-xs text-graphite-500 dark:text-slate-400">
                         {new Date(calc.calculated_at).toLocaleDateString()}
                       </td>
                       <td className="px-4 py-3">
@@ -625,14 +625,14 @@ export const PayeTaxCalculations = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {payroll.map((pay) => (
-                <Card key={pay.id} className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+                <Card key={pay.id} className="border-canvas-silk dark:border-slate-800 shadow-xs">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div>
                         <CardTitle className="text-sm font-extrabold">
                           {pay.employee?.first_name} {pay.employee?.last_name}
                         </CardTitle>
-                        <div className="text-[10px] text-[#676879]">
+                        <div className="text-[10px] text-graphite-500 dark:text-slate-400">
                           {pay.month} {pay.year}
                         </div>
                       </div>
@@ -644,38 +644,38 @@ export const PayeTaxCalculations = () => {
                   <CardContent className="space-y-3">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <div className="text-[10px] text-[#676879]">Gross Pay</div>
+                        <div className="text-[10px] text-graphite-500 dark:text-slate-400">Gross Pay</div>
                         <div className="text-sm font-bold">
                           {institution.currency || "ZMW"} {pay.gross_pay.toFixed(2)}
                         </div>
                       </div>
                       <div>
-                        <div className="text-[10px] text-[#676879]">Net Pay</div>
-                        <div className="text-sm font-bold text-[#00c875]">
+                        <div className="text-[10px] text-graphite-500 dark:text-slate-400">Net Pay</div>
+                        <div className="text-sm font-bold text-success-500">
                           {institution.currency || "ZMW"} {pay.net_pay.toFixed(2)}
                         </div>
                       </div>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-[#676879]">PAYE Tax</span>
-                      <span className="font-bold text-[#e44258]">
+                      <span className="text-graphite-500 dark:text-slate-400">PAYE Tax</span>
+                      <span className="font-bold text-error-500">
                         {institution.currency || "ZMW"} {pay.paye_tax.toFixed(2)}
                       </span>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-[#676879]">NAPSA (Emp)</span>
-                      <span className="font-bold text-[#a25ddc]">
+                      <span className="text-graphite-500 dark:text-slate-400">NAPSA (Emp)</span>
+                      <span className="font-bold text-purple-500">
                         {institution.currency || "ZMW"} {pay.napsa_employee.toFixed(2)}
                       </span>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-[#676879]">NHIMA (Emp)</span>
-                      <span className="font-bold text-[#0073ea]">
+                      <span className="text-graphite-500 dark:text-slate-400">NHIMA (Emp)</span>
+                      <span className="font-bold text-primary-500">
                         {institution.currency || "ZMW"} {pay.nhima_employee.toFixed(2)}
                       </span>
                     </div>
-                    <div className="flex items-center justify-between pt-2 border-t border-[#e6e9ef] dark:border-slate-800">
-                      <div className="text-xs text-[#676879]">
+                    <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
+                      <div className="text-xs text-graphite-500 dark:text-slate-400">
                         Total Deductions: {institution.currency || "ZMW"} {(pay.paye_tax + pay.napsa_employee + pay.nhima_employee).toFixed(2)}
                       </div>
                       <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
@@ -690,22 +690,22 @@ export const PayeTaxCalculations = () => {
 
           {/* Statutory Deductions Tab */}
           <TabsContent value="statutory" className="space-y-4">
-            <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+            <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
               <CardHeader>
                 <CardTitle className="text-sm font-extrabold flex items-center gap-2">
-                  <Users className="h-4 w-4 text-[#0073ea]" /> NAPSA & NHIMA Statutory Deductions
+                  <Users className="h-4 w-4 text-primary-500" /> NAPSA & NHIMA Statutory Deductions
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="h-[300px] flex items-center justify-center text-[#676879] text-xs">
+                <div className="h-[300px] flex items-center justify-center text-graphite-500 dark:text-slate-400 text-xs">
                   <div className="text-center space-y-4">
                     <div className="flex justify-center gap-4">
-                      <div className="p-4 rounded-xl bg-[#f0f2f7] dark:bg-slate-800">
+                      <div className="p-4 rounded-xl bg-canvas-mist dark:bg-slate-800">
                         <div className="text-sm font-bold mb-1">NAPSA</div>
                         <div className="text-[10px]">National Pension Scheme Authority</div>
                         <div className="text-[10px] mt-1">Employee: 5% • Employer: 10%</div>
                       </div>
-                      <div className="p-4 rounded-xl bg-[#f0f2f7] dark:bg-slate-800">
+                      <div className="p-4 rounded-xl bg-canvas-mist dark:bg-slate-800">
                         <div className="text-sm font-bold mb-1">NHIMA</div>
                         <div className="text-[10px]">National Health Insurance Management Authority</div>
                         <div className="text-[10px] mt-1">Employee: 1% • Employer: 2%</div>

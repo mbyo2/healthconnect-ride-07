@@ -73,26 +73,26 @@ export const DietManagement = ({ hospital }: { hospital: any }) => {
   return (
     <div className="space-y-4 font-sans text-slate-900 dark:text-slate-100">
       {/* Action Header */}
-      <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center border-b border-[#e6e9ef] pb-3">
+      <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center border-b border-canvas-silk pb-3">
         <div>
           <h3 className="text-base font-extrabold flex items-center gap-2">
-            <Utensils className="h-5 w-5 text-[#0073ea]" />
+            <Utensils className="h-5 w-5 text-primary-500" />
             Inpatient Clinical Diet & Nutrition WorkOS
           </h3>
-          <p className="text-xs text-[#676879] font-medium">
+          <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
             Manage prescribed nutrition plans, food allergies, and dietary restrictions
           </p>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={refresh}
-            className="px-3 py-1.5 rounded-md bg-slate-100 dark:bg-slate-800 hover:bg-[#e5f0ff] font-bold text-xs flex items-center gap-1"
+            className="px-3 py-1.5 rounded-md bg-slate-100 dark:bg-slate-800 hover:bg-primary-50 dark:hover:bg-slate-800 font-bold text-xs flex items-center gap-1"
           >
             <RefreshCw className="h-3.5 w-3.5" /> Refresh
           </button>
           <button
             onClick={() => setShowPrescribeDiet(true)}
-            className="px-3.5 py-1.5 rounded-md bg-[#0073ea] hover:bg-[#0060c4] text-white font-extrabold text-xs shadow-xs transition-all flex items-center gap-1"
+            className="px-3.5 py-1.5 rounded-md bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs transition-all flex items-center gap-1"
           >
             <Plus className="h-4 w-4" /> Prescribe Diet
           </button>
@@ -101,30 +101,30 @@ export const DietManagement = ({ hospital }: { hospital: any }) => {
 
       {/* Telemetry Summary Cards */}
       <div className="grid grid-cols-3 gap-3">
-        <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-[#e6e9ef] shadow-xs text-center">
-          <Utensils className="h-5 w-5 mx-auto text-[#0073ea] mb-1" />
-          <div className="text-2xl font-black font-mono text-[#0073ea]">{activePlans.length}</div>
-          <div className="text-[10px] text-[#676879] font-bold uppercase">Active Meal Plans</div>
+        <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk shadow-xs text-center">
+          <Utensils className="h-5 w-5 mx-auto text-primary-500 mb-1" />
+          <div className="text-2xl font-black font-mono text-primary-500">{activePlans.length}</div>
+          <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold uppercase">Active Meal Plans</div>
         </div>
 
-        <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-[#e6e9ef] shadow-xs text-center">
-          <AlertTriangle className="h-5 w-5 mx-auto text-[#e2445c] mb-1" />
-          <div className="text-2xl font-black font-mono text-[#e2445c]">{withAllergies.length}</div>
-          <div className="text-[10px] text-[#676879] font-bold uppercase">Known Allergies</div>
+        <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk shadow-xs text-center">
+          <AlertTriangle className="h-5 w-5 mx-auto text-error-500 mb-1" />
+          <div className="text-2xl font-black font-mono text-error-500">{withAllergies.length}</div>
+          <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold uppercase">Known Allergies</div>
         </div>
 
-        <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-[#e6e9ef] shadow-xs text-center">
-          <CheckCircle2 className="h-5 w-5 mx-auto text-[#00c875] mb-1" />
-          <div className="text-2xl font-black font-mono text-[#00c875]">{plans.length}</div>
-          <div className="text-[10px] text-[#676879] font-bold uppercase">Total Plans Issued</div>
+        <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk shadow-xs text-center">
+          <CheckCircle2 className="h-5 w-5 mx-auto text-success-500 mb-1" />
+          <div className="text-2xl font-black font-mono text-success-500">{plans.length}</div>
+          <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold uppercase">Total Plans Issued</div>
         </div>
       </div>
 
       {/* Active Plans List */}
-      <div className="w-full overflow-x-auto rounded-xl border border-[#e6e9ef] bg-white dark:bg-slate-900 shadow-xs">
+      <div className="w-full overflow-x-auto rounded-xl border border-canvas-silk bg-white dark:bg-slate-900 shadow-xs">
         <table className="w-full text-left border-collapse text-xs">
           <thead>
-            <tr className="border-b border-[#e6e9ef] bg-[#f5f6f8] text-[11px] font-extrabold uppercase text-[#676879]">
+            <tr className="border-b border-canvas-silk bg-canvas text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
               <th className="py-2.5 px-4">Patient Name</th>
               <th className="py-2.5 px-3">Diet Category</th>
               <th className="py-2.5 px-3 text-center">Status</th>
@@ -132,14 +132,14 @@ export const DietManagement = ({ hospital }: { hospital: any }) => {
               <th className="py-2.5 px-3">Known Allergies</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#e6e9ef]">
+          <tbody className="divide-y divide-canvas-silk">
             {plans.map((p) => (
-              <tr key={p.id} className="hover:bg-[#f0f2f7] transition-colors">
+              <tr key={p.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 transition-colors">
                 <td className="py-3 px-4 font-bold text-slate-900">{nameFor(p.patient_id) || "Inpatient Resident"}</td>
-                <td className="py-3 px-3 font-semibold text-[#0073ea]">{p.diet_type || "Regular"}</td>
+                <td className="py-3 px-3 font-semibold text-primary-500">{p.diet_type || "Regular"}</td>
                 <td className="py-3 px-3 text-center">
                   {!p.end_date || p.end_date >= today ? (
-                    <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-[#00c875]">Active Plan</span>
+                    <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-success-500">Active Plan</span>
                   ) : (
                     <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-slate-400">Completed</span>
                   )}
@@ -147,7 +147,7 @@ export const DietManagement = ({ hospital }: { hospital: any }) => {
                 <td className="py-3 px-3 font-mono">
                   {p.calories_per_day ? `${p.calories_per_day} kcal/day` : "Standard Meal"}
                 </td>
-                <td className="py-3 px-3 font-bold text-[#e2445c]">
+                <td className="py-3 px-3 font-bold text-error-500">
                   {p.allergies || "None Reported"}
                 </td>
               </tr>
@@ -158,15 +158,15 @@ export const DietManagement = ({ hospital }: { hospital: any }) => {
 
       {/* Prescribe Diet Modal */}
       <Dialog open={showPrescribeDiet} onOpenChange={setShowPrescribeDiet}>
-        <DialogContent className="sm:max-w-[450px] bg-white dark:bg-slate-900 border border-[#e6e9ef]">
+        <DialogContent className="sm:max-w-[450px] bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
           <DialogHeader>
             <DialogTitle className="font-extrabold text-base">Prescribe Inpatient Diet Plan</DialogTitle>
           </DialogHeader>
           <form onSubmit={handlePrescribeDiet} className="space-y-3 py-2 text-xs">
             <div>
-              <label className="font-extrabold text-[#676879] uppercase">Diet Type *</label>
+              <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Diet Type *</label>
               <select
-                className="w-full mt-1 p-2 rounded-md border border-[#c3c6d4] font-bold"
+                className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold"
                 value={form.diet_type}
                 onChange={(e) => setForm({ ...form, diet_type: e.target.value })}
               >
@@ -177,23 +177,23 @@ export const DietManagement = ({ hospital }: { hospital: any }) => {
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="font-extrabold text-[#676879] uppercase">Start Date *</label>
+                <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Start Date *</label>
                 <input
                   type="date"
                   value={form.start_date}
                   onChange={(e) => setForm({ ...form, start_date: e.target.value })}
-                  className="w-full mt-1 p-2 rounded-md border border-[#c3c6d4] font-bold"
+                  className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold"
                   required
                 />
               </div>
               <div>
-                <label className="font-extrabold text-[#676879] uppercase">Calories / Day</label>
+                <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Calories / Day</label>
                 <input
                   type="number"
                   value={form.calories_per_day}
                   onChange={(e) => setForm({ ...form, calories_per_day: e.target.value })}
                   placeholder="1800"
-                  className="w-full mt-1 p-2 rounded-md border border-[#c3c6d4] font-bold"
+                  className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold"
                 />
               </div>
             </div>
@@ -201,7 +201,7 @@ export const DietManagement = ({ hospital }: { hospital: any }) => {
               <button type="button" onClick={() => setShowPrescribeDiet(false)} className="px-3 py-1.5 text-xs font-bold text-slate-500">
                 Cancel
               </button>
-              <button type="submit" disabled={isSubmitting} className="px-4 py-1.5 rounded-md bg-[#0073ea] text-white text-xs font-bold shadow-xs">
+              <button type="submit" disabled={isSubmitting} className="px-4 py-1.5 rounded-md bg-primary-500 text-white text-xs font-bold shadow-xs">
                 {isSubmitting ? "Saving..." : "Prescribe Diet Plan"}
               </button>
             </DialogFooter>

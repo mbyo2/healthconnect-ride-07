@@ -150,11 +150,11 @@ export const SelfServiceKiosk: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f5f7fa] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans p-6 sm:p-10 flex flex-col justify-between">
+    <div className="min-h-screen bg-canvas-bone dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans p-6 sm:p-10 flex flex-col justify-between">
       {/* Top Kiosk Header */}
-      <div className="max-w-4xl mx-auto w-full flex items-center justify-between border-b border-[#e6e9ef] dark:border-slate-800 pb-4">
+      <div className="max-w-4xl mx-auto w-full flex items-center justify-between border-b border-canvas-silk dark:border-slate-800 pb-4">
         <div className="flex items-center gap-3">
-          <div className="h-12 w-12 rounded-2xl bg-[#0073ea] text-white flex items-center justify-center font-black text-xl shadow-sm shadow-[#0073ea]/30">
+          <div className="h-12 w-12 rounded-2xl bg-primary-500 text-white flex items-center justify-center font-black text-xl shadow-sm shadow-primary-500/30">
             <Ticket className="h-6 w-6" />
           </div>
           <div>
@@ -171,7 +171,7 @@ export const SelfServiceKiosk: React.FC = () => {
         {mode !== "menu" && (
           <button
             onClick={() => setMode("menu")}
-            className="px-4 py-2 rounded-xl bg-white dark:bg-slate-900 border border-[#c3c6d4] dark:border-slate-800 text-slate-700 dark:text-slate-200 text-xs font-black flex items-center gap-1.5 shadow-xs hover:bg-[#f0f2f7]"
+            className="px-4 py-2 rounded-xl bg-white dark:bg-slate-900 border border-graphite-300 dark:border-slate-700 dark:border-slate-800 text-slate-700 dark:text-slate-200 text-xs font-black flex items-center gap-1.5 shadow-xs hover:bg-canvas-mist dark:hover:bg-slate-800"
           >
             <Home className="h-4 w-4" /> Home Screen
           </button>
@@ -196,9 +196,9 @@ export const SelfServiceKiosk: React.FC = () => {
               {/* Option 1: Check-in */}
               <button
                 onClick={() => setMode("checkin")}
-                className="p-8 rounded-3xl bg-white dark:bg-slate-900 border-2 border-[#e6e9ef] dark:border-slate-800 hover:border-[#0073ea] shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between group active:scale-95"
+                className="p-8 rounded-3xl bg-white dark:bg-slate-900 border-2 border-canvas-silk dark:border-slate-800 hover:border-primary-500 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between group active:scale-95"
               >
-                <div className="h-14 w-14 rounded-2xl bg-blue-50 dark:bg-blue-950/50 text-[#0073ea] flex items-center justify-center font-black mb-6 group-hover:bg-[#0073ea] group-hover:text-white transition-colors">
+                <div className="h-14 w-14 rounded-2xl bg-blue-50 dark:bg-blue-950/50 text-primary-500 flex items-center justify-center font-black mb-6 group-hover:bg-primary-500 group-hover:text-white transition-colors">
                   <UserCheck className="h-7 w-7" />
                 </div>
                 <div>
@@ -209,7 +209,7 @@ export const SelfServiceKiosk: React.FC = () => {
                     Have an appointment today? Enter your phone number to print your queue token.
                   </p>
                 </div>
-                <div className="mt-6 flex items-center gap-1 text-xs font-black text-[#0073ea]">
+                <div className="mt-6 flex items-center gap-1 text-xs font-black text-primary-500">
                   <span>Touch to Start</span>
                   <ArrowRight className="h-4 w-4" />
                 </div>
@@ -218,7 +218,7 @@ export const SelfServiceKiosk: React.FC = () => {
               {/* Option 2: Walk-in Registration */}
               <button
                 onClick={() => setMode("register")}
-                className="p-8 rounded-3xl bg-white dark:bg-slate-900 border-2 border-[#e6e9ef] dark:border-slate-800 hover:border-emerald-500 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between group active:scale-95"
+                className="p-8 rounded-3xl bg-white dark:bg-slate-900 border-2 border-canvas-silk dark:border-slate-800 hover:border-emerald-500 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between group active:scale-95"
               >
                 <div className="h-14 w-14 rounded-2xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 flex items-center justify-center font-black mb-6 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
                   <HeartPulse className="h-7 w-7" />
@@ -240,7 +240,7 @@ export const SelfServiceKiosk: React.FC = () => {
               {/* Option 3: Bill Payment */}
               <button
                 onClick={() => setMode("pay")}
-                className="p-8 rounded-3xl bg-white dark:bg-slate-900 border-2 border-[#e6e9ef] dark:border-slate-800 hover:border-purple-500 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between group active:scale-95"
+                className="p-8 rounded-3xl bg-white dark:bg-slate-900 border-2 border-canvas-silk dark:border-slate-800 hover:border-purple-500 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between group active:scale-95"
               >
                 <div className="h-14 w-14 rounded-2xl bg-purple-50 dark:bg-purple-950/50 text-purple-600 flex items-center justify-center font-black mb-6 group-hover:bg-purple-600 group-hover:text-white transition-colors">
                   <CreditCard className="h-7 w-7" />
@@ -264,7 +264,7 @@ export const SelfServiceKiosk: React.FC = () => {
 
         {/* 2. Check-in by Phone / ID */}
         {mode === "checkin" && (
-          <div className="max-w-md mx-auto p-8 rounded-3xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-md space-y-6">
+          <div className="max-w-md mx-auto p-8 rounded-3xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-md space-y-6">
             <div className="text-center">
               <h2 className="text-xl font-black text-slate-900 dark:text-slate-100">Patient Appointment Lookup</h2>
               <p className="text-xs text-slate-500 mt-1">Enter your registered mobile phone number</p>
@@ -274,7 +274,7 @@ export const SelfServiceKiosk: React.FC = () => {
               <label className="font-bold text-xs text-slate-700 dark:text-slate-300">Mobile Phone Number</label>
               <input
                 type="tel"
-                className="w-full mt-2 px-4 py-3 rounded-2xl border-2 border-[#c3c6d4] text-lg font-black text-center tracking-widest focus:border-[#0073ea] focus:outline-none"
+                className="w-full mt-2 px-4 py-3 rounded-2xl border-2 border-graphite-300 dark:border-slate-700 text-lg font-black text-center tracking-widest focus:border-primary-500 focus:outline-none"
                 placeholder="+260 97X XXX XXX"
                 value={phoneSearch}
                 onChange={(e) => setPhoneSearch(e.target.value)}
@@ -283,7 +283,7 @@ export const SelfServiceKiosk: React.FC = () => {
 
             <button
               onClick={handleLookupCheckin}
-              className="w-full py-3.5 rounded-2xl bg-[#0073ea] hover:bg-[#0060c4] text-white font-extrabold text-sm shadow-sm active:scale-95 transition-all"
+              className="w-full py-3.5 rounded-2xl bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-sm shadow-sm active:scale-95 transition-all"
             >
               Verify &amp; Print Token Slip
             </button>
@@ -292,7 +292,7 @@ export const SelfServiceKiosk: React.FC = () => {
 
         {/* 3. Walk-in Registration */}
         {mode === "register" && (
-          <div className="max-w-lg mx-auto p-8 rounded-3xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-md space-y-4 text-xs">
+          <div className="max-w-lg mx-auto p-8 rounded-3xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-md space-y-4 text-xs">
             <div className="text-center pb-2">
               <h2 className="text-xl font-black text-slate-900 dark:text-slate-100">Quick Walk-In Registration</h2>
               <p className="text-xs text-slate-500 mt-1">Fill in basic details for immediate triage and consultation</p>
@@ -302,7 +302,7 @@ export const SelfServiceKiosk: React.FC = () => {
               <div>
                 <label className="font-bold">First Name *</label>
                 <input
-                  className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4]"
+                  className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700"
                   value={patientData.firstName}
                   onChange={(e) => setPatientData({ ...patientData, firstName: e.target.value })}
                 />
@@ -310,7 +310,7 @@ export const SelfServiceKiosk: React.FC = () => {
               <div>
                 <label className="font-bold">Last Name</label>
                 <input
-                  className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4]"
+                  className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700"
                   value={patientData.lastName}
                   onChange={(e) => setPatientData({ ...patientData, lastName: e.target.value })}
                 />
@@ -322,7 +322,7 @@ export const SelfServiceKiosk: React.FC = () => {
                 <label className="font-bold">Mobile Phone *</label>
                 <input
                   type="tel"
-                  className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4]"
+                  className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700"
                   placeholder="+260 97..."
                   value={patientData.phone}
                   onChange={(e) => setPatientData({ ...patientData, phone: e.target.value })}
@@ -331,7 +331,7 @@ export const SelfServiceKiosk: React.FC = () => {
               <div>
                 <label className="font-bold">Target Department</label>
                 <select
-                  className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4] font-bold bg-white dark:bg-slate-950"
+                  className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-bold bg-white dark:bg-slate-950"
                   value={patientData.department}
                   onChange={(e) => setPatientData({ ...patientData, department: e.target.value })}
                 >
@@ -347,7 +347,7 @@ export const SelfServiceKiosk: React.FC = () => {
               <label className="font-bold">Chief Symptoms / Reason for Visit</label>
               <textarea
                 rows={2}
-                className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4]"
+                className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700"
                 placeholder="e.g. Fever, cough, shoulder pain, routine checkup..."
                 value={patientData.symptoms}
                 onChange={(e) => setPatientData({ ...patientData, symptoms: e.target.value })}
@@ -365,13 +365,13 @@ export const SelfServiceKiosk: React.FC = () => {
 
         {/* 4. Payment Screen */}
         {mode === "pay" && (
-          <div className="max-w-md mx-auto p-8 rounded-3xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-md space-y-5 text-xs">
+          <div className="max-w-md mx-auto p-8 rounded-3xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-md space-y-5 text-xs">
             <div className="text-center">
               <h2 className="text-xl font-black text-slate-900 dark:text-slate-100">Kiosk Bill Slip</h2>
               <p className="text-xs text-slate-500 mt-1">Pharmacy, lab, or consultation — pay at the counter or in the app</p>
             </div>
 
-            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-[#e6e9ef] flex justify-between items-center">
+            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-canvas-silk flex justify-between items-center">
               <div>
                 <span className="text-[10px] font-bold text-slate-400 uppercase">Total Bill Outstanding</span>
                 <div className="text-2xl font-black text-emerald-600 mt-0.5">K{billAmount.toFixed(2)}</div>
@@ -388,7 +388,7 @@ export const SelfServiceKiosk: React.FC = () => {
                   type="button"
                   onClick={() => setPayMethod("mtn")}
                   className={`p-3 rounded-2xl border-2 font-bold text-center transition-all ${
-                    payMethod === "mtn" ? "border-amber-400 bg-amber-50 dark:bg-amber-950/40 font-black" : "border-[#e6e9ef]"
+                    payMethod === "mtn" ? "border-amber-400 bg-amber-50 dark:bg-amber-950/40 font-black" : "border-canvas-silk dark:border-slate-800"
                   }`}
                 >
                   🟡 MTN MoMo
@@ -397,7 +397,7 @@ export const SelfServiceKiosk: React.FC = () => {
                   type="button"
                   onClick={() => setPayMethod("airtel")}
                   className={`p-3 rounded-2xl border-2 font-bold text-center transition-all ${
-                    payMethod === "airtel" ? "border-rose-400 bg-rose-50 dark:bg-rose-950/40 font-black" : "border-[#e6e9ef]"
+                    payMethod === "airtel" ? "border-rose-400 bg-rose-50 dark:bg-rose-950/40 font-black" : "border-canvas-silk dark:border-slate-800"
                   }`}
                 >
                   🔴 Airtel Money
@@ -406,7 +406,7 @@ export const SelfServiceKiosk: React.FC = () => {
                   type="button"
                   onClick={() => setPayMethod("card")}
                   className={`p-3 rounded-2xl border-2 font-bold text-center transition-all ${
-                    payMethod === "card" ? "border-[#0073ea] bg-blue-50 dark:bg-blue-950/40 font-black" : "border-[#e6e9ef]"
+                    payMethod === "card" ? "border-primary-500 bg-blue-50 dark:bg-blue-950/40 font-black" : "border-canvas-silk dark:border-slate-800"
                   }`}
                 >
                   💳 Card POS
@@ -419,7 +419,7 @@ export const SelfServiceKiosk: React.FC = () => {
                 <label className="font-bold">Mobile Money Number</label>
                 <input
                   type="tel"
-                  className="w-full mt-1 px-4 py-2.5 rounded-xl border border-[#c3c6d4] text-center font-black"
+                  className="w-full mt-1 px-4 py-2.5 rounded-xl border border-graphite-300 dark:border-slate-700 text-center font-black"
                   placeholder="097X XXX XXX"
                   value={payPhone}
                   onChange={(e) => setPayPhone(e.target.value)}
@@ -444,7 +444,7 @@ export const SelfServiceKiosk: React.FC = () => {
                   </button>
                   <button
                     onClick={() => { setBillRef(null); setMode("menu"); }}
-                    className="flex-1 py-2.5 rounded-2xl border border-[#c3c6d4] font-bold text-xs"
+                    className="flex-1 py-2.5 rounded-2xl border border-graphite-300 dark:border-slate-700 font-bold text-xs"
                   >
                     Done
                   </button>
@@ -454,7 +454,7 @@ export const SelfServiceKiosk: React.FC = () => {
               <button
                 onClick={handleProcessPayment}
                 disabled={isProcessingPay}
-                className="w-full py-3.5 rounded-2xl bg-[#0073ea] hover:bg-[#0060c4] text-white font-extrabold text-sm shadow-sm active:scale-95 transition-all disabled:opacity-50"
+                className="w-full py-3.5 rounded-2xl bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-sm shadow-sm active:scale-95 transition-all disabled:opacity-50"
               >
                 {isProcessingPay ? "Preparing Bill Slip..." : `Get Bill Slip (K${billAmount.toFixed(2)})`}
               </button>
@@ -471,12 +471,12 @@ export const SelfServiceKiosk: React.FC = () => {
 
             <div>
               <span className="text-xs font-extrabold uppercase text-slate-400 tracking-wider">Your Queue Token Number</span>
-              <div className="text-6xl font-black font-mono text-[#0073ea] mt-2">
+              <div className="text-6xl font-black font-mono text-primary-500 mt-2">
                 {generatedToken.number}
               </div>
             </div>
 
-            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-[#e6e9ef] text-xs space-y-2">
+            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-canvas-silk text-xs space-y-2">
               <div className="flex justify-between">
                 <span className="text-slate-400">Department:</span>
                 <span className="font-bold text-slate-900 dark:text-slate-100">{generatedToken.dept}</span>

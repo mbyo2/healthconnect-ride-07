@@ -65,7 +65,7 @@ export const SearchFilters = () => {
           <Filter className="h-4 w-4" />
           Filters
           {activeCount > 0 && (
-            <span className="ml-1 inline-flex items-center justify-center h-4 w-4 rounded-full bg-[#0073ea] text-white text-[10px] font-black">
+            <span className="ml-1 inline-flex items-center justify-center h-4 w-4 rounded-full bg-primary-500 text-white text-[10px] font-black">
               {activeCount}
             </span>
           )}
@@ -189,7 +189,7 @@ export const SearchFilters = () => {
               {feeMax && (
                 <button
                   onClick={() => { setFeeMax(null); applyFilters(); }}
-                  className="text-xs text-[#0073ea] hover:underline"
+                  className="text-xs text-primary-500 hover:underline"
                 >
                   Remove fee limit
                 </button>
@@ -212,16 +212,16 @@ export const SearchFilters = () => {
 
             {/* Row 5: Service toggles */}
             <div className="flex flex-wrap gap-4">
-              <div className="flex items-center gap-2 p-3 border rounded-xl border-[#e6e9ef] min-w-[180px]">
-                <Video className="h-4 w-4 text-[#0073ea]" />
+              <div className="flex items-center gap-2 p-3 border rounded-xl border-canvas-silk min-w-[180px]">
+                <Video className="h-4 w-4 text-primary-500" />
                 <Label className="cursor-pointer flex-1 text-sm">Telemedicine available</Label>
                 <Switch
                   checked={telemedicineOnly}
                   onCheckedChange={v => { setTelemedicineOnly(v); applyFilters(); }}
                 />
               </div>
-              <div className="flex items-center gap-2 p-3 border rounded-xl border-[#e6e9ef] min-w-[180px]">
-                <Home className="h-4 w-4 text-[#00c875]" />
+              <div className="flex items-center gap-2 p-3 border rounded-xl border-canvas-silk min-w-[180px]">
+                <Home className="h-4 w-4 text-success-500" />
                 <Label className="cursor-pointer flex-1 text-sm">Home visits available</Label>
                 <Switch
                   checked={homeVisitsOnly}
@@ -236,7 +236,7 @@ export const SearchFilters = () => {
                 Clear all filters
               </Button>
               {activeCount > 0 && (
-                <span className="text-xs text-[#676879]">{activeCount} filter{activeCount > 1 ? 's' : ''} active</span>
+                <span className="text-xs text-graphite-500 dark:text-slate-400">{activeCount} filter{activeCount > 1 ? 's' : ''} active</span>
               )}
             </div>
           </CardContent>

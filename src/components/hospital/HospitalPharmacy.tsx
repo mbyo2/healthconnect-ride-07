@@ -246,24 +246,24 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
   return (
     <div className="space-y-4 font-sans text-slate-900 dark:text-slate-100">
       {/* Monday Header Bar */}
-      <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center p-4 rounded-xl bg-white dark:bg-slate-900 border border-[#e6e9ef] shadow-xs">
+      <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk shadow-xs">
         <div>
           <h3 className="text-base font-extrabold flex items-center gap-2">
-            <Pill className="h-5 w-5 text-[#0073ea]" /> In-Hospital Pharmacy
+            <Pill className="h-5 w-5 text-primary-500" /> In-Hospital Pharmacy
           </h3>
-          <p className="text-xs text-[#676879] font-medium">Dispensing • Stock Management • Profit Margins • Damage Audit</p>
+          <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">Dispensing • Stock Management • Profit Margins • Damage Audit</p>
         </div>
         <div className="flex gap-1.5 flex-wrap">
-          <button className="px-3 py-1.5 rounded-md bg-[#f0f2f7] font-bold text-xs flex items-center gap-1" onClick={() => { refresh(); refreshRx(); }}>
+          <button className="px-3 py-1.5 rounded-md bg-canvas-mist dark:bg-slate-800 font-bold text-xs flex items-center gap-1" onClick={() => { refresh(); refreshRx(); }}>
             <RefreshCw className="h-3.5 w-3.5" /> Refresh
           </button>
-          <button className="px-3 py-1.5 rounded-md border border-[#c3c6d4] font-bold text-xs flex items-center gap-1" onClick={() => setShowAddDrug(true)}>
+          <button className="px-3 py-1.5 rounded-md border border-graphite-300 dark:border-slate-700 font-bold text-xs flex items-center gap-1" onClick={() => setShowAddDrug(true)}>
             <Plus className="h-3.5 w-3.5" /> Add Drug
           </button>
-          <button className="px-3 py-1.5 rounded-md bg-[#0073ea] text-white font-extrabold text-xs flex items-center gap-1" onClick={() => setShowAddRx(true)}>
+          <button className="px-3 py-1.5 rounded-md bg-primary-500 text-white font-extrabold text-xs flex items-center gap-1" onClick={() => setShowAddRx(true)}>
             <Plus className="h-3.5 w-3.5" /> New Prescription
           </button>
-          <button className="px-3 py-1.5 rounded-md bg-[#e2445c] text-white font-extrabold text-xs flex items-center gap-1" onClick={() => setShowWriteOff(true)}>
+          <button className="px-3 py-1.5 rounded-md bg-error-500 text-white font-extrabold text-xs flex items-center gap-1" onClick={() => setShowWriteOff(true)}>
             <ShieldAlert className="h-3.5 w-3.5" /> Write-Off
           </button>
         </div>
@@ -278,17 +278,17 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
           { label: "Expiry Alerts", value: expiredItems.length + nearExpiry.length, color: "#e2445c", icon: <AlertTriangle className="h-5 w-5" /> },
           { label: "Open Rx", value: pendingRx.length, color: "#a25ddc", icon: <Pill className="h-5 w-5" /> },
         ].map((c) => (
-          <div key={c.label} className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-[#e6e9ef] text-center shadow-xs">
+          <div key={c.label} className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk text-center shadow-xs">
             <div style={{ color: c.color }} className="flex justify-center mb-1">{c.icon}</div>
             <p className="text-xl font-black font-mono" style={{ color: c.color }}>{c.value}</p>
-            <p className="text-[10px] text-[#676879] font-bold uppercase">{c.label}</p>
+            <p className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold uppercase">{c.label}</p>
           </div>
         ))}
       </div>
 
       {/* Tabs */}
       <Tabs defaultValue="orders">
-        <div className="overflow-x-auto p-1 bg-white dark:bg-slate-900 rounded-xl border border-[#e6e9ef] shadow-xs">
+        <div className="overflow-x-auto p-1 bg-white dark:bg-slate-900 rounded-xl border border-canvas-silk shadow-xs">
           <TabsList className="inline-flex w-auto min-w-full h-auto gap-1 bg-transparent p-1">
             {[
               { val: "orders", label: `Prescriptions (${pendingRx.length})` },
@@ -296,7 +296,7 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
               { val: "inventory", label: `Inventory & Margins (${inventory.length})` },
               { val: "alerts", label: "Alerts & Audit" },
             ].map((t) => (
-              <TabsTrigger key={t.val} value={t.val} className="text-xs font-extrabold px-3 py-1.5 rounded-md data-[state=active]:bg-[#0073ea] data-[state=active]:text-white transition-all">{t.label}</TabsTrigger>
+              <TabsTrigger key={t.val} value={t.val} className="text-xs font-extrabold px-3 py-1.5 rounded-md data-[state=active]:bg-primary-500 data-[state=active]:text-white transition-all">{t.label}</TabsTrigger>
             ))}
           </TabsList>
         </div>
@@ -308,10 +308,10 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
           ) : pendingRx.length === 0 ? (
             <EmptyState icon={Pill} title="No prescriptions to dispense" description="Prescriptions will appear here once routed." actionLabel="Write Prescription" onAction={() => setShowAddRx(true)} />
           ) : (
-            <div className="w-full overflow-x-auto rounded-xl border border-[#e6e9ef] bg-white dark:bg-slate-900">
+            <div className="w-full overflow-x-auto rounded-xl border border-canvas-silk bg-white dark:bg-slate-900">
               <table className="w-full text-xs">
                 <thead>
-                  <tr className="border-b border-[#e6e9ef] bg-[#f5f6f8] text-[11px] font-extrabold uppercase text-[#676879]">
+                  <tr className="border-b border-canvas-silk bg-canvas text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
                     <th className="py-2.5 px-4">Patient</th>
                     <th className="py-2.5 px-3">Medication</th>
                     <th className="py-2.5 px-3">Dosage</th>
@@ -320,16 +320,16 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
                     <th className="py-2.5 px-3 text-center">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#e6e9ef]">
+                <tbody className="divide-y divide-canvas-silk">
                   {pendingRx.map(rx => (
-                    <tr key={rx.id} className="hover:bg-[#f0f2f7] transition-colors">
-                      <td className="py-3 px-4 font-bold text-[#0073ea]">{nameFor(rx.patient_id) || rx.patient_name || 'Hospital Patient'}</td>
+                    <tr key={rx.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 transition-colors">
+                      <td className="py-3 px-4 font-bold text-primary-500">{nameFor(rx.patient_id) || rx.patient_name || 'Hospital Patient'}</td>
                       <td className="py-3 px-3 font-bold text-slate-900 dark:text-slate-100">{rx.medication_name}</td>
-                      <td className="py-3 px-3 text-[#676879]">{rx.strength || rx.dosage || '—'}</td>
+                      <td className="py-3 px-3 text-graphite-500 dark:text-slate-400">{rx.strength || rx.dosage || '—'}</td>
                       <td className="py-3 px-3 font-extrabold">{rx.quantity ?? '1'}</td>
-                      <td className="py-3 px-3 text-center"><span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold text-white bg-[#fdab3d] capitalize">{rx.status}</span></td>
+                      <td className="py-3 px-3 text-center"><span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold text-white bg-warning-500 capitalize">{rx.status}</span></td>
                       <td className="py-3 px-3 text-center">
-                        <button onClick={() => openDispenseCheck(rx)} className="px-3 py-1 rounded-md bg-[#00c875] text-white text-[10px] font-extrabold flex items-center gap-1 mx-auto">
+                        <button onClick={() => openDispenseCheck(rx)} className="px-3 py-1 rounded-md bg-success-500 text-white text-[10px] font-extrabold flex items-center gap-1 mx-auto">
                           <CheckCircle2 className="h-3 w-3" /> Dispense
                         </button>
                       </td>
@@ -461,10 +461,10 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
           ) : inventory.length === 0 ? (
             <EmptyState icon={Pill} title="No pharmacy stock" description="Add drugs to enable dispensing and margin tracking." actionLabel="Add First Drug" onAction={() => setShowAddDrug(true)} />
           ) : (
-            <div className="w-full overflow-x-auto rounded-xl border border-[#e6e9ef] bg-white dark:bg-slate-900">
+            <div className="w-full overflow-x-auto rounded-xl border border-canvas-silk bg-white dark:bg-slate-900">
               <table className="w-full text-xs">
                 <thead>
-                  <tr className="border-b border-[#e6e9ef] bg-[#f5f6f8] text-[11px] font-extrabold uppercase text-[#676879]">
+                  <tr className="border-b border-canvas-silk bg-canvas text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
                     <th className="py-2.5 px-4">Drug Name</th>
                     <th className="py-2.5 px-3">Category</th>
                     <th className="py-2.5 px-3">Batch</th>
@@ -476,7 +476,7 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
                     <th className="py-2.5 px-3 text-center">Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#e6e9ef]">
+                <tbody className="divide-y divide-canvas-silk">
                   {filteredInventory.map(i => {
                     const cost = Number(i.cost_price || i.unit_price * 0.6);
                     const price = Number(i.unit_price);
@@ -484,24 +484,24 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
                     const marginPct = cost > 0 ? ((margin / cost) * 100).toFixed(1) : '0';
                     const isExpired = i.expiry_date && new Date(i.expiry_date).getTime() <= Date.now();
                     return (
-                      <tr key={i.id} className="hover:bg-[#f0f2f7] transition-colors">
+                      <tr key={i.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 transition-colors">
                         <td className="py-3 px-4 font-bold text-slate-900 dark:text-slate-100">{i.product_name}</td>
-                        <td className="py-3 px-3 text-[#676879]">{i.category || '—'}</td>
-                        <td className="py-3 px-3 text-[#676879] font-mono">{i.batch_number || '—'}</td>
+                        <td className="py-3 px-3 text-graphite-500 dark:text-slate-400">{i.category || '—'}</td>
+                        <td className="py-3 px-3 text-graphite-500 dark:text-slate-400 font-mono">{i.batch_number || '—'}</td>
                         <td className="py-3 px-3 font-extrabold text-right">{i.quantity ?? 0}</td>
-                        <td className="py-3 px-3 text-[#676879] text-right">K{cost.toFixed(2)}</td>
+                        <td className="py-3 px-3 text-graphite-500 dark:text-slate-400 text-right">K{cost.toFixed(2)}</td>
                         <td className="py-3 px-3 font-bold text-right">K{price.toFixed(2)}</td>
                         <td className="py-3 px-3 text-center">
-                          <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold text-white bg-[#00c875]">+{marginPct}%</span>
+                          <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold text-white bg-success-500">+{marginPct}%</span>
                         </td>
-                        <td className="py-3 px-3 text-[#676879]">{i.expiry_date || '—'}</td>
+                        <td className="py-3 px-3 text-graphite-500 dark:text-slate-400">{i.expiry_date || '—'}</td>
                         <td className="py-3 px-3 text-center">
                           {isExpired ? (
-                            <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold text-white bg-[#e2445c]">Expired</span>
+                            <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold text-white bg-error-500">Expired</span>
                           ) : (i.quantity ?? 0) <= (i.reorder_level ?? 20) ? (
-                            <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold text-white bg-[#fdab3d]">Low</span>
+                            <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold text-white bg-warning-500">Low</span>
                           ) : (
-                            <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold text-white bg-[#00c875]">OK</span>
+                            <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold text-white bg-success-500">OK</span>
                           )}
                         </td>
                       </tr>
@@ -516,8 +516,8 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
         {/* Alerts & Audit Tab */}
         <TabsContent value="alerts" className="space-y-3 pt-3">
           <div className="flex justify-between items-center">
-            <h4 className="text-sm font-extrabold text-slate-900 dark:text-slate-100 flex items-center gap-2"><AlertTriangle className="h-4 w-4 text-[#fdab3d]" />Stock Alerts & Damage Audit</h4>
-            <button className="px-3 py-1.5 rounded-md bg-[#e2445c] text-white text-xs font-extrabold flex items-center gap-1" onClick={() => setShowWriteOff(true)}>
+            <h4 className="text-sm font-extrabold text-slate-900 dark:text-slate-100 flex items-center gap-2"><AlertTriangle className="h-4 w-4 text-warning-500" />Stock Alerts & Damage Audit</h4>
+            <button className="px-3 py-1.5 rounded-md bg-error-500 text-white text-xs font-extrabold flex items-center gap-1" onClick={() => setShowWriteOff(true)}>
               <ShieldAlert className="h-3.5 w-3.5" /> Log Write-Off
             </button>
           </div>
@@ -527,33 +527,33 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
           ) : null}
 
           {expiredItems.map(i => (
-            <div key={`exp-${i.id}`} className="flex items-center gap-3 p-3.5 rounded-xl border border-[#e2445c]/30 bg-[#e2445c]/5">
-              <AlertTriangle className="h-5 w-5 text-[#e2445c] flex-shrink-0" />
+            <div key={`exp-${i.id}`} className="flex items-center gap-3 p-3.5 rounded-xl border border-error-500/30 bg-error-500/5">
+              <AlertTriangle className="h-5 w-5 text-error-500 flex-shrink-0" />
               <div className="flex-1">
                 <p className="text-sm font-extrabold text-slate-900 dark:text-slate-100">{i.product_name} — EXPIRED</p>
-                <p className="text-xs text-[#676879]">Expiry: {i.expiry_date} • Qty: {i.quantity} • Batch: {i.batch_number || '—'}</p>
+                <p className="text-xs text-graphite-500 dark:text-slate-400">Expiry: {i.expiry_date} • Qty: {i.quantity} • Batch: {i.batch_number || '—'}</p>
               </div>
-              <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold text-white bg-[#e2445c]">Action Needed</span>
+              <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold text-white bg-error-500">Action Needed</span>
             </div>
           ))}
 
           {nearExpiry.map(i => (
-            <div key={`near-${i.id}`} className="flex items-center gap-3 p-3.5 rounded-xl border border-[#fdab3d]/30 bg-[#fdab3d]/5">
-              <AlertTriangle className="h-5 w-5 text-[#fdab3d] flex-shrink-0" />
+            <div key={`near-${i.id}`} className="flex items-center gap-3 p-3.5 rounded-xl border border-warning-500/30 bg-warning-500/5">
+              <AlertTriangle className="h-5 w-5 text-warning-500 flex-shrink-0" />
               <div className="flex-1">
                 <p className="text-sm font-extrabold text-slate-900 dark:text-slate-100">{i.product_name} — Expiring Soon</p>
-                <p className="text-xs text-[#676879]">Expiry: {i.expiry_date} • Qty: {i.quantity} • Batch: {i.batch_number || '—'}</p>
+                <p className="text-xs text-graphite-500 dark:text-slate-400">Expiry: {i.expiry_date} • Qty: {i.quantity} • Batch: {i.batch_number || '—'}</p>
               </div>
-              <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold text-white bg-[#fdab3d]">Near Expiry</span>
+              <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold text-white bg-warning-500">Near Expiry</span>
             </div>
           ))}
 
           {lowStock.map(i => (
-            <div key={i.id} className="flex items-center gap-3 p-3.5 rounded-xl border border-[#fdab3d]/30 bg-[#f5f6f8]">
-              <TrendingDown className="h-5 w-5 text-[#fdab3d] flex-shrink-0" />
+            <div key={i.id} className="flex items-center gap-3 p-3.5 rounded-xl border border-warning-500/30 bg-canvas dark:bg-slate-950">
+              <TrendingDown className="h-5 w-5 text-warning-500 flex-shrink-0" />
               <div className="flex-1">
                 <p className="text-sm font-extrabold text-slate-900 dark:text-slate-100">{i.product_name} — Low Stock</p>
-                <p className="text-xs text-[#676879]">Current: {i.quantity ?? 0} | Reorder Level: {i.reorder_level ?? 20}</p>
+                <p className="text-xs text-graphite-500 dark:text-slate-400">Current: {i.quantity ?? 0} | Reorder Level: {i.reorder_level ?? 20}</p>
               </div>
             </div>
           ))}
@@ -646,7 +646,7 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
                   variant="outline"
                   size="sm"
                   onClick={() => setRxMedications(prev => [...prev, { id: `${Date.now()}`, medication_name: '', dosage: '1 tablet daily', quantity: 10, instructions: 'Take as directed' }])}
-                  className="h-7 text-[11px] text-[#0073ea]"
+                  className="h-7 text-[11px] text-primary-500"
                 >
                   <Plus className="h-3 w-3 mr-1" /> Add Drug
                 </Button>
@@ -655,7 +655,7 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
               {rxMedications.map((item, idx) => (
                 <div key={item.id} className="p-3 border rounded-xl bg-slate-50 dark:bg-slate-900/60 space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-[10px] bg-[#0073ea] text-white px-2 py-0.5 rounded">
+                    <span className="font-bold text-[10px] bg-primary-500 text-white px-2 py-0.5 rounded">
                       Drug #{idx + 1}
                     </span>
                     {rxMedications.length > 1 && (
@@ -810,7 +810,7 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
               />
               <div className="flex gap-2 pt-1">
                 <Button variant="outline" className="flex-1" onClick={() => setSafetyRx(null)}>Cancel</Button>
-                <Button className="flex-1 bg-[#00c875] hover:bg-[#00a868] text-white" onClick={confirmDispense}>
+                <Button className="flex-1 bg-success-500 hover:bg-success-600 text-white" onClick={confirmDispense}>
                   <CheckCircle2 className="h-4 w-4 mr-1" /> Confirm Dispense
                 </Button>
               </div>

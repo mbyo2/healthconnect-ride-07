@@ -85,7 +85,7 @@ export function PWAInstallPrompt() {
           <X className="h-4 w-4" />
         </Button>
 
-        <div className="w-10 h-10 bg-[#3B82F6] rounded-full flex items-center justify-center text-white font-bold">
+        <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">
           D0C
         </div>
 

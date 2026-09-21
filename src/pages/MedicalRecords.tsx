@@ -18,6 +18,16 @@ export default function MedicalRecords() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  const downloadRecord = (record: MedicalRecord) => {
+    const blob = new Blob([JSON.stringify(record, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `medical-record-${record.id}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -61,8 +71,8 @@ export default function MedicalRecords() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 flex items-center justify-center p-6 font-sans">
-        <div className="text-center font-bold text-xs text-[#676879]">
+      <div className="min-h-screen bg-canvas dark:bg-slate-950 flex items-center justify-center p-6 font-sans">
+        <div className="text-center font-bold text-xs text-graphite-500 dark:text-slate-400">
           Loading Electronic Health Records...
         </div>
       </div>
@@ -73,7 +83,7 @@ export default function MedicalRecords() {
     <ProtectedRoute>
       <div className="min-h-screen bg-canvas text-midnight font-sans transition-colors pb-16">
         {/* Top Header */}
-        <div className="bg-white border-b border-canvas-silk px-4 sm:px-6 py-5 sticky top-0 z-30 shadow-sm">
+        <div className="bg-white dark:bg-slate-900 border-b border-canvas-silk dark:border-slate-800 px-4 sm:px-6 py-5 sticky top-0 z-30 shadow-sm">
           <div className="max-w-content mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-button">
@@ -98,11 +108,11 @@ export default function MedicalRecords() {
                 <Bot className="h-4 w-4" />
                 <span>AI Diagnostics</span>
               </button>
-              <button className="px-3.5 py-2 rounded-md border border-[#c3c6d4] dark:border-slate-700 bg-white dark:bg-slate-900 font-bold text-xs text-slate-800 dark:text-slate-200 flex items-center gap-1.5 hover:bg-[#f5f6f8]">
-                <Upload className="h-4 w-4 text-[#676879]" />
+              <button className="px-3.5 py-2 rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-900 font-bold text-xs text-slate-800 dark:text-slate-200 flex items-center gap-1.5 hover:bg-canvas dark:bg-slate-950">
+                <Upload className="h-4 w-4 text-graphite-500 dark:text-slate-400" />
                 <span>Upload Document</span>
               </button>
-              <button className="px-3.5 py-2 rounded-md bg-[#0073ea] hover:bg-[#0060c4] text-white font-extrabold text-xs flex items-center gap-1.5 shadow-xs transition-all">
+              <button className="px-3.5 py-2 rounded-md bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs flex items-center gap-1.5 shadow-xs transition-all">
                 <Download className="h-4 w-4" />
                 <span>Export EHR Data</span>
               </button>
@@ -113,7 +123,7 @@ export default function MedicalRecords() {
         {/* Content Body */}
         <div className="max-w-[1500px] mx-auto px-4 sm:px-6 pt-6 space-y-6">
           {/* AI Insights for Medical Records */}
-          <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
+          <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
             <AIInsightsWidget
               context="records"
               data={{
@@ -124,29 +134,29 @@ export default function MedicalRecords() {
           </div>
 
           {/* Comprehensive Medical Records Section */}
-          <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
+          <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
             <ComprehensiveMedicalRecords />
           </div>
 
           {/* Lab results + medication administration (live data) */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
+            <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
               <PatientLabResults />
             </div>
-            <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
+            <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
               <PatientMAR />
             </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Recent Records */}
-            <div className="lg:col-span-2 rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
-              <div className="flex items-center justify-between border-b border-[#e6e9ef] dark:border-slate-800 pb-3 mb-4">
+            <div className="lg:col-span-2 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
+              <div className="flex items-center justify-between border-b border-canvas-silk dark:border-slate-800 pb-3 mb-4">
                 <h2 className="font-extrabold text-sm flex items-center gap-2">
-                  <ClipboardList className="h-4 w-4 text-[#0073ea]" />
+                  <ClipboardList className="h-4 w-4 text-primary-500" />
                   Recent Diagnostic & Consultation Records
                 </h2>
-                <span className="text-xs text-[#676879] font-bold">{records.length} records</span>
+                <span className="text-xs text-graphite-500 dark:text-slate-400 font-bold">{records.length} records</span>
               </div>
 
               <div className="space-y-2">
@@ -154,29 +164,34 @@ export default function MedicalRecords() {
                   records.map((record) => (
                     <div
                       key={record.id}
-                      className="flex items-center justify-between p-3.5 rounded-xl border border-[#e6e9ef] dark:border-slate-800 bg-[#f5f6f8] dark:bg-slate-950 hover:bg-[#e5f0ff] dark:hover:bg-slate-800/80 transition-colors"
+                      className="flex items-center justify-between p-3.5 rounded-xl border border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 hover:bg-primary-50 dark:hover:bg-slate-800 dark:hover:bg-slate-800/80 transition-colors"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="p-2.5 bg-white dark:bg-slate-900 rounded-lg border border-[#e6e9ef] dark:border-slate-800">
+                        <div className="p-2.5 bg-white dark:bg-slate-900 rounded-lg border border-canvas-silk dark:border-slate-800">
                           {getTypeIcon(record.type)}
                         </div>
                         <div>
                           <h3 className="font-extrabold text-xs text-slate-900 dark:text-slate-100">{record.title}</h3>
-                          <p className="text-[11px] text-[#676879] dark:text-slate-400 font-medium mt-0.5">
+                          <p className="text-[11px] text-graphite-500 dark:text-slate-400 font-medium mt-0.5">
                             {record.provider} • {new Date(record.date).toLocaleDateString()}
                           </p>
                         </div>
                       </div>
                       <div className="flex items-center gap-3">
                         {getStatusPill(record.status)}
-                        <button className="p-1.5 rounded-lg border border-[#c3c6d4] text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800">
+                        <button
+                          onClick={() => downloadRecord(record)}
+                          aria-label={`Download record: ${record.title}`}
+                          title="Download record (JSON)"
+                          className="p-2 rounded-lg border border-graphite-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800 transition-colors"
+                        >
                           <Download className="h-3.5 w-3.5" />
                         </button>
                       </div>
                     </div>
                   ))
                 ) : (
-                  <div className="text-center py-10 text-xs text-[#676879] font-medium">
+                  <div className="text-center py-10 text-xs text-graphite-500 dark:text-slate-400 font-medium">
                     No medical records found. Upload your first record!
                   </div>
                 )}
@@ -185,14 +200,14 @@ export default function MedicalRecords() {
 
             {/* Health Metrics & FHIR Export */}
             <div className="space-y-6">
-              <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
+              <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
                 <FHIRExportPanel />
               </div>
 
-              <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
-                <div className="flex items-center justify-between border-b border-[#e6e9ef] dark:border-slate-800 pb-3 mb-4">
+              <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
+                <div className="flex items-center justify-between border-b border-canvas-silk dark:border-slate-800 pb-3 mb-4">
                   <h2 className="font-extrabold text-sm flex items-center gap-2">
-                    <Activity className="h-4 w-4 text-[#00c875]" />
+                    <Activity className="h-4 w-4 text-success-500" />
                     Vital Sign Metrics
                   </h2>
                 </div>
@@ -200,11 +215,11 @@ export default function MedicalRecords() {
                 <div className="space-y-3">
                   {healthMetrics.length > 0 ? (
                     healthMetrics.map((metric, index) => (
-                      <div key={index} className="p-3 rounded-xl border border-[#e6e9ef] dark:border-slate-800 bg-[#f5f6f8] dark:bg-slate-950 flex justify-between items-center">
+                      <div key={index} className="p-3 rounded-xl border border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 flex justify-between items-center">
                         <div>
                           <p className="font-bold text-xs text-slate-700 dark:text-slate-300">{metric.label}</p>
-                          <p className="text-xl font-black font-mono text-[#0073ea]">{metric.value}</p>
-                          <p className="text-[10px] text-[#676879] mt-0.5">{metric.date}</p>
+                          <p className="text-xl font-black font-mono text-primary-500">{metric.value}</p>
+                          <p className="text-[10px] text-graphite-500 dark:text-slate-400 mt-0.5">{metric.date}</p>
                         </div>
                         <div>
                           {getStatusPill(metric.status)}
@@ -212,7 +227,7 @@ export default function MedicalRecords() {
                       </div>
                     ))
                   ) : (
-                    <div className="text-center py-6 text-xs text-[#676879]">
+                    <div className="text-center py-6 text-xs text-graphite-500 dark:text-slate-400">
                       No health metrics recorded yet.
                     </div>
                   )}
@@ -222,29 +237,29 @@ export default function MedicalRecords() {
           </div>
 
           {/* Quick Actions */}
-          <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
+          <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
             <h2 className="font-extrabold text-sm mb-3">Quick EHR Actions</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
               <button
                 onClick={() => navigate('/appointments')}
-                className="flex items-center gap-2 p-3 rounded-xl border border-[#e6e9ef] dark:border-slate-800 bg-[#f5f6f8] dark:bg-slate-950 hover:bg-[#e5f0ff] dark:hover:bg-slate-800 transition-colors text-xs font-extrabold"
+                className="flex items-center gap-2 p-3 rounded-xl border border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 hover:bg-primary-50 dark:hover:bg-slate-800 dark:hover:bg-slate-800 transition-colors text-xs font-extrabold"
               >
-                <Calendar className="h-4 w-4 text-[#0073ea]" />
+                <Calendar className="h-4 w-4 text-primary-500" />
                 <span>Schedule Checkup</span>
               </button>
-              <button className="flex items-center gap-2 p-3 rounded-xl border border-[#e6e9ef] dark:border-slate-800 bg-[#f5f6f8] dark:bg-slate-950 hover:bg-[#e5f0ff] dark:hover:bg-slate-800 transition-colors text-xs font-extrabold">
-                <FileText className="h-4 w-4 text-[#a25ddc]" />
+              <button className="flex items-center gap-2 p-3 rounded-xl border border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 hover:bg-primary-50 dark:hover:bg-slate-800 dark:hover:bg-slate-800 transition-colors text-xs font-extrabold">
+                <FileText className="h-4 w-4 text-purple-500" />
                 <span>Request Records</span>
               </button>
-              <button className="flex items-center gap-2 p-3 rounded-xl border border-[#e6e9ef] dark:border-slate-800 bg-[#f5f6f8] dark:bg-slate-950 hover:bg-[#e5f0ff] dark:hover:bg-slate-800 transition-colors text-xs font-extrabold">
-                <Upload className="h-4 w-4 text-[#fdab3d]" />
+              <button className="flex items-center gap-2 p-3 rounded-xl border border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 hover:bg-primary-50 dark:hover:bg-slate-800 dark:hover:bg-slate-800 transition-colors text-xs font-extrabold">
+                <Upload className="h-4 w-4 text-warning-500" />
                 <span>Upload Document</span>
               </button>
               <button
                 onClick={() => navigate('/health-dashboard')}
-                className="flex items-center gap-2 p-3 rounded-xl border border-[#e6e9ef] dark:border-slate-800 bg-[#f5f6f8] dark:bg-slate-950 hover:bg-[#e5f0ff] dark:hover:bg-slate-800 transition-colors text-xs font-extrabold"
+                className="flex items-center gap-2 p-3 rounded-xl border border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 hover:bg-primary-50 dark:hover:bg-slate-800 dark:hover:bg-slate-800 transition-colors text-xs font-extrabold"
               >
-                <Heart className="h-4 w-4 text-[#e2445c]" />
+                <Heart className="h-4 w-4 text-error-500" />
                 <span>Health Summary</span>
               </button>
             </div>

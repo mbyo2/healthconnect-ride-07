@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -106,6 +106,22 @@ export const InsuranceTPA = ({ hospital }: { hospital: any }) => {
   const { data: claims, loading, error, refresh } = useHospitalModule<any>(
     'insurance_claims', 'institution_id', hospital?.id, { orderBy: 'created_at', ascending: false }
   );
+
+  // Claim adjudications settle bills — reflect them the moment they land.
+  useEffect(() => {
+    if (!hospital?.id) return;
+    const channel = supabase
+      .channel(`insurance-claims-live-${hospital.id}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'insurance_claims', filter: `institution_id=eq.${hospital.id}` },
+        () => refresh()
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [hospital?.id, refresh]);
 
   const open = claims.filter(c => ['draft', 'submitted', 'processing', 'pending'].includes(c.status));
   const settled = claims.filter(c => ['paid', 'approved'].includes(c.status));

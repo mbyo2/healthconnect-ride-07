@@ -218,11 +218,11 @@ export const EnterpriseAccounting = () => {
 
   const getEntryTypeColor = (type: string) => {
     switch (type) {
-      case "journal": return "bg-[#0073ea]";
-      case "receipt": return "bg-[#00c875]";
-      case "payment": return "bg-[#e44258]";
-      case "adjustment": return "bg-[#fdab3d]";
-      default: return "bg-[#676879]";
+      case "journal": return "bg-primary-500";
+      case "receipt": return "bg-success-500";
+      case "payment": return "bg-error-500";
+      case "adjustment": return "bg-warning-500";
+      default: return "bg-graphite-500 dark:bg-slate-600";
     }
   };
 
@@ -237,10 +237,10 @@ export const EnterpriseAccounting = () => {
 
   const getReconciliationStatusColor = (status: string) => {
     switch (status) {
-      case "reconciled": return "bg-[#00c875] text-white";
-      case "pending": return "bg-[#fdab3d] text-white";
-      case "variance": return "bg-[#e44258] text-white";
-      default: return "bg-[#676879] text-white";
+      case "reconciled": return "bg-success-500 text-white";
+      case "pending": return "bg-warning-500 text-white";
+      case "variance": return "bg-error-500 text-white";
+      default: return "bg-graphite-500 dark:bg-slate-600 text-white";
     }
   };
 
@@ -248,13 +248,13 @@ export const EnterpriseAccounting = () => {
 
   if (!institution) {
     return (
-      <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 flex items-center justify-center p-6">
+      <div className="min-h-screen bg-canvas dark:bg-slate-950 flex items-center justify-center p-6">
         <Card className="max-w-md w-full">
           <CardContent className="p-8 text-center space-y-4">
-            <Building2 className="h-12 w-12 mx-auto text-[#0073ea]" />
+            <Building2 className="h-12 w-12 mx-auto text-primary-500" />
             <h2 className="text-xl font-extrabold">Institution Required</h2>
-            <p className="text-xs text-[#676879]">Please select an institution to access enterprise accounting.</p>
-            <Button onClick={() => navigate("/institution-portal")} className="bg-[#0073ea] hover:bg-[#0056b3]">
+            <p className="text-xs text-graphite-500 dark:text-slate-400">Please select an institution to access enterprise accounting.</p>
+            <Button onClick={() => navigate("/institution-portal")} className="bg-primary-500 hover:bg-primary-600">
               Go to Institution Portal
             </Button>
           </CardContent>
@@ -269,23 +269,23 @@ export const EnterpriseAccounting = () => {
   const pendingReconciliations = reconciliations.filter((r) => r.reconciliation_status !== "reconciled").length;
 
   return (
-    <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pb-16">
+    <div className="min-h-screen bg-canvas dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pb-16">
       {/* Header */}
-      <div className="bg-white dark:bg-slate-900 border-b border-[#e6e9ef] dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
+      <div className="bg-white dark:bg-slate-900 border-b border-canvas-silk dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
         <div className="max-w-[1600px] mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-[#0073ea] text-white flex items-center justify-center shadow-xs">
+            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-xs">
               <BookOpen className="h-5 w-5" />
             </div>
             <div>
               <h1 className="text-xl font-extrabold">Enterprise Accounting</h1>
-              <p className="text-xs text-[#676879] font-medium">General Ledger, Asset Management & Bank Reconciliation</p>
+              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">General Ledger, Asset Management & Bank Reconciliation</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <Dialog open={showGlDialog} onOpenChange={setShowGlDialog}>
               <DialogTrigger asChild>
-                <Button className="bg-[#0073ea] hover:bg-[#0056b3] text-white font-bold text-xs flex items-center gap-2">
+                <Button className="bg-primary-500 hover:bg-primary-600 text-white font-bold text-xs flex items-center gap-2">
                   <Plus className="h-4 w-4" /> New GL Entry
                 </Button>
               </DialogTrigger>
@@ -396,7 +396,7 @@ export const EnterpriseAccounting = () => {
                       />
                     </div>
                   </div>
-                  <Button onClick={handleCreateGlEntry} className="w-full bg-[#0073ea] hover:bg-[#0056b3] text-white font-bold">
+                  <Button onClick={handleCreateGlEntry} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold">
                     Create GL Entry
                   </Button>
                 </div>
@@ -409,66 +409,66 @@ export const EnterpriseAccounting = () => {
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 pt-6">
         {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-[#676879] uppercase">Total Assets</span>
-                <BookOpen className="h-4 w-4 text-[#0073ea]" />
+                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Total Assets</span>
+                <BookOpen className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-[#0073ea]">
+              <div className="text-2xl font-black font-mono text-primary-500">
                 {institution.currency || "ZMW"} {(totalAssets / 1000).toFixed(1)}k
               </div>
-              <div className="text-[10px] text-[#676879] font-bold mt-0.5">Gross asset value</div>
+              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Gross asset value</div>
             </CardContent>
           </Card>
-          <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-[#676879] uppercase">Accumulated Depreciation</span>
-                <TrendingUp className="h-4 w-4 text-[#e44258]" />
+                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Accumulated Depreciation</span>
+                <TrendingUp className="h-4 w-4 text-error-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-[#e44258]">
+              <div className="text-2xl font-black font-mono text-error-500">
                 {institution.currency || "ZMW"} {(totalDepreciation / 1000).toFixed(1)}k
               </div>
-              <div className="text-[10px] text-[#676879] font-bold mt-0.5">Total depreciation</div>
+              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Total depreciation</div>
             </CardContent>
           </Card>
-          <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-[#676879] uppercase">Net Book Value</span>
-                <DollarSign className="h-4 w-4 text-[#00c875]" />
+                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Net Book Value</span>
+                <DollarSign className="h-4 w-4 text-success-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-[#00c875]">
+              <div className="text-2xl font-black font-mono text-success-500">
                 {institution.currency || "ZMW"} {(netBookValue / 1000).toFixed(1)}k
               </div>
-              <div className="text-[10px] text-[#676879] font-bold mt-0.5">Current asset value</div>
+              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Current asset value</div>
             </CardContent>
           </Card>
-          <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-[#676879] uppercase">Pending Reconciliations</span>
-                <AlertTriangle className="h-4 w-4 text-[#fdab3d]" />
+                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Pending Reconciliations</span>
+                <AlertTriangle className="h-4 w-4 text-warning-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-[#fdab3d]">{pendingReconciliations}</div>
-              <div className="text-[10px] text-[#676879] font-bold mt-0.5">Awaiting reconciliation</div>
+              <div className="text-2xl font-black font-mono text-warning-500">{pendingReconciliations}</div>
+              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Awaiting reconciliation</div>
             </CardContent>
           </Card>
         </div>
 
         <Tabs defaultValue="gl" className="space-y-6">
-          <TabsList className="bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 p-1">
-            <TabsTrigger value="gl" className="data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">
+          <TabsList className="bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 p-1">
+            <TabsTrigger value="gl" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <BookOpen className="h-4 w-4 mr-2" /> General Ledger
             </TabsTrigger>
-            <TabsTrigger value="assets" className="data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">
+            <TabsTrigger value="assets" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <FileText className="h-4 w-4 mr-2" /> Asset Management
             </TabsTrigger>
-            <TabsTrigger value="reconciliation" className="data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">
+            <TabsTrigger value="reconciliation" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <RefreshCw className="h-4 w-4 mr-2" /> Bank Reconciliation
             </TabsTrigger>
-            <TabsTrigger value="integration" className="data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">
+            <TabsTrigger value="integration" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <ArrowUpRight className="h-4 w-4 mr-2" /> ERP Integration
             </TabsTrigger>
           </TabsList>
@@ -500,9 +500,9 @@ export const EnterpriseAccounting = () => {
               </div>
             </div>
 
-            <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs overflow-hidden">
+            <Card className="border-canvas-silk dark:border-slate-800 shadow-xs overflow-hidden">
               <table className="w-full">
-                <thead className="bg-[#f0f2f7] dark:bg-slate-800">
+                <thead className="bg-canvas-mist dark:bg-slate-800">
                   <tr>
                     <th className="text-left text-xs font-extrabold px-4 py-3">Entry #</th>
                     <th className="text-left text-xs font-extrabold px-4 py-3">Date</th>
@@ -517,12 +517,12 @@ export const EnterpriseAccounting = () => {
                 </thead>
                 <tbody>
                   {glEntries.map((entry) => (
-                    <tr key={entry.id} className="border-t border-[#e6e9ef] dark:border-slate-800 hover:bg-[#f8f9fa] dark:hover:bg-slate-800">
+                    <tr key={entry.id} className="border-t border-canvas-silk dark:border-slate-800 hover:bg-canvas-bone dark:hover:bg-slate-800">
                       <td className="px-4 py-3">
                         <div className="text-xs font-bold">{entry.entry_number}</div>
-                        <div className="text-[10px] text-[#676879]">{entry.reference_number}</div>
+                        <div className="text-[10px] text-graphite-500 dark:text-slate-400">{entry.reference_number}</div>
                       </td>
-                      <td className="px-4 py-3 text-xs text-[#676879]">
+                      <td className="px-4 py-3 text-xs text-graphite-500 dark:text-slate-400">
                         {new Date(entry.entry_date).toLocaleDateString()}
                       </td>
                       <td className="px-4 py-3">
@@ -532,20 +532,20 @@ export const EnterpriseAccounting = () => {
                       </td>
                       <td className="px-4 py-3">
                         <div className="text-xs font-bold">{entry.account_name}</div>
-                        <div className="text-[10px] text-[#676879]">{entry.account_code}</div>
+                        <div className="text-[10px] text-graphite-500 dark:text-slate-400">{entry.account_code}</div>
                       </td>
-                      <td className="px-4 py-3 text-xs font-bold text-[#00c875]">
+                      <td className="px-4 py-3 text-xs font-bold text-success-500">
                         {entry.debit_amount > 0 ? `${entry.currency} ${entry.debit_amount.toFixed(2)}` : "-"}
                       </td>
-                      <td className="px-4 py-3 text-xs font-bold text-[#e44258]">
+                      <td className="px-4 py-3 text-xs font-bold text-error-500">
                         {entry.credit_amount > 0 ? `${entry.currency} ${entry.credit_amount.toFixed(2)}` : "-"}
                       </td>
                       <td className="px-4 py-3 text-xs">{entry.currency}</td>
                       <td className="px-4 py-3">
                         {entry.is_posted ? (
-                          <Badge className="bg-[#00c875] text-white text-[10px]">Posted</Badge>
+                          <Badge className="bg-success-500 text-white text-[10px]">Posted</Badge>
                         ) : (
-                          <Badge className="bg-[#fdab3d] text-white text-[10px]">Draft</Badge>
+                          <Badge className="bg-warning-500 text-white text-[10px]">Draft</Badge>
                         )}
                       </td>
                       <td className="px-4 py-3">
@@ -586,7 +586,7 @@ export const EnterpriseAccounting = () => {
               <div className="flex items-center gap-2">
                 <Dialog open={showAssetDialog} onOpenChange={setShowAssetDialog}>
                   <DialogTrigger asChild>
-                    <Button className="bg-[#0073ea] hover:bg-[#0056b3] text-white font-bold text-xs">
+                    <Button className="bg-primary-500 hover:bg-primary-600 text-white font-bold text-xs">
                       <Plus className="h-4 w-4 mr-1" /> Add Asset
                     </Button>
                   </DialogTrigger>
@@ -689,7 +689,7 @@ export const EnterpriseAccounting = () => {
                           className="mt-1"
                         />
                       </div>
-                      <Button onClick={handleCreateAsset} className="w-full bg-[#0073ea] hover:bg-[#0056b3] text-white font-bold">
+                      <Button onClick={handleCreateAsset} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold">
                         Add Asset
                       </Button>
                     </div>
@@ -703,12 +703,12 @@ export const EnterpriseAccounting = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {assets.map((asset) => (
-                <Card key={asset.id} className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+                <Card key={asset.id} className="border-canvas-silk dark:border-slate-800 shadow-xs">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div>
                         <CardTitle className="text-sm font-extrabold">{asset.asset_name}</CardTitle>
-                        <div className="text-[10px] text-[#676879]">{asset.asset_code}</div>
+                        <div className="text-[10px] text-graphite-500 dark:text-slate-400">{asset.asset_code}</div>
                       </div>
                       <Badge variant="outline" className="text-[10px]">{asset.asset_category}</Badge>
                     </div>
@@ -716,24 +716,24 @@ export const EnterpriseAccounting = () => {
                   <CardContent className="space-y-3">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <div className="text-[10px] text-[#676879]">Purchase Cost</div>
+                        <div className="text-[10px] text-graphite-500 dark:text-slate-400">Purchase Cost</div>
                         <div className="text-sm font-bold">{asset.currency} {asset.purchase_cost.toFixed(2)}</div>
                       </div>
                       <div>
-                        <div className="text-[10px] text-[#676879]">Net Book Value</div>
-                        <div className="text-sm font-bold text-[#00c875]">{asset.currency} {asset.net_book_value.toFixed(2)}</div>
+                        <div className="text-[10px] text-graphite-500 dark:text-slate-400">Net Book Value</div>
+                        <div className="text-sm font-bold text-success-500">{asset.currency} {asset.net_book_value.toFixed(2)}</div>
                       </div>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-[#676879]">Depreciation Method</span>
+                      <span className="text-graphite-500 dark:text-slate-400">Depreciation Method</span>
                       <span className="font-bold">{getDepreciationMethodLabel(asset.depreciation_method)}</span>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-[#676879]">Accumulated Depreciation</span>
-                      <span className="font-bold text-[#e44258]">{asset.currency} {asset.accumulated_depreciation.toFixed(2)}</span>
+                      <span className="text-graphite-500 dark:text-slate-400">Accumulated Depreciation</span>
+                      <span className="font-bold text-error-500">{asset.currency} {asset.accumulated_depreciation.toFixed(2)}</span>
                     </div>
-                    <div className="flex items-center justify-between pt-2 border-t border-[#e6e9ef] dark:border-slate-800">
-                      <div className="text-xs text-[#676879]">
+                    <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
+                      <div className="text-xs text-graphite-500 dark:text-slate-400">
                         Year {asset.current_depreciation_year} of {asset.useful_life_years}
                       </div>
                       <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
@@ -766,7 +766,7 @@ export const EnterpriseAccounting = () => {
               <div className="flex items-center gap-2">
                 <Dialog open={showReconciliationDialog} onOpenChange={setShowReconciliationDialog}>
                   <DialogTrigger asChild>
-                    <Button className="bg-[#0073ea] hover:bg-[#0056b3] text-white font-bold text-xs">
+                    <Button className="bg-primary-500 hover:bg-primary-600 text-white font-bold text-xs">
                       <Plus className="h-4 w-4 mr-1" /> New Reconciliation
                     </Button>
                   </DialogTrigger>
@@ -838,7 +838,7 @@ export const EnterpriseAccounting = () => {
                           className="mt-1"
                         />
                       </div>
-                      <Button onClick={handleCreateReconciliation} className="w-full bg-[#0073ea] hover:bg-[#0056b3] text-white font-bold">
+                      <Button onClick={handleCreateReconciliation} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold">
                         Start Reconciliation
                       </Button>
                     </div>
@@ -852,12 +852,12 @@ export const EnterpriseAccounting = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {reconciliations.map((reconciliation) => (
-                <Card key={reconciliation.id} className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+                <Card key={reconciliation.id} className="border-canvas-silk dark:border-slate-800 shadow-xs">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div>
                         <CardTitle className="text-sm font-extrabold">{reconciliation.bank_name}</CardTitle>
-                        <div className="text-[10px] text-[#676879]">{reconciliation.account_number}</div>
+                        <div className="text-[10px] text-graphite-500 dark:text-slate-400">{reconciliation.account_number}</div>
                       </div>
                       <Badge className={getReconciliationStatusColor(reconciliation.reconciliation_status) + " text-[10px]"}>
                         {reconciliation.reconciliation_status}
@@ -867,22 +867,22 @@ export const EnterpriseAccounting = () => {
                   <CardContent className="space-y-3">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <div className="text-[10px] text-[#676879]">Statement Balance</div>
+                        <div className="text-[10px] text-graphite-500 dark:text-slate-400">Statement Balance</div>
                         <div className="text-sm font-bold">{reconciliation.currency} {reconciliation.statement_balance.toFixed(2)}</div>
                       </div>
                       <div>
-                        <div className="text-[10px] text-[#676879]">Book Balance</div>
+                        <div className="text-[10px] text-graphite-500 dark:text-slate-400">Book Balance</div>
                         <div className="text-sm font-bold">{reconciliation.currency} {reconciliation.book_balance.toFixed(2)}</div>
                       </div>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-[#676879]">Variance</span>
-                      <span className={`font-bold ${reconciliation.variance !== 0 ? "text-[#e44258]" : "text-[#00c875]"}`}>
+                      <span className="text-graphite-500 dark:text-slate-400">Variance</span>
+                      <span className={`font-bold ${reconciliation.variance !== 0 ? "text-error-500" : "text-success-500"}`}>
                         {reconciliation.currency} {reconciliation.variance.toFixed(2)}
                       </span>
                     </div>
-                    <div className="flex items-center justify-between pt-2 border-t border-[#e6e9ef] dark:border-slate-800">
-                      <div className="text-xs text-[#676879]">
+                    <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
+                      <div className="text-xs text-graphite-500 dark:text-slate-400">
                         {new Date(reconciliation.statement_date).toLocaleDateString()}
                       </div>
                       <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
@@ -897,25 +897,25 @@ export const EnterpriseAccounting = () => {
 
           {/* ERP Integration Tab */}
           <TabsContent value="integration" className="space-y-4">
-            <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+            <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
               <CardHeader>
                 <CardTitle className="text-sm font-extrabold flex items-center gap-2">
-                  <ArrowUpRight className="h-4 w-4 text-[#0073ea]" /> External ERP Integration
+                  <ArrowUpRight className="h-4 w-4 text-primary-500" /> External ERP Integration
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="h-[300px] flex items-center justify-center text-[#676879] text-xs">
+                <div className="h-[300px] flex items-center justify-center text-graphite-500 dark:text-slate-400 text-xs">
                   <div className="text-center space-y-4">
                     <div className="flex justify-center gap-4">
-                      <div className="p-4 rounded-xl bg-[#f0f2f7] dark:bg-slate-800">
+                      <div className="p-4 rounded-xl bg-canvas-mist dark:bg-slate-800">
                         <div className="text-sm font-bold mb-1">SAP</div>
                         <div className="text-[10px]">Enterprise ERP</div>
                       </div>
-                      <div className="p-4 rounded-xl bg-[#f0f2f7] dark:bg-slate-800">
+                      <div className="p-4 rounded-xl bg-canvas-mist dark:bg-slate-800">
                         <div className="text-sm font-bold mb-1">Focus ERP</div>
                         <div className="text-[10px]">Mid-market ERP</div>
                       </div>
-                      <div className="p-4 rounded-xl bg-[#f0f2f7] dark:bg-slate-800">
+                      <div className="p-4 rounded-xl bg-canvas-mist dark:bg-slate-800">
                         <div className="text-sm font-bold mb-1">Tally</div>
                         <div className="text-[10px]">Accounting Software</div>
                       </div>

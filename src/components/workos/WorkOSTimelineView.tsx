@@ -19,7 +19,7 @@ export const WorkOSTimelineView: React.FC<WorkOSTimelineViewProps> = ({
   onSelectPatient,
 }) => {
   return (
-    <div className={`p-4 sm:p-6 overflow-x-auto transition-colors ${isDarkMode ? "bg-slate-950 text-slate-100" : "bg-[#f5f6f8] text-slate-900"}`}>
+    <div className={`p-4 sm:p-6 overflow-x-auto transition-colors ${isDarkMode ? "bg-slate-950 text-slate-100" : "bg-canvas text-slate-900"}`}>
       <div className={`rounded-2xl border p-4 sm:p-6 min-w-[1000px] ${
         isDarkMode ? "bg-slate-900/90 border-slate-800" : "bg-white border-slate-200 shadow-sm"
       }`}>

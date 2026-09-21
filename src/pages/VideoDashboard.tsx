@@ -53,20 +53,20 @@ const VideoDashboard: React.FC = () => {
   }, [user]);
 
   return (
-    <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors pb-16">
+    <div className="min-h-screen bg-canvas dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors pb-16">
       {/* Sticky Monday Top Header */}
-      <div className="bg-white dark:bg-slate-900 border-b border-[#e6e9ef] dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
+      <div className="bg-white dark:bg-slate-900 border-b border-canvas-silk dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
         <div className="max-w-[1500px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-[#0073ea] text-white flex items-center justify-center font-black text-sm shadow-xs">
+            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-black text-sm shadow-xs">
               <Video className="h-5 w-5" />
             </div>
             <div>
               <h1 className="text-xl font-extrabold tracking-tight flex items-center gap-2">
                 Telehealth & Video Telemetry Board
-                <span className="w-2 h-2 rounded-full bg-[#00c875] animate-ping" />
+                <span className="w-2 h-2 rounded-full bg-success-500 animate-ping" />
               </h1>
-              <p className="text-xs text-[#676879] dark:text-slate-400 font-medium">
+              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
                 HD Encrypted WebRTC Video Rooms, Patient Waiting Rooms, and E-Prescriptions
               </p>
             </div>
@@ -75,16 +75,16 @@ const VideoDashboard: React.FC = () => {
           <div className="flex items-center gap-2">
             <button
               onClick={() => navigate(`/video-call/${safeCryptoUUID()}`)}
-              className="px-4 py-2 rounded-md bg-[#0073ea] hover:bg-[#0060c4] text-white font-extrabold text-xs shadow-xs transition-all flex items-center gap-1.5"
+              className="px-4 py-2 rounded-md bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs transition-all flex items-center gap-1.5"
             >
               <Phone className="h-4 w-4" />
               <span>Instant Call Room</span>
             </button>
             <button
               onClick={() => navigate("/appointments")}
-              className="px-4 py-2 rounded-md border border-[#c3c6d4] bg-white text-slate-800 font-bold text-xs hover:bg-[#f0f2f7] flex items-center gap-1.5"
+              className="px-4 py-2 rounded-md border border-graphite-300 dark:border-slate-700 bg-white text-slate-800 font-bold text-xs hover:bg-canvas-mist dark:hover:bg-slate-800 flex items-center gap-1.5"
             >
-              <Calendar className="h-4 w-4 text-[#676879]" />
+              <Calendar className="h-4 w-4 text-graphite-500 dark:text-slate-400" />
               <span>Schedule Call</span>
             </button>
           </div>
@@ -94,63 +94,63 @@ const VideoDashboard: React.FC = () => {
       <div className="max-w-[1500px] mx-auto px-4 sm:px-6 pt-6 space-y-6">
         {/* KPI Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+          <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] font-extrabold text-[#676879] uppercase">Upcoming Sessions (7d)</span>
-              <Video className="h-5 w-5 text-[#0073ea]" />
+              <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Upcoming Sessions (7d)</span>
+              <Video className="h-5 w-5 text-primary-500" />
             </div>
-            <div className="text-3xl font-black font-mono text-[#0073ea]">{stats.loading ? "—" : stats.upcoming}</div>
-            <div className="text-[10px] text-[#676879] font-bold mt-0.5">
+            <div className="text-3xl font-black font-mono text-primary-500">{stats.loading ? "—" : stats.upcoming}</div>
+            <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">
               {stats.upcoming === 0 ? "No sessions scheduled" : `${stats.upcoming} sessions scheduled`}
             </div>
           </div>
 
-          <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+          <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] font-extrabold text-[#676879] uppercase">Today's Appointments</span>
-              <Clock className="h-5 w-5 text-[#fdab3d]" />
+              <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Today's Appointments</span>
+              <Clock className="h-5 w-5 text-warning-500" />
             </div>
-            <div className="text-3xl font-black font-mono text-[#fdab3d]">{stats.loading ? "—" : stats.today}</div>
-            <div className="text-[10px] text-[#676879] font-bold mt-0.5">
+            <div className="text-3xl font-black font-mono text-warning-500">{stats.loading ? "—" : stats.today}</div>
+            <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">
               {stats.today === 0 ? "No sessions scheduled today" : `${stats.today} consultation(s) today`}
             </div>
           </div>
 
-          <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+          <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] font-extrabold text-[#676879] uppercase">Active Live Calls</span>
-              <Radio className="h-5 w-5 text-[#00c875] animate-pulse" />
+              <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Active Live Calls</span>
+              <Radio className="h-5 w-5 text-success-500 animate-pulse" />
             </div>
-            <div className="text-3xl font-black font-mono text-[#00c875]">{stats.loading ? "—" : stats.active}</div>
-            <div className="text-[10px] text-[#676879] font-bold mt-0.5">
+            <div className="text-3xl font-black font-mono text-success-500">{stats.loading ? "—" : stats.active}</div>
+            <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">
               {stats.active === 0 ? "No active consultations" : `${stats.active} session(s) live`}
             </div>
           </div>
         </div>
 
         {/* Quick Launch Card */}
-        <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-xl bg-[#0073ea] text-white">
+            <div className="p-3 rounded-xl bg-primary-500 text-white">
               <Phone className="w-6 h-6" />
             </div>
             <div>
               <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">Launch On-Demand Telehealth Room</h3>
-              <p className="text-xs text-[#676879] font-medium">Create an instant encrypted WebRTC room link and invite patients or providers.</p>
+              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">Create an instant encrypted WebRTC room link and invite patients or providers.</p>
             </div>
           </div>
           <div className="flex items-center gap-2 w-full md:w-auto">
             <button
               onClick={() => navigate(`/video-call/${safeCryptoUUID()}`)}
-              className="w-full md:w-auto px-5 py-2.5 rounded-xl bg-[#0073ea] hover:bg-[#0060c4] text-white font-extrabold text-xs shadow-xs transition-all flex items-center justify-center gap-2"
+              className="w-full md:w-auto px-5 py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs transition-all flex items-center justify-center gap-2"
             >
               <Phone className="h-4 w-4" /> Start Instant Call
             </button>
             <button
               onClick={() => navigate("/appointments")}
-              className="w-full md:w-auto px-5 py-2.5 rounded-xl border border-[#c3c6d4] bg-white text-slate-800 font-bold text-xs hover:bg-[#f0f2f7] flex items-center justify-center gap-2"
+              className="w-full md:w-auto px-5 py-2.5 rounded-xl border border-graphite-300 dark:border-slate-700 bg-white text-slate-800 font-bold text-xs hover:bg-canvas-mist dark:hover:bg-slate-800 flex items-center justify-center gap-2"
             >
-              <Calendar className="h-4 w-4 text-[#676879]" /> Schedule Session
+              <Calendar className="h-4 w-4 text-graphite-500 dark:text-slate-400" /> Schedule Session
             </button>
           </div>
         </div>

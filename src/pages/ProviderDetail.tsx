@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProviderReviews } from "@/components/reviews/ProviderReviews";
 import { BookingModal } from "@/components/booking/BookingModal";
 import { WaitlistSignup } from "@/components/booking/WaitlistSignup";
+import { providerDisplayName } from "@/utils/providerDisplay";
 import { useState } from "react";
 import { Provider } from "@/types/provider";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -20,9 +21,9 @@ import { Badge } from "@/components/ui/badge";
 const Section = ({
   icon: Icon, title, children,
 }: { icon: React.ElementType; title: string; children: React.ReactNode }) => (
-  <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-xs space-y-3">
+  <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs space-y-3">
     <h3 className="font-extrabold text-sm flex items-center gap-2 text-slate-800 dark:text-slate-100">
-      <Icon className="h-4 w-4 text-[#0073ea]" />
+      <Icon className="h-4 w-4 text-primary-500" />
       {title}
     </h3>
     {children}
@@ -31,7 +32,7 @@ const Section = ({
 
 const InfoRow = ({ label, value }: { label: string; value: React.ReactNode }) => (
   <div className="flex items-start gap-2 text-xs">
-    <span className="text-[#676879] font-bold w-36 shrink-0">{label}</span>
+    <span className="text-graphite-500 dark:text-slate-400 font-bold w-36 shrink-0">{label}</span>
     <span className="text-slate-800 dark:text-slate-200 font-medium">{value}</span>
   </div>
 );
@@ -59,8 +60,9 @@ export const ProviderDetail = () => {
           )
         `)
         .eq("id", id)
-        .single();
+        .maybeSingle();
       if (error) throw error;
+      if (!data) throw new Error("Provider not found");
       return data as any;
     },
     enabled: !!id,
@@ -82,7 +84,7 @@ export const ProviderDetail = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#f5f6f8] p-6 flex justify-center items-center">
+      <div className="min-h-screen bg-canvas p-6 flex justify-center items-center">
         <Skeleton className="h-64 w-full max-w-4xl rounded-2xl" />
       </div>
     );
@@ -90,12 +92,12 @@ export const ProviderDetail = () => {
 
   if (error || !provider) {
     return (
-      <div className="min-h-screen bg-[#f5f6f8] p-6 flex items-center justify-center">
-        <div className="max-w-md w-full p-8 rounded-2xl bg-white border border-[#e6e9ef] text-center space-y-3">
+      <div className="min-h-screen bg-canvas p-6 flex items-center justify-center">
+        <div className="max-w-md w-full p-8 rounded-2xl bg-white border border-canvas-silk text-center space-y-3">
           <h2 className="text-lg font-extrabold">Provider Profile Not Found</h2>
           <button
             onClick={() => navigate("/search")}
-            className="px-4 py-2 rounded-md bg-[#0073ea] text-white font-bold text-xs"
+            className="px-4 py-2 rounded-md bg-primary-500 text-white font-bold text-xs"
           >
             Browse Verified Doctors
           </button>
@@ -105,10 +107,13 @@ export const ProviderDetail = () => {
   }
 
   const stats = provider.provider_statistics?.[0];
-  const rating = stats?.average_rating || provider.rating || 4.8;
+  // Real rating only — never invent 4.8 for unrated providers.
+  const ratingRaw = stats?.average_rating ?? provider.rating ?? null;
+  const rating = ratingRaw != null && Number(ratingRaw) > 0 ? Number(ratingRaw) : null;
   const reviewCount = stats?.total_reviews || 0;
 
-  const providerName = `Dr. ${provider.first_name || ""} ${provider.last_name || ""}`.trim();
+  // Honorific fits the cadre — only doctoral roles are "Dr.".
+  const providerName = providerDisplayName(provider);
   const providerSpecialty = provider.specialty || "Healthcare Specialist";
 
   const feeLabel = (() => {
@@ -133,24 +138,24 @@ export const ProviderDetail = () => {
         <title>{providerName} — {providerSpecialty} | Doc' O Clock</title>
       </Helmet>
 
-      <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pb-16">
+      <div className="min-h-screen bg-canvas dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pb-16">
         {/* Sticky top bar */}
-        <div className="bg-white dark:bg-slate-900 border-b border-[#e6e9ef] dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
+        <div className="bg-white dark:bg-slate-900 border-b border-canvas-silk dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
           <div className="max-w-5xl mx-auto flex items-center justify-between gap-4">
             <div className="min-w-0">
               <h1 className="text-base font-extrabold tracking-tight truncate">{providerName}</h1>
-              <p className="text-xs text-[#0073ea] font-bold truncate">{providerSpecialty}</p>
+              <p className="text-xs text-primary-500 font-bold truncate">{providerSpecialty}</p>
             </div>
             <div className="flex items-center gap-2 shrink-0">
               <button
                 onClick={() => setIsWaitlistOpen(true)}
-                className="px-3 py-1.5 rounded-md border border-[#e6e9ef] text-xs font-bold text-slate-600 hover:bg-[#f0f2f7]"
+                className="px-3 py-1.5 rounded-md border border-canvas-silk text-xs font-bold text-slate-600 hover:bg-canvas-mist dark:hover:bg-slate-800"
               >
                 Join Waitlist
               </button>
               <button
                 onClick={() => setIsBookingOpen(true)}
-                className="px-4 py-2 rounded-md bg-[#0073ea] hover:bg-[#0060c4] text-white font-extrabold text-xs shadow-xs flex items-center gap-1.5"
+                className="px-4 py-2 rounded-md bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs flex items-center gap-1.5"
               >
                 <CalendarPlus className="h-4 w-4" /> Book Appointment
               </button>
@@ -161,17 +166,17 @@ export const ProviderDetail = () => {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-6 space-y-5">
 
           {/* ── Hero ── */}
-          <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-xs flex flex-col sm:flex-row gap-5">
+          <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs flex flex-col sm:flex-row gap-5">
             {/* Avatar */}
             <div className="shrink-0">
               {provider.avatar_url ? (
                 <img
                   src={provider.avatar_url}
                   alt={providerName}
-                  className="w-28 h-28 rounded-2xl object-cover border-2 border-[#0073ea]"
+                  className="w-28 h-28 rounded-2xl object-cover border-2 border-primary-500"
                 />
               ) : (
-                <div className="w-28 h-28 rounded-2xl bg-[#e5f0ff] text-[#0073ea] flex items-center justify-center text-3xl font-black border-2 border-[#0073ea]">
+                <div className="w-28 h-28 rounded-2xl bg-primary-50 text-primary-500 flex items-center justify-center text-3xl font-black border-2 border-primary-500">
                   {provider.first_name?.[0]}{provider.last_name?.[0]}
                 </div>
               )}
@@ -180,19 +185,23 @@ export const ProviderDetail = () => {
             <div className="flex-1 space-y-3 min-w-0">
               <div>
                 <h2 className="text-xl font-extrabold">{providerName}</h2>
-                <p className="text-sm text-[#0073ea] font-extrabold">{providerSpecialty}</p>
+                <p className="text-sm text-primary-500 font-extrabold">{providerSpecialty}</p>
               </div>
 
               {/* Capability badges */}
               <div className="flex flex-wrap gap-1.5">
                 {provider.is_verified && (
-                  <Badge className="bg-[#00c875] text-white border-0 gap-1">
+                  <Badge className="bg-success-500 text-white border-0 gap-1">
                     <CheckCircle className="h-3 w-3" /> Verified
                   </Badge>
                 )}
-                {!!rating && (
-                  <Badge className="bg-[#fdab3d] text-white border-0">
-                    ★ {Number(rating).toFixed(1)} ({reviewCount} reviews)
+                {rating !== null ? (
+                  <Badge className="bg-warning-500 text-white border-0">
+                    ★ {rating.toFixed(1)}{reviewCount > 0 ? ` (${reviewCount} review${reviewCount === 1 ? '' : 's'})` : ''}
+                  </Badge>
+                ) : (
+                  <Badge variant="outline" className="gap-1">
+                    New provider — no reviews yet
                   </Badge>
                 )}
                 {provider.telemedicine_available && (
@@ -213,10 +222,10 @@ export const ProviderDetail = () => {
               </div>
 
               {/* Quick info row */}
-              <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-[#676879]">
+              <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-graphite-500 dark:text-slate-400">
                 {provider.primary_practice_location && (
                   <span className="flex items-center gap-1">
-                    <MapPin className="h-3.5 w-3.5 shrink-0 text-[#0073ea]" />
+                    <MapPin className="h-3.5 w-3.5 shrink-0 text-primary-500" />
                     {provider.primary_practice_location}
                   </span>
                 )}
@@ -227,7 +236,7 @@ export const ProviderDetail = () => {
                   </span>
                 )}
                 {feeLabel && (
-                  <span className="flex items-center gap-1 font-semibold text-[#0073ea]">
+                  <span className="flex items-center gap-1 font-semibold text-primary-500">
                     <DollarSign className="h-3.5 w-3.5 shrink-0" />
                     {feeLabel}
                   </span>
@@ -241,7 +250,7 @@ export const ProviderDetail = () => {
               </div>
 
               {provider.bio && (
-                <p className="text-xs text-[#676879] leading-relaxed line-clamp-3">{provider.bio}</p>
+                <p className="text-xs text-graphite-500 dark:text-slate-400 leading-relaxed line-clamp-3">{provider.bio}</p>
               )}
             </div>
           </div>
@@ -264,11 +273,11 @@ export const ProviderDetail = () => {
                   )}
                   {certs.length > 0 && (
                     <div>
-                      <p className="text-[11px] font-extrabold uppercase text-[#676879] mb-1.5">Board Certifications</p>
+                      <p className="text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400 mb-1.5">Board Certifications</p>
                       <div className="flex flex-wrap gap-1.5">
                         {certs.map(c => (
                           <Badge key={c} variant="outline" className="gap-1 text-xs">
-                            <Award className="h-3 w-3 text-[#0073ea]" /> {c}
+                            <Award className="h-3 w-3 text-primary-500" /> {c}
                           </Badge>
                         ))}
                       </div>
@@ -276,7 +285,7 @@ export const ProviderDetail = () => {
                   )}
                   {subs.length > 0 && (
                     <div>
-                      <p className="text-[11px] font-extrabold uppercase text-[#676879] mb-1.5">Subspecialties</p>
+                      <p className="text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400 mb-1.5">Subspecialties</p>
                       <div className="flex flex-wrap gap-1.5">
                         {subs.map(s => (
                           <Badge key={s} variant="secondary" className="text-xs">
@@ -294,11 +303,11 @@ export const ProviderDetail = () => {
                 <Section icon={Building2} title="Practice Details">
                   {hospitals.length > 0 && (
                     <div>
-                      <p className="text-[11px] font-extrabold uppercase text-[#676879] mb-1.5">Affiliated Hospitals</p>
+                      <p className="text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400 mb-1.5">Affiliated Hospitals</p>
                       <ul className="space-y-1">
                         {hospitals.map(h => (
                           <li key={h} className="flex items-center gap-1.5 text-xs">
-                            <CheckCircle className="h-3.5 w-3.5 text-[#00c875] shrink-0" /> {h}
+                            <CheckCircle className="h-3.5 w-3.5 text-success-500 shrink-0" /> {h}
                           </li>
                         ))}
                       </ul>
@@ -306,7 +315,7 @@ export const ProviderDetail = () => {
                   )}
                   {apptTypes.length > 0 && (
                     <div>
-                      <p className="text-[11px] font-extrabold uppercase text-[#676879] mb-1.5">Appointment Types</p>
+                      <p className="text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400 mb-1.5">Appointment Types</p>
                       <div className="flex flex-wrap gap-1.5">
                         {apptTypes.map(t => <Badge key={t} variant="secondary" className="text-xs">{t}</Badge>)}
                       </div>
@@ -320,19 +329,19 @@ export const ProviderDetail = () => {
                 <Section icon={Clock} title="Weekly Availability">
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                     {Object.entries(schedule).map(([day, info]) => (
-                      <div key={day} className="p-2 rounded-lg border border-[#e6e9ef] dark:border-slate-700 bg-[#f5f6f8] dark:bg-slate-800">
+                      <div key={day} className="p-2 rounded-lg border border-canvas-silk dark:border-slate-700 bg-canvas dark:bg-slate-800">
                         <p className="text-[11px] font-extrabold capitalize text-slate-700 dark:text-slate-200">{day}</p>
                         {info.available ? (
                           <div className="space-y-0.5 mt-1">
                             {(info.hours || []).map(h => (
-                              <p key={h} className="text-[10px] text-[#0073ea] font-bold">{h}</p>
+                              <p key={h} className="text-[10px] text-primary-500 font-bold">{h}</p>
                             ))}
                             {(!info.hours || info.hours.length === 0) && (
-                              <p className="text-[10px] text-[#00c875] font-bold">Available</p>
+                              <p className="text-[10px] text-success-500 font-bold">Available</p>
                             )}
                           </div>
                         ) : (
-                          <p className="text-[10px] text-[#676879] mt-1">Not available</p>
+                          <p className="text-[10px] text-graphite-500 dark:text-slate-400 mt-1">Not available</p>
                         )}
                       </div>
                     ))}
@@ -345,10 +354,10 @@ export const ProviderDetail = () => {
                 <Section icon={Stethoscope} title="Services Offered">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {services.map((svc: any) => (
-                      <div key={svc.id} className="flex items-center justify-between p-2 rounded-lg border border-[#e6e9ef] dark:border-slate-700 text-xs">
+                      <div key={svc.id} className="flex items-center justify-between p-2 rounded-lg border border-canvas-silk dark:border-slate-700 text-xs">
                         <span className="font-medium">{svc.name}</span>
                         {svc.price && (
-                          <span className="font-bold text-[#0073ea]">K{svc.price}</span>
+                          <span className="font-bold text-primary-500">K{svc.price}</span>
                         )}
                       </div>
                     ))}
@@ -357,9 +366,9 @@ export const ProviderDetail = () => {
               )}
 
               {/* Reviews */}
-              <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+              <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
                 <h3 className="font-extrabold text-sm mb-3 flex items-center gap-2">
-                  <Star className="h-4 w-4 text-[#0073ea]" /> Patient Reviews
+                  <Star className="h-4 w-4 text-primary-500" /> Patient Reviews
                 </h3>
                 <ProviderReviews providerId={id} />
               </div>
@@ -370,14 +379,14 @@ export const ProviderDetail = () => {
               {/* Fees & Insurance */}
               {(feeLabel || insurances.length > 0) && (
                 <Section icon={DollarSign} title="Fees & Insurance">
-                  {feeLabel && <InfoRow label="Consultation fee" value={<span className="font-bold text-[#0073ea]">{feeLabel}</span>} />}
+                  {feeLabel && <InfoRow label="Consultation fee" value={<span className="font-bold text-primary-500">{feeLabel}</span>} />}
                   {insurances.length > 0 && (
                     <div>
-                      <p className="text-[11px] font-extrabold uppercase text-[#676879] mb-1.5">Accepted Insurance</p>
+                      <p className="text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400 mb-1.5">Accepted Insurance</p>
                       <div className="flex flex-wrap gap-1.5">
                         {insurances.map(ins => (
                           <Badge key={ins} variant="outline" className="text-xs gap-1">
-                            <Shield className="h-3 w-3 text-[#00c875]" /> {ins}
+                            <Shield className="h-3 w-3 text-success-500" /> {ins}
                           </Badge>
                         ))}
                       </div>
@@ -399,12 +408,12 @@ export const ProviderDetail = () => {
               {(provider.phone || provider.email) && (
                 <Section icon={Users} title="Contact">
                   {provider.phone && (
-                    <a href={`tel:${provider.phone}`} className="flex items-center gap-2 text-xs text-[#0073ea] hover:underline">
+                    <a href={`tel:${provider.phone}`} className="flex items-center gap-2 text-xs text-primary-500 hover:underline">
                       <Phone className="h-4 w-4" /> {provider.phone}
                     </a>
                   )}
                   {provider.email && (
-                    <a href={`mailto:${provider.email}`} className="flex items-center gap-2 text-xs text-[#0073ea] hover:underline">
+                    <a href={`mailto:${provider.email}`} className="flex items-center gap-2 text-xs text-primary-500 hover:underline">
                       <Mail className="h-4 w-4" /> {provider.email}
                     </a>
                   )}
@@ -415,14 +424,14 @@ export const ProviderDetail = () => {
               <div className="space-y-2">
                 <button
                   onClick={() => setIsBookingOpen(true)}
-                  className="w-full py-3 rounded-2xl bg-[#0073ea] hover:bg-[#0060c4] text-white font-extrabold text-sm transition-all"
+                  className="w-full py-3 rounded-2xl bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-sm transition-all"
                 >
                   <CalendarPlus className="h-4 w-4 inline mr-2" />
                   Book Appointment
                 </button>
                 <button
                   onClick={() => setIsWaitlistOpen(true)}
-                  className="w-full py-2.5 rounded-2xl border border-[#e6e9ef] hover:bg-[#f0f2f7] text-slate-700 font-bold text-xs transition-all"
+                  className="w-full py-2.5 rounded-2xl border border-canvas-silk dark:border-slate-700 hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-xs transition-all"
                 >
                   Join Waitlist
                 </button>

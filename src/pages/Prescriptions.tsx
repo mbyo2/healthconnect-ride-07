@@ -267,7 +267,7 @@ export const Prescriptions = () => {
       case "pending":
         return <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-black bg-amber-100 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-900/40">● Pending Rx</span>;
       default:
-        return <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-black bg-[#e5f0ff] dark:bg-blue-950/50 text-[#0073ea] dark:text-blue-400 border border-[#0073ea]/20">{status || "Dispatched"}</span>;
+        return <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-black bg-primary-50 dark:bg-blue-950/50 text-primary-500 dark:text-blue-400 border border-primary-500/20">{status || "Dispatched"}</span>;
     }
   };
 
@@ -373,7 +373,7 @@ export const Prescriptions = () => {
   return (
     <div className="min-h-screen bg-canvas text-midnight font-sans transition-colors pb-16">
       {/* Top Bar */}
-      <div className="bg-white border-b border-canvas-silk px-4 sm:px-6 py-5 sticky top-0 z-30 shadow-sm">
+      <div className="bg-white dark:bg-slate-900 border-b border-canvas-silk dark:border-slate-800 px-4 sm:px-6 py-5 sticky top-0 z-30 shadow-sm">
         <div className="max-w-content mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="h-11 w-11 rounded-2xl bg-primary-500 text-white flex items-center justify-center shadow-button">
@@ -461,22 +461,22 @@ export const Prescriptions = () => {
                     {/* Prescribed Medication Items */}
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
-                        <label className="font-bold text-[#676879] uppercase">
+                        <label className="font-bold text-graphite-500 dark:text-slate-400 uppercase">
                           2. Medications to Prescribe ({medicationItems.length} item{medicationItems.length > 1 ? 's' : ''})
                         </label>
                         <button
                           type="button"
                           onClick={handleAddMedication}
-                          className="px-3 py-1 rounded-full bg-[#0073ea]/10 hover:bg-[#0073ea] hover:text-white text-[#0073ea] font-extrabold text-[11px] transition-all flex items-center gap-1"
+                          className="px-3 py-1 rounded-full bg-primary-500/10 hover:bg-primary-500 hover:text-white text-primary-500 font-extrabold text-[11px] transition-all flex items-center gap-1"
                         >
                           <Plus className="h-3 w-3" /> Add Another Medication
                         </button>
                       </div>
 
                       {medicationItems.map((item, idx) => (
-                        <div key={item.id} className="p-4 rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-[#f8fafc] dark:bg-slate-950/60 space-y-3 relative">
+                        <div key={item.id} className="p-4 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-canvas-bone dark:bg-slate-950/60 space-y-3 relative">
                           <div className="flex items-center justify-between">
-                            <span className="px-2 py-0.5 rounded-md bg-[#0073ea] text-white font-black text-[10px]">
+                            <span className="px-2 py-0.5 rounded-md bg-primary-500 text-white font-black text-[10px]">
                               Medication #{idx + 1}
                             </span>
                             {medicationItems.length > 1 && (
@@ -494,7 +494,7 @@ export const Prescriptions = () => {
                           <div>
                             <label className="font-bold text-slate-700 dark:text-slate-300">Medication Name *</label>
                             <input
-                              className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4] dark:border-slate-800 bg-white dark:bg-slate-900 font-medium"
+                              className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 dark:border-slate-800 bg-white dark:bg-slate-900 font-medium"
                               placeholder="e.g. Amoxicillin 500mg"
                               value={item.medication_name}
                               onChange={(e) => {
@@ -514,7 +514,7 @@ export const Prescriptions = () => {
                             <div>
                               <label className="font-bold text-slate-700 dark:text-slate-300">Dosage / Frequency *</label>
                               <input
-                                className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4] dark:border-slate-800 bg-white dark:bg-slate-900 font-medium"
+                                className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 dark:border-slate-800 bg-white dark:bg-slate-900 font-medium"
                                 placeholder="1 tablet 2x daily"
                                 value={item.dosage}
                                 onChange={(e) => handleUpdateMedication(item.id, "dosage", e.target.value)}
@@ -532,7 +532,7 @@ export const Prescriptions = () => {
                                 <input
                                   type="number"
                                   min={1}
-                                  className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4] dark:border-slate-800 bg-white dark:bg-slate-900 font-medium"
+                                  className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 dark:border-slate-800 bg-white dark:bg-slate-900 font-medium"
                                   value={item.quantity}
                                   onChange={(e) => handleUpdateMedication(item.id, "quantity", parseInt(e.target.value) || 1)}
                                 />
@@ -542,7 +542,7 @@ export const Prescriptions = () => {
                                 <input
                                   type="number"
                                   min={1}
-                                  className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4] dark:border-slate-800 bg-white dark:bg-slate-900 font-medium"
+                                  className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 dark:border-slate-800 bg-white dark:bg-slate-900 font-medium"
                                   value={item.duration_days}
                                   onChange={(e) => handleUpdateMedication(item.id, "duration_days", parseInt(e.target.value) || 1)}
                                 />
@@ -553,7 +553,7 @@ export const Prescriptions = () => {
                           <div>
                             <label className="font-bold text-slate-700 dark:text-slate-300">Instructions *</label>
                             <input
-                              className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4] dark:border-slate-800 bg-white dark:bg-slate-900 font-medium"
+                              className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 dark:border-slate-800 bg-white dark:bg-slate-900 font-medium"
                               placeholder="e.g. Take with a glass of water after food"
                               value={item.instructions}
                               onChange={(e) => handleUpdateMedication(item.id, "instructions", e.target.value)}
@@ -583,10 +583,10 @@ export const Prescriptions = () => {
 
                     {/* Overall Notes */}
                     <div>
-                      <label className="font-bold text-[#676879] uppercase">3. Clinical Notes / Remarks</label>
+                      <label className="font-bold text-graphite-500 dark:text-slate-400 uppercase">3. Clinical Notes / Remarks</label>
                       <textarea
                         rows={2}
-                        className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4] dark:border-slate-800 bg-white dark:bg-slate-950 font-medium"
+                        className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 dark:border-slate-800 bg-white dark:bg-slate-950 font-medium"
                         placeholder="Additional notes, diagnosis or patient instructions..."
                         value={rxNotes}
                         onChange={(e) => setRxNotes(e.target.value)}
@@ -598,7 +598,7 @@ export const Prescriptions = () => {
                     <button
                       type="button"
                       onClick={() => setShowNewPrescription(false)}
-                      className="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:bg-[#f0f2f7]"
+                      className="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:bg-canvas-mist dark:hover:bg-slate-800"
                     >
                       Cancel
                     </button>
@@ -606,7 +606,7 @@ export const Prescriptions = () => {
                       type="button"
                       disabled={isSubmitting}
                       onClick={handleCreatePrescription}
-                      className="px-5 py-2.5 rounded-xl bg-[#0073ea] hover:bg-[#0060c7] text-white text-xs font-extrabold shadow-sm flex items-center gap-1.5 disabled:opacity-50"
+                      className="px-5 py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-xs font-extrabold shadow-sm flex items-center gap-1.5 disabled:opacity-50"
                     >
                       <CheckCircle2 className="h-4 w-4" />
                       {isSubmitting ? "Processing..." : `Issue E-Prescription (${medicationItems.length} Meds)`}
@@ -627,14 +627,14 @@ export const Prescriptions = () => {
               placeholder="Search medication, Rx number, or instructions..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 rounded-full border-2 border-[#e6e9ef] dark:border-slate-800 bg-[#f5f7fa] dark:bg-slate-900 text-xs font-medium focus:outline-none focus:border-[#0073ea] transition-all placeholder:text-slate-400"
+              className="w-full pl-10 pr-4 py-2 rounded-full border-2 border-canvas-silk dark:border-slate-800 bg-canvas-bone dark:bg-slate-900 text-xs font-medium focus:outline-none focus:border-primary-500 transition-all placeholder:text-slate-400"
             />
           </div>
 
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-4 py-2 rounded-full border-2 border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-black text-slate-700 dark:text-slate-300 focus:outline-none focus:border-[#0073ea]"
+            className="px-4 py-2 rounded-full border-2 border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-black text-slate-700 dark:text-slate-300 focus:outline-none focus:border-primary-500"
           >
             <option value="all">All Prescriptions</option>
             <option value="active">Active / Filled</option>
@@ -704,14 +704,14 @@ export const Prescriptions = () => {
               />
             )}
 
-            <div className="rounded-3xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
-            <div className="px-5 py-4 bg-[#0f172a] flex items-center justify-between">
+            <div className="rounded-3xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
+            <div className="px-5 py-4 bg-slate-900 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-[#00a86b] animate-pulse" />
+                  <span className="w-2 h-2 rounded-full bg-success-600 animate-pulse" />
                   <h2 className="font-extrabold text-sm text-white">Active E-Prescriptions &amp; Refills</h2>
                 </div>
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-[#0073ea] text-white">
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-primary-500 text-white">
                   {filteredPrescriptions.length} Records ({groupedOrders.length} Orders)
                 </span>
               </div>
@@ -741,7 +741,7 @@ export const Prescriptions = () => {
               <div className="w-full overflow-x-auto">
                 <table className="w-full text-left border-collapse min-w-[950px]">
                   <thead>
-                    <tr className="text-[11px] font-extrabold uppercase text-[#676879] dark:text-slate-400 border-b border-[#e6e9ef] dark:border-slate-800 bg-[#f5f6f8] dark:bg-slate-950">
+                    <tr className="text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400 border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950">
                       <th className="py-2.5 px-4 w-[240px]">Medication Profile</th>
                       <th className="py-2.5 px-3 w-[140px] text-center">Status</th>
                       <th className="py-2.5 px-3 w-[180px]">Dosage &amp; Frequency</th>
@@ -751,13 +751,13 @@ export const Prescriptions = () => {
                       <th className="py-2.5 px-3 w-[140px] text-center">Action</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#e6e9ef] dark:divide-slate-800 text-xs">
+                  <tbody className="divide-y divide-canvas-silk dark:divide-slate-800 text-xs">
                     {filteredPrescriptions.map((p: any) => (
-                      <tr key={p.id} className="hover:bg-[#f0f2f7] dark:hover:bg-slate-800/60 transition-colors">
+                      <tr key={p.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-800/60 transition-colors">
                         {/* Medication */}
                         <td className="py-3 px-4">
                           <div className="font-extrabold text-sm text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
-                            <Pill className="h-4 w-4 text-[#0073ea] flex-shrink-0" />
+                            <Pill className="h-4 w-4 text-primary-500 flex-shrink-0" />
                             <span>{p.medication_name}</span>
                           </div>
                           {p.prescription_number && (
@@ -766,7 +766,7 @@ export const Prescriptions = () => {
                             </span>
                           )}
                           {p.instructions && (
-                            <div className="text-[10px] text-[#676879] dark:text-slate-400 truncate max-w-[220px] mt-0.5">
+                            <div className="text-[10px] text-graphite-500 dark:text-slate-400 truncate max-w-[220px] mt-0.5">
                               {p.instructions}
                             </div>
                           )}
@@ -795,7 +795,7 @@ export const Prescriptions = () => {
 
                         {/* Refills */}
                         <td className="py-3 px-3 font-mono font-bold text-center">
-                          <span className="px-2 py-0.5 rounded bg-[#f0f2f7] dark:bg-slate-800">
+                          <span className="px-2 py-0.5 rounded bg-canvas-mist dark:bg-slate-800">
                             {p.refills_remaining || 0} left
                           </span>
                         </td>
@@ -816,7 +816,7 @@ export const Prescriptions = () => {
                                   : [p];
                                 handlePrintSlip(batchItems);
                               }}
-                              className="px-3 py-1.5 rounded-xl bg-[#f0f4ff] dark:bg-slate-800 hover:bg-[#0073ea] hover:text-white text-[#0073ea] dark:text-blue-400 text-[11px] font-black transition-all active:scale-95 flex items-center gap-1"
+                              className="px-3 py-1.5 rounded-xl bg-primary-50 dark:bg-slate-800 hover:bg-primary-500 hover:text-white text-primary-500 dark:text-blue-400 text-[11px] font-black transition-all active:scale-95 flex items-center gap-1"
                               title="Print full official multi-drug prescription"
                             >
                               <Printer className="h-3.5 w-3.5" />

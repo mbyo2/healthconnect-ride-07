@@ -60,17 +60,17 @@ export const ConnectionsDashboard = () => {
   const myProviders = getMyProviders();
 
   return (
-    <div className="min-h-screen bg-[#f5f7fa] dark:bg-slate-950 py-8 px-4 sm:px-6 font-sans">
+    <div className="min-h-screen bg-canvas-bone dark:bg-slate-950 py-8 px-4 sm:px-6 font-sans">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header Banner */}
-        <div className="rounded-3xl bg-[#0f172a] text-white p-6 sm:p-8 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="rounded-3xl bg-slate-900 text-white p-6 sm:p-8 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="h-14 w-14 rounded-2xl bg-[#0073ea] text-white flex items-center justify-center font-black shadow-md">
+            <div className="h-14 w-14 rounded-2xl bg-primary-500 text-white flex items-center justify-center font-black shadow-md">
               <Users className="h-7 w-7" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#00a86b] animate-pulse" />
+                <span className="w-2 h-2 rounded-full bg-success-600 animate-pulse" />
                 <span className="text-[11px] font-black uppercase tracking-wider text-slate-300">Care Network</span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white mt-0.5">Healthcare Connections</h1>
@@ -81,7 +81,7 @@ export const ConnectionsDashboard = () => {
           </div>
           <button
             onClick={() => navigate('/marketplace-users')}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#0073ea] hover:bg-[#0060c7] text-white text-xs font-black shadow-sm shadow-[#0073ea]/30 transition-all active:scale-95 shrink-0"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary-500 hover:bg-primary-600 text-white text-xs font-black shadow-sm shadow-primary-500/30 transition-all active:scale-95 shrink-0"
           >
             <Search className="h-4 w-4" />
             Browse User Marketplace
@@ -89,20 +89,20 @@ export const ConnectionsDashboard = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-6">
-          <TabsList className="grid w-full grid-cols-5 p-1 bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 rounded-2xl shadow-xs">
-            <TabsTrigger value="overview" className="text-xs font-extrabold rounded-xl data-[state=active]:bg-[#0073ea] data-[state=active]:text-white transition-all">Overview</TabsTrigger>
-            <TabsTrigger value="connections" className="text-xs font-extrabold rounded-xl data-[state=active]:bg-[#0073ea] data-[state=active]:text-white transition-all">Network</TabsTrigger>
-            <TabsTrigger value="requests" className="text-xs font-extrabold rounded-xl data-[state=active]:bg-[#0073ea] data-[state=active]:text-white transition-all">Requests</TabsTrigger>
-            <TabsTrigger value="search" className="text-xs font-extrabold rounded-xl data-[state=active]:bg-[#0073ea] data-[state=active]:text-white transition-all">Find</TabsTrigger>
-            <TabsTrigger value="primary" className="text-xs font-extrabold rounded-xl data-[state=active]:bg-[#0073ea] data-[state=active]:text-white transition-all">Primary Care</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-5 p-1 bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 rounded-2xl shadow-xs">
+            <TabsTrigger value="overview" className="text-xs font-extrabold rounded-xl data-[state=active]:bg-primary-500 data-[state=active]:text-white transition-all">Overview</TabsTrigger>
+            <TabsTrigger value="connections" className="text-xs font-extrabold rounded-xl data-[state=active]:bg-primary-500 data-[state=active]:text-white transition-all">Network</TabsTrigger>
+            <TabsTrigger value="requests" className="text-xs font-extrabold rounded-xl data-[state=active]:bg-primary-500 data-[state=active]:text-white transition-all">Requests</TabsTrigger>
+            <TabsTrigger value="search" className="text-xs font-extrabold rounded-xl data-[state=active]:bg-primary-500 data-[state=active]:text-white transition-all">Find</TabsTrigger>
+            <TabsTrigger value="primary" className="text-xs font-extrabold rounded-xl data-[state=active]:bg-primary-500 data-[state=active]:text-white transition-all">Primary Care</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="rounded-3xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm">
+              <div className="rounded-3xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider">Total Connections</span>
-                  <div className="p-2 rounded-xl bg-[#e5f0ff] dark:bg-blue-950 text-[#0073ea]">
+                  <div className="p-2 rounded-xl bg-primary-50 dark:bg-blue-950 text-primary-500">
                     <Users className="h-4 w-4" />
                   </div>
                 </div>
@@ -110,7 +110,7 @@ export const ConnectionsDashboard = () => {
                 <p className="text-xs text-slate-400 font-medium mt-1">Active verified connections</p>
               </div>
 
-              <div className="rounded-3xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm">
+              <div className="rounded-3xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider">Pending Requests</span>
                   <div className="p-2 rounded-xl bg-amber-50 dark:bg-amber-950 text-amber-600">
@@ -122,7 +122,7 @@ export const ConnectionsDashboard = () => {
               </div>
 
               {profile?.role === 'health_personnel' && (
-                <div className="rounded-3xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm">
+                <div className="rounded-3xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm">
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider">My Patients</span>
                     <div className="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950 text-emerald-600">
@@ -135,7 +135,7 @@ export const ConnectionsDashboard = () => {
               )}
 
               {profile?.role === 'patient' && (
-                <div className="rounded-3xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm">
+                <div className="rounded-3xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm">
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider">My Providers</span>
                     <div className="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950 text-emerald-600">
@@ -148,10 +148,10 @@ export const ConnectionsDashboard = () => {
               )}
 
               {profile?.role === 'patient' && (
-                <div className="rounded-3xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm">
+                <div className="rounded-3xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm">
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider">Primary Care</span>
-                    <div className="p-2 rounded-xl bg-[#e5f0ff] dark:bg-blue-950 text-[#0073ea]">
+                    <div className="p-2 rounded-xl bg-primary-50 dark:bg-blue-950 text-primary-500">
                       <Star className="h-4 w-4" />
                     </div>
                   </div>
@@ -164,8 +164,8 @@ export const ConnectionsDashboard = () => {
             </div>
 
           {/* Recent Activity */}
-          <div className="rounded-3xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
-            <div className="border-b border-[#e6e9ef] dark:border-slate-800 pb-4 mb-4">
+          <div className="rounded-3xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
+            <div className="border-b border-canvas-silk dark:border-slate-800 pb-4 mb-4">
               <h2 className="text-lg font-black text-slate-900 dark:text-slate-100">Recent Connections</h2>
               <p className="text-xs text-slate-400 font-medium">Your latest verified medical connections</p>
             </div>

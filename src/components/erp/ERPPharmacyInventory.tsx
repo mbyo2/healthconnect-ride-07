@@ -139,7 +139,7 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
   return (
     <div className="space-y-6 font-sans text-slate-900 dark:text-slate-100">
       {/* Header Banner */}
-      <div className="p-6 rounded-3xl bg-gradient-to-r from-[#0073ea] via-[#0f172a] to-[#1e293b] text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="p-6 rounded-3xl bg-gradient-to-r from-primary-500 via-slate-900 to-slate-800 text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
           <div className="h-12 w-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center font-black text-xl border border-white/20">
             <Boxes className="h-6 w-6 text-white" />
@@ -167,7 +167,7 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-2 border-b border-[#e6e9ef] dark:border-slate-800 pb-2 overflow-x-auto">
+      <div className="flex items-center gap-2 border-b border-canvas-silk dark:border-slate-800 pb-2 overflow-x-auto">
         {[
           { id: "stock", label: "Medicine Batches & Stock Ledger", icon: Package },
           { id: "po", label: "Purchase Orders & Procurement", icon: Truck },
@@ -181,8 +181,8 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
               onClick={() => setActiveTab(tab.id as any)}
               className={`px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2 transition-all shrink-0 ${
                 activeTab === tab.id
-                  ? "bg-[#0073ea] text-white shadow-xs"
-                  : "bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-[#f0f2f7]"
+                  ? "bg-primary-500 text-white shadow-xs"
+                  : "bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-canvas-mist dark:hover:bg-slate-800"
               }`}
             >
               <Icon className="h-4 w-4" />
@@ -203,21 +203,21 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
                 placeholder="Search by drug name, batch #, warehouse, category..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 rounded-xl border border-[#c3c6d4] dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-medium focus:outline-none focus:border-[#0073ea]"
+                className="w-full pl-10 pr-4 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-medium focus:outline-none focus:border-primary-500"
               />
             </div>
             <button
               onClick={() => toast.success("Stock valuation report generated")}
-              className="px-4 py-2 rounded-xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-bold hover:bg-[#f0f2f7]"
+              className="px-4 py-2 rounded-xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-bold hover:bg-canvas-mist dark:hover:bg-slate-800"
             >
               Export Stock Valuation (Excel)
             </button>
           </div>
 
-          <div className="w-full overflow-x-auto rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
+          <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-[#e6e9ef] dark:border-slate-800 bg-[#f5f6f8] dark:bg-slate-950 text-[11px] font-extrabold uppercase text-[#676879]">
+                <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
                   <th className="py-3 px-4">Item &amp; Code</th>
                   <th className="py-3 px-3">Batch Number</th>
                   <th className="py-3 px-3">Expiry Date</th>
@@ -227,16 +227,16 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
                   <th className="py-3 px-3 text-center">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#e6e9ef] dark:divide-slate-800">
+              <tbody className="divide-y divide-canvas-silk dark:divide-slate-800">
                 {filteredBatches.map((b) => {
                   const isLow = b.quantity <= b.reorderLevel;
                   return (
-                    <tr key={b.id} className="hover:bg-[#f0f2f7] dark:hover:bg-slate-800/60">
+                    <tr key={b.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-800/60">
                       <td className="py-3 px-4">
                         <div className="font-extrabold text-slate-900 dark:text-slate-100">{b.itemName}</div>
                         <div className="text-[10px] text-slate-400 font-mono">{b.itemCode} • {b.category}</div>
                       </td>
-                      <td className="py-3 px-3 font-mono font-bold text-[#0073ea]">{b.batchNo}</td>
+                      <td className="py-3 px-3 font-mono font-bold text-primary-500">{b.batchNo}</td>
                       <td className="py-3 px-3 font-semibold text-slate-600 dark:text-slate-300">{b.expiryDate}</td>
                       <td className="py-3 px-3 font-medium text-slate-700 dark:text-slate-300">{b.warehouse}</td>
                       <td className="py-3 px-3 text-right font-black text-slate-900 dark:text-slate-100">
@@ -273,12 +273,12 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
           <div className="flex items-center justify-between">
             <div>
               <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">Purchase Orders &amp; Procurement Pipeline</h3>
-              <p className="text-xs text-[#676879] dark:text-slate-400">Manage supplier quotes, PO approval, and Goods Receipt Notes (GRN)</p>
+              <p className="text-xs text-graphite-500 dark:text-slate-400">Manage supplier quotes, PO approval, and Goods Receipt Notes (GRN)</p>
             </div>
 
             <Dialog open={showPOModal} onOpenChange={setShowPOModal}>
               <DialogTrigger asChild>
-                <button className="px-4 py-2 rounded-xl bg-[#0073ea] text-white text-xs font-extrabold flex items-center gap-1.5 shadow-xs">
+                <button className="px-4 py-2 rounded-xl bg-primary-500 text-white text-xs font-extrabold flex items-center gap-1.5 shadow-xs">
                   <Plus className="h-4 w-4" /> Raise Purchase Order
                 </button>
               </DialogTrigger>
@@ -290,7 +290,7 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
                   <div>
                     <label className="font-bold">Supplier *</label>
                     <select
-                      className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4] font-bold bg-white dark:bg-slate-950"
+                      className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-bold bg-white dark:bg-slate-950"
                       value={newPOSupplier}
                       onChange={(e) => setNewPOSupplier(e.target.value)}
                     >
@@ -304,7 +304,7 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
                     <label className="font-bold">Estimated Order Total (ZMW) *</label>
                     <input
                       type="number"
-                      className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4] font-bold"
+                      className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-bold"
                       value={newPOAmount}
                       onChange={(e) => setNewPOAmount(parseFloat(e.target.value) || 0)}
                     />
@@ -313,7 +313,7 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
                     <label className="font-bold">Expected Delivery Date *</label>
                     <input
                       type="date"
-                      className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4] font-medium"
+                      className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-medium"
                       value={newPOExpected}
                       onChange={(e) => setNewPOExpected(e.target.value)}
                     />
@@ -321,16 +321,16 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
                 </div>
                 <DialogFooter>
                   <button onClick={() => setShowPOModal(false)} className="px-4 py-2 font-bold text-slate-500">Cancel</button>
-                  <button onClick={handleCreatePO} className="px-5 py-2.5 rounded-xl bg-[#0073ea] text-white font-extrabold">Create PO</button>
+                  <button onClick={handleCreatePO} className="px-5 py-2.5 rounded-xl bg-primary-500 text-white font-extrabold">Create PO</button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
           </div>
 
-          <div className="w-full overflow-x-auto rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
+          <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-[#e6e9ef] dark:border-slate-800 bg-[#f5f6f8] dark:bg-slate-950 text-[11px] font-extrabold uppercase text-[#676879]">
+                <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
                   <th className="py-3 px-4">PO Number</th>
                   <th className="py-3 px-3">Supplier Name</th>
                   <th className="py-3 px-3">Order Date</th>
@@ -340,10 +340,10 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
                   <th className="py-3 px-3 text-center">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#e6e9ef] dark:divide-slate-800">
+              <tbody className="divide-y divide-canvas-silk dark:divide-slate-800">
                 {purchaseOrders.map((po) => (
-                  <tr key={po.id} className="hover:bg-[#f0f2f7] dark:hover:bg-slate-800/60">
-                    <td className="py-3 px-4 font-black font-mono text-[#0073ea]">{po.poNumber}</td>
+                  <tr key={po.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-800/60">
+                    <td className="py-3 px-4 font-black font-mono text-primary-500">{po.poNumber}</td>
                     <td className="py-3 px-3 font-bold text-slate-900 dark:text-slate-100">{po.supplier}</td>
                     <td className="py-3 px-3 text-slate-600">{po.orderDate}</td>
                     <td className="py-3 px-3 text-slate-600">{po.expectedDelivery}</td>
@@ -356,7 +356,7 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
                           po.status === "approved"
                             ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400"
                             : po.status === "submitted"
-                            ? "bg-blue-100 text-[#0073ea] dark:bg-blue-950"
+                            ? "bg-blue-100 text-primary-500 dark:bg-blue-950"
                             : "bg-slate-100 text-slate-600 dark:bg-slate-800"
                         }`}
                       >
@@ -366,7 +366,7 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
                     <td className="py-3 px-3 text-center">
                       <button
                         onClick={() => toast.success(`Goods Receipt Note (GRN) created for ${po.poNumber}`)}
-                        className="px-3 py-1 rounded-lg bg-[#f0f4ff] hover:bg-[#0073ea] hover:text-white text-[#0073ea] font-extrabold text-[11px] transition-colors"
+                        className="px-3 py-1 rounded-lg bg-primary-50 hover:bg-primary-500 hover:text-white text-primary-500 font-extrabold text-[11px] transition-colors"
                       >
                         Create GRN
                       </button>
@@ -385,12 +385,12 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
           <div className="flex items-center justify-between">
             <div>
               <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">Department Stock Movement Vouchers</h3>
-              <p className="text-xs text-[#676879] dark:text-slate-400">Transfer medicines between Central Pharmacy, OPD, IPD, OT, and Lab</p>
+              <p className="text-xs text-graphite-500 dark:text-slate-400">Transfer medicines between Central Pharmacy, OPD, IPD, OT, and Lab</p>
             </div>
 
             <Dialog open={showTransferModal} onOpenChange={setShowTransferModal}>
               <DialogTrigger asChild>
-                <button className="px-4 py-2 rounded-xl bg-[#0073ea] text-white text-xs font-extrabold flex items-center gap-1.5 shadow-xs">
+                <button className="px-4 py-2 rounded-xl bg-primary-500 text-white text-xs font-extrabold flex items-center gap-1.5 shadow-xs">
                   <Plus className="h-4 w-4" /> Issue Transfer Voucher
                 </button>
               </DialogTrigger>
@@ -403,7 +403,7 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
                     <div>
                       <label className="font-bold">Source Warehouse *</label>
                       <select
-                        className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4] font-bold"
+                        className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-bold"
                         value={transferFrom}
                         onChange={(e) => setTransferFrom(e.target.value)}
                       >
@@ -415,7 +415,7 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
                     <div>
                       <label className="font-bold">Destination Unit *</label>
                       <select
-                        className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4] font-bold"
+                        className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-bold"
                         value={transferTo}
                         onChange={(e) => setTransferTo(e.target.value)}
                       >
@@ -429,7 +429,7 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
                   <div>
                     <label className="font-bold">Item Description *</label>
                     <input
-                      className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4] font-bold"
+                      className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-bold"
                       value={transferItem}
                       onChange={(e) => setTransferItem(e.target.value)}
                     />
@@ -438,7 +438,7 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
                     <label className="font-bold">Quantity *</label>
                     <input
                       type="number"
-                      className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4] font-black"
+                      className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-black"
                       value={transferQty}
                       onChange={(e) => setTransferQty(parseInt(e.target.value) || 1)}
                     />
@@ -446,16 +446,16 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
                 </div>
                 <DialogFooter>
                   <button onClick={() => setShowTransferModal(false)} className="px-4 py-2 font-bold text-slate-500">Cancel</button>
-                  <button onClick={handleCreateTransfer} className="px-5 py-2.5 rounded-xl bg-[#0073ea] text-white font-extrabold">Issue Voucher</button>
+                  <button onClick={handleCreateTransfer} className="px-5 py-2.5 rounded-xl bg-primary-500 text-white font-extrabold">Issue Voucher</button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
           </div>
 
-          <div className="w-full overflow-x-auto rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
+          <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-[#e6e9ef] dark:border-slate-800 bg-[#f5f6f8] dark:bg-slate-950 text-[11px] font-extrabold uppercase text-[#676879]">
+                <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
                   <th className="py-3 px-4">Voucher No</th>
                   <th className="py-3 px-3">From Location</th>
                   <th className="py-3 px-3">To Destination</th>
@@ -464,10 +464,10 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
                   <th className="py-3 px-3">Issued By</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#e6e9ef] dark:divide-slate-800">
+              <tbody className="divide-y divide-canvas-silk dark:divide-slate-800">
                 {transfers.map((t) => (
-                  <tr key={t.id} className="hover:bg-[#f0f2f7] dark:hover:bg-slate-800/60">
-                    <td className="py-3 px-4 font-mono font-bold text-[#0073ea]">{t.voucherNo}</td>
+                  <tr key={t.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-800/60">
+                    <td className="py-3 px-4 font-mono font-bold text-primary-500">{t.voucherNo}</td>
                     <td className="py-3 px-3 font-semibold text-slate-700 dark:text-slate-300">{t.fromLocation}</td>
                     <td className="py-3 px-3 font-bold text-emerald-600">{t.toLocation}</td>
                     <td className="py-3 px-3 font-bold text-slate-900 dark:text-slate-100">{t.item}</td>
@@ -487,11 +487,11 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
           <div className="flex items-center justify-between">
             <div>
               <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">Automated Reorder Recommendations</h3>
-              <p className="text-xs text-[#676879] dark:text-slate-400">Items that have breached the minimum safety buffer</p>
+              <p className="text-xs text-graphite-500 dark:text-slate-400">Items that have breached the minimum safety buffer</p>
             </div>
             <button
               onClick={() => toast.success("Batch PO generated for all low stock items")}
-              className="px-4 py-2 rounded-xl bg-[#0073ea] text-white font-extrabold text-xs shadow-xs"
+              className="px-4 py-2 rounded-xl bg-primary-500 text-white font-extrabold text-xs shadow-xs"
             >
               Generate Batch PO for All ({lowStockItems.length})
             </button>
@@ -519,7 +519,7 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
 
                   <button
                     onClick={() => toast.success(`PO Draft generated for ${item.itemName} (+${shortfall * 2} units)`)}
-                    className="px-4 py-2 rounded-xl bg-[#0073ea] hover:bg-[#0060c4] text-white font-extrabold text-xs shadow-xs shrink-0"
+                    className="px-4 py-2 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs shrink-0"
                   >
                     Quick Reorder (+{shortfall * 2})
                   </button>

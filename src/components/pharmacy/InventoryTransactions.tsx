@@ -42,6 +42,7 @@ import {
 import { LoadingScreen } from '@/components/LoadingScreen';
 import { useAuth } from '@/context/AuthContext';
 import { useInstitutionContext } from '@/hooks/useInstitutionContext';
+import { useCurrency } from '@/hooks/use-currency';
 import { format } from 'date-fns';
 
 interface MedicationInventoryItem {
@@ -69,6 +70,7 @@ const TRANSACTION_TYPES = ['purchase', 'sale', 'adjustment', 'return', 'expired'
 
 export const InventoryTransactions = () => {
   const { user } = useAuth();
+  const { formatPrice } = useCurrency();
   const { institutionId: userInstitution, loading: loadingInstitution } = useInstitutionContext();
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -308,8 +310,8 @@ export const InventoryTransactions = () => {
                       <TableCell className="text-right font-medium">
                         {transaction.quantity}
                       </TableCell>
-                      <TableCell className="text-right">
-                        {transaction.unit_price ? `$${transaction.unit_price.toFixed(2)}` : 'N/A'}
+                      <TableCell className="text-right tnum">
+                        {transaction.unit_price ? formatPrice(transaction.unit_price) : 'N/A'}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate">
                         {transaction.notes || '-'}

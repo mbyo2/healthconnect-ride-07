@@ -90,8 +90,11 @@ export default function HealthDashboard() {
 
   if (loading) {
     return (
-      <div className="container mx-auto py-8 flex items-center justify-center">
-        <div className="text-center">Loading your health dashboard...</div>
+      <div className="min-h-screen bg-canvas flex items-center justify-center p-6">
+        <div className="text-center space-y-2">
+          <div className="h-8 w-8 mx-auto rounded-full border-2 border-primary-500 border-t-transparent animate-spin" aria-hidden />
+          <p className="text-sm font-medium text-graphite-500">Loading your health dashboard…</p>
+        </div>
       </div>
     );
   }
@@ -107,7 +110,7 @@ export default function HealthDashboard() {
               Your Health Journey
             </div>
             <h1 className="font-display text-4xl sm:text-5xl font-medium text-midnight tracking-tight mb-3">Health Dashboard</h1>
-            <p className="text-base text-graphite-500 leading-relaxed tracking-wide max-w-2xl">
+            <p className="text-base text-graphite-500 dark:text-slate-400 leading-relaxed tracking-wide max-w-2xl">
               Monitor your health metrics and track your wellness goals
             </p>
           </div>
@@ -149,15 +152,17 @@ export default function HealthDashboard() {
               </div>
             </div>
           )) : (
-            <div className="col-span-full text-center py-12">
-              <p className="text-muted-foreground text-lg">No health metrics recorded yet. Start tracking your health!</p>
+            <div className="col-span-full rounded-2xl border border-dashed border-canvas-silk bg-white dark:bg-slate-900 p-10 text-center">
+              <Heart className="h-8 w-8 mx-auto text-primary-500 mb-3" />
+              <p className="font-medium text-midnight">No health metrics yet</p>
+              <p className="text-sm text-graphite-500 mt-1">Start tracking — add vitals, symptoms, or connect a device.</p>
             </div>
           )}
         </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Health Goals */}
-        <Card className="hover:shadow-xl transition-all duration-300 border-2 border-border/50">
+        <Card className="vf-card !p-0 overflow-hidden">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-xl">
               <Target className="h-6 w-6 text-primary" />
@@ -192,7 +197,7 @@ export default function HealthDashboard() {
         </Card>
 
         {/* Upcoming Appointments */}
-        <Card className="hover:shadow-xl transition-all duration-300 border-2 border-border/50">
+        <Card className="vf-card !p-0 overflow-hidden">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-xl">
               <Calendar className="h-6 w-6 text-primary" />
@@ -212,7 +217,7 @@ export default function HealthDashboard() {
                     {appointment.date} at {appointment.time}
                   </p>
                 </div>
-                <Button variant="outline" size="sm" onClick={() => navigate(`/appointments/${index}`)} className="ml-4">
+                <Button variant="outline" size="sm" onClick={() => navigate(appointment.id ? `/appointments/${appointment.id}` : '/appointments')} className="ml-4">
                   View Details
                 </Button>
               </div>
@@ -233,7 +238,7 @@ export default function HealthDashboard() {
       </div>
 
       {/* Quick Actions - Responsive Grid */}
-      <Card className="hover:shadow-xl transition-all duration-300 border-2 border-border/50">
+      <Card className="vf-card !p-0 overflow-hidden">
         <CardHeader>
           <CardTitle className="text-xl">Quick Actions</CardTitle>
           <CardDescription className="text-base">
@@ -293,7 +298,7 @@ function GamificationSection() {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <Card className="hover:shadow-xl transition-all duration-300 border-2 border-border/50">
+      <Card className="vf-card !p-0 overflow-hidden">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-xl">
             <Trophy className="h-6 w-6 text-yellow-500 dark:text-yellow-400" />
@@ -304,7 +309,7 @@ function GamificationSection() {
         <CardContent>
           <div className="flex flex-wrap gap-3">
             {badges.length > 0 ? badges.map((userBadge) => (
-              <div key={userBadge.id} className="flex flex-col items-center p-3 border-2 border-border/50 rounded-xl bg-yellow-50/50 dark:bg-yellow-950/10 hover:border-yellow-500/50 transition-colors" title={userBadge.badge.description}>
+              <div key={userBadge.id} className="flex flex-col items-center p-3 border border-border rounded-xl bg-yellow-50/50 dark:bg-yellow-950/10 hover:border-yellow-500/50 transition-colors" title={userBadge.badge.description}>
                 <div className="p-3 bg-yellow-100 dark:bg-yellow-950/20 rounded-full mb-2">
                   <Award className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
                 </div>
@@ -317,7 +322,7 @@ function GamificationSection() {
         </CardContent>
       </Card>
 
-      <Card className="hover:shadow-xl transition-all duration-300 border-2 border-border/50">
+      <Card className="vf-card !p-0 overflow-hidden">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-xl">
             <Target className="h-6 w-6 text-primary" />

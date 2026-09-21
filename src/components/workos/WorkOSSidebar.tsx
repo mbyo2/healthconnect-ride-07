@@ -42,13 +42,13 @@ export const WorkOSSidebar: React.FC<WorkOSSidebarProps> = ({
   const [searchBoardQuery, setSearchBoardQuery] = useState("");
 
   const boards = [
-    { id: "main-triage", name: "Patient Triage & Operations", icon: Table, color: "text-[#0073ea]", count: 7, isFavorite: true },
-    { id: "insurance-claims", name: "NHIMA Insurance & Claims", icon: ShieldCheck, color: "text-[#00c875]", count: 8, isFavorite: true },
-    { id: "accounting-ledger", name: "Accounting & Doctor Splits", icon: BarChart2, color: "text-[#fdab3d]", count: 14, isFavorite: true },
-    { id: "hrms-roster", name: "HRMS Staff Roster & HPCZ", icon: Users, color: "text-[#a25ddc]", count: 6, isFavorite: true },
-    { id: "icu-pipeline", name: "ICU & Bed Allocation", icon: Layers, color: "text-[#a25ddc]", count: 4, isFavorite: false },
-    { id: "telehealth-crm", name: "Outpatient Telehealth Queue", icon: Activity, color: "text-[#00c875]", count: 12, isFavorite: false },
-    { id: "discharge-hub", name: "Discharge & Billing Pipeline", icon: BarChart2, color: "text-[#ff3d57]", count: 3, isFavorite: false },
+    { id: "main-triage", name: "Patient Triage & Operations", icon: Table, color: "text-primary-500", count: 7, isFavorite: true },
+    { id: "insurance-claims", name: "NHIMA Insurance & Claims", icon: ShieldCheck, color: "text-success-500", count: 8, isFavorite: true },
+    { id: "accounting-ledger", name: "Accounting & Doctor Splits", icon: BarChart2, color: "text-warning-500", count: 14, isFavorite: true },
+    { id: "hrms-roster", name: "HRMS Staff Roster & HPCZ", icon: Users, color: "text-purple-500", count: 6, isFavorite: true },
+    { id: "icu-pipeline", name: "ICU & Bed Allocation", icon: Layers, color: "text-purple-500", count: 4, isFavorite: false },
+    { id: "telehealth-crm", name: "Outpatient Telehealth Queue", icon: Activity, color: "text-success-500", count: 12, isFavorite: false },
+    { id: "discharge-hub", name: "Discharge & Billing Pipeline", icon: BarChart2, color: "text-error-500", count: 3, isFavorite: false },
   ];
 
   const filteredBoards = boards.filter((b) =>
@@ -62,7 +62,7 @@ export const WorkOSSidebar: React.FC<WorkOSSidebarProps> = ({
       } ${
         isDarkMode
           ? "bg-slate-900/95 border-slate-800 text-slate-200"
-          : "bg-[#292f4c] border-slate-800 text-white"
+          : "bg-slate-800 border-slate-800 text-white"
       }`}
     >
       {/* Collapse Toggle Button */}
@@ -82,11 +82,11 @@ export const WorkOSSidebar: React.FC<WorkOSSidebarProps> = ({
       <div className="p-3.5 border-b border-slate-700/60 flex items-center justify-between">
         <div className="flex items-center gap-2.5 overflow-hidden">
           {/* Status Icon */}
-          <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-[#0073ea] via-[#a25ddc] to-[#00c875] p-0.5 flex-shrink-0 shadow-md flex items-center justify-center">
+          <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-primary-500 via-purple-500 to-success-500 p-0.5 flex-shrink-0 shadow-md flex items-center justify-center">
             <div className="w-full h-full bg-slate-950/30 rounded-[10px] flex items-center justify-center gap-0.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#ff3d57]" />
-              <span className="w-1.5 h-1.5 rounded-full bg-[#fdab3d]" />
-              <span className="w-1.5 h-1.5 rounded-full bg-[#00c875]" />
+              <span className="w-1.5 h-1.5 rounded-full bg-error-500" />
+              <span className="w-1.5 h-1.5 rounded-full bg-warning-500" />
+              <span className="w-1.5 h-1.5 rounded-full bg-success-500" />
             </div>
           </div>
 
@@ -140,7 +140,7 @@ export const WorkOSSidebar: React.FC<WorkOSSidebarProps> = ({
                     onClick={() => onSelectBoard(board.id)}
                     className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
                       isActive
-                        ? "bg-[#0073ea] text-white shadow-sm font-bold"
+                        ? "bg-primary-500 text-white shadow-sm font-bold"
                         : "text-slate-300 hover:bg-slate-800/60 hover:text-white"
                     }`}
                   >
@@ -182,7 +182,7 @@ export const WorkOSSidebar: React.FC<WorkOSSidebarProps> = ({
                     onClick={() => onSelectBoard(board.id)}
                     className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
                       isActive
-                        ? "bg-[#0073ea] text-white shadow-sm font-bold"
+                        ? "bg-primary-500 text-white shadow-sm font-bold"
                         : "text-slate-300 hover:bg-slate-800/60 hover:text-white"
                     }`}
                   >
@@ -216,7 +216,7 @@ export const WorkOSSidebar: React.FC<WorkOSSidebarProps> = ({
                 title={board.name}
                 className={`p-2 rounded-xl transition-all ${
                   isActive
-                    ? "bg-[#0073ea] text-white shadow-md"
+                    ? "bg-primary-500 text-white shadow-md"
                     : "text-slate-400 hover:bg-slate-800 hover:text-white"
                 }`}
               >

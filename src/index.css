@@ -11,6 +11,39 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Google-grade interaction defaults: visible keyboard focus everywhere,
+   calm motion for users who request it, tabular figures for money/data. */
+:focus-visible {
+  outline: 2px solid #397dff;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+::selection {
+  background: rgba(57, 125, 255, 0.22);
+}
+
+.tnum, .font-mono {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (prefers-contrast: more) {
+  :root {
+    --doc-muted: #525252;
+  }
+}
+
 html {
   font-size: clamp(14px, 0.8vw + 12px, 18px);
 }
@@ -76,6 +109,26 @@ html {
     --success-foreground: 0 0% 100%;
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
+
+    /* ── Adaptive canvas + ink (light mode values) ── */
+    --canvas: 0 0% 100%;
+    --canvas-bone: 40 6% 96%;
+    --canvas-mist: 220 14% 93%;
+    --canvas-silk: 0 0% 90%;
+    --midnight: 0 0% 9%;
+    --charcoal: 0 0% 15%;
+
+    /* ── Trust scale (doc-blue ramp, space-separated for rgb() use) ── */
+    --trust-50: 240 249 255;
+    --trust-100: 224 235 255;
+    --trust-200: 194 215 255;
+    --trust-300: 148 191 255;
+    --trust-400: 93 163 255;
+    --trust-500: 57 125 255;
+    --trust-600: 37 99 235;
+    --trust-700: 29 78 216;
+    --trust-800: 30 64 175;
+    --trust-900: 30 58 138;
   }
 
   .dark {
@@ -98,7 +151,21 @@ html {
     --border:           24 8% 18%;
     --input:            24 8% 18%;
     --ring:             219 100% 65%;
+
+    /* ── Adaptive canvas + ink (dark mode values) ── */
+    --canvas: 24 10% 6%;
+    --canvas-bone: 24 8% 10%;
+    --canvas-mist: 24 8% 14%;
+    --canvas-silk: 24 8% 20%;
+    --midnight: 40 10% 98%;
+    --charcoal: 40 6% 90%;
   }
+
+  /* Lift secondary graphite text in dark mode so body copy stays legible. */
+  .dark .text-graphite-500 { color: #a8a29e; }
+  .dark .text-graphite-600 { color: #d6d3d1; }
+  .dark .text-graphite-400 { color: #a8a29e; }
+  .dark .placeholder\:text-graphite-400::placeholder { color: #78716c; }
 }
 
 /* ─── Base Resets ─── */
@@ -346,6 +413,15 @@ html {
   }
   .doc-fade-in {
     @apply animate-in fade-in duration-300;
+  }
+
+  /* ── Trust card surface (used by search/video surfaces) ── */
+  .trust-card {
+    @apply rounded-card border border-canvas-silk bg-white shadow-card;
+  }
+  .dark .trust-card {
+    background-color: hsl(24 8% 10%);
+    border-color: hsl(24 8% 18%);
   }
 
   /* ── Legacy monday-pill compatibility ── */

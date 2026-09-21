@@ -129,7 +129,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
   return (
     <div className="space-y-6 font-sans text-slate-900 dark:text-slate-100">
       {/* Header Banner */}
-      <div className="p-6 rounded-3xl bg-gradient-to-r from-[#0073ea] to-[#0f172a] text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="p-6 rounded-3xl bg-gradient-to-r from-primary-500 to-slate-900 text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
           <div className="h-12 w-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center font-black text-xl border border-white/20">
             <Baby className="h-6 w-6 text-white" />
@@ -164,7 +164,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
       </div>
 
       {/* Sub Tabs */}
-      <div className="flex items-center gap-2 border-b border-[#e6e9ef] dark:border-slate-800 pb-2 overflow-x-auto">
+      <div className="flex items-center gap-2 border-b border-canvas-silk dark:border-slate-800 pb-2 overflow-x-auto">
         {[
           { id: "growth", label: "WHO Growth Curves & Vitals", icon: TrendingUp },
           { id: "immunization", label: "Vaccine & Immunization Registry", icon: ShieldCheck },
@@ -178,8 +178,8 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
               onClick={() => setActiveSubTab(tab.id as any)}
               className={`px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2 transition-all shrink-0 ${
                 activeSubTab === tab.id
-                  ? "bg-[#0073ea] text-white shadow-xs"
-                  : "bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-[#f0f2f7]"
+                  ? "bg-primary-500 text-white shadow-xs"
+                  : "bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-canvas-mist dark:hover:bg-slate-800"
               }`}
             >
               <Icon className="h-4 w-4" />
@@ -197,14 +197,14 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
               <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">
                 Child Anthropometry &amp; Growth Trajectory
               </h3>
-              <p className="text-xs text-[#676879] dark:text-slate-400">
-                Patient: <span className="font-bold text-[#0073ea]">{activePatient?.first_name} {activePatient?.last_name}</span> (Age: {calculateAgeMonths(activePatient?.date_of_birth)} months)
+              <p className="text-xs text-graphite-500 dark:text-slate-400">
+                Patient: <span className="font-bold text-primary-500">{activePatient?.first_name} {activePatient?.last_name}</span> (Age: {calculateAgeMonths(activePatient?.date_of_birth)} months)
               </p>
             </div>
 
             <Dialog open={showGrowthModal} onOpenChange={setShowGrowthModal}>
               <DialogTrigger asChild>
-                <button className="px-4 py-2 rounded-xl bg-[#0073ea] text-white text-xs font-extrabold flex items-center gap-1.5 shadow-xs">
+                <button className="px-4 py-2 rounded-xl bg-primary-500 text-white text-xs font-extrabold flex items-center gap-1.5 shadow-xs">
                   <Plus className="h-4 w-4" /> Log Measurement
                 </button>
               </DialogTrigger>
@@ -218,7 +218,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
                     <input
                       type="number"
                       step="0.05"
-                      className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4] font-medium"
+                      className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-medium"
                       value={weightKg}
                       onChange={(e) => setWeightKg(parseFloat(e.target.value) || 0)}
                     />
@@ -229,7 +229,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
                       <input
                         type="number"
                         step="0.1"
-                        className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4] font-medium"
+                        className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-medium"
                         value={heightCm}
                         onChange={(e) => setHeightCm(parseFloat(e.target.value) || 0)}
                       />
@@ -239,7 +239,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
                       <input
                         type="number"
                         step="0.1"
-                        className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4] font-medium"
+                        className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-medium"
                         value={headCircumferenceCm}
                         onChange={(e) => setHeadCircumferenceCm(parseFloat(e.target.value) || 0)}
                       />
@@ -249,7 +249,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
                     <label className="font-bold text-slate-700 dark:text-slate-300">Clinical Notes</label>
                     <textarea
                       rows={2}
-                      className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4] font-medium"
+                      className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-medium"
                       placeholder="Feeding status, appetite, nutritional observations..."
                       value={growthNotes}
                       onChange={(e) => setGrowthNotes(e.target.value)}
@@ -258,7 +258,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
                 </div>
                 <DialogFooter>
                   <button onClick={() => setShowGrowthModal(false)} className="px-4 py-2 font-bold text-slate-500">Cancel</button>
-                  <button onClick={handleAddGrowthEntry} className="px-5 py-2.5 rounded-xl bg-[#0073ea] text-white font-extrabold">Save Record</button>
+                  <button onClick={handleAddGrowthEntry} className="px-5 py-2.5 rounded-xl bg-primary-500 text-white font-extrabold">Save Record</button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
@@ -266,15 +266,15 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
 
           {/* Growth Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+            <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
               <span className="text-[11px] font-extrabold uppercase text-slate-400">Current Weight</span>
-              <div className="text-2xl font-black text-[#0073ea] mt-1">
+              <div className="text-2xl font-black text-primary-500 mt-1">
                 {growthHistory[growthHistory.length - 1]?.weight} kg
               </div>
               <span className="text-[10px] font-bold text-emerald-600">✓ 50th percentile (Normal)</span>
             </div>
 
-            <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+            <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
               <span className="text-[11px] font-extrabold uppercase text-slate-400">Current Length / Height</span>
               <div className="text-2xl font-black text-slate-900 dark:text-slate-100 mt-1">
                 {growthHistory[growthHistory.length - 1]?.height} cm
@@ -282,7 +282,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
               <span className="text-[10px] font-bold text-emerald-600">✓ On WHO growth curve</span>
             </div>
 
-            <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+            <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
               <span className="text-[11px] font-extrabold uppercase text-slate-400">Head Circumference</span>
               <div className="text-2xl font-black text-slate-900 dark:text-slate-100 mt-1">
                 {growthHistory[growthHistory.length - 1]?.head} cm
@@ -292,10 +292,10 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
           </div>
 
           {/* Growth Table */}
-          <div className="w-full overflow-x-auto rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
+          <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-[#e6e9ef] dark:border-slate-800 bg-[#f5f6f8] dark:bg-slate-950 text-[11px] font-extrabold uppercase text-[#676879]">
+                <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
                   <th className="py-3 px-4">Visit Date</th>
                   <th className="py-3 px-3">Age (Months)</th>
                   <th className="py-3 px-3">Weight</th>
@@ -304,10 +304,10 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
                   <th className="py-3 px-3 text-center">WHO Percentile</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#e6e9ef] dark:divide-slate-800">
+              <tbody className="divide-y divide-canvas-silk dark:divide-slate-800">
                 {growthHistory.map((row, i) => (
-                  <tr key={i} className="hover:bg-[#f0f2f7] dark:hover:bg-slate-800/60">
-                    <td className="py-3 px-4 font-bold text-[#0073ea]">{row.date}</td>
+                  <tr key={i} className="hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-800/60">
+                    <td className="py-3 px-4 font-bold text-primary-500">{row.date}</td>
                     <td className="py-3 px-3 font-semibold">{row.ageMonths} mo</td>
                     <td className="py-3 px-3 font-black text-slate-900 dark:text-slate-100">{row.weight} kg</td>
                     <td className="py-3 px-3 font-semibold">{row.height} cm</td>
@@ -327,13 +327,13 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
           <div className="flex items-center justify-between">
             <div>
               <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">National Immunization Schedule (EPI)</h3>
-              <p className="text-xs text-[#676879] dark:text-slate-400">
+              <p className="text-xs text-graphite-500 dark:text-slate-400">
                 Tracking completed doses, upcoming shots, and batch serial numbers
               </p>
             </div>
             <button
               onClick={() => toast.success("Immunization certificate exported to PDF")}
-              className="px-4 py-2 rounded-xl border border-[#0073ea] text-[#0073ea] font-extrabold text-xs hover:bg-[#0073ea] hover:text-white transition-colors"
+              className="px-4 py-2 rounded-xl border border-primary-500 text-primary-500 font-extrabold text-xs hover:bg-primary-500 hover:text-white transition-colors"
             >
               Export Vaccine Certificate (PDF)
             </button>
@@ -343,7 +343,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
             {STANDARD_VACCINES.map((v) => (
               <div
                 key={v.id}
-                className="p-4 rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs flex items-center justify-between"
+                className="p-4 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs flex items-center justify-between"
               >
                 <div className="flex items-center gap-3">
                   <div
@@ -371,7 +371,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
                   ) : v.status === "due" ? (
                     <button
                       onClick={() => toast.success(`Recorded ${v.name} as administered`)}
-                      className="px-3 py-1.5 rounded-full text-[10px] font-black bg-[#0073ea] text-white shadow-xs hover:bg-[#0060c4]"
+                      className="px-3 py-1.5 rounded-full text-[10px] font-black bg-primary-500 text-white shadow-xs hover:bg-primary-600"
                     >
                       Record Dose
                     </button>
@@ -392,18 +392,18 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
         <div className="space-y-4">
           <div>
             <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">Pediatric Developmental Milestones (Ages 0 - 24 Months)</h3>
-            <p className="text-xs text-[#676879] dark:text-slate-400">Screening motor, speech, and social progression</p>
+            <p className="text-xs text-graphite-500 dark:text-slate-400">Screening motor, speech, and social progression</p>
           </div>
 
           <div className="space-y-3">
             {DEVELOPMENTAL_MILESTONES.map((m, idx) => (
               <div
                 key={idx}
-                className="p-4 rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                className="p-4 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3"
               >
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="px-2.5 py-0.5 rounded-md bg-[#0073ea]/10 text-[#0073ea] font-black text-[10px]">
+                    <span className="px-2.5 py-0.5 rounded-md bg-primary-500/10 text-primary-500 font-black text-[10px]">
                       {m.age}
                     </span>
                     <span className="text-[10px] font-bold text-slate-400 uppercase">{m.category}</span>
@@ -420,7 +420,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
                   </button>
                   <button
                     onClick={() => toast.info(`Milestone for ${m.age} marked as In Progress`)}
-                    className="px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-[#e6e9ef] text-slate-600 dark:text-slate-300 font-bold text-[11px]"
+                    className="px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-canvas-silk text-slate-600 dark:text-slate-300 font-bold text-[11px]"
                   >
                     In Progress
                   </button>
@@ -436,15 +436,15 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
         <div className="space-y-4">
           <div>
             <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">Weight-Based Pediatric Dosage Calculator</h3>
-            <p className="text-xs text-[#676879] dark:text-slate-400">
+            <p className="text-xs text-graphite-500 dark:text-slate-400">
               Calculate exact single and daily doses (mg and mL) from child weight and liquid concentration
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="p-5 rounded-3xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs space-y-4 text-xs">
+            <div className="p-5 rounded-3xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs space-y-4 text-xs">
               <h4 className="font-black text-sm text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                <Calculator className="h-4 w-4 text-[#0073ea]" /> Dosage Input Parameters
+                <Calculator className="h-4 w-4 text-primary-500" /> Dosage Input Parameters
               </h4>
 
               <div>
@@ -464,7 +464,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
                       setCalcConcentrationMgMl(20); // 100mg/5ml
                     }
                   }}
-                  className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4] font-bold bg-white dark:bg-slate-950"
+                  className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-bold bg-white dark:bg-slate-950"
                 >
                   <option value="Amoxicillin (50mg/kg/day in 2 divided doses)">Amoxicillin Susp (250mg/5mL)</option>
                   <option value="Paracetamol (15mg/kg/dose every 6h)">Paracetamol Syrup (120mg/5mL)</option>
@@ -481,7 +481,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
                     step="0.5"
                     value={calcWeight}
                     onChange={(e) => setCalcWeight(parseFloat(e.target.value) || 1)}
-                    className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4] font-black"
+                    className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-black"
                   />
                 </div>
                 <div>
@@ -491,7 +491,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
                     step="1"
                     value={calcMgPerKg}
                     onChange={(e) => setCalcMgPerKg(parseFloat(e.target.value) || 1)}
-                    className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4] font-black"
+                    className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-black"
                   />
                 </div>
               </div>
@@ -503,16 +503,16 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
                   step="1"
                   value={calcConcentrationMgMl}
                   onChange={(e) => setCalcConcentrationMgMl(parseFloat(e.target.value) || 1)}
-                  className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4] font-medium"
+                  className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-medium"
                 />
                 <span className="text-[10px] text-slate-400">e.g. 250mg in 5mL = 50 mg/mL</span>
               </div>
             </div>
 
             {/* Calculated Result Card */}
-            <div className="p-6 rounded-3xl bg-gradient-to-br from-[#0f172a] to-[#1e293b] text-white shadow-md flex flex-col justify-between space-y-4">
+            <div className="p-6 rounded-3xl bg-gradient-to-br from-slate-900 to-slate-800 text-white shadow-md flex flex-col justify-between space-y-4">
               <div>
-                <span className="px-3 py-1 rounded-full text-[10px] font-black bg-[#0073ea] text-white uppercase tracking-wider">
+                <span className="px-3 py-1 rounded-full text-[10px] font-black bg-primary-500 text-white uppercase tracking-wider">
                   Precise Calculated Dosage
                 </span>
                 <div className="mt-4">
@@ -542,7 +542,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
 
               <button
                 onClick={() => toast.success(`Dosage of ${singleDoseMl} mL (${singleDoseMg} mg) copied to prescription`)}
-                className="w-full py-2.5 rounded-xl bg-[#0073ea] hover:bg-[#0060c4] text-white font-extrabold text-xs shadow-xs"
+                className="w-full py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs"
               >
                 Insert into Prescription Order
               </button>

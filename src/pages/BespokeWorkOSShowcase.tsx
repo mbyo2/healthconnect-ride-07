@@ -295,7 +295,7 @@ export const BespokeWorkOSShowcase = () => {
       </Helmet>
 
       <div className={`min-h-screen flex font-sans transition-colors duration-200 ${
-        isDarkMode ? "bg-slate-950 text-slate-100" : "bg-[#f5f6f8] text-slate-900"
+        isDarkMode ? "bg-slate-950 text-slate-100" : "bg-canvas text-slate-900"
       }`}>
         {/* Workspace Navigation Sidebar */}
         <WorkOSSidebar
@@ -444,7 +444,7 @@ export const BespokeWorkOSShowcase = () => {
                   isDarkMode ? "bg-slate-950 border-slate-800" : "bg-slate-50 border-slate-200"
                 }`}>
                   <div>
-                    <div className="font-bold text-xs">When <span className="text-[#00c875]">Status changes to Done</span></div>
+                    <div className="font-bold text-xs">When <span className="text-success-500">Status changes to Done</span></div>
                     <div className="text-[11px] text-slate-400">Move patient item to Discharge Pipeline & generate PDF invoice</div>
                   </div>
                   <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-mono text-[10px] font-bold">ACTIVE</span>

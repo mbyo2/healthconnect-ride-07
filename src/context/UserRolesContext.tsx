@@ -3,6 +3,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
 import { UserRole, AdminLevel } from '@/types/user';
 import { ROLE_PRIORITY } from '@/config/roleConfig';
+import { withTimeout, TIMEOUTS } from '@/utils/async';
 import { supabase } from '@/integrations/supabase/client';
 
 interface UserRolesContextType {
@@ -133,15 +134,26 @@ export function UserRolesProvider({ children }: { children: React.ReactNode }) {
       if (user) {
         setLoading(true);
         try {
-          // 1. Fetch roles from user_roles table
-          const { data: rolesData, error } = await supabase
-            .from('user_roles')
-            .select('role')
-            .eq('user_id', user.id);
+          // 1. Fetch roles from user_roles table — timed so a stalled
+          // request falls back to profile/metadata roles instead of
+          // hanging the route gate forever.
+          let rolesData: any[] | null = null;
+          try {
+            const res = await withTimeout(
+              supabase.from('user_roles').select('role').eq('user_id', user.id),
+              TIMEOUTS.critical,
+              'fetchRoles'
+            );
+            if (!res.error && res.data && res.data.length > 0) {
+              rolesData = res.data;
+            }
+          } catch (rolesErr) {
+            console.warn('Roles fetch timed out, using profile/metadata roles:', rolesErr);
+          }
 
           const rawRoles: string[] = [];
 
-          if (!error && rolesData && rolesData.length > 0) {
+          if (rolesData && rolesData.length > 0) {
             rolesData.forEach(r => { if (r.role) rawRoles.push(r.role); });
           }
 

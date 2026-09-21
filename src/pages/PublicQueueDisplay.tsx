@@ -33,11 +33,11 @@ export const PublicQueueDisplay: React.FC = () => {
   const currentlyCalled = tokens.find((t) => t.status === "Called") || tokens[0];
 
   return (
-    <div className="min-h-screen bg-[#070d17] text-white font-sans p-6 sm:p-10 flex flex-col justify-between select-none">
+    <div className="min-h-screen bg-slate-950 text-white font-sans p-6 sm:p-10 flex flex-col justify-between select-none">
       {/* Top TV Header */}
       <div className="flex items-center justify-between border-b border-slate-800/80 pb-6">
         <div className="flex items-center gap-4">
-          <div className="h-14 w-14 rounded-2xl bg-[#0073ea] flex items-center justify-center font-black text-2xl shadow-lg shadow-[#0073ea]/30">
+          <div className="h-14 w-14 rounded-2xl bg-primary-500 flex items-center justify-center font-black text-2xl shadow-lg shadow-primary-500/30">
             <Building2 className="h-8 w-8 text-white" />
           </div>
           <div>
@@ -64,13 +64,13 @@ export const PublicQueueDisplay: React.FC = () => {
       {/* Main Focus: Big Screen Now Calling Hero */}
       <div className="my-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
         {/* Left 7 cols: Current Active Called Token */}
-        <div className="lg:col-span-7 p-8 sm:p-12 rounded-3xl bg-gradient-to-br from-[#0f172a] via-[#162033] to-[#0073ea]/40 border-2 border-[#0073ea] shadow-2xl flex flex-col justify-between relative overflow-hidden">
+        <div className="lg:col-span-7 p-8 sm:p-12 rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900 to-primary-500/40 border-2 border-primary-500 shadow-2xl flex flex-col justify-between relative overflow-hidden">
           <div className="absolute top-0 right-0 p-8 opacity-10">
-            <Bell className="h-48 w-48 text-[#0073ea]" />
+            <Bell className="h-48 w-48 text-primary-500" />
           </div>
 
           <div>
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#0073ea] text-white text-xs font-black uppercase tracking-widest animate-pulse">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary-500 text-white text-xs font-black uppercase tracking-widest animate-pulse">
               <Volume2 className="h-4 w-4" /> Now Calling / Token Called
             </div>
 
@@ -113,7 +113,7 @@ export const PublicQueueDisplay: React.FC = () => {
                 className="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 flex items-center justify-between shadow-sm"
               >
                 <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-xl bg-[#0073ea]/20 text-[#0073ea] font-mono font-black text-sm flex items-center justify-center border border-[#0073ea]/40">
+                  <div className="h-10 w-10 rounded-xl bg-primary-500/20 text-primary-500 font-mono font-black text-sm flex items-center justify-center border border-primary-500/40">
                     {tok.tokenNumber}
                   </div>
                   <div>

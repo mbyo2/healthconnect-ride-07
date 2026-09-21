@@ -56,19 +56,19 @@ export function UserCard({ user, onConnect, isConnecting }: UserCardProps) {
 
   const getRolePill = (role: string) => {
     switch (role) {
-      case "health_personnel": return "bg-[#0073ea] text-white";
-      case "patient": return "bg-[#00c875] text-white";
-      default: return "bg-[#a25ddc] text-white";
+      case "health_personnel": return "bg-primary-500 text-white";
+      case "patient": return "bg-success-500 text-white";
+      default: return "bg-purple-500 text-white";
     }
   };
 
   return (
-    <div className="p-5 rounded-2xl border border-[#e6e9ef] bg-white shadow-xs hover:border-[#0073ea] transition-all font-sans space-y-4">
+    <div className="p-5 rounded-2xl border border-canvas-silk bg-white shadow-xs hover:border-primary-500 transition-all font-sans space-y-4">
       <div className="flex items-start justify-between">
         <div className="flex items-center space-x-3">
-          <Avatar className="h-11 w-11 border border-[#e6e9ef]">
+          <Avatar className="h-11 w-11 border border-canvas-silk dark:border-slate-800">
             <AvatarImage src={user.avatar_url} />
-            <AvatarFallback className="bg-[#e5f0ff] text-[#0073ea] font-extrabold text-xs">
+            <AvatarFallback className="bg-primary-50 text-primary-500 font-extrabold text-xs">
               {user.first_name?.[0]}{user.last_name?.[0]}
             </AvatarFallback>
           </Avatar>
@@ -77,11 +77,11 @@ export function UserCard({ user, onConnect, isConnecting }: UserCardProps) {
               {user.first_name} {user.last_name}
             </h3>
             {user.specialty && (
-              <p className="text-xs text-[#676879] font-medium">{user.specialty}</p>
+              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">{user.specialty}</p>
             )}
             {user.city && user.state && (
-              <div className="flex items-center gap-1 text-[11px] text-[#676879] font-medium mt-0.5">
-                <MapPin className="h-3 w-3 text-[#0073ea]" />
+              <div className="flex items-center gap-1 text-[11px] text-graphite-500 dark:text-slate-400 font-medium mt-0.5">
+                <MapPin className="h-3 w-3 text-primary-500" />
                 {user.city}, {user.state}
               </div>
             )}
@@ -94,36 +94,36 @@ export function UserCard({ user, onConnect, isConnecting }: UserCardProps) {
       </div>
 
       {user.bio && (
-        <p className="text-xs text-[#676879] line-clamp-2 font-medium">
+        <p className="text-xs text-graphite-500 dark:text-slate-400 line-clamp-2 font-medium">
           {user.bio}
         </p>
       )}
 
       {/* Institution Info */}
       {user.institution && (
-        <div className="p-3 bg-[#e5f0ff] border border-[#c5d9f7] rounded-xl text-xs">
-          <div className="flex items-center gap-1.5 font-extrabold text-[#0073ea]">
+        <div className="p-3 bg-primary-50 border border-primary-200 rounded-xl text-xs">
+          <div className="flex items-center gap-1.5 font-extrabold text-primary-500">
             <Building className="h-3.5 w-3.5" />
             <span>{user.institution.name}</span>
           </div>
-          <p className="text-[10px] text-[#676879] font-medium mt-0.5">{user.institution.type}</p>
+          <p className="text-[10px] text-graphite-500 dark:text-slate-400 font-medium mt-0.5">{user.institution.type}</p>
         </div>
       )}
 
       {/* Services */}
       {user.services && user.services.length > 0 && (
         <div className="space-y-1.5 text-xs">
-          <h4 className="font-extrabold text-[#676879] uppercase text-[10px] flex items-center gap-1">
-            <Stethoscope className="h-3 w-3 text-[#0073ea]" /> Services Offered
+          <h4 className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase text-[10px] flex items-center gap-1">
+            <Stethoscope className="h-3 w-3 text-primary-500" /> Services Offered
           </h4>
           <div className="space-y-1">
             {user.services.slice(0, 3).map((service) => (
-              <div key={service.id} className="flex justify-between items-center text-xs p-1.5 rounded-lg bg-[#f5f6f8]">
+              <div key={service.id} className="flex justify-between items-center text-xs p-1.5 rounded-lg bg-canvas dark:bg-slate-950">
                 <span className="font-bold text-slate-900">{service.name}</span>
                 <div className="flex items-center gap-2">
-                  <span className="text-[#00c875] font-black">K{service.price}</span>
+                  <span className="text-success-500 font-black">K{service.price}</span>
                   {service.duration && (
-                    <span className="text-[#676879] text-[10px] flex items-center gap-0.5">
+                    <span className="text-graphite-500 dark:text-slate-400 text-[10px] flex items-center gap-0.5">
                       <Clock className="h-3 w-3" /> {service.duration}m
                     </span>
                   )}
@@ -137,14 +137,14 @@ export function UserCard({ user, onConnect, isConnecting }: UserCardProps) {
       {/* Products */}
       {user.products && user.products.length > 0 && (
         <div className="space-y-1.5 text-xs">
-          <h4 className="font-extrabold text-[#676879] uppercase text-[10px] flex items-center gap-1">
-            <Pill className="h-3 w-3 text-[#a25ddc]" /> Available Products
+          <h4 className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase text-[10px] flex items-center gap-1">
+            <Pill className="h-3 w-3 text-purple-500" /> Available Products
           </h4>
           <div className="space-y-1">
             {user.products.slice(0, 3).map((product) => (
-              <div key={product.id} className="flex justify-between items-center text-xs p-1.5 rounded-lg bg-[#f5f6f8]">
+              <div key={product.id} className="flex justify-between items-center text-xs p-1.5 rounded-lg bg-canvas dark:bg-slate-950">
                 <span className="font-bold text-slate-900">{product.medication_name}</span>
-                <span className="text-[#00c875] font-black">K{product.price}</span>
+                <span className="text-success-500 font-black">K{product.price}</span>
               </div>
             ))}
           </div>
@@ -152,15 +152,15 @@ export function UserCard({ user, onConnect, isConnecting }: UserCardProps) {
       )}
 
       {/* Contact Info */}
-      <div className="flex flex-wrap gap-3 text-[11px] text-[#676879] font-medium pt-1 border-t border-[#e6e9ef]">
+      <div className="flex flex-wrap gap-3 text-[11px] text-graphite-500 dark:text-slate-400 font-medium pt-1 border-t border-canvas-silk dark:border-slate-800">
         {user.email && (
           <div className="flex items-center gap-1">
-            <Mail className="h-3 w-3 text-[#0073ea]" /> {user.email}
+            <Mail className="h-3 w-3 text-primary-500" /> {user.email}
           </div>
         )}
         {user.phone && (
           <div className="flex items-center gap-1">
-            <Phone className="h-3 w-3 text-[#00c875]" /> {user.phone}
+            <Phone className="h-3 w-3 text-success-500" /> {user.phone}
           </div>
         )}
       </div>
@@ -170,22 +170,22 @@ export function UserCard({ user, onConnect, isConnecting }: UserCardProps) {
         <button
           onClick={() => onConnect(user.id, user.role)}
           disabled={isConnecting}
-          className="flex-1 py-2 rounded-xl bg-[#0073ea] hover:bg-[#0060c4] text-white font-extrabold text-xs shadow-xs transition-all"
+          className="flex-1 py-2 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs transition-all"
         >
           Connect
         </button>
         <button
           onClick={() => (window.location.href = `/chat?receiver=${user.id}`)}
-          className="px-3.5 py-2 rounded-xl border border-[#c3c6d4] bg-white text-slate-800 font-bold text-xs hover:bg-[#f0f2f7] flex items-center gap-1"
+          className="px-3.5 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 bg-white text-slate-800 font-bold text-xs hover:bg-canvas-mist dark:hover:bg-slate-800 flex items-center gap-1"
         >
-          <MessageCircle className="h-3.5 w-3.5 text-[#0073ea]" /> Chat
+          <MessageCircle className="h-3.5 w-3.5 text-primary-500" /> Chat
         </button>
         {user.role === "health_personnel" && (
           <button
             onClick={() => (window.location.href = `/provider/${user.id}`)}
-            className="px-3.5 py-2 rounded-xl border border-[#c3c6d4] bg-white text-slate-800 font-bold text-xs hover:bg-[#f0f2f7] flex items-center gap-1"
+            className="px-3.5 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 bg-white text-slate-800 font-bold text-xs hover:bg-canvas-mist dark:hover:bg-slate-800 flex items-center gap-1"
           >
-            <Calendar className="h-3.5 w-3.5 text-[#00c875]" /> Book
+            <Calendar className="h-3.5 w-3.5 text-success-500" /> Book
           </button>
         )}
       </div>

@@ -308,20 +308,22 @@ export const InstitutionDashboard = () => {
   return (
     <div className="min-h-screen bg-canvas text-midnight font-sans pb-16">
       {/* Header */}
-      <div className="bg-white border-b border-canvas-silk px-4 sm:px-6 py-5 sticky top-0 z-30 shadow-sm">
+      <div className="bg-white dark:bg-slate-900 border-b border-canvas-silk dark:border-slate-800 px-4 sm:px-6 py-5 sticky top-0 z-30 shadow-sm">
         <div className="max-w-content mx-auto flex flex-col md:flex-row md:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-xl text-white flex items-center justify-center shadow-button" style={{ background: cfg.color }}>
               {cfg.icon}
             </div>
             <div>
-              <h1 className="font-display text-2xl font-medium flex items-center gap-2">
+              <h1 className="font-display text-2xl font-medium tracking-tight flex items-center gap-2">
                 {institution.name}
                 <span className={`inline-block px-3 py-1 rounded-pill text-xs font-medium ${institution.is_verified ? "bg-success-50 text-success-500 border border-success-100" : "bg-warning-50 text-warning-500 border border-warning-100"}`}>
                   {institution.is_verified ? "Verified" : "Pending"}
                 </span>
               </h1>
-              <p className="text-sm text-graphite-500 font-medium tracking-wide">{cfg.label} Dashboard • ERPNext Integrated</p>
+              <p className="text-sm text-graphite-500 dark:text-slate-400 font-medium tracking-wide">
+                {cfg.label} Dashboard{!institution.is_verified ? " — pending verification (full HMS is already set up)" : ""}
+              </p>
             </div>
           </div>
 
@@ -329,12 +331,14 @@ export const InstitutionDashboard = () => {
             <button
               onClick={() => navigate("/kiosk")}
               className="vf-btn-secondary gap-1.5 text-sm"
+              aria-label="Open self-service kiosk (new tab)"
             >
               <Ticket className="h-3.5 w-3.5" /> Self-Service Kiosk
             </button>
             <button
               onClick={() => navigate("/queue-display")}
               className="vf-btn-secondary gap-1.5 text-sm"
+              aria-label="Open public TV display (new tab)"
             >
               <Tv className="h-3.5 w-3.5" /> Public TV Screen
             </button>
@@ -374,8 +378,8 @@ export const InstitutionDashboard = () => {
                 onClick={() => setActiveTab(tab.id)}
                 className={`px-3.5 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2 whitespace-nowrap transition-all ${
                   isActive
-                    ? "bg-[#0073ea] text-white shadow-xs"
-                    : "bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 text-[#676879] dark:text-slate-400 hover:bg-[#e8f1ff] hover:text-[#0073ea]"
+                    ? "bg-primary-500 text-white shadow-xs"
+                    : "bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 text-graphite-500 dark:text-slate-400 hover:bg-primary-100 hover:text-primary-500"
                 }`}
               >
                 <Icon className="h-4 w-4" />
@@ -436,26 +440,26 @@ export const InstitutionDashboard = () => {
             )}
 
             {/* Type-specific Quick Navigation */}
-            <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
-              <p className="text-xs font-extrabold text-[#676879] uppercase mb-3">{cfg.label} Quick Access Modules</p>
+            <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
+              <p className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase mb-3">{cfg.label} Quick Access Modules</p>
               <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
                 {cfg.quickLinks.map((action) => (
                   <button
                     key={action.label}
                     onClick={() => navigate(action.path)}
-                    className="flex flex-col items-center gap-2 p-3 rounded-xl border border-[#e6e9ef] dark:border-slate-700 hover:border-[#0073ea] hover:bg-[#e8f1ff] dark:hover:bg-slate-800 transition-all group text-center"
+                    className="flex flex-col items-center gap-2 p-3 rounded-xl border border-canvas-silk dark:border-slate-700 hover:border-primary-500 hover:bg-primary-100 dark:hover:bg-slate-800 transition-all group text-center"
                   >
-                    <span className="h-8 w-8 rounded-lg bg-[#f0f2f7] dark:bg-slate-800 flex items-center justify-center text-[#676879] group-hover:text-[#0073ea] group-hover:bg-[#dbeafe] transition-colors">
+                    <span className="h-8 w-8 rounded-lg bg-canvas-mist dark:bg-slate-800 flex items-center justify-center text-graphite-500 dark:text-slate-400 group-hover:text-primary-500 group-hover:bg-primary-100 transition-colors">
                       {action.icon}
                     </span>
-                    <span className="text-[10px] font-bold text-slate-700 dark:text-slate-300 group-hover:text-[#0073ea]">{action.label}</span>
+                    <span className="text-[10px] font-bold text-slate-700 dark:text-slate-300 group-hover:text-primary-500">{action.label}</span>
                   </button>
                 ))}
               </div>
             </div>
 
             {/* Quick Actions */}
-            <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
+            <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
               <QuickActions />
             </div>
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -162,6 +162,34 @@ export const HospitalManagement = () => {
     refetchInvoices();
   };
 
+  // Live bed board: admissions, discharges, transfers and bed flips from
+  // any terminal refresh this screen instantly — no polling, no stale beds.
+  useEffect(() => {
+    if (!hospital?.id) return;
+    const channel = supabase
+      .channel(`hms-live-${hospital.id}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'hospital_admissions', filter: `hospital_id=eq.${hospital.id}` },
+        () => { refetchAdmissions(); refetchDischarged(); }
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'hospital_beds', filter: `hospital_id=eq.${hospital.id}` },
+        () => refetchBeds()
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'hospital_departments', filter: `hospital_id=eq.${hospital.id}` },
+        () => refetchDepts()
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hospital?.id]);
+
   // Facility profile drives which modules matter for this kind of facility.
   const facilityProfile = getFacilityProfile(hospital?.type);
   const mod = (key: HmsModule, node: React.ReactNode) => (
@@ -179,29 +207,29 @@ export const HospitalManagement = () => {
 
   if (loadingHospital) {
     return (
-      <div className="flex justify-center items-center min-h-[60vh] bg-[#f5f6f8] dark:bg-slate-950">
-        <Loader2 className="h-8 w-8 animate-spin text-[#0073ea]" />
+      <div className="flex justify-center items-center min-h-[60vh] bg-canvas dark:bg-slate-950">
+        <Loader2 className="h-8 w-8 animate-spin text-primary-500" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors pb-16">
+    <div className="min-h-screen bg-canvas dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors pb-16">
       {/* Monday Sticky Header */}
-      <div className="bg-white dark:bg-slate-900 border-b border-[#e6e9ef] dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-2xs">
+      <div className="bg-white dark:bg-slate-900 border-b border-canvas-silk dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-2xs">
         <div className="max-w-[1600px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-[#0073ea] text-white flex items-center justify-center font-black text-sm shadow-xs">
+            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-black text-sm shadow-xs">
               <Building2 className="h-5 w-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-xl font-extrabold tracking-tight">{hospital.name}</h1>
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold text-white bg-[#00c875]">
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold text-white bg-success-500">
                   Live HMS Board
                 </span>
               </div>
-              <p className="text-xs text-[#676879] dark:text-slate-400 font-medium">
+              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
                 {facilityProfile.label}
                 {hospital.city ? ` • ${hospital.city}` : ""}
               </p>
@@ -211,7 +239,7 @@ export const HospitalManagement = () => {
 
           <button
             onClick={refreshAll}
-            className="px-3 py-1.5 rounded-md bg-[#f0f2f7] dark:bg-slate-800 hover:bg-[#e5f0ff] text-slate-700 dark:text-slate-300 font-bold text-xs flex items-center gap-1.5 transition-colors self-start md:self-auto"
+            className="px-3 py-1.5 rounded-md bg-canvas-mist dark:bg-slate-800 hover:bg-primary-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs flex items-center gap-1.5 transition-colors self-start md:self-auto"
           >
             <RefreshCw className="h-3.5 w-3.5" />
             <span>Sync Board Data</span>
@@ -222,7 +250,7 @@ export const HospitalManagement = () => {
       {/* Main Tabs Navigation & Body */}
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 pt-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <div className="overflow-x-auto p-1 bg-white dark:bg-slate-900 rounded-xl border border-[#e6e9ef] dark:border-slate-800">
+          <div className="overflow-x-auto p-1 bg-white dark:bg-slate-900 rounded-xl border border-canvas-silk dark:border-slate-800">
             <TabsList className="inline-flex w-auto min-w-full flex-wrap h-auto gap-1 bg-transparent p-1">
               {MODULE_TABS.map((t) => {
                 const relevance = facilityProfile.modules[t.val];
@@ -235,7 +263,7 @@ export const HospitalManagement = () => {
                         ? `Not usually used by a ${facilityProfile.label.toLowerCase()} — you can still open it`
                         : undefined
                     }
-                    className={`text-xs font-extrabold px-3 py-1.5 rounded-md data-[state=active]:bg-[#0073ea] data-[state=active]:text-white transition-all ${
+                    className={`text-xs font-extrabold px-3 py-1.5 rounded-md data-[state=active]:bg-primary-500 data-[state=active]:text-white transition-all ${
                       relevance === "atypical" ? "opacity-45 hover:opacity-80" : ""
                     }`}
                   >
@@ -247,7 +275,7 @@ export const HospitalManagement = () => {
             </TabsList>
           </div>
 
-          <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-6 shadow-xs">
+          <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-6 shadow-xs">
             <TabsContent value="dashboard" className="space-y-6">
               <HMSDashboard hospital={hospital} departments={departments} beds={beds} admissions={admissions} invoices={invoices} />
               <FacilityJourneyCard facilityType={hospital.type} />

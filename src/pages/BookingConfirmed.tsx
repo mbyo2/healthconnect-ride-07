@@ -1,4 +1,5 @@
-import { useSearchParams, useNavigate, Link } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { providerDisplayName } from "@/utils/providerDisplay";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format, parseISO } from "date-fns";
@@ -118,12 +119,6 @@ const BookingConfirmed = () => {
               {payment.result_explanation && (
                 <p className="text-xs text-muted-foreground">{payment.result_explanation}</p>
               )}
-              <Link
-                to={`/superadmin?dpo=${payment.id}`}
-                className="text-xs text-primary hover:underline inline-flex items-center gap-1"
-              >
-                View transaction in admin <ArrowRight className="h-3 w-3" />
-              </Link>
             </CardContent>
           </Card>
         );
@@ -146,7 +141,7 @@ const BookingConfirmed = () => {
             )}
             <div>
               <p className="font-semibold text-foreground">
-                Dr. {provider?.first_name} {provider?.last_name}
+                {providerDisplayName({ first_name: provider?.first_name, last_name: provider?.last_name, role: provider?.role })}
               </p>
               <p className="text-sm text-primary">{provider?.specialty}</p>
             </div>
@@ -178,9 +173,12 @@ const BookingConfirmed = () => {
               <>
                 <Video className="h-4 w-4 text-emerald-600" />
                 <span className="text-sm font-medium text-foreground">Video Consultation</span>
-                <Badge className="ml-auto bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-xs">
-                  Link will be sent via email
-                </Badge>
+                <button
+                  onClick={() => navigate('/video-consultations')}
+                  className="ml-auto bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-xs font-bold px-2.5 py-1 rounded-full hover:bg-emerald-500/20 transition-colors"
+                >
+                  Join from Video Consultations →
+                </button>
               </>
             ) : (
               <>

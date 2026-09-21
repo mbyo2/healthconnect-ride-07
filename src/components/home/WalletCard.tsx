@@ -84,7 +84,7 @@ export const WalletCard = () => {
 
             <CardHeader className="pb-2 relative z-10">
                 <CardTitle className="text-xs font-bold flex items-center gap-2 opacity-80 uppercase tracking-widest">
-                    <Wallet className="h-3.5 w-3.5" />
+                    <Wallet className="h-3.5 w-3.5" aria-hidden />
                     My Wallet Balance
                 </CardTitle>
             </CardHeader>

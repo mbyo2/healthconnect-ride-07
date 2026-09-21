@@ -86,7 +86,7 @@ export function Header() {
                 )}
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 z-[60] border border-[#e6e9ef] rounded-xl bg-white dark:bg-slate-900 shadow-lg">
+            <DropdownMenuContent align="end" className="w-56 z-[60] border border-canvas-silk rounded-xl bg-white dark:bg-slate-900 shadow-lg">
               {user ? (
                 <>
                   <DropdownMenuLabel>
@@ -94,7 +94,7 @@ export function Header() {
                     <div className="text-xs text-muted-foreground">My Account</div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild><Link to="/search" className="font-medium text-[#0073ea]">Find Doctors & Care</Link></DropdownMenuItem>
+                  <DropdownMenuItem asChild><Link to="/search" className="font-medium text-primary-500">Find Doctors & Care</Link></DropdownMenuItem>
                   <DropdownMenuItem asChild><Link to="/profile" className="font-medium">Profile & Settings</Link></DropdownMenuItem>
                   <DropdownMenuItem asChild><Link to="/appointments" className="font-medium">My Appointments</Link></DropdownMenuItem>
                   <DropdownMenuItem asChild><Link to="/contact" className="font-medium">Help & Support</Link></DropdownMenuItem>

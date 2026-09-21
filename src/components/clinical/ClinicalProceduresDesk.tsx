@@ -115,7 +115,7 @@ export const ClinicalProceduresDesk: React.FC<{ institutionId?: string }> = ({ i
   return (
     <div className="space-y-6 font-sans text-slate-900 dark:text-slate-100">
       {/* Header Banner */}
-      <div className="p-6 rounded-3xl bg-gradient-to-r from-[#0073ea] via-[#0f172a] to-[#1e293b] text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="p-6 rounded-3xl bg-gradient-to-r from-primary-500 via-slate-900 to-slate-800 text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
           <div className="h-12 w-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center font-black text-xl border border-white/20">
             <Stethoscope className="h-6 w-6 text-white" />
@@ -136,7 +136,7 @@ export const ClinicalProceduresDesk: React.FC<{ institutionId?: string }> = ({ i
         <div className="flex items-center gap-2">
           <Dialog open={showNewModal} onOpenChange={setShowNewModal}>
             <DialogTrigger asChild>
-              <button className="px-4 py-2 rounded-xl bg-white text-[#0f172a] font-extrabold text-xs flex items-center gap-1.5 shadow-sm hover:bg-slate-100 transition-all">
+              <button className="px-4 py-2 rounded-xl bg-white text-slate-900 font-extrabold text-xs flex items-center gap-1.5 shadow-sm hover:bg-slate-100 transition-all">
                 <Plus className="h-4 w-4" /> Log Clinical Procedure
               </button>
             </DialogTrigger>
@@ -148,7 +148,7 @@ export const ClinicalProceduresDesk: React.FC<{ institutionId?: string }> = ({ i
                 <div>
                   <label className="font-bold">Patient Name *</label>
                   <input
-                    className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4]"
+                    className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700"
                     value={patientName}
                     onChange={(e) => setPatientName(e.target.value)}
                     placeholder="e.g. John Banda"
@@ -158,7 +158,7 @@ export const ClinicalProceduresDesk: React.FC<{ institutionId?: string }> = ({ i
                 <div>
                   <label className="font-bold">Primary Diagnosis (ICD-10 Standard) *</label>
                   <select
-                    className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4] font-bold bg-white dark:bg-slate-950"
+                    className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-bold bg-white dark:bg-slate-950"
                     value={selectedIcd}
                     onChange={(e) => setSelectedIcd(e.target.value)}
                   >
@@ -173,7 +173,7 @@ export const ClinicalProceduresDesk: React.FC<{ institutionId?: string }> = ({ i
                 <div>
                   <label className="font-bold">Procedure Performed (CPT Standard) *</label>
                   <select
-                    className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4] font-bold bg-white dark:bg-slate-950"
+                    className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-bold bg-white dark:bg-slate-950"
                     value={selectedCpt}
                     onChange={(e) => setSelectedCpt(e.target.value)}
                   >
@@ -189,7 +189,7 @@ export const ClinicalProceduresDesk: React.FC<{ institutionId?: string }> = ({ i
                   <label className="font-bold">Procedure Clinical Notes &amp; Findings</label>
                   <textarea
                     rows={2}
-                    className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4]"
+                    className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700"
                     placeholder="Observations, anesthesia used, post-procedure recovery..."
                     value={procedureNotes}
                     onChange={(e) => setProcedureNotes(e.target.value)}
@@ -198,7 +198,7 @@ export const ClinicalProceduresDesk: React.FC<{ institutionId?: string }> = ({ i
               </div>
               <DialogFooter>
                 <button onClick={() => setShowNewModal(false)} className="px-4 py-2 font-bold text-slate-500">Cancel</button>
-                <button onClick={handleCreateProcedure} className="px-5 py-2.5 rounded-xl bg-[#0073ea] text-white font-extrabold">Save Procedure</button>
+                <button onClick={handleCreateProcedure} className="px-5 py-2.5 rounded-xl bg-primary-500 text-white font-extrabold">Save Procedure</button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
@@ -207,40 +207,40 @@ export const ClinicalProceduresDesk: React.FC<{ institutionId?: string }> = ({ i
 
       {/* Vital Signs Live Banner */}
       <div className="grid grid-cols-2 sm:grid-cols-6 gap-3">
-        <div className="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+        <div className="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
           <span className="text-[10px] font-extrabold uppercase text-slate-400">Heart Rate</span>
-          <div className="text-lg font-black text-[#0073ea]">{vitals.hr} bpm</div>
+          <div className="text-lg font-black text-primary-500">{vitals.hr} bpm</div>
           <span className="text-[9px] font-bold text-emerald-600">✓ Normal (60-100)</span>
         </div>
 
-        <div className="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+        <div className="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
           <span className="text-[10px] font-extrabold uppercase text-slate-400">Blood Pressure</span>
           <div className="text-lg font-black text-slate-900 dark:text-slate-100">{vitals.bpSys}/{vitals.bpDia}</div>
           <span className="text-[9px] font-bold text-emerald-600">✓ Normotensive</span>
         </div>
 
-        <div className="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+        <div className="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
           <span className="text-[10px] font-extrabold uppercase text-slate-400">SpO2 Oxygen</span>
           <div className="text-lg font-black text-emerald-600">{vitals.spo2}%</div>
           <span className="text-[9px] font-bold text-emerald-600">✓ Optimal</span>
         </div>
 
-        <div className="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+        <div className="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
           <span className="text-[10px] font-extrabold uppercase text-slate-400">Temperature</span>
           <div className="text-lg font-black text-slate-900 dark:text-slate-100">{vitals.temp} °C</div>
           <span className="text-[9px] font-bold text-emerald-600">✓ Afebrile</span>
         </div>
 
-        <div className="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+        <div className="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
           <span className="text-[10px] font-extrabold uppercase text-slate-400">Blood Glucose</span>
           <div className="text-lg font-black text-slate-900 dark:text-slate-100">{vitals.glucose} mmol/L</div>
           <span className="text-[9px] font-bold text-emerald-600">✓ Fasting Normal</span>
         </div>
 
-        <div className="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-xs flex flex-col justify-center text-center">
+        <div className="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs flex flex-col justify-center text-center">
           <button
             onClick={() => toast.success("Vital signs synced from connected Bluetooth monitors")}
-            className="text-[11px] font-extrabold text-[#0073ea] hover:underline"
+            className="text-[11px] font-extrabold text-primary-500 hover:underline"
           >
             🔄 Sync IoT Vitals
           </button>
@@ -248,10 +248,10 @@ export const ClinicalProceduresDesk: React.FC<{ institutionId?: string }> = ({ i
       </div>
 
       {/* Procedures Table */}
-      <div className="w-full overflow-x-auto rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
+      <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
         <table className="w-full text-left border-collapse text-xs">
           <thead>
-            <tr className="border-b border-[#e6e9ef] dark:border-slate-800 bg-[#f5f6f8] dark:bg-slate-950 text-[11px] font-extrabold uppercase text-[#676879]">
+            <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
               <th className="py-3 px-4">Procedure (CPT)</th>
               <th className="py-3 px-3">Patient Name</th>
               <th className="py-3 px-3">Diagnosis (ICD-10)</th>
@@ -261,12 +261,12 @@ export const ClinicalProceduresDesk: React.FC<{ institutionId?: string }> = ({ i
               <th className="py-3 px-3 text-center">Status</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#e6e9ef] dark:divide-slate-800">
+          <tbody className="divide-y divide-canvas-silk dark:divide-slate-800">
             {filteredProcedures.map((proc) => (
-              <tr key={proc.id} className="hover:bg-[#f0f2f7] dark:hover:bg-slate-800/60">
+              <tr key={proc.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-800/60">
                 <td className="py-3 px-4">
                   <div className="font-extrabold text-slate-900 dark:text-slate-100">{proc.procedureName}</div>
-                  <div className="text-[10px] font-mono text-[#0073ea]">{proc.procedureCode}</div>
+                  <div className="text-[10px] font-mono text-primary-500">{proc.procedureCode}</div>
                 </td>
                 <td className="py-3 px-3 font-bold text-slate-900 dark:text-slate-100">{proc.patientName}</td>
                 <td className="py-3 px-3 font-medium text-slate-700 dark:text-slate-300 max-w-xs truncate">
@@ -290,7 +290,7 @@ export const ClinicalProceduresDesk: React.FC<{ institutionId?: string }> = ({ i
                     className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase ${
                       proc.status === "Completed"
                         ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400"
-                        : "bg-blue-100 text-[#0073ea] dark:bg-blue-950"
+                        : "bg-blue-100 text-primary-500 dark:bg-blue-950"
                     }`}
                   >
                     {proc.status}

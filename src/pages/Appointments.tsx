@@ -184,7 +184,7 @@ export const AppointmentsPage = () => {
     <NetworkErrorBoundary>
       <div className="min-h-screen bg-canvas text-midnight font-sans transition-colors pb-16">
         {/* Top Header */}
-        <div className="bg-white border-b border-canvas-silk px-4 sm:px-6 py-5 sticky top-0 z-30 shadow-sm">
+        <div className="bg-white dark:bg-slate-900 border-b border-canvas-silk dark:border-slate-800 px-4 sm:px-6 py-5 sticky top-0 z-30 shadow-sm">
           <div className="max-w-content mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="h-11 w-11 rounded-2xl bg-primary-500 text-white flex items-center justify-center shadow-button">
@@ -223,7 +223,7 @@ export const AppointmentsPage = () => {
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                   viewMode === "table"
                     ? "bg-primary-500 text-white shadow-button"
-                    : "text-graphite-500 hover:text-midnight hover:bg-white"
+                    : "text-graphite-500 hover:text-midnight hover:bg-white dark:hover:bg-slate-800 dark:hover:text-slate-100"
                 }`}
               >
                 <Table className="h-3.5 w-3.5" />
@@ -235,7 +235,7 @@ export const AppointmentsPage = () => {
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                   viewMode === "kanban"
                     ? "bg-primary-500 text-white shadow-button"
-                    : "text-graphite-500 hover:text-midnight hover:bg-white"
+                    : "text-graphite-500 hover:text-midnight hover:bg-white dark:hover:bg-slate-800 dark:hover:text-slate-100"
                 }`}
               >
                 <Kanban className="h-3.5 w-3.5" />
@@ -252,14 +252,14 @@ export const AppointmentsPage = () => {
                   placeholder="Search name, specialty, or notes..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-9 pr-3 py-1.5 rounded-md border border-[#c3c6d4] dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-medium text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
+                  className="w-full pl-9 pr-3 py-1.5 rounded-md border border-graphite-300 dark:border-slate-700 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-medium text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
                 />
               </div>
 
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-3 py-1.5 rounded-md border border-[#c3c6d4] dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-bold text-slate-700 dark:text-slate-300 focus:outline-none"
+                className="px-3 py-1.5 rounded-md border border-graphite-300 dark:border-slate-700 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-bold text-slate-700 dark:text-slate-300 focus:outline-none"
               >
                 <option value="all">All Statuses</option>
                 <option value="scheduled">Scheduled</option>
@@ -302,16 +302,16 @@ export const AppointmentsPage = () => {
               )}
 
               {/* Upcoming Appointments Table Group */}
-              <div className="rounded-3xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
-                <div className="px-5 py-4 bg-[#0f172a] flex items-center justify-between">
+              <div className="rounded-3xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
+                <div className="px-5 py-4 bg-slate-900 flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-[#00a86b] animate-pulse" />
+                      <span className="w-2 h-2 rounded-full bg-success-600 animate-pulse" />
                       <h2 className="font-extrabold text-sm text-white">
                         Upcoming &amp; Active Appointments
                       </h2>
                     </div>
-                    <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-[#0073ea] text-white">
+                    <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-primary-500 text-white">
                       {upcoming.length}
                     </span>
                   </div>
@@ -334,7 +334,7 @@ export const AppointmentsPage = () => {
                   <div className="w-full overflow-x-auto">
                     <table className="w-full text-left border-collapse min-w-[900px]">
                       <thead>
-                        <tr className="text-[11px] font-extrabold uppercase text-[#676879] dark:text-slate-400 border-b border-[#e6e9ef] dark:border-slate-800 bg-[#f5f6f8] dark:bg-slate-950">
+                        <tr className="text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400 border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950">
                           <th className="py-3 px-6 w-[240px]">Participant</th>
                           <th className="py-3 px-3 w-[140px] text-center">Status</th>
                           <th className="py-3 px-3 w-[150px]">Date & Time</th>
@@ -343,14 +343,14 @@ export const AppointmentsPage = () => {
                           <th className="py-3 px-3 w-[150px] text-center">Actions</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-[#e6e9ef] dark:divide-slate-800 text-xs">
+                      <tbody className="divide-y divide-canvas-silk dark:divide-slate-800 text-xs">
                         {upcoming.map((app) => {
                           const person = isProvider ? app.patient : app.provider;
                           const isVideo = app.type === "video_consultation";
                           const apptDate = parseISO(app.date);
 
                           return (
-                            <tr key={app.id} className="hover:bg-[#f0f2f7] dark:hover:bg-slate-800/60 transition-colors">
+                            <tr key={app.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-800/60 transition-colors">
                               <td className="py-4 px-6">
                                 <div className="flex items-center gap-3">
                                   <div className="h-9 w-9 rounded-full bg-slate-100 text-slate-600 font-black text-xs flex items-center justify-center flex-shrink-0 uppercase">
@@ -361,13 +361,13 @@ export const AppointmentsPage = () => {
                                       {isProvider ? "" : "Dr. "}{person?.first_name} {person?.last_name}
                                     </div>
                                     {!isProvider && person?.specialty && (
-                                      <div className="text-[10px] text-[#0073ea] font-bold uppercase tracking-wide">{person.specialty}</div>
+                                      <div className="text-[10px] text-primary-500 font-bold uppercase tracking-wide">{person.specialty}</div>
                                     )}
                                     {/* New: fee + telemedicine + wait time for patient view */}
                                     {!isProvider && (
                                       <div className="flex flex-wrap gap-1 mt-1">
                                         {(person?.consultation_fee_min || person?.consultation_fee_max) && (
-                                          <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-[9px] font-black bg-[#e5f0ff] text-[#0073ea]">
+                                          <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-[9px] font-black bg-primary-50 text-primary-500">
                                             💰 {person.consultation_fee_min && person.consultation_fee_max
                                               ? `K${person.consultation_fee_min}–K${person.consultation_fee_max}`
                                               : `From K${person.consultation_fee_min ?? person.consultation_fee_max}`}
@@ -416,7 +416,7 @@ export const AppointmentsPage = () => {
                                   {isVideo && isToday(apptDate) && (
                                     <Link
                                       to={`/video-call/${app.id}`}
-                                      className="px-3 py-1.5 rounded-lg bg-[#00c875] text-white text-[10px] font-black hover:bg-[#00b368] transition-all"
+                                      className="px-3 py-1.5 rounded-lg bg-success-500 text-white text-[10px] font-black hover:bg-success-500 transition-all"
                                     >
                                       JOIN
                                     </Link>
@@ -447,8 +447,8 @@ export const AppointmentsPage = () => {
               </div>
 
               {/* Past Appointments Group */}
-              <div className="rounded-3xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
-                <div className="px-5 py-4 bg-[#f5f7fa] dark:bg-slate-950 border-b border-[#e6e9ef] dark:border-slate-800 flex items-center justify-between">
+              <div className="rounded-3xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
+                <div className="px-5 py-4 bg-canvas-bone dark:bg-slate-950 border-b border-canvas-silk dark:border-slate-800 flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <h2 className="font-extrabold text-sm text-slate-600 dark:text-slate-400">
                       Past &amp; Completed
@@ -471,7 +471,7 @@ export const AppointmentsPage = () => {
                   <div className="w-full overflow-x-auto">
                     <table className="w-full text-left border-collapse min-w-[900px]">
                       <thead>
-                        <tr className="text-[11px] font-extrabold uppercase text-[#676879] dark:text-slate-400 border-b border-[#e6e9ef] dark:border-slate-800 bg-[#f5f6f8] dark:bg-slate-950">
+                        <tr className="text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400 border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950">
                           <th className="py-2.5 px-4 w-[240px]">Participant</th>
                           <th className="py-2.5 px-3 w-[140px] text-center">Status</th>
                           <th className="py-2.5 px-3 w-[150px]">Date & Time</th>
@@ -480,23 +480,23 @@ export const AppointmentsPage = () => {
                           <th className="py-2.5 px-3 w-[150px] text-center">Re-Book</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-[#e6e9ef] dark:divide-slate-800 text-xs">
+                      <tbody className="divide-y divide-canvas-silk dark:divide-slate-800 text-xs">
                         {past.map((app) => {
                           const person = isProvider ? app.patient : app.provider;
                           const apptDate = parseISO(app.date);
 
                           return (
-                            <tr key={app.id} className="hover:bg-[#f0f2f7] dark:hover:bg-slate-800/60 transition-colors">
+                            <tr key={app.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-800/60 transition-colors">
                               <td className="py-3 px-4 font-bold text-slate-800 dark:text-slate-200">
                                 <div>
                                   <div>{isProvider ? "" : "Dr. "}{person?.first_name} {person?.last_name}</div>
                                   {!isProvider && person?.specialty && (
-                                    <div className="text-[10px] text-[#0073ea] font-bold mt-0.5">{person.specialty}</div>
+                                    <div className="text-[10px] text-primary-500 font-bold mt-0.5">{person.specialty}</div>
                                   )}
                                   {!isProvider && (person?.consultation_fee_min || person?.telemedicine_available) && (
                                     <div className="flex flex-wrap gap-1 mt-1">
                                       {person?.consultation_fee_min && (
-                                        <span className="text-[9px] font-black px-1.5 py-0.5 rounded-md bg-[#e5f0ff] text-[#0073ea]">
+                                        <span className="text-[9px] font-black px-1.5 py-0.5 rounded-md bg-primary-50 text-primary-500">
                                           💰 From K{person.consultation_fee_min}
                                         </span>
                                       )}
@@ -530,7 +530,7 @@ export const AppointmentsPage = () => {
                                 {!isProvider && app.provider_id && (
                                   <button
                                     onClick={() => navigate(`/provider/${app.provider_id}`)}
-                                    className="px-3 py-1.5 rounded-xl bg-[#0073ea] text-white text-[11px] font-black hover:bg-[#0060c7] transition-all active:scale-95"
+                                    className="px-3 py-1.5 rounded-xl bg-primary-500 text-white text-[11px] font-black hover:bg-primary-600 transition-all active:scale-95"
                                   >
                                     Re-Book
                                   </button>

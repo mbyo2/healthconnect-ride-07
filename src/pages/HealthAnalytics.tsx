@@ -12,20 +12,20 @@ const HealthAnalytics = () => {
   const { heartRateData, activityData, sleepData, vitalsData } = useHealthData(user?.id, timeRange);
 
   return (
-    <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors pb-16">
+    <div className="min-h-screen bg-canvas dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors pb-16">
       {/* Sticky Monday Top Header */}
-      <div className="bg-white dark:bg-slate-900 border-b border-[#e6e9ef] dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
+      <div className="bg-white dark:bg-slate-900 border-b border-canvas-silk dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
         <div className="max-w-[1500px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-[#0073ea] text-white flex items-center justify-center font-black text-sm shadow-xs">
+            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-black text-sm shadow-xs">
               <BarChart3 className="h-5 w-5" />
             </div>
             <div>
               <h1 className="text-xl font-extrabold tracking-tight flex items-center gap-2">
                 Biometric Health Analytics & Telemetry
-                <span className="w-2 h-2 rounded-full bg-[#00c875] animate-ping" />
+                <span className="w-2 h-2 rounded-full bg-success-500 animate-ping" />
               </h1>
-              <p className="text-xs text-[#676879] dark:text-slate-400 font-medium">
+              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
                 Longitudinal trends, wearable integration streams, and AI biometric analysis
               </p>
             </div>
@@ -35,7 +35,7 @@ const HealthAnalytics = () => {
             <select
               value={timeRange}
               onChange={(e) => setTimeRange(e.target.value)}
-              className="px-3 py-2 rounded-md border border-[#c3c6d4] dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-bold focus:outline-none"
+              className="px-3 py-2 rounded-md border border-graphite-300 dark:border-slate-700 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-bold focus:outline-none"
             >
               <option value="7days">Last 7 Days</option>
               <option value="30days">Last 30 Days</option>
@@ -43,7 +43,7 @@ const HealthAnalytics = () => {
               <option value="1year">Last Year</option>
             </select>
 
-            <button className="px-4 py-2 rounded-md bg-[#0073ea] hover:bg-[#0060c4] text-white font-extrabold text-xs shadow-xs transition-all flex items-center gap-1.5">
+            <button className="px-4 py-2 rounded-md bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs transition-all flex items-center gap-1.5">
               <Download className="h-4 w-4" />
               <span>Export Report</span>
             </button>
@@ -53,7 +53,7 @@ const HealthAnalytics = () => {
 
       <div className="max-w-[1500px] mx-auto px-4 sm:px-6 pt-6 space-y-6">
         {/* AI Health Insights */}
-        <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
+        <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
           <AIInsightsWidget
             context="health"
             data={{
@@ -67,51 +67,51 @@ const HealthAnalytics = () => {
 
         {/* 4 Vitals KPI Summary Strip */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+          <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] font-extrabold text-[#676879] uppercase">Blood Pressure</span>
-              <Heart className="h-5 w-5 text-[#e2445c]" />
+              <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Blood Pressure</span>
+              <Heart className="h-5 w-5 text-error-500" />
             </div>
-            <div className="text-2xl font-black font-mono text-[#e2445c]">{vitalsData.bloodPressure}</div>
-            <div className="text-[10px] text-[#00c875] font-bold mt-0.5">↓ 2% from last week • Normal</div>
+            <div className="text-2xl font-black font-mono text-error-500">{vitalsData.bloodPressure}</div>
+            <div className="text-[10px] text-success-500 font-bold mt-0.5">↓ 2% from last week • Normal</div>
           </div>
 
-          <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+          <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] font-extrabold text-[#676879] uppercase">Oxygen Saturation</span>
-              <Droplet className="h-5 w-5 text-[#0073ea]" />
+              <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Oxygen Saturation</span>
+              <Droplet className="h-5 w-5 text-primary-500" />
             </div>
-            <div className="text-2xl font-black font-mono text-[#0073ea]">{vitalsData.oxygenSaturation}</div>
-            <div className="text-[10px] text-[#00c875] font-bold mt-0.5">SpO2 • Excellent stability</div>
+            <div className="text-2xl font-black font-mono text-primary-500">{vitalsData.oxygenSaturation}</div>
+            <div className="text-[10px] text-success-500 font-bold mt-0.5">SpO2 • Excellent stability</div>
           </div>
 
-          <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+          <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] font-extrabold text-[#676879] uppercase">Body Weight</span>
-              <Weight className="h-5 w-5 text-[#a25ddc]" />
+              <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Body Weight</span>
+              <Weight className="h-5 w-5 text-purple-500" />
             </div>
-            <div className="text-2xl font-black font-mono text-[#a25ddc]">{vitalsData.weight}</div>
-            <div className="text-[10px] text-[#00c875] font-bold mt-0.5">BMI: 22.5 • ↓ 0.5 kg this month</div>
+            <div className="text-2xl font-black font-mono text-purple-500">{vitalsData.weight}</div>
+            <div className="text-[10px] text-success-500 font-bold mt-0.5">BMI: 22.5 • ↓ 0.5 kg this month</div>
           </div>
 
-          <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+          <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] font-extrabold text-[#676879] uppercase">Resting Heart Rate</span>
-              <Activity className="h-5 w-5 text-[#fdab3d]" />
+              <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Resting Heart Rate</span>
+              <Activity className="h-5 w-5 text-warning-500" />
             </div>
-            <div className="text-2xl font-black font-mono text-[#fdab3d]">{vitalsData.restingHeartRate}</div>
-            <div className="text-[10px] text-[#00c875] font-bold mt-0.5">↓ 3 bpm • Excellent fitness</div>
+            <div className="text-2xl font-black font-mono text-warning-500">{vitalsData.restingHeartRate}</div>
+            <div className="text-[10px] text-success-500 font-bold mt-0.5">↓ 3 bpm • Excellent fitness</div>
           </div>
         </div>
 
         {/* Detailed Analytics Board */}
-        <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
-          <div className="flex items-center justify-between border-b border-[#e6e9ef] dark:border-slate-800 pb-3 mb-4">
+        <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
+          <div className="flex items-center justify-between border-b border-canvas-silk dark:border-slate-800 pb-3 mb-4">
             <h2 className="font-extrabold text-sm flex items-center gap-2">
-              <LineChartIcon className="h-4 w-4 text-[#0073ea]" />
+              <LineChartIcon className="h-4 w-4 text-primary-500" />
               Biometric Data Visualizations
             </h2>
-            <div className="flex items-center gap-1 p-1 rounded-lg bg-[#f5f6f8] border border-[#e6e9ef]">
+            <div className="flex items-center gap-1 p-1 rounded-lg bg-canvas border border-canvas-silk dark:border-slate-800">
               {[
                 { id: "heart-rate", label: "Heart Rate" },
                 { id: "activity", label: "Activity" },
@@ -123,8 +123,8 @@ const HealthAnalytics = () => {
                   onClick={() => setActiveTab(tab.id as any)}
                   className={`px-3 py-1 rounded-md text-xs font-extrabold transition-all ${
                     activeTab === tab.id
-                      ? "bg-[#0073ea] text-white shadow-xs"
-                      : "text-[#676879] hover:bg-white"
+                      ? "bg-primary-500 text-white shadow-xs"
+                      : "text-graphite-500 dark:text-slate-400 hover:bg-white"
                   }`}
                 >
                   {tab.label}
@@ -136,7 +136,7 @@ const HealthAnalytics = () => {
           {activeTab === "heart-rate" && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="font-extrabold text-xs text-[#676879] uppercase">Heart Rate Telemetry Stream (bpm)</h3>
+                <h3 className="font-extrabold text-xs text-graphite-500 dark:text-slate-400 uppercase">Heart Rate Telemetry Stream (bpm)</h3>
               </div>
               <div className="h-[380px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
@@ -157,7 +157,7 @@ const HealthAnalytics = () => {
 
           {activeTab === "activity" && (
             <div className="space-y-4">
-              <h3 className="font-extrabold text-xs text-[#676879] uppercase">Daily Step Count & Active Caloric Burn</h3>
+              <h3 className="font-extrabold text-xs text-graphite-500 dark:text-slate-400 uppercase">Daily Step Count & Active Caloric Burn</h3>
               <div className="h-[380px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={activityData}>
@@ -176,7 +176,7 @@ const HealthAnalytics = () => {
 
           {activeTab === "sleep" && (
             <div className="space-y-4">
-              <h3 className="font-extrabold text-xs text-[#676879] uppercase">Sleep Architecture Breakdown</h3>
+              <h3 className="font-extrabold text-xs text-graphite-500 dark:text-slate-400 uppercase">Sleep Architecture Breakdown</h3>
               <div className="h-[380px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={sleepData}>
@@ -196,28 +196,28 @@ const HealthAnalytics = () => {
 
           {activeTab === "vitals" && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="p-4 rounded-xl border border-[#e6e9ef] bg-[#f5f6f8]">
-                <p className="font-extrabold text-xs text-[#676879] uppercase">Blood Pressure Telemetry</p>
-                <p className="text-3xl font-black font-mono text-[#e2445c] mt-2">{vitalsData.bloodPressure}</p>
-                <p className="text-xs text-[#00c875] font-bold mt-1">Normal Systolic & Diastolic balance</p>
+              <div className="p-4 rounded-xl border border-canvas-silk bg-canvas dark:bg-slate-950">
+                <p className="font-extrabold text-xs text-graphite-500 dark:text-slate-400 uppercase">Blood Pressure Telemetry</p>
+                <p className="text-3xl font-black font-mono text-error-500 mt-2">{vitalsData.bloodPressure}</p>
+                <p className="text-xs text-success-500 font-bold mt-1">Normal Systolic & Diastolic balance</p>
               </div>
 
-              <div className="p-4 rounded-xl border border-[#e6e9ef] bg-[#f5f6f8]">
-                <p className="font-extrabold text-xs text-[#676879] uppercase">Oxygen Saturation (SpO2)</p>
-                <p className="text-3xl font-black font-mono text-[#0073ea] mt-2">{vitalsData.oxygenSaturation}</p>
-                <p className="text-xs text-[#00c875] font-bold mt-1">Optimal arterial oxygenation</p>
+              <div className="p-4 rounded-xl border border-canvas-silk bg-canvas dark:bg-slate-950">
+                <p className="font-extrabold text-xs text-graphite-500 dark:text-slate-400 uppercase">Oxygen Saturation (SpO2)</p>
+                <p className="text-3xl font-black font-mono text-primary-500 mt-2">{vitalsData.oxygenSaturation}</p>
+                <p className="text-xs text-success-500 font-bold mt-1">Optimal arterial oxygenation</p>
               </div>
 
-              <div className="p-4 rounded-xl border border-[#e6e9ef] bg-[#f5f6f8]">
-                <p className="font-extrabold text-xs text-[#676879] uppercase">Body Mass Index (BMI)</p>
-                <p className="text-3xl font-black font-mono text-[#a25ddc] mt-2">{vitalsData.weight}</p>
-                <p className="text-xs text-[#00c875] font-bold mt-1">BMI 22.5 • Healthy range</p>
+              <div className="p-4 rounded-xl border border-canvas-silk bg-canvas dark:bg-slate-950">
+                <p className="font-extrabold text-xs text-graphite-500 dark:text-slate-400 uppercase">Body Mass Index (BMI)</p>
+                <p className="text-3xl font-black font-mono text-purple-500 mt-2">{vitalsData.weight}</p>
+                <p className="text-xs text-success-500 font-bold mt-1">BMI 22.5 • Healthy range</p>
               </div>
 
-              <div className="p-4 rounded-xl border border-[#e6e9ef] bg-[#f5f6f8]">
-                <p className="font-extrabold text-xs text-[#676879] uppercase">Resting Cardiac Rate</p>
-                <p className="text-3xl font-black font-mono text-[#fdab3d] mt-2">{vitalsData.restingHeartRate}</p>
-                <p className="text-xs text-[#00c875] font-bold mt-1">Athletic baseline</p>
+              <div className="p-4 rounded-xl border border-canvas-silk bg-canvas dark:bg-slate-950">
+                <p className="font-extrabold text-xs text-graphite-500 dark:text-slate-400 uppercase">Resting Cardiac Rate</p>
+                <p className="text-3xl font-black font-mono text-warning-500 mt-2">{vitalsData.restingHeartRate}</p>
+                <p className="text-xs text-success-500 font-bold mt-1">Athletic baseline</p>
               </div>
             </div>
           )}

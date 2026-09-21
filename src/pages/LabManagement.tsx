@@ -73,7 +73,10 @@ const LabManagement = () => {
   });
 
   const submitResult = async () => {
-    if (!selectedRequest || !resultSummary) return;
+    if (!selectedRequest || !resultSummary.trim()) {
+      toast.error("Enter the result summary before submitting");
+      return;
+    }
     setIsSubmitting(true);
     try {
       const { error } = await supabase
@@ -206,29 +209,29 @@ const LabManagement = () => {
 
   const getStatusPill = (status: LabTestStatus) => {
     switch (status) {
-      case "pending": return <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold text-white bg-[#fdab3d]">Pending</span>;
-      case "in_progress": return <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold text-white bg-[#0073ea]">In Progress</span>;
-      case "completed": return <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold text-white bg-[#00c875]">Completed</span>;
-      case "cancelled": return <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold text-white bg-[#e2445c]">Cancelled</span>;
-      default: return <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold text-white bg-[#676879]">{status}</span>;
+      case "pending": return <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold text-white bg-warning-500">Pending</span>;
+      case "in_progress": return <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold text-white bg-primary-500">In Progress</span>;
+      case "completed": return <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold text-white bg-success-500">Completed</span>;
+      case "cancelled": return <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold text-white bg-error-500">Cancelled</span>;
+      default: return <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold text-white bg-graphite-500 dark:bg-slate-600">{status}</span>;
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors pb-16">
+    <div className="min-h-screen bg-canvas dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors pb-16">
       {/* Sticky Monday Top Header */}
-      <div className="bg-white dark:bg-slate-900 border-b border-[#e6e9ef] dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
+      <div className="bg-white dark:bg-slate-900 border-b border-canvas-silk dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
         <div className="max-w-[1500px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-[#0073ea] text-white flex items-center justify-center font-black text-sm shadow-xs">
+            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-black text-sm shadow-xs">
               <Microscope className="h-5 w-5" />
             </div>
             <div>
               <h1 className="text-xl font-extrabold tracking-tight flex items-center gap-2">
                 Pathology & Diagnostics Laboratory Board
-                <span className="w-2 h-2 rounded-full bg-[#00c875] animate-ping" />
+                <span className="w-2 h-2 rounded-full bg-success-500 animate-ping" />
               </h1>
-              <p className="text-xs text-[#676879] dark:text-slate-400 font-medium">
+              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
                 Specimen telemetry, pathologist review queues, and automatic critical-result alerts
               </p>
             </div>
@@ -237,32 +240,32 @@ const LabManagement = () => {
           <div className="flex items-center gap-2">
             <Dialog open={showNewRequestDialog} onOpenChange={setShowNewRequestDialog}>
               <DialogTrigger asChild>
-                <button className="px-4 py-2 rounded-md bg-[#0073ea] hover:bg-[#0060c4] text-white font-extrabold text-xs shadow-xs transition-all flex items-center gap-1.5">
+                <button className="px-4 py-2 rounded-md bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs transition-all flex items-center gap-1.5">
                   <Plus className="h-4 w-4" />
                   <span>New Test Request</span>
                 </button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-[500px] bg-white border border-[#e6e9ef]">
+              <DialogContent className="sm:max-w-[500px] bg-white border border-canvas-silk dark:border-slate-800">
                 <DialogHeader>
                   <DialogTitle className="font-extrabold text-base">Create New Lab Request</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4 py-4 text-xs">
                   <div>
-                    <label className="font-extrabold text-[#676879] uppercase">Patient</label>
+                    <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Patient</label>
                     <input
                       placeholder="Search patient name..."
                       value={patientSearchTerm}
                       onChange={(e) => setPatientSearchTerm(e.target.value)}
-                      className="w-full mt-1 p-2 rounded-md border border-[#c3c6d4] font-medium"
+                      className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-medium"
                     />
                     {patientSearchTerm && !selectedPatientId && (
-                      <div className="max-h-32 overflow-y-auto border border-[#e6e9ef] rounded-md bg-white mt-1 shadow-xs">
+                      <div className="max-h-32 overflow-y-auto border border-canvas-silk rounded-md bg-white mt-1 shadow-xs">
                         {patients
                           ?.filter((p) => `${p.first_name} ${p.last_name}`.toLowerCase().includes(patientSearchTerm.toLowerCase()))
                           .map((p) => (
                             <div
                               key={p.id}
-                              className="p-2 text-xs font-bold hover:bg-[#f0f2f7] cursor-pointer"
+                              className="p-2 text-xs font-bold hover:bg-canvas-mist dark:hover:bg-slate-800 cursor-pointer"
                               onClick={() => {
                                 setSelectedPatientId(p.id);
                                 setPatientSearchTerm(`${p.first_name} ${p.last_name}`);
@@ -276,9 +279,9 @@ const LabManagement = () => {
                   </div>
 
                   <div>
-                    <label className="font-extrabold text-[#676879] uppercase">Test Type</label>
+                    <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Test Type</label>
                     <Select value={selectedTestType} onValueChange={setSelectedTestType}>
-                      <SelectTrigger className="mt-1 border border-[#c3c6d4] font-bold text-xs">
+                      <SelectTrigger className="mt-1 border border-graphite-300 dark:border-slate-700 font-bold text-xs">
                         <SelectValue placeholder="Select test type" />
                       </SelectTrigger>
                       <SelectContent>
@@ -295,7 +298,7 @@ const LabManagement = () => {
                     <div className="space-y-2">
                       <InstitutionInsuranceVerification patientId={selectedPatientId} onVerified={(v) => setSelectedVerification(v)} />
                       {selectedVerification && (
-                        <div className="p-2.5 rounded-lg bg-[#00c875]/10 border border-[#00c875]/30 text-[#00c875] font-bold text-xs flex items-center gap-1.5">
+                        <div className="p-2.5 rounded-lg bg-success-500/10 border border-success-500/30 text-success-500 font-bold text-xs flex items-center gap-1.5">
                           <CheckCircle2 className="h-4 w-4" />
                           <span>Insurance Applied: {selectedVerification.coverage_percentage}% Covered</span>
                         </div>
@@ -307,7 +310,7 @@ const LabManagement = () => {
                   <button onClick={() => setShowNewRequestDialog(false)} className="px-3 py-1.5 text-xs font-bold text-slate-500">
                     Cancel
                   </button>
-                  <button onClick={createRequest} disabled={!selectedPatientId || !selectedTestType || isSubmitting} className="px-4 py-1.5 rounded-md bg-[#0073ea] text-white text-xs font-bold">
+                  <button onClick={createRequest} disabled={!selectedPatientId || !selectedTestType || isSubmitting} className="px-4 py-1.5 rounded-md bg-primary-500 text-white text-xs font-bold">
                     {isSubmitting && <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />} Create Request
                   </button>
                 </DialogFooter>
@@ -328,8 +331,8 @@ const LabManagement = () => {
               onClick={() => setActiveTab(tab.id as any)}
               className={`px-4 py-2 rounded-xl text-xs font-extrabold transition-all ${
                 activeTab === tab.id
-                  ? "bg-[#0073ea] text-white shadow-xs"
-                  : "bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 text-[#676879] hover:bg-[#f0f2f7]"
+                  ? "bg-primary-500 text-white shadow-xs"
+                  : "bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 text-graphite-500 dark:text-slate-400 hover:bg-canvas-mist dark:hover:bg-slate-800"
               }`}
             >
               {tab.label}
@@ -341,42 +344,42 @@ const LabManagement = () => {
       <div className="max-w-[1500px] mx-auto px-4 sm:px-6 pt-6 space-y-6">
         {/* KPI Strip */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+          <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] font-extrabold text-[#676879] uppercase">Pending Orders</span>
-              <Clock className="h-5 w-5 text-[#fdab3d]" />
+              <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Pending Orders</span>
+              <Clock className="h-5 w-5 text-warning-500" />
             </div>
-            <div className="text-2xl font-black font-mono text-[#fdab3d]">{pendingRequests.length}</div>
-            <div className="text-[10px] text-[#676879] font-bold mt-0.5">Awaiting sample processing</div>
+            <div className="text-2xl font-black font-mono text-warning-500">{pendingRequests.length}</div>
+            <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Awaiting sample processing</div>
           </div>
 
-          <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+          <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] font-extrabold text-[#676879] uppercase">In Analysis</span>
-              <FlaskConical className="h-5 w-5 text-[#0073ea]" />
+              <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">In Analysis</span>
+              <FlaskConical className="h-5 w-5 text-primary-500" />
             </div>
-            <div className="text-2xl font-black font-mono text-[#0073ea]">{inProgressRequests.length}</div>
-            <div className="text-[10px] text-[#676879] font-bold mt-0.5">Currently on bench</div>
+            <div className="text-2xl font-black font-mono text-primary-500">{inProgressRequests.length}</div>
+            <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Currently on bench</div>
           </div>
 
-          <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+          <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] font-extrabold text-[#676879] uppercase">Completed Today</span>
-              <CheckCircle2 className="h-5 w-5 text-[#00c875]" />
+              <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Completed Today</span>
+              <CheckCircle2 className="h-5 w-5 text-success-500" />
             </div>
-            <div className="text-2xl font-black font-mono text-[#00c875]">
+            <div className="text-2xl font-black font-mono text-success-500">
               {completedRequests.filter((r) => new Date(r.updated_at).toDateString() === new Date().toDateString()).length}
             </div>
-            <div className="text-[10px] text-[#676879] font-bold mt-0.5">Signed off & released</div>
+            <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Signed off & released</div>
           </div>
         </div>
 
         {/* Requests Tab */}
         {activeTab === "requests" && (
-          <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#e6e9ef] dark:border-slate-800 pb-3">
+          <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-canvas-silk dark:border-slate-800 pb-3">
               <h2 className="font-extrabold text-sm flex items-center gap-2">
-                <FlaskConical className="h-4 w-4 text-[#0073ea]" /> Active Pathology Orders
+                <FlaskConical className="h-4 w-4 text-primary-500" /> Active Pathology Orders
               </h2>
               <div className="relative w-full sm:w-64">
                 <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-slate-400" />
@@ -385,15 +388,15 @@ const LabManagement = () => {
                   placeholder="Search patient or test name..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-9 pr-3 py-1.5 rounded-md border border-[#c3c6d4] text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
+                  className="w-full pl-9 pr-3 py-1.5 rounded-md border border-graphite-300 dark:border-slate-700 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary-500"
                 />
               </div>
             </div>
 
-            <div className="w-full overflow-x-auto rounded-xl border border-[#e6e9ef]">
+            <div className="w-full overflow-x-auto rounded-xl border border-canvas-silk dark:border-slate-800">
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
-                  <tr className="border-b border-[#e6e9ef] bg-[#f5f6f8] text-[11px] font-extrabold uppercase text-[#676879]">
+                  <tr className="border-b border-canvas-silk bg-canvas text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
                     <th className="py-2.5 px-4">Test Number</th>
                     <th className="py-2.5 px-3">Patient</th>
                     <th className="py-2.5 px-3">Test Requested</th>
@@ -403,7 +406,7 @@ const LabManagement = () => {
                     <th className="py-2.5 px-3 text-center">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#e6e9ef]">
+                <tbody className="divide-y divide-canvas-silk">
                   {requests
                     ?.filter(
                       (r) =>
@@ -412,39 +415,39 @@ const LabManagement = () => {
                         r.test_type?.toLowerCase().includes(searchTerm.toLowerCase())
                     )
                     .map((request) => (
-                      <tr key={request.id} className="hover:bg-[#f0f2f7] transition-colors">
+                      <tr key={request.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 transition-colors">
                         <td className="py-3 px-4 font-mono font-bold text-slate-900">{request.test_number || "LAB-SYS"}</td>
-                        <td className="py-3 px-3 font-bold text-[#0073ea]">
+                        <td className="py-3 px-3 font-bold text-primary-500">
                           {request.patient?.first_name} {request.patient?.last_name}
                         </td>
                         <td className="py-3 px-3 font-bold text-slate-900">{request.test_type || request.test?.name}</td>
-                        <td className="py-3 px-3 text-[#676879]">Dr. {request.provider?.last_name || "Staff"}</td>
+                        <td className="py-3 px-3 text-graphite-500 dark:text-slate-400">Dr. {request.provider?.last_name || "Staff"}</td>
                         <td className="py-3 px-3 text-center">
                           {request.priority === "urgent" || request.priority === "stat" ? (
-                            <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white bg-[#e2445c] flex items-center gap-1 mx-auto w-fit">
+                            <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white bg-error-500 flex items-center gap-1 mx-auto w-fit">
                               <AlertCircle className="h-3 w-3" /> STAT
                             </span>
                           ) : (
-                            <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white bg-[#579bfc]">Routine</span>
+                            <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white bg-primary-400">Routine</span>
                           )}
                         </td>
                         <td className="py-3 px-3 text-center">{getStatusPill(request.status)}</td>
                         <td className="py-3 px-3 text-center">
                           {request.status === "pending" && (
-                            <button onClick={() => toast.success("Sample collected")} className="px-3 py-1 rounded-md bg-[#0073ea] text-white text-[10px] font-extrabold">
+                            <button onClick={() => toast.success("Sample collected")} className="px-3 py-1 rounded-md bg-primary-500 text-white text-[10px] font-extrabold">
                               Collect Sample
                             </button>
                           )}
                           {request.status === "in_progress" && (
                             <button
                               onClick={() => { setSelectedRequest(request); setActiveTab("results"); }}
-                              className="px-3 py-1 rounded-md bg-[#00c875] text-white text-[10px] font-extrabold"
+                              className="px-3 py-1 rounded-md bg-success-500 text-white text-[10px] font-extrabold"
                             >
                               Enter Result
                             </button>
                           )}
                           {request.status === "completed" && (
-                            <button onClick={() => setSelectedRequest(request)} className="px-3 py-1 rounded-md border border-[#c3c6d4] text-xs font-bold">
+                            <button onClick={() => setSelectedRequest(request)} className="px-3 py-1 rounded-md border border-graphite-300 dark:border-slate-700 text-xs font-bold">
                               View Results
                             </button>
                           )}
@@ -459,16 +462,16 @@ const LabManagement = () => {
 
         {/* Results Entry Tab */}
         {activeTab === "results" && (
-          <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
+          <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
             <h2 className="font-extrabold text-sm mb-4 flex items-center gap-2">
-              <FileText className="h-4 w-4 text-[#0073ea]" /> Pathologist Results Verification Entry
+              <FileText className="h-4 w-4 text-primary-500" /> Pathologist Results Verification Entry
             </h2>
             {selectedRequest ? (
               <div className="space-y-4 text-xs">
-                <div className="p-4 rounded-xl bg-[#e5f0ff] border border-[#0073ea]/20 flex justify-between items-center">
+                <div className="p-4 rounded-xl bg-primary-50 border border-primary-500/20 flex justify-between items-center">
                   <div>
-                    <p className="font-extrabold text-sm text-[#0073ea]">{(selectedRequest as any).test_type || (selectedRequest as any).test?.name}</p>
-                    <p className="text-xs text-[#676879]">
+                    <p className="font-extrabold text-sm text-primary-500">{(selectedRequest as any).test_type || (selectedRequest as any).test?.name}</p>
+                    <p className="text-xs text-graphite-500 dark:text-slate-400">
                       Patient: <strong>{selectedRequest.patient?.first_name} {selectedRequest.patient?.last_name}</strong>
                     </p>
                   </div>
@@ -476,36 +479,36 @@ const LabManagement = () => {
                 </div>
 
                 <div>
-                  <label className="font-extrabold text-[#676879] uppercase">Result Findings Summary</label>
+                  <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Result Findings Summary</label>
                   <textarea
-                    className="w-full min-h-[140px] mt-1 p-3 rounded-xl border border-[#c3c6d4] font-medium text-xs focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
+                    className="w-full min-h-[140px] mt-1 p-3 rounded-xl border border-graphite-300 dark:border-slate-700 font-medium text-xs focus:outline-none focus:ring-2 focus:ring-primary-500"
                     placeholder="Enter quantitative values, microscopic findings, and clinical impressions..."
                     value={resultSummary}
                     onChange={(e) => setResultSummary(e.target.value)}
                   />
                 </div>
 
-                <label className="flex items-center gap-2 text-xs font-bold cursor-pointer p-3 rounded-xl border border-[#e2445c]/30 bg-[#ffeef0]">
+                <label className="flex items-center gap-2 text-xs font-bold cursor-pointer p-3 rounded-xl border border-error-500/30 bg-error-50">
                   <Checkbox checked={isCritical} onCheckedChange={(v) => setIsCritical(v === true)} />
-                  <span>Flag as <strong className="text-[#e2445c]">CRITICAL VALUE</strong> — triggers automated push, SMS, & clinician dispatch alerts</span>
+                  <span>Flag as <strong className="text-error-500">CRITICAL VALUE</strong> — triggers automated push, SMS, & clinician dispatch alerts</span>
                 </label>
 
                 <div className="flex gap-2">
-                  <button onClick={() => setSelectedRequest(null)} className="px-4 py-2 rounded-md border border-[#c3c6d4] font-bold text-xs">
+                  <button onClick={() => setSelectedRequest(null)} className="px-4 py-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold text-xs">
                     Cancel
                   </button>
                   <button
                     onClick={submitResult}
                     disabled={!resultSummary || isSubmitting}
-                    className="px-5 py-2 rounded-md bg-[#00c875] text-white font-extrabold text-xs flex items-center gap-1 shadow-xs"
+                    className="px-5 py-2 rounded-md bg-success-500 text-white font-extrabold text-xs flex items-center gap-1 shadow-xs"
                   >
                     {isSubmitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />} Submit & Release Results
                   </button>
                 </div>
               </div>
             ) : (
-              <div className="text-center py-12 text-xs text-[#676879]">
-                <FileText className="h-10 w-10 mx-auto mb-2 opacity-30 text-[#0073ea]" />
+              <div className="text-center py-12 text-xs text-graphite-500 dark:text-slate-400">
+                <FileText className="h-10 w-10 mx-auto mb-2 opacity-30 text-primary-500" />
                 <p className="font-bold">Select an in-progress lab test from the Orders queue to enter results.</p>
               </div>
             )}
@@ -514,18 +517,18 @@ const LabManagement = () => {
 
         {/* Catalog Tab */}
         {activeTab === "catalog" && (
-          <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
+          <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
             <h2 className="font-extrabold text-sm mb-4 flex items-center gap-2">
-              <Microscope className="h-4 w-4 text-[#a25ddc]" /> Diagnostic Test Catalog
+              <Microscope className="h-4 w-4 text-purple-500" /> Diagnostic Test Catalog
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {testCatalog.map((test) => (
-                <div key={test.code} className="p-3.5 rounded-xl border border-[#e6e9ef] bg-[#f5f6f8] flex justify-between items-center">
+                <div key={test.code} className="p-3.5 rounded-xl border border-canvas-silk bg-canvas flex justify-between items-center">
                   <div>
                     <h4 className="font-extrabold text-xs text-slate-900">{test.name}</h4>
-                    <p className="text-[10px] text-[#676879]">{test.code} • {test.category}</p>
+                    <p className="text-[10px] text-graphite-500 dark:text-slate-400">{test.code} • {test.category}</p>
                   </div>
-                  <span className="font-black text-sm font-mono text-[#0073ea]">{formatPrice(test.price)}</span>
+                  <span className="font-black text-sm font-mono text-primary-500">{formatPrice(test.price)}</span>
                 </div>
               ))}
             </div>

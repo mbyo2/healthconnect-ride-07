@@ -285,7 +285,7 @@ export const PatientRegistration = () => {
         return (
           <div className="space-y-4">
             <div className="flex items-center gap-2 mb-4">
-              <User className="h-5 w-5 text-[#0073ea]" />
+              <User className="h-5 w-5 text-primary-500" />
               <h3 className="text-sm font-extrabold">Personal Information</h3>
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -385,7 +385,7 @@ export const PatientRegistration = () => {
         return (
           <div className="space-y-4">
             <div className="flex items-center gap-2 mb-4">
-              <MapPin className="h-5 w-5 text-[#0073ea]" />
+              <MapPin className="h-5 w-5 text-primary-500" />
               <h3 className="text-sm font-extrabold">Contact Information</h3>
             </div>
             <FormField
@@ -450,10 +450,10 @@ export const PatientRegistration = () => {
         return (
           <div className="space-y-4">
             <div className="flex items-center gap-2 mb-4">
-              <Phone className="h-5 w-5 text-[#0073ea]" />
+              <Phone className="h-5 w-5 text-primary-500" />
               <h3 className="text-sm font-extrabold">Emergency Contact</h3>
             </div>
-            <p className="text-xs text-[#676879]">In case of emergency, who should we contact?</p>
+            <p className="text-xs text-graphite-500 dark:text-slate-400">In case of emergency, who should we contact?</p>
             <FormField
               control={emergencyContactForm.control}
               name="emergencyName"
@@ -510,7 +510,7 @@ export const PatientRegistration = () => {
         return (
           <div className="space-y-4">
             <div className="flex items-center gap-2 mb-4">
-              <CreditCard className="h-5 w-5 text-[#0073ea]" />
+              <CreditCard className="h-5 w-5 text-primary-500" />
               <h3 className="text-sm font-extrabold">Insurance Information</h3>
             </div>
             <FormField
@@ -590,10 +590,10 @@ export const PatientRegistration = () => {
         return (
           <div className="space-y-4">
             <div className="flex items-center gap-2 mb-4">
-              <Heart className="h-5 w-5 text-[#0073ea]" />
+              <Heart className="h-5 w-5 text-primary-500" />
               <h3 className="text-sm font-extrabold">Medical History</h3>
             </div>
-            <p className="text-xs text-[#676879]">This information helps your healthcare provider give you better care.</p>
+            <p className="text-xs text-graphite-500 dark:text-slate-400">This information helps your healthcare provider give you better care.</p>
 
             <FormField
               control={medicalHistoryForm.control}
@@ -697,7 +697,7 @@ export const PatientRegistration = () => {
         return (
           <div className="space-y-4">
             <div className="flex items-center gap-2 mb-4">
-              <Sparkles className="h-5 w-5 text-[#0073ea]" />
+              <Sparkles className="h-5 w-5 text-primary-500" />
               <h3 className="text-sm font-extrabold">Create Your Account</h3>
             </div>
             <FormField
@@ -748,7 +748,7 @@ export const PatientRegistration = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 flex items-center justify-center p-4 font-sans">
+    <div className="min-h-screen bg-canvas dark:bg-slate-950 flex items-center justify-center p-4 font-sans">
       <Card className="w-full max-w-2xl shadow-md">
         <CardHeader className="pb-4">
           <div className="flex items-center justify-between mb-2">
@@ -760,7 +760,7 @@ export const PatientRegistration = () => {
             >
               <ArrowLeft className="h-3.5 w-3.5 mr-1" /> Back
             </Button>
-            <div className="text-xs font-bold text-[#676879]">
+            <div className="text-xs font-bold text-graphite-500 dark:text-slate-400">
               Step {currentStep} of {totalSteps}
             </div>
           </div>
@@ -783,14 +783,14 @@ export const PatientRegistration = () => {
               <Button
                 onClick={handleSubmit}
                 disabled={loading}
-                className="bg-[#0073ea] hover:bg-[#0056b3] text-xs"
+                className="bg-primary-500 hover:bg-primary-600 text-xs"
               >
                 {loading ? "Creating Account..." : "Complete Registration"} <CheckCircle className="h-3.5 w-3.5 ml-1" />
               </Button>
             ) : (
               <Button
                 onClick={handleNext}
-                className="bg-[#0073ea] hover:bg-[#0056b3] text-xs"
+                className="bg-primary-500 hover:bg-primary-600 text-xs"
               >
                 Next <ArrowRight className="h-3.5 w-3.5 ml-1" />
               </Button>

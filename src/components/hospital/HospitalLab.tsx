@@ -12,15 +12,15 @@ const getStatusPill = (status: string) => {
   switch (status) {
     case "completed":
     case "report_ready":
-      return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-[#00c875]">Report Ready</span>;
+      return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-success-500">Report Ready</span>;
     case "processing":
-      return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-[#fdab3d]">Processing</span>;
+      return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-warning-500">Processing</span>;
     case "sample_collected":
-      return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-[#579bfc]">Sample Collected</span>;
+      return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-primary-400">Sample Collected</span>;
     case "cancelled":
-      return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-[#e2445c]">Cancelled</span>;
+      return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-error-500">Cancelled</span>;
     default:
-      return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-[#a25ddc]">Pending Collection</span>;
+      return <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-purple-500">Pending Collection</span>;
   }
 };
 
@@ -117,26 +117,26 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
   return (
     <div className="space-y-4 font-sans text-slate-900 dark:text-slate-100">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center border-b border-[#e6e9ef] pb-3">
+      <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center border-b border-canvas-silk pb-3">
         <div>
           <h3 className="text-base font-extrabold flex items-center gap-2">
-            <TestTube className="h-5 w-5 text-[#0073ea]" />
+            <TestTube className="h-5 w-5 text-primary-500" />
             Laboratory Information Management System (LIMS)
           </h3>
-          <p className="text-xs text-[#676879] font-medium">
+          <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
             Sample lifecycle tracking, reflex test rules, and result dispatch
           </p>
         </div>
         <div className="flex gap-2">
           <button
             onClick={refresh}
-            className="px-3 py-1.5 rounded-md bg-[#f0f2f7] font-bold text-xs flex items-center gap-1"
+            className="px-3 py-1.5 rounded-md bg-canvas-mist dark:bg-slate-800 font-bold text-xs flex items-center gap-1"
           >
             <RefreshCw className="h-3.5 w-3.5" /> Refresh
           </button>
           <button
             onClick={() => setShowOrderDialog(true)}
-            className="px-3.5 py-1.5 rounded-md bg-[#0073ea] hover:bg-[#0060c4] text-white font-extrabold text-xs shadow-xs flex items-center gap-1"
+            className="px-3.5 py-1.5 rounded-md bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs flex items-center gap-1"
           >
             <Plus className="h-4 w-4" /> Order Lab Test
           </button>
@@ -151,22 +151,22 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
           { label: "Reports Ready", value: stats.completed, color: "#00c875", icon: <CheckCircle2 className="h-5 w-5" /> },
           { label: "STAT / Urgent", value: stats.urgent, color: "#e2445c", icon: <AlertCircle className="h-5 w-5" /> },
         ].map((card) => (
-          <div key={card.label} className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-[#e6e9ef] shadow-xs text-center">
+          <div key={card.label} className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk shadow-xs text-center">
             <div style={{ color: card.color }} className="flex justify-center mb-1">{card.icon}</div>
             <div className="text-2xl font-black font-mono" style={{ color: card.color }}>{card.value}</div>
-            <div className="text-[10px] text-[#676879] font-bold uppercase">{card.label}</div>
+            <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold uppercase">{card.label}</div>
           </div>
         ))}
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex items-center gap-1.5 p-1 bg-white dark:bg-slate-900 border border-[#e6e9ef] rounded-xl overflow-x-auto">
+      <div className="flex items-center gap-1.5 p-1 bg-white dark:bg-slate-900 border border-canvas-silk rounded-xl overflow-x-auto">
         {["all", "pending", "sample_collected", "processing", "completed"].map((s) => (
           <button
             key={s}
             onClick={() => setFilter(s)}
             className={`px-3 py-1.5 rounded-md text-xs font-extrabold whitespace-nowrap transition-all ${
-              filter === s ? "bg-[#0073ea] text-white shadow-xs" : "text-[#676879] hover:bg-[#f0f2f7]"
+              filter === s ? "bg-primary-500 text-white shadow-xs" : "text-graphite-500 dark:text-slate-400 hover:bg-canvas-mist dark:hover:bg-slate-800"
             }`}
           >
             {s === "all" ? "All Orders" : s.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase())}
@@ -188,10 +188,10 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
           onAction={() => setShowOrderDialog(true)}
         />
       ) : (
-        <div className="w-full overflow-x-auto rounded-xl border border-[#e6e9ef] bg-white dark:bg-slate-900 shadow-xs">
+        <div className="w-full overflow-x-auto rounded-xl border border-canvas-silk bg-white dark:bg-slate-900 shadow-xs">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="border-b border-[#e6e9ef] bg-[#f5f6f8] text-[11px] font-extrabold uppercase text-[#676879]">
+              <tr className="border-b border-canvas-silk bg-canvas text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
                 <th className="py-2.5 px-4">Test # / Type</th>
                 <th className="py-2.5 px-3">Patient</th>
                 <th className="py-2.5 px-3 text-center">Status</th>
@@ -201,21 +201,21 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
                 <th className="py-2.5 px-3 text-center">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#e6e9ef]">
+            <tbody className="divide-y divide-canvas-silk">
               {filtered.map((order) => (
-                <tr key={order.id} className="hover:bg-[#f0f2f7] transition-colors">
+                <tr key={order.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 transition-colors">
                   <td className="py-3 px-4">
                     <div className="font-mono font-bold text-slate-900">{order.test_number}</div>
-                    <div className="text-[10px] text-[#676879]">{order.test_type}</div>
+                    <div className="text-[10px] text-graphite-500 dark:text-slate-400">{order.test_type}</div>
                   </td>
-                  <td className="py-3 px-3 font-bold text-[#0073ea]">{nameFor(order.patient_id) || "Inpatient"}</td>
+                  <td className="py-3 px-3 font-bold text-primary-500">{nameFor(order.patient_id) || "Inpatient"}</td>
                   <td className="py-3 px-3 text-center">{getStatusPill(order.status)}</td>
                   <td className="py-3 px-3 text-slate-500">{order.sample_type || "—"}</td>
                   <td className="py-3 px-3">
                     {order.priority && order.priority !== "routine" ? (
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold text-white bg-[#e2445c]">{order.priority.toUpperCase()}</span>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold text-white bg-error-500">{order.priority.toUpperCase()}</span>
                     ) : (
-                      <span className="text-[#676879]">Routine</span>
+                      <span className="text-graphite-500 dark:text-slate-400">Routine</span>
                     )}
                   </td>
                   <td className="py-3 px-3 text-slate-600 max-w-[200px] truncate">{order.result_summary || "—"}</td>
@@ -224,7 +224,7 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
                       {["pending", "ordered"].includes(order.status) && (
                         <button
                           onClick={() => advance(order, "sample_collected")}
-                          className="px-2 py-1 rounded text-[10px] font-bold bg-[#579bfc] text-white"
+                          className="px-2 py-1 rounded text-[10px] font-bold bg-primary-400 text-white"
                         >
                           Collect
                         </button>
@@ -232,7 +232,7 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
                       {order.status === "sample_collected" && (
                         <button
                           onClick={() => advance(order, "processing")}
-                          className="px-2 py-1 rounded text-[10px] font-bold bg-[#fdab3d] text-white"
+                          className="px-2 py-1 rounded text-[10px] font-bold bg-warning-500 text-white"
                         >
                           Process
                         </button>
@@ -240,7 +240,7 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
                       {["processing", "sample_collected"].includes(order.status) && (
                         <button
                           onClick={() => { setShowResultDialog(order); setResultInput(order.result_summary || ""); }}
-                          className="px-2 py-1 rounded text-[10px] font-bold bg-[#0073ea] text-white"
+                          className="px-2 py-1 rounded text-[10px] font-bold bg-primary-500 text-white"
                         >
                           Enter Result
                         </button>
@@ -248,7 +248,7 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
                       {["completed", "report_ready"].includes(order.status) && (
                         <button
                           onClick={() => window.print()}
-                          className="px-2 py-1 rounded text-[10px] font-bold bg-[#00c875] text-white flex items-center gap-0.5"
+                          className="px-2 py-1 rounded text-[10px] font-bold bg-success-500 text-white flex items-center gap-0.5"
                         >
                           <Printer className="h-3 w-3" /> Print
                         </button>
@@ -264,45 +264,45 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
 
       {/* Order Dialog */}
       <Dialog open={showOrderDialog} onOpenChange={setShowOrderDialog}>
-        <DialogContent className="sm:max-w-[425px] bg-white border border-[#e6e9ef]">
+        <DialogContent className="sm:max-w-[425px] bg-white border border-canvas-silk dark:border-slate-800">
           <DialogHeader>
             <DialogTitle className="font-extrabold text-base">Order Laboratory Test</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleOrderLab} className="space-y-3 py-2 text-xs">
             <div>
-              <label className="font-extrabold text-[#676879] uppercase">Test Name *</label>
+              <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Test Name *</label>
               <input
                 value={orderForm.test_type}
                 onChange={(e) => setOrderForm({ ...orderForm, test_type: e.target.value })}
                 placeholder="e.g. Full Blood Count / Lipid Profile"
-                className="w-full mt-1 p-2 rounded-md border border-[#c3c6d4] font-bold"
+                className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold"
                 required
               />
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="font-extrabold text-[#676879] uppercase">Category</label>
+                <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Category</label>
                 <input
                   value={orderForm.test_category}
                   onChange={(e) => setOrderForm({ ...orderForm, test_category: e.target.value })}
                   placeholder="e.g. Biochemistry"
-                  className="w-full mt-1 p-2 rounded-md border border-[#c3c6d4]"
+                  className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700"
                 />
               </div>
               <div>
-                <label className="font-extrabold text-[#676879] uppercase">Sample Type</label>
+                <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Sample Type</label>
                 <input
                   value={orderForm.sample_type}
                   onChange={(e) => setOrderForm({ ...orderForm, sample_type: e.target.value })}
                   placeholder="e.g. Blood, Urine"
-                  className="w-full mt-1 p-2 rounded-md border border-[#c3c6d4]"
+                  className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700"
                 />
               </div>
             </div>
             <div>
-              <label className="font-extrabold text-[#676879] uppercase">Priority</label>
+              <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Priority</label>
               <select
-                className="w-full mt-1 p-2 rounded-md border border-[#c3c6d4] font-bold"
+                className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold"
                 value={orderForm.priority}
                 onChange={(e) => setOrderForm({ ...orderForm, priority: e.target.value })}
               >
@@ -313,7 +313,7 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
             </div>
             <DialogFooter className="pt-2">
               <button type="button" onClick={() => setShowOrderDialog(false)} className="px-3 py-1.5 text-xs font-bold text-slate-500">Cancel</button>
-              <button type="submit" disabled={isSubmitting} className="px-4 py-1.5 rounded-md bg-[#0073ea] text-white text-xs font-bold">
+              <button type="submit" disabled={isSubmitting} className="px-4 py-1.5 rounded-md bg-primary-500 text-white text-xs font-bold">
                 {isSubmitting ? "Ordering..." : "Order Lab Test"}
               </button>
             </DialogFooter>
@@ -323,14 +323,14 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
 
       {/* Enter Result Dialog */}
       <Dialog open={!!showResultDialog} onOpenChange={(o) => !o && setShowResultDialog(null)}>
-        <DialogContent className="sm:max-w-[425px] bg-white border border-[#e6e9ef]">
+        <DialogContent className="sm:max-w-[425px] bg-white border border-canvas-silk dark:border-slate-800">
           <DialogHeader>
             <DialogTitle className="font-extrabold text-base">Enter Result — {showResultDialog?.test_type}</DialogTitle>
           </DialogHeader>
           <div className="py-2 text-xs">
-            <label className="font-extrabold text-[#676879] uppercase">Result Summary *</label>
+            <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Result Summary *</label>
             <textarea
-              className="w-full mt-1 h-24 p-2 rounded-md border border-[#c3c6d4] text-xs font-medium"
+              className="w-full mt-1 h-24 p-2 rounded-md border border-graphite-300 dark:border-slate-700 text-xs font-medium"
               placeholder="e.g. Haemoglobin 14.2 g/dL — Within Normal Range"
               value={resultInput}
               onChange={(e) => setResultInput(e.target.value)}
@@ -341,7 +341,7 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
             <button
               onClick={submitResult}
               disabled={!resultInput.trim() || isSubmitting}
-              className="px-4 py-1.5 rounded-md bg-[#00c875] text-white text-xs font-bold"
+              className="px-4 py-1.5 rounded-md bg-success-500 text-white text-xs font-bold"
             >
               {isSubmitting ? "Releasing..." : "Submit & Release Result"}
             </button>

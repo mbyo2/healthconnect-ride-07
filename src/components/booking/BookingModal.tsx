@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, MapPin, Video, Building2, ChevronLeft, ChevronRight, Check, Loader2, Bell, UserPlus, UserCheck } from "lucide-react";
 import { format, addDays, startOfWeek, isSameDay, isAfter, isBefore, startOfDay } from "date-fns";
 import { Provider } from "@/types/provider";
+import { providerDisplayName } from "@/utils/providerDisplay";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -152,7 +153,7 @@ export const BookingModal = ({ provider, isOpen, onClose }: BookingModalProps) =
           )}
         </div>
         <h3 className="text-lg font-semibold text-foreground">
-          Dr. {provider.first_name} {provider.last_name}
+          {providerDisplayName(provider as any)}
         </h3>
         <p className="text-sm text-muted-foreground">{provider.specialty}</p>
       </div>
@@ -348,7 +349,7 @@ export const BookingModal = ({ provider, isOpen, onClose }: BookingModalProps) =
               </div>
             )}
             <div>
-              <p className="font-medium text-foreground">Dr. {provider.first_name} {provider.last_name}</p>
+              <p className="font-medium text-foreground">{providerDisplayName(provider as any)}</p>
               <p className="text-sm text-muted-foreground">{provider.specialty}</p>
             </div>
           </div>
@@ -438,7 +439,7 @@ export const BookingModal = ({ provider, isOpen, onClose }: BookingModalProps) =
           )}
         </div>
         <h3 className="text-lg font-semibold text-foreground">
-          Dr. {provider.first_name} {provider.last_name}
+          {providerDisplayName(provider as any)}
         </h3>
         <p className="text-sm text-muted-foreground">{provider.specialty}</p>
       </div>

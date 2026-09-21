@@ -3,6 +3,8 @@ import { HealthcareProviderType, InsuranceProvider, SpecialtyType } from '@/type
 import type { Provider } from '@/types/provider';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
+import { ALL_CLINICIAN_ROLES } from '@/config/roleConfig';
+import { withTimeout, TIMEOUTS } from '@/utils/async';
 
 type Coordinates = { latitude: number; longitude: number } | null;
 
@@ -92,6 +94,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const fetchProviders = async () => {
     setIsLoading(true);
     try {
+      // Every clinical cadre, verified only — never a single legacy role.
       let query = supabase
         .from('profiles' as any)
         .select(`
@@ -107,7 +110,8 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           availability_schedule,
           provider_locations ( latitude, longitude )
         `, { count: 'exact' })
-        .eq('role', 'health_personnel');
+        .in('role', ALL_CLINICIAN_ROLES as any)
+        .eq('is_verified', true);
 
       if (selectedSpecialty && selectedSpecialty !== 'all' as any) {
         query = query.eq('specialty', selectedSpecialty);
@@ -140,10 +144,13 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         query = query.lte('consultation_fee_min', feeMax);
       }
 
-      const { data, error, count } = await query
-        .order('rating', { ascending: false, nullsFirst: false })
-        .limit(10)
-        .range((currentPage - 1) * 10, currentPage * 10 - 1);
+      const { data, error, count } = await withTimeout(
+        query
+          .order('rating', { ascending: false, nullsFirst: false })
+          .range((currentPage - 1) * 10, currentPage * 10 - 1),
+        TIMEOUTS.standard,
+        'provider search'
+      );
 
       if (error) throw error;
 
@@ -197,8 +204,9 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       setTotalCount(count || mappedProviders.length);
       setHasMore((count || 0) > currentPage * 10);
 
+      // Analytics must NEVER wipe results — fire and forget.
       if (user?.id) {
-        await supabase.from('audit_logs' as any).insert({
+        supabase.from('audit_logs' as any).insert({
           user_id: user.id,
           action: 'search',
           resource: 'provider',
@@ -210,13 +218,20 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           category: 'data_access',
           outcome: 'success',
           timestamp: new Date().toISOString(),
+        }).then(({ error: auditError }) => {
+          if (auditError) console.warn('Search audit log skipped:', auditError.message);
         });
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error fetching providers:', err);
-      setProviders([]);
-      setTotalCount(0);
-      setHasMore(false);
+      if (err?.name === 'TimeoutError') {
+        // Transient slowness: keep previous results + counts in place.
+        // Skeletons only show on first load (see SearchResults).
+      } else {
+        setProviders([]);
+        setTotalCount(0);
+        setHasMore(false);
+      }
     } finally {
       setIsLoading(false);
     }

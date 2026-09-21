@@ -205,10 +205,10 @@ export const ZambiaCompliance = () => {
 
   const getComplianceStatusColor = (status: string) => {
     switch (status) {
-      case "compliant": case "active": return "bg-[#00c875] text-white";
-      case "non_compliant": case "suspended": return "bg-[#e44258] text-white";
-      case "pending": case "pending_review": return "bg-[#fdab3d] text-white";
-      default: return "bg-[#676879] text-white";
+      case "compliant": case "active": return "bg-success-500 text-white";
+      case "non_compliant": case "suspended": return "bg-error-500 text-white";
+      case "pending": case "pending_review": return "bg-warning-500 text-white";
+      default: return "bg-graphite-500 dark:bg-slate-600 text-white";
     }
   };
 
@@ -218,11 +218,11 @@ export const ZambiaCompliance = () => {
     const taxCompliant = taxConfig?.tax_compliance_status === "active";
 
     if (nhimaCompliant && councilCompliant && taxCompliant) {
-      return { status: "fully_compliant", color: "text-[#00c875]" };
+      return { status: "fully_compliant", color: "text-success-500" };
     } else if (!councilCompliant || !taxCompliant) {
-      return { status: "non_compliant", color: "text-[#e44258]" };
+      return { status: "non_compliant", color: "text-error-500" };
     } else {
-      return { status: "partially_compliant", color: "text-[#fdab3d]" };
+      return { status: "partially_compliant", color: "text-warning-500" };
     }
   };
 
@@ -230,13 +230,13 @@ export const ZambiaCompliance = () => {
 
   if (!institution) {
     return (
-      <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 flex items-center justify-center p-6">
+      <div className="min-h-screen bg-canvas dark:bg-slate-950 flex items-center justify-center p-6">
         <Card className="max-w-md w-full">
           <CardContent className="p-8 text-center space-y-4">
-            <Building2 className="h-12 w-12 mx-auto text-[#0073ea]" />
+            <Building2 className="h-12 w-12 mx-auto text-primary-500" />
             <h2 className="text-xl font-extrabold">Institution Required</h2>
-            <p className="text-xs text-[#676879]">Please select an institution to access Zambia compliance.</p>
-            <Button onClick={() => navigate("/institution-portal")} className="bg-[#0073ea] hover:bg-[#0056b3]">
+            <p className="text-xs text-graphite-500 dark:text-slate-400">Please select an institution to access Zambia compliance.</p>
+            <Button onClick={() => navigate("/institution-portal")} className="bg-primary-500 hover:bg-primary-600">
               Go to Institution Portal
             </Button>
           </CardContent>
@@ -248,17 +248,17 @@ export const ZambiaCompliance = () => {
   const overallCompliance = getOverallCompliance();
 
   return (
-    <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pb-16">
+    <div className="min-h-screen bg-canvas dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pb-16">
       {/* Header */}
-      <div className="bg-white dark:bg-slate-900 border-b border-[#e6e9ef] dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
+      <div className="bg-white dark:bg-slate-900 border-b border-canvas-silk dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
         <div className="max-w-[1600px] mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-[#0073ea] text-white flex items-center justify-center shadow-xs">
+            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-xs">
               <Flag className="h-5 w-5" />
             </div>
             <div>
               <h1 className="text-xl font-extrabold">Zambia Compliance</h1>
-              <p className="text-xs text-[#676879] font-medium">Regulatory Compliance Management</p>
+              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">Regulatory Compliance Management</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -271,43 +271,43 @@ export const ZambiaCompliance = () => {
 
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 pt-6">
         {/* Compliance Overview */}
-        <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs mb-6">
+        <Card className="border-canvas-silk dark:border-slate-800 shadow-xs mb-6">
           <CardHeader>
             <CardTitle className="text-sm font-extrabold flex items-center gap-2">
-              <ShieldCheck className="h-4 w-4 text-[#0073ea]" /> Overall Compliance Status
+              <ShieldCheck className="h-4 w-4 text-primary-500" /> Overall Compliance Status
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="flex items-center gap-3 p-4 rounded-xl bg-[#f0f2f7] dark:bg-slate-800">
-                <div className={`h-10 w-10 rounded-lg ${nhimaConfig?.is_nhima_accredited ? "bg-[#00c875]" : "bg-[#e44258]"} text-white flex items-center justify-center`}>
+              <div className="flex items-center gap-3 p-4 rounded-xl bg-canvas-mist dark:bg-slate-800">
+                <div className={`h-10 w-10 rounded-lg ${nhimaConfig?.is_nhima_accredited ? "bg-success-500" : "bg-error-500"} text-white flex items-center justify-center`}>
                   {nhimaConfig?.is_nhima_accredited ? <CheckCircle className="h-5 w-5" /> : <AlertTriangle className="h-5 w-5" />}
                 </div>
                 <div>
                   <div className="text-xs font-bold">NHIMA Accreditation</div>
-                  <div className="text-[10px] text-[#676879]">
+                  <div className="text-[10px] text-graphite-500 dark:text-slate-400">
                     {nhimaConfig?.is_nhima_accredited ? "Accredited" : "Not Accredited"}
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-3 p-4 rounded-xl bg-[#f0f2f7] dark:bg-slate-800">
-                <div className={`h-10 w-10 rounded-lg ${medicalCouncilConfig?.compliance_status === "compliant" ? "bg-[#00c875]" : "bg-[#e44258]"} text-white flex items-center justify-center`}>
+              <div className="flex items-center gap-3 p-4 rounded-xl bg-canvas-mist dark:bg-slate-800">
+                <div className={`h-10 w-10 rounded-lg ${medicalCouncilConfig?.compliance_status === "compliant" ? "bg-success-500" : "bg-error-500"} text-white flex items-center justify-center`}>
                   {medicalCouncilConfig?.compliance_status === "compliant" ? <CheckCircle className="h-5 w-5" /> : <AlertTriangle className="h-5 w-5" />}
                 </div>
                 <div>
                   <div className="text-xs font-bold">Medical Council</div>
-                  <div className="text-[10px] text-[#676879]">
+                  <div className="text-[10px] text-graphite-500 dark:text-slate-400">
                     {medicalCouncilConfig?.compliance_status || "Not Configured"}
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-3 p-4 rounded-xl bg-[#f0f2f7] dark:bg-slate-800">
-                <div className={`h-10 w-10 rounded-lg ${taxConfig?.tax_compliance_status === "active" ? "bg-[#00c875]" : "bg-[#e44258]"} text-white flex items-center justify-center`}>
+              <div className="flex items-center gap-3 p-4 rounded-xl bg-canvas-mist dark:bg-slate-800">
+                <div className={`h-10 w-10 rounded-lg ${taxConfig?.tax_compliance_status === "active" ? "bg-success-500" : "bg-error-500"} text-white flex items-center justify-center`}>
                   {taxConfig?.tax_compliance_status === "active" ? <CheckCircle className="h-5 w-5" /> : <AlertTriangle className="h-5 w-5" />}
                 </div>
                 <div>
                   <div className="text-xs font-bold">ZRA Tax Compliance</div>
-                  <div className="text-[10px] text-[#676879]">
+                  <div className="text-[10px] text-graphite-500 dark:text-slate-400">
                     {taxConfig?.tax_compliance_status || "Not Configured"}
                   </div>
                 </div>
@@ -317,17 +317,17 @@ export const ZambiaCompliance = () => {
         </Card>
 
         <Tabs defaultValue="nhima" className="space-y-6">
-          <TabsList className="bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 p-1">
-            <TabsTrigger value="nhima" className="data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">
+          <TabsList className="bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 p-1">
+            <TabsTrigger value="nhima" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <Globe className="h-4 w-4 mr-2" /> NHIMA Configuration
             </TabsTrigger>
-            <TabsTrigger value="council" className="data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">
+            <TabsTrigger value="council" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <FileText className="h-4 w-4 mr-2" /> Medical Council
             </TabsTrigger>
-            <TabsTrigger value="tax" className="data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">
+            <TabsTrigger value="tax" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <BarChart3 className="h-4 w-4 mr-2" /> ZRA Tax
             </TabsTrigger>
-            <TabsTrigger value="regulations" className="data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">
+            <TabsTrigger value="regulations" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <CheckSquare className="h-4 w-4 mr-2" /> Health Regulations
             </TabsTrigger>
           </TabsList>
@@ -338,7 +338,7 @@ export const ZambiaCompliance = () => {
               <h3 className="text-sm font-extrabold">National Health Insurance Scheme Configuration</h3>
               <Dialog open={showNhimaDialog} onOpenChange={setShowNhimaDialog}>
                 <DialogTrigger asChild>
-                  <Button className="bg-[#0073ea] hover:bg-[#0056b3] text-white font-bold text-xs">
+                  <Button className="bg-primary-500 hover:bg-primary-600 text-white font-bold text-xs">
                     <Settings className="h-4 w-4 mr-1" /> Configure NHIMA
                   </Button>
                 </DialogTrigger>
@@ -427,7 +427,7 @@ export const ZambiaCompliance = () => {
                         className="mt-1"
                       />
                     </div>
-                    <Button onClick={handleSaveNhima} className="w-full bg-[#0073ea] hover:bg-[#0056b3] text-white font-bold">
+                    <Button onClick={handleSaveNhima} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold">
                       Save NHIMA Configuration
                     </Button>
                   </div>
@@ -436,43 +436,43 @@ export const ZambiaCompliance = () => {
             </div>
 
             {nhimaConfig ? (
-              <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+              <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                 <CardHeader>
                   <CardTitle className="text-sm font-extrabold">Current NHIMA Configuration</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <div className="text-[10px] text-[#676879]">Provider Code</div>
+                      <div className="text-[10px] text-graphite-500 dark:text-slate-400">Provider Code</div>
                       <div className="text-sm font-bold">{nhimaConfig.nhima_provider_code || "Not Set"}</div>
                     </div>
                     <div>
-                      <div className="text-[10px] text-[#676879]">Facility Type</div>
+                      <div className="text-[10px] text-graphite-500 dark:text-slate-400">Facility Type</div>
                       <div className="text-sm font-bold">{nhimaConfig.nhima_facility_type || "Not Set"}</div>
                     </div>
                     <div>
-                      <div className="text-[10px] text-[#676879]">Accreditation #</div>
+                      <div className="text-[10px] text-graphite-500 dark:text-slate-400">Accreditation #</div>
                       <div className="text-sm font-bold">{nhimaConfig.nhima_accreditation_number || "Not Set"}</div>
                     </div>
                     <div>
-                      <div className="text-[10px] text-[#676879]">Processing Days</div>
+                      <div className="text-[10px] text-graphite-500 dark:text-slate-400">Processing Days</div>
                       <div className="text-sm font-bold">{nhimaConfig.nhima_claim_processing_days} days</div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 pt-2 border-t border-[#e6e9ef] dark:border-slate-800">
-                    <Badge className={nhimaConfig.is_nhima_accredited ? "bg-[#00c875] text-white text-[10px]" : "bg-[#e44258] text-white text-[10px]"}>
+                  <div className="flex items-center gap-2 pt-2 border-t border-canvas-silk dark:border-slate-800">
+                    <Badge className={nhimaConfig.is_nhima_accredited ? "bg-success-500 text-white text-[10px]" : "bg-error-500 text-white text-[10px]"}>
                       {nhimaConfig.is_nhima_accredited ? "Accredited" : "Not Accredited"}
                     </Badge>
                   </div>
                 </CardContent>
               </Card>
             ) : (
-              <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+              <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                 <CardContent className="p-8 text-center">
-                  <Globe className="h-12 w-12 mx-auto text-[#0073ea] mb-4" />
+                  <Globe className="h-12 w-12 mx-auto text-primary-500 mb-4" />
                   <h3 className="text-sm font-extrabold mb-2">NHIMA Not Configured</h3>
-                  <p className="text-xs text-[#676879] mb-4">Configure your NHIMA settings to enable insurance claims</p>
-                  <Button onClick={() => setShowNhimaDialog(true)} className="bg-[#0073ea] hover:bg-[#0056b3]">
+                  <p className="text-xs text-graphite-500 dark:text-slate-400 mb-4">Configure your NHIMA settings to enable insurance claims</p>
+                  <Button onClick={() => setShowNhimaDialog(true)} className="bg-primary-500 hover:bg-primary-600">
                     Configure NHIMA
                   </Button>
                 </CardContent>
@@ -486,7 +486,7 @@ export const ZambiaCompliance = () => {
               <h3 className="text-sm font-extrabold">Medical Council Compliance</h3>
               <Dialog open={showCouncilDialog} onOpenChange={setShowCouncilDialog}>
                 <DialogTrigger asChild>
-                  <Button className="bg-[#0073ea] hover:bg-[#0056b3] text-white font-bold text-xs">
+                  <Button className="bg-primary-500 hover:bg-primary-600 text-white font-bold text-xs">
                     <Settings className="h-4 w-4 mr-1" /> Configure Council
                   </Button>
                 </DialogTrigger>
@@ -531,7 +531,7 @@ export const ZambiaCompliance = () => {
                         className="mt-1"
                       />
                     </div>
-                    <Button onClick={handleSaveCouncil} className="w-full bg-[#0073ea] hover:bg-[#0056b3] text-white font-bold">
+                    <Button onClick={handleSaveCouncil} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold">
                       Save Council Configuration
                     </Button>
                   </div>
@@ -540,18 +540,18 @@ export const ZambiaCompliance = () => {
             </div>
 
             {medicalCouncilConfig ? (
-              <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+              <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                 <CardHeader>
                   <CardTitle className="text-sm font-extrabold">Council Compliance Status</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <div className="text-[10px] text-[#676879]">Registration #</div>
+                      <div className="text-[10px] text-graphite-500 dark:text-slate-400">Registration #</div>
                       <div className="text-sm font-bold">{medicalCouncilConfig.council_registration_number || "Not Set"}</div>
                     </div>
                     <div>
-                      <div className="text-[10px] text-[#676879]">License Expiry</div>
+                      <div className="text-[10px] text-graphite-500 dark:text-slate-400">License Expiry</div>
                       <div className="text-sm font-bold">
                         {medicalCouncilConfig.license_expiry_date 
                           ? new Date(medicalCouncilConfig.license_expiry_date).toLocaleDateString()
@@ -559,12 +559,12 @@ export const ZambiaCompliance = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between pt-2 border-t border-[#e6e9ef] dark:border-slate-800">
+                  <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
                     <Badge className={getComplianceStatusColor(medicalCouncilConfig.compliance_status) + " text-[10px]"}>
                       {medicalCouncilConfig.compliance_status || "Not Configured"}
                     </Badge>
                     {medicalCouncilConfig.next_audit_date && (
-                      <div className="text-xs text-[#676879]">
+                      <div className="text-xs text-graphite-500 dark:text-slate-400">
                         Next Audit: {new Date(medicalCouncilConfig.next_audit_date).toLocaleDateString()}
                       </div>
                     )}
@@ -572,12 +572,12 @@ export const ZambiaCompliance = () => {
                 </CardContent>
               </Card>
             ) : (
-              <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+              <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                 <CardContent className="p-8 text-center">
-                  <FileText className="h-12 w-12 mx-auto text-[#0073ea] mb-4" />
+                  <FileText className="h-12 w-12 mx-auto text-primary-500 mb-4" />
                   <h3 className="text-sm font-extrabold mb-2">Medical Council Not Configured</h3>
-                  <p className="text-xs text-[#676879] mb-4">Configure your medical council compliance settings</p>
-                  <Button onClick={() => setShowCouncilDialog(true)} className="bg-[#0073ea] hover:bg-[#0056b3]">
+                  <p className="text-xs text-graphite-500 dark:text-slate-400 mb-4">Configure your medical council compliance settings</p>
+                  <Button onClick={() => setShowCouncilDialog(true)} className="bg-primary-500 hover:bg-primary-600">
                     Configure Council
                   </Button>
                 </CardContent>
@@ -591,7 +591,7 @@ export const ZambiaCompliance = () => {
               <h3 className="text-sm font-extrabold">Zambia Revenue Authority Tax Configuration</h3>
               <Dialog open={showTaxDialog} onOpenChange={setShowTaxDialog}>
                 <DialogTrigger asChild>
-                  <Button className="bg-[#0073ea] hover:bg-[#0056b3] text-white font-bold text-xs">
+                  <Button className="bg-primary-500 hover:bg-primary-600 text-white font-bold text-xs">
                     <Settings className="h-4 w-4 mr-1" /> Configure Tax
                   </Button>
                 </DialogTrigger>
@@ -674,7 +674,7 @@ export const ZambiaCompliance = () => {
                         className="mt-1"
                       />
                     </div>
-                    <Button onClick={handleSaveTax} className="w-full bg-[#0073ea] hover:bg-[#0056b3] text-white font-bold">
+                    <Button onClick={handleSaveTax} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold">
                       Save Tax Configuration
                     </Button>
                   </div>
@@ -683,38 +683,38 @@ export const ZambiaCompliance = () => {
             </div>
 
             {taxConfig ? (
-              <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+              <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                 <CardHeader>
                   <CardTitle className="text-sm font-extrabold">Tax Compliance Status</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <div className="text-[10px] text-[#676879]">VAT Rate</div>
+                      <div className="text-[10px] text-graphite-500 dark:text-slate-400">VAT Rate</div>
                       <div className="text-sm font-bold">{taxConfig.vat_rate}%</div>
                     </div>
                     <div>
-                      <div className="text-[10px] text-[#676879]">Withholding Tax</div>
+                      <div className="text-[10px] text-graphite-500 dark:text-slate-400">Withholding Tax</div>
                       <div className="text-sm font-bold">{taxConfig.withholding_tax_rate}%</div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 pt-2 border-t border-[#e6e9ef] dark:border-slate-800">
+                  <div className="flex items-center gap-2 pt-2 border-t border-canvas-silk dark:border-slate-800">
                     <Badge className={getComplianceStatusColor(taxConfig.tax_compliance_status) + " text-[10px]"}>
                       {taxConfig.tax_compliance_status || "Not Configured"}
                     </Badge>
                     {taxConfig.requires_ecfd_system && (
-                      <Badge className="bg-[#a25ddc] text-white text-[10px]">ECFD Required</Badge>
+                      <Badge className="bg-purple-500 text-white text-[10px]">ECFD Required</Badge>
                     )}
                   </div>
                 </CardContent>
               </Card>
             ) : (
-              <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+              <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                 <CardContent className="p-8 text-center">
-                  <BarChart3 className="h-12 w-12 mx-auto text-[#0073ea] mb-4" />
+                  <BarChart3 className="h-12 w-12 mx-auto text-primary-500 mb-4" />
                   <h3 className="text-sm font-extrabold mb-2">ZRA Tax Not Configured</h3>
-                  <p className="text-xs text-[#676879] mb-4">Configure your tax compliance settings</p>
-                  <Button onClick={() => setShowTaxDialog(true)} className="bg-[#0073ea] hover:bg-[#0056b3]">
+                  <p className="text-xs text-graphite-500 dark:text-slate-400 mb-4">Configure your tax compliance settings</p>
+                  <Button onClick={() => setShowTaxDialog(true)} className="bg-primary-500 hover:bg-primary-600">
                     Configure Tax
                   </Button>
                 </CardContent>
@@ -733,27 +733,27 @@ export const ZambiaCompliance = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {regulations.map((regulation) => (
-                <Card key={regulation.id} className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+                <Card key={regulation.id} className="border-canvas-silk dark:border-slate-800 shadow-xs">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div>
                         <CardTitle className="text-sm font-extrabold">{regulation.regulation_name}</CardTitle>
-                        <div className="text-[10px] text-[#676879]">{regulation.regulation_code}</div>
+                        <div className="text-[10px] text-graphite-500 dark:text-slate-400">{regulation.regulation_code}</div>
                       </div>
                       <Badge variant="outline" className="text-[10px]">{regulation.regulation_category}</Badge>
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-[#676879]">Inspection Frequency</span>
+                      <span className="text-graphite-500 dark:text-slate-400">Inspection Frequency</span>
                       <span className="font-bold">{regulation.inspection_frequency}</span>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-[#676879]">Effective Date</span>
+                      <span className="text-graphite-500 dark:text-slate-400">Effective Date</span>
                       <span className="font-bold">{new Date(regulation.effective_date).toLocaleDateString()}</span>
                     </div>
-                    <div className="flex items-center justify-between pt-2 border-t border-[#e6e9ef] dark:border-slate-800">
-                      <div className="text-xs text-[#676879]">
+                    <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
+                      <div className="text-xs text-graphite-500 dark:text-slate-400">
                         {regulation.documentation_requirements.length} documentation requirements
                       </div>
                       <Button variant="ghost" size="sm" className="h-7 w-7 p-0">

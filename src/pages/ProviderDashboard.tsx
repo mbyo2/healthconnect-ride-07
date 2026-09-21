@@ -83,7 +83,7 @@ const MyPracticeEditor = () => {
           "insurance_providers_accepted,affiliated_hospitals"
         )
         .eq("id", user.id)
-        .single();
+        .maybeSingle();
       if (!p) return;
       const d = p as any;
       setData(prev => ({
@@ -161,14 +161,14 @@ const MyPracticeEditor = () => {
   if (!loaded) {
     return (
       <div className="flex justify-center py-12">
-        <Loader2 className="h-6 w-6 animate-spin text-[#0073ea]" />
+        <Loader2 className="h-6 w-6 animate-spin text-primary-500" />
       </div>
     );
   }
 
   const Section = ({ icon: Icon, title, children }: { icon: any; title: string; children: React.ReactNode }) => (
     <div className="space-y-3">
-      <h3 className="text-xs font-extrabold uppercase text-[#676879] flex items-center gap-1.5 border-b border-[#f0f2f7] dark:border-slate-800 pb-2">
+      <h3 className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400 flex items-center gap-1.5 border-b border-canvas-mist dark:border-slate-800 pb-2">
         <Icon className="h-4 w-4" /> {title}
       </h3>
       {children}
@@ -191,7 +191,7 @@ const MyPracticeEditor = () => {
           className={`px-3 py-1 rounded-full text-xs font-bold border transition-all ${
             data[field].includes(opt)
               ? `${activeColor} text-white border-transparent`
-              : "bg-white dark:bg-slate-800 border-[#e6e9ef] text-[#676879] hover:border-current"
+              : "bg-white dark:bg-slate-800 border-canvas-silk text-graphite-500 dark:text-slate-400 hover:border-current"
           }`}
         >
           {opt}
@@ -207,22 +207,22 @@ const MyPracticeEditor = () => {
       <Section icon={GraduationCap} title="Education">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-1.5">
-            <Label className="text-[11px] font-extrabold uppercase text-[#676879]">Medical School</Label>
+            <Label className="text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">Medical School</Label>
             <Input
               value={data.medical_school}
               onChange={e => setData(p => ({ ...p, medical_school: e.target.value }))}
               placeholder="e.g. UNZA School of Medicine"
-              className="h-10 rounded-xl border-[#e6e9ef] text-xs font-medium"
+              className="h-10 rounded-xl border-canvas-silk text-xs font-medium"
             />
           </div>
           <div className="space-y-1.5">
-            <Label className="text-[11px] font-extrabold uppercase text-[#676879]">Graduation Year</Label>
+            <Label className="text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">Graduation Year</Label>
             <Input
               type="number" min="1960" max="2030"
               value={data.graduation_year}
               onChange={e => setData(p => ({ ...p, graduation_year: e.target.value }))}
               placeholder="e.g. 2015"
-              className="h-10 rounded-xl border-[#e6e9ef] text-xs font-medium"
+              className="h-10 rounded-xl border-canvas-silk text-xs font-medium"
             />
           </div>
         </div>
@@ -230,33 +230,33 @@ const MyPracticeEditor = () => {
 
       {/* Board Certifications */}
       <Section icon={Award} title="Board Certifications">
-        <PillSelector options={CERT_OPTIONS} field="board_certifications" activeColor="bg-[#0073ea]" />
+        <PillSelector options={CERT_OPTIONS} field="board_certifications" activeColor="bg-primary-500" />
       </Section>
 
       {/* Subspecialties */}
       <Section icon={Stethoscope} title="Subspecialties">
-        <PillSelector options={SUBSPECIALTY_OPTIONS} field="subspecialties" activeColor="bg-[#a25ddc]" />
+        <PillSelector options={SUBSPECIALTY_OPTIONS} field="subspecialties" activeColor="bg-purple-500" />
       </Section>
 
       {/* Practice */}
       <Section icon={MapPin} title="Practice Details">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="sm:col-span-2 space-y-1.5">
-            <Label className="text-[11px] font-extrabold uppercase text-[#676879]">Primary Practice Location</Label>
+            <Label className="text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">Primary Practice Location</Label>
             <Input
               value={data.primary_practice_location}
               onChange={e => setData(p => ({ ...p, primary_practice_location: e.target.value }))}
               placeholder="e.g. Woodlands Clinic, Lusaka"
-              className="h-10 rounded-xl border-[#e6e9ef] text-xs font-medium"
+              className="h-10 rounded-xl border-canvas-silk text-xs font-medium"
             />
           </div>
           <div className="space-y-1.5">
-            <Label className="text-[11px] font-extrabold uppercase text-[#676879]">Avg. Wait Time</Label>
+            <Label className="text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">Avg. Wait Time</Label>
             <Input
               value={data.typical_wait_time}
               onChange={e => setData(p => ({ ...p, typical_wait_time: e.target.value }))}
               placeholder="e.g. 15 mins"
-              className="h-10 rounded-xl border-[#e6e9ef] text-xs font-medium"
+              className="h-10 rounded-xl border-canvas-silk text-xs font-medium"
             />
           </div>
         </div>
@@ -266,7 +266,7 @@ const MyPracticeEditor = () => {
       <Section icon={Building2} title="Affiliated Hospitals">
         <div className="flex flex-wrap gap-2 mb-2 min-h-[28px]">
           {data.affiliated_hospitals.length === 0
-            ? <span className="text-xs text-[#676879]">None added yet</span>
+            ? <span className="text-xs text-graphite-500 dark:text-slate-400">None added yet</span>
             : data.affiliated_hospitals.map(h => (
               <Badge key={h} variant="secondary" className="gap-1 pr-1">
                 {h}
@@ -283,9 +283,9 @@ const MyPracticeEditor = () => {
             onChange={e => setData(p => ({ ...p, newHospital: e.target.value }))}
             onKeyDown={e => e.key === "Enter" && (e.preventDefault(), addHospital())}
             placeholder="Add hospital name…"
-            className="h-9 rounded-xl border-[#e6e9ef] text-xs"
+            className="h-9 rounded-xl border-canvas-silk text-xs"
           />
-          <Button type="button" size="sm" onClick={addHospital} className="rounded-xl h-9 px-3 bg-[#0073ea] hover:bg-[#0060c4]">
+          <Button type="button" size="sm" onClick={addHospital} className="rounded-xl h-9 px-3 bg-primary-500 hover:bg-primary-600">
             <Plus className="h-4 w-4" />
           </Button>
         </div>
@@ -295,24 +295,24 @@ const MyPracticeEditor = () => {
       <Section icon={DollarSign} title="Consultation Fees (ZMW)">
         <div className="flex items-center gap-3 max-w-xs">
           <div className="flex-1 space-y-1.5">
-            <Label className="text-[11px] font-extrabold uppercase text-[#676879]">Min</Label>
+            <Label className="text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">Min</Label>
             <Input
               type="number" min="0"
               value={data.consultation_fee_min}
               onChange={e => setData(p => ({ ...p, consultation_fee_min: e.target.value }))}
               placeholder="200"
-              className="h-10 rounded-xl border-[#e6e9ef] text-xs font-medium"
+              className="h-10 rounded-xl border-canvas-silk text-xs font-medium"
             />
           </div>
-          <span className="mt-6 text-[#676879] font-bold text-sm">–</span>
+          <span className="mt-6 text-graphite-500 dark:text-slate-400 font-bold text-sm">–</span>
           <div className="flex-1 space-y-1.5">
-            <Label className="text-[11px] font-extrabold uppercase text-[#676879]">Max</Label>
+            <Label className="text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">Max</Label>
             <Input
               type="number" min="0"
               value={data.consultation_fee_max}
               onChange={e => setData(p => ({ ...p, consultation_fee_max: e.target.value }))}
               placeholder="500"
-              className="h-10 rounded-xl border-[#e6e9ef] text-xs font-medium"
+              className="h-10 rounded-xl border-canvas-silk text-xs font-medium"
             />
           </div>
         </div>
@@ -326,9 +326,9 @@ const MyPracticeEditor = () => {
             { key: "home_visits_available" as const, icon: Home, label: "Home Visits" },
             { key: "accepts_insurance" as const, icon: Shield, label: "Accepts Insurance" },
           ]).map(item => (
-            <div key={item.key} className="flex items-center justify-between p-3 border border-[#e6e9ef] rounded-xl bg-white dark:bg-slate-900">
+            <div key={item.key} className="flex items-center justify-between p-3 border border-canvas-silk rounded-xl bg-white dark:bg-slate-900">
               <div className="flex items-center gap-2 text-xs font-semibold text-slate-700 dark:text-slate-300">
-                <item.icon className="h-4 w-4 text-[#0073ea]" />
+                <item.icon className="h-4 w-4 text-primary-500" />
                 {item.label}
               </div>
               <Switch
@@ -343,13 +343,13 @@ const MyPracticeEditor = () => {
       {/* Insurance providers — shown only when accepts_insurance is on */}
       {data.accepts_insurance && (
         <Section icon={Shield} title="Accepted Insurance Providers">
-          <PillSelector options={INSURANCE_OPTIONS} field="insurance_providers_accepted" activeColor="bg-[#00c875]" />
+          <PillSelector options={INSURANCE_OPTIONS} field="insurance_providers_accepted" activeColor="bg-success-500" />
         </Section>
       )}
 
       {/* Languages */}
       <Section icon={Languages} title="Languages Spoken">
-        <PillSelector options={LANGUAGE_OPTIONS} field="languages_spoken" activeColor="bg-[#fdab3d]" />
+        <PillSelector options={LANGUAGE_OPTIONS} field="languages_spoken" activeColor="bg-warning-500" />
       </Section>
 
       {/* Save */}
@@ -357,7 +357,7 @@ const MyPracticeEditor = () => {
         <Button
           onClick={handleSave}
           disabled={saving}
-          className="rounded-xl h-11 px-8 bg-[#0073ea] hover:bg-[#0060c4] text-white font-extrabold text-xs"
+          className="rounded-xl h-11 px-8 bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs"
         >
           {saving
             ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving…</>
@@ -453,7 +453,7 @@ export const ProviderDashboard = () => {
   return (
     <div className="min-h-screen bg-canvas text-midnight font-sans transition-colors pb-16">
       {/* Top Bar */}
-      <div className="bg-white border-b border-canvas-silk px-4 sm:px-6 py-5 sticky top-0 z-30 shadow-sm">
+      <div className="bg-white dark:bg-slate-900 border-b border-canvas-silk dark:border-slate-800 px-4 sm:px-6 py-5 sticky top-0 z-30 shadow-sm">
         <div className="max-w-content mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-button">
@@ -500,8 +500,8 @@ export const ProviderDashboard = () => {
             <div className="text-xs font-medium text-warning-500">Awaiting Triage</div>
           </div>
           <div className="vf-card space-y-3">
-            <div className="text-xs font-extrabold text-[#676879] dark:text-slate-400 uppercase">Shift Earnings (ZMW)</div>
-            <div className="text-3xl font-black font-mono text-[#00c875] mt-1">{formatPrice(weekStats?.revenue || 0)}</div>
+            <div className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Shift Earnings (ZMW)</div>
+            <div className="text-3xl font-black font-mono text-success-500 mt-1">{formatPrice(weekStats?.revenue || 0)}</div>
             <div className="text-[11px] font-bold text-emerald-500 mt-1">+14% Shift Growth</div>
           </div>
         </div>
@@ -519,9 +519,9 @@ export const ProviderDashboard = () => {
             <button
               key={act.label}
               onClick={() => navigate(act.route)}
-              className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 hover:border-[#0073ea] hover:shadow-xs transition-all flex items-center gap-2.5 text-xs font-extrabold text-slate-800 dark:text-slate-200"
+              className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 hover:border-primary-500 hover:shadow-xs transition-all flex items-center gap-2.5 text-xs font-extrabold text-slate-800 dark:text-slate-200"
             >
-              <div className="p-2 rounded-lg bg-[#e5f0ff] dark:bg-blue-950 text-[#0073ea]">
+              <div className="p-2 rounded-lg bg-primary-50 dark:bg-blue-950 text-primary-500">
                 <act.icon className="h-4 w-4" />
               </div>
               <span>{act.label}</span>
@@ -530,28 +530,28 @@ export const ProviderDashboard = () => {
         </div>
 
         {/* Today's queue */}
-        <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs overflow-hidden">
-          <div className="px-4 py-3 bg-[#e5f0ff] dark:bg-blue-950/40 border-b border-[#e6e9ef] dark:border-slate-800 flex items-center justify-between border-l-4 border-l-[#0073ea]">
+        <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs overflow-hidden">
+          <div className="px-4 py-3 bg-primary-50 dark:bg-blue-950/40 border-b border-canvas-silk dark:border-slate-800 flex items-center justify-between border-l-4 border-l-primary-500">
             <div className="flex items-center gap-2">
-              <h2 className="font-extrabold text-sm text-[#0073ea]">Today's Scheduled Consultations</h2>
-              <span className="px-2 py-0.5 rounded-full text-xs font-mono font-bold bg-[#0073ea] text-white">
+              <h2 className="font-extrabold text-sm text-primary-500">Today's Scheduled Consultations</h2>
+              <span className="px-2 py-0.5 rounded-full text-xs font-mono font-bold bg-primary-500 text-white">
                 {todayAppointments.length}
               </span>
             </div>
-            <button onClick={() => navigate("/appointments")} className="text-xs font-bold text-[#0073ea] hover:underline flex items-center gap-1">
+            <button onClick={() => navigate("/appointments")} className="text-xs font-bold text-primary-500 hover:underline flex items-center gap-1">
               View All Board Records <ArrowRight className="h-3.5 w-3.5" />
             </button>
           </div>
 
           {todayAppointments.length === 0 ? (
-            <div className="p-8 text-center text-xs text-[#676879] dark:text-slate-400">
+            <div className="p-8 text-center text-xs text-graphite-500 dark:text-slate-400">
               No appointments scheduled for today
             </div>
           ) : (
             <div className="w-full overflow-x-auto">
               <table className="w-full text-left border-collapse min-w-[850px]">
                 <thead>
-                  <tr className="text-[11px] font-extrabold uppercase text-[#676879] dark:text-slate-400 border-b border-[#e6e9ef] dark:border-slate-800 bg-[#f5f6f8] dark:bg-slate-950">
+                  <tr className="text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400 border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950">
                     <th className="py-2.5 px-4 w-[240px]">Patient Name</th>
                     <th className="py-2.5 px-3 w-[130px] text-center">Status</th>
                     <th className="py-2.5 px-3 w-[150px]">Consult Time</th>
@@ -559,28 +559,28 @@ export const ProviderDashboard = () => {
                     <th className="py-2.5 px-3 w-[150px] text-center">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#e6e9ef] dark:divide-slate-800 text-xs">
+                <tbody className="divide-y divide-canvas-silk dark:divide-slate-800 text-xs">
                   {todayAppointments.map((app: any) => (
-                    <tr key={app.id} className="hover:bg-[#f0f2f7] dark:hover:bg-slate-800/60 transition-colors">
+                    <tr key={app.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-800/60 transition-colors">
                       <td className="py-3 px-4 font-extrabold text-slate-900 dark:text-slate-100">
-                        {app.patient?.first_name} {app.patient?.last_name}
+                        {[app.patient?.first_name, app.patient?.last_name].filter(Boolean).join(' ') || 'Patient'}
                       </td>
                       <td className="py-3 px-3 text-center">
                         {app.status === "completed"
-                          ? <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-[#00c875]">Completed</span>
-                          : <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-[#579bfc]">Scheduled</span>
+                          ? <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-success-500">Completed</span>
+                          : <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-primary-400">Scheduled</span>
                         }
                       </td>
                       <td className="py-3 px-3 font-mono font-bold text-slate-700 dark:text-slate-300">{app.time}</td>
                       <td className="py-3 px-3">
-                        <span className="inline-block px-2 py-0.5 rounded bg-[#f0f2f7] dark:bg-slate-800 font-semibold text-[11px]">
+                        <span className="inline-block px-2 py-0.5 rounded bg-canvas-mist dark:bg-slate-800 font-semibold text-[11px]">
                           {app.type === "video_consultation" ? "Video Call" : "In-Person"}
                         </span>
                       </td>
                       <td className="py-3 px-3 text-center">
                         <button
                           onClick={() => navigate("/appointments")}
-                          className="px-3 py-1 rounded-md bg-[#0073ea] text-white text-[11px] font-bold hover:bg-[#0060c4]"
+                          className="px-3 py-1 rounded-md bg-primary-500 text-white text-[11px] font-bold hover:bg-primary-600"
                         >
                           Open EMR Case Sheet
                         </button>
@@ -596,7 +596,7 @@ export const ProviderDashboard = () => {
         {/* ── Detailed modules tabs (now includes My Practice) ── */}
         <Tabs defaultValue="schedule" className="space-y-4">
           <div className="overflow-x-auto">
-            <TabsList className="inline-flex items-center gap-1 p-1 bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 rounded-xl w-auto min-w-full">
+            <TabsList className="inline-flex items-center gap-1 p-1 bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 rounded-xl w-auto min-w-full">
               {[
                 { value: "schedule", label: "Schedule Manager" },
                 { value: "patients", label: "Patient Directory" },
@@ -607,7 +607,7 @@ export const ProviderDashboard = () => {
                 <TabsTrigger
                   key={tab.value}
                   value={tab.value}
-                  className="text-xs font-extrabold px-4 py-1.5 rounded-md whitespace-nowrap data-[state=active]:bg-[#0073ea] data-[state=active]:text-white"
+                  className="text-xs font-extrabold px-4 py-1.5 rounded-md whitespace-nowrap data-[state=active]:bg-primary-500 data-[state=active]:text-white"
                 >
                   {tab.label}
                 </TabsTrigger>
@@ -615,7 +615,7 @@ export const ProviderDashboard = () => {
             </TabsList>
           </div>
 
-          <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
+          <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
             <TabsContent value="schedule"><ScheduleManager /></TabsContent>
             <TabsContent value="patients"><PatientRecords /></TabsContent>
             <TabsContent value="waitlist"><WaitlistManager /></TabsContent>
@@ -623,10 +623,10 @@ export const ProviderDashboard = () => {
             <TabsContent value="my_practice">
               <div className="mb-4">
                 <h2 className="font-extrabold text-base text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                  <GraduationCap className="h-5 w-5 text-[#0073ea]" />
+                  <GraduationCap className="h-5 w-5 text-primary-500" />
                   My Practice Profile
                 </h2>
-                <p className="text-xs text-[#676879] mt-0.5">
+                <p className="text-xs text-graphite-500 dark:text-slate-400 mt-0.5">
                   These details appear on your public provider listing and help patients choose the right care.
                 </p>
               </div>

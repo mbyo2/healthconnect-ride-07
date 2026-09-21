@@ -190,30 +190,30 @@ export const FinancialControls = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "approved": return "bg-[#00c875] text-white";
-      case "rejected": return "bg-[#e44258] text-white";
-      case "flagged": return "bg-[#fdab3d] text-white";
-      default: return "bg-[#0073ea] text-white";
+      case "approved": return "bg-success-500 text-white";
+      case "rejected": return "bg-error-500 text-white";
+      case "flagged": return "bg-warning-500 text-white";
+      default: return "bg-primary-500 text-white";
     }
   };
 
   const getRiskColor = (score: number) => {
-    if (score >= 0.8) return "text-[#e44258]";
-    if (score >= 0.5) return "text-[#fdab3d]";
-    return "text-[#00c875]";
+    if (score >= 0.8) return "text-error-500";
+    if (score >= 0.5) return "text-warning-500";
+    return "text-success-500";
   };
 
   if (loading) return <LoadingScreen />;
 
   if (!institution) {
     return (
-      <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 flex items-center justify-center p-6">
+      <div className="min-h-screen bg-canvas dark:bg-slate-950 flex items-center justify-center p-6">
         <Card className="max-w-md w-full">
           <CardContent className="p-8 text-center space-y-4">
-            <Building2 className="h-12 w-12 mx-auto text-[#0073ea]" />
+            <Building2 className="h-12 w-12 mx-auto text-primary-500" />
             <h2 className="text-xl font-extrabold">Institution Required</h2>
-            <p className="text-xs text-[#676879]">Please select an institution to access financial controls.</p>
-            <Button onClick={() => navigate("/institution-portal")} className="bg-[#0073ea] hover:bg-[#0056b3]">
+            <p className="text-xs text-graphite-500 dark:text-slate-400">Please select an institution to access financial controls.</p>
+            <Button onClick={() => navigate("/institution-portal")} className="bg-primary-500 hover:bg-primary-600">
               Go to Institution Portal
             </Button>
           </CardContent>
@@ -227,23 +227,23 @@ export const FinancialControls = () => {
   const totalDiscrepancyAmount = discrepancies.reduce((sum, d) => sum + d.difference_amount, 0);
 
   return (
-    <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pb-16">
+    <div className="min-h-screen bg-canvas dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pb-16">
       {/* Header */}
-      <div className="bg-white dark:bg-slate-900 border-b border-[#e6e9ef] dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
+      <div className="bg-white dark:bg-slate-900 border-b border-canvas-silk dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
         <div className="max-w-[1600px] mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-[#0073ea] text-white flex items-center justify-center shadow-xs">
+            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-xs">
               <ShieldCheck className="h-5 w-5" />
             </div>
             <div>
               <h1 className="text-xl font-extrabold">Financial Controls</h1>
-              <p className="text-xs text-[#676879] font-medium">Revenue Leak Prevention & Audit Management</p>
+              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">Revenue Leak Prevention & Audit Management</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <Dialog open={showSettingsDialog} onOpenChange={setShowSettingsDialog}>
               <DialogTrigger asChild>
-                <Button className="bg-[#0073ea] hover:bg-[#0056b3] text-white font-bold text-xs flex items-center gap-2">
+                <Button className="bg-primary-500 hover:bg-primary-600 text-white font-bold text-xs flex items-center gap-2">
                   <Settings className="h-4 w-4" /> Configure Controls
                 </Button>
               </DialogTrigger>
@@ -325,7 +325,7 @@ export const FinancialControls = () => {
                       />
                     </div>
                   </div>
-                  <Button onClick={handleSaveControls} className="w-full bg-[#0073ea] hover:bg-[#0056b3] text-white font-bold">
+                  <Button onClick={handleSaveControls} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold">
                     Save Settings
                   </Button>
                 </div>
@@ -338,59 +338,59 @@ export const FinancialControls = () => {
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 pt-6">
         {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-[#676879] uppercase">Flagged Transactions</span>
-                <AlertTriangle className="h-4 w-4 text-[#fdab3d]" />
+                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Flagged Transactions</span>
+                <AlertTriangle className="h-4 w-4 text-warning-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-[#fdab3d]">{flaggedCount}</div>
-              <div className="text-[10px] text-[#676879] font-bold mt-0.5">Requires review</div>
+              <div className="text-2xl font-black font-mono text-warning-500">{flaggedCount}</div>
+              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Requires review</div>
             </CardContent>
           </Card>
-          <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-[#676879] uppercase">Pending Audits</span>
-                <Clock className="h-4 w-4 text-[#0073ea]" />
+                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Pending Audits</span>
+                <Clock className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-[#0073ea]">{pendingCount}</div>
-              <div className="text-[10px] text-[#676879] font-bold mt-0.5">Awaiting approval</div>
+              <div className="text-2xl font-black font-mono text-primary-500">{pendingCount}</div>
+              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Awaiting approval</div>
             </CardContent>
           </Card>
-          <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-[#676879] uppercase">Price Discrepancies</span>
-                <DollarSign className="h-4 w-4 text-[#e44258]" />
+                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Price Discrepancies</span>
+                <DollarSign className="h-4 w-4 text-error-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-[#e44258]">{discrepancies.length}</div>
-              <div className="text-[10px] text-[#676879] font-bold mt-0.5">Unresolved</div>
+              <div className="text-2xl font-black font-mono text-error-500">{discrepancies.length}</div>
+              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Unresolved</div>
             </CardContent>
           </Card>
-          <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-[#676879] uppercase">Total Discrepancy</span>
-                <TrendingUp className="h-4 w-4 text-[#a25ddc]" />
+                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Total Discrepancy</span>
+                <TrendingUp className="h-4 w-4 text-purple-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-[#a25ddc]">
+              <div className="text-2xl font-black font-mono text-purple-500">
                 {institution.currency || "ZMW"} {totalDiscrepancyAmount.toFixed(2)}
               </div>
-              <div className="text-[10px] text-[#676879] font-bold mt-0.5">At risk amount</div>
+              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">At risk amount</div>
             </CardContent>
           </Card>
         </div>
 
         <Tabs defaultValue="audit" className="space-y-6">
-          <TabsList className="bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 p-1">
-            <TabsTrigger value="audit" className="data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">
+          <TabsList className="bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 p-1">
+            <TabsTrigger value="audit" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <FileText className="h-4 w-4 mr-2" /> Revenue Audit Log
             </TabsTrigger>
-            <TabsTrigger value="discrepancies" className="data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">
+            <TabsTrigger value="discrepancies" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <AlertTriangle className="h-4 w-4 mr-2" /> Price Discrepancies
             </TabsTrigger>
-            <TabsTrigger value="analytics" className="data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">
+            <TabsTrigger value="analytics" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <TrendingUp className="h-4 w-4 mr-2" /> Analytics
             </TabsTrigger>
           </TabsList>
@@ -415,7 +415,7 @@ export const FinancialControls = () => {
               <div className="flex items-center gap-2">
                 <Dialog open={showAuditDialog} onOpenChange={setShowAuditDialog}>
                   <DialogTrigger asChild>
-                    <Button className="bg-[#0073ea] hover:bg-[#0056b3] text-white font-bold text-xs">
+                    <Button className="bg-primary-500 hover:bg-primary-600 text-white font-bold text-xs">
                       <Plus className="h-4 w-4 mr-1" /> Manual Audit
                     </Button>
                   </DialogTrigger>
@@ -470,7 +470,7 @@ export const FinancialControls = () => {
                           className="mt-1"
                         />
                       </div>
-                      <Button onClick={handleCreateAudit} className="w-full bg-[#0073ea] hover:bg-[#0056b3] text-white font-bold">
+                      <Button onClick={handleCreateAudit} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold">
                         Create Audit Entry
                       </Button>
                     </div>
@@ -482,9 +482,9 @@ export const FinancialControls = () => {
               </div>
             </div>
 
-            <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs overflow-hidden">
+            <Card className="border-canvas-silk dark:border-slate-800 shadow-xs overflow-hidden">
               <table className="w-full">
-                <thead className="bg-[#f0f2f7] dark:bg-slate-800">
+                <thead className="bg-canvas-mist dark:bg-slate-800">
                   <tr>
                     <th className="text-left text-xs font-extrabold px-4 py-3">Transaction</th>
                     <th className="text-left text-xs font-extrabold px-4 py-3">Type</th>
@@ -497,10 +497,10 @@ export const FinancialControls = () => {
                 </thead>
                 <tbody>
                   {auditLogs.map((log) => (
-                    <tr key={log.id} className="border-t border-[#e6e9ef] dark:border-slate-800 hover:bg-[#f8f9fa] dark:hover:bg-slate-800">
+                    <tr key={log.id} className="border-t border-canvas-silk dark:border-slate-800 hover:bg-canvas-bone dark:hover:bg-slate-800">
                       <td className="px-4 py-3">
                         <div className="text-xs font-bold">{log.transaction_id?.slice(0, 8)}...</div>
-                        <div className="text-[10px] text-[#676879]">{log.reason || "No reason provided"}</div>
+                        <div className="text-[10px] text-graphite-500 dark:text-slate-400">{log.reason || "No reason provided"}</div>
                       </td>
                       <td className="px-4 py-3">
                         <Badge variant="outline" className="text-[10px]">
@@ -520,10 +520,10 @@ export const FinancialControls = () => {
                           {log.status}
                         </Badge>
                         {log.flagged_for_review && (
-                          <Badge className="bg-[#fdab3d] text-white text-[10px] ml-1">Flagged</Badge>
+                          <Badge className="bg-warning-500 text-white text-[10px] ml-1">Flagged</Badge>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-xs text-[#676879]">
+                      <td className="px-4 py-3 text-xs text-graphite-500 dark:text-slate-400">
                         {new Date(log.created_at).toLocaleDateString()}
                       </td>
                       <td className="px-4 py-3">
@@ -569,19 +569,19 @@ export const FinancialControls = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {discrepancies.map((discrepancy) => (
-                <Card key={discrepancy.id} className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+                <Card key={discrepancy.id} className="border-canvas-silk dark:border-slate-800 shadow-xs">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div>
                         <CardTitle className="text-sm font-extrabold flex items-center gap-2">
-                          <AlertTriangle className="h-4 w-4 text-[#e44258]" />
+                          <AlertTriangle className="h-4 w-4 text-error-500" />
                           {discrepancy.transaction_type} Discrepancy
                         </CardTitle>
-                        <div className="text-[10px] text-[#676879] mt-1">
+                        <div className="text-[10px] text-graphite-500 dark:text-slate-400 mt-1">
                           {new Date(discrepancy.created_at).toLocaleString()}
                         </div>
                       </div>
-                      <Badge className="bg-[#e44258] text-white text-[10px]">
+                      <Badge className="bg-error-500 text-white text-[10px]">
                         {discrepancy.difference_percentage.toFixed(1)}% Diff
                       </Badge>
                     </div>
@@ -589,29 +589,29 @@ export const FinancialControls = () => {
                   <CardContent className="space-y-3">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <div className="text-[10px] text-[#676879]">Expected</div>
-                        <div className="text-sm font-bold text-[#00c875]">
+                        <div className="text-[10px] text-graphite-500 dark:text-slate-400">Expected</div>
+                        <div className="text-sm font-bold text-success-500">
                           {institution.currency || "ZMW"} {discrepancy.expected_price.toFixed(2)}
                         </div>
                       </div>
                       <div>
-                        <div className="text-[10px] text-[#676879]">Actual</div>
-                        <div className="text-sm font-bold text-[#e44258]">
+                        <div className="text-[10px] text-graphite-500 dark:text-slate-400">Actual</div>
+                        <div className="text-sm font-bold text-error-500">
                           {institution.currency || "ZMW"} {discrepancy.actual_price.toFixed(2)}
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center justify-between pt-2 border-t border-[#e6e9ef] dark:border-slate-800">
+                    <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
                       <div className="text-xs">
-                        <span className="text-[#676879]">Difference: </span>
-                        <span className="font-bold text-[#e44258]">
+                        <span className="text-graphite-500 dark:text-slate-400">Difference: </span>
+                        <span className="font-bold text-error-500">
                           {institution.currency || "ZMW"} {discrepancy.difference_amount.toFixed(2)}
                         </span>
                       </div>
                       <Button
                         size="sm"
                         onClick={() => handleResolveDiscrepancy(discrepancy.id)}
-                        className="text-xs bg-[#00c875] hover:bg-[#00a562] text-white"
+                        className="text-xs bg-success-500 hover:bg-success-600 text-white"
                       >
                         Resolve
                       </Button>
@@ -625,37 +625,37 @@ export const FinancialControls = () => {
           {/* Analytics Tab */}
           <TabsContent value="analytics" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+              <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                 <CardHeader>
                   <CardTitle className="text-sm font-extrabold flex items-center gap-2">
-                    <TrendingUp className="h-4 w-4 text-[#0073ea]" /> Revenue Leak Trends
+                    <TrendingUp className="h-4 w-4 text-primary-500" /> Revenue Leak Trends
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="h-[200px] flex items-center justify-center text-[#676879] text-xs">
+                  <div className="h-[200px] flex items-center justify-center text-graphite-500 dark:text-slate-400 text-xs">
                     Analytics chart placeholder - Integrate with your charting library
                   </div>
                 </CardContent>
               </Card>
-              <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+              <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                 <CardHeader>
                   <CardTitle className="text-sm font-extrabold flex items-center gap-2">
-                    <ShieldCheck className="h-4 w-4 text-[#0073ea]" /> Control Effectiveness
+                    <ShieldCheck className="h-4 w-4 text-primary-500" /> Control Effectiveness
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-[#676879]">Approval Rate</span>
-                      <span className="font-bold text-[#00c875]">94.2%</span>
+                      <span className="text-graphite-500 dark:text-slate-400">Approval Rate</span>
+                      <span className="font-bold text-success-500">94.2%</span>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-[#676879]">Fraud Detection</span>
-                      <span className="font-bold text-[#0073ea]">87.5%</span>
+                      <span className="text-graphite-500 dark:text-slate-400">Fraud Detection</span>
+                      <span className="font-bold text-primary-500">87.5%</span>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-[#676879]">Auto-Lock Success</span>
-                      <span className="font-bold text-[#a25ddc]">91.8%</span>
+                      <span className="text-graphite-500 dark:text-slate-400">Auto-Lock Success</span>
+                      <span className="font-bold text-purple-500">91.8%</span>
                     </div>
                   </div>
                 </CardContent>

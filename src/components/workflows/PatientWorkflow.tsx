@@ -177,7 +177,7 @@ export const PatientWorkflow = React.memo(() => {
   if (loading) {
     return (
       <div className="space-y-6 max-w-4xl mx-auto py-12 text-center">
-        <div className="h-10 w-10 border-4 border-[#0073ea] border-t-transparent rounded-full animate-spin mx-auto" />
+        <div className="h-10 w-10 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto" />
         <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">Loading your health dashboard...</h2>
       </div>
     );
@@ -188,7 +188,7 @@ export const PatientWorkflow = React.memo(() => {
     return (
       <div className="space-y-6 max-w-5xl mx-auto">
         <div className="text-center space-y-3">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold text-[#0073ea] bg-[#e5f0ff] dark:bg-blue-950/50 border border-[#0073ea]/20">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold text-primary-500 bg-primary-50 dark:bg-blue-950/50 border border-primary-500/20">
             <Sparkles className="h-3.5 w-3.5" />
             <span>Patient Onboarding</span>
           </div>
@@ -200,12 +200,12 @@ export const PatientWorkflow = React.memo(() => {
           <div className="max-w-md mx-auto space-y-2 pt-2">
             <div className="flex justify-between items-center text-xs font-bold">
               <span className="text-slate-700 dark:text-slate-300">Setup Progress</span>
-              <span className="text-[#0073ea]">{completionPercentage}%</span>
+              <span className="text-primary-500">{completionPercentage}%</span>
             </div>
             <Progress value={completionPercentage} className="h-2.5 rounded-full bg-slate-100 dark:bg-slate-800" />
             {nextStep && (
               <p className="text-xs font-semibold text-slate-500">
-                Next: <span className="text-[#0073ea] font-bold">{nextStep.title}</span>
+                Next: <span className="text-primary-500 font-bold">{nextStep.title}</span>
               </p>
             )}
           </div>
@@ -221,8 +221,8 @@ export const PatientWorkflow = React.memo(() => {
                   step.completed
                     ? 'border-emerald-200 dark:border-emerald-900/40 bg-emerald-50/20'
                     : isHighlighted
-                    ? 'border-[#0073ea]/60 shadow-md ring-2 ring-[#0073ea]/15'
-                    : 'border-[#e6e9ef] dark:border-slate-800'
+                    ? 'border-primary-500/60 shadow-md ring-2 ring-primary-500/15'
+                    : 'border-canvas-silk dark:border-slate-800'
                 }`}
               >
                 <div className="flex items-center justify-between mb-3">
@@ -230,8 +230,8 @@ export const PatientWorkflow = React.memo(() => {
                     step.completed
                       ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600'
                       : isHighlighted
-                      ? 'bg-[#e5f0ff] dark:bg-blue-950/60 text-[#0073ea]'
-                      : 'bg-[#f5f7fa] dark:bg-slate-800 text-slate-500'
+                      ? 'bg-primary-50 dark:bg-blue-950/60 text-primary-500'
+                      : 'bg-canvas-bone dark:bg-slate-800 text-slate-500'
                   }`}>
                     <CheckCircle2 className="h-5 w-5" />
                   </div>
@@ -247,8 +247,8 @@ export const PatientWorkflow = React.memo(() => {
                   onClick={() => handleNavigation(step.route, step.title)}
                   className={`w-full py-2.5 rounded-xl font-bold text-xs transition-all ${
                     step.completed
-                      ? 'bg-[#f5f7fa] dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200'
-                      : 'bg-[#0073ea] text-white hover:bg-[#0060c7] shadow-sm'
+                      ? 'bg-canvas-bone dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200'
+                      : 'bg-primary-500 text-white hover:bg-primary-600 shadow-sm'
                   }`}
                 >
                   {step.id === 'profile' ? (isProfileComplete ? 'Edit Profile' : 'Complete Profile') : (step.completed ? 'View' : 'Start')}
@@ -270,9 +270,9 @@ export const PatientWorkflow = React.memo(() => {
       <ProfileCompleteBanner />
 
       {/* ─── Top Header Bar (Date & Notification Bell) ─── */}
-      <div className="flex items-center justify-between bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-3xl border border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+      <div className="flex items-center justify-between bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-3xl border border-canvas-silk dark:border-slate-800 shadow-xs">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-2xl bg-[#e5f0ff] dark:bg-blue-950/60 border border-[#0073ea]/20 text-[#0073ea]">
+          <div className="p-2.5 rounded-2xl bg-primary-50 dark:bg-blue-950/60 border border-primary-500/20 text-primary-500">
             <Calendar className="h-5 w-5" />
           </div>
           <div>
@@ -286,7 +286,7 @@ export const PatientWorkflow = React.memo(() => {
         <div className="flex items-center gap-2">
           <button
             onClick={() => handleNavigation('/notifications', 'Notifications')}
-            className="p-2.5 rounded-2xl bg-[#f5f7fa] dark:bg-slate-800 border border-[#e6e9ef] dark:border-slate-700 hover:border-[#0073ea]/40 text-slate-700 dark:text-slate-300 relative transition-all active:scale-95"
+            className="p-2.5 rounded-2xl bg-canvas-bone dark:bg-slate-800 border border-canvas-silk dark:border-slate-700 hover:border-primary-500/40 text-slate-700 dark:text-slate-300 relative transition-all active:scale-95"
             aria-label="Notifications"
           >
             <Bell className="h-5 w-5" />
@@ -297,12 +297,12 @@ export const PatientWorkflow = React.memo(() => {
 
       {/* ─── Online / Offline Care Mode Toggle Switch ─── */}
       <div className="flex justify-center">
-        <div className="p-1 rounded-2xl bg-[#f0f2f7] dark:bg-slate-800/80 border border-[#e6e9ef] dark:border-slate-700 flex w-full max-w-md shadow-xs">
+        <div className="p-1 rounded-2xl bg-canvas-mist dark:bg-slate-800/80 border border-canvas-silk dark:border-slate-700 flex w-full max-w-md shadow-xs">
           <button
             onClick={() => setCareMode('online')}
             className={`flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-black transition-all flex items-center justify-center gap-1.5 ${
               careMode === 'online'
-                ? 'bg-white dark:bg-slate-900 text-[#0073ea] shadow-sm border border-[#e6e9ef] dark:border-slate-700'
+                ? 'bg-white dark:bg-slate-900 text-primary-500 shadow-sm border border-canvas-silk dark:border-slate-700'
                 : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
             }`}
           >
@@ -313,7 +313,7 @@ export const PatientWorkflow = React.memo(() => {
             onClick={() => setCareMode('offline')}
             className={`flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-black transition-all flex items-center justify-center gap-1.5 ${
               careMode === 'offline'
-                ? 'bg-white dark:bg-slate-900 text-[#0073ea] shadow-sm border border-[#e6e9ef] dark:border-slate-700'
+                ? 'bg-white dark:bg-slate-900 text-primary-500 shadow-sm border border-canvas-silk dark:border-slate-700'
                 : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
             }`}
           >
@@ -326,14 +326,14 @@ export const PatientWorkflow = React.memo(() => {
       {/* ─── High-Contrast Dark Next Appointment Banner (Black/Navy) ─── */}
       <div
         onClick={() => handleNavigation('/appointments', 'Appointments')}
-        className="group p-5 sm:p-6 rounded-3xl bg-[#0f172a] text-white shadow-xl shadow-slate-900/10 border border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 cursor-pointer hover:bg-slate-900 transition-all active:scale-[0.99]"
+        className="group p-5 sm:p-6 rounded-3xl bg-slate-900 text-white shadow-xl shadow-slate-900/10 border border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 cursor-pointer hover:bg-slate-900 transition-all active:scale-[0.99]"
       >
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="text-xs font-extrabold text-slate-400 uppercase tracking-wider">
               {upcomingAppointment ? 'Your next appointment' : 'Quick Consultation'}
             </span>
-            <span className="w-2 h-2 rounded-full bg-[#00a86b] animate-pulse" />
+            <span className="w-2 h-2 rounded-full bg-success-600 animate-pulse" />
           </div>
           <div className="text-lg sm:text-xl font-black text-white flex items-center gap-2">
             {upcomingAppointment ? (
@@ -359,7 +359,7 @@ export const PatientWorkflow = React.memo(() => {
         </div>
 
         <div className="flex items-center gap-2">
-          <button className="px-5 py-2.5 rounded-full bg-white text-[#0f172a] hover:bg-[#e5f0ff] hover:text-[#0073ea] font-black text-xs sm:text-sm flex items-center gap-1.5 shadow-md transition-all">
+          <button className="px-5 py-2.5 rounded-full bg-white text-slate-900 hover:bg-primary-50 dark:hover:bg-slate-800 hover:text-primary-500 font-black text-xs sm:text-sm flex items-center gap-1.5 shadow-md transition-all">
             <span>{upcomingAppointment ? 'View Appointment' : 'Book Now'}</span>
             <ChevronRight className="h-4 w-4" />
           </button>
@@ -368,9 +368,9 @@ export const PatientWorkflow = React.memo(() => {
 
       {/* ─── Digital Prescription Alert Card (if active) ─── */}
       {activePrescriptionsCount > 0 && (
-        <div className="p-4 sm:p-5 rounded-3xl bg-[#0f172a] text-white border border-slate-800 flex items-center justify-between shadow-lg">
+        <div className="p-4 sm:p-5 rounded-3xl bg-slate-900 text-white border border-slate-800 flex items-center justify-between shadow-lg">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-2xl bg-[#0073ea]/20 text-[#38bdf8]">
+            <div className="p-2.5 rounded-2xl bg-primary-500/20 text-sky-400">
               <Pill className="h-5 w-5" />
             </div>
             <div>
@@ -382,7 +382,7 @@ export const PatientWorkflow = React.memo(() => {
           </div>
           <button
             onClick={() => handleNavigation('/prescriptions', 'Prescriptions')}
-            className="px-4 py-2 rounded-xl bg-[#0073ea] hover:bg-[#0060c7] text-white font-bold text-xs transition-all shadow-sm"
+            className="px-4 py-2 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-bold text-xs transition-all shadow-sm"
           >
             View
           </button>
@@ -398,7 +398,7 @@ export const PatientWorkflow = React.memo(() => {
           </div>
           <button
             onClick={() => handleNavigation('/search', 'All Specialties')}
-            className="text-xs font-black text-[#0073ea] hover:underline flex items-center gap-1"
+            className="text-xs font-black text-primary-500 hover:underline flex items-center gap-1"
           >
             <span>View all</span>
             <ChevronRight className="h-3.5 w-3.5" />
@@ -417,15 +417,15 @@ export const PatientWorkflow = React.memo(() => {
                 }}
                 className={`p-4 rounded-3xl bg-white dark:bg-slate-900 border transition-all cursor-pointer text-center flex flex-col items-center justify-center gap-2 group hover:shadow-md hover:-translate-y-0.5 active:scale-95 ${
                   isSelected
-                    ? 'border-[#0073ea]/50 bg-[#e5f0ff]/40 dark:bg-blue-950/40 ring-2 ring-[#0073ea]/20'
-                    : 'border-[#e6e9ef] dark:border-slate-800 hover:border-[#0073ea]/40'
+                    ? 'border-primary-500/50 bg-primary-50/40 dark:bg-blue-950/40 ring-2 ring-primary-500/20'
+                    : 'border-canvas-silk dark:border-slate-800 hover:border-primary-500/40'
                 }`}
               >
-                <div className="w-12 h-12 rounded-2xl bg-[#f5f7fa] dark:bg-slate-800 border border-[#e6e9ef] dark:border-slate-700 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                <div className="w-12 h-12 rounded-2xl bg-canvas-bone dark:bg-slate-800 border border-canvas-silk dark:border-slate-700 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
                   {spec.icon}
                 </div>
                 <div>
-                  <span className="text-xs sm:text-sm font-black text-slate-900 dark:text-slate-100 block group-hover:text-[#0073ea] transition-colors">
+                  <span className="text-xs sm:text-sm font-black text-slate-900 dark:text-slate-100 block group-hover:text-primary-500 transition-colors">
                     {spec.name}
                   </span>
                   <span className="text-[10px] text-slate-400 font-medium block">
@@ -447,7 +447,7 @@ export const PatientWorkflow = React.memo(() => {
           </div>
           <button
             onClick={() => handleNavigation('/search', 'Find Doctors')}
-            className="text-xs font-black text-[#0073ea] hover:underline flex items-center gap-1"
+            className="text-xs font-black text-primary-500 hover:underline flex items-center gap-1"
           >
             <span>View all</span>
             <ChevronRight className="h-3.5 w-3.5" />
@@ -461,7 +461,7 @@ export const PatientWorkflow = React.memo(() => {
             return (
               <div
                 key={doc.id}
-                className="p-5 rounded-3xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-4"
+                className="p-5 rounded-3xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-4"
               >
                 {/* Doctor Info */}
                 <div className="flex items-start gap-3.5">
@@ -469,9 +469,9 @@ export const PatientWorkflow = React.memo(() => {
                     <img
                       src={doc.avatar}
                       alt={doc.name}
-                      className="h-13 w-13 rounded-2xl object-cover ring-2 ring-[#0073ea]/30"
+                      className="h-13 w-13 rounded-2xl object-cover ring-2 ring-primary-500/30"
                     />
-                    <span className="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-[#00a86b] ring-2 ring-white dark:ring-slate-900" />
+                    <span className="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-success-600 ring-2 ring-white dark:ring-slate-900" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
@@ -481,7 +481,7 @@ export const PatientWorkflow = React.memo(() => {
                         <span>{doc.rating}</span>
                       </div>
                     </div>
-                    <p className="text-xs text-[#0073ea] font-extrabold">{doc.specialty}</p>
+                    <p className="text-xs text-primary-500 font-extrabold">{doc.specialty}</p>
                     <p className="text-[11px] text-slate-400 font-medium truncate">{doc.experience}</p>
                   </div>
                 </div>
@@ -498,8 +498,8 @@ export const PatientWorkflow = React.memo(() => {
                           onClick={() => handleSlotSelect(doc.id, slot)}
                           className={`py-1.5 px-2 rounded-xl text-[11px] font-black text-center transition-all ${
                             isActive
-                              ? 'bg-[#0f172a] text-white shadow-xs border border-[#0f172a]'
-                              : 'bg-[#f8fafc] dark:bg-slate-800 border border-[#e6e9ef] dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-[#0073ea]/40'
+                              ? 'bg-slate-900 text-white shadow-xs border border-slate-900'
+                              : 'bg-canvas-bone dark:bg-slate-800 border border-canvas-silk dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-primary-500/40'
                           }`}
                         >
                           {slot}
@@ -510,14 +510,14 @@ export const PatientWorkflow = React.memo(() => {
                 </div>
 
                 {/* Booking Button */}
-                <div className="pt-1 flex items-center justify-between gap-2 border-t border-[#e6e9ef] dark:border-slate-800">
+                <div className="pt-1 flex items-center justify-between gap-2 border-t border-canvas-silk dark:border-slate-800">
                   <div>
                     <span className="text-[10px] text-slate-400 block font-medium">Consultation Fee</span>
                     <span className="text-sm font-black text-slate-900 dark:text-slate-100">{doc.price}</span>
                   </div>
                   <button
                     onClick={() => handleBookSlot(doc)}
-                    className="px-4 py-2 rounded-xl bg-[#0073ea] hover:bg-[#0060c7] text-white font-black text-xs flex items-center gap-1 shadow-sm transition-all active:scale-95"
+                    className="px-4 py-2 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-black text-xs flex items-center gap-1 shadow-sm transition-all active:scale-95"
                   >
                     <span>Book {activeSlot}</span>
                     <ChevronRight className="h-3.5 w-3.5" />
@@ -535,7 +535,7 @@ export const PatientWorkflow = React.memo(() => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
           <div
             onClick={() => handleNavigation('/emergency', 'Emergency')}
-            className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-sm hover:shadow-md hover:border-rose-300 transition-all cursor-pointer active:scale-95 group"
+            className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md hover:border-rose-300 transition-all cursor-pointer active:scale-95 group"
           >
             <div className="p-2.5 bg-rose-50 dark:bg-rose-950/40 text-rose-600 rounded-2xl w-fit mb-2 group-hover:scale-105 transition-transform">
               <AlertTriangle className="h-5 w-5" />
@@ -546,7 +546,7 @@ export const PatientWorkflow = React.memo(() => {
 
           <div
             onClick={() => handleNavigation('/marketplace', 'Buy Medicine')}
-            className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-sm hover:shadow-md hover:border-emerald-300 transition-all cursor-pointer active:scale-95 group"
+            className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md hover:border-emerald-300 transition-all cursor-pointer active:scale-95 group"
           >
             <div className="p-2.5 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 rounded-2xl w-fit mb-2 group-hover:scale-105 transition-transform">
               <Pill className="h-5 w-5" />
@@ -557,9 +557,9 @@ export const PatientWorkflow = React.memo(() => {
 
           <div
             onClick={() => handleNavigation('/search', 'Find Doctor')}
-            className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-sm hover:shadow-md hover:border-[#0073ea]/40 transition-all cursor-pointer active:scale-95 group"
+            className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md hover:border-primary-500/40 transition-all cursor-pointer active:scale-95 group"
           >
-            <div className="p-2.5 bg-[#e5f0ff] dark:bg-blue-950/60 text-[#0073ea] rounded-2xl w-fit mb-2 group-hover:scale-105 transition-transform">
+            <div className="p-2.5 bg-primary-50 dark:bg-blue-950/60 text-primary-500 rounded-2xl w-fit mb-2 group-hover:scale-105 transition-transform">
               <Users className="h-5 w-5" />
             </div>
             <h3 className="text-xs sm:text-sm font-black text-slate-900 dark:text-slate-100">Find Doctor</h3>
@@ -568,7 +568,7 @@ export const PatientWorkflow = React.memo(() => {
 
           <div
             onClick={() => handleNavigation('/healthcare-institutions', 'Hospitals')}
-            className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-sm hover:shadow-md hover:border-purple-300 transition-all cursor-pointer active:scale-95 group"
+            className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md hover:border-purple-300 transition-all cursor-pointer active:scale-95 group"
           >
             <div className="p-2.5 bg-purple-50 dark:bg-purple-950/40 text-purple-600 rounded-2xl w-fit mb-2 group-hover:scale-105 transition-transform">
               <Building2 className="h-5 w-5" />
@@ -585,7 +585,7 @@ export const PatientWorkflow = React.memo(() => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
           <div
             onClick={() => handleNavigation('/insurance-cards', 'Insurance Cards')}
-            className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-sm hover:shadow-md transition-all cursor-pointer active:scale-95"
+            className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md transition-all cursor-pointer active:scale-95"
           >
             <div className="p-2 bg-teal-50 dark:bg-teal-950/40 text-teal-600 rounded-xl w-fit mb-2">
               <CreditCard className="h-4 w-4" />
@@ -596,7 +596,7 @@ export const PatientWorkflow = React.memo(() => {
 
           <div
             onClick={() => handleNavigation('/cost-estimator', 'Cost Estimator')}
-            className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-sm hover:shadow-md transition-all cursor-pointer active:scale-95"
+            className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md transition-all cursor-pointer active:scale-95"
           >
             <div className="p-2 bg-orange-50 dark:bg-orange-950/40 text-orange-600 rounded-xl w-fit mb-2">
               <Shield className="h-4 w-4" />
@@ -607,7 +607,7 @@ export const PatientWorkflow = React.memo(() => {
 
           <div
             onClick={() => handleNavigation('/waitlist', 'Waitlist')}
-            className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-sm hover:shadow-md transition-all cursor-pointer active:scale-95"
+            className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md transition-all cursor-pointer active:scale-95"
           >
             <div className="p-2 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 rounded-xl w-fit mb-2">
               <Calendar className="h-4 w-4" />
@@ -618,7 +618,7 @@ export const PatientWorkflow = React.memo(() => {
 
           <div
             onClick={() => handleNavigation('/appointment-reminders', 'Reminders')}
-            className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-sm hover:shadow-md transition-all cursor-pointer active:scale-95"
+            className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md transition-all cursor-pointer active:scale-95"
           >
             <div className="p-2 bg-pink-50 dark:bg-pink-950/40 text-pink-600 rounded-xl w-fit mb-2">
               <Activity className="h-4 w-4" />
@@ -634,7 +634,7 @@ export const PatientWorkflow = React.memo(() => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         <div className="lg:col-span-2">
-          <div className="p-5 sm:p-6 rounded-3xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-sm space-y-3">
+          <div className="p-5 sm:p-6 rounded-3xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm space-y-3">
             <h3 className="font-black text-base text-slate-900 dark:text-slate-100">Health Support & Emergency Services</h3>
             <p className="text-xs text-slate-500 leading-relaxed font-medium">
               Need immediate triage, symptom checks, or emergency ambulance dispatch? Our clinical emergency team is available 24/7.
@@ -649,7 +649,7 @@ export const PatientWorkflow = React.memo(() => {
               </button>
               <button
                 onClick={() => handleNavigation('/symptoms', 'Symptoms Tracker')}
-                className="px-5 py-2.5 rounded-full bg-[#e5f0ff] text-[#0073ea] hover:bg-[#d0e4ff] font-extrabold text-xs flex items-center gap-1.5 transition-all"
+                className="px-5 py-2.5 rounded-full bg-primary-50 text-primary-500 hover:bg-primary-100 font-extrabold text-xs flex items-center gap-1.5 transition-all"
               >
                 <Heart className="h-3.5 w-3.5" />
                 <span>Check Symptoms</span>

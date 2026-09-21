@@ -89,13 +89,13 @@ export const MultiCountryAccounting = () => {
   return (
     <div className="space-y-6 font-sans text-slate-900 dark:text-slate-100">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-[#e6e9ef] pb-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-canvas-silk pb-4">
         <div>
           <h2 className="text-lg font-extrabold flex items-center gap-2">
-            <Globe className="h-5 w-5 text-[#0073ea]" />
+            <Globe className="h-5 w-5 text-primary-500" />
             Multi-Country HRMS & Healthcare Financial Ledger
           </h2>
-          <p className="text-xs text-[#676879] dark:text-slate-400 font-medium">
+          <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
             ZRA/NAPSA/NHIMA statutory rules, chart of accounts, and automated P&L reporting
           </p>
         </div>
@@ -103,13 +103,13 @@ export const MultiCountryAccounting = () => {
         <div className="flex items-center gap-2">
           <button
             onClick={() => exportToCSV(`ChartOfAccounts_${customRates.countryCode}`, accounts)}
-            className="px-3 py-1.5 rounded-md bg-[#f0f2f7] dark:bg-slate-800 font-bold text-xs flex items-center gap-1"
+            className="px-3 py-1.5 rounded-md bg-canvas-mist dark:bg-slate-800 font-bold text-xs flex items-center gap-1"
           >
             <Download className="h-3.5 w-3.5" /> Export CSV
           </button>
           <button
             onClick={() => setShowAccountModal(true)}
-            className="px-3.5 py-1.5 rounded-md bg-[#0073ea] hover:bg-[#0060c4] text-white font-extrabold text-xs shadow-xs flex items-center gap-1"
+            className="px-3.5 py-1.5 rounded-md bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs flex items-center gap-1"
           >
             <Plus className="h-4 w-4" /> Add Account
           </button>
@@ -118,33 +118,33 @@ export const MultiCountryAccounting = () => {
 
       {/* Telemetry Summary Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-[#e6e9ef] shadow-xs">
-          <div className="text-xs font-extrabold text-[#676879] uppercase">Gross Revenue</div>
-          <div className="text-2xl font-black font-mono text-[#0073ea] mt-1">
+        <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk shadow-xs">
+          <div className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Gross Revenue</div>
+          <div className="text-2xl font-black font-mono text-primary-500 mt-1">
             {customRates.currency} {totalRevenue.toLocaleString()}
           </div>
           <div className="text-[10px] text-slate-400 mt-0.5">Consultations & Pharmacy</div>
         </div>
 
-        <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-[#e6e9ef] shadow-xs">
-          <div className="text-xs font-extrabold text-[#676879] uppercase">Operating Expenses</div>
-          <div className="text-2xl font-black font-mono text-[#e2445c] mt-1">
+        <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk shadow-xs">
+          <div className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Operating Expenses</div>
+          <div className="text-2xl font-black font-mono text-error-500 mt-1">
             {customRates.currency} {totalExpenses.toLocaleString()}
           </div>
           <div className="text-[10px] text-slate-400 mt-0.5">Salaries & Consumables</div>
         </div>
 
-        <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-[#e6e9ef] shadow-xs">
-          <div className="text-xs font-extrabold text-[#676879] uppercase">Net Income</div>
-          <div className="text-2xl font-black font-mono text-[#00c875] mt-1">
+        <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk shadow-xs">
+          <div className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Net Income</div>
+          <div className="text-2xl font-black font-mono text-success-500 mt-1">
             {customRates.currency} {netProfit.toLocaleString()}
           </div>
           <div className="text-[10px] text-emerald-500 font-bold mt-0.5">After VAT Deduction</div>
         </div>
 
-        <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-[#e6e9ef] shadow-xs">
-          <div className="text-xs font-extrabold text-[#676879] uppercase">VAT Tax ({customRates.vatRate}%)</div>
-          <div className="text-2xl font-black font-mono text-[#fdab3d] mt-1">
+        <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk shadow-xs">
+          <div className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">VAT Tax ({customRates.vatRate}%)</div>
+          <div className="text-2xl font-black font-mono text-warning-500 mt-1">
             {customRates.currency} {estimatedVatTax.toLocaleString()}
           </div>
           <div className="text-[10px] text-amber-500 font-bold mt-0.5">Statutory Liability</div>
@@ -152,13 +152,13 @@ export const MultiCountryAccounting = () => {
       </div>
 
       {/* Country Config Selector */}
-      <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-[#e6e9ef] shadow-xs flex items-center justify-between">
+      <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk shadow-xs flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <span className="text-xs font-extrabold uppercase text-[#676879]">Tax Jurisdiction:</span>
+          <span className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400">Tax Jurisdiction:</span>
           <select
             value={selectedCountry.countryCode}
             onChange={(e) => handleCountryChange(e.target.value)}
-            className="p-1.5 rounded-md border border-[#c3c6d4] text-xs font-bold bg-white"
+            className="p-1.5 rounded-md border border-graphite-300 dark:border-slate-700 text-xs font-bold bg-white"
           >
             {DEFAULT_COUNTRIES.map((c) => (
               <option key={c.countryCode} value={c.countryCode}>
@@ -168,29 +168,29 @@ export const MultiCountryAccounting = () => {
           </select>
         </div>
 
-        <span className="px-3 py-1 rounded-full text-xs font-bold text-white bg-[#00c875]">
+        <span className="px-3 py-1 rounded-full text-xs font-bold text-white bg-success-500">
           Active {customRates.countryCode} Rules
         </span>
       </div>
 
       {/* Chart of Accounts Table */}
-      <div className="w-full overflow-x-auto rounded-xl border border-[#e6e9ef] bg-white dark:bg-slate-900 shadow-xs">
+      <div className="w-full overflow-x-auto rounded-xl border border-canvas-silk bg-white dark:bg-slate-900 shadow-xs">
         <table className="w-full text-left border-collapse text-xs">
           <thead>
-            <tr className="border-b border-[#e6e9ef] bg-[#f5f6f8] text-[11px] font-extrabold uppercase text-[#676879]">
+            <tr className="border-b border-canvas-silk bg-canvas text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
               <th className="py-2.5 px-4">Account Code</th>
               <th className="py-2.5 px-3">Account Title</th>
               <th className="py-2.5 px-3">Category</th>
               <th className="py-2.5 px-3 text-right">Balance ({customRates.currency})</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#e6e9ef]">
+          <tbody className="divide-y divide-canvas-silk">
             {accounts.map((acc) => (
-              <tr key={acc.code} className="hover:bg-[#f0f2f7] transition-colors">
+              <tr key={acc.code} className="hover:bg-canvas-mist dark:hover:bg-slate-800 transition-colors">
                 <td className="py-3 px-4 font-mono font-bold text-slate-900">{acc.code}</td>
                 <td className="py-3 px-3 font-extrabold text-slate-900">{acc.name}</td>
-                <td className="py-3 px-3 text-[#676879]">{acc.type}</td>
-                <td className="py-3 px-3 text-right font-mono font-bold text-[#0073ea]">
+                <td className="py-3 px-3 text-graphite-500 dark:text-slate-400">{acc.type}</td>
+                <td className="py-3 px-3 text-right font-mono font-bold text-primary-500">
                   {customRates.currency} {acc.balance.toLocaleString()}
                 </td>
               </tr>

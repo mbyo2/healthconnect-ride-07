@@ -32,7 +32,7 @@ export const WorkOSAICopilotBar: React.FC<WorkOSAICopilotBarProps> = ({ isDarkMo
   };
 
   return (
-    <div className={`p-4 sm:p-6 space-y-6 transition-colors ${isDarkMode ? "bg-slate-950 text-slate-100" : "bg-[#f5f6f8] text-slate-900"}`}>
+    <div className={`p-4 sm:p-6 space-y-6 transition-colors ${isDarkMode ? "bg-slate-950 text-slate-100" : "bg-canvas text-slate-900"}`}>
       <div className={`p-5 sm:p-6 rounded-2xl border ${
         isDarkMode ? "bg-slate-900/90 border-slate-800" : "bg-white border-slate-200 shadow-sm"
       }`}>

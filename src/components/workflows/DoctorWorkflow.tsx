@@ -53,14 +53,14 @@ export const DoctorWorkflow = () => {
       <ProfileCompleteBanner />
 
       {/* Header Banner */}
-      <div className="rounded-3xl bg-[#0f172a] text-white p-6 sm:p-8 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="rounded-3xl bg-slate-900 text-white p-6 sm:p-8 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <div className="h-14 w-14 rounded-2xl bg-[#0073ea] text-white flex items-center justify-center font-black shadow-md">
+          <div className="h-14 w-14 rounded-2xl bg-primary-500 text-white flex items-center justify-center font-black shadow-md">
             <Stethoscope className="h-7 w-7" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-[#00a86b] animate-pulse" />
+              <span className="w-2 h-2 rounded-full bg-success-600 animate-pulse" />
               <span className="text-[11px] font-black uppercase tracking-wider text-slate-300">Doctor Clinical Workspace</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white mt-0.5">Physician Dashboard</h1>
@@ -76,16 +76,16 @@ export const DoctorWorkflow = () => {
         {workflowSteps.map((step, index) => (
           <div
             key={index}
-            className="group cursor-pointer rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs hover:border-[#0073ea] hover:shadow-md transition-all active:scale-[0.98] touch-manipulation flex flex-col justify-between"
+            className="group cursor-pointer rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs hover:border-primary-500 hover:shadow-md transition-all active:scale-[0.98] touch-manipulation flex flex-col justify-between"
             onClick={() => handleNavigation(step.route, step.title)}
           >
             <div>
               <div className="flex items-center gap-3 mb-2">
-                <div className="p-2.5 bg-[#e5f0ff] dark:bg-blue-950/60 text-[#0073ea] dark:text-blue-400 rounded-xl shrink-0 group-hover:bg-[#0073ea] group-hover:text-white transition-colors">
+                <div className="p-2.5 bg-primary-50 dark:bg-blue-950/60 text-primary-500 dark:text-blue-400 rounded-xl shrink-0 group-hover:bg-primary-500 group-hover:text-white transition-colors">
                   {step.icon}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <h3 className="text-xs font-black text-slate-900 dark:text-slate-100 group-hover:text-[#0073ea] transition-colors truncate">
+                  <h3 className="text-xs font-black text-slate-900 dark:text-slate-100 group-hover:text-primary-500 transition-colors truncate">
                     {step.title}
                   </h3>
                   <p className="text-[11px] text-slate-400 font-medium line-clamp-1">{step.description}</p>
@@ -94,7 +94,7 @@ export const DoctorWorkflow = () => {
             </div>
             <button
               onClick={(e) => { e.stopPropagation(); handleNavigation(step.route, step.title); }}
-              className="w-full mt-2 py-1.5 rounded-xl bg-[#f5f7fa] dark:bg-slate-800 text-slate-700 dark:text-slate-300 group-hover:bg-[#0073ea] group-hover:text-white text-[11px] font-black transition-all"
+              className="w-full mt-2 py-1.5 rounded-xl bg-canvas-bone dark:bg-slate-800 text-slate-700 dark:text-slate-300 group-hover:bg-primary-500 group-hover:text-white text-[11px] font-black transition-all"
             >
               Open Module
             </button>

@@ -1,6 +1,7 @@
 import { format } from "date-fns";
 import { MapPin, Navigation, ExternalLink } from "lucide-react";
 import { Provider } from "@/types/provider";
+import { providerDisplayName } from "@/utils/providerDisplay";
 import { Button } from "@/components/ui/button";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import { useState, useEffect } from "react";
@@ -60,7 +61,7 @@ export const BookingSummary = ({
     <div className="p-4 bg-muted rounded-lg space-y-3">
       <h3 className="font-medium text-foreground">Booking Summary</h3>
       <div className="text-sm space-y-1 text-foreground">
-        <p>Provider: Dr. {provider.first_name} {provider.last_name}</p>
+        <p>Provider: {providerDisplayName(provider as any)}</p>
         <p>Date: {format(selectedDate, "MMMM d, yyyy")}</p>
         <p>Time: {selectedTime}</p>
         <p>Duration: 30 minutes</p>
@@ -95,7 +96,7 @@ export const BookingSummary = ({
                   <Marker position={coords}>
                     <Popup>
                       <div className="text-xs">
-                        <p className="font-medium">Dr. {provider.first_name} {provider.last_name}</p>
+                        <p className="font-medium">{providerDisplayName(provider as any)}</p>
                         <p>{providerAddress}</p>
                       </div>
                     </Popup>

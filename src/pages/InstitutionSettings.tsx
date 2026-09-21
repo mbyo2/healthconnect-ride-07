@@ -1,3 +1,4 @@
+import { Helmet } from "react-helmet-async";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -237,15 +238,30 @@ const InstitutionSettings = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center p-8">
-        <Loader2 className="animate-spin h-6 w-6 text-muted-foreground" />
+      <div className="min-h-screen bg-canvas flex items-center justify-center p-6" role="status" aria-label="Loading settings">
+        <div className="h-8 w-8 rounded-full border-2 border-primary-500 border-t-transparent animate-spin" aria-hidden />
+        <span className="sr-only">Loading settings</span>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto p-6 max-w-4xl">
-      <h1 className="text-3xl font-bold mb-6">Institution Settings</h1>
+    <div className="min-h-screen bg-canvas text-midnight font-sans transition-colors pb-16">
+      <Helmet>
+        <title>Institution Settings | Doc&apos; O Clock</title>
+        <link rel="canonical" href="https://doc0clock.online/institution/settings" />
+      </Helmet>
+      <div className="bg-white dark:bg-slate-900 border-b border-canvas-silk dark:border-slate-800 px-4 sm:px-6 py-5 sticky top-0 z-30 shadow-sm">
+        <div className="max-w-4xl mx-auto flex items-center gap-3">
+          <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-button"><Building2 className="h-5 w-5" /></div>
+          <div>
+            <h1 className="font-display text-2xl font-medium tracking-tight">Institution Settings</h1>
+            <p className="text-sm text-graphite-500 font-medium tracking-wide">Operational details, marketplace visibility, and billing preferences</p>
+          </div>
+        </div>
+      </div>
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-6">
+      <div className="space-y-6">
 
       <form onSubmit={handleSave} className="space-y-6">
 
@@ -568,11 +584,13 @@ const InstitutionSettings = () => {
         </Card>
 
         {/* ── Save ── */}
-        <Button type="submit" disabled={saving} className="w-full md:w-auto">
+        <Button type="submit" disabled={saving} className="w-full md:w-auto vf-btn-primary">
           {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
           Save Changes
         </Button>
       </form>
+      </div>
+    </div>
     </div>
   );
 };

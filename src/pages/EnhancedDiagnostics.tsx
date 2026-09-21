@@ -188,30 +188,30 @@ export const EnhancedDiagnostics = () => {
 
   const getOrderTypeColor = (type: string) => {
     switch (type) {
-      case "lab": return "bg-[#a25ddc]";
-      case "radiology": return "bg-[#0073ea]";
-      case "both": return "bg-[#6366f1]";
-      default: return "bg-[#676879]";
+      case "lab": return "bg-purple-500";
+      case "radiology": return "bg-primary-500";
+      case "both": return "bg-indigo-500";
+      default: return "bg-graphite-500 dark:bg-slate-600";
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case "stat": return "bg-[#e44258] text-white";
-      case "urgent": return "bg-[#fdab3d] text-white";
-      case "routine": return "bg-[#0073ea] text-white";
-      default: return "bg-[#676879] text-white";
+      case "stat": return "bg-error-500 text-white";
+      case "urgent": return "bg-warning-500 text-white";
+      case "routine": return "bg-primary-500 text-white";
+      default: return "bg-graphite-500 dark:bg-slate-600 text-white";
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "completed": return "bg-[#00c875] text-white";
-      case "in_progress": return "bg-[#0073ea] text-white";
-      case "approved": return "bg-[#a25ddc] text-white";
-      case "pending": return "bg-[#fdab3d] text-white";
-      case "cancelled": return "bg-[#e44258] text-white";
-      default: return "bg-[#676879] text-white";
+      case "completed": return "bg-success-500 text-white";
+      case "in_progress": return "bg-primary-500 text-white";
+      case "approved": return "bg-purple-500 text-white";
+      case "pending": return "bg-warning-500 text-white";
+      case "cancelled": return "bg-error-500 text-white";
+      default: return "bg-graphite-500 dark:bg-slate-600 text-white";
     }
   };
 
@@ -219,13 +219,13 @@ export const EnhancedDiagnostics = () => {
 
   if (!institution) {
     return (
-      <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 flex items-center justify-center p-6">
+      <div className="min-h-screen bg-canvas dark:bg-slate-950 flex items-center justify-center p-6">
         <Card className="max-w-md w-full">
           <CardContent className="p-8 text-center space-y-4">
-            <Building2 className="h-12 w-12 mx-auto text-[#0073ea]" />
+            <Building2 className="h-12 w-12 mx-auto text-primary-500" />
             <h2 className="text-xl font-extrabold">Institution Required</h2>
-            <p className="text-xs text-[#676879]">Please select an institution to access enhanced diagnostics.</p>
-            <Button onClick={() => navigate("/institution-portal")} className="bg-[#0073ea] hover:bg-[#0056b3]">
+            <p className="text-xs text-graphite-500 dark:text-slate-400">Please select an institution to access enhanced diagnostics.</p>
+            <Button onClick={() => navigate("/institution-portal")} className="bg-primary-500 hover:bg-primary-600">
               Go to Institution Portal
             </Button>
           </CardContent>
@@ -242,23 +242,23 @@ export const EnhancedDiagnostics = () => {
   const scheduledStaff = schedules.filter((s) => new Date(s.shift_date) >= new Date()).length;
 
   return (
-    <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pb-16">
+    <div className="min-h-screen bg-canvas dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pb-16">
       {/* Header */}
-      <div className="bg-white dark:bg-slate-900 border-b border-[#e6e9ef] dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
+      <div className="bg-white dark:bg-slate-900 border-b border-canvas-silk dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
         <div className="max-w-[1600px] mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-[#0073ea] text-white flex items-center justify-center shadow-xs">
+            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-xs">
               <FlaskConical className="h-5 w-5" />
             </div>
             <div>
               <h1 className="text-xl font-extrabold">Enhanced Diagnostics</h1>
-              <p className="text-xs text-[#676879] font-medium">Lab & Radiology Order Management</p>
+              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">Lab & Radiology Order Management</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <Dialog open={showOrderDialog} onOpenChange={setShowOrderDialog}>
               <DialogTrigger asChild>
-                <Button className="bg-[#0073ea] hover:bg-[#0056b3] text-white font-bold text-xs flex items-center gap-2">
+                <Button className="bg-primary-500 hover:bg-primary-600 text-white font-bold text-xs flex items-center gap-2">
                   <Plus className="h-4 w-4" /> New Order
                 </Button>
               </DialogTrigger>
@@ -340,7 +340,7 @@ export const EnhancedDiagnostics = () => {
                       className="mt-1"
                     />
                   </div>
-                  <Button onClick={handleCreateOrder} className="w-full bg-[#0073ea] hover:bg-[#0056b3] text-white font-bold">
+                  <Button onClick={handleCreateOrder} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold">
                     Create Order
                   </Button>
                 </div>
@@ -452,7 +452,7 @@ export const EnhancedDiagnostics = () => {
                       className="mt-1"
                     />
                   </div>
-                  <Button onClick={handleCreateSchedule} className="w-full bg-[#0073ea] hover:bg-[#0056b3] text-white font-bold">
+                  <Button onClick={handleCreateSchedule} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold">
                     Create Schedule
                   </Button>
                 </div>
@@ -465,60 +465,60 @@ export const EnhancedDiagnostics = () => {
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 pt-6">
         {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-[#676879] uppercase">Pending Orders</span>
-                <Clock className="h-4 w-4 text-[#a25ddc]" />
+                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Pending Orders</span>
+                <Clock className="h-4 w-4 text-purple-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-[#a25ddc]">{pendingOrders}</div>
-              <div className="text-[10px] text-[#676879] font-bold mt-0.5">Awaiting processing</div>
+              <div className="text-2xl font-black font-mono text-purple-500">{pendingOrders}</div>
+              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Awaiting processing</div>
             </CardContent>
           </Card>
-          <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-[#676879] uppercase">In Progress</span>
-                <Activity className="h-4 w-4 text-[#0073ea]" />
+                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">In Progress</span>
+                <Activity className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-[#0073ea]">{inProgressOrders}</div>
-              <div className="text-[10px] text-[#676879] font-bold mt-0.5">Currently processing</div>
+              <div className="text-2xl font-black font-mono text-primary-500">{inProgressOrders}</div>
+              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Currently processing</div>
             </CardContent>
           </Card>
-          <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-[#676879] uppercase">Completed Today</span>
-                <CheckCircle className="h-4 w-4 text-[#00c875]" />
+                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Completed Today</span>
+                <CheckCircle className="h-4 w-4 text-success-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-[#00c875]">{completedToday}</div>
-              <div className="text-[10px] text-[#676879] font-bold mt-0.5">Results delivered</div>
+              <div className="text-2xl font-black font-mono text-success-500">{completedToday}</div>
+              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Results delivered</div>
             </CardContent>
           </Card>
-          <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-[#676879] uppercase">Scheduled Staff</span>
-                <Users className="h-4 w-4 text-[#fdab3d]" />
+                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Scheduled Staff</span>
+                <Users className="h-4 w-4 text-warning-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-[#fdab3d]">{scheduledStaff}</div>
-              <div className="text-[10px] text-[#676879] font-bold mt-0.5">Upcoming shifts</div>
+              <div className="text-2xl font-black font-mono text-warning-500">{scheduledStaff}</div>
+              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Upcoming shifts</div>
             </CardContent>
           </Card>
         </div>
 
         <Tabs defaultValue="orders" className="space-y-6">
-          <TabsList className="bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 p-1">
-            <TabsTrigger value="orders" className="data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">
+          <TabsList className="bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 p-1">
+            <TabsTrigger value="orders" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <FlaskConical className="h-4 w-4 mr-2" /> Diagnostic Orders
             </TabsTrigger>
-            <TabsTrigger value="results" className="data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">
+            <TabsTrigger value="results" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <FileText className="h-4 w-4 mr-2" /> Results Management
             </TabsTrigger>
-            <TabsTrigger value="scheduling" className="data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">
+            <TabsTrigger value="scheduling" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <Calendar className="h-4 w-4 mr-2" /> Staff Scheduling
             </TabsTrigger>
-            <TabsTrigger value="integration" className="data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">
+            <TabsTrigger value="integration" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <Video className="h-4 w-4 mr-2" /> Telemedicine Integration
             </TabsTrigger>
           </TabsList>
@@ -561,9 +561,9 @@ export const EnhancedDiagnostics = () => {
               </div>
             </div>
 
-            <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs overflow-hidden">
+            <Card className="border-canvas-silk dark:border-slate-800 shadow-xs overflow-hidden">
               <table className="w-full">
-                <thead className="bg-[#f0f2f7] dark:bg-slate-800">
+                <thead className="bg-canvas-mist dark:bg-slate-800">
                   <tr>
                     <th className="text-left text-xs font-extrabold px-4 py-3">Order #</th>
                     <th className="text-left text-xs font-extrabold px-4 py-3">Patient</th>
@@ -577,7 +577,7 @@ export const EnhancedDiagnostics = () => {
                 </thead>
                 <tbody>
                   {orders.map((order) => (
-                    <tr key={order.id} className="border-t border-[#e6e9ef] dark:border-slate-800 hover:bg-[#f8f9fa] dark:hover:bg-slate-800">
+                    <tr key={order.id} className="border-t border-canvas-silk dark:border-slate-800 hover:bg-canvas-bone dark:hover:bg-slate-800">
                       <td className="px-4 py-3">
                         <div className="text-xs font-bold">{order.order_number}</div>
                       </td>
@@ -602,7 +602,7 @@ export const EnhancedDiagnostics = () => {
                           {order.status}
                         </Badge>
                       </td>
-                      <td className="px-4 py-3 text-xs text-[#676879]">
+                      <td className="px-4 py-3 text-xs text-graphite-500 dark:text-slate-400">
                         {new Date(order.ordered_at).toLocaleDateString()}
                       </td>
                       <td className="px-4 py-3">
@@ -624,14 +624,14 @@ export const EnhancedDiagnostics = () => {
 
           {/* Results Management Tab */}
           <TabsContent value="results" className="space-y-4">
-            <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+            <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
               <CardHeader>
                 <CardTitle className="text-sm font-extrabold flex items-center gap-2">
-                  <FileText className="h-4 w-4 text-[#0073ea]" /> Results Management
+                  <FileText className="h-4 w-4 text-primary-500" /> Results Management
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="h-[200px] flex items-center justify-center text-[#676879] text-xs">
+                <div className="h-[200px] flex items-center justify-center text-graphite-500 dark:text-slate-400 text-xs">
                   Results management interface placeholder - Review and approve diagnostic results
                 </div>
               </CardContent>
@@ -661,40 +661,40 @@ export const EnhancedDiagnostics = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {schedules.map((schedule) => (
-                <Card key={schedule.id} className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+                <Card key={schedule.id} className="border-canvas-silk dark:border-slate-800 shadow-xs">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-xl bg-[#0073ea] text-white flex items-center justify-center">
+                        <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center">
                           <UserRound className="h-5 w-5" />
                         </div>
                         <div>
                           <CardTitle className="text-sm font-extrabold">
                             {schedule.staff?.first_name} {schedule.staff?.last_name}
                           </CardTitle>
-                          <div className="text-[10px] text-[#676879]">{schedule.staff?.specialty}</div>
+                          <div className="text-[10px] text-graphite-500 dark:text-slate-400">{schedule.staff?.specialty}</div>
                         </div>
                       </div>
                       {schedule.is_on_call && (
-                        <Badge className="bg-[#fdab3d] text-white text-[10px]">On Call</Badge>
+                        <Badge className="bg-warning-500 text-white text-[10px]">On Call</Badge>
                       )}
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-[#676879]">Date</span>
+                      <span className="text-graphite-500 dark:text-slate-400">Date</span>
                       <span className="font-bold">{new Date(schedule.shift_date).toLocaleDateString()}</span>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-[#676879]">Shift</span>
+                      <span className="text-graphite-500 dark:text-slate-400">Shift</span>
                       <span className="font-bold">{schedule.shift_start} - {schedule.shift_end}</span>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-[#676879]">Type</span>
+                      <span className="text-graphite-500 dark:text-slate-400">Type</span>
                       <Badge variant="outline" className="text-[10px]">{schedule.shift_type}</Badge>
                     </div>
-                    <div className="flex items-center justify-between pt-2 border-t border-[#e6e9ef] dark:border-slate-800">
-                      <div className="text-xs text-[#676879]">
+                    <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
+                      <div className="text-xs text-graphite-500 dark:text-slate-400">
                         {schedule.assigned_patients.length} patients assigned
                       </div>
                       <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
@@ -709,14 +709,14 @@ export const EnhancedDiagnostics = () => {
 
           {/* Telemedicine Integration Tab */}
           <TabsContent value="integration" className="space-y-4">
-            <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+            <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
               <CardHeader>
                 <CardTitle className="text-sm font-extrabold flex items-center gap-2">
-                  <Video className="h-4 w-4 text-[#0073ea]" /> Telemedicine-Diagnostic Integration
+                  <Video className="h-4 w-4 text-primary-500" /> Telemedicine-Diagnostic Integration
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="h-[200px] flex items-center justify-center text-[#676879] text-xs">
+                <div className="h-[200px] flex items-center justify-center text-graphite-500 dark:text-slate-400 text-xs">
                   Telemedicine integration interface placeholder - Order diagnostics during video consultations
                 </div>
               </CardContent>

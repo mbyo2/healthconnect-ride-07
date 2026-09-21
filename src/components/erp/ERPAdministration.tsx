@@ -154,7 +154,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
   return (
     <div className="space-y-6 font-sans text-slate-900 dark:text-slate-100">
       {/* Header Banner */}
-      <div className="p-6 rounded-3xl bg-gradient-to-r from-[#0f172a] via-[#1e293b] to-[#0073ea] text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="p-6 rounded-3xl bg-gradient-to-r from-slate-900 via-slate-800 to-primary-500 text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
           <div className="h-12 w-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center font-black text-xl border border-white/20">
             <Building className="h-6 w-6 text-white" />
@@ -180,7 +180,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-2 border-b border-[#e6e9ef] dark:border-slate-800 pb-2 overflow-x-auto">
+      <div className="flex items-center gap-2 border-b border-canvas-silk dark:border-slate-800 pb-2 overflow-x-auto">
         {[
           { id: "hr", label: "Human Resources & Shifts (HR)", icon: Users },
           { id: "finance", label: "General Ledger & Financials", icon: DollarSign },
@@ -193,8 +193,8 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
               onClick={() => setActiveTab(tab.id as any)}
               className={`px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2 transition-all shrink-0 ${
                 activeTab === tab.id
-                  ? "bg-[#0073ea] text-white shadow-xs"
-                  : "bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-[#f0f2f7]"
+                  ? "bg-primary-500 text-white shadow-xs"
+                  : "bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-canvas-mist dark:hover:bg-slate-800"
               }`}
             >
               <Icon className="h-4 w-4" />
@@ -210,12 +210,12 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
           <div className="flex items-center justify-between">
             <div>
               <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">Personnel Directory &amp; Staff Scheduling</h3>
-              <p className="text-xs text-[#676879] dark:text-slate-400">Manage clinical clinicians, duty rosters, shift schedules, and attendance</p>
+              <p className="text-xs text-graphite-500 dark:text-slate-400">Manage clinical clinicians, duty rosters, shift schedules, and attendance</p>
             </div>
 
             <Dialog open={showEmpModal} onOpenChange={setShowEmpModal}>
               <DialogTrigger asChild>
-                <button className="px-4 py-2 rounded-xl bg-[#0073ea] text-white text-xs font-extrabold flex items-center gap-1.5 shadow-xs">
+                <button className="px-4 py-2 rounded-xl bg-primary-500 text-white text-xs font-extrabold flex items-center gap-1.5 shadow-xs">
                   <Plus className="h-4 w-4" /> Add Staff Member
                 </button>
               </DialogTrigger>
@@ -227,7 +227,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
                   <div>
                     <label className="font-bold">Full Name *</label>
                     <input
-                      className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4]"
+                      className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700"
                       value={newEmp.name}
                       onChange={(e) => setNewEmp({ ...newEmp, name: e.target.value })}
                     />
@@ -236,7 +236,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
                     <div>
                       <label className="font-bold">Designation / Role</label>
                       <input
-                        className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4]"
+                        className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700"
                         value={newEmp.role}
                         onChange={(e) => setNewEmp({ ...newEmp, role: e.target.value })}
                       />
@@ -244,7 +244,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
                     <div>
                       <label className="font-bold">Department</label>
                       <input
-                        className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4]"
+                        className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700"
                         value={newEmp.department}
                         onChange={(e) => setNewEmp({ ...newEmp, department: e.target.value })}
                       />
@@ -253,7 +253,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
                   <div>
                     <label className="font-bold">Phone Number</label>
                     <input
-                      className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4]"
+                      className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700"
                       placeholder="+260 970 000 000"
                       value={newEmp.phone}
                       onChange={(e) => setNewEmp({ ...newEmp, phone: e.target.value })}
@@ -262,16 +262,16 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
                 </div>
                 <DialogFooter>
                   <button onClick={() => setShowEmpModal(false)} className="px-4 py-2 font-bold text-slate-500">Cancel</button>
-                  <button onClick={handleAddEmployee} className="px-5 py-2.5 rounded-xl bg-[#0073ea] text-white font-extrabold">Save Staff</button>
+                  <button onClick={handleAddEmployee} className="px-5 py-2.5 rounded-xl bg-primary-500 text-white font-extrabold">Save Staff</button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
           </div>
 
-          <div className="w-full overflow-x-auto rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
+          <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-[#e6e9ef] dark:border-slate-800 bg-[#f5f6f8] dark:bg-slate-950 text-[11px] font-extrabold uppercase text-[#676879]">
+                <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
                   <th className="py-3 px-4">Employee Name</th>
                   <th className="py-3 px-3">Designation &amp; Department</th>
                   <th className="py-3 px-3">Contact</th>
@@ -280,12 +280,12 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
                   <th className="py-3 px-3 text-center">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#e6e9ef] dark:divide-slate-800">
+              <tbody className="divide-y divide-canvas-silk dark:divide-slate-800">
                 {employees.map((emp) => (
-                  <tr key={emp.id} className="hover:bg-[#f0f2f7] dark:hover:bg-slate-800/60">
+                  <tr key={emp.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-800/60">
                     <td className="py-3 px-4 font-bold text-slate-900 dark:text-slate-100">{emp.name}</td>
                     <td className="py-3 px-3">
-                      <div className="font-bold text-[#0073ea]">{emp.role}</div>
+                      <div className="font-bold text-primary-500">{emp.role}</div>
                       <div className="text-[10px] text-slate-400">{emp.department}</div>
                     </td>
                     <td className="py-3 px-3 text-slate-600 dark:text-slate-300">
@@ -301,7 +301,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
                     <td className="py-3 px-3 text-center">
                       <button
                         onClick={() => toast.success(`Generated Monthly Payslip for ${emp.name}`)}
-                        className="px-3 py-1 rounded-lg bg-[#f0f4ff] hover:bg-[#0073ea] hover:text-white text-[#0073ea] font-extrabold text-[11px] transition-colors"
+                        className="px-3 py-1 rounded-lg bg-primary-50 hover:bg-primary-500 hover:text-white text-primary-500 font-extrabold text-[11px] transition-colors"
                       >
                         Payslip
                       </button>
@@ -318,21 +318,21 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
       {activeTab === "finance" && (
         <div className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+            <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
               <span className="text-[11px] font-extrabold uppercase text-slate-400">Total Operating Inflow</span>
               <div className="text-2xl font-black text-emerald-600 mt-1">K{totalIncome.toLocaleString()}</div>
               <span className="text-[10px] font-bold text-slate-500">Pharmacy + OPD + IPD + Claims</span>
             </div>
 
-            <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+            <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
               <span className="text-[11px] font-extrabold uppercase text-slate-400">Operating Expenses</span>
               <div className="text-2xl font-black text-rose-600 mt-1">K{totalExpenses.toLocaleString()}</div>
               <span className="text-[10px] font-bold text-slate-500">Procurement + Payroll + Maintenance</span>
             </div>
 
-            <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+            <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
               <span className="text-[11px] font-extrabold uppercase text-slate-400">Net Operating Margin</span>
-              <div className="text-2xl font-black text-[#0073ea] mt-1">K{netSurplus.toLocaleString()}</div>
+              <div className="text-2xl font-black text-primary-500 mt-1">K{netSurplus.toLocaleString()}</div>
               <span className="text-[10px] font-bold text-emerald-600">✓ Healthy Cash Position</span>
             </div>
           </div>
@@ -342,7 +342,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
 
             <Dialog open={showVoucherModal} onOpenChange={setShowVoucherModal}>
               <DialogTrigger asChild>
-                <button className="px-4 py-2 rounded-xl bg-[#0073ea] text-white text-xs font-extrabold flex items-center gap-1.5 shadow-xs">
+                <button className="px-4 py-2 rounded-xl bg-primary-500 text-white text-xs font-extrabold flex items-center gap-1.5 shadow-xs">
                   <Plus className="h-4 w-4" /> New Journal Voucher
                 </button>
               </DialogTrigger>
@@ -354,7 +354,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
                   <div>
                     <label className="font-bold">Voucher Type *</label>
                     <select
-                      className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4] font-bold"
+                      className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-bold"
                       value={newVoucher.type}
                       onChange={(e) => setNewVoucher({ ...newVoucher, type: e.target.value as any })}
                     >
@@ -366,7 +366,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
                   <div>
                     <label className="font-bold">Chart of Accounts Category *</label>
                     <input
-                      className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4] font-medium"
+                      className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-medium"
                       value={newVoucher.account}
                       onChange={(e) => setNewVoucher({ ...newVoucher, account: e.target.value })}
                     />
@@ -375,7 +375,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
                     <label className="font-bold">Amount (ZMW) *</label>
                     <input
                       type="number"
-                      className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4] font-black"
+                      className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-black"
                       value={newVoucher.amount}
                       onChange={(e) => setNewVoucher({ ...newVoucher, amount: parseFloat(e.target.value) || 0 })}
                     />
@@ -383,16 +383,16 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
                 </div>
                 <DialogFooter>
                   <button onClick={() => setShowVoucherModal(false)} className="px-4 py-2 font-bold text-slate-500">Cancel</button>
-                  <button onClick={handleAddVoucher} className="px-5 py-2.5 rounded-xl bg-[#0073ea] text-white font-extrabold">Post Voucher</button>
+                  <button onClick={handleAddVoucher} className="px-5 py-2.5 rounded-xl bg-primary-500 text-white font-extrabold">Post Voucher</button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
           </div>
 
-          <div className="w-full overflow-x-auto rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
+          <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-[#e6e9ef] dark:border-slate-800 bg-[#f5f6f8] dark:bg-slate-950 text-[11px] font-extrabold uppercase text-[#676879]">
+                <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
                   <th className="py-3 px-4">Voucher No</th>
                   <th className="py-3 px-3">Date</th>
                   <th className="py-3 px-3">Account Description</th>
@@ -401,10 +401,10 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
                   <th className="py-3 px-3 text-center">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#e6e9ef] dark:divide-slate-800">
+              <tbody className="divide-y divide-canvas-silk dark:divide-slate-800">
                 {vouchers.map((v) => (
-                  <tr key={v.id} className="hover:bg-[#f0f2f7] dark:hover:bg-slate-800/60">
-                    <td className="py-3 px-4 font-mono font-bold text-[#0073ea]">{v.voucherNo}</td>
+                  <tr key={v.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-800/60">
+                    <td className="py-3 px-4 font-mono font-bold text-primary-500">{v.voucherNo}</td>
                     <td className="py-3 px-3 text-slate-600">{v.date}</td>
                     <td className="py-3 px-3 font-bold text-slate-900 dark:text-slate-100">{v.account}</td>
                     <td className="py-3 px-3 text-slate-500">{v.reference}</td>
@@ -434,14 +434,14 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
           <div className="flex items-center justify-between">
             <div>
               <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">Medical Asset Register &amp; Calibration</h3>
-              <p className="text-xs text-[#676879] dark:text-slate-400">
+              <p className="text-xs text-graphite-500 dark:text-slate-400">
                 Biomedical equipment tracking, maintenance schedules, and calibration compliance
               </p>
             </div>
 
             <Dialog open={showAssetModal} onOpenChange={setShowAssetModal}>
               <DialogTrigger asChild>
-                <button className="px-4 py-2 rounded-xl bg-[#0073ea] text-white text-xs font-extrabold flex items-center gap-1.5 shadow-xs">
+                <button className="px-4 py-2 rounded-xl bg-primary-500 text-white text-xs font-extrabold flex items-center gap-1.5 shadow-xs">
                   <Plus className="h-4 w-4" /> Log New Asset
                 </button>
               </DialogTrigger>
@@ -453,7 +453,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
                   <div>
                     <label className="font-bold">Asset Name *</label>
                     <input
-                      className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4]"
+                      className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700"
                       value={newAsset.name}
                       onChange={(e) => setNewAsset({ ...newAsset, name: e.target.value })}
                     />
@@ -462,7 +462,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
                     <div>
                       <label className="font-bold">Department</label>
                       <input
-                        className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4]"
+                        className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700"
                         value={newAsset.department}
                         onChange={(e) => setNewAsset({ ...newAsset, department: e.target.value })}
                       />
@@ -470,7 +470,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
                     <div>
                       <label className="font-bold">Serial Number</label>
                       <input
-                        className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4]"
+                        className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700"
                         value={newAsset.serialNumber}
                         onChange={(e) => setNewAsset({ ...newAsset, serialNumber: e.target.value })}
                       />
@@ -479,16 +479,16 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
                 </div>
                 <DialogFooter>
                   <button onClick={() => setShowAssetModal(false)} className="px-4 py-2 font-bold text-slate-500">Cancel</button>
-                  <button onClick={handleAddAsset} className="px-5 py-2.5 rounded-xl bg-[#0073ea] text-white font-extrabold">Save Asset</button>
+                  <button onClick={handleAddAsset} className="px-5 py-2.5 rounded-xl bg-primary-500 text-white font-extrabold">Save Asset</button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
           </div>
 
-          <div className="w-full overflow-x-auto rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
+          <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-[#e6e9ef] dark:border-slate-800 bg-[#f5f6f8] dark:bg-slate-950 text-[11px] font-extrabold uppercase text-[#676879]">
+                <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
                   <th className="py-3 px-4">Asset Code &amp; Name</th>
                   <th className="py-3 px-3">Department</th>
                   <th className="py-3 px-3">Serial No</th>
@@ -497,12 +497,12 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
                   <th className="py-3 px-3 text-center">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#e6e9ef] dark:divide-slate-800">
+              <tbody className="divide-y divide-canvas-silk dark:divide-slate-800">
                 {assets.map((ast) => (
-                  <tr key={ast.id} className="hover:bg-[#f0f2f7] dark:hover:bg-slate-800/60">
+                  <tr key={ast.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-800/60">
                     <td className="py-3 px-4">
                       <div className="font-extrabold text-slate-900 dark:text-slate-100">{ast.name}</div>
-                      <div className="text-[10px] font-mono text-[#0073ea]">{ast.assetCode}</div>
+                      <div className="text-[10px] font-mono text-primary-500">{ast.assetCode}</div>
                     </td>
                     <td className="py-3 px-3 font-semibold">{ast.department}</td>
                     <td className="py-3 px-3 font-mono text-slate-500">{ast.serialNumber}</td>
@@ -521,7 +521,7 @@ export const ERPAdministration: React.FC<{ institutionId?: string }> = ({ instit
                     <td className="py-3 px-3 text-center">
                       <button
                         onClick={() => toast.success(`Preventative maintenance task logged for ${ast.assetCode}`)}
-                        className="px-3 py-1 rounded-lg bg-[#f0f4ff] hover:bg-[#0073ea] hover:text-white text-[#0073ea] font-extrabold text-[11px] transition-colors"
+                        className="px-3 py-1 rounded-lg bg-primary-50 hover:bg-primary-500 hover:text-white text-primary-500 font-extrabold text-[11px] transition-colors"
                       >
                         Service
                       </button>

@@ -161,11 +161,11 @@ export const AppointmentDetails = () => {
   const getStatusPill = (status: string) => {
     switch (status) {
       case "completed":
-        return <span className="inline-block px-3.5 py-1 rounded-full text-xs font-bold text-white bg-[#00c875]">Completed</span>;
+        return <span className="inline-block px-3.5 py-1 rounded-full text-xs font-bold text-white bg-success-500">Completed</span>;
       case "cancelled":
-        return <span className="inline-block px-3.5 py-1 rounded-full text-xs font-bold text-white bg-[#e2445c]">Cancelled</span>;
+        return <span className="inline-block px-3.5 py-1 rounded-full text-xs font-bold text-white bg-error-500">Cancelled</span>;
       default:
-        return <span className="inline-block px-3.5 py-1 rounded-full text-xs font-bold text-white bg-[#579bfc]">Scheduled</span>;
+        return <span className="inline-block px-3.5 py-1 rounded-full text-xs font-bold text-white bg-primary-400">Scheduled</span>;
     }
   };
 
@@ -175,13 +175,13 @@ export const AppointmentDetails = () => {
 
   if (!appointment) {
     return (
-      <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 p-6 flex items-center justify-center">
-        <div className="max-w-md w-full p-8 rounded-2xl bg-white dark:bg-slate-900 border border-[#e6e9ef] text-center space-y-3">
-          <Calendar className="h-12 w-12 mx-auto text-[#0073ea]" />
+      <div className="min-h-screen bg-canvas dark:bg-slate-950 p-6 flex items-center justify-center">
+        <div className="max-w-md w-full p-8 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk text-center space-y-3">
+          <Calendar className="h-12 w-12 mx-auto text-primary-500" />
           <h3 className="text-lg font-extrabold">Appointment Record Not Found</h3>
           <button
             onClick={() => navigate("/appointments")}
-            className="px-4 py-2 rounded-md bg-[#0073ea] text-white font-bold text-xs"
+            className="px-4 py-2 rounded-md bg-primary-500 text-white font-bold text-xs"
           >
             Return to Appointments Board
           </button>
@@ -191,20 +191,20 @@ export const AppointmentDetails = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors pb-16">
+    <div className="min-h-screen bg-canvas dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors pb-16">
       {/* Sticky Header */}
-      <div className="bg-white dark:bg-slate-900 border-b border-[#e6e9ef] dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-2xs">
+      <div className="bg-white dark:bg-slate-900 border-b border-canvas-silk dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-2xs">
         <div className="max-w-[1400px] mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button
               onClick={() => navigate("/appointments")}
-              className="p-2 rounded-lg bg-[#f0f2f7] dark:bg-slate-800 hover:bg-[#e5f0ff] transition-colors"
+              className="p-2 rounded-lg bg-canvas-mist dark:bg-slate-800 hover:bg-primary-50 dark:hover:bg-slate-800 transition-colors"
             >
               <ArrowLeft className="h-4 w-4 text-slate-700 dark:text-slate-300" />
             </button>
             <div>
               <h1 className="text-xl font-extrabold tracking-tight">Appointment Record #{appointment.id.slice(0, 8)}</h1>
-              <p className="text-xs text-[#676879] dark:text-slate-400 font-medium">
+              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
                 {appointment.patient ? `Patient: ${appointment.patient.first_name} ${appointment.patient.last_name}` : `Doctor: Dr. ${appointment.provider.first_name}`}
               </p>
             </div>
@@ -217,9 +217,9 @@ export const AppointmentDetails = () => {
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 pt-6 space-y-6">
         <div className="grid md:grid-cols-2 gap-6">
           {/* Appointment Information Card */}
-          <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-xs space-y-4">
-            <h2 className="font-extrabold text-base flex items-center gap-2 border-b border-[#e6e9ef] pb-3">
-              <Calendar className="h-5 w-5 text-[#0073ea]" />
+          <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs space-y-4">
+            <h2 className="font-extrabold text-base flex items-center gap-2 border-b border-canvas-silk pb-3">
+              <Calendar className="h-5 w-5 text-primary-500" />
               Appointment Information
             </h2>
 
@@ -227,7 +227,7 @@ export const AppointmentDetails = () => {
               <div className="flex items-start gap-3">
                 <Calendar className="h-4 w-4 text-slate-400 mt-0.5" />
                 <div>
-                  <div className="font-bold text-[#676879] uppercase">Date</div>
+                  <div className="font-bold text-graphite-500 dark:text-slate-400 uppercase">Date</div>
                   <div className="font-extrabold text-sm text-slate-900 dark:text-slate-100">
                     {format(new Date(appointment.time_slot.date), "EEEE, MMMM d, yyyy")}
                   </div>
@@ -237,7 +237,7 @@ export const AppointmentDetails = () => {
               <div className="flex items-start gap-3">
                 <Clock className="h-4 w-4 text-slate-400 mt-0.5" />
                 <div>
-                  <div className="font-bold text-[#676879] uppercase">Time Span</div>
+                  <div className="font-bold text-graphite-500 dark:text-slate-400 uppercase">Time Span</div>
                   <div className="font-mono font-bold text-slate-800 dark:text-slate-200">
                     {appointment.time_slot.start_time} - {appointment.time_slot.end_time}
                   </div>
@@ -247,7 +247,7 @@ export const AppointmentDetails = () => {
               <div className="flex items-start gap-3">
                 <Video className="h-4 w-4 text-slate-400 mt-0.5" />
                 <div>
-                  <div className="font-bold text-[#676879] uppercase">Consultation Type</div>
+                  <div className="font-bold text-graphite-500 dark:text-slate-400 uppercase">Consultation Type</div>
                   <div className="font-semibold text-slate-800 dark:text-slate-200 capitalize">
                     {appointment.type === "video_consultation" ? "Video Consultation" : "In-Person Visit"}
                   </div>
@@ -257,15 +257,15 @@ export const AppointmentDetails = () => {
           </div>
 
           {/* Participant Info */}
-          <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-xs space-y-4">
-            <h2 className="font-extrabold text-base flex items-center gap-2 border-b border-[#e6e9ef] pb-3">
-              <User className="h-5 w-5 text-[#0073ea]" />
+          <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs space-y-4">
+            <h2 className="font-extrabold text-base flex items-center gap-2 border-b border-canvas-silk pb-3">
+              <User className="h-5 w-5 text-primary-500" />
               Participant Details
             </h2>
 
             <div className="space-y-3 text-xs">
               <div>
-                <div className="font-bold text-[#676879] uppercase">Full Name</div>
+                <div className="font-bold text-graphite-500 dark:text-slate-400 uppercase">Full Name</div>
                 <div className="font-extrabold text-sm text-slate-900 dark:text-slate-100">
                   {appointment.patient
                     ? `${appointment.patient.first_name} ${appointment.patient.last_name}`
@@ -275,8 +275,8 @@ export const AppointmentDetails = () => {
 
               {appointment.provider.specialty && (
                 <div>
-                  <div className="font-bold text-[#676879] uppercase">Clinical Specialty</div>
-                  <div className="font-bold text-[#0073ea]">{appointment.provider.specialty}</div>
+                  <div className="font-bold text-graphite-500 dark:text-slate-400 uppercase">Clinical Specialty</div>
+                  <div className="font-bold text-primary-500">{appointment.provider.specialty}</div>
                 </div>
               )}
             </div>
@@ -284,21 +284,21 @@ export const AppointmentDetails = () => {
         </div>
 
         {/* Clinical Notes Section */}
-        <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-xs space-y-3">
+        <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs space-y-3">
           <h2 className="font-extrabold text-base flex items-center gap-2">
-            <FileText className="h-5 w-5 text-[#0073ea]" />
+            <FileText className="h-5 w-5 text-primary-500" />
             Clinical Notes & Observations
           </h2>
           <textarea
             rows={4}
-            className="w-full p-3 rounded-xl border border-[#c3c6d4] dark:border-slate-800 bg-[#f5f6f8] dark:bg-slate-950 text-xs font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
+            className="w-full p-3 rounded-xl border border-graphite-300 dark:border-slate-700 dark:border-slate-800 bg-canvas dark:bg-slate-950 text-xs font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary-500"
             placeholder="Enter clinical observations, symptoms, or instructions..."
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
           />
           <button
             onClick={updateNotes}
-            className="px-4 py-2 rounded-md bg-[#0073ea] hover:bg-[#0060c4] text-white font-extrabold text-xs shadow-xs transition-all"
+            className="px-4 py-2 rounded-md bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs transition-all"
           >
             Save Clinical Notes
           </button>

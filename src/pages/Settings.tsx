@@ -25,6 +25,32 @@ const Settings = () => {
   const { showSuccess } = useSuccessFeedback();
   const navigate = useNavigate();
   const { isEasyReadingEnabled, enableEasyReading, disableEasyReading } = useAccessibility();
+  const [exporting, setExporting] = useState(false);
+
+  const handleExportRequest = async () => {
+    setExporting(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Please sign in to submit a data request.');
+      const { error } = await supabase.from('data_subject_requests' as any).insert({
+        user_id: user.id,
+        request_type: 'export',
+        metadata: { requested_from: 'settings_page' },
+      });
+      if (error) {
+        if (error.code === '23505') {
+          toast.info('An export request is already awaiting review.');
+          return;
+        }
+        throw error;
+      }
+      toast.success('Data export requested — you will be notified when it is ready.');
+    } catch (error: any) {
+      toast.error(error.message || 'Unable to submit your request. Please try again.');
+    } finally {
+      setExporting(false);
+    }
+  };
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -36,7 +62,7 @@ const Settings = () => {
           .from("profiles" as any)
           .select("show_in_search")
           .eq("id", user.id)
-          .single();
+          .maybeSingle();
 
         if (profile) setProfileVisibility((profile as any).show_in_search ?? true);
 
@@ -44,7 +70,7 @@ const Settings = () => {
           .from("user_two_factor" as any)
           .select("enabled")
           .eq("user_id", user.id)
-          .single();
+          .maybeSingle();
 
         if (tfa) setTwoFactor((tfa as any).enabled ?? false);
 
@@ -52,7 +78,7 @@ const Settings = () => {
           .from("notification_settings")
           .select("*")
           .eq("user_id", user.id)
-          .single();
+          .maybeSingle();
 
         if (notifSettings) {
           setNotifications(notifSettings.push_notifications ?? true);
@@ -64,7 +90,7 @@ const Settings = () => {
           .from("user_settings" as any)
           .select("*")
           .eq("user_id", user.id)
-          .single();
+          .maybeSingle();
 
         if (userSettings) {
           setLanguage((userSettings as any).language || "en");
@@ -208,7 +234,7 @@ const Settings = () => {
   return (
     <div className="min-h-screen bg-canvas text-midnight font-sans transition-colors pb-16">
       {/* Top Header */}
-      <div className="bg-white border-b border-canvas-silk px-4 sm:px-6 py-5 sticky top-0 z-30 shadow-sm">
+      <div className="bg-white dark:bg-slate-900 border-b border-canvas-silk dark:border-slate-800 px-4 sm:px-6 py-5 sticky top-0 z-30 shadow-sm">
         <div className="max-w-content mx-auto flex items-center gap-3">
           <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-button">
             <SettingsIcon className="h-5 w-5" />
@@ -258,33 +284,34 @@ const Settings = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium text-sm text-midnight">Dark / Light Interface Theme</p>
-                  <p className="text-[11px] text-[#676879]">Toggle dark mode styling</p>
+                  <p className="text-[11px] text-graphite-500 dark:text-slate-400">Toggle dark mode styling</p>
                 </div>
                 <ThemeToggle />
               </div>
-              <div className="flex items-center justify-between pt-2 border-t border-[#e6e9ef]">
+              <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
                 <div>
                   <p className="font-bold text-xs">Accessibility Easy Reading</p>
-                  <p className="text-[11px] text-[#676879]">High-contrast text and enlarged touch targets</p>
+                  <p className="text-[11px] text-graphite-500 dark:text-slate-400">High-contrast text and enlarged touch targets</p>
                 </div>
                 <Switch checked={isEasyReadingEnabled} onCheckedChange={handleAccessibilityToggle} />
               </div>
             </div>
 
             {/* Privacy & Data */}
-            <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-3">
-              <h2 className="font-extrabold text-sm flex items-center gap-2 border-b border-[#e6e9ef] pb-3">
-                <Shield className="h-4 w-4 text-[#00c875]" /> Privacy & Data Rights
+            <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-3">
+              <h2 className="font-extrabold text-sm flex items-center gap-2 border-b border-canvas-silk pb-3">
+                <Shield className="h-4 w-4 text-success-500" /> Privacy & Data Rights
               </h2>
               <button
-                onClick={() => toast.info("Data export request initiated. You will receive an email when ready.")}
-                className="w-full py-2.5 rounded-xl border border-[#c3c6d4] bg-white font-bold text-xs text-slate-800 hover:bg-[#f0f2f7] text-left px-3"
+                onClick={handleExportRequest}
+                disabled={exporting}
+                className="w-full py-2.5 rounded-xl border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-bold text-xs text-slate-800 dark:text-slate-200 hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-700 text-left px-3 disabled:opacity-50 transition-all"
               >
-                Request Export of All Personal Data
+                {exporting ? 'Submitting request…' : 'Request Export of All Personal Data'}
               </button>
               <button
                 onClick={() => navigate("/privacy-security")}
-                className="w-full py-2.5 rounded-xl border border-[#e2445c]/30 bg-[#e2445c]/5 font-bold text-xs text-[#e2445c] hover:bg-[#e2445c]/10 text-left px-3"
+                className="w-full py-2.5 rounded-xl border border-error-500/30 bg-error-500/5 font-bold text-xs text-error-500 hover:bg-error-500/10 text-left px-3"
               >
                 Delete Account & Purge Records
               </button>
@@ -294,42 +321,42 @@ const Settings = () => {
           {/* Column 2 */}
           <div className="space-y-6">
             {/* Notification Controls */}
-            <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
-              <h2 className="font-extrabold text-sm flex items-center gap-2 border-b border-[#e6e9ef] pb-3">
-                <Bell className="h-4 w-4 text-[#fdab3d]" /> Notification Telemetry
+            <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
+              <h2 className="font-extrabold text-sm flex items-center gap-2 border-b border-canvas-silk pb-3">
+                <Bell className="h-4 w-4 text-warning-500" /> Notification Telemetry
               </h2>
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-bold text-xs">Browser Push Notifications</p>
-                  <p className="text-[11px] text-[#676879]">Instant alerts for messages, calls & lab updates</p>
+                  <p className="text-[11px] text-graphite-500 dark:text-slate-400">Instant alerts for messages, calls & lab updates</p>
                 </div>
                 <Switch checked={notifications} onCheckedChange={handleNotificationToggle} />
               </div>
-              <div className="flex items-center justify-between pt-2 border-t border-[#e6e9ef]">
+              <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
                 <div>
                   <p className="font-bold text-xs">Email Broadcasts</p>
-                  <p className="text-[11px] text-[#676879]">Consultation receipts and appointment confirmations</p>
+                  <p className="text-[11px] text-graphite-500 dark:text-slate-400">Consultation receipts and appointment confirmations</p>
                 </div>
                 <Switch checked={emailNotifications} onCheckedChange={handleEmailToggle} />
               </div>
-              <div className="flex items-center justify-between pt-2 border-t border-[#e6e9ef]">
+              <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
                 <div>
                   <p className="font-bold text-xs">SMS Reminders</p>
-                  <p className="text-[11px] text-[#676879]">Text reminders 1 hour prior to appointments</p>
+                  <p className="text-[11px] text-graphite-500 dark:text-slate-400">Text reminders 1 hour prior to appointments</p>
                 </div>
                 <Switch checked={smsReminders} onCheckedChange={handleSmsToggle} />
               </div>
             </div>
 
             {/* Regional Localization */}
-            <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
-              <h2 className="font-extrabold text-sm flex items-center gap-2 border-b border-[#e6e9ef] pb-3">
-                <Globe className="h-4 w-4 text-[#0073ea]" /> Regional Localization
+            <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
+              <h2 className="font-extrabold text-sm flex items-center gap-2 border-b border-canvas-silk pb-3">
+                <Globe className="h-4 w-4 text-primary-500" /> Regional Localization
               </h2>
               <div className="space-y-1.5">
-                <label className="text-xs font-extrabold text-[#676879] uppercase">Display Language</label>
+                <label htmlFor="settings-language" className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Display Language</label>
                 <Select value={language} onValueChange={handleLanguageChange}>
-                  <SelectTrigger className="border-[#c3c6d4] text-xs font-bold"><SelectValue /></SelectTrigger>
+                  <SelectTrigger id="settings-language" className="border-graphite-300 dark:border-slate-700 text-xs font-bold"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="en">English</SelectItem>
                     <SelectItem value="fr">French</SelectItem>
@@ -339,9 +366,9 @@ const Settings = () => {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-extrabold text-[#676879] uppercase">System Timezone</label>
+                <label htmlFor="settings-timezone" className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">System Timezone</label>
                 <Select value={timezone} onValueChange={handleTimezoneChange}>
-                  <SelectTrigger className="border-[#c3c6d4] text-xs font-bold"><SelectValue /></SelectTrigger>
+                  <SelectTrigger id="settings-timezone" className="border-graphite-300 dark:border-slate-700 text-xs font-bold"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="UTC">UTC</SelectItem>
                     <SelectItem value="CAT">Central Africa Time (CAT / Lusaka)</SelectItem>
@@ -352,9 +379,9 @@ const Settings = () => {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-extrabold text-[#676879] uppercase">Date Display Format</label>
+                <label htmlFor="settings-date-format" className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Date Display Format</label>
                 <Select value={dateFormat} onValueChange={handleDateFormatChange}>
-                  <SelectTrigger className="border-[#c3c6d4] text-xs font-bold"><SelectValue /></SelectTrigger>
+                  <SelectTrigger id="settings-date-format" className="border-graphite-300 dark:border-slate-700 text-xs font-bold"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="MM/DD/YYYY">MM/DD/YYYY</SelectItem>
                     <SelectItem value="DD/MM/YYYY">DD/MM/YYYY</SelectItem>

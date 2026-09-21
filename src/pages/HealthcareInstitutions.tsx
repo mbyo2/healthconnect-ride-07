@@ -40,17 +40,17 @@ interface Institution {
 // ── helpers ───────────────────────────────────────────────────────────────────
 
 const TYPE_ICONS: Record<string, React.ReactNode> = {
-  hospital:          <Heart      className="h-5 w-5 text-[#e44258]" />,
-  clinic:            <Stethoscope className="h-5 w-5 text-[#00c875]" />,
-  pharmacy:          <Pill       className="h-5 w-5 text-[#0073ea]" />,
+  hospital:          <Heart      className="h-5 w-5 text-error-500" />,
+  clinic:            <Stethoscope className="h-5 w-5 text-success-500" />,
+  pharmacy:          <Pill       className="h-5 w-5 text-primary-500" />,
   dispensary:        <Pill       className="h-5 w-5 text-emerald-600" />,
   pediatric_center:  <Heart      className="h-5 w-5 text-pink-500" />,
   physiotherapy:     <Stethoscope className="h-5 w-5 text-indigo-500" />,
-  laboratory:        <FlaskConical className="h-5 w-5 text-[#a25ddc]" />,
-  nursing_home:      <Heart      className="h-5 w-5 text-[#fdab3d]" />,
-  care_home:         <Heart      className="h-5 w-5 text-[#fdab3d]" />,
-  specialized_clinic:<Stethoscope className="h-5 w-5 text-[#00c875]" />,
-  diagnostic_center: <FlaskConical className="h-5 w-5 text-[#a25ddc]" />,
+  laboratory:        <FlaskConical className="h-5 w-5 text-purple-500" />,
+  nursing_home:      <Heart      className="h-5 w-5 text-warning-500" />,
+  care_home:         <Heart      className="h-5 w-5 text-warning-500" />,
+  specialized_clinic:<Stethoscope className="h-5 w-5 text-success-500" />,
+  diagnostic_center: <FlaskConical className="h-5 w-5 text-purple-500" />,
 };
 
 const FILTER_TABS = [
@@ -157,7 +157,7 @@ export const HealthcareInstitutions = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f5f7fa] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pb-20">
+    <div className="min-h-screen bg-canvas-bone dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pb-20">
       <Helmet>
         <title>Hospitals, Clinics & Pharmacies in Zambia | Doc' O Clock</title>
         <meta
@@ -168,9 +168,9 @@ export const HealthcareInstitutions = () => {
       </Helmet>
 
       {/* ── Hero Banner ── */}
-      <div className="bg-[#0f172a] text-white border-b border-slate-800 px-4 sm:px-6 py-10 sm:py-14">
+      <div className="bg-slate-900 text-white border-b border-slate-800 px-4 sm:px-6 py-10 sm:py-14">
         <div className="max-w-7xl mx-auto space-y-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0073ea]/20 border border-[#0073ea]/40 text-[#0073ea] text-xs font-black uppercase tracking-wider">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-500/20 border border-primary-500/40 text-primary-500 text-xs font-black uppercase tracking-wider">
             <Building2 className="h-3.5 w-3.5" />
             Verified Healthcare Facilities
           </div>
@@ -188,12 +188,12 @@ export const HealthcareInstitutions = () => {
                 placeholder="Search by facility name, city, specialty or service…"
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
-                className="pl-10 h-11 bg-slate-900/90 border-slate-700 text-white placeholder:text-slate-400 rounded-xl text-sm focus-visible:ring-[#0073ea]"
+                className="pl-10 h-11 bg-slate-900/90 border-slate-700 text-white placeholder:text-slate-400 rounded-xl text-sm focus-visible:ring-primary-500"
               />
             </div>
             <Button
               onClick={() => navigate('/institution-portal')}
-              className="w-full sm:w-auto h-11 px-5 bg-[#0073ea] hover:bg-[#0060c4] text-white font-bold rounded-xl shrink-0 text-xs"
+              className="w-full sm:w-auto h-11 px-5 bg-primary-500 hover:bg-primary-600 text-white font-bold rounded-xl shrink-0 text-xs"
             >
               Register Facility
             </Button>
@@ -211,8 +211,8 @@ export const HealthcareInstitutions = () => {
               onClick={() => setTypeFilter(tab.key)}
               className={`px-4 py-2 rounded-xl font-extrabold text-xs whitespace-nowrap transition-all ${
                 typeFilter === tab.key
-                  ? 'bg-[#0073ea] text-white shadow-xs'
-                  : 'bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 text-[#676879] hover:bg-[#e8f1ff] hover:text-[#0073ea]'
+                  ? 'bg-primary-500 text-white shadow-xs'
+                  : 'bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 text-graphite-500 dark:text-slate-400 hover:bg-primary-100 hover:text-primary-500'
               }`}
             >
               {tab.label}
@@ -222,7 +222,7 @@ export const HealthcareInstitutions = () => {
 
         {/* ── Results count ── */}
         {!loading && (
-          <p className="text-xs font-bold text-[#676879]">
+          <p className="text-xs font-bold text-graphite-500 dark:text-slate-400">
             {filtered.length} {filtered.length === 1 ? 'facility' : 'facilities'} found
             {typeFilter !== 'all' && ` · ${FILTER_TABS.find(t => t.key === typeFilter)?.label}`}
             {searchTerm && ` · "${searchTerm}"`}
@@ -233,13 +233,13 @@ export const HealthcareInstitutions = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {loading ? (
             <div className="col-span-full flex justify-center py-16">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0073ea]" />
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500" />
             </div>
           ) : filtered.length === 0 ? (
-            <div className="col-span-full p-12 text-center rounded-2xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 space-y-3">
+            <div className="col-span-full p-12 text-center rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 space-y-3">
               <Building2 className="h-12 w-12 mx-auto text-slate-300" />
               <h3 className="font-extrabold text-base">No institutions found</h3>
-              <p className="text-xs text-[#676879]">Try clearing your search filters or choose another category.</p>
+              <p className="text-xs text-graphite-500 dark:text-slate-400">Try clearing your search filters or choose another category.</p>
               <Button size="sm" variant="outline" onClick={() => { setSearchTerm(''); setTypeFilter('all'); }}>
                 Reset Filters
               </Button>
@@ -263,25 +263,25 @@ const InstitutionCard = ({ inst, onBook }: { inst: Institution; onBook: () => vo
   ]));
 
   return (
-    <div className="rounded-2xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-xs hover:shadow-md hover:border-[#0073ea]/50 transition-all flex flex-col">
+    <div className="rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs hover:shadow-md hover:border-primary-500/50 transition-all flex flex-col">
 
       {/* ── Card header ── */}
       <div className="p-5 space-y-3 flex-1">
         {/* Name row */}
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-3">
-            <div className="h-11 w-11 rounded-xl bg-[#f0f4ff] dark:bg-slate-800 flex items-center justify-center shrink-0 border border-[#d0e1fd] dark:border-slate-700">
-              {TYPE_ICONS[inst.institution_type] || <Building2 className="h-5 w-5 text-[#0073ea]" />}
+            <div className="h-11 w-11 rounded-xl bg-primary-50 dark:bg-slate-800 flex items-center justify-center shrink-0 border border-primary-200 dark:border-slate-700">
+              {TYPE_ICONS[inst.institution_type] || <Building2 className="h-5 w-5 text-primary-500" />}
             </div>
             <div className="min-w-0">
               <h3 className="font-black text-sm text-slate-900 dark:text-slate-100 leading-snug line-clamp-2">{inst.name}</h3>
-              <p className="text-[11px] font-bold text-[#676879] capitalize mt-0.5">
+              <p className="text-[11px] font-bold text-graphite-500 dark:text-slate-400 capitalize mt-0.5">
                 {inst.institution_type?.replace(/_/g, ' ')}
               </p>
             </div>
           </div>
           {inst.is_verified && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-[#00c875]/10 text-[#00c875] shrink-0">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-success-500/10 text-success-500 shrink-0">
               <CheckCircle2 className="h-3 w-3" /> Verified
             </span>
           )}
@@ -289,16 +289,16 @@ const InstitutionCard = ({ inst, onBook }: { inst: Institution; onBook: () => vo
 
         {/* Location */}
         {inst.location && (
-          <div className="flex items-center gap-1.5 text-xs text-[#676879]">
-            <MapPin className="h-3.5 w-3.5 text-[#0073ea] shrink-0" />
+          <div className="flex items-center gap-1.5 text-xs text-graphite-500 dark:text-slate-400">
+            <MapPin className="h-3.5 w-3.5 text-primary-500 shrink-0" />
             <span className="truncate">{inst.location}</span>
           </div>
         )}
 
         {/* Phone */}
         {inst.phone && (
-          <div className="flex items-center gap-1.5 text-xs text-[#676879]">
-            <Phone className="h-3.5 w-3.5 text-[#00c875] shrink-0" />
+          <div className="flex items-center gap-1.5 text-xs text-graphite-500 dark:text-slate-400">
+            <Phone className="h-3.5 w-3.5 text-success-500 shrink-0" />
             <span>{inst.phone}</span>
           </div>
         )}
@@ -306,22 +306,22 @@ const InstitutionCard = ({ inst, onBook }: { inst: Institution; onBook: () => vo
         {/* ── Capability badge strip ── */}
         <div className="flex flex-wrap gap-1.5 pt-0.5">
           {inst.is_24_7 && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-[#e44258]/10 text-[#e44258]">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-error-500/10 text-error-500">
               <Clock className="h-3 w-3" /> 24 / 7
             </span>
           )}
           {inst.emergency_services && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-[#fdab3d]/15 text-[#c47c00]">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-warning-500/15 text-warning-600">
               <Zap className="h-3 w-3" /> Emergency
             </span>
           )}
           {inst.ambulance_services && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-[#0073ea]/10 text-[#0073ea]">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-primary-500/10 text-primary-500">
               <Siren className="h-3 w-3" /> Ambulance
             </span>
           )}
           {inst.telemedicine_available && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-[#a25ddc]/10 text-[#a25ddc]">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-purple-500/10 text-purple-500">
               <Wifi className="h-3 w-3" /> Telemedicine
             </span>
           )}
@@ -331,7 +331,7 @@ const InstitutionCard = ({ inst, onBook }: { inst: Institution; onBook: () => vo
             </span>
           )}
           {inst.accreditation_body && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-[#00c875]/10 text-[#00c875]">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-success-500/10 text-success-500">
               <ShieldCheck className="h-3 w-3" /> {inst.accreditation_body}
             </span>
           )}
@@ -341,7 +341,7 @@ const InstitutionCard = ({ inst, onBook }: { inst: Institution; onBook: () => vo
         {allServices.length > 0 && (
           <div className="flex flex-wrap gap-1.5 pt-0.5">
             {allServices.slice(0, 4).map((svc, i) => (
-              <span key={i} className="px-2 py-0.5 rounded-md bg-[#f0f4ff] dark:bg-slate-800 text-[10px] font-bold text-[#0073ea]">
+              <span key={i} className="px-2 py-0.5 rounded-md bg-primary-50 dark:bg-slate-800 text-[10px] font-bold text-primary-500">
                 {svc}
               </span>
             ))}
@@ -357,7 +357,7 @@ const InstitutionCard = ({ inst, onBook }: { inst: Institution; onBook: () => vo
         {(inst.equipment_available || []).length > 0 && (
           <div className="flex flex-wrap gap-1.5">
             {(inst.equipment_available || []).slice(0, 3).map((eq, i) => (
-              <span key={i} className="px-2 py-0.5 rounded-md bg-[#f5f6f8] dark:bg-slate-800 text-[10px] font-bold text-slate-500 border border-[#e6e9ef] dark:border-slate-700">
+              <span key={i} className="px-2 py-0.5 rounded-md bg-canvas dark:bg-slate-800 text-[10px] font-bold text-slate-500 border border-canvas-silk dark:border-slate-700">
                 {eq}
               </span>
             ))}
@@ -371,7 +371,7 @@ const InstitutionCard = ({ inst, onBook }: { inst: Institution; onBook: () => vo
 
         {/* ── Languages (shown if more than just English) ── */}
         {(inst.languages_spoken || []).length > 1 && (
-          <div className="flex items-center gap-1.5 text-[11px] text-[#676879]">
+          <div className="flex items-center gap-1.5 text-[11px] text-graphite-500 dark:text-slate-400">
             <Languages className="h-3.5 w-3.5 shrink-0" />
             <span>{(inst.languages_spoken || []).join(' · ')}</span>
           </div>
@@ -379,10 +379,10 @@ const InstitutionCard = ({ inst, onBook }: { inst: Institution; onBook: () => vo
       </div>
 
       {/* ── Card footer ── */}
-      <div className="px-5 pb-5 pt-3 border-t border-[#f0f2f7] dark:border-slate-800 flex items-center gap-2">
+      <div className="px-5 pb-5 pt-3 border-t border-canvas-mist dark:border-slate-800 flex items-center gap-2">
         <Button
           size="sm"
-          className="flex-1 bg-[#0073ea] hover:bg-[#0060c4] text-white text-xs font-bold rounded-xl h-9"
+          className="flex-1 bg-primary-500 hover:bg-primary-600 text-white text-xs font-bold rounded-xl h-9"
           onClick={onBook}
         >
           <Calendar className="h-3.5 w-3.5 mr-1.5" /> Book / Order
@@ -391,7 +391,7 @@ const InstitutionCard = ({ inst, onBook }: { inst: Institution; onBook: () => vo
           <Button
             size="sm"
             variant="outline"
-            className="h-9 px-3 rounded-xl border-[#e6e9ef] text-xs font-bold hover:bg-[#f0f4ff]"
+            className="h-9 px-3 rounded-xl border-canvas-silk text-xs font-bold hover:bg-primary-50"
             onClick={() => window.open(`tel:${inst.phone}`)}
             title="Call"
           >
@@ -402,7 +402,7 @@ const InstitutionCard = ({ inst, onBook }: { inst: Institution; onBook: () => vo
           <Button
             size="sm"
             variant="outline"
-            className="h-9 px-3 rounded-xl border-[#e6e9ef] text-xs font-bold hover:bg-[#f0f4ff]"
+            className="h-9 px-3 rounded-xl border-canvas-silk text-xs font-bold hover:bg-primary-50"
             onClick={() => window.open(inst.website, '_blank')}
             title="Website"
           >

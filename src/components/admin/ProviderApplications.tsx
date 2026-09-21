@@ -49,15 +49,15 @@ interface ProviderApp {
 
 const InfoRow = ({ label, value }: { label: string; value: React.ReactNode }) => (
   <div className="flex flex-col gap-0.5">
-    <span className="text-[10px] font-extrabold uppercase text-[#676879]">{label}</span>
+    <span className="text-[10px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">{label}</span>
     <span className="text-xs font-medium text-slate-800 dark:text-slate-200">{value || "—"}</span>
   </div>
 );
 
 const BoolBadge = ({ value, trueLabel = "Yes", falseLabel = "No" }: { value: boolean | null; trueLabel?: string; falseLabel?: string }) => (
   value
-    ? <Badge className="bg-[#00c875]/15 text-[#00c875] border-0 text-xs">{trueLabel}</Badge>
-    : <Badge variant="outline" className="text-xs text-[#676879]">{falseLabel}</Badge>
+    ? <Badge className="bg-success-500/15 text-success-500 border-0 text-xs">{trueLabel}</Badge>
+    : <Badge variant="outline" className="text-xs text-graphite-500 dark:text-slate-400">{falseLabel}</Badge>
 );
 
 export const ProviderApplications = () => {
@@ -185,9 +185,9 @@ export const ProviderApplications = () => {
   };
 
   const statusPill = (st: string) => {
-    if (st === "approved") return <span className="px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-[#00c875]">Approved</span>;
-    if (st === "rejected") return <span className="px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-[#e2445c]">Rejected</span>;
-    return <span className="px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-[#fdab3d]">Pending</span>;
+    if (st === "approved") return <span className="px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-success-500">Approved</span>;
+    if (st === "rejected") return <span className="px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-error-500">Rejected</span>;
+    return <span className="px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-warning-500">Pending</span>;
   };
 
   const p = selected?.profile;
@@ -195,9 +195,9 @@ export const ProviderApplications = () => {
   return (
     <div className="space-y-4">
       {/* Filter bar */}
-      <div className="flex items-center justify-between border-b border-[#e6e9ef] pb-3">
+      <div className="flex items-center justify-between border-b border-canvas-silk pb-3">
         <h2 className="text-base font-extrabold flex items-center gap-2 mr-auto">
-          <ShieldCheck className="h-5 w-5 text-[#0073ea]" />
+          <ShieldCheck className="h-5 w-5 text-primary-500" />
           Practitioner Accreditation Applications
         </h2>
         <div className="flex items-center gap-1.5">
@@ -207,8 +207,8 @@ export const ProviderApplications = () => {
               onClick={() => setFilter(f)}
               className={`px-3 py-1 rounded-md text-xs font-extrabold capitalize transition-all ${
                 filter === f
-                  ? "bg-[#0073ea] text-white shadow-xs"
-                  : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-[#e5f0ff]"
+                  ? "bg-primary-500 text-white shadow-xs"
+                  : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-primary-50 dark:hover:bg-slate-800"
               }`}
             >
               {f}
@@ -218,16 +218,16 @@ export const ProviderApplications = () => {
       </div>
 
       {loading ? (
-        <div className="flex justify-center p-8"><Loader2 className="animate-spin text-[#0073ea]" /></div>
+        <div className="flex justify-center p-8"><Loader2 className="animate-spin text-primary-500" /></div>
       ) : apps.length === 0 ? (
-        <div className="p-8 text-center text-xs text-[#676879] bg-[#f5f6f8] rounded-xl border border-[#e6e9ef]">
+        <div className="p-8 text-center text-xs text-graphite-500 dark:text-slate-400 bg-canvas rounded-xl border border-canvas-silk dark:border-slate-800">
           No {filter} provider accreditation applications found.
         </div>
       ) : (
-        <div className="w-full overflow-x-auto rounded-xl border border-[#e6e9ef] bg-white dark:bg-slate-900">
+        <div className="w-full overflow-x-auto rounded-xl border border-canvas-silk bg-white dark:bg-slate-900">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="border-b border-[#e6e9ef] bg-[#f5f6f8] text-[11px] font-extrabold uppercase text-[#676879]">
+              <tr className="border-b border-canvas-silk bg-canvas text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
                 <th className="py-2.5 px-4">Applicant</th>
                 <th className="py-2.5 px-3">Specialty</th>
                 <th className="py-2.5 px-3">Medical School</th>
@@ -237,16 +237,16 @@ export const ProviderApplications = () => {
                 <th className="py-2.5 px-3 text-center">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#e6e9ef]">
+            <tbody className="divide-y divide-canvas-silk">
               {apps.map(app => (
-                <tr key={app.id} className="hover:bg-[#f0f2f7] transition-colors">
+                <tr key={app.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 transition-colors">
                   <td className="py-3 px-4">
                     <div className="font-bold text-slate-900 dark:text-slate-100">
                       {app.profile?.first_name} {app.profile?.last_name}
                     </div>
                     <div className="text-[10px] text-slate-400">{app.profile?.email}</div>
                   </td>
-                  <td className="py-3 px-3 font-semibold text-[#0073ea]">{app.specialty || "General Medicine"}</td>
+                  <td className="py-3 px-3 font-semibold text-primary-500">{app.specialty || "General Medicine"}</td>
                   <td className="py-3 px-3 text-slate-600 dark:text-slate-300">{app.profile?.medical_school || "—"}</td>
                   <td className="py-3 px-3 font-mono">{app.license_number || "—"}</td>
                   <td className="py-3 px-3 font-bold">{app.years_of_experience} yrs</td>
@@ -254,7 +254,7 @@ export const ProviderApplications = () => {
                   <td className="py-3 px-3 text-center">
                     <button
                       onClick={() => openReview(app)}
-                      className="px-3 py-1 rounded-md bg-[#0073ea] text-white text-[11px] font-bold hover:bg-[#0060c4] flex items-center gap-1 mx-auto"
+                      className="px-3 py-1 rounded-md bg-primary-500 text-white text-[11px] font-bold hover:bg-primary-600 flex items-center gap-1 mx-auto"
                     >
                       <FileText className="h-3 w-3" /> Review
                     </button>
@@ -268,7 +268,7 @@ export const ProviderApplications = () => {
 
       {/* ── Review Modal ── */}
       <Dialog open={!!selected} onOpenChange={open => !open && setSelected(null)}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto bg-white dark:bg-slate-900 border border-[#e6e9ef]">
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800">
           <DialogHeader>
             <DialogTitle className="font-extrabold text-base">
               Review — {p?.first_name} {p?.last_name}
@@ -279,7 +279,7 @@ export const ProviderApplications = () => {
             <div className="space-y-5 text-xs">
 
               {/* Basic info */}
-              <section className="grid grid-cols-2 md:grid-cols-3 gap-3 p-4 rounded-xl bg-[#f5f6f8] border border-[#e6e9ef]">
+              <section className="grid grid-cols-2 md:grid-cols-3 gap-3 p-4 rounded-xl bg-canvas border border-canvas-silk dark:border-slate-800">
                 <InfoRow label="Email" value={p?.email} />
                 <InfoRow label="Phone" value={p?.phone} />
                 <InfoRow label="License #" value={selected.license_number} />
@@ -290,27 +290,27 @@ export const ProviderApplications = () => {
 
               {/* Education & credentials */}
               <section>
-                <h4 className="font-extrabold uppercase text-[#676879] flex items-center gap-1.5 mb-2">
+                <h4 className="font-extrabold uppercase text-graphite-500 dark:text-slate-400 flex items-center gap-1.5 mb-2">
                   <GraduationCap className="h-4 w-4" /> Education & Credentials
                 </h4>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 p-4 rounded-xl bg-[#f5f6f8] border border-[#e6e9ef]">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 p-4 rounded-xl bg-canvas border border-canvas-silk dark:border-slate-800">
                   <InfoRow label="Medical School" value={p?.medical_school} />
                   <InfoRow label="Graduation Year" value={p?.graduation_year} />
                   <div className="col-span-2 md:col-span-3">
-                    <span className="text-[10px] font-extrabold uppercase text-[#676879]">Board Certifications</span>
+                    <span className="text-[10px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">Board Certifications</span>
                     <div className="flex flex-wrap gap-1.5 mt-1">
                       {(p?.board_certifications || []).length > 0
                         ? (p!.board_certifications as string[]).map(c => (
                             <Badge key={c} variant="outline" className="text-xs gap-1">
-                              <Award className="h-3 w-3 text-[#0073ea]" /> {c}
+                              <Award className="h-3 w-3 text-primary-500" /> {c}
                             </Badge>
                           ))
-                        : <span className="text-[#676879]">None listed</span>
+                        : <span className="text-graphite-500 dark:text-slate-400">None listed</span>
                       }
                     </div>
                   </div>
                   <div className="col-span-2 md:col-span-3">
-                    <span className="text-[10px] font-extrabold uppercase text-[#676879]">Subspecialties</span>
+                    <span className="text-[10px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">Subspecialties</span>
                     <div className="flex flex-wrap gap-1.5 mt-1">
                       {(p?.subspecialties || []).length > 0
                         ? (p!.subspecialties as string[]).map(s => (
@@ -318,7 +318,7 @@ export const ProviderApplications = () => {
                               <Stethoscope className="h-3 w-3 mr-1" /> {s}
                             </Badge>
                           ))
-                        : <span className="text-[#676879]">None listed</span>
+                        : <span className="text-graphite-500 dark:text-slate-400">None listed</span>
                       }
                     </div>
                   </div>
@@ -327,20 +327,20 @@ export const ProviderApplications = () => {
 
               {/* Practice details */}
               <section>
-                <h4 className="font-extrabold uppercase text-[#676879] flex items-center gap-1.5 mb-2">
+                <h4 className="font-extrabold uppercase text-graphite-500 dark:text-slate-400 flex items-center gap-1.5 mb-2">
                   <Building2 className="h-4 w-4" /> Practice Details
                 </h4>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 p-4 rounded-xl bg-[#f5f6f8] border border-[#e6e9ef]">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 p-4 rounded-xl bg-canvas border border-canvas-silk dark:border-slate-800">
                   <InfoRow label="Practice Location" value={p?.primary_practice_location} />
                   <InfoRow label="Typical Wait Time" value={p?.typical_wait_time} />
                   <div className="col-span-2 md:col-span-3">
-                    <span className="text-[10px] font-extrabold uppercase text-[#676879]">Affiliated Hospitals</span>
+                    <span className="text-[10px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">Affiliated Hospitals</span>
                     <div className="flex flex-wrap gap-1.5 mt-1">
                       {(p?.affiliated_hospitals || []).length > 0
                         ? (p!.affiliated_hospitals as string[]).map(h => (
                             <Badge key={h} variant="outline" className="text-xs">{h}</Badge>
                           ))
-                        : <span className="text-[#676879]">None listed</span>
+                        : <span className="text-graphite-500 dark:text-slate-400">None listed</span>
                       }
                     </div>
                   </div>
@@ -349,10 +349,10 @@ export const ProviderApplications = () => {
 
               {/* Fees & capabilities */}
               <section>
-                <h4 className="font-extrabold uppercase text-[#676879] flex items-center gap-1.5 mb-2">
+                <h4 className="font-extrabold uppercase text-graphite-500 dark:text-slate-400 flex items-center gap-1.5 mb-2">
                   <DollarSign className="h-4 w-4" /> Fees & Capabilities
                 </h4>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 p-4 rounded-xl bg-[#f5f6f8] border border-[#e6e9ef]">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 p-4 rounded-xl bg-canvas border border-canvas-silk dark:border-slate-800">
                   <InfoRow
                     label="Consultation Fee"
                     value={
@@ -364,25 +364,25 @@ export const ProviderApplications = () => {
                     }
                   />
                   <div>
-                    <span className="text-[10px] font-extrabold uppercase text-[#676879]">Accepts Insurance</span>
+                    <span className="text-[10px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">Accepts Insurance</span>
                     <div className="mt-1"><BoolBadge value={p?.accepts_insurance ?? false} /></div>
                   </div>
                   <div>
-                    <span className="text-[10px] font-extrabold uppercase text-[#676879]">Telemedicine</span>
+                    <span className="text-[10px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">Telemedicine</span>
                     <div className="mt-1"><BoolBadge value={p?.telemedicine_available ?? false} trueLabel="Available" falseLabel="Not offered" /></div>
                   </div>
                   <div>
-                    <span className="text-[10px] font-extrabold uppercase text-[#676879]">Home Visits</span>
+                    <span className="text-[10px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">Home Visits</span>
                     <div className="mt-1"><BoolBadge value={p?.home_visits_available ?? false} trueLabel="Available" falseLabel="Not offered" /></div>
                   </div>
                   <div className="col-span-2 md:col-span-3">
-                    <span className="text-[10px] font-extrabold uppercase text-[#676879]">Insurance Providers Accepted</span>
+                    <span className="text-[10px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">Insurance Providers Accepted</span>
                     <div className="flex flex-wrap gap-1.5 mt-1">
                       {(p?.insurance_providers_accepted || []).length > 0
                         ? (p!.insurance_providers_accepted as string[]).map(ins => (
                             <Badge key={ins} variant="outline" className="text-xs">{ins}</Badge>
                           ))
-                        : <span className="text-[#676879]">None listed</span>
+                        : <span className="text-graphite-500 dark:text-slate-400">None listed</span>
                       }
                     </div>
                   </div>
@@ -392,7 +392,7 @@ export const ProviderApplications = () => {
               {/* Languages */}
               {(p?.languages_spoken || []).length > 0 && (
                 <section>
-                  <h4 className="font-extrabold uppercase text-[#676879] flex items-center gap-1.5 mb-2">
+                  <h4 className="font-extrabold uppercase text-graphite-500 dark:text-slate-400 flex items-center gap-1.5 mb-2">
                     <Languages className="h-4 w-4" /> Languages Spoken
                   </h4>
                   <div className="flex flex-wrap gap-1.5">
@@ -405,10 +405,10 @@ export const ProviderApplications = () => {
 
               {/* Document checklist */}
               <section>
-                <h4 className="font-extrabold uppercase text-[#676879] mb-2">Document Verification Checklist</h4>
+                <h4 className="font-extrabold uppercase text-graphite-500 dark:text-slate-400 mb-2">Document Verification Checklist</h4>
                 <div className="space-y-2">
                   {getCountryRequirements(p?.country || "ZM", "healthcareProfessionals").map(req => (
-                    <div key={req.id} className="flex items-start gap-2.5 p-2.5 rounded-lg border border-[#e6e9ef] bg-[#f5f6f8]">
+                    <div key={req.id} className="flex items-start gap-2.5 p-2.5 rounded-lg border border-canvas-silk bg-canvas dark:bg-slate-950">
                       <Checkbox
                         id={`chk-${req.id}`}
                         checked={documentChecks[req.id] || false}
@@ -419,11 +419,11 @@ export const ProviderApplications = () => {
                       />
                       <div className="flex-1">
                         <label htmlFor={`chk-${req.id}`} className="font-bold cursor-pointer flex items-center gap-1">
-                          {req.name} {req.required && <span className="text-[#e2445c]">*</span>}
+                          {req.name} {req.required && <span className="text-error-500">*</span>}
                         </label>
-                        <p className="text-[10px] text-[#676879] mt-0.5">{req.description}</p>
+                        <p className="text-[10px] text-graphite-500 dark:text-slate-400 mt-0.5">{req.description}</p>
                       </div>
-                      {documentChecks[req.id] && <CheckCircle className="h-4 w-4 text-[#00c875] shrink-0" />}
+                      {documentChecks[req.id] && <CheckCircle className="h-4 w-4 text-success-500 shrink-0" />}
                     </div>
                   ))}
                 </div>
@@ -432,15 +432,15 @@ export const ProviderApplications = () => {
               {/* Uploaded documents */}
               {Object.keys(docUrls).length > 0 && (
                 <section>
-                  <h4 className="font-extrabold uppercase text-[#676879] mb-2">
+                  <h4 className="font-extrabold uppercase text-graphite-500 dark:text-slate-400 mb-2">
                     Uploaded Documents ({Object.keys(docUrls).length})
                   </h4>
                   <ul className="space-y-1">
                     {Object.entries(docUrls).map(([path, url]) => (
-                      <li key={path} className="flex items-center justify-between p-2 border border-[#e6e9ef] rounded-md">
+                      <li key={path} className="flex items-center justify-between p-2 border border-canvas-silk rounded-md">
                         <span className="truncate flex-1 font-medium text-xs">{path.split("/").pop()}</span>
                         <a href={url} target="_blank" rel="noopener noreferrer"
-                          className="text-[#0073ea] font-bold flex items-center gap-1 ml-2 text-xs shrink-0">
+                          className="text-primary-500 font-bold flex items-center gap-1 ml-2 text-xs shrink-0">
                           View <ExternalLink className="h-3 w-3" />
                         </a>
                       </li>
@@ -451,10 +451,10 @@ export const ProviderApplications = () => {
 
               {/* Review notes */}
               <section>
-                <label className="font-extrabold uppercase text-[#676879]">Review Notes</label>
+                <label className="font-extrabold uppercase text-graphite-500 dark:text-slate-400">Review Notes</label>
                 <textarea
                   rows={2}
-                  className="w-full mt-1 p-2.5 rounded-md border border-[#c3c6d4] bg-[#f5f6f8] text-xs font-medium"
+                  className="w-full mt-1 p-2.5 rounded-md border border-graphite-300 dark:border-slate-700 bg-canvas text-xs font-medium"
                   value={notes}
                   onChange={e => setNotes(e.target.value)}
                   placeholder="Notes (required for rejection)…"
@@ -470,14 +470,14 @@ export const ProviderApplications = () => {
             <button
               onClick={() => decide("rejected")}
               disabled={processing || !notes.trim()}
-              className="px-4 py-1.5 rounded-md bg-[#e2445c] text-white text-xs font-bold disabled:opacity-40 flex items-center gap-1"
+              className="px-4 py-1.5 rounded-md bg-error-500 text-white text-xs font-bold disabled:opacity-40 flex items-center gap-1"
             >
               <X className="h-3.5 w-3.5" /> Reject
             </button>
             <button
               onClick={() => decide("approved")}
               disabled={processing}
-              className="px-4 py-1.5 rounded-md bg-[#00c875] text-white text-xs font-bold disabled:opacity-40 flex items-center gap-1"
+              className="px-4 py-1.5 rounded-md bg-success-500 text-white text-xs font-bold disabled:opacity-40 flex items-center gap-1"
             >
               {processing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
               Approve & Verify

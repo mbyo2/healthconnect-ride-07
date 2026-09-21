@@ -211,32 +211,32 @@ export const MedicalShiftHR = () => {
 
   const getShiftTypeColor = (type: string) => {
     switch (type) {
-      case "day": return "bg-[#0073ea]";
-      case "night": return "bg-[#6366f1]";
-      case "evening": return "bg-[#fdab3d]";
-      case "rotating": return "bg-[#a25ddc]";
-      case "on_call": return "bg-[#e44258]";
-      default: return "bg-[#676879]";
+      case "day": return "bg-primary-500";
+      case "night": return "bg-indigo-500";
+      case "evening": return "bg-warning-500";
+      case "rotating": return "bg-purple-500";
+      case "on_call": return "bg-error-500";
+      default: return "bg-graphite-500 dark:bg-slate-600";
     }
   };
 
   const getAttendanceStatusColor = (status: string) => {
     switch (status) {
-      case "present": return "bg-[#00c875] text-white";
-      case "absent": return "bg-[#e44258] text-white";
-      case "late": return "bg-[#fdab3d] text-white";
-      case "early_departure": return "bg-[#a25ddc] text-white";
-      case "on_leave": return "bg-[#676879] text-white";
-      default: return "bg-[#676879] text-white";
+      case "present": return "bg-success-500 text-white";
+      case "absent": return "bg-error-500 text-white";
+      case "late": return "bg-warning-500 text-white";
+      case "early_departure": return "bg-purple-500 text-white";
+      case "on_leave": return "bg-graphite-500 dark:bg-slate-600 text-white";
+      default: return "bg-graphite-500 dark:bg-slate-600 text-white";
     }
   };
 
   const getDeviceStatusColor = (status: string) => {
     switch (status) {
-      case "online": return "bg-[#00c875] text-white";
-      case "offline": return "bg-[#e44258] text-white";
-      case "syncing": return "bg-[#fdab3d] text-white";
-      default: return "bg-[#676879] text-white";
+      case "online": return "bg-success-500 text-white";
+      case "offline": return "bg-error-500 text-white";
+      case "syncing": return "bg-warning-500 text-white";
+      default: return "bg-graphite-500 dark:bg-slate-600 text-white";
     }
   };
 
@@ -244,13 +244,13 @@ export const MedicalShiftHR = () => {
 
   if (!institution) {
     return (
-      <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 flex items-center justify-center p-6">
+      <div className="min-h-screen bg-canvas dark:bg-slate-950 flex items-center justify-center p-6">
         <Card className="max-w-md w-full">
           <CardContent className="p-8 text-center space-y-4">
-            <Building2 className="h-12 w-12 mx-auto text-[#0073ea]" />
+            <Building2 className="h-12 w-12 mx-auto text-primary-500" />
             <h2 className="text-xl font-extrabold">Institution Required</h2>
-            <p className="text-xs text-[#676879]">Please select an institution to access shift HR.</p>
-            <Button onClick={() => navigate("/institution-portal")} className="bg-[#0073ea] hover:bg-[#0056b3]">
+            <p className="text-xs text-graphite-500 dark:text-slate-400">Please select an institution to access shift HR.</p>
+            <Button onClick={() => navigate("/institution-portal")} className="bg-primary-500 hover:bg-primary-600">
               Go to Institution Portal
             </Button>
           </CardContent>
@@ -265,23 +265,23 @@ export const MedicalShiftHR = () => {
   const onlineDevices = devices.filter((d) => d.connection_status === "online").length;
 
   return (
-    <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pb-16">
+    <div className="min-h-screen bg-canvas dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pb-16">
       {/* Header */}
-      <div className="bg-white dark:bg-slate-900 border-b border-[#e6e9ef] dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
+      <div className="bg-white dark:bg-slate-900 border-b border-canvas-silk dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
         <div className="max-w-[1600px] mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-[#0073ea] text-white flex items-center justify-center shadow-xs">
+            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-xs">
               <Clock className="h-5 w-5" />
             </div>
             <div>
               <h1 className="text-xl font-extrabold">Medical Shift HR & Attendance</h1>
-              <p className="text-xs text-[#676879] font-medium">Shift Management & Biometric Attendance Tracking</p>
+              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">Shift Management & Biometric Attendance Tracking</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <Dialog open={showShiftDialog} onOpenChange={setShowShiftDialog}>
               <DialogTrigger asChild>
-                <Button className="bg-[#0073ea] hover:bg-[#0056b3] text-white font-bold text-xs flex items-center gap-2">
+                <Button className="bg-primary-500 hover:bg-primary-600 text-white font-bold text-xs flex items-center gap-2">
                   <Plus className="h-4 w-4" /> New Shift
                 </Button>
               </DialogTrigger>
@@ -387,7 +387,7 @@ export const MedicalShiftHR = () => {
                       />
                     </div>
                   </div>
-                  <Button onClick={handleCreateShift} className="w-full bg-[#0073ea] hover:bg-[#0056b3] text-white font-bold">
+                  <Button onClick={handleCreateShift} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold">
                     Create Shift
                   </Button>
                 </div>
@@ -400,60 +400,60 @@ export const MedicalShiftHR = () => {
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 pt-6">
         {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-[#676879] uppercase">Active Shifts</span>
-                <Clock className="h-4 w-4 text-[#0073ea]" />
+                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Active Shifts</span>
+                <Clock className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-[#0073ea]">{activeShifts}</div>
-              <div className="text-[10px] text-[#676879] font-bold mt-0.5">Configured shifts</div>
+              <div className="text-2xl font-black font-mono text-primary-500">{activeShifts}</div>
+              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Configured shifts</div>
             </CardContent>
           </Card>
-          <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-[#676879] uppercase">Today's Assignments</span>
-                <Users className="h-4 w-4 text-[#a25ddc]" />
+                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Today's Assignments</span>
+                <Users className="h-4 w-4 text-purple-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-[#a25ddc]">{todayAssignments}</div>
-              <div className="text-[10px] text-[#676879] font-bold mt-0.5">Staff scheduled</div>
+              <div className="text-2xl font-black font-mono text-purple-500">{todayAssignments}</div>
+              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Staff scheduled</div>
             </CardContent>
           </Card>
-          <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-[#676879] uppercase">Present Today</span>
-                <CheckCircle className="h-4 w-4 text-[#00c875]" />
+                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Present Today</span>
+                <CheckCircle className="h-4 w-4 text-success-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-[#00c875]">{presentToday}</div>
-              <div className="text-[10px] text-[#676879] font-bold mt-0.5">Clock-in recorded</div>
+              <div className="text-2xl font-black font-mono text-success-500">{presentToday}</div>
+              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Clock-in recorded</div>
             </CardContent>
           </Card>
-          <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-[#676879] uppercase">Online Devices</span>
-                <Fingerprint className="h-4 w-4 text-[#fdab3d]" />
+                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Online Devices</span>
+                <Fingerprint className="h-4 w-4 text-warning-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-[#fdab3d]">{onlineDevices}</div>
-              <div className="text-[10px] text-[#676879] font-bold mt-0.5">Biometric devices</div>
+              <div className="text-2xl font-black font-mono text-warning-500">{onlineDevices}</div>
+              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Biometric devices</div>
             </CardContent>
           </Card>
         </div>
 
         <Tabs defaultValue="shifts" className="space-y-6">
-          <TabsList className="bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 p-1">
-            <TabsTrigger value="shifts" className="data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">
+          <TabsList className="bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 p-1">
+            <TabsTrigger value="shifts" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <Clock className="h-4 w-4 mr-2" /> Shifts
             </TabsTrigger>
-            <TabsTrigger value="assignments" className="data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">
+            <TabsTrigger value="assignments" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <Users className="h-4 w-4 mr-2" /> Assignments
             </TabsTrigger>
-            <TabsTrigger value="attendance" className="data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">
+            <TabsTrigger value="attendance" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <Fingerprint className="h-4 w-4 mr-2" /> Attendance
             </TabsTrigger>
-            <TabsTrigger value="devices" className="data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">
+            <TabsTrigger value="devices" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <Settings className="h-4 w-4 mr-2" /> Biometric Devices
             </TabsTrigger>
           </TabsList>
@@ -469,7 +469,7 @@ export const MedicalShiftHR = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {shifts.map((shift) => (
-                <Card key={shift.id} className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+                <Card key={shift.id} className="border-canvas-silk dark:border-slate-800 shadow-xs">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
@@ -478,38 +478,38 @@ export const MedicalShiftHR = () => {
                         </div>
                         <div>
                           <CardTitle className="text-sm font-extrabold">{shift.shift_name}</CardTitle>
-                          <div className="text-[10px] text-[#676879]">{shift.shift_type}</div>
+                          <div className="text-[10px] text-graphite-500 dark:text-slate-400">{shift.shift_type}</div>
                         </div>
                       </div>
                       {shift.is_active ? (
-                        <Badge className="bg-[#00c875] text-white text-[10px]">Active</Badge>
+                        <Badge className="bg-success-500 text-white text-[10px]">Active</Badge>
                       ) : (
-                        <Badge className="bg-[#676879] text-white text-[10px]">Inactive</Badge>
+                        <Badge className="bg-graphite-500 dark:bg-slate-600 text-white text-[10px]">Inactive</Badge>
                       )}
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-[#676879]">Hours</span>
+                      <span className="text-graphite-500 dark:text-slate-400">Hours</span>
                       <span className="font-bold">{shift.start_time} - {shift.end_time}</span>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-[#676879]">Break</span>
+                      <span className="text-graphite-500 dark:text-slate-400">Break</span>
                       <span className="font-bold">{shift.break_duration_minutes} min</span>
                     </div>
                     <div className="flex items-center gap-2">
                       {shift.is_overnight && (
-                        <Badge className="bg-[#6366f1] text-white text-[10px]">Overnight</Badge>
+                        <Badge className="bg-indigo-500 text-white text-[10px]">Overnight</Badge>
                       )}
                       {shift.requires_on_call && (
-                        <Badge className="bg-[#e44258] text-white text-[10px]">On Call</Badge>
+                        <Badge className="bg-error-500 text-white text-[10px]">On Call</Badge>
                       )}
                       {shift.auto_assign_rotation && (
-                        <Badge className="bg-[#a25ddc] text-white text-[10px]">Auto Rotation</Badge>
+                        <Badge className="bg-purple-500 text-white text-[10px]">Auto Rotation</Badge>
                       )}
                     </div>
-                    <div className="flex items-center justify-between pt-2 border-t border-[#e6e9ef] dark:border-slate-800">
-                      <div className="text-xs text-[#676879]">
+                    <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
+                      <div className="text-xs text-graphite-500 dark:text-slate-400">
                         {shift.staff_requirements.length} staff required
                       </div>
                       <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
@@ -541,7 +541,7 @@ export const MedicalShiftHR = () => {
               <div className="flex items-center gap-2">
                 <Dialog open={showAssignmentDialog} onOpenChange={setShowAssignmentDialog}>
                   <DialogTrigger asChild>
-                    <Button className="bg-[#0073ea] hover:bg-[#0056b3] text-white font-bold text-xs">
+                    <Button className="bg-primary-500 hover:bg-primary-600 text-white font-bold text-xs">
                       <Plus className="h-4 w-4 mr-1" /> Assign Staff
                     </Button>
                   </DialogTrigger>
@@ -600,7 +600,7 @@ export const MedicalShiftHR = () => {
                           className="mt-1"
                         />
                       </div>
-                      <Button onClick={handleCreateAssignment} className="w-full bg-[#0073ea] hover:bg-[#0056b3] text-white font-bold">
+                      <Button onClick={handleCreateAssignment} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold">
                         Create Assignment
                       </Button>
                     </div>
@@ -612,9 +612,9 @@ export const MedicalShiftHR = () => {
               </div>
             </div>
 
-            <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs overflow-hidden">
+            <Card className="border-canvas-silk dark:border-slate-800 shadow-xs overflow-hidden">
               <table className="w-full">
-                <thead className="bg-[#f0f2f7] dark:bg-slate-800">
+                <thead className="bg-canvas-mist dark:bg-slate-800">
                   <tr>
                     <th className="text-left text-xs font-extrabold px-4 py-3">Staff</th>
                     <th className="text-left text-xs font-extrabold px-4 py-3">Shift</th>
@@ -627,18 +627,18 @@ export const MedicalShiftHR = () => {
                 </thead>
                 <tbody>
                   {assignments.map((assignment) => (
-                    <tr key={assignment.id} className="border-t border-[#e6e9ef] dark:border-slate-800 hover:bg-[#f8f9fa] dark:hover:bg-slate-800">
+                    <tr key={assignment.id} className="border-t border-canvas-silk dark:border-slate-800 hover:bg-canvas-bone dark:hover:bg-slate-800">
                       <td className="px-4 py-3">
                         <div className="text-xs font-bold">
                           {assignment.staff?.first_name} {assignment.staff?.last_name}
                         </div>
-                        <div className="text-[10px] text-[#676879]">{assignment.staff?.specialty}</div>
+                        <div className="text-[10px] text-graphite-500 dark:text-slate-400">{assignment.staff?.specialty}</div>
                       </td>
                       <td className="px-4 py-3">
                         <div className="text-xs font-bold">{assignment.shift?.shift_name}</div>
-                        <div className="text-[10px] text-[#676879]">{assignment.shift?.start_time} - {assignment.shift?.end_time}</div>
+                        <div className="text-[10px] text-graphite-500 dark:text-slate-400">{assignment.shift?.start_time} - {assignment.shift?.end_time}</div>
                       </td>
-                      <td className="px-4 py-3 text-xs text-[#676879]">
+                      <td className="px-4 py-3 text-xs text-graphite-500 dark:text-slate-400">
                         {new Date(assignment.shift_date).toLocaleDateString()}
                       </td>
                       <td className="px-4 py-3 text-xs">
@@ -649,7 +649,7 @@ export const MedicalShiftHR = () => {
                           {assignment.status}
                         </Badge>
                       </td>
-                      <td className="px-4 py-3 text-xs text-[#676879]">
+                      <td className="px-4 py-3 text-xs text-graphite-500 dark:text-slate-400">
                         {new Date(assignment.assigned_at).toLocaleDateString()}
                       </td>
                       <td className="px-4 py-3">
@@ -695,9 +695,9 @@ export const MedicalShiftHR = () => {
               </div>
             </div>
 
-            <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs overflow-hidden">
+            <Card className="border-canvas-silk dark:border-slate-800 shadow-xs overflow-hidden">
               <table className="w-full">
-                <thead className="bg-[#f0f2f7] dark:bg-slate-800">
+                <thead className="bg-canvas-mist dark:bg-slate-800">
                   <tr>
                     <th className="text-left text-xs font-extrabold px-4 py-3">Staff</th>
                     <th className="text-left text-xs font-extrabold px-4 py-3">Date</th>
@@ -711,39 +711,39 @@ export const MedicalShiftHR = () => {
                 </thead>
                 <tbody>
                   {attendance.map((record) => (
-                    <tr key={record.id} className="border-t border-[#e6e9ef] dark:border-slate-800 hover:bg-[#f8f9fa] dark:hover:bg-slate-800">
+                    <tr key={record.id} className="border-t border-canvas-silk dark:border-slate-800 hover:bg-canvas-bone dark:hover:bg-slate-800">
                       <td className="px-4 py-3">
                         <div className="text-xs font-bold">
                           {record.staff?.first_name} {record.staff?.last_name}
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-xs text-[#676879]">
+                      <td className="px-4 py-3 text-xs text-graphite-500 dark:text-slate-400">
                         {new Date(record.date).toLocaleDateString()}
                       </td>
                       <td className="px-4 py-3 text-xs">
                         {record.clock_in_time ? (
                           <div className="flex items-center gap-1">
-                            <LogIn className="h-3 w-3 text-[#00c875]" />
+                            <LogIn className="h-3 w-3 text-success-500" />
                             {new Date(record.clock_in_time).toLocaleTimeString()}
                           </div>
                         ) : (
-                          <span className="text-[#676879]">-</span>
+                          <span className="text-graphite-500 dark:text-slate-400">-</span>
                         )}
                       </td>
                       <td className="px-4 py-3 text-xs">
                         {record.clock_out_time ? (
                           <div className="flex items-center gap-1">
-                            <LogOut className="h-3 w-3 text-[#e44258]" />
+                            <LogOut className="h-3 w-3 text-error-500" />
                             {new Date(record.clock_out_time).toLocaleTimeString()}
                           </div>
                         ) : (
-                          <span className="text-[#676879]">-</span>
+                          <span className="text-graphite-500 dark:text-slate-400">-</span>
                         )}
                       </td>
                       <td className="px-4 py-3 text-xs font-bold">
                         {record.total_hours_worked?.toFixed(1) || "-"}h
                       </td>
-                      <td className="px-4 py-3 text-xs font-bold text-[#fdab3d]">
+                      <td className="px-4 py-3 text-xs font-bold text-warning-500">
                         {record.overtime_hours?.toFixed(1) || "-"}h
                       </td>
                       <td className="px-4 py-3">
@@ -753,9 +753,9 @@ export const MedicalShiftHR = () => {
                       </td>
                       <td className="px-4 py-3">
                         {record.biometric_verified ? (
-                          <Fingerprint className="h-4 w-4 text-[#00c875]" />
+                          <Fingerprint className="h-4 w-4 text-success-500" />
                         ) : (
-                          <Fingerprint className="h-4 w-4 text-[#676879]" />
+                          <Fingerprint className="h-4 w-4 text-graphite-500 dark:text-slate-400" />
                         )}
                       </td>
                     </tr>
@@ -776,16 +776,16 @@ export const MedicalShiftHR = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {devices.map((device) => (
-                <Card key={device.id} className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+                <Card key={device.id} className="border-canvas-silk dark:border-slate-800 shadow-xs">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-xl bg-[#0073ea] text-white flex items-center justify-center">
+                        <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center">
                           <Fingerprint className="h-5 w-5" />
                         </div>
                         <div>
                           <CardTitle className="text-sm font-extrabold">{device.device_name}</CardTitle>
-                          <div className="text-[10px] text-[#676879]">{device.device_type}</div>
+                          <div className="text-[10px] text-graphite-500 dark:text-slate-400">{device.device_type}</div>
                         </div>
                       </div>
                       <Badge className={getDeviceStatusColor(device.connection_status) + " text-[10px]"}>
@@ -795,19 +795,19 @@ export const MedicalShiftHR = () => {
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-[#676879]">Location</span>
+                      <span className="text-graphite-500 dark:text-slate-400">Location</span>
                       <span className="font-bold">{device.device_location}</span>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-[#676879]">Serial Number</span>
+                      <span className="text-graphite-500 dark:text-slate-400">Serial Number</span>
                       <span className="font-bold">{device.serial_number || "N/A"}</span>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-[#676879]">IP Address</span>
+                      <span className="text-graphite-500 dark:text-slate-400">IP Address</span>
                       <span className="font-bold">{device.ip_address || "N/A"}</span>
                     </div>
-                    <div className="flex items-center justify-between pt-2 border-t border-[#e6e9ef] dark:border-slate-800">
-                      <div className="text-xs text-[#676879]">
+                    <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
+                      <div className="text-xs text-graphite-500 dark:text-slate-400">
                         Last Sync: {device.last_sync_at ? new Date(device.last_sync_at).toLocaleString() : "Never"}
                       </div>
                       <Button variant="ghost" size="sm" className="h-7 w-7 p-0">

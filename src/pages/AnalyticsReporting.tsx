@@ -127,22 +127,22 @@ export const AnalyticsReporting = () => {
 
   const getReportTypeColor = (type: string) => {
     switch (type) {
-      case "summary": return "bg-[#0073ea]";
-      case "detailed": return "bg-[#00c875]";
-      case "comparative": return "bg-[#a25ddc]";
-      case "trend": return "bg-[#fdab3d]";
-      default: return "bg-[#676879]";
+      case "summary": return "bg-primary-500";
+      case "detailed": return "bg-success-500";
+      case "comparative": return "bg-purple-500";
+      case "trend": return "bg-warning-500";
+      default: return "bg-graphite-500 dark:bg-slate-600";
     }
   };
 
   const getCategoryColor = (category: string) => {
     switch (category) {
-      case "financial": return "bg-[#0073ea] text-white";
-      case "operational": return "bg-[#00c875] text-white";
-      case "clinical": return "bg-[#a25ddc] text-white";
-      case "patient": return "bg-[#fdab3d] text-white";
-      case "staff": return "bg-[#6366f1] text-white";
-      default: return "bg-[#676879] text-white";
+      case "financial": return "bg-primary-500 text-white";
+      case "operational": return "bg-success-500 text-white";
+      case "clinical": return "bg-purple-500 text-white";
+      case "patient": return "bg-warning-500 text-white";
+      case "staff": return "bg-indigo-500 text-white";
+      default: return "bg-graphite-500 dark:bg-slate-600 text-white";
     }
   };
 
@@ -150,13 +150,13 @@ export const AnalyticsReporting = () => {
 
   if (!institution) {
     return (
-      <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 flex items-center justify-center p-6">
+      <div className="min-h-screen bg-canvas dark:bg-slate-950 flex items-center justify-center p-6">
         <Card className="max-w-md w-full">
           <CardContent className="p-8 text-center space-y-4">
-            <Building2 className="h-12 w-12 mx-auto text-[#0073ea]" />
+            <Building2 className="h-12 w-12 mx-auto text-primary-500" />
             <h2 className="text-xl font-extrabold">Institution Required</h2>
-            <p className="text-xs text-[#676879]">Please select an institution to access analytics and reporting.</p>
-            <Button onClick={() => navigate("/institution-portal")} className="bg-[#0073ea] hover:bg-[#0056b3]">
+            <p className="text-xs text-graphite-500 dark:text-slate-400">Please select an institution to access analytics and reporting.</p>
+            <Button onClick={() => navigate("/institution-portal")} className="bg-primary-500 hover:bg-primary-600">
               Go to Institution Portal
             </Button>
           </CardContent>
@@ -216,23 +216,23 @@ export const AnalyticsReporting = () => {
   const hasChartData = reports.length > 0;
 
   return (
-    <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pb-16">
+    <div className="min-h-screen bg-canvas dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pb-16">
       {/* Header */}
-      <div className="bg-white dark:bg-slate-900 border-b border-[#e6e9ef] dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
+      <div className="bg-white dark:bg-slate-900 border-b border-canvas-silk dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
         <div className="max-w-[1600px] mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-[#0073ea] text-white flex items-center justify-center shadow-xs">
+            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-xs">
               <BarChart3 className="h-5 w-5" />
             </div>
             <div>
               <h1 className="text-xl font-extrabold">Analytics & Reporting</h1>
-              <p className="text-xs text-[#676879] font-medium">Business Intelligence & Custom Reports</p>
+              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">Business Intelligence & Custom Reports</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <Dialog open={showReportDialog} onOpenChange={setShowReportDialog}>
               <DialogTrigger asChild>
-                <Button className="bg-[#0073ea] hover:bg-[#0056b3] text-white font-bold text-xs flex items-center gap-2">
+                <Button className="bg-primary-500 hover:bg-primary-600 text-white font-bold text-xs flex items-center gap-2">
                   <FileText className="h-4 w-4" /> Generate Report
                 </Button>
               </DialogTrigger>
@@ -337,7 +337,7 @@ export const AnalyticsReporting = () => {
                       </div>
                     )}
                   </div>
-                  <Button onClick={handleGenerateReport} className="w-full bg-[#0073ea] hover:bg-[#0056b3] text-white font-bold">
+                  <Button onClick={handleGenerateReport} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold">
                     Generate Report
                   </Button>
                 </div>
@@ -350,60 +350,60 @@ export const AnalyticsReporting = () => {
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 pt-6">
         {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-[#676879] uppercase">Total Reports</span>
-                <FileText className="h-4 w-4 text-[#0073ea]" />
+                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Total Reports</span>
+                <FileText className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-[#0073ea]">{totalReports}</div>
-              <div className="text-[10px] text-[#676879] font-bold mt-0.5">All time</div>
+              <div className="text-2xl font-black font-mono text-primary-500">{totalReports}</div>
+              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">All time</div>
             </CardContent>
           </Card>
-          <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-[#676879] uppercase">Scheduled</span>
-                <Calendar className="h-4 w-4 text-[#a25ddc]" />
+                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Scheduled</span>
+                <Calendar className="h-4 w-4 text-purple-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-[#a25ddc]">{scheduledReports}</div>
-              <div className="text-[10px] text-[#676879] font-bold mt-0.5">Auto-generated</div>
+              <div className="text-2xl font-black font-mono text-purple-500">{scheduledReports}</div>
+              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Auto-generated</div>
             </CardContent>
           </Card>
-          <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-[#676879] uppercase">Financial Reports</span>
-                <DollarSign className="h-4 w-4 text-[#00c875]" />
+                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Financial Reports</span>
+                <DollarSign className="h-4 w-4 text-success-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-[#00c875]">{financialReports}</div>
-              <div className="text-[10px] text-[#676879] font-bold mt-0.5">Revenue & costs</div>
+              <div className="text-2xl font-black font-mono text-success-500">{financialReports}</div>
+              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Revenue & costs</div>
             </CardContent>
           </Card>
-          <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-[#676879] uppercase">Recent (7d)</span>
-                <Clock className="h-4 w-4 text-[#fdab3d]" />
+                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Recent (7d)</span>
+                <Clock className="h-4 w-4 text-warning-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-[#fdab3d]">{recentReports}</div>
-              <div className="text-[10px] text-[#676879] font-bold mt-0.5">Generated this week</div>
+              <div className="text-2xl font-black font-mono text-warning-500">{recentReports}</div>
+              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Generated this week</div>
             </CardContent>
           </Card>
         </div>
 
         <Tabs defaultValue="dashboard" className="space-y-6">
-          <TabsList className="bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 p-1">
-            <TabsTrigger value="dashboard" className="data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">
+          <TabsList className="bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 p-1">
+            <TabsTrigger value="dashboard" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <BarChart3 className="h-4 w-4 mr-2" /> Dashboard
             </TabsTrigger>
-            <TabsTrigger value="reports" className="data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">
+            <TabsTrigger value="reports" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <FileText className="h-4 w-4 mr-2" /> Reports
             </TabsTrigger>
-            <TabsTrigger value="financial" className="data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">
+            <TabsTrigger value="financial" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <DollarSign className="h-4 w-4 mr-2" /> Financial Analytics
             </TabsTrigger>
-            <TabsTrigger value="operational" className="data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">
+            <TabsTrigger value="operational" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <Activity className="h-4 w-4 mr-2" /> Operational Analytics
             </TabsTrigger>
           </TabsList>
@@ -411,11 +411,11 @@ export const AnalyticsReporting = () => {
           {/* Dashboard Tab */}
           <TabsContent value="dashboard" className="space-y-4">
             {!hasChartData ? (
-              <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+              <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                 <CardContent className="p-8 text-center space-y-2">
-                  <BarChart3 className="h-8 w-8 mx-auto text-[#0073ea]" />
+                  <BarChart3 className="h-8 w-8 mx-auto text-primary-500" />
                   <p className="text-sm font-extrabold">No analytics yet</p>
-                  <p className="text-xs text-[#676879]">
+                  <p className="text-xs text-graphite-500 dark:text-slate-400">
                     Generate your first report to populate revenue, category, and activity trends.
                   </p>
                 </CardContent>
@@ -423,10 +423,10 @@ export const AnalyticsReporting = () => {
             ) : (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+                  <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                     <CardHeader>
                       <CardTitle className="text-sm font-extrabold flex items-center gap-2">
-                        <TrendingUp className="h-4 w-4 text-[#0073ea]" /> Reports Over Time
+                        <TrendingUp className="h-4 w-4 text-primary-500" /> Reports Over Time
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -443,10 +443,10 @@ export const AnalyticsReporting = () => {
                       </div>
                     </CardContent>
                   </Card>
-                  <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+                  <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                     <CardHeader>
                       <CardTitle className="text-sm font-extrabold flex items-center gap-2">
-                        <Users className="h-4 w-4 text-[#00c875]" /> Reports by Type
+                        <Users className="h-4 w-4 text-success-500" /> Reports by Type
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -463,10 +463,10 @@ export const AnalyticsReporting = () => {
                       </div>
                     </CardContent>
                   </Card>
-                  <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+                  <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                     <CardHeader>
                       <CardTitle className="text-sm font-extrabold flex items-center gap-2">
-                        <Activity className="h-4 w-4 text-[#a25ddc]" /> Reports by Category
+                        <Activity className="h-4 w-4 text-purple-500" /> Reports by Category
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -489,10 +489,10 @@ export const AnalyticsReporting = () => {
                   </Card>
                 </div>
 
-                <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+                <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                   <CardHeader>
                     <CardTitle className="text-sm font-extrabold flex items-center gap-2">
-                      <PieChart className="h-4 w-4 text-[#0073ea]" /> Category Breakdown
+                      <PieChart className="h-4 w-4 text-primary-500" /> Category Breakdown
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -543,11 +543,11 @@ export const AnalyticsReporting = () => {
             </div>
 
             {reports.length === 0 ? (
-              <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+              <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                 <CardContent className="p-8 text-center space-y-2">
-                  <FileText className="h-8 w-8 mx-auto text-[#0073ea]" />
+                  <FileText className="h-8 w-8 mx-auto text-primary-500" />
                   <p className="text-sm font-extrabold">No reports found</p>
-                  <p className="text-xs text-[#676879]">
+                  <p className="text-xs text-graphite-500 dark:text-slate-400">
                     Generate your first analytics report to see it listed here.
                   </p>
                 </CardContent>
@@ -555,7 +555,7 @@ export const AnalyticsReporting = () => {
             ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {reports.map((report) => (
-                <Card key={report.id} className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+                <Card key={report.id} className="border-canvas-silk dark:border-slate-800 shadow-xs">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
@@ -564,35 +564,35 @@ export const AnalyticsReporting = () => {
                         </div>
                         <div>
                           <CardTitle className="text-sm font-extrabold">{report.report_name}</CardTitle>
-                          <div className="text-[10px] text-[#676879]">
+                          <div className="text-[10px] text-graphite-500 dark:text-slate-400">
                             {new Date(report.generated_at).toLocaleString()}
                           </div>
                         </div>
                       </div>
                       {report.is_scheduled && (
-                        <Badge className="bg-[#a25ddc] text-white text-[10px]">Scheduled</Badge>
+                        <Badge className="bg-purple-500 text-white text-[10px]">Scheduled</Badge>
                       )}
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-[#676879]">Type</span>
+                      <span className="text-graphite-500 dark:text-slate-400">Type</span>
                       <Badge variant="outline" className="text-[10px]">{report.report_type}</Badge>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-[#676879]">Category</span>
+                      <span className="text-graphite-500 dark:text-slate-400">Category</span>
                       <Badge className={getCategoryColor(report.report_category) + " text-[10px]"}>
                         {report.report_category}
                       </Badge>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-[#676879]">Date Range</span>
+                      <span className="text-graphite-500 dark:text-slate-400">Date Range</span>
                       <span className="font-bold">
                         {report.date_range_start ? new Date(report.date_range_start).toLocaleDateString() : "—"} - {report.date_range_end ? new Date(report.date_range_end).toLocaleDateString() : "—"}
                       </span>
                     </div>
-                    <div className="flex items-center justify-between pt-2 border-t border-[#e6e9ef] dark:border-slate-800">
-                      <div className="text-xs text-[#676879]">
+                    <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
+                      <div className="text-xs text-graphite-500 dark:text-slate-400">
                         {(report.recipients || []).length} recipients
                       </div>
                       <div className="flex items-center gap-1">
@@ -614,11 +614,11 @@ export const AnalyticsReporting = () => {
           {/* Financial Analytics Tab */}
           <TabsContent value="financial" className="space-y-4">
             {!hasChartData ? (
-              <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+              <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                 <CardContent className="p-8 text-center space-y-2">
-                  <DollarSign className="h-8 w-8 mx-auto text-[#00c875]" />
+                  <DollarSign className="h-8 w-8 mx-auto text-success-500" />
                   <p className="text-sm font-extrabold">No financial reports yet</p>
-                  <p className="text-xs text-[#676879]">
+                  <p className="text-xs text-graphite-500 dark:text-slate-400">
                     Financial analytics appear here once financial-category reports are generated.
                   </p>
                 </CardContent>
@@ -626,10 +626,10 @@ export const AnalyticsReporting = () => {
             ) : (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+                  <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                     <CardHeader>
                       <CardTitle className="text-sm font-extrabold flex items-center gap-2">
-                        <DollarSign className="h-4 w-4 text-[#0073ea]" /> Reports by Category
+                        <DollarSign className="h-4 w-4 text-primary-500" /> Reports by Category
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -646,10 +646,10 @@ export const AnalyticsReporting = () => {
                       </div>
                     </CardContent>
                   </Card>
-                  <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+                  <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                     <CardHeader>
                       <CardTitle className="text-sm font-extrabold flex items-center gap-2">
-                        <TrendingUp className="h-4 w-4 text-[#0073ea]" /> Scheduled vs Ad-hoc
+                        <TrendingUp className="h-4 w-4 text-primary-500" /> Scheduled vs Ad-hoc
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -673,10 +673,10 @@ export const AnalyticsReporting = () => {
                   </Card>
                 </div>
 
-                <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+                <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                   <CardHeader>
                     <CardTitle className="text-sm font-extrabold flex items-center gap-2">
-                      <LineChart className="h-4 w-4 text-[#0073ea]" /> Reporting Activity Trend
+                      <LineChart className="h-4 w-4 text-primary-500" /> Reporting Activity Trend
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -700,11 +700,11 @@ export const AnalyticsReporting = () => {
           {/* Operational Analytics Tab */}
           <TabsContent value="operational" className="space-y-4">
             {!hasChartData ? (
-              <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+              <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                 <CardContent className="p-8 text-center space-y-2">
-                  <Activity className="h-8 w-8 mx-auto text-[#0073ea]" />
+                  <Activity className="h-8 w-8 mx-auto text-primary-500" />
                   <p className="text-sm font-extrabold">No operational data yet</p>
-                  <p className="text-xs text-[#676879]">
+                  <p className="text-xs text-graphite-500 dark:text-slate-400">
                     Operational analytics appear here once reports are generated for this institution.
                   </p>
                 </CardContent>
@@ -712,10 +712,10 @@ export const AnalyticsReporting = () => {
             ) : (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+                  <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                     <CardHeader>
                       <CardTitle className="text-sm font-extrabold flex items-center gap-2">
-                        <Activity className="h-4 w-4 text-[#0073ea]" /> Reporting Cadence
+                        <Activity className="h-4 w-4 text-primary-500" /> Reporting Cadence
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -732,10 +732,10 @@ export const AnalyticsReporting = () => {
                       </div>
                     </CardContent>
                   </Card>
-                  <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+                  <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                     <CardHeader>
                       <CardTitle className="text-sm font-extrabold flex items-center gap-2">
-                        <Users className="h-4 w-4 text-[#0073ea]" /> Reports by Type
+                        <Users className="h-4 w-4 text-primary-500" /> Reports by Type
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -754,10 +754,10 @@ export const AnalyticsReporting = () => {
                   </Card>
                 </div>
 
-                <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+                <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                   <CardHeader>
                     <CardTitle className="text-sm font-extrabold flex items-center gap-2">
-                      <Clock className="h-4 w-4 text-[#0073ea]" /> Recent Activity (last 12 weeks)
+                      <Clock className="h-4 w-4 text-primary-500" /> Recent Activity (last 12 weeks)
                     </CardTitle>
                   </CardHeader>
                   <CardContent>

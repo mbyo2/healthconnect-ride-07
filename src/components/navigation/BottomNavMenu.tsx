@@ -51,15 +51,15 @@ export function BottomNavMenu({ user, menuItems }: BottomNavMenuProps) {
 
       <SheetContent
         side="right"
-        className="w-[82vw] max-w-sm bg-white dark:bg-slate-900 border-l border-[#e6e9ef] dark:border-slate-800 flex flex-col h-full p-0"
+        className="w-[82vw] max-w-sm bg-white dark:bg-slate-900 border-l border-canvas-silk dark:border-slate-800 flex flex-col h-full p-0"
       >
         <SheetHeader className="pb-0 flex-shrink-0 px-5 pt-6">
           <SheetTitle className="text-xl font-black text-slate-900 dark:text-slate-100 tracking-tight">Menu</SheetTitle>
           {user && (
-            <div className="flex items-center gap-3 mt-4 py-3.5 px-4 bg-[#f5f7fa] dark:bg-slate-800 rounded-3xl border border-[#e6e9ef] dark:border-slate-700">
-              <Avatar className="h-11 w-11 ring-2 ring-[#0073ea]/30 ring-offset-1 ring-offset-[#f5f7fa] dark:ring-offset-slate-800">
+            <div className="flex items-center gap-3 mt-4 py-3.5 px-4 bg-canvas-bone dark:bg-slate-800 rounded-3xl border border-canvas-silk dark:border-slate-700">
+              <Avatar className="h-11 w-11 ring-2 ring-primary-500/30 ring-offset-1 ring-offset-canvas-bone dark:ring-offset-slate-800">
                 <AvatarImage src={user?.user_metadata?.avatar_url || ""} />
-                <AvatarFallback className="bg-[#e5f0ff] dark:bg-blue-950 text-[#0073ea] dark:text-blue-400 font-extrabold text-sm">
+                <AvatarFallback className="bg-primary-50 dark:bg-blue-950 text-primary-500 dark:text-blue-400 font-extrabold text-sm">
                   {user?.email?.[0]?.toUpperCase() || "U"}
                 </AvatarFallback>
               </Avatar>
@@ -79,13 +79,13 @@ export function BottomNavMenu({ user, menuItems }: BottomNavMenuProps) {
               <SheetClose key={idx} asChild>
                 <Link
                   to={item.to}
-                  className="flex items-center gap-3.5 w-full p-3.5 rounded-2xl hover:bg-[#f0f4ff] dark:hover:bg-slate-800 transition-all group"
+                  className="flex items-center gap-3.5 w-full p-3.5 rounded-2xl hover:bg-primary-50 dark:hover:bg-slate-800 transition-all group"
                 >
-                  <div className="p-2.5 rounded-xl bg-[#e5f0ff] dark:bg-blue-950/60 text-[#0073ea] dark:text-blue-400 group-hover:bg-[#0073ea] group-hover:text-white transition-all shrink-0">
+                  <div className="p-2.5 rounded-xl bg-primary-50 dark:bg-blue-950/60 text-primary-500 dark:text-blue-400 group-hover:bg-primary-500 group-hover:text-white transition-all shrink-0">
                     {item.icon}
                   </div>
                   <div className="flex flex-col min-w-0">
-                    <span className="text-sm font-extrabold text-slate-900 dark:text-slate-100 group-hover:text-[#0073ea] transition-colors">{item.label}</span>
+                    <span className="text-sm font-extrabold text-slate-900 dark:text-slate-100 group-hover:text-primary-500 transition-colors">{item.label}</span>
                     <span className="text-xs text-slate-400 dark:text-slate-500 truncate font-medium">{item.description}</span>
                   </div>
                 </Link>

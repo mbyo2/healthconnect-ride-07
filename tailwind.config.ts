@@ -46,11 +46,14 @@ export default {
         '20': '5rem',
       },
       colors: {
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
+        // NOTE: every var-based token carries "<alpha-value>" so opacity
+        // modifiers (bg-muted/50, border-destructive/20, …) actually render.
+        // Without it Tailwind v3 silently drops those classes app-wide.
+        border: "hsl(var(--border) / <alpha-value>)",
+        input: "hsl(var(--input) / <alpha-value>)",
+        ring: "hsl(var(--ring) / <alpha-value>)",
+        background: "hsl(var(--background) / <alpha-value>)",
+        foreground: "hsl(var(--foreground) / <alpha-value>)",
         // Signal Blue — primary actions (Voiceflow-inspired)
         primary: {
           DEFAULT: "#397dff",
@@ -82,24 +85,24 @@ export default {
           900: "#7b2509",
         },
         secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
+          DEFAULT: "hsl(var(--secondary) / <alpha-value>)",
+          foreground: "hsl(var(--secondary-foreground) / <alpha-value>)",
         },
         destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
+          DEFAULT: "hsl(var(--destructive) / <alpha-value>)",
+          foreground: "hsl(var(--destructive-foreground) / <alpha-value>)",
         },
         muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
+          DEFAULT: "hsl(var(--muted) / <alpha-value>)",
+          foreground: "hsl(var(--muted-foreground) / <alpha-value>)",
         },
         popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
+          DEFAULT: "hsl(var(--popover) / <alpha-value>)",
+          foreground: "hsl(var(--popover-foreground) / <alpha-value>)",
         },
         card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
+          DEFAULT: "hsl(var(--card) / <alpha-value>)",
+          foreground: "hsl(var(--card-foreground) / <alpha-value>)",
         },
         // Editorial neutrals (Voiceflow graphite scale) - Updated for better contrast
         graphite: {
@@ -115,14 +118,17 @@ export default {
           900: "#0c0a09",
           950: "#000000",
         },
+        // Adaptive surfaces + ink: light values in :root, dark values
+        // under .dark (see index.css). Every bg-canvas/text-midnight usage
+        // across the app follows automatically — no per-file dark: needed.
         canvas: {
-          DEFAULT: "#ffffff",
-          bone: "#f5f5f4",
-          mist: "#edeeee",
-          silk: "#e5e5e5",
+          DEFAULT: "hsl(var(--canvas) / <alpha-value>)",
+          bone: "hsl(var(--canvas-bone) / <alpha-value>)",
+          mist: "hsl(var(--canvas-mist) / <alpha-value>)",
+          silk: "hsl(var(--canvas-silk) / <alpha-value>)",
         },
-        midnight: "#171717",
-        charcoal: "#262626",
+        midnight: "hsl(var(--midnight) / <alpha-value>)",
+        charcoal: "hsl(var(--charcoal) / <alpha-value>)",
         slate: {
           50: "#F8FAFC",
           100: "#F1F5F9",
@@ -136,12 +142,38 @@ export default {
           900: "#0F172A",
         },
         success: {
+          DEFAULT: "#22C55E",
           50: "#F0FDF4",
           100: "#DCFCE7",
           200: "#BBF7D0",
           300: "#86EFAC",
           400: "#4ADE80",
           500: "#22C55E",
+          600: "#16A34A",
+          700: "#15803D",
+        },
+        // Aliased to destructive hues — used across pills, trends, errors
+        error: {
+          DEFAULT: "#E2445C",
+          50: "#FEF2F2",
+          100: "#FEE2E2",
+          200: "#FECACA",
+          300: "#FCA5A5",
+          400: "#F87171",
+          500: "#E2445C",
+          600: "#DC2626",
+          700: "#B91C1C",
+        },
+        warning: {
+          DEFAULT: "#F59E0B",
+          50: "#FFFBEB",
+          100: "#FEF3C7",
+          200: "#FDE68A",
+          300: "#FCD34D",
+          400: "#FBBF24",
+          500: "#F59E0B",
+          600: "#D97706",
+          700: "#B45309",
         },
         alert: {
           50: "#FEF2F2",
@@ -228,6 +260,10 @@ export default {
         'hero-wash': 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(57,125,255,0.08), transparent 60%), radial-gradient(ellipse 50% 40% at 90% 20%, rgba(245,92,21,0.06), transparent 50%)',
       },
       boxShadow: {
+        // v3 has no xs/2xs scale — define them so the hundreds of
+        // `shadow-xs` usages across the app actually render.
+        '2xs': '0 1px 2px rgba(16, 24, 40, 0.04)',
+        'xs': '0 1px 3px rgba(16, 24, 40, 0.06)',
         'card': '0 10px 40px rgba(0, 0, 0, 0.04)',
         'card-hover': '0 20px 60px rgba(0, 0, 0, 0.08)',
         'button': '0 1px 2px 0 rgba(0, 0, 0, 0.05)',

@@ -9,15 +9,15 @@ export const StatusBadge = ({ status, variant = "default" }: StatusBadgeProps) =
   const getBadgeClass = () => {
     switch (variant) {
       case "success":
-        return "bg-[#00c875] text-white";
+        return "bg-success-500 text-white";
       case "warning":
-        return "bg-[#fdab3d] text-white";
+        return "bg-warning-500 text-white";
       case "error":
-        return "bg-[#e44258] text-white";
+        return "bg-error-500 text-white";
       case "info":
-        return "bg-[#0073ea] text-white";
+        return "bg-primary-500 text-white";
       default:
-        return "bg-[#676879] text-white";
+        return "bg-graphite-500 dark:bg-slate-600 text-white";
     }
   };
 

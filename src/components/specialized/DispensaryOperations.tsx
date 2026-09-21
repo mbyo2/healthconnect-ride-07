@@ -150,7 +150,7 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
   return (
     <div className="space-y-6 font-sans text-slate-900 dark:text-slate-100">
       {/* Header Banner */}
-      <div className="p-6 rounded-3xl bg-gradient-to-r from-emerald-600 to-[#0f172a] text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="p-6 rounded-3xl bg-gradient-to-r from-emerald-600 to-slate-900 text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
           <div className="h-12 w-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center font-black text-xl border border-white/20">
             <Pill className="h-6 w-6 text-white" />
@@ -186,7 +186,7 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
                 placeholder="Search essential medicine, category, or batch number..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-[#c3c6d4] dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-medium focus:outline-none focus:border-[#0073ea]"
+                className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-graphite-300 dark:border-slate-700 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-medium focus:outline-none focus:border-primary-500"
               />
             </div>
           </div>
@@ -195,7 +195,7 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
             {filteredStock.map((item) => (
               <div
                 key={item.id}
-                className="p-4 rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs hover:border-[#0073ea] transition-all flex flex-col justify-between"
+                className="p-4 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs hover:border-primary-500 transition-all flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-center justify-between mb-1">
@@ -217,7 +217,7 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between mt-3 pt-3 border-t border-[#e6e9ef] dark:border-slate-800">
+                <div className="flex items-center justify-between mt-3 pt-3 border-t border-canvas-silk dark:border-slate-800">
                   <div>
                     <span className="text-xs font-black text-slate-900 dark:text-slate-100">K{item.unitPrice.toFixed(2)}</span>
                     <span className="text-[10px] text-slate-400 block">{item.stock} in stock</span>
@@ -236,8 +236,8 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
         </div>
 
         {/* Right Column: POS Dispensing Cart */}
-        <div className="p-5 rounded-3xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs space-y-4 text-xs h-fit sticky top-24">
-          <div className="flex items-center justify-between border-b border-[#e6e9ef] dark:border-slate-800 pb-3">
+        <div className="p-5 rounded-3xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs space-y-4 text-xs h-fit sticky top-24">
+          <div className="flex items-center justify-between border-b border-canvas-silk dark:border-slate-800 pb-3">
             <h3 className="font-black text-sm text-slate-900 dark:text-slate-100 flex items-center gap-2">
               <ShoppingBag className="h-4 w-4 text-emerald-600" /> Dispensing Order Cart
             </h3>
@@ -251,7 +251,7 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
             <div>
               <label className="font-bold text-slate-700 dark:text-slate-300">Customer / Patient Name</label>
               <input
-                className="w-full mt-1 px-3 py-1.5 rounded-xl border border-[#c3c6d4] font-medium"
+                className="w-full mt-1 px-3 py-1.5 rounded-xl border border-graphite-300 dark:border-slate-700 font-medium"
                 placeholder="Walk-in Customer"
                 value={customerName}
                 onChange={(e) => setCustomerName(e.target.value)}
@@ -262,7 +262,7 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
               <select
                 value={paymentMethod}
                 onChange={(e) => setPaymentMethod(e.target.value as any)}
-                className="w-full mt-1 px-3 py-1.5 rounded-xl border border-[#c3c6d4] font-bold bg-white dark:bg-slate-950"
+                className="w-full mt-1 px-3 py-1.5 rounded-xl border border-graphite-300 dark:border-slate-700 font-bold bg-white dark:bg-slate-950"
               >
                 <option value="mobile_money">📱 Mobile Money (MTN / Airtel / Zamtel)</option>
                 <option value="cash">💵 Cash at Counter</option>
@@ -279,7 +279,7 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
               </div>
             ) : (
               cart.map((c) => (
-                <div key={c.item.id} className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-[#e6e9ef] flex items-center justify-between">
+                <div key={c.item.id} className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-canvas-silk flex items-center justify-between">
                   <div className="max-w-[130px]">
                     <div className="font-bold truncate">{c.item.name}</div>
                     <div className="text-[10px] text-slate-400">K{c.item.unitPrice.toFixed(2)} each</div>
@@ -301,7 +301,7 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
                     </button>
                   </div>
 
-                  <div className="text-right font-black text-[#0073ea]">
+                  <div className="text-right font-black text-primary-500">
                     K{(c.item.unitPrice * c.qty).toFixed(2)}
                   </div>
                 </div>
@@ -310,7 +310,7 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
           </div>
 
           {/* Subtotal & Checkout button */}
-          <div className="pt-3 border-t border-[#e6e9ef] dark:border-slate-800 space-y-3">
+          <div className="pt-3 border-t border-canvas-silk dark:border-slate-800 space-y-3">
             <div className="flex justify-between text-sm font-black">
               <span>Total Payable:</span>
               <span className="text-emerald-600 text-base font-black">K{subtotal.toFixed(2)}</span>

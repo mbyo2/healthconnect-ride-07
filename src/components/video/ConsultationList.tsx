@@ -1,4 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,22 @@ const JOINABLE_STATUSES = ["scheduled", "in-progress"];
 
 export const ConsultationList = ({ onJoinMeeting }: ConsultationListProps) => {
   const isMobile = useMediaQuery('(max-width: 768px)');
+  const queryClient = useQueryClient();
+
+  // Visit going live / cancelled elsewhere reflects here instantly.
+  useEffect(() => {
+    const channel = supabase
+      .channel('video-consultations-live')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'video_consultations' },
+        () => queryClient.invalidateQueries({ queryKey: ['video-consultations'] })
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
 
   const { data, isLoading } = useQuery({
     queryKey: ['video-consultations'],

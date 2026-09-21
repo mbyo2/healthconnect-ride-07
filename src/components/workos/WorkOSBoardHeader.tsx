@@ -74,7 +74,7 @@ export const WorkOSBoardHeader: React.FC<WorkOSBoardHeaderProps> = ({
       <div className="px-4 sm:px-6 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
         {/* Title & Brand Icon */}
         <div className="flex items-start gap-3">
-          <div className="h-11 w-11 rounded-2xl bg-gradient-to-br from-[#0073ea] via-[#a25ddc] to-[#00c875] p-0.5 shadow-md flex items-center justify-center text-white flex-shrink-0">
+          <div className="h-11 w-11 rounded-2xl bg-gradient-to-br from-primary-500 via-purple-500 to-success-500 p-0.5 shadow-md flex items-center justify-center text-white flex-shrink-0">
             <div className="w-full h-full bg-slate-950/20 backdrop-blur-sm rounded-[14px] flex items-center justify-center">
               <Activity className="h-6 w-6 text-white animate-pulse" />
             </div>
@@ -83,7 +83,7 @@ export const WorkOSBoardHeader: React.FC<WorkOSBoardHeaderProps> = ({
             <div className="flex items-center gap-2.5 flex-wrap">
               <h1 className="text-xl sm:text-2xl font-black tracking-tight font-sans flex items-center gap-2">
                 <span>{boardTitle}</span>
-                <span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/10 text-[#0073ea] font-mono font-bold border border-blue-500/20">
+                <span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/10 text-primary-500 font-mono font-bold border border-blue-500/20">
                   CRM Board
                 </span>
               </h1>
@@ -127,7 +127,7 @@ export const WorkOSBoardHeader: React.FC<WorkOSBoardHeaderProps> = ({
           {/* New Patient Intake Split-Button */}
           <button
             onClick={onAddNewItem}
-            className="flex items-center gap-2 px-4 py-2 bg-[#0073ea] hover:bg-blue-600 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md transition-all active:scale-[0.98]"
+            className="flex items-center gap-2 px-4 py-2 bg-primary-500 hover:bg-blue-600 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md transition-all active:scale-[0.98]"
           >
             <Plus className="h-4 w-4" />
             <span>New Patient</span>
@@ -152,7 +152,7 @@ export const WorkOSBoardHeader: React.FC<WorkOSBoardHeaderProps> = ({
             onClick={() => onViewChange("table")}
             className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               currentView === "table"
-                ? "bg-[#0073ea] text-white shadow-sm font-bold"
+                ? "bg-primary-500 text-white shadow-sm font-bold"
                 : isDarkMode ? "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50" : "text-slate-600 hover:text-slate-900 hover:bg-white"
             }`}
           >
@@ -164,7 +164,7 @@ export const WorkOSBoardHeader: React.FC<WorkOSBoardHeaderProps> = ({
             onClick={() => onViewChange("kanban")}
             className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               currentView === "kanban"
-                ? "bg-[#0073ea] text-white shadow-sm font-bold"
+                ? "bg-primary-500 text-white shadow-sm font-bold"
                 : isDarkMode ? "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50" : "text-slate-600 hover:text-slate-900 hover:bg-white"
             }`}
           >
@@ -176,7 +176,7 @@ export const WorkOSBoardHeader: React.FC<WorkOSBoardHeaderProps> = ({
             onClick={() => onViewChange("timeline")}
             className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               currentView === "timeline"
-                ? "bg-[#0073ea] text-white shadow-sm font-bold"
+                ? "bg-primary-500 text-white shadow-sm font-bold"
                 : isDarkMode ? "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50" : "text-slate-600 hover:text-slate-900 hover:bg-white"
             }`}
           >
@@ -188,7 +188,7 @@ export const WorkOSBoardHeader: React.FC<WorkOSBoardHeaderProps> = ({
             onClick={() => onViewChange("funnel")}
             className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               currentView === "funnel"
-                ? "bg-[#0073ea] text-white shadow-sm font-bold"
+                ? "bg-primary-500 text-white shadow-sm font-bold"
                 : isDarkMode ? "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50" : "text-slate-600 hover:text-slate-900 hover:bg-white"
             }`}
           >
@@ -200,7 +200,7 @@ export const WorkOSBoardHeader: React.FC<WorkOSBoardHeaderProps> = ({
             onClick={() => onViewChange("widgets")}
             className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               currentView === "widgets"
-                ? "bg-[#0073ea] text-white shadow-sm font-bold"
+                ? "bg-primary-500 text-white shadow-sm font-bold"
                 : isDarkMode ? "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50" : "text-slate-600 hover:text-slate-900 hover:bg-white"
             }`}
           >

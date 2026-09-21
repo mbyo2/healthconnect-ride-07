@@ -26,7 +26,7 @@ interface WorkOSWidgetsGridProps {
 
 export const WorkOSWidgetsGrid: React.FC<WorkOSWidgetsGridProps> = ({ isDarkMode, stats }) => {
   return (
-    <div className={`p-4 sm:p-6 space-y-6 transition-colors ${isDarkMode ? "bg-slate-950 text-slate-100" : "bg-[#f5f6f8] text-slate-900"}`}>
+    <div className={`p-4 sm:p-6 space-y-6 transition-colors ${isDarkMode ? "bg-slate-950 text-slate-100" : "bg-canvas text-slate-900"}`}>
       {/* Bento Top Metrics Summary Strip */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Metric 1: ICU Occupancy */}

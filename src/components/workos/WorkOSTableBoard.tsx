@@ -54,29 +54,29 @@ interface WorkOSTableBoardProps {
 
 export const WORKOS_STATUS_CONFIG: Record<PatientStatus, { bg: string; text: string; shadow: string }> = {
   "Done": {
-    bg: "bg-[#00c875]",
+    bg: "bg-success-500",
     text: "text-white font-bold",
-    shadow: "shadow-sm shadow-[#00c875]/30",
+    shadow: "shadow-sm shadow-success-500/30",
   },
   "In Progress": {
-    bg: "bg-[#fdab3d]",
+    bg: "bg-warning-500",
     text: "text-white font-bold",
-    shadow: "shadow-sm shadow-[#fdab3d]/30",
+    shadow: "shadow-sm shadow-warning-500/30",
   },
   "Stuck / Critical": {
-    bg: "bg-[#e2445c]",
+    bg: "bg-error-500",
     text: "text-white font-bold",
-    shadow: "shadow-sm shadow-[#e2445c]/30 animate-pulse",
+    shadow: "shadow-sm shadow-error-500/30 animate-pulse",
   },
   "Under Review": {
-    bg: "bg-[#a25ddc]",
+    bg: "bg-purple-500",
     text: "text-white font-bold",
-    shadow: "shadow-sm shadow-[#a25ddc]/30",
+    shadow: "shadow-sm shadow-purple-500/30",
   },
   "Scheduled": {
-    bg: "bg-[#579bfc]",
+    bg: "bg-primary-400",
     text: "text-white font-bold",
-    shadow: "shadow-sm shadow-[#579bfc]/30",
+    shadow: "shadow-sm shadow-primary-400/30",
   },
 };
 
@@ -114,7 +114,7 @@ export const WorkOSTableBoard: React.FC<WorkOSTableBoardProps> = ({
   };
 
   return (
-    <div className={`w-full overflow-x-auto p-4 sm:p-6 transition-colors ${isDarkMode ? "bg-slate-950 text-slate-100" : "bg-[#f5f6f8] text-slate-900"}`}>
+    <div className={`w-full overflow-x-auto p-4 sm:p-6 transition-colors ${isDarkMode ? "bg-slate-950 text-slate-100" : "bg-canvas text-slate-900"}`}>
       <div className="min-w-[1100px] space-y-6">
         {groupNames.map((groupName) => {
           const groupPatients = patients.filter((p) => p.groupName === groupName);
@@ -387,28 +387,28 @@ export const WorkOSTableBoard: React.FC<WorkOSTableBoardProps> = ({
                           {doneCount > 0 && (
                             <div
                               style={{ width: `${(doneCount / groupPatients.length) * 100}%` }}
-                              className="h-full bg-[#00c875] first:rounded-l-[3px] last:rounded-r-[3px]"
+                              className="h-full bg-success-500 first:rounded-l-[3px] last:rounded-r-[3px]"
                               title={`Done: ${doneCount} (${Math.round((doneCount / groupPatients.length) * 100)}%)`}
                             />
                           )}
                           {inProgressCount > 0 && (
                             <div
                               style={{ width: `${(inProgressCount / groupPatients.length) * 100}%` }}
-                              className="h-full bg-[#fdab3d] first:rounded-l-[3px] last:rounded-r-[3px]"
+                              className="h-full bg-warning-500 first:rounded-l-[3px] last:rounded-r-[3px]"
                               title={`In Progress: ${inProgressCount} (${Math.round((inProgressCount / groupPatients.length) * 100)}%)`}
                             />
                           )}
                           {stuckCount > 0 && (
                             <div
                               style={{ width: `${(stuckCount / groupPatients.length) * 100}%` }}
-                              className="h-full bg-[#e2445c] first:rounded-l-[3px] last:rounded-r-[3px]"
+                              className="h-full bg-error-500 first:rounded-l-[3px] last:rounded-r-[3px]"
                               title={`Stuck / Critical: ${stuckCount} (${Math.round((stuckCount / groupPatients.length) * 100)}%)`}
                             />
                           )}
                           {groupPatients.length - doneCount - inProgressCount - stuckCount > 0 && (
                             <div
                               style={{ width: `${((groupPatients.length - doneCount - inProgressCount - stuckCount) / groupPatients.length) * 100}%` }}
-                              className="h-full bg-[#579bfc] first:rounded-l-[3px] last:rounded-r-[3px]"
+                              className="h-full bg-primary-400 first:rounded-l-[3px] last:rounded-r-[3px]"
                               title={`Scheduled / Review: ${groupPatients.length - doneCount - inProgressCount - stuckCount}`}
                             />
                           )}

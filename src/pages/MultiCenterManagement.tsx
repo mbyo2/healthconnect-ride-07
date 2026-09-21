@@ -165,23 +165,23 @@ export const MultiCenterManagement = () => {
   if (loading) return <LoadingScreen />;
 
   return (
-    <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pb-16">
+    <div className="min-h-screen bg-canvas dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pb-16">
       {/* Header */}
-      <div className="bg-white dark:bg-slate-900 border-b border-[#e6e9ef] dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
+      <div className="bg-white dark:bg-slate-900 border-b border-canvas-silk dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
         <div className="max-w-[1600px] mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-[#0073ea] text-white flex items-center justify-center shadow-xs">
+            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-xs">
               <Network className="h-5 w-5" />
             </div>
             <div>
               <h1 className="text-xl font-extrabold">Multi-Center Management</h1>
-              <p className="text-xs text-[#676879] font-medium">Network Administration & Cross-Institution Operations</p>
+              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">Network Administration & Cross-Institution Operations</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
               <DialogTrigger asChild>
-                <Button className="bg-[#0073ea] hover:bg-[#0056b3] text-white font-bold text-xs flex items-center gap-2">
+                <Button className="bg-primary-500 hover:bg-primary-600 text-white font-bold text-xs flex items-center gap-2">
                   <Plus className="h-4 w-4" /> Create Network
                 </Button>
               </DialogTrigger>
@@ -235,7 +235,7 @@ export const MultiCenterManagement = () => {
                       />
                     </div>
                   </div>
-                  <Button onClick={handleCreateNetwork} className="w-full bg-[#0073ea] hover:bg-[#0056b3] text-white font-bold">
+                  <Button onClick={handleCreateNetwork} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold">
                     Create Network
                   </Button>
                 </div>
@@ -247,17 +247,17 @@ export const MultiCenterManagement = () => {
 
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 pt-6">
         <Tabs defaultValue="networks" className="space-y-6">
-          <TabsList className="bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 p-1">
-            <TabsTrigger value="networks" className="data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">
+          <TabsList className="bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 p-1">
+            <TabsTrigger value="networks" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <Network className="h-4 w-4 mr-2" /> Networks
             </TabsTrigger>
-            <TabsTrigger value="members" className="data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">
+            <TabsTrigger value="members" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <Users className="h-4 w-4 mr-2" /> Members
             </TabsTrigger>
-            <TabsTrigger value="countries" className="data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">
+            <TabsTrigger value="countries" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <Globe className="h-4 w-4 mr-2" /> Countries
             </TabsTrigger>
-            <TabsTrigger value="billing" className="data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">
+            <TabsTrigger value="billing" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <DollarSign className="h-4 w-4 mr-2" /> Cross-Billing
             </TabsTrigger>
           </TabsList>
@@ -266,11 +266,11 @@ export const MultiCenterManagement = () => {
           <TabsContent value="networks" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {networks.map((network) => (
-                <Card key={network.id} className="border-[#e6e9ef] dark:border-slate-800 shadow-xs hover:shadow-md transition-shadow">
+                <Card key={network.id} className="border-canvas-silk dark:border-slate-800 shadow-xs hover:shadow-md transition-shadow">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-xl bg-[#0073ea] text-white flex items-center justify-center">
+                        <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center">
                           <Building2 className="h-5 w-5" />
                         </div>
                         <div>
@@ -292,23 +292,23 @@ export const MultiCenterManagement = () => {
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-[#676879]">Institutions</span>
+                      <span className="text-graphite-500 dark:text-slate-400">Institutions</span>
                       <span className="font-bold">
                         {members.filter((m) => m.network_id === network.id).length}
                       </span>
                     </div>
                     <div className="flex items-center gap-2 text-xs">
                       {network.centralized_pricing && (
-                        <Badge className="bg-[#00c875] text-white">Central Pricing</Badge>
+                        <Badge className="bg-success-500 text-white">Central Pricing</Badge>
                       )}
                       {network.centralized_inventory && (
-                        <Badge className="bg-[#a25ddc] text-white">Central Inventory</Badge>
+                        <Badge className="bg-purple-500 text-white">Central Inventory</Badge>
                       )}
                       {network.cross_billing_enabled && (
-                        <Badge className="bg-[#fdab3d] text-white">Cross-Billing</Badge>
+                        <Badge className="bg-warning-500 text-white">Cross-Billing</Badge>
                       )}
                     </div>
-                    <div className="pt-2 border-t border-[#e6e9ef] dark:border-slate-800">
+                    <div className="pt-2 border-t border-canvas-silk dark:border-slate-800">
                       <Button
                         variant="outline"
                         size="sm"
@@ -329,9 +329,9 @@ export const MultiCenterManagement = () => {
 
           {/* Members Tab */}
           <TabsContent value="members" className="space-y-4">
-            <div className="rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden">
+            <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden">
               <table className="w-full">
-                <thead className="bg-[#f0f2f7] dark:bg-slate-800">
+                <thead className="bg-canvas-mist dark:bg-slate-800">
                   <tr>
                     <th className="text-left text-xs font-extrabold px-4 py-3">Institution</th>
                     <th className="text-left text-xs font-extrabold px-4 py-3">Network</th>
@@ -344,15 +344,15 @@ export const MultiCenterManagement = () => {
                 </thead>
                 <tbody>
                   {members.map((member) => (
-                    <tr key={member.id} className="border-t border-[#e6e9ef] dark:border-slate-800 hover:bg-[#f8f9fa] dark:hover:bg-slate-800">
+                    <tr key={member.id} className="border-t border-canvas-silk dark:border-slate-800 hover:bg-canvas-bone dark:hover:bg-slate-800">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
-                          <div className="h-8 w-8 rounded-lg bg-[#0073ea] text-white flex items-center justify-center">
+                          <div className="h-8 w-8 rounded-lg bg-primary-500 text-white flex items-center justify-center">
                             <Building2 className="h-4 w-4" />
                           </div>
                           <div>
                             <div className="text-xs font-bold">{member.institution?.name}</div>
-                            <div className="text-[10px] text-[#676879]">{member.institution?.type}</div>
+                            <div className="text-[10px] text-graphite-500 dark:text-slate-400">{member.institution?.type}</div>
                           </div>
                         </div>
                       </td>
@@ -367,12 +367,12 @@ export const MultiCenterManagement = () => {
                       <td className="px-4 py-3 text-xs font-bold">{member.commission_rate}%</td>
                       <td className="px-4 py-3">
                         {member.is_active ? (
-                          <Badge className="bg-[#00c875] text-white text-[10px]">Active</Badge>
+                          <Badge className="bg-success-500 text-white text-[10px]">Active</Badge>
                         ) : (
-                          <Badge className="bg-[#e44258] text-white text-[10px]">Inactive</Badge>
+                          <Badge className="bg-error-500 text-white text-[10px]">Inactive</Badge>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-xs text-[#676879]">
+                      <td className="px-4 py-3 text-xs text-graphite-500 dark:text-slate-400">
                         {new Date(member.joined_at).toLocaleDateString()}
                       </td>
                       <td className="px-4 py-3">
@@ -399,32 +399,32 @@ export const MultiCenterManagement = () => {
           <TabsContent value="countries" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {countries.map((country) => (
-                <Card key={country.id} className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+                <Card key={country.id} className="border-canvas-silk dark:border-slate-800 shadow-xs">
                   <CardHeader className="pb-3">
                     <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-xl bg-[#0073ea] text-white flex items-center justify-center">
+                      <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center">
                         <Globe className="h-5 w-5" />
                       </div>
                       <div>
                         <CardTitle className="text-sm font-extrabold">{country.name}</CardTitle>
-                        <div className="text-[10px] text-[#676879]">{country.code}</div>
+                        <div className="text-[10px] text-graphite-500 dark:text-slate-400">{country.code}</div>
                       </div>
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-2">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-[#676879]">Currency</span>
+                      <span className="text-graphite-500 dark:text-slate-400">Currency</span>
                       <span className="font-bold">{country.currency_code} ({country.currency_symbol})</span>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-[#676879]">Tax Rate</span>
+                      <span className="text-graphite-500 dark:text-slate-400">Tax Rate</span>
                       <span className="font-bold">{(country.tax_rate * 100).toFixed(0)}%</span>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-[#676879]">Phone Prefix</span>
+                      <span className="text-graphite-500 dark:text-slate-400">Phone Prefix</span>
                       <span className="font-bold">{country.phone_prefix}</span>
                     </div>
-                    <div className="pt-2 border-t border-[#e6e9ef] dark:border-slate-800">
+                    <div className="pt-2 border-t border-canvas-silk dark:border-slate-800">
                       <Button
                         variant="outline"
                         size="sm"
@@ -442,23 +442,23 @@ export const MultiCenterManagement = () => {
 
           {/* Cross-Billing Tab */}
           <TabsContent value="billing" className="space-y-4">
-            <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+            <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
               <CardHeader>
                 <CardTitle className="text-sm font-extrabold flex items-center gap-2">
-                  <DollarSign className="h-4 w-4 text-[#0073ea]" /> Cross-Institution Billing
+                  <DollarSign className="h-4 w-4 text-primary-500" /> Cross-Institution Billing
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="rounded-xl bg-[#f0f2f7] dark:bg-slate-800 p-4">
+                <div className="rounded-xl bg-canvas-mist dark:bg-slate-800 p-4">
                   <h4 className="text-xs font-extrabold mb-3">Active Cross-Billing Networks</h4>
                   <div className="space-y-2">
                     {networks.filter((n) => n.cross_billing_enabled).map((network) => (
                       <div key={network.id} className="flex items-center justify-between p-3 bg-white dark:bg-slate-900 rounded-lg">
                         <div className="flex items-center gap-3">
-                          <CheckCircle className="h-4 w-4 text-[#00c875]" />
+                          <CheckCircle className="h-4 w-4 text-success-500" />
                           <div>
                             <div className="text-xs font-bold">{network.network_name}</div>
-                            <div className="text-[10px] text-[#676879]">
+                            <div className="text-[10px] text-graphite-500 dark:text-slate-400">
                               {members.filter((m) => m.network_id === network.id).length} institutions
                             </div>
                           </div>
@@ -471,18 +471,18 @@ export const MultiCenterManagement = () => {
                   </div>
                 </div>
 
-                <div className="rounded-xl bg-[#f0f2f7] dark:bg-slate-800 p-4">
+                <div className="rounded-xl bg-canvas-mist dark:bg-slate-800 p-4">
                   <h4 className="text-xs font-extrabold mb-3">Billing Rules</h4>
                   <div className="space-y-2 text-xs">
-                    <div className="flex items-center gap-2 text-[#676879]">
+                    <div className="flex items-center gap-2 text-graphite-500 dark:text-slate-400">
                       <ArrowRight className="h-3 w-3" />
                       <span>Commission rates apply per network member</span>
                     </div>
-                    <div className="flex items-center gap-2 text-[#676879]">
+                    <div className="flex items-center gap-2 text-graphite-500 dark:text-slate-400">
                       <ArrowRight className="h-3 w-3" />
                       <span>Cross-currency conversion handled automatically</span>
                     </div>
-                    <div className="flex items-center gap-2 text-[#676879]">
+                    <div className="flex items-center gap-2 text-graphite-500 dark:text-slate-400">
                       <ArrowRight className="h-3 w-3" />
                       <span>Tax compliance per country regulations</span>
                     </div>
@@ -570,7 +570,7 @@ export const MultiCenterManagement = () => {
                 className="mt-1"
               />
             </div>
-            <Button onClick={handleAddMember} className="w-full bg-[#0073ea] hover:bg-[#0056b3] text-white font-bold">
+            <Button onClick={handleAddMember} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold">
               Add Institution
             </Button>
           </div>

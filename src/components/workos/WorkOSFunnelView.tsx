@@ -56,7 +56,7 @@ export const WorkOSFunnelView: React.FC<WorkOSFunnelViewProps> = ({
       stage: "4. Outpatient Telehealth & Recovery",
       count: outpatientCount,
       percent: Math.round((outpatientCount / totalPatients) * 100),
-      color: "from-emerald-600 to-[#00c875]",
+      color: "from-emerald-600 to-success-500",
       textColor: "text-emerald-500",
       borderColor: "border-emerald-500/30",
       description: "Remote monitoring, chronic disease management & therapy",
@@ -65,7 +65,7 @@ export const WorkOSFunnelView: React.FC<WorkOSFunnelViewProps> = ({
       stage: "5. Discharge & Clearance",
       count: dischargeCount,
       percent: Math.round((dischargeCount / totalPatients) * 100),
-      color: "from-[#00c875] to-teal-500",
+      color: "from-success-500 to-teal-500",
       textColor: "text-teal-500",
       borderColor: "border-teal-500/30",
       description: "Final billing settlement, medication release & discharge",
@@ -76,7 +76,7 @@ export const WorkOSFunnelView: React.FC<WorkOSFunnelViewProps> = ({
 
   return (
     <div className={`p-4 sm:p-6 space-y-6 min-h-[700px] transition-colors ${
-      isDarkMode ? "bg-slate-950 text-slate-100" : "bg-[#f5f6f8] text-slate-900"
+      isDarkMode ? "bg-slate-950 text-slate-100" : "bg-canvas text-slate-900"
     }`}>
       {/* Funnel Header Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

@@ -254,13 +254,13 @@ export const TariffAndPriceManager = ({ institutionId: propInstitutionId }: { in
   return (
     <div className="space-y-4 text-slate-900 dark:text-slate-100 font-sans">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-[#e6e9ef] pb-3">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-canvas-silk pb-3">
         <div>
           <h2 className="text-base font-extrabold flex items-center gap-2">
-            <DollarSign className="h-5 w-5 text-[#0073ea]" />
+            <DollarSign className="h-5 w-5 text-primary-500" />
             Universal Hospital Service Tariff & Pricing Matrix
           </h2>
-          <p className="text-xs text-[#676879] dark:text-slate-400 font-medium">
+          <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
             Configure consultation fees, laboratory panels, radiology rates, and ward bed prices
           </p>
         </div>
@@ -269,7 +269,7 @@ export const TariffAndPriceManager = ({ institutionId: propInstitutionId }: { in
             <button
               onClick={loadStarterTariffs}
               disabled={seeding || !institutionId}
-              className="px-3.5 py-1.5 rounded-md border border-[#0073ea] text-[#0073ea] hover:bg-[#e8f1ff] font-extrabold text-xs shadow-xs flex items-center gap-1 disabled:opacity-50"
+              className="px-3.5 py-1.5 rounded-md border border-primary-500 text-primary-500 hover:bg-primary-100 font-extrabold text-xs shadow-xs flex items-center gap-1 disabled:opacity-50"
             >
               <Tag className="h-4 w-4" />
               <span>{seeding ? 'Loading…' : 'Load Starter Tariffs'}</span>
@@ -277,7 +277,7 @@ export const TariffAndPriceManager = ({ institutionId: propInstitutionId }: { in
           )}
           <button
             onClick={() => setShowAddModal(true)}
-            className="px-3.5 py-1.5 rounded-md bg-[#0073ea] hover:bg-[#0060c4] text-white font-extrabold text-xs shadow-xs flex items-center gap-1"
+            className="px-3.5 py-1.5 rounded-md bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs flex items-center gap-1"
           >
             <Plus className="h-4 w-4" />
             <span>Add Service Tariff</span>
@@ -286,12 +286,12 @@ export const TariffAndPriceManager = ({ institutionId: propInstitutionId }: { in
       </div>
 
       {loading ? (
-        <p className="text-xs text-[#676879] py-8 text-center">Loading charge book…</p>
+        <p className="text-xs text-graphite-500 dark:text-slate-400 py-8 text-center">Loading charge book…</p>
       ) : tariffs.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-[#c3c6d4] p-8 text-center space-y-2">
+        <div className="rounded-xl border border-dashed border-graphite-300 dark:border-slate-700 p-8 text-center space-y-2">
           <Tag className="h-8 w-8 mx-auto text-slate-300" />
           <p className="text-sm font-extrabold">No tariffs yet</p>
-          <p className="text-xs text-[#676879]">Load the Zambian starter charge book or add your own services — billing uses these rates.</p>
+          <p className="text-xs text-graphite-500 dark:text-slate-400">Load the Zambian starter charge book or add your own services — billing uses these rates.</p>
         </div>
       ) : null}
 
@@ -304,14 +304,14 @@ export const TariffAndPriceManager = ({ institutionId: propInstitutionId }: { in
             placeholder="Search procedure name, code, or department..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-3 py-1.5 rounded-md border border-[#c3c6d4] bg-white dark:bg-slate-900 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
+            className="w-full pl-9 pr-3 py-1.5 rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary-500"
           />
         </div>
 
         <select
           value={categoryFilter}
           onChange={(e) => setCategoryFilter(e.target.value)}
-          className="px-3 py-1.5 rounded-md border border-[#c3c6d4] bg-white dark:bg-slate-900 text-xs font-bold text-slate-700"
+          className="px-3 py-1.5 rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold text-slate-700"
         >
           <option value="all">All Categories ({tariffs.length})</option>
           <option value="opd">OPD & Consultation</option>
@@ -325,10 +325,10 @@ export const TariffAndPriceManager = ({ institutionId: propInstitutionId }: { in
 
       {/* Main Tariff Table */}
       {!loading && tariffs.length > 0 && (
-      <div className="w-full overflow-x-auto rounded-xl border border-[#e6e9ef] bg-white dark:bg-slate-900 shadow-xs">
+      <div className="w-full overflow-x-auto rounded-xl border border-canvas-silk bg-white dark:bg-slate-900 shadow-xs">
         <table className="w-full text-left border-collapse text-xs">
           <thead>
-            <tr className="border-b border-[#e6e9ef] bg-[#f5f6f8] text-[11px] font-extrabold uppercase text-[#676879]">
+            <tr className="border-b border-canvas-silk bg-canvas text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
               <th className="py-2.5 px-4">Code / Category</th>
               <th className="py-2.5 px-3">Service Name</th>
               <th className="py-2.5 px-3">Department</th>
@@ -339,7 +339,7 @@ export const TariffAndPriceManager = ({ institutionId: propInstitutionId }: { in
               <th className="py-2.5 px-3 text-center">Action</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#e6e9ef]">
+          <tbody className="divide-y divide-canvas-silk">
             {filtered.map((t) => {
               const isEditing = editingId === t.id;
               const cost = isEditing ? editingCost : t.costPrice || 0;
@@ -347,10 +347,10 @@ export const TariffAndPriceManager = ({ institutionId: propInstitutionId }: { in
               const margin = price > 0 ? Math.round(((price - cost) / price) * 100) : 0;
 
               return (
-                <tr key={t.id} className="hover:bg-[#f0f2f7] transition-colors">
+                <tr key={t.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 transition-colors">
                   <td className="py-3 px-4 font-mono font-bold text-slate-900">{t.code}</td>
                   <td className="py-3 px-3 font-extrabold text-slate-900">{t.name}</td>
-                  <td className="py-3 px-3 text-[#676879]">{t.department}</td>
+                  <td className="py-3 px-3 text-graphite-500 dark:text-slate-400">{t.department}</td>
                   <td className="py-3 px-3 text-right font-mono">
                     {isEditing ? (
                       <input
@@ -363,13 +363,13 @@ export const TariffAndPriceManager = ({ institutionId: propInstitutionId }: { in
                       <span>{cost.toLocaleString()}</span>
                     )}
                   </td>
-                  <td className="py-3 px-3 text-right font-mono font-bold text-[#0073ea]">
+                  <td className="py-3 px-3 text-right font-mono font-bold text-primary-500">
                     {isEditing ? (
                       <input
                         type="number"
                         value={editingPrice}
                         onChange={(e) => setEditingPrice(Number(e.target.value))}
-                        className="w-24 text-right p-1 border rounded text-xs font-mono font-bold text-[#0073ea]"
+                        className="w-24 text-right p-1 border rounded text-xs font-mono font-bold text-primary-500"
                       />
                     ) : (
                       <span>{price.toLocaleString()}</span>
@@ -381,9 +381,9 @@ export const TariffAndPriceManager = ({ institutionId: propInstitutionId }: { in
                   <td className="py-3 px-3 text-center">
                     <button onClick={() => toggleAvailability(t.id, !t.isAvailable)}>
                       {t.isAvailable ? (
-                        <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-[#00c875]">Active</span>
+                        <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-success-500">Active</span>
                       ) : (
-                        <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-[#e2445c]">Disabled</span>
+                        <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-error-500">Disabled</span>
                       )}
                     </button>
                   </td>
@@ -391,7 +391,7 @@ export const TariffAndPriceManager = ({ institutionId: propInstitutionId }: { in
                     {isEditing ? (
                       <button
                         onClick={() => handleSaveInlineEdit(t.id)}
-                        className="px-2.5 py-1 rounded-md bg-[#00c875] text-white text-[11px] font-bold"
+                        className="px-2.5 py-1 rounded-md bg-success-500 text-white text-[11px] font-bold"
                       >
                         Save
                       </button>
@@ -402,7 +402,7 @@ export const TariffAndPriceManager = ({ institutionId: propInstitutionId }: { in
                           setEditingPrice(t.basePrice);
                           setEditingCost(t.costPrice || 0);
                         }}
-                        className="px-2.5 py-1 rounded-md bg-[#0073ea] text-white text-[11px] font-bold"
+                        className="px-2.5 py-1 rounded-md bg-primary-500 text-white text-[11px] font-bold"
                       >
                         Edit Price
                       </button>
@@ -418,39 +418,39 @@ export const TariffAndPriceManager = ({ institutionId: propInstitutionId }: { in
 
       {/* Add Modal */}
       <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
-        <DialogContent className="sm:max-w-[450px] bg-white border border-[#e6e9ef]">
+        <DialogContent className="sm:max-w-[450px] bg-white border border-canvas-silk dark:border-slate-800">
           <DialogHeader>
             <DialogTitle className="font-extrabold text-base">Add Service Price</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleAddService} className="space-y-3 py-2 text-xs">
             <div>
-              <label className="font-extrabold text-[#676879] uppercase">Service Name *</label>
+              <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Service Name *</label>
               <input
                 value={newService.name}
                 onChange={(e) => setNewService({ ...newService, name: e.target.value })}
                 placeholder="e.g. Dental Crown Fitting"
-                className="w-full mt-1 p-2 rounded-md border border-[#c3c6d4] font-bold"
+                className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold"
                 required
               />
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="font-extrabold text-[#676879] uppercase">Selling Price ({currency}) *</label>
+                <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Selling Price ({currency}) *</label>
                 <input
                   type="number"
                   value={newService.basePrice}
                   onChange={(e) => setNewService({ ...newService, basePrice: Number(e.target.value) })}
-                  className="w-full mt-1 p-2 rounded-md border border-[#c3c6d4] font-bold text-[#0073ea]"
+                  className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold text-primary-500"
                   required
                 />
               </div>
               <div>
-                <label className="font-extrabold text-[#676879] uppercase">Cost Price ({currency})</label>
+                <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Cost Price ({currency})</label>
                 <input
                   type="number"
                   value={newService.costPrice}
                   onChange={(e) => setNewService({ ...newService, costPrice: Number(e.target.value) })}
-                  className="w-full mt-1 p-2 rounded-md border border-[#c3c6d4]"
+                  className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700"
                 />
               </div>
             </div>
@@ -458,7 +458,7 @@ export const TariffAndPriceManager = ({ institutionId: propInstitutionId }: { in
               <button type="button" onClick={() => setShowAddModal(false)} className="px-3 py-1.5 text-xs font-bold text-slate-500">
                 Cancel
               </button>
-              <button type="submit" className="px-4 py-1.5 rounded-md bg-[#0073ea] text-white font-bold text-xs">
+              <button type="submit" className="px-4 py-1.5 rounded-md bg-primary-500 text-white font-bold text-xs">
                 Save Price
               </button>
             </DialogFooter>

@@ -45,6 +45,8 @@ export const VideoControls = ({
         size={isTV ? "lg" : isMobile ? "default" : "icon"}
         onClick={onToggleMute}
         title={isMuted ? "Unmute" : "Mute"}
+        aria-label={isMuted ? "Unmute microphone" : "Mute microphone"}
+        aria-pressed={isMuted}
         className={`${isTV ? "px-6 py-4 text-lg" : ""} ${isMobile ? "h-14 min-w-14" : ""}`}
         data-dpad-focusable={isTV ? "true" : undefined}
       >
@@ -66,6 +68,8 @@ export const VideoControls = ({
         size={isTV ? "lg" : isMobile ? "default" : "icon"}
         onClick={onToggleVideo}
         title={isVideoOff ? "Turn camera on" : "Turn camera off"}
+        aria-label={isVideoOff ? "Turn camera on" : "Turn camera off"}
+        aria-pressed={isVideoOff}
         className={`${isTV ? "px-6 py-4 text-lg" : ""} ${isMobile ? "h-14 min-w-14" : ""}`}
         data-dpad-focusable={isTV ? "true" : undefined}
       >
@@ -87,6 +91,8 @@ export const VideoControls = ({
         size={isTV ? "lg" : isMobile ? "default" : "icon"}
         onClick={onToggleScreenShare}
         title={isScreenSharing ? "Stop sharing" : "Share screen"}
+        aria-label={isScreenSharing ? "Stop screen sharing" : "Share screen"}
+        aria-pressed={isScreenSharing}
         className={`${isTV ? "px-6 py-4 text-lg" : ""} ${isMobile ? "h-14 min-w-14" : ""}`}
         data-dpad-focusable={isTV ? "true" : undefined}
       >
@@ -100,6 +106,8 @@ export const VideoControls = ({
           size={isTV ? "lg" : isMobile ? "default" : "icon"}
           onClick={onToggleRecording}
           title={isRecording ? "Stop recording" : "Record meeting"}
+          aria-label={isRecording ? "Stop recording" : "Record meeting"}
+          aria-pressed={isRecording}
           className={`${isTV ? "px-6 py-4 text-lg" : ""} ${isMobile ? "h-14 min-w-14" : ""}`}
           data-dpad-focusable={isTV ? "true" : undefined}
         >

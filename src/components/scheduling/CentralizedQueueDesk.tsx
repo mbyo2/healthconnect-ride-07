@@ -108,7 +108,7 @@ export const CentralizedQueueDesk: React.FC<{ institutionId?: string }> = ({ ins
   return (
     <div className="space-y-6 font-sans text-slate-900 dark:text-slate-100">
       {/* Header Banner */}
-      <div className="p-6 rounded-3xl bg-gradient-to-r from-[#0073ea] via-[#0f172a] to-[#1e293b] text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="p-6 rounded-3xl bg-gradient-to-r from-primary-500 via-slate-900 to-slate-800 text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
           <div className="h-12 w-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center font-black text-xl border border-white/20">
             <Ticket className="h-6 w-6 text-white" />
@@ -137,7 +137,7 @@ export const CentralizedQueueDesk: React.FC<{ institutionId?: string }> = ({ ins
           </Link>
           <Dialog open={showNewTokenModal} onOpenChange={setShowNewTokenModal}>
             <DialogTrigger asChild>
-              <button className="px-4 py-2 rounded-xl bg-white text-[#0f172a] font-extrabold text-xs flex items-center gap-1.5 shadow-sm hover:bg-slate-100 transition-all">
+              <button className="px-4 py-2 rounded-xl bg-white text-slate-900 font-extrabold text-xs flex items-center gap-1.5 shadow-sm hover:bg-slate-100 transition-all">
                 <Plus className="h-4 w-4" /> Issue Walk-in Token
               </button>
             </DialogTrigger>
@@ -149,7 +149,7 @@ export const CentralizedQueueDesk: React.FC<{ institutionId?: string }> = ({ ins
                 <div>
                   <label className="font-bold">Patient Name *</label>
                   <input
-                    className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4]"
+                    className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700"
                     placeholder="Enter full name"
                     value={newTokenPatient}
                     onChange={(e) => setNewTokenPatient(e.target.value)}
@@ -158,7 +158,7 @@ export const CentralizedQueueDesk: React.FC<{ institutionId?: string }> = ({ ins
                 <div>
                   <label className="font-bold">Target Department</label>
                   <select
-                    className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4] font-bold bg-white dark:bg-slate-950"
+                    className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-bold bg-white dark:bg-slate-950"
                     value={newTokenDept}
                     onChange={(e) => setNewTokenDept(e.target.value)}
                   >
@@ -173,7 +173,7 @@ export const CentralizedQueueDesk: React.FC<{ institutionId?: string }> = ({ ins
                 <div>
                   <label className="font-bold">Triage Priority</label>
                   <select
-                    className="w-full mt-1 px-3 py-2 rounded-xl border border-[#c3c6d4] font-bold bg-white dark:bg-slate-950"
+                    className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-bold bg-white dark:bg-slate-950"
                     value={newTokenPriority}
                     onChange={(e) => setNewTokenPriority(e.target.value as any)}
                   >
@@ -185,7 +185,7 @@ export const CentralizedQueueDesk: React.FC<{ institutionId?: string }> = ({ ins
               </div>
               <DialogFooter>
                 <button onClick={() => setShowNewTokenModal(false)} className="px-4 py-2 font-bold text-slate-500">Cancel</button>
-                <button onClick={handleCreateToken} className="px-5 py-2.5 rounded-xl bg-[#0073ea] text-white font-extrabold">Generate Token</button>
+                <button onClick={handleCreateToken} className="px-5 py-2.5 rounded-xl bg-primary-500 text-white font-extrabold">Generate Token</button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
@@ -194,19 +194,19 @@ export const CentralizedQueueDesk: React.FC<{ institutionId?: string }> = ({ ins
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+        <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
           <span className="text-[11px] font-extrabold uppercase text-slate-400">Waiting in Queue</span>
-          <div className="text-3xl font-black text-[#0073ea] mt-1">{waitingCount} Patients</div>
+          <div className="text-3xl font-black text-primary-500 mt-1">{waitingCount} Patients</div>
           <span className="text-[10px] font-bold text-slate-500">Avg Wait: 8 mins</span>
         </div>
 
-        <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+        <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
           <span className="text-[11px] font-extrabold uppercase text-slate-400">Currently in Consultation</span>
           <div className="text-3xl font-black text-amber-500 mt-1">{inRoomCount} Active</div>
           <span className="text-[10px] font-bold text-slate-500">Across 6 Consultation Rooms</span>
         </div>
 
-        <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+        <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
           <span className="text-[11px] font-extrabold uppercase text-slate-400">Completed / Served Today</span>
           <div className="text-3xl font-black text-emerald-600 mt-1">{servedCount + 34} Served</div>
           <span className="text-[10px] font-bold text-emerald-600">✓ On Track</span>
@@ -214,10 +214,10 @@ export const CentralizedQueueDesk: React.FC<{ institutionId?: string }> = ({ ins
       </div>
 
       {/* Live Queue Table */}
-      <div className="w-full overflow-x-auto rounded-2xl border border-[#e6e9ef] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
+      <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
         <table className="w-full text-left border-collapse text-xs">
           <thead>
-            <tr className="border-b border-[#e6e9ef] dark:border-slate-800 bg-[#f5f6f8] dark:bg-slate-950 text-[11px] font-extrabold uppercase text-[#676879]">
+            <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
               <th className="py-3 px-4">Token #</th>
               <th className="py-3 px-3">Patient Name</th>
               <th className="py-3 px-3">Department</th>
@@ -227,11 +227,11 @@ export const CentralizedQueueDesk: React.FC<{ institutionId?: string }> = ({ ins
               <th className="py-3 px-3 text-center">Calling Action</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#e6e9ef] dark:divide-slate-800">
+          <tbody className="divide-y divide-canvas-silk dark:divide-slate-800">
             {tokens.map((tok) => (
-              <tr key={tok.id} className="hover:bg-[#f0f2f7] dark:hover:bg-slate-800/60">
+              <tr key={tok.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-800/60">
                 <td className="py-3 px-4">
-                  <div className="font-black font-mono text-sm text-[#0073ea]">{tok.tokenNumber}</div>
+                  <div className="font-black font-mono text-sm text-primary-500">{tok.tokenNumber}</div>
                   {tok.priority !== "Normal" && (
                     <span className="px-1.5 py-0.5 rounded bg-rose-100 text-rose-700 font-bold text-[9px]">
                       {tok.priority}
@@ -248,7 +248,7 @@ export const CentralizedQueueDesk: React.FC<{ institutionId?: string }> = ({ ins
                       tok.status === "In-Room"
                         ? "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300"
                         : tok.status === "Called"
-                        ? "bg-[#0073ea] text-white animate-pulse"
+                        ? "bg-primary-500 text-white animate-pulse"
                         : tok.status === "Served"
                         ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
                         : "bg-slate-100 text-slate-600 dark:bg-slate-800"
@@ -261,14 +261,14 @@ export const CentralizedQueueDesk: React.FC<{ institutionId?: string }> = ({ ins
                   <div className="flex items-center justify-center gap-1.5">
                     <button
                       onClick={() => handleCallToken(tok)}
-                      className="px-3 py-1 rounded-xl bg-[#0073ea] hover:bg-[#0060c4] text-white font-extrabold text-[11px] flex items-center gap-1 shadow-xs"
+                      className="px-3 py-1 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-[11px] flex items-center gap-1 shadow-xs"
                     >
                       <Volume2 className="h-3.5 w-3.5" /> Call
                     </button>
                     <select
                       value={tok.status}
                       onChange={(e) => handleSetStatus(tok.id, e.target.value as any)}
-                      className="p-1 rounded-lg border border-[#c3c6d4] text-[11px] font-bold bg-white dark:bg-slate-800"
+                      className="p-1 rounded-lg border border-graphite-300 dark:border-slate-700 text-[11px] font-bold bg-white dark:bg-slate-800"
                     >
                       <option value="Waiting">Waiting</option>
                       <option value="In-Room">In-Room</option>

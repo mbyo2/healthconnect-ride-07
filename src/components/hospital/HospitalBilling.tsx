@@ -17,9 +17,9 @@ interface BillingProps {
 
 const getPaymentPill = (status: string) => {
   switch (status) {
-    case "paid": return <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold text-white bg-[#00c875]">Paid</span>;
-    case "overdue": return <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold text-white bg-[#e2445c]">Overdue</span>;
-    default: return <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold text-white bg-[#fdab3d]">Pending</span>;
+    case "paid": return <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold text-white bg-success-500">Paid</span>;
+    case "overdue": return <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold text-white bg-error-500">Overdue</span>;
+    default: return <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold text-white bg-warning-500">Pending</span>;
   }
 };
 
@@ -138,14 +138,14 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
   return (
     <div className="space-y-4 font-sans text-slate-900 dark:text-slate-100">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-[#e6e9ef] pb-3">
+      <div className="flex items-center justify-between border-b border-canvas-silk pb-3">
         <h3 className="text-base font-extrabold flex items-center gap-2">
-          <Receipt className="h-5 w-5 text-[#0073ea]" />
+          <Receipt className="h-5 w-5 text-primary-500" />
           Hospital Billing & Invoice Management
         </h3>
         <button
           onClick={() => setShowDialog(true)}
-          className="px-4 py-1.5 rounded-md bg-[#0073ea] text-white text-xs font-extrabold flex items-center gap-1 shadow-xs"
+          className="px-4 py-1.5 rounded-md bg-primary-500 text-white text-xs font-extrabold flex items-center gap-1 shadow-xs"
         >
           <Plus className="h-4 w-4" /> Generate Invoice
         </button>
@@ -158,20 +158,20 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
           { label: "Collected", value: formatPrice(paidAmount), color: "#00c875", icon: <CheckCircle className="h-5 w-5" /> },
           { label: "Outstanding", value: formatPrice(pendingAmount), color: "#e2445c", icon: <AlertCircle className="h-5 w-5" /> },
         ].map((c) => (
-          <div key={c.label} className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-[#e6e9ef] shadow-xs text-center">
+          <div key={c.label} className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk shadow-xs text-center">
             <div style={{ color: c.color }} className="flex justify-center mb-1">{c.icon}</div>
             <div className="text-xl font-black font-mono" style={{ color: c.color }}>{c.value}</div>
-            <div className="text-[10px] text-[#676879] font-bold uppercase">{c.label}</div>
+            <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold uppercase">{c.label}</div>
           </div>
         ))}
       </div>
 
       {/* Invoices Table */}
       {invoices && invoices.length > 0 ? (
-        <div className="w-full overflow-x-auto rounded-xl border border-[#e6e9ef] bg-white dark:bg-slate-900 shadow-xs">
+        <div className="w-full overflow-x-auto rounded-xl border border-canvas-silk bg-white dark:bg-slate-900 shadow-xs">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="border-b border-[#e6e9ef] bg-[#f5f6f8] text-[11px] font-extrabold uppercase text-[#676879]">
+              <tr className="border-b border-canvas-silk bg-canvas text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
                 <th className="py-2.5 px-4">Invoice #</th>
                 <th className="py-2.5 px-3">Patient</th>
                 <th className="py-2.5 px-3">Date</th>
@@ -180,15 +180,15 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
                 <th className="py-2.5 px-3 text-center">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#e6e9ef]">
+            <tbody className="divide-y divide-canvas-silk">
               {invoices.map((inv: any) => (
-                <tr key={inv.id} className="hover:bg-[#f0f2f7] transition-colors">
+                <tr key={inv.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 transition-colors">
                   <td className="py-3 px-4 font-mono font-bold text-slate-900">{inv.invoice_number}</td>
-                  <td className="py-3 px-3 font-bold text-[#0073ea]">{inv.patient?.first_name} {inv.patient?.last_name}</td>
-                  <td className="py-3 px-3 text-[#676879]">{new Date(inv.created_at).toLocaleDateString()}</td>
+                  <td className="py-3 px-3 font-bold text-primary-500">{inv.patient?.first_name} {inv.patient?.last_name}</td>
+                  <td className="py-3 px-3 text-graphite-500 dark:text-slate-400">{new Date(inv.created_at).toLocaleDateString()}</td>
                   <td className="py-3 px-3 text-right font-extrabold text-slate-900">{formatPrice(inv.total_amount)}</td>
                   <td className="py-3 px-3 text-right">
-                    {inv.balance > 0 ? <span className="font-bold text-[#e2445c]">{formatPrice(inv.balance)}</span> : <span className="text-[#00c875] font-bold">—</span>}
+                    {inv.balance > 0 ? <span className="font-bold text-error-500">{formatPrice(inv.balance)}</span> : <span className="text-success-500 font-bold">—</span>}
                   </td>
                   <td className="py-3 px-3 text-center">{getPaymentPill(inv.payment_status)}</td>
                 </tr>
@@ -197,7 +197,7 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
           </table>
         </div>
       ) : (
-        <div className="text-center py-12 text-xs text-[#676879]">
+        <div className="text-center py-12 text-xs text-graphite-500 dark:text-slate-400">
           <DollarSign className="h-10 w-10 mx-auto mb-2 opacity-30" />
           <p className="font-bold">No invoices yet. Generate your first invoice above.</p>
         </div>
@@ -205,16 +205,16 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
 
       {/* Generate Invoice Dialog */}
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
-        <DialogContent className="bg-white border border-[#e6e9ef] max-w-md">
+        <DialogContent className="bg-white border border-canvas-silk max-w-md">
           <DialogHeader>
             <DialogTitle className="font-extrabold text-base">Generate Invoice</DialogTitle>
-            <DialogDescription className="text-xs text-[#676879]">Create a billing record and auto-populate pending charges for a patient.</DialogDescription>
+            <DialogDescription className="text-xs text-graphite-500 dark:text-slate-400">Create a billing record and auto-populate pending charges for a patient.</DialogDescription>
           </DialogHeader>
           <div className="space-y-3 py-2 text-xs">
             <div>
-              <label className="font-extrabold text-[#676879] uppercase">Patient</label>
+              <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Patient</label>
               <Select value={selectedPatientId} onValueChange={handlePatientSelect}>
-                <SelectTrigger className="mt-1 border border-[#c3c6d4] text-xs font-bold"><SelectValue placeholder="Select admitted patient" /></SelectTrigger>
+                <SelectTrigger className="mt-1 border border-graphite-300 dark:border-slate-700 text-xs font-bold"><SelectValue placeholder="Select admitted patient" /></SelectTrigger>
                 <SelectContent>
                   {admissions?.map((a: any) => (
                     <SelectItem key={a.patient_id} value={a.patient_id}>{a.patient?.first_name} {a.patient?.last_name}</SelectItem>
@@ -224,16 +224,16 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
             </div>
 
             {isLoadingCharges && (
-              <div className="flex items-center gap-2 p-2 bg-[#e5f0ff] rounded-lg text-[#0073ea] text-[10px] font-bold">
+              <div className="flex items-center gap-2 p-2 bg-primary-50 rounded-lg text-primary-500 text-[10px] font-bold">
                 <Loader2 className="h-3.5 w-3.5 animate-spin" /> Fetching system charges...
               </div>
             )}
 
             {pendingPatientCharges.length > 0 && (
-              <div className="p-3 rounded-xl border border-[#0073ea]/20 bg-[#e5f0ff] space-y-1">
-                <p className="font-extrabold text-[#0073ea] text-[10px] uppercase">Auto-Populated Charges:</p>
+              <div className="p-3 rounded-xl border border-primary-500/20 bg-primary-50 space-y-1">
+                <p className="font-extrabold text-primary-500 text-[10px] uppercase">Auto-Populated Charges:</p>
                 {pendingPatientCharges.map((c, i) => (
-                  <div key={i} className="flex justify-between text-[#676879]">
+                  <div key={i} className="flex justify-between text-graphite-500 dark:text-slate-400">
                     <span>• {c.description}</span>
                     <span className="font-mono font-bold">{formatPrice(c.amount)}</span>
                   </div>
@@ -242,22 +242,22 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
             )}
 
             <div>
-              <label className="font-extrabold text-[#676879] uppercase">Amount ({currency === "USD" ? "$" : "K"})</label>
-              <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0.00" className="w-full mt-1 p-2 rounded-md border border-[#c3c6d4] font-bold" />
+              <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Amount ({currency === "USD" ? "$" : "K"})</label>
+              <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0.00" className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold" />
             </div>
             <div>
-              <label className="font-extrabold text-[#676879] uppercase">Description</label>
-              <input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Consultation, Lab tests, etc." className="w-full mt-1 p-2 rounded-md border border-[#c3c6d4]" />
+              <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Description</label>
+              <input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Consultation, Lab tests, etc." className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700" />
             </div>
 
             {selectedPatientId && (
               <div className="space-y-3">
                 <InstitutionInsuranceVerification patientId={selectedPatientId} onVerified={(v) => setSelectedVerification(v)} />
                 {selectedVerification && (
-                  <div className="p-3 rounded-xl border border-[#00c875]/30 bg-[#00c875]/10 flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-[#00c875]" />
+                  <div className="p-3 rounded-xl border border-success-500/30 bg-success-500/10 flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-success-500" />
                     <div>
-                      <p className="font-extrabold text-[#00c875] text-xs">Insurance: {selectedVerification.coverage_percentage}% covered</p>
+                      <p className="font-extrabold text-success-500 text-xs">Insurance: {selectedVerification.coverage_percentage}% covered</p>
                       <p className="text-xs text-slate-600">Patient pays: {formatPrice((Number(amount) * (100 - selectedVerification.coverage_percentage)) / 100)}</p>
                     </div>
                   </div>
@@ -267,7 +267,7 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
           </div>
           <DialogFooter>
             <button onClick={() => setShowDialog(false)} className="px-3 py-1.5 text-xs font-bold text-slate-500">Cancel</button>
-            <button onClick={generateInvoice} disabled={!selectedPatientId || !amount || isSubmitting} className="px-4 py-1.5 rounded-md bg-[#0073ea] text-white text-xs font-bold flex items-center gap-1">
+            <button onClick={generateInvoice} disabled={!selectedPatientId || !amount || isSubmitting} className="px-4 py-1.5 rounded-md bg-primary-500 text-white text-xs font-bold flex items-center gap-1">
               {isSubmitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />} Generate Invoice
             </button>
           </DialogFooter>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -26,7 +26,26 @@ export const ReferralManagement = ({ hospital }: { hospital: any }) => {
   );
   const referrals = [...outgoing, ...incoming];
 
-  const { nameFor } = usePatientNames(referrals.map((r: any) => r.patient_id));
+  // Incoming network referrals must arrive the moment they're sent.
+  useEffect(() => {
+    if (!hospital?.id) return;
+    const channel = supabase
+      .channel(`referrals-live-${hospital.id}`)
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'referrals', filter: `referred_to_hospital_id=eq.${hospital.id}` },
+        () => refreshIncoming()
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'referrals', filter: `hospital_id=eq.${hospital.id}` },
+        () => refresh()
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [hospital?.id, refresh, refreshIncoming]);
   const { patients, loading: patientsLoading } = useHospitalPatients(hospital?.id);
 
   const [open, setOpen] = useState(false);

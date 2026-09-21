@@ -44,11 +44,11 @@ export const LandingHero = () => {
           style={{ animationDelay: "0.2s" }}
         >
           <button type="button" onClick={() => navigate("/search")} className="vf-btn-primary">
-            Get started
+            Find a doctor
             <ArrowRight className="h-4 w-4" />
           </button>
-          <button type="button" onClick={() => navigate("/video-dashboard")} className="vf-btn-secondary">
-            Start a video consult
+          <button type="button" onClick={() => navigate("/pricing")} className="vf-btn-secondary">
+            Transparent pricing
           </button>
         </div>
 

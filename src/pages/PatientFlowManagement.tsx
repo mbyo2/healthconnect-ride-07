@@ -180,14 +180,14 @@ export const PatientFlowManagement = () => {
 
   const getStageTypeColor = (type: string) => {
     switch (type) {
-      case "check_in": return "bg-[#0073ea]";
-      case "triage": return "bg-[#a25ddc]";
-      case "consultation": return "bg-[#00c875]";
-      case "diagnostic": return "bg-[#fdab3d]";
-      case "treatment": return "bg-[#e44258]";
-      case "billing": return "bg-[#6366f1]";
-      case "discharge": return "bg-[#10b981]";
-      default: return "bg-[#676879]";
+      case "check_in": return "bg-primary-500";
+      case "triage": return "bg-purple-500";
+      case "consultation": return "bg-success-500";
+      case "diagnostic": return "bg-warning-500";
+      case "treatment": return "bg-error-500";
+      case "billing": return "bg-indigo-500";
+      case "discharge": return "bg-success-500";
+      default: return "bg-graphite-500 dark:bg-slate-600";
     }
   };
 
@@ -207,13 +207,13 @@ export const PatientFlowManagement = () => {
 
   if (!institution) {
     return (
-      <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 flex items-center justify-center p-6">
+      <div className="min-h-screen bg-canvas dark:bg-slate-950 flex items-center justify-center p-6">
         <Card className="max-w-md w-full">
           <CardContent className="p-8 text-center space-y-4">
-            <Building2 className="h-12 w-12 mx-auto text-[#0073ea]" />
+            <Building2 className="h-12 w-12 mx-auto text-primary-500" />
             <h2 className="text-xl font-extrabold">Institution Required</h2>
-            <p className="text-xs text-[#676879]">Please select an institution to access patient flow management.</p>
-            <Button onClick={() => navigate("/institution-portal")} className="bg-[#0073ea] hover:bg-[#0056b3]">
+            <p className="text-xs text-graphite-500 dark:text-slate-400">Please select an institution to access patient flow management.</p>
+            <Button onClick={() => navigate("/institution-portal")} className="bg-primary-500 hover:bg-primary-600">
               Go to Institution Portal
             </Button>
           </CardContent>
@@ -228,23 +228,23 @@ export const PatientFlowManagement = () => {
   const utilizationRate = totalCapacity > 0 ? (currentLoad / totalCapacity) * 100 : 0;
 
   return (
-    <div className="min-h-screen bg-[#f5f6f8] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pb-16">
+    <div className="min-h-screen bg-canvas dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pb-16">
       {/* Header */}
-      <div className="bg-white dark:bg-slate-900 border-b border-[#e6e9ef] dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
+      <div className="bg-white dark:bg-slate-900 border-b border-canvas-silk dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
         <div className="max-w-[1600px] mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-[#0073ea] text-white flex items-center justify-center shadow-xs">
+            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-xs">
               <Users className="h-5 w-5" />
             </div>
             <div>
               <h1 className="text-xl font-extrabold">Patient Flow Management</h1>
-              <p className="text-xs text-[#676879] font-medium">Real-time Patient Journey & Capacity Optimization</p>
+              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">Real-time Patient Journey & Capacity Optimization</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <Dialog open={showStageDialog} onOpenChange={setShowStageDialog}>
               <DialogTrigger asChild>
-                <Button className="bg-[#0073ea] hover:bg-[#0056b3] text-white font-bold text-xs flex items-center gap-2">
+                <Button className="bg-primary-500 hover:bg-primary-600 text-white font-bold text-xs flex items-center gap-2">
                   <Plus className="h-4 w-4" /> Add Stage
                 </Button>
               </DialogTrigger>
@@ -318,7 +318,7 @@ export const PatientFlowManagement = () => {
                       />
                     </div>
                   </div>
-                  <Button onClick={handleCreateStage} className="w-full bg-[#0073ea] hover:bg-[#0056b3] text-white font-bold">
+                  <Button onClick={handleCreateStage} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold">
                     Create Stage
                   </Button>
                 </div>
@@ -376,7 +376,7 @@ export const PatientFlowManagement = () => {
                       onCheckedChange={(checked) => setCapacityForm({ ...capacityForm, overbooking_allowed: checked })}
                     />
                   </div>
-                  <Button onClick={handleUpdateCapacity} className="w-full bg-[#0073ea] hover:bg-[#0056b3] text-white font-bold">
+                  <Button onClick={handleUpdateCapacity} className="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold">
                     Update Capacity
                   </Button>
                 </div>
@@ -389,60 +389,60 @@ export const PatientFlowManagement = () => {
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 pt-6">
         {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-[#676879] uppercase">Active Patients</span>
-                <Users className="h-4 w-4 text-[#0073ea]" />
+                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Active Patients</span>
+                <Users className="h-4 w-4 text-primary-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-[#0073ea]">{activeFlows.length}</div>
-              <div className="text-[10px] text-[#676879] font-bold mt-0.5">Currently in flow</div>
+              <div className="text-2xl font-black font-mono text-primary-500">{activeFlows.length}</div>
+              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Currently in flow</div>
             </CardContent>
           </Card>
-          <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-[#676879] uppercase">Avg Wait Time</span>
-                <Clock className="h-4 w-4 text-[#a25ddc]" />
+                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Avg Wait Time</span>
+                <Clock className="h-4 w-4 text-purple-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-[#a25ddc]">{averageWaitTime.toFixed(0)}m</div>
-              <div className="text-[10px] text-[#676879] font-bold mt-0.5">Per patient</div>
+              <div className="text-2xl font-black font-mono text-purple-500">{averageWaitTime.toFixed(0)}m</div>
+              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Per patient</div>
             </CardContent>
           </Card>
-          <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-[#676879] uppercase">Capacity Utilization</span>
-                <BarChart3 className="h-4 w-4 text-[#00c875]" />
+                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Capacity Utilization</span>
+                <BarChart3 className="h-4 w-4 text-success-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-[#00c875]">{utilizationRate.toFixed(0)}%</div>
-              <div className="text-[10px] text-[#676879] font-bold mt-0.5">{currentLoad}/{totalCapacity} patients</div>
+              <div className="text-2xl font-black font-mono text-success-500">{utilizationRate.toFixed(0)}%</div>
+              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">{currentLoad}/{totalCapacity} patients</div>
             </CardContent>
           </Card>
-          <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+          <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold text-[#676879] uppercase">Flow Stages</span>
-                <ArrowRight className="h-4 w-4 text-[#fdab3d]" />
+                <span className="text-[10px] font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Flow Stages</span>
+                <ArrowRight className="h-4 w-4 text-warning-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-[#fdab3d]">{stages.length}</div>
-              <div className="text-[10px] text-[#676879] font-bold mt-0.5">Configured stages</div>
+              <div className="text-2xl font-black font-mono text-warning-500">{stages.length}</div>
+              <div className="text-[10px] text-graphite-500 dark:text-slate-400 font-bold mt-0.5">Configured stages</div>
             </CardContent>
           </Card>
         </div>
 
         <Tabs defaultValue="active" className="space-y-6">
-          <TabsList className="bg-white dark:bg-slate-900 border border-[#e6e9ef] dark:border-slate-800 p-1">
-            <TabsTrigger value="active" className="data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">
+          <TabsList className="bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 p-1">
+            <TabsTrigger value="active" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <Activity className="h-4 w-4 mr-2" /> Active Flows
             </TabsTrigger>
-            <TabsTrigger value="stages" className="data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">
+            <TabsTrigger value="stages" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <MapPin className="h-4 w-4 mr-2" /> Flow Stages
             </TabsTrigger>
-            <TabsTrigger value="capacity" className="data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">
+            <TabsTrigger value="capacity" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <BarChart3 className="h-4 w-4 mr-2" /> Capacity
             </TabsTrigger>
-            <TabsTrigger value="analytics" className="data-[state=active]:bg-[#0073ea] data-[state=active]:text-white">
+            <TabsTrigger value="analytics" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
               <TrendingUp className="h-4 w-4 mr-2" /> Analytics
             </TabsTrigger>
           </TabsList>
@@ -484,37 +484,37 @@ export const PatientFlowManagement = () => {
                 );
 
                 return (
-                  <Card key={flow.id} className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+                  <Card key={flow.id} className="border-canvas-silk dark:border-slate-800 shadow-xs">
                     <CardHeader className="pb-3">
                       <div className="flex items-start justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="h-10 w-10 rounded-xl bg-[#0073ea] text-white flex items-center justify-center">
+                          <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center">
                             <UserRound className="h-5 w-5" />
                           </div>
                           <div>
                             <CardTitle className="text-sm font-extrabold">
                               {flow.patient?.first_name} {flow.patient?.last_name}
                             </CardTitle>
-                            <div className="text-[10px] text-[#676879]">
+                            <div className="text-[10px] text-graphite-500 dark:text-slate-400">
                               Started: {new Date(flow.started_at).toLocaleTimeString()}
                             </div>
                           </div>
                         </div>
-                        <Badge className={timeData.isOverdue ? "bg-[#e44258] text-white text-[10px]" : "bg-[#00c875] text-white text-[10px]"}>
+                        <Badge className={timeData.isOverdue ? "bg-error-500 text-white text-[10px]" : "bg-success-500 text-white text-[10px]"}>
                           {timeData.isOverdue ? "Overdue" : "On Track"}
                         </Badge>
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-3">
                       {flow.current_stage && (
-                        <div className="rounded-xl bg-[#f0f2f7] dark:bg-slate-800 p-3">
+                        <div className="rounded-xl bg-canvas-mist dark:bg-slate-800 p-3">
                           <div className="flex items-center gap-2 mb-2">
                             <div className={`h-6 w-6 rounded-lg ${getStageTypeColor(flow.current_stage.stage_type)} text-white flex items-center justify-center`}>
                               {getStageTypeIcon(flow.current_stage.stage_type)}
                             </div>
                             <div>
                               <div className="text-xs font-bold">{flow.current_stage.stage_name}</div>
-                              <div className="text-[10px] text-[#676879]">
+                              <div className="text-[10px] text-graphite-500 dark:text-slate-400">
                                 {timeData.elapsedMinutes.toFixed(0)} / {flow.current_stage.estimated_duration_minutes || 0} min
                               </div>
                             </div>
@@ -523,9 +523,9 @@ export const PatientFlowManagement = () => {
                         </div>
                       )}
 
-                      <div className="flex items-center justify-between pt-2 border-t border-[#e6e9ef] dark:border-slate-800">
+                      <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
                         <div className="text-xs">
-                          <span className="text-[#676879]">Total Wait: </span>
+                          <span className="text-graphite-500 dark:text-slate-400">Total Wait: </span>
                           <span className="font-bold">{flow.total_wait_time_minutes || 0}m</span>
                         </div>
                         <div className="flex items-center gap-1">
@@ -555,11 +555,11 @@ export const PatientFlowManagement = () => {
 
             <div className="space-y-2">
               {stages.map((stage, index) => (
-                <Card key={stage.id} className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+                <Card key={stage.id} className="border-canvas-silk dark:border-slate-800 shadow-xs">
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">
-                        <div className="h-8 w-8 rounded-lg bg-[#f0f2f7] dark:bg-slate-800 flex items-center justify-center font-bold text-sm">
+                        <div className="h-8 w-8 rounded-lg bg-canvas-mist dark:bg-slate-800 flex items-center justify-center font-bold text-sm">
                           {index + 1}
                         </div>
                         <div className={`h-8 w-8 rounded-lg ${getStageTypeColor(stage.stage_type)} text-white flex items-center justify-center`}>
@@ -567,17 +567,17 @@ export const PatientFlowManagement = () => {
                         </div>
                         <div>
                           <div className="text-sm font-bold">{stage.stage_name}</div>
-                          <div className="text-[10px] text-[#676879]">
+                          <div className="text-[10px] text-graphite-500 dark:text-slate-400">
                             {stage.estimated_duration_minutes} min • {stage.stage_type}
                           </div>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
                         {stage.auto_proceed && (
-                          <Badge className="bg-[#00c875] text-white text-[10px]">Auto</Badge>
+                          <Badge className="bg-success-500 text-white text-[10px]">Auto</Badge>
                         )}
                         {stage.skip_allowed && (
-                          <Badge className="bg-[#a25ddc] text-white text-[10px]">Skip</Badge>
+                          <Badge className="bg-purple-500 text-white text-[10px]">Skip</Badge>
                         )}
                         <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
                           <Edit className="h-3 w-3" />
@@ -594,27 +594,27 @@ export const PatientFlowManagement = () => {
           <TabsContent value="capacity" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {capacity.map((cap) => (
-                <Card key={cap.id} className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+                <Card key={cap.id} className="border-canvas-silk dark:border-slate-800 shadow-xs">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm font-extrabold flex items-center gap-2">
-                      <Building2 className="h-4 w-4 text-[#0073ea]" />
+                      <Building2 className="h-4 w-4 text-primary-500" />
                       {cap.department_id || "General"}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-[#676879]">Current Load</span>
+                      <span className="text-graphite-500 dark:text-slate-400">Current Load</span>
                       <span className="font-bold">{cap.current_load} / {cap.max_capacity}</span>
                     </div>
                     <Progress value={(cap.current_load / cap.max_capacity) * 100} className="h-2" />
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-[#676879]">Available</span>
-                      <span className="font-bold text-[#00c875]">{cap.available_slots}</span>
+                      <span className="text-graphite-500 dark:text-slate-400">Available</span>
+                      <span className="font-bold text-success-500">{cap.available_slots}</span>
                     </div>
                     {cap.overbooking_allowed && (
                       <div className="flex items-center justify-between text-xs">
-                        <span className="text-[#676879]">Overbooking</span>
-                        <span className="font-bold text-[#fdab3d]">+{cap.overbooking_threshold}</span>
+                        <span className="text-graphite-500 dark:text-slate-400">Overbooking</span>
+                        <span className="font-bold text-warning-500">+{cap.overbooking_threshold}</span>
                       </div>
                     )}
                   </CardContent>
@@ -626,37 +626,37 @@ export const PatientFlowManagement = () => {
           {/* Analytics Tab */}
           <TabsContent value="analytics" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+              <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                 <CardHeader>
                   <CardTitle className="text-sm font-extrabold flex items-center gap-2">
-                    <TrendingUp className="h-4 w-4 text-[#0073ea]" /> Flow Analytics
+                    <TrendingUp className="h-4 w-4 text-primary-500" /> Flow Analytics
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="h-[200px] flex items-center justify-center text-[#676879] text-xs">
+                  <div className="h-[200px] flex items-center justify-center text-graphite-500 dark:text-slate-400 text-xs">
                     Flow analytics chart placeholder
                   </div>
                 </CardContent>
               </Card>
-              <Card className="border-[#e6e9ef] dark:border-slate-800 shadow-xs">
+              <Card className="border-canvas-silk dark:border-slate-800 shadow-xs">
                 <CardHeader>
                   <CardTitle className="text-sm font-extrabold flex items-center gap-2">
-                    <AlertTriangle className="h-4 w-4 text-[#0073ea]" /> Bottlenecks
+                    <AlertTriangle className="h-4 w-4 text-primary-500" /> Bottlenecks
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-[#676879]">Triage Stage</span>
-                      <span className="font-bold text-[#e44258]">12 min avg</span>
+                      <span className="text-graphite-500 dark:text-slate-400">Triage Stage</span>
+                      <span className="font-bold text-error-500">12 min avg</span>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-[#676879]">Consultation</span>
-                      <span className="font-bold text-[#fdab3d]">8 min avg</span>
+                      <span className="text-graphite-500 dark:text-slate-400">Consultation</span>
+                      <span className="font-bold text-warning-500">8 min avg</span>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-[#676879]">Billing</span>
-                      <span className="font-bold text-[#00c875]">5 min avg</span>
+                      <span className="text-graphite-500 dark:text-slate-400">Billing</span>
+                      <span className="font-bold text-success-500">5 min avg</span>
                     </div>
                   </div>
                 </CardContent>
