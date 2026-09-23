@@ -14,6 +14,7 @@ import { format } from 'date-fns';
 import { CalendarIcon, Plus, Pill, Clock, AlertTriangle, CheckCircle, Building, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { providerDisplayName } from '@/utils/providerDisplay';
 
 interface Prescription {
   id: string;
@@ -85,7 +86,7 @@ export const ComprehensivePrescriptions = () => {
       let pharmacyMap: Record<string, any> = {};
 
       if (providerIds.length > 0) {
-        const { data: profs } = await supabase.from('profiles').select('id, first_name, last_name').in('id', providerIds);
+        const { data: profs } = await supabase.from('profiles').select('id, first_name, last_name, role').in('id', providerIds);
         (profs || []).forEach((p) => { providerMap[p.id] = p; });
       }
 
@@ -335,7 +336,7 @@ export const ComprehensivePrescriptions = () => {
                     <div className="text-sm">
                       <span className="font-medium text-muted-foreground">Prescribed by:</span>
                       <p className="mt-1">
-                        Dr. {(prescription as any).profiles.first_name} {(prescription as any).profiles.last_name}
+                        {providerDisplayName({ first_name: (prescription as any).profiles.first_name, last_name: (prescription as any).profiles.last_name, role: (prescription as any).profiles?.role })}
                       </p>
                     </div>
                   </div>

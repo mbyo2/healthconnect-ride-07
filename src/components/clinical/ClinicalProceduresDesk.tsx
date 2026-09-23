@@ -48,7 +48,9 @@ const COMMON_CPT = [
   { code: "96372", label: "Therapeutic / Diagnostic Injection (IM / SubQ)" },
 ];
 
-const DEFAULT_PROCEDURES: ClinicalProcedure[] = [
+// Clearly-labeled sample rows for demos — never shown as real records.
+// The desk starts empty; samples load only via the opt-in button below.
+const SAMPLE_PROCEDURES: ClinicalProcedure[] = [
   { id: "pr-1", procedureCode: "CPT-99214", procedureName: "Comprehensive Clinical Consultation", patientName: "Chanda Mulenga", diagnosisIcd: "ICD-I10 (Essential Hypertension)", performer: "Dr. Mwape Chilufya", date: "2026-09-01", consentSigned: true, status: "Completed", notes: "Medication adjusted to Amlodipine 5mg OD. BP controlled at 122/78." },
   { id: "pr-2", procedureCode: "CPT-97110", procedureName: "Therapeutic Spinal Mobilization", patientName: "Ruth Chiluba", diagnosisIcd: "ICD-M54.5 (Low Back Pain)", performer: "PT Faith Musonda", date: "2026-09-01", consentSigned: true, status: "In Progress", notes: "Lumbar Grade II mobilization and core stabilization." },
   { id: "pr-3", procedureCode: "CPT-90471", procedureName: "EPI Childhood Vaccine Administration", patientName: "Baby Joshua Tembo", diagnosisIcd: "ICD-Z23 (Encounter for immunization)", performer: "Sister Grace Banda", date: "2026-09-01", consentSigned: true, status: "Completed", notes: "Pentavalent-3 and IPV administered left anterolateral thigh." },
@@ -56,7 +58,8 @@ const DEFAULT_PROCEDURES: ClinicalProcedure[] = [
 ];
 
 export const ClinicalProceduresDesk: React.FC<{ institutionId?: string }> = ({ institutionId }) => {
-  const [procedures, setProcedures] = useState<ClinicalProcedure[]>(DEFAULT_PROCEDURES);
+  const [procedures, setProcedures] = useState<ClinicalProcedure[]>([]);
+  const [samplesLoaded, setSamplesLoaded] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
   // New Procedure Form state
@@ -66,15 +69,15 @@ export const ClinicalProceduresDesk: React.FC<{ institutionId?: string }> = ({ i
   const [selectedCpt, setSelectedCpt] = useState(COMMON_CPT[0].code);
   const [procedureNotes, setProcedureNotes] = useState("");
 
-  // Vitals Quick Check state
-  const [vitals, setVitals] = useState({
-    hr: 74,
-    bpSys: 120,
-    bpDia: 80,
-    spo2: 98,
-    temp: 36.6,
-    glucose: 5.4,
-  });
+  // Reference ranges for quick clinical checks — not live patient vitals.
+  // Live vitals arrive via paired IoT monitors (see IoT Monitoring).
+  const vitals = {
+    hr: '60–100',
+    bp: '< 120/80',
+    spo2: '≥ 95',
+    temp: '36.1–37.2',
+    glucose: '4.0–5.4',
+  };
 
   const filteredProcedures = procedures.filter(
     (p) =>
@@ -205,41 +208,41 @@ export const ClinicalProceduresDesk: React.FC<{ institutionId?: string }> = ({ i
         </div>
       </div>
 
-      {/* Vital Signs Live Banner */}
+      {/* Vital Signs Reference Ranges — normal ranges for quick checks, not live readings */}
       <div className="grid grid-cols-2 sm:grid-cols-6 gap-3">
         <div className="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
-          <span className="text-[10px] font-extrabold uppercase text-slate-400">Heart Rate</span>
+          <span className="text-[10px] font-extrabold uppercase text-slate-400">Heart Rate · ref</span>
           <div className="text-lg font-black text-primary-500">{vitals.hr} bpm</div>
-          <span className="text-[9px] font-bold text-emerald-600">✓ Normal (60-100)</span>
+          <span className="text-[9px] font-bold text-slate-400">Resting adult range</span>
         </div>
 
         <div className="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
-          <span className="text-[10px] font-extrabold uppercase text-slate-400">Blood Pressure</span>
-          <div className="text-lg font-black text-slate-900 dark:text-slate-100">{vitals.bpSys}/{vitals.bpDia}</div>
-          <span className="text-[9px] font-bold text-emerald-600">✓ Normotensive</span>
+          <span className="text-[10px] font-extrabold uppercase text-slate-400">Blood Pressure · ref</span>
+          <div className="text-lg font-black text-slate-900 dark:text-slate-100">{vitals.bp} mmHg</div>
+          <span className="text-[9px] font-bold text-slate-400">Normal adult range</span>
         </div>
 
         <div className="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
-          <span className="text-[10px] font-extrabold uppercase text-slate-400">SpO2 Oxygen</span>
+          <span className="text-[10px] font-extrabold uppercase text-slate-400">SpO2 Oxygen · ref</span>
           <div className="text-lg font-black text-emerald-600">{vitals.spo2}%</div>
-          <span className="text-[9px] font-bold text-emerald-600">✓ Optimal</span>
+          <span className="text-[9px] font-bold text-slate-400">Healthy saturation</span>
         </div>
 
         <div className="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
-          <span className="text-[10px] font-extrabold uppercase text-slate-400">Temperature</span>
+          <span className="text-[10px] font-extrabold uppercase text-slate-400">Temperature · ref</span>
           <div className="text-lg font-black text-slate-900 dark:text-slate-100">{vitals.temp} °C</div>
-          <span className="text-[9px] font-bold text-emerald-600">✓ Afebrile</span>
+          <span className="text-[9px] font-bold text-slate-400">Afebrile range</span>
         </div>
 
         <div className="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
-          <span className="text-[10px] font-extrabold uppercase text-slate-400">Blood Glucose</span>
+          <span className="text-[10px] font-extrabold uppercase text-slate-400">Blood Glucose · ref</span>
           <div className="text-lg font-black text-slate-900 dark:text-slate-100">{vitals.glucose} mmol/L</div>
-          <span className="text-[9px] font-bold text-emerald-600">✓ Fasting Normal</span>
+          <span className="text-[9px] font-bold text-slate-400">Fasting range</span>
         </div>
 
         <div className="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs flex flex-col justify-center text-center">
           <button
-            onClick={() => toast.success("Vital signs synced from connected Bluetooth monitors")}
+            onClick={() => toast.info("No monitor connected — pair a Bluetooth monitor from IoT Monitoring for live vitals")}
             className="text-[11px] font-extrabold text-primary-500 hover:underline"
           >
             🔄 Sync IoT Vitals
@@ -262,6 +265,26 @@ export const ClinicalProceduresDesk: React.FC<{ institutionId?: string }> = ({ i
             </tr>
           </thead>
           <tbody className="divide-y divide-canvas-silk dark:divide-slate-800">
+            {filteredProcedures.length === 0 && (
+              <tr>
+                <td colSpan={7} className="py-10 px-4 text-center">
+                  <p className="text-sm font-bold text-slate-700 dark:text-slate-300">
+                    {searchQuery ? 'No procedures match your search.' : 'No procedures recorded yet.'}
+                  </p>
+                  <p className="text-xs text-slate-500 mt-1">
+                    {searchQuery ? 'Try a different search term.' : 'Log your first procedure above — entries here are session-only until backend sync lands.'}
+                  </p>
+                  {!searchQuery && !samplesLoaded && (
+                    <button
+                      onClick={() => { setProcedures(SAMPLE_PROCEDURES); setSamplesLoaded(true); }}
+                      className="mt-3 px-4 py-2 rounded-xl border border-canvas-silk dark:border-slate-700 text-xs font-extrabold text-primary-500 hover:bg-primary-50 dark:hover:bg-slate-800 transition-colors"
+                    >
+                      Load sample data for demo
+                    </button>
+                  )}
+                </td>
+              </tr>
+            )}
             {filteredProcedures.map((proc) => (
               <tr key={proc.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-800/60">
                 <td className="py-3 px-4">

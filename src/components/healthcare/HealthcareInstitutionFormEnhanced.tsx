@@ -16,6 +16,8 @@ import type { Database } from "@/integrations/supabase/types";
 import { SpecialtySelector } from "./SpecialtySelector";
 import { saveInstitutionSpecialties } from "@/hooks/useClinicSpecialties";
 import { provisionInstitutionWorkspace } from "@/services/institutionProvisioning";
+import { useFormDraft } from "@/hooks/use-form-draft";
+import { authRedirectUrl, currentReturnTo } from "@/utils/pendingAction";
 import { REGULATORY_REQUIREMENTS, getCountryRequirements, validateDocumentUpload, type DocumentRequirement } from "@/config/regulatoryRequirements";
 import { INSTITUTION_TYPE_OPTIONS, type InstitutionTypeOption } from "@/config/facilityProfiles";
 
@@ -60,7 +62,9 @@ export const HealthcareInstitutionFormEnhanced = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentTab, setCurrentTab] = useState("basic");
   
-  const [formData, setFormData] = useState({
+  // Draft-persisted: a half-filled application survives reloads and the
+  // login redirect (session expiry mid-fill no longer wipes 40 fields).
+  const { draft: formData, setDraft: setFormData, clearDraft: clearInstitutionDraft } = useFormDraft("doc_form_draft_institution_enh", {
     // Basic Information
     name: "",
     type: "",
@@ -255,7 +259,9 @@ export const HealthcareInstitutionFormEnhanced = () => {
       const { data: { user } } = await supabase.auth.getUser();
 
       if (!user) {
-        toast.error("You must be logged in to register an institution");
+        // Draft is persisted by useFormDraft — login returns here via redirect.
+        toast.info("Sign in to submit — your application draft is saved.");
+        navigate(authRedirectUrl(currentReturnTo()));
         return;
       }
 
@@ -346,6 +352,7 @@ export const HealthcareInstitutionFormEnhanced = () => {
           : "Institution registered successfully! You'll have HMS access once approved (not publicly listed)."
       );
       
+      clearInstitutionDraft();
       navigate("/institution-status");
     } catch (error: any) {
       console.error("Error registering institution:", error);

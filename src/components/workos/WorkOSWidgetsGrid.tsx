@@ -168,7 +168,7 @@ export const WorkOSWidgetsGrid: React.FC<WorkOSWidgetsGridProps> = ({ isDarkMode
               <Users className="h-5 w-5 text-emerald-500" />
               <h3 className="font-extrabold text-base tracking-tight">On-Call Specialists</h3>
             </div>
-            <span className="text-xs font-mono font-bold text-emerald-500">4 Active</span>
+            <span className="text-xs font-mono font-bold text-slate-400">Sample roster</span>
           </div>
 
           <div className="space-y-3">

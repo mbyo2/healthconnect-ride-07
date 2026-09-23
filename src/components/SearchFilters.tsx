@@ -73,8 +73,8 @@ export const SearchFilters = () => {
 
         <div className="flex items-center gap-2">
           <MapPin className="h-4 w-4 text-muted-foreground" />
-          <Switch checked={useUserLocation} onCheckedChange={setUseUserLocation} />
-          <Label className="text-sm">Use my location</Label>
+          <Switch id="use-user-location" checked={useUserLocation} onCheckedChange={setUseUserLocation} />
+          <Label htmlFor="use-user-location" className="text-sm">Use my location</Label>
         </div>
       </div>
 

@@ -47,10 +47,10 @@ serve(async (req) => {
     );
 
     const body = await req.json() as PaymentRequest;
-    const { amount: clientAmount, currency, providerId, serviceId, orderId, description } = body;
+    const { amount: clientAmount, currency, providerId: clientProviderId, serviceId, orderId, description } = body;
     // FORCE patientId to the authenticated user — never trust client-supplied value
     const patientId = user.id;
-    if (!clientAmount || clientAmount <= 0 || !providerId || (!serviceId && !orderId)) {
+    if (!clientAmount || clientAmount <= 0 || (!serviceId && !orderId)) {
       return new Response(JSON.stringify({ error: 'Invalid input' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
@@ -71,7 +71,61 @@ serve(async (req) => {
       }
       throw e;
     }
-    console.log('Processing wallet payment:', { amount, patientId, providerId, serviceId });
+    // Resolve a real provider profile for the payments row (provider_id has
+    // an FK to profiles — sentinel UUIDs and order IDs violate it and fail
+    // the whole payment). Client value wins when valid; pharmacy orders fall
+    // back to the dispensing facility's admin, then any affiliated staffer.
+    let providerId: string | null = null;
+    if (clientProviderId) {
+      const { data: prof } = await supabaseClient
+        .from('profiles')
+        .select('id')
+        .eq('id', clientProviderId)
+        .maybeSingle();
+      if (prof) providerId = clientProviderId;
+    }
+    if (!providerId && orderId) {
+      const { data: order } = await supabaseClient
+        .from('orders')
+        .select('pharmacy_id')
+        .eq('id', orderId)
+        .maybeSingle();
+      const pharmacyId = (order as any)?.pharmacy_id;
+      if (pharmacyId) {
+        const { data: inst } = await supabaseClient
+          .from('healthcare_institutions')
+          .select('admin_id')
+          .eq('id', pharmacyId)
+          .maybeSingle();
+        if ((inst as any)?.admin_id) {
+          const { data: adminProf } = await supabaseClient
+            .from('profiles')
+            .select('id')
+            .eq('id', (inst as any).admin_id)
+            .maybeSingle();
+          if (adminProf) providerId = (inst as any).admin_id;
+        }
+        if (!providerId) {
+          const { data: staffer } = await supabaseClient
+            .from('institution_personnel')
+            .select('user_id')
+            .eq('institution_id', pharmacyId)
+            .limit(1)
+            .maybeSingle();
+          if ((staffer as any)?.user_id) providerId = (staffer as any).user_id;
+        }
+      }
+    }
+    if (!providerId) {
+      return new Response(
+        JSON.stringify({ success: false, error: 'Could not link this payment to a provider account' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    // Order references travel in metadata — service_id must stay NULL for
+    // orders (it references healthcare_services).
+    const serviceIdForDb = orderId ? null : serviceId;
+    console.log('Processing wallet payment:', { amount, patientId, providerId, serviceId: serviceIdForDb, orderId });
 
 
     // Process wallet transaction using database function
@@ -81,7 +135,7 @@ serve(async (req) => {
           p_user_id: patientId,
           p_transaction_type: 'debit',
           p_amount: amount,
-          p_description: `Payment for service ${serviceId}`,
+          p_description: orderId ? `Wallet payment for order ${orderId}` : `Wallet payment for service ${serviceId}`,
           p_payment_id: null // Will be set after payment record creation
         });
 
@@ -96,7 +150,7 @@ serve(async (req) => {
           return new Response(
             JSON.stringify({ 
               success: false, 
-              message: `Insufficient funds. Available: $${currentBalance}, Required: $${amount}`,
+              message: `Insufficient funds. Available: K${currentBalance}, Required: K${amount}`,
               availableBalance: currentBalance,
               requiredAmount: amount
             }),
@@ -110,18 +164,18 @@ serve(async (req) => {
         throw transactionError;
       }
 
-    // Create payment record in database
-    const paymentId = `PAY-WALLET-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
-
+    // Create payment record in database. The id is DB-defaulted (uuid) —
+    // custom string IDs violate the uuid PK. service_id stays NULL for
+    // pharmacy orders (it references healthcare_services; the order link
+    // travels in metadata).
     const { data: payment, error: paymentError } = await supabaseClient
       .from('payments')
       .insert({
-        id: paymentId,
         patient_id: patientId,
         provider_id: providerId,
-        service_id: serviceId,
+        service_id: serviceIdForDb,
         amount: amount,
-        currency: currency,
+        currency: (currency || 'ZMW').toUpperCase(),
         status: 'completed',
         payment_method: 'wallet',
         metadata: orderId ? { reference_type: 'order', reference_id: orderId, description } : { description },
@@ -137,7 +191,7 @@ serve(async (req) => {
           p_user_id: patientId,
           p_transaction_type: 'credit',
           p_amount: amount,
-          p_description: `Rollback for failed payment ${paymentId}`,
+          p_description: `Rollback for failed wallet payment of ${amount}`,
           p_payment_id: null
         });
         throw paymentError;

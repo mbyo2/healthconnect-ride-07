@@ -14,6 +14,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { AnimatedButton } from "@/components/ui/animated-button";
 import { useFeedbackSystem } from "@/hooks/use-feedback-system";
 import { ForgotPasswordDialog } from "@/components/auth/ForgotPasswordDialog";
+import { safeRedirectTarget } from "@/utils/pendingAction";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -170,11 +171,13 @@ export const Auth = () => {
   const [countries, setCountries] = useState<Array<{ value: string; label: string; dialCode: string }>>([]);
 
   const redirectParam = searchParams.get("redirect");
-  const redirectTo = redirectParam && redirectParam.startsWith("/") ? redirectParam : "/dashboard";
+  // safeRedirectTarget rejects protocol-relative (//evil) and scheme URLs.
+  const redirectTo = safeRedirectTarget(redirectParam);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session?.user) navigate(redirectTo);
+      // replace: so the back button never lands back on the login screen
+      if (data.session?.user) navigate(redirectTo, { replace: true });
       setAuthLoading(false);
     });
   }, [navigate, redirectTo]);
@@ -226,9 +229,13 @@ export const Auth = () => {
     setLocalLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email: data.email, password: data.password });
     if (error) showError(error.message);
-    else navigate(redirectTo);
+    else navigate(redirectTo, { replace: true });
     setLocalLoading(false);
   };
+
+  // Email verification must land back on /auth WITH the redirect param,
+  // otherwise a brand-new user loses the flow they came from.
+  const verifyRedirect = `${window.location.origin}/auth?redirect=${encodeURIComponent(redirectTo)}`;
 
   const onPatientSignup = async (data: z.infer<typeof patientSchema>) => {
     setLocalLoading(true);
@@ -236,6 +243,7 @@ export const Auth = () => {
       email: data.email,
       password: data.password,
       options: {
+        emailRedirectTo: verifyRedirect,
         data: {
           first_name: data.firstName,
           last_name: data.lastName,
@@ -255,6 +263,7 @@ export const Auth = () => {
       email: data.email,
       password: data.password,
       options: {
+        emailRedirectTo: verifyRedirect,
         data: {
           first_name: data.firstName,
           last_name: data.lastName,
@@ -285,6 +294,7 @@ export const Auth = () => {
       email: data.email,
       password: data.password,
       options: {
+        emailRedirectTo: verifyRedirect,
         data: {
           first_name: data.adminFirstName,
           last_name: data.adminLastName,

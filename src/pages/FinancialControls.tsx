@@ -399,7 +399,7 @@ export const FinancialControls = () => {
           <TabsContent value="audit" className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Input placeholder="Search transactions..." className="w-64 h-9 text-xs" />
+                <Input type="search" aria-label="Search transactions..." className="w-64 h-9 text-xs" />
                 <Select defaultValue="all">
                   <SelectTrigger className="w-32 h-9 text-xs">
                     <SelectValue />
@@ -483,7 +483,7 @@ export const FinancialControls = () => {
             </div>
 
             <Card className="border-canvas-silk dark:border-slate-800 shadow-xs overflow-hidden">
-              <table className="w-full">
+              <div className="overflow-x-auto"><table className="w-full min-w-[640px]">
                 <thead className="bg-canvas-mist dark:bg-slate-800">
                   <tr>
                     <th className="text-left text-xs font-extrabold px-4 py-3">Transaction</th>
@@ -541,7 +541,7 @@ export const FinancialControls = () => {
                     </tr>
                   ))}
                 </tbody>
-              </table>
+              </table></div>
             </Card>
           </TabsContent>
 
@@ -549,7 +549,7 @@ export const FinancialControls = () => {
           <TabsContent value="discrepancies" className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Input placeholder="Search discrepancies..." className="w-64 h-9 text-xs" />
+                <Input type="search" aria-label="Search discrepancies..." className="w-64 h-9 text-xs" />
                 <Select defaultValue="all">
                   <SelectTrigger className="w-32 h-9 text-xs">
                     <SelectValue />

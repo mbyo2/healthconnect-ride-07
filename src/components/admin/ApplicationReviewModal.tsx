@@ -460,7 +460,7 @@ export const ApplicationReviewModal = ({
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {app.operational_since && (
               <div>
                 <Label className="text-muted-foreground">Operational Since</Label>

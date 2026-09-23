@@ -5,6 +5,7 @@ import { useCurrency } from '@/hooks/use-currency';
 import { MetricCard } from '@/components/shared/MetricCard';
 import { SimpleBarChart, DonutChart, TrendChart } from '@/components/charts';
 import { SuggestionBanner } from '@/components/guidance';
+import { useNavigate } from 'react-router-dom';
 
 interface HMSDashboardProps {
   hospital: any;
@@ -16,6 +17,7 @@ interface HMSDashboardProps {
 
 export const HMSDashboard = ({ hospital, departments, beds, admissions, invoices }: HMSDashboardProps) => {
   const { formatPrice } = useCurrency();
+  const navigate = useNavigate();
   
   const totalBeds = beds?.length || 0;
   const occupiedBeds = beds?.filter(b => b.status === 'occupied').length || 0;
@@ -98,7 +100,7 @@ export const HMSDashboard = ({ hospital, departments, beds, admissions, invoices
           variant="warning"
           icon={AlertTriangle}
           actions={[
-            { label: 'View Bed Management', onClick: () => window.location.href = '/hospital-management?tab=beds', variant: 'primary' },
+            { label: 'View Bed Management', onClick: () => navigate('/hospital-management?tab=beds'), variant: 'primary' },
           ]}
         />
       )}

@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useOfflineMode } from "@/hooks/use-offline-mode";
 import { safeCryptoUUID } from "@/utils/storage";
+import { providerDisplayName } from "@/utils/providerDisplay";
 import {
   Pill, AlertTriangle, CheckCircle, Package, Plus, Trash2,
   Printer, Search, User, FileText, CheckCircle2
@@ -93,7 +94,7 @@ export function PrescriptionFulfillment() {
       if (allProfileIds.length > 0) {
         const { data: profiles } = await supabase
           .from("profiles")
-          .select("id, first_name, last_name, email")
+          .select("id, first_name, last_name, email, role")
           .in("id", allProfileIds as string[]);
         (profiles || []).forEach((prof) => {
           profileMap[prof.id] = prof;
@@ -113,7 +114,7 @@ export function PrescriptionFulfillment() {
           duration_days: prescription.duration_days,
           frequency: prescription.instructions,
           prescribed_by: providerProf
-            ? `Dr. ${providerProf.first_name || ""} ${providerProf.last_name || ""}`.trim()
+            ? providerDisplayName({ first_name: providerProf.first_name, last_name: providerProf.last_name, role: (providerProf as any)?.role })
             : "Pharmacy / Attending Provider",
           prescribed_date: prescription.prescribed_date,
           notes: prescription.notes,

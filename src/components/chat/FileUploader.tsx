@@ -80,6 +80,7 @@ export const FileUploader = ({ onUploadComplete }: FileUploaderProps) => {
       className="relative"
       disabled={uploading}
       type="button"
+      aria-label="Attach a file to this message"
     >
       <input
         type="file"
@@ -87,6 +88,7 @@ export const FileUploader = ({ onUploadComplete }: FileUploaderProps) => {
         onChange={handleFileUpload}
         disabled={uploading}
         accept=".jpg,.jpeg,.png,.pdf,.txt"
+        aria-label="Choose a file to attach"
       />
       <Upload className="h-4 w-4" />
     </Button>

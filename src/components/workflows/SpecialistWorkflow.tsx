@@ -50,7 +50,7 @@ export const SpecialistWorkflow = () => {
                   <SelectContent>{SPECIALTY_TYPES.map(s => <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                 <div className="space-y-1"><Label>Session #</Label><Input type="number" value={form.session_number} onChange={e => setForm({...form, session_number: +e.target.value})} /></div>
                 <div className="space-y-1"><Label>Total Sessions</Label><Input type="number" value={form.total_sessions} onChange={e => setForm({...form, total_sessions: +e.target.value})} /></div>
                 <div className="space-y-1"><Label>Date</Label><Input type="date" value={form.session_date} onChange={e => setForm({...form, session_date: e.target.value})} /></div>

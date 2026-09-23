@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { User, MapPin, Star, Calendar, Search, GraduationCap, DollarSign, Shield, Video, Home } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import { providerDisplayName } from '@/utils/providerDisplay';
 
 interface Professional {
   id: string;
@@ -93,6 +94,8 @@ const HealthcareProfessionals = () => {
           accepts_insurance,
           telemedicine_available,
           home_visits_available,
+          accepting_patients,
+          role,
           is_verified
         `)
         .in('role', PROVIDER_ROLES as any)
@@ -121,7 +124,7 @@ const HealthcareProfessionals = () => {
         accepts_insurance: item.accepts_insurance ?? false,
         telemedicine_available: item.telemedicine_available ?? false,
         home_visits_available: item.home_visits_available ?? false,
-        accepting_patients: true,
+        accepting_patients: item.accepting_patients ?? false,
       }));
 
       setProfessionals(mappedData);
@@ -246,7 +249,7 @@ const HealthcareProfessionals = () => {
                     </div>
                     <div>
                       <CardTitle className="text-base leading-snug">
-                        Dr. {prof.first_name} {prof.last_name}
+                        {providerDisplayName({ first_name: prof.first_name, last_name: prof.last_name, role: (prof as any)?.role })}
                       </CardTitle>
                       <CardDescription>{prof.specialty || 'General Practice'}</CardDescription>
                     </div>

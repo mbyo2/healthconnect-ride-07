@@ -111,7 +111,7 @@ const HealthAnalytics = () => {
               <LineChartIcon className="h-4 w-4 text-primary-500" />
               Biometric Data Visualizations
             </h2>
-            <div className="flex items-center gap-1 p-1 rounded-lg bg-canvas border border-canvas-silk dark:border-slate-800">
+            <div className="flex items-center gap-1 p-1 rounded-lg bg-canvas border border-canvas-silk dark:border-slate-800" role="tablist" aria-label="Biometric data views">
               {[
                 { id: "heart-rate", label: "Heart Rate" },
                 { id: "activity", label: "Activity" },
@@ -120,11 +120,13 @@ const HealthAnalytics = () => {
               ].map((tab) => (
                 <button
                   key={tab.id}
+                  role="tab"
+                  aria-selected={activeTab === tab.id}
                   onClick={() => setActiveTab(tab.id as any)}
                   className={`px-3 py-1 rounded-md text-xs font-extrabold transition-all ${
                     activeTab === tab.id
                       ? "bg-primary-500 text-white shadow-xs"
-                      : "text-graphite-500 dark:text-slate-400 hover:bg-white"
+                      : "text-graphite-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800"
                   }`}
                 >
                   {tab.label}

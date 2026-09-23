@@ -210,6 +210,7 @@ export const Imaging3DUploader = () => {
                     size="icon"
                     variant="destructive"
                     className="h-8 w-8"
+                    aria-label="Clear loaded image slices"
                     onClick={clearSlices}
                   >
                     <X className="h-4 w-4" />

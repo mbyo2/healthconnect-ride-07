@@ -138,7 +138,7 @@ const AppointmentRemindersPage = () => {
                   <p className="text-[11px] text-graphite-500 dark:text-slate-400">Sent to registered patient email address</p>
                 </div>
               </div>
-              <Switch checked={emailReminders} onCheckedChange={setEmailReminders} />
+              <Switch checked={emailReminders} onCheckedChange={setEmailReminders} aria-label="Email notifications" />
             </div>
 
             <div className="flex items-center justify-between p-3.5 rounded-xl border border-canvas-silk bg-canvas dark:bg-slate-950">
@@ -151,7 +151,7 @@ const AppointmentRemindersPage = () => {
                   <p className="text-[11px] text-graphite-500 dark:text-slate-400">Cellular SMS text dispatched to mobile phone</p>
                 </div>
               </div>
-              <Switch checked={smsReminders} onCheckedChange={setSmsReminders} />
+              <Switch checked={smsReminders} onCheckedChange={setSmsReminders} aria-label="SMS text reminders" />
             </div>
 
             <div className="flex items-center justify-between p-3.5 rounded-xl border border-canvas-silk bg-canvas dark:bg-slate-950">
@@ -164,7 +164,7 @@ const AppointmentRemindersPage = () => {
                   <p className="text-[11px] text-graphite-500 dark:text-slate-400">Browser push & mobile app push alerts</p>
                 </div>
               </div>
-              <Switch checked={pushReminders} onCheckedChange={setPushReminders} />
+              <Switch checked={pushReminders} onCheckedChange={setPushReminders} aria-label="Push notifications" />
             </div>
 
             <button

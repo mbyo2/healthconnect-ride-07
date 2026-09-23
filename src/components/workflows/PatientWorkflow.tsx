@@ -11,6 +11,7 @@ import { format } from 'date-fns';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
+import { providerDisplayName } from '@/utils/providerDisplay';
 import {
   Heart,
   Search,
@@ -31,7 +32,6 @@ import {
   Bell,
   ChevronRight,
   Clock,
-  Star,
   Stethoscope,
   ArrowRight,
   FileText
@@ -51,45 +51,7 @@ const SPECIALTIES_DATA = [
   { id: 'general', name: 'General Care', icon: '🩺', sub: 'Family Medicine', route: '/search?specialty=General+Practice' },
 ];
 
-// Sample featured doctors with interactive time slots
-const FEATURED_DOCTORS = [
-  {
-    id: 'doc-1',
-    name: 'Dr. Aysha Hayes',
-    specialty: 'Dentist',
-    experience: '12 years experience • Online',
-    rating: 4.8,
-    reviews: 142,
-    avatar: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=240&q=85',
-    timeSlots: ['8:00 a.m.', '9:00 a.m.', '10:00 a.m.', '2:30 p.m.'],
-    price: 'K350',
-    mode: 'online'
-  },
-  {
-    id: 'doc-2',
-    name: 'Dr. Hari Monroe',
-    specialty: 'Cardiologist',
-    experience: '15 years experience • Lusaka Hospital',
-    rating: 4.9,
-    reviews: 210,
-    avatar: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=240&q=85',
-    timeSlots: ['9:30 a.m.', '11:00 a.m.', '3:00 p.m.', '4:15 p.m.'],
-    price: 'K450',
-    mode: 'both'
-  },
-  {
-    id: 'doc-3',
-    name: 'Dr. Sarah Jenkins',
-    specialty: 'Pediatrician',
-    experience: '9 years experience • Online',
-    rating: 4.9,
-    reviews: 188,
-    avatar: 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?auto=format&fit=crop&w=240&q=85',
-    timeSlots: ['10:00 a.m.', '11:30 a.m.', '1:00 p.m.', '3:30 p.m.'],
-    price: 'K300',
-    mode: 'online'
-  }
-];
+
 
 export const PatientWorkflow = React.memo(() => {
   const navigate = useNavigate();
@@ -97,10 +59,21 @@ export const PatientWorkflow = React.memo(() => {
   const { showSuccess } = useSuccessFeedback();
   const [careMode, setCareMode] = useState<'online' | 'offline'>('online');
   const [selectedSpecialty, setSelectedSpecialty] = useState<string>('dentistry');
-  const [selectedDoctorSlots, setSelectedDoctorSlots] = useState<Record<string, string>>({
-    'doc-1': '9:00 a.m.',
-    'doc-2': '9:30 a.m.',
-    'doc-3': '10:00 a.m.'
+
+  // Real verified providers for the "Available Doctors" rail — never sample data.
+  const { data: featuredProviders = [] } = useQuery({
+    queryKey: ['patient-featured-providers'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name, specialty, avatar_url, consultation_fee_min, role')
+        .eq('is_verified', true)
+        .order('created_at', { ascending: false })
+        .limit(3);
+      if (error) return [];
+      return (data as any[]) || [];
+    },
+    staleTime: 5 * 60 * 1000,
   });
 
   const {
@@ -121,7 +94,7 @@ export const PatientWorkflow = React.memo(() => {
         .from('appointments')
         .select(`
           id, date, time, type, status,
-          provider:profiles!appointments_provider_id_fkey(first_name, last_name, specialty, avatar_url)
+          provider:profiles!appointments_provider_id_fkey(first_name, last_name, specialty, avatar_url, role)
         `)
         .eq('patient_id', user.id)
         .gte('date', new Date().toISOString().split('T')[0])
@@ -165,14 +138,7 @@ export const PatientWorkflow = React.memo(() => {
     }
   }, [navigate, showSuccess]);
 
-  const handleSlotSelect = (docId: string, slot: string) => {
-    setSelectedDoctorSlots(prev => ({ ...prev, [docId]: slot }));
-  };
 
-  const handleBookSlot = (doctor: typeof FEATURED_DOCTORS[0]) => {
-    const slot = selectedDoctorSlots[doctor.id] || doctor.timeSlots[0];
-    navigate(`/search?doctor=${encodeURIComponent(doctor.name)}&time=${encodeURIComponent(slot)}`);
-  };
 
   if (loading) {
     return (
@@ -343,12 +309,12 @@ export const PatientWorkflow = React.memo(() => {
                 </span>
                 {upcomingAppointment.provider && (
                   <span className="text-sm font-bold text-slate-300">
-                    • Dr. {upcomingAppointment.provider.first_name} {upcomingAppointment.provider.last_name}
+                    • {providerDisplayName({ first_name: upcomingAppointment.provider.first_name, last_name: upcomingAppointment.provider.last_name, role: (upcomingAppointment.provider as any)?.role })}
                   </span>
                 )}
               </>
             ) : (
-              <span>October 22, 10:00 a.m. • Available slots ready</span>
+              <span>No upcoming appointments — book your next visit</span>
             )}
           </div>
           <p className="text-xs text-slate-400 font-medium">
@@ -438,12 +404,12 @@ export const PatientWorkflow = React.memo(() => {
         </div>
       </div>
 
-      {/* ─── Featured Doctors & Selectable Time Slots ─── */}
+      {/* ─── Verified Doctors rail (real directory data) ─── */}
       <div>
         <div className="flex items-center justify-between mb-3.5 px-1">
           <div>
             <h2 className="text-lg sm:text-xl font-black text-slate-900 dark:text-slate-100 tracking-tight">Available Doctors</h2>
-            <p className="text-xs text-slate-400 font-medium">Select a slot for instant consultation</p>
+            <p className="text-xs text-slate-400 font-medium">Verified providers — open a profile to see live slots</p>
           </div>
           <button
             onClick={() => handleNavigation('/search', 'Find Doctors')}
@@ -454,79 +420,60 @@ export const PatientWorkflow = React.memo(() => {
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {FEATURED_DOCTORS.map((doc) => {
-            const activeSlot = selectedDoctorSlots[doc.id] || doc.timeSlots[0];
-
-            return (
+        {featuredProviders.length === 0 ? (
+          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 text-center">
+            <p className="text-sm font-bold text-slate-700 dark:text-slate-300">No verified providers listed yet.</p>
+            <p className="text-xs text-slate-500 mt-1">Search the full directory to find care near you.</p>
+            <button
+              onClick={() => handleNavigation('/search', 'Find Doctors')}
+              className="mt-3 px-4 py-2 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-black text-xs transition-all"
+            >
+              Search doctors
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {featuredProviders.map((doc: any) => (
               <div
                 key={doc.id}
                 className="p-5 rounded-3xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-4"
               >
-                {/* Doctor Info */}
                 <div className="flex items-start gap-3.5">
-                  <div className="relative">
+                  {doc.avatar_url ? (
                     <img
-                      src={doc.avatar}
-                      alt={doc.name}
+                      src={doc.avatar_url}
+                      alt={`${doc.first_name || ''} ${doc.last_name || ''}`.trim() || 'Provider photo'}
                       className="h-13 w-13 rounded-2xl object-cover ring-2 ring-primary-500/30"
                     />
-                    <span className="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-success-600 ring-2 ring-white dark:ring-slate-900" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-sm font-black text-slate-900 dark:text-slate-100 truncate">{doc.name}</h3>
-                      <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/40 text-amber-600 text-[11px] font-black">
-                        <Star className="h-3 w-3 fill-amber-500 text-amber-500" />
-                        <span>{doc.rating}</span>
-                      </div>
+                  ) : (
+                    <div className="h-13 w-13 rounded-2xl bg-primary-50 dark:bg-blue-950/50 text-primary-500 flex items-center justify-center font-black text-lg ring-2 ring-primary-500/30" aria-hidden>
+                      {(doc.first_name?.[0] || 'D')}{(doc.last_name?.[0] || '')}
                     </div>
-                    <p className="text-xs text-primary-500 font-extrabold">{doc.specialty}</p>
-                    <p className="text-[11px] text-slate-400 font-medium truncate">{doc.experience}</p>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-sm font-black text-slate-900 dark:text-slate-100 truncate">
+                      {providerDisplayName({ first_name: doc.first_name, last_name: doc.last_name, role: doc.role })}
+                    </h3>
+                    <p className="text-xs text-primary-500 font-extrabold">{doc.specialty || 'General Practice'}</p>
+                    <p className="text-[11px] text-slate-400 font-medium truncate">
+                      {doc.consultation_fee_min ? `From K${doc.consultation_fee_min}` : 'Fee on request'}
+                    </p>
                   </div>
                 </div>
 
-                {/* Selectable Time Slots (Pills) */}
-                <div className="space-y-1.5">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Select Time Slot:</div>
-                  <div className="grid grid-cols-2 gap-1.5">
-                    {doc.timeSlots.map((slot) => {
-                      const isActive = activeSlot === slot;
-                      return (
-                        <button
-                          key={slot}
-                          onClick={() => handleSlotSelect(doc.id, slot)}
-                          className={`py-1.5 px-2 rounded-xl text-[11px] font-black text-center transition-all ${
-                            isActive
-                              ? 'bg-slate-900 text-white shadow-xs border border-slate-900'
-                              : 'bg-canvas-bone dark:bg-slate-800 border border-canvas-silk dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-primary-500/40'
-                          }`}
-                        >
-                          {slot}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Booking Button */}
-                <div className="pt-1 flex items-center justify-between gap-2 border-t border-canvas-silk dark:border-slate-800">
-                  <div>
-                    <span className="text-[10px] text-slate-400 block font-medium">Consultation Fee</span>
-                    <span className="text-sm font-black text-slate-900 dark:text-slate-100">{doc.price}</span>
-                  </div>
+                <div className="pt-1 border-t border-canvas-silk dark:border-slate-800">
                   <button
-                    onClick={() => handleBookSlot(doc)}
-                    className="px-4 py-2 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-black text-xs flex items-center gap-1 shadow-sm transition-all active:scale-95"
+                    onClick={() => navigate('/search')}
+                    className="w-full px-4 py-2 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-black text-xs flex items-center justify-center gap-1 shadow-sm transition-all active:scale-95"
                   >
-                    <span>Book {activeSlot}</span>
+                    <span>View &amp; book</span>
                     <ChevronRight className="h-3.5 w-3.5" />
                   </button>
                 </div>
               </div>
-            );
-          })}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* ─── Quick Access Services Hub (Clean Blue, Black & White) ─── */}
@@ -645,7 +592,7 @@ export const PatientWorkflow = React.memo(() => {
                 className="px-5 py-2.5 rounded-full bg-rose-600 hover:bg-rose-700 text-white font-extrabold text-xs flex items-center gap-1.5 shadow-sm transition-all"
               >
                 <Phone className="h-3.5 w-3.5" />
-                <span>Call Emergency (992)</span>
+                <span>Call Emergency (991)</span>
               </button>
               <button
                 onClick={() => handleNavigation('/symptoms', 'Symptoms Tracker')}

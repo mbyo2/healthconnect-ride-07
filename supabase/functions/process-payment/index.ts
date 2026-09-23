@@ -30,7 +30,7 @@ interface PaymentRequest {
 }
 
 // PayPal API functions
-const PAYPAL_API_BASE = Deno.env.get('PAYPAL_API_BASE') || 'https://api-m.paypal.com';
+const PAYPAL_API_BASE = Deno.env.get('PAYPAL_BASE_URL') || Deno.env.get('PAYPAL_API_BASE') || 'https://api-m.paypal.com';
 
 async function getPayPalAccessToken() {
   const clientId = Deno.env.get('PAYPAL_CLIENT_ID');

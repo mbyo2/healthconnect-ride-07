@@ -432,7 +432,7 @@ export const EnhancedTelemedicine = () => {
           <TabsContent value="workflows" className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Input placeholder="Search workflows..." className="w-64 h-9 text-xs" />
+                <Input type="search" aria-label="Search workflows..." className="w-64 h-9 text-xs" />
                 <Select defaultValue="active">
                   <SelectTrigger className="w-32 h-9 text-xs">
                     <SelectValue />
@@ -510,7 +510,7 @@ export const EnhancedTelemedicine = () => {
           <TabsContent value="tasks" className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Input placeholder="Search tasks..." className="w-64 h-9 text-xs" />
+                <Input type="search" aria-label="Search tasks..." className="w-64 h-9 text-xs" />
                 <Select defaultValue="pending">
                   <SelectTrigger className="w-32 h-9 text-xs">
                     <SelectValue />
@@ -597,7 +597,7 @@ export const EnhancedTelemedicine = () => {
           <TabsContent value="diagnostics" className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Input placeholder="Search diagnostic orders..." className="w-64 h-9 text-xs" />
+                <Input type="search" aria-label="Search diagnostic orders..." className="w-64 h-9 text-xs" />
                 <Select defaultValue="all">
                   <SelectTrigger className="w-32 h-9 text-xs">
                     <SelectValue />

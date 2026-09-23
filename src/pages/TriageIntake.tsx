@@ -7,6 +7,7 @@ import { Slider } from "@/components/ui/slider";
 import { Loader2, AlertTriangle, Stethoscope, ShieldCheck, Ambulance, Activity } from "lucide-react";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { RatingBadge } from "@/components/RatingBadge";
+import { providerDisplayName } from "@/utils/providerDisplay";
 
 type TriageResponse = {
   session_id: string;
@@ -23,6 +24,7 @@ type TriageResponse = {
     specialty: string | null;
     rating: number | null;
     city: string | null;
+    role?: string | null;
   }>;
 };
 
@@ -341,11 +343,11 @@ export default function TriageIntake() {
                   </button>
                 )}
                 {result.providers.map((p) => {
-                  const name = `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim() || "Provider";
+                  const name = providerDisplayName({ first_name: p.first_name, last_name: p.last_name, role: (p as any)?.role });
                   return (
                     <div key={p.id} className="flex items-center justify-between p-3.5 rounded-xl border border-canvas-silk dark:border-slate-700 bg-canvas dark:bg-slate-800">
                       <div className="flex-1">
-                        <p className="font-extrabold text-xs text-primary-500">Dr. {name}</p>
+                        <p className="font-extrabold text-xs text-primary-500">{name}</p>
                         <div className="flex items-center gap-2 mt-1.5">
                           <p className="text-[11px] text-graphite-500 dark:text-slate-400">
                             {p.specialty ?? result.recommended_specialty} {p.city ? `• ${p.city}` : ""}

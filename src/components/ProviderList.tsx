@@ -63,7 +63,7 @@ export const ProviderList = ({ providers, onProviderSelect, selectedProvider }: 
                 {provider.avatar_url ? (
                   <img
                     src={provider.avatar_url}
-                    alt={`Dr. ${provider.first_name} ${provider.last_name}`}
+                    alt={`${provider.first_name} ${provider.last_name}`}
                     className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover border border-canvas-silk dark:border-slate-800"
                   />
                 ) : (

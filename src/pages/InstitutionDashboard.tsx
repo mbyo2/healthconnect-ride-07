@@ -329,14 +329,14 @@ export const InstitutionDashboard = () => {
 
           <div className="flex items-center gap-2 flex-wrap">
             <button
-              onClick={() => navigate("/kiosk")}
+              onClick={() => window.open("/kiosk", "_blank", "noopener")}
               className="vf-btn-secondary gap-1.5 text-sm"
               aria-label="Open self-service kiosk (new tab)"
             >
               <Ticket className="h-3.5 w-3.5" /> Self-Service Kiosk
             </button>
             <button
-              onClick={() => navigate("/queue-display")}
+              onClick={() => window.open(`/queue-display?institution=${institution.id}`, "_blank", "noopener")}
               className="vf-btn-secondary gap-1.5 text-sm"
               aria-label="Open public TV display (new tab)"
             >
@@ -351,9 +351,9 @@ export const InstitutionDashboard = () => {
         </div>
       </div>
 
-      {/* Main Suite Tab Navigation */}
-      <div className="max-w-content mx-auto px-4 sm:px-6 pt-4">
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-2 border-b border-canvas-silk scrollbar-none">
+        {/* Main Suite Tab Navigation */}
+        <div className="max-w-content mx-auto px-4 sm:px-6 pt-4">
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-2 border-b border-canvas-silk scrollbar-none" role="tablist" aria-label="Institution modules">
           {[
             { id: "overview", label: "Dashboard Overview", icon: Building2 },
             { id: "patients", label: "Patient Hub (Central MRN)", icon: UserRound },
@@ -375,6 +375,8 @@ export const InstitutionDashboard = () => {
             return (
               <button
                 key={tab.id}
+                role="tab"
+                aria-selected={isActive}
                 onClick={() => setActiveTab(tab.id)}
                 className={`px-3.5 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2 whitespace-nowrap transition-all ${
                   isActive

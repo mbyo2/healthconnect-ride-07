@@ -118,7 +118,7 @@ export const ROLE_META: Record<UserRole, RoleMeta> = {
   [USER_ROLES.TRADITIONAL_PRACTITIONER]: { label: 'Traditional Practitioner', icon: 'Sprout', category: 'community', landingPage: '/provider-dashboard' },
   [USER_ROLES.MEDICAL_RECORDS_OFFICER]: { label: 'Medical Records Officer', icon: 'FolderArchive', category: 'institution', landingPage: '/institution-dashboard' },
   // ── Facility operations ──
-  [USER_ROLES.INSTITUTION_ADMIN]:   { label: 'Institution Admin',   icon: 'Building',        category: 'institution', landingPage: '/institution-portal' },
+  [USER_ROLES.INSTITUTION_ADMIN]:   { label: 'Institution Admin',   icon: 'Building',        category: 'institution', landingPage: '/institution-dashboard' },
   [USER_ROLES.INSTITUTION_STAFF]:   { label: 'Institution Staff',   icon: 'Building',        category: 'institution', landingPage: '/institution-dashboard' },
   [USER_ROLES.RECEPTIONIST]:        { label: 'Receptionist',        icon: 'Phone',           category: 'institution', landingPage: '/institution-dashboard' },
   [USER_ROLES.HR_MANAGER]:          { label: 'HR Manager',          icon: 'Users',           category: 'institution', landingPage: '/institution-dashboard' },

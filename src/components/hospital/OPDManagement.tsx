@@ -223,7 +223,7 @@ export const OPDManagement = ({ hospital, departments }: OPDProps) => {
             <div className="flex gap-2">
               <div className="relative flex-1">
                 <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input placeholder="Search by name or token..." className="pl-8 w-48" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
+                <Input type="search" aria-label="Search by name or token..." className="pl-8 w-48" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
               </div>
               <Button onClick={() => setShowRegDialog(true)}>
                 <UserPlus className="h-4 w-4 mr-2" /> Register Patient

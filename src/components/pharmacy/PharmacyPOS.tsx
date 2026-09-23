@@ -256,16 +256,16 @@ export const PharmacyPOS = () => {
                   <p className="text-graphite-500 dark:text-slate-400">{formatPrice(item.unit_price)} each</p>
                 </div>
                 <div className="flex items-center gap-0.5">
-                  <button onClick={() => updateQuantity(index, -1)} className="h-6 w-6 rounded flex items-center justify-center bg-white border border-canvas-silk hover:bg-canvas-mist dark:hover:bg-slate-800">
+                  <button aria-label={`Decrease quantity of ${item.item_name}`} onClick={() => updateQuantity(index, -1)} className="h-6 w-6 rounded flex items-center justify-center bg-white dark:bg-slate-800 border border-canvas-silk dark:border-slate-700 hover:bg-canvas-mist dark:hover:bg-slate-700">
                     <Minus className="h-3 w-3" />
                   </button>
                   <span className="w-7 text-center font-extrabold">{item.quantity}</span>
-                  <button onClick={() => updateQuantity(index, 1)} className="h-6 w-6 rounded flex items-center justify-center bg-white border border-canvas-silk hover:bg-canvas-mist dark:hover:bg-slate-800">
+                  <button aria-label={`Increase quantity of ${item.item_name}`} onClick={() => updateQuantity(index, 1)} className="h-6 w-6 rounded flex items-center justify-center bg-white dark:bg-slate-800 border border-canvas-silk dark:border-slate-700 hover:bg-canvas-mist dark:hover:bg-slate-700">
                     <Plus className="h-3 w-3" />
                   </button>
                 </div>
                 <span className="font-extrabold w-16 text-right text-primary-500">{formatPrice(item.total)}</span>
-                <button onClick={() => removeItem(index)} className="h-6 w-6 rounded flex items-center justify-center text-error-500 hover:bg-error-50">
+                <button aria-label={`Remove ${item.item_name} from cart`} onClick={() => removeItem(index)} className="h-6 w-6 rounded flex items-center justify-center text-error-500 hover:bg-error-50">
                   <X className="h-3 w-3" />
                 </button>
               </div>
@@ -294,7 +294,7 @@ export const PharmacyPOS = () => {
           {/* Discount Selector */}
           <div className="flex gap-1">
             {[0, 5, 10, 15].map((d) => (
-              <button key={d} onClick={() => setDiscountPercent(d)} className={`flex-1 py-1 rounded text-[10px] font-extrabold transition-all ${discountPercent === d ? "bg-primary-500 text-white" : "bg-canvas-mist dark:bg-slate-800 text-graphite-500 dark:text-slate-400 hover:bg-canvas-silk"}`}>
+              <button key={d} aria-pressed={discountPercent === d} aria-label={d === 0 ? "No discount" : `${d} percent discount`} onClick={() => setDiscountPercent(d)} className={`flex-1 py-1 rounded text-[10px] font-extrabold transition-all ${discountPercent === d ? "bg-primary-500 text-white" : "bg-canvas-mist dark:bg-slate-800 text-graphite-500 dark:text-slate-400 hover:bg-canvas-silk"}`}>
                 {d === 0 ? "No Disc" : `${d}%`}
               </button>
             ))}
@@ -308,7 +308,7 @@ export const PharmacyPOS = () => {
               { value: "card", icon: <CreditCard className="h-3.5 w-3.5" />, label: "Card" },
               { value: "insurance", icon: <Shield className="h-3.5 w-3.5" />, label: "Insurance" },
             ].map((pm) => (
-              <button key={pm.value} onClick={() => setPaymentMethod(pm.value)} className={`flex-1 py-1.5 rounded text-[10px] font-extrabold flex items-center justify-center gap-1 transition-all ${paymentMethod === pm.value ? "bg-primary-500 text-white" : "bg-canvas-mist dark:bg-slate-800 text-graphite-500 dark:text-slate-400"}`}>
+              <button key={pm.value} aria-pressed={paymentMethod === pm.value} aria-label={`Pay with ${pm.label}`} onClick={() => setPaymentMethod(pm.value)} className={`flex-1 py-1.5 rounded text-[10px] font-extrabold flex items-center justify-center gap-1 transition-all ${paymentMethod === pm.value ? "bg-primary-500 text-white" : "bg-canvas-mist dark:bg-slate-800 text-graphite-500 dark:text-slate-400"}`}>
                 {pm.icon}{pm.label}
               </button>
             ))}

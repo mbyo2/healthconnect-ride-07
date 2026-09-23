@@ -76,7 +76,7 @@ const Marketplace = () => {
           </div>
 
           {/* Navigation Bar */}
-          <div className="max-w-[1500px] mx-auto mt-4 flex items-center gap-2">
+          <div className="max-w-[1500px] mx-auto mt-4 flex items-center gap-2" role="tablist" aria-label="Marketplace sections">
             {[
               { id: "products", label: "Medication Catalog" },
               { id: "cart", label: `Cart Checkout (${cart?.items?.length ?? 0})` },
@@ -84,6 +84,8 @@ const Marketplace = () => {
             ].map((tab) => (
               <button
                 key={tab.id}
+                role="tab"
+                aria-selected={activeTab === tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
                 className={`px-4 py-2 rounded-xl text-xs font-extrabold transition-all ${
                   activeTab === tab.id

@@ -408,6 +408,7 @@ export const MedicationInventory = () => {
                             size="icon"
                             onClick={() => handleEdit(item)}
                             title="Edit"
+                            aria-label={`Edit ${item.product_name || item.medication_name || 'medication'}`}
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
@@ -417,6 +418,7 @@ export const MedicationInventory = () => {
                             onClick={() => confirmDelete(item.id)}
                             className="hover:text-red-500"
                             title="Delete"
+                            aria-label={`Delete ${item.product_name || item.medication_name || 'medication'}`}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>

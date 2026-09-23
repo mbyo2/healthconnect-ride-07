@@ -147,10 +147,12 @@ export const HeaderControls = ({ isMenuOpen, setIsMenuOpen, navigate }: HeaderCo
       <VoiceCommandButton />
       <ThemeToggle />
       {isAuthenticated && <NotificationCenter />}
-      <Button 
-        variant="ghost" 
+      <Button
+        variant="ghost"
         size="icon"
         className="md:hidden h-10 w-10 hover:bg-accent transition-colors"
+        aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+        aria-expanded={isMenuOpen}
         onClick={() => setIsMenuOpen(!isMenuOpen)}
       >
         <Menu className="h-5 w-5" />

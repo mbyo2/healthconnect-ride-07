@@ -5,6 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import { format, isPast, isFuture } from 'date-fns';
+import { providerDisplayName } from '@/utils/providerDisplay';
 
 interface Reminder {
   id: string;
@@ -35,7 +36,7 @@ export const AppointmentReminders = () => {
           *,
           appointments (
             date, time, type,
-            provider:profiles!appointments_provider_id_fkey (first_name, last_name, specialty)
+            provider:profiles!appointments_provider_id_fkey (first_name, last_name, specialty, role)
           )
         `)
         .eq('patient_id', user!.id)
@@ -73,7 +74,7 @@ export const AppointmentReminders = () => {
                   <p className="text-sm font-medium text-foreground">{reminder.message_content}</p>
                   {reminder.appointments && (
                     <p className="text-xs text-muted-foreground mt-1">
-                      Dr. {reminder.appointments.provider?.first_name} {reminder.appointments.provider?.last_name} • {reminder.appointments.date} at {reminder.appointments.time}
+                      {providerDisplayName({ first_name: reminder.appointments.provider?.first_name, last_name: reminder.appointments.provider?.last_name, role: (reminder.appointments.provider as any)?.role })} • {reminder.appointments.date} at {reminder.appointments.time}
                     </p>
                   )}
                   <p className="text-xs text-muted-foreground">

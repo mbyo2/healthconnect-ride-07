@@ -40,8 +40,9 @@ export const SelfServiceKiosk: React.FC = () => {
     time: "09:00 AM",
   });
 
-  // Payment state
-  const [billAmount, setBillAmount] = useState(150.0);
+  // Payment state — amount is entered from the patient's paper invoice;
+  // the kiosk never invents a bill total.
+  const [billAmount, setBillAmount] = useState(0);
   const [payMethod, setPayMethod] = useState<"mtn" | "airtel" | "card">("mtn");
   const [payPhone, setPayPhone] = useState("");
   const [isProcessingPay, setIsProcessingPay] = useState(false);
@@ -88,6 +89,10 @@ export const SelfServiceKiosk: React.FC = () => {
   // patient settles at the counter (cash / card / MoMo POS) or in the app.
   // No fake "approved" state is ever shown.
   const handleProcessPayment = () => {
+    if (!(billAmount > 0)) {
+      toast.error("Enter the amount shown on your hospital invoice");
+      return;
+    }
     if (!payPhone && (payMethod === "mtn" || payMethod === "airtel")) {
       toast.error("Enter your Mobile Money mobile number");
       return;
@@ -140,7 +145,7 @@ export const SelfServiceKiosk: React.FC = () => {
               <div>Patient: ${generatedToken.patient}</div>
               <div>Issued: ${generatedToken.time}</div>
             </div>
-            <p style="font-size: 9px; margin-top: 15px;">Please watch the Waiting Room TV display for your token number.</p>
+            <p style="font-size: 9px; margin-top: 15px;">Present this slip at reception to join the queue.</p>
             <script>window.print();</script>
           </body>
         </html>
@@ -285,7 +290,7 @@ export const SelfServiceKiosk: React.FC = () => {
               onClick={handleLookupCheckin}
               className="w-full py-3.5 rounded-2xl bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-sm shadow-sm active:scale-95 transition-all"
             >
-              Verify &amp; Print Token Slip
+              Print Token Slip
             </button>
           </div>
         )}
@@ -371,14 +376,24 @@ export const SelfServiceKiosk: React.FC = () => {
               <p className="text-xs text-slate-500 mt-1">Pharmacy, lab, or consultation — pay at the counter or in the app</p>
             </div>
 
-            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-canvas-silk flex justify-between items-center">
-              <div>
-                <span className="text-[10px] font-bold text-slate-400 uppercase">Total Bill Outstanding</span>
-                <div className="text-2xl font-black text-emerald-600 mt-0.5">K{billAmount.toFixed(2)}</div>
+            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-canvas-silk space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-[10px] font-bold text-slate-400 uppercase">Amount From Your Invoice (K)</span>
+                <span className="px-2.5 py-1 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-extrabold text-[10px]">
+                  Payable Slip
+                </span>
               </div>
-              <span className="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 font-extrabold text-[10px]">
-                Active Invoice
-              </span>
+              <input
+                type="number"
+                min={0}
+                step="0.01"
+                inputMode="decimal"
+                aria-label="Bill amount in Kwacha from your hospital invoice"
+                className="w-full px-4 py-3 rounded-2xl border-2 border-graphite-300 dark:border-slate-700 text-2xl font-black text-emerald-600 text-center focus:border-primary-500 focus:outline-none"
+                placeholder="0.00"
+                value={billAmount || ''}
+                onChange={(e) => setBillAmount(Math.max(0, Number(e.target.value) || 0))}
+              />
             </div>
 
             <div>
@@ -386,6 +401,7 @@ export const SelfServiceKiosk: React.FC = () => {
               <div className="grid grid-cols-3 gap-2 mt-2">
                 <button
                   type="button"
+                  aria-pressed={payMethod === "mtn"}
                   onClick={() => setPayMethod("mtn")}
                   className={`p-3 rounded-2xl border-2 font-bold text-center transition-all ${
                     payMethod === "mtn" ? "border-amber-400 bg-amber-50 dark:bg-amber-950/40 font-black" : "border-canvas-silk dark:border-slate-800"
@@ -395,6 +411,7 @@ export const SelfServiceKiosk: React.FC = () => {
                 </button>
                 <button
                   type="button"
+                  aria-pressed={payMethod === "airtel"}
                   onClick={() => setPayMethod("airtel")}
                   className={`p-3 rounded-2xl border-2 font-bold text-center transition-all ${
                     payMethod === "airtel" ? "border-rose-400 bg-rose-50 dark:bg-rose-950/40 font-black" : "border-canvas-silk dark:border-slate-800"
@@ -404,6 +421,7 @@ export const SelfServiceKiosk: React.FC = () => {
                 </button>
                 <button
                   type="button"
+                  aria-pressed={payMethod === "card"}
                   onClick={() => setPayMethod("card")}
                   className={`p-3 rounded-2xl border-2 font-bold text-center transition-all ${
                     payMethod === "card" ? "border-primary-500 bg-blue-50 dark:bg-blue-950/40 font-black" : "border-canvas-silk dark:border-slate-800"
@@ -485,9 +503,9 @@ export const SelfServiceKiosk: React.FC = () => {
                 <span className="text-slate-400">Please Proceed To:</span>
                 <span className="font-bold text-emerald-600">{generatedToken.room}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-slate-400">Estimated Waiting:</span>
-                <span className="font-bold">Approx. 8 - 12 mins</span>
+              <div className="flex justify-between gap-3">
+                <span className="text-slate-400 shrink-0">Next Step:</span>
+                <span className="font-bold text-right">Present this slip at reception to join the queue</span>
               </div>
             </div>
 

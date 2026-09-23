@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LoadingScreen } from "@/components/LoadingScreen";
+import { providerDisplayName } from "@/utils/providerDisplay";
 
 interface AppointmentData {
   id: string;
@@ -96,7 +97,7 @@ export const AppointmentDetails = () => {
           *,
           time_slot:provider_time_slots(*),
           patient:profiles!patient_id(first_name, last_name, email, phone),
-          provider:profiles!provider_id(first_name, last_name, specialty, address)
+          provider:profiles!provider_id(first_name, last_name, specialty, address, role)
         `)
         .eq("id", id)
         .single();
@@ -198,6 +199,7 @@ export const AppointmentDetails = () => {
           <div className="flex items-center gap-3">
             <button
               onClick={() => navigate("/appointments")}
+              aria-label="Back to appointments"
               className="p-2 rounded-lg bg-canvas-mist dark:bg-slate-800 hover:bg-primary-50 dark:hover:bg-slate-800 transition-colors"
             >
               <ArrowLeft className="h-4 w-4 text-slate-700 dark:text-slate-300" />
@@ -205,7 +207,7 @@ export const AppointmentDetails = () => {
             <div>
               <h1 className="text-xl font-extrabold tracking-tight">Appointment Record #{appointment.id.slice(0, 8)}</h1>
               <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
-                {appointment.patient ? `Patient: ${appointment.patient.first_name} ${appointment.patient.last_name}` : `Doctor: Dr. ${appointment.provider.first_name}`}
+                {appointment.patient ? `Patient: ${appointment.patient.first_name} ${appointment.patient.last_name}` : `Provider: ${providerDisplayName({ first_name: appointment.provider.first_name, last_name: appointment.provider.last_name, role: (appointment.provider as any)?.role })}`}
               </p>
             </div>
           </div>
@@ -269,7 +271,7 @@ export const AppointmentDetails = () => {
                 <div className="font-extrabold text-sm text-slate-900 dark:text-slate-100">
                   {appointment.patient
                     ? `${appointment.patient.first_name} ${appointment.patient.last_name}`
-                    : `Dr. ${appointment.provider.first_name} ${appointment.provider.last_name}`}
+                    : providerDisplayName({ first_name: appointment.provider.first_name, last_name: appointment.provider.last_name, role: (appointment.provider as any)?.role })}
                 </div>
               </div>
 

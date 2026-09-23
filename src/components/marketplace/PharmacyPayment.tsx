@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,6 +8,8 @@ import { Loader2, Pill, DollarSign, CreditCard, Smartphone, Wallet } from "lucid
 import { useCurrency } from "@/hooks/use-currency";
 import { useDPOPayment } from "@/hooks/useDPOPayment";
 import { useWalletPayment } from "@/hooks/useWalletPayment";
+import { peekPendingAction, takePendingAction } from "@/utils/pendingAction";
+import { FlowResult } from "@/components/ui/flow-result";
 import type { Order } from "@/types/marketplace";
 
 interface PharmacyPaymentProps {
@@ -18,6 +20,23 @@ interface PharmacyPaymentProps {
 export const PharmacyPayment = ({ order, onPaymentSuccess }: PharmacyPaymentProps) => {
   const [loading, setLoading] = useState(false);
   const [payMethod, setPayMethod] = useState<'dpo' | 'wallet'>('dpo');
+  const [payError, setPayError] = useState<string | null>(null);
+  const resumedRef = useRef(false);
+
+  // Post-login resume: restore the checkout the user left, then let them
+  // confirm payment explicitly. Money never moves without a tap. Only
+  // consume intents parked for this exact route.
+  useEffect(() => {
+    if (resumedRef.current) return;
+    resumedRef.current = true;
+    const pending = peekPendingAction();
+    const here = `${window.location.pathname}${window.location.search}`;
+    if (pending?.kind === 'checkout' && pending.returnTo === here) {
+      takePendingAction();
+      setPayMethod('wallet');
+      toast.success('Welcome back — review and confirm your payment.');
+    }
+  }, []);
   const { formatPrice, convertForCharge } = useCurrency();
   const { redirectToCheckout } = useDPOPayment();
   const { balance: walletBalance, paying: walletPaying, pay: payWithWallet } = useWalletPayment();
@@ -29,6 +48,7 @@ export const PharmacyPayment = ({ order, onPaymentSuccess }: PharmacyPaymentProp
       toast.error("Nothing to pay for this order.");
       return;
     }
+    setPayError(null);
     setLoading(true);
     try {
       if (payMethod === 'wallet') {
@@ -60,7 +80,11 @@ export const PharmacyPayment = ({ order, onPaymentSuccess }: PharmacyPaymentProp
       });
     } catch (error) {
       console.error('Payment error:', error);
-      toast.error(error instanceof Error ? error.message : 'Payment failed');
+      setPayError(
+        error instanceof Error && error.message
+          ? error.message
+          : "Payment failed. No money moved — try again or switch method."
+      );
       setLoading(false);
     }
   };
@@ -99,10 +123,21 @@ export const PharmacyPayment = ({ order, onPaymentSuccess }: PharmacyPaymentProp
             </Badge>
           </div>
           
+          {payError && (
+            <FlowResult
+              status="error"
+              title="Payment didn't go through"
+              description={payError}
+              onRetry={() => { setPayError(null); handlePayment(); }}
+              retryLabel="Try Payment Again"
+            />
+          )}
+
           <div className="grid grid-cols-2 gap-2">
             <button
               type="button"
-              onClick={() => setPayMethod('dpo')}
+              aria-pressed={payMethod === 'dpo'}
+              onClick={() => { setPayError(null); setPayMethod('dpo'); }}
               className={`flex items-center justify-center gap-2 p-3 rounded-xl border text-xs font-bold transition-all ${payMethod === 'dpo' ? 'border-primary bg-primary/5 text-primary' : 'border-border text-muted-foreground'}`}
             >
               <CreditCard className="h-4 w-4" /> Card
@@ -111,7 +146,8 @@ export const PharmacyPayment = ({ order, onPaymentSuccess }: PharmacyPaymentProp
             </button>
             <button
               type="button"
-              onClick={() => setPayMethod('wallet')}
+              aria-pressed={payMethod === 'wallet'}
+              onClick={() => { setPayError(null); setPayMethod('wallet'); }}
               className={`flex items-center justify-center gap-2 p-3 rounded-xl border text-xs font-bold transition-all ${payMethod === 'wallet' ? 'border-primary bg-primary/5 text-primary' : 'border-border text-muted-foreground'}`}
             >
               <Wallet className="h-4 w-4" /> Wallet ({formatPrice(walletBalance)})

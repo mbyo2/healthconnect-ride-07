@@ -102,7 +102,7 @@ export const DischargeSummary = ({ hospital, admissions }: { hospital: any; admi
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <Card className="lg:col-span-1">
           <CardContent className="pt-4 space-y-2 max-h-[500px] overflow-y-auto">
-            <Input placeholder="Search admissions..." value={search} onChange={e => setSearch(e.target.value)} className="mb-2" />
+            <Input type="search" aria-label="Search admissions..." value={search} onChange={e => setSearch(e.target.value)} className="mb-2" />
             {filtered.length === 0 ? (
               <EmptyState icon={FileText} title="No admissions" description="Admitted patients appear here for discharge documentation." />
             ) : (

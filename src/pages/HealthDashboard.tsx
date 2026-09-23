@@ -22,16 +22,26 @@ import {
 import { getHealthStats, getHealthGoals, getUpcomingAppointments, type HealthStat, type HealthGoal, type UpcomingAppointment } from "@/services/healthMetrics";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { StatsCard } from "@/components/charts";
 import { useGamification } from "@/hooks/useGamification";
 import { Trophy, Award } from "lucide-react";
 import { AIInsightsWidget } from "@/components/ai/AIInsightsWidget";
+
+interface VitalPoint { value: number }
 
 export default function HealthDashboard() {
   const [healthStats, setHealthStats] = useState<HealthStat[]>([]);
   const [healthGoals, setHealthGoals] = useState<HealthGoal[]>([]);
   const [upcomingAppointments, setUpcomingAppointments] = useState<UpcomingAppointment[]>([]);
+  const [vitalHistory, setVitalHistory] = useState<{
+    heartRate: VitalPoint[]; systolic: VitalPoint[]; diastolic: VitalPoint[];
+    spo2: VitalPoint[]; weight: VitalPoint[];
+    latest: { heartRate: number | null; systolic: number | null; diastolic: number | null; spo2: number | null; weight: number | null };
+  } | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -53,6 +63,42 @@ export default function HealthDashboard() {
 
     fetchData();
   }, []);
+
+  // Vitals history for the graphic tiles — last 20 readings, real data only.
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      try {
+        const { data, error } = await supabase
+          .from('vital_signs')
+          .select('heart_rate, blood_pressure_systolic, blood_pressure_diastolic, oxygen_saturation, weight, recorded_at')
+          .eq('user_id', user.id)
+          .order('recorded_at', { ascending: false })
+          .limit(20);
+        if (error || !data || data.length === 0) return;
+        const rows = [...(data as any[])].reverse();
+        const series = (pick: (r: any) => number | null): VitalPoint[] =>
+          rows.map((r) => ({ value: Number(pick(r)) })).filter((p) => Number.isFinite(p.value));
+        const first = rows[rows.length - 1] as any;
+        setVitalHistory({
+          heartRate: series((r) => r.heart_rate),
+          systolic: series((r) => r.blood_pressure_systolic),
+          diastolic: series((r) => r.blood_pressure_diastolic),
+          spo2: series((r) => r.oxygen_saturation),
+          weight: series((r) => r.weight),
+          latest: {
+            heartRate: first?.heart_rate ?? null,
+            systolic: first?.blood_pressure_systolic ?? null,
+            diastolic: first?.blood_pressure_diastolic ?? null,
+            spo2: first?.oxygen_saturation ?? null,
+            weight: first?.weight ?? null,
+          },
+        });
+      } catch (error) {
+        console.error('Error fetching vitals history:', error);
+      }
+    })();
+  }, [user]);
 
   const getTrendIcon = (trend: string) => {
     switch (trend) {
@@ -129,6 +175,51 @@ export default function HealthDashboard() {
             goals: healthGoals
           }}
         />
+
+        {/* Vitals strip — graphic tiles from recorded vitals history */}
+        {vitalHistory && (
+          <div>
+            <h2 className="font-display text-xl font-medium text-midnight tracking-tight mb-3">Latest Vitals</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {vitalHistory.latest.heartRate != null && (
+                <StatsCard
+                  label="Heart Rate"
+                  value={`${vitalHistory.latest.heartRate} bpm`}
+                  icon={Heart}
+                  color="#e2445c"
+                  sparklineData={vitalHistory.heartRate}
+                />
+              )}
+              {vitalHistory.latest.systolic != null && (
+                <StatsCard
+                  label="Blood Pressure"
+                  value={`${vitalHistory.latest.systolic}/${vitalHistory.latest.diastolic ?? '–'} mmHg`}
+                  icon={Activity}
+                  color="#397dff"
+                  sparklineData={vitalHistory.systolic}
+                />
+              )}
+              {vitalHistory.latest.spo2 != null && (
+                <StatsCard
+                  label="Oxygen Saturation"
+                  value={`${vitalHistory.latest.spo2}%`}
+                  icon={Droplets}
+                  color="#00a86b"
+                  sparklineData={vitalHistory.spo2}
+                />
+              )}
+              {vitalHistory.latest.weight != null && (
+                <StatsCard
+                  label="Weight"
+                  value={`${vitalHistory.latest.weight} kg`}
+                  icon={Target}
+                  color="#a25ddc"
+                  sparklineData={vitalHistory.weight}
+                />
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Health Stats - Modern Card Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">

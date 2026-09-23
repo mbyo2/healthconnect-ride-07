@@ -330,7 +330,7 @@ export const MultiCenterManagement = () => {
           {/* Members Tab */}
           <TabsContent value="members" className="space-y-4">
             <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden">
-              <table className="w-full">
+              <div className="overflow-x-auto"><table className="w-full min-w-[640px]">
                 <thead className="bg-canvas-mist dark:bg-slate-800">
                   <tr>
                     <th className="text-left text-xs font-extrabold px-4 py-3">Institution</th>
@@ -391,7 +391,7 @@ export const MultiCenterManagement = () => {
                     </tr>
                   ))}
                 </tbody>
-              </table>
+              </table></div>
             </div>
           </TabsContent>
 

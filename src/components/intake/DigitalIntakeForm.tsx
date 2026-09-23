@@ -147,11 +147,11 @@ export const DigitalIntakeForm = ({ appointmentId, onComplete }: DigitalIntakeFo
 
           <TabsContent value="medications" className="space-y-4 mt-4">
             {medications.map((med, i) => (
-              <div key={i} className="grid grid-cols-4 gap-2 items-end">
+              <div key={i} className="grid grid-cols-1 sm:grid-cols-4 gap-2 sm:items-end">
                 <div><Label>Name</Label><Input value={med.name} onChange={e => { const m = [...medications]; m[i].name = e.target.value; setMedications(m); }} /></div>
                 <div><Label>Dosage</Label><Input value={med.dosage} onChange={e => { const m = [...medications]; m[i].dosage = e.target.value; setMedications(m); }} /></div>
                 <div><Label>Frequency</Label><Input value={med.frequency} onChange={e => { const m = [...medications]; m[i].frequency = e.target.value; setMedications(m); }} /></div>
-                <Button variant="ghost" size="icon" onClick={() => setMedications(medications.filter((_, j) => j !== i))}><Trash2 className="h-4 w-4" /></Button>
+                <Button variant="ghost" size="icon" onClick={() => setMedications(medications.filter((_, j) => j !== i))} aria-label="Remove medication"><Trash2 className="h-4 w-4" /></Button>
               </div>
             ))}
             <Button variant="outline" size="sm" onClick={() => setMedications([...medications, { name: '', dosage: '', frequency: '' }])}>
@@ -165,7 +165,7 @@ export const DigitalIntakeForm = ({ appointmentId, onComplete }: DigitalIntakeFo
 
           <TabsContent value="allergies" className="space-y-4 mt-4">
             {allergies.map((allergy, i) => (
-              <div key={i} className="grid grid-cols-4 gap-2 items-end">
+              <div key={i} className="grid grid-cols-1 sm:grid-cols-4 gap-2 sm:items-end">
                 <div><Label>Allergen</Label><Input value={allergy.allergen} onChange={e => { const a = [...allergies]; a[i].allergen = e.target.value; setAllergies(a); }} /></div>
                 <div><Label>Reaction</Label><Input value={allergy.reaction} onChange={e => { const a = [...allergies]; a[i].reaction = e.target.value; setAllergies(a); }} /></div>
                 <div>
@@ -179,7 +179,7 @@ export const DigitalIntakeForm = ({ appointmentId, onComplete }: DigitalIntakeFo
                     </SelectContent>
                   </Select>
                 </div>
-                <Button variant="ghost" size="icon" onClick={() => setAllergies(allergies.filter((_, j) => j !== i))}><Trash2 className="h-4 w-4" /></Button>
+                <Button variant="ghost" size="icon" onClick={() => setAllergies(allergies.filter((_, j) => j !== i))} aria-label="Remove allergy"><Trash2 className="h-4 w-4" /></Button>
               </div>
             ))}
             <Button variant="outline" size="sm" onClick={() => setAllergies([...allergies, { allergen: '', reaction: '', severity: 'mild' }])}>
@@ -216,7 +216,7 @@ export const DigitalIntakeForm = ({ appointmentId, onComplete }: DigitalIntakeFo
               <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
                 <li>The information I have provided is accurate and complete to the best of my knowledge.</li>
                 <li>I authorize the healthcare provider to access my medical information for the purpose of my care.</li>
-                <li>I understand my rights under HIPAA regarding my protected health information.</li>
+                <li>I understand my rights under Zambia&apos;s Data Protection Act regarding my health information.</li>
                 <li>I consent to the proposed treatment and understand I may withdraw consent at any time.</li>
               </ul>
             </div>

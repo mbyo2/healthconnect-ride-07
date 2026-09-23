@@ -36,8 +36,21 @@ const InstitutionPatients = () => {
       const providerIds = personnelRes.data?.map(p => p.user_id) || [];
       let appointments: any[] = [];
       if (providerIds.length > 0) {
-        const { data } = await supabase.from('appointments').select('patient_id, date, status, type').in('provider_id', providerIds);
-        appointments = data || [];
+        // Paginate — a single response caps out (PostgREST default 1000
+        // rows) and would silently drop patients at large institutions.
+        const pageSize = 1000;
+        for (let from = 0; ; from += pageSize) {
+          const { data, error: apptsError } = await supabase
+            .from('appointments')
+            .select('patient_id, date, status, type')
+            .in('provider_id', providerIds)
+            .order('date', { ascending: true })
+            .range(from, from + pageSize - 1);
+          if (apptsError) throw apptsError;
+          const page = data || [];
+          appointments = appointments.concat(page);
+          if (page.length < pageSize) break;
+        }
       }
 
       const patientIds = new Set([

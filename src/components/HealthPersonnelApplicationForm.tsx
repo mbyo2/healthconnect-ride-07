@@ -154,7 +154,7 @@ export const HealthPersonnelApplicationForm = () => {
                 disabled={isSubmitting} required
                 className={`pr-10 ${inputCls(errors[f.field])}`}
               />
-              <button type="button" onClick={f.toggle} disabled={isSubmitting} className="absolute right-2.5 top-2.5 text-graphite-500 dark:text-slate-400">
+              <button type="button" aria-label={f.show ? `Hide ${f.label.toLowerCase()}` : `Show ${f.label.toLowerCase()}`} onClick={f.toggle} disabled={isSubmitting} className="absolute right-2.5 top-2.5 text-graphite-500 dark:text-slate-400">
                 {f.show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>

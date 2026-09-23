@@ -2,30 +2,32 @@ import { Star, Quote, ThumbsUp, Award, TrendingUp, HeartPulse, ShieldCheck } fro
 import { ZAMBIAN_TESTIMONIALS } from "@/config/zambia";
 import { usePlatformStats, formatStat } from "@/hooks/usePlatformStats";
 
-const PARTNERS = [
-  { name: "UTH Lusaka", fullName: "University Teaching Hospital", abbr: "UTH" },
-  { name: "CIMA Healthcare", fullName: "CIMA Medical Network", abbr: "CI" },
-  { name: "Ministry of Health", fullName: "MoH Republic of Zambia", abbr: "MoH" },
-  { name: "Medland Hospital", fullName: "Specialist Medical Center", abbr: "ML" },
-  { name: "NHIMA Zambia", fullName: "National Health Insurance Authority", abbr: "NH" },
-  { name: "Fairview Hospital", fullName: "Healthcare Services Lusaka", abbr: "FV" },
-];
-
-const METRICS = [
-  { value: "500+", label: "Verified Doctors", detail: "Across 20+ clinical specialties", icon: Award },
-  { value: "98.4%", label: "Patient Satisfaction", detail: "Rated 4.9/5 across 50,000+ consults", icon: HeartPulse },
-  { value: "< 15m", label: "Average Video Wait", detail: "Direct connection with on-call doctor", icon: TrendingUp },
-  { value: "100%", label: "NHIMA Accepted", detail: "Digital eligibility & claim verification", icon: ShieldCheck },
+// Facility segments the platform serves — not claimed partnerships.
+const ECOSYSTEM = [
+  { name: "Teaching Hospitals", fullName: "Tertiary & referral care", abbr: "TH" },
+  { name: "Clinics", fullName: "Primary care practices", abbr: "CL" },
+  { name: "Pharmacies", fullName: "Retail & hospital dispensaries", abbr: "PH" },
+  { name: "Laboratories", fullName: "Diagnostics & imaging", abbr: "LB" },
+  { name: "NHIMA Cover", fullName: "Insurance eligibility checks", abbr: "NH" },
+  { name: "Emergency Care", fullName: "Triage & ambulance dispatch", abbr: "ER" },
 ];
 
 export const Testimonials = () => {
   const stats = usePlatformStats();
 
+  // Live platform counts — unknown values render as "—", never faked.
+  const metrics = [
+    { value: formatStat(stats.doctors), label: "Verified Providers", detail: "Doctors, nurses & clinical cadres", icon: Award },
+    { value: formatStat(stats.hospitals), label: "Care Facilities", detail: "Hospitals & clinics on platform", icon: HeartPulse },
+    { value: formatStat(stats.appointments), label: "Appointments", detail: "Booked through the platform", icon: TrendingUp },
+    { value: formatStat(stats.pharmacies), label: "Pharmacies", detail: "Dispensaries & drug stores", icon: ShieldCheck },
+  ];
+
   return (
-    <section className="vf-section bg-white border-t border-canvas-silk">
+    <section className="vf-section bg-white dark:bg-slate-900 border-t border-canvas-silk">
       <div className="mx-auto max-w-content px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 mb-16">
-          {METRICS.map((m) => (
+          {metrics.map((m) => (
             <div key={m.label} className="vf-card space-y-3">
               <div className="p-2.5 rounded-2xl bg-primary-50 w-fit border border-primary-100">
                 <m.icon className="h-5 w-5 text-primary-500" />
@@ -33,7 +35,7 @@ export const Testimonials = () => {
               <div>
                 <div className="font-display text-3xl sm:text-4xl font-medium text-midnight">{m.value}</div>
                 <div className="text-xs sm:text-sm text-midnight font-medium mt-1">{m.label}</div>
-                <div className="text-[11px] text-graphite-500 mt-0.5 leading-snug tracking-wide">{m.detail}</div>
+                <div className="text-[11px] text-graphite-500 dark:text-slate-400 mt-0.5 leading-snug tracking-wide">{m.detail}</div>
               </div>
             </div>
           ))}
@@ -41,14 +43,14 @@ export const Testimonials = () => {
 
         <div className="text-center mb-6">
           <p className="text-xs font-medium uppercase tracking-widest text-graphite-400">
-            Trusted by Zambia&apos;s Leading Healthcare Networks & Hospitals
+            Built for every corner of Zambia&apos;s healthcare ecosystem
           </p>
         </div>
         <div className="flex flex-wrap justify-center gap-3 mb-16">
-          {PARTNERS.map((p) => (
+          {ECOSYSTEM.map((p) => (
             <div
               key={p.name}
-              className="px-4 py-3 rounded-card bg-white border border-canvas-silk flex items-center gap-3 hover:border-primary-200 hover:shadow-card transition-all"
+              className="px-4 py-3 rounded-card bg-white dark:bg-slate-900 border border-canvas-silk flex items-center gap-3 hover:border-primary-200 hover:shadow-card transition-all"
             >
               <div className="h-8 w-8 rounded-xl bg-primary-500 flex items-center justify-center text-white font-medium text-xs">
                 {p.abbr[0]}
@@ -64,15 +66,15 @@ export const Testimonials = () => {
         <div className="text-center mb-10 max-w-2xl mx-auto">
           <div className="vf-eyebrow mb-5">
             <ThumbsUp className="h-3.5 w-3.5 text-accent-500" />
-            Verified Patient Reviews
+            Community Stories
           </div>
           <h2 className="font-display text-3xl sm:text-5xl font-medium text-midnight tracking-tight">
             {stats.patients > 0
               ? <>Loved by {formatStat(stats.patients)} Zambian patients</>
               : <>Built for Zambian patients</>}
           </h2>
-          <p className="text-base text-graphite-500 max-w-xl mx-auto font-normal mt-4 leading-relaxed tracking-wide">
-            Real experiences from patients booking appointments in Lusaka, Ndola, Kitwe, and across Zambia.
+          <p className="text-base text-graphite-500 dark:text-slate-400 max-w-xl mx-auto font-normal mt-4 leading-relaxed tracking-wide">
+            Illustrative stories showing how patients, providers and pharmacies across Zambia could use the platform.
           </p>
         </div>
 
@@ -87,7 +89,7 @@ export const Testimonials = () => {
                     ))}
                   </div>
                   <span className="px-2.5 py-0.5 rounded-pill text-[10px] font-medium bg-success-50 text-success-500">
-                    Verified Patient
+                    Illustrative story
                   </span>
                 </div>
                 <div className="relative pt-1">
@@ -118,11 +120,15 @@ export const Testimonials = () => {
               ))}
             </div>
             <div className="text-center sm:text-left">
-              <div className="font-medium text-midnight text-sm sm:text-base">4.9 / 5.0 Rating Across All App Stores</div>
+              <div className="font-medium text-midnight text-sm sm:text-base">
+                {stats.appointments > 0
+                  ? <>{formatStat(stats.appointments)} consultations booked and counting</>
+                  : <>Bookings open across Zambia</>}
+              </div>
               <div className="text-xs text-graphite-400">
                 {stats.patients > 0
-                  ? <>Over {formatStat(stats.patients)} verified Zambian consultations</>
-                  : <>Verified Zambian consultations</>}
+                  ? <>Over {formatStat(stats.patients)} Zambian patients on the platform</>
+                  : <>Patients, providers & pharmacies welcome</>}
               </div>
             </div>
           </div>

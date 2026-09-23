@@ -167,7 +167,7 @@ serve(async (req: Request) => {
     // Verify PayPal credentials BEFORE creating any DB records to avoid stale pending rows.
     const paypalClientId = Deno.env.get('PAYPAL_CLIENT_ID');
     const paypalClientSecret = Deno.env.get('PAYPAL_CLIENT_SECRET');
-    const paypalBaseUrl = Deno.env.get('PAYPAL_BASE_URL') || 'https://api-m.paypal.com';
+    const paypalBaseUrl = Deno.env.get('PAYPAL_BASE_URL') || Deno.env.get('PAYPAL_API_BASE') || 'https://api-m.paypal.com';
 
     if (!paypalClientId || !paypalClientSecret) {
       console.error('PayPal credentials not configured; refusing to create payment record.');
@@ -193,7 +193,7 @@ serve(async (req: Request) => {
         provider_id: providerIdForDb,
         service_id: serviceIdForDb,
         amount: amount,
-        currency: currency || 'USD',
+        currency: currency || 'ZMW',
         status: 'pending',
         payment_method: 'paypal',
         invoice_number: `PAY-${Date.now()}-${patientId}`,
@@ -201,7 +201,7 @@ serve(async (req: Request) => {
           requested_service_id: serviceId,
           requested_provider_id: providerId,
           provider_id_for_db: providerIdForDb,
-          requested_currency: currency || 'USD'
+          requested_currency: currency || 'ZMW'
         },
         created_at: new Date().toISOString()
       })
@@ -228,9 +228,14 @@ serve(async (req: Request) => {
       const tokenData: PayPalAccessTokenResponse = await tokenResponse.json();
 
       // Create PayPal order
+      // PayPal does not support ZMW, so convert to USD for the gateway only.
+      // The canonical amount stays in ZMW in our ledger; conversion details are
+      // stored in metadata for finance reconciliation.
+      // TODO: replace the static fallback rate with a live FX lookup when available.
       const isZMW = (currency || '').toUpperCase() === 'ZMW';
-      const paypalCurrency = isZMW ? 'USD' : (currency || 'USD');
-      const paypalValue = isZMW ? Math.max(1, Math.round(amount * 0.037 * 100) / 100) : amount;
+      const paypalCurrency = isZMW ? 'USD' : (currency || 'ZMW');
+      const ZMW_TO_USD_FALLBACK = 0.037;
+      const paypalValue = isZMW ? Math.max(1, Math.round(amount * ZMW_TO_USD_FALLBACK * 100) / 100) : amount;
 
       const orderPayload = {
         intent: 'CAPTURE',
@@ -286,7 +291,15 @@ serve(async (req: Request) => {
               ? (payment as any).metadata
               : {}),
             paypal_order_id: orderData.id,
-            paypal_status: orderData.status
+            paypal_status: orderData.status,
+            ...(isZMW
+              ? {
+                  gateway_currency: paypalCurrency,
+                  gateway_amount: paypalValue,
+                  fx_rate_zmw_to_usd: ZMW_TO_USD_FALLBACK,
+                  fx_note: 'Static fallback rate — reconcile against bank rate',
+                }
+              : {}),
           }
         })
         .eq('id', payment.id);

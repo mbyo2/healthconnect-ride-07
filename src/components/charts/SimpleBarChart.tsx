@@ -56,11 +56,12 @@ export const SimpleBarChart = ({
           />
           <Tooltip
             contentStyle={{
-              backgroundColor: 'white',
-              border: '1px solid #e2e8f0',
+              backgroundColor: 'hsl(var(--card))',
+              border: '1px solid hsl(var(--border))',
               borderRadius: '8px',
               fontSize: '12px',
-              padding: '8px 12px'
+              padding: '8px 12px',
+              color: 'hsl(var(--card-foreground))',
             }}
             cursor={{ fill: 'rgba(59, 130, 246, 0.1)' }}
           />

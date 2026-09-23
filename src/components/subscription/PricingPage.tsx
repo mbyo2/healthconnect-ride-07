@@ -548,7 +548,7 @@ export const PricingPage = () => {
       </Tabs>
 
       <div className="text-center text-sm text-muted-foreground space-y-1">
-        <p>All plans include SSL encryption, HIPAA-compliant data handling, and 24/7 system monitoring.</p>
+        <p>All plans include encrypted connections, data handling aligned with Zambia&apos;s Data Protection Act, and system monitoring.</p>
         <p>All prices in Zambian Kwacha (ZMW). Need a custom plan? <Button variant="link" className="p-0 h-auto text-sm">Contact our sales team</Button></p>
       </div>
     </div>

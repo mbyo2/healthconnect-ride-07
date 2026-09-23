@@ -17,6 +17,8 @@ import { DrugInteractionAlert } from "@/components/clinical/DrugInteractionAlert
 import { AllergyAlertSystem } from "@/components/clinical/AllergyAlertSystem";
 import { EmptyState, LoadingSkeleton } from "@/components/shared";
 import { SuggestionBanner, HealthTipCard, NextStepsCard } from "@/components/guidance";
+import { useNavigate } from "react-router-dom";
+import { providerDisplayName } from "@/utils/providerDisplay";
 
 interface MedicationItem {
   id: string;
@@ -60,6 +62,7 @@ export const Prescriptions = () => {
   const { availableRoles } = useUserRoles();
   const { institutionId } = useInstitutionContext();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [showNewPrescription, setShowNewPrescription] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchPatient, setSearchPatient] = useState("");
@@ -100,7 +103,7 @@ export const Prescriptions = () => {
           id, medication_name, dosage, duration_days, prescribed_date, status,
           refills_remaining, instructions, quantity, generic_name, strength, prescription_number, notes,
           patient:profiles!comprehensive_prescriptions_patient_id_fkey(first_name, last_name, email, phone),
-          provider:profiles!comprehensive_prescriptions_provider_id_fkey(first_name, last_name)
+          provider:profiles!comprehensive_prescriptions_provider_id_fkey(first_name, last_name, role)
         `)
         .order("prescribed_date", { ascending: false });
 
@@ -136,7 +139,7 @@ export const Prescriptions = () => {
     setMedicationItems((prev) => [
       ...prev,
       {
-        id: `med-${Date.now()}`,
+        id: `med-${Date.now()}-${Math.floor(Math.random() * 1e6)}`,
         medication_name: "",
         dosage: "1 tablet once daily",
         instructions: "Take as directed",
@@ -288,7 +291,9 @@ export const Prescriptions = () => {
     if (!printWin) return;
 
     const patientName = `${first.patient?.first_name || ""} ${first.patient?.last_name || ""}`.trim() || "Patient";
-    const providerName = `Dr. ${first.provider?.first_name || ""} ${first.provider?.last_name || ""}`.trim() || "Attending Clinician / Pharmacist";
+    const providerName = first.provider?.first_name || first.provider?.last_name
+      ? providerDisplayName({ first_name: first.provider?.first_name, last_name: first.provider?.last_name, role: (first.provider as any)?.role })
+      : "Attending Clinician / Pharmacist";
     const dateStr = new Date(first.prescribed_date).toLocaleDateString();
     const rxNo = first.prescription_number || `RX-${first.id.substring(0, 8).toUpperCase()}`;
 
@@ -660,7 +665,7 @@ export const Prescriptions = () => {
                 variant="info"
                 icon={Info}
                 actions={[
-                  { label: 'Book Appointment', onClick: () => window.location.href = '/appointments', variant: 'primary' },
+                  { label: 'Book Appointment', onClick: () => navigate('/appointments'), variant: 'primary' },
                 ]}
               />
             )}
@@ -732,7 +737,7 @@ export const Prescriptions = () => {
                       setSearchQuery("");
                       setStatusFilter("all");
                     } else {
-                      window.location.href = '/search';
+                      navigate('/search');
                     }
                   }}
                 />
@@ -788,7 +793,9 @@ export const Prescriptions = () => {
                           <div className="font-bold text-xs text-slate-800 dark:text-slate-200">
                             {isProvider
                               ? `${p.patient?.first_name || ""} ${p.patient?.last_name || ""}`.trim() || "Patient"
-                              : `Dr. ${p.provider?.first_name || ""} ${p.provider?.last_name || ""}`.trim() || "Attending Provider"
+                              : (p.provider?.first_name || p.provider?.last_name
+                                ? providerDisplayName({ first_name: p.provider?.first_name, last_name: p.provider?.last_name, role: (p.provider as any)?.role })
+                                : "Attending Provider")
                             }
                           </div>
                         </td>

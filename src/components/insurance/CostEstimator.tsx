@@ -206,11 +206,11 @@ export const CostEstimator = () => {
       )}
 
       <div>
-        <label className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400 block mb-1">
+        <label htmlFor="cost-estimator-service" className="text-xs font-extrabold uppercase text-graphite-500 dark:text-slate-400 block mb-1">
           Select Clinical Procedure or Consultation Type
         </label>
         <Select value={serviceType} onValueChange={setServiceType}>
-          <SelectTrigger className="w-full text-xs font-medium border-graphite-300 dark:border-slate-700">
+          <SelectTrigger id="cost-estimator-service" className="w-full text-xs font-medium border-graphite-300 dark:border-slate-700">
             <SelectValue placeholder="Choose a medical procedure..." />
           </SelectTrigger>
           <SelectContent>

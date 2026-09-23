@@ -16,8 +16,8 @@ const HealthcareApplication = () => {
           </p>
           
           <p className="text-muted-foreground text-sm">
-            <strong>Note:</strong> After successful registration, you will be automatically 
-            logged in and redirected to your provider dashboard.
+            <strong>Note:</strong> After submission, your application goes to admin review.
+            You can track its status on the application status page.
           </p>
         </div>
         

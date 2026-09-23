@@ -93,7 +93,7 @@ export const ProcedureManagement = () => {
   const [pricingForm, setPricingForm] = useState({
     procedure_id: "",
     price: 0,
-    currency: "USD",
+    currency: "ZMW",
     effective_from: new Date().toISOString().split('T')[0],
     effective_to: "",
   });
@@ -480,7 +480,7 @@ export const ProcedureManagement = () => {
           <TabsContent value="catalog" className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Input placeholder="Search procedures..." className="w-64 h-9 text-xs" />
+                <Input type="search" aria-label="Search procedures..." className="w-64 h-9 text-xs" />
                 <Select defaultValue="all">
                   <SelectTrigger className="w-32 h-9 text-xs">
                     <SelectValue />
@@ -531,7 +531,7 @@ export const ProcedureManagement = () => {
                     </div>
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-graphite-500 dark:text-slate-400">Base Price</span>
-                      <span className="font-bold">${procedure.base_price.toFixed(2)}</span>
+                      <span className="font-bold">K{procedure.base_price.toFixed(2)}</span>
                     </div>
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-graphite-500 dark:text-slate-400">Duration</span>
@@ -573,7 +573,7 @@ export const ProcedureManagement = () => {
               <>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Input placeholder="Search pricing..." className="w-64 h-9 text-xs" />
+                    <Input type="search" aria-label="Search pricing..." className="w-64 h-9 text-xs" />
                     <Select defaultValue="active">
                       <SelectTrigger className="w-32 h-9 text-xs">
                         <SelectValue />
@@ -590,7 +590,7 @@ export const ProcedureManagement = () => {
                 </div>
 
                 <Card className="border-canvas-silk dark:border-slate-800 shadow-xs overflow-hidden">
-                  <table className="w-full">
+                  <div className="overflow-x-auto"><table className="w-full min-w-[640px]">
                     <thead className="bg-canvas-mist dark:bg-slate-800">
                       <tr>
                         <th className="text-left text-xs font-extrabold px-4 py-3">Procedure</th>
@@ -631,7 +631,7 @@ export const ProcedureManagement = () => {
                         </tr>
                       ))}
                     </tbody>
-                  </table>
+                  </table></div>
                 </Card>
               </>
             )}
@@ -654,7 +654,7 @@ export const ProcedureManagement = () => {
               <>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Input placeholder="Search executions..." className="w-64 h-9 text-xs" />
+                    <Input type="search" aria-label="Search executions..." className="w-64 h-9 text-xs" />
                     <Select defaultValue="all">
                       <SelectTrigger className="w-32 h-9 text-xs">
                         <SelectValue />

@@ -53,7 +53,7 @@ const AIDiagnostics = () => {
           </div>
 
           {/* Navigation Tabs */}
-          <div className="max-w-[1500px] mx-auto mt-4 flex items-center gap-2">
+          <div className="max-w-[1500px] mx-auto mt-4 flex items-center gap-2" role="tablist" aria-label="AI diagnostics sections">
             {[
               { id: "chat", label: "AI Consultation", icon: <MessageSquare className="h-3.5 w-3.5" /> },
               { id: "documents", label: "Document OCR", icon: <FileText className="h-3.5 w-3.5" /> },
@@ -63,11 +63,13 @@ const AIDiagnostics = () => {
             ].map((tab) => (
               <button
                 key={tab.id}
+                role="tab"
+                aria-selected={activeTab === tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-extrabold transition-all ${
                   activeTab === tab.id
                     ? "bg-primary-500 text-white shadow-xs"
-                    : "bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-700 text-graphite-500 dark:text-slate-400 hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-800"
+                    : "bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-700 text-graphite-500 dark:text-slate-400 hover:bg-canvas-mist dark:hover:bg-slate-800"
                 }`}
               >
                 {tab.icon}
@@ -89,7 +91,12 @@ const AIDiagnostics = () => {
             ].map((card) => (
               <div
                 key={card.id}
+                role="button"
+                tabIndex={0}
+                aria-pressed={activeTab === card.id}
+                aria-label={`Open ${card.title}`}
                 onClick={() => setActiveTab(card.id)}
+                onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setActiveTab(card.id); } }}
                 className={`p-3.5 rounded-xl border transition-all cursor-pointer ${
                   activeTab === card.id
                     ? "border-primary-500 bg-white dark:bg-slate-900 shadow-xs ring-2 ring-primary-500/20"

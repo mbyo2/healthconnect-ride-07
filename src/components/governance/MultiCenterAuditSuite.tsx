@@ -395,7 +395,7 @@ function DeploymentManager() {
               <span className="text-emerald-300 font-semibold text-sm">Cloud SaaS – Fully Operational</span>
             </div>
             <p className="text-xs text-emerald-200/60">
-              HealthConnect Enterprise Edition running on multi-region cloud infrastructure with auto-scaling, geo-redundant backups (RPO 15 min), and 99.9% SLA uptime guarantee. HIPAA BAA and GDPR DPA signed.
+              Doc&apos; O Clock cloud deployment with automated backups. Confirm backup, retention and agreement terms with your administrator before relying on them for compliance.
             </p>
           </div>
         </div>

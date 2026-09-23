@@ -526,7 +526,7 @@ export const MedicalShiftHR = () => {
           <TabsContent value="assignments" className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Input placeholder="Search assignments..." className="w-64 h-9 text-xs" />
+                <Input type="search" aria-label="Search assignments..." className="w-64 h-9 text-xs" />
                 <Select defaultValue="today">
                   <SelectTrigger className="w-32 h-9 text-xs">
                     <SelectValue />
@@ -613,7 +613,7 @@ export const MedicalShiftHR = () => {
             </div>
 
             <Card className="border-canvas-silk dark:border-slate-800 shadow-xs overflow-hidden">
-              <table className="w-full">
+              <div className="overflow-x-auto"><table className="w-full min-w-[640px]">
                 <thead className="bg-canvas-mist dark:bg-slate-800">
                   <tr>
                     <th className="text-left text-xs font-extrabold px-4 py-3">Staff</th>
@@ -665,7 +665,7 @@ export const MedicalShiftHR = () => {
                     </tr>
                   ))}
                 </tbody>
-              </table>
+              </table></div>
             </Card>
           </TabsContent>
 
@@ -673,7 +673,7 @@ export const MedicalShiftHR = () => {
           <TabsContent value="attendance" className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Input placeholder="Search attendance..." className="w-64 h-9 text-xs" />
+                <Input type="search" aria-label="Search attendance..." className="w-64 h-9 text-xs" />
                 <Select defaultValue="today">
                   <SelectTrigger className="w-32 h-9 text-xs">
                     <SelectValue />
@@ -696,7 +696,7 @@ export const MedicalShiftHR = () => {
             </div>
 
             <Card className="border-canvas-silk dark:border-slate-800 shadow-xs overflow-hidden">
-              <table className="w-full">
+              <div className="overflow-x-auto"><table className="w-full min-w-[640px]">
                 <thead className="bg-canvas-mist dark:bg-slate-800">
                   <tr>
                     <th className="text-left text-xs font-extrabold px-4 py-3">Staff</th>
@@ -761,7 +761,7 @@ export const MedicalShiftHR = () => {
                     </tr>
                   ))}
                 </tbody>
-              </table>
+              </table></div>
             </Card>
           </TabsContent>
 

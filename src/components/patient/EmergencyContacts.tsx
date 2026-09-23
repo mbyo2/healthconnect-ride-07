@@ -125,6 +125,7 @@ export const EmergencyContacts = () => {
               <Button
                 variant="ghost"
                 size="icon"
+                aria-label={`Delete emergency contact ${contact.name || ''}`.trim()}
                 onClick={() => deleteContact(contact.id)}
               >
                 <Trash2 className="h-4 w-4" />

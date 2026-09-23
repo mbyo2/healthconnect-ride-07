@@ -546,7 +546,7 @@ export const CareTeamManagement = () => {
           <TabsContent value="assignments" className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Input placeholder="Search assignments..." className="w-64 h-9 text-xs" />
+                <Input type="search" aria-label="Search assignments..." className="w-64 h-9 text-xs" />
                 <Select defaultValue="active">
                   <SelectTrigger className="w-32 h-9 text-xs">
                     <SelectValue />
@@ -562,8 +562,9 @@ export const CareTeamManagement = () => {
               </Button>
             </div>
 
-            <Card className="border-canvas-silk dark:border-slate-800 shadow-xs overflow-hidden">
-              <table className="w-full">
+              <Card className="border-canvas-silk dark:border-slate-800 shadow-xs overflow-hidden">
+              <div className="overflow-x-auto">
+              <table className="w-full min-w-[640px]">
                 <thead className="bg-canvas-mist dark:bg-slate-800">
                   <tr>
                     <th className="text-left text-xs font-extrabold px-4 py-3">Patient</th>
@@ -572,7 +573,6 @@ export const CareTeamManagement = () => {
                     <th className="text-left text-xs font-extrabold px-4 py-3">Type</th>
                     <th className="text-left text-xs font-extrabold px-4 py-3">Assigned</th>
                     <th className="text-left text-xs font-extrabold px-4 py-3">Status</th>
-                    <th className="text-left text-xs font-extrabold px-4 py-3">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -609,20 +609,11 @@ export const CareTeamManagement = () => {
                           <Badge className="bg-graphite-500 dark:bg-slate-600 text-white text-[10px]">Inactive</Badge>
                         )}
                       </td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-1">
-                          <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
-                            <Eye className="h-3 w-3" />
-                          </Button>
-                          <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
-                            <Edit className="h-3 w-3" />
-                          </Button>
-                        </div>
-                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
+              </div>
             </Card>
           </TabsContent>
 
@@ -684,7 +675,7 @@ export const CareTeamManagement = () => {
           <TabsContent value="tasks" className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Input placeholder="Search tasks..." className="w-64 h-9 text-xs" />
+                <Input type="search" aria-label="Search tasks..." className="w-64 h-9 text-xs" />
                 <Select defaultValue="pending">
                   <SelectTrigger className="w-32 h-9 text-xs">
                     <SelectValue />

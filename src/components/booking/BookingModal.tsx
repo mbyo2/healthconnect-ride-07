@@ -16,11 +16,21 @@ import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { WaitlistSignup } from "./WaitlistSignup";
 import { CostBreakdown } from "./CostBreakdown";
+import { FlowResult } from "@/components/ui/flow-result";
+import {
+  savePendingAction,
+  takePendingAction,
+  peekPendingAction,
+  authRedirectUrl,
+  currentReturnTo,
+} from "@/utils/pendingAction";
 
 interface BookingModalProps {
   provider: Provider;
   isOpen: boolean;
   onClose: () => void;
+  /** Called when a saved pre-login booking is ready to resume (parent opens the modal). */
+  onRequestOpen?: () => void;
 }
 
 const TIME_SLOTS = [
@@ -29,7 +39,7 @@ const TIME_SLOTS = [
   "15:30", "16:00", "16:30", "17:00"
 ];
 
-export const BookingModal = ({ provider, isOpen, onClose }: BookingModalProps) => {
+export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen }: BookingModalProps) => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [step, setStep] = useState<'visit' | 'type' | 'datetime' | 'confirm'>('visit');
@@ -39,6 +49,7 @@ export const BookingModal = ({ provider, isOpen, onClose }: BookingModalProps) =
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [reason, setReason] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [weekStart, setWeekStart] = useState(startOfWeek(new Date(), { weekStartsOn: 1 }));
   const [bookedSlots, setBookedSlots] = useState<string[]>([]);
   const [showWaitlist, setShowWaitlist] = useState(false);
@@ -72,13 +83,57 @@ export const BookingModal = ({ provider, isOpen, onClose }: BookingModalProps) =
   const handlePrevWeek = () => setWeekStart(addDays(weekStart, -7));
   const handleNextWeek = () => setWeekStart(addDays(weekStart, 7));
 
+  // A changed selection invalidates the previous failure.
+  useEffect(() => {
+    setSubmitError(null);
+  }, [selectedDate, selectedTime]);
+
+  // Resume a booking started before login: restore selections and reopen
+  // at the confirm step. Nothing is created until the user confirms.
+  useEffect(() => {
+    if (isOpen || !user || !provider?.id || !onRequestOpen) return;
+    const pending = peekPendingAction();
+    if (pending?.kind === 'booking' && pending.providerId === provider.id) {
+      takePendingAction();
+      setVisitType(pending.visitType);
+      setAppointmentType(pending.appointmentType);
+      const restoredDate = pending.date ? new Date(`${pending.date}T00:00:00`) : null;
+      setSelectedDate(restoredDate);
+      if (restoredDate) setWeekStart(startOfWeek(restoredDate, { weekStartsOn: 1 }));
+      setSelectedTime(pending.time);
+      setReason(pending.reason || '');
+      setStep('confirm');
+      onRequestOpen();
+      toast.success('Welcome back — your booking details were kept. Review and confirm.');
+    }
+  }, [isOpen, user, provider?.id, onRequestOpen]);
+
   const handleSubmit = async () => {
-    if (!user || !selectedDate || !selectedTime) {
+    if (!selectedDate || !selectedTime) {
       toast.error("Please complete all booking details");
+      return;
+    }
+    if (!user) {
+      // Auth wall: stash the intent so login drops the user back here and
+      // the booking resumes — never silently drop it behind a toast.
+      savePendingAction({
+        kind: 'booking',
+        providerId: provider.id,
+        visitType,
+        appointmentType,
+        date: format(selectedDate, 'yyyy-MM-dd'),
+        time: selectedTime,
+        reason,
+        returnTo: currentReturnTo(),
+        createdAt: Date.now(),
+      });
+      toast.info('Sign in to finish booking — your details are saved.');
+      navigate(authRedirectUrl(currentReturnTo()));
       return;
     }
 
     setIsSubmitting(true);
+    setSubmitError(null);
     try {
       const { data: booked, error } = await supabase.from('appointments').insert({
         patient_id: user.id,
@@ -130,7 +185,11 @@ export const BookingModal = ({ provider, isOpen, onClose }: BookingModalProps) =
       }
     } catch (error) {
       console.error('Booking error:', error);
-      toast.error("Failed to book appointment. Please try again.");
+      setSubmitError(
+        error instanceof Error && error.message
+          ? error.message
+          : "We couldn't create your appointment. Your details are safe — try again."
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -240,19 +299,20 @@ export const BookingModal = ({ provider, isOpen, onClose }: BookingModalProps) =
             Select a date
           </h4>
           <div className="flex items-center gap-2">
-            <Button 
-              variant="outline" 
-              size="icon" 
+            <Button
+              variant="outline"
+              size="icon"
               className="h-8 w-8"
               onClick={handlePrevWeek}
               disabled={isBefore(weekStart, today)}
+              aria-label="Previous week"
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
             <span className="text-sm text-muted-foreground min-w-[120px] text-center">
               {format(weekStart, 'MMM d')} - {format(addDays(weekStart, 6), 'MMM d')}
             </span>
-            <Button variant="outline" size="icon" className="h-8 w-8" onClick={handleNextWeek}>
+            <Button variant="outline" size="icon" className="h-8 w-8" onClick={handleNextWeek} aria-label="Next week">
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
@@ -292,7 +352,7 @@ export const BookingModal = ({ provider, isOpen, onClose }: BookingModalProps) =
             <Clock className="h-4 w-4 text-primary" />
             Available times for {format(selectedDate, 'EEEE, MMM d')}
           </h4>
-          <div className="grid grid-cols-4 gap-2">
+          <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
             {TIME_SLOTS.map((time) => {
               const isBooked = isSlotBooked(selectedDate, time);
               const isSelected = selectedTime === time;
@@ -401,9 +461,19 @@ export const BookingModal = ({ provider, isOpen, onClose }: BookingModalProps) =
         />
       </div>
 
-      <Button 
-        className="w-full" 
-        size="lg" 
+      {submitError && (
+        <FlowResult
+          status="error"
+          title="Booking didn't go through"
+          description={submitError}
+          onRetry={handleSubmit}
+          retryLabel="Try Booking Again"
+        />
+      )}
+
+      <Button
+        className="w-full"
+        size="lg"
         onClick={handleSubmit}
         disabled={isSubmitting}
       >

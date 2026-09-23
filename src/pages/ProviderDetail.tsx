@@ -446,6 +446,7 @@ export const ProviderDetail = () => {
             provider={provider as Provider}
             isOpen={isBookingOpen}
             onClose={() => setIsBookingOpen(false)}
+            onRequestOpen={() => setIsBookingOpen(true)}
           />
         )}
         {provider && (
@@ -453,6 +454,7 @@ export const ProviderDetail = () => {
             provider={provider as any}
             isOpen={isWaitlistOpen}
             onClose={() => setIsWaitlistOpen(false)}
+            onRequestOpen={() => setIsWaitlistOpen(true)}
           />
         )}
       </div>

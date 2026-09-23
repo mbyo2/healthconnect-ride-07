@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { PrimaryProviderAssignment } from '@/types/connections';
 import { Star, MessageCircle, Calendar, Phone, Mail } from 'lucide-react';
 import { format } from 'date-fns';
+import { providerDisplayName } from '@/utils/providerDisplay';
 
 interface PrimaryProviderCardProps {
   primaryProvider: PrimaryProviderAssignment | null;
@@ -68,7 +69,7 @@ export const PrimaryProviderCard = ({
           <div className="flex-1 space-y-3">
             <div>
               <h3 className="text-xl font-semibold">
-                Dr. {primaryProvider.provider?.first_name} {primaryProvider.provider?.last_name}
+                {providerDisplayName({ first_name: primaryProvider.provider?.first_name, last_name: primaryProvider.provider?.last_name, role: (primaryProvider.provider as any)?.role })}
               </h3>
               {primaryProvider.provider?.specialty && (
                 <Badge variant="outline" className="mt-1">

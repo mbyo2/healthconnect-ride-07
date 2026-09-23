@@ -20,6 +20,7 @@ export function BottomNavItem({ to, label, icon, active, description }: BottomNa
   return (
     <Link
       to={to}
+      aria-current={active ? "page" : undefined}
       className={cn(
         "relative flex flex-1 flex-col items-center justify-center py-1.5 px-2 rounded-pill transition-all min-h-[50px] touch-manipulation group",
         active

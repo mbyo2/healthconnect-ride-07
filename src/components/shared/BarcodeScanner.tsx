@@ -85,7 +85,7 @@ export const BarcodeScanner = ({ onScan, onClose, title = 'Scan Barcode' }: Barc
           {title}
         </CardTitle>
         {onClose && (
-          <Button variant="ghost" size="icon" onClick={() => { stopCamera(); onClose(); }}>
+          <Button variant="ghost" size="icon" aria-label="Close barcode scanner" onClick={() => { stopCamera(); onClose(); }}>
             <X className="h-4 w-4" />
           </Button>
         )}

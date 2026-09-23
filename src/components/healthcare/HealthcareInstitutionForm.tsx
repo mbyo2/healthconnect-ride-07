@@ -17,6 +17,11 @@ import { saveInstitutionSpecialties } from "@/hooks/useClinicSpecialties";
 import { REGULATORY_REQUIREMENTS, getCountryRequirements, validateDocumentUpload, type DocumentRequirement } from "@/config/regulatoryRequirements";
 import { INSTITUTION_TYPE_OPTIONS, type InstitutionTypeOption } from "@/config/facilityProfiles";
 import { provisionInstitutionWorkspace } from "@/services/institutionProvisioning";
+import { authRedirectUrl, currentReturnTo } from "@/utils/pendingAction";
+
+// Draft key — a half-filled institution application survives reloads and
+// the login redirect, so nobody retypes 40 fields after signing in.
+const DRAFT_KEY = "doc_form_draft_institution";
 
 type HealthcareInstitution = Database['public']['Tables']['healthcare_institutions']['Insert'];
 
@@ -104,6 +109,36 @@ export const HealthcareInstitutionForm = () => {
   const [uploadedDocuments, setUploadedDocuments] = useState<Record<string, string>>({});
   const [documentValidation, setDocumentValidation] = useState<{ valid: boolean; missing: string[] }>({ valid: true, missing: [] });
   const [typeOptions, setTypeOptions] = useState<InstitutionTypeOption[]>(INSTITUTION_TYPE_OPTIONS);
+  const [draftRestored, setDraftRestored] = useState(false);
+
+  // Restore an in-progress application (e.g. after the login redirect).
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(DRAFT_KEY);
+      if (!raw) return;
+      const draft = JSON.parse(raw);
+      if (draft?.formData) setFormData((prev) => ({ ...prev, ...draft.formData }));
+      if (Array.isArray(draft?.selectedSpecialties)) setSelectedSpecialties(draft.selectedSpecialties);
+      if (typeof draft?.currentTab === 'string') setCurrentTab(draft.currentTab);
+      if (typeof draft?.selectedCountry === 'string') setSelectedCountry(draft.selectedCountry);
+      setDraftRestored(true);
+      if (draft?.formData?.name) toast.info('Restored your in-progress application.');
+    } catch {
+      // corrupt draft — start fresh
+    }
+  }, []);
+
+  // Persist every change so the draft survives reloads and logins.
+  useEffect(() => {
+    if (!draftRestored && !formData.name && selectedSpecialties.length === 0) return;
+    try {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify({
+        formData, selectedSpecialties, currentTab, selectedCountry,
+      }));
+    } catch {
+      // storage unavailable — form still works for this session
+    }
+  }, [formData, selectedSpecialties, currentTab, selectedCountry, draftRestored]);
 
   // Institution types are data, not code — load from the reference table,
   // fall back to the bundled MOH Zambia taxonomy when offline/empty.
@@ -221,7 +256,9 @@ export const HealthcareInstitutionForm = () => {
       const { data: { user } } = await supabase.auth.getUser();
 
       if (!user) {
-        toast.error("You must be logged in to register an institution");
+        // Draft is already persisted above — login returns here via redirect.
+        toast.info("Sign in to submit — your application draft is saved.");
+        navigate(authRedirectUrl(currentReturnTo()));
         return;
       }
 
@@ -273,6 +310,7 @@ export const HealthcareInstitutionForm = () => {
       if (appError) throw appError;
 
       toast.success("Institution registered successfully! Awaiting verification.");
+      try { localStorage.removeItem(DRAFT_KEY); } catch { /* ignore */ }
       navigate("/institution-status");
     } catch (error: any) {
       console.error("Error registering institution:", error);

@@ -72,7 +72,7 @@ export const VoiceCommandsHelp: React.FC = () => {
             <Mic className="h-5 w-5" />
             Voice Commands
           </DialogTitle>
-          <Button variant="ghost" size="icon" onClick={() => setOpen(false)} className="h-8 w-8">
+          <Button variant="ghost" size="icon" aria-label="Close voice commands help" onClick={() => setOpen(false)} className="h-8 w-8">
             <X className="h-4 w-4" />
           </Button>
         </DialogHeader>

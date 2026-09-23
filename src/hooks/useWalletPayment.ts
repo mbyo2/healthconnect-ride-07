@@ -1,8 +1,14 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
+import {
+  savePendingAction,
+  authRedirectUrl,
+  currentReturnTo,
+} from "@/utils/pendingAction";
 
 export interface WalletPayInput {
   amount: number;
@@ -23,6 +29,7 @@ export interface WalletPayInput {
 export function useWalletPayment() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [paying, setPaying] = useState(false);
 
   const balanceQuery = useQuery({
@@ -42,9 +49,20 @@ export function useWalletPayment() {
 
   const pay = async (input: WalletPayInput): Promise<boolean> => {
     if (!user) {
-      toast.error("Sign in to pay with your wallet.");
+      // Auth wall: remember where the checkout lives so login returns here.
+      // The payment itself is NEVER auto-retried — the user taps pay again.
+      const returnTo = currentReturnTo();
+      savePendingAction({
+        kind: 'checkout',
+        returnTo,
+        label: input.description || 'wallet checkout',
+        createdAt: Date.now(),
+      });
+      toast.info('Sign in to continue checkout — nothing has been charged.');
+      navigate(authRedirectUrl(returnTo));
       return false;
     }
+
     if (!(input.amount > 0)) {
       toast.error("Invalid payment amount.");
       return false;
@@ -58,8 +76,8 @@ export function useWalletPayment() {
           amount: input.amount,
           currency: "ZMW",
           patientId: user.id,
-          providerId: input.providerId || "00000000-0000-0000-0000-000000000000",
-          serviceId: input.serviceId || input.orderId || "wallet_spend",
+          providerId: input.providerId || null,
+          serviceId: input.serviceId || null,
           orderId: input.orderId,
           description: input.description,
         },

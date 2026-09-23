@@ -463,7 +463,7 @@ export const StaffManagement = ({ institutionId }: { institutionId: string }) =>
           <div className="flex flex-col sm:flex-row gap-2 justify-between">
             <div className="relative flex-1 max-w-sm">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Search staff..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-9" />
+              <Input type="search" aria-label="Search staff..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-9" />
             </div>
             <div className="flex gap-2">
               <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
@@ -587,7 +587,7 @@ export const StaffManagement = ({ institutionId }: { institutionId: string }) =>
                         </TableCell>
                         <TableCell className="text-right">
                           {s.is_active !== false && (
-                            <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDeactivateStaff(s.id)}>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" aria-label={`Deactivate ${(s as any).first_name || (s as any).email || 'staff member'}`} onClick={() => handleDeactivateStaff(s.id)}>
                               <XCircle className="h-4 w-4" />
                             </Button>
                           )}

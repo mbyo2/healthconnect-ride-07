@@ -108,9 +108,10 @@ serve(async (req) => {
       );
     }
 
-    // Verify the PayPal order ID matches the one stored on the payment record.
-    // Prevents capturing a cheaper order against a different (more expensive) payment.
-    if (payment.invoice_number !== paypalOrderId) {
+    // Verify the PayPal order ID matches the one stored on the payment record
+    // (external_payment_id, set at order creation). Prevents capturing a
+    // cheaper order against a different (more expensive) payment.
+    if (!payment.external_payment_id || payment.external_payment_id !== paypalOrderId) {
       return new Response(
         JSON.stringify({ success: false, error: 'Order ID mismatch' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -134,7 +135,7 @@ serve(async (req) => {
     // Get PayPal credentials
     const paypalClientId = Deno.env.get('PAYPAL_CLIENT_ID');
     const paypalClientSecret = Deno.env.get('PAYPAL_CLIENT_SECRET');
-    const paypalBaseUrl = Deno.env.get('PAYPAL_BASE_URL') || 'https://api-m.paypal.com';
+    const paypalBaseUrl = Deno.env.get('PAYPAL_BASE_URL') || Deno.env.get('PAYPAL_API_BASE') || 'https://api-m.paypal.com';
 
     if (!paypalClientId || !paypalClientSecret) {
       console.error('PayPal credentials missing at capture time — refusing to complete payment');
@@ -218,16 +219,27 @@ serve(async (req) => {
           : null;
 
       if (requestedServiceId === 'wallet_topup') {
-        const { error: walletError } = await supabaseClient.rpc('process_wallet_transaction', {
-          p_user_id: payment.patient_id,
-          p_transaction_type: 'credit',
-          p_amount: payment.amount,
-          p_description: `PayPal wallet top-up - ${payment.invoice_number}`,
-          p_payment_id: payment.id
-        });
+        // Idempotency: skip when this payment already produced its credit
+        // (concurrent/retried captures must not double-fund the wallet).
+        const { data: existingCredit } = await supabaseClient
+          .from('wallet_transactions')
+          .select('id')
+          .eq('payment_id', payment.id)
+          .eq('transaction_type', 'credit')
+          .limit(1)
+          .maybeSingle();
+        if (!existingCredit) {
+          const { error: walletError } = await supabaseClient.rpc('process_wallet_transaction', {
+            p_user_id: payment.patient_id,
+            p_transaction_type: 'credit',
+            p_amount: payment.amount,
+            p_description: `PayPal wallet top-up - ${payment.invoice_number}`,
+            p_payment_id: payment.id
+          });
 
-        if (walletError) {
-          console.error('Error crediting wallet:', walletError);
+          if (walletError) {
+            console.error('Error crediting wallet:', walletError);
+          }
         }
       } else {
         // Real money received: pay out the provider / pharmacy / institution

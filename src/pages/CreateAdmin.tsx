@@ -104,21 +104,21 @@ const CreateAdmin: React.FC = () => {
             <>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <Label>First Name</Label>
-                  <Input value={form.firstName} onChange={e => setForm({ ...form, firstName: e.target.value })} />
+                  <Label htmlFor="admin-first-name">First Name</Label>
+                  <Input id="admin-first-name" autoComplete="given-name" value={form.firstName} onChange={e => setForm({ ...form, firstName: e.target.value })} />
                 </div>
                 <div className="space-y-1">
-                  <Label>Last Name</Label>
-                  <Input value={form.lastName} onChange={e => setForm({ ...form, lastName: e.target.value })} />
+                  <Label htmlFor="admin-last-name">Last Name</Label>
+                  <Input id="admin-last-name" autoComplete="family-name" value={form.lastName} onChange={e => setForm({ ...form, lastName: e.target.value })} />
                 </div>
               </div>
               <div className="space-y-1">
-                <Label>Email</Label>
-                <Input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} />
+                <Label htmlFor="admin-email">Email</Label>
+                <Input id="admin-email" type="email" autoComplete="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} />
               </div>
               <div className="space-y-1">
-                <Label>Password</Label>
-                <Input type="password" value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} placeholder="Min 8 characters" />
+                <Label htmlFor="admin-password">Password</Label>
+                <Input id="admin-password" type="password" autoComplete="new-password" value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} placeholder="Min 8 characters" />
               </div>
               {isSuperAdmin && (
                 <div className="space-y-1">

@@ -1,11 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
 import {
   BedDouble,
-  Building,
   ArrowRightLeft,
   FileCheck,
-  Plus,
   Search,
   CheckCircle2,
   Clock,
@@ -13,83 +11,177 @@ import {
   ShieldCheck,
   Sparkles,
 } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
+import { supabase } from "@/integrations/supabase/client";
+import { providerDisplayName } from "@/utils/providerDisplay";
+import { ensureBillingDraft } from "@/services/dischargeWorkflow";
 
-interface InpatientBed {
+interface LiveBed {
+  id: string;
   bedNumber: string;
   ward: string;
+  status: string;
   patientName?: string;
   admissionDate?: string;
   admittingDoctor?: string;
-  status: "Available" | "Occupied" | "Cleaning" | "Maintenance";
+  admissionId?: string;
 }
 
-interface BedTransferLog {
+interface LiveAdmission {
   id: string;
+  admission_number: string;
+  patient_id: string;
   patientName: string;
-  fromBed: string;
-  toBed: string;
-  date: string;
-  reason: string;
+  bedNumber?: string;
+  diagnosis?: string | null;
+  admissionDate?: string;
+  bed_id?: string | null;
 }
 
-const DEFAULT_BEDS: InpatientBed[] = [
-  { bedNumber: "BED-ICU-01", ward: "Intensive Care Unit (ICU)", patientName: "Mwamba Chileshe", admissionDate: "2026-08-28", admittingDoctor: "Dr. Mwape Chilufya", status: "Occupied" },
-  { bedNumber: "BED-ICU-02", ward: "Intensive Care Unit (ICU)", status: "Available" },
-  { bedNumber: "BED-MED-101", ward: "Male Medical Ward", patientName: "Felix Mwape", admissionDate: "2026-08-30", admittingDoctor: "Dr. Lindiwe Zulu", status: "Occupied" },
-  { bedNumber: "BED-MED-102", ward: "Male Medical Ward", status: "Available" },
-  { bedNumber: "BED-PED-201", ward: "Pediatric Ward", patientName: "Baby Joshua Tembo", admissionDate: "2026-09-01", admittingDoctor: "Dr. Lindiwe Zulu", status: "Occupied" },
-  { bedNumber: "BED-PED-202", ward: "Pediatric Ward", status: "Available" },
-  { bedNumber: "BED-SURG-301", ward: "Surgical Recovery Ward", patientName: "Ruth Chiluba", admissionDate: "2026-08-31", admittingDoctor: "Dr. Mwape Chilufya", status: "Occupied" },
-];
-
-const DEFAULT_TRANSFERS: BedTransferLog[] = [
-  { id: "tr-1", patientName: "Ruth Chiluba", fromBed: "BED-ICU-01", toBed: "BED-SURG-301", date: "2026-08-31", reason: "Post-op stability, stepped down to Surgical Ward" },
-  { id: "tr-2", patientName: "Felix Mwape", fromBed: "Emergency Observation", toBed: "BED-MED-101", date: "2026-08-30", reason: "Formal IPD admission from Emergency Triage" },
-];
-
+/**
+ * OPD/IPD care management backed by live hospital data — beds from
+ * hospital_beds, occupants from admitted hospital_admissions. Discharges
+ * perform the real three-step close (admission → discharged, bed freed,
+ * billing draft opened). There is no transfers ledger table, so the
+ * transfers tab honestly says where transfers live instead of faking a log.
+ */
 export const CareManagementSuite: React.FC<{ institutionId?: string }> = ({ institutionId }) => {
-  const [activeTab, setActiveTab] = useState<"opd" | "ipd" | "transfers" | "discharge">("ipd");
-  const [beds, setBeds] = useState<InpatientBed[]>(DEFAULT_BEDS);
-  const [transfers, setTransfers] = useState<BedTransferLog[]>(DEFAULT_TRANSFERS);
+  const [activeTab, setActiveTab] = useState<"ipd" | "transfers" | "discharge">("ipd");
+  const [beds, setBeds] = useState<LiveBed[]>([]);
+  const [admitted, setAdmitted] = useState<LiveAdmission[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [dischargingId, setDischargingId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  // New Transfer Modal
-  const [showTransferModal, setShowTransferModal] = useState(false);
-  const [transferPatient, setTransferPatient] = useState("Mwamba Chileshe");
-  const [transferFrom, setTransferFrom] = useState("BED-ICU-01");
-  const [transferTo, setTransferTo] = useState("BED-MED-102");
-  const [transferReason, setTransferReason] = useState("Stepped down to general medical ward");
+  const fetchData = useCallback(async () => {
+    if (!institutionId) {
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    try {
+      const [bedsRes, deptRes, admRes] = await Promise.all([
+        supabase
+          .from("hospital_beds" as any)
+          .select("id, bed_number, status, department_id")
+          .eq("hospital_id", institutionId)
+          .order("bed_number"),
+        supabase
+          .from("hospital_departments" as any)
+          .select("id, name")
+          .eq("hospital_id", institutionId),
+        supabase
+          .from("hospital_admissions" as any)
+          .select(`
+            id, admission_number, bed_id, diagnosis, admission_date, patient_id,
+            patient:profiles!hospital_admissions_patient_id_fkey(first_name, last_name),
+            doctor:profiles!hospital_admissions_admitting_doctor_id_fkey(first_name, last_name, role)
+          `)
+          .eq("hospital_id", institutionId)
+          .eq("status", "admitted"),
+      ]);
+      if (bedsRes.error) throw bedsRes.error;
+      if (admRes.error) throw admRes.error;
 
-  const handleBedTransfer = () => {
-    const log: BedTransferLog = {
-      id: `tr-${Date.now()}`,
-      patientName: transferPatient,
-      fromBed: transferFrom,
-      toBed: transferTo,
-      date: new Date().toISOString().split("T")[0],
-      reason: transferReason,
-    };
-    setTransfers([log, ...transfers]);
+      const deptNames = new Map<string, string>(
+        ((deptRes.data as any[]) || []).map((d: any) => [d.id, d.name])
+      );
+      const admissions = ((admRes.data as any[]) || []);
+      const occupantByBed = new Map<string, any>();
+      admissions.forEach((a: any) => {
+        if (a.bed_id) occupantByBed.set(a.bed_id, a);
+      });
 
-    // Update beds
-    setBeds((prev) =>
-      prev.map((b) => {
-        if (b.bedNumber === transferFrom) {
-          return { ...b, status: "Available", patientName: undefined };
-        }
-        if (b.bedNumber === transferTo) {
-          return { ...b, status: "Occupied", patientName: transferPatient, admissionDate: new Date().toISOString().split("T")[0] };
-        }
-        return b;
-      })
-    );
+      const liveBeds: LiveBed[] = ((bedsRes.data as any[]) || []).map((b: any) => {
+        const occ = occupantByBed.get(b.id);
+        const patient = occ?.patient;
+        const doctor = occ?.doctor;
+        return {
+          id: b.id,
+          bedNumber: b.bed_number,
+          ward: deptNames.get(b.department_id) || "General Ward",
+          status: b.status || "available",
+          patientName: patient ? `${patient.first_name || ""} ${patient.last_name || ""}`.trim() || undefined : undefined,
+          admissionDate: occ?.admission_date
+            ? new Date(occ.admission_date).toLocaleDateString()
+            : undefined,
+          admittingDoctor: doctor
+            ? providerDisplayName({ first_name: doctor.first_name, last_name: doctor.last_name, role: doctor.role })
+            : undefined,
+          admissionId: occ?.id,
+        };
+      });
+      setBeds(liveBeds);
 
-    toast.success(`Patient ${transferPatient} moved from ${transferFrom} to ${transferTo}`);
-    setShowTransferModal(false);
+      const bedNumberById = new Map(liveBeds.map((b) => [b.id, b.bedNumber]));
+      setAdmitted(
+        admissions.map((a: any) => ({
+          id: a.id,
+          admission_number: a.admission_number || a.id.slice(0, 8),
+          patient_id: a.patient_id,
+          patientName: a.patient
+            ? `${a.patient.first_name || ""} ${a.patient.last_name || ""}`.trim() || "Patient"
+            : "Patient",
+          bedNumber: a.bed_id ? bedNumberById.get(a.bed_id) : undefined,
+          diagnosis: a.diagnosis,
+          admissionDate: a.admission_date
+            ? new Date(a.admission_date).toLocaleDateString()
+            : undefined,
+          bed_id: a.bed_id,
+        }))
+      );
+    } catch (error) {
+      console.error("Error loading care management data:", error);
+      toast.error("Failed to load ward data");
+    } finally {
+      setLoading(false);
+    }
+  }, [institutionId]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const handleDischarge = async (admission: LiveAdmission) => {
+    setDischargingId(admission.id);
+    try {
+      const { error: admErr } = await (supabase.from("hospital_admissions" as any) as any)
+        .update({ status: "discharged", discharge_date: new Date().toISOString() })
+        .eq("id", admission.id);
+      if (admErr) throw admErr;
+
+      if (admission.bed_id) {
+        await (supabase.from("hospital_beds" as any) as any)
+          .update({ status: "available", current_patient_id: null })
+          .eq("id", admission.bed_id);
+      }
+
+      await ensureBillingDraft(institutionId, admission as any);
+      toast.success(`Discharged ${admission.patientName} — bed freed and billing draft opened.`);
+      fetchData();
+    } catch (error: any) {
+      console.error("Error discharging patient:", error);
+      toast.error(error?.message || "Failed to discharge patient");
+    } finally {
+      setDischargingId(null);
+    }
   };
 
-  const occupiedCount = beds.filter((b) => b.status === "Occupied").length;
-  const availableCount = beds.filter((b) => b.status === "Available").length;
+  const occupiedCount = beds.filter((b) => b.status === "occupied").length;
+  const filteredBeds = beds.filter(
+    (b) =>
+      !searchQuery ||
+      b.bedNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      b.ward.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (b.patientName || "").toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  if (!institutionId) {
+    return (
+      <div className="p-8 rounded-3xl border border-dashed text-center text-sm text-muted-foreground">
+        Care management needs an institution context — open this from a facility dashboard.
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 font-sans text-slate-900 dark:text-slate-100">
@@ -103,24 +195,25 @@ export const CareManagementSuite: React.FC<{ institutionId?: string }> = ({ inst
             <div className="flex items-center gap-2">
               <h2 className="text-xl font-black tracking-tight">Outpatient (OPD) &amp; Inpatient (IPD) Care Management</h2>
               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-400 text-slate-950">
-                ADT &amp; Bed Movement
+                Live ADT Data
               </span>
             </div>
             <p className="text-xs text-blue-100 font-medium">
-              OPD service units, admission/discharge/transfer (ADT), ward bed occupancy &amp; discharge summaries
+              Admission/discharge/transfer (ADT), ward bed occupancy &amp; discharge summaries
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
           <span className="px-3 py-1.5 rounded-xl bg-white/20 text-white font-bold text-xs">
-            Occupancy: {occupiedCount} / {beds.length} Beds ({Math.round((occupiedCount / beds.length) * 100)}%)
+            Occupancy: {loading ? "…" : `${occupiedCount} / ${beds.length} Beds`}
+            {!loading && beds.length > 0 ? ` (${Math.round((occupiedCount / beds.length) * 100)}%)` : ""}
           </span>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-2 border-b border-canvas-silk dark:border-slate-800 pb-2 overflow-x-auto">
+      <div className="flex items-center gap-2 border-b border-canvas-silk dark:border-slate-800 pb-2 overflow-x-auto" role="tablist" aria-label="Care management views">
         {[
           { id: "ipd", label: "IPD Wards & Bed Grid", icon: BedDouble },
           { id: "transfers", label: "Bed Movements & Transfers", icon: ArrowRightLeft },
@@ -130,6 +223,8 @@ export const CareManagementSuite: React.FC<{ institutionId?: string }> = ({ inst
           return (
             <button
               key={tab.id}
+              role="tab"
+              aria-selected={activeTab === tab.id}
               onClick={() => setActiveTab(tab.id as any)}
               className={`px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2 transition-all shrink-0 ${
                 activeTab === tab.id
@@ -147,197 +242,170 @@ export const CareManagementSuite: React.FC<{ institutionId?: string }> = ({ inst
       {/* 1. IPD Wards & Bed Grid */}
       {activeTab === "ipd" && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-3">
             <div>
               <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">Live Hospital Ward &amp; Bed Occupancy</h3>
-              <p className="text-xs text-graphite-500 dark:text-slate-400">Real-time bed tracking across ICU, Medical, Pediatric, and Surgical Wards</p>
+              <p className="text-xs text-graphite-500 dark:text-slate-400">Real-time bed tracking across wards</p>
             </div>
-
-            <Dialog open={showTransferModal} onOpenChange={setShowTransferModal}>
-              <DialogTrigger asChild>
-                <button className="px-4 py-2 rounded-xl bg-primary-500 text-white text-xs font-extrabold flex items-center gap-1.5 shadow-xs">
-                  <ArrowRightLeft className="h-4 w-4" /> Initiate Bed Transfer
-                </button>
-              </DialogTrigger>
-              <DialogContent className="max-w-md bg-white dark:bg-slate-900 rounded-3xl p-6">
-                <DialogHeader>
-                  <DialogTitle className="font-black text-lg">Inpatient Bed Transfer Order</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-3 py-2 text-xs">
-                  <div>
-                    <label className="font-bold">Admitted Patient *</label>
-                    <input
-                      className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700"
-                      value={transferPatient}
-                      onChange={(e) => setTransferPatient(e.target.value)}
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <label className="font-bold">Current Bed *</label>
-                      <input
-                        className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700"
-                        value={transferFrom}
-                        onChange={(e) => setTransferFrom(e.target.value)}
-                      />
-                    </div>
-                    <div>
-                      <label className="font-bold">Destination Bed *</label>
-                      <select
-                        className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-bold bg-white dark:bg-slate-950"
-                        value={transferTo}
-                        onChange={(e) => setTransferTo(e.target.value)}
-                      >
-                        {beds.filter((b) => b.status === "Available").map((b) => (
-                          <option key={b.bedNumber} value={b.bedNumber}>
-                            {b.bedNumber} ({b.ward})
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-                  <div>
-                    <label className="font-bold">Clinical Transfer Reason</label>
-                    <input
-                      className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700"
-                      value={transferReason}
-                      onChange={(e) => setTransferReason(e.target.value)}
-                    />
-                  </div>
-                </div>
-                <DialogFooter>
-                  <button onClick={() => setShowTransferModal(false)} className="px-4 py-2 font-bold text-slate-500">Cancel</button>
-                  <button onClick={handleBedTransfer} className="px-5 py-2.5 rounded-xl bg-primary-500 text-white font-extrabold">Execute Transfer</button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          </div>
-
-          {/* Bed Cards Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {beds.map((b) => {
-              const isOccupied = b.status === "Occupied";
-              return (
-                <div
-                  key={b.bedNumber}
-                  className={`p-5 rounded-3xl border transition-all flex flex-col justify-between space-y-3 ${
-                    isOccupied
-                      ? "bg-white dark:bg-slate-900 border-primary-500/40 shadow-xs"
-                      : "bg-slate-50/60 dark:bg-slate-950 border-dashed border-graphite-300 dark:border-slate-700 dark:border-slate-800"
-                  }`}
-                >
-                  <div>
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="font-mono font-black text-xs text-primary-500">{b.bedNumber}</span>
-                      <span
-                        className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase ${
-                          isOccupied
-                            ? "bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300"
-                            : "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
-                        }`}
-                      >
-                        {b.status}
-                      </span>
-                    </div>
-
-                    <div className="text-[11px] font-bold text-slate-400">{b.ward}</div>
-
-                    {isOccupied ? (
-                      <div className="mt-3 p-2.5 rounded-xl bg-primary-500/5 border border-primary-500/20 text-xs">
-                        <div className="font-black text-slate-900 dark:text-slate-100">{b.patientName}</div>
-                        <div className="text-[10px] text-slate-500">Admitted: {b.admissionDate}</div>
-                        <div className="text-[10px] text-primary-500 font-semibold">{b.admittingDoctor}</div>
-                      </div>
-                    ) : (
-                      <div className="mt-3 p-4 rounded-xl border border-dashed text-center text-slate-400 text-xs font-semibold">
-                        Ready for Admission
-                      </div>
-                    )}
-                  </div>
-
-                  {isOccupied && (
-                    <button
-                      onClick={() => toast.success(`Generated Discharge Summary for ${b.patientName}`)}
-                      className="w-full py-1.5 rounded-xl border border-canvas-silk hover:bg-primary-500 hover:text-white text-slate-700 dark:text-slate-300 font-extrabold text-[11px] transition-colors"
-                    >
-                      Discharge Patient
-                    </button>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* 2. Bed Transfers Log */}
-      {activeTab === "transfers" && (
-        <div className="space-y-4">
-          <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
-            <table className="w-full text-left border-collapse text-xs">
-              <thead>
-                <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
-                  <th className="py-3 px-4">Patient Name</th>
-                  <th className="py-3 px-3">From Bed</th>
-                  <th className="py-3 px-3">To Destination Bed</th>
-                  <th className="py-3 px-3">Transfer Date</th>
-                  <th className="py-3 px-3">Clinical Indication / Reason</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-canvas-silk dark:divide-slate-800">
-                {transfers.map((tr) => (
-                  <tr key={tr.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-800/60">
-                    <td className="py-3 px-4 font-bold text-slate-900 dark:text-slate-100">{tr.patientName}</td>
-                    <td className="py-3 px-3 font-mono text-rose-600 font-bold">{tr.fromBed}</td>
-                    <td className="py-3 px-3 font-mono text-emerald-600 font-bold">{tr.toBed}</td>
-                    <td className="py-3 px-3 text-slate-500">{tr.date}</td>
-                    <td className="py-3 px-3 font-medium text-slate-700 dark:text-slate-300">{tr.reason}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-
-      {/* 3. Discharge Summaries */}
-      {activeTab === "discharge" && (
-        <div className="space-y-4">
-          <div className="p-6 rounded-3xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs space-y-4 text-xs">
-            <div className="flex items-center justify-between border-b border-canvas-silk dark:border-slate-800 pb-3">
-              <h3 className="font-black text-sm text-slate-900 dark:text-slate-100">
-                Official Electronic Discharge Summary Generator
-              </h3>
-              <button
-                onClick={() => toast.success("Official Discharge Summary PDF exported")}
-                className="px-4 py-2 rounded-xl bg-primary-500 text-white font-extrabold text-xs shadow-xs"
-              >
-                Export Discharge Summary (PDF)
-              </button>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="font-bold">Inpatient Admission No</label>
-                <input className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700" value="ADM-2026-0491 (Ruth Chiluba)" readOnly />
-              </div>
-              <div>
-                <label className="font-bold">Discharge Status</label>
-                <input className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700" value="Recovered / Discharged to Outpatient Care" readOnly />
-              </div>
-            </div>
-
-            <div>
-              <label className="font-bold">Hospital Course &amp; Treatment Summary</label>
-              <textarea
-                rows={3}
-                className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700"
-                defaultValue="Patient underwent Lumbar L4-L5 decompression surgery on 2026-08-31. Post-operative period uneventful. Mobilized on Day 1 with Physiotherapy. Surgical site clean and dry without signs of infection. Oral analgesia prescribed for 7 days."
+            <div className="relative w-full sm:w-64">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-graphite-400" aria-hidden />
+              <input
+                type="search"
+                aria-label="Search beds, wards, or patients"
+                placeholder="Search beds…"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-3 py-1.5 rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-medium placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
             </div>
           </div>
+
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" role="status" aria-label="Loading beds">
+              {[0, 1, 2, 3].map((i) => (
+                <div key={i} className="h-36 rounded-3xl bg-muted animate-pulse" aria-hidden />
+              ))}
+            </div>
+          ) : filteredBeds.length === 0 ? (
+            <div className="p-10 rounded-3xl border border-dashed text-center">
+              <BedDouble className="h-8 w-8 mx-auto text-slate-400 mb-2" aria-hidden />
+              <p className="font-bold text-sm">
+                {beds.length === 0 ? "No beds registered yet." : "No beds match your search."}
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">
+                {beds.length === 0
+                  ? "Add beds in Hospital Management to light up this board."
+                  : "Try a different bed number, ward, or patient name."}
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {filteredBeds.map((b) => {
+                const isOccupied = b.status === "occupied";
+                return (
+                  <div
+                    key={b.id}
+                    className={`p-5 rounded-3xl border transition-all flex flex-col justify-between space-y-3 ${
+                      isOccupied
+                        ? "bg-white dark:bg-slate-900 border-primary-500/40 shadow-xs"
+                        : "bg-slate-50/60 dark:bg-slate-950 border-dashed border-graphite-300 dark:border-slate-700"
+                    }`}
+                  >
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="font-mono font-black text-xs text-primary-500">{b.bedNumber}</span>
+                        <span
+                          className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase ${
+                            isOccupied
+                              ? "bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300"
+                              : "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
+                          }`}
+                        >
+                          {b.status}
+                        </span>
+                      </div>
+
+                      <div className="text-[11px] font-bold text-slate-400">{b.ward}</div>
+
+                      {isOccupied && (
+                        <div className="mt-3 p-2.5 rounded-xl bg-primary-500/5 border border-primary-500/20 text-xs">
+                          <div className="font-black text-slate-900 dark:text-slate-100">{b.patientName || "Occupant"}</div>
+                          {b.admissionDate && (
+                            <div className="text-[10px] text-slate-500">Admitted: {b.admissionDate}</div>
+                          )}
+                          {b.admittingDoctor && (
+                            <div className="text-[10px] text-primary-500 font-semibold">{b.admittingDoctor}</div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
+
+      {/* 2. Bed Movements & Transfers */}
+      {activeTab === "transfers" && (
+        <div className="p-10 rounded-3xl border border-dashed text-center">
+          <ArrowRightLeft className="h-8 w-8 mx-auto text-slate-400 mb-2" aria-hidden />
+          <p className="font-bold text-sm">No transfer ledger yet</p>
+          <p className="text-xs text-muted-foreground mt-1 max-w-md mx-auto">
+            Bed-to-bed moves are recorded during admission and transfer in Hospital Management.
+            A dedicated transfer log ships with the next HMS update.
+          </p>
+        </div>
+      )}
+
+      {/* 3. Discharge */}
+      {activeTab === "discharge" && (
+        <div className="space-y-4">
+          <div>
+            <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">Admitted Patients Ready for Discharge</h3>
+            <p className="text-xs text-graphite-500 dark:text-slate-400">
+              Discharging frees the bed immediately and opens the billing draft.
+            </p>
+          </div>
+          {loading ? (
+            <div className="space-y-2" role="status" aria-label="Loading admitted patients">
+              {[0, 1, 2].map((i) => (
+                <div key={i} className="h-16 rounded-2xl bg-muted animate-pulse" aria-hidden />
+              ))}
+            </div>
+          ) : admitted.length === 0 ? (
+            <div className="p-10 rounded-3xl border border-dashed text-center">
+              <CheckCircle2 className="h-8 w-8 mx-auto text-emerald-500 mb-2" aria-hidden />
+              <p className="font-bold text-sm">No admitted patients</p>
+              <p className="text-xs text-muted-foreground mt-1">Admit patients from OPD or Emergency to see them here.</p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {admitted.map((a) => (
+                <div
+                  key={a.id}
+                  className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                >
+                  <div>
+                    <p className="font-bold text-sm">{a.patientName}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {a.admission_number}
+                      {a.bedNumber ? ` · Bed ${a.bedNumber}` : ""}
+                      {a.diagnosis ? ` · ${a.diagnosis}` : ""}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => handleDischarge(a)}
+                    disabled={dischargingId === a.id}
+                    className="px-4 py-2 rounded-xl bg-primary-500 hover:bg-primary-600 disabled:opacity-50 text-white font-extrabold text-xs flex items-center gap-1.5 transition-all"
+                  >
+                    {dischargingId === a.id ? (
+                      <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                    ) : (
+                      <CheckCircle2 className="h-4 w-4" aria-hidden />
+                    )}
+                    {dischargingId === a.id ? "Discharging…" : "Discharge Patient"}
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Trust strip */}
+      <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+        <ShieldCheck className="h-4 w-4 text-success-500" aria-hidden />
+        <span>Live facility data</span>
+        <span aria-hidden>·</span>
+        <UserCheck className="h-4 w-4" aria-hidden />
+        <span>Occupant names visible to care staff only</span>
+        <span aria-hidden>·</span>
+        <Clock className="h-4 w-4" aria-hidden />
+        <span>Updates in real time</span>
+        <Sparkles className="h-4 w-4 text-primary-500" aria-hidden />
+      </div>
     </div>
   );
 };

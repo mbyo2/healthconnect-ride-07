@@ -68,6 +68,17 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/health-analytics',    // patient trends & outcomes
   ]),
 
+  // ── Specialist (same scope as Doctor) ────────────────────
+  [USER_ROLES.SPECIALIST]: dedupeRoutes([
+    ...COMMON_ROUTES,
+    ...PROVIDER_CORE_ROUTES,
+    '/prescriptions',       // specialists can prescribe
+    '/ai-diagnostics',      // clinical decision support
+    '/telemedicine',
+    '/medications',
+    '/health-analytics',    // patient trends & outcomes
+  ]),
+
   // ── Nurse (Solo Consultant) ──────────────────────────────
   [USER_ROLES.NURSE]: dedupeRoutes([
     ...COMMON_ROUTES,
@@ -147,6 +158,34 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/connections',         // patient lookup
   ]),
 
+  // ── Pathologist (same scope as Lab Technician) ────────────
+  [USER_ROLES.PATHOLOGIST]: dedupeRoutes([
+    ...COMMON_ROUTES,
+    '/lab-management',
+    '/ai-diagnostics',
+    '/wallet',
+    '/map',
+    '/search',
+    '/chat',
+    '/medical-records',
+    '/medications',
+    '/connections',         // patient lookup
+  ]),
+
+  // ── Phlebotomist (same scope as Lab Technician) ───────────
+  [USER_ROLES.PHLEBOTOMIST]: dedupeRoutes([
+    ...COMMON_ROUTES,
+    '/lab-management',
+    '/ai-diagnostics',
+    '/wallet',
+    '/map',
+    '/search',
+    '/chat',
+    '/medical-records',
+    '/medications',
+    '/connections',         // patient lookup
+  ]),
+
   // ── Lab (business entity) ────────────────────────────────
   [USER_ROLES.LAB]: dedupeRoutes([
     ...COMMON_ROUTES,
@@ -188,6 +227,163 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
 
   // ── Institution Staff ────────────────────────────────────
   [USER_ROLES.INSTITUTION_STAFF]: dedupeRoutes([
+    ...COMMON_ROUTES,
+    '/institution-portal',
+    '/institution-dashboard',
+    '/institution/patients',
+    '/institution/personnel',
+    '/institution/reports',
+    '/institution/appointments',
+    '/institution/devices',
+    '/appointments',
+    '/appointments/:id',
+    '/wallet',
+    '/medical-records',
+    '/hospital-management',
+    '/pharmacy-inventory',
+    '/medications',
+  ]),
+
+  // ── Facility operations roles (same scope as Institution Staff) ──
+  // Reception, HR, CXO, OT, billing, inventory, triage, maintenance and
+  // ambulance staff work inside the institution workspace.
+  [USER_ROLES.RECEPTIONIST]: dedupeRoutes([
+    ...COMMON_ROUTES,
+    '/institution-portal',
+    '/institution-dashboard',
+    '/institution/patients',
+    '/institution/personnel',
+    '/institution/reports',
+    '/institution/appointments',
+    '/institution/devices',
+    '/appointments',
+    '/appointments/:id',
+    '/wallet',
+    '/medical-records',
+    '/hospital-management',
+    '/pharmacy-inventory',
+    '/medications',
+  ]),
+  [USER_ROLES.HR_MANAGER]: dedupeRoutes([
+    ...COMMON_ROUTES,
+    '/institution-portal',
+    '/institution-dashboard',
+    '/institution/patients',
+    '/institution/personnel',
+    '/institution/reports',
+    '/institution/appointments',
+    '/institution/devices',
+    '/appointments',
+    '/appointments/:id',
+    '/wallet',
+    '/medical-records',
+    '/hospital-management',
+    '/pharmacy-inventory',
+    '/medications',
+  ]),
+  [USER_ROLES.CXO]: dedupeRoutes([
+    ...COMMON_ROUTES,
+    '/institution-portal',
+    '/institution-dashboard',
+    '/institution/patients',
+    '/institution/personnel',
+    '/institution/reports',
+    '/institution/appointments',
+    '/institution/devices',
+    '/appointments',
+    '/appointments/:id',
+    '/wallet',
+    '/medical-records',
+    '/hospital-management',
+    '/pharmacy-inventory',
+    '/medications',
+  ]),
+  [USER_ROLES.OT_STAFF]: dedupeRoutes([
+    ...COMMON_ROUTES,
+    '/institution-portal',
+    '/institution-dashboard',
+    '/institution/patients',
+    '/institution/personnel',
+    '/institution/reports',
+    '/institution/appointments',
+    '/institution/devices',
+    '/appointments',
+    '/appointments/:id',
+    '/wallet',
+    '/medical-records',
+    '/hospital-management',
+    '/pharmacy-inventory',
+    '/medications',
+  ]),
+  [USER_ROLES.BILLING_STAFF]: dedupeRoutes([
+    ...COMMON_ROUTES,
+    '/institution-portal',
+    '/institution-dashboard',
+    '/institution/patients',
+    '/institution/personnel',
+    '/institution/reports',
+    '/institution/appointments',
+    '/institution/devices',
+    '/appointments',
+    '/appointments/:id',
+    '/wallet',
+    '/medical-records',
+    '/hospital-management',
+    '/pharmacy-inventory',
+    '/medications',
+  ]),
+  [USER_ROLES.INVENTORY_MANAGER]: dedupeRoutes([
+    ...COMMON_ROUTES,
+    '/institution-portal',
+    '/institution-dashboard',
+    '/institution/patients',
+    '/institution/personnel',
+    '/institution/reports',
+    '/institution/appointments',
+    '/institution/devices',
+    '/appointments',
+    '/appointments/:id',
+    '/wallet',
+    '/medical-records',
+    '/hospital-management',
+    '/pharmacy-inventory',
+    '/medications',
+  ]),
+  [USER_ROLES.TRIAGE_STAFF]: dedupeRoutes([
+    ...COMMON_ROUTES,
+    '/institution-portal',
+    '/institution-dashboard',
+    '/institution/patients',
+    '/institution/personnel',
+    '/institution/reports',
+    '/institution/appointments',
+    '/institution/devices',
+    '/appointments',
+    '/appointments/:id',
+    '/wallet',
+    '/medical-records',
+    '/hospital-management',
+    '/pharmacy-inventory',
+    '/medications',
+  ]),
+  [USER_ROLES.MAINTENANCE_MANAGER]: dedupeRoutes([
+    ...COMMON_ROUTES,
+    '/institution-portal',
+    '/institution-dashboard',
+    '/institution/patients',
+    '/institution/personnel',
+    '/institution/reports',
+    '/institution/appointments',
+    '/institution/devices',
+    '/appointments',
+    '/appointments/:id',
+    '/wallet',
+    '/medical-records',
+    '/hospital-management',
+    '/pharmacy-inventory',
+    '/medications',
+  ]),
+  [USER_ROLES.AMBULANCE_STAFF]: dedupeRoutes([
     ...COMMON_ROUTES,
     '/institution-portal',
     '/institution-dashboard',
@@ -601,7 +797,7 @@ export const ROLE_LANDING_PAGES: Record<string, string> = {
   [USER_ROLES.ADMIN]: '/admin-dashboard',
   [USER_ROLES.LAB]: '/lab-management',
   [USER_ROLES.PHARMACY]: '/pharmacy-portal',
-  [USER_ROLES.INSTITUTION_ADMIN]: '/institution-portal',
+  [USER_ROLES.INSTITUTION_ADMIN]: '/institution-dashboard',
   [USER_ROLES.INSTITUTION_STAFF]: '/institution-dashboard',
   [USER_ROLES.SUPER_ADMIN]: '/super-admin-dashboard',
   [USER_ROLES.SUPPORT]: '/admin-dashboard',
@@ -639,7 +835,6 @@ export const ROLE_LANDING_PAGES: Record<string, string> = {
   [USER_ROLES.INVENTORY_MANAGER]: '/institution-dashboard',
   [USER_ROLES.TRIAGE_STAFF]: '/institution-dashboard',
   [USER_ROLES.MAINTENANCE_MANAGER]: '/institution-dashboard',
-  [USER_ROLES.SPECIALIST]: '/provider-dashboard',
   [USER_ROLES.AMBULANCE_STAFF]: '/institution-dashboard',
   [USER_ROLES.PATHOLOGIST]: '/lab-management',
 };
@@ -697,9 +892,9 @@ export const getRoleLandingPage = (userRoles: UserRole[] | null): string => {
   if (userRoles.includes(USER_ROLES.LAB) || userRoles.includes(USER_ROLES.LAB_TECHNICIAN)) return '/lab-management';
   if (userRoles.includes(USER_ROLES.PATHOLOGIST) || userRoles.includes(USER_ROLES.PHLEBOTOMIST)) return '/lab-management';
 
-  // Generic institution admin/staff routes
-  // Institution admins should land on the institution portal (not the dashboard)
-  if (userRoles.includes(USER_ROLES.INSTITUTION_ADMIN)) return '/institution-portal';
+  // Generic institution admin/staff routes — the dashboard itself handles
+  // unverified institutions inline, so no login-screen hop is needed.
+  if (userRoles.includes(USER_ROLES.INSTITUTION_ADMIN)) return '/institution-dashboard';
   if (userRoles.includes(USER_ROLES.INSTITUTION_STAFF)) return '/institution-dashboard';
   if (userRoles.includes(USER_ROLES.MEDICAL_RECORDS_OFFICER)) return '/institution-dashboard';
   if (userRoles.includes(USER_ROLES.RECEPTIONIST)) return '/institution-dashboard';

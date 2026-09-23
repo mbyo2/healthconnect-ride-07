@@ -14,6 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogT
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { dispatchNotification } from "@/hooks/useNotifications";
+import { providerDisplayName } from "@/utils/providerDisplay";
 
 const LabManagement = () => {
   const { user } = useAuth();
@@ -38,7 +39,7 @@ const LabManagement = () => {
       try {
         const { data, error } = await supabase
           .from("lab_tests")
-          .select("*, patient:profiles!patient_id(first_name, last_name), provider:profiles!ordered_by(first_name, last_name)")
+          .select("*, patient:profiles!patient_id(first_name, last_name), provider:profiles!ordered_by(first_name, last_name, role)")
           .order("created_at", { ascending: false });
 
         if (error) throw error;
@@ -178,7 +179,7 @@ const LabManagement = () => {
         ordered_by: user.id,
         lab_id: user.id,
         test_type: selectedTestType,
-        test_number: `LAB-${Math.random().toString(36).substr(2, 6).toUpperCase()}`,
+        test_number: `LAB-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
         status: "pending",
         price: total,
         total_amount: total,
@@ -320,7 +321,7 @@ const LabManagement = () => {
         </div>
 
         {/* View Selection Bar */}
-        <div className="max-w-[1500px] mx-auto mt-4 px-4 sm:px-6 flex items-center gap-2">
+        <div className="max-w-[1500px] mx-auto mt-4 px-4 sm:px-6 flex items-center gap-2" role="tablist" aria-label="Laboratory views">
           {[
             { id: "requests", label: "Lab Orders Queue" },
             { id: "results", label: "Results Entry" },
@@ -328,6 +329,8 @@ const LabManagement = () => {
           ].map((tab) => (
             <button
               key={tab.id}
+              role="tab"
+              aria-selected={activeTab === tab.id}
               onClick={() => setActiveTab(tab.id as any)}
               className={`px-4 py-2 rounded-xl text-xs font-extrabold transition-all ${
                 activeTab === tab.id
@@ -421,7 +424,7 @@ const LabManagement = () => {
                           {request.patient?.first_name} {request.patient?.last_name}
                         </td>
                         <td className="py-3 px-3 font-bold text-slate-900">{request.test_type || request.test?.name}</td>
-                        <td className="py-3 px-3 text-graphite-500 dark:text-slate-400">Dr. {request.provider?.last_name || "Staff"}</td>
+                        <td className="py-3 px-3 text-graphite-500 dark:text-slate-400">{request.provider?.last_name ? providerDisplayName({ first_name: request.provider?.first_name, last_name: request.provider?.last_name, role: (request.provider as any)?.role }) : "Staff"}</td>
                         <td className="py-3 px-3 text-center">
                           {request.priority === "urgent" || request.priority === "stat" ? (
                             <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white bg-error-500 flex items-center gap-1 mx-auto w-fit">

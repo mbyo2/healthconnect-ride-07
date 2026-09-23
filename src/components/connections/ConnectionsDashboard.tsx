@@ -10,12 +10,20 @@ import { ConnectionCard } from './ConnectionCard';
 import { PrimaryProviderCard } from './PrimaryProviderCard';
 import { SearchProviders } from './SearchProviders';
 import { useAuth } from '@/context/AuthContext';
+import { useUserRoles } from '@/context/UserRolesContext';
+import { ALL_CLINICIAN_ROLES } from '@/config/roleConfig';
 import { Users, UserPlus, Star, Clock, CheckCircle, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export const ConnectionsDashboard = () => {
   const navigate = useNavigate();
-  const { user, profile } = useAuth();
+  const { profile } = useAuth();
+  const { availableRoles, isPatient } = useUserRoles();
+  // Any clinical cadre (doctor, nurse, pharmacist…) sees the provider-side
+  // cards — never just the legacy 'health_personnel' string.
+  const isClinician =
+    availableRoles.some((r) => (ALL_CLINICIAN_ROLES as readonly string[]).includes(r)) ||
+    profile?.role === 'health_personnel';
   const {
     connections,
     connectionsLoading,
@@ -121,7 +129,7 @@ export const ConnectionsDashboard = () => {
                 <p className="text-xs text-slate-400 font-medium mt-1">Awaiting confirmation</p>
               </div>
 
-              {profile?.role === 'health_personnel' && (
+              {isClinician && (
                 <div className="rounded-3xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm">
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider">My Patients</span>
@@ -134,7 +142,7 @@ export const ConnectionsDashboard = () => {
                 </div>
               )}
 
-              {profile?.role === 'patient' && (
+              {isPatient && (
                 <div className="rounded-3xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm">
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider">My Providers</span>
@@ -147,7 +155,7 @@ export const ConnectionsDashboard = () => {
                 </div>
               )}
 
-              {profile?.role === 'patient' && (
+              {isPatient && (
                 <div className="rounded-3xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm">
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider">Primary Care</span>

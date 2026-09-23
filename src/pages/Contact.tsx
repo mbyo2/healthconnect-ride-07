@@ -5,11 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { MapPin, Phone, Mail, Clock, CheckCircle2 } from "lucide-react";
+import { MapPin, Mail, Clock, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 
 const SUPPORT_EMAIL = "support@doc0clock.online";
-const SUPPORT_PHONE = "+260 211 000 000";
 const EMERGENCY_NUMBER = import.meta.env.VITE_EMERGENCY_NUMBER || "991";
 
 const Contact = () => {
@@ -152,13 +151,6 @@ const Contact = () => {
                   <CardTitle>Contact Information</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <Phone className="h-5 w-5 text-primary" />
-                    <div>
-                      <p className="font-medium">Phone</p>
-                      <p className="text-muted-foreground">{SUPPORT_PHONE}</p>
-                    </div>
-                  </div>
                   <div className="flex items-center gap-3">
                     <Mail className="h-5 w-5 text-primary" />
                     <div>

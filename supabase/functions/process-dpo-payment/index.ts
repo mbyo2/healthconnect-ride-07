@@ -1,5 +1,8 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
+import { resolveServicePrice, assertTrustedAmount, PriceMismatchError } from '../_shared/price-guard.ts';
+// NOTE: Legacy endpoint — frontend uses dpo-create-token + dpo-verify-token.
+// Kept for backwards compatibility but hardened with server-side price checks.
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -47,7 +50,7 @@ serve(async (req) => {
       );
     }
 
-    const { amount, currency, patientId, providerId, serviceId, redirectUrl } = await req.json() as PaymentRequest;
+    const { amount: clientAmount, currency, patientId, providerId, serviceId, redirectUrl } = await req.json() as PaymentRequest;
 
     // Validate that the authenticated user is the patient
     if (user.id !== patientId) {
@@ -59,7 +62,7 @@ serve(async (req) => {
     }
 
     // Validate required fields
-    if (!amount || amount <= 0) {
+    if (!clientAmount || clientAmount <= 0) {
       return new Response(
         JSON.stringify({ error: 'Invalid amount' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -78,6 +81,21 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
+
+    // Resolve authoritative price server-side — never trust client amount
+    let amount: number;
+    try {
+      const trusted = await resolveServicePrice(serviceClient as any, serviceId);
+      amount = assertTrustedAmount(clientAmount, trusted);
+    } catch (e) {
+      if (e instanceof PriceMismatchError) {
+        return new Response(
+          JSON.stringify({ error: 'Payment amount does not match the authoritative price', expectedAmount: e.expected }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      throw e;
+    }
 
     // Validate provider exists
     const { data: provider, error: providerError } = await serviceClient
@@ -114,7 +132,7 @@ serve(async (req) => {
       );
     }
 
-    // Create payment record in our database
+    // Create payment record in our database (ZMW canonical)
     const { data: payment, error: paymentError } = await serviceClient
       .from('payments')
       .insert({
@@ -122,6 +140,7 @@ serve(async (req) => {
         provider_id: providerId,
         service_id: serviceId,
         amount: amount,
+        currency: (currency || 'ZMW').toUpperCase(),
         status: 'pending',
         payment_method: 'dpo',
         invoice_number: `PAY-${Date.now()}-${patientId.substring(0, 8)}`,

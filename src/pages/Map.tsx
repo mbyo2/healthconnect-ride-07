@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 import { MobileOptimizedCard } from '@/components/ui/MobileOptimizedCard';
 import { LoadingScreen } from '@/components/LoadingScreen';
 import { ALL_CLINICIAN_ROLES } from '@/config/roleConfig';
+import { providerDisplayName } from '@/utils/providerDisplay';
 
 const MapPage = () => {
   const [selectedProvider, setSelectedProvider] = useState<Provider | null>(null);
@@ -32,7 +33,7 @@ const MapPage = () => {
           supabase
             .from('profiles')
             .select(`
-              id, first_name, last_name, specialty, bio, avatar_url,
+              id, first_name, last_name, specialty, bio, avatar_url, role,
               telemedicine_available, consultation_fee_min, consultation_fee_max,
               typical_wait_time, subspecialties,
               provider_locations ( latitude, longitude )
@@ -56,6 +57,7 @@ const MapPage = () => {
         id: p.id,
         first_name: p.first_name || '',
         last_name: p.last_name || '',
+        role: p.role || undefined,
         specialty: p.specialty || 'General Practice',
         bio: p.bio,
         avatar_url: p.avatar_url,
@@ -174,13 +176,15 @@ const MapPage = () => {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
+                type="search"
+                aria-label="Search by name or specialty"
                 placeholder="Search by name or specialty..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10 h-11"
               />
             </div>
-            <Button variant="outline" size="icon" className="h-11 w-11">
+            <Button variant="outline" size="icon" className="h-11 w-11" aria-label="Filter search results">
               <Filter className="w-4 h-4" />
             </Button>
           </div>
@@ -250,7 +254,7 @@ const MapPage = () => {
                 )}
                 <div className="flex-1 min-w-0">
                   <h3 className="font-semibold text-base truncate">
-                    {selectedProvider.first_name} {selectedProvider.last_name}
+                    {providerDisplayName({ first_name: selectedProvider.first_name, last_name: selectedProvider.last_name, role: selectedProvider.role })}
                   </h3>
                   <p className="text-sm text-muted-foreground">{selectedProvider.specialty}</p>
                   <div className="flex flex-wrap gap-1.5 mt-1.5">

@@ -16,21 +16,17 @@ interface MetricCardProps {
   onClick?: () => void;
 }
 
-export const MetricCard = ({ 
+function MetricCardBody({
   label,
   title,
-  value, 
-  subtitle, 
-  icon: Icon, 
-  trend, 
+  value,
+  subtitle,
+  icon: Icon,
+  trend,
   color = '#397dff',
-  onClick 
-}: MetricCardProps) => {
+}: Omit<MetricCardProps, 'onClick'> & { icon?: LucideIcon }) {
   return (
-    <div 
-      className={`vf-card p-4 ${onClick ? 'cursor-pointer hover:shadow-lg transition-shadow' : ''}`}
-      onClick={onClick}
-    >
+    <>
       <div className="flex items-start justify-between mb-2">
         <div className="flex-1">
           <p className="text-xs font-medium text-graphite-500 uppercase tracking-wide mb-1">
@@ -52,7 +48,7 @@ export const MetricCard = ({
           )}
         </div>
         {Icon && (
-          <div 
+          <div
             className="h-10 w-10 rounded-xl flex items-center justify-center"
             style={{ backgroundColor: `${color}15`, color }}
           >
@@ -60,6 +56,51 @@ export const MetricCard = ({
           </div>
         )}
       </div>
+    </>
+  );
+}
+
+export const MetricCard = ({
+  label,
+  title,
+  value,
+  subtitle,
+  icon: Icon,
+  trend,
+  color = '#397dff',
+  onClick
+}: MetricCardProps) => {
+  if (onClick) {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        aria-label={typeof (label ?? title) === 'string' ? String(label ?? title) : undefined}
+        className="vf-card p-4 w-full text-left cursor-pointer hover:shadow-lg transition-shadow focus-visible:ring-2 focus-visible:ring-primary"
+      >
+        <MetricCardBody
+          label={label}
+          title={title}
+          value={value}
+          subtitle={subtitle}
+          icon={Icon}
+          trend={trend}
+          color={color}
+        />
+      </button>
+    );
+  }
+  return (
+    <div className="vf-card p-4">
+      <MetricCardBody
+        label={label}
+        title={title}
+        value={value}
+        subtitle={subtitle}
+        icon={Icon}
+        trend={trend}
+        color={color}
+      />
     </div>
   );
 };

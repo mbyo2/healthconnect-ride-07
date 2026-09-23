@@ -29,7 +29,20 @@ export const AppLogo = ({
   };
 
   const LogoContent = () => (
-    <div className={cn("flex items-center gap-2", className)} onClick={onClick}>
+    <div
+      className={cn("flex items-center gap-2", className)}
+      onClick={onClick}
+      {...(onClick
+        ? {
+            role: "link" as const,
+            tabIndex: 0,
+            "aria-label": "Go to home page",
+            onKeyDown: (e: React.KeyboardEvent) => {
+              if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onClick(); }
+            },
+          }
+        : {})}
+    >
       <img 
         src="/d0c-icon.svg" 
         alt="Doc' O Clock" 

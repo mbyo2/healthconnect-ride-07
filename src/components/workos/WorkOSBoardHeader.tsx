@@ -87,9 +87,9 @@ export const WorkOSBoardHeader: React.FC<WorkOSBoardHeaderProps> = ({
                   CRM Board
                 </span>
               </h1>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
-                Live Sync
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20" title="This board shows sample data for demonstration">
+                <span className="w-2 h-2 rounded-full bg-amber-500" aria-hidden />
+                Demo Data
               </span>
             </div>
             <p className={`text-xs sm:text-sm mt-0.5 ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}>

@@ -48,7 +48,16 @@ DECLARE
     'device_alerts',
     -- money movement (dashboards stay live)
     'payments',
-    'wallet_transactions'
+    'wallet_transactions',
+    -- subscribed by the app but missing from the first revision —
+    -- without these the channels below silently receive NOTHING
+    'user_wallets', -- WalletCard balance
+    'device_data_feeds', -- DeviceManagement telemetry
+    'billing_invoices', -- useBillingModule
+    'billing_payments', -- useBillingModule
+    'hospital_inventory', -- useHospitalInventory
+    'asset_register', -- useMaintenanceModule
+    'iot_devices' -- useIoT device list
   ];
 BEGIN
   FOREACH t IN ARRAY tables LOOP

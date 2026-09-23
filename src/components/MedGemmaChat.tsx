@@ -474,6 +474,7 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
                       size="icon"
                       variant="destructive"
                       className="absolute -top-1 -right-1 h-6 w-6 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                      aria-label={`Remove image ${idx + 1}`}
                       onClick={() => removeImage(idx)}
                     >
                       <X className="h-3 w-3" />
@@ -523,6 +524,7 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
               variant="outline"
               className="flex-shrink-0 h-12 w-12 rounded-full border-2 hover:bg-primary/10 hover:border-primary transition-all"
               title="Upload medical images (max 10): X-rays, lab results, scans, etc."
+              aria-label="Upload medical images"
             >
               <div className="relative">
                 <Paperclip className="h-5 w-5" />
@@ -540,6 +542,7 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyPress}
+                aria-label="Type your health question"
                 placeholder={selectedImages.length > 0 ? "Describe what you want to know about these images..." : "Ask me about your health..."}
                 disabled={isLoading}
                 className="resize-none min-h-[48px] max-h-[120px] rounded-3xl px-4 py-3 pr-12 text-base bg-muted/50 border-2 focus-visible:ring-2 focus-visible:ring-primary"
@@ -549,6 +552,7 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
                 onClick={sendMessage}
                 disabled={isLoading || (!input.trim() && selectedImages.length === 0)}
                 size="icon"
+                aria-label="Send message"
                 className="absolute right-1 bottom-1 h-10 w-10 rounded-full bg-primary hover:bg-primary/90 disabled:opacity-50"
               >
                 {isLoading ? (

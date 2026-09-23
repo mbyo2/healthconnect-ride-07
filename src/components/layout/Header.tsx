@@ -17,7 +17,7 @@ export const Header = () => {
     <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b w-full">
       <div className="max-w-screen-2xl mx-auto px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-6 min-w-0">
-          <div className="logo-link flex-shrink-0 cursor-pointer" onClick={() => navigate('/')}>
+          <div className="logo-link flex-shrink-0 cursor-pointer" role="link" tabIndex={0} aria-label="Go to home page" onClick={() => navigate('/')} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate('/'); } }}>
             <Logo />
           </div>
           <DesktopNavigation />

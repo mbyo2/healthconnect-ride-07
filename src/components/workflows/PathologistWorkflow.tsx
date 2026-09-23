@@ -38,7 +38,7 @@ export const PathologistWorkflow = () => {
         <Card className="border-primary">
           <CardHeader><CardTitle>Review: {selectedReport.patient_name} — {selectedReport.test_name}</CardTitle></CardHeader>
           <CardContent className="space-y-3">
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div><Label className="text-muted-foreground">Result</Label><p className="font-mono text-lg">{selectedReport.result_value || '--'}</p></div>
               <div><Label className="text-muted-foreground">Reference Range</Label><p className="font-mono text-lg">{selectedReport.reference_range || '--'}</p></div>
               <div><Label className="text-muted-foreground">Lab Tech</Label><p>{selectedReport.lab_tech_name || 'N/A'}</p></div>

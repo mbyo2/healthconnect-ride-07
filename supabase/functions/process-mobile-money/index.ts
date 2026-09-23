@@ -187,11 +187,12 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({
         success: paymentResult.success,
+        sandbox: true,
         paymentId: payment.id,
         transactionReference: transactionRef,
         externalTransactionId: paymentResult.transactionId,
-        message: paymentResult.success 
-          ? `Payment request sent to ${formattedPhone}. Please check your phone and enter your ${provider.toUpperCase()} PIN to complete the payment.`
+        message: paymentResult.success
+          ? `[SANDBOX] Simulated request for ${formattedPhone}. No real charge was made — integrate live ${provider.toUpperCase()} APIs before production.`
           : paymentResult.error,
         amount,
         provider: provider.toUpperCase()
@@ -216,6 +217,12 @@ serve(async (req) => {
   }
 });
 
+// ⚠️ SANDBOX ONLY — no real money moves here. This stub simulates provider
+// responses (delay, random failures, fake transaction IDs) so checkout UX
+// can be built and tested. DO NOT present results to patients as real
+// charges: integrate MTN MoMo / Airtel Money / Zamtel Kwacha (or
+// Flutterwave aggregator) APIs before production use. The
+// success response carries `sandbox: true` so any future UI must label it.
 // Initiate mobile money payment with Zambian providers
 async function initiateMobileMoneyPayment({
   amount,

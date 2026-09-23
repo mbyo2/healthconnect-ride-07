@@ -3,6 +3,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Star, MapPin, Quote } from 'lucide-react';
 import { usePlatformStats, formatStat } from '@/hooks/usePlatformStats';
 
+// Illustrative community stories for Zambian users — clearly labeled as
+// samples below, never presented as verified reviews.
 const TESTIMONIALS = [
   {
     name: 'Sarah M.',
@@ -11,15 +13,15 @@ const TESTIMONIALS = [
     content: "Doc' O Clock has made healthcare so much easier for my family. I can book appointments without queuing for hours!",
   },
   {
-    name: 'Dr. James K.',
+    name: 'James K.',
     role: 'Healthcare Provider',
-    city: 'Nairobi',
+    city: 'Ndola',
     content: 'This platform helps me reach more patients and manage my practice efficiently. A game-changer for healthcare delivery.',
   },
   {
     name: 'Maria L.',
     role: 'Mother of Two',
-    city: 'Lagos',
+    city: 'Kitwe',
     content: "The emergency feature is incredible. I found the nearest hospital and got help within minutes.",
   },
   {
@@ -31,13 +33,13 @@ const TESTIMONIALS = [
   {
     name: 'Grace T.',
     role: 'Patient',
-    city: 'Dar es Salaam',
+    city: 'Livingstone',
     content: 'Living far from major hospitals, this app connects me to doctors via video call. Truly life-changing technology!',
   },
   {
-    name: 'Dr. Amina B.',
+    name: 'Amina B.',
     role: 'Specialist',
-    city: 'Accra',
+    city: 'Lusaka',
     content: 'The platform helps me manage referrals and follow up with patients. Healthcare is becoming more accessible for everyone.',
   },
 ];
@@ -80,13 +82,15 @@ export const Testimonials = () => {
         <div className="text-center mb-10 max-w-2xl mx-auto">
           <div className="vf-eyebrow mb-5">
             <Quote className="h-3.5 w-3.5 text-accent-500" />
-            Real Stories from Our Users
+            Community Stories
           </div>
           <h2 className="font-display text-3xl sm:text-5xl font-medium text-midnight tracking-tight">
-            What Our Users Say
+            {stats.patients > 0
+              ? <>Loved by {formatStat(stats.patients)} Zambian patients</>
+              : <>Built for Zambian patients</>}
           </h2>
           <p className="text-base text-graphite-500 max-w-xl mx-auto font-normal mt-4 leading-relaxed tracking-wide">
-            Join thousands of people who trust Doc' O Clock for their healthcare needs
+            Illustrative stories showing how the platform could work for you.
           </p>
         </div>
         
@@ -119,10 +123,12 @@ export const Testimonials = () => {
           </div>
           
           <div className="flex justify-center gap-2 mt-4">
-            {testimonials.map((_, i) => (
+            {testimonials.map((t, i) => (
               <button
-                key={i}
+                key={t.id}
                 onClick={() => setActiveIndex(i)}
+                aria-label={`Show story from ${t.name}`}
+                aria-current={i === activeIndex}
                 className={`h-2 rounded-full transition-all ${
                   i === activeIndex ? 'w-6 bg-primary' : 'w-2 bg-muted-foreground/30'
                 }`}
@@ -165,16 +171,14 @@ export const Testimonials = () => {
           ))}
         </div>
 
-        {/* Trust indicators */}
+        {/* Trust indicators — live counts only, never fabricated */}
         <div className="mt-10 text-center">
           <div className="inline-flex items-center gap-4 md:gap-6 text-sm text-graphite-500">
-            <span className="flex items-center gap-1.5">
-              <Star className="h-4 w-4 text-amber-400 fill-amber-400" /> {stats.rating}/5 average rating
-            </span>
-            <span>•</span>
-            <span>{formatStat(stats.patients)} users across Zambia</span>
+            <span>{formatStat(stats.patients)} patients across Zambia</span>
             <span className="hidden md:inline">•</span>
-            <span className="hidden md:inline">Growing nationwide</span>
+            <span className="hidden md:inline">{formatStat(stats.doctors)} verified providers</span>
+            <span>•</span>
+            <span>Growing nationwide</span>
           </div>
         </div>
       </div>

@@ -3,12 +3,13 @@ import { ArrowRight, Search } from "lucide-react";
 import { FormEvent, useState } from "react";
 import { ZAMBIAN_TESTIMONIALS } from "@/config/zambia";
 
-const PARTNER_TABS = [
-  { id: "uth", name: "UTH Lusaka", quote: 0 },
-  { id: "cima", name: "CIMA", quote: 1 },
-  { id: "moh", name: "Ministry of Health", quote: 5 },
-  { id: "nhima", name: "NHIMA", quote: 3 },
-  { id: "medland", name: "Medland", quote: 2 },
+// Care topics framing the illustrative stories below — not partner endorsements.
+const STORY_TABS = [
+  { id: "appointments", name: "Appointments", quote: 0 },
+  { id: "providers", name: "Providers", quote: 1 },
+  { id: "specialists", name: "Specialists", quote: 5 },
+  { id: "pharmacy", name: "Pharmacy", quote: 3 },
+  { id: "emergency", name: "Emergency", quote: 2 },
 ];
 
 export const LandingHero = () => {
@@ -16,7 +17,7 @@ export const LandingHero = () => {
   const [query, setQuery] = useState("");
   const [activePartner, setActivePartner] = useState(0);
 
-  const featured = ZAMBIAN_TESTIMONIALS[PARTNER_TABS[activePartner].quote];
+  const featured = ZAMBIAN_TESTIMONIALS[STORY_TABS[activePartner].quote];
 
   const onSearch = (e: FormEvent) => {
     e.preventDefault();
@@ -33,7 +34,7 @@ export const LandingHero = () => {
         </h1>
 
         <p
-          className="mx-auto mt-6 max-w-2xl text-base leading-relaxed tracking-wide text-graphite-500 opacity-0 animate-hero-rise sm:text-lg"
+          className="mx-auto mt-6 max-w-2xl text-base leading-relaxed tracking-wide text-graphite-500 dark:text-slate-400 opacity-0 animate-hero-rise sm:text-lg"
           style={{ animationDelay: "0.12s" }}
         >
           Zambia&apos;s healthcare platform for booking verified doctors, encrypted video consults, NHIMA cover, digital prescriptions, and pharmacy delivery — from Lusaka to every province.
@@ -54,7 +55,7 @@ export const LandingHero = () => {
 
         <form
           onSubmit={onSearch}
-          className="mx-auto mt-6 flex max-w-xl items-center gap-2 rounded-pill border border-canvas-silk bg-white p-1.5 shadow-pill-nav opacity-0 animate-hero-rise"
+          className="mx-auto mt-6 flex max-w-xl items-center gap-2 rounded-pill border border-canvas-silk bg-white dark:bg-slate-900 p-1.5 shadow-pill-nav opacity-0 animate-hero-rise"
           style={{ animationDelay: "0.28s" }}
           role="search"
         >
@@ -80,7 +81,7 @@ export const LandingHero = () => {
         className="relative mx-auto mt-12 max-w-content px-4 opacity-0 animate-hero-rise sm:mt-16 sm:px-6 lg:px-8"
         style={{ animationDelay: "0.36s" }}
       >
-        <div className="overflow-hidden rounded-card border border-canvas-silk bg-white shadow-card-hover">
+        <div className="overflow-hidden rounded-card border border-canvas-silk bg-white dark:bg-slate-900 shadow-card-hover">
           <div className="flex items-center gap-2 border-b border-canvas-silk bg-canvas-bone px-4 py-2.5">
             <span className="h-2.5 w-2.5 rounded-full bg-canvas-silk" />
             <span className="h-2.5 w-2.5 rounded-full bg-canvas-silk" />
@@ -105,7 +106,7 @@ export const LandingHero = () => {
               <div className="mt-4 flex items-center justify-between gap-3">
                 <div>
                   <p className="text-sm font-medium text-midnight">{featured.name}</p>
-                  <p className="text-xs text-graphite-500">
+                  <p className="text-xs text-graphite-500 dark:text-slate-400">
                     {featured.role} · {featured.city}
                   </p>
                 </div>
@@ -129,7 +130,7 @@ export const LandingHero = () => {
               Patient stories
             </p>
           </div>
-          {PARTNER_TABS.map((partner, i) => (
+          {STORY_TABS.map((partner, i) => (
             <button
               key={partner.id}
               type="button"
@@ -137,7 +138,7 @@ export const LandingHero = () => {
               className={`flex items-center justify-center border-b border-canvas-silk px-4 py-4 text-sm font-medium transition-colors sm:border-b-0 lg:border-r lg:last:border-r-0 ${
                 activePartner === i
                   ? "bg-midnight text-white"
-                  : "text-graphite-600 hover:bg-canvas-bone hover:text-midnight"
+                  : "text-graphite-600 dark:text-slate-300 hover:bg-canvas-bone hover:text-midnight"
               }`}
             >
               {partner.name}

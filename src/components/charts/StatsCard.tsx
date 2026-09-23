@@ -25,7 +25,7 @@ export const StatsCard = ({
     <div className="vf-card p-5">
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
-          <p className="text-xs font-medium text-graphite-500 uppercase tracking-wide mb-2">
+          <p className="text-xs font-medium text-graphite-500 dark:text-slate-400 uppercase tracking-wide mb-2">
             {label}
           </p>
           <p className="text-3xl font-display font-medium text-midnight mb-2">
@@ -41,7 +41,7 @@ export const StatsCard = ({
               <span className={`text-sm font-medium ${change.isPositive ? 'text-success-600' : 'text-error-600'}`}>
                 {change.value}
               </span>
-              <span className="text-xs text-graphite-500">vs last period</span>
+              <span className="text-xs text-graphite-500 dark:text-slate-400">vs last period</span>
             </div>
           )}
         </div>

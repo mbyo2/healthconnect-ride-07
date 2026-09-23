@@ -518,7 +518,7 @@ export const AnalyticsReporting = () => {
           <TabsContent value="reports" className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Input placeholder="Search reports..." className="w-64 h-9 text-xs" />
+                <Input type="search" aria-label="Search reports..." className="w-64 h-9 text-xs" />
                 <Select defaultValue="all">
                   <SelectTrigger className="w-32 h-9 text-xs">
                     <SelectValue />

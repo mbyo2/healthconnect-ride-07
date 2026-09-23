@@ -11,7 +11,7 @@ const corsHeaders = {
 // Input validation schema
 const paymentSplitsSchema = z.object({
   amount: z.number().positive().max(1000000, 'Amount exceeds maximum'),
-  currency: z.enum(['USD', 'EUR', 'GBP', 'KES', 'UGX', 'TZS']),
+  currency: z.enum(['USD', 'EUR', 'GBP', 'KES', 'UGX', 'TZS', 'ZMW', 'ZAR', 'NGN', 'GHS']),
   patientId: z.string().uuid('Invalid patient ID'),
   providerId: z.string().uuid('Invalid provider ID'),
   serviceId: z.string().max(200, 'Service ID too long'),
@@ -138,7 +138,7 @@ serve(async (req) => {
       throw walletResult.error;
     }
 
-    // Create payment record
+    // Create payment record (currency is ZMW by default — canonical platform currency)
     const { data: payment, error: paymentError } = await supabase
       .from('payments')
       .insert({
@@ -146,6 +146,7 @@ serve(async (req) => {
         provider_id: providerId,
         service_id: serviceId,
         amount: amount,
+        currency: currency || 'ZMW',
         status: 'processing',
         payment_method: paymentMethod,
         payment_date: new Date().toISOString()

@@ -41,7 +41,7 @@ const statusVariant: Record<string, "default" | "secondary" | "destructive" | "o
 
 function Row({ label, value, mono }: { label: string; value: React.ReactNode; mono?: boolean }) {
   return (
-    <div className="grid grid-cols-3 gap-2 py-2 border-b border-border last:border-0">
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 sm:gap-2 py-2 border-b border-border last:border-0">
       <div className="text-xs uppercase tracking-wide text-muted-foreground">{label}</div>
       <div className={`col-span-2 text-sm break-all ${mono ? "font-mono" : ""}`}>{value ?? "—"}</div>
     </div>
@@ -164,7 +164,7 @@ export function DPOPaymentsAdmin() {
                     {r.result_code || "—"} {r.result_explanation ? `· ${r.result_explanation}` : ""}
                   </td>
                   <td className="px-4 py-2 text-right">
-                    <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); setSelected(r); }}>
+                    <Button variant="ghost" size="sm" aria-label={`View transaction ${r.trans_ref || r.id}`} onClick={(e) => { e.stopPropagation(); setSelected(r); }}>
                       <Eye className="h-4 w-4" />
                     </Button>
                   </td>

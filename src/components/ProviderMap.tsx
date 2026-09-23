@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { Provider } from '@/types/provider';
+import { providerDisplayName } from '@/utils/providerDisplay';
 
 // Default coordinates for Lusaka, Zambia
 const DEFAULT_COORDINATES: [number, number] = [-15.3875, 28.3228];
@@ -95,7 +96,7 @@ export const ProviderMap: React.FC<ProviderMapProps> = ({
           <Popup>
             <div className="p-2">
               <h3 className="font-semibold text-foreground">
-                Dr. {provider.first_name} {provider.last_name}
+                {providerDisplayName({ first_name: provider.first_name, last_name: provider.last_name, role: (provider as any)?.role })}
               </h3>
               <p className="text-sm text-muted-foreground">{provider.specialty}</p>
               {provider.distance !== undefined && (

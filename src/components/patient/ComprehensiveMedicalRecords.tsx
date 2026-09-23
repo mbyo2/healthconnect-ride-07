@@ -523,7 +523,7 @@ export const ComprehensiveMedicalRecords = () => {
                     )}
                     {record.is_private && <Badge variant="outline">Private</Badge>}
                     {canEditRecordType(record.record_type) && (
-                      <Button variant="ghost" size="icon" onClick={() => handleEdit(record)}>
+                      <Button variant="ghost" size="icon" aria-label={`Edit ${record.record_type || 'medical'} record`} onClick={() => handleEdit(record)}>
                         <Edit2 className="h-4 w-4" />
                       </Button>
                     )}

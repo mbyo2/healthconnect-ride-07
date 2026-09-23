@@ -38,6 +38,17 @@ body {
   }
 }
 
+/* Mobile form UX: iOS Safari auto-zooms on focus when an input's text is
+   smaller than 16px — disorienting mid-form. Keep the compact desktop
+   aesthetic, but guarantee 16px+ text on phones. */
+@media (max-width: 640px) {
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
 @media (prefers-contrast: more) {
   :root {
     --doc-muted: #525252;

@@ -94,7 +94,7 @@ export default function Documentation() {
     {
       icon: <Shield className="h-6 w-6" />,
       title: "Privacy & Security",
-      description: "HIPAA-compliant platform ensuring your data is protected"
+      description: "Encrypted platform aligned with Zambia's Data Protection Act"
     }
   ];
 

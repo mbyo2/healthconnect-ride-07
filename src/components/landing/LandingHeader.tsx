@@ -34,8 +34,8 @@ export const LandingHeader = ({ scrolled }: LandingHeaderProps) => {
       <div
         className={`pointer-events-auto mx-auto flex max-w-content items-center gap-2 rounded-nav border px-2 py-1.5 shadow-pill-nav backdrop-blur-xl transition-all duration-300 sm:px-3 ${
           scrolled
-            ? "border-canvas-silk bg-white/95"
-            : "border-white/70 bg-white/80"
+            ? "border-canvas-silk bg-white dark:bg-slate-900/95"
+            : "border-white/70 bg-white dark:bg-slate-900/80"
         }`}
       >
         <button
@@ -59,7 +59,7 @@ export const LandingHeader = ({ scrolled }: LandingHeaderProps) => {
               className={`rounded-pill px-3 py-2 text-[13px] font-medium tracking-wide transition-colors ${
                 isActive(item.route)
                   ? "bg-canvas-mist text-midnight"
-                  : "text-graphite-600 hover:bg-canvas-mist hover:text-midnight"
+                  : "text-graphite-600 dark:text-slate-300 hover:bg-canvas-mist hover:text-midnight"
               }`}
             >
               {item.label}
@@ -78,7 +78,7 @@ export const LandingHeader = ({ scrolled }: LandingHeaderProps) => {
           <button
             type="button"
             onClick={() => navigate("/auth")}
-            className="hidden rounded-pill px-3.5 py-2 text-[13px] font-medium text-graphite-600 hover:bg-canvas-mist hover:text-midnight sm:inline-flex"
+            className="hidden rounded-pill px-3.5 py-2 text-[13px] font-medium text-graphite-600 dark:text-slate-300 hover:bg-canvas-mist hover:text-midnight sm:inline-flex"
           >
             Login
           </button>
@@ -91,7 +91,7 @@ export const LandingHeader = ({ scrolled }: LandingHeaderProps) => {
           </button>
           <button
             type="button"
-            className="rounded-pill p-2 text-graphite-600 hover:bg-canvas-mist lg:hidden"
+            className="rounded-pill p-2 text-graphite-600 dark:text-slate-300 hover:bg-canvas-mist lg:hidden"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-expanded={mobileMenuOpen}
             aria-label="Toggle menu"
@@ -102,7 +102,7 @@ export const LandingHeader = ({ scrolled }: LandingHeaderProps) => {
       </div>
 
       {mobileMenuOpen && (
-        <div className="pointer-events-auto mx-auto mt-2 max-w-content rounded-card border border-canvas-silk bg-white/95 p-3 shadow-pill-nav backdrop-blur-xl lg:hidden">
+        <div className="pointer-events-auto mx-auto mt-2 max-w-content rounded-card border border-canvas-silk bg-white dark:bg-slate-900/95 p-3 shadow-pill-nav backdrop-blur-xl lg:hidden">
           <div className="space-y-1">
             {[...NAV_ITEMS, { label: "Emergency", route: "/emergency" }].map((item) => (
               <button

@@ -193,7 +193,7 @@ function AdjudicationSimulator() {
                 />
               </div>
               <div className="col-span-1 flex justify-end">
-                <Button size="icon" variant="ghost" onClick={() => removeLine(item.id)} className="h-7 w-7 text-slate-400 hover:text-red-400">
+                <Button size="icon" variant="ghost" aria-label="Remove line item" onClick={() => removeLine(item.id)} className="h-7 w-7 text-slate-400 hover:text-red-400">
                   <Trash2 className="h-3 w-3" />
                 </Button>
               </div>

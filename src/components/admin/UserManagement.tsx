@@ -24,6 +24,16 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 type UserRole = 'patient' | 'health_personnel' | 'admin' | 'institution_admin';
 
@@ -45,6 +55,7 @@ export function UserManagement() {
   const [isRoleDialogOpen, setIsRoleDialogOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState<UserRole>('patient');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [pendingRevoke, setPendingRevoke] = useState<{ userId: string; role: UserRole; email: string } | null>(null);
 
   useEffect(() => {
     fetchUsers();
@@ -176,11 +187,11 @@ export function UserManagement() {
                   key={role}
                   variant="outline"
                   className="cursor-pointer hover:bg-destructive hover:text-destructive-foreground"
-                  onClick={() => {
-                    if (window.confirm(`Revoke role "${role}" from this user?`)) {
-                      handleRevokeRole(user.id, role);
-                    }
-                  }}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Revoke role ${role} from ${user.email}`}
+                  onClick={() => setPendingRevoke({ userId: user.id, role, email: user.email })}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setPendingRevoke({ userId: user.id, role, email: user.email }); } }}
                 >
                   {role} ×
                 </Badge>
@@ -244,6 +255,8 @@ export function UserManagement() {
             <div className="relative">
               <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
+                type="search"
+                aria-label="Search users by email or name"
                 placeholder="Search users by email or name..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -309,6 +322,28 @@ export function UserManagement() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={pendingRevoke !== null} onOpenChange={(open) => { if (!open) setPendingRevoke(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Revoke this role?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {pendingRevoke && (
+                <>Role <strong>{pendingRevoke.role}</strong> will be removed from <strong>{pendingRevoke.email}</strong>. They will immediately lose the permissions that come with it.</>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => { if (pendingRevoke) handleRevokeRole(pendingRevoke.userId, pendingRevoke.role); setPendingRevoke(null); }}
+            >
+              Revoke role
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

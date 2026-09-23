@@ -154,13 +154,13 @@ export const ShiftScheduleCalendar: React.FC = () => {
             Shift Schedule
           </CardTitle>
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="icon" onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}>
+            <Button variant="outline" size="icon" onClick={() => setCurrentMonth(subMonths(currentMonth, 1))} aria-label="Previous month">
               <ChevronLeft className="h-4 w-4" />
             </Button>
             <span className="font-medium min-w-[150px] text-center">
               {format(currentMonth, 'MMMM yyyy')}
             </span>
-            <Button variant="outline" size="icon" onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}>
+            <Button variant="outline" size="icon" onClick={() => setCurrentMonth(addMonths(currentMonth, 1))} aria-label="Next month">
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>

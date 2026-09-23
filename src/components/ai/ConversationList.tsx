@@ -12,6 +12,16 @@ import {
 import { MessageSquare, Plus, MoreVertical, Archive, Trash2, Search } from 'lucide-react';
 import { ChatConversation } from '@/hooks/useAIChat';
 import { formatDistanceToNow } from 'date-fns';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 interface ConversationListProps {
     conversations: ChatConversation[];
@@ -31,12 +41,14 @@ export const ConversationList = ({
     onDeleteConversation
 }: ConversationListProps) => {
     const [searchQuery, setSearchQuery] = useState('');
+    const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
     const filteredConversations = conversations.filter(conv =>
         conv.title.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     return (
+        <>
         <Card className="h-full flex flex-col">
             <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
@@ -49,6 +61,8 @@ export const ConversationList = ({
                 <div className="relative mt-2">
                     <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
+                        type="search"
+                        aria-label="Search conversations"
                         placeholder="Search conversations..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
@@ -86,6 +100,7 @@ export const ConversationList = ({
                                                 variant="ghost"
                                                 size="icon"
                                                 className="h-8 w-8 opacity-0 group-hover:opacity-100"
+                                                aria-label={`Conversation options for ${conv.title || 'conversation'}`}
                                             >
                                                 <MoreVertical className="h-4 w-4" />
                                             </Button>
@@ -103,9 +118,7 @@ export const ConversationList = ({
                                             <DropdownMenuItem
                                                 onClick={(e) => {
                                                     e.stopPropagation();
-                                                    if (confirm('Delete this conversation? This cannot be undone.')) {
-                                                        onDeleteConversation(conv.id);
-                                                    }
+                                                    setPendingDeleteId(conv.id);
                                                 }}
                                                 className="text-destructive"
                                             >
@@ -121,5 +134,25 @@ export const ConversationList = ({
                 </ScrollArea>
             </CardContent>
         </Card>
+        <AlertDialog open={pendingDeleteId !== null} onOpenChange={(open) => { if (!open) setPendingDeleteId(null); }}>
+            <AlertDialogContent>
+                <AlertDialogHeader>
+                    <AlertDialogTitle>Delete this conversation?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        This will permanently delete the conversation and its messages. This cannot be undone.
+                    </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        onClick={() => { if (pendingDeleteId) onDeleteConversation(pendingDeleteId); setPendingDeleteId(null); }}
+                    >
+                        Delete
+                    </AlertDialogAction>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
+        </>
     );
 };

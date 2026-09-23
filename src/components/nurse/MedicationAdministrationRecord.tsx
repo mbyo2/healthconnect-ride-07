@@ -9,6 +9,16 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
@@ -53,6 +63,9 @@ export const MedicationAdministrationRecord: React.FC<MARProps> = ({ institution
   const [adminNotes, setAdminNotes] = useState('');
   const [holdReason, setHoldReason] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('administered');
+  // Blocking interaction warning — explicit override dialog instead of window.confirm
+  const [interactionWarning, setInteractionWarning] = useState<string | null>(null);
+  const [checkingInteractions, setCheckingInteractions] = useState(false);
 
   const { data: marEntries, isLoading } = useQuery({
     queryKey: ['mar-entries', institutionId, patientId],
@@ -98,6 +111,7 @@ export const MedicationAdministrationRecord: React.FC<MARProps> = ({ institution
       setSelectedEntry(null);
       setAdminNotes('');
       setHoldReason('');
+      setInteractionWarning(null);
     },
     onError: (error) => {
       toast.error('Failed to update medication record');
@@ -105,25 +119,35 @@ export const MedicationAdministrationRecord: React.FC<MARProps> = ({ institution
     },
   });
 
-  const handleAdminister = async () => {
+  const submitAdministration = () => {
     if (!selectedEntry) return;
-    // Safety: drug-interaction check when actually administering
-    if (selectedStatus === 'administered') {
-      const others = await getPatientActiveMedications(selectedEntry.patient_id);
-      const filtered = others.filter(d => d.toLowerCase() !== selectedEntry.medication_name.toLowerCase());
-      const interactions = await checkInteractions(selectedEntry.medication_name, filtered);
-      if (interactions.some(i => isBlocking(i.severity))) {
-        const msg = summarize(interactions);
-        const ok = window.confirm(`⚠️ Drug interaction detected:\n\n${msg}\n\nConfirm administration anyway?`);
-        if (!ok) return;
-      }
-    }
     administerMutation.mutate({
       id: selectedEntry.id,
       status: selectedStatus,
       notes: adminNotes,
       holdReason: selectedStatus === 'held' ? holdReason : undefined,
     });
+  };
+
+  const handleAdminister = async () => {
+    if (!selectedEntry) return;
+    // Safety: drug-interaction check when actually administering
+    if (selectedStatus === 'administered') {
+      setCheckingInteractions(true);
+      try {
+        const others = await getPatientActiveMedications(selectedEntry.patient_id);
+        const filtered = others.filter(d => d.toLowerCase() !== selectedEntry.medication_name.toLowerCase());
+        const interactions = await checkInteractions(selectedEntry.medication_name, filtered);
+        if (interactions.some(i => isBlocking(i.severity))) {
+          // Blocking interaction — require explicit override in the dialog below
+          setInteractionWarning(summarize(interactions));
+          return;
+        }
+      } finally {
+        setCheckingInteractions(false);
+      }
+    }
+    submitAdministration();
   };
 
   const getDueStatus = (scheduledTime: string, status: string) => {
@@ -141,14 +165,41 @@ export const MedicationAdministrationRecord: React.FC<MARProps> = ({ institution
   if (isLoading) {
     return (
       <Card>
-        <CardContent className="flex items-center justify-center py-8">
+        <CardContent className="flex items-center justify-center py-8" role="status" aria-label="Loading medication records">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </CardContent>
       </Card>
     );
   }
 
+  const blockingAlert = (
+    <AlertDialog open={interactionWarning !== null} onOpenChange={(open) => { if (!open) setInteractionWarning(null); }}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle className="flex items-center gap-2 text-destructive">
+            <AlertTriangle className="h-5 w-5" aria-hidden />
+            Blocking drug interaction
+          </AlertDialogTitle>
+          <AlertDialogDescription className="whitespace-pre-wrap">
+            {interactionWarning}
+            {'\n\n'}Administering anyway overrides a safety block. This override is recorded with your user ID.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Hold — do not administer</AlertDialogCancel>
+          <AlertDialogAction
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            onClick={submitAdministration}
+          >
+            Override &amp; administer
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+
   return (
+    <>
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
@@ -267,15 +318,15 @@ export const MedicationAdministrationRecord: React.FC<MARProps> = ({ institution
 
                             <Button
                               onClick={handleAdminister}
-                              disabled={administerMutation.isPending}
+                              disabled={administerMutation.isPending || checkingInteractions}
                               className="w-full"
                             >
-                              {administerMutation.isPending ? (
+                              {(administerMutation.isPending || checkingInteractions) ? (
                                 <Loader2 className="h-4 w-4 animate-spin mr-2" />
                               ) : (
                                 <CheckCircle2 className="h-4 w-4 mr-2" />
                               )}
-                              Confirm
+                              {checkingInteractions ? 'Checking interactions…' : 'Confirm'}
                             </Button>
                           </div>
                         </DialogContent>
@@ -301,6 +352,8 @@ export const MedicationAdministrationRecord: React.FC<MARProps> = ({ institution
         </Table>
       </CardContent>
     </Card>
+    {blockingAlert}
+    </>
   );
 };
 

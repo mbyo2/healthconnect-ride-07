@@ -1,7 +1,12 @@
 import {
   MapPin, MessageCircle, Calendar, Pill, Stethoscope, Building, User, ShoppingCart, Phone, Mail, Clock
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ALL_CLINICIAN_ROLES } from "@/config/roleConfig";
+
+const isClinicianRole = (role?: string | null) =>
+  !!role && (ALL_CLINICIAN_ROLES as readonly string[]).includes(role);
 
 interface UserWithServices {
   id: string;
@@ -46,17 +51,18 @@ interface UserCardProps {
 }
 
 export function UserCard({ user, onConnect, isConnecting }: UserCardProps) {
+  const navigate = useNavigate();
   const getRoleIcon = (role: string) => {
+    if (isClinicianRole(role)) return <Stethoscope className="h-3.5 w-3.5" />;
     switch (role) {
-      case "health_personnel": return <Stethoscope className="h-3.5 w-3.5" />;
       case "patient": return <User className="h-3.5 w-3.5" />;
       default: return <Building className="h-3.5 w-3.5" />;
     }
   };
 
   const getRolePill = (role: string) => {
+    if (isClinicianRole(role)) return "bg-primary-500 text-white";
     switch (role) {
-      case "health_personnel": return "bg-primary-500 text-white";
       case "patient": return "bg-success-500 text-white";
       default: return "bg-purple-500 text-white";
     }
@@ -175,14 +181,14 @@ export function UserCard({ user, onConnect, isConnecting }: UserCardProps) {
           Connect
         </button>
         <button
-          onClick={() => (window.location.href = `/chat?receiver=${user.id}`)}
+          onClick={() => navigate(`/chat?receiver=${user.id}`)}
           className="px-3.5 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 bg-white text-slate-800 font-bold text-xs hover:bg-canvas-mist dark:hover:bg-slate-800 flex items-center gap-1"
         >
           <MessageCircle className="h-3.5 w-3.5 text-primary-500" /> Chat
         </button>
-        {user.role === "health_personnel" && (
+        {isClinicianRole(user.role) && (
           <button
-            onClick={() => (window.location.href = `/provider/${user.id}`)}
+            onClick={() => navigate(`/provider/${user.id}`)}
             className="px-3.5 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 bg-white text-slate-800 font-bold text-xs hover:bg-canvas-mist dark:hover:bg-slate-800 flex items-center gap-1"
           >
             <Calendar className="h-3.5 w-3.5 text-success-500" /> Book

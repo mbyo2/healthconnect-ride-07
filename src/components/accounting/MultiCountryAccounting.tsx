@@ -158,7 +158,7 @@ export const MultiCountryAccounting = () => {
           <select
             value={selectedCountry.countryCode}
             onChange={(e) => handleCountryChange(e.target.value)}
-            className="p-1.5 rounded-md border border-graphite-300 dark:border-slate-700 text-xs font-bold bg-white"
+            className="p-1.5 rounded-md border border-graphite-300 dark:border-slate-700 text-xs font-bold bg-white dark:bg-slate-800 dark:text-slate-100"
           >
             {DEFAULT_COUNTRIES.map((c) => (
               <option key={c.countryCode} value={c.countryCode}>

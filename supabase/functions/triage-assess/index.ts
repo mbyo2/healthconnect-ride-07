@@ -209,12 +209,13 @@ serve(async (req) => {
       specialty: string | null;
       rating: number | null;
       city: string | null;
+      role: string | null;
     }> = [];
 
     if (ai.urgency !== "emergency") {
       const { data: provs } = await admin
         .from("profiles")
-        .select("id, first_name, last_name, specialty, rating, city")
+        .select("id, first_name, last_name, specialty, rating, city, role")
         .eq("is_verified", true)
         .eq("accepting_patients", true)
         .ilike("specialty", `%${ai.recommended_specialty}%`)

@@ -9,8 +9,8 @@ const UserMarketplacePage = () => {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto py-8 flex justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <div className="container mx-auto py-8 flex justify-center" role="status" aria-label="Loading marketplace">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" aria-hidden></div>
       </div>
     );
   }

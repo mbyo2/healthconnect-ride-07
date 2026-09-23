@@ -15,17 +15,21 @@ export const ChatWindow = ({ providerId }: ChatWindowProps) => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const fetchMessages = async () => {
+    let activeChannel: ReturnType<typeof supabase.channel> | null = null;
+
+    const init = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
+      const userId = user.id;
 
+      // Scope to this 1:1 conversation only — never the whole inbox.
       const { data, error } = await supabase
         .from('messages')
         .select(`
           *,
           attachments:chat_attachments(*)
         `)
-        .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
+        .or(`and(sender_id.eq.${userId},receiver_id.eq.${providerId}),and(sender_id.eq.${providerId},receiver_id.eq.${userId})`)
         .order('created_at', { ascending: true });
 
       if (error) {
@@ -34,26 +38,30 @@ export const ChatWindow = ({ providerId }: ChatWindowProps) => {
       }
 
       setMessages(data || []);
+
+      activeChannel = supabase
+        .channel(`messages-${providerId}`)
+        .on('postgres_changes',
+          { event: 'INSERT', schema: 'public', table: 'messages' },
+          (payload) => {
+            setMessages(prev => {
+              const incoming = payload.new as Message;
+              // Ignore messages from other conversations on the shared channel.
+              const mine = incoming.sender_id === userId && incoming.receiver_id === providerId;
+              const theirs = incoming.sender_id === providerId && incoming.receiver_id === userId;
+              if (!mine && !theirs) return prev;
+              if (prev.some(m => m.id === incoming.id)) return prev;
+              return [...prev, incoming];
+            });
+          }
+        )
+        .subscribe();
     };
 
-    fetchMessages();
-
-    const channel = supabase
-      .channel('messages')
-      .on('postgres_changes', 
-        { event: 'INSERT', schema: 'public', table: 'messages' },
-        (payload) => {
-          setMessages(prev => {
-            const incoming = payload.new as Message;
-            if (prev.some(m => m.id === incoming.id)) return prev;
-            return [...prev, incoming];
-          });
-        }
-      )
-      .subscribe();
+    init();
 
     return () => {
-      supabase.removeChannel(channel);
+      if (activeChannel) supabase.removeChannel(activeChannel);
     };
   }, [providerId]);
 
@@ -113,6 +121,7 @@ export const ChatWindow = ({ providerId }: ChatWindowProps) => {
         onSendMessage={sendMessage}
         onUploadComplete={handleFileUpload}
         loading={loading}
+        draftKey={providerId}
       />
     </div>
   );

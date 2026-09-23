@@ -126,6 +126,7 @@ export const DocumentAnalysisUploader = () => {
                     size="icon"
                     variant="destructive"
                     className="absolute -top-2 -right-2 h-7 w-7 rounded-full"
+                    aria-label="Remove uploaded document"
                     onClick={clearDocument}
                   >
                     <X className="h-4 w-4" />

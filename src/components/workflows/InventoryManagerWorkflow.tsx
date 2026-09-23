@@ -91,7 +91,7 @@ export const InventoryManagerWorkflow = () => {
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>Stock List</CardTitle>
-            <Input placeholder="Search by name or barcode..." className="max-w-xs" value={search} onChange={e => setSearch(e.target.value)} />
+            <Input type="search" aria-label="Search by name or barcode..." className="max-w-xs" value={search} onChange={e => setSearch(e.target.value)} />
           </div>
         </CardHeader>
         <CardContent>

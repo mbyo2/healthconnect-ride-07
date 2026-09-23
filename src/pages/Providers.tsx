@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import { ALL_CLINICIAN_ROLES } from '@/config/roleConfig';
 import { Header } from '@/components/Header';
 import { RatingBadge } from '@/components/RatingBadge';
+import { providerDisplayName } from '@/utils/providerDisplay';
 // Define Provider interface correctly
 interface Provider {
   id: string;
@@ -96,13 +97,13 @@ const ProviderList = ({ providers, loading }: ProviderListProps) => {
             <div className="flex items-center space-x-4">
               <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center overflow-hidden">
                 {provider.avatar_url ? (
-                  <img src={provider.avatar_url} alt={`Dr. ${provider.last_name}`} className="w-full h-full object-cover" />
+                  <img src={provider.avatar_url} alt={`${provider.first_name} ${provider.last_name}`} className="w-full h-full object-cover" />
                 ) : (
                   <span className="text-2xl font-bold text-muted-foreground">{provider.first_name[0]}{provider.last_name[0]}</span>
                 )}
               </div>
               <div>
-                <h3 className="font-semibold">Dr. {provider.first_name} {provider.last_name}</h3>
+                <h3 className="font-semibold">{providerDisplayName({ first_name: provider.first_name, last_name: provider.last_name, role: (provider as any)?.role })}</h3>
                 <p className="text-sm text-muted-foreground">{provider.specialty}</p>
                 <div className="flex items-center mt-2">
                   <RatingBadge rating={provider.rating} size="md" />
@@ -194,7 +195,7 @@ const Providers = () => {
           'id, first_name, last_name, specialty, subspecialties, bio, avatar_url, ' +
           'years_experience, rating, primary_practice_location, ' +
           'consultation_fee_min, consultation_fee_max, ' +
-          'telemedicine_available, home_visits_available, medical_school',
+          'telemedicine_available, home_visits_available, medical_school, role',
           { count: 'exact' }
         )
         .in('role', PROVIDER_ROLES as any)

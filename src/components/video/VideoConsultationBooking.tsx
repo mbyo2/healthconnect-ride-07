@@ -1,5 +1,6 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,6 +21,15 @@ import { CONSULTABLE_PROVIDER_ROLES } from '@/config/roleConfig';
 import { useDPOPayment } from '@/hooks/useDPOPayment';
 import { useWalletPayment } from '@/hooks/useWalletPayment';
 import { useCurrency } from '@/hooks/use-currency';
+import { providerDisplayName } from '@/utils/providerDisplay';
+import { FlowResult } from '@/components/ui/flow-result';
+import {
+  savePendingAction,
+  peekPendingAction,
+  takePendingAction,
+  authRedirectUrl,
+  currentReturnTo,
+} from '@/utils/pendingAction';
 
 interface VideoConsultationBookingProps {
   onBookingComplete?: (consultationId: string) => void;
@@ -27,6 +37,7 @@ interface VideoConsultationBookingProps {
 
 export const VideoConsultationBooking = ({ onBookingComplete }: VideoConsultationBookingProps) => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { redirectToCheckout, loading: paymentLoading } = useDPOPayment();
   const { formatPrice, convertForCharge } = useCurrency();
   const [selectedDate, setSelectedDate] = useState<Date>();
@@ -35,6 +46,7 @@ export const VideoConsultationBooking = ({ onBookingComplete }: VideoConsultatio
   const [consultationType, setConsultationType] = useState('');
   const [notes, setNotes] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const { balance: walletBalance, paying: walletPaying, pay: payWithWallet } = useWalletPayment();
   const [payMethod, setPayMethod] = useState<'dpo' | 'wallet'>('dpo');
@@ -57,7 +69,7 @@ export const VideoConsultationBooking = ({ onBookingComplete }: VideoConsultatio
       // neq(false) instead of eq(true) so legacy rows with NULL are kept.
       const base = supabase
         .from('profiles')
-        .select('id, first_name, last_name, specialty, telemedicine_available')
+        .select('id, first_name, last_name, specialty, telemedicine_available, role')
         .in('role', CONSULTABLE_PROVIDER_ROLES as any)
         .eq('is_verified', true)
         .neq('accepting_patients', false)
@@ -103,13 +115,45 @@ export const VideoConsultationBooking = ({ onBookingComplete }: VideoConsultatio
   });
 
 
+  // Resume a video booking started before login (e.g. expired session).
+  useEffect(() => {
+    if (!user) return;
+    const pending = peekPendingAction();
+    if (pending?.kind === 'video-booking') {
+      takePendingAction();
+      if (pending.providerId) setSelectedProvider(pending.providerId);
+      if (pending.consultationTypeId) setConsultationType(pending.consultationTypeId);
+      if (pending.date) setSelectedDate(new Date(`${pending.date}T00:00:00`));
+      if (pending.time) setSelectedTime(pending.time);
+      if (pending.notes) setNotes(pending.notes);
+      toast.success('Welcome back — your video booking details were kept. Review and confirm.');
+    }
+  }, [user]);
+
   const handleBookConsultation = async () => {
-    if (!user || !selectedDate || !selectedTime || !selectedProvider || !consultationType) {
+    if (!selectedDate || !selectedTime || !selectedProvider || !consultationType) {
       toast.error('Please fill in all required fields');
+      return;
+    }
+    if (!user) {
+      // Auth wall: stash the booking so login resumes it — never drop it.
+      savePendingAction({
+        kind: 'video-booking',
+        providerId: selectedProvider,
+        consultationTypeId: consultationType,
+        date: format(selectedDate, 'yyyy-MM-dd'),
+        time: selectedTime,
+        notes,
+        returnTo: currentReturnTo(),
+        createdAt: Date.now(),
+      });
+      toast.info('Sign in to finish booking — your details are saved.');
+      navigate(authRedirectUrl(currentReturnTo()));
       return;
     }
 
     setIsLoading(true);
+    setSubmitError(null);
 
     try {
       const consultationData = consultationTypes.find(type => type.id === consultationType);
@@ -166,7 +210,7 @@ export const VideoConsultationBooking = ({ onBookingComplete }: VideoConsultatio
           currency: 'ZMW',
           providerId: selectedProvider,
           serviceId: (consultationData as any).serviceCode,
-          description: `${consultationData.name} - Dr. ${provider.first_name || ''} ${provider.last_name || ''}`.trim(),
+          description: `${consultationData.name} - ${providerDisplayName({ first_name: provider.first_name, last_name: provider.last_name, role: (provider as any)?.role })}`.trim(),
         });
         if (ok) {
           toast.success('Consultation booked and paid from wallet.');
@@ -186,13 +230,17 @@ export const VideoConsultationBooking = ({ onBookingComplete }: VideoConsultatio
         currency: charge.currency,
         reference_type: 'consultation',
         reference_id: data?.id,
-        description: `${consultationData.name} - Dr. ${provider.first_name || ''} ${provider.last_name || ''}`.trim(),
+        description: `${consultationData.name} - ${providerDisplayName({ first_name: provider.first_name, last_name: provider.last_name, role: (provider as any)?.role })}`.trim(),
         customer_first_name: (user as any)?.user_metadata?.first_name,
         customer_last_name: (user as any)?.user_metadata?.last_name,
       });
     } catch (error) {
       console.error('Error booking consultation:', error);
-      toast.error('Failed to book consultation. Please try again.');
+      setSubmitError(
+        error instanceof Error && error.message
+          ? error.message
+          : "We couldn't book your consultation. Nothing was charged — try again."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -268,7 +316,7 @@ export const VideoConsultationBooking = ({ onBookingComplete }: VideoConsultatio
                 <SelectItem key={provider.id} value={provider.id}>
                   <div className="flex items-center gap-2">
                     <User className="h-4 w-4" />
-                    {provider.first_name} {provider.last_name}
+                    {providerDisplayName({ first_name: provider.first_name, last_name: provider.last_name, role: provider.role })}
                     {provider.specialty ? ` - ${provider.specialty}` : ''}
                   </div>
                 </SelectItem>
@@ -335,6 +383,7 @@ export const VideoConsultationBooking = ({ onBookingComplete }: VideoConsultatio
           <div className="grid grid-cols-2 gap-2">
             <button
               type="button"
+              aria-pressed={payMethod === 'dpo'}
               onClick={() => setPayMethod('dpo')}
               className={`flex items-center justify-center gap-2 p-3 rounded-xl border text-xs font-bold transition-all ${payMethod === 'dpo' ? 'border-primary-500 bg-primary-50 text-primary-600' : 'border-canvas-silk text-graphite-500'}`}
             >
@@ -342,6 +391,7 @@ export const VideoConsultationBooking = ({ onBookingComplete }: VideoConsultatio
             </button>
             <button
               type="button"
+              aria-pressed={payMethod === 'wallet'}
               onClick={() => setPayMethod('wallet')}
               className={`flex items-center justify-center gap-2 p-3 rounded-xl border text-xs font-bold transition-all ${payMethod === 'wallet' ? 'border-primary-500 bg-primary-50 text-primary-600' : 'border-canvas-silk text-graphite-500'}`}
             >
@@ -355,8 +405,18 @@ export const VideoConsultationBooking = ({ onBookingComplete }: VideoConsultatio
           )}
         </div>
 
+        {submitError && (
+          <FlowResult
+            status="error"
+            title="Booking didn't go through"
+            description={submitError}
+            onRetry={() => { setSubmitError(null); handleBookConsultation(); }}
+            retryLabel="Try Booking Again"
+          />
+        )}
+
         <Button
-          onClick={handleBookConsultation}
+          onClick={() => { setSubmitError(null); handleBookConsultation(); }}
           disabled={!selectedDate || !selectedTime || !selectedProvider || !consultationType || isLoading || paymentLoading || walletPaying}
           className="w-full"
           size="lg"

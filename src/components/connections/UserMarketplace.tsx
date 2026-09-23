@@ -9,6 +9,14 @@ import { useSession } from '@supabase/auth-helpers-react';
 import { Search } from 'lucide-react';
 import { toast } from 'sonner';
 import { UserCard } from './UserCard';
+import { ALL_CLINICIAN_ROLES } from '@/config/roleConfig';
+
+// Any clinical cadre counts as a provider here — never just the legacy
+// 'health_personnel' string, or doctors/nurses/pharmacists vanish from
+// listings, lose their services, and get connection rows backwards.
+const CLINICIAN_ROLES = ALL_CLINICIAN_ROLES as readonly string[];
+const isClinicianRole = (role?: string | null) =>
+  !!role && CLINICIAN_ROLES.includes(role);
 
 interface UserWithServices {
   id: string;
@@ -96,9 +104,12 @@ export const UserMarketplace = () => {
       // Always exclude patients from the marketplace view, and only show approved accounts
       baseQuery = baseQuery.neq('role', 'patient').eq('is_verified', true);
 
-      // Filter by role if specific tab is selected
-      if (activeTab !== 'all') {
-        baseQuery = baseQuery.eq('role', activeTab as 'health_personnel' | 'admin');
+      // Filter by role if specific tab is selected. The "Doctors" tab
+      // covers every clinical cadre, not just the legacy role string.
+      if (activeTab === 'health_personnel') {
+        baseQuery = baseQuery.in('role', CLINICIAN_ROLES as any);
+      } else if (activeTab !== 'all') {
+        baseQuery = baseQuery.eq('role', activeTab as 'admin');
       }
 
       // Apply search filter
@@ -109,9 +120,9 @@ export const UserMarketplace = () => {
       const { data: profilesData, error } = await baseQuery.limit(50);
       if (error) throw error;
 
-      // Fetch services for health personnel
+      // Fetch services for every clinician, not just the legacy role
       const healthPersonnelIds = profilesData
-        ?.filter(p => p.role === 'health_personnel')
+        ?.filter(p => isClinicianRole(p.role))
         .map(p => p.id) || [];
 
       let servicesData = [];
@@ -171,7 +182,7 @@ export const UserMarketplace = () => {
   const handleSendConnectionRequest = (targetUserId: string, targetRole: string) => {
     if (!session?.user) return;
 
-    const isTargetProvider = targetRole === 'health_personnel';
+    const isTargetProvider = isClinicianRole(targetRole);
 
     requestConnection({
       patient_id: isTargetProvider ? session.user.id : targetUserId,
@@ -185,7 +196,7 @@ export const UserMarketplace = () => {
   const getAvailableTabs = () => {
     return [
       { id: "all", label: "All", count: users?.length || 0 },
-      { id: "health_personnel", label: "Doctors", count: users?.filter(u => u.role === 'health_personnel').length || 0 },
+      { id: "health_personnel", label: "Doctors", count: users?.filter(u => isClinicianRole(u.role)).length || 0 },
       { id: "admin", label: "Institutions", count: users?.filter(u => u.role === 'admin').length || 0 }
     ];
   };

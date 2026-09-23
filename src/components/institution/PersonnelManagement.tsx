@@ -190,6 +190,7 @@ export const PersonnelManagement = ({ institutionId }: { institutionId: string }
                                             variant="ghost"
                                             size="icon"
                                             className="text-destructive hover:text-destructive/90"
+                                            aria-label={`Remove ${p.profile?.email || 'personnel'} (${p.role})`}
                                             onClick={() => handleRemovePersonnel(p.id)}
                                         >
                                             <Trash2 className="h-4 w-4" />

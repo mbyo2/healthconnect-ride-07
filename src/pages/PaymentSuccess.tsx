@@ -20,14 +20,18 @@ const PaymentSuccess = () => {
   useEffect(() => {
     const handlePaymentCompletion = async () => {
       try {
-        if (paymentId && (status === 'success' || status === 'mock_success')) {
-          // PayPal payment completion - need to capture it
+        if (paymentId && status === 'success') {
+          // PayPal payment completion - capture must succeed server-side
+          // before anything is shown as paid.
+          if (!token) {
+            throw new Error('Missing PayPal order reference');
+          }
           console.log('Capturing PayPal payment:', paymentId);
 
           const { data, error } = await supabase.functions.invoke('capture-paypal-payment', {
             body: {
               paymentId: paymentId,
-              paypalOrderId: token || 'mock-order-id' // token is the order ID in PayPal return URL
+              paypalOrderId: token // token is the order ID in PayPal return URL
             }
           });
 
@@ -55,8 +59,11 @@ const PaymentSuccess = () => {
             throw new Error(data?.error || "Failed to capture payment");
           }
         } else if (token && PayerID) {
-          // Legacy PayPal flow
-          toast.success("Payment completed successfully!");
+          // Legacy PayPal return without a payment reference — never claim
+          // success without server verification; point at the dashboard.
+          toast.info("Payment return received — check your dashboard for confirmation.");
+          navigate("/dashboard");
+          return;
         } else if (paymentId) {
           // Wallet payment completion (direct)
           toast.success("Payment processed successfully!");
@@ -79,9 +86,9 @@ const PaymentSuccess = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="min-h-screen flex items-center justify-center bg-background" role="status" aria-label="Finalizing payment">
         <div className="text-center space-y-4">
-          <div className="animate-spin h-12 w-12 border-4 border-primary border-t-transparent rounded-full mx-auto"></div>
+          <div className="animate-spin h-12 w-12 border-4 border-primary border-t-transparent rounded-full mx-auto" aria-hidden></div>
           <p className="text-sm sm:text-base text-muted-foreground font-medium">Finalizing your payment...</p>
         </div>
       </div>

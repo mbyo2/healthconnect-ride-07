@@ -10,6 +10,7 @@ import { useUserRoles } from "@/context/UserRolesContext";
 import { ALL_CLINICIAN_ROLES } from "@/config/roleConfig";
 import { EmptyState, LoadingSkeleton } from "@/components/shared";
 import { SuggestionBanner, HealthTipCard } from "@/components/guidance";
+import { providerDisplayName } from "@/utils/providerDisplay";
 import {
   Calendar,
   Clock,
@@ -74,7 +75,7 @@ export const AppointmentsPage = () => {
             provider:profiles!appointments_provider_id_fkey (
               first_name, last_name, specialty, avatar_url, phone, address,
               consultation_fee_min, consultation_fee_max,
-              telemedicine_available, typical_wait_time
+              telemedicine_available, typical_wait_time, role
             )
           `)
           .eq("patient_id", user.id)
@@ -350,7 +351,7 @@ export const AppointmentsPage = () => {
                           const apptDate = parseISO(app.date);
 
                           return (
-                            <tr key={app.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-800/60 transition-colors">
+                            <tr key={app.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800/60 transition-colors">
                               <td className="py-4 px-6">
                                 <div className="flex items-center gap-3">
                                   <div className="h-9 w-9 rounded-full bg-slate-100 text-slate-600 font-black text-xs flex items-center justify-center flex-shrink-0 uppercase">
@@ -358,7 +359,9 @@ export const AppointmentsPage = () => {
                                   </div>
                                   <div>
                                     <div className="font-bold text-sm text-slate-900 dark:text-slate-100">
-                                      {isProvider ? "" : "Dr. "}{person?.first_name} {person?.last_name}
+                                      {isProvider
+                                        ? `${person?.first_name || ''} ${person?.last_name || ''}`.trim() || 'Patient'
+                                        : providerDisplayName({ first_name: person?.first_name, last_name: person?.last_name, role: (person as any)?.role })}
                                     </div>
                                     {!isProvider && person?.specialty && (
                                       <div className="text-[10px] text-primary-500 font-bold uppercase tracking-wide">{person.specialty}</div>
@@ -486,10 +489,12 @@ export const AppointmentsPage = () => {
                           const apptDate = parseISO(app.date);
 
                           return (
-                            <tr key={app.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-800/60 transition-colors">
+                            <tr key={app.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800/60 transition-colors">
                               <td className="py-3 px-4 font-bold text-slate-800 dark:text-slate-200">
                                 <div>
-                                  <div>{isProvider ? "" : "Dr. "}{person?.first_name} {person?.last_name}</div>
+                                  <div>{isProvider
+                                    ? `${person?.first_name || ''} ${person?.last_name || ''}`.trim() || 'Patient'
+                                    : providerDisplayName({ first_name: person?.first_name, last_name: person?.last_name, role: (person as any)?.role })}</div>
                                   {!isProvider && person?.specialty && (
                                     <div className="text-[10px] text-primary-500 font-bold mt-0.5">{person.specialty}</div>
                                   )}

@@ -99,7 +99,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         .from('profiles' as any)
         .select(`
           id, first_name, last_name, specialty, bio, provider_type, avatar_url,
-          years_experience, rating,
+          years_experience, rating, role,
           accepted_insurances,
           medical_school, graduation_year, board_certifications, subspecialties,
           primary_practice_location, affiliated_hospitals,
@@ -158,6 +158,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         id: p.id,
         first_name: p.first_name ?? '',
         last_name: p.last_name ?? '',
+        role: p.role ?? undefined,
         specialty: p.specialty ?? 'General Practice',
         bio: p.bio ?? '',
         provider_type: p.provider_type ?? 'doctor',

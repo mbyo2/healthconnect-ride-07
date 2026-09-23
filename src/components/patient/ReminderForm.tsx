@@ -232,6 +232,7 @@ export const ReminderForm = () => {
                     type="button"
                     variant="ghost"
                     size="icon"
+                    aria-label="Remove reminder time"
                     onClick={() => removeReminderTime(index)}
                   >
                     <Trash2 className="h-4 w-4" />
@@ -353,13 +354,15 @@ export const ReminderForm = () => {
                     </p>
                   </div>
                   <div className="flex space-x-2">
-                    <Switch 
+                    <Switch
                       checked={reminder.active}
+                      aria-label={`Turn reminder ${reminder.active ? 'off' : 'on'} for ${reminder.medication_name || 'medication'}`}
                       onCheckedChange={() => toggleReminderActive(reminder.id, reminder.active)}
                     />
                     <Button
                       variant="ghost"
                       size="icon"
+                      aria-label={`Delete reminder for ${reminder.medication_name || 'medication'}`}
                       onClick={() => deleteReminder(reminder.id)}
                     >
                       <Trash2 className="h-4 w-4" />

@@ -10,10 +10,32 @@ interface MessageInputProps {
   onSendMessage: (content: string) => Promise<void>;
   onUploadComplete: (fileUrl: string, fileName: string) => void;
   loading: boolean;
+  /** Stable per-conversation key — drafts survive reloads and logins. */
+  draftKey?: string;
 }
 
-export const MessageInput = ({ onSendMessage, onUploadComplete, loading }: MessageInputProps) => {
-  const [newMessage, setNewMessage] = useState("");
+const draftStorageKey = (key: string) => `doc_chat_draft_${key}`;
+
+export const MessageInput = ({ onSendMessage, onUploadComplete, loading, draftKey }: MessageInputProps) => {
+  const [newMessage, setNewMessage] = useState(() => {
+    if (!draftKey) return "";
+    try {
+      return localStorage.getItem(draftStorageKey(draftKey)) || "";
+    } catch {
+      return "";
+    }
+  });
+
+  const updateDraft = (value: string) => {
+    setNewMessage(value);
+    if (!draftKey) return;
+    try {
+      if (value) localStorage.setItem(draftStorageKey(draftKey), value);
+      else localStorage.removeItem(draftStorageKey(draftKey));
+    } catch {
+      // storage unavailable — draft simply won't persist
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,7 +62,7 @@ export const MessageInput = ({ onSendMessage, onUploadComplete, loading }: Messa
     });
 
     await onSendMessage(newMessage);
-    setNewMessage("");
+    updateDraft("");
   };
 
   const handleSecurityViolation = (violation: string) => {
@@ -51,7 +73,7 @@ export const MessageInput = ({ onSendMessage, onUploadComplete, loading }: Messa
     <form onSubmit={handleSubmit} className="p-4 border-t flex gap-2">
       <SecureInput
         value={newMessage}
-        onChange={(e) => setNewMessage(e.target.value)}
+        onChange={(e) => updateDraft(e.target.value)}
         placeholder="Type your message..."
         disabled={loading}
         maxLength={2000}

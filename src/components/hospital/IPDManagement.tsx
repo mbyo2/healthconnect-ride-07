@@ -198,7 +198,7 @@ export const IPDManagement = ({ hospital, patients, departments, beds, admission
                 <div className="flex gap-2">
                   <div className="relative">
                     <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input placeholder="Search..." className="pl-8 w-48" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
+                    <Input type="search" aria-label="Search..." className="pl-8 w-48" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
                   </div>
                   <Button onClick={() => setShowAdmitDialog(true)}>
                     <Plus className="h-4 w-4 mr-2" /> New Admission

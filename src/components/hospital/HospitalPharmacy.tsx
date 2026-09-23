@@ -349,7 +349,7 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
                 <CardTitle className="text-sm flex items-center gap-2"><Sparkles className="h-4 w-4 text-primary" /> Select Products to Dispense</CardTitle>
                 <div className="relative">
                   <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input placeholder="Search..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="pl-8 h-8 text-xs" />
+                  <Input type="search" aria-label="Search..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="pl-8 h-8 text-xs" />
                 </div>
               </CardHeader>
               <CardContent>
@@ -403,9 +403,9 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
                           <p className="text-muted-foreground text-[10px]">K{item.unit_price} × {item.cartQty} = <strong>K{(item.unit_price * item.cartQty).toFixed(2)}</strong></p>
                         </div>
                         <div className="flex gap-1">
-                          <Button size="icon" variant="outline" className="h-6 w-6" onClick={() => setPosCart(p => p.map(i => i.id === item.id ? { ...i, cartQty: Math.max(1, i.cartQty - 1) } : i))}>-</Button>
-                          <Button size="icon" variant="outline" className="h-6 w-6" onClick={() => setPosCart(p => p.map(i => i.id === item.id ? { ...i, cartQty: i.cartQty + 1 } : i))}>+</Button>
-                          <Button size="icon" variant="ghost" className="h-6 w-6 text-destructive" onClick={() => setPosCart(p => p.filter(i => i.id !== item.id))}><Trash2 className="h-3 w-3" /></Button>
+                          <Button size="icon" variant="outline" className="h-6 w-6" aria-label={`Decrease quantity of ${item.product_name || 'item'}`} onClick={() => setPosCart(p => p.map(i => i.id === item.id ? { ...i, cartQty: Math.max(1, i.cartQty - 1) } : i))}>-</Button>
+                          <Button size="icon" variant="outline" className="h-6 w-6" aria-label={`Increase quantity of ${item.product_name || 'item'}`} onClick={() => setPosCart(p => p.map(i => i.id === item.id ? { ...i, cartQty: i.cartQty + 1 } : i))}>+</Button>
+                          <Button size="icon" variant="ghost" className="h-6 w-6 text-destructive" aria-label={`Remove ${item.product_name || 'item'} from cart`} onClick={() => setPosCart(p => p.filter(i => i.id !== item.id))}><Trash2 className="h-3 w-3" /></Button>
                         </div>
                       </div>
                     ))
@@ -454,7 +454,7 @@ export const HospitalPharmacy = ({ hospital }: { hospital: any }) => {
         <TabsContent value="inventory" className="space-y-3 pt-3">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input placeholder="Search drugs..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="pl-9 text-xs h-9" />
+            <Input type="search" aria-label="Search drugs..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="pl-9 text-xs h-9" />
           </div>
           {loading ? (
             <ListSkeleton count={5} variant="compact" />

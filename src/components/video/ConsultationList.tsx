@@ -8,6 +8,7 @@ import { format } from "date-fns";
 import { VideoConsultationDetails, ConsultationListProps } from "@/types/video";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { Skeleton } from "@/components/ui/skeleton";
+import { providerDisplayName } from "@/utils/providerDisplay";
 
 /** Joinable while the visit is bookable or live — the Daily room is minted on demand. */
 const JOINABLE_STATUSES = ["scheduled", "in-progress"];
@@ -47,7 +48,8 @@ export const ConsultationList = ({ onJoinMeeting }: ConsultationListProps) => {
           provider:profiles!video_consultations_provider_id_fkey(
             first_name,
             last_name,
-            specialty
+            specialty,
+            role
           ),
           patient:profiles!video_consultations_patient_id_fkey(
             first_name,
@@ -96,7 +98,7 @@ export const ConsultationList = ({ onJoinMeeting }: ConsultationListProps) => {
         const isProviderSide = userId && consultation.provider_id === userId;
         const counterpart = isProviderSide
           ? `${consultation.patient?.first_name || ''} ${consultation.patient?.last_name || ''}`.trim() || 'Patient'
-          : `Dr. ${consultation.provider?.first_name || ''} ${consultation.provider?.last_name || ''}`.trim();
+          : providerDisplayName({ first_name: consultation.provider?.first_name, last_name: consultation.provider?.last_name, role: (consultation.provider as any)?.role });
         const canJoin = JOINABLE_STATUSES.includes(consultation.status);
 
         return (

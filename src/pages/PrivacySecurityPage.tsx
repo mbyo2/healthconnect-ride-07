@@ -11,6 +11,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TwoFactorMethod } from "@/types/settings";
 import { Separator } from "@/components/ui/separator";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const PrivacySecurityPage = () => {
   const [currentPassword, setCurrentPassword] = useState("");
@@ -31,6 +41,7 @@ const PrivacySecurityPage = () => {
   const [allowResearchUsage, setAllowResearchUsage] = useState(false);
   const [showInSearch, setShowInSearch] = useState(true);
   const [dataRetentionPeriod, setDataRetentionPeriod] = useState("365");
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
     const fetchSecuritySettings = async () => {
@@ -201,14 +212,8 @@ const PrivacySecurityPage = () => {
     }
   };
 
-  const handleDeleteAccount = async () => {
-    const confirmed = window.confirm(
-      "Request deletion of your account? We will retain only data required by law until the request is reviewed."
-    );
-
-    if (confirmed) {
-      await submitDataRequest('deletion');
-    }
+  const handleDeleteAccount = () => {
+    setShowDeleteConfirm(true);
   };
 
   const submitDataRequest = async (requestType: 'export' | 'deletion') => {
@@ -269,6 +274,7 @@ const PrivacySecurityPage = () => {
   };
 
   return (
+    <>
     <div className="container mx-auto px-4 py-8 space-y-6">
       <div className="flex items-center gap-2 mb-6">
         <Shield className="h-6 w-6" />
@@ -298,6 +304,7 @@ const PrivacySecurityPage = () => {
                   />
                   <button
                     type="button"
+                    aria-label={showCurrentPassword ? "Hide current password" : "Show current password"}
                     className="absolute inset-y-0 right-0 pr-3 flex items-center"
                     onClick={() => setShowCurrentPassword(!showCurrentPassword)}
                   >
@@ -323,6 +330,7 @@ const PrivacySecurityPage = () => {
                   />
                   <button
                     type="button"
+                    aria-label={showNewPassword ? "Hide new password" : "Show new password"}
                     className="absolute inset-y-0 right-0 pr-3 flex items-center"
                     onClick={() => setShowNewPassword(!showNewPassword)}
                   >
@@ -582,7 +590,7 @@ const PrivacySecurityPage = () => {
                 <p className="text-sm text-muted-foreground mb-2">
                   Request deletion of all your personal data (apart from that required by law)
                 </p>
-                <Button variant="outline" onClick={() => submitDataRequest('deletion')} disabled={isLoading}>Request Data Deletion</Button>
+                <Button variant="outline" onClick={() => setShowDeleteConfirm(true)} disabled={isLoading}>Request Data Deletion</Button>
               </div>
             </div>
           </Card>
@@ -610,6 +618,26 @@ const PrivacySecurityPage = () => {
         </TabsContent>
       </Tabs>
     </div>
+    <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Request account deletion?</AlertDialogTitle>
+          <AlertDialogDescription>
+            This submits a deletion request for review. We will retain only data required by law until the request is reviewed. This cannot be undone once actioned.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            onClick={() => { setShowDeleteConfirm(false); submitDataRequest('deletion'); }}
+          >
+            Request deletion
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+    </>
   );
 };
 

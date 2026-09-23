@@ -52,13 +52,27 @@ const InstitutionReports = () => {
         const { count } = await supabase.from('appointments').select('*', { count: 'exact', head: true }).in('provider_id', providerIds);
         appointmentsCount = count || 0;
 
-        const { data: appts } = await supabase.from('appointments').select('patient_id, date, status').in('provider_id', providerIds);
-        patientsCount = new Set(appts?.map(a => a.patient_id)).size;
-
-        appts?.forEach(a => {
-          const key = format(new Date(a.date), 'MMM');
-          if (months[key]) months[key].appts++;
-        });
+        // Paginate — PostgREST caps single responses (default 1000 rows),
+        // so one fetch would silently truncate large institutions' stats.
+        const patientIds = new Set<string>();
+        const pageSize = 1000;
+        for (let from = 0; ; from += pageSize) {
+          const { data: appts, error: apptsError } = await supabase
+            .from('appointments')
+            .select('patient_id, date, status')
+            .in('provider_id', providerIds)
+            .order('date', { ascending: true })
+            .range(from, from + pageSize - 1);
+          if (apptsError) throw apptsError;
+          const page = appts || [];
+          page.forEach(a => {
+            if ((a as any).patient_id) patientIds.add((a as any).patient_id);
+            const key = format(new Date((a as any).date), 'MMM');
+            if (months[key]) months[key].appts++;
+          });
+          if (page.length < pageSize) break;
+        }
+        patientsCount = patientIds.size;
       }
 
       // Revenue by month
@@ -92,7 +106,7 @@ const InstitutionReports = () => {
     }
   };
 
-  if (instLoading || loading) return <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>;
+  if (instLoading || loading) return <div className="flex justify-center p-8" role="status" aria-label="Loading reports"><Loader2 className="animate-spin" aria-hidden /></div>;
 
   const currency = institution?.currency || 'ZMW';
 

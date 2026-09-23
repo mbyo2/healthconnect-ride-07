@@ -1,25 +1,22 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Tv, Volume2, Clock, CheckCircle2, Building2, Bell, Sparkles } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface DisplayToken {
+  id: string;
   tokenNumber: string;
   department: string;
-  room: string;
-  doctor: string;
-  status: "Called" | "In-Room" | "Next";
+  status: "waiting" | "serving" | "completed" | "cancelled" | "no_show";
 }
 
-const LIVE_DISPLAY_TOKENS: DisplayToken[] = [
-  { tokenNumber: "PED-04", department: "Pediatric Clinic", room: "Room 104", doctor: "Dr. Lindiwe Zulu", status: "Called" },
-  { tokenNumber: "OPD-101", department: "General Medicine", room: "Room 102", doctor: "Dr. Mwape Chilufya", status: "In-Room" },
-  { tokenNumber: "PHM-28", department: "Main Pharmacy", room: "Counter 2", doctor: "Pharm. Kelvin Tembo", status: "Next" },
-  { tokenNumber: "LAB-12", department: "Phlebotomy / Lab", room: "Sample Station 1", doctor: "Lab Scientist Banda", status: "In-Room" },
-  { tokenNumber: "PT-02", department: "Physiotherapy", room: "Rehab Gym B", doctor: "PT Faith Musonda", status: "In-Room" },
-  { tokenNumber: "RAD-08", department: "Radiology X-Ray", room: "Imaging Suite 1", doctor: "Rad. Tech Phiri", status: "Next" },
-];
-
 export const PublicQueueDisplay: React.FC = () => {
-  const [tokens, setTokens] = useState<DisplayToken[]>(LIVE_DISPLAY_TOKENS);
+  const [searchParams] = useSearchParams();
+  // TV displays are per-facility: /queue-display?institution=<uuid>
+  const institutionId = searchParams.get("institution") || "";
+  const [tokens, setTokens] = useState<DisplayToken[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [feedError, setFeedError] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
   const [currentDate, setCurrentDate] = useState(new Date().toLocaleDateString(undefined, { weekday: "long", year: "numeric", month: "long", day: "numeric" }));
 
@@ -30,7 +27,56 @@ export const PublicQueueDisplay: React.FC = () => {
     return () => clearInterval(timer);
   }, []);
 
-  const currentlyCalled = tokens.find((t) => t.status === "Called") || tokens[0];
+  const fetchTokens = useCallback(async () => {
+    if (!institutionId) { setLoading(false); return; }
+    try {
+      const today = new Date().toISOString().split("T")[0];
+      const { data, error } = await supabase
+        .from("queue_tokens")
+        .select("id, token_number, department, status")
+        .eq("institution_id", institutionId)
+        .gte("created_at", today)
+        .neq("status", "cancelled")
+        .order("created_at", { ascending: true })
+        .limit(50);
+      if (error) throw error;
+      setTokens(((data as any[]) || []).map((t) => ({
+        id: String(t.id),
+        tokenNumber: String(t.token_number || "—"),
+        department: String(t.department || "General"),
+        status: t.status,
+      })));
+      setFeedError(false);
+    } catch {
+      setFeedError(true);
+    } finally {
+      setLoading(false);
+    }
+  }, [institutionId]);
+
+  useEffect(() => {
+    fetchTokens();
+  }, [fetchTokens]);
+
+  useEffect(() => {
+    if (!institutionId) return;
+    const channel = supabase
+      .channel("public-queue-display")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "queue_tokens", filter: `institution_id=eq.${institutionId}` },
+        () => fetchTokens()
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [institutionId, fetchTokens]);
+
+  // Token numbers only — never patient names on a public screen.
+  const serving = tokens.filter((t) => t.status === "serving");
+  const waiting = tokens.filter((t) => t.status === "waiting");
+  const currentlyCalled = serving[serving.length - 1] || waiting[0] || null;
 
   return (
     <div className="min-h-screen bg-slate-950 text-white font-sans p-6 sm:p-10 flex flex-col justify-between select-none">
@@ -46,7 +92,7 @@ export const PublicQueueDisplay: React.FC = () => {
               <span className="w-3 h-3 rounded-full bg-emerald-400 animate-pulse" />
             </h1>
             <p className="text-sm font-medium text-slate-400">
-              Live Patient Calling &amp; Department Queue Display System
+              {institutionId ? "Department Queue Display" : "Department Queue Display — not connected"}
             </p>
           </div>
         </div>
@@ -75,41 +121,66 @@ export const PublicQueueDisplay: React.FC = () => {
             </div>
 
             <div className="mt-8">
-              <div className="text-7xl sm:text-9xl font-black font-mono tracking-tight text-white drop-shadow-md">
-                {currentlyCalled.tokenNumber}
-              </div>
+              {loading ? (
+                <div className="text-4xl sm:text-5xl font-black tracking-tight text-slate-400" role="status" aria-label="Loading queue">
+                  Loading queue…
+                </div>
+              ) : currentlyCalled ? (
+                <div className="text-7xl sm:text-9xl font-black font-mono tracking-tight text-white drop-shadow-md">
+                  {currentlyCalled.tokenNumber}
+                </div>
+              ) : (
+                <div className="text-3xl sm:text-5xl font-black tracking-tight text-slate-300">
+                  {!institutionId
+                    ? "Display not connected"
+                    : feedError
+                      ? "Live queue unavailable"
+                      : "No tokens called yet"}
+                </div>
+              )}
             </div>
+            {!loading && !currentlyCalled && (
+              <p className="mt-4 text-sm text-slate-400 max-w-md">
+                {!institutionId
+                  ? "Append ?institution=<facility-id> to this display's URL to connect it to a live queue."
+                  : feedError
+                    ? "Check the display's network connection and queue permissions, then reload."
+                    : "Tokens appear here the moment reception calls them."}
+              </p>
+            )}
           </div>
 
-          <div className="mt-8 pt-6 border-t border-slate-700/80 grid grid-cols-2 gap-4">
-            <div>
-              <span className="text-xs font-bold uppercase text-slate-400">Please Proceed To:</span>
-              <div className="text-3xl sm:text-4xl font-black text-emerald-400 mt-1">
-                {currentlyCalled.room}
+          {currentlyCalled && (
+            <div className="mt-8 pt-6 border-t border-slate-700/80 grid grid-cols-2 gap-4">
+              <div>
+                <span className="text-xs font-bold uppercase text-slate-400">Department:</span>
+                <div className="text-3xl sm:text-4xl font-black text-emerald-400 mt-1">
+                  {currentlyCalled.department}
+                </div>
+                <span className="text-sm font-semibold text-slate-300">Please proceed as directed by reception</span>
               </div>
-              <span className="text-sm font-semibold text-slate-300">{currentlyCalled.department}</span>
-            </div>
 
-            <div>
-              <span className="text-xs font-bold uppercase text-slate-400">Attending Clinician:</span>
-              <div className="text-2xl sm:text-3xl font-black text-white mt-1">
-                {currentlyCalled.doctor}
+              <div>
+                <span className="text-xs font-bold uppercase text-slate-400">Status:</span>
+                <div className="text-2xl sm:text-3xl font-black text-white mt-1 capitalize">
+                  {currentlyCalled.status === "serving" ? "Now serving" : "Next in queue"}
+                </div>
+                <span className="text-xs text-blue-300 font-bold">Token numbers only — names stay private</span>
               </div>
-              <span className="text-xs text-blue-300 font-bold">Consultation Active</span>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Right 5 cols: Department Status Grid */}
         <div className="lg:col-span-5 flex flex-col justify-between gap-3">
           <div className="px-2 font-extrabold text-sm uppercase text-slate-400 tracking-wider">
-            All Department Active Queues
+            Up Next in Queue
           </div>
 
           <div className="space-y-3 flex-1">
-            {tokens.slice(1).map((tok, idx) => (
+            {waiting.slice(0, 6).map((tok) => (
               <div
-                key={idx}
+                key={tok.id}
                 className="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 flex items-center justify-between shadow-sm"
               >
                 <div className="flex items-center gap-3">
@@ -118,23 +189,22 @@ export const PublicQueueDisplay: React.FC = () => {
                   </div>
                   <div>
                     <h4 className="font-extrabold text-sm text-white">{tok.department}</h4>
-                    <p className="text-xs text-slate-400">{tok.room} • {tok.doctor}</p>
+                    <p className="text-xs text-slate-400">Waiting</p>
                   </div>
                 </div>
 
                 <div>
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-black uppercase ${
-                      tok.status === "In-Room"
-                        ? "bg-emerald-950 text-emerald-400 border border-emerald-800"
-                        : "bg-blue-950 text-blue-300 border border-blue-800"
-                    }`}
-                  >
-                    {tok.status}
+                  <span className="px-3 py-1 rounded-full text-xs font-black uppercase bg-blue-950 text-blue-300 border border-blue-800">
+                    Next
                   </span>
                 </div>
               </div>
             ))}
+            {!loading && waiting.length === 0 && (
+              <div className="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 text-sm text-slate-400 text-center">
+                Queue is clear — walk-ins welcome at reception.
+              </div>
+            )}
           </div>
         </div>
       </div>

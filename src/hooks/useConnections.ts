@@ -88,7 +88,7 @@ export const useConnections = () => {
         .select(`
           *,
           provider:profiles!primary_provider_assignments_provider_id_fkey(
-            id, first_name, last_name, avatar_url, specialty, email
+            id, first_name, last_name, avatar_url, specialty, email, role
           )
         `)
         .eq('patient_id', user.id)

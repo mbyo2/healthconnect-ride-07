@@ -54,6 +54,12 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: 'Forbidden' }), { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
+    // A receipt certifies money received — never issue one for a payment
+    // that hasn't completed (pending/failed must not produce receipts).
+    if (payment.status !== 'completed') {
+      return new Response(JSON.stringify({ error: 'Receipts are only issued for completed payments' }), { status: 422, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+
     const pdfDoc = await PDFDocument.create();
     const page = pdfDoc.addPage();
     const { height } = page.getSize();
@@ -65,7 +71,7 @@ serve(async (req) => {
       `Patient: ${payment.patient?.first_name ?? ''} ${payment.patient?.last_name ?? ''}`,
       `Provider: ${payment.provider?.first_name ?? ''} ${payment.provider?.last_name ?? ''}`,
       `Service: ${payment.service?.name ?? ''}`,
-      `Amount: $${payment.amount}`,
+      `Amount: ${String(payment.currency || 'ZMW').toUpperCase() === 'ZMW' ? 'K' : `${payment.currency} `}${payment.amount}`,
       `Status: ${payment.status}`,
     ];
     details.forEach((text, i) => page.drawText(text, { x: 50, y: height - 100 - i * 20, size: 12 }));

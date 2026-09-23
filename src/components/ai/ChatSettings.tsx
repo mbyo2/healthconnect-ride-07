@@ -52,7 +52,7 @@ export const ChatSettings = ({ messages, conversationTitle, onImport }: ChatSett
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8">
+                <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Chat settings">
                     <Settings className="h-4 w-4" />
                 </Button>
             </DialogTrigger>

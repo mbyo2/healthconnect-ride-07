@@ -10,6 +10,7 @@ import { Calendar, Clock, MapPin, CalendarX, RefreshCw, FileCheck } from "lucide
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { AppointmentWithProvider } from "@/types/appointments";
+import { providerDisplayName } from "@/utils/providerDisplay";
 
 export const AppointmentsList = () => {
   const navigate = useNavigate();
@@ -27,7 +28,8 @@ export const AppointmentsList = () => {
             first_name,
             last_name,
             specialty,
-            address
+            address,
+            role
           )
         `)
         .eq('patient_id', user.id)
@@ -77,7 +79,7 @@ export const AppointmentsList = () => {
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
               <h3 className="text-xl font-semibold">
-                Dr. {appointment.provider.first_name} {appointment.provider.last_name}
+                {providerDisplayName({ first_name: appointment.provider.first_name, last_name: appointment.provider.last_name, role: (appointment.provider as any)?.role })}
               </h3>
               <p className="text-muted-foreground">{appointment.provider.specialty}</p>
               <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">

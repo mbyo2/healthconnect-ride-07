@@ -121,7 +121,7 @@ export const PromotedListingManager = () => {
             </div>
             <div className="p-4 bg-muted/50 rounded-xl text-center">
               <DollarSign className="h-5 w-5 text-primary mx-auto mb-1" />
-              <p className="text-2xl font-bold text-foreground">${listing.spent_total?.toFixed(2)}</p>
+              <p className="text-2xl font-bold text-foreground">K{listing.spent_total?.toFixed(2)}</p>
               <p className="text-xs text-muted-foreground">Total Spent</p>
             </div>
           </div>

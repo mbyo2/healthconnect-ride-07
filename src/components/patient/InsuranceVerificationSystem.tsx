@@ -264,7 +264,7 @@ export const InsuranceVerificationSystem = () => {
                             <CreditCard className="h-4 w-4 text-muted-foreground" />
                             <div>
                               <span className="font-medium text-muted-foreground">Copay:</span>
-                              <p>${latestVerification.copay_amount}</p>
+                              <p>K{latestVerification.copay_amount}</p>
                             </div>
                           </div>
                         )}

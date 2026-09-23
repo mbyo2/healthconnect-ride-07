@@ -21,6 +21,7 @@ export interface Provider {
   institution_id?: string;
   accepted_insurances?: InsuranceProvider[] | string[];
   // Base profile fields
+  role?: string;
   address?: string;
   city?: string;
   state?: string;

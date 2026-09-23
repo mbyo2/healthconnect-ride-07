@@ -23,13 +23,13 @@ const VideoConsultations = () => {
                 </div>
                 <h1 className="font-display text-3xl font-medium tracking-tight text-midnight">Video Consultations</h1>
                 <p className="text-sm text-graphite-500 font-medium tracking-wide">
-                  End-to-end encrypted virtual doctor visits &amp; telemedicine calls
+                  Encrypted virtual doctor visits &amp; telemedicine calls
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-pill bg-success-50 border border-success-100 text-xs font-medium text-success-500">
               <ShieldCheck className="h-4 w-4" />
-              HIPAA / Data Compliant
+              Secure &amp; Private
             </div>
           </div>
 

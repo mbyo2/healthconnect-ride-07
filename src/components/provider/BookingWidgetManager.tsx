@@ -122,7 +122,7 @@ export const BookingWidgetManager = () => {
             <TabsContent value="link" className="space-y-4 mt-4">
               <div className="flex items-center gap-2">
                 <Input value={getDirectLink(widget.widget_key)} readOnly className="font-mono text-sm" />
-                <Button variant="outline" size="icon" onClick={() => copyToClipboard(getDirectLink(widget.widget_key))}>
+                <Button variant="outline" size="icon" aria-label="Copy booking link" onClick={() => copyToClipboard(getDirectLink(widget.widget_key))}>
                   <Copy className="h-4 w-4" />
                 </Button>
               </div>

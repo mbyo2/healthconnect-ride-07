@@ -4,13 +4,18 @@ import { Button } from "@/components/ui/button";
 import { Wallet, Plus, ArrowUpRight, History } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
+import { useUserRoles } from "@/context/UserRolesContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useCurrency } from "@/hooks/use-currency";
 
 export const WalletCard = () => {
     const { user } = useAuth();
+    const { isHealthPersonnel, isAdmin } = useUserRoles();
     const navigate = useNavigate();
+    // Providers earn into this wallet; patients spend from it. Same balance,
+    // different headline job.
+    const isEarner = (isHealthPersonnel || isAdmin) && !!user;
     const [balance, setBalance] = useState<number | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const { formatPrice } = useCurrency();
@@ -85,7 +90,7 @@ export const WalletCard = () => {
             <CardHeader className="pb-2 relative z-10">
                 <CardTitle className="text-xs font-bold flex items-center gap-2 opacity-80 uppercase tracking-widest">
                     <Wallet className="h-3.5 w-3.5" aria-hidden />
-                    My Wallet Balance
+                    {isEarner ? "Earnings Balance" : "My Wallet Balance"}
                 </CardTitle>
             </CardHeader>
 
@@ -103,7 +108,9 @@ export const WalletCard = () => {
                         </div>
                         <p className="text-[10px] md:text-xs text-primary-foreground/80 mt-1.5 font-medium flex items-center gap-1">
                             <ArrowUpRight className="h-3 w-3" />
-                            Available for consultations & medicine
+                            {isEarner
+                                ? "Consultation earnings & payouts"
+                                : "Available for consultations & medicine"}
                         </p>
                     </div>
 
@@ -114,7 +121,7 @@ export const WalletCard = () => {
                             onClick={handleWalletAction}
                         >
                             <Plus className="h-4 w-4 mr-1.5" />
-                            Top Up
+                            {isEarner ? "Earnings" : "Top Up"}
                         </Button>
                         <Button
                             size="sm"

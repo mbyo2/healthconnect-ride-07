@@ -265,14 +265,14 @@ const Settings = () => {
                   <p className="font-medium text-sm text-midnight">Directory Profile Visibility</p>
                   <p className="text-xs text-graphite-500">Visible to verified patient search & provider index</p>
                 </div>
-                <Switch checked={profileVisibility} onCheckedChange={handleVisibilityToggle} />
+                <Switch checked={profileVisibility} onCheckedChange={handleVisibilityToggle} aria-label="Directory profile visibility" />
               </div>
               <div className="flex items-center justify-between pt-2 border-t border-canvas-silk">
                 <div>
                   <p className="font-medium text-sm text-midnight">Two-Factor Authentication (2FA)</p>
                   <p className="text-xs text-graphite-500">TOTP authenticator app verification</p>
                 </div>
-                <Switch checked={twoFactor} onCheckedChange={handleTwoFactorToggle} />
+                <Switch checked={twoFactor} onCheckedChange={handleTwoFactorToggle} aria-label="Two-factor authentication" />
               </div>
             </div>
 
@@ -293,7 +293,7 @@ const Settings = () => {
                   <p className="font-bold text-xs">Accessibility Easy Reading</p>
                   <p className="text-[11px] text-graphite-500 dark:text-slate-400">High-contrast text and enlarged touch targets</p>
                 </div>
-                <Switch checked={isEasyReadingEnabled} onCheckedChange={handleAccessibilityToggle} />
+                <Switch checked={isEasyReadingEnabled} onCheckedChange={handleAccessibilityToggle} aria-label="Accessibility easy reading" />
               </div>
             </div>
 
@@ -330,21 +330,21 @@ const Settings = () => {
                   <p className="font-bold text-xs">Browser Push Notifications</p>
                   <p className="text-[11px] text-graphite-500 dark:text-slate-400">Instant alerts for messages, calls & lab updates</p>
                 </div>
-                <Switch checked={notifications} onCheckedChange={handleNotificationToggle} />
+                <Switch checked={notifications} onCheckedChange={handleNotificationToggle} aria-label="Browser push notifications" />
               </div>
               <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
                 <div>
                   <p className="font-bold text-xs">Email Broadcasts</p>
                   <p className="text-[11px] text-graphite-500 dark:text-slate-400">Consultation receipts and appointment confirmations</p>
                 </div>
-                <Switch checked={emailNotifications} onCheckedChange={handleEmailToggle} />
+                <Switch checked={emailNotifications} onCheckedChange={handleEmailToggle} aria-label="Email broadcasts" />
               </div>
               <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
                 <div>
                   <p className="font-bold text-xs">SMS Reminders</p>
                   <p className="text-[11px] text-graphite-500 dark:text-slate-400">Text reminders 1 hour prior to appointments</p>
                 </div>
-                <Switch checked={smsReminders} onCheckedChange={handleSmsToggle} />
+                <Switch checked={smsReminders} onCheckedChange={handleSmsToggle} aria-label="SMS reminders" />
               </div>
             </div>
 

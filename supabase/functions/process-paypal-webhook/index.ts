@@ -12,7 +12,7 @@ async function getPayPalAccessToken(): Promise<string | null> {
   const clientSecret = Deno.env.get('PAYPAL_CLIENT_SECRET');
   if (!clientId || !clientSecret) return null;
   const auth = btoa(`${clientId}:${clientSecret}`);
-  const base = Deno.env.get('PAYPAL_API_BASE') || 'https://api-m.paypal.com';
+  const base = Deno.env.get('PAYPAL_BASE_URL') || Deno.env.get('PAYPAL_API_BASE') || 'https://api-m.paypal.com';
   const res = await fetch(`${base}/v1/oauth2/token`, {
     method: 'POST',
     headers: {
@@ -50,7 +50,7 @@ async function verifyPayPalSignature(
       return false;
     }
 
-    const base = Deno.env.get('PAYPAL_API_BASE') || 'https://api-m.paypal.com';
+    const base = Deno.env.get('PAYPAL_BASE_URL') || Deno.env.get('PAYPAL_API_BASE') || 'https://api-m.paypal.com';
     const verifyRes = await fetch(`${base}/v1/notifications/verify-webhook-signature`, {
       method: 'POST',
       headers: {

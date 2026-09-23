@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -12,11 +13,20 @@ import { toast } from 'sonner';
 import { format, addDays } from 'date-fns';
 import { Provider } from '@/types/provider';
 import { providerDisplayName } from '@/utils/providerDisplay';
+import {
+  savePendingAction,
+  takePendingAction,
+  peekPendingAction,
+  authRedirectUrl,
+  currentReturnTo,
+} from '@/utils/pendingAction';
 
 interface WaitlistSignupProps {
   provider: Provider;
   isOpen: boolean;
   onClose: () => void;
+  /** Called when a saved pre-login waitlist entry is ready to resume. */
+  onRequestOpen?: () => void;
 }
 
 const PREFERRED_TIMES = [
@@ -26,13 +36,30 @@ const PREFERRED_TIMES = [
   { id: 'any', label: 'Any time' },
 ];
 
-export const WaitlistSignup = ({ provider, isOpen, onClose }: WaitlistSignupProps) => {
+export const WaitlistSignup = ({ provider, isOpen, onClose, onRequestOpen }: WaitlistSignupProps) => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [urgency, setUrgency] = useState<string>('normal');
   const [selectedTimes, setSelectedTimes] = useState<string[]>(['any']);
   const [notes, setNotes] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
+
+  // Resume a waitlist entry started before login — nothing is submitted
+  // until the user confirms.
+  useEffect(() => {
+    if (isOpen || !user || !provider?.id || !onRequestOpen) return;
+    const pending = peekPendingAction();
+    if (pending?.kind === 'waitlist' && pending.providerId === provider.id) {
+      takePendingAction();
+      setUrgency(pending.urgency);
+      setSelectedDays(pending.selectedDays);
+      setSelectedTimes(pending.selectedTimes);
+      setNotes(pending.notes || '');
+      onRequestOpen();
+      toast.success('Welcome back — your waitlist preferences were kept. Review and join.');
+    }
+  }, [isOpen, user, provider?.id, onRequestOpen]);
 
   const nextDays = Array.from({ length: 14 }, (_, i) => addDays(new Date(), i + 1));
 
@@ -55,7 +82,19 @@ export const WaitlistSignup = ({ provider, isOpen, onClose }: WaitlistSignupProp
 
   const handleSubmit = async () => {
     if (!user) {
-      toast.error('Please sign in to join the waitlist');
+      // Auth wall: stash preferences so login resumes the join flow.
+      savePendingAction({
+        kind: 'waitlist',
+        providerId: provider.id,
+        urgency,
+        selectedDays,
+        selectedTimes,
+        notes,
+        returnTo: currentReturnTo(),
+        createdAt: Date.now(),
+      });
+      toast.info('Sign in to join the waitlist — your preferences are saved.');
+      navigate(authRedirectUrl(currentReturnTo()));
       return;
     }
     setSubmitting(true);
@@ -135,6 +174,7 @@ export const WaitlistSignup = ({ provider, isOpen, onClose }: WaitlistSignupProp
                 return (
                   <button
                     key={dayStr}
+                    aria-pressed={isSelected}
                     onClick={() => toggleDay(dayStr)}
                     className={`px-3 py-2 rounded-lg text-xs font-medium transition-all ${
                       isSelected ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-primary/10'
@@ -156,6 +196,7 @@ export const WaitlistSignup = ({ provider, isOpen, onClose }: WaitlistSignupProp
               {PREFERRED_TIMES.map(time => (
                 <button
                   key={time.id}
+                  aria-pressed={selectedTimes.includes(time.id)}
                   onClick={() => toggleTime(time.id)}
                   className={`p-3 rounded-lg text-sm font-medium transition-all text-left ${
                     selectedTimes.includes(time.id) ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-primary/10'

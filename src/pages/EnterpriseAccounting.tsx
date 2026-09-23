@@ -477,7 +477,7 @@ export const EnterpriseAccounting = () => {
           <TabsContent value="gl" className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Input placeholder="Search entries..." className="w-64 h-9 text-xs" />
+                <Input type="search" aria-label="Search entries..." className="w-64 h-9 text-xs" />
                 <Select defaultValue="all">
                   <SelectTrigger className="w-32 h-9 text-xs">
                     <SelectValue />
@@ -501,7 +501,7 @@ export const EnterpriseAccounting = () => {
             </div>
 
             <Card className="border-canvas-silk dark:border-slate-800 shadow-xs overflow-hidden">
-              <table className="w-full">
+              <div className="overflow-x-auto"><table className="w-full min-w-[640px]">
                 <thead className="bg-canvas-mist dark:bg-slate-800">
                   <tr>
                     <th className="text-left text-xs font-extrabold px-4 py-3">Entry #</th>
@@ -561,7 +561,7 @@ export const EnterpriseAccounting = () => {
                     </tr>
                   ))}
                 </tbody>
-              </table>
+              </table></div>
             </Card>
           </TabsContent>
 
@@ -569,7 +569,7 @@ export const EnterpriseAccounting = () => {
           <TabsContent value="assets" className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Input placeholder="Search assets..." className="w-64 h-9 text-xs" />
+                <Input type="search" aria-label="Search assets..." className="w-64 h-9 text-xs" />
                 <Select defaultValue="all">
                   <SelectTrigger className="w-32 h-9 text-xs">
                     <SelectValue />
@@ -750,7 +750,7 @@ export const EnterpriseAccounting = () => {
           <TabsContent value="reconciliation" className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Input placeholder="Search reconciliations..." className="w-64 h-9 text-xs" />
+                <Input type="search" aria-label="Search reconciliations..." className="w-64 h-9 text-xs" />
                 <Select defaultValue="all">
                   <SelectTrigger className="w-32 h-9 text-xs">
                     <SelectValue />

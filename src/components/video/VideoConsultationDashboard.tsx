@@ -10,6 +10,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { format } from 'date-fns';
+import { providerDisplayName } from '@/utils/providerDisplay';
 
 export const VideoConsultationDashboard = () => {
   const { user } = useAuth();
@@ -28,7 +29,8 @@ export const VideoConsultationDashboard = () => {
           provider:profiles!video_consultations_provider_id_fkey(
             first_name,
             last_name,
-            specialty
+            specialty,
+            role
           ),
           patient:profiles!video_consultations_patient_id_fkey(
             first_name,
@@ -135,7 +137,7 @@ export const VideoConsultationDashboard = () => {
                         <div className="flex items-center gap-2">
                           <User className="h-4 w-4" />
                           <span className="font-medium">
-                            Dr. {consultation.provider?.first_name} {consultation.provider?.last_name}
+                            {providerDisplayName({ first_name: consultation.provider?.first_name, last_name: consultation.provider?.last_name, role: (consultation.provider as any)?.role })}
                           </span>
                           <Badge variant="outline">{consultation.provider?.specialty}</Badge>
                         </div>
@@ -196,7 +198,7 @@ export const VideoConsultationDashboard = () => {
                         <div className="flex items-center gap-2">
                           <User className="h-4 w-4" />
                           <span className="font-medium">
-                            Dr. {consultation.provider?.first_name} {consultation.provider?.last_name}
+                            {providerDisplayName({ first_name: consultation.provider?.first_name, last_name: consultation.provider?.last_name, role: (consultation.provider as any)?.role })}
                           </span>
                           <Badge variant="outline">{consultation.provider?.specialty}</Badge>
                         </div>

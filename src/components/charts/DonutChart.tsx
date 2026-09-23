@@ -49,11 +49,12 @@ export const DonutChart = ({
             </Pie>
             <Tooltip
               contentStyle={{
-                backgroundColor: 'white',
-                border: '1px solid #e2e8f0',
+                backgroundColor: 'hsl(var(--card))',
+                border: '1px solid hsl(var(--border))',
                 borderRadius: '8px',
                 fontSize: '12px',
-                padding: '8px 12px'
+                padding: '8px 12px',
+                color: 'hsl(var(--card-foreground))',
               }}
               formatter={(value: any, name: string) => [
                 `${value} (${Math.round((value / total) * 100)}%)`,

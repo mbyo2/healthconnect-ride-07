@@ -8,7 +8,7 @@ import { BrowseSpecialties, CTASection, LandingFooter } from "@/components/landi
 
 const SITE_URL = "https://doc0clock.online";
 const SITE_NAME = "Doc' O Clock";
-const DEFAULT_TITLE = "Doc' O Clock — Zambia's #1 Healthcare Platform | Book Doctors, Video Consultations & Pharmacy";
+const DEFAULT_TITLE = "Doc' O Clock — Healthcare Platform for Zambia | Book Doctors, Video Consultations & Pharmacy";
 const DEFAULT_DESCRIPTION =
   "Connect with verified doctors across Zambia. Book appointments, attend video consultations, receive digital prescriptions, and order medications for delivery. Healthcare that works for everyone.";
 
@@ -26,7 +26,7 @@ const Landing = () => {
     "@type": "MedicalOrganization",
     name: SITE_NAME,
     alternateName: ["Doc O Clock", "Doc0Clock", "HealthConnect"],
-    description: "Zambia's leading healthcare platform connecting patients with verified doctors, pharmacies, and hospitals.",
+    description: "Healthcare platform for Zambia connecting patients with verified doctors, pharmacies, and hospitals.",
     url: SITE_URL,
     logo: `${SITE_URL}/logo192.png`,
     image: `${SITE_URL}/og-image.png`,
@@ -101,13 +101,6 @@ const Landing = () => {
       price: "0",
       priceCurrency: "ZMW",
       description: "Free for patients to book appointments and access telemedicine",
-    },
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: "4.9",
-      ratingCount: "50000",
-      bestRating: "5",
-      worstRating: "1",
     },
     featureList: [
       "Doctor booking",
@@ -209,7 +202,7 @@ const Landing = () => {
         <meta name="geo.placename" content="Zambia" />
         <link rel="canonical" href={`${SITE_URL}/`} />
 
-        <meta property="og:title" content="Doc' O Clock — Zambia's #1 Healthcare Platform" />
+        <meta property="og:title" content="Doc' O Clock — Healthcare Platform for Zambia" />
         <meta property="og:description" content="Connect with verified doctors, book appointments, attend video consultations, and order medications — all in one platform." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`${SITE_URL}/`} />
@@ -223,7 +216,7 @@ const Landing = () => {
         <meta property="og:locale:alternate" content="en_US" />
 
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Doc' O Clock — Zambia's #1 Healthcare Platform" />
+        <meta name="twitter:title" content="Doc' O Clock — Healthcare Platform for Zambia" />
         <meta name="twitter:description" content="Connect with verified doctors, book appointments, attend video consultations, and order medications." />
         <meta name="twitter:image" content={`${SITE_URL}/og-image.png`} />
         <meta name="twitter:image:alt" content="Doc' O Clock healthcare platform for Zambia" />

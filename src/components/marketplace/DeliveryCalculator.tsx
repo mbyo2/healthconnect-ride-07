@@ -215,10 +215,14 @@ export const DeliveryCalculator = ({ product, quantity, onDeliverySelect }: Deli
               <p className="text-muted-foreground">
                 • ID verification required for prescription medications<br/>
                 • Secure packaging ensures medication integrity<br/>
-                • Contact {' '}
-                <a href="tel:+260977123456" className="underline font-medium text-primary">
-                  +260 977 123456
-                </a> for delivery tracking
+                {product.pharmacy?.phone ? (
+                  <>• Contact {' '}
+                  <a href={`tel:${product.pharmacy.phone.replace(/[^\d+]/g, '')}`} className="underline font-medium text-primary">
+                    {product.pharmacy.phone}
+                  </a> for delivery tracking</>
+                ) : (
+                  <>• Track this delivery from your orders page</>
+                )}
               </p>
             </div>
           </div>

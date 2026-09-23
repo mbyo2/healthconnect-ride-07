@@ -71,10 +71,15 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children, requireRoles }
       navigate(target, { replace: true, state: { from: location } });
     };
 
-    // Redirect to auth if not authenticated
+    // Redirect to auth if not authenticated — carry the return-to path so
+    // login drops the user back where they were (Spotify/Google pattern).
     if (!user) {
       if (currentPath !== '/auth') {
-        guardedNavigate('/auth', `Not authenticated (from ${currentPath})`);
+        const returnTo = `${location.pathname}${location.search}`;
+        guardedNavigate(
+          `/auth?redirect=${encodeURIComponent(returnTo)}`,
+          `Not authenticated (from ${currentPath})`
+        );
       }
       return;
     }

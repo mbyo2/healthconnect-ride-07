@@ -180,7 +180,7 @@ export const EMRCaseSheets = ({ hospital, departments }: Props) => {
           <CardHeader className="pb-3">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Search by name or UHID..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="pl-9" />
+              <Input type="search" aria-label="Search by name or UHID..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="pl-9" />
             </div>
           </CardHeader>
           <CardContent className="space-y-2 max-h-[500px] overflow-y-auto">
@@ -191,7 +191,7 @@ export const EMRCaseSheets = ({ hospital, departments }: Props) => {
             ) : filteredCases.length === 0 ? (
               <EmptyState icon={FileText} title="No case sheets" description="Consultation records created at this facility appear here." />
             ) : filteredCases.map((c: any) => (
-              <div key={c.id} onClick={() => setActiveCase(c)} className={`p-3 rounded-lg border cursor-pointer transition-all hover:shadow-sm ${activeCase?.id === c.id ? 'border-primary bg-primary/5' : 'border-border'}`}>
+              <div key={c.id} role="button" tabIndex={0} aria-pressed={activeCase?.id === c.id} aria-label={`Open case sheet for ${nameFor(c.patient_id)}`} onClick={() => setActiveCase(c)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActiveCase(c); } }} className={`p-3 rounded-lg border cursor-pointer transition-all hover:shadow-sm ${activeCase?.id === c.id ? 'border-primary bg-primary/5' : 'border-border'}`}>
                 <div className="flex items-center justify-between">
                   <span className="font-medium text-sm text-foreground">{nameFor(c.patient_id)}</span>
                   <Badge variant={c.status === 'completed' ? 'default' : 'secondary'} className="text-[10px] capitalize">{c.status || 'active'}</Badge>

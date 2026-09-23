@@ -9,6 +9,7 @@ import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ALL_CLINICIAN_ROLES } from "@/config/roleConfig";
 
 export const ProviderPortal = () => {
   const navigate = useNavigate();
@@ -42,7 +43,10 @@ export const ProviderPortal = () => {
 
           setIsRedirecting(true);
 
-          if (profile?.role === 'health_personnel') {
+          if (
+            (profile?.role && (ALL_CLINICIAN_ROLES as readonly string[]).includes(profile.role)) ||
+            profile?.role === 'health_personnel'
+          ) {
             const { data: application } = await supabase
               .from('health_personnel_applications')
               .select('status')
@@ -60,7 +64,7 @@ export const ProviderPortal = () => {
             }
           } else {
             toast.error("You don't have provider access");
-            navigate("/login");
+            navigate("/auth");
           }
         }
 

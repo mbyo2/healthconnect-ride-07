@@ -183,7 +183,7 @@ export const DigitalSlideViewer: React.FC<DigitalSlideViewerProps> = ({
         <div className="flex items-center gap-2 p-2 bg-muted/50 border-b flex-wrap">
           {/* Zoom Controls */}
           <div className="flex items-center gap-1 border-r pr-2">
-            <Button size="icon" variant="ghost" onClick={handleZoomOut} title="Zoom Out">
+            <Button size="icon" variant="ghost" onClick={handleZoomOut} title="Zoom Out" aria-label="Zoom out">
               <ZoomOut className="h-4 w-4" />
             </Button>
             <Select value={String(zoom)} onValueChange={v => setZoom(Number(v))}>
@@ -196,7 +196,7 @@ export const DigitalSlideViewer: React.FC<DigitalSlideViewerProps> = ({
                 ))}
               </SelectContent>
             </Select>
-            <Button size="icon" variant="ghost" onClick={handleZoomIn} title="Zoom In">
+            <Button size="icon" variant="ghost" onClick={handleZoomIn} title="Zoom In" aria-label="Zoom in">
               <ZoomIn className="h-4 w-4" />
             </Button>
           </div>
@@ -208,13 +208,14 @@ export const DigitalSlideViewer: React.FC<DigitalSlideViewerProps> = ({
               variant={activeTool === 'pan' ? 'secondary' : 'ghost'}
               onClick={() => setActiveTool('pan')}
               title="Pan"
+              aria-label="Pan tool"
             >
               <Move className="h-4 w-4" />
             </Button>
-            <Button size="icon" variant="ghost" onClick={handleRotate} title="Rotate 90°">
+            <Button size="icon" variant="ghost" onClick={handleRotate} title="Rotate 90°" aria-label="Rotate 90 degrees">
               <RotateCw className="h-4 w-4" />
             </Button>
-            <Button size="icon" variant="ghost" onClick={toggleFullscreen} title="Fullscreen">
+            <Button size="icon" variant="ghost" onClick={toggleFullscreen} title="Fullscreen" aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}>
               {isFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
             </Button>
           </div>
@@ -226,6 +227,7 @@ export const DigitalSlideViewer: React.FC<DigitalSlideViewerProps> = ({
               variant={activeTool === 'marker' ? 'secondary' : 'ghost'}
               onClick={() => setActiveTool('marker')}
               title="Add Marker"
+              aria-label="Add marker tool"
             >
               <Crosshair className="h-4 w-4" />
             </Button>
@@ -234,6 +236,7 @@ export const DigitalSlideViewer: React.FC<DigitalSlideViewerProps> = ({
               variant={activeTool === 'measure' ? 'secondary' : 'ghost'}
               onClick={() => setActiveTool('measure')}
               title="Measure"
+              aria-label="Measure tool"
             >
               <Ruler className="h-4 w-4" />
             </Button>
@@ -242,10 +245,11 @@ export const DigitalSlideViewer: React.FC<DigitalSlideViewerProps> = ({
               variant={activeTool === 'region' ? 'secondary' : 'ghost'}
               onClick={() => setActiveTool('region')}
               title="Draw Region"
+              aria-label="Draw region tool"
             >
               <Pencil className="h-4 w-4" />
             </Button>
-            <Button size="icon" variant="ghost" onClick={clearAnnotations} title="Clear Annotations">
+            <Button size="icon" variant="ghost" onClick={clearAnnotations} title="Clear Annotations" aria-label="Clear annotations">
               <Eraser className="h-4 w-4" />
             </Button>
           </div>
@@ -266,7 +270,7 @@ export const DigitalSlideViewer: React.FC<DigitalSlideViewerProps> = ({
 
           {/* Export */}
           <div className="flex items-center gap-1">
-            <Button size="icon" variant="ghost" onClick={exportAnnotations} title="Export Annotations">
+            <Button size="icon" variant="ghost" onClick={exportAnnotations} title="Export Annotations" aria-label="Export annotations">
               <Download className="h-4 w-4" />
             </Button>
             <Button size="sm" variant="ghost" onClick={handleReset}>Reset</Button>

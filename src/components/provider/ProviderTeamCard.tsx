@@ -103,7 +103,7 @@ export const ProviderTeamCard = ({ specialtyIds = [] }: ProviderTeamCardProps) =
                 </div>
                 <div className="flex items-center gap-2">
                   <Badge variant={m.status === 'active' ? 'default' : 'outline'} className="text-xs capitalize">{m.status}</Badge>
-                  <Button variant="ghost" size="icon" onClick={() => remove.mutate(m.id)}>
+                  <Button variant="ghost" size="icon" aria-label={`Remove ${m.member_email} from team`} onClick={() => remove.mutate(m.id)}>
                     <Trash2 className="h-4 w-4 text-destructive" />
                   </Button>
                 </div>

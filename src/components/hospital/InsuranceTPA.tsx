@@ -45,10 +45,11 @@ export const InsuranceTPA = ({ hospital }: { hospital: any }) => {
         .update({ approved_amount: amt, status: adjudicateStatus, processed_at: new Date().toISOString() })
         .eq('id', adjudicating.id);
       if (err) throw err;
+      const prevStatus = adjudicating.status;
       const updated = { ...adjudicating, approved_amount: amt, status: adjudicateStatus };
       setAdjudicating(null);
       // Reuse the settlement path so the linked bill is updated.
-      await setStatus(updated, adjudicateStatus);
+      await setStatus(updated, adjudicateStatus, prevStatus);
     } catch (e: any) {
       toast.error(e?.message || 'Failed to record adjudication');
     }
@@ -170,7 +171,8 @@ export const InsuranceTPA = ({ hospital }: { hospital: any }) => {
     }
   };
 
-  const setStatus = async (row: any, status: string) => {
+  const SETTLED = ['paid', 'approved'];
+  const setStatus = async (row: any, status: string, prevStatus?: string) => {
     try {
       const patch: any = { status };
       if (status === 'submitted') patch.submitted_at = new Date().toISOString();
@@ -180,22 +182,27 @@ export const InsuranceTPA = ({ hospital }: { hospital: any }) => {
 
       // Claim paid → settle it against the linked hospital bill so the
       // invoice balance stays truthful (settles in full when covered).
-      if ((status === 'paid' || status === 'approved') && row.invoice_id && Number(row.approved_amount || 0) > 0) {
+      // Idempotency: a claim settles its bill exactly once — moving between
+      // settled states (approved → paid) must not decrement twice.
+      const wasSettled = SETTLED.includes(prevStatus ?? row.status);
+      if ((status === 'paid' || status === 'approved') && !wasSettled && row.invoice_id && Number(row.approved_amount || 0) > 0) {
         try {
           const { data: bill } = await (supabase.from('hospital_billing' as any) as any)
-            .select('id, balance, total_amount')
+            .select('id, balance, total_amount, paid_amount')
             .eq('id', row.invoice_id)
             .maybeSingle();
           if (bill) {
-            const nextBalance = Math.max(Number(bill.balance ?? bill.total_amount ?? 0) - Number(row.approved_amount), 0);
+            const approved = Number(row.approved_amount);
+            const nextBalance = Math.max(Number(bill.balance ?? bill.total_amount ?? 0) - approved, 0);
             await (supabase.from('hospital_billing' as any) as any)
               .update({
                 balance: nextBalance,
-                paid_amount: Number(row.approved_amount),
+                // Accumulate — never clobber cash/card payments already on the bill.
+                paid_amount: Number(bill.paid_amount || 0) + approved,
                 payment_status: nextBalance <= 0 ? 'paid' : 'partial',
               })
               .eq('id', row.invoice_id);
-            toast.success(`Claim ${status} — K${Number(row.approved_amount).toLocaleString()} applied to the invoice`);
+            toast.success(`Claim ${status} — K${approved.toLocaleString()} applied to the invoice`);
             refresh();
             return;
           }
@@ -361,10 +368,12 @@ export const InsuranceTPA = ({ hospital }: { hospital: any }) => {
               {adjudicating?.invoice_id ? ' · linked invoice will be settled automatically' : ''}
             </p>
             <div>
-              <Label>Approved / Paid Amount (K) *</Label>
+              <Label htmlFor="adjudicated-amount">Approved / Paid Amount (K) *</Label>
               <Input
+                id="adjudicated-amount"
                 type="number"
                 min={0}
+                inputMode="decimal"
                 value={approvedAmount}
                 onChange={(e) => setApprovedAmount(e.target.value)}
                 placeholder="0.00"

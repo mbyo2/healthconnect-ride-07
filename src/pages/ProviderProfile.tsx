@@ -14,6 +14,7 @@ import {
   Languages, Stethoscope, CheckCircle2,
 } from "lucide-react";
 import { LoadingScreen } from "@/components/LoadingScreen";
+import { providerDisplayName } from "@/utils/providerDisplay";
 import { ProviderReviews } from "@/components/provider/ProviderReviews";
 import { ProviderEducation } from "@/components/provider/ProviderEducation";
 
@@ -57,6 +58,7 @@ const ProviderProfile = () => {
           typical_wait_time,
           appointment_types,
           availability_schedule,
+          role,
           provider_locations (
             latitude,
             longitude
@@ -122,7 +124,7 @@ const ProviderProfile = () => {
                 )}
               </Avatar>
               <h1 className="text-xl font-bold">
-                Dr. {provider.first_name} {provider.last_name}
+                {providerDisplayName({ first_name: provider.first_name, last_name: provider.last_name, role: (provider as any)?.role })}
               </h1>
               <p className="text-muted-foreground text-sm">{provider.specialty || "General Practice"}</p>
 
@@ -226,7 +228,7 @@ const ProviderProfile = () => {
                 {provider.bio && (
                   <Card className="p-6">
                     <h2 className="text-lg font-bold mb-3">
-                      About Dr. {provider.first_name} {provider.last_name}
+                      About {providerDisplayName({ first_name: provider.first_name, last_name: provider.last_name, role: (provider as any)?.role })}
                     </h2>
                     <p className="text-muted-foreground whitespace-pre-line text-sm leading-relaxed">
                       {provider.bio}

@@ -124,7 +124,7 @@ const SuperAdminDashboard = () => {
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="border border-canvas-silk rounded-xl bg-white">
+            <DropdownMenuContent align="end" className="border border-canvas-silk dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900">
               <DropdownMenuLabel className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Actions</DropdownMenuLabel>
               <DropdownMenuItem onClick={() => toggleAdminLevel(admin.id, admin.admin_level)} className="text-xs font-bold">
                 {admin.admin_level === "admin" ? "Promote to Superadmin" : "Change to Admin"}

@@ -15,7 +15,7 @@ export const BrowseSpecialties = () => {
           <h2 className="font-display text-3xl sm:text-5xl font-medium text-midnight tracking-tight">
             Browse medical specialties across Zambia
           </h2>
-          <p className="text-base text-graphite-500 max-w-xl mx-auto mt-4 tracking-wide">
+          <p className="text-base text-graphite-500 dark:text-slate-400 max-w-xl mx-auto mt-4 tracking-wide">
             Connect with certified doctors, dentists, and surgeons in Lusaka, Copperbelt, and nationwide.
           </p>
         </div>
@@ -30,7 +30,7 @@ export const BrowseSpecialties = () => {
             <button
               key={spec}
               onClick={() => navigate(`/search?specialty=${encodeURIComponent(spec)}`)}
-              className="px-4 py-2.5 rounded-pill bg-white border border-canvas-silk text-sm font-medium text-graphite-600 hover:border-primary-300 hover:text-primary-600 hover:bg-primary-50 transition-all"
+              className="px-4 py-2.5 rounded-pill bg-white dark:bg-slate-900 border border-canvas-silk text-sm font-medium text-graphite-600 dark:text-slate-300 hover:border-primary-300 hover:text-primary-600 hover:bg-primary-50 transition-all"
             >
               {spec}
             </button>
@@ -53,7 +53,7 @@ export const BrowseSpecialties = () => {
 export const CTASection = () => {
   const navigate = useNavigate();
   return (
-    <section className="vf-section bg-white border-t border-canvas-silk">
+    <section className="vf-section bg-white dark:bg-slate-900 border-t border-canvas-silk">
       <div className="mx-auto max-w-content px-4 sm:px-6 lg:px-8">
         <div className="relative overflow-hidden p-8 sm:p-14 lg:p-16 rounded-card bg-midnight">
           <div className="absolute top-0 right-0 w-80 h-80 bg-primary-500/20 blur-[100px] rounded-full pointer-events-none" />
@@ -71,7 +71,7 @@ export const CTASection = () => {
                 Book appointments with verified specialists, consult via encrypted video, and receive prescription medications delivered straight to your home.
               </p>
               <div className="flex flex-wrap gap-4 justify-center lg:justify-start pt-1">
-                {["Free to book", "NHIMA Accepted", "500+ Doctors", "256-Bit Encrypted"].map((b) => (
+                {["Free to book", "NHIMA Accepted", "Verified Doctors", "256-Bit Encrypted"].map((b) => (
                   <span key={b} className="flex items-center gap-1.5 text-xs text-white/80 font-medium">
                     <CheckCircle2 className="h-4 w-4 text-primary-300" />{b}
                   </span>
@@ -165,15 +165,15 @@ export const LandingFooter = () => {
               <AppLogo size="sm" linkTo="/" />
               <span className="font-display text-lg text-midnight">Doc&apos; O Clock</span>
             </div>
-            <p className="text-sm text-graphite-500 leading-relaxed tracking-wide max-w-sm">
+            <p className="text-sm text-graphite-500 dark:text-slate-400 leading-relaxed tracking-wide max-w-sm">
               Zambia&apos;s premier digital healthcare and telemedicine platform connecting patients with certified doctors, pharmacies, and hospitals.
             </p>
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-pill bg-white border border-canvas-silk w-fit">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-pill bg-white dark:bg-slate-900 border border-canvas-silk w-fit">
               <span className="w-2 h-2 rounded-full bg-success-500 animate-soft-pulse" />
               <span className="text-xs font-medium text-graphite-700">24/7 Zambian Healthcare Network</span>
             </div>
             <div className="space-y-2 pt-1 max-w-sm">
-              <span className="text-xs font-medium text-graphite-600 block">Need care right now?</span>
+              <span className="text-xs font-medium text-graphite-600 dark:text-slate-300 block">Need care right now?</span>
               <div className="flex items-center gap-2">
                 <a
                   href={EMERGENCY_TEL}
@@ -183,7 +183,7 @@ export const LandingFooter = () => {
                 </a>
                 <Link
                   to="/contact"
-                  className="px-4 py-2.5 rounded-pill border border-canvas-silk bg-white font-medium text-xs text-midnight shrink-0 transition-all hover:border-primary-500"
+                  className="px-4 py-2.5 rounded-pill border border-canvas-silk dark:border-slate-700 bg-white dark:bg-slate-900 font-medium text-xs text-midnight shrink-0 transition-all hover:border-primary-500"
                 >
                   Contact Support
                 </Link>
@@ -199,7 +199,7 @@ export const LandingFooter = () => {
               <ul className="space-y-2.5">
                 {section.links.map((link) => (
                   <li key={link.label}>
-                    <Link to={link.href} className="text-xs text-graphite-500 hover:text-primary-500 font-medium transition-colors block">
+                    <Link to={link.href} className="text-xs text-graphite-500 dark:text-slate-400 hover:text-primary-500 font-medium transition-colors block">
                       {link.label}
                     </Link>
                   </li>
@@ -216,9 +216,9 @@ export const LandingFooter = () => {
               <ShieldCheck className="h-4 w-4" />
               NHIMA & Ministry of Health Aligned
             </span>
-            <span className="flex items-center gap-1.5 text-graphite-500">
+            <span className="flex items-center gap-1.5 text-graphite-500 dark:text-slate-400">
               <Lock className="h-3.5 w-3.5 text-primary-500" />
-              256-Bit HIPAA-Grade Encryption
+              256-Bit Encrypted
             </span>
           </div>
         </div>

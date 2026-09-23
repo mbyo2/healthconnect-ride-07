@@ -6,6 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useHealthData } from '@/hooks/useHealthData';
+import { providerDisplayName } from '@/utils/providerDisplay';
 
 const AdvancedDashboard = () => {
     const { profile, user } = useAuth();
@@ -43,7 +44,8 @@ const AdvancedDashboard = () => {
                         id,
                         first_name,
                         last_name,
-                        specialization
+                        specialization,
+                        role
                     )
                 `)
                 .eq('patient_id', user.id)
@@ -194,7 +196,7 @@ const AdvancedDashboard = () => {
 
     const upcomingAppointments = appointments.map(apt => ({
         id: apt.id,
-        doctor: apt.provider ? `Dr. ${apt.provider.first_name} ${apt.provider.last_name}` : 'Unknown Provider',
+        doctor: apt.provider ? providerDisplayName({ first_name: apt.provider.first_name, last_name: apt.provider.last_name, role: (apt.provider as any)?.role }) : 'Unknown Provider',
         specialty: apt.provider?.specialization || 'General',
         date: new Date(apt.appointment_date).toLocaleDateString(),
         time: apt.appointment_time || 'TBD',
