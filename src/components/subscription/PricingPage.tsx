@@ -252,7 +252,7 @@ const PharmacySection = () => {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="text-center p-4 rounded-lg bg-background border">
               <DollarSign className="h-6 w-6 text-primary mx-auto mb-2" />
-              <p className="font-semibold text-sm">K200/mo</p>
+              <p className="font-semibold text-sm">K1,100/mo</p>
               <p className="text-xs text-muted-foreground">Marketplace listing fee</p>
             </div>
             <div className="text-center p-4 rounded-lg bg-background border">
@@ -262,8 +262,8 @@ const PharmacySection = () => {
             </div>
             <div className="text-center p-4 rounded-lg bg-background border">
               <Clock className="h-6 w-6 text-primary mx-auto mb-2" />
-              <p className="font-semibold text-sm">K2,000/yr</p>
-              <p className="text-xs text-muted-foreground">Save with annual billing</p>
+              <p className="font-semibold text-sm">K13,200/yr</p>
+              <p className="text-xs text-muted-foreground">Annual billing (12 × K1,100)</p>
             </div>
           </div>
 
@@ -326,7 +326,8 @@ const InstitutionPlanCard = ({ plan, onSubscribe, subscribing }: {
           </div>
           {annual > 0 && (
             <p className="text-xs text-muted-foreground mt-1">
-              or {formatKwacha(annual)}/year — save {formatKwacha(Math.max(0, monthly * 12 - annual))}
+              or {formatKwacha(annual)}/year
+              {monthly * 12 - annual > 0 && <> — save {formatKwacha(monthly * 12 - annual)}</>}
             </p>
           )}
           <Badge variant="secondary" className="mt-2 text-xs gap-1">
@@ -426,7 +427,7 @@ const InstitutionSection = () => {
             <div className="text-center p-4 rounded-lg bg-background border">
               <Clock className="h-6 w-6 text-primary mx-auto mb-2" />
               <p className="font-semibold text-sm">Annual Option</p>
-              <p className="text-xs text-muted-foreground">Pay yearly and save 2 months</p>
+              <p className="text-xs text-muted-foreground">One simple payment per year</p>
             </div>
           </div>
         </CardContent>
