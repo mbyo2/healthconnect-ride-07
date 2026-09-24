@@ -111,11 +111,11 @@ const AppointmentRemindersPage = () => {
             </div>
             <div>
               <h1 className="text-xl font-extrabold tracking-tight flex items-center gap-2">
-                Automated Appointment Reminders & Calendar Sync
+                Appointment Reminders & Calendar Sync
                 <span className="w-2 h-2 rounded-full bg-success-500 animate-ping" />
               </h1>
               <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
-                Configure 24-hour and 1-hour pre-visit alerts via Push, Email, SMS, and iCal / Google Calendar sync
+                A confirmation lands in your inbox the moment you book; timed reminders follow the channels you enable below. Sync visits to iCal / Google Calendar.
               </p>
             </div>
           </div>
@@ -125,7 +125,7 @@ const AppointmentRemindersPage = () => {
           {/* Reminder Channel Preferences */}
           <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
             <h2 className="font-extrabold text-sm flex items-center gap-2 border-b border-canvas-silk pb-3">
-              <Bell className="h-4 w-4 text-primary-500" /> Automated Reminder Dispatch Channels
+              <Bell className="h-4 w-4 text-primary-500" /> Reminder Channels
             </h2>
 
             <div className="flex items-center justify-between p-3.5 rounded-xl border border-canvas-silk bg-canvas dark:bg-slate-950">
@@ -147,11 +147,14 @@ const AppointmentRemindersPage = () => {
                   <MessageSquare className="h-4 w-4" />
                 </div>
                 <div>
-                  <p className="font-extrabold text-xs">SMS Text Reminders</p>
-                  <p className="text-[11px] text-graphite-500 dark:text-slate-400">Cellular SMS text dispatched to mobile phone</p>
+                  <p className="font-extrabold text-xs flex items-center gap-2">
+                    SMS Text Reminders
+                    <span className="px-1.5 py-0.5 rounded bg-warning-500/15 text-warning-600 text-[10px] font-bold">Coming soon</span>
+                  </p>
+                  <p className="text-[11px] text-graphite-500 dark:text-slate-400">No SMS gateway is connected yet — enable it to be first in line when live delivery lands</p>
                 </div>
               </div>
-              <Switch checked={smsReminders} onCheckedChange={setSmsReminders} aria-label="SMS text reminders" />
+              <Switch checked={smsReminders} onCheckedChange={setSmsReminders} aria-label="SMS text reminders (coming soon — no live gateway yet)" />
             </div>
 
             <div className="flex items-center justify-between p-3.5 rounded-xl border border-canvas-silk bg-canvas dark:bg-slate-950">
@@ -172,7 +175,7 @@ const AppointmentRemindersPage = () => {
               disabled={saving}
               className="w-full py-3 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs transition-all"
             >
-              {saving ? "Saving Dispatch Settings..." : "Save Dispatch Preferences"}
+              {saving ? "Saving..." : "Save Reminder Preferences"}
             </button>
           </div>
 

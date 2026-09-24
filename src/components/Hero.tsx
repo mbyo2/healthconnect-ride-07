@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Shield, CheckCircle, Star, Clock, Heart, Users, Stethoscope, Building2, Search } from 'lucide-react';
+import { Shield, CheckCircle, Clock, Heart, Users, Stethoscope, Building2, Search } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { usePlatformStats, formatStat } from '@/hooks/usePlatformStats';
 
@@ -30,7 +30,6 @@ export const Hero = () => {
           {[
             { icon: Shield, label: "Verified Providers" },
             { icon: CheckCircle, label: "Insurance Support" },
-            { icon: Star, label: `${stats.rating}/5 Rating` },
             { icon: Clock, label: "24/7 Emergency" },
           ].map(({ icon: Icon, label }) => (
             <div key={label} className="flex items-center gap-1.5">
@@ -48,7 +47,7 @@ export const Hero = () => {
             </h1>
 
             <p className="text-base sm:text-lg text-graphite-500 mb-8 leading-relaxed tracking-wide max-w-xl mx-auto lg:mx-0 opacity-0 animate-hero-rise" style={{ animationDelay: "0.2s" }}>
-              Find trusted doctors, book instantly, consult via video — all from Zambia's most modern healthcare platform.
+              Find trusted doctors, book instantly, consult via video — healthcare built for Zambia.
             </p>
 
             {/* Search */}
@@ -56,7 +55,8 @@ export const Hero = () => {
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-graphite-400" />
                 <Input
-                  type="text"
+                  type="search"
+                  aria-label="Search doctors and specialties"
                   placeholder="Search doctors, specialties..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -111,7 +111,7 @@ export const Hero = () => {
 
             {/* Mobile diverse clinicians */}
             <div className="md:hidden mb-6 p-4 bg-card border border-border rounded-xl">
-              <p className="text-xs font-medium text-graphite-600 mb-3">Trusted by diverse African clinicians</p>
+              <p className="text-xs font-medium text-graphite-600 mb-3">Care across Zambia</p>
               <div className="flex items-center justify-center -space-x-3">
                 <img
                   src="https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=80&auto=format&fit=crop&q=85"
@@ -133,8 +133,8 @@ export const Hero = () => {
                   alt="African healthcare professional with light skin"
                   className="w-12 h-12 rounded-full border-3 border-white object-cover"
                 />
-                <div className="w-12 h-12 rounded-full border-3 border-white bg-primary-500 flex items-center justify-center text-white text-sm font-bold">
-                  500+
+                <div className="w-12 h-12 rounded-full border-3 border-white bg-primary-500 flex items-center justify-center text-white text-[10px] font-bold px-1 text-center leading-tight">
+                  {formatStat(stats.doctors)}
                 </div>
               </div>
             </div>
@@ -150,7 +150,7 @@ export const Hero = () => {
 
               {/* Diverse African Clinicians */}
               <div className="mb-6">
-                <p className="text-xs font-medium text-graphite-500 mb-3">Trusted by African clinicians</p>
+                <p className="text-xs font-medium text-graphite-500 mb-3">For patients and providers</p>
                 <div className="flex items-center -space-x-3 mb-2">
                   <img
                     src="https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=80&auto=format&fit=crop&q=85"
@@ -172,11 +172,11 @@ export const Hero = () => {
                     alt="African healthcare professional with light skin"
                     className="w-10 h-10 rounded-full border-2 border-white object-cover"
                   />
-                  <div className="w-10 h-10 rounded-full border-2 border-white bg-primary-500 flex items-center justify-center text-white text-xs font-medium">
-                    500+
+                  <div className="w-10 h-10 rounded-full border-2 border-white bg-primary-500 flex items-center justify-center text-white text-[9px] font-medium px-0.5 text-center leading-tight">
+                    {formatStat(stats.doctors)}
                   </div>
                 </div>
-                <p className="text-xs text-graphite-500">Diverse healthcare professionals across Africa</p>
+                <p className="text-xs text-graphite-500">Providers across Zambia</p>
               </div>
 
               <div className="space-y-2.5">

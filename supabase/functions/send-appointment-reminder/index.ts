@@ -48,7 +48,7 @@ serve(async (req) => {
 
     const { data: appointment, error: appointmentError } = await supabase
       .from("appointments")
-      .select(`id, date, time, type, patient_id, provider_id, profiles:provider_id(first_name, last_name)`)
+      .select(`id, date, time, type, patient_id, provider_id, profiles:provider_id(first_name, last_name, role)`)
       .eq("id", appointment_id)
       .maybeSingle();
 
@@ -67,8 +67,11 @@ serve(async (req) => {
       );
     }
 
-    const profiles = appointment.profiles as { first_name: string; last_name: string } | null;
-    const providerName = profiles ? `Dr. ${profiles.first_name} ${profiles.last_name}` : "Your Provider";
+    const profiles = appointment.profiles as { first_name: string; last_name: string; role?: string } | null;
+    const DOCTORAL = new Set(['doctor', 'specialist', 'dentist', 'medical_licentiate', 'radiologist', 'pathologist', 'health_personnel']);
+    const providerName = profiles
+      ? `${profiles.role && DOCTORAL.has(String(profiles.role).toLowerCase()) ? 'Dr. ' : ''}${profiles.first_name} ${profiles.last_name}`.trim()
+      : "Your Provider";
     const appointmentDate = new Date(appointment.date).toLocaleDateString();
 
     const { data: notification } = await supabase

@@ -176,6 +176,16 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen }: Booki
         }
       }
 
+      // Dispatch the confirmation reminder (in-app notification). Non-blocking
+      // and silent on failure — the booking itself already succeeded.
+      if (booked?.id) {
+        supabase.functions.invoke('send-appointment-reminder', {
+          body: { appointment_id: booked.id },
+        }).catch((reminderErr) => {
+          console.error('Reminder dispatch failed (non-fatal):', reminderErr);
+        });
+      }
+
       toast.success("Appointment booked successfully!");
       onClose();
       if (booked?.id) {

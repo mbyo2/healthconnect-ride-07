@@ -134,7 +134,10 @@ serve(async (req) => {
     // Simulate SMS API call (replace with actual provider)
     const smsResponse = await simulateZambianSMS(formattedPhone, message, smsConfig);
 
-    // Log SMS attempt in database with sender info
+    // Log SMS attempt in database with sender info.
+    // NOTE: no live SMS provider is connected yet, so successful calls are
+    // recorded as 'simulated' — never 'sent' — until a real gateway
+    // (Africa's Talking / MTN / Vodacom / Zamtel) is wired below.
     const { error: logError } = await supabaseClient
       .from('sms_logs')
       .insert({
@@ -143,7 +146,7 @@ serve(async (req) => {
         type: type,
         patient_id: patientId,
         sender_id: user.id, // Track who sent the SMS
-        status: smsResponse.success ? 'sent' : 'failed',
+        status: smsResponse.success ? 'simulated' : 'failed',
         provider: smsConfig.provider,
         response_data: smsResponse,
         created_at: new Date().toISOString()
@@ -162,9 +165,10 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({
         success: true,
+        simulated: true,
         messageId: smsResponse.messageId,
         phone: formattedPhone,
-        message: 'SMS sent successfully'
+        message: 'SMS simulated — connect a live provider for real delivery'
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

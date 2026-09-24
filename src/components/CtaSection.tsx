@@ -31,7 +31,7 @@ export const CtaSection = () => {
             {[
               { icon: CheckCircle, label: "Free to start" },
               { icon: CreditCard, label: "Flexible payments" },
-              { icon: MapPin, label: "Growing worldwide" },
+              { icon: MapPin, label: "Growing across Zambia" },
               { icon: Phone, label: "24/7 Emergency" },
             ].map(({ icon: Icon, label }) => (
               <div key={label} className="flex items-center gap-1.5 opacity-85">
@@ -62,7 +62,7 @@ export const CtaSection = () => {
               { value: formatStat(stats.doctors), label: "Doctors" },
               { value: formatStat(stats.hospitals), label: "Hospitals" },
               { value: formatStat(stats.pharmacies), label: "Pharmacies" },
-              { value: `${stats.rating}★`, label: "Rating" },
+              { value: formatStat(stats.appointments), label: "Consultations" },
             ].map((stat) => (
               <div key={stat.label} className="text-center">
                 <div className="text-lg md:text-2xl font-bold">{stat.value}</div>

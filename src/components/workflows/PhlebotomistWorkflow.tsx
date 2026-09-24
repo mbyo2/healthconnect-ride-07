@@ -35,12 +35,13 @@ export const PhlebotomistWorkflow = () => {
   const [form, setForm] = useState<{ patient_name: string; sample_type: string; collection_type: 'in_lab' | 'home_visit'; address: string; scheduled_time: string }>({ patient_name: '', sample_type: 'blood', collection_type: 'in_lab', address: '', scheduled_time: '' });
 
   const fetchSamples = useCallback(async () => {
-    if (!user) return;
+    if (!user || !institutionId) return;
     setLoading(true);
     try {
       const { data, error } = await supabase
         .from('sample_collections')
         .select('*')
+        .eq('institution_id', institutionId)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -59,7 +60,7 @@ export const PhlebotomistWorkflow = () => {
       console.error('Error fetching samples:', err);
     }
     setLoading(false);
-  }, [user]);
+  }, [user, institutionId]);
 
   useEffect(() => { fetchSamples(); }, [fetchSamples]);
 

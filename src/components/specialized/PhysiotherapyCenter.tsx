@@ -38,7 +38,9 @@ interface ExercisePlan {
   equipment: string;
 }
 
-const DEFAULT_ROM_JOINTS: JointROM[] = [
+// Sample joint readings for demos — never shown as real records.
+// The worksheet starts empty; samples load only via the opt-in button.
+const SAMPLE_ROM_JOINTS: JointROM[] = [
   { id: "1", joint: "Shoulder", movement: "Flexion", leftDegrees: 140, rightDegrees: 175, normalRange: "0° - 180°", notes: "Mild impingement left" },
   { id: "2", joint: "Shoulder", movement: "Abduction", leftDegrees: 120, rightDegrees: 170, normalRange: "0° - 180°", notes: "Subacromial pain" },
   { id: "3", joint: "Knee", movement: "Flexion", leftDegrees: 130, rightDegrees: 135, normalRange: "0° - 140°", notes: "Good progress" },
@@ -51,8 +53,9 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
   const [activeTab, setActiveTab] = useState<"rom" | "pain" | "exercises" | "sessions">("rom");
   const [selectedPatientId, setSelectedPatientId] = useState("");
 
-  // ROM state
-  const [romList, setRomList] = useState<JointROM[]>(DEFAULT_ROM_JOINTS);
+  // ROM state — session worksheet only (no backend table exists yet)
+  const [romList, setRomList] = useState<JointROM[]>([]);
+  const [romSamplesLoaded, setRomSamplesLoaded] = useState(false);
   const [showAddROM, setShowAddROM] = useState(false);
   const [newJoint, setNewJoint] = useState({
     joint: "Shoulder",
@@ -77,12 +80,9 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
     { id: "ex-4", name: "Glute Bridges with Core Brace", targetArea: "Pelvis / Posterior Chain", sets: 3, reps: "12 reps (3s hold)", frequency: "Daily", equipment: "Bodyweight" },
   ]);
 
-  // Rehabilitation Sessions
+  // Rehabilitation Sessions — session worksheet only (no backend table exists yet)
   const [sessions, setSessions] = useState([
-    { sessionNo: 1, date: "2026-08-15", painPre: 8, painPost: 5, modalities: "TENS (20m), Moist Heat, Manual Spine Mobilization Grade II", therapist: "Lead PT" },
-    { sessionNo: 2, date: "2026-08-22", painPre: 6, painPost: 4, modalities: "Ultrasound 1.5W/cm², Myofascial Release, Core Activation", therapist: "Lead PT" },
-    { sessionNo: 3, date: "2026-08-29", painPre: 5, painPost: 2, modalities: "Dry Needling glutes, Resistance Band Rehab, Cryotherapy", therapist: "Lead PT" },
-  ]);
+  ] as Array<{ sessionNo: number; date: string; painPre: number; painPost: number; modalities: string; therapist: string }>);
 
   const { data: patients = [] } = useQuery({
     queryKey: ["pt-patients"],
@@ -112,7 +112,7 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
         notes: newJoint.notes,
       },
     ]);
-    toast.success("Joint Range of Motion recorded");
+    toast.success("Joint reading added to this session's worksheet (not saved to chart)");
     setShowAddROM(false);
   };
 
@@ -270,8 +270,27 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
             </Dialog>
           </div>
 
+          {romList.length === 0 && (
+            <div className="p-8 rounded-2xl border border-dashed text-center">
+              <p className="font-bold text-sm">No measurements this session</p>
+              <p className="text-xs text-muted-foreground mt-1 max-w-md mx-auto">
+                Goniometry readings entered here stay in this session&apos;s worksheet until a
+                clinical-record integration lands — they are not filed to any chart.
+              </p>
+              {!romSamplesLoaded && (
+                <button
+                  onClick={() => { setRomList(SAMPLE_ROM_JOINTS); setRomSamplesLoaded(true); }}
+                  className="mt-3 px-4 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 text-xs font-extrabold text-primary-500 hover:bg-primary-50 dark:hover:bg-slate-800 transition-colors"
+                >
+                  Load sample data for demo
+                </button>
+              )}
+            </div>
+          )}
+
+          {romList.length > 0 && (
           <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
-            <table className="w-full text-left border-collapse text-xs">
+            <table className="w-full min-w-[640px] text-left border-collapse text-xs">
               <thead>
                 <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
                   <th className="py-3 px-4">Joint &amp; Movement</th>
@@ -317,6 +336,7 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
               </tbody>
             </table>
           </div>
+          )}
         </div>
       )}
 
@@ -390,49 +410,85 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
               </div>
 
               <button
-                onClick={() => toast.success("Pain Assessment saved to clinical chart")}
+                onClick={() => toast.success(`VAS ${painScore}/10 noted in this session's worksheet (not filed to chart)`)}
                 className="w-full py-2.5 rounded-xl bg-primary-500 text-white font-extrabold shadow-xs hover:bg-primary-600"
               >
                 Log Pain Assessment
               </button>
             </div>
 
-            {/* Pain Trend Summary */}
+            {/* Pain Trend Summary — derived from this session's logged entries */}
             <div className="p-6 rounded-3xl bg-slate-900 text-white shadow-md flex flex-col justify-between space-y-4">
               <div>
                 <span className="px-3 py-1 rounded-full text-[10px] font-black bg-emerald-400 text-slate-950 uppercase">
-                  Rehabilitation Trajectory
+                  Session Worksheet
                 </span>
                 <div className="mt-4">
-                  <div className="text-3xl font-black text-emerald-400">
-                    -75% Pain Reduction
-                  </div>
-                  <p className="text-xs text-slate-300 mt-1">
-                    Baseline at initial intake was VAS 8/10. Current baseline is VAS 2/10.
-                  </p>
+                  {sessions.length === 0 ? (
+                    <>
+                      <div className="text-3xl font-black text-slate-300">No sessions yet</div>
+                      <p className="text-xs text-slate-300 mt-1">
+                        Log sessions below to track pre/post pain across this worksheet.
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <div className="text-3xl font-black text-emerald-400">
+                        {sessions.length} session{sessions.length === 1 ? "" : "s"} logged
+                      </div>
+                      <p className="text-xs text-slate-300 mt-1">
+                        Latest: VAS {sessions[sessions.length - 1].painPre}/10 →{" "}
+                        {sessions[sessions.length - 1].painPost}/10 post-treatment.
+                      </p>
+                    </>
+                  )}
                 </div>
               </div>
 
               <div className="p-4 rounded-2xl bg-white/10 border border-white/10 space-y-2 text-xs">
                 <div className="flex justify-between">
-                  <span className="text-slate-300">Functional Capacity:</span>
-                  <span className="font-bold text-white">Able to sit for 90+ mins</span>
+                  <span className="text-slate-300">Current VAS setting:</span>
+                  <span className="font-bold text-white">{painScore}/10</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-300">Target Discharge Score:</span>
-                  <span className="font-bold text-emerald-300">VAS ≤ 1/10</span>
+                  <span className="text-slate-300">Location:</span>
+                  <span className="font-bold text-emerald-300">{painLocation || "—"}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-300">Treatment Phase:</span>
-                  <span className="font-bold text-blue-300">Phase 3: Strengthening &amp; Return to Sport</span>
+                  <span className="text-slate-300">Record status:</span>
+                  <span className="font-bold text-blue-300">Session worksheet only</span>
                 </div>
               </div>
 
               <button
-                onClick={() => toast.success("Exported Physical Therapy Progress Report (PDF)")}
+                onClick={() => {
+                  const lines = [
+                    "PHYSIOTHERAPY SESSION WORKSHEET (not a clinical record)",
+                    `Date: ${new Date().toLocaleDateString()}`,
+                    `Current VAS: ${painScore}/10 at ${painLocation || "unspecified site"}`,
+                    "",
+                    ...sessions.map(
+                      (s) => `Session #${s.sessionNo} (${s.date}): VAS ${s.painPre} → ${s.painPost} — ${s.modalities}`
+                    ),
+                  ];
+                  const printWin = window.open("", "_blank");
+                  if (!printWin) {
+                    toast.error("Popup blocked — allow popups to print the worksheet");
+                    return;
+                  }
+                  printWin.document.write(
+                    `<html><body style="font-family: monospace; font-size: 12px; max-width: 560px; margin: auto; padding: 20px;">` +
+                    `<h2>Physiotherapy Session Worksheet</h2>` +
+                    `<p>Printed ${new Date().toLocaleString()} — worksheet copy, not a filed clinical record.</p><hr/>` +
+                    `<pre>${lines.join("\n")}</pre>` +
+                    `<script>window.print();</script></body></html>`
+                  );
+                  printWin.document.close();
+                  toast.success("Worksheet sent to printer");
+                }}
                 className="w-full py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-extrabold text-xs border border-white/20"
               >
-                Export Progress Report (PDF)
+                Print Session Worksheet
               </button>
             </div>
           </div>
@@ -452,10 +508,21 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
               </p>
             </div>
             <button
-              onClick={() => toast.success("Exercise Prescription sent to Patient Mobile App & WhatsApp")}
+              onClick={async () => {
+                const text = exercises
+                  .map((ex) => `• ${ex.name} (${ex.targetArea}): ${ex.sets} sets × ${ex.reps}, ${ex.frequency} — ${ex.equipment}`)
+                  .join("\n");
+                const summary = `Exercise plan:\n${text}`;
+                try {
+                  await navigator.clipboard.writeText(summary);
+                  toast.success("Exercise plan copied — paste it anywhere to share");
+                } catch {
+                  toast.error("Copy failed — your browser blocked clipboard access");
+                }
+              }}
               className="px-4 py-2 rounded-xl bg-primary-500 text-white font-extrabold text-xs shadow-xs"
             >
-              Share with Patient App
+              Copy Plan to Share
             </button>
           </div>
 
@@ -520,7 +587,7 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
                   therapist: "Lead PT",
                 };
                 setSessions([...sessions, nextSess]);
-                toast.success(`Session #${nextSess.sessionNo} logged!`);
+                toast.success(`Session #${nextSess.sessionNo} added to this worksheet (not filed to chart)`);
               }}
               className="px-4 py-2 rounded-xl bg-primary-500 text-white font-extrabold text-xs shadow-xs flex items-center gap-1.5"
             >
@@ -528,8 +595,8 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
             </button>
           </div>
 
-          <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
-            <table className="w-full text-left border-collapse text-xs">
+              <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
+            <table className="w-full min-w-[640px] text-left border-collapse text-xs">
               <thead>
                 <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
                   <th className="py-3 px-4">Session #</th>
@@ -541,6 +608,14 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
                 </tr>
               </thead>
               <tbody className="divide-y divide-canvas-silk dark:divide-slate-800">
+                {sessions.length === 0 && (
+                  <tr>
+                    <td colSpan={6} className="py-10 text-center">
+                      <p className="font-bold text-sm">No sessions logged this worksheet</p>
+                      <p className="text-xs text-muted-foreground mt-1">Log today&apos;s session to start tracking pre/post pain here.</p>
+                    </td>
+                  </tr>
+                )}
                 {sessions.map((s) => (
                   <tr key={s.sessionNo} className="hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-800/60">
                     <td className="py-3 px-4 font-black text-primary-500">Session #{s.sessionNo}</td>

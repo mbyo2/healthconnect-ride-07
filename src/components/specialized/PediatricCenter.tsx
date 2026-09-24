@@ -66,6 +66,10 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
   const [headCircumferenceCm, setHeadCircumferenceCm] = useState<number>(44);
   const [growthNotes, setGrowthNotes] = useState("");
 
+  // Session worksheet state (nothing here is filed to any registry yet)
+  const [recordedDoses, setRecordedDoses] = useState<string[]>([]);
+  const [achievedMilestones, setAchievedMilestones] = useState<number[]>([]);
+
   // Dosage Calculator state
   const [calcDrug, setCalcDrug] = useState("Amoxicillin (50mg/kg/day in 2 divided doses)");
   const [calcWeight, setCalcWeight] = useState<number>(10);
@@ -96,13 +100,21 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
     return Math.max(diff, 1);
   };
 
-  // Sample Growth History
+  // Growth entries live in this session's worksheet only (no growth-chart
+  // table exists yet) — the chart starts empty with an opt-in demo.
   const [growthHistory, setGrowthHistory] = useState([
-    { date: "2026-03-15", ageMonths: 2, weight: 5.2, height: 58, head: 38.5, percentile: "50th" },
-    { date: "2026-05-10", ageMonths: 4, weight: 6.8, height: 64, head: 41.0, percentile: "60th" },
-    { date: "2026-07-20", ageMonths: 6, weight: 7.9, height: 68, head: 43.2, percentile: "55th" },
-    { date: "2026-09-01", ageMonths: 8, weight: 8.7, height: 72, head: 44.5, percentile: "52nd" },
-  ]);
+  ] as Array<{ date: string; ageMonths: number; weight: number; height: number; head: number; percentile: string }>);
+  const [growthSamplesLoaded, setGrowthSamplesLoaded] = useState(false);
+
+  const loadSampleGrowth = () => {
+    setGrowthHistory([
+      { date: "2026-03-15", ageMonths: 2, weight: 5.2, height: 58, head: 38.5, percentile: "50th" },
+      { date: "2026-05-10", ageMonths: 4, weight: 6.8, height: 64, head: 41.0, percentile: "60th" },
+      { date: "2026-07-20", ageMonths: 6, weight: 7.9, height: 68, head: 43.2, percentile: "55th" },
+      { date: "2026-09-01", ageMonths: 8, weight: 8.7, height: 72, head: 44.5, percentile: "52nd" },
+    ]);
+    setGrowthSamplesLoaded(true);
+  };
 
   const handleAddGrowthEntry = () => {
     if (!weightKg || !heightCm) {
@@ -118,7 +130,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
       percentile: "50th (WHO Standard)",
     };
     setGrowthHistory((prev) => [...prev, newEntry]);
-    toast.success("Growth record successfully logged!");
+    toast.success("Growth entry added to this session's worksheet (not filed to chart)");
     setShowGrowthModal(false);
   };
 
@@ -264,22 +276,39 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
             </Dialog>
           </div>
 
-          {/* Growth Cards */}
+          {/* Growth Cards — latest worksheet entry, or honest empty state */}
+          {growthHistory.length === 0 ? (
+            <div className="p-8 rounded-2xl border border-dashed text-center">
+              <p className="font-bold text-sm">No growth entries this session</p>
+              <p className="text-xs text-muted-foreground mt-1 max-w-md mx-auto">
+                Entries logged here stay in this session&apos;s worksheet until a growth-chart
+                integration lands — they are not filed to any chart.
+              </p>
+              {!growthSamplesLoaded && (
+                <button
+                  onClick={() => { loadSampleGrowth(); }}
+                  className="mt-3 px-4 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 text-xs font-extrabold text-primary-500 hover:bg-primary-50 dark:hover:bg-slate-800 transition-colors"
+                >
+                  Load sample data for demo
+                </button>
+              )}
+            </div>
+          ) : (
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
-              <span className="text-[11px] font-extrabold uppercase text-slate-400">Current Weight</span>
+              <span className="text-[11px] font-extrabold uppercase text-slate-400">Latest Weight (worksheet)</span>
               <div className="text-2xl font-black text-primary-500 mt-1">
                 {growthHistory[growthHistory.length - 1]?.weight} kg
               </div>
-              <span className="text-[10px] font-bold text-emerald-600">✓ 50th percentile (Normal)</span>
+              <span className="text-[10px] font-bold text-slate-500">Session entry — verify against WHO charts</span>
             </div>
 
             <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
-              <span className="text-[11px] font-extrabold uppercase text-slate-400">Current Length / Height</span>
+              <span className="text-[11px] font-extrabold uppercase text-slate-400">Latest Length / Height</span>
               <div className="text-2xl font-black text-slate-900 dark:text-slate-100 mt-1">
                 {growthHistory[growthHistory.length - 1]?.height} cm
               </div>
-              <span className="text-[10px] font-bold text-emerald-600">✓ On WHO growth curve</span>
+              <span className="text-[10px] font-bold text-slate-500">Session entry — verify against WHO charts</span>
             </div>
 
             <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
@@ -287,9 +316,10 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
               <div className="text-2xl font-black text-slate-900 dark:text-slate-100 mt-1">
                 {growthHistory[growthHistory.length - 1]?.head} cm
               </div>
-              <span className="text-[10px] font-bold text-emerald-600">✓ Microcephaly / Macrocephaly Screen: Negative</span>
+              <span className="text-[10px] font-bold text-slate-500">Session entry — clinical screening still required</span>
             </div>
           </div>
+          )}
 
           {/* Growth Table */}
           <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
@@ -331,16 +361,45 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
                 Tracking completed doses, upcoming shots, and batch serial numbers
               </p>
             </div>
-            <button
-              onClick={() => toast.success("Immunization certificate exported to PDF")}
-              className="px-4 py-2 rounded-xl border border-primary-500 text-primary-500 font-extrabold text-xs hover:bg-primary-500 hover:text-white transition-colors"
-            >
-              Export Vaccine Certificate (PDF)
-            </button>
+              <button
+                onClick={() => {
+                  const recorded = STANDARD_VACCINES.filter((x) =>
+                    recordedDoses.includes(x.id)
+                  );
+                  const printWin = window.open("", "_blank");
+                  if (!printWin) {
+                    toast.error("Popup blocked — allow popups to print the record");
+                    return;
+                  }
+                  printWin.document.write(
+                    `<html><body style="font-family: monospace; font-size: 12px; max-width: 560px; margin: auto; padding: 20px;">` +
+                    `<h2>Immunization Session Record (worksheet — not a registry certificate)</h2>` +
+                    `<p>Printed ${new Date().toLocaleString()}</p><hr/>` +
+                    (recorded.length === 0
+                      ? `<p>No doses recorded this session.</p>`
+                      : `<ul>${recorded.map((x) => `<li>${x.name} — recorded ${new Date().toLocaleDateString()}</li>`).join("")}</ul>`) +
+                    `<script>window.print();</script></body></html>`
+                  );
+                  printWin.document.close();
+                  toast.success("Session record sent to printer");
+                }}
+                className="px-4 py-2 rounded-xl border border-primary-500 text-primary-500 font-extrabold text-xs hover:bg-primary-500 hover:text-white transition-colors"
+              >
+                Print Session Record
+              </button>
           </div>
 
+          <p className="text-xs text-muted-foreground -mt-1">
+            Zambia EPI reference schedule. Doses you record below stay in this session&apos;s
+            worksheet — they are not filed to any immunization registry.
+          </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {STANDARD_VACCINES.map((v) => (
+            {STANDARD_VACCINES.map((v) => {
+              const recorded = recordedDoses.includes(v.id);
+              // Schedule position (due age) is reference info; only recorded
+              // doses belong to this patient — nothing is pre-marked given.
+              const shown = recorded ? "completed" : v.status === "upcoming" ? "upcoming" : "due";
+              return (
               <div
                 key={v.id}
                 className="p-4 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs flex items-center justify-between"
@@ -348,9 +407,9 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
                 <div className="flex items-center gap-3">
                   <div
                     className={`h-9 w-9 rounded-xl flex items-center justify-center font-black ${
-                      v.status === "completed"
+                      shown === "completed"
                         ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400"
-                        : v.status === "due"
+                        : shown === "due"
                         ? "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-400 animate-pulse"
                         : "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400"
                     }`}
@@ -364,13 +423,16 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
                 </div>
 
                 <div>
-                  {v.status === "completed" ? (
+                  {shown === "completed" ? (
                     <span className="px-3 py-1 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400">
-                      ✓ Administered
+                      ✓ {recorded ? "Recorded (session)" : "Administered"}
                     </span>
-                  ) : v.status === "due" ? (
+                  ) : shown === "due" ? (
                     <button
-                      onClick={() => toast.success(`Recorded ${v.name} as administered`)}
+                      onClick={() => {
+                        setRecordedDoses((prev) => [...prev, v.id]);
+                        toast.success(`Recorded ${v.name} in this session's worksheet (not filed to registry)`);
+                      }}
                       className="px-3 py-1.5 rounded-full text-[10px] font-black bg-primary-500 text-white shadow-xs hover:bg-primary-600"
                     >
                       Record Dose
@@ -382,7 +444,8 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
                   )}
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}
@@ -413,10 +476,19 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
 
                 <div className="flex items-center gap-2 shrink-0">
                   <button
-                    onClick={() => toast.success(`Milestone for ${m.age} marked as Achieved`)}
-                    className="px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-300 font-extrabold text-[11px] hover:bg-emerald-600 hover:text-white transition-colors"
+                    aria-pressed={achievedMilestones.includes(idx)}
+                    onClick={() => {
+                      setAchievedMilestones((prev) =>
+                        prev.includes(idx) ? prev.filter((i) => i !== idx) : [...prev, idx]
+                      );
+                    }}
+                    className={`px-3 py-1.5 rounded-xl font-extrabold text-[11px] transition-colors ${
+                      achievedMilestones.includes(idx)
+                        ? "bg-emerald-600 text-white"
+                        : "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-300 hover:bg-emerald-600 hover:text-white"
+                    }`}
                   >
-                    ✓ Achieved
+                    {achievedMilestones.includes(idx) ? "✓ Noted (session)" : "✓ Achieved"}
                   </button>
                   <button
                     onClick={() => toast.info(`Milestone for ${m.age} marked as In Progress`)}
@@ -541,10 +613,18 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
               </div>
 
               <button
-                onClick={() => toast.success(`Dosage of ${singleDoseMl} mL (${singleDoseMg} mg) copied to prescription`)}
+                onClick={async () => {
+                  const text = `${calcDrug}: ${singleDoseMl} mL (${singleDoseMg} mg) per dose for ${calcWeight} kg patient`;
+                  try {
+                    await navigator.clipboard.writeText(text);
+                    toast.success("Dosage copied — paste it into the prescription");
+                  } catch {
+                    toast.error("Copy failed — your browser blocked clipboard access");
+                  }
+                }}
                 className="w-full py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs"
               >
-                Insert into Prescription Order
+                Copy Dosage for Prescription
               </button>
             </div>
           </div>

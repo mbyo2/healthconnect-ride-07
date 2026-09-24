@@ -16,6 +16,8 @@ import { MultiCountryAccounting } from "@/components/accounting/MultiCountryAcco
 import { exportInvoicePDF } from "@/utils/pdfExport";
 import { useCurrency } from "@/hooks/use-currency";
 import { supabase } from "@/integrations/supabase/client";
+import { useInstitutionAffiliation } from "@/hooks/useInstitutionAffiliation";
+import { fetchInstitutionTariffs, resolveTariffPrice, type ServiceTariff } from "@/components/pricing/TariffAndPriceManager";
 import { toast } from "sonner";
 
 const STATUS_CONFIG: Record<string, { label: string; pillColor: string }> = {
@@ -35,6 +37,7 @@ export const BillingStaffWorkflow = () => {
     createInvoice, recordPayment,
   } = useBillingModule();
   const { currency } = useCurrency();
+  const { institutionId } = useInstitutionAffiliation();
 
   const [isInvoiceDialogOpen, setIsInvoiceDialogOpen] = useState(false);
   const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
@@ -71,23 +74,47 @@ export const BillingStaffWorkflow = () => {
           supabase.from("comprehensive_prescriptions").select("id, medication_name, quantity").eq("patient_id", patientId).eq("status", "active"),
         ]);
 
+        // Prices resolve from the institution tariff book — never invented.
+        // Anything without a tariff (or recorded) price enters at 0 so staff
+        // set it explicitly instead of billing a fabricated figure.
+        let tariffs: ServiceTariff[] = [];
+        try {
+          tariffs = institutionId ? await fetchInstitutionTariffs(institutionId) : [];
+        } catch {
+          tariffs = [];
+        }
+        const needsRate: string[] = [];
         const fetchedItems: Array<{ description: string; quantity: number; unit_price: number; total: number }> = [];
 
         (apptsRes.data || []).forEach((a: any) => {
-          fetchedItems.push({ description: `Consultation (${a.type?.replace("_", " ") || "General"})`, quantity: 1, unit_price: 150, total: 150 });
+          const label = `Consultation (${a.type?.replace("_", " ") || "General"})`;
+          const price = resolveTariffPrice(tariffs, "opd", a.type, 0);
+          if (!(price > 0)) needsRate.push(label);
+          fetchedItems.push({ description: label, quantity: 1, unit_price: price, total: price });
         });
         (labsRes.data || []).forEach((l: any) => {
-          const price = l.price || l.total_amount || 200;
-          fetchedItems.push({ description: `Lab Test: ${l.test_type}`, quantity: 1, unit_price: price, total: price });
+          const label = `Lab Test: ${l.test_type}`;
+          const price = Number(l.price || l.total_amount) || resolveTariffPrice(tariffs, "lab", l.test_type, 0);
+          if (!(price > 0)) needsRate.push(label);
+          fetchedItems.push({ description: label, quantity: 1, unit_price: price, total: price });
         });
         (rxsRes.data || []).forEach((r: any) => {
           const qty = r.quantity || 1;
-          fetchedItems.push({ description: `Rx: ${r.medication_name}`, quantity: qty, unit_price: 50, total: 50 * qty });
+          const label = `Rx: ${r.medication_name}`;
+          const price = resolveTariffPrice(tariffs, "pharmacy", r.medication_name, 0);
+          if (!(price > 0)) needsRate.push(label);
+          fetchedItems.push({ description: label, quantity: qty, unit_price: price, total: price * qty });
         });
 
         if (fetchedItems.length > 0) {
           setInvoiceForm((prev) => ({ ...prev, items: fetchedItems }));
-          toast.success(`Auto-filled ${fetchedItems.length} line items from patient system charges`);
+          if (needsRate.length > 0) {
+            toast.warning(
+              `Auto-filled ${fetchedItems.length} items — ${needsRate.length} need${needsRate.length === 1 ? "s" : ""} a rate: ${needsRate.slice(0, 3).join(", ")}${needsRate.length > 3 ? "…" : ""}`
+            );
+          } else {
+            toast.success(`Auto-filled ${fetchedItems.length} line items from patient system charges`);
+          }
         } else {
           toast.info("No pending system charges found for this patient");
         }

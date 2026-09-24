@@ -1,11 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
 import {
   Package,
   Boxes,
   Truck,
   ArrowLeftRight,
-  ShieldAlert,
   Plus,
   Search,
   CheckCircle2,
@@ -17,11 +16,13 @@ import {
   Sparkles,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
+import { supabase } from "@/integrations/supabase/client";
+import { useCurrency } from "@/hooks/use-currency";
 
-interface StockBatchItem {
+interface StockRow {
   id: string;
-  itemCode: string;
   itemName: string;
+  itemCode: string;
   category: string;
   batchNo: string;
   expiryDate: string;
@@ -32,66 +33,141 @@ interface StockBatchItem {
   warehouse: string;
 }
 
-interface PurchaseOrder {
+interface PurchaseOrderRow {
   id: string;
   poNumber: string;
   supplier: string;
   orderDate: string;
-  itemsCount: number;
   totalAmount: number;
-  status: "draft" | "submitted" | "approved" | "received" | "cancelled";
+  status: string;
   expectedDelivery: string;
 }
 
-interface StockTransfer {
+interface MovementRow {
   id: string;
-  voucherNo: string;
-  fromLocation: string;
-  toLocation: string;
   item: string;
   quantity: number;
+  transaction_type: string;
   date: string;
-  transferredBy: string;
+  reference?: string | null;
 }
 
-const DEFAULT_BATCHES: StockBatchItem[] = [
-  { id: "1", itemCode: "MED-001", itemName: "Amoxicillin 500mg Caps", category: "Antibiotics", batchNo: "BATCH-2026-A1", expiryDate: "2027-08-31", quantity: 450, reorderLevel: 200, unitPrice: 15.0, costPrice: 9.0, warehouse: "Main Pharmacy Store" },
-  { id: "2", itemCode: "MED-002", itemName: "Paracetamol 500mg Tabs", category: "Analgesics", batchNo: "BATCH-2026-P4", expiryDate: "2028-02-15", quantity: 180, reorderLevel: 250, unitPrice: 3.0, costPrice: 1.2, warehouse: "OPD Sub-Store" },
-  { id: "3", itemCode: "MED-003", itemName: "Ceftriaxone 1g Injectable", category: "Injectables", batchNo: "BATCH-2026-C9", expiryDate: "2026-10-30", quantity: 45, reorderLevel: 100, unitPrice: 45.0, costPrice: 28.0, warehouse: "IPD Pharmacy Ward" },
-  { id: "4", itemCode: "MED-004", itemName: "Insulin Glargine 100IU/mL", category: "Endocrine", batchNo: "BATCH-2026-IN7", expiryDate: "2027-01-20", quantity: 28, reorderLevel: 40, unitPrice: 180.0, costPrice: 120.0, warehouse: "Cold Chain Refrigerator" },
-  { id: "5", itemCode: "MED-005", itemName: "IV Normal Saline 0.9% 500ml", category: "IV Fluids", batchNo: "BATCH-2026-NS2", expiryDate: "2028-11-30", quantity: 320, reorderLevel: 150, unitPrice: 25.0, costPrice: 14.0, warehouse: "Central Store" },
+const SUPPLIERS = [
+  "PharmaMed Zambia Ltd",
+  "Universal Diagnostics Supply",
+  "Crown Healthcare Equipments",
+  "Mediland Africa Wholesalers",
 ];
 
-const DEFAULT_POS: PurchaseOrder[] = [
-  { id: "po-1", poNumber: "PO-2026-0891", supplier: "PharmaMed Zambia Ltd", orderDate: "2026-08-25", itemsCount: 6, totalAmount: 48500.0, status: "approved", expectedDelivery: "2026-09-05" },
-  { id: "po-2", poNumber: "PO-2026-0892", supplier: "Universal Diagnostics Supply", orderDate: "2026-08-28", itemsCount: 3, totalAmount: 14200.0, status: "submitted", expectedDelivery: "2026-09-08" },
-  { id: "po-3", poNumber: "PO-2026-0893", supplier: "Crown Healthcare Equipments", orderDate: "2026-09-01", itemsCount: 1, totalAmount: 85000.0, status: "draft", expectedDelivery: "2026-09-15" },
-];
-
-const DEFAULT_TRANSFERS: StockTransfer[] = [
-  { id: "st-1", voucherNo: "STV-2026-104", fromLocation: "Central Store", toLocation: "OPD Pharmacy", item: "Paracetamol 500mg (500 tabs)", quantity: 500, date: "2026-08-30", transferredBy: "Store Manager" },
-  { id: "st-2", voucherNo: "STV-2026-105", fromLocation: "Main Pharmacy", toLocation: "Emergency Trauma Unit", item: "IV Normal Saline 500ml", quantity: 60, date: "2026-09-01", transferredBy: "Chief Pharmacist" },
-];
-
+/**
+ * ERP stock & buying backed by live inventory data — medication batches
+ * from medication_inventory, purchase orders from purchase_orders, and the
+ * movement log from inventory_transactions. Empty states when empty; new
+ * purchase orders insert for real.
+ */
 export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ institutionId }) => {
+  const { formatPrice } = useCurrency();
   const [activeTab, setActiveTab] = useState<"stock" | "po" | "transfers" | "reorder">("stock");
-  const [batches, setBatches] = useState<StockBatchItem[]>(DEFAULT_BATCHES);
-  const [purchaseOrders, setPurchaseOrders] = useState<PurchaseOrder[]>(DEFAULT_POS);
-  const [transfers, setTransfers] = useState<StockTransfer[]>(DEFAULT_TRANSFERS);
+  const [batches, setBatches] = useState<StockRow[]>([]);
+  const [purchaseOrders, setPurchaseOrders] = useState<PurchaseOrderRow[]>([]);
+  const [movements, setMovements] = useState<MovementRow[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
 
   // New PO Modal state
   const [showPOModal, setShowPOModal] = useState(false);
-  const [newPOSupplier, setNewPOSupplier] = useState("PharmaMed Zambia Ltd");
+  const [newPOSupplier, setNewPOSupplier] = useState(SUPPLIERS[0]);
   const [newPOAmount, setNewPOAmount] = useState(15000);
-  const [newPOExpected, setNewPOExpected] = useState("2026-09-12");
+  const [newPOExpected, setNewPOExpected] = useState(new Date(Date.now() + 14 * 86400000).toISOString().split("T")[0]);
+  const [creatingPO, setCreatingPO] = useState(false);
 
-  // New Transfer Modal state
-  const [showTransferModal, setShowTransferModal] = useState(false);
-  const [transferFrom, setTransferFrom] = useState("Central Store");
-  const [transferTo, setTransferTo] = useState("OPD Sub-Store");
-  const [transferItem, setTransferItem] = useState("Amoxicillin 500mg Caps");
-  const [transferQty, setTransferQty] = useState(100);
+  const fetchAll = useCallback(async () => {
+    if (!institutionId) {
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    try {
+      const [stockRes, poRes] = await Promise.all([
+        supabase
+          .from("medication_inventory")
+          .select("id, medication_name, dosage, batch_number, expiry_date, quantity_available, minimum_stock_level, unit_price, cost_price, supplier_name, manufacturer")
+          .eq("institution_id", institutionId)
+          .order("medication_name")
+          .limit(1000),
+        supabase
+          .from("purchase_orders")
+          .select("id, order_number, total_amount, status, expected_delivery_date, order_date, notes")
+          .eq("institution_id", institutionId)
+          .order("order_date", { ascending: false })
+          .limit(200),
+      ]);
+      if (stockRes.error) throw stockRes.error;
+      if (poRes.error) throw poRes.error;
+
+      const stock = ((stockRes.data as any[]) || []).map((s: any, i: number) => ({
+        id: s.id,
+        itemName: `${s.medication_name}${s.dosage ? ` ${s.dosage}` : ""}`,
+        itemCode: `MED-${String(i + 1).padStart(3, "0")}`,
+        category: s.manufacturer || "General",
+        batchNo: s.batch_number || "—",
+        expiryDate: s.expiry_date ? new Date(s.expiry_date).toLocaleDateString() : "—",
+        quantity: Number(s.quantity_available || 0),
+        reorderLevel: Number(s.minimum_stock_level || 0),
+        unitPrice: Number(s.unit_price || 0),
+        costPrice: Number(s.cost_price || 0),
+        warehouse: s.supplier_name || "Main Store",
+      }));
+      setBatches(stock);
+
+      setPurchaseOrders(
+        ((poRes.data as any[]) || []).map((p: any) => ({
+          id: p.id,
+          poNumber: p.order_number || p.id.slice(0, 8),
+          supplier: p.notes || "Supplier",
+          orderDate: p.order_date ? new Date(p.order_date).toLocaleDateString() : "—",
+          totalAmount: Number(p.total_amount || 0),
+          status: p.status || "draft",
+          expectedDelivery: p.expected_delivery_date
+            ? new Date(p.expected_delivery_date).toLocaleDateString()
+            : "—",
+        }))
+      );
+
+      // Movement log from real inventory transactions on this stock
+      const itemIds = stock.map((s) => s.id);
+      if (itemIds.length > 0) {
+        const { data: txns } = await supabase
+          .from("inventory_transactions")
+          .select("id, medication_inventory_id, transaction_type, quantity, unit_price, transaction_date, invoice_number")
+          .in("medication_inventory_id", itemIds.slice(0, 200))
+          .order("transaction_date", { ascending: false })
+          .limit(200);
+        const nameById = new Map(stock.map((s) => [s.id, s.itemName]));
+        setMovements(
+          ((txns as any[]) || []).map((t: any) => ({
+            id: t.id,
+            item: nameById.get(t.medication_inventory_id) || "Item",
+            quantity: Number(t.quantity || 0),
+            transaction_type: t.transaction_type || "movement",
+            date: t.transaction_date ? new Date(t.transaction_date).toLocaleDateString() : "—",
+            reference: t.invoice_number,
+          }))
+        );
+      } else {
+        setMovements([]);
+      }
+    } catch (error) {
+      console.error("Error loading pharmacy inventory:", error);
+      toast.error("Failed to load inventory data");
+    } finally {
+      setLoading(false);
+    }
+  }, [institutionId]);
+
+  useEffect(() => {
+    fetchAll();
+  }, [fetchAll]);
 
   // Filtered Stock
   const filteredBatches = batches.filter((b) =>
@@ -104,37 +180,60 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
   // Items needing reorder
   const lowStockItems = batches.filter((b) => b.quantity <= b.reorderLevel);
 
-  const handleCreatePO = () => {
-    const newPO: PurchaseOrder = {
-      id: `po-${Date.now()}`,
-      poNumber: `PO-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
-      supplier: newPOSupplier,
-      orderDate: new Date().toISOString().split("T")[0],
-      itemsCount: 4,
-      totalAmount: newPOAmount,
-      status: "submitted",
-      expectedDelivery: newPOExpected,
-    };
-    setPurchaseOrders([newPO, ...purchaseOrders]);
-    toast.success(`Purchase Order ${newPO.poNumber} created and submitted for approval`);
-    setShowPOModal(false);
+  const handleCreatePO = async () => {
+    if (!institutionId || !(newPOAmount > 0)) {
+      toast.error("Enter a valid order total");
+      return;
+    }
+    setCreatingPO(true);
+    try {
+      const poNumber = `PO-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+      const { error } = await (supabase.from("purchase_orders" as any) as any).insert({
+        institution_id: institutionId,
+        order_number: poNumber,
+        total_amount: newPOAmount,
+        status: "submitted",
+        expected_delivery_date: newPOExpected || null,
+        notes: newPOSupplier,
+      });
+      if (error) throw error;
+      toast.success(`Purchase Order ${poNumber} submitted for approval`);
+      setShowPOModal(false);
+      fetchAll();
+    } catch (error: any) {
+      console.error("Error creating PO:", error);
+      toast.error(error?.message || "Failed to create purchase order");
+    } finally {
+      setCreatingPO(false);
+    }
   };
 
-  const handleCreateTransfer = () => {
-    const newST: StockTransfer = {
-      id: `st-${Date.now()}`,
-      voucherNo: `STV-${new Date().getFullYear()}-${Math.floor(100 + Math.random() * 900)}`,
-      fromLocation: transferFrom,
-      toLocation: transferTo,
-      item: transferItem,
-      quantity: transferQty,
-      date: new Date().toISOString().split("T")[0],
-      transferredBy: "Inventory Clerk",
-    };
-    setTransfers([newST, ...transfers]);
-    toast.success(`Stock Transfer Voucher ${newST.voucherNo} issued`);
-    setShowTransferModal(false);
+  const handleExportValuation = () => {
+    if (batches.length === 0) {
+      toast.info("Nothing to export — no stock on record");
+      return;
+    }
+    const header = "Item,Batch,Expiry,Quantity,Unit Price,Cost Price,Value\n";
+    const lines = batches.map((b) =>
+      [`"${b.itemName}"`, b.batchNo, b.expiryDate, b.quantity, b.unitPrice, b.costPrice, (b.quantity * (b.costPrice || b.unitPrice)).toFixed(2)].join(",")
+    );
+    const blob = new Blob([header + lines.join("\n")], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `stock-valuation-${new Date().toISOString().split("T")[0]}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+    toast.success(`Stock valuation exported (${batches.length} lines)`);
   };
+
+  if (!institutionId) {
+    return (
+      <div className="p-8 rounded-3xl border border-dashed text-center text-sm text-muted-foreground">
+        Inventory needs an institution context — open this from a facility dashboard.
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 font-sans text-slate-900 dark:text-slate-100">
@@ -148,11 +247,11 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
             <div className="flex items-center gap-2">
               <h2 className="text-xl font-black tracking-tight">ERP Stock &amp; Buying Procurement Hub</h2>
               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-400 text-slate-950">
-                ERPNext Compatible
+                Live Stock
               </span>
             </div>
             <p className="text-xs text-blue-100 font-medium">
-              Medicine batch management, expiration monitoring, automated reordering, stock vouchers &amp; purchase workflows
+              Medicine batch management, expiration monitoring, reordering, movements &amp; purchase workflows
             </p>
           </div>
         </div>
@@ -167,17 +266,19 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-2 border-b border-canvas-silk dark:border-slate-800 pb-2 overflow-x-auto">
+      <div className="flex items-center gap-2 border-b border-canvas-silk dark:border-slate-800 pb-2 overflow-x-auto" role="tablist" aria-label="Inventory views">
         {[
           { id: "stock", label: "Medicine Batches & Stock Ledger", icon: Package },
           { id: "po", label: "Purchase Orders & Procurement", icon: Truck },
-          { id: "transfers", label: "Department Stock Transfers", icon: ArrowLeftRight },
-          { id: "reorder", label: "Auto-Reordering Queue", icon: AlertTriangle },
+          { id: "transfers", label: "Stock Movements Log", icon: ArrowLeftRight },
+          { id: "reorder", label: "Reorder Queue", icon: AlertTriangle },
         ].map((tab) => {
           const Icon = tab.icon;
           return (
             <button
               key={tab.id}
+              role="tab"
+              aria-selected={activeTab === tab.id}
               onClick={() => setActiveTab(tab.id as any)}
               className={`px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2 transition-all shrink-0 ${
                 activeTab === tab.id
@@ -197,25 +298,26 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
         <div className="space-y-4">
           <div className="flex items-center justify-between gap-3">
             <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden />
               <input
-                type="text"
+                type="search"
+                aria-label="Search stock by drug name, batch, warehouse, or category"
                 placeholder="Search by drug name, batch #, warehouse, category..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-medium focus:outline-none focus:border-primary-500"
+                className="w-full pl-10 pr-4 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-medium placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
             </div>
             <button
-              onClick={() => toast.success("Stock valuation report generated")}
-              className="px-4 py-2 rounded-xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-bold hover:bg-canvas-mist dark:hover:bg-slate-800"
+              onClick={handleExportValuation}
+              className="px-4 py-2 rounded-xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-bold hover:bg-canvas-mist dark:hover:bg-slate-800 flex items-center gap-1.5"
             >
-              Export Stock Valuation (Excel)
+              <FileSpreadsheet className="h-4 w-4" /> Export Valuation (CSV)
             </button>
           </div>
 
           <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
-            <table className="w-full text-left border-collapse text-xs">
+            <table className="w-full min-w-[760px] text-left border-collapse text-xs">
               <thead>
                 <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
                   <th className="py-3 px-4">Item &amp; Code</th>
@@ -228,39 +330,50 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
                 </tr>
               </thead>
               <tbody className="divide-y divide-canvas-silk dark:divide-slate-800">
-                {filteredBatches.map((b) => {
-                  const isLow = b.quantity <= b.reorderLevel;
-                  return (
-                    <tr key={b.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-800/60">
-                      <td className="py-3 px-4">
-                        <div className="font-extrabold text-slate-900 dark:text-slate-100">{b.itemName}</div>
-                        <div className="text-[10px] text-slate-400 font-mono">{b.itemCode} • {b.category}</div>
-                      </td>
-                      <td className="py-3 px-3 font-mono font-bold text-primary-500">{b.batchNo}</td>
-                      <td className="py-3 px-3 font-semibold text-slate-600 dark:text-slate-300">{b.expiryDate}</td>
-                      <td className="py-3 px-3 font-medium text-slate-700 dark:text-slate-300">{b.warehouse}</td>
-                      <td className="py-3 px-3 text-right font-black text-slate-900 dark:text-slate-100">
-                        {b.quantity} units
-                        <div className="text-[10px] text-slate-400 font-normal">Reorder at: {b.reorderLevel}</div>
-                      </td>
-                      <td className="py-3 px-3 text-right font-mono">
-                        <div className="font-bold text-slate-900 dark:text-slate-100">K{b.unitPrice.toFixed(2)}</div>
-                        <div className="text-[10px] text-slate-400">Cost: K{b.costPrice.toFixed(2)}</div>
-                      </td>
-                      <td className="py-3 px-3 text-center">
-                        {isLow ? (
-                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-400">
-                            ⚠ Low Stock
-                          </span>
-                        ) : (
-                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400">
-                            ✓ In Stock
-                          </span>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })}
+                {loading ? (
+                  <tr><td colSpan={7} className="py-8 text-center text-muted-foreground" role="status" aria-label="Loading stock">Loading stock…</td></tr>
+                ) : filteredBatches.length === 0 ? (
+                  <tr><td colSpan={7} className="py-10 text-center">
+                    <p className="font-bold text-sm">{batches.length === 0 ? "No stock registered" : "No matches found"}</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {batches.length === 0 ? "Add inventory in Pharmacy Management to stock this ledger." : "Try a different search term."}
+                    </p>
+                  </td></tr>
+                ) : (
+                  filteredBatches.map((b) => {
+                    const isLow = b.quantity <= b.reorderLevel;
+                    return (
+                      <tr key={b.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800/60">
+                        <td className="py-3 px-4">
+                          <div className="font-extrabold text-slate-900 dark:text-slate-100">{b.itemName}</div>
+                          <div className="text-[10px] text-slate-400 font-mono">{b.itemCode} • {b.category}</div>
+                        </td>
+                        <td className="py-3 px-3 font-mono font-bold text-primary-500">{b.batchNo}</td>
+                        <td className="py-3 px-3 font-semibold text-slate-600 dark:text-slate-300">{b.expiryDate}</td>
+                        <td className="py-3 px-3 font-medium text-slate-700 dark:text-slate-300">{b.warehouse}</td>
+                        <td className="py-3 px-3 text-right font-black text-slate-900 dark:text-slate-100">
+                          {b.quantity} units
+                          <div className="text-[10px] text-slate-400 font-normal">Reorder at: {b.reorderLevel}</div>
+                        </td>
+                        <td className="py-3 px-3 text-right font-mono">
+                          <div className="font-bold text-slate-900 dark:text-slate-100">{formatPrice(b.unitPrice)}</div>
+                          <div className="text-[10px] text-slate-400">Cost: {formatPrice(b.costPrice)}</div>
+                        </td>
+                        <td className="py-3 px-3 text-center">
+                          {isLow ? (
+                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-400">
+                              Low Stock
+                            </span>
+                          ) : (
+                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400">
+                              In Stock
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
               </tbody>
             </table>
           </div>
@@ -270,10 +383,10 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
       {/* 2. Purchase Orders */}
       {activeTab === "po" && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-3">
             <div>
               <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">Purchase Orders &amp; Procurement Pipeline</h3>
-              <p className="text-xs text-graphite-500 dark:text-slate-400">Manage supplier quotes, PO approval, and Goods Receipt Notes (GRN)</p>
+              <p className="text-xs text-graphite-500 dark:text-slate-400">{purchaseOrders.length} order{purchaseOrders.length === 1 ? "" : "s"} on record</p>
             </div>
 
             <Dialog open={showPOModal} onOpenChange={setShowPOModal}>
@@ -284,36 +397,39 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
               </DialogTrigger>
               <DialogContent className="max-w-md bg-white dark:bg-slate-900 rounded-3xl p-6">
                 <DialogHeader>
-                  <DialogTitle className="font-black text-lg">Raise ERP Purchase Order</DialogTitle>
+                  <DialogTitle className="font-black text-lg">Raise Purchase Order</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-3 py-2 text-xs">
                   <div>
-                    <label className="font-bold">Supplier *</label>
+                    <label htmlFor="erp-po-supplier" className="font-bold">Supplier *</label>
                     <select
+                      id="erp-po-supplier"
                       className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-bold bg-white dark:bg-slate-950"
                       value={newPOSupplier}
                       onChange={(e) => setNewPOSupplier(e.target.value)}
                     >
-                      <option value="PharmaMed Zambia Ltd">PharmaMed Zambia Ltd</option>
-                      <option value="Universal Diagnostics Supply">Universal Diagnostics Supply</option>
-                      <option value="Crown Healthcare Equipments">Crown Healthcare Equipments</option>
-                      <option value="Mediland Africa Wholesalers">Mediland Africa Wholesalers</option>
+                      {SUPPLIERS.map((s) => (
+                        <option key={s} value={s}>{s}</option>
+                      ))}
                     </select>
                   </div>
                   <div>
-                    <label className="font-bold">Estimated Order Total (ZMW) *</label>
+                    <label htmlFor="erp-po-amount" className="font-bold">Estimated Order Total (ZMW) *</label>
                     <input
+                      id="erp-po-amount"
                       type="number"
+                      min={0}
                       className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-bold"
                       value={newPOAmount}
                       onChange={(e) => setNewPOAmount(parseFloat(e.target.value) || 0)}
                     />
                   </div>
                   <div>
-                    <label className="font-bold">Expected Delivery Date *</label>
+                    <label htmlFor="erp-po-expected" className="font-bold">Expected Delivery</label>
                     <input
+                      id="erp-po-expected"
                       type="date"
-                      className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-medium"
+                      className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-bold"
                       value={newPOExpected}
                       onChange={(e) => setNewPOExpected(e.target.value)}
                     />
@@ -321,214 +437,147 @@ export const ERPPharmacyInventory: React.FC<{ institutionId?: string }> = ({ ins
                 </div>
                 <DialogFooter>
                   <button onClick={() => setShowPOModal(false)} className="px-4 py-2 font-bold text-slate-500">Cancel</button>
-                  <button onClick={handleCreatePO} className="px-5 py-2.5 rounded-xl bg-primary-500 text-white font-extrabold">Create PO</button>
+                  <button onClick={handleCreatePO} disabled={creatingPO} className="px-5 py-2.5 rounded-xl bg-primary-500 text-white font-extrabold disabled:opacity-50">
+                    {creatingPO ? "Raising…" : "Submit Order"}
+                  </button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
           </div>
 
           <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
-            <table className="w-full text-left border-collapse text-xs">
+            <table className="w-full min-w-[640px] text-left border-collapse text-xs">
               <thead>
                 <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
                   <th className="py-3 px-4">PO Number</th>
-                  <th className="py-3 px-3">Supplier Name</th>
-                  <th className="py-3 px-3">Order Date</th>
-                  <th className="py-3 px-3">Expected Delivery</th>
-                  <th className="py-3 px-3 text-right">Total Amount</th>
+                  <th className="py-3 px-3">Supplier</th>
+                  <th className="py-3 px-3 text-right">Total</th>
+                  <th className="py-3 px-3">Expected</th>
                   <th className="py-3 px-3 text-center">Status</th>
-                  <th className="py-3 px-3 text-center">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-canvas-silk dark:divide-slate-800">
-                {purchaseOrders.map((po) => (
-                  <tr key={po.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-800/60">
-                    <td className="py-3 px-4 font-black font-mono text-primary-500">{po.poNumber}</td>
-                    <td className="py-3 px-3 font-bold text-slate-900 dark:text-slate-100">{po.supplier}</td>
-                    <td className="py-3 px-3 text-slate-600">{po.orderDate}</td>
-                    <td className="py-3 px-3 text-slate-600">{po.expectedDelivery}</td>
-                    <td className="py-3 px-3 text-right font-black text-slate-900 dark:text-slate-100">
-                      K{po.totalAmount.toLocaleString()}
-                    </td>
-                    <td className="py-3 px-3 text-center">
-                      <span
-                        className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase ${
-                          po.status === "approved"
-                            ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400"
-                            : po.status === "submitted"
-                            ? "bg-blue-100 text-primary-500 dark:bg-blue-950"
-                            : "bg-slate-100 text-slate-600 dark:bg-slate-800"
-                        }`}
-                      >
-                        {po.status}
-                      </span>
-                    </td>
-                    <td className="py-3 px-3 text-center">
-                      <button
-                        onClick={() => toast.success(`Goods Receipt Note (GRN) created for ${po.poNumber}`)}
-                        className="px-3 py-1 rounded-lg bg-primary-50 hover:bg-primary-500 hover:text-white text-primary-500 font-extrabold text-[11px] transition-colors"
-                      >
-                        Create GRN
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                {loading ? (
+                  <tr><td colSpan={5} className="py-8 text-center text-muted-foreground" role="status" aria-label="Loading purchase orders">Loading orders…</td></tr>
+                ) : purchaseOrders.length === 0 ? (
+                  <tr><td colSpan={5} className="py-10 text-center">
+                    <p className="font-bold text-sm">No purchase orders yet</p>
+                    <p className="text-xs text-muted-foreground mt-1">Raise the first order to start procurement.</p>
+                  </td></tr>
+                ) : (
+                  purchaseOrders.map((po) => (
+                    <tr key={po.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800/60">
+                      <td className="py-3 px-4 font-mono font-bold text-primary-500">{po.poNumber}</td>
+                      <td className="py-3 px-3 font-semibold">{po.supplier}</td>
+                      <td className="py-3 px-3 text-right font-black tabular-nums">{formatPrice(po.totalAmount)}</td>
+                      <td className="py-3 px-3 text-slate-500">{po.expectedDelivery}</td>
+                      <td className="py-3 px-3 text-center capitalize">{po.status}</td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
         </div>
       )}
 
-      {/* 3. Department Stock Transfers */}
+      {/* 3. Stock Movements (real transaction log) */}
       {activeTab === "transfers" && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">Department Stock Movement Vouchers</h3>
-              <p className="text-xs text-graphite-500 dark:text-slate-400">Transfer medicines between Central Pharmacy, OPD, IPD, OT, and Lab</p>
-            </div>
-
-            <Dialog open={showTransferModal} onOpenChange={setShowTransferModal}>
-              <DialogTrigger asChild>
-                <button className="px-4 py-2 rounded-xl bg-primary-500 text-white text-xs font-extrabold flex items-center gap-1.5 shadow-xs">
-                  <Plus className="h-4 w-4" /> Issue Transfer Voucher
-                </button>
-              </DialogTrigger>
-              <DialogContent className="max-w-md bg-white dark:bg-slate-900 rounded-3xl p-6">
-                <DialogHeader>
-                  <DialogTitle className="font-black text-lg">New Stock Transfer Voucher</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-3 py-2 text-xs">
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <label className="font-bold">Source Warehouse *</label>
-                      <select
-                        className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-bold"
-                        value={transferFrom}
-                        onChange={(e) => setTransferFrom(e.target.value)}
-                      >
-                        <option value="Central Store">Central Store</option>
-                        <option value="Main Pharmacy Store">Main Pharmacy Store</option>
-                        <option value="Cold Chain Refrigerator">Cold Chain Refrigerator</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="font-bold">Destination Unit *</label>
-                      <select
-                        className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-bold"
-                        value={transferTo}
-                        onChange={(e) => setTransferTo(e.target.value)}
-                      >
-                        <option value="OPD Sub-Store">OPD Sub-Store</option>
-                        <option value="IPD Pharmacy Ward">IPD Pharmacy Ward</option>
-                        <option value="Emergency Trauma Unit">Emergency Trauma Unit</option>
-                        <option value="Operating Theatre (OT)">Operating Theatre (OT)</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div>
-                    <label className="font-bold">Item Description *</label>
-                    <input
-                      className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-bold"
-                      value={transferItem}
-                      onChange={(e) => setTransferItem(e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <label className="font-bold">Quantity *</label>
-                    <input
-                      type="number"
-                      className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-black"
-                      value={transferQty}
-                      onChange={(e) => setTransferQty(parseInt(e.target.value) || 1)}
-                    />
-                  </div>
-                </div>
-                <DialogFooter>
-                  <button onClick={() => setShowTransferModal(false)} className="px-4 py-2 font-bold text-slate-500">Cancel</button>
-                  <button onClick={handleCreateTransfer} className="px-5 py-2.5 rounded-xl bg-primary-500 text-white font-extrabold">Issue Voucher</button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+          <div>
+            <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">Stock Movement Log</h3>
+            <p className="text-xs text-graphite-500 dark:text-slate-400">
+              Every recorded stock movement — dispenses, receipts and adjustments.
+            </p>
           </div>
-
           <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
-            <table className="w-full text-left border-collapse text-xs">
+            <table className="w-full min-w-[640px] text-left border-collapse text-xs">
               <thead>
                 <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
-                  <th className="py-3 px-4">Voucher No</th>
-                  <th className="py-3 px-3">From Location</th>
-                  <th className="py-3 px-3">To Destination</th>
-                  <th className="py-3 px-3">Transferred Item</th>
+                  <th className="py-3 px-4">Item</th>
+                  <th className="py-3 px-3">Movement</th>
                   <th className="py-3 px-3 text-right">Quantity</th>
-                  <th className="py-3 px-3">Issued By</th>
+                  <th className="py-3 px-3">Date</th>
+                  <th className="py-3 px-3">Reference</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-canvas-silk dark:divide-slate-800">
-                {transfers.map((t) => (
-                  <tr key={t.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-800/60">
-                    <td className="py-3 px-4 font-mono font-bold text-primary-500">{t.voucherNo}</td>
-                    <td className="py-3 px-3 font-semibold text-slate-700 dark:text-slate-300">{t.fromLocation}</td>
-                    <td className="py-3 px-3 font-bold text-emerald-600">{t.toLocation}</td>
-                    <td className="py-3 px-3 font-bold text-slate-900 dark:text-slate-100">{t.item}</td>
-                    <td className="py-3 px-3 text-right font-black text-slate-900 dark:text-slate-100">{t.quantity}</td>
-                    <td className="py-3 px-3 text-slate-500">{t.transferredBy}</td>
-                  </tr>
-                ))}
+                {loading ? (
+                  <tr><td colSpan={5} className="py-8 text-center text-muted-foreground" role="status" aria-label="Loading movements">Loading movements…</td></tr>
+                ) : movements.length === 0 ? (
+                  <tr><td colSpan={5} className="py-10 text-center">
+                    <p className="font-bold text-sm">No movements recorded</p>
+                    <p className="text-xs text-muted-foreground mt-1">Dispenses and receipts will appear here automatically.</p>
+                  </td></tr>
+                ) : (
+                  movements.map((m) => (
+                    <tr key={m.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800/60">
+                      <td className="py-3 px-4 font-bold">{m.item}</td>
+                      <td className="py-3 px-3 capitalize">{m.transaction_type.replace(/_/g, " ")}</td>
+                      <td className="py-3 px-3 text-right font-black tabular-nums">{m.quantity}</td>
+                      <td className="py-3 px-3 text-slate-500">{m.date}</td>
+                      <td className="py-3 px-3 font-mono text-slate-500">{m.reference || "—"}</td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
         </div>
       )}
 
-      {/* 4. Auto-Reorder Queue */}
+      {/* 4. Reorder Queue (computed from live levels) */}
       {activeTab === "reorder" && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">Automated Reorder Recommendations</h3>
-              <p className="text-xs text-graphite-500 dark:text-slate-400">Items that have breached the minimum safety buffer</p>
-            </div>
-            <button
-              onClick={() => toast.success("Batch PO generated for all low stock items")}
-              className="px-4 py-2 rounded-xl bg-primary-500 text-white font-extrabold text-xs shadow-xs"
-            >
-              Generate Batch PO for All ({lowStockItems.length})
-            </button>
+          <div>
+            <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">Reorder Queue</h3>
+            <p className="text-xs text-graphite-500 dark:text-slate-400">
+              Items at or below their minimum stock level, computed live.
+            </p>
           </div>
-
-          <div className="space-y-3">
-            {lowStockItems.map((item) => {
-              const shortfall = item.reorderLevel - item.quantity;
-              return (
+          {loading ? (
+            <div className="space-y-2" role="status" aria-label="Loading reorder queue">
+              {[0, 1, 2].map((i) => (
+                <div key={i} className="h-16 rounded-2xl bg-muted animate-pulse" aria-hidden />
+              ))}
+            </div>
+          ) : lowStockItems.length === 0 ? (
+            <div className="p-10 rounded-2xl border border-dashed text-center">
+              <CheckCircle2 className="h-8 w-8 mx-auto text-emerald-500 mb-2" aria-hidden />
+              <p className="font-bold text-sm">Stock levels healthy</p>
+              <p className="text-xs text-muted-foreground mt-1">Nothing is at or below reorder level right now.</p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {lowStockItems.map((b) => (
                 <div
-                  key={item.id}
-                  className="p-4 rounded-2xl border border-amber-300 dark:border-amber-900 bg-amber-50/50 dark:bg-amber-950/20 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                  key={b.id}
+                  className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-amber-200 dark:border-amber-900 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                 >
                   <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-extrabold text-sm text-slate-900 dark:text-slate-100">{item.itemName}</span>
-                      <span className="px-2 py-0.5 rounded bg-amber-200 dark:bg-amber-900 text-amber-900 dark:text-amber-200 font-mono text-[10px] font-black">
-                        {item.batchNo}
-                      </span>
-                    </div>
-                    <div className="text-xs text-slate-500 mt-1">
-                      Current: <span className="font-bold text-rose-600">{item.quantity} units</span> • Reorder Threshold: {item.reorderLevel} units • Shortfall: +{shortfall} units
-                    </div>
+                    <p className="font-bold text-sm">{b.itemName}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {b.quantity} left · reorder at {b.reorderLevel} · {b.batchNo}
+                    </p>
                   </div>
-
-                  <button
-                    onClick={() => toast.success(`PO Draft generated for ${item.itemName} (+${shortfall * 2} units)`)}
-                    className="px-4 py-2 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs shrink-0"
-                  >
-                    Quick Reorder (+{shortfall * 2})
-                  </button>
+                  <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-400 w-fit">
+                    Reorder needed
+                  </span>
                 </div>
-              );
-            })}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
+
+      {/* Trust strip */}
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-muted-foreground">
+        <span className="flex items-center gap-1.5"><Layers className="h-3.5 w-3.5" aria-hidden /> Batches tracked</span>
+        <span className="flex items-center gap-1.5"><Clock className="h-3.5 w-3.5" aria-hidden /> Expiry monitored</span>
+        <span className="flex items-center gap-1.5"><Calendar className="h-3.5 w-3.5" aria-hidden /> POs on record</span>
+        <span className="flex items-center gap-1.5"><CheckCircle2 className="h-3.5 w-3.5" aria-hidden /> Movements logged</span>
+        <Sparkles className="h-3.5 w-3.5 text-primary-500" aria-hidden />
+      </div>
     </div>
   );
 };

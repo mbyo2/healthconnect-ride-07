@@ -18,6 +18,8 @@ export const RatingBadge = ({
 }: RatingBadgeProps) => {
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
+  // No rating yet (null/undefined/0) renders nothing — never a red "0.0".
+  if (rating == null || !(Number(rating) > 0)) return null;
   const getRatingColor = (rate: number, max: number) => {
     const percentage = (rate / max) * 100;
     if (percentage >= 80) return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100";

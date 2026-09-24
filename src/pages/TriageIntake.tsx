@@ -156,6 +156,14 @@ export default function TriageIntake() {
         .update({ appointment_id: appt.id, status: "booked" })
         .eq("id", result.session_id);
 
+      // Confirmation reminder (in-app notification). Non-blocking and silent
+      // on failure — the booking itself already succeeded.
+      supabase.functions.invoke('send-appointment-reminder', {
+        body: { appointment_id: appt.id },
+      }).catch((reminderErr) => {
+        console.error('Reminder dispatch failed (non-fatal):', reminderErr);
+      });
+
       toast.success("Appointment requested", { description: "The provider has been notified." });
       navigate("/appointments");
     } catch (err: any) {

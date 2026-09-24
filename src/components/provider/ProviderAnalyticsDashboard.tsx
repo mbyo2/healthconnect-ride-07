@@ -132,7 +132,7 @@ export const ProviderAnalyticsDashboard = () => {
             <h3 className="font-extrabold text-xs text-slate-900 flex items-center gap-1.5">
               <MessageSquareText className="h-4 w-4 text-warning-500" /> Patient Ratings & Feedback
             </h3>
-            <span className="text-[10px] font-bold text-graphite-500 dark:text-slate-400">Avg: {stats?.average_rating?.toFixed(1) || "5.0"} ★</span>
+            <span className="text-[10px] font-bold text-graphite-500 dark:text-slate-400">Avg: {stats?.average_rating != null ? `${Number(stats.average_rating).toFixed(1)} ★` : "—"}</span>
           </div>
 
           {recentReviews.length === 0 ? (

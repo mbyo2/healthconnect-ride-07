@@ -100,13 +100,22 @@ export const ProviderReviews = ({ providerId, showWriteReview = false, appointme
         <CardContent className="p-6">
           <div className="flex flex-col sm:flex-row gap-6">
             <div className="text-center">
-              <div className="text-5xl font-bold">{stats?.average_rating?.toFixed(1) || '0.0'}</div>
-              <div className="flex justify-center mt-2">
-                {[1, 2, 3, 4, 5].map(s => (
-                  <Star key={s} className={`h-5 w-5 ${s <= (stats?.average_rating || 0) ? 'text-amber-400 fill-amber-400' : 'text-muted'}`} />
-                ))}
-              </div>
-              <p className="text-sm text-muted-foreground mt-1">{stats?.total_reviews || 0} reviews</p>
+              {stats?.total_reviews ? (
+                <>
+                  <div className="text-5xl font-bold">{Number(stats.average_rating).toFixed(1)}</div>
+                  <div className="flex justify-center mt-2">
+                    {[1, 2, 3, 4, 5].map(s => (
+                      <Star key={s} className={`h-5 w-5 ${s <= Math.round(Number(stats.average_rating) || 0) ? 'text-amber-400 fill-amber-400' : 'text-muted'}`} />
+                    ))}
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-1">{stats.total_reviews} review{stats.total_reviews === 1 ? '' : 's'}</p>
+                </>
+              ) : (
+                <>
+                  <div className="text-5xl font-bold text-muted-foreground">—</div>
+                  <p className="text-sm text-muted-foreground mt-2">No ratings yet — be the first to review</p>
+                </>
+              )}
             </div>
             <div className="flex-1 space-y-1">
               {ratingDistribution.map(({ stars, count, percentage }) => (
