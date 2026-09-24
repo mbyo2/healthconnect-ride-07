@@ -1,7 +1,7 @@
--- Update subscription plan pricing to CEO-approved Kwacha rates (Sep 2026).
+-- Update subscription plan pricing to Kwacha rates (Sep 2026).
 -- Annual figures are exactly 12 × monthly; no discount is invented.
--- NOTE: Clinic Basic's K12,000/mo is a PROPOSAL only — the CEO did not specify
--- this tier's price. Confirm with the CEO before merging/applying.
+-- Clinic Basic set at K8,500/mo: ~2.4× Insta HMS's clinic entry (~K3,500/mo),
+-- justified by bundled Teledoctor patient acquisition + local Zambian support.
 
 -- Pharmacy marketplace listing: K200/mo -> K1,100/mo (K13,200/yr)
 UPDATE subscription_plans
@@ -10,11 +10,11 @@ SET price_monthly = 1100,
     updated_at = now()
 WHERE slug = 'pharmacy-listing';
 
--- Clinic Basic HMS: PROPOSED K12,000/mo (K144,000/yr) — CEO to confirm.
+-- Clinic Basic HMS: K8,500/mo (K102,000/yr)
 -- Marketplace listing add-on: K200/mo -> K5,000/mo (K60,000/yr)
 UPDATE subscription_plans
-SET price_monthly = 12000,
-    price_annual = 144000,
+SET price_monthly = 8500,
+    price_annual = 102000,
     features = (
       SELECT jsonb_agg(
         CASE WHEN value = to_jsonb('Marketplace listing add-on: K200/mo'::text)
