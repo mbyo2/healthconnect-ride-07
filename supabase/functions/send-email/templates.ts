@@ -8,14 +8,14 @@ const esc = (s: unknown) => String(s ?? '')
 export const appointmentReminderTemplate = (appointment: {
   date: string;
   time: string;
-  provider: { first_name: string; last_name: string };
+  provider: { first_name: string; last_name: string; honorific?: string };
 }) => `
 <h2>Appointment Reminder</h2>
 <p>This is a reminder for your upcoming appointment:</p>
 <ul>
   <li>Date: ${esc(appointment.date)}</li>
   <li>Time: ${esc(appointment.time)}</li>
-  <li>Provider: Dr. ${esc(appointment.provider?.first_name)} ${esc(appointment.provider?.last_name)}</li>
+  <li>Provider: ${esc(appointment.provider?.honorific ?? '')}${esc(appointment.provider?.first_name)} ${esc(appointment.provider?.last_name)}</li>
 </ul>
 <p>Please arrive 10 minutes before your scheduled time.</p>
 `;
@@ -28,7 +28,7 @@ export const paymentConfirmationTemplate = (payment: {
 <h2>Payment Confirmation</h2>
 <p>Thank you for your payment:</p>
 <ul>
-  <li>Amount: $${esc(payment.amount)}</li>
+  <li>Amount: K${esc(payment.amount)} ZMW</li>
   <li>Date: ${esc(payment.date)}</li>
   <li>Service: ${esc(payment.service)}</li>
 </ul>

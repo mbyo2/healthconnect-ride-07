@@ -72,9 +72,7 @@ serve(async (req) => {
           : "your provider";
         const dayLabel = apptDate === todayStr ? "today" : "tomorrow";
 
-        // In-app reminder — always delivered; email/SMS/push fan-out honours
-        // the patient's notification_settings and requires the matching
-        // provider secrets (RESEND / SMS gateway / push keys).
+        // In-app reminder — always delivered.
         const { error: notifError } = await supabaseClient.from("notifications").insert({
           user_id: (appointment as any).patient_id,
           title: "Upcoming Appointment Reminder",
@@ -82,6 +80,48 @@ serve(async (req) => {
           type: "appointment",
         });
         if (notifError) throw notifError;
+
+        // Email fan-out — best-effort, only when the patient opted in.
+        // The send-email internal path re-verifies account-holder ownership.
+        try {
+          const { data: prefs } = await supabaseClient
+            .from("notification_settings")
+            .select("email_notifications")
+            .eq("user_id", (appointment as any).patient_id)
+            .maybeSingle();
+          if (prefs?.email_notifications !== false) {
+            const { data: accountUser } = await supabaseClient.auth.admin.getUserById((appointment as any).patient_id);
+            const patientEmail = accountUser?.user?.email;
+            if (patientEmail) {
+              const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
+              await fetch(`${supabaseUrl}/functions/v1/send-email`, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "apikey": Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+                  "x-cron-secret": Deno.env.get("CRON_SECRET") ?? "",
+                },
+                body: JSON.stringify({
+                  type: "appointment_reminder",
+                  to: [patientEmail],
+                  user_id: (appointment as any).patient_id,
+                  data: {
+                    date: apptDate,
+                    time: apptTime,
+                    provider: {
+                      first_name: provider?.first_name ?? "",
+                      last_name: provider?.last_name ?? "",
+                      honorific: provider?.role && DOCTORAL.has(String(provider.role).toLowerCase()) ? "Dr. " : "",
+                    },
+                  },
+                }),
+              });
+            }
+          }
+        } catch (emailErr) {
+          // Non-fatal: the in-app reminder already landed.
+          console.error(`Reminder email failed for appointment ${(appointment as any)?.id}:`, emailErr);
+        }
 
         const { error: markError } = await supabaseClient
           .from("appointments")

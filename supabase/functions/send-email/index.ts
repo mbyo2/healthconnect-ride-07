@@ -11,7 +11,7 @@ const RESEND_API_KEY = Deno.env.get("RESEND");
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+    "authorization, x-client-info, apikey, content-type, x-cron-secret",
 };
 
 type EmailType = "appointment_reminder" | "payment_confirmation" | "registration_confirmation";
@@ -20,6 +20,8 @@ interface EmailRequest {
   type: EmailType;
   to: string[];
   data: Record<string, any>;
+  /** Internal worker calls only: the account holder who must own `to`. */
+  user_id?: string;
 }
 
 serve(async (req) => {
@@ -29,6 +31,46 @@ serve(async (req) => {
   }
 
   try {
+    // Internal worker path: service-to-service calls authenticated by
+    // CRON_SECRET. Restricted to the appointment_reminder template and to
+    // the account holder's own verified email (checked via Admin API below),
+    // so the function can never be used as an open relay.
+    const cronSecret = req.headers.get('x-cron-secret');
+    const expectedCronSecret = Deno.env.get('CRON_SECRET');
+    const isInternalWorker = !!expectedCronSecret && !!cronSecret && cronSecret === expectedCronSecret;
+
+    let user: { id: string; email?: string } | null = null;
+    let isAdmin = false;
+    let emailRequest: EmailRequest;
+
+    if (isInternalWorker) {
+      const parsed: EmailRequest = await req.json().catch(() => null as any);
+      if (!parsed || parsed.type !== 'appointment_reminder' || !parsed.user_id) {
+        return new Response(
+          JSON.stringify({ error: 'Internal calls are limited to appointment_reminder with user_id' }),
+          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      const supabaseService = createClient(
+        Deno.env.get('SUPABASE_URL') ?? '',
+        Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+      );
+      const { data: accountUser, error: accountError } = await supabaseService.auth.admin.getUserById(parsed.user_id);
+      const ownerEmail = (accountUser?.user?.email ?? '').toLowerCase();
+      const requestedTo = (parsed.to || []).map(e => String(e).toLowerCase());
+      if (accountError || !ownerEmail || requestedTo.some(e => e !== ownerEmail)) {
+        return new Response(
+          JSON.stringify({ error: 'Internal calls may only email the account holder' }),
+          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      // Stash the verified body for the shared pipeline below.
+      (req as any).__parsedBody = parsed;
+      user = { id: parsed.user_id, email: ownerEmail };
+      console.log('Internal worker email for user:', user.id, parsed.type);
+    }
+
+    if (!isInternalWorker) {
     // Authentication check - require valid user token
     const authHeader = req.headers.get('Authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -46,19 +88,24 @@ serve(async (req) => {
       { global: { headers: { Authorization: authHeader } } }
     );
 
-    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser();
-    if (authError || !user) {
+    const { data: { user: authUser }, error: authError } = await supabaseAuth.auth.getUser();
+    if (authError || !authUser) {
       console.error('Authentication failed:', authError?.message);
       return new Response(
         JSON.stringify({ error: 'Unauthorized' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+    user = { id: authUser.id, email: authUser.email };
 
     console.log('Authenticated user:', user.id);
 
-    const emailRequest: EmailRequest = await req.json();
+    emailRequest = await req.json();
     console.log("Processing email request from user:", user.id, emailRequest.type);
+    } else {
+      // Internal worker body was already parsed + ownership-verified above.
+      emailRequest = (req as any).__parsedBody;
+    }
 
     // Input validation
     if (!emailRequest.type || !emailRequest.to || !Array.isArray(emailRequest.to) || emailRequest.to.length === 0) {
@@ -81,9 +128,11 @@ serve(async (req) => {
     // Anti-abuse: only allow sending to the caller's own email address, unless the
     // caller is an admin/superadmin. This prevents the function from being used as
     // an open relay by any authenticated user.
-    const userEmail = (user.email ?? '').toLowerCase();
+    const userEmail = (user!.email ?? '').toLowerCase();
     const requestedTo = emailRequest.to.map(e => e.toLowerCase());
-    let isAdmin = false;
+    // NOTE: isAdmin stays false on the internal-worker path (ownership of the
+    // single recipient was already verified via the Admin API above).
+    if (!isInternalWorker) {
     try {
       const supabaseService = createClient(
         Deno.env.get('SUPABASE_URL') ?? '',
@@ -92,12 +141,13 @@ serve(async (req) => {
       const { data: profile } = await supabaseService
         .from('profiles')
         .select('admin_level')
-        .eq('id', user.id)
+        .eq('id', user!.id)
         .maybeSingle();
       isAdmin = profile?.admin_level === 'admin' || profile?.admin_level === 'superadmin';
     } catch (_e) {
       isAdmin = false;
     }
+    } // end user-path admin lookup (internal workers skip: recipient pre-verified)
 
     if (!isAdmin) {
       const forbiddenRecipients = requestedTo.filter(e => e !== userEmail);
@@ -116,7 +166,7 @@ serve(async (req) => {
     switch (emailRequest.type) {
       case "appointment_reminder":
         subject = "Appointment Reminder";
-        html = appointmentReminderTemplate(emailRequest.data as { date: string; time: string; provider: { first_name: string; last_name: string; }; });
+        html = appointmentReminderTemplate(emailRequest.data as { date: string; time: string; provider: { first_name: string; last_name: string; honorific?: string }; });
         break;
       case "payment_confirmation":
         subject = "Payment Confirmation";
@@ -151,7 +201,7 @@ serve(async (req) => {
     }
 
     const data = await res.json();
-    console.log("Email sent successfully by user:", user.id, data);
+    console.log("Email sent successfully by user:", user!.id, data);
 
     return new Response(JSON.stringify(data), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
