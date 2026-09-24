@@ -178,7 +178,7 @@ const HealthAnalytics = () => {
 
           {activeTab === "sleep" && (
             <div className="space-y-4">
-              <h3 className="font-extrabold text-xs text-graphite-500 dark:text-slate-400 uppercase">Sleep Architecture Breakdown</h3>
+              <h3 className="font-extrabold text-xs text-graphite-500 dark:text-slate-400 uppercase">Sleep Stages (estimated 20/60/20 split of recorded hours)</h3>
               <div className="h-[380px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={sleepData}>

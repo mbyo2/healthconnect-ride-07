@@ -125,7 +125,8 @@ export const getHealthStats = async (): Promise<HealthStat[]> => {
   }
 };
 
-// Generate mock health goals based on the latest health metrics
+// Derive health goals from the user's latest recorded metrics, measured
+// against standard reference targets (config/healthMetrics).
 export const getHealthGoals = async (): Promise<HealthGoal[]> => {
   try {
     const { data: { user } } = await supabase.auth.getUser();

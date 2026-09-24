@@ -5,7 +5,6 @@ import { toast } from 'sonner';
 import { bluetoothService } from '@/services/iot/bluetooth-service';
 import { usbService } from '@/services/iot/usb-service';
 import { serialService } from '@/services/iot/serial-service';
-import { wifiService } from '@/services/iot/wifi-service';
 import { ConnectionType } from '@/types/iot';
 
 // Throttle function to prevent excessive updates

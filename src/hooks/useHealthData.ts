@@ -97,7 +97,8 @@ export function useHealthData(userId: string | undefined, timeRange: string) {
         setSleepData(processedData.map(d => ({
             date: d.date,
             hours: d.sleep_hours || 0,
-            // Mock breakdown as we only have total hours in schema
+            // Estimated stage split — only total hours are recorded, so the
+            // chart is labelled "estimated" in HealthAnalytics.
             deep: (d.sleep_hours || 0) * 0.2,
             light: (d.sleep_hours || 0) * 0.6,
             rem: (d.sleep_hours || 0) * 0.2

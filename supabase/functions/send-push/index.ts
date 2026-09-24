@@ -137,11 +137,16 @@ serve(async (req) => {
     // technologists) who hold no user_connections row with the patient.
     const targetUserIds = requestedTargetIds;
 
-    // Audit log of the push send
-    await supabase.from("audit_logs").insert({
+    // Audit log of the push send (columns must match the audit_logs schema:
+    // action/category/outcome/resource/severity/timestamp are required).
+    const { error: auditError } = await supabase.from("audit_logs").insert({
       user_id: user.id,
       action: "push_notification_sent",
-      resource_type: "notification",
+      category: "notification",
+      outcome: "success",
+      resource: "notification",
+      severity: "info",
+      timestamp: new Date().toISOString(),
       details: {
         title: payload.title,
         recipient_count: targetUserIds.length,
@@ -149,6 +154,7 @@ serve(async (req) => {
         tag: payload.tag || "general",
       },
     });
+    if (auditError) console.error("push audit insert failed:", auditError.message);
 
     // Fetch subscriptions
     const { data: subscriptions, error: subError } = await supabase

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
 import {
   Baby,
@@ -55,20 +56,22 @@ const DEVELOPMENTAL_MILESTONES = [
 
 export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institutionId }) => {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const [activeSubTab, setActiveSubTab] = useState<"growth" | "immunization" | "milestones" | "calculator">("growth");
   const [selectedPatientId, setSelectedPatientId] = useState<string>("");
   const [searchPatient, setSearchPatient] = useState("");
 
-  // Growth entry state
+  // Growth entry state — blank until measured; nothing is prefilled.
   const [showGrowthModal, setShowGrowthModal] = useState(false);
-  const [weightKg, setWeightKg] = useState<number>(8.5);
-  const [heightCm, setHeightCm] = useState<number>(72);
-  const [headCircumferenceCm, setHeadCircumferenceCm] = useState<number>(44);
+  const [weightKg, setWeightKg] = useState<number>(0);
+  const [heightCm, setHeightCm] = useState<number>(0);
+  const [headCircumferenceCm, setHeadCircumferenceCm] = useState<number>(0);
   const [growthNotes, setGrowthNotes] = useState("");
+  const [savingGrowth, setSavingGrowth] = useState(false);
 
-  // Session worksheet state (nothing here is filed to any registry yet)
-  const [recordedDoses, setRecordedDoses] = useState<string[]>([]);
+  // Milestone checklist is a session aid; doses below file to vaccination_records.
   const [achievedMilestones, setAchievedMilestones] = useState<number[]>([]);
+  const [recordingDose, setRecordingDose] = useState<string | null>(null);
 
   // Dosage Calculator state
   const [calcDrug, setCalcDrug] = useState("Amoxicillin (50mg/kg/day in 2 divided doses)");
@@ -92,6 +95,56 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
 
   const activePatient = patients.find((p) => p.id === selectedPatientId) || patients[0];
 
+  // Real immunization registry for the active child.
+  const { data: vaccineRecords = [], refetch: refetchVaccines } = useQuery({
+    queryKey: ["peds-vaccines", activePatient?.id],
+    enabled: !!activePatient?.id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("vaccination_records")
+        .select("id,vaccine_name,dose_number,administered_date,batch_number,notes")
+        .eq("patient_id", activePatient!.id)
+        .order("administered_date", { ascending: false })
+        .limit(200);
+      if (error) throw error;
+      return (data || []) as any[];
+    },
+  });
+
+  const recordedVaccineNames = new Set(vaccineRecords.map((r) => r.vaccine_name));
+
+  const handleRecordDose = async (vaccineName: string) => {
+    if (!activePatient?.id) {
+      toast.error("Select a patient first");
+      return;
+    }
+    if (!user) {
+      toast.error("Sign in to file immunization records");
+      return;
+    }
+    setRecordingDose(vaccineName);
+    try {
+      const doseNumber = vaccineRecords.filter((r) => r.vaccine_name === vaccineName).length + 1;
+      const { error } = await supabase.from("vaccination_records").insert({
+        patient_id: activePatient.id,
+        vaccine_name: vaccineName,
+        dose_number: doseNumber,
+        administered_date: new Date().toISOString().split("T")[0],
+        administered_by: user.id,
+        notes: "Recorded via Pediatric Center",
+      } as any);
+      if (error) throw error;
+      toast.success(`${vaccineName} filed to the immunization registry`);
+      refetchVaccines();
+      queryClient.invalidateQueries({ queryKey: ["peds-vaccines"] });
+    } catch (e: any) {
+      console.error("Record dose failed:", e);
+      toast.error(e?.message || "Could not file the dose. Check permissions and try again.");
+    } finally {
+      setRecordingDose(null);
+    }
+  };
+
   const calculateAgeMonths = (dob?: string) => {
     if (!dob) return 12;
     const birth = new Date(dob);
@@ -100,38 +153,80 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
     return Math.max(diff, 1);
   };
 
-  // Growth entries live in this session's worksheet only (no growth-chart
-  // table exists yet) — the chart starts empty with an opt-in demo.
-  const [growthHistory, setGrowthHistory] = useState([
-  ] as Array<{ date: string; ageMonths: number; weight: number; height: number; head: number; percentile: string }>);
-  const [growthSamplesLoaded, setGrowthSamplesLoaded] = useState(false);
+  // Growth history persists per measurement in comprehensive_health_metrics
+  // (category 'growth'). The chart renders recorded values only.
+  const { data: growthRows = [], refetch: refetchGrowth } = useQuery({
+    queryKey: ["peds-growth", activePatient?.id],
+    enabled: !!activePatient?.id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("comprehensive_health_metrics")
+        .select("metric_name,value,unit,recorded_at,notes")
+        .eq("user_id", activePatient!.id)
+        .eq("metric_category", "growth")
+        .order("recorded_at", { ascending: true })
+        .limit(500);
+      if (error) throw error;
+      return (data || []) as any[];
+    },
+  });
 
-  const loadSampleGrowth = () => {
-    setGrowthHistory([
-      { date: "2026-03-15", ageMonths: 2, weight: 5.2, height: 58, head: 38.5, percentile: "50th" },
-      { date: "2026-05-10", ageMonths: 4, weight: 6.8, height: 64, head: 41.0, percentile: "60th" },
-      { date: "2026-07-20", ageMonths: 6, weight: 7.9, height: 68, head: 43.2, percentile: "55th" },
-      { date: "2026-09-01", ageMonths: 8, weight: 8.7, height: 72, head: 44.5, percentile: "52nd" },
-    ]);
-    setGrowthSamplesLoaded(true);
+  const ageAt = (dob?: string, at?: string) => {
+    if (!dob) return 0;
+    const birth = new Date(dob);
+    const ref = at ? new Date(at) : new Date();
+    return Math.max((ref.getFullYear() - birth.getFullYear()) * 12 + (ref.getMonth() - birth.getMonth()), 0);
   };
 
-  const handleAddGrowthEntry = () => {
-    if (!weightKg || !heightCm) {
-      toast.error("Please enter weight and height");
+  const growthHistory = (() => {
+    const byDay: Record<string, any> = {};
+    growthRows.forEach((r) => {
+      const day = (r.recorded_at || "").slice(0, 10);
+      if (!day) return;
+      byDay[day] = byDay[day] || { date: day, ageMonths: ageAt(activePatient?.date_of_birth, r.recorded_at), weight: 0, height: 0, head: 0 };
+      if (r.metric_name === "weight_kg") byDay[day].weight = Number(r.value);
+      if (r.metric_name === "height_cm") byDay[day].height = Number(r.value);
+      if (r.metric_name === "head_circumference_cm") byDay[day].head = Number(r.value);
+    });
+    return Object.values(byDay) as Array<{ date: string; ageMonths: number; weight: number; height: number; head: number }>;
+  })();
+
+  const handleAddGrowthEntry = async () => {
+    if (!activePatient?.id) {
+      toast.error("Select a patient first");
       return;
     }
-    const newEntry = {
-      date: new Date().toISOString().split("T")[0],
-      ageMonths: calculateAgeMonths(activePatient?.date_of_birth),
-      weight: weightKg,
-      height: heightCm,
-      head: headCircumferenceCm,
-      percentile: "50th (WHO Standard)",
-    };
-    setGrowthHistory((prev) => [...prev, newEntry]);
-    toast.success("Growth entry added to this session's worksheet (not filed to chart)");
-    setShowGrowthModal(false);
+    if (!weightKg || !heightCm) {
+      toast.error("Enter the measured weight and height");
+      return;
+    }
+    if (!user) {
+      toast.error("Sign in to file growth records");
+      return;
+    }
+    setSavingGrowth(true);
+    try {
+      const recordedAt = new Date().toISOString();
+      const rows = [
+        { user_id: activePatient.id, metric_category: "growth", metric_name: "weight_kg", value: weightKg, unit: "kg", recorded_at: recordedAt, recorded_by: user.id, is_patient_entered: false, notes: growthNotes.trim() || null },
+        { user_id: activePatient.id, metric_category: "growth", metric_name: "height_cm", value: heightCm, unit: "cm", recorded_at: recordedAt, recorded_by: user.id, is_patient_entered: false, notes: growthNotes.trim() || null },
+      ];
+      if (headCircumferenceCm > 0) {
+        rows.push({ user_id: activePatient.id, metric_category: "growth", metric_name: "head_circumference_cm", value: headCircumferenceCm, unit: "cm", recorded_at: recordedAt, recorded_by: user.id, is_patient_entered: false, notes: growthNotes.trim() || null });
+      }
+      const { error } = await supabase.from("comprehensive_health_metrics").insert(rows as any);
+      if (error) throw error;
+      toast.success("Growth measurements filed to the child's chart");
+      setShowGrowthModal(false);
+      setWeightKg(0); setHeightCm(0); setHeadCircumferenceCm(0); setGrowthNotes("");
+      refetchGrowth();
+      queryClient.invalidateQueries({ queryKey: ["peds-growth"] });
+    } catch (e: any) {
+      console.error("Save growth failed:", e);
+      toast.error(e?.message || "Could not file the measurements. Check permissions and try again.");
+    } finally {
+      setSavingGrowth(false);
+    }
   };
 
   // Dosage computation
@@ -270,37 +365,28 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
                 </div>
                 <DialogFooter>
                   <button onClick={() => setShowGrowthModal(false)} className="px-4 py-2 font-bold text-slate-500">Cancel</button>
-                  <button onClick={handleAddGrowthEntry} className="px-5 py-2.5 rounded-xl bg-primary-500 text-white font-extrabold">Save Record</button>
+                  <button onClick={handleAddGrowthEntry} disabled={savingGrowth} className="px-5 py-2.5 rounded-xl bg-primary-500 text-white font-extrabold disabled:opacity-50">{savingGrowth ? "Filing…" : "Save Record"}</button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
           </div>
 
-          {/* Growth Cards — latest worksheet entry, or honest empty state */}
+          {/* Growth Cards — latest charted entry, or honest empty state */}
           {growthHistory.length === 0 ? (
             <div className="p-8 rounded-2xl border border-dashed text-center">
-              <p className="font-bold text-sm">No growth entries this session</p>
+              <p className="font-bold text-sm">No growth measurements on this child&apos;s chart</p>
               <p className="text-xs text-muted-foreground mt-1 max-w-md mx-auto">
-                Entries logged here stay in this session&apos;s worksheet until a growth-chart
-                integration lands — they are not filed to any chart.
+                Log the first measurement above — entries file to the chart and persist.
               </p>
-              {!growthSamplesLoaded && (
-                <button
-                  onClick={() => { loadSampleGrowth(); }}
-                  className="mt-3 px-4 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 text-xs font-extrabold text-primary-500 hover:bg-primary-50 dark:hover:bg-slate-800 transition-colors"
-                >
-                  Load sample data for demo
-                </button>
-              )}
             </div>
           ) : (
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
-              <span className="text-[11px] font-extrabold uppercase text-slate-400">Latest Weight (worksheet)</span>
+              <span className="text-[11px] font-extrabold uppercase text-slate-400">Latest Weight (charted)</span>
               <div className="text-2xl font-black text-primary-500 mt-1">
                 {growthHistory[growthHistory.length - 1]?.weight} kg
               </div>
-              <span className="text-[10px] font-bold text-slate-500">Session entry — verify against WHO charts</span>
+              <span className="text-[10px] font-bold text-slate-500">{growthHistory[growthHistory.length - 1]?.date} — verify against WHO charts</span>
             </div>
 
             <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
@@ -308,15 +394,15 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
               <div className="text-2xl font-black text-slate-900 dark:text-slate-100 mt-1">
                 {growthHistory[growthHistory.length - 1]?.height} cm
               </div>
-              <span className="text-[10px] font-bold text-slate-500">Session entry — verify against WHO charts</span>
+              <span className="text-[10px] font-bold text-slate-500">{growthHistory[growthHistory.length - 1]?.date} — verify against WHO charts</span>
             </div>
 
             <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">
               <span className="text-[11px] font-extrabold uppercase text-slate-400">Head Circumference</span>
               <div className="text-2xl font-black text-slate-900 dark:text-slate-100 mt-1">
-                {growthHistory[growthHistory.length - 1]?.head} cm
+                {growthHistory[growthHistory.length - 1]?.head || "—"}{growthHistory[growthHistory.length - 1]?.head ? " cm" : ""}
               </div>
-              <span className="text-[10px] font-bold text-slate-500">Session entry — clinical screening still required</span>
+              <span className="text-[10px] font-bold text-slate-500">Clinical screening still required</span>
             </div>
           </div>
           )}
@@ -331,7 +417,6 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
                   <th className="py-3 px-3">Weight</th>
                   <th className="py-3 px-3">Height / Length</th>
                   <th className="py-3 px-3">Head Circ.</th>
-                  <th className="py-3 px-3 text-center">WHO Percentile</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-canvas-silk dark:divide-slate-800">
@@ -341,8 +426,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
                     <td className="py-3 px-3 font-semibold">{row.ageMonths} mo</td>
                     <td className="py-3 px-3 font-black text-slate-900 dark:text-slate-100">{row.weight} kg</td>
                     <td className="py-3 px-3 font-semibold">{row.height} cm</td>
-                    <td className="py-3 px-3 font-semibold">{row.head} cm</td>
-                    <td className="py-3 px-3 text-center font-bold text-emerald-600">{row.percentile}</td>
+                    <td className="py-3 px-3 font-semibold">{row.head ? `${row.head} cm` : "—"}</td>
                   </tr>
                 ))}
               </tbody>
@@ -363,42 +447,39 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
             </div>
               <button
                 onClick={() => {
-                  const recorded = STANDARD_VACCINES.filter((x) =>
-                    recordedDoses.includes(x.id)
-                  );
                   const printWin = window.open("", "_blank");
                   if (!printWin) {
                     toast.error("Popup blocked — allow popups to print the record");
                     return;
                   }
+                  const esc = (s: unknown) => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;");
                   printWin.document.write(
                     `<html><body style="font-family: monospace; font-size: 12px; max-width: 560px; margin: auto; padding: 20px;">` +
-                    `<h2>Immunization Session Record (worksheet — not a registry certificate)</h2>` +
+                    `<h2>Immunization Registry Record</h2>` +
+                    `<p>Patient: ${esc(activePatient?.first_name)} ${esc(activePatient?.last_name)}</p>` +
                     `<p>Printed ${new Date().toLocaleString()}</p><hr/>` +
-                    (recorded.length === 0
-                      ? `<p>No doses recorded this session.</p>`
-                      : `<ul>${recorded.map((x) => `<li>${x.name} — recorded ${new Date().toLocaleDateString()}</li>`).join("")}</ul>`) +
+                    (vaccineRecords.length === 0
+                      ? `<p>No doses filed for this child yet.</p>`
+                      : `<ul>${vaccineRecords.map((r) => `<li>${esc(r.vaccine_name)} — dose ${esc(r.dose_number)} on ${esc(r.administered_date)}</li>`).join("")}</ul>`) +
                     `<script>window.print();</script></body></html>`
                   );
                   printWin.document.close();
-                  toast.success("Session record sent to printer");
+                  toast.success("Registry record sent to printer");
                 }}
                 className="px-4 py-2 rounded-xl border border-primary-500 text-primary-500 font-extrabold text-xs hover:bg-primary-500 hover:text-white transition-colors"
               >
-                Print Session Record
+                Print Registry Record
               </button>
           </div>
 
           <p className="text-xs text-muted-foreground -mt-1">
-            Zambia EPI reference schedule. Doses you record below stay in this session&apos;s
-            worksheet — they are not filed to any immunization registry.
+            Zambia EPI reference schedule. Doses you record below file to this child&apos;s
+            immunization registry — nothing is pre-marked given.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {STANDARD_VACCINES.map((v) => {
-              const recorded = recordedDoses.includes(v.id);
-              // Schedule position (due age) is reference info; only recorded
-              // doses belong to this patient — nothing is pre-marked given.
-              const shown = recorded ? "completed" : v.status === "upcoming" ? "upcoming" : "due";
+              const recorded = recordedVaccineNames.has(v.name);
+              const shown = recorded ? "completed" : "due";
               return (
               <div
                 key={v.id}
@@ -425,22 +506,16 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
                 <div>
                   {shown === "completed" ? (
                     <span className="px-3 py-1 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400">
-                      ✓ {recorded ? "Recorded (session)" : "Administered"}
+                      ✓ Filed in registry
                     </span>
-                  ) : shown === "due" ? (
-                    <button
-                      onClick={() => {
-                        setRecordedDoses((prev) => [...prev, v.id]);
-                        toast.success(`Recorded ${v.name} in this session's worksheet (not filed to registry)`);
-                      }}
-                      className="px-3 py-1.5 rounded-full text-[10px] font-black bg-primary-500 text-white shadow-xs hover:bg-primary-600"
-                    >
-                      Record Dose
-                    </button>
                   ) : (
-                    <span className="px-3 py-1 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500 dark:bg-slate-800">
-                      Scheduled
-                    </span>
+                    <button
+                      onClick={() => handleRecordDose(v.name)}
+                      disabled={recordingDose === v.name}
+                      className="px-3 py-1.5 rounded-full text-[10px] font-black bg-primary-500 text-white shadow-xs hover:bg-primary-600 disabled:opacity-50"
+                    >
+                      {recordingDose === v.name ? "Filing…" : "Record Dose"}
+                    </button>
                   )}
                 </div>
               </div>

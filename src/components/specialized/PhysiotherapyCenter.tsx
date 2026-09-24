@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
 import {
   Activity,
@@ -38,24 +39,14 @@ interface ExercisePlan {
   equipment: string;
 }
 
-// Sample joint readings for demos — never shown as real records.
-// The worksheet starts empty; samples load only via the opt-in button.
-const SAMPLE_ROM_JOINTS: JointROM[] = [
-  { id: "1", joint: "Shoulder", movement: "Flexion", leftDegrees: 140, rightDegrees: 175, normalRange: "0° - 180°", notes: "Mild impingement left" },
-  { id: "2", joint: "Shoulder", movement: "Abduction", leftDegrees: 120, rightDegrees: 170, normalRange: "0° - 180°", notes: "Subacromial pain" },
-  { id: "3", joint: "Knee", movement: "Flexion", leftDegrees: 130, rightDegrees: 135, normalRange: "0° - 140°", notes: "Good progress" },
-  { id: "4", joint: "Knee", movement: "Extension", leftDegrees: 0, rightDegrees: 0, normalRange: "0°", notes: "Full terminal extension" },
-  { id: "5", joint: "Lumbar Spine", movement: "Forward Flexion", leftDegrees: 60, rightDegrees: 60, normalRange: "0° - 80°", notes: "Hamstring tightness" },
-  { id: "6", joint: "Cervical Spine", movement: "Rotation", leftDegrees: 65, rightDegrees: 80, normalRange: "0° - 80°", notes: "Trapezius spasm" },
-];
+// Normal ROM reference ranges (goniometry standard, not patient data).
 
 export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ institutionId }) => {
   const [activeTab, setActiveTab] = useState<"rom" | "pain" | "exercises" | "sessions">("rom");
   const [selectedPatientId, setSelectedPatientId] = useState("");
 
-  // ROM state — session worksheet only (no backend table exists yet)
+  // ROM readings staged for the next filed session (attached to its notes).
   const [romList, setRomList] = useState<JointROM[]>([]);
-  const [romSamplesLoaded, setRomSamplesLoaded] = useState(false);
   const [showAddROM, setShowAddROM] = useState(false);
   const [newJoint, setNewJoint] = useState({
     joint: "Shoulder",
@@ -66,11 +57,11 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
     notes: "",
   });
 
-  // Pain Scale State
-  const [painScore, setPainScore] = useState<number>(6);
-  const [painLocation, setPainLocation] = useState<string>("Left Lumbar / Sacroiliac Joint");
-  const [aggravatingFactors, setAggravatingFactors] = useState<string>("Prolonged sitting, bending forward");
-  const [relievingFactors, setRelievingFactors] = useState<string>("Walking, heat packs, supine decompression");
+  // Pain Scale State — blank until the clinician assesses; nothing prefilled.
+  const [painScore, setPainScore] = useState<number>(0);
+  const [painLocation, setPainLocation] = useState<string>("");
+  const [aggravatingFactors, setAggravatingFactors] = useState<string>("");
+  const [relievingFactors, setRelievingFactors] = useState<string>("");
 
   // Exercise Prescriptions
   const [exercises, setExercises] = useState<ExercisePlan[]>([
@@ -80,9 +71,11 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
     { id: "ex-4", name: "Glute Bridges with Core Brace", targetArea: "Pelvis / Posterior Chain", sets: 3, reps: "12 reps (3s hold)", frequency: "Daily", equipment: "Bodyweight" },
   ]);
 
-  // Rehabilitation Sessions — session worksheet only (no backend table exists yet)
-  const [sessions, setSessions] = useState([
-  ] as Array<{ sessionNo: number; date: string; painPre: number; painPost: number; modalities: string; therapist: string }>);
+  // Rehabilitation Sessions persist to specialist_sessions (physiotherapy).
+  const [savingSession, setSavingSession] = useState(false);
+  const [sessPainPre, setSessPainPre] = useState<number>(0);
+  const [sessPainPost, setSessPainPost] = useState<number>(0);
+  const [sessModalities, setSessModalities] = useState("");
 
   const { data: patients = [] } = useQuery({
     queryKey: ["pt-patients"],
@@ -98,6 +91,90 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
   });
 
   const activePatient = patients.find((p) => p.id === selectedPatientId) || patients[0];
+  const activePatientName = activePatient ? `${activePatient.first_name || ""} ${activePatient.last_name || ""}`.trim() : "";
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+
+  // Persisted physio sessions for the active patient at this facility.
+  const { data: persistedSessions = [], refetch: refetchPhysioSessions } = useQuery({
+    queryKey: ["physio-sessions", institutionId, activePatientName],
+    enabled: !!activePatientName,
+    queryFn: async () => {
+      let q = (supabase.from("specialist_sessions" as any) as any)
+        .select("id,session_number,session_date,status,vitals_before,vitals_after,protocol_notes,provider_id,created_at")
+        .eq("specialty_type", "physiotherapy")
+        .eq("patient_name", activePatientName)
+        .order("session_date", { ascending: false })
+        .limit(100);
+      if (institutionId) q = q.eq("institution_id", institutionId);
+      const { data, error } = await q;
+      if (error) throw error;
+      const rows = (data || []) as any[];
+      const provIds = [...new Set(rows.map((r) => r.provider_id).filter(Boolean))];
+      let names: Record<string, string> = {};
+      if (provIds.length) {
+        try {
+          const { data: profs } = await supabase.from("profiles").select("id,first_name,last_name").in("id", provIds);
+          ((profs as any[]) || []).forEach((p) => {
+            names[p.id] = `${p.first_name || ""} ${p.last_name || ""}`.trim() || "Clinician";
+          });
+        } catch { /* keep ids */ }
+      }
+      return rows.map((r) => ({
+        sessionNo: r.session_number,
+        date: (r.session_date || "").slice(0, 10),
+        painPre: r.vitals_before?.pain ?? null,
+        painPost: r.vitals_after?.pain ?? null,
+        modalities: r.protocol_notes || "",
+        therapist: r.provider_id === user?.id ? "You" : names[r.provider_id] || "—",
+      }));
+    },
+  });
+
+  const handleLogSession = async () => {
+    if (!activePatientName) {
+      toast.error("Select a patient first");
+      return;
+    }
+    if (!sessModalities.trim()) {
+      toast.error("Describe the modalities and interventions applied");
+      return;
+    }
+    if (!user) {
+      toast.error("Sign in to file therapy sessions");
+      return;
+    }
+    setSavingSession(true);
+    try {
+      const romSummary = romList.length
+        ? `ROM readings: ${romList.map((r) => `${r.joint} ${r.movement} L${r.leftDegrees}°/R${r.rightDegrees}°`).join("; ")}. `
+        : "";
+      const nextNo = persistedSessions.length ? Math.max(...persistedSessions.map((s: any) => s.sessionNo || 0)) + 1 : 1;
+      const { error } = await (supabase.from("specialist_sessions" as any) as any).insert({
+        patient_name: activePatientName,
+        specialty_type: "physiotherapy",
+        session_number: nextNo,
+        total_sessions: null,
+        status: "completed",
+        vitals_before: { pain: sessPainPre },
+        vitals_after: { pain: sessPainPost },
+        protocol_notes: `${romSummary}Modalities: ${sessModalities.trim()}`,
+        session_date: new Date().toISOString().split("T")[0],
+        institution_id: institutionId || null,
+        provider_id: user.id,
+      });
+      if (error) throw error;
+      toast.success(`Session #${nextNo} filed to ${activePatientName}'s chart`);
+      setSessPainPre(0); setSessPainPost(0); setSessModalities("");
+      refetchPhysioSessions();
+      queryClient.invalidateQueries({ queryKey: ["physio-sessions"] });
+    } catch (e: any) {
+      console.error("Log physio session failed:", e);
+      toast.error(e?.message || "Could not file the session. Check permissions and try again.");
+    } finally {
+      setSavingSession(false);
+    }
+  };
 
   const handleAddROM = () => {
     setRomList((prev) => [
@@ -112,7 +189,7 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
         notes: newJoint.notes,
       },
     ]);
-    toast.success("Joint reading added to this session's worksheet (not saved to chart)");
+    toast.success("Reading staged — it files with the next saved session");
     setShowAddROM(false);
   };
 
@@ -272,19 +349,11 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
 
           {romList.length === 0 && (
             <div className="p-8 rounded-2xl border border-dashed text-center">
-              <p className="font-bold text-sm">No measurements this session</p>
+              <p className="font-bold text-sm">No measurements staged for the next session</p>
               <p className="text-xs text-muted-foreground mt-1 max-w-md mx-auto">
-                Goniometry readings entered here stay in this session&apos;s worksheet until a
-                clinical-record integration lands — they are not filed to any chart.
+                Readings you add here attach to the next session you file — they are staged,
+                not yet on the chart.
               </p>
-              {!romSamplesLoaded && (
-                <button
-                  onClick={() => { setRomList(SAMPLE_ROM_JOINTS); setRomSamplesLoaded(true); }}
-                  className="mt-3 px-4 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 text-xs font-extrabold text-primary-500 hover:bg-primary-50 dark:hover:bg-slate-800 transition-colors"
-                >
-                  Load sample data for demo
-                </button>
-              )}
             </div>
           )}
 
@@ -410,35 +479,35 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
               </div>
 
               <button
-                onClick={() => toast.success(`VAS ${painScore}/10 noted in this session's worksheet (not filed to chart)`)}
+                onClick={() => toast.success(`VAS ${painScore}/10 assessed — file it with the session on the Sessions tab`)}
                 className="w-full py-2.5 rounded-xl bg-primary-500 text-white font-extrabold shadow-xs hover:bg-primary-600"
               >
                 Log Pain Assessment
               </button>
             </div>
 
-            {/* Pain Trend Summary — derived from this session's logged entries */}
+              {/* Pain Trend Summary — derived from filed sessions for this patient */}
             <div className="p-6 rounded-3xl bg-slate-900 text-white shadow-md flex flex-col justify-between space-y-4">
               <div>
                 <span className="px-3 py-1 rounded-full text-[10px] font-black bg-emerald-400 text-slate-950 uppercase">
-                  Session Worksheet
+                  Filed Chart
                 </span>
                 <div className="mt-4">
-                  {sessions.length === 0 ? (
+                  {persistedSessions.length === 0 ? (
                     <>
                       <div className="text-3xl font-black text-slate-300">No sessions yet</div>
                       <p className="text-xs text-slate-300 mt-1">
-                        Log sessions below to track pre/post pain across this worksheet.
+                        File sessions below to track pre/post pain on this patient&apos;s chart.
                       </p>
                     </>
                   ) : (
                     <>
                       <div className="text-3xl font-black text-emerald-400">
-                        {sessions.length} session{sessions.length === 1 ? "" : "s"} logged
+                        {persistedSessions.length} session{persistedSessions.length === 1 ? "" : "s"} filed
                       </div>
                       <p className="text-xs text-slate-300 mt-1">
-                        Latest: VAS {sessions[sessions.length - 1].painPre}/10 →{" "}
-                        {sessions[sessions.length - 1].painPost}/10 post-treatment.
+                        Latest: VAS {persistedSessions[0].painPre ?? "—"}/10 →{" "}
+                        {persistedSessions[0].painPost ?? "—"}/10 post-treatment.
                       </p>
                     </>
                   )}
@@ -456,19 +525,19 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-300">Record status:</span>
-                  <span className="font-bold text-blue-300">Session worksheet only</span>
+                  <span className="font-bold text-blue-300">Assessment aid — file via Sessions tab</span>
                 </div>
               </div>
 
               <button
                 onClick={() => {
                   const lines = [
-                    "PHYSIOTHERAPY SESSION WORKSHEET (not a clinical record)",
+                    `PHYSIOTHERAPY SUMMARY — ${activePatientName || "no patient selected"} (filed chart sessions)`,
                     `Date: ${new Date().toLocaleDateString()}`,
-                    `Current VAS: ${painScore}/10 at ${painLocation || "unspecified site"}`,
+                    `Current VAS assessment: ${painScore}/10 at ${painLocation || "unspecified site"}`,
                     "",
-                    ...sessions.map(
-                      (s) => `Session #${s.sessionNo} (${s.date}): VAS ${s.painPre} → ${s.painPost} — ${s.modalities}`
+                    ...persistedSessions.map(
+                      (s: any) => `Session #${s.sessionNo} (${s.date}): VAS ${s.painPre ?? "—"} → ${s.painPost ?? "—"} — ${s.modalities}`
                     ),
                   ];
                   const printWin = window.open("", "_blank");
@@ -478,17 +547,17 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
                   }
                   printWin.document.write(
                     `<html><body style="font-family: monospace; font-size: 12px; max-width: 560px; margin: auto; padding: 20px;">` +
-                    `<h2>Physiotherapy Session Worksheet</h2>` +
-                    `<p>Printed ${new Date().toLocaleString()} — worksheet copy, not a filed clinical record.</p><hr/>` +
+                    `<h2>Physiotherapy Session Summary</h2>` +
+                    `<p>Printed ${new Date().toLocaleString()} — from filed chart sessions.</p><hr/>` +
                     `<pre>${lines.join("\n")}</pre>` +
                     `<script>window.print();</script></body></html>`
                   );
                   printWin.document.close();
-                  toast.success("Worksheet sent to printer");
+                  toast.success("Summary sent to printer");
                 }}
                 className="w-full py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-extrabold text-xs border border-white/20"
               >
-                Print Session Worksheet
+                Print Session Summary
               </button>
             </div>
           </div>
@@ -504,7 +573,7 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
                 Prescribed Home &amp; Clinic Exercise Protocol
               </h3>
               <p className="text-xs text-graphite-500 dark:text-slate-400">
-                Customized therapeutic conditioning routine for active rehabilitation
+                Starter protocol templates — customize sets, reps and equipment per patient before sharing
               </p>
             </div>
             <button
@@ -564,38 +633,62 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
         </div>
       )}
 
-      {/* 4. Therapy Sessions */}
+      {/* 4. Therapy Sessions — filed to the patient's chart */}
       {activeTab === "sessions" && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">
-                Clinical Session Logs &amp; Modality Applications
-              </h3>
-              <p className="text-xs text-graphite-500 dark:text-slate-400">
-                Treatment interventions, pre/post pain differentials, and manual adjustments
-              </p>
-            </div>
-            <button
-              onClick={() => {
-                const nextSess = {
-                  sessionNo: sessions.length + 1,
-                  date: new Date().toISOString().split("T")[0],
-                  painPre: 4,
-                  painPost: 1,
-                  modalities: "Deep Tissue Trigger Point, Eccentric Loading, Dynamic Balance Training",
-                  therapist: "Lead PT",
-                };
-                setSessions([...sessions, nextSess]);
-                toast.success(`Session #${nextSess.sessionNo} added to this worksheet (not filed to chart)`);
-              }}
-              className="px-4 py-2 rounded-xl bg-primary-500 text-white font-extrabold text-xs shadow-xs flex items-center gap-1.5"
-            >
-              <Plus className="h-4 w-4" /> Log Today's Session
-            </button>
+          <div>
+            <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">
+              Clinical Session Logs &amp; Modality Applications
+            </h3>
+            <p className="text-xs text-graphite-500 dark:text-slate-400">
+              Filed sessions for {activePatientName || "the selected patient"} — treatment interventions with pre/post pain differentials
+            </p>
           </div>
 
-              <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
+          <div className="p-4 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            <div>
+              <label className="font-bold">Pre-treatment VAS (0–10) *</label>
+              <input
+                type="number" min={0} max={10}
+                className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-bold"
+                value={sessPainPre}
+                onChange={(e) => setSessPainPre(Math.min(10, Math.max(0, parseInt(e.target.value) || 0)))}
+              />
+            </div>
+            <div>
+              <label className="font-bold">Post-treatment VAS (0–10) *</label>
+              <input
+                type="number" min={0} max={10}
+                className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-bold"
+                value={sessPainPost}
+                onChange={(e) => setSessPainPost(Math.min(10, Math.max(0, parseInt(e.target.value) || 0)))}
+              />
+            </div>
+            <div className="sm:col-span-2">
+              <label className="font-bold">Modalities &amp; interventions applied *</label>
+              <textarea
+                rows={2}
+                className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700"
+                placeholder="e.g. Deep tissue trigger point, eccentric loading, dynamic balance training…"
+                value={sessModalities}
+                onChange={(e) => setSessModalities(e.target.value)}
+              />
+              {romList.length > 0 && (
+                <p className="text-[11px] text-slate-500 mt-1">{romList.length} ROM reading{romList.length === 1 ? "" : "s"} from the worksheet will attach to this session&apos;s notes.</p>
+              )}
+            </div>
+            <div className="sm:col-span-2">
+              <button
+                onClick={handleLogSession}
+                disabled={savingSession}
+                className="px-4 py-2 rounded-xl bg-primary-500 text-white font-extrabold text-xs shadow-xs flex items-center gap-1.5 disabled:opacity-50"
+              >
+                <Plus className="h-4 w-4" /> {savingSession ? "Filing…" : "File Session to Chart"}
+              </button>
+            </div>
+          </div>
+
+          <div className="w-full overflow-x-auto rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
             <table className="w-full min-w-[640px] text-left border-collapse text-xs">
               <thead>
                 <tr className="border-b border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
@@ -608,20 +701,20 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
                 </tr>
               </thead>
               <tbody className="divide-y divide-canvas-silk dark:divide-slate-800">
-                {sessions.length === 0 && (
+                {persistedSessions.length === 0 && (
                   <tr>
                     <td colSpan={6} className="py-10 text-center">
-                      <p className="font-bold text-sm">No sessions logged this worksheet</p>
-                      <p className="text-xs text-muted-foreground mt-1">Log today&apos;s session to start tracking pre/post pain here.</p>
+                      <p className="font-bold text-sm">No sessions filed for this patient</p>
+                      <p className="text-xs text-muted-foreground mt-1">File the first session above — entries persist to the chart.</p>
                     </td>
                   </tr>
                 )}
-                {sessions.map((s) => (
+                {persistedSessions.map((s: any) => (
                   <tr key={s.sessionNo} className="hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-800/60">
                     <td className="py-3 px-4 font-black text-primary-500">Session #{s.sessionNo}</td>
                     <td className="py-3 px-3 font-semibold text-slate-700 dark:text-slate-300">{s.date}</td>
-                    <td className="py-3 px-3 text-center font-bold text-rose-600">{s.painPre}/10</td>
-                    <td className="py-3 px-3 text-center font-bold text-emerald-600">{s.painPost}/10</td>
+                    <td className="py-3 px-3 text-center font-bold text-rose-600">{s.painPre ?? "—"}{s.painPre !== null ? "/10" : ""}</td>
+                    <td className="py-3 px-3 text-center font-bold text-emerald-600">{s.painPost ?? "—"}{s.painPost !== null ? "/10" : ""}</td>
                     <td className="py-3 px-3 font-medium text-slate-800 dark:text-slate-200">{s.modalities}</td>
                     <td className="py-3 px-3 font-semibold text-slate-500">{s.therapist}</td>
                   </tr>

@@ -574,7 +574,7 @@ export const InstitutionDashboard = () => {
         {activeTab === "lis_ris" && <LISRadiologySuite institutionId={institution.id} />}
 
         {/* 12. HL7 FHIR Interoperability */}
-        {activeTab === "fhir" && <FHIRInteroperabilityHub patientId={institution.id} />}
+        {activeTab === "fhir" && <FHIRInteroperabilityHub institutionId={institution.id} />}
 
         {/* 13. Revenue Cycle Management & Insurance */}
         {activeTab === "rcm" && (
@@ -586,7 +586,7 @@ export const InstitutionDashboard = () => {
         {/* 14. Multi-Center Enterprise Governance & Cryptographic Audit */}
         {activeTab === "governance" && (
           <div className="bg-slate-950 rounded-2xl p-6 border border-slate-800">
-            <MultiCenterAuditSuite />
+            <MultiCenterAuditSuite institutionId={institution.id} />
           </div>
         )}
       </div>

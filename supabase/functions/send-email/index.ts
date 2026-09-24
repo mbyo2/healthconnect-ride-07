@@ -178,12 +178,17 @@ serve(async (req) => {
             Deno.env.get('SUPABASE_URL') ?? '',
             Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
           );
-          await supabaseService.from('audit_logs').insert({
+          const { error: auditError } = await supabaseService.from('audit_logs').insert({
             user_id: user!.id,
             action: 'staff_email_sent',
-            resource_type: 'email',
+            category: 'notification',
+            outcome: 'success',
+            resource: 'email',
+            severity: 'info',
+            timestamp: new Date().toISOString(),
             details: { type: emailRequest.type, recipients: requestedTo },
           });
+          if (auditError) console.error('staff email audit insert failed:', auditError.message);
         } catch (_auditErr) {
           // Audit failure must not block care communication; it is logged.
           console.error('staff email audit insert failed');

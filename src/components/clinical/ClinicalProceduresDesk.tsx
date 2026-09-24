@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/context/AuthContext";
 import {
   Stethoscope,
   Activity,
@@ -38,36 +40,101 @@ const COMMON_ICD10 = [
   { code: "R50.9", label: "Fever, unspecified" },
 ];
 
-const COMMON_CPT = [
-  { code: "99213", label: "Office / Outpatient Visit, Est. Patient, 20-29 mins" },
-  { code: "99214", label: "Office / Outpatient Visit, Est. Patient, 30-39 mins" },
-  { code: "97110", label: "Therapeutic Procedure / Exercises, 15 minutes" },
-  { code: "90471", label: "Immunization Administration (single or combo vaccine)" },
-  { code: "12001", label: "Simple Repair of Superficial Wounds (≤ 2.5 cm)" },
-  { code: "99283", label: "Emergency Department Visit, Moderate Severity" },
-  { code: "96372", label: "Therapeutic / Diagnostic Injection (IM / SubQ)" },
-];
-
-// Clearly-labeled sample rows for demos — never shown as real records.
-// The desk starts empty; samples load only via the opt-in button below.
-const SAMPLE_PROCEDURES: ClinicalProcedure[] = [
-  { id: "pr-1", procedureCode: "CPT-99214", procedureName: "Comprehensive Clinical Consultation", patientName: "Chanda Mulenga", diagnosisIcd: "ICD-I10 (Essential Hypertension)", performer: "Dr. Mwape Chilufya", date: "2026-09-01", consentSigned: true, status: "Completed", notes: "Medication adjusted to Amlodipine 5mg OD. BP controlled at 122/78." },
-  { id: "pr-2", procedureCode: "CPT-97110", procedureName: "Therapeutic Spinal Mobilization", patientName: "Ruth Chiluba", diagnosisIcd: "ICD-M54.5 (Low Back Pain)", performer: "PT Faith Musonda", date: "2026-09-01", consentSigned: true, status: "In Progress", notes: "Lumbar Grade II mobilization and core stabilization." },
-  { id: "pr-3", procedureCode: "CPT-90471", procedureName: "EPI Childhood Vaccine Administration", patientName: "Baby Joshua Tembo", diagnosisIcd: "ICD-Z23 (Encounter for immunization)", performer: "Sister Grace Banda", date: "2026-09-01", consentSigned: true, status: "Completed", notes: "Pentavalent-3 and IPV administered left anterolateral thigh." },
-  { id: "pr-4", procedureCode: "CPT-12001", procedureName: "Superficial Wound Suture (Forearm)", patientName: "Felix Mwape", diagnosisIcd: "ICD-S51.8 (Laceration of forearm)", performer: "Dr. Lindiwe Zulu", date: "2026-08-30", consentSigned: true, status: "Completed", notes: "3 nylon interrupted sutures applied under local 2% lidocaine." },
-];
+// ICD-10 quick-pick reference (coding standard, not patient data).
+// The procedure catalog loads live from clinical_procedures.
 
 export const ClinicalProceduresDesk: React.FC<{ institutionId?: string }> = ({ institutionId }) => {
+  const { user } = useAuth();
   const [procedures, setProcedures] = useState<ClinicalProcedure[]>([]);
-  const [samplesLoaded, setSamplesLoaded] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [catalog, setCatalog] = useState<any[]>([]);
+  const [roster, setRoster] = useState<{ id: string; name: string }[]>([]);
 
   // New Procedure Form state
   const [showNewModal, setShowNewModal] = useState(false);
-  const [patientName, setPatientName] = useState("");
+  const [selectedPatientId, setSelectedPatientId] = useState("");
   const [selectedIcd, setSelectedIcd] = useState(COMMON_ICD10[0].code);
-  const [selectedCpt, setSelectedCpt] = useState(COMMON_CPT[0].code);
+  const [selectedProcedureId, setSelectedProcedureId] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState<ClinicalProcedure["status"]>("Scheduled");
+  const [consentSigned, setConsentSigned] = useState(false);
   const [procedureNotes, setProcedureNotes] = useState("");
+
+  const splitNotes = (notes: string | null) => {
+    const m = /^\[ICD-([^\]]+)\]\s?/.exec(notes || "");
+    return { icd: m ? m[1] : "—", body: (notes || "").replace(/^\[ICD-[^\]]+\]\s?/, "") };
+  };
+
+  const fetchDesk = async () => {
+    setLoading(true);
+    try {
+      const [execRes, catRes] = await Promise.all([
+        institutionId
+          ? supabase.from("procedure_executions" as any).select("id,execution_date,status,notes,patient_id,provider_id,procedure_id").eq("institution_id", institutionId).order("execution_date", { ascending: false }).limit(200)
+          : { data: [], error: null } as any,
+        supabase.from("clinical_procedures" as any).select("id,procedure_code,procedure_name,category,base_price").eq("is_active", true).order("procedure_name").limit(200),
+      ]);
+      if (execRes.error) throw execRes.error;
+      const catRows = ((catRes as any).data as any[]) || [];
+      setCatalog(catRows);
+      if (!selectedProcedureId && catRows.length) setSelectedProcedureId(catRows[0].id);
+      const catById: Record<string, any> = {};
+      catRows.forEach((c) => { catById[c.id] = c; });
+
+      const execRows = ((execRes as any).data as any[]) || [];
+      const personIds = [...new Set([...execRows.map((r) => r.patient_id), ...execRows.map((r) => r.provider_id)].filter(Boolean))];
+      let names: Record<string, string> = {};
+      if (personIds.length) {
+        try {
+          const { data: profs } = await supabase.from("profiles").select("id,first_name,last_name").in("id", personIds);
+          ((profs as any[]) || []).forEach((p) => {
+            names[p.id] = `${p.first_name || ""} ${p.last_name || ""}`.trim() || "Unnamed";
+          });
+        } catch { /* names stay blank */ }
+      }
+      setProcedures(execRows.map((r) => {
+        const cat = catById[r.procedure_id];
+        const { icd, body } = splitNotes(r.notes);
+        return {
+          id: r.id,
+          procedureCode: cat ? cat.procedure_code : "—",
+          procedureName: cat ? cat.procedure_name : "Procedure",
+          patientName: names[r.patient_id] || "—",
+          diagnosisIcd: icd.startsWith("ICD-") ? icd : `ICD-${icd}`,
+          performer: r.provider_id === user?.id ? "You" : names[r.provider_id] || "—",
+          date: (r.execution_date || "").slice(0, 10),
+          consentSigned: true, // persisted executions were recorded with consent
+          status: (r.status || "Scheduled") as ClinicalProcedure["status"],
+          notes: body,
+        };
+      }));
+
+      // Facility patient roster (admissions) for the log form.
+      if (institutionId) {
+        try {
+          const { data: adm } = await supabase.from("hospital_admissions" as any).select("patient_id").eq("hospital_id", institutionId).limit(500);
+          const ids = [...new Set(((adm as any[]) || []).map((a) => a.patient_id).filter(Boolean))];
+          if (ids.length) {
+            const { data: pats } = await supabase.from("profiles").select("id,first_name,last_name").in("id", ids);
+            const opts = ((pats as any[]) || []).map((p) => ({ id: p.id, name: `${p.first_name || ""} ${p.last_name || ""}`.trim() || "Unnamed patient" }));
+            setRoster(opts);
+            if (!selectedPatientId && opts.length) setSelectedPatientId(opts[0].id);
+          }
+        } catch (rosterErr) {
+          console.error("Procedure roster failed:", rosterErr);
+        }
+      }
+    } catch (e: any) {
+      console.error("Procedures desk failed:", e);
+      toast.error(e?.message || "Could not load recorded procedures.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { fetchDesk(); }, [institutionId]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
 
   // Reference ranges for quick clinical checks — not live patient vitals.
   // Live vitals arrive via paired IoT monitors (see IoT Monitoring).
@@ -87,32 +154,47 @@ export const ClinicalProceduresDesk: React.FC<{ institutionId?: string }> = ({ i
       p.procedureCode.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleCreateProcedure = () => {
-    if (!patientName) {
-      toast.error("Please enter patient name");
+  const handleCreateProcedure = async () => {
+    if (!selectedPatientId) {
+      toast.error("Select a registered patient first");
       return;
     }
-    const icdObj = COMMON_ICD10.find((i) => i.code === selectedIcd) || COMMON_ICD10[0];
-    const cptObj = COMMON_CPT.find((c) => c.code === selectedCpt) || COMMON_CPT[0];
-
-    const newProc: ClinicalProcedure = {
-      id: `pr-${Date.now()}`,
-      procedureCode: `CPT-${cptObj.code}`,
-      procedureName: cptObj.label,
-      patientName,
-      diagnosisIcd: `ICD-${icdObj.code} (${icdObj.label})`,
-      performer: "Attending Clinician",
-      date: new Date().toISOString().split("T")[0],
-      consentSigned: true,
-      status: "Completed",
-      notes: procedureNotes || "Procedure performed according to standard clinical protocol.",
-    };
-
-    setProcedures([newProc, ...procedures]);
-    toast.success(`Clinical procedure logged with ICD-10 & CPT coding`);
-    setShowNewModal(false);
-    setPatientName("");
-    setProcedureNotes("");
+    if (!selectedProcedureId) {
+      toast.error("Select a procedure from the catalog");
+      return;
+    }
+    if (!consentSigned) {
+      toast.error("Patient consent must be confirmed before logging");
+      return;
+    }
+    if (!user) {
+      toast.error("Sign in to log procedures");
+      return;
+    }
+    setSaving(true);
+    try {
+      const icdObj = COMMON_ICD10.find((i) => i.code === selectedIcd) || COMMON_ICD10[0];
+      const { error } = await supabase.from("procedure_executions" as any).insert({
+        procedure_id: selectedProcedureId,
+        patient_id: selectedPatientId,
+        institution_id: institutionId || null,
+        provider_id: user.id,
+        execution_date: new Date().toISOString().split("T")[0],
+        status: selectedStatus,
+        notes: `[ICD-${icdObj.code} (${icdObj.label})] ${procedureNotes.trim() || "No additional notes recorded."}`,
+      });
+      if (error) throw error;
+      toast.success("Clinical procedure logged with ICD-10 coding");
+      setShowNewModal(false);
+      setProcedureNotes("");
+      setConsentSigned(false);
+      await fetchDesk();
+    } catch (e: any) {
+      console.error("Log procedure failed:", e);
+      toast.error(e?.message || "Could not save the procedure. Check permissions and try again.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -149,13 +231,17 @@ export const ClinicalProceduresDesk: React.FC<{ institutionId?: string }> = ({ i
               </DialogHeader>
               <div className="space-y-3 py-2 text-xs">
                 <div>
-                  <label className="font-bold">Patient Name *</label>
-                  <input
-                    className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700"
-                    value={patientName}
-                    onChange={(e) => setPatientName(e.target.value)}
-                    placeholder="e.g. John Banda"
-                  />
+                  <label className="font-bold">Patient (admitted to this facility) *</label>
+                  <select
+                    className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-bold bg-white dark:bg-slate-950"
+                    value={selectedPatientId}
+                    onChange={(e) => setSelectedPatientId(e.target.value)}
+                  >
+                    {roster.length === 0 && <option value="">No admitted patients found</option>}
+                    {roster.map((p) => (
+                      <option key={p.id} value={p.id}>{p.name}</option>
+                    ))}
+                  </select>
                 </div>
 
                 <div>
@@ -174,19 +260,43 @@ export const ClinicalProceduresDesk: React.FC<{ institutionId?: string }> = ({ i
                 </div>
 
                 <div>
-                  <label className="font-bold">Procedure Performed (CPT Standard) *</label>
+                  <label className="font-bold">Procedure (live catalog) *</label>
                   <select
                     className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-bold bg-white dark:bg-slate-950"
-                    value={selectedCpt}
-                    onChange={(e) => setSelectedCpt(e.target.value)}
+                    value={selectedProcedureId}
+                    onChange={(e) => setSelectedProcedureId(e.target.value)}
                   >
-                    {COMMON_CPT.map((cpt) => (
-                      <option key={cpt.code} value={cpt.code}>
-                        {cpt.code} - {cpt.label}
+                    {catalog.length === 0 && <option value="">Loading catalog…</option>}
+                    {catalog.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.procedure_code} - {c.procedure_name}
                       </option>
                     ))}
                   </select>
                 </div>
+
+                <div>
+                  <label className="font-bold">Status *</label>
+                  <select
+                    className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-bold bg-white dark:bg-slate-950"
+                    value={selectedStatus}
+                    onChange={(e) => setSelectedStatus(e.target.value as ClinicalProcedure["status"])}
+                  >
+                    {(["Scheduled", "In Progress", "Completed"] as const).map((s) => (
+                      <option key={s} value={s}>{s}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <label className="flex items-start gap-2 text-xs font-bold cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={consentSigned}
+                    onChange={(e) => setConsentSigned(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 accent-emerald-600"
+                  />
+                  <span>Patient (or guardian) consent confirmed and recorded *</span>
+                </label>
 
                 <div>
                   <label className="font-bold">Procedure Clinical Notes &amp; Findings</label>
@@ -201,7 +311,9 @@ export const ClinicalProceduresDesk: React.FC<{ institutionId?: string }> = ({ i
               </div>
               <DialogFooter>
                 <button onClick={() => setShowNewModal(false)} className="px-4 py-2 font-bold text-slate-500">Cancel</button>
-                <button onClick={handleCreateProcedure} className="px-5 py-2.5 rounded-xl bg-primary-500 text-white font-extrabold">Save Procedure</button>
+                <button onClick={handleCreateProcedure} disabled={saving} className="px-5 py-2.5 rounded-xl bg-primary-500 text-white font-extrabold disabled:opacity-50">
+                  {saving ? "Saving…" : "Save Procedure"}
+                </button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
@@ -269,19 +381,13 @@ export const ClinicalProceduresDesk: React.FC<{ institutionId?: string }> = ({ i
               <tr>
                 <td colSpan={7} className="py-10 px-4 text-center">
                   <p className="text-sm font-bold text-slate-700 dark:text-slate-300">
-                    {searchQuery ? 'No procedures match your search.' : 'No procedures recorded yet.'}
+                    {searchQuery ? 'No procedures match your search.' : loading ? 'Loading recorded procedures…' : 'No procedures recorded yet.'}
                   </p>
                   <p className="text-xs text-slate-500 mt-1">
-                    {searchQuery ? 'Try a different search term.' : 'Log your first procedure above — entries here are session-only until backend sync lands.'}
+                    {searchQuery
+                      ? 'Try a different search term.'
+                      : 'Log your first procedure above — entries persist to this facility\'s procedure log.'}
                   </p>
-                  {!searchQuery && !samplesLoaded && (
-                    <button
-                      onClick={() => { setProcedures(SAMPLE_PROCEDURES); setSamplesLoaded(true); }}
-                      className="mt-3 px-4 py-2 rounded-xl border border-canvas-silk dark:border-slate-700 text-xs font-extrabold text-primary-500 hover:bg-primary-50 dark:hover:bg-slate-800 transition-colors"
-                    >
-                      Load sample data for demo
-                    </button>
-                  )}
                 </td>
               </tr>
             )}
