@@ -10,6 +10,7 @@ import { MoreHorizontal, UserPlus, ShieldAlert, Users, Settings, Shield } from "
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { AdminLevel } from "@/types/user";
 import { DPOPaymentsAdmin } from "@/components/admin/DPOPaymentsAdmin";
+import { SubscriptionPricingAdmin } from "@/components/admin/SubscriptionPricingAdmin";
 import { Button } from "@/components/ui/button";
 
 type AdminUser = {
@@ -226,6 +227,11 @@ const SuperAdminDashboard = () => {
             <Shield className="h-4 w-4 text-purple-500" /> Admin & Superadmin Management
           </h2>
           <DataTable columns={adminColumns} data={admins} searchColumn="email" />
+        </div>
+
+        {/* Subscription Pricing — superadmin editable */}
+        <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
+          <SubscriptionPricingAdmin />
         </div>
 
         {/* DPO Payments Admin */}
