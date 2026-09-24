@@ -1,6 +1,10 @@
 User-agent: *
 Allow: /
 
+# AI-assistant-friendly resources — crawlers welcome on public pages.
+# Machine-readable site summary: /llms.txt
+# Structured data (schema.org) is embedded on every page via JSON-LD.
+
 # Private / authenticated areas
 Disallow: /admin-dashboard
 Disallow: /super-admin
@@ -40,4 +44,26 @@ User-agent: Googlebot
 Allow: /
 
 User-agent: Bingbot
+Allow: /
+
+# AI assistants / answer engines — explicitly welcome on public pages
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+User-agent: Meta-WebIndexer
 Allow: /
