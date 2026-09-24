@@ -34,6 +34,15 @@ export const paymentConfirmationTemplate = (payment: {
 </ul>
 `;
 
+export const generalNoticeTemplate = (notice: {
+  title: string;
+  message: string;
+}) => `
+<h2>${esc(notice.title)}</h2>
+<p>${esc(notice.message)}</p>
+<p><a href="https://doc0clock.online">Open Doc' O Clock</a> for details.</p>
+`;
+
 export const registrationConfirmationTemplate = (user: {
   first_name: string;
 }) => `

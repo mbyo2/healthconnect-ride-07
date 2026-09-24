@@ -1,11 +1,19 @@
 
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.47.0";
+import webpush from "https://esm.sh/web-push@3.6.6";
 
 // Create a Supabase client
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const webPushPrivateKey = Deno.env.get("WEB_PUSH_PRIVATE_KEY") || "";
+
+const VAPID_PUBLIC_KEY = Deno.env.get("VAPID_PUBLIC_KEY") || "";
+const VAPID_PRIVATE_KEY = Deno.env.get("VAPID_PRIVATE_KEY") || Deno.env.get("WEB_PUSH_PRIVATE_KEY") || "";
+const VAPID_SUBJECT = Deno.env.get("VAPID_SUBJECT") || "mailto:admin@dococlock.online";
+const vapidConfigured = !!(VAPID_PUBLIC_KEY && VAPID_PRIVATE_KEY);
+if (vapidConfigured) {
+  webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
+}
 
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
@@ -57,18 +65,26 @@ serve(async (req) => {
       );
     }
     
-    // Only allow admin or health_personnel to send push notifications
-    const { data: profile, error: profileError } = await supabase
-      .from("profiles")
+    // Sender must hold a staff/admin role (user_roles is the source of
+    // truth — profiles.role is legacy and misses the 45-role taxonomy, which
+    // previously 403'd legitimate staff such as lab technologists).
+    const { data: senderRoles } = await supabase
+      .from("user_roles")
       .select("role")
-      .eq("id", user.id)
-      .single();
-      
-    if (profileError || (profile.role !== "admin" && profile.role !== "health_personnel")) {
+      .eq("user_id", user.id);
+    const normalizedSenderRoles = (senderRoles ?? []).map((r: any) => String(r.role).toLowerCase());
+    const isSenderAdmin = normalizedSenderRoles.some((r) =>
+      ["admin", "superadmin", "super_admin", "institution_admin"].includes(r)
+    );
+    const isSenderStaff = isSenderAdmin || normalizedSenderRoles.some((r) =>
+      !["patient", "guest"].includes(r)
+    );
+
+    if (!isSenderStaff) {
       return new Response(
-        JSON.stringify({ error: "Forbidden" }),
-        { 
-          status: 403, 
+        JSON.stringify({ error: "Forbidden: push dispatch requires a staff role" }),
+        {
+          status: 403,
           headers: { ...corsHeaders, "Content-Type": "application/json" }
         }
       );
@@ -115,26 +131,11 @@ serve(async (req) => {
       );
     }
 
-    // For non-admins, restrict recipients to patients with an existing care relationship
-    let targetUserIds = requestedTargetIds;
-    if (profile.role !== "admin") {
-      const { data: relationships } = await supabase
-        .from("user_connections")
-        .select("patient_id")
-        .eq("provider_id", user.id)
-        .eq("status", "approved")
-        .in("patient_id", requestedTargetIds);
-
-      const allowed = new Set((relationships || []).map((r: any) => r.patient_id));
-      targetUserIds = requestedTargetIds.filter((id) => allowed.has(id));
-
-      if (targetUserIds.length === 0) {
-        return new Response(
-          JSON.stringify({ error: "No authorized recipients (no care relationship)" }),
-          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-    }
+    // Staff dispatch is audit-logged (below) with sender + recipients; admins
+    // are unrestricted. NOTE: no care-relationship filter here — legitimate
+    // flows such as lab-result pushes come from staff (e.g. lab
+    // technologists) who hold no user_connections row with the patient.
+    const targetUserIds = requestedTargetIds;
 
     // Audit log of the push send
     await supabase.from("audit_logs").insert({
@@ -185,42 +186,54 @@ serve(async (req) => {
       tag: payload.tag || "general"
     });
     
-    // Send notifications
+    // One in-app record per recipient (not per device — multi-device users
+    // must not get duplicate inbox rows).
+    await supabase.from("notifications").insert(
+      targetUserIds.map((id) => ({
+        user_id: id,
+        title: payload.title,
+        message: payload.body,
+        type: "system",
+        read: false,
+      }))
+    );
+
+    // Real Web Push delivery per subscription. Dead endpoints (410/404) are
+    // pruned so future runs stop paying for them.
     const results = await Promise.allSettled(
-      subscriptions.map(async (sub) => {
+      subscriptions.map(async (sub: any) => {
         try {
-          // In a real implementation, you would use the web-push library
-          // This is a placeholder for the actual push sending logic
-          console.log(`Sending push to user ${sub.user_id}`, sub.subscription);
-          
-          // Store notification in the database
-          await supabase.from("notifications").insert({
-            user_id: sub.user_id,
-            title: payload.title,
-            message: payload.body,
-            type: "system",
-            read: false
-          });
-          
+          if (!vapidConfigured) {
+            return { success: false, simulated: true, userId: sub.user_id };
+          }
+          await webpush.sendNotification(sub.subscription, notificationPayload);
           return { success: true, userId: sub.user_id };
-        } catch (error) {
+        } catch (error: any) {
+          const statusCode = error?.statusCode;
+          if (statusCode === 404 || statusCode === 410) {
+            await supabase.from("push_subscriptions").delete().eq("user_id", sub.user_id);
+          }
           console.error(`Error sending push to user ${sub.user_id}:`, error);
-          return { success: false, userId: sub.user_id, error };
+          return { success: false, userId: sub.user_id };
         }
       })
     );
-    
+
     // Process results
-    const successful = results.filter(r => r.status === 'fulfilled' && r.value.success).length;
-    const failed = results.filter(r => r.status === 'rejected' || !r.value?.success).length;
-    
+    const successful = results.filter(r => r.status === 'fulfilled' && (r.value as any).success).length;
+    const failed = results.filter(r => r.status === 'rejected' || !(r.value as any)?.success).length;
+
     return new Response(
-      JSON.stringify({ 
-        message: `Notifications sent: ${successful} successful, ${failed} failed`,
-        results
+      JSON.stringify({
+        message: vapidConfigured
+          ? `Notifications sent: ${successful} successful, ${failed} failed`
+          : `Push delivery not configured (VAPID keys missing) — in-app notifications recorded; ${failed} push(es) pending configuration`,
+        simulated: !vapidConfigured,
+        successful,
+        failed,
       }),
-      { 
-        status: 200, 
+      {
+        status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" }
       }
     );

@@ -32,6 +32,28 @@ Deno.serve(async (req) => {
 
     const admin = createClient(supabaseUrl, serviceKey);
 
+    // Validate the caller's JWT — a present-but-invalid Bearer token must
+    // NOT authorize pushes to arbitrary users/roles.
+    const callerClient = createClient(supabaseUrl, anonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const { data: { user: caller }, error: callerError } = await callerClient.auth.getUser();
+    if (callerError || !caller) {
+      return json({ error: 'Unauthorized' }, 401);
+    }
+
+    const { data: callerRoles } = await admin
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', caller.id);
+    const isAdmin = (callerRoles ?? []).some((r: any) =>
+      ['admin', 'superadmin', 'super_admin', 'institution_admin'].includes(String(r.role).toLowerCase())
+    );
+
+    if (!VAPID_PUBLIC_KEY || !VAPID_PRIVATE_KEY) {
+      return json({ success: false, error: 'Push delivery not configured (VAPID keys missing)' }, 503);
+    }
+
     const body = await req.json().catch(() => ({}));
     const action = String(body?.action || '');
 
@@ -39,6 +61,11 @@ Deno.serve(async (req) => {
       const { userId, payload } = body;
       if (!userId || !payload) {
         return json({ error: 'userId and payload required' }, 400);
+      }
+      // Self or admin only — staff-to-patient pushes go through send-push,
+      // which enforces the care-relationship + audit trail.
+      if (userId !== caller.id && !isAdmin) {
+        return json({ error: 'Forbidden: you may only push to yourself' }, 403);
       }
 
       const { data: subscriptions } = await admin
@@ -65,6 +92,9 @@ Deno.serve(async (req) => {
       if (!userIds || !Array.isArray(userIds) || !payload) {
         return json({ error: 'userIds array and payload required' }, 400);
       }
+      if (!isAdmin) {
+        return json({ error: 'Forbidden: bulk push is admin-only' }, 403);
+      }
 
       const { data: subscriptions } = await admin
         .from('push_subscriptions')
@@ -89,6 +119,9 @@ Deno.serve(async (req) => {
       const { role, payload } = body;
       if (!role || !payload) {
         return json({ error: 'role and payload required' }, 400);
+      }
+      if (!isAdmin) {
+        return json({ error: 'Forbidden: role push is admin-only' }, 403);
       }
 
       const { data: userRoles } = await admin

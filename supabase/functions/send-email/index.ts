@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
 import {
   appointmentReminderTemplate,
+  generalNoticeTemplate,
   paymentConfirmationTemplate,
   registrationConfirmationTemplate,
 } from "./templates.ts";
@@ -14,7 +15,7 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-cron-secret",
 };
 
-type EmailType = "appointment_reminder" | "payment_confirmation" | "registration_confirmation";
+type EmailType = "appointment_reminder" | "payment_confirmation" | "registration_confirmation" | "general_notice";
 
 interface EmailRequest {
   type: EmailType;
@@ -130,8 +131,9 @@ serve(async (req) => {
     // an open relay by any authenticated user.
     const userEmail = (user!.email ?? '').toLowerCase();
     const requestedTo = emailRequest.to.map(e => e.toLowerCase());
-    // NOTE: isAdmin stays false on the internal-worker path (ownership of the
-    // single recipient was already verified via the Admin API above).
+    // NOTE: isAdmin/isStaff stay false on the internal-worker path (the
+    // single recipient was already ownership-verified via Admin API above).
+    let isStaff = false;
     if (!isInternalWorker) {
     try {
       const supabaseService = createClient(
@@ -143,19 +145,49 @@ serve(async (req) => {
         .select('admin_level')
         .eq('id', user!.id)
         .maybeSingle();
-      isAdmin = profile?.admin_level === 'admin' || profile?.admin_level === 'superadmin';
+      const { data: roles } = await supabaseService
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user!.id);
+      const roleNames = (roles ?? []).map((r: any) => String(r.role).toLowerCase());
+      isAdmin = profile?.admin_level === 'admin' || profile?.admin_level === 'superadmin'
+        || roleNames.some((r: string) => ['admin', 'superadmin', 'super_admin', 'institution_admin'].includes(r));
+      // Staff (any non-patient role) may send operational notices to patients
+      // — e.g. lab-result or appointment emails — with an audit trail below.
+      isStaff = isAdmin || roleNames.some((r: string) => !['patient', 'guest'].includes(r));
     } catch (_e) {
       isAdmin = false;
+      isStaff = false;
     }
-    } // end user-path admin lookup (internal workers skip: recipient pre-verified)
+    } // end user-path role lookup (internal workers skip: recipient pre-verified)
 
+    const STAFF_TEMPLATES: EmailType[] = ['general_notice', 'appointment_reminder'];
     if (!isAdmin) {
       const forbiddenRecipients = requestedTo.filter(e => e !== userEmail);
       if (forbiddenRecipients.length > 0) {
-        return new Response(
-          JSON.stringify({ error: 'You may only send email to your own address' }),
-          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
+        // Staff may send operational notices (not marketing/payment mail) to
+        // other addresses; everything is audit-logged below.
+        if (!(isStaff && STAFF_TEMPLATES.includes(emailRequest.type))) {
+          return new Response(
+            JSON.stringify({ error: 'You may only send email to your own address' }),
+            { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+        try {
+          const supabaseService = createClient(
+            Deno.env.get('SUPABASE_URL') ?? '',
+            Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+          );
+          await supabaseService.from('audit_logs').insert({
+            user_id: user!.id,
+            action: 'staff_email_sent',
+            resource_type: 'email',
+            details: { type: emailRequest.type, recipients: requestedTo },
+          });
+        } catch (_auditErr) {
+          // Audit failure must not block care communication; it is logged.
+          console.error('staff email audit insert failed');
+        }
       }
     }
 
@@ -176,6 +208,18 @@ serve(async (req) => {
         subject = "Welcome to Doc' O Clock";
         html = registrationConfirmationTemplate(emailRequest.data as { first_name: string; });
         break;
+      case "general_notice": {
+        const notice = emailRequest.data as { title?: string; message?: string };
+        if (!notice?.title || !notice?.message) {
+          return new Response(
+            JSON.stringify({ error: 'general_notice requires data.title and data.message' }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+        subject = String(notice.title).slice(0, 120);
+        html = generalNoticeTemplate({ title: subject, message: String(notice.message).slice(0, 2000) });
+        break;
+      }
       default:
         throw new Error("Invalid email type");
     }

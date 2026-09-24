@@ -59,38 +59,55 @@ export async function dispatchNotification(payload: NotificationPayload): Promis
     // notifications table may not exist on every env; ignore
   }
 
+  // send-sms only accepts its template enum — map our category across.
+  const smsType =
+    payload.category === 'appointment' ? 'appointment'
+    : payload.category === 'prescription' ? 'prescription'
+    : 'general';
+
   for (const channel of channels) {
     let res: { ok: boolean; error?: string } = { ok: false, error: 'not attempted' };
     switch (channel) {
       case 'push':
+        // send-push contract: { userId|userIds, title, body, url? }.
         res = await tryInvoke('send-push', {
-          userId: payload.userId,
+          userIds: [payload.userId],
           title: payload.title,
           body: payload.message,
-          link: payload.link,
+          url: payload.link || '/',
         });
         break;
       case 'sms':
+        // send-sms contract: { phone, message, type, patientId? }. Simulated
+        // until a live gateway is connected — the result reports it honestly.
+        if (!payload.phone) {
+          res = { ok: false, error: 'skipped: no recipient phone number' };
+          break;
+        }
         res = await tryInvoke('send-sms', {
-          userId: payload.userId,
           phone: payload.phone,
-          message: `${payload.title}: ${payload.message}`,
+          message: `${payload.title}: ${payload.message}`.slice(0, 640),
+          type: smsType,
+          patientId: payload.userId,
         });
         break;
       case 'email':
+        // send-email contract: { type, to[], data }. Generic content travels
+        // as general_notice (staff/admin or self-send enforced server-side).
+        if (!payload.email) {
+          res = { ok: false, error: 'skipped: no recipient email address' };
+          break;
+        }
         res = await tryInvoke('send-email', {
-          to: payload.email,
-          userId: payload.userId,
-          subject: payload.title,
-          html: `<p>${payload.message}</p>`,
+          type: 'general_notice',
+          to: [payload.email],
+          data: { title: payload.title, message: payload.message },
         });
         break;
       case 'whatsapp':
-        res = await tryInvoke('whatsapp-dispatch', {
-          userId: payload.userId,
-          phone: payload.phone,
-          message: `${payload.title}\n${payload.message}`,
-        });
+        // No whatsapp-dispatch function is deployed — report honestly instead
+        // of invoking a missing endpoint.
+        res = { ok: false, error: 'skipped: WhatsApp channel is not connected' };
         break;
     }
     results.push({ channel, ...res });

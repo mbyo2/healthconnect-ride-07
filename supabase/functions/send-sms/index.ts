@@ -10,7 +10,7 @@ const corsHeaders = {
 const smsSchema = z.object({
   phone: z.string().min(9).max(20),
   message: z.string().min(1).max(640),
-  type: z.enum(['emergency', 'appointment', 'prescription', 'order']),
+  type: z.enum(['emergency', 'appointment', 'prescription', 'order', 'general']),
   patientId: z.string().uuid().optional(),
 });
 
@@ -126,6 +126,11 @@ serve(async (req) => {
         priority: 'low',
         retries: 1,
         provider: 'bulk_gateway'
+      },
+      'general': {
+        priority: 'low',
+        retries: 1,
+        provider: 'standard_gateway'
       }
     };
 
