@@ -73,11 +73,17 @@ export function useInstitutionContext() {
     }
 
     try {
-      // 1. Check if user is admin/owner
+      // 1. Check if user is admin/owner. Use limit(1) ordered by newest:
+      // if duplicate rows ever exist for an admin, maybeSingle() would
+      // error on the multiples and the hook would fall through and insert
+      // ANOTHER duplicate on every login (self-amplifying). Take the
+      // newest row instead and never amplify.
       const { data: adminInst } = await supabase
         .from('healthcare_institutions')
         .select('*')
         .eq('admin_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
         .maybeSingle();
 
       if (adminInst) {
@@ -160,12 +166,14 @@ export function useInstitutionContext() {
         }
       }
 
-      // 5. Email match
+      // 5. Email match (same multiples guard as step 1)
       if (user.email) {
         const { data: emailInst } = await supabase
           .from('healthcare_institutions')
           .select('*')
           .eq('email', user.email)
+          .order('created_at', { ascending: false })
+          .limit(1)
           .maybeSingle();
 
         if (emailInst) {
@@ -253,6 +261,25 @@ export function useInstitutionContext() {
             ? 'hospital'
             : 'clinic');
         const determinedType = sanitizeInstitutionType(rawType);
+
+        // Re-check for an existing admin row immediately before inserting:
+        // concurrent hook executions (or a retry after a slow insert) can
+        // otherwise both pass step 1 and create duplicates.
+        const { data: lateInst } = await supabase
+          .from('healthcare_institutions')
+          .select('*')
+          .eq('admin_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (lateInst) {
+          setInstitution(lateInst as InstitutionData);
+          setIsAdmin(true);
+          setIsStaff(false);
+          setLoading(false);
+          return;
+        }
 
         const { data: newInst, error: insertError } = await supabase
           .from('healthcare_institutions')
