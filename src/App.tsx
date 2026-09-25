@@ -257,6 +257,8 @@ const AppContent = () => {
             <Route path="/connections" element={<RouteGuard><Connections /></RouteGuard>} />
             <Route path="/chat" element={<RouteGuard><Chat /></RouteGuard>} />
             <Route path="/prescriptions" element={<RouteGuard><Prescriptions /></RouteGuard>} />
+            {/* Legacy path: old bookmarks/links to the pharmacy Rx view land here */}
+            <Route path="/pharmacy-rx" element={<Navigate to="/prescriptions" replace />} />
             <Route path="/symptoms" element={<RouteGuard><Symptoms /></RouteGuard>} />
             <Route path="/triage" element={<RouteGuard><TriageIntake /></RouteGuard>} />
             <Route path="/doc-o-clock" element={<RouteGuard><TriageIntake /></RouteGuard>} />

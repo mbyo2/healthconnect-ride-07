@@ -9,11 +9,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
-import { Loader2, Save, ShieldCheck, Building2, Activity, Globe } from "lucide-react";
+import { Loader2, Save, ShieldCheck, Building2, Activity, Globe, Stethoscope } from "lucide-react";
 import { InsuranceProvider } from "@/types/healthcare";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useInstitutionContext } from "@/hooks/useInstitutionContext";
+import { SpecialtySelector } from "@/components/healthcare/SpecialtySelector";
+import { useInstitutionSpecialties, saveInstitutionSpecialties } from "@/hooks/useClinicSpecialties";
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -33,7 +35,6 @@ type InstitutionFormData = {
   // New operational fields (correct migration names)
   services_offered: string[];
   equipment_available: string[];     // migration uses equipment_available, not specialized_equipment
-  specialties: string[];             // migration uses specialties (array), not services_specialties
   languages_spoken: string[];
   number_of_beds: string;            // integer in DB, string in form for input handling
   number_of_staff: string;
@@ -78,6 +79,17 @@ const InstitutionSettings = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [institution, setInstitution] = useState<any>(null);
+  // Clinical specialties (normalized join table, not the legacy text array)
+  const [selectedSpecialtyIds, setSelectedSpecialtyIds] = useState<string[]>([]);
+  const [primarySpecialtyId, setPrimarySpecialtyId] = useState<string | undefined>(undefined);
+  const { data: existingSpecialties } = useInstitutionSpecialties(institution?.id);
+
+  useEffect(() => {
+    if (existingSpecialties) {
+      setSelectedSpecialtyIds(existingSpecialties.map((s) => s.specialty_id));
+      setPrimarySpecialtyId(existingSpecialties.find((s) => s.is_primary)?.specialty_id);
+    }
+  }, [existingSpecialties]);
   const [formData, setFormData] = useState<InstitutionFormData>({
     name: "",
     address: "",
@@ -90,7 +102,6 @@ const InstitutionSettings = () => {
     list_in_marketplace: false,
     services_offered: [],
     equipment_available: [],
-    specialties: [],
     languages_spoken: [],
     number_of_beds: "",
     number_of_staff: "",
@@ -128,7 +139,6 @@ const InstitutionSettings = () => {
         list_in_marketplace: (contextInst as any).list_in_marketplace ?? false,
         services_offered: (contextInst as any).services_offered || [],
         equipment_available: (contextInst as any).equipment_available || [],
-        specialties: (contextInst as any).specialties || [],
         languages_spoken: (contextInst as any).languages_spoken || [],
         number_of_beds: String((contextInst as any).number_of_beds || ""),
         number_of_staff: String((contextInst as any).number_of_staff || ""),
@@ -176,7 +186,7 @@ const InstitutionSettings = () => {
   };
 
   const handleArrayToggle = (
-    field: "services_offered" | "equipment_available" | "specialties" | "languages_spoken",
+    field: "services_offered" | "equipment_available" | "languages_spoken",
     value: string
   ) => {
     setFormData(prev => {
@@ -212,7 +222,6 @@ const InstitutionSettings = () => {
           list_in_marketplace: formData.list_in_marketplace,
           services_offered: formData.services_offered,
           equipment_available: formData.equipment_available,
-          specialties: formData.specialties,
           languages_spoken: formData.languages_spoken,
           number_of_beds: formData.number_of_beds ? parseInt(formData.number_of_beds, 10) : null,
           number_of_staff: formData.number_of_staff ? parseInt(formData.number_of_staff, 10) : null,
@@ -226,6 +235,11 @@ const InstitutionSettings = () => {
         .eq("id", institution.id);
 
       if (error) throw error;
+
+      // Clinical specialties live in the normalized institution_specialties
+      // table (drives marketplace + staffing), not a text array.
+      await saveInstitutionSpecialties(institution.id, selectedSpecialtyIds, primarySpecialtyId);
+
       await refreshInstitution?.();
       toast.success("Settings saved successfully");
     } catch (error: any) {
@@ -408,6 +422,29 @@ const InstitutionSettings = () => {
                 />
               </div>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* ── Clinical Specialties ── */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Stethoscope className="h-5 w-5 text-primary" />
+              Clinical Specialties
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground mb-4">
+              Choose the specialties this facility offers. These appear on your
+              marketplace listing and drive specialty-aware staffing.
+            </p>
+            <SpecialtySelector
+              selected={selectedSpecialtyIds}
+              primaryId={primarySpecialtyId}
+              onSelectionChange={setSelectedSpecialtyIds}
+              onPrimaryChange={setPrimarySpecialtyId}
+              disabled={saving}
+            />
           </CardContent>
         </Card>
 

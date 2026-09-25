@@ -149,32 +149,12 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen }: Booki
 
       if (error) throw error;
 
-      // Pay-per-new-booking model: first-time patients generate a pending
-      // booking fee for the provider (settled against their wallet/plan —
-      // never charged to the patient).
-      if (visitType === 'new' && booked?.id) {
-        try {
-          let feeAmount = 60; // platform default when no specialty fee exists
-          const { data: feeRow } = await (supabase as any)
-            .from('specialty_booking_fees')
-            .select('booking_fee')
-            .eq('is_active', true)
-            .eq('specialty', (provider as any).specialty || 'General Practice')
-            .maybeSingle();
-          if (feeRow?.booking_fee) feeAmount = Number(feeRow.booking_fee);
-          await (supabase as any).from('booking_fees').insert({
-            provider_id: provider.id,
-            patient_id: user.id,
-            appointment_id: booked.id,
-            amount: feeAmount,
-            currency: 'ZMW',
-            status: 'pending',
-          });
-        } catch (feeErr) {
-          // Non-fatal: the appointment stands; the fee can be backfilled.
-          console.error('Booking fee record failed (non-fatal):', feeErr);
-        }
-      }
+      // Pay-per-new-booking model: the database trigger
+      // trg_charge_booking_fee (on appointments) is the single source of
+      // truth for fee creation — it atomically records exactly one pending
+      // booking fee for genuine first-time patients (settled against the
+      // provider's wallet/plan, never charged to the patient). No manual
+      // insert here: a second insert would double-charge the provider.
 
       // Dispatch the confirmation reminder (in-app notification). Non-blocking
       // and silent on failure — the booking itself already succeeded.
