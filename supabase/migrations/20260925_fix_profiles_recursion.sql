@@ -28,8 +28,8 @@ AS $$
     FROM public.appointments a
     WHERE a.status IS DISTINCT FROM 'cancelled'
       AND (
-        (a.patient_id = viewer_id AND a.doctor_id = other_id)
-        OR (a.doctor_id = viewer_id AND a.patient_id = other_id)
+        (a.patient_id = viewer_id AND a.provider_id = other_id)
+        OR (a.provider_id = viewer_id AND a.patient_id = other_id)
       )
   );
 $$;
