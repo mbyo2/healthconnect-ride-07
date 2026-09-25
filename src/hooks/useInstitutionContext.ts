@@ -201,23 +201,53 @@ export function useInstitutionContext() {
             ? `${profile.first_name}'s Healthcare Practice`
             : "Doc' O Clock Healthcare Center");
 
+        // Map to a valid healthcare_provider_type enum value. The DB enum only
+        // accepts a fixed set; anything else fails the INSERT and the hook
+        // falls back to a fake in-memory institution (which then breaks every
+        // downstream RLS check, e.g. medication_inventory). This sanitizer
+        // guarantees a valid value — new institution_types codes added later
+        // only need a line here if they deserve better than the default.
+        const VALID_INSTITUTION_TYPES = new Set([
+          'doctor', 'nurse', 'hospital', 'clinic', 'pharmacy', 'nursing_home',
+          'dentist', 'optician', 'dermatology_clinic', 'physiotherapy',
+          'radiology_center', 'eye_clinic', 'skin_clinic', 'dental_clinic',
+          'specialty_clinic', 'laboratory', 'wholesale_pharmacy',
+        ]);
+        const sanitizeInstitutionType = (raw: string): string => {
+          const t = (raw || '').toLowerCase().trim();
+          if (VALID_INSTITUTION_TYPES.has(t)) return t;
+          if (t.includes('wholesale')) return 'wholesale_pharmacy';
+          if (t.includes('pharm') || t.includes('drug') || t.includes('dispens') || t === 'health_shop') return 'pharmacy';
+          if (t.includes('lab') || t.includes('blood')) return 'laboratory';
+          if (t.includes('imaging') || t.includes('radiolog') || t.includes('diagnostic')) return 'radiology_center';
+          if (t.includes('nursing') || t.includes('hospice') || t.includes('home_care') || t.includes('care_home')) return 'nursing_home';
+          if (t.includes('dental')) return 'dental_clinic';
+          if (t.includes('eye') || t.includes('opti')) return 'eye_clinic';
+          if (t.includes('physio') || t.includes('rehab')) return 'physiotherapy';
+          if (t.includes('dermat') || t.includes('skin')) return 'dermatology_clinic';
+          if (t.includes('hospital')) return 'hospital';
+          if (t.includes('maternity') || t.includes('cancer') || t.includes('cardiac') || t.includes('children') || t.includes('mental')) return 'specialty_clinic';
+          return 'clinic';
+        };
+
         const roleLower = userRole.toLowerCase();
         const btLower = businessType.toLowerCase();
-        const determinedType =
+        const rawType =
           businessType ||
           (['pharmacy', 'pharmacist', 'pharmacy_technologist'].includes(roleLower)
-            ? 'retail_pharmacy'
+            ? 'pharmacy'
             : ['wholesale_pharmacy', 'wholesale'].includes(roleLower) || btLower.includes('wholesale')
             ? 'wholesale_pharmacy'
             : ['laboratory', 'lab', 'lab_technician', 'pathologist', 'phlebotomist'].includes(roleLower)
             ? 'laboratory'
             : roleLower.includes('imaging') || roleLower.includes('radiology')
-            ? 'imaging_centre'
+            ? 'radiology_center'
             : ['nursing_home'].includes(roleLower)
             ? 'nursing_home'
             : ['hospital'].includes(roleLower)
             ? 'hospital'
             : 'clinic');
+        const determinedType = sanitizeInstitutionType(rawType);
 
         const { data: newInst, error: insertError } = await supabase
           .from('healthcare_institutions')

@@ -104,16 +104,55 @@ const EMPLOYMENT_TYPES = [
 export const StaffManagement = ({ institutionId }: { institutionId: string }) => {
   const { institution } = useInstitutionContext();
   const facilityProfile = getFacilityProfile(institution?.type);
+  // Staff roles are DB-driven (specialty_staff_roles) so new roles added by
+  // the platform appear in the admin's picker without a code change. The
+  // hardcoded list remains as the offline fallback.
+  const [dbStaffRoles, setDbStaffRoles] = useState<Array<{ value: string; label: string }>>([]);
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data, error } = await supabase
+          .from("specialty_staff_roles")
+          .select("role_name")
+          .order("role_name");
+        if (error || !data) return;
+        const seen = new Set<string>();
+        const roles: Array<{ value: string; label: string }> = [];
+        for (const row of data as Array<{ role_name: string }>) {
+          const label = (row.role_name || "").trim();
+          if (!label || seen.has(label.toLowerCase())) continue;
+          seen.add(label.toLowerCase());
+          roles.push({
+            value: label.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, ""),
+            label,
+          });
+        }
+        if (!cancelled && roles.length > 0) setDbStaffRoles(roles);
+      } catch {
+        /* fall back to the hardcoded list */
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
   // Roles this kind of facility typically employs come first in the pickers.
   const orderedStaffRoles = useMemo(() => {
     const preferred = facilityProfile.staffRoles;
-    return [...STAFF_ROLES]
+    const merged = [...STAFF_ROLES];
+    const existing = new Set(merged.map((r) => r.value));
+    for (const r of dbStaffRoles) {
+      if (!existing.has(r.value)) {
+        merged.push(r);
+        existing.add(r.value);
+      }
+    }
+    return merged
       .map((r) => {
         const rank = preferred.indexOf(r.value);
         return { ...r, typical: rank >= 0, rank: rank >= 0 ? rank : 999 };
       })
       .sort((a, b) => a.rank - b.rank);
-  }, [facilityProfile]);
+  }, [facilityProfile, dbStaffRoles]);
 
   const [staff, setStaff] = useState<StaffMember[]>([]);
   const [invitations, setInvitations] = useState<Invitation[]>([]);

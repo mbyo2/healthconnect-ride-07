@@ -130,6 +130,23 @@ const FALLBACK_BUSINESS_TYPES: Array<{ value: string; label: string }> = [
 const FALLBACK_COUNTRIES: Array<{ value: string; label: string; dialCode: string }> = [
   { value: "ZM", label: "Zambia", dialCode: "+260" },
 ];
+// Specialty taxonomy — mirrors clinic_specialty_catalog so signup works
+// identically with or without DB rows. The live list is DB-driven.
+const FALLBACK_SPECIALTIES: Array<{ value: string; label: string }> = [
+  "Allergy & Immunology", "Anesthesiology", "Cardiology", "Critical Care",
+  "Dental Care", "Dermatology / Skin Care", "Emergency Medicine",
+  "Endocrinology & Diabetes", "ENT (Ear Nose Throat)", "Family Medicine",
+  "Fertility & Reproductive Medicine", "Gastroenterology", "General Practice",
+  "General Surgery", "Geriatric Medicine", "Gynecology / Women Health",
+  "Hematology", "Infectious Diseases", "Internal Medicine",
+  "Laboratory Services", "Mental Health / Counseling", "Neonatology",
+  "Nephrology", "Neurology", "Neurosurgery", "Nuclear Medicine", "Oncology",
+  "Oral & Maxillofacial Surgery", "Optician / Eye Care", "Orthopedics",
+  "Pediatric Surgery", "Pediatrics", "Physiotherapy", "Plastic & Reconstructive Surgery",
+  "Podiatry", "Pulmonology", "Radiology / Imaging", "Rheumatology",
+  "Sleep Medicine", "Sports Medicine", "Thoracic Surgery", "Urology",
+  "Vascular Surgery", "Colorectal Surgery", "Wound Care", "Occupational Medicine",
+].map((name) => ({ value: name, label: name }));
 
 type SignupPath = null | "patient" | "provider" | "business";
 
@@ -168,6 +185,7 @@ export const Auth = () => {
   const { showSuccess, showError } = useFeedbackSystem();
   const [providerTypes, setProviderTypes] = useState<Array<{ value: string; label: string }>>([]);
   const [businessTypes, setBusinessTypes] = useState<Array<{ value: string; label: string }>>([]);
+  const [specialties, setSpecialties] = useState<Array<{ value: string; label: string }>>([]);
   const [countries, setCountries] = useState<Array<{ value: string; label: string; dialCode: string }>>([]);
 
   const redirectParam = searchParams.get("redirect");
@@ -185,10 +203,11 @@ export const Auth = () => {
   useEffect(() => {
     const fetchDynamicData = async () => {
       try {
-        const [providerTypesRes, businessTypesRes, countriesRes] = await Promise.all([
+        const [providerTypesRes, businessTypesRes, countriesRes, specialtiesRes] = await Promise.all([
           supabase.from("provider_types").select("code, name").eq("is_active", true).order("display_order"),
           supabase.from("institution_types").select("code, name").eq("is_active", true).order("display_order"),
           supabase.from("countries").select("code, name, dial_code").eq("is_active", true).order("name"),
+          supabase.from("clinic_specialty_catalog").select("name").eq("is_active", true).order("name"),
         ]);
 
         if (providerTypesRes.data && providerTypesRes.data.length > 0) {
@@ -206,11 +225,17 @@ export const Auth = () => {
         } else {
           setCountries(FALLBACK_COUNTRIES);
         }
+        if (specialtiesRes.data && specialtiesRes.data.length > 0) {
+          setSpecialties(specialtiesRes.data.map((s) => ({ value: s.name, label: s.name })));
+        } else {
+          setSpecialties(FALLBACK_SPECIALTIES);
+        }
       } catch (error) {
         console.error("Error fetching dynamic data:", error);
         setProviderTypes((prev) => (prev.length > 0 ? prev : FALLBACK_PROVIDER_TYPES));
         setBusinessTypes((prev) => (prev.length > 0 ? prev : FALLBACK_BUSINESS_TYPES));
         setCountries((prev) => (prev.length > 0 ? prev : FALLBACK_COUNTRIES));
+        setSpecialties((prev) => (prev.length > 0 ? prev : FALLBACK_SPECIALTIES));
       }
     };
 
@@ -481,6 +506,18 @@ export const Auth = () => {
                           <FormControl><SelectTrigger className="h-9 border-graphite-300 dark:border-slate-700 text-xs font-bold"><SelectValue placeholder="Select profession" /></SelectTrigger></FormControl>
                           <SelectContent>
                             {providerTypes.map((t) => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                    <FormField control={providerForm.control} name="specialty" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Specialty</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl><SelectTrigger className="h-9 border-graphite-300 dark:border-slate-700 text-xs font-bold"><SelectValue placeholder="Select specialty (optional)" /></SelectTrigger></FormControl>
+                          <SelectContent>
+                            {specialties.map((s) => <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}
                           </SelectContent>
                         </Select>
                         <FormMessage />
