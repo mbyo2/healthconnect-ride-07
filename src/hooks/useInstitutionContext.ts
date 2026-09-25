@@ -225,6 +225,8 @@ export function useInstitutionContext() {
           if (t.includes('eye') || t.includes('opti')) return 'eye_clinic';
           if (t.includes('physio') || t.includes('rehab')) return 'physiotherapy';
           if (t.includes('dermat') || t.includes('skin')) return 'dermatology_clinic';
+          if (t.includes('surg') || t.includes('trauma') || t.includes('theatre')) return 'hospital';
+          if (t.includes('teach') || t.includes('universit') || t.includes('academic')) return 'hospital';
           if (t.includes('hospital')) return 'hospital';
           if (t.includes('maternity') || t.includes('cancer') || t.includes('cardiac') || t.includes('children') || t.includes('mental')) return 'specialty_clinic';
           return 'clinic';
