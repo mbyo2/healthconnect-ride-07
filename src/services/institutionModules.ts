@@ -277,6 +277,7 @@ export async function setModulePrice(
 export function formatModulePrice(p: ModulePrice | undefined): string | null {
   if (!p || !p.is_billable || p.price_monthly == null) return null;
   const n = Number(p.price_monthly);
+  if (n === 0) return "Free";
   const formatted = n % 1 === 0 ? n.toLocaleString("en-ZM") : n.toLocaleString("en-ZM", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   return `K${formatted}/mo`;
 }

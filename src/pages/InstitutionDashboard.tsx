@@ -14,7 +14,7 @@ import { QuickActions } from "@/components/institution/QuickActions";
 import { RecentActivityFeed } from "@/components/institution/RecentActivityFeed";
 import { useInstitutionContext } from "@/hooks/useInstitutionContext";
 import { getFacilityArchetype } from "@/config/facilityProfiles";
-import { getEffectiveInstitutionModules, type EffectiveModule } from "@/services/institutionModules";
+import { getEffectiveInstitutionModules, getModulePriceMap, formatModulePrice, type EffectiveModule, type ModulePrice } from "@/services/institutionModules";
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
 import { format, subMonths, startOfMonth, endOfMonth } from "date-fns";
 import { MetricCard } from "@/components/shared/MetricCard";
@@ -190,6 +190,7 @@ export const InstitutionDashboard = () => {
   // institution without a code change.
   const [preciseTypeLabel, setPreciseTypeLabel] = useState<string | null>(null);
   const [charter, setCharter] = useState<EffectiveModule[]>([]);
+  const [modulePrices, setModulePrices] = useState<Record<string, ModulePrice>>({});
 
   // Module deep-links for chartered modules that are live in the app.
   const MODULE_PATHS: Record<string, string> = {
@@ -308,14 +309,18 @@ export const InstitutionDashboard = () => {
     let cancelled = false;
     (async () => {
       try {
-        const { label, modules } = await getEffectiveInstitutionModules(
-          supabase as any,
-          institution.id,
-          institution.type_code
-        );
+        const [{ label, modules }, priceMap] = await Promise.all([
+          getEffectiveInstitutionModules(
+            supabase as any,
+            institution.id,
+            institution.type_code
+          ),
+          getModulePriceMap(supabase as any).catch(() => ({} as Record<string, ModulePrice>)),
+        ]);
         if (cancelled) return;
         if (label) setPreciseTypeLabel(label);
         setCharter(modules);
+        setModulePrices(priceMap);
       } catch {
         /* modules are progressive enhancement — dashboard works without them */
       }
@@ -513,8 +518,10 @@ export const InstitutionDashboard = () => {
             </div>
 
             {/* Modules for this facility (DB-driven + per-institution admin grants).
-                Live modules open; planned modules are chartered but not built yet;
-                admin-granted modules show a "New" badge; suspended modules are hidden. */}
+                Live modules open; planned modules are available on request and
+                can be activated for the facility at any time — this is how a
+                small institution grows its module set over time. Admin-granted
+                modules show a "New" badge; suspended modules are hidden. */}
             {charter.length > 0 && (
               <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
                 <p className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase mb-1">
@@ -522,7 +529,7 @@ export const InstitutionDashboard = () => {
                 </p>
                 <p className="text-[11px] text-graphite-400 dark:text-slate-500 mb-3">
                   {charter.filter((m) => m.effective === "live").length} live now,{" "}
-                  {charter.filter((m) => m.effective === "planned").length} coming soon.
+                  {charter.filter((m) => m.effective === "planned").length} available to add.
                   {charter.some((m) => m.source === "admin_grant") && (
                     <> · <span className="text-primary-600 font-bold">includes modules added for your facility by the platform team</span></>
                   )}
@@ -532,6 +539,8 @@ export const InstitutionDashboard = () => {
                     const isLive = m.effective === "live";
                     const isGranted = m.source === "admin_grant";
                     const path = MODULE_PATHS[m.module_key];
+                    const priceLabel = formatModulePrice(modulePrices[m.module_key]);
+                    const badge = isGranted ? "New" : isLive ? "Live" : priceLabel ? `Available · ${priceLabel}` : "Available";
                     const inner = (
                       <>
                         <span className="flex items-center gap-1.5 text-[11px] font-bold text-slate-700 dark:text-slate-300">
@@ -542,8 +551,8 @@ export const InstitutionDashboard = () => {
                           )}
                           <span className="truncate">{m.module_name}</span>
                         </span>
-                        <span className={`text-[9px] font-extrabold uppercase tracking-wide ${isLive ? "text-success-500" : "text-graphite-400"}`}>
-                          {isGranted ? "New" : isLive ? "Live" : "Coming soon"}
+                        <span className={`text-[9px] font-extrabold uppercase tracking-wide ${isLive ? "text-success-500" : "text-primary-500"}`}>
+                          {badge}
                         </span>
                       </>
                     );
@@ -551,18 +560,18 @@ export const InstitutionDashboard = () => {
                       "flex items-center justify-between gap-2 p-2.5 rounded-xl border text-left transition-all " +
                       (isLive
                         ? "border-canvas-silk dark:border-slate-700 hover:border-primary-500 hover:bg-primary-100 dark:hover:bg-slate-800"
-                        : "border-canvas-silk dark:border-slate-800 bg-canvas-mist/50 dark:bg-slate-800/40 opacity-80");
+                        : "border-canvas-silk dark:border-slate-800 bg-canvas-mist/50 dark:bg-slate-800/40 opacity-80 hover:border-primary-500 hover:opacity-100 cursor-pointer");
                     const title = m.description
-                      ? isGranted ? `${m.description} — added for your facility by the platform team` : isLive ? m.description : `${m.description} — planned`
+                      ? isGranted ? `${m.description} — added for your facility by the platform team` : isLive ? m.description : `${m.description} — available on request, open Modules & Add-ons in Settings`
                       : m.module_name;
-                    return isLive && path ? (
-                      <button key={m.module_key} onClick={() => navigate(path)} className={cls} title={title}>
+                    // Live modules with a route open directly; planned modules
+                    // go to Settings → Modules & Add-ons so the facility can
+                    // request activation and grow over time.
+                    const target = isLive && path ? path : "/institution-settings";
+                    return (
+                      <button key={m.module_key} onClick={() => navigate(target)} className={cls} title={title}>
                         {inner}
                       </button>
-                    ) : (
-                      <div key={m.module_key} className={cls} title={title}>
-                        {inner}
-                      </div>
                     );
                   })}
                 </div>

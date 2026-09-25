@@ -92,8 +92,8 @@ export function ModulePricingAdmin() {
       </div>
       <p className="text-xs text-graphite-500 mb-4">
         Superadmin price list for paid module add-ons. Set a monthly price (ZMW) per module —
-        institutions see it on their Modules &amp; Add-ons card. Blank price or “Not billable”
-        means the module isn't sold as an add-on.
+        institutions see it on their Modules &amp; Add-ons card. Enter 0 for free, leave blank
+        or switch off “Billable” for modules not sold as add-ons.
       </p>
 
       {loading ? (
