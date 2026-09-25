@@ -133,6 +133,10 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
         total: Math.round(c.item.unitPrice * c.qty * 100) / 100,
       }));
 
+      // Cash collected at the till counts as paid. Mobile-money/card sales stay
+      // pending until the payment is confirmed — never mark unverified
+      // digital money as received.
+      const cashCollected = paymentMethod === "cash";
       const { data: sale, error: saleError } = await (supabase.from("pharmacy_sales" as any) as any)
         .insert({
           pharmacy_id: institutionId,
@@ -141,10 +145,10 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
           items,
           subtotal,
           total_amount: subtotal,
-          paid_amount: subtotal,
-          balance: 0,
+          paid_amount: cashCollected ? subtotal : 0,
+          balance: cashCollected ? 0 : subtotal,
           payment_method: paymentMethod,
-          payment_status: "paid",
+          payment_status: cashCollected ? "paid" : "pending",
           cashier_id: user?.id || null,
           served_by: user?.id || null,
           transaction_id: receiptNo,
@@ -169,13 +173,14 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
         }).then(() => {});
       }
 
-      // Print receipt from the recorded sale
+      // Print receipt from the recorded sale (escape everything user/DB-sourced).
+      const esc = (s: unknown) => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
       const printWin = window.open("", "_blank");
       if (printWin) {
         const rows = cart
           .map(
             (c) =>
-              `<tr><td style="padding:4px 0;">${c.item.name} (x${c.qty})</td><td style="text-align:right;">K${(c.item.unitPrice * c.qty).toFixed(2)}</td></tr>`
+              `<tr><td style="padding:4px 0;">${esc(c.item.name)} (x${c.qty})</td><td style="text-align:right;">K${(c.item.unitPrice * c.qty).toFixed(2)}</td></tr>`
           )
           .join("");
 
@@ -185,9 +190,9 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
               <div style="text-align:center; font-weight:bold; font-size:14px;">DOC' O CLOCK DISPENSARY</div>
               <div style="text-align:center; font-size:11px;">Primary Essential Medical Dispense</div>
               <hr style="border-top:1px dashed #000; margin:10px 0;"/>
-              <div><strong>Receipt:</strong> ${receiptNo}</div>
-              <div><strong>Customer:</strong> ${customerName || "Walk-in Patient"}</div>
-              <div><strong>Payment:</strong> ${paymentMethod.toUpperCase()}</div>
+              <div><strong>Receipt:</strong> ${esc(receiptNo)}</div>
+              <div><strong>Customer:</strong> ${esc(customerName || "Walk-in Patient")}</div>
+              <div><strong>Payment:</strong> ${esc(paymentMethod.toUpperCase())} — ${cashCollected ? "PAID" : "PENDING CONFIRMATION"}</div>
               <div><strong>Date:</strong> ${new Date().toLocaleString()}</div>
               <hr style="border-top:1px dashed #000; margin:10px 0;"/>
               <table style="width:100%;">
@@ -208,7 +213,11 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
         printWin.document.close();
       }
 
-      toast.success(`Dispensing completed! Receipt #${receiptNo} recorded.`);
+      toast.success(
+        cashCollected
+          ? `Dispensing completed! Receipt #${receiptNo} recorded.`
+          : `Sale recorded as pending — receipt #${receiptNo}. Confirm the ${paymentMethod} payment to settle it.`
+      );
       setCart([]);
       setCustomerName("");
       setCustomerPhone("");
