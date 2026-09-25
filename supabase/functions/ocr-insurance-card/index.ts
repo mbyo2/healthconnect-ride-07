@@ -40,7 +40,7 @@ Deno.serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) throw new Error('AI service not configured');
 
-    // Use HuggingFace inference for document understanding
+    // Card reading runs on the vision model via the Lovable AI gateway.
     const prompt = `Extract the following information from this insurance card image. Return ONLY a JSON object with these fields:
     - insurance_provider: company name
     - plan_name: plan/policy name

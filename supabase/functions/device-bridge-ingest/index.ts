@@ -66,7 +66,16 @@ Deno.serve(async (req) => {
     }
 
     const expected = await hmac(BRIDGE_SECRET, institutionHeader)
-    if (token !== expected) {
+    // Constant-time comparison — plain !== would leak prefix info via timing.
+    const tokenBytes = new TextEncoder().encode(token)
+    const expectedBytes = new TextEncoder().encode(expected)
+    let tokenMismatch = tokenBytes.length !== expectedBytes.length
+    const sharedLen = Math.min(tokenBytes.length, expectedBytes.length)
+    let diff = 0
+    for (let i = 0; i < sharedLen; i++) diff |= tokenBytes[i] ^ expectedBytes[i]
+    // Compare the tail against expected bytes so length alone never passes.
+    for (let i = sharedLen; i < expectedBytes.length; i++) diff |= expectedBytes[i] ^ 0
+    if (tokenMismatch || diff !== 0) {
       return new Response(JSON.stringify({ error: 'Invalid bridge token' }), {
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -157,8 +166,15 @@ Deno.serve(async (req) => {
         severity: r.alert!.severity,
         message: r.alert!.message,
       }))
+    let alertsFailed = 0
     if (alertRows.length) {
-      await supabase.from('device_alerts').insert(alertRows)
+      const { error: alertErr } = await supabase.from('device_alerts').insert(alertRows)
+      if (alertErr) {
+        // Feeds are already saved; never fail the whole batch over alerts,
+        // but report loudly so the gap is visible and retryable.
+        alertsFailed = alertRows.length
+        console.error('device-bridge-ingest alert insert failed:', alertErr.message)
+      }
     }
 
     // Heartbeat
@@ -198,7 +214,7 @@ Deno.serve(async (req) => {
 
 
     return new Response(
-      JSON.stringify({ ok: true, ingested: feedRows.length, triage_escalated: escalated.length }),
+      JSON.stringify({ ok: alertsFailed === 0, ingested: feedRows.length, triage_escalated: escalated.length, alerts_failed: alertsFailed }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
     )
   } catch (e) {
