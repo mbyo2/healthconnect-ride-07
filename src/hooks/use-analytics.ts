@@ -88,7 +88,10 @@ export function trackEvent(event: string, props?: Record<string, string | number
 }
 
 /**
- * Hook that auto-tracks page views on route changes
+ * Hook that auto-tracks page views on route changes.
+ * Pathname only — query strings can carry reset tokens, invite codes and
+ * record IDs, so they must never leave the device (see track-analytics
+ * edge denylist for the server-side backstop).
  */
 export function usePageTracking() {
   const location = useLocation();
@@ -96,10 +99,8 @@ export function usePageTracking() {
   useEffect(() => {
     trackEvent('pageview', {
       path: location.pathname,
-      search: location.search,
-      referrer: document.referrer || 'direct',
     });
-  }, [location.pathname, location.search]);
+  }, [location.pathname]);
 }
 
 /**

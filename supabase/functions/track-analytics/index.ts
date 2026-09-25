@@ -48,6 +48,9 @@ Deno.serve(async (req) => {
     const MAX_PROPS_STRING = 500;
     const MAX_PROPS_JSON_BYTES = 4096;
 
+    // Prop keys that must never be stored (tokens, secrets, identifiers).
+    const DENIED_KEYS = /(token|password|secret|ssn|national[_-]?id|card|account|otp|code|auth|session|receiver|patient|appointment)/i;
+
     const sanitizeProps = (raw: unknown): Record<string, string | number | boolean> | null => {
       if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null;
       const out: Record<string, string | number | boolean> = {};
@@ -55,6 +58,7 @@ Deno.serve(async (req) => {
       for (const [k, v] of Object.entries(raw as Record<string, unknown>)) {
         if (keys >= MAX_PROPS_KEYS) break;
         const key = String(k).slice(0, 80);
+        if (DENIED_KEYS.test(key)) continue; // never persist secrets/identifiers
         if (typeof v === 'string') {
           out[key] = v.slice(0, MAX_PROPS_STRING);
         } else if (typeof v === 'number' && Number.isFinite(v)) {
@@ -79,7 +83,9 @@ Deno.serve(async (req) => {
     const rows = capped.map((e) => ({
       user_id: userId,
       event_name: String(e.event || 'unknown').slice(0, 120),
-      path: e.path ? String(e.path).slice(0, 500) : null,
+      // Strip query strings server-side too: reset tokens, invite codes and
+      // record IDs must never be stored, even if an old client sends them.
+      path: e.path ? String(e.path).split('?')[0].slice(0, 500) : null,
       props: sanitizeProps(e.props),
       occurred_at: e.timestamp ? new Date(e.timestamp).toISOString() : new Date().toISOString(),
     }));
