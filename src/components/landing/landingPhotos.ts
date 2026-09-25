@@ -19,6 +19,16 @@ export const LANDING_PHOTOS = {
   ctaBand: "photo-1551601651-2a8555f1a136",
 } as const;
 
+/** Testimonial avatars, in ZAMBIAN_TESTIMONIALS order (all visually verified). */
+export const TESTIMONIAL_PHOTOS = [
+  "photo-1505421031134-e57263cae630", // Chipo Mwanza — smiling woman in headwrap
+  "photo-1622253692010-333f2da6031d", // Dr. Mulenga Banda — male nurse in scrubs
+  "photo-1532076904124-d4e8fe7fbbec", // Thandiwe Phiri — woman with glasses
+  "photo-1714118657863-2843a622718b", // Bwalya Chilufya — young man
+  "photo-1620424037570-15137a4a562d", // Mwila Tembo — young woman
+  "photo-1655313836628-af779ac11e14", // Dr. Ngosa Zimba — senior man
+] as const;
+
 const BASE = "https://images.unsplash.com";
 
 /** Single Unsplash URL at a given width (q=80 is visually lossless for photos). */

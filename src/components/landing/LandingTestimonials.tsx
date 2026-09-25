@@ -1,6 +1,7 @@
 import { Star, Quote, ThumbsUp, Award, TrendingUp, HeartPulse, ShieldCheck } from "lucide-react";
 import { ZAMBIAN_TESTIMONIALS } from "@/config/zambia";
 import { usePlatformStats, formatStat } from "@/hooks/usePlatformStats";
+import { TESTIMONIAL_PHOTOS, unsplash } from "./landingPhotos";
 
 // Facility segments the platform serves — not claimed partnerships.
 const ECOSYSTEM = [
@@ -100,9 +101,15 @@ export const Testimonials = () => {
                 </div>
               </div>
               <div className="pt-4 border-t border-canvas-mist flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-primary-500 text-white flex items-center justify-center font-medium text-xs shrink-0">
-                  {t.name.split(" ").map((n) => n[0]).join("")}
-                </div>
+                <img
+                  src={unsplash(TESTIMONIAL_PHOTOS[idx] ?? TESTIMONIAL_PHOTOS[0], 160)}
+                  alt={`Illustrative portrait for ${t.name}'s community story — Doc' O Clock`}
+                  className="h-10 w-10 rounded-full object-cover shrink-0"
+                  loading="lazy"
+                  decoding="async"
+                  width={80}
+                  height={80}
+                />
                 <div>
                   <div className="font-medium text-sm text-midnight group-hover:text-primary-500 transition-colors">{t.name}</div>
                   <div className="text-[11px] text-graphite-400">{t.role} · {t.city}</div>
