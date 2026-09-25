@@ -215,3 +215,68 @@ export async function getAllCharterModules(
   });
   return [...seen.values()];
 }
+
+// ── Paid add-on pricing (superadmin-set) ─────────────────────────────
+
+export type ModulePrice = {
+  module_key: string;
+  module_name: string;
+  price_monthly: number | null;
+  currency: string;
+  is_billable: boolean;
+  updated_at?: string | null;
+};
+
+/** All module prices (superadmin price list). */
+export async function getAllModulePrices(supabase: SupabaseClient): Promise<ModulePrice[]> {
+  const { data, error } = await supabase
+    .from("institution_module_pricing")
+    .select("module_key, module_name, price_monthly, currency, is_billable, updated_at")
+    .order("module_name");
+  if (error) throw error;
+  return (data || []) as ModulePrice[];
+}
+
+/** Prices keyed by module_key for quick lookup. */
+export async function getModulePriceMap(
+  supabase: SupabaseClient
+): Promise<Record<string, ModulePrice>> {
+  const rows = await getAllModulePrices(supabase);
+  const map: Record<string, ModulePrice> = {};
+  rows.forEach((r) => { map[r.module_key] = r; });
+  return map;
+}
+
+/** Set (or update) a module's add-on price — superadmin only (RLS-enforced). */
+export async function setModulePrice(
+  supabase: SupabaseClient,
+  moduleKey: string,
+  moduleName: string,
+  priceMonthly: number | null,
+  isBillable: boolean,
+  updatedBy: string,
+  currency: string = "ZMW"
+): Promise<void> {
+  const { error } = await supabase
+    .from("institution_module_pricing")
+    .upsert(
+      {
+        module_key: moduleKey,
+        module_name: moduleName,
+        price_monthly: priceMonthly,
+        currency,
+        is_billable: isBillable,
+        updated_by: updatedBy,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "module_key" }
+    );
+  if (error) throw error;
+}
+
+export function formatModulePrice(p: ModulePrice | undefined): string | null {
+  if (!p || !p.is_billable || p.price_monthly == null) return null;
+  const n = Number(p.price_monthly);
+  const formatted = n % 1 === 0 ? n.toLocaleString("en-ZM") : n.toLocaleString("en-ZM", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return `K${formatted}/mo`;
+}

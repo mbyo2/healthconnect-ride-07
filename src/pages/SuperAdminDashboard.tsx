@@ -11,6 +11,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { AdminLevel } from "@/types/user";
 import { DPOPaymentsAdmin } from "@/components/admin/DPOPaymentsAdmin";
 import { SubscriptionPricingAdmin } from "@/components/admin/SubscriptionPricingAdmin";
+import { ModulePricingAdmin } from "@/components/admin/ModulePricingAdmin";
 import { Button } from "@/components/ui/button";
 
 type AdminUser = {
@@ -248,6 +249,11 @@ const SuperAdminDashboard = () => {
         {/* Subscription Pricing — superadmin editable */}
         <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
           <SubscriptionPricingAdmin />
+        </div>
+
+        {/* Module Add-on Pricing — superadmin editable */}
+        <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
+          <ModulePricingAdmin />
         </div>
 
         {/* DPO Payments Admin */}

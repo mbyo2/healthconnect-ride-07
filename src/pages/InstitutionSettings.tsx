@@ -16,7 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useInstitutionContext } from "@/hooks/useInstitutionContext";
 import { SpecialtySelector } from "@/components/healthcare/SpecialtySelector";
 import { useInstitutionSpecialties, saveInstitutionSpecialties } from "@/hooks/useClinicSpecialties";
-import { getEffectiveInstitutionModules, type EffectiveModule } from "@/services/institutionModules";
+import { getEffectiveInstitutionModules, getModulePriceMap, formatModulePrice, type EffectiveModule, type ModulePrice } from "@/services/institutionModules";
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -86,12 +86,19 @@ const InstitutionSettings = () => {
   const { data: existingSpecialties } = useInstitutionSpecialties(institution?.id);
   // Effective modules for this facility (tier charter + admin entitlements)
   const [effModules, setEffModules] = useState<EffectiveModule[]>([]);
+  const [modulePrices, setModulePrices] = useState<Record<string, ModulePrice>>({});
   useEffect(() => {
     if (!institution?.id) return;
     let cancelled = false;
-    getEffectiveInstitutionModules(supabase as any, institution.id, institution.type_code)
-      .then(({ modules }) => { if (!cancelled) setEffModules(modules); })
-      .catch(() => {});
+    (async () => {
+      try {
+        const [{ modules }, priceMap] = await Promise.all([
+          getEffectiveInstitutionModules(supabase as any, institution.id, institution.type_code),
+          getModulePriceMap(supabase as any).catch(() => ({} as Record<string, ModulePrice>)),
+        ]);
+        if (!cancelled) { setEffModules(modules); setModulePrices(priceMap); }
+      } catch { /* modules are progressive enhancement */ }
+    })();
     return () => { cancelled = true; };
   }, [institution?.id, institution?.type_code]);
 
@@ -390,7 +397,14 @@ const InstitutionSettings = () => {
               <p className="text-sm text-muted-foreground">Loading modules…</p>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {effModules.map((m) => (
+                {effModules.map((m) => {
+                  const priceLabel = formatModulePrice(modulePrices[m.module_key]);
+                  const sub = m.source === "admin_grant"
+                    ? `Added for your facility${priceLabel ? ` · ${priceLabel}` : ""}`
+                    : m.effective === "live" ? "Active"
+                    : m.effective === "planned" ? (priceLabel ? `Available · ${priceLabel} — contact us to activate` : "Available on request")
+                    : "Suspended — contact support";
+                  return (
                   <div
                     key={m.module_key}
                     className={`flex items-center gap-2.5 p-2.5 rounded-xl border text-sm ${
@@ -411,12 +425,11 @@ const InstitutionSettings = () => {
                     )}
                     <div className="min-w-0">
                       <p className="font-bold text-xs truncate">{m.module_name}</p>
-                      <p className="text-[10px] text-muted-foreground">
-                        {m.source === "admin_grant" ? "Added for your facility" : m.effective === "live" ? "Active" : m.effective === "planned" ? "Available on request" : "Suspended — contact support"}
-                      </p>
+                      <p className="text-[10px] text-muted-foreground">{sub}</p>
                     </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </CardContent>

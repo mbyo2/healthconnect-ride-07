@@ -5,10 +5,13 @@ import { Building2, CheckCircle2, Hourglass, Ban, RotateCcw, Plus, Search, Loade
 import {
   getEffectiveInstitutionModules,
   getAllCharterModules,
+  getModulePriceMap,
+  formatModulePrice,
   setInstitutionModuleEnabled,
   clearInstitutionModuleOverride,
   type EffectiveModule,
   type CharterModule,
+  type ModulePrice,
 } from "@/services/institutionModules";
 
 type Institution = { id: string; name: string; type_code: string | null; city: string | null };
@@ -27,6 +30,7 @@ export const InstitutionModuleManager = () => {
   const [tierLabel, setTierLabel] = useState<string | null>(null);
   const [modules, setModules] = useState<EffectiveModule[]>([]);
   const [catalog, setCatalog] = useState<CharterModule[]>([]);
+  const [prices, setPrices] = useState<Record<string, ModulePrice>>({});
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState<string | null>(null);
   const [grantKey, setGrantKey] = useState("");
@@ -57,14 +61,16 @@ export const InstitutionModuleManager = () => {
   const loadModules = async (instId: string, typeCode: string | null) => {
     setLoading(true);
     try {
-      const [eff, all] = await Promise.all([
+      const [eff, all, priceMap] = await Promise.all([
         getEffectiveInstitutionModules(supabase as any, instId, typeCode),
         getAllCharterModules(supabase as any),
+        getModulePriceMap(supabase as any).catch(() => ({} as Record<string, ModulePrice>)),
       ]);
       setTier(eff.tier);
       setTierLabel(eff.label);
       setModules(eff.modules);
       setCatalog(all);
+      setPrices(priceMap);
     } catch (e: any) {
       toast.error(e?.message || "Failed to load modules");
       setModules([]);
@@ -82,6 +88,7 @@ export const InstitutionModuleManager = () => {
 
   const toggleModule = async (m: EffectiveModule) => {
     const enable = m.effective !== "live";
+    const priceLabel = formatModulePrice(prices[m.module_key]);
     setSaving(m.module_key);
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -92,9 +99,11 @@ export const InstitutionModuleManager = () => {
         m.module_name,
         enable,
         user?.id || "",
-        enable ? `Enabled by platform admin${tier ? ` (tier default: ${m.status})` : ""}` : "Suspended by platform admin"
+        enable
+          ? `Enabled by platform admin${priceLabel ? ` @ ${priceLabel}` : ""}${tier ? ` (tier default: ${m.status})` : ""}`
+          : "Suspended by platform admin"
       );
-      toast.success(enable ? `“${m.module_name}” enabled for ${selected?.name}` : `“${m.module_name}” suspended for ${selected?.name}`);
+      toast.success(enable ? `“${m.module_name}” enabled for ${selected?.name}${priceLabel ? ` (${priceLabel})` : ""}` : `“${m.module_name}” suspended for ${selected?.name}`);
       await loadModules(selectedId, selected?.type_code || null);
     } catch (e: any) {
       toast.error(e?.message || "Failed to update module");
@@ -203,6 +212,7 @@ export const InstitutionModuleManager = () => {
                 {modules.map((m) => {
                   const isLive = m.effective === "live";
                   const isPlanned = m.effective === "planned";
+                  const priceLabel = formatModulePrice(prices[m.module_key]);
                   return (
                     <div
                       key={m.module_key}
@@ -220,6 +230,7 @@ export const InstitutionModuleManager = () => {
                         <p className="text-[10px] text-graphite-500">
                           {m.source === "charter" ? (isLive ? "Tier default" : "Tier default · planned")
                           : m.source === "admin_grant" ? "Added by admin" : "Suspended by admin"}
+                          {priceLabel && <span className="ml-1 font-extrabold text-primary-600">{priceLabel}</span>}
                         </p>
                         <div className="flex items-center gap-2 mt-2">
                           <button
