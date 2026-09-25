@@ -9,6 +9,7 @@ import { DataTable } from "@/components/ui/data-table";
 import { MoreHorizontal, UserPlus, ShieldAlert, Users, Settings, Shield } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { AdminLevel } from "@/types/user";
+import { syncAdminLevel } from "@/lib/adminLevelSync";
 import { DPOPaymentsAdmin } from "@/components/admin/DPOPaymentsAdmin";
 import { SubscriptionPricingAdmin } from "@/components/admin/SubscriptionPricingAdmin";
 import { ModulePricingAdmin } from "@/components/admin/ModulePricingAdmin";
@@ -99,13 +100,58 @@ const SuperAdminDashboard = () => {
   const toggleAdminLevel = async (id: string, currentLevel: AdminLevel) => {
     try {
       setIsSubmitting(true);
-      const newLevel = currentLevel === "admin" ? "super_admin" : "admin";
-      const { error } = await supabase.from("user_roles").update({ role: newLevel }).eq("user_id", id);
-      if (error) throw error;
-      toast.success(`Admin ${newLevel === "super_admin" ? "promoted to Superadmin" : "changed to Admin"}`);
+      const { data: { user: me } } = await supabase.auth.getUser();
+      if (me && me.id === id) {
+        toast.error("You cannot change your own admin level");
+        return;
+      }
+      const isCurrentlySuper = currentLevel === "superadmin";
+      const oldRole = isCurrentlySuper ? "super_admin" : "admin";
+      const newRole = isCurrentlySuper ? "admin" : "super_admin";
+      // NOTE: user_roles has no UPDATE policy — promote/demote via
+      // delete+insert, which the super_admin INSERT/DELETE policies allow.
+      const { error: delError } = await supabase
+        .from("user_roles")
+        .delete()
+        .eq("user_id", id)
+        .eq("role", oldRole);
+      if (delError) throw delError;
+      const { error: insError } = await supabase
+        .from("user_roles")
+        .insert({ user_id: id, role: newRole, granted_by: me?.id });
+      if (insError) throw insError;
+      await syncAdminLevel(id);
+      toast.success(`Admin ${isCurrentlySuper ? "changed to Admin" : "promoted to Superadmin"}`);
       fetchAdmins();
-    } catch (error) {
-      toast.error("Failed to update admin level");
+    } catch (error: any) {
+      toast.error(error.message || "Failed to update admin level");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const removeAdminAccess = async (id: string, email?: string | null) => {
+    try {
+      const { data: { user: me } } = await supabase.auth.getUser();
+      if (me && me.id === id) {
+        toast.error("You cannot remove your own admin access");
+        return;
+      }
+      if (!window.confirm(`Remove all admin access for ${email || id}? They will lose access to the admin dashboards.`)) {
+        return;
+      }
+      setIsSubmitting(true);
+      const { error } = await supabase
+        .from("user_roles")
+        .delete()
+        .eq("user_id", id)
+        .in("role", ["admin", "super_admin"]);
+      if (error) throw error;
+      await syncAdminLevel(id);
+      toast.success("Admin access removed");
+      fetchAdmins();
+    } catch (error: any) {
+      toast.error(error.message || "Failed to remove admin access");
     } finally {
       setIsSubmitting(false);
     }
@@ -148,7 +194,12 @@ const SuperAdminDashboard = () => {
                 {admin.admin_level === "admin" ? "Promote to Superadmin" : "Change to Admin"}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-xs font-bold text-error-500">Remove Admin Access</DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => removeAdminAccess(admin.id, admin.email)}
+                className="text-xs font-bold text-error-500"
+              >
+                Remove Admin Access
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         );

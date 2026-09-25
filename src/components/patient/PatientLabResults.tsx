@@ -3,20 +3,18 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { FlaskConical, Loader2, FileDown } from 'lucide-react';
+import { FlaskConical, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
-import { Button } from '@/components/ui/button';
 
 interface LabResultRow {
   id: string;
-  test_name: string;
-  test_date: string;
   result_value: string | null;
   unit: string | null;
   reference_range: string | null;
-  notes: string | null;
-  document_url: string | null;
+  comments: string | null;
+  verified_at: string | null;
   created_at: string;
+  lab_tests: { name: string | null } | null;
 }
 
 export default function PatientLabResults() {
@@ -25,17 +23,19 @@ export default function PatientLabResults() {
     queryKey: ['patient-lab-results', user?.id],
     enabled: !!user?.id,
     queryFn: async () => {
+      // lab_results has no test_date column — order by created_at; the test
+      // name comes from the lab_tests FK (test_id).
       const { data, error } = await supabase
         .from('lab_results')
-        .select('*')
+        .select('id, result_value, unit, reference_range, comments, verified_at, created_at, lab_tests(name)')
         .eq('patient_id', user!.id)
-        .order('test_date', { ascending: false })
+        .order('created_at', { ascending: false })
         .limit(50);
       if (error) {
         console.error('lab_results fetch error', error);
         return [] as LabResultRow[];
       }
-      return (data || []) as LabResultRow[];
+      return (data || []) as unknown as LabResultRow[];
     },
   });
 
@@ -56,30 +56,25 @@ export default function PatientLabResults() {
         ) : (
           <div className="space-y-3">
             {data.map(r => {
-              const critical = (r.notes || '').toLowerCase().includes('critical');
+              const critical = (r.comments || '').toLowerCase().includes('critical');
+              const testName = r.lab_tests?.name || 'Lab test';
+              const resultDate = r.verified_at || r.created_at;
               return (
                 <div key={r.id} className="flex items-start justify-between gap-3 p-3 border rounded-lg">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <h4 className="font-medium truncate">{r.test_name}</h4>
+                      <h4 className="font-medium truncate">{testName}</h4>
                       {critical && <Badge variant="destructive">Critical</Badge>}
                     </div>
                     <p className="text-sm">{r.result_value} {r.unit}</p>
                     {r.reference_range && (
                       <p className="text-xs text-muted-foreground">Ref: {r.reference_range}</p>
                     )}
-                    {r.notes && <p className="text-xs text-muted-foreground mt-1">{r.notes}</p>}
+                    {r.comments && <p className="text-xs text-muted-foreground mt-1">{r.comments}</p>}
                     <p className="text-xs text-muted-foreground mt-1">
-                      {format(new Date(r.test_date), 'PPP')}
+                      {resultDate ? format(new Date(resultDate), 'PPP') : 'Date not recorded'}
                     </p>
                   </div>
-                  {r.document_url && (
-                    <Button asChild size="sm" variant="ghost">
-                      <a href={r.document_url} target="_blank" rel="noreferrer">
-                        <FileDown className="h-4 w-4" />
-                      </a>
-                    </Button>
-                  )}
                 </div>
               );
             })}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { PhoneOTPLogin } from './PhoneOTPLogin';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import type { AuthSession } from '@supabase/supabase-js';
 import { logSecurityEvent, SecurityEvents, authRateLimiter } from '@/utils/security-service';
@@ -15,7 +15,6 @@ interface AuthFormProps {
 }
 
 export const AuthForm = ({ mode = 'login' }: AuthFormProps) => {
-  const navigate = useNavigate();
   const [session, setSession] = useState<AuthSession | null>(null);
   const [rateLimitExceeded, setRateLimitExceeded] = useState(false);
   const [email, setEmail] = useState('');
@@ -41,9 +40,13 @@ export const AuthForm = ({ mode = 'login' }: AuthFormProps) => {
           userId: session.user.id,
           provider: session.user.app_metadata?.provider,
         });
-        
+
+        // NOTE: no navigation here on purpose. Post-sign-in navigation is
+        // owned by the route (App.tsx /auth → /dashboard → RoleRedirect).
+        // Navigating here too raced with it (navigate('/profile') vs
+        // Navigate to='/dashboard'), landing users on different pages
+        // depending on which listener fired first.
         setSession(session);
-        navigate('/profile');
       } else if (event === 'SIGNED_OUT') {
         await logSecurityEvent(SecurityEvents.LOGOUT, {
           userId: session?.user?.id,
@@ -55,7 +58,7 @@ export const AuthForm = ({ mode = 'login' }: AuthFormProps) => {
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

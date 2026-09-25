@@ -97,14 +97,18 @@ export const Prescriptions = () => {
     queryKey: ["prescriptions", user?.id, isProvider],
     queryFn: async () => {
       if (!user) return [];
+      // NOTE: comprehensive_prescriptions.(patient_id|provider_id) FK at
+      // auth.users, so `profiles!..._fkey` join hints are invalid
+      // PostgREST. Participants are resolved in two steps: patient rows via
+      // the "Appointment participants can view each other's profiles" RLS
+      // policy, provider rows via the public provider_directory view.
       const query = (supabase as any)
         .from("comprehensive_prescriptions")
-        .select(`
-          id, medication_name, dosage, duration_days, prescribed_date, status,
-          refills_remaining, instructions, quantity, generic_name, strength, prescription_number, notes,
-          patient:profiles!comprehensive_prescriptions_patient_id_fkey(first_name, last_name, email, phone),
-          provider:profiles!comprehensive_prescriptions_provider_id_fkey(first_name, last_name, role)
-        `)
+        .select(
+          "id, medication_name, dosage, duration_days, prescribed_date, status, " +
+          "refills_remaining, instructions, quantity, generic_name, strength, " +
+          "prescription_number, notes, patient_id, provider_id"
+        )
         .order("prescribed_date", { ascending: false });
 
       if (isProvider) {
@@ -115,7 +119,31 @@ export const Prescriptions = () => {
 
       const { data, error } = await query;
       if (error) throw error;
-      return data || [];
+      const rows = data || [];
+
+      const patientIds = [...new Set(rows.map((r: any) => r.patient_id).filter(Boolean))];
+      const providerIds = [...new Set(rows.map((r: any) => r.provider_id).filter(Boolean))];
+      let patientMap: Record<string, any> = {};
+      let providerMap: Record<string, any> = {};
+      if (patientIds.length > 0) {
+        const { data: patients } = await supabase
+          .from("profiles")
+          .select("id, first_name, last_name, email, phone")
+          .in("id", patientIds);
+        patientMap = Object.fromEntries((patients || []).map((p: any) => [p.id, p]));
+      }
+      if (providerIds.length > 0) {
+        const { data: providers } = await supabase
+          .from("provider_directory")
+          .select("id, first_name, last_name, role")
+          .in("id", providerIds);
+        providerMap = Object.fromEntries((providers || []).map((p: any) => [p.id, p]));
+      }
+      return rows.map((r: any) => ({
+        ...r,
+        patient: patientMap[r.patient_id] || null,
+        provider: providerMap[r.provider_id] || null,
+      }));
     },
     enabled: !!user,
   });
@@ -199,7 +227,8 @@ export const Prescriptions = () => {
     setIsSubmitting(true);
     try {
       const rxNumber = `RX-${Date.now().toString(36).toUpperCase()}-${Math.floor(Math.random() * 900 + 100)}`;
-      const prescribedDate = new Date().toISOString();
+      // prescribed_date is a DATE column — send YYYY-MM-DD, not a timestamp.
+      const prescribedDate = new Date().toISOString().split("T")[0];
 
       const inserts = medicationItems.map((item) => ({
         provider_id: user.id,
@@ -212,7 +241,8 @@ export const Prescriptions = () => {
         quantity: item.quantity || 1,
         duration_days: item.duration_days || 7,
         refills_remaining: item.refills_remaining || 0,
-        status: "active",
+        // Status CHECK only allows pending/filled/partially_filled/cancelled/expired.
+        status: "pending",
         prescribed_date: prescribedDate,
         notes: rxNotes || null,
       }));

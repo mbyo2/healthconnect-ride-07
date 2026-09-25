@@ -300,6 +300,27 @@ export const PROVIDER_CORE_ROUTES = [
   '/insurance-cards',
   '/map',
   '/search',
+  // AI triage intake flow (patients start here; providers triage walk-ins)
+  '/triage',
+  '/doc-o-clock',
+];
+
+/** Advanced institution-network management pages (HMS add-on surface). */
+export const INSTITUTION_MANAGEMENT_ROUTES = [
+  '/multi-center',
+  '/financial-controls',
+  '/patient-flow',
+  '/enhanced-inventory',
+  '/procedure-management',
+  '/care-team',
+  '/enhanced-diagnostics',
+  '/zambia-compliance',
+  '/enhanced-telemedicine',
+  '/analytics-reporting',
+  '/enterprise-accounting',
+  '/zra-smart-invoice',
+  '/paye-calculations',
+  '/medical-shift-hr',
 ];
 
 export const INSTITUTION_OPERATIONAL_ROUTES = [
@@ -344,4 +365,10 @@ export const PUBLIC_ROUTES = [
   '/reset-password',
   '/patient-registration',
   '/accept-invitation',
+  // Waiting-room queue displays and the self-service kiosk are public by design
+  '/queue-display',
+  '/kiosk',
+  // Payment gateway bounce-back pages (DPO / wallet top-up return here)
+  '/payment-return',
+  '/payment-cancelled',
 ];

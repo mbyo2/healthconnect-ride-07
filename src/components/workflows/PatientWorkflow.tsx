@@ -87,32 +87,53 @@ export const PatientWorkflow = React.memo(() => {
     isWorkflowComplete
   } = useProfileCompletion();
 
-  // Fetch upcoming appointment for dynamic dark banner
+  // Fetch upcoming appointment for dynamic dark banner.
+  // NOTE: appointments.provider_id FKs point at auth.users (see migrations),
+  // so a `profiles!appointments_provider_id_fkey` join hint is invalid and
+  // patient sessions cannot read profiles rows directly. Provider details
+  // come from the public provider_directory view instead.
   const { data: upcomingAppointment } = useQuery({
     queryKey: ['patient-next-appointment', user?.id],
     queryFn: async () => {
       if (!user) return null;
       const { data, error } = await supabase
         .from('appointments')
-        .select(`
-          id, date, time, type, status,
-          provider:profiles!appointments_provider_id_fkey(first_name, last_name, specialty, avatar_url, role)
-        `)
+        .select('id, date, time, type, status, provider_id')
         .eq('patient_id', user.id)
         .gte('date', new Date().toISOString().split('T')[0])
         .order('date', { ascending: true })
+        .order('time', { ascending: true })
         .limit(1)
         .maybeSingle();
 
-      if (error && error.code !== 'PGRST116') {
+      if (error) {
         console.error('Error fetching next appointment:', error);
+        return null;
       }
-      return data || null;
+      if (!data) return null;
+
+      let provider: { first_name?: string | null; last_name?: string | null; specialty?: string | null; avatar_url?: string | null; role?: string | null } | null = null;
+      if (data.provider_id) {
+        const { data: dir, error: dirError } = await supabase
+          .from('provider_directory')
+          .select('first_name, last_name, specialty, avatar_url, role')
+          .eq('id', data.provider_id)
+          .maybeSingle();
+        if (dirError) {
+          console.error('Error fetching appointment provider:', dirError);
+        } else {
+          provider = dir;
+        }
+      }
+      return { ...data, provider };
     },
     enabled: !!user,
   });
 
-  // Fetch latest active prescription count
+  // Fetch latest active prescription count.
+  // comprehensive_prescriptions.status CHECK allows
+  // ('pending','filled','partially_filled','cancelled','expired') — there is
+  // no 'active' value, so "needs action" = pending + partially_filled.
   const { data: activePrescriptionsCount = 0 } = useQuery({
     queryKey: ['patient-prescriptions-count', user?.id],
     queryFn: async () => {
@@ -121,7 +142,7 @@ export const PatientWorkflow = React.memo(() => {
         .from('comprehensive_prescriptions')
         .select('*', { count: 'exact', head: true })
         .eq('patient_id', user.id)
-        .eq('status', 'active');
+        .in('status', ['pending', 'partially_filled']);
 
       if (error) return 0;
       return count || 0;
@@ -445,10 +466,10 @@ export const PatientWorkflow = React.memo(() => {
                     <img
                       src={doc.avatar_url}
                       alt={`${doc.first_name || ''} ${doc.last_name || ''}`.trim() || 'Provider photo'}
-                      className="h-13 w-13 rounded-2xl object-cover ring-2 ring-primary-500/30"
+                      className="h-12 w-12 rounded-2xl object-cover ring-2 ring-primary-500/30"
                     />
                   ) : (
-                    <div className="h-13 w-13 rounded-2xl bg-primary-50 dark:bg-blue-950/50 text-primary-500 flex items-center justify-center font-black text-lg ring-2 ring-primary-500/30" aria-hidden>
+                    <div className="h-12 w-12 rounded-2xl bg-primary-50 dark:bg-blue-950/50 text-primary-500 flex items-center justify-center font-black text-lg ring-2 ring-primary-500/30" aria-hidden>
                       {(doc.first_name?.[0] || 'D')}{(doc.last_name?.[0] || '')}
                     </div>
                   )}
@@ -465,7 +486,7 @@ export const PatientWorkflow = React.memo(() => {
 
                 <div className="pt-1 border-t border-canvas-silk dark:border-slate-800">
                   <button
-                    onClick={() => navigate('/search')}
+                    onClick={() => navigate(`/provider/${doc.id}`)}
                     className="w-full px-4 py-2 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-black text-xs flex items-center justify-center gap-1 shadow-sm transition-all active:scale-95"
                   >
                     <span>View &amp; book</span>

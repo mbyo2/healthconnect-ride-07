@@ -30,20 +30,39 @@ export const AppointmentReminders = () => {
   const { data: reminders = [] } = useQuery({
     queryKey: ['appointment-reminders', user?.id],
     queryFn: async () => {
+      // NOTE: appointments.provider_id FKs point at auth.users, so a
+      // `profiles!appointments_provider_id_fkey` join hint is invalid
+      // PostgREST. Provider details come from the public
+      // provider_directory view instead.
       const { data, error } = await (supabase as any)
         .from('appointment_reminders')
         .select(`
           *,
           appointments (
-            date, time, type,
-            provider:profiles!appointments_provider_id_fkey (first_name, last_name, specialty, role)
+            date, time, type, provider_id
           )
         `)
         .eq('patient_id', user!.id)
         .order('scheduled_for', { ascending: true })
         .limit(20);
       if (error) throw error;
-      return (data || []) as Reminder[];
+      const rows = (data || []) as Reminder[];
+
+      const providerIds = [...new Set(
+        rows.map((r) => (r.appointments as any)?.provider_id).filter(Boolean)
+      )];
+      if (providerIds.length > 0) {
+        const { data: providers } = await supabase
+          .from('provider_directory')
+          .select('id, first_name, last_name, specialty, role')
+          .in('id', providerIds);
+        const providerMap = Object.fromEntries((providers || []).map((p: any) => [p.id, p]));
+        rows.forEach((r) => {
+          const appt = r.appointments as any;
+          if (appt?.provider_id) appt.provider = providerMap[appt.provider_id] || null;
+        });
+      }
+      return rows;
     },
     enabled: !!user,
   });

@@ -11,6 +11,7 @@ import { Search, UserPlus, UserMinus, Shield, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { USER_ROLES, ROLE_META, type UserRole } from '@/config/roleConfig';
 import { syncAdminLevel } from '@/lib/adminLevelSync';
+import { useUserRoles } from '@/context/UserRolesContext';
 
 type AppRole = UserRole;
 
@@ -24,6 +25,7 @@ interface UserWithRoles {
 
 export const RoleManagement: React.FC = () => {
   const { user } = useAuth();
+  const { isSuperAdmin } = useUserRoles();
   const { toast } = useToast();
   const [users, setUsers] = useState<UserWithRoles[]>([]);
   const [loading, setLoading] = useState(true);
@@ -31,8 +33,11 @@ export const RoleManagement: React.FC = () => {
   const [selectedRole, setSelectedRole] = useState<AppRole | 'all'>('all');
 
   // Every role in the taxonomy is assignable — driven by roleConfig so new
-  // cadres appear here automatically.
+  // cadres appear here automatically. Privileged roles stay superadmin-only.
   const availableRoles: AppRole[] = Object.values(USER_ROLES);
+  const assignableRoles: AppRole[] = isSuperAdmin
+    ? availableRoles
+    : availableRoles.filter(r => r !== USER_ROLES.ADMIN && r !== USER_ROLES.SUPER_ADMIN);
 
   const CATEGORY_STYLES: Record<string, string> = {
     admin: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
@@ -62,18 +67,19 @@ export const RoleManagement: React.FC = () => {
     try {
       setLoading(true);
 
-      // Fetch all profiles
+      // Bounded: newest 200 users + their roles (roles scoped to those ids)
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select('id, email, first_name, last_name')
-        .order('email');
+        .order('created_at', { ascending: false })
+        .limit(200);
 
       if (profilesError) throw profilesError;
 
-      // Fetch all user roles
-      const { data: userRoles, error: rolesError } = await supabase
-        .from('user_roles')
-        .select('user_id, role');
+      const ids = (profiles || []).map(p => p.id);
+      const { data: userRoles, error: rolesError } = ids.length
+        ? await supabase.from('user_roles').select('user_id, role').in('user_id', ids)
+        : { data: [] as any[], error: null };
 
       if (rolesError) throw rolesError;
 
@@ -101,6 +107,15 @@ export const RoleManagement: React.FC = () => {
   };
 
   const assignRole = async (userId: string, role: AppRole) => {
+    // Privileged roles are a superadmin prerogative (RLS would 403 anyway)
+    if ((role === USER_ROLES.ADMIN || role === USER_ROLES.SUPER_ADMIN) && !isSuperAdmin) {
+      toast({
+        title: 'Not permitted',
+        description: 'Only super admins can assign admin roles',
+        variant: 'destructive'
+      });
+      return;
+    }
     try {
       const { error } = await supabase
         .from('user_roles')
@@ -133,6 +148,15 @@ export const RoleManagement: React.FC = () => {
   };
 
   const revokeRole = async (userId: string, role: AppRole) => {
+    // Privileged roles are a superadmin prerogative (RLS would 403 anyway)
+    if ((role === USER_ROLES.ADMIN || role === USER_ROLES.SUPER_ADMIN) && !isSuperAdmin) {
+      toast({
+        title: 'Not permitted',
+        description: 'Only super admins can revoke admin roles',
+        variant: 'destructive'
+      });
+      return;
+    }
     try {
       const { error } = await supabase
         .from('user_roles')
@@ -194,6 +218,7 @@ export const RoleManagement: React.FC = () => {
               </CardTitle>
               <CardDescription>
                 Manage user roles and permissions across the system
+                <span className="block text-[11px] mt-1">Showing up to 200 most recent users — use search to find specific users.</span>
               </CardDescription>
             </div>
           </div>
@@ -268,7 +293,7 @@ export const RoleManagement: React.FC = () => {
                       <SelectValue placeholder="Assign role" />
                     </SelectTrigger>
                 <SelectContent className="max-h-80">
-                  {availableRoles
+                  {assignableRoles
                     .filter(role => !userData.roles.includes(role))
                     .map(role => (
                       <SelectItem key={role} value={role}>

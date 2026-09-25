@@ -11,6 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, FileText } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -28,6 +29,7 @@ interface PatientRecord {
 
 export const PatientRecords = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
 
   const { data: records, isLoading } = useQuery({
     queryKey: ['medical_records'],
@@ -35,6 +37,11 @@ export const PatientRecords = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
+      // NOTE: comprehensive_medical_records.patient_id FKs point at
+      // auth.users, so the `profiles!..._fkey` join hint is invalid
+      // PostgREST. Patient names are fetched directly — the "Appointment
+      // participants can view each other's profiles" RLS policy permits
+      // participant rows; others resolve to null (already handled).
       const { data, error } = await supabase
         .from('comprehensive_medical_records')
         .select(`
@@ -42,28 +49,42 @@ export const PatientRecords = () => {
           patient_id,
           record_type,
           description,
-          visit_date,
-          patient:profiles!comprehensive_medical_records_patient_id_fkey(first_name, last_name)
+          visit_date
         `)
-        .order('visit_date', { ascending: false });
+        .order('visit_date', { ascending: false })
+        .limit(100);
 
       if (error) throw error;
 
-      return (data as any[]).map(record => ({
+      const rows = (data as any[]) || [];
+      const patientIds = [...new Set(rows.map((r) => r.patient_id).filter(Boolean))];
+      let patientMap: Record<string, any> = {};
+      if (patientIds.length > 0) {
+        const { data: patients } = await supabase
+          .from('profiles')
+          .select('id, first_name, last_name')
+          .in('id', patientIds);
+        patientMap = Object.fromEntries((patients || []).map((p: any) => [p.id, p]));
+      }
+
+      return rows.map(record => ({
         id: record.id,
         patient_id: record.patient_id,
         record_type: record.record_type,
         description: record.description,
         date: record.visit_date,
-        patient: record.patient
+        patient: patientMap[record.patient_id] || null
       })) as PatientRecord[];
     }
   });
 
-  const filteredRecords = records?.filter(record =>
-    record.patient.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    record.patient.last_name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredRecords = records?.filter(record => {
+    // patient join can be null under RLS (walk-in records) — never crash
+    const first = record.patient?.first_name?.toLowerCase() || "";
+    const last = record.patient?.last_name?.toLowerCase() || "";
+    const q = searchTerm.toLowerCase();
+    return first.includes(q) || last.includes(q);
+  });
 
   return (
     <Card className="p-6">
@@ -79,7 +100,7 @@ export const PatientRecords = () => {
               className="pl-8"
             />
           </div>
-          <Button>
+          <Button onClick={() => navigate("/medical-records")}>
             <FileText className="w-4 h-4 mr-2" />
             New Record
           </Button>
@@ -96,7 +117,6 @@ export const PatientRecords = () => {
               <TableHead>Patient Name</TableHead>
               <TableHead>Record Type</TableHead>
               <TableHead>Description</TableHead>
-              <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -104,15 +124,10 @@ export const PatientRecords = () => {
               <TableRow key={record.id}>
                 <TableCell>{new Date(record.date).toLocaleDateString()}</TableCell>
                 <TableCell>
-                  {record.patient.first_name} {record.patient.last_name}
+                  {[record.patient?.first_name, record.patient?.last_name].filter(Boolean).join(" ") || "Patient"}
                 </TableCell>
                 <TableCell>{record.record_type}</TableCell>
                 <TableCell>{record.description}</TableCell>
-                <TableCell>
-                  <Button variant="ghost" size="sm">
-                    View
-                  </Button>
-                </TableCell>
               </TableRow>
             ))}
           </TableBody>

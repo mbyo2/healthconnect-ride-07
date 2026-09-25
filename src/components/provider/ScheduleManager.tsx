@@ -12,6 +12,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { format } from "date-fns";
 
 interface Appointment {
   id: string;
@@ -48,7 +49,8 @@ export const ScheduleManager = () => {
           )
         `)
         .eq('provider_id', user.id)
-        .eq('date', selectedDate ? selectedDate.toISOString().split('T')[0] : undefined)
+        // Local calendar date (toISOString() would shift a day for UTC+ zones)
+        .eq('date', format(selectedDate as Date, 'yyyy-MM-dd'))
         .order('time');
 
       if (error) throw error;

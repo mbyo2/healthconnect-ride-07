@@ -207,10 +207,11 @@ export const EnhancedInventory = () => {
   }
 
   const avgSupplierRating = supplierPerformance.length > 0
-    ? supplierPerformance.reduce((sum, s) => sum + s.rating, 0) / supplierPerformance.length
+    ? supplierPerformance.reduce((sum, s) => sum + Number(s.rating || 0), 0) / supplierPerformance.length
     : 0;
   const pendingOrders = purchaseOrders.filter((o) => o.status === "pending").length;
-  const totalOrderValue = purchaseOrders.reduce((sum, o) => sum + o.final_amount, 0);
+  // NUMERIC columns arrive as strings from PostgREST — coerce before summing
+  const totalOrderValue = purchaseOrders.reduce((sum, o) => sum + Number(o.final_amount || 0), 0);
   const openDiscrepancies = reconciliations.filter((r) => r.status !== "completed").length;
 
   return (
@@ -251,7 +252,7 @@ export const EnhancedInventory = () => {
                       <SelectContent>
                         {supplierPerformance.map((sp) => (
                           <SelectItem key={sp.supplier_id} value={sp.supplier_id}>
-                            {sp.supplier?.name} (Rating: {sp.rating.toFixed(1)})
+                            {sp.supplier?.name} (Rating: {Number(sp.rating || 0).toFixed(1)})
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -495,7 +496,7 @@ export const EnhancedInventory = () => {
                         {order.expected_delivery_date ? new Date(order.expected_delivery_date).toLocaleDateString() : "N/A"}
                       </td>
                       <td className="px-4 py-3 text-xs font-bold">
-                        {institution.currency || "ZMW"} {order.final_amount.toFixed(2)}
+                        {institution.currency || "ZMW"} {Number(order.final_amount || 0).toFixed(2)}
                       </td>
                       <td className="px-4 py-3">
                         <Badge className={getStatusColor(order.status) + " text-[10px]"}>
@@ -566,7 +567,7 @@ export const EnhancedInventory = () => {
                       <div>
                         <div className="text-[10px] text-graphite-500 dark:text-slate-400">Total Value</div>
                         <div className="text-sm font-bold text-warning-500">
-                          {institution.currency || "ZMW"} {reconciliation.total_discrepancy_value.toFixed(2)}
+                          {institution.currency || "ZMW"} {Number(reconciliation.total_discrepancy_value || 0).toFixed(2)}
                         </div>
                       </div>
                     </div>
@@ -614,8 +615,8 @@ export const EnhancedInventory = () => {
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-graphite-500 dark:text-slate-400">On-Time Delivery Rate</span>
                       <span className="font-bold text-primary-500">
-                        {supplierPerformance.length > 0 
-                          ? (supplierPerformance.reduce((sum, s) => sum + s.on_time_delivery_rate, 0) / supplierPerformance.length * 100).toFixed(0)
+                        {supplierPerformance.length > 0
+                          ? (supplierPerformance.reduce((sum, s) => sum + Number(s.on_time_delivery_rate || 0), 0) / supplierPerformance.length * 100).toFixed(0)
                           : 0}%
                       </span>
                     </div>

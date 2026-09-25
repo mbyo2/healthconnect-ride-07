@@ -94,7 +94,8 @@ export const InstitutionApplications = () => {
         .from("institution_applications" as any)
         .select("*")
         .eq("status", filter)
-        .order("submitted_at", { ascending: false });
+        .order("submitted_at", { ascending: false })
+        .limit(500);
       if (error) throw error;
 
       const applicantIds = (data as any[] || []).map(a => a.applicant_id);
@@ -103,7 +104,7 @@ export const InstitutionApplications = () => {
         applicantIds.length
           ? supabase
               .from("profiles")
-              .select("id, first_name, last_name, email")
+              .select("id, first_name, last_name, email, country")
               .in("id", applicantIds)
           : Promise.resolve({ data: [] as any[] }),
         applicantIds.length
@@ -201,23 +202,33 @@ export const InstitutionApplications = () => {
       if (appErr) throw appErr;
 
       if (status === "approved") {
-        await supabase
+        const { error: instErr } = await supabase
           .from("healthcare_institutions")
           .update({ is_verified: true })
           .eq("admin_id", selected.applicant_id);
-        await supabase.from("profiles").update({ is_verified: true }).eq("id", selected.applicant_id);
+        if (instErr) throw instErr;
+        const { error: profErr } = await supabase
+          .from("profiles")
+          .update({ is_verified: true })
+          .eq("id", selected.applicant_id);
+        if (profErr) throw profErr;
       }
 
-      await supabase.from("audit_logs" as any).insert({
-        user_id: user?.id,
-        action: status === "approved" ? "approve_institution" : "reject_institution",
-        resource: "institution_application",
-        resource_id: selected.id,
-        details: { institution_name: selected.institution_name, notes },
-        category: "admin_action",
-        outcome: "success",
-        severity: "info",
-      });
+      // Audit trail — a logging failure must never mask a completed decision.
+      try {
+        await supabase.from("audit_logs" as any).insert({
+          user_id: user?.id,
+          action: status === "approved" ? "approve_institution" : "reject_institution",
+          resource: "institution_application",
+          resource_id: selected.id,
+          details: { institution_name: selected.institution_name, notes },
+          category: "data_modification",
+          outcome: "success",
+          severity: "info",
+        });
+      } catch (auditErr) {
+        console.error("Failed to write audit log:", auditErr);
+      }
 
       toast.success(`Institution application ${status === "approved" ? "approved ✓" : "rejected"}`);
       setSelected(null);

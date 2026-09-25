@@ -86,7 +86,9 @@ export const ComprehensivePrescriptions = () => {
       let pharmacyMap: Record<string, any> = {};
 
       if (providerIds.length > 0) {
-        const { data: profs } = await supabase.from('profiles').select('id, first_name, last_name, role').in('id', providerIds);
+        // patients cannot read profiles rows directly (RLS: own profile only),
+        // so prescriber names come from the public provider_directory view.
+        const { data: profs } = await supabase.from('provider_directory').select('id, first_name, last_name, role').in('id', providerIds);
         (profs || []).forEach((p) => { providerMap[p.id] = p; });
       }
 

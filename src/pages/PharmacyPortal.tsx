@@ -12,6 +12,7 @@ import { PharmacyCustomers } from '@/components/pharmacy/PharmacyCustomers';
 import { PharmacySalesReport } from '@/components/pharmacy/PharmacySalesReport';
 import { PharmacyDeliveryTracking } from '@/components/pharmacy/PharmacyDeliveryTracking';
 import { useAuth } from '@/context/AuthContext';
+import { useUserRoles } from '@/context/UserRolesContext';
 import { useInstitutionContext } from '@/hooks/useInstitutionContext';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -22,12 +23,21 @@ import {
 
 const PharmacyPortal = () => {
   const { user } = useAuth();
+  const { hasRole } = useUserRoles();
   const { institutionId: pharmacyId } = useInstitutionContext();
   const [activeTab, setActiveTab] = useState('dashboard');
 
+  // Wholesale distributors (ZAMRA-licensed) are B2B-only: no retail POS,
+  // no patient Rx dispensing, no walk-in customers. A user holding BOTH a
+  // wholesale and a retail pharmacy role keeps the full retail surface.
+  const isWholesaleOnly =
+    hasRole(['wholesale_pharmacy']) &&
+    !hasRole(['pharmacy', 'pharmacist', 'pharmacy_technologist']);
+  const showRetailTabs = !isWholesaleOnly;
+
   return (
     <ProtectedRoute>
-      <RoleProtectedRoute allowedRoles={['pharmacy', 'pharmacist', 'wholesale_pharmacy', 'institution_admin', 'admin', 'super_admin']}>
+      <RoleProtectedRoute allowedRoles={['pharmacy', 'pharmacist', 'pharmacy_technologist', 'wholesale_pharmacy', 'institution_admin', 'admin', 'super_admin']}>
         <div className="min-h-screen bg-canvas-bone dark:bg-slate-950 py-8 px-4 sm:px-6 font-sans">
           <div className="max-w-7xl mx-auto space-y-6">
             {/* Header Banner */}
@@ -41,9 +51,13 @@ const PharmacyPortal = () => {
                     <span className="w-2 h-2 rounded-full bg-success-600 animate-pulse" />
                     <span className="text-[11px] font-black uppercase tracking-wider text-slate-300">Pharmacy &amp; Logistics Hub</span>
                   </div>
-                  <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white mt-0.5">Pharmacy Operations Portal</h1>
+                  <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white mt-0.5">
+                    {isWholesaleOnly ? 'Wholesale Distribution Portal' : 'Pharmacy Operations Portal'}
+                  </h1>
                   <p className="text-xs text-slate-400 font-medium">
-                    POS billing, medication inventory, digital Rx fulfillment &amp; courier dispatch
+                    {isWholesaleOnly
+                      ? 'B2B medicine supply: warehouse inventory, purchase orders & distributor invoicing'
+                      : 'POS billing, medication inventory, digital Rx fulfillment & courier dispatch'}
                   </p>
                 </div>
               </div>
@@ -54,21 +68,29 @@ const PharmacyPortal = () => {
                 <TabsTrigger value="dashboard" className="gap-1.5 text-xs font-black rounded-xl data-[state=active]:bg-primary-500 data-[state=active]:text-white py-2 px-3.5 transition-all">
                   <LayoutDashboard className="h-3.5 w-3.5" /> Dashboard
                 </TabsTrigger>
-                <TabsTrigger value="pos" className="gap-1.5 text-xs font-black rounded-xl data-[state=active]:bg-primary-500 data-[state=active]:text-white py-2 px-3.5 transition-all">
-                  <ShoppingCart className="h-3.5 w-3.5" /> POS Billing
-                </TabsTrigger>
+                {showRetailTabs && (
+                  <TabsTrigger value="pos" className="gap-1.5 text-xs font-black rounded-xl data-[state=active]:bg-primary-500 data-[state=active]:text-white py-2 px-3.5 transition-all">
+                    <ShoppingCart className="h-3.5 w-3.5" /> POS Billing
+                  </TabsTrigger>
+                )}
                 <TabsTrigger value="inventory" className="gap-1.5 text-xs font-black rounded-xl data-[state=active]:bg-primary-500 data-[state=active]:text-white py-2 px-3.5 transition-all">
                   <Package className="h-3.5 w-3.5" /> Inventory
                 </TabsTrigger>
-                <TabsTrigger value="prescriptions" className="gap-1.5 text-xs font-black rounded-xl data-[state=active]:bg-primary-500 data-[state=active]:text-white py-2 px-3.5 transition-all">
-                  <ClipboardList className="h-3.5 w-3.5" /> Rx Fulfillment
-                </TabsTrigger>
-                <TabsTrigger value="deliveries" className="gap-1.5 text-xs font-black rounded-xl data-[state=active]:bg-primary-500 data-[state=active]:text-white py-2 px-3.5 transition-all">
-                  <Truck className="h-3.5 w-3.5" /> Deliveries
-                </TabsTrigger>
-                <TabsTrigger value="customers" className="gap-1.5 text-xs font-black rounded-xl data-[state=active]:bg-primary-500 data-[state=active]:text-white py-2 px-3.5 transition-all">
-                  <Users className="h-3.5 w-3.5" /> Customers
-                </TabsTrigger>
+                {showRetailTabs && (
+                  <TabsTrigger value="prescriptions" className="gap-1.5 text-xs font-black rounded-xl data-[state=active]:bg-primary-500 data-[state=active]:text-white py-2 px-3.5 transition-all">
+                    <ClipboardList className="h-3.5 w-3.5" /> Rx Fulfillment
+                  </TabsTrigger>
+                )}
+                {showRetailTabs && (
+                  <TabsTrigger value="deliveries" className="gap-1.5 text-xs font-black rounded-xl data-[state=active]:bg-primary-500 data-[state=active]:text-white py-2 px-3.5 transition-all">
+                    <Truck className="h-3.5 w-3.5" /> Deliveries
+                  </TabsTrigger>
+                )}
+                {showRetailTabs && (
+                  <TabsTrigger value="customers" className="gap-1.5 text-xs font-black rounded-xl data-[state=active]:bg-primary-500 data-[state=active]:text-white py-2 px-3.5 transition-all">
+                    <Users className="h-3.5 w-3.5" /> Customers
+                  </TabsTrigger>
+                )}
                 <TabsTrigger value="suppliers" className="gap-1.5 text-xs font-black rounded-xl data-[state=active]:bg-primary-500 data-[state=active]:text-white py-2 px-3.5 transition-all">
                   <Building2 className="h-3.5 w-3.5" /> Suppliers
                 </TabsTrigger>
@@ -78,19 +100,21 @@ const PharmacyPortal = () => {
               </TabsList>
 
               <TabsContent value="dashboard"><PharmacyDashboard /></TabsContent>
-              <TabsContent value="pos"><PharmacyPOS /></TabsContent>
+              {showRetailTabs && <TabsContent value="pos"><PharmacyPOS /></TabsContent>}
               <TabsContent value="inventory"><MedicationInventory /></TabsContent>
-              <TabsContent value="prescriptions"><PrescriptionFulfillment /></TabsContent>
-              <TabsContent value="deliveries">
-                {pharmacyId ? (
-                  <PharmacyDeliveryTracking pharmacyId={pharmacyId} />
-                ) : (
-                  <div className="rounded-3xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-8 text-center text-xs text-slate-400 font-medium">
-                    No pharmacy branch linked to this account
-                  </div>
-                )}
-              </TabsContent>
-              <TabsContent value="customers"><PharmacyCustomers /></TabsContent>
+              {showRetailTabs && <TabsContent value="prescriptions"><PrescriptionFulfillment /></TabsContent>}
+              {showRetailTabs && (
+                <TabsContent value="deliveries">
+                  {pharmacyId ? (
+                    <PharmacyDeliveryTracking pharmacyId={pharmacyId} />
+                  ) : (
+                    <div className="rounded-3xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-8 text-center text-xs text-slate-400 font-medium">
+                      No pharmacy branch linked to this account
+                    </div>
+                  )}
+                </TabsContent>
+              )}
+              {showRetailTabs && <TabsContent value="customers"><PharmacyCustomers /></TabsContent>}
               <TabsContent value="suppliers"><SupplierManagement /></TabsContent>
               <TabsContent value="reports"><PharmacySalesReport /></TabsContent>
             </Tabs>

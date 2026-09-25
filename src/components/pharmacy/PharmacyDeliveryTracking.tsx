@@ -10,6 +10,7 @@ interface DeliveryTrackingProps {
 }
 
 const statusConfig: Record<string, { icon: any; color: string; label: string }> = {
+  assigned: { icon: Clock, color: "text-amber-600 bg-amber-50 border-amber-200", label: "Assigned" },
   pending: { icon: Clock, color: "text-yellow-600 bg-yellow-50 border-yellow-200", label: "Pending" },
   picked_up: { icon: Package, color: "text-blue-600 bg-blue-50 border-blue-200", label: "Picked Up" },
   in_transit: { icon: Truck, color: "text-purple-600 bg-purple-50 border-purple-200", label: "In Transit" },
@@ -20,9 +21,12 @@ export const PharmacyDeliveryTracking = ({ pharmacyId }: DeliveryTrackingProps) 
   const { data: deliveries, isLoading } = useQuery({
     queryKey: ["pharmacy-deliveries", pharmacyId],
     queryFn: async () => {
+      // delivery_tracking has no pharmacy column — scope through orders!inner
+      // so a pharmacy only ever sees its own deliveries.
       const { data, error } = await (supabase as any)
         .from("delivery_tracking")
-        .select("*, order:orders(id, total_amount, patient_id)")
+        .select("*, order:orders!inner(id, total_amount, patient_id, pharmacy_id)")
+        .eq("order.pharmacy_id", pharmacyId)
         .order("created_at", { ascending: false })
         .limit(20);
       if (error) throw error;

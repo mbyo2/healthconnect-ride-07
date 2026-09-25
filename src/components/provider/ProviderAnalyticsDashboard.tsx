@@ -24,13 +24,25 @@ export const ProviderAnalyticsDashboard = () => {
     queryKey: ["provider-recent-appointments"],
     queryFn: async () => {
       if (!user) return [];
+      // NOTE: appointments.patient_id FKs point at auth.users, so the
+      // `profiles!appointments_patient_id_fkey` hint is invalid PostgREST.
       const { data } = await supabase
         .from("appointments")
-        .select(`*, patient:profiles!appointments_patient_id_fkey (first_name, last_name)`)
+        .select("*")
         .eq("provider_id", user.id)
         .order("date", { ascending: false })
         .limit(10);
-      return data || [];
+      const rows = (data as any[]) || [];
+      const patientIds = [...new Set(rows.map((a) => a.patient_id).filter(Boolean))];
+      if (patientIds.length > 0) {
+        const { data: patients } = await supabase
+          .from("profiles")
+          .select("id, first_name, last_name")
+          .in("id", patientIds);
+        const patientMap = Object.fromEntries((patients || []).map((p: any) => [p.id, p]));
+        rows.forEach((a) => { a.patient = patientMap[a.patient_id] || null; });
+      }
+      return rows;
     },
     enabled: !!user,
   });

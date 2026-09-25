@@ -103,7 +103,8 @@ export const MedicationInventory = () => {
         .from('medication_inventory' as any)
         .select('*')
         .eq('institution_id', userInstitution)
-        .order('medication_name', { ascending: true });
+        .order('medication_name', { ascending: true })
+        .limit(500);
 
       if (error) {
         console.error('Error fetching medication inventory:', error);

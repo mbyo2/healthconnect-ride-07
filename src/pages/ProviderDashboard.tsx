@@ -2,7 +2,6 @@ import { useState, useMemo, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScheduleManager } from "@/components/provider/ScheduleManager";
 import { AvailabilityManager } from "@/components/provider/AvailabilityManager";
-import { DigitalSignature } from "@/components/provider/DigitalSignature";
 import { PatientRecords } from "@/components/provider/PatientRecords";
 import { ProviderAnalyticsDashboard } from "@/components/provider/ProviderAnalyticsDashboard";
 import { WaitlistManager } from "@/components/booking/WaitlistManager";
@@ -26,6 +25,7 @@ import { format, startOfWeek, endOfWeek } from "date-fns";
 import { useCurrency } from "@/hooks/use-currency";
 import { useUserRoles } from "@/context/UserRolesContext";
 import { ROLE_META } from "@/config/roleConfig";
+import { hasRoutePermission } from "@/utils/rolePermissions";
 import { useInstitutionAffiliation } from "@/hooks/useInstitutionAffiliation";
 import { toast } from "sonner";
 
@@ -438,9 +438,19 @@ export const ProviderDashboard = () => {
     prescriptions: "/prescriptions",
     patients: "/appointments",
     schedule: "/provider-calendar",
+    billing: "/wallet",
     dispense: "/pharmacy-portal",
     test_queue: "/lab-management",
   };
+
+  // A tile is only tappable when the module is live AND this provider's roles
+  // are actually permitted to open the target route (RouteGuard would bounce
+  // them otherwise — e.g. nurses see a live "E-prescriptions" charter entry
+  // but lack the /prescriptions route).
+  const canOpenModule = (m: { status: string; module_key: string }) =>
+    m.status === "live" &&
+    !!PROVIDER_MODULE_PATHS[m.module_key] &&
+    hasRoutePermission(availableRoles, PROVIDER_MODULE_PATHS[m.module_key]);
 
   const { data: todayAppointments = [] } = useQuery({
     queryKey: ["provider-today-appointments"],
@@ -472,11 +482,13 @@ export const ProviderDashboard = () => {
           .gte("date", weekStart)
           .lte("date", weekEnd),
         // Real collected revenue from the payments ledger.
+        // NOTE: payments.status only allows pending/completed/failed/refunded —
+        // 'completed' is the collected state; there is no 'paid' value.
         supabase
           .from("payments")
           .select("amount")
           .eq("provider_id", user.id)
-          .in("status", ["paid", "completed"])
+          .in("status", ["completed"])
           .gte("created_at", weekStart)
           .lte("created_at", weekEnd),
       ]);
@@ -514,9 +526,11 @@ export const ProviderDashboard = () => {
           </div>
 
           <div className="flex items-center gap-2 flex-wrap">
-            <button onClick={() => navigate("/ai-diagnostics")} className="vf-btn-secondary gap-2 text-sm">
-              <Bot className="h-3.5 w-3.5" /> MedGemma AI
-            </button>
+            {hasRoutePermission(availableRoles, "/ai-diagnostics") && (
+              <button onClick={() => navigate("/ai-diagnostics")} className="vf-btn-secondary gap-2 text-sm">
+                <Bot className="h-3.5 w-3.5" /> MedGemma AI
+              </button>
+            )}
             <button onClick={() => navigate("/provider-calendar")} className="vf-btn-primary gap-2 text-sm">
               <Calendar className="h-3.5 w-3.5" /> Calendar
             </button>
@@ -549,7 +563,7 @@ export const ProviderDashboard = () => {
           </div>
         </div>
 
-        {/* Quick action pills */}
+        {/* Quick action pills — only show actions this provider's roles may open */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
           {[
             { label: "Calendar", route: "/provider-calendar", icon: Calendar },
@@ -558,7 +572,9 @@ export const ProviderDashboard = () => {
             { label: "Telehealth", route: "/video-dashboard", icon: Video },
             { label: "Medical EMR", route: "/medical-records", icon: Stethoscope },
             { label: "Chat Console", route: "/chat", icon: MessageSquare },
-          ].map(act => (
+          ]
+            .filter(act => hasRoutePermission(availableRoles, act.route))
+            .map(act => (
             <button
               key={act.label}
               onClick={() => navigate(act.route)}
@@ -585,29 +601,29 @@ export const ProviderDashboard = () => {
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5">
               {charter.map((m) => {
-                const isLive = m.status === "live";
+                const openable = canOpenModule(m);
                 const path = PROVIDER_MODULE_PATHS[m.module_key];
                 const inner = (
                   <>
                     <span className="flex items-center gap-1.5 text-[11px] font-bold text-slate-700 dark:text-slate-300">
-                      {isLive ? (
+                      {m.status === "live" ? (
                         <CheckCircle2 className="h-3.5 w-3.5 text-success-500 shrink-0" />
                       ) : (
                         <Hourglass className="h-3.5 w-3.5 text-graphite-400 shrink-0" />
                       )}
                       <span className="truncate">{m.module_name}</span>
                     </span>
-                    <span className={`text-[9px] font-extrabold uppercase tracking-wide ${isLive ? "text-success-500" : "text-graphite-400"}`}>
-                      {isLive ? "Live" : "Coming soon"}
+                    <span className={`text-[9px] font-extrabold uppercase tracking-wide ${m.status === "live" ? "text-success-500" : "text-graphite-400"}`}>
+                      {m.status === "live" ? "Live" : "Coming soon"}
                     </span>
                   </>
                 );
                 const cls =
                   "flex items-center justify-between gap-2 p-2.5 rounded-xl border text-left transition-all " +
-                  (isLive
+                  (openable
                     ? "border-canvas-silk dark:border-slate-700 hover:border-primary-500 hover:bg-primary-100 dark:hover:bg-slate-800"
                     : "border-canvas-silk dark:border-slate-800 bg-canvas-mist/50 dark:bg-slate-800/40 opacity-80");
-                return isLive && path ? (
+                return openable && path ? (
                   <button key={m.module_key} onClick={() => navigate(path)} className={cls} title={m.description || m.module_name}>
                     {inner}
                   </button>

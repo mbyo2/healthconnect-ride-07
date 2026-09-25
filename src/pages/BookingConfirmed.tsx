@@ -21,18 +21,35 @@ const BookingConfirmed = () => {
     queryKey: ['booking-confirmed', appointmentId],
     queryFn: async () => {
       if (!appointmentId) return null;
+      // NOTE: appointments.provider_id FKs point at auth.users, so a
+      // `profiles!appointments_provider_id_fkey` join hint is invalid
+      // PostgREST. Provider details come from the public
+      // provider_directory view instead.
       const { data, error } = await supabase
         .from('appointments')
-        .select(`
-          *,
-          provider:profiles!appointments_provider_id_fkey (
-            first_name, last_name, specialty, address, city, phone, avatar_url
-          )
-        `)
+        .select('*')
         .eq('id', appointmentId)
         .single();
       if (error) throw error;
-      return data;
+      if (!data) return null;
+
+      let provider: any = null;
+      if ((data as any).provider_id) {
+        const { data: dir, error: dirError } = await supabase
+          .from('provider_directory')
+          .select('first_name, last_name, specialty, avatar_url, role, city, primary_practice_location, location')
+          .eq('id', (data as any).provider_id)
+          .maybeSingle();
+        if (dirError) {
+          console.error('Error fetching booking provider:', dirError);
+        } else if (dir) {
+          provider = {
+            ...dir,
+            address: dir.primary_practice_location || dir.location || null,
+          };
+        }
+      }
+      return { ...data, provider };
     },
     enabled: !!appointmentId,
   });

@@ -50,7 +50,8 @@ export const PharmacyManagement = () => {
         .from("pharmacy_inventory" as any)
         .select("*")
         .eq("pharmacy_id", pharmacy?.id)
-        .order("product_name");
+        .order("product_name")
+        .limit(500);
       return (data as any[]) || [];
     },
     enabled: !!pharmacy,
@@ -65,7 +66,8 @@ export const PharmacyManagement = () => {
         .select("*")
         .eq("pharmacy_id", pharmacy?.id)
         .gte("created_at", today)
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false })
+        .limit(500);
       return (data as any[]) || [];
     },
     enabled: !!pharmacy,
@@ -114,6 +116,7 @@ export const PharmacyManagement = () => {
         total_amount: total,
         payment_method: paymentMethod,
         payment_status: "completed",
+        served_by: user?.id || null,
         created_at: new Date().toISOString(),
       });
 

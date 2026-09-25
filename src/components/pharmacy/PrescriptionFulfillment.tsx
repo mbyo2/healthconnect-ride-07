@@ -78,11 +78,17 @@ export function PrescriptionFulfillment() {
 
       let query = (supabase as any).from("comprehensive_prescriptions").select("*");
 
+      // Scope to this pharmacy's queue plus unassigned network prescriptions.
+      // Without a linked institution we show nothing — never the whole network queue.
       if (institutionId) {
         query = query.or(`pharmacy_id.eq.${institutionId},pharmacy_id.is.null`);
+      } else {
+        query = query.eq("pharmacy_id", "00000000-0000-0000-0000-000000000000");
       }
 
-      const { data: prescriptionsData, error } = await query.order("prescribed_date", { ascending: false });
+      const { data: prescriptionsData, error } = await query
+        .order("prescribed_date", { ascending: false })
+        .limit(100);
       if (error) throw error;
 
       // Batch fetch profile names

@@ -119,11 +119,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       // Fetch profile from profiles table — raced against a timeout so a
       // stalled ward network can never wedge the whole app on a spinner.
-      const { data: profileData, error: profileError } = await withTimeout(
-        supabase.from('profiles').select('*').eq('id', userId).maybeSingle(),
-        TIMEOUTS.critical,
-        'fetchProfile'
-      );
+      // The profile and role queries are independent — run them concurrently
+      // instead of serially to shorten cold-boot sign-in time.
+      const [profileRes, roleRes] = await Promise.all([
+        withTimeout(
+          supabase.from('profiles').select('*').eq('id', userId).maybeSingle(),
+          TIMEOUTS.critical,
+          'fetchProfile'
+        ).then(
+          (res) => ({ data: res.data, error: res.error as { code?: string } | null }),
+          (err: any) => ({ data: null, error: err as { code?: string } | null })
+        ),
+        withTimeout(
+          supabase.rpc('get_user_role', { _user_id: userId }),
+          TIMEOUTS.critical,
+          'get_user_role'
+        ).then(
+          (res) => ({ data: res.data, error: null as any }),
+          (err: any) => ({ data: null, error: err })
+        ),
+      ]);
+
+      const profileData = profileRes.data;
+      const profileError = profileRes.error;
 
       if (profileError && profileError.code !== 'PGRST116') {
         console.error(`Error fetching profile (attempt ${retryCount + 1}):`, profileError);
@@ -134,22 +152,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      // Fetch user's primary role from user_roles table using secure function
+      // Fetch user's primary role from user_roles table using secure function.
+      // A timeout/failure here is non-fatal — fall through to the
+      // profile/metadata role below.
       let roleData: any = null;
-      try {
-        const { data, error: roleError } = await withTimeout(
-          supabase.rpc('get_user_role', { _user_id: userId }),
-          TIMEOUTS.critical,
-          'get_user_role'
-        );
-        if (roleError) {
-          console.error('Error fetching role:', roleError);
-        } else {
-          roleData = data;
-        }
-      } catch (roleErr) {
-        // Timeout here is non-fatal — fall through to cached/metadata role.
-        console.warn('Role fetch timed out, using fallback role:', roleErr);
+      if (roleRes.error) {
+        console.warn('Role fetch failed, using fallback role:', roleRes.error);
+      } else {
+        roleData = roleRes.data;
       }
 
       if (profileData) {

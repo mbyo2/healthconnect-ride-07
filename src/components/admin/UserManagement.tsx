@@ -8,6 +8,7 @@ import { DataTable } from '@/components/ui/data-table';
 import { ColumnDef } from '@tanstack/react-table';
 import { toast } from 'sonner';
 import { Search, UserCog, Shield, Users } from 'lucide-react';
+import { useUserRoles } from '@/context/UserRolesContext';
 import {
   Dialog,
   DialogContent,
@@ -49,6 +50,7 @@ interface UserWithRoles {
 }
 
 export function UserManagement() {
+  const { isSuperAdmin } = useUserRoles();
   const [users, setUsers] = useState<UserWithRoles[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -58,21 +60,34 @@ export function UserManagement() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [pendingRevoke, setPendingRevoke] = useState<{ userId: string; role: UserRole; email: string } | null>(null);
 
+  // Debounced server-side search — the user list stays bounded (200 rows max).
   useEffect(() => {
-    fetchUsers();
-  }, []);
+    const t = setTimeout(() => { fetchUsers(searchTerm); }, 300);
+    return () => clearTimeout(t);
+  }, [searchTerm]);
 
-  const fetchUsers = async () => {
+  const fetchUsers = async (term: string = '') => {
     try {
       setIsLoading(true);
 
-      // Fetch all profiles and all roles in parallel (no N+1)
-      const [{ data: profilesData, error: profilesError }, { data: rolesData, error: rolesError }] = await Promise.all([
-        supabase.from('profiles').select('*').order('created_at', { ascending: false }),
-        supabase.from('user_roles').select('user_id, role'),
-      ]);
-
+      const q = term.trim().replace(/[%_,()]/g, '');
+      let query = supabase
+        .from('profiles')
+        .select('id, email, first_name, last_name, created_at, is_profile_complete')
+        .order('created_at', { ascending: false })
+        .limit(200);
+      if (q) {
+        const like = `%${q}%`;
+        query = query.or(`email.ilike.${like},first_name.ilike.${like},last_name.ilike.${like}`);
+      }
+      const { data: profilesData, error: profilesError } = await query;
       if (profilesError) throw profilesError;
+
+      // Roles scoped to the loaded page of users (no unbounded user_roles scan)
+      const ids = (profilesData || []).map((p: any) => p.id);
+      const { data: rolesData, error: rolesError } = ids.length
+        ? await supabase.from('user_roles').select('user_id, role').in('user_id', ids)
+        : { data: [] as any[], error: null };
       if (rolesError) throw rolesError;
 
       const rolesByUser = new Map<string, UserRole[]>();
@@ -113,6 +128,12 @@ export function UserManagement() {
         return;
       }
 
+      // Privileged roles are a superadmin prerogative (RLS would 403 anyway)
+      if ((selectedRole === 'admin' || (selectedRole as string) === 'super_admin') && !isSuperAdmin) {
+        toast.error('Only super admins can assign admin roles');
+        return;
+      }
+
       // Insert new role
       const { error } = await supabase
         .from('user_roles')
@@ -131,7 +152,7 @@ export function UserManagement() {
 
       toast.success(`Role "${selectedRole}" assigned successfully`);
       setIsRoleDialogOpen(false);
-      fetchUsers();
+      fetchUsers(searchTerm);
     } catch (error: any) {
       console.error('Error assigning role:', error);
       toast.error(error.message || 'Failed to assign role');
@@ -141,6 +162,11 @@ export function UserManagement() {
   };
 
   const handleRevokeRole = async (userId: string, role: UserRole) => {
+    // Privileged roles are a superadmin prerogative (RLS would 403 anyway)
+    if ((role === 'admin' || (role as string) === 'super_admin') && !isSuperAdmin) {
+      toast.error('Only super admins can revoke admin roles');
+      return;
+    }
     try {
       const { error } = await supabase
         .from('user_roles')
@@ -156,19 +182,15 @@ export function UserManagement() {
       }
 
       toast.success(`Role "${role}" revoked successfully`);
-      fetchUsers();
+      fetchUsers(searchTerm);
     } catch (error: any) {
       console.error('Error revoking role:', error);
       toast.error(error.message || 'Failed to revoke role');
     }
   };
 
-  const filteredUsers = users.filter(
-    (user) =>
-      user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.last_name?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Server-side search (see fetchUsers): the `users` array already reflects
+  // the search box, so no client-side filtering is needed here.
 
   const columns: ColumnDef<UserWithRoles>[] = [
     {
@@ -254,6 +276,7 @@ export function UserManagement() {
               </CardTitle>
               <CardDescription>
                 Manage user accounts and role assignments
+                <span className="block text-[11px] mt-1">Showing up to 200 most recent — use search to find specific users.</span>
               </CardDescription>
             </div>
             <Badge variant="secondary" className="text-lg px-4 py-2">
@@ -276,7 +299,8 @@ export function UserManagement() {
             </div>
           </div>
 
-          <DataTable columns={columns} data={filteredUsers} />
+          {/* Server-side filtered: `users` already reflects the search box */}
+          <DataTable columns={columns} data={users} />
         </CardContent>
       </Card>
 
@@ -317,7 +341,7 @@ export function UserManagement() {
                   <SelectItem value="patient">Patient</SelectItem>
                   <SelectItem value="health_personnel">Health Personnel</SelectItem>
                   <SelectItem value="institution_admin">Institution Admin</SelectItem>
-                  <SelectItem value="admin">Admin</SelectItem>
+                  {isSuperAdmin && <SelectItem value="admin">Admin</SelectItem>}
                 </SelectContent>
               </Select>
             </div>

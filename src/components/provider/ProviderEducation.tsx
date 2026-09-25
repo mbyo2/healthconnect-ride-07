@@ -3,58 +3,41 @@ import React from "react";
 import { Card } from "@/components/ui/card";
 import { GraduationCap, Award } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ProviderEducationProps {
   providerId: string | undefined;
 }
 
+// Real education data from the provider's own profile (edited in the
+// "My Practice" tab of the provider dashboard). No mock credentials —
+// unprovided details render as an honest empty state.
 export const ProviderEducation: React.FC<ProviderEducationProps> = ({ providerId }) => {
-  // This would fetch from an education table in a real implementation
-  const education = [
-    {
-      id: "1",
-      degree: "Doctor of Medicine (MD)",
-      institution: "University of Zambia School of Medicine",
-      year: "2010 - 2014",
-      description: "Graduated with honors"
+  const { data, isLoading } = useQuery({
+    queryKey: ["provider-education", providerId],
+    queryFn: async () => {
+      if (!providerId) return null;
+      const { data, error } = await supabase
+        .from("provider_directory")
+        .select("medical_school, graduation_year, board_certifications")
+        .eq("id", providerId)
+        .maybeSingle();
+      if (error) throw error;
+      return data as {
+        medical_school: string | null;
+        graduation_year: number | null;
+        board_certifications: string[] | null;
+      } | null;
     },
-    {
-      id: "2",
-      degree: "Residency in Internal Medicine",
-      institution: "University Teaching Hospital, Lusaka",
-      year: "2014 - 2017",
-      description: "Specialized in cardiovascular health"
-    },
-    {
-      id: "3",
-      degree: "Fellowship in Cardiology",
-      institution: "Groote Schuur Hospital, Cape Town",
-      year: "2017 - 2019",
-      description: "Advanced training in cardiovascular care"
-    }
-  ];
+    enabled: !!providerId,
+  });
 
-  // This would fetch from a certifications table in a real implementation
-  const certifications = [
-    {
-      id: "1",
-      name: "Board Certified in Internal Medicine",
-      issuer: "Medical Council of Zambia",
-      year: "2017"
-    },
-    {
-      id: "2",
-      name: "Advanced Cardiovascular Life Support (ACLS)",
-      issuer: "American Heart Association",
-      year: "2020"
-    },
-    {
-      id: "3",
-      name: "Certified in Medical Practice Management",
-      issuer: "Healthcare Management Association",
-      year: "2021"
-    }
-  ];
+  if (isLoading) {
+    return <div className="p-6 text-center text-sm text-muted-foreground">Loading education…</div>;
+  }
+
+  const certifications = data?.board_certifications ?? [];
 
   return (
     <div className="space-y-6">
@@ -63,36 +46,37 @@ export const ProviderEducation: React.FC<ProviderEducationProps> = ({ providerId
           <GraduationCap className="h-5 w-5" />
           Education
         </h2>
-        
-        <div className="space-y-4">
-          {education.map(edu => (
-            <div key={edu.id} className="border-l-2 border-primary pl-4 pb-4 last:pb-0">
-              <p className="font-semibold">{edu.degree}</p>
-              <p className="text-sm">{edu.institution}</p>
-              <p className="text-sm text-muted-foreground">{edu.year}</p>
-              <p className="text-sm text-muted-foreground mt-1">{edu.description}</p>
-            </div>
-          ))}
-        </div>
+
+        {data?.medical_school ? (
+          <div className="border-l-2 border-primary pl-4 pb-4 last:pb-0">
+            <p className="font-semibold">{data.medical_school}</p>
+            {data.graduation_year && (
+              <p className="text-sm text-muted-foreground">Class of {data.graduation_year}</p>
+            )}
+          </div>
+        ) : (
+          <p className="text-sm text-muted-foreground">Education details not provided yet.</p>
+        )}
       </Card>
-      
+
       <Card className="p-6">
         <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
           <Award className="h-5 w-5" />
           Certifications & Licenses
         </h2>
-        
-        <div className="space-y-3">
-          {certifications.map(cert => (
-            <div key={cert.id} className="flex justify-between items-center">
-              <div>
-                <p className="font-medium">{cert.name}</p>
-                <p className="text-sm text-muted-foreground">{cert.issuer}</p>
+
+        {certifications.length > 0 ? (
+          <div className="space-y-3">
+            {certifications.map(cert => (
+              <div key={cert} className="flex justify-between items-center">
+                <p className="font-medium">{cert}</p>
+                <Badge variant="outline">Certified</Badge>
               </div>
-              <Badge variant="outline">{cert.year}</Badge>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-muted-foreground">No certifications listed yet.</p>
+        )}
       </Card>
     </div>
   );

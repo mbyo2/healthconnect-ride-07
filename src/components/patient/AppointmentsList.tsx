@@ -22,22 +22,46 @@ export const AppointmentsList = () => {
 
       const { data, error } = await supabase
         .from('appointments')
-        .select(`
-          *,
-          provider:profiles!appointments_provider_id_fkey (
-            first_name,
-            last_name,
-            specialty,
-            address,
-            role
-          )
-        `)
+        .select('id, date, time, type, status, provider_id, notes')
         .eq('patient_id', user.id)
         .gte('date', new Date().toISOString().split('T')[0])
-        .order('date', { ascending: true });
+        .order('date', { ascending: true })
+        .order('time', { ascending: true });
 
       if (error) throw error;
-      return data as AppointmentWithProvider[];
+
+      // appointments.provider_id FKs point at auth.users (see migrations), so
+      // a `profiles!appointments_provider_id_fkey` join hint is invalid and
+      // patient sessions cannot read profiles rows — resolve providers from
+      // the public provider_directory view instead.
+      const providerIds = Array.from(
+        new Set((data || []).map((a: any) => a.provider_id).filter(Boolean))
+      );
+      const providerMap: Record<string, any> = {};
+      if (providerIds.length > 0) {
+        const { data: dirs } = await supabase
+          .from('provider_directory')
+          .select('id, first_name, last_name, specialty, role, location, city')
+          .in('id', providerIds);
+        (dirs || []).forEach((d: any) => {
+          providerMap[d.id] = d;
+        });
+      }
+
+      const enriched = (data || []).map((a: any) => ({
+        ...a,
+        provider: {
+          first_name: providerMap[a.provider_id]?.first_name ?? '',
+          last_name: providerMap[a.provider_id]?.last_name ?? '',
+          specialty: providerMap[a.provider_id]?.specialty ?? undefined,
+          role: providerMap[a.provider_id]?.role ?? undefined,
+          address:
+            [providerMap[a.provider_id]?.location, providerMap[a.provider_id]?.city]
+              .filter(Boolean)
+              .join(', ') || undefined,
+        },
+      }));
+      return enriched as AppointmentWithProvider[];
     }
   });
 

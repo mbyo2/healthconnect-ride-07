@@ -264,12 +264,25 @@ export const StaffManagement = ({ institutionId }: { institutionId: string }) =>
     if (!inviteEmail) return;
     setIsInviting(true);
     try {
+      const email = inviteEmail.toLowerCase().trim();
+      // Avoid a raw unique-violation error when a pending invite exists.
+      const { data: existingInvite } = await supabase
+        .from('staff_invitations')
+        .select('id')
+        .eq('institution_id', institutionId)
+        .eq('email', email)
+        .eq('status', 'pending')
+        .maybeSingle();
+      if (existingInvite) {
+        toast.info("A pending invitation already exists for this email.");
+        return;
+      }
       const { data: { user } } = await supabase.auth.getUser();
       const { error } = await supabase
         .from('staff_invitations')
         .insert({
           institution_id: institutionId,
-          email: inviteEmail.toLowerCase().trim(),
+          email,
           staff_role: inviteRole,
           department_name: inviteDept || null,
           specialty: inviteSpecialty || null,
@@ -303,6 +316,18 @@ export const StaffManagement = ({ institutionId }: { institutionId: string }) =>
 
       if (profileError || !profileData) {
         toast.error("User not found. Send an invitation instead.");
+        return;
+      }
+
+      // Avoid a raw unique-violation error when the user is already staff.
+      const { data: existingStaff } = await supabase
+        .from('institution_staff')
+        .select('id')
+        .eq('institution_id', institutionId)
+        .eq('provider_id', profileData.id)
+        .maybeSingle();
+      if (existingStaff) {
+        toast.info("This user is already a staff member of this institution.");
         return;
       }
 

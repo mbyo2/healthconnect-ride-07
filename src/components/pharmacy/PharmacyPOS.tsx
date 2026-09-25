@@ -141,7 +141,12 @@ export const PharmacyPOS = () => {
 
   const closeRegister = useMutation({
     mutationFn: async (closingBalance: number) => {
-      const { error } = await (supabase as any).from("pos_register_sessions").update({ closing_balance: closingBalance, expected_balance: (activeSession?.opening_balance || 0) + (activeSession?.cash_sales || 0) - (activeSession?.total_refunds || 0), status: "closed", closed_at: new Date().toISOString() }).eq("id", activeSession.id);
+      // NUMERIC columns arrive as strings from PostgREST — coerce, otherwise
+      // "500" + "1200" would store a garbage "5001200" expected balance.
+      const expected = Number(activeSession?.opening_balance || 0)
+        + Number(activeSession?.cash_sales || 0)
+        - Number(activeSession?.total_refunds || 0);
+      const { error } = await (supabase as any).from("pos_register_sessions").update({ closing_balance: closingBalance, expected_balance: expected, status: "closed", closed_at: new Date().toISOString() }).eq("id", activeSession.id);
       if (error) throw error;
     },
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["pos-session"] }); toast.success("Register closed"); },
@@ -360,7 +365,7 @@ export const PharmacyPOS = () => {
                 <div className="flex justify-between"><span className="text-graphite-500 dark:text-slate-400 font-bold">Opening Balance:</span><span className="font-extrabold">{formatPrice(activeSession.opening_balance)}</span></div>
                 <div className="flex justify-between"><span className="text-graphite-500 dark:text-slate-400 font-bold">Total Sales:</span><span className="font-extrabold text-success-500">{formatPrice(activeSession.total_sales)}</span></div>
                 <div className="flex justify-between"><span className="text-graphite-500 dark:text-slate-400 font-bold">Transactions:</span><span className="font-extrabold">{activeSession.transaction_count}</span></div>
-                <div className="flex justify-between border-t border-canvas-silk pt-1"><span className="font-extrabold">Expected Cash:</span><span className="font-black text-primary-500">{formatPrice(activeSession.opening_balance + activeSession.cash_sales)}</span></div>
+                <div className="flex justify-between border-t border-canvas-silk pt-1"><span className="font-extrabold">Expected Cash:</span><span className="font-black text-primary-500">{formatPrice(Number(activeSession.opening_balance || 0) + Number(activeSession.cash_sales || 0))}</span></div>
               </div>
             )}
             <div>

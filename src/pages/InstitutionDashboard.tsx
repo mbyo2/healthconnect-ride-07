@@ -16,7 +16,8 @@ import { useInstitutionContext } from "@/hooks/useInstitutionContext";
 import { getFacilityArchetype } from "@/config/facilityProfiles";
 import { getEffectiveInstitutionModules, getModulePriceMap, formatModulePrice, type EffectiveModule, type ModulePrice } from "@/services/institutionModules";
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
-import { format, subMonths, startOfMonth, endOfMonth } from "date-fns";
+import { format, subMonths, subDays, startOfMonth, startOfDay, endOfMonth } from "date-fns";
+import { toast } from "sonner";
 import { MetricCard } from "@/components/shared/MetricCard";
 import { TrendChart, SimpleBarChart, DonutChart } from "@/components/charts";
 import { SuggestionBanner } from "@/components/guidance";
@@ -191,6 +192,9 @@ export const InstitutionDashboard = () => {
   const [preciseTypeLabel, setPreciseTypeLabel] = useState<string | null>(null);
   const [charter, setCharter] = useState<EffectiveModule[]>([]);
   const [modulePrices, setModulePrices] = useState<Record<string, ModulePrice>>({});
+  // Real chart data (never static placeholders): weekly visit flow + visit-type mix.
+  const [weeklyFlow, setWeeklyFlow] = useState<{ name: string; visits: number }[]>([]);
+  const [visitMix, setVisitMix] = useState<{ name: string; value: number; color: string }[]>([]);
 
   // Module deep-links for chartered modules that are live in the app.
   const MODULE_PATHS: Record<string, string> = {
@@ -235,59 +239,91 @@ export const InstitutionDashboard = () => {
           ...(staffRes.data?.map((s) => s.provider_id) || []),
         ].filter((v, i, a) => a.indexOf(v) === i);
 
-        let appointmentsCount = 0, todayCount = 0, appointmentActivities: any[] = [];
-        if (providerIds.length > 0) {
-          const { count } = await supabase.from("appointments").select("*", { count: "exact", head: true }).in("provider_id", providerIds);
-          appointmentsCount = count || 0;
-          const { count: todayC } = await supabase.from("appointments").select("*", { count: "exact", head: true }).in("provider_id", providerIds).eq("date", today);
-          todayCount = todayC || 0;
-          const { data: recentAppts } = await supabase.from("appointments")
-            .select("id, date, time, status, type, patient:profiles!patient_id(first_name, last_name)")
-            .in("provider_id", providerIds).order("created_at", { ascending: false }).limit(10);
-          appointmentActivities = (recentAppts || []).map((a: any) => ({
-            id: a.id, type: "appointment" as const,
-            title: `${a.patient?.first_name || ""} ${a.patient?.last_name || ""}`.trim() || "Patient",
-            description: `${a.type?.replace(/_/g, " ")} - ${a.status}`,
-            timestamp: `${a.date}T${a.time}`,
-          }));
-        }
+        let appointmentsCount = 0, todayCount = 0, uniquePatients = 0;
+        let appointmentActivities: any[] = [];
+        const paidByMonth = new Map<string, number>();
+        const monthCounts = [0, 0, 0, 0, 0, 0];
 
-        let uniquePatients = 0;
-        if (providerIds.length > 0) {
-          const { data: patientAppts } = await supabase.from("appointments").select("patient_id").in("provider_id", providerIds);
-          uniquePatients = new Set((patientAppts || []).map((a: any) => a.patient_id)).size;
-        }
-
-        // Real collected revenue from the payments ledger (no per-visit estimates).
-        let paidByMonth = new Map<string, number>();
         if (providerIds.length > 0) {
           const sixMonthsAgo = format(startOfMonth(subMonths(new Date(), 5)), "yyyy-MM-dd");
-          const { data: paidRows } = await supabase
-            .from("payments")
-            .select("amount, created_at")
-            .in("provider_id", providerIds)
-            .in("status", ["paid", "completed"])
-            .gte("created_at", sixMonthsAgo)
-            .limit(2000);
-          (paidRows || []).forEach((p: any) => {
+          const ninetyDaysAgo = format(subDays(new Date(), 90), "yyyy-MM-dd");
+          // Oldest → newest so index 0 = 5 months ago, index 5 = current month.
+          const monthRanges = [5, 4, 3, 2, 1, 0].map((i) => {
+            const d = subMonths(new Date(), i);
+            return {
+              name: format(d, "MMM"),
+              start: format(startOfMonth(d), "yyyy-MM-dd"),
+              end: format(endOfMonth(d), "yyyy-MM-dd"),
+            };
+          });
+
+          // All independent reads fire together — one round trip batch instead
+          // of ~12 sequential awaits.
+          const [
+            totalCount, todayApptCount, recentAppts,
+            patientAppts, paidRows, flowRows, ...perMonthCounts
+          ] = await Promise.all([
+            supabase.from("appointments").select("*", { count: "exact", head: true }).in("provider_id", providerIds).then((r) => r.count || 0),
+            supabase.from("appointments").select("*", { count: "exact", head: true }).in("provider_id", providerIds).eq("date", today).then((r) => r.count || 0),
+            supabase.from("appointments")
+              .select("id, date, time, status, type, patient:profiles!patient_id(first_name, last_name)")
+              .in("provider_id", providerIds).order("created_at", { ascending: false }).limit(10)
+              .then((r) => r.data || []),
+            supabase.from("appointments").select("patient_id").in("provider_id", providerIds).limit(5000).then((r) => r.data || []),
+            supabase.from("payments").select("amount, created_at").in("provider_id", providerIds).in("status", ["paid", "completed"]).gte("created_at", sixMonthsAgo).limit(2000).then((r) => r.data || []),
+            supabase.from("appointments").select("date, type").in("provider_id", providerIds).gte("date", ninetyDaysAgo).limit(5000).then((r) => r.data || []),
+            ...monthRanges.map((m) =>
+              supabase.from("appointments").select("*", { count: "exact", head: true }).in("provider_id", providerIds).gte("date", m.start).lte("date", m.end).then((r) => r.count || 0)
+            ),
+          ]);
+
+          appointmentsCount = totalCount;
+          todayCount = todayApptCount;
+          uniquePatients = new Set((patientAppts as any[]).map((a: any) => a.patient_id)).size;
+          appointmentActivities = (recentAppts as any[]).map((a: any) => ({
+            id: a.id, type: "appointment" as const,
+            title: `${a.patient?.first_name || ""} ${a.patient?.last_name || ""}`.trim() || "Patient",
+            description: `${String(a.type || "visit").replace(/_/g, " ")} - ${a.status}`,
+            timestamp: `${a.date}T${a.time || "00:00"}`,
+          }));
+
+          (paidRows as any[]).forEach((p: any) => {
             const key = format(new Date(p.created_at), "MMM");
             paidByMonth.set(key, (paidByMonth.get(key) || 0) + (Number(p.amount) || 0));
           });
+          perMonthCounts.forEach((c, i) => { monthCounts[i] = c; });
+
+          // Weekly patient flow (last 7 days) + visit-type mix (last 90 days)
+          // bucketed client-side from one query — real data, never static.
+          const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+          const weekBuckets = [0, 0, 0, 0, 0, 0, 0];
+          const weekStart = startOfDay(subDays(new Date(), 6));
+          const typeBuckets = new Map<string, number>();
+          (flowRows as any[]).forEach((r: any) => {
+            const d = new Date(`${r.date}T00:00:00`);
+            if (!isNaN(d.getTime()) && d >= weekStart) weekBuckets[d.getDay()] += 1;
+            const t = String(r.type || "general").replace(/_/g, " ");
+            typeBuckets.set(t, (typeBuckets.get(t) || 0) + 1);
+          });
+          setWeeklyFlow([1, 2, 3, 4, 5, 6, 0].map((i) => ({ name: dayNames[i], visits: weekBuckets[i] })));
+          const TYPE_COLORS = ["#397dff", "#22C55E", "#f55c15", "#a855f7", "#EF4444", "#eab308"];
+          setVisitMix(
+            [...typeBuckets.entries()]
+              .sort((a, b) => b[1] - a[1])
+              .slice(0, 6)
+              .map(([name, value], i) => ({
+                name: name.charAt(0).toUpperCase() + name.slice(1),
+                value,
+                color: TYPE_COLORS[i % TYPE_COLORS.length],
+              }))
+          );
         }
 
-        const months: { name: string; revenue: number; appointments: number }[] = [];
-        for (let i = 5; i >= 0; i--) {
+        const months: { name: string; revenue: number; appointments: number }[] = [5, 4, 3, 2, 1, 0].map((i) => {
           const d = subMonths(new Date(), i);
-          const mStart = format(startOfMonth(d), "yyyy-MM-dd");
-          const mEnd = format(endOfMonth(d), "yyyy-MM-dd");
           const mName = format(d, "MMM");
-          let mCount = 0;
-          if (providerIds.length > 0) {
-            const { count: mc } = await supabase.from("appointments").select("*", { count: "exact", head: true }).in("provider_id", providerIds).gte("date", mStart).lte("date", mEnd);
-            mCount = mc || 0;
-          }
-          months.push({ name: mName, revenue: paidByMonth.get(mName) || 0, appointments: mCount });
-        }
+          return { name: mName, revenue: paidByMonth.get(mName) || 0, appointments: monthCounts[5 - i] };
+        });
         setChartData(months);
         setActivities(appointmentActivities);
         setCounts({ personnel: personnelCount || providerIds.length, appointments: appointmentsCount, patients: uniquePatients, todayAppointments: todayCount, revenue: months.reduce((s, m) => s + m.revenue, 0) });
@@ -336,7 +372,11 @@ export const InstitutionDashboard = () => {
         <div className="max-w-md w-full vf-card text-center space-y-4">
           <Building2 className="h-12 w-12 mx-auto text-primary-500" />
           <h2 className="font-display text-xl font-medium text-midnight">Setting Up Your Dashboard</h2>
-          <p className="text-sm text-graphite-500">Your institution workspace is being prepared. Please refresh in a moment.</p>
+          <p className="text-sm text-graphite-500">
+            We couldn't load an institution workspace for this account. If you just
+            registered a facility, refresh in a moment. If you're joining as staff,
+            ask your institution administrator to send you a staff invitation.
+          </p>
           <button onClick={() => window.location.reload()} className="vf-btn-primary mx-auto">
             Refresh
           </button>
@@ -566,10 +606,16 @@ export const InstitutionDashboard = () => {
                       : m.module_name;
                     // Live modules with a route open directly; planned modules
                     // go to Settings → Modules & Add-ons so the facility can
-                    // request activation and grow over time.
-                    const target = isLive && path ? path : "/institution-settings";
+                    // request activation and grow over time. Non-admins can't
+                    // open Settings (RouteGuard), so they get guidance instead
+                    // of a silent redirect bounce.
+                    const handleModuleClick = () => {
+                      if (isLive && path) { navigate(path); return; }
+                      if (isAdmin) { navigate("/institution/settings"); return; }
+                      toast.info("Ask your institution admin to request this module in Settings → Modules & Add-ons.");
+                    };
                     return (
-                      <button key={m.module_key} onClick={() => navigate(target)} className={cls} title={title}>
+                      <button key={m.module_key} onClick={handleModuleClick} className={cls} title={title}>
                         {inner}
                       </button>
                     );
@@ -612,7 +658,7 @@ export const InstitutionDashboard = () => {
               </div>
             </div>
 
-            {/* Additional Charts Row */}
+            {/* Additional Charts Row — real appointment data, never placeholders */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
               {/* Patient Flow by Day */}
               <div className="vf-card p-5">
@@ -620,18 +666,10 @@ export const InstitutionDashboard = () => {
                   <h3 className="font-display text-sm font-medium text-midnight">
                     Weekly Patient Flow
                   </h3>
-                  <p className="text-xs text-graphite-500 mt-1">Average appointments per day</p>
+                  <p className="text-xs text-graphite-500 mt-1">Appointments per day — last 7 days</p>
                 </div>
                 <SimpleBarChart
-                  data={[
-                    { name: 'Mon', visits: 42 },
-                    { name: 'Tue', visits: 38 },
-                    { name: 'Wed', visits: 51 },
-                    { name: 'Thu', visits: 45 },
-                    { name: 'Fri', visits: 47 },
-                    { name: 'Sat', visits: 28 },
-                    { name: 'Sun', visits: 15 },
-                  ]}
+                  data={weeklyFlow}
                   bars={[
                     { dataKey: 'visits', name: 'Patient Visits', color: '#397dff' },
                   ]}
@@ -645,17 +683,18 @@ export const InstitutionDashboard = () => {
                   <h3 className="font-display text-sm font-medium text-midnight">
                     Service Distribution
                   </h3>
-                  <p className="text-xs text-graphite-500 mt-1">Appointments by type</p>
+                  <p className="text-xs text-graphite-500 mt-1">Appointments by type — last 90 days</p>
                 </div>
-                <DonutChart
-                  data={[
-                    { name: 'General Consultation', value: 285, color: '#397dff' },
-                    { name: 'Specialist Visit', value: 158, color: '#22C55E' },
-                    { name: 'Follow-up', value: 124, color: '#f55c15' },
-                    { name: 'Emergency', value: 67, color: '#EF4444' },
-                  ]}
-                  height={250}
-                />
+                {visitMix.length > 0 ? (
+                  <DonutChart
+                    data={visitMix}
+                    height={250}
+                  />
+                ) : (
+                  <p className="text-sm text-graphite-500 text-center py-16">
+                    No appointment data yet — the mix appears once visits are booked.
+                  </p>
+                )}
               </div>
             </div>
           </div>

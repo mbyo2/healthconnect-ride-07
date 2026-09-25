@@ -24,7 +24,8 @@ export const RevenueAnalyticsDashboard = () => {
         .from('revenue_events')
         .select('*')
         .gte('created_at', startDate.toISOString())
-        .order('created_at', { ascending: true });
+        .order('created_at', { ascending: true })
+        .limit(5000);
       return data || [];
     },
   });
@@ -34,7 +35,8 @@ export const RevenueAnalyticsDashboard = () => {
     queryFn: async () => {
       const { data } = await (supabase as any)
         .from('user_subscriptions')
-        .select('*, plan:subscription_plans(*)');
+        .select('*, plan:subscription_plans(*)')
+        .limit(2000);
       return data || [];
     },
   });
@@ -47,7 +49,8 @@ export const RevenueAnalyticsDashboard = () => {
       const { data } = await (supabase as any)
         .from('payments')
         .select('*')
-        .gte('created_at', startDate.toISOString());
+        .gte('created_at', startDate.toISOString())
+        .limit(5000);
       return data || [];
     },
   });

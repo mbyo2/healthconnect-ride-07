@@ -79,7 +79,8 @@ export const ProviderApplications = () => {
         .from("health_personnel_applications")
         .select("*")
         .eq("status", filter)
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false })
+        .limit(500);
       if (error) throw error;
 
       const userIds = (data || []).map((a: any) => a.user_id);
@@ -87,7 +88,7 @@ export const ProviderApplications = () => {
         ? await supabase
             .from("profiles")
             .select(
-              "id, first_name, last_name, email, phone, provider_type, role, " +
+              "id, first_name, last_name, email, phone, country, provider_type, role, " +
               "medical_school, graduation_year, board_certifications, subspecialties, " +
               "primary_practice_location, affiliated_hospitals, " +
               "consultation_fee_min, consultation_fee_max, accepts_insurance, " +

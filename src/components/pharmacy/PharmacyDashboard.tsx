@@ -36,8 +36,9 @@ export const PharmacyDashboard = () => {
       
       const { data, error } = await supabase
         .from("medication_inventory")
-        .select("*")
-        .eq("institution_id", userInstitution);
+        .select("id, quantity_available, minimum_stock_level, expiry_date")
+        .eq("institution_id", userInstitution)
+        .limit(2000);
 
       if (error) {
         console.warn(`Error fetching inventory: ${error.message}`);
@@ -70,8 +71,9 @@ export const PharmacyDashboard = () => {
         .from("inventory_transactions")
         .select(`
           *,
-          medication_inventory (medication_name, dosage)
+          medication_inventory!inner (medication_name, dosage, institution_id)
         `)
+        .eq("medication_inventory.institution_id", userInstitution)
         .order('transaction_date', { ascending: false })
         .limit(5);
 

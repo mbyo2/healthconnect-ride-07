@@ -59,12 +59,19 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen }: Booki
     if (!isOpen || !provider?.id) return;
     
     const fetchBookedSlots = async () => {
+      // Scope to the bookable window (today → +120 days). Without a date
+      // bound this pulled the provider's ENTIRE appointment history just to
+      // render availability for the current week. `date` is a DATE column.
+      const todayStr = format(new Date(), 'yyyy-MM-dd');
+      const horizonStr = format(addDays(new Date(), 120), 'yyyy-MM-dd');
       const { data } = await supabase
         .from('appointments')
         .select('date, time')
         .eq('provider_id', provider.id)
-        .in('status', ['scheduled', 'confirmed']);
-      
+        .in('status', ['scheduled', 'confirmed'])
+        .gte('date', todayStr)
+        .lte('date', horizonStr);
+
       if (data) {
         setBookedSlots(data.map(a => `${a.date}-${a.time}`));
       }

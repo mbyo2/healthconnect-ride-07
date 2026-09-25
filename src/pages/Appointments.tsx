@@ -54,35 +54,61 @@ export const AppointmentsPage = () => {
       if (!user) throw new Error("User not authenticated");
 
       if (isProvider) {
+        // NOTE: appointments.patient_id FKs point at auth.users, so a
+        // `profiles!appointments_patient_id_fkey` join hint is invalid
+        // PostgREST. Patient rows are fetched directly — the
+        // "Appointment participants can view each other's profiles" RLS
+        // policy permits reading the other participant's profile.
         const { data, error } = await supabase
           .from("appointments")
-          .select(`
-            *,
-            patient:profiles!appointments_patient_id_fkey (
-              first_name, last_name, avatar_url, phone
-            )
-          `)
+          .select("*")
           .eq("provider_id", user.id)
-          .order("date", { ascending: true });
+          .order("date", { ascending: true })
+          .limit(500);
 
         if (error) throw error;
-        return data || [];
+        const rows = data || [];
+        const patientIds = [...new Set(rows.map((a: any) => a.patient_id).filter(Boolean))];
+        let patientMap: Record<string, any> = {};
+        if (patientIds.length > 0) {
+          const { data: patients } = await supabase
+            .from("profiles")
+            .select("id, first_name, last_name, avatar_url, phone")
+            .in("id", patientIds);
+          patientMap = Object.fromEntries((patients || []).map((p: any) => [p.id, p]));
+        }
+        return rows.map((a: any) => ({ ...a, patient: patientMap[a.patient_id] || null }));
       } else {
+        // NOTE: same invalid-join-hint issue as above; provider details
+        // come from the public provider_directory view instead.
         const { data, error } = await supabase
           .from("appointments")
-          .select(`
-            *,
-            provider:profiles!appointments_provider_id_fkey (
-              first_name, last_name, specialty, avatar_url, phone, address,
-              consultation_fee_min, consultation_fee_max,
-              telemedicine_available, typical_wait_time, role
-            )
-          `)
+          .select("*")
           .eq("patient_id", user.id)
-          .order("date", { ascending: true });
+          .order("date", { ascending: true })
+          .limit(500);
 
         if (error) throw error;
-        return data || [];
+        const rows = data || [];
+        const providerIds = [...new Set(rows.map((a: any) => a.provider_id).filter(Boolean))];
+        let providerMap: Record<string, any> = {};
+        if (providerIds.length > 0) {
+          const { data: providers } = await supabase
+            .from("provider_directory")
+            .select(
+              "id, first_name, last_name, specialty, avatar_url, phone, role, " +
+              "consultation_fee_min, consultation_fee_max, telemedicine_available, " +
+              "typical_wait_time, primary_practice_location, location"
+            )
+            .in("id", providerIds);
+          providerMap = Object.fromEntries(
+            (providers || []).map((p: any) => [
+              p.id,
+              { ...p, address: p.primary_practice_location || p.location || null },
+            ])
+          );
+        }
+        return rows.map((a: any) => ({ ...a, provider: providerMap[a.provider_id] || null }));
       }
     },
     {

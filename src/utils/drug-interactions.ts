@@ -55,7 +55,9 @@ export async function getPatientActiveMedications(patientId: string): Promise<st
     const { data } = await (supabase.from('comprehensive_prescriptions' as any) as any)
       .select('medication_name, generic_name')
       .eq('patient_id', patientId)
-      .eq('status', 'active');
+      // NOTE: the status CHECK has no 'active' value — dispensed/usable
+      // prescriptions are 'pending', 'filled' or 'partially_filled'.
+      .in('status', ['pending', 'filled', 'partially_filled']);
     const names = (data || []).flatMap((r: any) => [r.medication_name, r.generic_name]).filter(Boolean);
     return Array.from(new Set(names));
   } catch {

@@ -98,7 +98,8 @@ export const InventoryTransactions = () => {
         .from('medication_inventory')
         .select('id, medication_name, dosage, quantity_available, unit_price')
         .eq('institution_id', userInstitution)
-        .order('medication_name', { ascending: true });
+        .order('medication_name', { ascending: true })
+        .limit(1000);
 
       if (error) {
         console.error('Error fetching medication inventory:', error);
@@ -128,7 +129,8 @@ export const InventoryTransactions = () => {
           )
         `)
         .eq('medication_inventory.institution_id', userInstitution)
-        .order('transaction_date', { ascending: false });
+        .order('transaction_date', { ascending: false })
+        .limit(200);
 
       if (error) {
         console.error('Error fetching transactions:', error);

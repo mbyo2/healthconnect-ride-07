@@ -7,7 +7,7 @@ import { useCurrency } from "@/hooks/use-currency";
 import {
   FlaskConical, Search, Plus, Clock, CheckCircle2, AlertCircle, FileText, Microscope, Loader2, Pencil, Trash2
 } from "lucide-react";
-import { LabRequest, LabTestStatus } from "@/types/lab";
+import { LabRequest } from "@/types/lab";
 import { toast } from "sonner";
 import { InstitutionInsuranceVerification } from "@/components/institution/InstitutionInsuranceVerification";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
@@ -116,7 +116,8 @@ const LabManagement = () => {
         const { data, error } = await supabase
           .from("lab_tests")
           .select("*, patient:profiles!patient_id(first_name, last_name), provider:profiles!ordered_by(first_name, last_name, role)")
-          .order("created_at", { ascending: false });
+          .order("created_at", { ascending: false })
+          .limit(500);
 
         if (error) throw error;
         return data as any[];
@@ -130,7 +131,12 @@ const LabManagement = () => {
   const { data: patients } = useQuery({
     queryKey: ["lab-patients"],
     queryFn: async () => {
-      const { data } = await supabase.from("profiles").select("id, first_name, last_name, email").limit(50);
+      const { data } = await supabase
+        .from("profiles")
+        .select("id, first_name, last_name, email")
+        .eq("role", "patient")
+        .order("created_at", { ascending: false })
+        .limit(200);
       return data || [];
     },
   });
@@ -140,10 +146,8 @@ const LabManagement = () => {
     queryFn: async () => {
       const { data, error } = await supabase.from("lab_test_catalog" as any).select("*").order("name");
       if (error) {
-        return [
-          { name: "Complete Blood Count (CBC)", code: "HEM-001", category: "Hematology", price: 150 },
-          { name: "Lipid Profile", code: "BIO-001", category: "Biochemistry", price: 200 },
-        ];
+        console.error("Error fetching lab test catalog:", error);
+        return [];
       }
       return data as any[];
     },
@@ -169,43 +173,53 @@ const LabManagement = () => {
       if (error) throw error;
 
       const isUrgent = isCritical || ["stat", "critical", "urgent"].includes(((selectedRequest as any).priority || "").toLowerCase());
-      try {
-        await supabase.from("lab_results").insert({
-          patient_id: (selectedRequest as any).patient_id,
-          test_name: (selectedRequest as any).test_type || "Lab Test",
-          test_date: new Date().toISOString().split("T")[0],
-          result_value: resultSummary,
-          notes: isUrgent ? `CRITICAL — ${selectedRequest ? "requires immediate review" : ""}` : "Pending pathologist review",
-        });
-      } catch (e) { console.error("lab_results push failed", e); }
+      const patientName = (selectedRequest as any).patient
+        ? `${(selectedRequest as any).patient.first_name ?? ""} ${(selectedRequest as any).patient.last_name ?? ""}`.trim()
+        : "Unknown Patient";
 
-      let institutionId: string | undefined = contextInstitutionId || undefined;
-      try {
-        const patientName = (selectedRequest as any).patient
-          ? `${(selectedRequest as any).patient.first_name ?? ""} ${(selectedRequest as any).patient.last_name ?? ""}`.trim()
-          : "Unknown Patient";
-        if (!institutionId) {
-          const { data: staffRow } = await supabase
-            .from("institution_staff")
-            .select("institution_id")
-            .eq("provider_id", user?.id ?? "")
-            .eq("is_active", true)
-            .limit(1)
-            .maybeSingle();
-          institutionId = staffRow?.institution_id;
-        }
-        if (institutionId) {
-          await (supabase.from("pathologist_reviews" as any) as any).insert({
-            institution_id: institutionId,
-            patient_name: patientName,
-            test_name: (selectedRequest as any).test_type || "Lab Test",
-            result_value: resultSummary,
-            lab_tech_id: user?.id ?? null,
-            lab_tech_name: user?.email ?? null,
-            status: isUrgent ? "urgent_review" : "pending_review",
-          });
-        }
-      } catch (e) { console.error("pathologist queue push failed", e); }
+      // The lab_results push and the institution resolution are independent — run together.
+      await Promise.all([
+        (async () => {
+          try {
+            await supabase.from("lab_results").insert({
+              request_id: selectedRequest.id,
+              patient_id: (selectedRequest as any).patient_id,
+              technician_id: user?.id ?? null,
+              test_name: (selectedRequest as any).test_type || "Lab Test",
+              test_date: new Date().toISOString().split("T")[0],
+              result_value: resultSummary,
+              is_abnormal: isCritical,
+              comments: isUrgent ? `CRITICAL — requires immediate review` : "Pending pathologist review",
+            });
+          } catch (e) { console.error("lab_results push failed", e); }
+        })(),
+        (async () => {
+          try {
+            let institutionId: string | undefined = contextInstitutionId || undefined;
+            if (!institutionId) {
+              const { data: staffRow } = await supabase
+                .from("institution_staff")
+                .select("institution_id")
+                .eq("provider_id", user?.id ?? "")
+                .eq("is_active", true)
+                .limit(1)
+                .maybeSingle();
+              institutionId = staffRow?.institution_id;
+            }
+            if (institutionId) {
+              await (supabase.from("pathologist_reviews" as any) as any).insert({
+                institution_id: institutionId,
+                patient_name: patientName,
+                test_name: (selectedRequest as any).test_type || "Lab Test",
+                result_value: resultSummary,
+                lab_tech_id: user?.id ?? null,
+                lab_tech_name: user?.email ?? null,
+                status: isUrgent ? "urgent_review" : "pending_review",
+              });
+            }
+          } catch (e) { console.error("pathologist queue push failed", e); }
+        })(),
+      ]);
 
       if (isUrgent) {
         const patientId = (selectedRequest as any).patient_id;
@@ -238,6 +252,24 @@ const LabManagement = () => {
     if (!selectedPatientId || !selectedTestType || !user) return;
     setIsSubmitting(true);
     try {
+      // lab_tests.lab_id is NOT NULL REFERENCES healthcare_institutions(id) —
+      // resolve the lab/facility the signed-in user belongs to, never the user id.
+      let labInstitutionId: string | null = contextInstitutionId || null;
+      if (!labInstitutionId) {
+        const { data: staffRow } = await supabase
+          .from("institution_staff")
+          .select("institution_id")
+          .eq("provider_id", user.id)
+          .eq("is_active", true)
+          .limit(1)
+          .maybeSingle();
+        labInstitutionId = staffRow?.institution_id ?? null;
+      }
+      if (!labInstitutionId) {
+        toast.error("Your account isn't linked to a lab yet — ask your facility admin to add you as staff first.");
+        return;
+      }
+
       const test = testCatalog.find((t) => t.name === selectedTestType);
       const total = test?.price || 0;
       let balance = total;
@@ -253,7 +285,7 @@ const LabManagement = () => {
       const { error } = await supabase.from("lab_tests").insert({
         patient_id: selectedPatientId,
         ordered_by: user.id,
-        lab_id: user.id,
+        lab_id: labInstitutionId,
         test_type: selectedTestType,
         test_number: `LAB-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
         status: "pending",
@@ -275,7 +307,41 @@ const LabManagement = () => {
     } catch (error) {
       console.error("Error creating lab request:", error);
       toast.error("Failed to create lab request");
-    } fontally: {
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const collectSample = async (request: any) => {
+    setIsSubmitting(true);
+    try {
+      const { error } = await supabase
+        .from("lab_tests")
+        .update({ status: "sample_collected", sample_collected_at: new Date().toISOString() })
+        .eq("id", request.id);
+      if (error) throw error;
+      toast.success("Sample collected");
+      queryClient.invalidateQueries({ queryKey: ["lab-requests"] });
+    } catch (e: any) {
+      toast.error(e.message || "Failed to record sample collection");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const startAnalysis = async (request: any) => {
+    setIsSubmitting(true);
+    try {
+      const { error } = await supabase
+        .from("lab_tests")
+        .update({ status: "in_progress" })
+        .eq("id", request.id);
+      if (error) throw error;
+      toast.success("Sample moved to analysis");
+      queryClient.invalidateQueries({ queryKey: ["lab-requests"] });
+    } catch (e: any) {
+      toast.error(e.message || "Failed to start analysis");
+    } finally {
       setIsSubmitting(false);
     }
   };
@@ -284,9 +350,10 @@ const LabManagement = () => {
   const inProgressRequests = requests?.filter((r) => r.status === "in_progress") || [];
   const completedRequests = requests?.filter((r) => r.status === "completed") || [];
 
-  const getStatusPill = (status: LabTestStatus) => {
+  const getStatusPill = (status: string) => {
     switch (status) {
       case "pending": return <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold text-white bg-warning-500">Pending</span>;
+      case "sample_collected": return <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold text-white bg-teal-500">Sample Collected</span>;
       case "in_progress": return <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold text-white bg-primary-500">In Progress</span>;
       case "completed": return <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold text-white bg-success-500">Completed</span>;
       case "cancelled": return <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold text-white bg-error-500">Cancelled</span>;
@@ -363,7 +430,7 @@ const LabManagement = () => {
                       </SelectTrigger>
                       <SelectContent>
                         {testCatalog.map((test) => (
-                          <SelectItem key={test.code} value={test.name}>
+                          <SelectItem key={test.id} value={test.name}>
                             {test.name} ({formatPrice(test.price)})
                           </SelectItem>
                         ))}
@@ -513,8 +580,21 @@ const LabManagement = () => {
                         <td className="py-3 px-3 text-center">{getStatusPill(request.status)}</td>
                         <td className="py-3 px-3 text-center">
                           {request.status === "pending" && (
-                            <button onClick={() => toast.success("Sample collected")} className="px-3 py-1 rounded-md bg-primary-500 text-white text-[10px] font-extrabold">
+                            <button
+                              onClick={() => collectSample(request)}
+                              disabled={isSubmitting}
+                              className="px-3 py-1 rounded-md bg-primary-500 text-white text-[10px] font-extrabold disabled:opacity-50"
+                            >
                               Collect Sample
+                            </button>
+                          )}
+                          {request.status === "sample_collected" && (
+                            <button
+                              onClick={() => startAnalysis(request)}
+                              disabled={isSubmitting}
+                              className="px-3 py-1 rounded-md bg-teal-500 text-white text-[10px] font-extrabold disabled:opacity-50"
+                            >
+                              Start Analysis
                             </button>
                           )}
                           {request.status === "in_progress" && (
@@ -610,7 +690,7 @@ const LabManagement = () => {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {testCatalog.map((test) => (
-                <div key={test.id || test.code} className="p-3.5 rounded-xl border border-canvas-silk bg-canvas flex justify-between items-center gap-2">
+                <div key={test.id} className="p-3.5 rounded-xl border border-canvas-silk bg-canvas flex justify-between items-center gap-2">
                   <div className="min-w-0">
                     <h4 className="font-extrabold text-xs text-slate-900">{test.name}</h4>
                     <p className="text-[10px] text-graphite-500 dark:text-slate-400">{test.category}{test.description ? ` • ${test.description}` : ""}</p>

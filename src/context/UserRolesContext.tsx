@@ -26,6 +26,11 @@ interface UserRolesContextType {
 
 const UserRolesContext = createContext<UserRolesContextType | undefined>(undefined);
 
+/** Order-insensitive comparison so setState only fires on real changes. */
+function sameRoleSet(a: UserRole[], b: UserRole[]): boolean {
+  return a.length === b.length && a.every(r => b.includes(r));
+}
+
 /**
  * Expand raw role strings (DB rows, profile, auth metadata) into the full
  * capability set. Single implementation used by both the initial fetch and
@@ -106,6 +111,14 @@ export function UserRolesProvider({ children }: { children: React.ReactNode }) {
   const [availableRoles, setAvailableRoles] = useState<UserRole[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Key the effect on PRIMITIVES, not object identities: AuthContext creates a
+  // fresh `profile` object on every fetchProfile (which runs on every auth
+  // event, including TOKEN_REFRESHED). Depending on `profile`/`user` objects
+  // refired this effect — and a full user_roles DB round-trip — constantly.
+  const profileRole = profile?.role;
+  const profileAdminLevel = profile?.admin_level;
+  const userId = user?.id;
+
   useEffect(() => {
     let mounted = true;
     let timeoutId: NodeJS.Timeout;
@@ -178,19 +191,22 @@ export function UserRolesProvider({ children }: { children: React.ReactNode }) {
 
           // 4. Role Expansion for related capabilities (shared helper)
           const roles = expandRawRoles(rawRoles);
-          setAvailableRoles(roles);
+          // Compare before setState: AuthContext creates a fresh profile
+          // object on every fetchProfile (including TOKEN_REFRESHED), so
+          // without this the roles effect refires constantly and re-renders
+          // RoleRedirect / RouteGuard even when nothing actually changed.
+          setAvailableRoles(prev => (sameRoleSet(prev, roles) ? prev : roles));
 
           // Primary role follows the central priority order (roleConfig).
           const primaryRole = ROLE_PRIORITY.find(r => roles.includes(r)) || roles[0];
 
-          setUserRole(primaryRole);
-          setCurrentRole(primaryRole);
+          setUserRole(prev => (prev === primaryRole ? prev : primaryRole));
+          setCurrentRole(prev => (prev === primaryRole ? prev : primaryRole));
 
-          if (roles.includes('admin') || roles.includes('super_admin')) {
-            setAdminLevel(roles.includes('super_admin') ? 'superadmin' : 'admin');
-          } else {
-            setAdminLevel(profile?.admin_level as AdminLevel);
-          }
+          const newAdminLevel = (roles.includes('admin') || roles.includes('super_admin'))
+            ? (roles.includes('super_admin') ? 'superadmin' : 'admin')
+            : (profile?.admin_level as AdminLevel);
+          setAdminLevel(prev => (prev === newAdminLevel ? prev : newAdminLevel));
 
           // Ensure role is recorded in user_roles table in background if missing
           if (!rolesData || rolesData.length === 0) {
@@ -202,9 +218,9 @@ export function UserRolesProvider({ children }: { children: React.ReactNode }) {
         } catch (err) {
           console.error('Unexpected error in fetchRoles:', err);
           const fallbackRole = (profile?.role || user.user_metadata?.role || 'patient') as UserRole;
-          setAvailableRoles([fallbackRole]);
-          setUserRole(fallbackRole);
-          setCurrentRole(fallbackRole);
+          setAvailableRoles(prev => (sameRoleSet(prev, [fallbackRole]) ? prev : [fallbackRole]));
+          setUserRole(prev => (prev === fallbackRole ? prev : fallbackRole));
+          setCurrentRole(prev => (prev === fallbackRole ? prev : fallbackRole));
         } finally {
           setLoading(false);
         }
@@ -223,7 +239,8 @@ export function UserRolesProvider({ children }: { children: React.ReactNode }) {
       mounted = false;
       if (timeoutId) clearTimeout(timeoutId);
     };
-  }, [profile, user, authLoading]);
+  // NOTE: primitives on purpose — never `profile`/`user` objects (see above).
+  }, [profileRole, profileAdminLevel, userId, authLoading]);
 
   const hasRole = (roles: UserRole[]): boolean => {
     return roles.some(role => availableRoles.includes(role));
@@ -263,12 +280,13 @@ export function UserRolesProvider({ children }: { children: React.ReactNode }) {
         .eq('user_id', user.id);
 
       if (rolesData && rolesData.length > 0) {
-        // Same expansion as the initial fetch — never raw rows.
+        // Same expansion AND same primary-role selection as the initial
+        // fetch — the two can never disagree.
         const roles = expandRawRoles(rolesData.map(r => String(r.role)));
-        setAvailableRoles(roles);
-        const primaryRole = roles[0] as UserRole;
-        setUserRole(primaryRole);
-        setCurrentRole(primaryRole);
+        setAvailableRoles(prev => (sameRoleSet(prev, roles) ? prev : roles));
+        const primaryRole = ROLE_PRIORITY.find(r => roles.includes(r)) || roles[0];
+        setUserRole(prev => (prev === primaryRole ? prev : primaryRole));
+        setCurrentRole(prev => (prev === primaryRole ? prev : primaryRole));
       }
     }
   };

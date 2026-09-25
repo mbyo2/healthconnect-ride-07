@@ -2,6 +2,7 @@
 // Re-export from centralized config
 export {
   USER_ROLES, COMMON_ROUTES, PROVIDER_CORE_ROUTES, INSTITUTION_OPERATIONAL_ROUTES,
+  INSTITUTION_MANAGEMENT_ROUTES,
   PUBLIC_ROUTES, ROLE_META, ROLE_PRIORITY,
   CONSULTABLE_PROVIDER_ROLES, ALL_CLINICIAN_ROLES, PRESCRIBING_ROLES,
   NURSING_ROLES, COMMUNITY_ROLES, PHARMACY_SIDE_ROLES, LAB_SIDE_ROLES,
@@ -10,6 +11,7 @@ export type { UserRole, RoleMeta } from '@/config/roleConfig';
 
 import {
   USER_ROLES, COMMON_ROUTES, PROVIDER_CORE_ROUTES, INSTITUTION_OPERATIONAL_ROUTES,
+  INSTITUTION_MANAGEMENT_ROUTES,
   PUBLIC_ROUTES, ROLE_META, ROLE_PRIORITY,
 } from '@/config/roleConfig';
 import type { UserRole } from '@/config/roleConfig';
@@ -43,6 +45,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/search',
     '/medical-records',
     '/video-consultations',
+    '/video-dashboard',     // patient telehealth entry — onboarding "Video Consultation" step routes here
     '/video-call/:roomId',
     '/health-dashboard',
     '/marketplace-users',
@@ -55,6 +58,8 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/iot-monitoring',
     '/mental-health',
     '/ar-anatomy',
+    '/triage',              // AI triage intake — the booking front door
+    '/doc-o-clock',
   ]),
 
   // ── Doctor (Individual Consultant) ───────────────────────
@@ -223,6 +228,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/hospital-management',
     '/pharmacy-inventory',     // medical supplies inventory
     '/medications',
+    ...INSTITUTION_MANAGEMENT_ROUTES, // network admin surface (multi-center, finance, ZRA…)
   ]),
 
   // ── Institution Staff ────────────────────────────────────
@@ -688,11 +694,13 @@ ROLE_PERMISSIONS[USER_ROLES.HR_MANAGER] = dedupeRoutes([
   '/institution/personnel',
   '/institution/reports',
   '/institution/settings',
+  '/medical-shift-hr',      // shift/HR management
   '/wallet',
 ]);
 
 ROLE_PERMISSIONS[USER_ROLES.CXO] = dedupeRoutes([
   ...INSTITUTION_OPERATIONAL_ROUTES,
+  ...INSTITUTION_MANAGEMENT_ROUTES, // network admin surface (multi-center, finance, ZRA…)
   '/institution/reports',
   '/institution/personnel',
   '/institution/settings',
@@ -887,6 +895,7 @@ export const getRoleLandingPage = (userRoles: UserRole[] | null): string => {
   // Priority order: admin > pharmacy/lab (specific portals) > institution_admin > clinical providers > patient
   if (userRoles.includes(USER_ROLES.SUPER_ADMIN)) return '/admin-dashboard';
   if (userRoles.includes(USER_ROLES.ADMIN)) return '/admin-dashboard';
+  if (userRoles.includes(USER_ROLES.SUPPORT)) return '/admin-dashboard';
   if (userRoles.includes(USER_ROLES.CXO)) return '/institution-dashboard';
 
   // Specific institution portals FIRST (before generic institution_admin)

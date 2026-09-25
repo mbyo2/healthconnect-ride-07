@@ -35,18 +35,21 @@ export const PharmacySalesReport = () => {
         .eq('pharmacy_id', pharmacyId!)
         .gte('created_at', getDateFilter())
         .eq('status', 'completed')
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(1000);
       return data || [];
     },
     enabled: !!pharmacyId,
   });
 
-  const totalRevenue = sales?.reduce((sum: number, s: any) => sum + s.total_amount, 0) || 0;
+  // PostgREST returns NUMERIC columns as strings — coerce before summing,
+  // otherwise totals silently concatenate ("150.50" + "200.00" → "150.50200.00").
+  const totalRevenue = sales?.reduce((sum: number, s: any) => sum + Number(s.total_amount || 0), 0) || 0;
   const totalTransactions = sales?.length || 0;
   const avgTransaction = totalTransactions > 0 ? totalRevenue / totalTransactions : 0;
 
   const paymentBreakdown = sales?.reduce((acc: any, s: any) => {
-    acc[s.payment_method] = (acc[s.payment_method] || 0) + s.total_amount;
+    acc[s.payment_method] = (acc[s.payment_method] || 0) + Number(s.total_amount || 0);
     return acc;
   }, {}) || {};
 
@@ -62,8 +65,9 @@ export const PharmacySalesReport = () => {
       ? `${date.getHours()}:00`
       : date.toLocaleDateString('en-ZM', { month: 'short', day: 'numeric' });
     const existing = acc.find(a => a.label === key);
-    if (existing) { existing.revenue += s.total_amount; existing.count += 1; }
-    else acc.push({ label: key, revenue: s.total_amount, count: 1 });
+    const revenue = Number(s.total_amount || 0);
+    if (existing) { existing.revenue += revenue; existing.count += 1; }
+    else acc.push({ label: key, revenue, count: 1 });
     return acc;
   }, []) || [];
 
