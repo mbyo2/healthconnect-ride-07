@@ -61,14 +61,16 @@ export const PatientWorkflow = React.memo(() => {
   const [selectedSpecialty, setSelectedSpecialty] = useState<string>('dentistry');
 
   // Real verified providers for the "Available Doctors" rail — never sample data.
+  // Uses the public provider directory (verified clinicians only); querying
+  // profiles directly leaked the viewer's own row into the rail.
   const { data: featuredProviders = [] } = useQuery({
     queryKey: ['patient-featured-providers'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('profiles')
+        .from('provider_directory')
         .select('id, first_name, last_name, specialty, avatar_url, consultation_fee_min, role')
         .eq('is_verified', true)
-        .order('created_at', { ascending: false })
+        .order('rating', { ascending: false, nullsFirst: false })
         .limit(3);
       if (error) return [];
       return (data as any[]) || [];

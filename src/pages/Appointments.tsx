@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { format, isPast, parseISO, isToday } from "date-fns";
+import { format, parseISO, isToday } from "date-fns";
 import { Link, useNavigate } from "react-router-dom";
 import { NetworkErrorBoundary } from "@/components/errors/NetworkErrorBoundary";
 import { useApiQuery } from "@/hooks/use-api-query";
@@ -151,20 +151,35 @@ export const AppointmentsPage = () => {
     });
   }, [appointments, searchQuery, statusFilter, isProvider]);
 
-  // Group into Upcoming & Past
+  // Group into Upcoming & Past.
+  // An appointment is "past" only once its scheduled date+time has passed —
+  // comparing the bare date (midnight) wrongly buried all of today's
+  // appointments under Past. Rows without a parseable time count through
+  // the end of their day.
+  const apptDateTime = (a: { date: string; time?: string | null }) => {
+    const d = parseISO(a.date);
+    const m = /^(\d{1,2}):(\d{2})/.exec(a.time || "");
+    if (m) {
+      d.setHours(parseInt(m[1], 10), parseInt(m[2], 10), 0, 0);
+    } else {
+      d.setHours(23, 59, 59, 999);
+    }
+    return d;
+  };
+
   const upcoming = useMemo(
     () =>
       filteredAppointments
-        .filter((a) => !isPast(parseISO(a.date)) && a.status !== "cancelled" && a.status !== "completed")
-        .sort((a, b) => parseISO(a.date).getTime() - parseISO(b.date).getTime()),
+        .filter((a) => apptDateTime(a).getTime() >= Date.now() && a.status !== "cancelled" && a.status !== "completed")
+        .sort((a, b) => apptDateTime(a).getTime() - apptDateTime(b).getTime()),
     [filteredAppointments]
   );
 
   const past = useMemo(
     () =>
       filteredAppointments
-        .filter((a) => isPast(parseISO(a.date)) || a.status === "completed" || a.status === "cancelled")
-        .sort((a, b) => parseISO(b.date).getTime() - parseISO(a.date).getTime()),
+        .filter((a) => apptDateTime(a).getTime() < Date.now() || a.status === "completed" || a.status === "cancelled")
+        .sort((a, b) => apptDateTime(b).getTime() - apptDateTime(a).getTime()),
     [filteredAppointments]
   );
 
