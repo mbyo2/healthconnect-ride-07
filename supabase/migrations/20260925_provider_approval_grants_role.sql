@@ -28,6 +28,7 @@ AS $$
 DECLARE
   v_profession text;
   v_role user_role;
+  v_role_app app_role;
 BEGIN
   -- The profession the provider chose at signup, allowlisted to real,
   -- active provider professions.
@@ -41,15 +42,17 @@ BEGIN
         WHERE pt.code = v_profession AND pt.is_active
      ) THEN
     BEGIN
-      v_role := v_profession::user_role;
+      v_role     := v_profession::user_role;
+      v_role_app := v_profession::app_role;
     EXCEPTION WHEN invalid_text_representation THEN
-      -- Code drifted out of the enum: fall back to the generic cadre.
-      v_role := 'health_personnel'::user_role;
+      -- Code drifted out of the enums: fall back to the generic cadre.
+      v_role     := 'health_personnel'::user_role;
+      v_role_app := 'health_personnel'::app_role;
     END;
 
     -- Canonical role store (audited by the user_roles audit trigger).
-    INSERT INTO public.user_roles (user_id, role)
-    VALUES (NEW.user_id, v_role::text)
+    INSERT INTO public.user_roles (user_id, role, granted_by)
+    VALUES (NEW.user_id, v_role_app, NEW.reviewed_by)
     ON CONFLICT (user_id, role) DO NOTHING;
 
     -- Keep the profile in sync and mark verified. Passes through the
