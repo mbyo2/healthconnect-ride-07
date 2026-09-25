@@ -37,7 +37,7 @@ describe('Auth Flow & Role Routing', () => {
       [['lab'], '/lab-management'],
       [['admin'], '/admin-dashboard'],
       [['super_admin'], '/admin-dashboard'],
-      [['institution_admin'], '/institution-portal'],
+      [['institution_admin'], '/institution-dashboard'],
       [['institution_staff'], '/institution-dashboard'],
     ];
 
@@ -59,7 +59,7 @@ describe('Auth Flow & Role Routing', () => {
     });
 
     it('institution_admin takes priority over doctor', () => {
-      expect(getRoleLandingPage(['doctor', 'institution_admin'])).toBe('/institution-portal');
+      expect(getRoleLandingPage(['doctor', 'institution_admin'])).toBe('/institution-dashboard');
     });
 
     it('super_admin takes priority over everything', () => {

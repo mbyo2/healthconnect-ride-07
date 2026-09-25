@@ -37,8 +37,8 @@ describe('Role Routing', () => {
       expect(getRoleLandingPage(['super_admin'])).toBe('/admin-dashboard');
     });
 
-    it('routes institution_admin to /institution-portal', () => {
-      expect(getRoleLandingPage(['institution_admin'])).toBe('/institution-portal');
+    it('routes institution_admin to /institution-dashboard', () => {
+      expect(getRoleLandingPage(['institution_admin'])).toBe('/institution-dashboard');
     });
 
     it('prioritizes admin over patient when user has both', () => {

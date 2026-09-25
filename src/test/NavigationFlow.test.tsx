@@ -30,12 +30,13 @@ describe('Navigation Flow Tests', () => {
   });
 
   /**
-   * Test that healthcare application is publicly accessible
-   * Requirements: 1.4
+   * Healthcare application is auth-gated: the form ties the application to
+   * the applicant's account (refreshProfile on submit), so anonymous users
+   * are sent through sign-in first. Requirements: 1.4
    */
-  it('should allow public access to healthcare application route', () => {
+  it('should require auth for the healthcare application route', () => {
     const hasAccess = hasRoutePermission(null, '/healthcare-application');
-    expect(hasAccess).toBe(true);
+    expect(hasAccess).toBe(false);
   });
 
   /**
@@ -48,7 +49,7 @@ describe('Navigation Flow Tests', () => {
       { roles: [USER_ROLES.PATIENT], expectedPath: '/home' },
       { roles: [USER_ROLES.ADMIN], expectedPath: '/admin-dashboard' },
       { roles: [USER_ROLES.PHARMACY], expectedPath: '/pharmacy-portal' },
-      { roles: [USER_ROLES.INSTITUTION_ADMIN], expectedPath: '/institution-portal' },
+      { roles: [USER_ROLES.INSTITUTION_ADMIN], expectedPath: '/institution-dashboard' },
     ];
 
     testCases.forEach(({ roles, expectedPath }) => {

@@ -525,6 +525,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
   // B2B supply only — no direct patient dispensing, no prescriptions.
   [USER_ROLES.WHOLESALE_PHARMACY]: dedupeRoutes([
     ...COMMON_ROUTES,
+    '/pharmacy-portal', // role landing page — must stay in its own permission set
     '/pharmacy-inventory',
     '/pharmacy-management',
     '/marketplace',

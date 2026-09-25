@@ -101,7 +101,7 @@
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react-swc": "^4.3.1",
-    "@vitest/ui": "^4.1.8",
+    "@vitest/ui": "^4.1.11",
     "autoprefixer": "^10.4.20",
     "esbuild": "^0.28.1",
     "eslint": "^9.9.0",
@@ -117,7 +117,7 @@
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.0.1",
     "vite": "^8.0.16",
-    "vitest": "^4.1.8"
+    "vitest": "^4.1.11"
   },
   "overrides": {
     "@vitejs/plugin-react": "^6.0.0"
