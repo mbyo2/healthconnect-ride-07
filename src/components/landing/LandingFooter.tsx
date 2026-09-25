@@ -1,11 +1,12 @@
 import { Link, useNavigate } from "react-router-dom";
 import { AppLogo } from "@/components/ui/AppLogo";
 import { ArrowRight, Calendar, Phone, HeartPulse, ShieldCheck, Lock, Globe, CheckCircle2 } from "lucide-react";
+import { LANDING_PHOTOS, unsplash, unsplashSrcSet } from "./landingPhotos";
 
 export const BrowseSpecialties = () => {
   const navigate = useNavigate();
   return (
-    <section className="vf-section bg-canvas-bone border-t border-canvas-silk">
+    <section className="vf-section bg-canvas border-t border-canvas-silk">
       <div className="mx-auto max-w-content px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-10 max-w-2xl mx-auto">
           <div className="vf-eyebrow mb-5">
@@ -53,9 +54,22 @@ export const BrowseSpecialties = () => {
 export const CTASection = () => {
   const navigate = useNavigate();
   return (
-    <section className="vf-section bg-white dark:bg-slate-900 border-t border-canvas-silk">
+    <section className="vf-section bg-canvas-mist dark:bg-slate-900 border-t border-canvas-silk">
       <div className="mx-auto max-w-content px-4 sm:px-6 lg:px-8">
         <div className="relative overflow-hidden p-8 sm:p-14 lg:p-16 rounded-card bg-midnight">
+          {/* Photographic backdrop under the midnight wash. */}
+          <div className="absolute inset-0" aria-hidden>
+            <img
+              src={unsplash(LANDING_PHOTOS.ctaBand, 1600)}
+              srcSet={unsplashSrcSet(LANDING_PHOTOS.ctaBand, [800, 1200, 1600, 2000])}
+              sizes="100vw"
+              alt=""
+              className="h-full w-full object-cover"
+              loading="lazy"
+              decoding="async"
+            />
+            <div className="absolute inset-0 bg-midnight/80" />
+          </div>
           <div className="absolute top-0 right-0 w-80 h-80 bg-primary-500/20 blur-[100px] rounded-full pointer-events-none" />
           <div className="absolute bottom-0 left-0 w-64 h-64 bg-accent-500/15 blur-[80px] rounded-full pointer-events-none" />
 

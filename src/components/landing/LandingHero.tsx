@@ -3,6 +3,8 @@ import { ArrowRight, Search } from "lucide-react";
 import { FormEvent, useState } from "react";
 import { ZAMBIAN_TESTIMONIALS } from "@/config/zambia";
 
+import { unsplash, unsplashSrcSet } from "./landingPhotos";
+
 // Care topics framing the illustrative stories below — not partner endorsements.
 const STORY_TABS = [
   { id: "appointments", name: "Appointments", quote: 0 },
@@ -92,12 +94,16 @@ export const LandingHero = () => {
           </div>
           <div className="relative">
             <img
-              src="https://images.unsplash.com/photo-1581594693702-fbdc51b2763b?auto=format&fit=crop&w=2000&q=85"
+              src={unsplash("photo-1581594693702-fbdc51b2763b", 1600)}
+              srcSet={unsplashSrcSet("photo-1581594693702-fbdc51b2763b", [640, 960, 1280, 1600, 2000])}
+              sizes="100vw"
               alt="Black African female doctor attending to patient - Doc' O Clock live care consultation platform"
               className="h-[38vh] w-full object-cover object-center sm:h-[48vh] lg:h-[54vh]"
               width={2000}
               height={1125}
               loading="eager"
+              fetchpriority="high"
+              decoding="async"
             />
             <article className="absolute bottom-5 left-4 right-4 z-20 mx-auto max-w-sm rounded-card border border-white/70 bg-white/95 p-5 shadow-card-hover backdrop-blur-md sm:left-auto sm:right-6 sm:mx-0">
               <p className="font-display text-lg leading-snug text-midnight">

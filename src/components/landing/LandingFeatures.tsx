@@ -5,6 +5,7 @@ import {
   CheckCircle, ArrowRight, ChevronRight, Stethoscope,
   Sparkles, Building2, Activity, CheckCircle2, MapPin
 } from "lucide-react";
+import { LANDING_PHOTOS, unsplash, unsplashSrcSet } from "./landingPhotos";
 
 export const HowItWorks = () => {
   const navigate = useNavigate();
@@ -17,16 +18,22 @@ export const HowItWorks = () => {
               title: "Book.",
               desc: "Find verified doctors by specialty, hospital, NHIMA cover, or city — and lock a slot in seconds.",
               route: "/search",
+              photo: LANDING_PHOTOS.bookStep,
+              alt: "Illustrative photo: an African doctor booking an appointment on a phone — Doc' O Clock",
             },
             {
               title: "Consult.",
               desc: "Join an encrypted video visit from home or walk into clinic without the queue. Same record either way.",
               route: "/video-dashboard",
+              photo: LANDING_PHOTOS.consultStep,
+              alt: "Illustrative photo: a doctor on a laptop with a stethoscope — Doc' O Clock video consultations",
             },
             {
               title: "Continue.",
               desc: "Digital prescriptions land on your phone and nearby pharmacies fulfil them for pickup or delivery.",
               route: "/prescriptions",
+              photo: LANDING_PHOTOS.pharmacyStep,
+              alt: "Illustrative photo: prescribed medicines ready for pharmacy fulfilment — Doc' O Clock",
             },
           ].map((item) => (
             <button
@@ -35,7 +42,20 @@ export const HowItWorks = () => {
               onClick={() => navigate(item.route)}
               className="group text-left"
             >
-              <h2 className="font-display text-4xl font-medium tracking-tight text-midnight sm:text-5xl">
+              <span className="block overflow-hidden rounded-card border border-canvas-silk shadow-card">
+                <img
+                  src={unsplash(item.photo, 800)}
+                  srcSet={unsplashSrcSet(item.photo, [400, 800, 1200])}
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  alt={item.alt}
+                  className="aspect-[16/10] w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  loading="lazy"
+                  decoding="async"
+                  width={800}
+                  height={500}
+                />
+              </span>
+              <h2 className="mt-6 font-display text-4xl font-medium tracking-tight text-midnight sm:text-5xl">
                 {item.title}
               </h2>
               <p className="mt-4 max-w-sm text-sm leading-relaxed tracking-wide text-graphite-500 dark:text-slate-400 sm:text-base">
@@ -53,9 +73,23 @@ export const HowItWorks = () => {
 };
 
 export const PlatformScale = () => (
-  <section className="vf-section border-t border-canvas-silk bg-canvas-bone">
-    <div className="mx-auto max-w-content px-4 sm:px-6 lg:px-8">
-      <h2 className="mx-auto max-w-3xl text-center font-display text-3xl font-medium tracking-tight text-midnight sm:text-5xl">
+  <section className="vf-section relative overflow-hidden border-t border-canvas-silk">
+    {/* Full-bleed photographic band — the "different colour" in the Apple-like rhythm. */}
+    <div className="absolute inset-0" aria-hidden>
+      <img
+        src={unsplash(LANDING_PHOTOS.scaleBand, 1600)}
+        srcSet={unsplashSrcSet(LANDING_PHOTOS.scaleBand, [800, 1200, 1600, 2000])}
+        sizes="100vw"
+        alt=""
+        className="h-full w-full object-cover"
+        loading="lazy"
+        decoding="async"
+      />
+      <div className="absolute inset-0 bg-midnight/70" />
+      <div className="absolute inset-0 bg-gradient-to-b from-midnight/40 via-transparent to-midnight/40" />
+    </div>
+    <div className="relative mx-auto max-w-content px-4 sm:px-6 lg:px-8">
+      <h2 className="mx-auto max-w-3xl text-center font-display text-3xl font-medium tracking-tight text-white sm:text-5xl">
         Built for everyday care. Ready for Zambia at scale.
       </h2>
       <div className="mt-12 grid grid-cols-2 gap-6 lg:grid-cols-4 lg:gap-10">
@@ -66,11 +100,11 @@ export const PlatformScale = () => (
           { value: "24/7", unit: "access", label: "Emergency & bookings" },
         ].map((stat) => (
           <div key={stat.label} className="text-center lg:text-left">
-            <div className="font-display text-4xl font-medium tracking-tight text-midnight sm:text-5xl">
+            <div className="font-display text-4xl font-medium tracking-tight text-white sm:text-5xl">
               {stat.value}
-              <span className="ml-1 text-xl text-graphite-400 sm:text-2xl">{stat.unit}</span>
+              <span className="ml-1 text-xl text-white/60 sm:text-2xl">{stat.unit}</span>
             </div>
-            <p className="mt-2 text-sm text-graphite-500 dark:text-slate-400">{stat.label}</p>
+            <p className="mt-2 text-sm text-white/70">{stat.label}</p>
           </div>
         ))}
       </div>
@@ -122,10 +156,15 @@ export const CareExperience = () => {
           <div className="rounded-card border border-canvas-silk bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-card overflow-hidden">
             <div className="rounded-2xl overflow-hidden relative">
               <img
-                src="https://images.unsplash.com/photo-1594824476967-48c8b964273f?auto=format&fit=crop&w=1200&q=85"
+                src={unsplash("photo-1594824476967-48c8b964273f", 900)}
+                srcSet={unsplashSrcSet("photo-1594824476967-48c8b964273f", [480, 768, 1200])}
+                sizes="(max-width: 1024px) 100vw, 50vw"
                 alt="Illustrative photo: a doctor in a video consultation - Doc' O Clock telemedicine"
                 className="h-64 sm:h-80 w-full object-cover"
                 loading="lazy"
+                decoding="async"
+                width={1200}
+                height={800}
               />
               <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-midnight/80 to-transparent">
                 <div className="flex items-center justify-between gap-3">
@@ -262,7 +301,7 @@ export const Features = () => {
   const active = features[activeFeature];
 
   return (
-    <section className="vf-section bg-white dark:bg-slate-900 border-t border-canvas-silk">
+    <section className="vf-section bg-primary-50 dark:bg-slate-900 border-t border-canvas-silk">
       <div className="mx-auto max-w-content px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12 max-w-2xl mx-auto">
           <div className="vf-eyebrow mb-5">
@@ -373,6 +412,19 @@ export const ForProviders = () => {
           </div>
 
           <div className="rounded-card border border-canvas-silk bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-card space-y-5">
+            <div className="overflow-hidden rounded-2xl -mx-0">
+              <img
+                src={unsplash(LANDING_PHOTOS.providers, 900)}
+                srcSet={unsplashSrcSet(LANDING_PHOTOS.providers, [480, 768, 1200])}
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                alt="Illustrative photo: an African doctor reviewing a patient scan with a colleague — Doc' O Clock for providers"
+                className="aspect-[16/9] w-full object-cover"
+                loading="lazy"
+                decoding="async"
+                width={1200}
+                height={675}
+              />
+            </div>
             <div className="flex items-center justify-between pb-4 border-b border-canvas-mist">
               <div className="flex items-center gap-2">
                 <Activity className="h-5 w-5 text-primary-500" />

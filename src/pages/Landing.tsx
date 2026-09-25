@@ -201,6 +201,9 @@ const Landing = () => {
         <meta name="geo.region" content="ZM" />
         <meta name="geo.placename" content="Zambia" />
         <link rel="canonical" href={`${SITE_URL}/`} />
+        {/* Warm up the image CDN so landing photos start loading sooner. */}
+        <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://images.unsplash.com" />
 
         <meta property="og:title" content="Doc' O Clock — Healthcare Platform for Zambia" />
         <meta property="og:description" content="Connect with verified doctors, book appointments, attend video consultations, and order medications — all in one platform." />
