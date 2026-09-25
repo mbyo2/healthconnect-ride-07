@@ -27,7 +27,7 @@ const PharmacyPortal = () => {
 
   return (
     <ProtectedRoute>
-      <RoleProtectedRoute allowedRoles={['pharmacy', 'pharmacist', 'institution_admin', 'admin']}>
+      <RoleProtectedRoute allowedRoles={['pharmacy', 'pharmacist', 'wholesale_pharmacy', 'institution_admin', 'admin', 'super_admin']}>
         <div className="min-h-screen bg-canvas-bone dark:bg-slate-950 py-8 px-4 sm:px-6 font-sans">
           <div className="max-w-7xl mx-auto space-y-6">
             {/* Header Banner */}

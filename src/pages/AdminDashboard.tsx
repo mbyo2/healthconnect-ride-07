@@ -9,6 +9,7 @@ import { RoleManagement } from "@/components/admin/RoleManagement";
 import { PromoCodeManager } from "@/components/admin/PromoCodeManager";
 import { CommissionSettings } from "@/components/admin/CommissionSettings";
 import { SecurityDashboard } from "@/components/admin/SecurityDashboard";
+import { InstitutionModuleManager } from "@/components/admin/InstitutionModuleManager";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { MetricCard } from "@/components/shared/MetricCard";
 import { QuickActions } from "@/components/shared/QuickActions";
@@ -17,7 +18,7 @@ import { SuggestionBanner, RecommendationCard } from "@/components/guidance";
 import {
   Shield, Users, Activity, DollarSign, Building2, Stethoscope,
   UserCog, Ticket, Percent, Lock, Sparkles, RefreshCw, TrendingUp,
-  AlertTriangle, CheckCircle, Clock
+  AlertTriangle, CheckCircle, Clock, LayoutGrid
 } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -32,6 +33,7 @@ const TABS = [
   { value: "roles", label: "Roles", icon: UserCog },
   { value: "providers", label: "Providers", icon: Stethoscope },
   { value: "applications", label: "Institutions", icon: Building2 },
+  { value: "modules", label: "Modules", icon: LayoutGrid },
   { value: "revenue", label: "Revenue", icon: DollarSign },
   { value: "commissions", label: "Commissions", icon: Percent },
   { value: "promos", label: "Promos", icon: Ticket },
@@ -396,6 +398,7 @@ export const AdminDashboard = () => {
             <TabsContent value="roles"><RoleManagement /></TabsContent>
             <TabsContent value="providers"><ProviderApplications /></TabsContent>
             <TabsContent value="applications"><InstitutionApplications /></TabsContent>
+            <TabsContent value="modules"><InstitutionModuleManager /></TabsContent>
             <TabsContent value="revenue"><RevenueAnalyticsDashboard /></TabsContent>
             <TabsContent value="commissions"><CommissionSettings /></TabsContent>
             <TabsContent value="promos"><PromoCodeManager /></TabsContent>

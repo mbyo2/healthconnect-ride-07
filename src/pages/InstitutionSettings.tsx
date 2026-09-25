@@ -9,13 +9,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
-import { Loader2, Save, ShieldCheck, Building2, Activity, Globe, Stethoscope } from "lucide-react";
+import { Loader2, Save, ShieldCheck, Building2, Activity, Globe, Stethoscope, CheckCircle2, Hourglass, Ban, Puzzle } from "lucide-react";
 import { InsuranceProvider } from "@/types/healthcare";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useInstitutionContext } from "@/hooks/useInstitutionContext";
 import { SpecialtySelector } from "@/components/healthcare/SpecialtySelector";
 import { useInstitutionSpecialties, saveInstitutionSpecialties } from "@/hooks/useClinicSpecialties";
+import { getEffectiveInstitutionModules, type EffectiveModule } from "@/services/institutionModules";
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -83,6 +84,16 @@ const InstitutionSettings = () => {
   const [selectedSpecialtyIds, setSelectedSpecialtyIds] = useState<string[]>([]);
   const [primarySpecialtyId, setPrimarySpecialtyId] = useState<string | undefined>(undefined);
   const { data: existingSpecialties } = useInstitutionSpecialties(institution?.id);
+  // Effective modules for this facility (tier charter + admin entitlements)
+  const [effModules, setEffModules] = useState<EffectiveModule[]>([]);
+  useEffect(() => {
+    if (!institution?.id) return;
+    let cancelled = false;
+    getEffectiveInstitutionModules(supabase as any, institution.id, institution.type_code)
+      .then(({ modules }) => { if (!cancelled) setEffModules(modules); })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [institution?.id, institution?.type_code]);
 
   useEffect(() => {
     if (existingSpecialties) {
@@ -359,6 +370,55 @@ const InstitutionSettings = () => {
                 }}
               />
             </div>
+          </CardContent>
+        </Card>
+
+        {/* ── Modules & Add-ons ── */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Puzzle className="h-5 w-5 text-primary" />
+              Modules &amp; Add-ons
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground mb-4">
+              Modules active on your facility. Need something extra — ICU, theatre, insurance claims,
+              ambulance dispatch? Contact the Doc'O Clock platform team and we switch it on for you.
+            </p>
+            {effModules.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Loading modules…</p>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {effModules.map((m) => (
+                  <div
+                    key={m.module_key}
+                    className={`flex items-center gap-2.5 p-2.5 rounded-xl border text-sm ${
+                      m.effective === "live"
+                        ? "border-success-200 bg-success-50/40"
+                        : m.effective === "planned"
+                        ? "border-canvas-silk bg-muted/30"
+                        : "border-error-200 bg-error-50/40"
+                    }`}
+                    title={m.description || m.module_name}
+                  >
+                    {m.effective === "live" ? (
+                      <CheckCircle2 className="h-4 w-4 text-success-500 shrink-0" />
+                    ) : m.effective === "planned" ? (
+                      <Hourglass className="h-4 w-4 text-graphite-400 shrink-0" />
+                    ) : (
+                      <Ban className="h-4 w-4 text-error-500 shrink-0" />
+                    )}
+                    <div className="min-w-0">
+                      <p className="font-bold text-xs truncate">{m.module_name}</p>
+                      <p className="text-[10px] text-muted-foreground">
+                        {m.source === "admin_grant" ? "Added for your facility" : m.effective === "live" ? "Active" : m.effective === "planned" ? "Available on request" : "Suspended — contact support"}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
 

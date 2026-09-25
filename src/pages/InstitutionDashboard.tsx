@@ -14,6 +14,7 @@ import { QuickActions } from "@/components/institution/QuickActions";
 import { RecentActivityFeed } from "@/components/institution/RecentActivityFeed";
 import { useInstitutionContext } from "@/hooks/useInstitutionContext";
 import { getFacilityArchetype } from "@/config/facilityProfiles";
+import { getEffectiveInstitutionModules, type EffectiveModule } from "@/services/institutionModules";
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
 import { format, subMonths, startOfMonth, endOfMonth } from "date-fns";
 import { MetricCard } from "@/components/shared/MetricCard";
@@ -181,11 +182,14 @@ export const InstitutionDashboard = () => {
   const [activities, setActivities] = useState<any[]>([]);
   const [chartData, setChartData] = useState<any[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
-  // Precise facility identity + chartered modules (DB-driven). The exact
+  // Precise facility identity + effective modules (DB-driven). The exact
   // type chosen at signup (type_code) drives the archetype, the header
-  // label and the module charter — not the coarse enum in `type`.
+  // label and the module set — not the coarse enum in `type`. The module
+  // set is the tier charter overlaid with per-institution admin entitlements
+  // (see institutionModules service): admins can grant/suspend modules per
+  // institution without a code change.
   const [preciseTypeLabel, setPreciseTypeLabel] = useState<string | null>(null);
-  const [charter, setCharter] = useState<Array<{ module_key: string; module_name: string; description: string | null; status: string }>>([]);
+  const [charter, setCharter] = useState<EffectiveModule[]>([]);
 
   // Module deep-links for chartered modules that are live in the app.
   const MODULE_PATHS: Record<string, string> = {
@@ -296,31 +300,24 @@ export const InstitutionDashboard = () => {
     fetchDashboardData();
   }, [institution]);
 
-  // Load the precise facility type + its chartered modules from the DB.
+  // Load the precise facility type + its effective modules from the DB.
+  // Effective = tier charter overlaid with this institution's admin-granted
+  // entitlements (modular HMS: platform admins toggle modules per facility).
   useEffect(() => {
     if (!institution) return;
-    const code = (institution.type_code || "").toLowerCase().trim();
-    if (!code) return;
     let cancelled = false;
     (async () => {
       try {
-        const { data: t } = await supabase
-          .from("institution_types")
-          .select("description, tier")
-          .eq("name", code)
-          .maybeSingle();
-        if (cancelled || !t) return;
-        if (t.description) setPreciseTypeLabel(t.description);
-        if (t.tier) {
-          const { data: rows } = await supabase
-            .from("facility_module_charter")
-            .select("module_key, module_name, description, status")
-            .eq("tier", t.tier)
-            .order("display_order");
-          if (!cancelled && rows) setCharter(rows as any);
-        }
+        const { label, modules } = await getEffectiveInstitutionModules(
+          supabase as any,
+          institution.id,
+          institution.type_code
+        );
+        if (cancelled) return;
+        if (label) setPreciseTypeLabel(label);
+        setCharter(modules);
       } catch {
-        /* charter is progressive enhancement — dashboard works without it */
+        /* modules are progressive enhancement — dashboard works without them */
       }
     })();
     return () => { cancelled = true; };
@@ -515,20 +512,25 @@ export const InstitutionDashboard = () => {
               </div>
             </div>
 
-            {/* Modules chartered for this facility tier (DB-driven).
-                Live modules open; planned modules are chartered but not built yet. */}
+            {/* Modules for this facility (DB-driven + per-institution admin grants).
+                Live modules open; planned modules are chartered but not built yet;
+                admin-granted modules show a "New" badge; suspended modules are hidden. */}
             {charter.length > 0 && (
               <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
                 <p className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase mb-1">
                   {headerLabel} Modules
                 </p>
                 <p className="text-[11px] text-graphite-400 dark:text-slate-500 mb-3">
-                  Chartered for your facility type — {charter.filter((m) => m.status === "live").length} live now,{" "}
-                  {charter.filter((m) => m.status === "planned").length} coming soon.
+                  {charter.filter((m) => m.effective === "live").length} live now,{" "}
+                  {charter.filter((m) => m.effective === "planned").length} coming soon.
+                  {charter.some((m) => m.source === "admin_grant") && (
+                    <> · <span className="text-primary-600 font-bold">includes modules added for your facility by the platform team</span></>
+                  )}
                 </p>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5">
-                  {charter.map((m) => {
-                    const isLive = m.status === "live";
+                  {charter.filter((m) => m.effective !== "disabled").map((m) => {
+                    const isLive = m.effective === "live";
+                    const isGranted = m.source === "admin_grant";
                     const path = MODULE_PATHS[m.module_key];
                     const inner = (
                       <>
@@ -541,7 +543,7 @@ export const InstitutionDashboard = () => {
                           <span className="truncate">{m.module_name}</span>
                         </span>
                         <span className={`text-[9px] font-extrabold uppercase tracking-wide ${isLive ? "text-success-500" : "text-graphite-400"}`}>
-                          {isLive ? "Live" : "Coming soon"}
+                          {isGranted ? "New" : isLive ? "Live" : "Coming soon"}
                         </span>
                       </>
                     );
@@ -550,12 +552,15 @@ export const InstitutionDashboard = () => {
                       (isLive
                         ? "border-canvas-silk dark:border-slate-700 hover:border-primary-500 hover:bg-primary-100 dark:hover:bg-slate-800"
                         : "border-canvas-silk dark:border-slate-800 bg-canvas-mist/50 dark:bg-slate-800/40 opacity-80");
+                    const title = m.description
+                      ? isGranted ? `${m.description} — added for your facility by the platform team` : isLive ? m.description : `${m.description} — planned`
+                      : m.module_name;
                     return isLive && path ? (
-                      <button key={m.module_key} onClick={() => navigate(path)} className={cls} title={m.description || m.module_name}>
+                      <button key={m.module_key} onClick={() => navigate(path)} className={cls} title={title}>
                         {inner}
                       </button>
                     ) : (
-                      <div key={m.module_key} className={cls} title={m.description ? `${m.description} — planned` : "Planned module"}>
+                      <div key={m.module_key} className={cls} title={title}>
                         {inner}
                       </div>
                     );

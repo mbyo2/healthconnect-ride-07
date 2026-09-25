@@ -528,6 +528,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/pharmacy-portal', // role landing page — must stay in its own permission set
     '/pharmacy-inventory',
     '/pharmacy-management',
+    '/institution-dashboard', // wholesale distributors are facility admins too
     '/marketplace',
     '/wallet',
     '/map',
