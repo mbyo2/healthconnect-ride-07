@@ -10,7 +10,7 @@ import {
 import { LabRequest, LabTestStatus } from "@/types/lab";
 import { toast } from "sonner";
 import { InstitutionInsuranceVerification } from "@/components/institution/InstitutionInsuranceVerification";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { dispatchNotification } from "@/hooks/useNotifications";
@@ -38,6 +38,8 @@ const LabManagement = () => {
   const [editingTest, setEditingTest] = useState<any | null>(null);
   const [testForm, setTestForm] = useState({ name: "", category: "Hematology", description: "", price: "" });
   const [savingTest, setSavingTest] = useState(false);
+  const [testToDelete, setTestToDelete] = useState<any | null>(null);
+  const [deletingTest, setDeletingTest] = useState(false);
 
   const openNewTestDialog = () => {
     setEditingTest(null);
@@ -91,15 +93,19 @@ const LabManagement = () => {
     }
   };
 
-  const deleteTest = async (test: any) => {
-    if (!window.confirm(`Remove "${test.name}" from the catalog?`)) return;
+  const deleteTest = async () => {
+    if (!testToDelete) return;
+    setDeletingTest(true);
     try {
-      const { error } = await (supabase as any).from("lab_test_catalog").delete().eq("id", test.id);
+      const { error } = await (supabase as any).from("lab_test_catalog").delete().eq("id", testToDelete.id);
       if (error) throw error;
       toast.success("Test removed from catalog");
       queryClient.invalidateQueries({ queryKey: ["lab-test-catalog"] });
+      setTestToDelete(null);
     } catch (e: any) {
       toast.error(e.message || "Failed to remove test");
+    } finally {
+      setDeletingTest(false);
     }
   };
 
@@ -619,7 +625,7 @@ const LabManagement = () => {
                       <Pencil className="h-3.5 w-3.5" />
                     </button>
                     <button
-                      onClick={() => deleteTest(test)}
+                      onClick={() => setTestToDelete(test)}
                       title="Remove test"
                       className="p-1.5 rounded-lg hover:bg-white text-slate-500 hover:text-rose-600 transition-colors"
                     >
@@ -701,6 +707,35 @@ const LabManagement = () => {
               >
                 {savingTest && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
                 {editingTest ? "Save Changes" : "Add Test"}
+              </button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Remove Test confirmation */}
+        <Dialog open={!!testToDelete} onOpenChange={(open) => { if (!open) setTestToDelete(null); }}>
+          <DialogContent className="sm:max-w-[380px] bg-white border border-canvas-silk dark:border-slate-800">
+            <DialogHeader>
+              <DialogTitle className="text-sm font-black">Remove test from catalog?</DialogTitle>
+              <DialogDescription className="text-xs">
+                “{testToDelete?.name}” will be removed from your lab catalog. This cannot be undone.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <button
+                onClick={() => setTestToDelete(null)}
+                disabled={deletingTest}
+                className="px-4 py-2 rounded-lg border border-canvas-silk text-xs font-bold text-slate-600 hover:bg-canvas disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={deleteTest}
+                disabled={deletingTest}
+                className="px-4 py-2 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold disabled:opacity-50 inline-flex items-center gap-1.5"
+              >
+                {deletingTest && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                Remove Test
               </button>
             </DialogFooter>
           </DialogContent>
