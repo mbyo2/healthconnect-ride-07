@@ -28,7 +28,7 @@ CRITICAL SAFETY:
 
   const clinicalTriggers = `
 CLINICAL DECISION TRIGGERS:
-1. EMERGENCY: Use "emergency", "call 911", "immediately" for chest pain+SOB, stroke signs, severe bleeding, difficulty breathing, loss of consciousness, severe allergic reactions.
+1. EMERGENCY: Use "emergency", "call 991 (Zambia's emergency line)", "immediately" for chest pain+SOB, stroke signs, severe bleeding, difficulty breathing, loss of consciousness, severe allergic reactions.
 2. URGENT CARE: Use "see a doctor soon", "within 24 hours" for persistent high fever, infections, moderate pain, worsening symptoms.
 3. PREVENTIVE: Use "screening", "vaccination", "prevention" for age-appropriate screenings, vaccinations, lifestyle modifications.
 4. MONITORING: Use "monitor", "track", "watch for" for chronic conditions, medication side effects, symptom progression.`;
@@ -518,13 +518,31 @@ serve(async (req: Request) => {
     }
 
 
-    // Verify the user's role from the DB — never trust client-supplied userRole
-    const { data: profile } = await supabaseAuth
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .maybeSingle();
-    const verifiedRole = (profile?.role as string) || 'patient';
+    // Verify the user's role from the DB — never trust client-supplied userRole.
+    // user_roles is the source of truth (45-role taxonomy); profiles.role is
+    // legacy and would silently downgrade staff to the patient prompt.
+    let verifiedRole = 'patient';
+    try {
+      const { data: roleRows } = await supabaseAuth
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id);
+      const primary = (roleRows ?? [])
+        .map((r: any) => String(r.role || '').toLowerCase())
+        .find((r: string) => r && r !== 'patient' && r !== 'guest');
+      if (primary) {
+        verifiedRole = primary;
+      } else {
+        const { data: profile } = await supabaseAuth
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .maybeSingle();
+        if (profile?.role) verifiedRole = String(profile.role).toLowerCase();
+      }
+    } catch (_roleErr) {
+      console.error('Role lookup failed; defaulting to patient prompt');
+    }
 
     // Role-specific system prompts (server-verified role)
     const systemPrompt = buildRoleAwarePrompt(verifiedRole);
