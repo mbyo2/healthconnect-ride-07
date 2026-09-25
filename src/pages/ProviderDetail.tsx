@@ -49,21 +49,55 @@ export const ProviderDetail = () => {
     queryKey: ["provider-detail", id],
     queryFn: async () => {
       if (!id) return null;
+      // Public directory view: verified providers, directory-safe columns only.
+      // (profiles.* is not publicly readable; provider_statistics embed removed
+      //  in favor of the directory's rating/reviews_count.)
       const { data, error } = await supabase
-        .from("profiles")
+        .from("provider_directory")
         .select(`
-          *,
-          provider_statistics (
-            average_rating,
-            total_reviews,
-            total_appointments
-          )
+          id,
+          first_name,
+          last_name,
+          specialty,
+          subspecialties,
+          avatar_url,
+          provider_type,
+          email,
+          phone,
+          years_experience,
+          rating,
+          reviews_count,
+          medical_school,
+          graduation_year,
+          board_certifications,
+          primary_practice_location,
+          affiliated_hospitals,
+          consultation_fee_min,
+          consultation_fee_max,
+          accepts_insurance,
+          insurance_providers_accepted,
+          telemedicine_available,
+          home_visits_available,
+          languages_spoken,
+          typical_wait_time,
+          appointment_types,
+          availability_schedule,
+          is_verified,
+          role
         `)
         .eq("id", id)
         .maybeSingle();
       if (error) throw error;
       if (!data) throw new Error("Provider not found");
-      return data as any;
+      // Shape stats the way the page already consumes them.
+      return {
+        ...data,
+        provider_statistics: [{
+          average_rating: data.rating,
+          total_reviews: data.reviews_count ?? 0,
+          total_appointments: 0,
+        }],
+      } as any;
     },
     enabled: !!id,
   });
