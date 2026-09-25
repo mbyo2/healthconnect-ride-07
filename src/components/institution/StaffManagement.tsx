@@ -103,7 +103,9 @@ const EMPLOYMENT_TYPES = [
 
 export const StaffManagement = ({ institutionId }: { institutionId: string }) => {
   const { institution } = useInstitutionContext();
-  const facilityProfile = getFacilityProfile(institution?.type);
+  // Resolve from the precise signup choice (type_code) so staff suggestions
+  // match what the facility actually is, not the coarse enum.
+  const facilityProfile = getFacilityProfile(institution?.type_code || institution?.type);
   // Staff roles are DB-driven (specialty_staff_roles) so new roles added by
   // the platform appear in the admin's picker without a code change. The
   // hardcoded list remains as the offline fallback.

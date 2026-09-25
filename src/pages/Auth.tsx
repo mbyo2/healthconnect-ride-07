@@ -130,6 +130,13 @@ const FALLBACK_BUSINESS_TYPES: Array<{ value: string; label: string }> = [
 const FALLBACK_COUNTRIES: Array<{ value: string; label: string; dialCode: string }> = [
   { value: "ZM", label: "Zambia", dialCode: "+260" },
 ];
+// In the offline fallback every regulated cadre requires a licence number;
+// traditional/other practitioners are registered, not licenced.
+const FALLBACK_PROVIDER_TYPES_WITH_LICENCE = FALLBACK_PROVIDER_TYPES.map((t) => ({
+  ...t,
+  requiresLicense: t.value !== "traditional_practitioner" && t.value !== "health_personnel",
+}));
+
 // Specialty taxonomy — mirrors clinic_specialty_catalog so signup works
 // identically with or without DB rows. The live list is DB-driven.
 const FALLBACK_SPECIALTIES: Array<{ value: string; label: string }> = [
@@ -183,7 +190,7 @@ export const Auth = () => {
   const [signupPath, setSignupPath] = useState<SignupPath>(pathParam || null);
   const [showPassword, setShowPassword] = useState(false);
   const { showSuccess, showError } = useFeedbackSystem();
-  const [providerTypes, setProviderTypes] = useState<Array<{ value: string; label: string }>>([]);
+  const [providerTypes, setProviderTypes] = useState<Array<{ value: string; label: string; requiresLicense?: boolean }>>([]);
   const [businessTypes, setBusinessTypes] = useState<Array<{ value: string; label: string }>>([]);
   const [specialties, setSpecialties] = useState<Array<{ value: string; label: string }>>([]);
   const [countries, setCountries] = useState<Array<{ value: string; label: string; dialCode: string }>>([]);
@@ -204,16 +211,16 @@ export const Auth = () => {
     const fetchDynamicData = async () => {
       try {
         const [providerTypesRes, businessTypesRes, countriesRes, specialtiesRes] = await Promise.all([
-          supabase.from("provider_types").select("code, name").eq("is_active", true).order("display_order"),
+          supabase.from("provider_types").select("code, name, requires_license").eq("is_active", true).order("display_order"),
           supabase.from("institution_types").select("code, name").eq("is_active", true).order("display_order"),
           supabase.from("countries").select("code, name, dial_code").eq("is_active", true).order("name"),
           supabase.from("clinic_specialty_catalog").select("name").eq("is_active", true).order("name"),
         ]);
 
         if (providerTypesRes.data && providerTypesRes.data.length > 0) {
-          setProviderTypes(providerTypesRes.data.map((t) => ({ value: t.code, label: t.name })));
+          setProviderTypes(providerTypesRes.data.map((t) => ({ value: t.code, label: t.name, requiresLicense: !!(t as any).requires_license })));
         } else {
-          setProviderTypes(FALLBACK_PROVIDER_TYPES);
+          setProviderTypes(FALLBACK_PROVIDER_TYPES_WITH_LICENCE);
         }
         if (businessTypesRes.data && businessTypesRes.data.length > 0) {
           setBusinessTypes(businessTypesRes.data.map((t) => ({ value: t.code, label: t.name })));
@@ -232,7 +239,7 @@ export const Auth = () => {
         }
       } catch (error) {
         console.error("Error fetching dynamic data:", error);
-        setProviderTypes((prev) => (prev.length > 0 ? prev : FALLBACK_PROVIDER_TYPES));
+        setProviderTypes((prev) => (prev.length > 0 ? prev : FALLBACK_PROVIDER_TYPES_WITH_LICENCE));
         setBusinessTypes((prev) => (prev.length > 0 ? prev : FALLBACK_BUSINESS_TYPES));
         setCountries((prev) => (prev.length > 0 ? prev : FALLBACK_COUNTRIES));
         setSpecialties((prev) => (prev.length > 0 ? prev : FALLBACK_SPECIALTIES));
@@ -284,6 +291,14 @@ export const Auth = () => {
 
   const onProviderSignup = async (data: z.infer<typeof providerSchema>) => {
     setLocalLoading(true);
+    // The profession choice is enforced: regulated cadres must supply a
+    // licence/registration number (requires_license in provider_types).
+    const chosenProfession = providerTypes.find((t) => t.value === data.providerType);
+    if (chosenProfession?.requiresLicense && !data.licenseNumber?.trim()) {
+      showError(`A licence / registration number is required for ${chosenProfession.label}.`);
+      setLocalLoading(false);
+      return;
+    }
     const { error } = await supabase.auth.signUp({
       email: data.email,
       password: data.password,
@@ -523,9 +538,21 @@ export const Auth = () => {
                         <FormMessage />
                       </FormItem>
                     )} />
-                    <FormField control={providerForm.control} name="licenseNumber" render={({ field }) => (
-                      <FormItem><FormLabel className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">License / Reg. Number</FormLabel><FormControl><Input {...field} className="h-9 text-xs border-graphite-300 dark:border-slate-700" /></FormControl><FormMessage /></FormItem>
-                    )} />
+                    <FormField control={providerForm.control} name="licenseNumber" render={({ field }) => {
+                      const prof = providerTypes.find((t) => t.value === providerForm.watch("providerType"));
+                      return (
+                        <FormItem>
+                          <FormLabel className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">
+                            License / Reg. Number{prof?.requiresLicense ? " *" : ""}
+                          </FormLabel>
+                          <FormControl><Input {...field} className="h-9 text-xs border-graphite-300 dark:border-slate-700" /></FormControl>
+                          {prof?.requiresLicense && (
+                            <p className="text-[10px] text-graphite-400">Required for {prof.label} — verified during application review.</p>
+                          )}
+                          <FormMessage />
+                        </FormItem>
+                      );
+                    }} />
                     <FormField control={providerForm.control} name="email" render={({ field }) => (
                       <FormItem><FormLabel className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Email</FormLabel><FormControl><Input {...field} type="email" className="h-9 text-xs border-graphite-300 dark:border-slate-700" /></FormControl><FormMessage /></FormItem>
                     )} />

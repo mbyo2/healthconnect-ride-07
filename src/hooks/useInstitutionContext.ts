@@ -6,6 +6,9 @@ export interface InstitutionData {
   id: string;
   name: string;
   type: string;
+  /** Exact institution_types code chosen at signup (e.g. teaching_hospital).
+   *  `type` is the coarse healthcare_provider_type enum value. */
+  type_code?: string | null;
   address?: string;
   city?: string;
   state?: string;
@@ -256,6 +259,10 @@ export function useInstitutionContext() {
           .insert({
             name: institutionName,
             type: determinedType as any,
+            // Preserve the exact facility type chosen at signup so the
+            // dashboard, module charter and staff roles can respond to it.
+            // (rawType is the pre-sanitizer code, e.g. teaching_hospital.)
+            type_code: (rawType || '').toLowerCase().trim() || null,
             admin_id: user.id,
             is_verified: true,
             email: user.email || '',
@@ -277,8 +284,10 @@ export function useInstitutionContext() {
 
           // Provision the HMS workspace in the background (idempotent —
           // no-op if departments already exist for this institution).
+          // Pass the precise type code so department seeding matches the
+          // exact facility kind chosen at signup.
           const { provisionInstitutionWorkspace } = await import('@/services/institutionProvisioning');
-          provisionInstitutionWorkspace(newInst.id, (newInst as InstitutionData).type).then(() => {}).catch(() => {});
+          provisionInstitutionWorkspace(newInst.id, (newInst as InstitutionData).type_code || (newInst as InstitutionData).type).then(() => {}).catch(() => {});
 
           setInstitution(newInst as InstitutionData);
           setIsAdmin(true);
@@ -292,6 +301,7 @@ export function useInstitutionContext() {
           id: user.id,
           name: institutionName,
           type: determinedType,
+          type_code: (rawType || '').toLowerCase().trim() || null,
           admin_id: user.id,
           is_verified: true,
           email: user.email || '',

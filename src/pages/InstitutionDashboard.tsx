@@ -7,7 +7,7 @@ import {
   Package, ShoppingCart, BarChart3, Truck, ClipboardList, Activity,
   Baby, Dumbbell, Ticket, Share2, Layers, Tv,
   DollarSign, Wrench, FileCode, Clock, CreditCard, Network,
-  BookOpen, FileText, Calculator
+  BookOpen, FileText, Calculator, CheckCircle2, Hourglass
 } from "lucide-react";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { QuickActions } from "@/components/institution/QuickActions";
@@ -181,6 +181,28 @@ export const InstitutionDashboard = () => {
   const [activities, setActivities] = useState<any[]>([]);
   const [chartData, setChartData] = useState<any[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
+  // Precise facility identity + chartered modules (DB-driven). The exact
+  // type chosen at signup (type_code) drives the archetype, the header
+  // label and the module charter — not the coarse enum in `type`.
+  const [preciseTypeLabel, setPreciseTypeLabel] = useState<string | null>(null);
+  const [charter, setCharter] = useState<Array<{ module_key: string; module_name: string; description: string | null; status: string }>>([]);
+
+  // Module deep-links for chartered modules that are live in the app.
+  const MODULE_PATHS: Record<string, string> = {
+    patient_registration: "/institution/patients",
+    appointments: "/institution/appointments",
+    telehealth: "/video-dashboard",
+    opd: "/hospital-management?tab=opd",
+    prescriptions: "/prescriptions",
+    laboratory: "/lab-management",
+    pharmacy: "/pharmacy-portal",
+    pharmacy_inventory: "/pharmacy-inventory",
+    billing: "/hospital-management?tab=billing",
+    hr_staff: "/institution/personnel",
+    reports: "/institution/reports",
+    ipd_wards: "/hospital-management?tab=ipd",
+    emergency: "/hospital-management?tab=opd",
+  };
 
   const activeTab = searchParams.get("tab") || "overview";
   const setActiveTab = (tabName: string) => {
@@ -274,6 +296,36 @@ export const InstitutionDashboard = () => {
     fetchDashboardData();
   }, [institution]);
 
+  // Load the precise facility type + its chartered modules from the DB.
+  useEffect(() => {
+    if (!institution) return;
+    const code = (institution.type_code || "").toLowerCase().trim();
+    if (!code) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data: t } = await supabase
+          .from("institution_types")
+          .select("description, tier")
+          .eq("name", code)
+          .maybeSingle();
+        if (cancelled || !t) return;
+        if (t.description) setPreciseTypeLabel(t.description);
+        if (t.tier) {
+          const { data: rows } = await supabase
+            .from("facility_module_charter")
+            .select("module_key, module_name, description, status")
+            .eq("tier", t.tier)
+            .order("display_order");
+          if (!cancelled && rows) setCharter(rows as any);
+        }
+      } catch {
+        /* charter is progressive enhancement — dashboard works without it */
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [institution]);
+
   if (instLoading || dataLoading) return <LoadingScreen />;
 
   if (!institution) {
@@ -291,12 +343,15 @@ export const InstitutionDashboard = () => {
     );
   }
 
-  // Resolve by facility archetype so every MOH level & private type lands
-  // on a tailored dashboard; wholesale distributors get their own config.
+  // Resolve by facility archetype from the PRECISE signup choice
+  // (type_code), falling back to the coarse enum. Wholesale distributors
+  // get their own config.
+  const preciseType = (institution.type_code || institution.type || "").toLowerCase();
   const cfg =
-    institution.type === 'wholesale_pharmacy'
+    preciseType === 'wholesale_pharmacy'
       ? TYPE_CONFIG.wholesale_pharmacy
-      : TYPE_CONFIG[getFacilityArchetype(institution.type)] || DEFAULT_CONFIG;
+      : TYPE_CONFIG[getFacilityArchetype(preciseType)] || DEFAULT_CONFIG;
+  const headerLabel = preciseTypeLabel || cfg.label;
 
   const kpiCards = [
     { label: "Staff & Personnel", value: counts.personnel, sub: "Active members", color: "primary", icon: <Users className="h-5 w-5" /> },
@@ -322,7 +377,7 @@ export const InstitutionDashboard = () => {
                 </span>
               </h1>
               <p className="text-sm text-graphite-500 dark:text-slate-400 font-medium tracking-wide">
-                {cfg.label} Dashboard{!institution.is_verified ? " — pending verification (full HMS is already set up)" : ""}
+                {headerLabel} Dashboard{!institution.is_verified ? " — pending verification (full HMS is already set up)" : ""}
               </p>
             </div>
           </div>
@@ -459,6 +514,55 @@ export const InstitutionDashboard = () => {
                 ))}
               </div>
             </div>
+
+            {/* Modules chartered for this facility tier (DB-driven).
+                Live modules open; planned modules are chartered but not built yet. */}
+            {charter.length > 0 && (
+              <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
+                <p className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase mb-1">
+                  {headerLabel} Modules
+                </p>
+                <p className="text-[11px] text-graphite-400 dark:text-slate-500 mb-3">
+                  Chartered for your facility type — {charter.filter((m) => m.status === "live").length} live now,{" "}
+                  {charter.filter((m) => m.status === "planned").length} coming soon.
+                </p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5">
+                  {charter.map((m) => {
+                    const isLive = m.status === "live";
+                    const path = MODULE_PATHS[m.module_key];
+                    const inner = (
+                      <>
+                        <span className="flex items-center gap-1.5 text-[11px] font-bold text-slate-700 dark:text-slate-300">
+                          {isLive ? (
+                            <CheckCircle2 className="h-3.5 w-3.5 text-success-500 shrink-0" />
+                          ) : (
+                            <Hourglass className="h-3.5 w-3.5 text-graphite-400 shrink-0" />
+                          )}
+                          <span className="truncate">{m.module_name}</span>
+                        </span>
+                        <span className={`text-[9px] font-extrabold uppercase tracking-wide ${isLive ? "text-success-500" : "text-graphite-400"}`}>
+                          {isLive ? "Live" : "Coming soon"}
+                        </span>
+                      </>
+                    );
+                    const cls =
+                      "flex items-center justify-between gap-2 p-2.5 rounded-xl border text-left transition-all " +
+                      (isLive
+                        ? "border-canvas-silk dark:border-slate-700 hover:border-primary-500 hover:bg-primary-100 dark:hover:bg-slate-800"
+                        : "border-canvas-silk dark:border-slate-800 bg-canvas-mist/50 dark:bg-slate-800/40 opacity-80");
+                    return isLive && path ? (
+                      <button key={m.module_key} onClick={() => navigate(path)} className={cls} title={m.description || m.module_name}>
+                        {inner}
+                      </button>
+                    ) : (
+                      <div key={m.module_key} className={cls} title={m.description ? `${m.description} — planned` : "Planned module"}>
+                        {inner}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* Quick Actions */}
             <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">

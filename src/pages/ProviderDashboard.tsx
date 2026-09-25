@@ -17,6 +17,7 @@ import {
   ClipboardList, Wallet, MessageSquare, TrendingUp, Heart, Pill,
   ExternalLink, GraduationCap, Award, DollarSign, Shield, Home,
   MapPin, Building2, Languages, Save, Plus, X, Loader2,
+  CheckCircle2, Hourglass,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -381,7 +382,9 @@ export const ProviderDashboard = () => {
 
   // Dashboard identity follows the taxonomy — every cadre gets a named
   // console derived from its role metadata, never a hardcoded trio.
-  const dashboardMeta = useMemo(() => {
+  // professionCode is the exact profession chosen at signup; it drives the
+  // module charter below so the signup choice shapes the workspace.
+  const { dashboardMeta, professionCode } = useMemo(() => {
     const subtitleByCategory: Record<string, string> = {
       clinical: "Consultations, digital prescriptions & patient triage queue",
       nursing: "Ward rounds, vitals telemetry & home visits",
@@ -390,15 +393,54 @@ export const ProviderDashboard = () => {
       pharmacy: "Dispensing, stock & patient counselling",
       lab: "Test queue, results & verification",
     };
-    const pick = availableRoles
-      .map((r) => ROLE_META[r as keyof typeof ROLE_META])
-      .find((m) => m && m.category !== 'patient' && m.category !== 'admin' && m.category !== 'institution');
-    if (!pick) return { title: "Healthcare Provider Workspace", subtitle: "Practice management, patient queue & telehealth" };
+    const pickEntry = availableRoles
+      .map((r) => [r, ROLE_META[r as keyof typeof ROLE_META]] as const)
+      .find(([, m]) => m && m.category !== 'patient' && m.category !== 'admin' && m.category !== 'institution');
+    if (!pickEntry) return {
+      dashboardMeta: { title: "Healthcare Provider Workspace", subtitle: "Practice management, patient queue & telehealth" },
+      professionCode: null as string | null,
+    };
+    const [code, pick] = pickEntry;
     return {
-      title: `${pick.label} Console`,
-      subtitle: subtitleByCategory[pick.category] || "Practice management, patient queue & telehealth",
+      dashboardMeta: {
+        title: `${pick.label} Console`,
+        subtitle: subtitleByCategory[pick.category] || "Practice management, patient queue & telehealth",
+      },
+      professionCode: code as string,
     };
   }, [availableRoles]);
+
+  // Modules chartered for this profession (DB-driven). Live modules open;
+  // planned modules are chartered but not built yet.
+  const [charter, setCharter] = useState<Array<{ module_key: string; module_name: string; description: string | null; status: string }>>([]);
+  useEffect(() => {
+    if (!professionCode) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data } = await supabase
+          .from("provider_module_charter")
+          .select("module_key, module_name, description, status")
+          .eq("provider_type", professionCode)
+          .order("display_order");
+        if (!cancelled && data) setCharter(data as any);
+      } catch {
+        /* charter is progressive enhancement */
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [professionCode]);
+
+  const PROVIDER_MODULE_PATHS: Record<string, string> = {
+    appointments: "/appointments",
+    telehealth: "/video-dashboard",
+    consultations: "/medical-records",
+    prescriptions: "/prescriptions",
+    patients: "/appointments",
+    schedule: "/provider-calendar",
+    dispense: "/pharmacy-portal",
+    test_queue: "/lab-management",
+  };
 
   const { data: todayAppointments = [] } = useQuery({
     queryKey: ["provider-today-appointments"],
@@ -529,6 +571,55 @@ export const ProviderDashboard = () => {
             </button>
           ))}
         </div>
+
+        {/* Modules chartered for this profession (DB-driven).
+            Live modules open; planned modules are chartered but not built yet. */}
+        {charter.length > 0 && (
+          <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
+            <p className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase mb-1">
+              My Practice Modules
+            </p>
+            <p className="text-[11px] text-graphite-400 dark:text-slate-500 mb-3">
+              Chartered for your profession — {charter.filter((m) => m.status === "live").length} live now,{" "}
+              {charter.filter((m) => m.status === "planned").length} coming soon.
+            </p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5">
+              {charter.map((m) => {
+                const isLive = m.status === "live";
+                const path = PROVIDER_MODULE_PATHS[m.module_key];
+                const inner = (
+                  <>
+                    <span className="flex items-center gap-1.5 text-[11px] font-bold text-slate-700 dark:text-slate-300">
+                      {isLive ? (
+                        <CheckCircle2 className="h-3.5 w-3.5 text-success-500 shrink-0" />
+                      ) : (
+                        <Hourglass className="h-3.5 w-3.5 text-graphite-400 shrink-0" />
+                      )}
+                      <span className="truncate">{m.module_name}</span>
+                    </span>
+                    <span className={`text-[9px] font-extrabold uppercase tracking-wide ${isLive ? "text-success-500" : "text-graphite-400"}`}>
+                      {isLive ? "Live" : "Coming soon"}
+                    </span>
+                  </>
+                );
+                const cls =
+                  "flex items-center justify-between gap-2 p-2.5 rounded-xl border text-left transition-all " +
+                  (isLive
+                    ? "border-canvas-silk dark:border-slate-700 hover:border-primary-500 hover:bg-primary-100 dark:hover:bg-slate-800"
+                    : "border-canvas-silk dark:border-slate-800 bg-canvas-mist/50 dark:bg-slate-800/40 opacity-80");
+                return isLive && path ? (
+                  <button key={m.module_key} onClick={() => navigate(path)} className={cls} title={m.description || m.module_name}>
+                    {inner}
+                  </button>
+                ) : (
+                  <div key={m.module_key} className={cls} title={m.description ? `${m.description} — planned` : "Planned module"}>
+                    {inner}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Today's queue */}
         <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs overflow-hidden">
