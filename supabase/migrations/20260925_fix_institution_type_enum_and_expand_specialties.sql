@@ -49,7 +49,8 @@ INSERT INTO public.clinic_specialty_catalog (name, description, icon_name) VALUE
   ('Critical Care', 'Intensive care medicine', 'HeartPulse'),
   ('Fertility & Reproductive Medicine', 'IVF and fertility treatment', 'Heart'),
   ('Wound Care', 'Chronic and complex wound management', 'Bandage'),
-  ('Occupational Medicine', 'Workplace health and injury care', 'Briefcase')
+  ('Occupational Medicine', 'Workplace health and injury care', 'Briefcase'),
+  ('Pharmacy Services', 'Retail, hospital and wholesale pharmacy services', 'Pill')
 ON CONFLICT (name) DO NOTHING;
 
 -- ─── 3. Staff roles for the new specialties ────────────────────────────────
@@ -132,5 +133,10 @@ INSERT INTO public.specialty_staff_roles (specialty_id, role_name, description, 
   ((SELECT id FROM clinic_specialty_catalog WHERE name = 'Wound Care'), 'Wound Care Specialist', 'Complex wound physician', true, true),
   ((SELECT id FROM clinic_specialty_catalog WHERE name = 'Wound Care'), 'Wound Care Nurse', 'Wound dressing and management', true, true),
   ((SELECT id FROM clinic_specialty_catalog WHERE name = 'Occupational Medicine'), 'Occupational Physician', 'Workplace health physician', true, true),
-  ((SELECT id FROM clinic_specialty_catalog WHERE name = 'Occupational Medicine'), 'Occupational Health Nurse', 'Workplace health nursing', true, true)
+  ((SELECT id FROM clinic_specialty_catalog WHERE name = 'Occupational Medicine'), 'Occupational Health Nurse', 'Workplace health nursing', true, true),
+  ((SELECT id FROM clinic_specialty_catalog WHERE name = 'Pharmacy Services'), 'Pharmacist', 'Licensed pharmacist', true, true),
+  ((SELECT id FROM clinic_specialty_catalog WHERE name = 'Pharmacy Services'), 'Pharmacy Technologist', 'Dispensing and stock management', true, true),
+  ((SELECT id FROM clinic_specialty_catalog WHERE name = 'Pharmacy Services'), 'Dispenser', 'Medicine dispensing support', true, true),
+  ((SELECT id FROM clinic_specialty_catalog WHERE name = 'Pharmacy Services'), 'Pharmacy Cashier', 'Point-of-sale and billing', false, false),
+  ((SELECT id FROM clinic_specialty_catalog WHERE name = 'Pharmacy Services'), 'Inventory Officer', 'Stock control and ordering', false, false)
 ON CONFLICT (specialty_id, role_name) DO NOTHING;
