@@ -26,15 +26,17 @@ WHERE bf.appointment_id = dup.appointment_id
   AND bf.created_at > dup.first_created;
 
 -- Edge: identical created_at timestamps — keep exactly one by id.
+-- (id is UUID: cast to text so the aggregate is valid on every PG build;
+--  this matches the expression applied to production via the dashboard.)
 DELETE FROM public.booking_fees bf
 USING (
-  SELECT appointment_id, MIN(id) AS first_id
+  SELECT appointment_id, MIN(id::text) AS first_id
   FROM public.booking_fees
   GROUP BY appointment_id
   HAVING COUNT(*) > 1
 ) dup
 WHERE bf.appointment_id = dup.appointment_id
-  AND bf.id <> dup.first_id;
+  AND bf.id::text <> dup.first_id;
 
 -- 2. Enforce: one fee per appointment, structurally.
 DO $$
