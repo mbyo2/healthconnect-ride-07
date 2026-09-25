@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Settings, Save, RotateCcw } from "lucide-react";
+import { useUserRoles } from "@/context/UserRolesContext";
 
 interface CommissionSetting {
   id: string;
@@ -35,6 +36,7 @@ const META: Record<string, { label: string; description: string; payee: string; 
 };
 
 export const CommissionSettings = () => {
+  const { isSuperAdmin } = useUserRoles();
   const [settings, setSettings] = useState<CommissionSetting[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -141,6 +143,7 @@ export const CommissionSettings = () => {
                       value={setting.commission_percentage}
                       onChange={(e) => updateSetting(setting.id, parseFloat(e.target.value) || 0)}
                       className="w-20 text-center"
+                      disabled={!isSuperAdmin}
                     />
                     <span className="text-sm text-muted-foreground">%</span>
                   </div>
@@ -168,14 +171,22 @@ export const CommissionSettings = () => {
         )}
 
         <div className="flex gap-2">
-          <Button onClick={saveSettings} disabled={saving || invalid} className="flex-1">
-            <Save className="h-4 w-4 mr-2" />
-            {saving ? "Saving..." : "Save Settings"}
-          </Button>
-          <Button variant="outline" onClick={resetToDefaults}>
-            <RotateCcw className="h-4 w-4 mr-2" />
-            Reset
-          </Button>
+          {isSuperAdmin ? (
+            <>
+              <Button onClick={saveSettings} disabled={saving || invalid} className="flex-1">
+                <Save className="h-4 w-4 mr-2" />
+                {saving ? "Saving..." : "Save Settings"}
+              </Button>
+              <Button variant="outline" onClick={resetToDefaults}>
+                <RotateCcw className="h-4 w-4 mr-2" />
+                Reset to Defaults
+              </Button>
+            </>
+          ) : (
+            <p className="text-xs text-muted-foreground">
+              Platform fees affect company revenue — only super admins can change them. Contact a super admin if an adjustment is needed.
+            </p>
+          )}
         </div>
       </CardContent>
     </Card>

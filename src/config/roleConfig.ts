@@ -292,6 +292,7 @@ export const PROVIDER_CORE_ROUTES = [
   '/wallet',
   '/emergency',
   '/video-consultations',
+  '/video-dashboard',
   '/video-call/:roomId',
   '/application-status',
   '/healthcare-application',

@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScheduleManager } from "@/components/provider/ScheduleManager";
+import { AvailabilityManager } from "@/components/provider/AvailabilityManager";
 import { DigitalSignature } from "@/components/provider/DigitalSignature";
 import { PatientRecords } from "@/components/provider/PatientRecords";
 import { ProviderAnalyticsDashboard } from "@/components/provider/ProviderAnalyticsDashboard";
@@ -599,6 +600,7 @@ export const ProviderDashboard = () => {
             <TabsList className="inline-flex items-center gap-1 p-1 bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 rounded-xl w-auto min-w-full">
               {[
                 { value: "schedule", label: "Schedule Manager" },
+                { value: "availability", label: "Working Hours" },
                 { value: "patients", label: "Patient Directory" },
                 { value: "waitlist", label: "Waitlist Triage" },
                 { value: "analytics", label: "Analytics" },
@@ -617,6 +619,7 @@ export const ProviderDashboard = () => {
 
           <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
             <TabsContent value="schedule"><ScheduleManager /></TabsContent>
+            <TabsContent value="availability"><AvailabilityManager /></TabsContent>
             <TabsContent value="patients"><PatientRecords /></TabsContent>
             <TabsContent value="waitlist"><WaitlistManager /></TabsContent>
             <TabsContent value="analytics"><ProviderAnalyticsDashboard /></TabsContent>
