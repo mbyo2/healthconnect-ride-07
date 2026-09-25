@@ -99,11 +99,11 @@ export const InstitutionApplications = () => {
 
       const applicantIds = (data as any[] || []).map(a => a.applicant_id);
 
-      const [{ data: profiles }, { data: institutions }] = await Promise.all([
+      const [{ data: profiles, error: profilesError }, { data: institutions }] = await Promise.all([
         applicantIds.length
           ? supabase
               .from("profiles")
-              .select("id, first_name, last_name, email, country")
+              .select("id, first_name, last_name, email")
               .in("id", applicantIds)
           : Promise.resolve({ data: [] as any[] }),
         applicantIds.length
@@ -119,6 +119,9 @@ export const InstitutionApplications = () => {
               .in("admin_id", applicantIds)
           : Promise.resolve({ data: [] as any[] }),
       ]);
+
+      // Surface profile-fetch errors instead of silently rendering blank applicants
+      if (profilesError) throw profilesError;
 
       const merged = (data as any[] || []).map(a => ({
         ...a,

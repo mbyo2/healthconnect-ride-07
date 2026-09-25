@@ -38,20 +38,36 @@ const SuperAdminDashboard = () => {
   const fetchAdmins = async () => {
     try {
       setIsLoading(true);
-      const { data, error } = await supabase
+      // NOTE: user_roles has no FK to profiles (it references auth.users), so an
+      // embedded profiles(...) join 400s. Fetch roles then profiles separately.
+      const { data: roleRows, error: rolesError } = await supabase
         .from("user_roles")
-        .select("user_id, role, profiles(id, email, first_name, last_name, created_at)")
-        .in("role", ["admin", "super_admin"])
-        .order("profiles(created_at)", { ascending: false });
-      if (error) throw error;
-      const formattedAdmins = (data || []).map((item: any) => ({
-        id: item.user_id,
-        email: item.profiles?.email,
-        first_name: item.profiles?.first_name,
-        last_name: item.profiles?.last_name,
-        admin_level: item.role === "super_admin" ? "superadmin" : "admin",
-        created_at: item.profiles?.created_at,
-      }));
+        .select("user_id, role")
+        .in("role", ["admin", "super_admin"]);
+      if (rolesError) throw rolesError;
+      const adminIds = (roleRows || []).map((r: any) => r.user_id);
+      const { data: profileRows, error: profilesError } = adminIds.length
+        ? await supabase
+            .from("profiles")
+            .select("id, email, first_name, last_name, created_at")
+            .in("id", adminIds)
+        : { data: [] as any[], error: null };
+      if (profilesError) throw profilesError;
+      const formattedAdmins = (roleRows || []).map((item: any) => {
+        const p = (profileRows || []).find((x: any) => x.id === item.user_id);
+        return {
+          id: item.user_id,
+          email: p?.email,
+          first_name: p?.first_name,
+          last_name: p?.last_name,
+          admin_level: item.role === "super_admin" ? "superadmin" : "admin",
+          created_at: p?.created_at,
+        };
+      });
+      // Newest admins first (client-side; embedded order-by is unavailable)
+      formattedAdmins.sort((a: any, b: any) =>
+        new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
+      );
       setAdmins(formattedAdmins as any);
     } catch (error) {
       toast.error("Failed to load admin users");

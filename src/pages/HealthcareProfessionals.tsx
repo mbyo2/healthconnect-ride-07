@@ -54,7 +54,7 @@ const HealthcareProfessionals = () => {
   const fetchSpecialties = async () => {
     try {
       const { data, error } = await supabase
-        .from('profiles')
+        .from('provider_directory')
         .select('specialty')
         .in('role', PROVIDER_ROLES as any)
         .not('specialty', 'is', null);
@@ -74,7 +74,7 @@ const HealthcareProfessionals = () => {
     try {
       // Query profiles table which has all the new provider enhancement columns
       const { data, error } = await supabase
-        .from('profiles')
+        .from('provider_directory')
         .select(`
           id,
           first_name,

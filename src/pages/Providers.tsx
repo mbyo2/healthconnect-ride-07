@@ -190,9 +190,9 @@ const Providers = () => {
       const PROVIDER_ROLES = ALL_CLINICIAN_ROLES;
 
       let profQuery = supabase
-        .from('profiles')
+        .from('provider_directory')
         .select(
-          'id, first_name, last_name, specialty, subspecialties, bio, avatar_url, ' +
+          'id, first_name, last_name, specialty, subspecialties, avatar_url, ' +
           'years_experience, rating, primary_practice_location, ' +
           'consultation_fee_min, consultation_fee_max, ' +
           'telemedicine_available, home_visits_available, medical_school, role',

@@ -83,11 +83,11 @@ export const ProviderApplications = () => {
       if (error) throw error;
 
       const userIds = (data || []).map((a: any) => a.user_id);
-      const { data: profiles } = userIds.length
+      const profilesRes = userIds.length
         ? await supabase
             .from("profiles")
             .select(
-              "id, first_name, last_name, email, phone, country, provider_type, role, " +
+              "id, first_name, last_name, email, phone, provider_type, role, " +
               "medical_school, graduation_year, board_certifications, subspecialties, " +
               "primary_practice_location, affiliated_hospitals, " +
               "consultation_fee_min, consultation_fee_max, accepts_insurance, " +
@@ -95,7 +95,10 @@ export const ProviderApplications = () => {
               "languages_spoken, typical_wait_time"
             )
             .in("id", userIds)
-        : { data: [] as any[] };
+        : { data: [] as any[], error: null };
+      // Surface profile-fetch errors instead of silently rendering blank applicants
+      if (profilesRes.error) throw profilesRes.error;
+      const profiles = profilesRes.data;
 
       const merged = (data || []).map((a: any) => ({
         ...a,

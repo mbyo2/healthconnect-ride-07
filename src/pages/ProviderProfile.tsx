@@ -28,14 +28,13 @@ const ProviderProfile = () => {
       if (!providerId) return null;
 
       const { data, error } = await supabase
-        .from("profiles")
+        .from("provider_directory")
         .select(`
           id,
           first_name,
           last_name,
           specialty,
           subspecialties,
-          bio,
           avatar_url,
           provider_type,
           email,
@@ -58,11 +57,7 @@ const ProviderProfile = () => {
           typical_wait_time,
           appointment_types,
           availability_schedule,
-          role,
-          provider_locations (
-            latitude,
-            longitude
-          )
+          role
         `)
         .eq("id", providerId)
         .maybeSingle();

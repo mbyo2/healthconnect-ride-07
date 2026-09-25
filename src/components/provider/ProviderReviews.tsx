@@ -28,7 +28,7 @@ export const ProviderReviews: React.FC<ProviderReviewsProps> = ({ providerId }) 
           rating,
           comment,
           created_at,
-          reviewer:profiles(first_name, last_name, avatar_url)
+          reviewer:profiles!reviews_reviewer_id_fkey(first_name, last_name, avatar_url)
         `)
         .eq('provider_id', providerId)
         .order('created_at', { ascending: false });

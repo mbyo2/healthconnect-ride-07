@@ -31,16 +31,25 @@ export const PersonnelManagement = ({ institutionId }: { institutionId: string }
 
     const fetchPersonnel = async () => {
         try {
-            const { data, error } = await supabase
+            // NOTE: institution_personnel.user_id references auth.users, not
+            // profiles, so an embedded profile:profiles(...) join 400s.
+            // Fetch personnel then profiles separately and merge client-side.
+            const { data: rows, error } = await supabase
                 .from('institution_personnel' as any)
-                .select(`
-          *,
-          profile:profiles(first_name, last_name, email)
-        `)
+                .select('*')
                 .eq('institution_id', institutionId);
 
             if (error) throw error;
-            setPersonnel(data as any || []);
+            const ids = (rows || []).map((r: any) => r.user_id).filter(Boolean);
+            const { data: profs, error: pErr } = ids.length
+                ? await supabase.from('profiles').select('id, first_name, last_name, email').in('id', ids)
+                : { data: [] as any[], error: null };
+            if (pErr) throw pErr;
+            const merged = (rows || []).map((r: any) => ({
+                ...r,
+                profile: (profs || []).find((p: any) => p.id === r.user_id) || null,
+            }));
+            setPersonnel(merged as any || []);
         } catch (error) {
             console.error("Error fetching personnel:", error);
             toast.error("Failed to load personnel");

@@ -94,11 +94,12 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const fetchProviders = async () => {
     setIsLoading(true);
     try {
+      // Public directory view (verified providers, directory-safe columns).
       // Every clinical cadre, verified only — never a single legacy role.
       let query = supabase
-        .from('profiles' as any)
+        .from('provider_directory' as any)
         .select(`
-          id, first_name, last_name, specialty, bio, provider_type, avatar_url,
+          id, first_name, last_name, specialty, provider_type, avatar_url,
           years_experience, rating, role,
           accepted_insurances,
           medical_school, graduation_year, board_certifications, subspecialties,
@@ -107,8 +108,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           accepts_insurance, insurance_providers_accepted,
           telemedicine_available, home_visits_available,
           languages_spoken, typical_wait_time, appointment_types,
-          availability_schedule,
-          provider_locations ( latitude, longitude )
+          availability_schedule
         `, { count: 'exact' })
         .in('role', ALL_CLINICIAN_ROLES as any)
         .eq('is_verified', true);
@@ -160,7 +160,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         last_name: p.last_name ?? '',
         role: p.role ?? undefined,
         specialty: p.specialty ?? 'General Practice',
-        bio: p.bio ?? '',
+        bio: '',
         provider_type: p.provider_type ?? 'doctor',
         avatar_url: p.avatar_url,
         rating: p.rating,
@@ -184,21 +184,10 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         typical_wait_time: p.typical_wait_time,
         appointment_types: p.appointment_types || [],
         availability_schedule: p.availability_schedule,
-        location: p.provider_locations?.[0]
-          ? {
-              latitude: Number(p.provider_locations[0].latitude),
-              longitude: Number(p.provider_locations[0].longitude),
-            }
-          : null,
-        distance:
-          userLocation && p.provider_locations?.[0]
-            ? calculateDistance(
-                userLocation.latitude,
-                userLocation.longitude,
-                Number(p.provider_locations[0].latitude),
-                Number(p.provider_locations[0].longitude)
-              )
-            : undefined,
+        // Precise coordinates are not published in the public directory yet;
+        // distance-based sorting returns once provider locations are modeled.
+        location: null,
+        distance: undefined,
       }));
 
       setProviders(mappedProviders);
