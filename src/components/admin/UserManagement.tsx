@@ -24,6 +24,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
+import { syncAdminLevel } from '@/lib/adminLevelSync';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -123,6 +124,11 @@ export function UserManagement() {
 
       if (error) throw error;
 
+      // Keep legacy profiles.admin_level in sync (used by older UI/RLS paths)
+      if (selectedRole === 'admin' || selectedRole === 'super_admin') {
+        await syncAdminLevel(selectedUser.id);
+      }
+
       toast.success(`Role "${selectedRole}" assigned successfully`);
       setIsRoleDialogOpen(false);
       fetchUsers();
@@ -143,6 +149,11 @@ export function UserManagement() {
         .eq('role', role);
 
       if (error) throw error;
+
+      // Keep legacy profiles.admin_level in sync (used by older UI/RLS paths)
+      if (role === 'admin' || role === 'super_admin') {
+        await syncAdminLevel(userId);
+      }
 
       toast.success(`Role "${role}" revoked successfully`);
       fetchUsers();

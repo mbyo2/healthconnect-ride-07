@@ -269,6 +269,7 @@ const AppContent = () => {
             {/* marketplace-users and emergency are now public above */}
             <Route path="/map" element={<RouteGuard><Map /></RouteGuard>} />
             <Route path="/marketplace" element={<RouteGuard><Marketplace /></RouteGuard>} />
+            <Route path="/market" element={<RouteGuard><Navigate to="/marketplace" replace /></RouteGuard>} />
             <Route path="/pharmacy-portal" element={<RouteGuard><PharmacyPortal /></RouteGuard>} />
             <Route path="/healthcare-application" element={<RouteGuard><HealthcareApplication /></RouteGuard>} />
             <Route path="/create-admin" element={<RouteGuard requireRoles={["super_admin"]}><CreateAdmin /></RouteGuard>} />

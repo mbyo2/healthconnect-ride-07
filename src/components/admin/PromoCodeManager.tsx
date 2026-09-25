@@ -12,8 +12,11 @@ import { usePromoCodes, useCreatePromoCode, useTogglePromoCode, type PromoCode }
 import { Plus, Ticket, Copy, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { useUserRoles } from "@/context/UserRolesContext";
 
 export const PromoCodeManager = () => {
+  // Promo codes directly reduce revenue — only super admins may create or toggle them.
+  const { isSuperAdmin } = useUserRoles();
   const { data: codes, isLoading } = usePromoCodes();
   const createPromo = useCreatePromoCode();
   const togglePromo = useTogglePromoCode();
@@ -67,6 +70,7 @@ export const PromoCodeManager = () => {
           <CardTitle className="flex items-center gap-2"><Ticket className="h-5 w-5" /> Promo Codes</CardTitle>
           <CardDescription>Create and manage promotional codes</CardDescription>
         </div>
+        {isSuperAdmin ? (
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button size="sm"><Plus className="h-4 w-4 mr-1" /> Create Code</Button>
@@ -155,6 +159,9 @@ export const PromoCodeManager = () => {
             </div>
           </DialogContent>
         </Dialog>
+        ) : (
+          <span className="text-xs text-muted-foreground">Only super admins can create promo codes</span>
+        )}
       </CardHeader>
       <CardContent>
         {isLoading ? (
@@ -192,7 +199,11 @@ export const PromoCodeManager = () => {
                     <TableCell>{c.times_used}{c.max_uses ? `/${c.max_uses}` : '/∞'}</TableCell>
                     <TableCell>{c.valid_until ? format(new Date(c.valid_until), 'MMM d, yyyy') : 'Never'}</TableCell>
                     <TableCell>
-                      <Switch checked={c.is_active} onCheckedChange={(v) => togglePromo.mutate({ id: c.id, is_active: v })} />
+                      <Switch
+                        checked={c.is_active}
+                        disabled={!isSuperAdmin}
+                        onCheckedChange={(v) => togglePromo.mutate({ id: c.id, is_active: v })}
+                      />
                     </TableCell>
                   </TableRow>
                 ))}

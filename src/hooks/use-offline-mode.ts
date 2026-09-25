@@ -193,7 +193,10 @@ export const useOfflineMode = () => {
   };
 
   // Cache data for offline use
-  const cacheForOffline = async (key: string, data: any, expirationMinutes = 60): Promise<boolean> => {
+  // NOTE: wrapped in useCallback with a stable identity — consumers put this
+  // in useEffect dependency arrays, and a new identity per render caused an
+  // infinite reload loop (e.g. pharmacy Rx Fulfillment spinning forever).
+  const cacheForOffline = useCallback(async (key: string, data: any, expirationMinutes = 60): Promise<boolean> => {
     try {
       const db = await openIndexedDB('offlineActionsDB', 1);
       if (!db) {
@@ -216,10 +219,11 @@ export const useOfflineMode = () => {
       console.error('Error caching data for offline use:', error);
       return false;
     }
-  };
+  }, []);
 
   // Get cached data
-  const getOfflineCache = async (key: string): Promise<any | null> => {
+  // NOTE: useCallback for the same stable-identity reason as cacheForOffline.
+  const getOfflineCache = useCallback(async (key: string): Promise<any | null> => {
     try {
       const db = await openIndexedDB('offlineActionsDB', 1);
       if (!db) return null;
@@ -250,7 +254,7 @@ export const useOfflineMode = () => {
       console.error('Error getting cached data:', error);
       return null;
     }
-  };
+  }, []);
 
   // Open the offline database. Return null if IndexedDB is unavailable or blocked (e.g., Safari private mode)
   const openOfflineDB = (): Promise<IDBDatabase | null> => {

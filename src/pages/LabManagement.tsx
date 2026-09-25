@@ -5,7 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useInstitutionContext } from "@/hooks/useInstitutionContext";
 import { useCurrency } from "@/hooks/use-currency";
 import {
-  FlaskConical, Search, Plus, Clock, CheckCircle2, AlertCircle, FileText, Microscope, Loader2
+  FlaskConical, Search, Plus, Clock, CheckCircle2, AlertCircle, FileText, Microscope, Loader2, Pencil, Trash2
 } from "lucide-react";
 import { LabRequest, LabTestStatus } from "@/types/lab";
 import { toast } from "sonner";
@@ -32,6 +32,76 @@ const LabManagement = () => {
   const [selectedVerification, setSelectedVerification] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<"requests" | "results" | "catalog">("requests");
   const queryClient = useQueryClient();
+
+  // ── Diagnostic catalog management (lab manager workflow) ──
+  const [showTestDialog, setShowTestDialog] = useState(false);
+  const [editingTest, setEditingTest] = useState<any | null>(null);
+  const [testForm, setTestForm] = useState({ name: "", category: "Hematology", description: "", price: "" });
+  const [savingTest, setSavingTest] = useState(false);
+
+  const openNewTestDialog = () => {
+    setEditingTest(null);
+    setTestForm({ name: "", category: "Hematology", description: "", price: "" });
+    setShowTestDialog(true);
+  };
+
+  const openEditTestDialog = (test: any) => {
+    setEditingTest(test);
+    setTestForm({
+      name: test.name || "",
+      category: test.category || "Hematology",
+      description: test.description || "",
+      price: test.price != null ? String(test.price) : "",
+    });
+    setShowTestDialog(true);
+  };
+
+  const saveTest = async () => {
+    if (!testForm.name.trim()) {
+      toast.error("Enter the test name");
+      return;
+    }
+    const price = parseFloat(testForm.price);
+    if (isNaN(price) || price < 0) {
+      toast.error("Enter a valid price in ZMW");
+      return;
+    }
+    setSavingTest(true);
+    try {
+      const payload = {
+        name: testForm.name.trim(),
+        category: testForm.category,
+        description: testForm.description.trim() || null,
+        price,
+      };
+      let error;
+      if (editingTest?.id) {
+        ({ error } = await (supabase as any).from("lab_test_catalog").update(payload).eq("id", editingTest.id));
+      } else {
+        ({ error } = await (supabase as any).from("lab_test_catalog").insert(payload));
+      }
+      if (error) throw error;
+      toast.success(editingTest ? "Test updated" : "Test added to catalog");
+      setShowTestDialog(false);
+      queryClient.invalidateQueries({ queryKey: ["lab-test-catalog"] });
+    } catch (e: any) {
+      toast.error(e.message || "Failed to save test");
+    } finally {
+      setSavingTest(false);
+    }
+  };
+
+  const deleteTest = async (test: any) => {
+    if (!window.confirm(`Remove "${test.name}" from the catalog?`)) return;
+    try {
+      const { error } = await (supabase as any).from("lab_test_catalog").delete().eq("id", test.id);
+      if (error) throw error;
+      toast.success("Test removed from catalog");
+      queryClient.invalidateQueries({ queryKey: ["lab-test-catalog"] });
+    } catch (e: any) {
+      toast.error(e.message || "Failed to remove test");
+    }
+  };
 
   const { data: requests } = useQuery({
     queryKey: ["lab-requests"],
@@ -521,22 +591,120 @@ const LabManagement = () => {
         {/* Catalog Tab */}
         {activeTab === "catalog" && (
           <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
-            <h2 className="font-extrabold text-sm mb-4 flex items-center gap-2">
-              <Microscope className="h-4 w-4 text-purple-500" /> Diagnostic Test Catalog
-            </h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-extrabold text-sm flex items-center gap-2">
+                <Microscope className="h-4 w-4 text-purple-500" /> Diagnostic Test Catalog
+              </h2>
+              <button
+                onClick={openNewTestDialog}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary-500 hover:bg-primary-600 text-white text-xs font-bold transition-colors"
+              >
+                <Plus className="h-3.5 w-3.5" /> Add Test
+              </button>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {testCatalog.map((test) => (
-                <div key={test.code} className="p-3.5 rounded-xl border border-canvas-silk bg-canvas flex justify-between items-center">
-                  <div>
+                <div key={test.id || test.code} className="p-3.5 rounded-xl border border-canvas-silk bg-canvas flex justify-between items-center gap-2">
+                  <div className="min-w-0">
                     <h4 className="font-extrabold text-xs text-slate-900">{test.name}</h4>
-                    <p className="text-[10px] text-graphite-500 dark:text-slate-400">{test.code} • {test.category}</p>
+                    <p className="text-[10px] text-graphite-500 dark:text-slate-400">{test.category}{test.description ? ` • ${test.description}` : ""}</p>
                   </div>
-                  <span className="font-black text-sm font-mono text-primary-500">{formatPrice(test.price)}</span>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <span className="font-black text-sm font-mono text-primary-500 mr-1">{formatPrice(test.price)}</span>
+                    <button
+                      onClick={() => openEditTestDialog(test)}
+                      title="Edit test"
+                      className="p-1.5 rounded-lg hover:bg-white text-slate-500 hover:text-primary-600 transition-colors"
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                    </button>
+                    <button
+                      onClick={() => deleteTest(test)}
+                      title="Remove test"
+                      className="p-1.5 rounded-lg hover:bg-white text-slate-500 hover:text-rose-600 transition-colors"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
+            {testCatalog.length === 0 && (
+              <p className="text-center text-xs text-slate-400 py-8">No tests in the catalog yet. Add your first test to start receiving orders.</p>
+            )}
           </div>
         )}
+
+        {/* Add / Edit Test Dialog */}
+        <Dialog open={showTestDialog} onOpenChange={setShowTestDialog}>
+          <DialogContent className="sm:max-w-[440px] bg-white border border-canvas-silk dark:border-slate-800">
+            <DialogHeader>
+              <DialogTitle className="font-extrabold text-base">{editingTest ? "Edit Test" : "Add Test to Catalog"}</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-3 py-2">
+              <div>
+                <label className="text-xs font-bold text-slate-600">Test name *</label>
+                <input
+                  value={testForm.name}
+                  onChange={(e) => setTestForm({ ...testForm, name: e.target.value })}
+                  placeholder="e.g. Full Blood Count"
+                  className="mt-1 w-full rounded-lg border border-canvas-silk px-3 py-2 text-sm outline-none focus:border-primary-500"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-slate-600">Category</label>
+                <Select value={testForm.category} onValueChange={(v) => setTestForm({ ...testForm, category: v })}>
+                  <SelectTrigger className="mt-1 w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {["Hematology", "Biochemistry", "Microbiology", "Immunology", "Pathology", "Radiology", "Cardiology", "Other"].map((c) => (
+                      <SelectItem key={c} value={c}>{c}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-xs font-bold text-slate-600">Price (ZMW) *</label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={testForm.price}
+                  onChange={(e) => setTestForm({ ...testForm, price: e.target.value })}
+                  placeholder="e.g. 150"
+                  className="mt-1 w-full rounded-lg border border-canvas-silk px-3 py-2 text-sm outline-none focus:border-primary-500"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-slate-600">Description</label>
+                <textarea
+                  value={testForm.description}
+                  onChange={(e) => setTestForm({ ...testForm, description: e.target.value })}
+                  placeholder="Short description for patients and ordering clinicians"
+                  rows={2}
+                  className="mt-1 w-full rounded-lg border border-canvas-silk px-3 py-2 text-sm outline-none focus:border-primary-500"
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <button
+                onClick={() => setShowTestDialog(false)}
+                className="px-4 py-2 rounded-lg border border-canvas-silk text-xs font-bold text-slate-600 hover:bg-canvas"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={saveTest}
+                disabled={savingTest}
+                className="px-4 py-2 rounded-lg bg-primary-500 hover:bg-primary-600 text-white text-xs font-bold disabled:opacity-50 inline-flex items-center gap-1.5"
+              >
+                {savingTest && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                {editingTest ? "Save Changes" : "Add Test"}
+              </button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

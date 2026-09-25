@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Search, UserPlus, UserMinus, Shield, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { USER_ROLES, ROLE_META, type UserRole } from '@/config/roleConfig';
+import { syncAdminLevel } from '@/lib/adminLevelSync';
 
 type AppRole = UserRole;
 
@@ -111,6 +112,11 @@ export const RoleManagement: React.FC = () => {
 
       if (error) throw error;
 
+      // Keep legacy profiles.admin_level in sync (used by older UI/RLS paths)
+      if (role === 'admin' || role === 'super_admin') {
+        await syncAdminLevel(userId);
+      }
+
       toast({
         title: 'Success',
         description: `Role ${role} assigned successfully`
@@ -135,6 +141,11 @@ export const RoleManagement: React.FC = () => {
         .eq('role', role);
 
       if (error) throw error;
+
+      // Keep legacy profiles.admin_level in sync (used by older UI/RLS paths)
+      if (role === 'admin' || role === 'super_admin') {
+        await syncAdminLevel(userId);
+      }
 
       toast({
         title: 'Success',
