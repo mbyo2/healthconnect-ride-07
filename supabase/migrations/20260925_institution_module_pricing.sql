@@ -51,7 +51,7 @@ USING (true);
 -- to work through. Prices start NULL (unset) — nothing is sold until the
 -- superadmin sets a price.
 INSERT INTO public.institution_module_pricing (module_key, module_name, price_monthly, is_billable)
-SELECT DISTINCT module_key, MIN(module_name), NULL, true
+SELECT DISTINCT module_key, MIN(module_name), NULL::NUMERIC(12,2), true
 FROM public.facility_module_charter
 GROUP BY module_key
 ON CONFLICT (module_key) DO UPDATE SET
