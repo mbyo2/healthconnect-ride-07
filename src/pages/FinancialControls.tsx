@@ -230,17 +230,17 @@ export const FinancialControls = () => {
     <div className="min-h-screen bg-canvas dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pb-16">
       {/* Header */}
       <div className="bg-white dark:bg-slate-900 border-b border-canvas-silk dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
-        <div className="max-w-[1600px] mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-xs">
+        <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-xs shrink-0">
               <ShieldCheck className="h-5 w-5" />
             </div>
-            <div>
-              <h1 className="text-xl font-extrabold">Financial Controls</h1>
-              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">Revenue Leak Prevention & Audit Management</p>
+            <div className="min-w-0">
+              <h1 className="text-xl font-extrabold truncate">Financial Controls</h1>
+              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium truncate">Revenue Leak Prevention & Audit Management</p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             <Dialog open={showSettingsDialog} onOpenChange={setShowSettingsDialog}>
               <DialogTrigger asChild>
                 <Button className="bg-primary-500 hover:bg-primary-600 text-white font-bold text-xs flex items-center gap-2">

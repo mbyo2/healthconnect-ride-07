@@ -30,12 +30,15 @@ export function DesktopNavMenu({ secondaryNavItems }: DesktopNavMenuProps) {
   useEffect(() => { setOpen(false); }, [location.pathname]);
   
   const isActiveSecondaryPage = secondaryNavItems.some(item => location.pathname === item.to);
-  
+
+  // Nothing to show: never render an empty "More" button.
+  if (secondaryNavItems.length === 0) return null;
+
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
         <button
-          className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+          className={`flex items-center gap-2 shrink-0 whitespace-nowrap px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
             isActiveSecondaryPage
               ? "bg-primary/10 text-primary"
               : "text-muted-foreground hover:text-foreground hover:bg-accent"
@@ -45,7 +48,7 @@ export function DesktopNavMenu({ secondaryNavItems }: DesktopNavMenuProps) {
           More
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-60 max-h-[70vh] overflow-y-auto">
+      <DropdownMenuContent sideOffset={8} className="w-60 max-h-[70vh] overflow-y-auto z-[60]">
         <DropdownMenuLabel className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Quick Access</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {secondaryNavItems.map((item, index) => (

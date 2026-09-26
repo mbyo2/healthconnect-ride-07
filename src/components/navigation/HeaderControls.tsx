@@ -100,13 +100,13 @@ export const HeaderControls = ({ isMenuOpen, setIsMenuOpen, navigate }: HeaderCo
   }, [availableRoles, isHealthPersonnel, isAdmin]);
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2 shrink-0">
       {/* Auth buttons/dropdown for desktop */}
-      <div className="hidden md:flex items-center gap-2">
+      <div className="hidden md:flex items-center gap-2 shrink-0">
         {isAuthenticated ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="rounded-full h-8 w-8 p-0">
+              <Button variant="ghost" size="sm" className="rounded-full h-8 w-8 p-0 shrink-0">
                 <Avatar className="h-8 w-8">
                   <AvatarImage src={profile?.avatar_url || ''} />
                   <AvatarFallback>
@@ -133,10 +133,10 @@ export const HeaderControls = ({ isMenuOpen, setIsMenuOpen, navigate }: HeaderCo
           </DropdownMenu>
         ) : (
           <>
-            <Button variant="outline" size="sm" asChild>
+            <Button variant="outline" size="sm" asChild className="whitespace-nowrap shrink-0">
               <Link to="/auth">Sign In</Link>
             </Button>
-            <Button size="sm" asChild>
+            <Button size="sm" asChild className="whitespace-nowrap shrink-0">
               <Link to="/auth?tab=signup">Sign Up</Link>
             </Button>
           </>

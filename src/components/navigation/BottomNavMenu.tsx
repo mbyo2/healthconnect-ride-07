@@ -38,20 +38,20 @@ export function BottomNavMenu({ user, menuItems }: BottomNavMenuProps) {
     <Sheet>
       <SheetTrigger asChild>
         <button
-          className="relative flex flex-1 flex-col items-center justify-center py-1.5 px-2 rounded-2xl min-h-[50px] text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 touch-manipulation group"
+          className="relative flex flex-1 min-w-0 flex-col items-center justify-center py-1.5 px-2 rounded-2xl min-h-[50px] text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 touch-manipulation group"
           {...touchFeedbackProps}
           aria-label="More options"
         >
           <div className="p-2 rounded-full transition-all duration-200 flex items-center justify-center group-hover:bg-slate-100 dark:group-hover:bg-slate-800">
             <Menu className="h-5 w-5" />
           </div>
-          <span className="text-[10px] font-black leading-none tracking-tight mt-0.5">More</span>
+          <span className="hidden min-[400px]:block text-[10px] font-black leading-none tracking-tight mt-0.5">More</span>
         </button>
       </SheetTrigger>
 
       <SheetContent
         side="right"
-        className="w-[82vw] max-w-sm bg-white dark:bg-slate-900 border-l border-canvas-silk dark:border-slate-800 flex flex-col h-full p-0"
+        className="w-[82vw] max-w-sm max-h-[100dvh] bg-white dark:bg-slate-900 border-l border-canvas-silk dark:border-slate-800 flex flex-col h-full p-0"
       >
         <SheetHeader className="pb-0 flex-shrink-0 px-5 pt-6">
           <SheetTitle className="text-xl font-black text-slate-900 dark:text-slate-100 tracking-tight">Menu</SheetTitle>
@@ -73,8 +73,16 @@ export function BottomNavMenu({ user, menuItems }: BottomNavMenuProps) {
           )}
         </SheetHeader>
 
-        <ScrollArea className="flex-1 px-5 mt-4">
+        {/* min-h-0 is required: without it this flex-1 child can't shrink on
+            short viewports, internal scrolling breaks and items below the
+            fold become unreachable. */}
+        <ScrollArea className="flex-1 min-h-0 px-5 mt-4">
           <div className="space-y-1 pb-8">
+            {menuItems.length === 0 && (
+              <p className="text-sm text-slate-400 dark:text-slate-500 font-medium px-1 py-6 text-center">
+                No additional menu items available for your role.
+              </p>
+            )}
             {menuItems.map((item, idx) => (
               <SheetClose key={idx} asChild>
                 <Link

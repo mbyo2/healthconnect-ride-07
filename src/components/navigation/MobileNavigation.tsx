@@ -153,8 +153,11 @@ export const MobileNavigation = ({ setIsMenuOpen, navigate }: MobileNavigationPr
   }, [isAuthenticated, isHealthPersonnel, isAdmin, availableRoles, isInstitutionAffiliated]);
 
   return (
-    <div className="absolute top-16 left-0 right-0 bg-background/95 backdrop-blur-md border-b shadow-lg animate-in slide-in-from-top duration-300 md:hidden z-50">
-      <nav className="container mx-auto px-4 py-3 space-y-1 max-h-[calc(100vh-4rem)] overflow-y-auto">
+    {/* top-full (not a hardcoded top-16): the header height varies with its
+        content (logo / role switcher), so a fixed 64px offset either overlaps
+        the header or leaves a gap. inset-x-0 keeps full-width alignment. */}
+    <div className="absolute top-full inset-x-0 bg-background/95 backdrop-blur-md border-b shadow-lg animate-in slide-in-from-top duration-300 md:hidden z-50">
+      <nav className="container mx-auto px-4 py-3 space-y-1 max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain">
         {isAuthenticated && (
           <div className="border-b pb-3 mb-2">
             <div className="font-medium text-foreground">
@@ -170,7 +173,7 @@ export const MobileNavigation = ({ setIsMenuOpen, navigate }: MobileNavigationPr
           <Button
             key={item.to}
             variant="ghost"
-            className="w-full justify-start text-foreground hover:text-primary hover:bg-accent/50 transition-colors"
+            className="w-full justify-start min-h-[44px] h-auto py-2.5 text-foreground hover:text-primary hover:bg-accent/50 transition-colors"
             onClick={() => navigateTo(item.to)}
           >
             {item.icon}
@@ -182,7 +185,7 @@ export const MobileNavigation = ({ setIsMenuOpen, navigate }: MobileNavigationPr
           <div className="border-t pt-3 mt-3 space-y-1">
             <Button
               variant="ghost"
-              className="w-full justify-start text-foreground hover:text-primary hover:bg-accent/50 transition-colors"
+              className="w-full justify-start min-h-[44px] h-auto py-2.5 text-foreground hover:text-primary hover:bg-accent/50 transition-colors"
               onClick={() => navigateTo("/profile")}
             >
               <User className="mr-2 h-5 w-5" />
@@ -190,7 +193,7 @@ export const MobileNavigation = ({ setIsMenuOpen, navigate }: MobileNavigationPr
             </Button>
             <Button
               variant="ghost"
-              className="w-full justify-start text-foreground hover:text-primary hover:bg-accent/50 transition-colors"
+              className="w-full justify-start min-h-[44px] h-auto py-2.5 text-foreground hover:text-primary hover:bg-accent/50 transition-colors"
               onClick={() => navigateTo("/settings")}
             >
               <Settings className="mr-2 h-5 w-5" />
@@ -198,7 +201,7 @@ export const MobileNavigation = ({ setIsMenuOpen, navigate }: MobileNavigationPr
             </Button>
             <Button
               variant="ghost"
-              className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10 transition-colors"
+              className="w-full justify-start min-h-[44px] h-auto py-2.5 text-destructive hover:text-destructive hover:bg-destructive/10 transition-colors"
               onClick={handleLogout}
             >
               Sign Out
@@ -210,14 +213,14 @@ export const MobileNavigation = ({ setIsMenuOpen, navigate }: MobileNavigationPr
           <div className="border-t pt-3 mt-3 space-y-1">
             <Button
               variant="ghost"
-              className="w-full justify-start text-foreground hover:text-primary hover:bg-accent/50 transition-colors"
+              className="w-full justify-start min-h-[44px] h-auto py-2.5 text-foreground hover:text-primary hover:bg-accent/50 transition-colors"
               onClick={() => navigateTo("/auth")}
             >
               Sign In
             </Button>
             <Button
               variant="ghost"
-              className="w-full justify-start text-foreground hover:text-primary hover:bg-accent/50 transition-colors"
+              className="w-full justify-start min-h-[44px] h-auto py-2.5 text-foreground hover:text-primary hover:bg-accent/50 transition-colors"
               onClick={() => navigateTo("/auth?tab=signup")}
             >
               Sign Up

@@ -22,7 +22,9 @@ export function BottomNavItem({ to, label, icon, active, description }: BottomNa
       to={to}
       aria-current={active ? "page" : undefined}
       className={cn(
-        "relative flex flex-1 flex-col items-center justify-center py-1.5 px-2 rounded-pill transition-all min-h-[50px] touch-manipulation group",
+        // min-w-0 lets flex-1 items shrink at 360px instead of pushing
+        // siblings (incl. the More trigger) off-screen.
+        "relative flex flex-1 min-w-0 flex-col items-center justify-center py-1.5 px-2 rounded-pill transition-all min-h-[50px] touch-manipulation group",
         active
           ? "text-primary-500"
           : "text-graphite-500 hover:text-midnight dark:text-slate-400 dark:hover:text-slate-100"
@@ -41,8 +43,11 @@ export function BottomNavItem({ to, label, icon, active, description }: BottomNa
       {active && (
         <span className="w-1 h-1 rounded-full bg-primary-500 mt-0.5 animate-in fade-in zoom-in" />
       )}
+      {/* Icon-only below 400px: long labels (e.g. "Appointments") can't fit a
+          ~62px slot at 360px and would truncate to unreadable. The full label
+          stays on aria-label for screen readers. */}
       <span className={cn(
-        "text-[10px] font-medium leading-none tracking-wide mt-0.5",
+        "hidden min-[400px]:block max-w-full truncate text-[10px] font-medium leading-none tracking-wide mt-0.5",
         active ? "text-primary-500" : "text-graphite-500 dark:text-slate-400"
       )}>
         {label}

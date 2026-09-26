@@ -4,7 +4,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { useUserRoles } from "@/context/UserRolesContext";
 import { useInstitutionAffiliation } from "@/hooks/useInstitutionAffiliation";
-import { useMemo } from "react";
+import { useMemo, useRef, useState, useEffect } from "react";
 import { 
   Home, Search, Calendar, MessageSquare, Settings, Heart, Wallet,
   Stethoscope, Package, Pill, Shield, Building2, Activity, Brain,
@@ -13,11 +13,43 @@ import {
   Navigation, Headphones
 } from "lucide-react";
 
+/**
+ * Detects whether a horizontal scroll container has hidden content on its
+ * left/right edges, so edge-fade affordances can show only when scrolling
+ * is actually possible (and disappear when scrolled to an end).
+ */
+function useScrollEdges<T extends HTMLElement>() {
+  const ref = useRef<T | null>(null);
+  const [edges, setEdges] = useState({ left: false, right: false });
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const update = () => {
+      const { scrollLeft, scrollWidth, clientWidth } = el;
+      setEdges({
+        left: scrollLeft > 4,
+        right: scrollLeft + clientWidth < scrollWidth - 4,
+      });
+    };
+    update();
+    el.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    return () => {
+      el.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
+  }, []);
+
+  return { ref, edges };
+}
+
 export const DesktopNavigation = () => {
   const location = useLocation();
   const { isAuthenticated } = useAuth();
   const { availableRoles, isHealthPersonnel, isAdmin, isPatient } = useUserRoles();
   const { isInstitutionAffiliated } = useInstitutionAffiliation();
+  const { ref: navScrollRef, edges: navEdges } = useScrollEdges<HTMLDivElement>();
 
   const navItems = useMemo(() => {
     if (!isAuthenticated) {
@@ -261,21 +293,34 @@ export const DesktopNavigation = () => {
   }, [isAuthenticated, isHealthPersonnel, isAdmin, isPatient, availableRoles, isInstitutionAffiliated]);
 
   return (
-    <div className="hidden md:flex items-center gap-1.5 lg:gap-2 flex-wrap min-w-0">
-      {navItems.map((item, index) => (
-        <Button 
-          key={index} 
-          variant={location.pathname === item.to ? "default" : "ghost"} 
-          asChild
-          size="sm"
-          className="flex items-center text-xs lg:text-sm px-2.5 lg:px-3 py-1.5"
-        >
-          <Link to={item.to}>
-            {item.icon}
-            <span className="truncate">{item.label}</span>
-          </Link>
-        </Button>
-      ))}
+    <div className="relative hidden md:flex min-w-0 max-w-full" role="navigation" aria-label="Main navigation">
+      <div
+        ref={navScrollRef}
+        className="flex items-center gap-1.5 lg:gap-2 min-w-0 max-w-full overflow-x-auto scrollbar-hide scroll-smooth py-1"
+      >
+        {navItems.map((item, index) => (
+          <Button
+            key={index}
+            variant={location.pathname === item.to ? "default" : "ghost"}
+            asChild
+            size="sm"
+            className="flex items-center shrink-0 whitespace-nowrap text-xs lg:text-sm px-2.5 lg:px-3 py-1.5"
+          >
+            <Link to={item.to}>
+              {item.icon}
+              <span className="truncate">{item.label}</span>
+            </Link>
+          </Button>
+        ))}
+      </div>
+
+      {/* Scroll affordances: edge fades appear only while hidden items exist */}
+      {navEdges.left && (
+        <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-background via-background/70 to-transparent" />
+      )}
+      {navEdges.right && (
+        <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-background via-background/70 to-transparent" />
+      )}
     </div>
   );
 };

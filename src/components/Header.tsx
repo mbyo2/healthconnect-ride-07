@@ -55,13 +55,17 @@ export function Header() {
       >
         Skip to main content
       </a>
-      <div className="flex h-16 items-center justify-between px-4">
-        <AppLogo size="sm" className="gap-2 shrink-0" />
+      <div className="flex h-16 items-center justify-between px-3 sm:px-4">
+        {/* Wordmark text hides below 420px so the action cluster never overflows narrow phones */}
+        <AppLogo
+          size="sm"
+          className="gap-1.5 sm:gap-2 shrink-0 [&_span]:hidden min-[420px]:[&_span]:inline"
+        />
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-2 shrink-0">
           {user && (
             <>
-              <Button variant="ghost" size="icon" aria-label="Search doctors and care" className="h-10 w-10 rounded-pill" onClick={() => navigate("/search")}>
+              <Button variant="ghost" size="icon" aria-label="Search doctors and care" className="h-9 w-9 sm:h-10 sm:w-10 rounded-pill shrink-0" onClick={() => navigate("/search")}>
                 <Search className="h-5 w-5" />
               </Button>
               <NotificationBell />
@@ -73,9 +77,9 @@ export function Header() {
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" aria-label={user ? "Account menu" : "Open menu"} className="h-10 w-10 rounded-pill ml-2">
+              <Button variant="ghost" size="icon" aria-label={user ? "Account menu" : "Open menu"} className="h-9 w-9 sm:h-10 sm:w-10 rounded-pill ml-1 sm:ml-2 shrink-0">
                 {user ? (
-                  <Avatar className="h-9 w-9 ring-2 ring-primary-500">
+                  <Avatar className="h-8 w-8 sm:h-9 sm:w-9 ring-2 ring-primary-500">
                     <AvatarImage src={profile?.avatar_url || ""} alt={user?.email || "Avatar"} />
                     <AvatarFallback className="bg-primary-50 text-primary-500 text-xs font-medium">
                       {user?.email?.[0]?.toUpperCase() || "U"}

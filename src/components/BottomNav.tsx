@@ -233,7 +233,9 @@ export function BottomNav() {
       { to: "/symptoms", label: "Symptoms", icon: <HeartPulse className="h-5 w-5" />, active: location.pathname === "/symptoms", description: "Track symptoms and health" },
       { to: "/chat", label: "Chat", icon: <MessageSquare className="h-5 w-5" />, active: location.pathname === "/chat", description: "Chat with providers" },
     ];
-  }, [location.pathname, isHealthPersonnel, isAdmin, availableRoles]);
+  // location.search is a dep: the admin "Apps" active state reads it, and
+  // without it the highlight goes stale when switching dashboard tabs.
+  }, [location.pathname, location.search, isHealthPersonnel, isAdmin, availableRoles]);
 
   const menuItems = useMemo(() => {
     // Support menu

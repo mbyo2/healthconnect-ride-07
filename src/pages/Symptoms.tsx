@@ -109,22 +109,22 @@ const Symptoms = () => {
       {/* Sticky Monday Top Header */}
       <div className="bg-white dark:bg-slate-900 border-b border-canvas-silk dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
         <div className="max-w-[1500px] mx-auto flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-black text-sm shadow-xs">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-black text-sm shadow-xs shrink-0">
               <ClipboardList className="h-5 w-5" />
             </div>
-            <div>
-              <h1 className="text-xl font-extrabold tracking-tight flex items-center gap-2">
-                Patient Symptom Intake & Self-Reporting Matrix
-                <span className="w-2 h-2 rounded-full bg-success-500 animate-ping" />
+            <div className="min-w-0">
+              <h1 className="text-xl font-extrabold tracking-tight flex items-center gap-2 min-w-0">
+                <span className="truncate">Patient Symptom Intake & Self-Reporting Matrix</span>
+                <span className="w-2 h-2 rounded-full bg-success-500 animate-ping shrink-0" />
               </h1>
-              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
+              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium truncate">
                 Log active physical symptoms to feed MedGemma AI diagnostic models and clinician case sheets
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={() => navigate("/ai-diagnostics")}
               className="px-4 py-2 rounded-md bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs transition-all flex items-center gap-1.5"

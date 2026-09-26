@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useUserRoles } from '@/context/UserRolesContext';
 import { getRoleNavigation } from '@/utils/rolePermissions';
+import { ROLE_META } from '@/config/roleConfig';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,10 +21,47 @@ interface RoleBasedMenuProps {
   className?: string;
 }
 
+interface NavItem {
+  path: string;
+  label: string;
+  icon: string;
+}
+
+// getRoleNavigation() can return the same destination more than once for a
+// role (e.g. /pharmacy-management is registered under two pharmacy role
+// entries). Collapse duplicates so one role never sees two identical items
+// pointing at the same destination.
+const dedupeByPath = (items: NavItem[]): NavItem[] => {
+  const seen = new Set<string>();
+  return items.filter((item) => {
+    if (seen.has(item.path)) return false;
+    seen.add(item.path);
+    return true;
+  });
+};
+
+// Roles that exist in the org taxonomy but have no entries in the role
+// navigation map (or any unknown future role) get Profile + Settings instead
+// of an empty menu — the menu must never render nothing.
+const FALLBACK_NAVIGATION: NavItem[] = [
+  { path: '/profile', label: 'Profile', icon: 'User' },
+  { path: '/settings', label: 'Settings', icon: 'Settings' },
+];
+
+const prettifyRole = (role: string) =>
+  role
+    .split('_')
+    .map((w) => (w ? w.charAt(0).toUpperCase() + w.slice(1) : w))
+    .join(' ');
+
 export const RoleBasedMenu: React.FC<RoleBasedMenuProps> = ({ className }) => {
   const { user } = useAuth();
   const { availableRoles, primaryRole } = useUserRoles();
-  const navigation = getRoleNavigation(availableRoles);
+
+  const navigation = useMemo<NavItem[]>(() => {
+    const items = dedupeByPath(getRoleNavigation(availableRoles));
+    return items.length > 0 ? items : FALLBACK_NAVIGATION;
+  }, [availableRoles]);
 
   const getIcon = (iconName: string) => {
     const IconComponent = Icons[iconName as keyof typeof Icons] as React.ComponentType<any>;
@@ -45,6 +83,11 @@ export const RoleBasedMenu: React.FC<RoleBasedMenuProps> = ({ className }) => {
       case 'admin':
         return 'Administrator';
       default:
+        if (role) {
+          const meta = (ROLE_META as Record<string, { label?: string }>)[role];
+          if (meta?.label) return meta.label;
+          return prettifyRole(role);
+        }
         return 'User';
     }
   };
@@ -71,7 +114,9 @@ export const RoleBasedMenu: React.FC<RoleBasedMenuProps> = ({ className }) => {
           <Menu className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-64">
+      {/* max-h + scroll: roles with many items (e.g. super_admin) must not
+          overflow the viewport and clip the bottom items */}
+      <DropdownMenuContent align="end" className="w-64 max-h-[70vh] overflow-y-auto">
         <DropdownMenuLabel>
           <div className="flex flex-col gap-1">
             <span>{getRoleDisplayName(primaryRole)} Menu</span>

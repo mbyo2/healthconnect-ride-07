@@ -157,18 +157,18 @@ export const AppointmentDetails = () => {
     <div className="min-h-screen bg-canvas dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors pb-16">
       {/* Sticky Header */}
       <div className="bg-white dark:bg-slate-900 border-b border-canvas-silk dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-2xs">
-        <div className="max-w-[1400px] mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
+        <div className="max-w-[1400px] mx-auto flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
             <button
               onClick={() => navigate("/appointments")}
               aria-label="Back to appointments"
-              className="p-2 rounded-lg bg-canvas-mist dark:bg-slate-800 hover:bg-primary-50 dark:hover:bg-slate-800 transition-colors"
+              className="p-2 rounded-lg bg-canvas-mist dark:bg-slate-800 hover:bg-primary-50 dark:hover:bg-slate-800 transition-colors shrink-0"
             >
               <ArrowLeft className="h-4 w-4 text-slate-700 dark:text-slate-300" />
             </button>
-            <div>
-              <h1 className="text-xl font-extrabold tracking-tight">Appointment Record #{appointment.id.slice(0, 8)}</h1>
-              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
+            <div className="min-w-0">
+              <h1 className="text-xl font-extrabold tracking-tight truncate">Appointment Record #{appointment.id.slice(0, 8)}</h1>
+              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium truncate">
                 {appointment.patient
                   ? `Patient: ${appointment.patient.first_name} ${appointment.patient.last_name}`
                   : appointment.provider
@@ -178,7 +178,7 @@ export const AppointmentDetails = () => {
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             {appointment.status !== "cancelled" && appointment.status !== "completed" && (
               <button
                 onClick={() => setShowCancelDialog(true)}
