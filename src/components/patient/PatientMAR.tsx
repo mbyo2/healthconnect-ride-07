@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Pill, Loader2, CheckCircle2, Clock, AlertTriangle, XCircle } from 'lucide-react';
 import { format } from 'date-fns';
@@ -39,7 +40,7 @@ const statusVariant: Record<string, 'default' | 'secondary' | 'destructive' | 'o
 
 export default function PatientMAR() {
   const { user } = useAuth();
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['patient-mar', user?.id],
     enabled: !!user?.id,
     queryFn: async () => {
@@ -65,6 +66,11 @@ export default function PatientMAR() {
       <CardContent>
         {isLoading ? (
           <div className="flex justify-center py-6"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
+        ) : isError ? (
+          <div className="text-center py-6 space-y-3">
+            <p className="text-sm text-destructive">We couldn&apos;t load your medication records.</p>
+            <Button variant="outline" className="h-11 min-h-[44px]" onClick={() => refetch()}>Try again</Button>
+          </div>
         ) : !data || data.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center py-6">No medication records yet.</p>
         ) : (

@@ -165,6 +165,10 @@ const Profile = () => {
 
   // — basic save —
   const handleSave = async () => {
+    if (!formData.firstName.trim()) {
+      toast.error("Please enter your first name before saving");
+      return;
+    }
     try {
       const { error } = await supabase
         .from("profiles")
@@ -265,10 +269,11 @@ const Profile = () => {
                 type="button"
                 onClick={() => avatarInputRef.current?.click()}
                 disabled={avatarUploading}
-                className="absolute -bottom-1 -right-1 h-9 w-9 rounded-full bg-primary-500 text-white flex items-center justify-center shadow-button hover:bg-primary-600 transition-transform active:scale-95 disabled:opacity-60"
+                aria-label="Change profile photo"
+                className="absolute -bottom-1 -right-1 h-11 w-11 min-h-[44px] min-w-[44px] rounded-full bg-primary-500 text-white flex items-center justify-center shadow-button hover:bg-primary-600 transition-transform active:scale-95 disabled:opacity-60"
                 title="Change Photo"
               >
-                <Camera className="h-4 w-4" />
+                <Camera className="h-5 w-5" />
               </button>
               <input
                 ref={avatarInputRef}
@@ -283,7 +288,7 @@ const Profile = () => {
             <div className="flex-1 text-center sm:text-left space-y-2">
               <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
                 <h1 className="font-display text-3xl font-medium text-midnight tracking-tight">
-                  {formData.firstName} {formData.lastName || "Account"}
+                  {[formData.firstName, formData.lastName].filter(Boolean).join(" ") || "Your Account"}
                 </h1>
                 <span className="inline-flex items-center gap-1 px-3 py-1 rounded-pill text-xs font-medium bg-success-50 text-success-500 border border-success-100">
                   <ShieldCheck className="h-3.5 w-3.5" />
@@ -354,8 +359,8 @@ const Profile = () => {
                 </div>
               ))}
               <div className="space-y-1.5">
-                <Label className="text-xs font-extrabold text-slate-600 dark:text-slate-400 uppercase">Email Address</Label>
-                <Input value={formData.email} disabled className="h-11 rounded-2xl border-2 border-canvas-silk dark:border-slate-800 bg-canvas-bone dark:bg-slate-950 font-medium text-xs opacity-75" />
+                <Label htmlFor="profile-email" className="text-xs font-extrabold text-slate-600 dark:text-slate-400 uppercase">Email Address</Label>
+                <Input id="profile-email" value={formData.email} disabled className="h-11 rounded-2xl border-2 border-canvas-silk dark:border-slate-800 bg-canvas-bone dark:bg-slate-950 font-medium text-xs opacity-75" />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="phone" className="text-xs font-extrabold text-slate-600 dark:text-slate-400 uppercase">Phone Number</Label>

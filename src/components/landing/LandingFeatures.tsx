@@ -174,7 +174,7 @@ export const CareExperience = () => {
                   </div>
                   <button
                     onClick={() => navigate("/video-dashboard")}
-                    className="px-3.5 py-1.5 rounded-pill text-xs font-medium text-white bg-primary-500 hover:bg-primary-600 shrink-0"
+                    className="px-5 py-3 rounded-pill text-sm font-medium text-white bg-primary-500 hover:bg-primary-600 shrink-0"
                   >
                     Start a visit
                   </button>
@@ -198,7 +198,7 @@ export const Features = () => {
       icon: Stethoscope,
       title: "Book verified doctors & specialists",
       desc: "Browse certified practitioners across 20+ specialties. View hospital credentials, available slots and book in seconds.",
-      metrics: ["Verified Doctors", "Zero Booking Fees", "Instant Confirmations"],
+      metrics: ["Verified Doctors", "Clear Fee Pricing", "Instant Confirmations"],
       badge: "Top Rated",
       preview: (
         <div className="space-y-2.5">

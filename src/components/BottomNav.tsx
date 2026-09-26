@@ -1,5 +1,5 @@
 
-import { Home, Search, Calendar, MessageSquare, Heart, Users, ShoppingCart, Pill, AlertTriangle, User, Wallet, Brain, Shield, Activity, Settings, Building2, Stethoscope, Package, Headphones, Scissors, Droplets, DollarSign, Wrench, Truck, Microscope, BarChart3, ClipboardList, Navigation } from "lucide-react";
+import { Home, Search, Calendar, MessageSquare, Heart, Users, ShoppingCart, Pill, AlertTriangle, User, Wallet, Brain, Shield, Activity, Settings, Building2, Stethoscope, Package, Headphones, Scissors, Droplets, DollarSign, Wrench, Truck, Microscope, BarChart3, ClipboardList, Navigation, HeartPulse } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { useDeviceType } from "@/hooks/use-device-type";
 import { useAuth } from "@/context/AuthContext";
@@ -230,7 +230,7 @@ export function BottomNav() {
     return [
       { to: "/home", label: "Home", icon: <Home className="h-5 w-5" />, active: location.pathname === "/home" || location.pathname === "/", description: "Dashboard and overview" },
       { to: "/search", label: "Find", icon: <Search className="h-5 w-5" />, active: location.pathname === "/search", description: "Find doctors and clinics" },
-      { to: "/symptoms", label: "Symptoms", icon: <Heart className="h-5 w-5" />, active: location.pathname === "/symptoms", description: "Track symptoms and health" },
+      { to: "/symptoms", label: "Symptoms", icon: <HeartPulse className="h-5 w-5" />, active: location.pathname === "/symptoms", description: "Track symptoms and health" },
       { to: "/chat", label: "Chat", icon: <MessageSquare className="h-5 w-5" />, active: location.pathname === "/chat", description: "Chat with providers" },
     ];
   }, [location.pathname, isHealthPersonnel, isAdmin, availableRoles]);

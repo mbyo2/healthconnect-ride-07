@@ -21,8 +21,6 @@ import {
   ArrowRight,
   CheckCircle,
   Stethoscope,
-  Table,
-  Kanban,
   Search,
   Filter,
   ExternalLink,
@@ -35,7 +33,6 @@ import {
 export const AppointmentsPage = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const [viewMode, setViewMode] = useState<"table" | "kanban" | "calendar">("table");
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const { availableRoles } = useUserRoles();
@@ -258,35 +255,8 @@ export const AppointmentsPage = () => {
 
           {/* Views & Filters Bar */}
           <div className="max-w-content mx-auto mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 border-t border-canvas-silk">
-            {/* View Tabs */}
-            <div className="flex items-center gap-1 p-1 rounded-xl bg-canvas-bone border border-canvas-silk">
-              <button
-                onClick={() => setViewMode("table")}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                  viewMode === "table"
-                    ? "bg-primary-500 text-white shadow-button"
-                    : "text-graphite-500 hover:text-midnight hover:bg-white dark:hover:bg-slate-800 dark:hover:text-slate-100"
-                }`}
-              >
-                <Table className="h-3.5 w-3.5" />
-                <span>Main Table</span>
-              </button>
-
-              <button
-                onClick={() => setViewMode("kanban")}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                  viewMode === "kanban"
-                    ? "bg-primary-500 text-white shadow-button"
-                    : "text-graphite-500 hover:text-midnight hover:bg-white dark:hover:bg-slate-800 dark:hover:text-slate-100"
-                }`}
-              >
-                <Kanban className="h-3.5 w-3.5" />
-                <span>Kanban Flow</span>
-              </button>
-            </div>
-
             {/* Filter inputs */}
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <div className="relative min-w-[220px]">
                 <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-slate-400" />
                 <input
@@ -460,7 +430,7 @@ export const AppointmentsPage = () => {
                                   {isVideo && isToday(apptDate) && (
                                     <Link
                                       to={`/video-call/${app.id}`}
-                                      className="px-3 py-1.5 rounded-lg bg-success-500 text-white text-[10px] font-black hover:bg-success-500 transition-all"
+                                      className="px-3 py-1.5 min-h-[40px] rounded-lg bg-success-500 text-white text-[10px] font-black hover:bg-success-500 transition-all inline-flex items-center"
                                     >
                                       JOIN
                                     </Link>
@@ -468,14 +438,14 @@ export const AppointmentsPage = () => {
                                   {isProvider && (
                                     <button
                                       onClick={() => completeAppointment.mutate(app.id)}
-                                      className="px-3 py-1.5 rounded-lg bg-slate-900 text-white text-[10px] font-black hover:bg-black transition-all active:scale-95"
+                                      className="px-3 py-1.5 min-h-[40px] rounded-lg bg-slate-900 text-white text-[10px] font-black hover:bg-black transition-all active:scale-95 inline-flex items-center"
                                     >
                                       DONE
                                     </button>
                                   )}
                                   <button
                                     onClick={() => cancelAppointment.mutate(app.id)}
-                                    className="px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-600 text-[10px] font-black hover:bg-slate-50 transition-all active:scale-95"
+                                    className="px-3 py-1.5 min-h-[40px] rounded-lg bg-white border border-slate-200 text-slate-600 text-[10px] font-black hover:bg-slate-50 transition-all active:scale-95 inline-flex items-center"
                                   >
                                     CANCEL
                                   </button>
@@ -569,14 +539,14 @@ export const AppointmentsPage = () => {
                               </td>
 
                               <td className="py-3 px-3 text-slate-500 truncate max-w-[180px]">
-                                {person?.address || "Lusaka Clinic"}
+                                {person?.address || "To be confirmed"}
                               </td>
 
                               <td className="py-3 px-3 text-center">
                                 {!isProvider && app.provider_id && (
                                   <button
                                     onClick={() => navigate(`/provider/${app.provider_id}`)}
-                                    className="px-3 py-1.5 rounded-xl bg-primary-500 text-white text-[11px] font-black hover:bg-primary-600 transition-all active:scale-95"
+                                    className="px-3 py-1.5 min-h-[40px] rounded-xl bg-primary-500 text-white text-[11px] font-black hover:bg-primary-600 transition-all active:scale-95 inline-flex items-center"
                                   >
                                     Re-Book
                                   </button>

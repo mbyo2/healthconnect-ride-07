@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
@@ -17,6 +18,7 @@ const JOINABLE_STATUSES = ["scheduled", "active"];
 
 export const ConsultationList = ({ onJoinMeeting }: ConsultationListProps) => {
   const isMobile = useMediaQuery('(max-width: 768px)');
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   // Visit going live / cancelled elsewhere reflects here instantly.
@@ -34,7 +36,7 @@ export const ConsultationList = ({ onJoinMeeting }: ConsultationListProps) => {
     };
   }, [queryClient]);
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['video-consultations'],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -89,12 +91,22 @@ export const ConsultationList = ({ onJoinMeeting }: ConsultationListProps) => {
     );
   }
 
+  if (isError) {
+    return (
+      <div className="text-center py-8 space-y-3">
+        <p className="text-muted-foreground">We couldn&apos;t load your video visits. Check your connection and try again.</p>
+        <Button variant="outline" className="h-11 min-h-[44px]" onClick={() => refetch()}>
+          Try again
+        </Button>
+      </div>
+    );
+  }
+
   const consultations = data?.consultations || [];
   const userId = data?.userId;
 
   return (
     <div className="grid gap-4">
-      <h1 className={`font-bold ${isMobile ? 'text-xl mb-2' : 'text-2xl mb-4'}`}>Video Consultations</h1>
 
       {consultations?.map((consultation: any) => {
         const isProviderSide = userId && consultation.provider_id === userId;
@@ -131,7 +143,7 @@ export const ConsultationList = ({ onJoinMeeting }: ConsultationListProps) => {
                 </div>
 
                 <p className={`text-sm capitalize ${isMobile ? 'mt-1' : 'mt-1'}`}>
-                  Status: <span className={`font-medium ${consultation.status === 'in-progress' ? 'text-green-600 dark:text-green-400' : ''}`}>{consultation.status?.replace('-', ' ')}</span>
+                  Status: <span className={`font-medium ${consultation.status === 'in-progress' || consultation.status === 'active' ? 'text-green-600 dark:text-green-400' : ''}`}>{String(consultation.status || '').replace(/-/g, ' ')}</span>
                 </p>
               </div>
 
@@ -151,8 +163,12 @@ export const ConsultationList = ({ onJoinMeeting }: ConsultationListProps) => {
       })}
 
       {(!consultations || consultations.length === 0) && (
-        <div className="text-center text-muted-foreground py-8">
-          No video consultations scheduled
+        <div className="text-center py-8 space-y-3">
+          <p className="text-muted-foreground font-medium">No video consultations scheduled</p>
+          <p className="text-sm text-muted-foreground">Book a video visit with a verified provider to get started.</p>
+          <Button className="h-11 min-h-[44px]" onClick={() => navigate('/search')}>
+            <Video className="h-4 w-4 mr-2" /> Find a provider
+          </Button>
         </div>
       )}
     </div>

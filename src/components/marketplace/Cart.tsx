@@ -29,7 +29,11 @@ export const Cart = ({
       <Card>
         <CardContent className="py-8 text-center">
           <ShoppingCart className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-          <p className="text-muted-foreground">Your cart is empty</p>
+          <p className="text-muted-foreground font-semibold">Your cart is empty</p>
+          <p className="text-sm text-muted-foreground mt-1">
+            Browse the medication catalog and tap "Add to Cart" — your items will
+            appear here, ready for checkout.
+          </p>
         </CardContent>
       </Card>
     );
@@ -64,7 +68,9 @@ export const Cart = ({
               <Button
                 size="sm"
                 variant="outline"
+                aria-label={`Decrease quantity of ${item.product.medication_name}`}
                 onClick={() => onUpdateQuantity(item.product.id, item.quantity - 1)}
+                className="min-h-[44px] min-w-[44px]"
               >
                 <Minus className="h-3 w-3" />
               </Button>
@@ -72,15 +78,18 @@ export const Cart = ({
               <Input
                 type="number"
                 value={item.quantity}
+                aria-label={`Quantity of ${item.product.medication_name}`}
                 onChange={(e) => onUpdateQuantity(item.product.id, parseInt(e.target.value) || 0)}
-                className="w-16 text-center"
+                className="w-16 text-center min-h-[44px]"
                 min="0"
               />
               
               <Button
                 size="sm"
                 variant="outline"
+                aria-label={`Increase quantity of ${item.product.medication_name}`}
                 onClick={() => onUpdateQuantity(item.product.id, item.quantity + 1)}
+                className="min-h-[44px] min-w-[44px]"
               >
                 <Plus className="h-3 w-3" />
               </Button>
@@ -91,8 +100,9 @@ export const Cart = ({
               <Button
                 size="sm"
                 variant="ghost"
+                aria-label={`Remove ${item.product.medication_name} from cart`}
                 onClick={() => onRemoveItem(item.product.id)}
-                className="text-red-600 hover:text-red-700"
+                className="text-red-600 hover:text-red-700 min-h-[44px] min-w-[44px]"
               >
                 <Trash2 className="h-3 w-3" />
               </Button>
@@ -116,7 +126,7 @@ export const Cart = ({
           
           <Button 
             onClick={onCheckout} 
-            className="w-full"
+            className="w-full min-h-[44px]"
             disabled={isLoading}
           >
             {isLoading ? 'Processing...' : 'Proceed to Checkout'}

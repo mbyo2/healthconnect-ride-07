@@ -196,7 +196,7 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen }: Booki
 
   const renderTypeSelection = () => (
     <div className="space-y-6">
-      <Button variant="ghost" size="sm" onClick={() => setStep('visit')} className="mb-2">
+      <Button variant="ghost" onClick={() => setStep('visit')} className="mb-2 h-11">
         <ChevronLeft className="h-4 w-4 mr-1" />
         Back
       </Button>
@@ -285,7 +285,7 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen }: Booki
 
   const renderDateTimeSelection = () => (
     <div className="space-y-6">
-      <Button variant="ghost" size="sm" onClick={() => setStep('type')} className="mb-2">
+      <Button variant="ghost" onClick={() => setStep('type')} className="mb-2 h-11">
         <ChevronLeft className="h-4 w-4 mr-1" />
         Back
       </Button>
@@ -301,7 +301,7 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen }: Booki
             <Button
               variant="outline"
               size="icon"
-              className="h-8 w-8"
+              className="h-11 w-11"
               onClick={handlePrevWeek}
               disabled={isBefore(weekStart, today)}
               aria-label="Previous week"
@@ -311,7 +311,7 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen }: Booki
             <span className="text-sm text-muted-foreground min-w-[120px] text-center">
               {format(weekStart, 'MMM d')} - {format(addDays(weekStart, 6), 'MMM d')}
             </span>
-            <Button variant="outline" size="icon" className="h-8 w-8" onClick={handleNextWeek} aria-label="Next week">
+            <Button variant="outline" size="icon" className="h-11 w-11" onClick={handleNextWeek} aria-label="Next week">
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
@@ -329,7 +329,7 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen }: Booki
                 disabled={isPast}
                 onClick={() => setSelectedDate(day)}
                 className={cn(
-                  "p-2 rounded-xl text-center transition-all",
+                  "p-2 rounded-xl text-center transition-all min-h-[56px] flex flex-col items-center justify-center",
                   isPast && "opacity-40 cursor-not-allowed",
                   isSelected && "bg-primary text-primary-foreground ring-2 ring-primary ring-offset-2",
                   !isSelected && !isPast && "bg-muted hover:bg-primary/10 cursor-pointer",
@@ -390,7 +390,7 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen }: Booki
 
   const renderConfirmation = () => (
     <div className="space-y-6">
-      <Button variant="ghost" size="sm" onClick={() => setStep('datetime')} className="mb-2">
+      <Button variant="ghost" onClick={() => setStep('datetime')} className="mb-2 h-11">
         <ChevronLeft className="h-4 w-4 mr-1" />
         Back
       </Button>

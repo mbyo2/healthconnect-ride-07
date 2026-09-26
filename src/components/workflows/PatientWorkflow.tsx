@@ -93,7 +93,7 @@ export const PatientWorkflow = React.memo(() => {
   // so a `profiles!appointments_provider_id_fkey` join hint is invalid and
   // patient sessions cannot read profiles rows directly. Provider details
   // come from the public provider_directory view instead.
-  const { data: upcomingAppointment } = useQuery({
+  const { data: upcomingAppointment, isError: upcomingError, refetch: refetchUpcoming } = useQuery({
     queryKey: ['patient-next-appointment', user?.id],
     queryFn: async () => {
       if (!user) return null;
@@ -107,10 +107,7 @@ export const PatientWorkflow = React.memo(() => {
         .limit(1)
         .maybeSingle();
 
-      if (error) {
-        console.error('Error fetching next appointment:', error);
-        return null;
-      }
+      if (error) throw error;
       if (!data) return null;
 
       let provider: { first_name?: string | null; last_name?: string | null; specialty?: string | null; avatar_url?: string | null; role?: string | null } | null = null;
@@ -235,7 +232,7 @@ export const PatientWorkflow = React.memo(() => {
                 <p className="text-xs text-slate-500 leading-relaxed mb-4">{step.description}</p>
                 <button
                   onClick={() => handleNavigation(step.route, step.title)}
-                  className={`w-full py-2.5 rounded-xl font-bold text-xs transition-all ${
+                  className={`w-full py-3.5 rounded-xl font-bold text-xs transition-all ${
                     step.completed
                       ? 'bg-canvas-bone dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200'
                       : 'bg-primary-500 text-white hover:bg-primary-600 shadow-sm'
@@ -284,7 +281,7 @@ export const PatientWorkflow = React.memo(() => {
         <div className="flex items-center gap-2">
           <button
             onClick={() => handleNavigation('/notifications', 'Notifications')}
-            className="p-2.5 rounded-2xl bg-canvas-bone dark:bg-slate-800 border border-canvas-silk dark:border-slate-700 hover:border-primary-500/40 text-slate-700 dark:text-slate-300 relative transition-all active:scale-95"
+            className="p-3 rounded-2xl bg-canvas-bone dark:bg-slate-800 border border-canvas-silk dark:border-slate-700 hover:border-primary-500/40 text-slate-700 dark:text-slate-300 relative transition-all active:scale-95"
             aria-label="Notifications"
           >
             <Bell className="h-5 w-5" />
@@ -298,7 +295,7 @@ export const PatientWorkflow = React.memo(() => {
         <div className="p-1 rounded-2xl bg-canvas-mist dark:bg-slate-800/80 border border-canvas-silk dark:border-slate-700 flex w-full max-w-md shadow-xs">
           <button
             onClick={() => setCareMode('online')}
-            className={`flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-black transition-all flex items-center justify-center gap-1.5 ${
+            className={`flex-1 py-3.5 rounded-xl text-xs sm:text-sm font-black transition-all flex items-center justify-center gap-1.5 ${
               careMode === 'online'
                 ? 'bg-white dark:bg-slate-900 text-primary-500 shadow-sm border border-canvas-silk dark:border-slate-700'
                 : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
@@ -309,7 +306,7 @@ export const PatientWorkflow = React.memo(() => {
           </button>
           <button
             onClick={() => setCareMode('offline')}
-            className={`flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-black transition-all flex items-center justify-center gap-1.5 ${
+            className={`flex-1 py-3.5 rounded-xl text-xs sm:text-sm font-black transition-all flex items-center justify-center gap-1.5 ${
               careMode === 'offline'
                 ? 'bg-white dark:bg-slate-900 text-primary-500 shadow-sm border border-canvas-silk dark:border-slate-700'
                 : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
@@ -323,21 +320,26 @@ export const PatientWorkflow = React.memo(() => {
 
       {/* ─── High-Contrast Dark Next Appointment Banner (Black/Navy) ─── */}
       <div
-        onClick={() => handleNavigation('/appointments', 'Appointments')}
+        onClick={() => upcomingError ? refetchUpcoming() : handleNavigation('/appointments', 'Appointments')}
         className="group p-5 sm:p-6 rounded-3xl bg-slate-900 text-white shadow-xl shadow-slate-900/10 border border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 cursor-pointer hover:bg-slate-900 transition-all active:scale-[0.99]"
       >
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="text-xs font-extrabold text-slate-400 uppercase tracking-wider">
-              {upcomingAppointment ? 'Your next appointment' : 'Quick Consultation'}
+              {upcomingError ? 'Appointments unavailable' : upcomingAppointment ? 'Your next appointment' : 'Quick Consultation'}
             </span>
             <span className="w-2 h-2 rounded-full bg-success-600 animate-pulse" />
           </div>
           <div className="text-lg sm:text-xl font-black text-white flex items-center gap-2">
-            {upcomingAppointment ? (
+            {upcomingError ? (
+              <span>Couldn&apos;t load your appointments — tap to retry</span>
+            ) : upcomingAppointment ? (
               <>
                 <span>
-                  {format(new Date(upcomingAppointment.date), 'MMMM d')}, {upcomingAppointment.time}
+                  {(() => {
+                    const d = new Date(upcomingAppointment.date);
+                    return isNaN(d.getTime()) ? 'Date to be confirmed' : format(d, 'MMMM d');
+                  })()}, {upcomingAppointment.time || 'Time TBC'}
                 </span>
                 {upcomingAppointment.provider && (
                   <span className="text-sm font-bold text-slate-300">

@@ -10,7 +10,7 @@ import { useSearch } from "@/context/SearchContext";
 import {
   Home, Calendar, MessageSquare, Users, ShoppingCart, Heart, Settings, User, Brain,
   Shield, Activity, BarChart3, AlertTriangle, Zap, Package, Pill, Stethoscope,
-  Building2, Wallet, ShieldCheck, Calculator, Bell, Clock
+  Building2, Wallet, ShieldCheck, Calculator, Bell, Clock, CalendarCheck
 } from "lucide-react";
 import { DesktopNavMenu } from "@/components/navigation/DesktopNavMenu";
 import { DesktopUserMenu } from "@/components/navigation/DesktopUserMenu";
@@ -142,7 +142,7 @@ export function DesktopNav() {
     return [
       { to: "/home", label: "Home", icon: <Home className="h-4 w-4" />, active: location.pathname === "/" || location.pathname === "/home" },
       { to: "/search", label: "Find Care", icon: <Search className="h-4 w-4" />, active: location.pathname === "/search" },
-      { to: "/appointments", label: "My Care", icon: <Calendar className="h-4 w-4" />, active: location.pathname.includes("appointment") },
+      { to: "/appointments", label: "My Appointments", icon: <CalendarCheck className="h-4 w-4" />, active: location.pathname.includes("appointment") },
       { to: "/chat", label: "Messages", icon: <MessageSquare className="h-4 w-4" />, active: location.pathname === "/chat" },
     ];
   }, [location.pathname, isAuthenticated, isHealthPersonnel, isAdmin, isPatient, availableRoles, isInstitutionAffiliated]);

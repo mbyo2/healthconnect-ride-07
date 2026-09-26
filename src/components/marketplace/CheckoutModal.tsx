@@ -187,10 +187,10 @@ export const CheckoutModal = ({
           </div>
 
           <div className="flex gap-2">
-            <Button type="button" variant="outline" onClick={onClose} className="flex-1">
+            <Button type="button" variant="outline" onClick={onClose} className="flex-1 min-h-[44px]">
               Cancel
             </Button>
-            <Button type="submit" disabled={isLoading || !formData.pharmacy_id} className="flex-1">
+            <Button type="submit" disabled={isLoading || !formData.pharmacy_id} className="flex-1 min-h-[44px]">
               {isLoading ? 'Placing Order...' : `Place Order (K${(safeCart?.total ?? 0).toFixed(2)})`}
             </Button>
           </div>

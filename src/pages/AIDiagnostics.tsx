@@ -52,8 +52,8 @@ const AIDiagnostics = () => {
             </div>
           </div>
 
-          {/* Navigation Tabs */}
-          <div className="max-w-[1500px] mx-auto mt-4 flex items-center gap-2" role="tablist" aria-label="AI diagnostics sections">
+          {/* Navigation Tabs — horizontally scrollable on small screens */}
+          <div className="max-w-[1500px] mx-auto mt-4 flex items-center gap-2 overflow-x-auto whitespace-nowrap pb-1 [-ms-overflow-style:none] [scrollbar-width:thin]" role="tablist" aria-label="AI diagnostics sections">
             {[
               { id: "chat", label: "AI Consultation", icon: <MessageSquare className="h-3.5 w-3.5" /> },
               { id: "documents", label: "Document OCR", icon: <FileText className="h-3.5 w-3.5" /> },
@@ -66,7 +66,7 @@ const AIDiagnostics = () => {
                 role="tab"
                 aria-selected={activeTab === tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-extrabold transition-all ${
+                className={`flex shrink-0 items-center gap-1.5 px-3.5 py-2 min-h-[44px] rounded-xl text-xs font-extrabold transition-all ${
                   activeTab === tab.id
                     ? "bg-primary-500 text-white shadow-xs"
                     : "bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-700 text-graphite-500 dark:text-slate-400 hover:bg-canvas-mist dark:hover:bg-slate-800"
@@ -154,9 +154,13 @@ const AIDiagnostics = () => {
           <div className="rounded-2xl border border-warning-500/30 bg-canvas-bone p-4 flex items-start gap-3 text-xs">
             <AlertCircle className="h-5 w-5 text-warning-500 flex-shrink-0 mt-0.5" />
             <div>
-              <p className="font-extrabold text-slate-900">Clinical Decision Support Disclaimer</p>
+              <p className="font-extrabold text-slate-900 flex items-center gap-1.5">
+                <span aria-hidden="true">⚠️</span> Important safety note
+              </p>
               <p className="text-graphite-500 dark:text-slate-400 mt-0.5 leading-relaxed font-medium">
-                This AI assistant is designed for decision support and informational purposes. It does not replace professional medical judgment, diagnosis, or emergency triage. For life-threatening symptoms, dial emergency services immediately.
+                <strong className="text-slate-900 dark:text-slate-100">If this is an emergency, call 991 or 112 now.</strong>{" "}
+                This AI assistant gives information only — it is not a doctor and cannot diagnose you.
+                Always confirm important health decisions with a qualified clinician.
               </p>
             </div>
           </div>

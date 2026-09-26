@@ -493,11 +493,11 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
                     <Button
                       size="icon"
                       variant="destructive"
-                      className="absolute -top-1 -right-1 h-6 w-6 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="absolute -top-2 -right-2 h-11 w-11 min-h-[44px] min-w-[44px] rounded-full shadow-lg opacity-100 md:opacity-0 md:group-hover:opacity-100 md:focus-visible:opacity-100 transition-opacity"
                       aria-label={`Remove image ${idx + 1}`}
                       onClick={() => removeImage(idx)}
                     >
-                      <X className="h-3 w-3" />
+                      <X className="h-4 w-4" />
                     </Button>
                     <span className="absolute bottom-1 left-1 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded">
                       {idx + 1}
@@ -573,7 +573,7 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
                 disabled={isLoading || (!input.trim() && selectedImages.length === 0)}
                 size="icon"
                 aria-label="Send message"
-                className="absolute right-1 bottom-1 h-10 w-10 rounded-full bg-primary hover:bg-primary/90 disabled:opacity-50"
+                className="absolute right-1 bottom-1 h-11 w-11 min-h-[44px] min-w-[44px] rounded-full bg-primary hover:bg-primary/90 disabled:opacity-50"
               >
                 {isLoading ? (
                   <Loader2 className="h-5 w-5 animate-spin" />

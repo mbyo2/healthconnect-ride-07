@@ -229,11 +229,11 @@ const Settings = () => {
           </div>
           <div>
             <h1 className="font-display text-2xl font-medium tracking-tight flex items-center gap-2">
-              System Preferences & Settings
+              Settings
               <span className="w-2 h-2 rounded-full bg-success-500 animate-ping" />
             </h1>
-            <p className="text-sm text-graphite-500 font-medium tracking-wide">
-              Configure profile visibility, security, push notifications, and regional localization
+            <p className="text-sm text-graphite-600 dark:text-slate-300 font-medium tracking-wide">
+              Your account, security, notifications, and region
             </p>
           </div>
         </div>
@@ -248,12 +248,17 @@ const Settings = () => {
               <h2 className="font-medium text-base flex items-center gap-2 border-b border-canvas-silk pb-3">
                 <User className="h-4 w-4 text-primary-500" /> Account Preferences
               </h2>
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-3">
                 <div>
                   <p className="font-medium text-sm text-midnight">Two-Factor Authentication (2FA)</p>
-                  <p className="text-xs text-graphite-500">TOTP authenticator app verification</p>
+                  <p className="text-xs text-graphite-500">Extra security with an authenticator app</p>
                 </div>
-                <Switch checked={twoFactor} onCheckedChange={handleTwoFactorToggle} aria-label="Two-factor authentication" />
+                <button
+                  onClick={handleTwoFactorToggle}
+                  className="px-4 py-2.5 min-h-[44px] rounded-xl border border-graphite-300 dark:border-slate-700 text-xs font-extrabold hover:bg-canvas dark:hover:bg-slate-800 transition-colors flex-shrink-0"
+                >
+                  Manage · {twoFactor ? 'On' : 'Off'}
+                </button>
               </div>
             </div>
 
@@ -265,16 +270,16 @@ const Settings = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium text-sm text-midnight">Dark / Light Interface Theme</p>
-                  <p className="text-[11px] text-graphite-500 dark:text-slate-400">Toggle dark mode styling</p>
+                  <p className="text-xs text-graphite-600 dark:text-slate-300">Toggle dark mode styling</p>
                 </div>
                 <ThemeToggle />
               </div>
               <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
                 <div>
                   <p className="font-bold text-xs">Accessibility Easy Reading</p>
-                  <p className="text-[11px] text-graphite-500 dark:text-slate-400">High-contrast text and enlarged touch targets</p>
+                  <p className="text-xs text-graphite-600 dark:text-slate-300">High-contrast text and enlarged touch targets</p>
                 </div>
-                <Switch checked={isEasyReadingEnabled} onCheckedChange={handleAccessibilityToggle} aria-label="Accessibility easy reading" />
+                <Switch checked={isEasyReadingEnabled} onCheckedChange={handleAccessibilityToggle} aria-label="Accessibility easy reading"  className="scale-125" />
               </div>
             </div>
 
@@ -286,13 +291,13 @@ const Settings = () => {
               <button
                 onClick={handleExportRequest}
                 disabled={exporting}
-                className="w-full py-2.5 rounded-xl border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-bold text-xs text-slate-800 dark:text-slate-200 hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-700 text-left px-3 disabled:opacity-50 transition-all"
+                className="w-full py-2.5 min-h-[44px] rounded-xl border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-bold text-xs text-slate-800 dark:text-slate-200 hover:bg-canvas-mist dark:hover:bg-slate-700 text-left px-3 disabled:opacity-50 transition-all"
               >
                 {exporting ? 'Submitting request…' : 'Request Export of All Personal Data'}
               </button>
               <button
                 onClick={() => navigate("/privacy-security")}
-                className="w-full py-2.5 rounded-xl border border-error-500/30 bg-error-500/5 font-bold text-xs text-error-500 hover:bg-error-500/10 text-left px-3"
+                className="w-full py-2.5 min-h-[44px] rounded-xl border border-error-500/30 bg-error-500/5 font-bold text-xs text-error-500 hover:bg-error-500/10 text-left px-3"
               >
                 Delete Account & Purge Records
               </button>
@@ -304,35 +309,35 @@ const Settings = () => {
             {/* Notification Controls */}
             <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
               <h2 className="font-extrabold text-sm flex items-center gap-2 border-b border-canvas-silk pb-3">
-                <Bell className="h-4 w-4 text-warning-500" /> Notification Telemetry
+                <Bell className="h-4 w-4 text-warning-500" /> Notifications
               </h2>
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-bold text-xs">Browser Push Notifications</p>
-                  <p className="text-[11px] text-graphite-500 dark:text-slate-400">Instant alerts for messages, calls & lab updates</p>
+                  <p className="text-xs text-graphite-600 dark:text-slate-300">Instant alerts for messages, calls & lab updates</p>
                 </div>
-                <Switch checked={notifications} onCheckedChange={handleNotificationToggle} aria-label="Browser push notifications" />
+                <Switch checked={notifications} onCheckedChange={handleNotificationToggle} aria-label="Browser push notifications"  className="scale-125" />
               </div>
               <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
                 <div>
                   <p className="font-bold text-xs">Email Broadcasts</p>
-                  <p className="text-[11px] text-graphite-500 dark:text-slate-400">Consultation receipts and appointment confirmations</p>
+                  <p className="text-xs text-graphite-600 dark:text-slate-300">Consultation receipts and appointment confirmations</p>
                 </div>
-                <Switch checked={emailNotifications} onCheckedChange={handleEmailToggle} aria-label="Email broadcasts" />
+                <Switch checked={emailNotifications} onCheckedChange={handleEmailToggle} aria-label="Email broadcasts"  className="scale-125" />
               </div>
               <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
                 <div>
                   <p className="font-bold text-xs">SMS Reminders <span className="ml-1 rounded-full bg-canvas-silk px-2 py-0.5 text-[10px] font-bold text-graphite-500">Coming soon</span></p>
-                  <p className="text-[11px] text-graphite-500 dark:text-slate-400">Text reminders once the SMS gateway is connected</p>
+                  <p className="text-xs text-graphite-600 dark:text-slate-300">Text reminders once the SMS gateway is connected</p>
                 </div>
-                <Switch checked={smsReminders} disabled onCheckedChange={handleSmsToggle} aria-label="SMS reminders (coming soon)" />
+                <Switch checked={smsReminders} disabled onCheckedChange={handleSmsToggle} aria-label="SMS reminders (coming soon)"  className="scale-125" />
               </div>
             </div>
 
             {/* Regional Localization */}
             <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
               <h2 className="font-extrabold text-sm flex items-center gap-2 border-b border-canvas-silk pb-3">
-                <Globe className="h-4 w-4 text-primary-500" /> Regional Localization
+                <Globe className="h-4 w-4 text-primary-500" /> Language & Region
               </h2>
               <div className="space-y-1.5">
                 <label htmlFor="settings-language" className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Display Language</label>

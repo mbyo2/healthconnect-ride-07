@@ -34,7 +34,7 @@ export const InsuranceCardUpload = () => {
   const [providerName, setProviderName] = useState('');
   const [policyNumber, setPolicyNumber] = useState('');
 
-  const { data: cards = [] } = useQuery({
+  const { data: cards = [], isLoading: cardsLoading, isError: cardsError, refetch: refetchCards } = useQuery({
     queryKey: ['insurance-cards', user?.id],
     queryFn: async () => {
       const { data, error } = await (supabase as any)
@@ -104,12 +104,14 @@ export const InsuranceCardUpload = () => {
         provider_name: providerName,
         policy_number: policyNumber,
       };
+      let ocrSucceeded = false;
       try {
         const imageBase64 = await fileToBase64(frontFile);
         const { data: ocrRes } = await supabase.functions.invoke('ocr-insurance-card', {
           body: { imageBase64 },
         });
         if (ocrRes && typeof ocrRes === 'object') {
+          ocrSucceeded = true;
           ocrPayload = {
             ...ocrRes,
             // Manual fields win over OCR if user typed them
@@ -136,7 +138,9 @@ export const InsuranceCardUpload = () => {
         throw error;
       }
 
-      toast.success('Insurance card uploaded and scanned successfully!');
+      toast.success(ocrSucceeded
+        ? 'Insurance card uploaded and scanned successfully!'
+        : 'Insurance card uploaded. We saved the details you entered — the scan could not read the card automatically.');
       setFrontPreview(null);
       setBackPreview(null);
       setFrontFile(null);
@@ -198,6 +202,12 @@ export const InsuranceCardUpload = () => {
     queryClient.invalidateQueries({ queryKey: ['insurance-cards'] });
   };
 
+  const confirmAndDeleteCard = (cardId: string) => {
+    if (window.confirm('Delete this insurance card? The card photos and details will be permanently removed.')) {
+      deleteCard(cardId);
+    }
+  };
+
   const viewCardImage = async (path: string | null) => {
     if (!path) return;
     const { data, error } = await supabase.storage.from('insurance_cards').createSignedUrl(path, 300);
@@ -235,7 +245,7 @@ export const InsuranceCardUpload = () => {
                 <RefreshCw className="h-3.5 w-3.5 mr-1.5" />
                 Retry verification
               </Button>
-              <Button size="sm" variant="ghost" onClick={() => deleteCard(latestCard.id)}>
+              <Button size="sm" variant="ghost" onClick={() => confirmAndDeleteCard(latestCard.id)}>
                 <Trash2 className="h-3.5 w-3.5 mr-1.5" />
                 Delete & re-upload
               </Button>
@@ -271,7 +281,8 @@ export const InsuranceCardUpload = () => {
                   <img src={frontPreview} alt="Front" className="w-full h-full object-cover" />
                   <button
                     onClick={() => { setFrontPreview(null); setFrontFile(null); }}
-                    className="absolute top-2 right-2 p-1 bg-background/80 rounded-full"
+                    aria-label="Remove front image"
+                    className="absolute top-2 right-2 p-2.5 min-h-[44px] min-w-[44px] bg-background/80 rounded-full flex items-center justify-center"
                   >
                     <X className="h-4 w-4" />
                   </button>
@@ -302,7 +313,8 @@ export const InsuranceCardUpload = () => {
                   <img src={backPreview} alt="Back" className="w-full h-full object-cover" />
                   <button
                     onClick={() => { setBackPreview(null); setBackFile(null); }}
-                    className="absolute top-2 right-2 p-1 bg-background/80 rounded-full"
+                    aria-label="Remove back image"
+                    className="absolute top-2 right-2 p-2.5 min-h-[44px] min-w-[44px] bg-background/80 rounded-full flex items-center justify-center"
                   >
                     <X className="h-4 w-4" />
                   </button>
@@ -322,7 +334,7 @@ export const InsuranceCardUpload = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="ins-provider">Insurance Provider</Label>
-              <Input id="ins-provider" placeholder="e.g. Blue Cross" value={providerName} onChange={(e) => setProviderName(e.target.value)} className="mt-1" />
+              <Input id="ins-provider" placeholder="e.g. Sanlam, Prudential Zambia" value={providerName} onChange={(e) => setProviderName(e.target.value)} className="mt-1" />
             </div>
             <div>
               <Label htmlFor="ins-policy">Policy Number</Label>
@@ -330,13 +342,28 @@ export const InsuranceCardUpload = () => {
             </div>
           </div>
 
-          <Button onClick={uploadCard} disabled={!frontFile || uploading} className="w-full">
+          <Button onClick={uploadCard} disabled={!frontFile || uploading} className="w-full h-11 min-h-[44px]">
             {uploading ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Uploading...</> : <><Shield className="h-4 w-4 mr-2" />Upload & Verify</>}
           </Button>
         </CardContent>
       </Card>
 
-      {cards.length > 0 && (
+      {cardsLoading ? (
+        <Card>
+          <CardContent className="py-8">
+            <div className="space-y-3">
+              <div className="h-16 rounded-lg bg-muted animate-pulse" />
+            </div>
+          </CardContent>
+        </Card>
+      ) : cardsError ? (
+        <Card>
+          <CardContent className="py-8 text-center space-y-3">
+            <p className="text-sm text-destructive">We couldn&apos;t load your saved insurance cards.</p>
+            <Button variant="outline" className="h-11 min-h-[44px]" onClick={() => refetchCards()}>Try again</Button>
+          </CardContent>
+        </Card>
+      ) : cards.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Your Insurance Cards</CardTitle>
@@ -361,22 +388,22 @@ export const InsuranceCardUpload = () => {
                     {statusBadge(card.verification_status)}
                     {card.front_image_url && (
                       <Button
-                        size="sm"
                         variant="ghost"
+                        aria-label="View card image"
                         title="View card image"
                         onClick={() => viewCardImage(card.front_image_url)}
-                        className="h-8 px-2"
+                        className="h-11 min-h-[44px] px-3"
                       >
-                        <Eye className="h-3.5 w-3.5" />
+                        <Eye className="h-4 w-4" />
                       </Button>
                     )}
                     {card.verification_status === 'failed' && (
-                      <Button size="sm" variant="ghost" onClick={() => retryVerification(card.id)} className="h-8 px-2">
-                        <RefreshCw className="h-3.5 w-3.5" />
+                      <Button variant="ghost" aria-label="Retry verification" onClick={() => retryVerification(card.id)} className="h-11 min-h-[44px] px-3">
+                        <RefreshCw className="h-4 w-4" />
                       </Button>
                     )}
-                    <Button size="sm" variant="ghost" onClick={() => deleteCard(card.id)} className="h-8 px-2 text-muted-foreground">
-                      <Trash2 className="h-3.5 w-3.5" />
+                    <Button variant="ghost" aria-label="Delete insurance card" onClick={() => confirmAndDeleteCard(card.id)} className="h-11 min-h-[44px] px-3 text-muted-foreground">
+                      <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
                 </div>

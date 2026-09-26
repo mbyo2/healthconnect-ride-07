@@ -77,7 +77,7 @@ export const FileUploader = ({ onUploadComplete }: FileUploaderProps) => {
     <Button
       variant="outline"
       size="icon"
-      className="relative"
+      className="relative min-h-[44px] min-w-[44px]"
       disabled={uploading}
       type="button"
       aria-label="Attach a file to this message"

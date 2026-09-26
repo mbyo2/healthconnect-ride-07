@@ -18,12 +18,12 @@ export const AvailableDoctorsRail = ({ providers, onViewAll, onViewProvider }: A
     <div>
       <div className="flex items-center justify-between mb-3.5 px-1">
         <div>
-          <h2 className="text-lg sm:text-xl font-black text-slate-900 dark:text-slate-100 tracking-tight">Available Doctors</h2>
+          <h2 className="text-lg sm:text-xl font-black text-slate-900 dark:text-slate-100 tracking-tight">Available Providers</h2>
           <p className="text-xs text-slate-400 font-medium">Verified providers — open a profile to see live slots</p>
         </div>
         <button
           onClick={onViewAll}
-          className="text-xs font-black text-primary-500 hover:underline flex items-center gap-1"
+          className="text-xs font-black text-primary-500 hover:underline flex items-center gap-1 px-2 py-2 -mr-2 min-h-[40px]"
         >
           <span>View all</span>
           <ChevronRight className="h-3.5 w-3.5" />
@@ -74,7 +74,7 @@ export const AvailableDoctorsRail = ({ providers, onViewAll, onViewProvider }: A
               <div className="pt-1 border-t border-canvas-silk dark:border-slate-800">
                 <button
                   onClick={() => onViewProvider(doc.id)}
-                  className="w-full px-4 py-2 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-black text-xs flex items-center justify-center gap-1 shadow-sm transition-all active:scale-95"
+                  className="w-full px-4 py-3 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-black text-xs flex items-center justify-center gap-1 shadow-sm transition-all active:scale-95 min-h-[44px]"
                 >
                   <span>View &amp; book</span>
                   <ChevronRight className="h-3.5 w-3.5" />

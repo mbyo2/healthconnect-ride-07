@@ -5,7 +5,7 @@ import { Wallet, Plus, ArrowUpRight, History } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { useUserRoles } from "@/context/UserRolesContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import { useCurrency } from "@/hooks/use-currency";
 
@@ -13,6 +13,7 @@ export const WalletCard = () => {
     const { user } = useAuth();
     const { isHealthPersonnel, isAdmin } = useUserRoles();
     const navigate = useNavigate();
+    const location = useLocation();
     // Providers earn into this wallet; patients spend from it. Same balance,
     // different headline job.
     const isEarner = (isHealthPersonnel || isAdmin) && !!user;
@@ -77,6 +78,19 @@ export const WalletCard = () => {
         navigate('/wallet');
     };
 
+    // Jump to a wallet-page section. If we're already on /wallet, scroll
+    // directly; otherwise navigate first, then scroll once it mounts.
+    const scrollToWalletSection = (sectionId: string) => {
+        const scroll = () =>
+            document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (location.pathname === '/wallet') {
+            scroll();
+        } else {
+            navigate('/wallet');
+            window.setTimeout(scroll, 400);
+        }
+    };
+
     return (
         <Card className="group bg-gradient-to-br from-primary via-primary/90 to-primary/80 text-primary-foreground border-none shadow-2xl overflow-hidden relative transition-all duration-500 hover:shadow-primary/20 hover:-translate-y-1 active:scale-[0.98]">
             {/* Animated background glow */}
@@ -117,8 +131,8 @@ export const WalletCard = () => {
                     <div className="flex gap-3 mt-1">
                         <Button
                             size="sm"
-                            className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 flex-1 font-bold shadow-lg shadow-black/10 transition-all active:scale-95"
-                            onClick={handleWalletAction}
+                            className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 flex-1 font-bold shadow-lg shadow-black/10 transition-all active:scale-95 h-11"
+                            onClick={() => scrollToWalletSection('wallet-topup')}
                         >
                             <Plus className="h-4 w-4 mr-1.5" />
                             {isEarner ? "Earnings" : "Top Up"}
@@ -126,8 +140,8 @@ export const WalletCard = () => {
                         <Button
                             size="sm"
                             variant="outline"
-                            className="bg-primary-foreground/10 backdrop-blur-md border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/20 flex-1 font-semibold transition-all active:scale-95"
-                            onClick={handleWalletAction}
+                            className="bg-primary-foreground/10 backdrop-blur-md border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/20 flex-1 font-semibold transition-all active:scale-95 h-11"
+                            onClick={() => scrollToWalletSection('wallet-history')}
                         >
                             <History className="h-4 w-4 mr-1.5" />
                             History

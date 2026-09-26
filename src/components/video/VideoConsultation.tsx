@@ -151,9 +151,8 @@ export const VideoConsultation = () => {
       {isMobile && activeConsultation && (
         <Button 
           variant="ghost" 
-          size="sm" 
           onClick={handleLeaveCall}
-          className="mb-4 -ml-2 flex items-center text-trust-500"
+          className="mb-4 -ml-2 flex items-center text-trust-500 h-11 min-h-[44px]"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back to consultations

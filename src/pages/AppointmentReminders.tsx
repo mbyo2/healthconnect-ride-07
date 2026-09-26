@@ -15,24 +15,29 @@ const AppointmentRemindersPage = () => {
   const [smsReminders, setSmsReminders] = useState(false);
   const [pushReminders, setPushReminders] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [prefsLoading, setPrefsLoading] = useState(true);
 
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const { data } = await (supabase as any)
-        .from("notification_settings")
-        .select("*")
-        .eq("user_id", user.id)
-        .maybeSingle();
-      if (data) {
-        setEmailReminders(data.email_notifications ?? true);
-        setSmsReminders(data.appointment_reminders ?? false);
-        setPushReminders(data.push_notifications ?? true);
+      try {
+        const { data } = await (supabase as any)
+          .from("notification_settings")
+          .select("*")
+          .eq("user_id", user.id)
+          .maybeSingle();
+        if (data) {
+          setEmailReminders(data.email_notifications ?? true);
+          setSmsReminders(data.appointment_reminders ?? false);
+          setPushReminders(data.push_notifications ?? true);
+        }
+      } finally {
+        setPrefsLoading(false);
       }
     })();
   }, [user]);
 
-  const { data: upcoming = [] } = useQuery({
+  const { data: upcoming = [], isLoading: upcomingLoading, isError: upcomingError, refetch: refetchUpcoming } = useQuery({
     queryKey: ["upcoming-appointments-reminders", user?.id],
     queryFn: async () => {
       const today = new Date().toISOString().split("T")[0];
@@ -120,7 +125,7 @@ const AppointmentRemindersPage = () => {
                 <span className="w-2 h-2 rounded-full bg-success-500 animate-ping" />
               </h1>
               <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
-                A confirmation lands in your inbox the moment you book; timed reminders follow the channels you enable below. Sync visits to iCal / Google Calendar.
+                Timed reminders follow the channels you enable below. Sync visits to iCal / Google Calendar.
               </p>
             </div>
           </div>
@@ -131,6 +136,7 @@ const AppointmentRemindersPage = () => {
           <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
             <h2 className="font-extrabold text-sm flex items-center gap-2 border-b border-canvas-silk pb-3">
               <Bell className="h-4 w-4 text-primary-500" /> Reminder Channels
+              {prefsLoading && <span className="text-[11px] font-medium text-graphite-400">Loading…</span>}
             </h2>
 
             <div className="flex items-center justify-between p-3.5 rounded-xl border border-canvas-silk bg-canvas dark:bg-slate-950">
@@ -159,7 +165,7 @@ const AppointmentRemindersPage = () => {
                   <p className="text-[11px] text-graphite-500 dark:text-slate-400">No SMS gateway is connected yet — enable it to be first in line when live delivery lands</p>
                 </div>
               </div>
-              <Switch checked={smsReminders} onCheckedChange={setSmsReminders} aria-label="SMS text reminders (coming soon — no live gateway yet)" />
+              <Switch checked={smsReminders} disabled aria-label="SMS text reminders (coming soon — no live gateway yet)" />
             </div>
 
             <div className="flex items-center justify-between p-3.5 rounded-xl border border-canvas-silk bg-canvas dark:bg-slate-950">
@@ -178,7 +184,7 @@ const AppointmentRemindersPage = () => {
             <button
               onClick={savePreferences}
               disabled={saving}
-              className="w-full py-3 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs transition-all"
+              className="w-full py-3.5 min-h-[48px] rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs transition-all disabled:opacity-60"
             >
               {saving ? "Saving..." : "Save Reminder Preferences"}
             </button>
@@ -190,13 +196,29 @@ const AppointmentRemindersPage = () => {
               <Calendar className="h-4 w-4 text-success-500" /> Upcoming Visits & iCal Export
             </h2>
 
-            {upcoming.length === 0 ? (
+            {upcomingLoading ? (
+              <div className="space-y-3">
+                {[0, 1].map((i) => (
+                  <div key={i} className="h-20 rounded-xl bg-canvas dark:bg-slate-950 animate-pulse" />
+                ))}
+              </div>
+            ) : upcomingError ? (
+              <div className="text-center py-10 space-y-3">
+                <p className="text-xs font-medium text-destructive">We couldn&apos;t load your upcoming visits.</p>
+                <button
+                  onClick={() => refetchUpcoming()}
+                  className="px-4 py-2.5 min-h-[44px] rounded-xl bg-primary-500 text-white text-xs font-extrabold"
+                >
+                  Try again
+                </button>
+              </div>
+            ) : upcoming.length === 0 ? (
               <div className="text-center py-10 text-xs text-graphite-500 dark:text-slate-400">
                 <Calendar className="h-10 w-10 mx-auto mb-2 opacity-30 text-primary-500" />
                 <p className="font-bold">No upcoming appointments scheduled.</p>
                 <button
                   onClick={() => navigate("/search")}
-                  className="mt-2 text-xs font-bold text-primary-500 hover:underline"
+                  className="mt-3 px-3 py-2.5 min-h-[44px] text-xs font-bold text-primary-500 hover:underline"
                 >
                   Book an appointment now
                 </button>
@@ -221,7 +243,7 @@ const AppointmentRemindersPage = () => {
                     </div>
                     <button
                       onClick={() => downloadIcs(apt)}
-                      className="px-4 py-2 rounded-xl bg-white border border-graphite-300 dark:border-slate-700 text-primary-500 font-extrabold text-xs flex items-center gap-1.5 hover:bg-primary-50 dark:hover:bg-slate-800"
+                      className="px-4 py-2.5 min-h-[44px] rounded-xl bg-white border border-graphite-300 dark:border-slate-700 text-primary-500 font-extrabold text-xs flex items-center gap-1.5 hover:bg-primary-50 dark:hover:bg-slate-800"
                     >
                       <Calendar className="h-3.5 w-3.5" />
                       <span>Sync to Calendar (.ics)</span>

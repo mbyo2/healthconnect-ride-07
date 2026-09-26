@@ -30,9 +30,9 @@ interface WaitlistSignupProps {
 }
 
 const PREFERRED_TIMES = [
-  { id: 'morning', label: 'Morning (8-12)' },
-  { id: 'afternoon', label: 'Afternoon (12-4)' },
-  { id: 'evening', label: 'Evening (4-6)' },
+  { id: 'morning', label: 'Morning (08:00–12:00)' },
+  { id: 'afternoon', label: 'Afternoon (12:00–16:00)' },
+  { id: 'evening', label: 'Evening (16:00–18:00)' },
   { id: 'any', label: 'Any time' },
 ];
 
@@ -182,7 +182,7 @@ export const WaitlistSignup = ({ provider, isOpen, onClose, onRequestOpen }: Wai
                     key={dayStr}
                     aria-pressed={isSelected}
                     onClick={() => toggleDay(dayStr)}
-                    className={`px-3 py-2 rounded-lg text-xs font-medium transition-all ${
+                    className={`px-3 py-2.5 min-h-[44px] rounded-lg text-xs font-medium transition-all ${
                       isSelected ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-primary/10'
                     }`}
                   >
@@ -204,7 +204,7 @@ export const WaitlistSignup = ({ provider, isOpen, onClose, onRequestOpen }: Wai
                   key={time.id}
                   aria-pressed={selectedTimes.includes(time.id)}
                   onClick={() => toggleTime(time.id)}
-                  className={`p-3 rounded-lg text-sm font-medium transition-all text-left ${
+                  className={`p-3 min-h-[48px] rounded-lg text-sm font-medium transition-all text-left ${
                     selectedTimes.includes(time.id) ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-primary/10'
                   }`}
                 >

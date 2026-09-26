@@ -31,7 +31,7 @@ export const useMarketplace = () => {
   }, []);
 
   // Get all marketplace products
-  const { data: products = [], isLoading: productsLoading } = useQuery({
+  const { data: products = [], isLoading: productsLoading, isError: productsError, refetch: refetchProducts } = useQuery({
     queryKey: ['marketplace-products'],
     queryFn: async () => {
       // Only surface products from pharmacies that were approved AND opted into public listing
@@ -246,6 +246,8 @@ export const useMarketplace = () => {
   return {
     products,
     productsLoading,
+    productsError,
+    refetchProducts,
     orders,
     ordersLoading,
     cart,

@@ -38,12 +38,29 @@ const Emergency = () => {
   const [isEmergencyActive, setIsEmergencyActive] = useState(false);
   const [emergencyServices, setEmergencyServices] = useState<EmergencyService[]>([]);
   const [showContactManager, setShowContactManager] = useState(false);
+  // Pre-send countdown (purely local UI): the alert is only logged after the
+  // countdown finishes, so an accidental tap can always be cancelled with no
+  // backend call ever being made.
+  const [sendCountdown, setSendCountdown] = useState<number | null>(null);
 
   useEffect(() => {
     loadZambianEmergencyServices();
     loadEmergencyContacts();
     getCurrentLocation();
   }, [user]);
+
+  // Pre-send countdown tick: the real send only fires when the countdown
+  // reaches zero. Purely local UI — no backend call until sendAlert runs.
+  useEffect(() => {
+    if (sendCountdown === null) return;
+    if (sendCountdown <= 0) {
+      setSendCountdown(null);
+      void sendAlert();
+      return;
+    }
+    const t = setTimeout(() => setSendCountdown((c) => (c !== null ? c - 1 : c)), 1000);
+    return () => clearTimeout(t);
+  }, [sendCountdown]);
 
   const loadZambianEmergencyServices = () => {
     // Load Zambian ambulance services
@@ -105,7 +122,24 @@ const Emergency = () => {
     }
   };
 
-  const triggerEmergency = async () => {
+  // Starts the visible pre-send countdown. Tapping SEND never fires the
+  // alert immediately — the user gets 5 seconds to cancel an accidental tap,
+  // and nothing touches the backend until the countdown completes.
+  const startAlertCountdown = () => {
+    if (isEmergencyActive || sendCountdown !== null) return;
+    if (!user) {
+      toast.error('Sign in so the alert can be logged — or call 991 right now.');
+      return;
+    }
+    setSendCountdown(5);
+  };
+
+  const cancelAlertCountdown = () => {
+    setSendCountdown(null);
+    toast.info('Alert cancelled — nothing was sent.');
+  };
+
+  const sendAlert = async () => {
     // SOS must work even when geolocation is denied — the alert is logged
     // without coordinates and the call buttons below stay available.
     if (!user) {
@@ -228,23 +262,47 @@ const Emergency = () => {
                     : 'Waiting for your location — enable location services so contacts can find you.'}
                 </div>
 
-                <Button
-                  onClick={triggerEmergency}
-                  className="w-full bg-red-600 hover:bg-red-700 text-white text-lg py-6"
-                  disabled={isEmergencyActive}
-                >
-                  {isEmergencyActive ? (
-                    <>
-                      <Clock className="h-5 w-5 mr-2 animate-spin" />
-                      Emergency Alert Active
-                    </>
-                  ) : (
-                    <>
-                      <AlertTriangle className="h-5 w-5 mr-2" />
-                      SEND EMERGENCY ALERT
-                    </>
-                  )}
-                </Button>
+                {sendCountdown !== null && !isEmergencyActive ? (
+                  <div className="rounded-xl border-2 border-red-500 bg-white dark:bg-slate-900 p-4 text-center space-y-3" role="alert">
+                    <p className="text-sm font-bold text-red-700 dark:text-red-300">
+                      Sending emergency alert in
+                    </p>
+                    <p className="text-5xl font-black tabular-nums text-red-600" aria-hidden="true">
+                      {sendCountdown}
+                    </p>
+                    <p className="sr-only" aria-live="assertive">
+                      Emergency alert sends in {sendCountdown} seconds. Cancel now if this was an accident.
+                    </p>
+                    <Button
+                      onClick={cancelAlertCountdown}
+                      variant="outline"
+                      className="w-full min-h-[44px] text-base font-bold border-red-500 text-red-700 dark:text-red-300 hover:bg-red-50 dark:hover:bg-red-950"
+                    >
+                      Cancel — this was an accident
+                    </Button>
+                    <p className="text-xs text-muted-foreground">
+                      Nothing has been sent yet.
+                    </p>
+                  </div>
+                ) : (
+                  <Button
+                    onClick={startAlertCountdown}
+                    className="w-full bg-red-600 hover:bg-red-700 text-white text-lg py-6 min-h-[44px]"
+                    disabled={isEmergencyActive}
+                  >
+                    {isEmergencyActive ? (
+                      <>
+                        <Clock className="h-5 w-5 mr-2 animate-spin" />
+                        Emergency Alert Active
+                      </>
+                    ) : (
+                      <>
+                        <AlertTriangle className="h-5 w-5 mr-2" />
+                        SEND EMERGENCY ALERT
+                      </>
+                    )}
+                  </Button>
+                )}
                 {!location && !isEmergencyActive && (
                   <p className="text-xs text-center text-muted-foreground">
                     Location not detected — the alert still works, but enabling location services helps contacts find you.
@@ -260,6 +318,10 @@ const Emergency = () => {
                     </div>
                     <p className="text-xs text-muted-foreground">
                       No SMS was sent — if you can, call 991 now. Your contacts are listed below.
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Pressed by mistake? The alert was only logged in the app — no emergency
+                      service was notified automatically.
                     </p>
                   </div>
                 )}

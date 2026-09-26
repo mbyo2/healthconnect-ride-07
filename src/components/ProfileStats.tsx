@@ -17,49 +17,53 @@ interface Stats {
 export const ProfileStats = ({ userId }: ProfileStatsProps) => {
   const [stats, setStats] = useState<Stats>({ appointments: 0, providers: 0, prescriptions: 0, connections: 0 });
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
+
+  const fetchStats = async () => {
+    if (!userId) return;
+
+    try {
+      setLoadError(false);
+      const { count: appointmentCount } = await supabase
+        .from('appointments')
+        .select('*', { count: 'exact', head: true })
+        .eq('patient_id', userId);
+
+      const { count: connectionsCount } = await supabase
+        .from('user_connections')
+        .select('*', { count: 'exact', head: true })
+        .eq('patient_id', userId)
+        .eq('status', 'approved');
+
+      const { count: prescriptionsCount } = await supabase
+        .from('comprehensive_prescriptions')
+        .select('*', { count: 'exact', head: true })
+        .eq('patient_id', userId);
+
+      const { data: appointmentProviders } = await supabase
+        .from('appointments')
+        .select('provider_id')
+        .eq('patient_id', userId);
+
+      const uniqueProviders = new Set(appointmentProviders?.map(a => a.provider_id) || []).size;
+
+      setStats({
+        appointments: appointmentCount || 0,
+        providers: Math.max(uniqueProviders, connectionsCount || 0),
+        prescriptions: prescriptionsCount || 0,
+        connections: connectionsCount || 0
+      });
+    } catch (error) {
+      console.error('Error fetching profile stats:', error);
+      setLoadError(true);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchStats = async () => {
-      if (!userId) return;
-
-      try {
-        const { count: appointmentCount } = await supabase
-          .from('appointments')
-          .select('*', { count: 'exact', head: true })
-          .eq('patient_id', userId);
-
-        const { count: connectionsCount } = await supabase
-          .from('user_connections')
-          .select('*', { count: 'exact', head: true })
-          .eq('patient_id', userId)
-          .eq('status', 'approved');
-
-        const { count: prescriptionsCount } = await supabase
-          .from('comprehensive_prescriptions')
-          .select('*', { count: 'exact', head: true })
-          .eq('patient_id', userId);
-
-        const { data: appointmentProviders } = await supabase
-          .from('appointments')
-          .select('provider_id')
-          .eq('patient_id', userId);
-
-        const uniqueProviders = new Set(appointmentProviders?.map(a => a.provider_id) || []).size;
-
-        setStats({
-          appointments: appointmentCount || 0,
-          providers: Math.max(uniqueProviders, connectionsCount || 0),
-          prescriptions: prescriptionsCount || 0,
-          connections: connectionsCount || 0
-        });
-      } catch (error) {
-        console.error('Error fetching profile stats:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchStats();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
   if (loading) {
@@ -68,6 +72,20 @@ export const ProfileStats = ({ userId }: ProfileStatsProps) => {
         {[1, 2, 3, 4].map((i) => (
           <Skeleton key={i} className="h-20 w-full rounded-lg" />
         ))}
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div className="rounded-lg border border-border p-4 text-center space-y-2">
+        <p className="text-sm text-muted-foreground">Couldn&apos;t load your stats.</p>
+        <button
+          onClick={fetchStats}
+          className="text-xs font-bold text-primary underline underline-offset-2 min-h-[44px] px-4"
+        >
+          Try again
+        </button>
       </div>
     );
   }

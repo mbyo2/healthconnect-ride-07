@@ -92,7 +92,7 @@ export const ConnectedWorkflows: React.FC = () => {
                   <React.Fragment key={idx}>
                     <button
                       onClick={() => handleStepClick(step.route)}
-                      className="flex items-center justify-center p-1 rounded-lg hover:bg-muted transition-colors group/step active:scale-95"
+                      className="flex items-center justify-center p-3 rounded-lg hover:bg-muted transition-colors group/step active:scale-95"
                       aria-label={step.label}
                       title={step.label}
                     >

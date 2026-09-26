@@ -9,10 +9,12 @@ import { useVoiceCommands } from "@/hooks/use-voice-commands";
 import { Button } from "@/components/ui/button";
 import { Volume2, MapPin, List } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const MemoizedProviderMap = memo(ProviderMap);
 
 export const SearchResults = () => {
+  const navigate = useNavigate();
   const { providers, isLoading, userLocation, maxDistance, totalCount, searchTerm } = useSearch();
   const { speak } = useVoiceCommands();
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
@@ -79,7 +81,7 @@ export const SearchResults = () => {
           <div className="flex bg-muted rounded-lg p-1">
             <button
               onClick={() => setViewMode('list')}
-              className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-all ${
+              className={`flex items-center gap-2 px-4 py-2.5 min-h-[44px] rounded-md text-sm font-medium transition-all ${
                 viewMode === 'list'
                   ? 'bg-background text-foreground shadow-sm'
                   : 'text-muted-foreground hover:text-foreground'
@@ -90,7 +92,7 @@ export const SearchResults = () => {
             </button>
             <button
               onClick={() => setViewMode('map')}
-              className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-all ${
+              className={`flex items-center gap-2 px-4 py-2.5 min-h-[44px] rounded-md text-sm font-medium transition-all ${
                 viewMode === 'map'
                   ? 'bg-background text-foreground shadow-sm'
                   : 'text-muted-foreground hover:text-foreground'
@@ -105,9 +107,8 @@ export const SearchResults = () => {
           {providers.length > 0 && (
             <Button 
               variant="outline" 
-              size="sm"
               onClick={handleReadResults}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 h-11"
             >
               <Volume2 className="h-4 w-4" />
               Read Results
@@ -126,7 +127,10 @@ export const SearchResults = () => {
           />
         </div>
       ) : (
-        <ProviderList providers={providers} />
+        <ProviderList
+          providers={providers}
+          onProviderSelect={(p) => navigate(`/provider/${p.id}`)}
+        />
       )}
       
       {providers.length > 0 && <SearchPagination />}

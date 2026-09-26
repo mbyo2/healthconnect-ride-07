@@ -32,7 +32,7 @@ export const LandingHero = () => {
       <div className="relative z-10 mx-auto max-w-content px-4 pt-28 text-center sm:px-6 sm:pt-32 lg:px-8">
         <h1 className="mx-auto max-w-5xl font-display text-[2.75rem] font-medium leading-[1.05] tracking-tight text-midnight opacity-0 animate-hero-rise sm:text-6xl lg:text-[5rem]">
           Healthcare patients love.
-          <br className="hidden sm:block" /> Care you can prove.
+          <br className="hidden sm:block" /> Book a doctor in seconds.
         </h1>
 
         <p
@@ -73,7 +73,7 @@ export const LandingHero = () => {
             placeholder="Search doctors, specialties, or pharmacies"
             className="min-w-0 flex-1 bg-transparent py-2.5 text-sm text-midnight outline-none placeholder:text-graphite-400"
           />
-          <button type="submit" className="vf-btn-primary !px-5 !py-2.5 shrink-0">
+          <button type="submit" className="vf-btn-primary !px-5 !py-3 shrink-0">
             Search
           </button>
         </form>

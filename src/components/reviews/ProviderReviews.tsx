@@ -154,7 +154,8 @@ export const ProviderReviews = ({ providerId, showWriteReview = false, appointme
                     onMouseEnter={() => setHoverRating(s)}
                     onMouseLeave={() => setHoverRating(0)}
                     onClick={() => setRating(s)}
-                    className="p-1"
+                    className="p-2"
+                    aria-label={`Rate ${s} out of 5 stars`}
                   >
                     <Star className={`h-8 w-8 transition-colors ${
                       s <= (hoverRating || rating) ? 'text-amber-400 fill-amber-400' : 'text-muted'
@@ -218,9 +219,9 @@ export const ProviderReviews = ({ providerId, showWriteReview = false, appointme
                     )}
 
                     <div className="flex items-center gap-4 mt-2">
-                      <button className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground">
+                      <span className="inline-flex items-center gap-1 text-xs text-muted-foreground" aria-label={`${review.helpful_count || 0} people found this helpful`}>
                         <ThumbsUp className="h-3 w-3" /> Helpful ({review.helpful_count || 0})
-                      </button>
+                      </span>
                     </div>
                   </div>
                 </div>

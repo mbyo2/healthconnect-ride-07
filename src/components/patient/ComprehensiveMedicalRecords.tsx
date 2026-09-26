@@ -537,9 +537,18 @@ export const ComprehensiveMedicalRecords = () => {
                 {record.clinical_data && Object.keys(record.clinical_data).length > 0 && (
                   <div className="mt-4 p-3 bg-muted rounded-lg">
                     <h4 className="text-sm font-medium mb-2">Clinical Data</h4>
-                    <pre className="text-xs text-muted-foreground">
-                      {JSON.stringify(record.clinical_data, null, 2)}
-                    </pre>
+                    <dl className="divide-y divide-border/60">
+                      {Object.entries(record.clinical_data).map(([key, value]) => (
+                        <div key={key} className="flex items-start justify-between gap-3 py-1.5">
+                          <dt className="text-xs font-medium text-muted-foreground capitalize">
+                            {key.replace(/_/g, ' ')}
+                          </dt>
+                          <dd className="text-xs font-semibold text-foreground text-right break-words">
+                            {typeof value === 'object' && value !== null ? JSON.stringify(value) : String(value ?? '—')}
+                          </dd>
+                        </div>
+                      ))}
+                    </dl>
                   </div>
                 )}
               </CardContent>

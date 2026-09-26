@@ -10,7 +10,8 @@ export const SearchPagination = () => {
     hasMore, 
     loadMore, 
     currentPage, 
-    totalCount 
+    totalCount,
+    refreshProviders,
   } = useSearch();
 
   return (
@@ -26,8 +27,8 @@ export const SearchPagination = () => {
           size="sm"
           disabled={currentPage === 1 || isLoading}
           onClick={() => {
-            // This would need to be implemented in the context
-            // For now we just reset to page 1
+            // Pagination appends pages, so "Previous" returns to the first page.
+            refreshProviders();
             window.scrollTo(0, 0);
           }}
         >

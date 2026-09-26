@@ -85,13 +85,13 @@ export const LandingHeader = ({ scrolled }: LandingHeaderProps) => {
           <button
             type="button"
             onClick={() => navigate("/search")}
-            className="vf-btn-primary !px-4 !py-2 text-[13px]"
+            className="vf-btn-primary !px-4 !py-3 text-[13px]"
           >
             Get started
           </button>
           <button
             type="button"
-            className="rounded-pill p-2 text-graphite-600 dark:text-slate-300 hover:bg-canvas-mist lg:hidden"
+            className="rounded-pill p-3 text-graphite-600 dark:text-slate-300 hover:bg-canvas-mist lg:hidden"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-expanded={mobileMenuOpen}
             aria-label="Toggle menu"

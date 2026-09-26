@@ -38,7 +38,7 @@ const statusBadge = (s: string) => {
     case "waiting": return <Badge variant="secondary"><Loader2 className="h-3 w-3 mr-1 animate-spin" />Waiting</Badge>;
     case "cancelled": return <Badge variant="outline">Cancelled</Badge>;
     case "expired": return <Badge variant="outline">Expired</Badge>;
-    default: return <Badge variant="outline">{s}</Badge>;
+    default: return <Badge variant="outline">{s.charAt(0).toUpperCase() + s.slice(1)}</Badge>;
   }
 };
 
@@ -47,7 +47,7 @@ const WaitlistPage = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const { data: entries = [], isLoading } = useQuery({
+  const { data: entries = [], isLoading, isError, refetch } = useQuery({
     queryKey: ["my-waitlist", user?.id],
     queryFn: async () => {
       const { data, error } = await (supabase as any)
@@ -99,7 +99,7 @@ const WaitlistPage = () => {
                 Get notified when earlier slots open with providers you've waitlisted with.
               </p>
             </div>
-            <Button onClick={() => navigate("/search")} variant="outline" size="sm">
+            <Button onClick={() => navigate("/search")} variant="outline" className="h-11 min-h-[44px]">
               <Search className="h-4 w-4 mr-2" />
               Find Providers
             </Button>
@@ -109,6 +109,16 @@ const WaitlistPage = () => {
             <div className="flex justify-center py-12">
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
             </div>
+          ) : isError ? (
+            <Card>
+              <CardContent className="py-12 text-center space-y-3">
+                <p className="font-medium text-foreground">We couldn&apos;t load your waitlist</p>
+                <p className="text-sm text-muted-foreground">Check your connection and try again.</p>
+                <Button variant="outline" className="h-11 min-h-[44px]" onClick={() => refetch()}>
+                  Try again
+                </Button>
+              </CardContent>
+            </Card>
           ) : entries.length === 0 ? (
             <Card>
               <CardContent className="py-12 text-center">
@@ -117,7 +127,7 @@ const WaitlistPage = () => {
                 <p className="text-sm text-muted-foreground mt-1">
                   Find a provider and join their waitlist to get earlier slots.
                 </p>
-                <Button onClick={() => navigate("/search")} className="mt-4">
+                <Button onClick={() => navigate("/search")} className="mt-4 h-11 min-h-[44px]">
                   Find Providers
                 </Button>
               </CardContent>
@@ -132,7 +142,7 @@ const WaitlistPage = () => {
                         <CardTitle className="text-base flex items-center gap-2 flex-wrap">
                           {entry.provider_name ? `Waitlist · ${entry.provider_name}` : "Provider waitlist"}
                           <Badge className={urgencyColor(entry.urgency)}>
-                            {entry.urgency}
+                            {entry.urgency.charAt(0).toUpperCase() + entry.urgency.slice(1)}
                           </Badge>
                         </CardTitle>
                         <CardDescription className="mt-1">
@@ -155,7 +165,7 @@ const WaitlistPage = () => {
                     <div className="flex gap-2 pt-2">
                       <Button
                         variant="outline"
-                        size="sm"
+                        className="h-11 min-h-[44px]"
                         onClick={() => navigate(`/provider/${entry.provider_id}`)}
                       >
                         View Provider
@@ -163,7 +173,7 @@ const WaitlistPage = () => {
                       {entry.status === "waiting" && (
                         <Button
                           variant="ghost"
-                          size="sm"
+                          className="h-11 min-h-[44px]"
                           onClick={() => cancelEntry(entry.id)}
                         >
                           <X className="h-4 w-4 mr-1" />

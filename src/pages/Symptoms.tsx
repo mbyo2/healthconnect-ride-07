@@ -11,6 +11,7 @@ const Symptoms = () => {
   const navigate = useNavigate();
 
   const [symptomCategories, setSymptomCategories] = useState<any[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
 
   useEffect(() => {
     fetchSymptomCategories();
@@ -43,6 +44,8 @@ const Symptoms = () => {
       setSymptomCategories((data as any[]) || []);
     } catch (error) {
       console.error("Error fetching symptom categories:", error);
+    } finally {
+      setCategoriesLoading(false);
     }
   };
 
@@ -167,7 +170,21 @@ const Symptoms = () => {
             </div>
 
             <div className="space-y-4">
-              {symptomCategories.map((category) => (
+              {categoriesLoading ? (
+                <div className="space-y-4" aria-label="Loading symptom categories">
+                  {[0, 1, 2].map((c) => (
+                    <div key={c} className="space-y-2" aria-hidden="true">
+                      <div className="h-4 w-40 rounded bg-canvas dark:bg-slate-800 animate-pulse" />
+                      <div className="flex flex-wrap gap-2">
+                        {[0, 1, 2, 3, 4].map((i) => (
+                          <div key={i} className="h-11 rounded-full bg-canvas dark:bg-slate-800 animate-pulse" style={{ width: `${5 + ((i * 37 + c * 13) % 4)}rem` }} />
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                symptomCategories.map((category) => (
                 <div key={category.title} className="space-y-2">
                   <h4 className="font-extrabold text-xs text-graphite-500 dark:text-slate-400 uppercase flex items-center gap-1.5">
                     {getIconForCategory(category.title)}
@@ -182,7 +199,7 @@ const Symptoms = () => {
                           onClick={() => toggleSymptom(symptom)}
                           aria-pressed={isSelected}
                           title={isSelected ? 'Remove symptom' : 'Add symptom'}
-                          className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
+                          className={`min-h-[44px] min-w-0 max-w-full break-words text-left px-4 py-2 rounded-full text-xs font-bold transition-all ${
                             isSelected
                               ? "bg-primary-500 text-white shadow-xs"
                               : "bg-canvas dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-canvas-silk dark:border-slate-700 hover:bg-primary-50 dark:hover:bg-slate-800 dark:hover:bg-slate-700"
@@ -194,7 +211,8 @@ const Symptoms = () => {
                     })}
                   </div>
                 </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
 
@@ -213,10 +231,12 @@ const Symptoms = () => {
                     type="number"
                     min="1"
                     max="10"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     value={severity}
                     onChange={(e) => setSeverity(e.target.value)}
                     placeholder="Rate severity from 1 (mild) to 10 (severe)"
-                    className="w-full mt-1 p-2.5 rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-bold placeholder:text-slate-400"
+                    className="w-full mt-1 p-2.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-bold placeholder:text-slate-400"
                   />
                 </div>
 
@@ -260,7 +280,8 @@ const Symptoms = () => {
                       key={symptom}
                       onClick={() => toggleSymptom(symptom)}
                       title="Remove symptom"
-                      className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold text-white bg-primary-500 hover:bg-primary-600 transition-colors"
+                      aria-label={`Remove ${symptom}`}
+                      className="inline-flex items-center gap-1 min-h-[44px] px-4 py-2 rounded-full text-xs font-bold text-white bg-primary-500 hover:bg-primary-600 transition-colors break-words min-w-0 max-w-full text-left"
                     >
                       {symptom} <span aria-hidden>×</span>
                     </button>

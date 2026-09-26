@@ -93,7 +93,7 @@ export const Prescriptions = () => {
     r === 'institution_admin'
   );
 
-  const { data: prescriptions = [], isLoading } = useQuery({
+  const { data: prescriptions = [], isLoading, isError, refetch } = useQuery({
     queryKey: ["prescriptions", user?.id, isProvider],
     queryFn: async () => {
       if (!user) return [];
@@ -307,6 +307,10 @@ export const Prescriptions = () => {
         return <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-black bg-rose-100 dark:bg-rose-950/50 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-900/40">✕ Expired</span>;
       case "pending":
         return <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-black bg-amber-100 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-900/40">● Pending Rx</span>;
+      case "partially_filled":
+        return <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-black bg-sky-100 dark:bg-sky-950/50 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-900/40">◐ Partially Filled</span>;
+      case "cancelled":
+        return <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-black bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-700">✕ Cancelled</span>;
       default:
         return <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-black bg-primary-50 dark:bg-blue-950/50 text-primary-500 dark:text-blue-400 border border-primary-500/20">{status || "Dispatched"}</span>;
     }
@@ -399,7 +403,7 @@ export const Prescriptions = () => {
           <div class="footer">
             <div>
               <p>Generated securely via Doc' O Clock E-Prescribing System</p>
-              <p>Verify validity at app.dococlock.com/prescriptions</p>
+              <p>Verify validity at doc0clock.online/prescriptions</p>
             </div>
             <div class="sig-box">
               ${providerName}<br />
@@ -662,26 +666,30 @@ export const Prescriptions = () => {
         </div>
 
         {/* Filter controls */}
-        <div className="max-w-[1500px] mx-auto mt-4 flex items-center justify-between gap-3 px-1">
-          <div className="relative min-w-[280px]">
+        <div className="max-w-[1500px] mx-auto mt-4 flex flex-wrap items-center gap-3 px-1">
+          <div className="relative min-w-[220px] flex-1 sm:flex-none">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <input
               type="text"
               placeholder="Search medication, Rx number, or instructions..."
+              aria-label="Search prescriptions"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 rounded-full border-2 border-canvas-silk dark:border-slate-800 bg-canvas-bone dark:bg-slate-900 text-xs font-medium focus:outline-none focus:border-primary-500 transition-all placeholder:text-slate-400"
+              className="w-full pl-10 pr-4 py-2.5 min-h-[44px] rounded-full border-2 border-canvas-silk dark:border-slate-800 bg-canvas-bone dark:bg-slate-900 text-xs font-medium focus:outline-none focus:border-primary-500 transition-all placeholder:text-slate-400"
             />
           </div>
 
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-4 py-2 rounded-full border-2 border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-black text-slate-700 dark:text-slate-300 focus:outline-none focus:border-primary-500"
+            aria-label="Filter by prescription status"
+            className="px-4 py-2.5 min-h-[44px] rounded-full border-2 border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-black text-slate-700 dark:text-slate-300 focus:outline-none focus:border-primary-500"
           >
             <option value="all">All Prescriptions</option>
             <option value="active">Active / Filled</option>
             <option value="pending">Pending</option>
+            <option value="partially_filled">Partially Filled</option>
+            <option value="cancelled">Cancelled</option>
             <option value="expired">Expired</option>
           </select>
         </div>
@@ -692,6 +700,16 @@ export const Prescriptions = () => {
         {isLoading ? (
           <div className="space-y-4">
             <LoadingSkeleton variant="card" count={2} />
+          </div>
+        ) : isError ? (
+          <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-8 text-center space-y-3">
+            <p className="text-sm font-medium text-destructive">We couldn&apos;t load your prescriptions.</p>
+            <button
+              onClick={() => refetch()}
+              className="px-4 py-2.5 min-h-[44px] rounded-xl bg-primary-500 text-white text-xs font-extrabold"
+            >
+              Try again
+            </button>
           </div>
         ) : (
           <div className="space-y-5">
@@ -861,7 +879,7 @@ export const Prescriptions = () => {
                                   : [p];
                                 handlePrintSlip(batchItems);
                               }}
-                              className="px-3 py-1.5 rounded-xl bg-primary-50 dark:bg-slate-800 hover:bg-primary-500 hover:text-white text-primary-500 dark:text-blue-400 text-[11px] font-black transition-all active:scale-95 flex items-center gap-1"
+                              className="px-3 py-2.5 min-h-[44px] rounded-xl bg-primary-50 dark:bg-slate-800 hover:bg-primary-500 hover:text-white text-primary-500 dark:text-blue-400 text-[11px] font-black transition-all active:scale-95 flex items-center gap-1"
                               title="Print full official multi-drug prescription"
                             >
                               <Printer className="h-3.5 w-3.5" />

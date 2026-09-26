@@ -138,7 +138,7 @@ export const PharmacyPayment = ({ order, onPaymentSuccess }: PharmacyPaymentProp
               type="button"
               aria-pressed={payMethod === 'dpo'}
               onClick={() => { setPayError(null); setPayMethod('dpo'); }}
-              className={`flex items-center justify-center gap-2 p-3 rounded-xl border text-xs font-bold transition-all ${payMethod === 'dpo' ? 'border-primary bg-primary/5 text-primary' : 'border-border text-muted-foreground'}`}
+              className={`flex items-center justify-center gap-2 p-3 min-h-[44px] rounded-xl border text-xs font-bold transition-all ${payMethod === 'dpo' ? 'border-primary bg-primary/5 text-primary' : 'border-border text-muted-foreground'}`}
             >
               <CreditCard className="h-4 w-4" /> Card
               <span className="mx-0.5">•</span>
@@ -148,7 +148,7 @@ export const PharmacyPayment = ({ order, onPaymentSuccess }: PharmacyPaymentProp
               type="button"
               aria-pressed={payMethod === 'wallet'}
               onClick={() => { setPayError(null); setPayMethod('wallet'); }}
-              className={`flex items-center justify-center gap-2 p-3 rounded-xl border text-xs font-bold transition-all ${payMethod === 'wallet' ? 'border-primary bg-primary/5 text-primary' : 'border-border text-muted-foreground'}`}
+              className={`flex items-center justify-center gap-2 p-3 min-h-[44px] rounded-xl border text-xs font-bold transition-all ${payMethod === 'wallet' ? 'border-primary bg-primary/5 text-primary' : 'border-border text-muted-foreground'}`}
             >
               <Wallet className="h-4 w-4" /> Wallet ({formatPrice(walletBalance)})
             </button>
@@ -163,7 +163,7 @@ export const PharmacyPayment = ({ order, onPaymentSuccess }: PharmacyPaymentProp
         <Button
           onClick={handlePayment}
           disabled={loading || walletPaying || order.status !== 'pending'}
-          className="w-full"
+          className="w-full min-h-[44px]"
         >
           {loading || walletPaying ? (
             <>

@@ -14,7 +14,10 @@ const Marketplace = () => {
   const {
     products,
     productsLoading,
+    productsError,
+    refetchProducts,
     orders,
+    ordersLoading,
     cart,
     addToCart,
     removeFromCart,
@@ -84,7 +87,7 @@ const Marketplace = () => {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setActiveTab("cart")}
-                className="px-4 py-2 rounded-md bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs transition-all flex items-center gap-2"
+                className="px-4 py-2 min-h-[44px] rounded-md bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs transition-all flex items-center gap-2"
               >
                 <ShoppingCart className="h-4 w-4" />
                 <span>Cart ({cart?.items?.length ?? 0})</span>
@@ -104,7 +107,7 @@ const Marketplace = () => {
                 role="tab"
                 aria-selected={activeTab === tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`px-4 py-2 rounded-xl text-xs font-extrabold transition-all ${
+                className={`px-4 py-2 min-h-[44px] rounded-xl text-xs font-extrabold transition-all ${
                   activeTab === tab.id
                     ? "bg-primary-500 text-white shadow-xs"
                     : "bg-white dark:bg-slate-900 border border-canvas-silk text-graphite-500 dark:text-slate-400 hover:bg-canvas-mist dark:hover:bg-slate-800"
@@ -146,7 +149,20 @@ const Marketplace = () => {
               </div>
 
               {/* Products Grid */}
-              {productsLoading ? (
+              {productsError ? (
+                <div className="text-center py-12 text-xs text-graphite-500 dark:text-slate-400" role="alert">
+                  <Package className="h-10 w-10 mx-auto mb-2 opacity-30 text-primary-500" />
+                  <p className="font-bold text-sm text-slate-900 dark:text-slate-100 mb-1">Couldn't load medications.</p>
+                  <p className="font-medium mb-4">Check your connection and try again — your cart is safe.</p>
+                  <button
+                    onClick={() => refetchProducts()}
+                    aria-label="Retry loading medications"
+                    className="px-6 min-h-[44px] rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-xs font-extrabold transition-all"
+                  >
+                    Try again
+                  </button>
+                </div>
+              ) : productsLoading ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" aria-label="Loading products">
                   {[...Array(6)].map((_, i) => (
                     <div key={i} className="h-60 bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 animate-pulse rounded-2xl" />
@@ -160,10 +176,11 @@ const Marketplace = () => {
                 </div>
               )}
 
-              {filteredProducts?.length === 0 && !productsLoading && (
+              {!productsError && filteredProducts?.length === 0 && !productsLoading && (
                 <div className="text-center py-12 text-xs text-graphite-500 dark:text-slate-400">
                   <Package className="h-10 w-10 mx-auto mb-2 opacity-30 text-primary-500" />
                   <p className="font-bold">No medications found matching your criteria.</p>
+                  <p className="font-medium mt-1">Try a different search term or category.</p>
                 </div>
               )}
             </div>
@@ -184,8 +201,17 @@ const Marketplace = () => {
           {activeTab === "orders" && (
             <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
               <h2 className="font-extrabold text-sm mb-4">Medication Fulfillment & Order History</h2>
-              <div className="space-y-3">
-                {orders?.map((order) => (
+              <div className="space-y-3" aria-label={ordersLoading ? "Loading orders" : "Order history"}>
+                {ordersLoading ? (
+                  [0, 1, 2].map((i) => (
+                    <div key={i} className="border border-canvas-silk bg-canvas rounded-xl p-4 animate-pulse" aria-hidden="true">
+                      <div className="h-4 w-40 rounded bg-canvas-silk dark:bg-slate-800 mb-2" />
+                      <div className="h-3 w-56 rounded bg-canvas-silk dark:bg-slate-800 mb-1" />
+                      <div className="h-3 w-48 rounded bg-canvas-silk dark:bg-slate-800" />
+                    </div>
+                  ))
+                ) : (
+                  orders?.map((order) => (
                   <div key={order.id} className="border border-canvas-silk bg-canvas rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                     <div>
                       <div className="flex items-center gap-2">
@@ -205,19 +231,22 @@ const Marketplace = () => {
                       {order.status === "pending" && (
                         <button
                           onClick={() => setPendingPaymentOrder(order)}
-                          className="px-4 py-2 rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-xs font-extrabold transition-all"
+                          className="px-4 py-2 min-h-[44px] rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-xs font-extrabold transition-all"
                         >
                           Pay now
                         </button>
                       )}
                     </div>
                   </div>
-                ))}
+                )))}
 
-                {orders?.length === 0 && (
+                {!ordersLoading && orders?.length === 0 && (
                   <div className="text-center py-10 text-xs text-graphite-500 dark:text-slate-400">
                     <Package className="h-10 w-10 mx-auto mb-2 opacity-30 text-primary-500" />
-                    <p className="font-bold">No active pharmacy orders yet.</p>
+                    <p className="font-bold">No orders yet.</p>
+                    <p className="font-medium mt-1">
+                      When you place an order, it will appear here so you can pay and track delivery.
+                    </p>
                   </div>
                 )}
               </div>

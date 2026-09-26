@@ -31,7 +31,7 @@ export const BrowseSpecialties = () => {
             <button
               key={spec}
               onClick={() => navigate(`/search?specialty=${encodeURIComponent(spec)}`)}
-              className="px-4 py-2.5 rounded-pill bg-white dark:bg-slate-900 border border-canvas-silk text-sm font-medium text-graphite-600 dark:text-slate-300 hover:border-primary-300 hover:text-primary-600 hover:bg-primary-50 transition-all"
+              className="px-4 py-2.5 rounded-pill bg-white dark:bg-slate-900 border border-canvas-silk text-sm font-medium text-graphite-600 dark:text-slate-300 hover:border-primary-300 hover:text-primary-600 hover:bg-primary-50 transition-all min-h-[44px] inline-flex items-center"
             >
               {spec}
             </button>
@@ -160,7 +160,6 @@ const FOOTER_SECTIONS = [
     links: [
       { label: "About Us", href: "/about" },
       { label: "Contact & Support", href: "/contact" },
-      { label: "Emergency Help", href: "/emergency" },
       { label: "Terms of Service", href: "/terms" },
       { label: "Privacy Policy", href: "/privacy" },
     ],
@@ -191,13 +190,13 @@ export const LandingFooter = () => {
               <div className="flex items-center gap-2">
                 <a
                   href={EMERGENCY_TEL}
-                  className="px-4 py-2.5 rounded-pill bg-destructive hover:opacity-90 font-medium text-xs text-white shrink-0 transition-all"
+                  className="px-4 py-3.5 rounded-pill bg-destructive hover:opacity-90 font-medium text-xs text-white shrink-0 transition-all"
                 >
                   Call Emergency
                 </a>
                 <Link
                   to="/contact"
-                  className="px-4 py-2.5 rounded-pill border border-canvas-silk dark:border-slate-700 bg-white dark:bg-slate-900 font-medium text-xs text-midnight shrink-0 transition-all hover:border-primary-500"
+                  className="px-4 py-3.5 rounded-pill border border-canvas-silk dark:border-slate-700 bg-white dark:bg-slate-900 font-medium text-xs text-midnight shrink-0 transition-all hover:border-primary-500"
                 >
                   Contact Support
                 </Link>

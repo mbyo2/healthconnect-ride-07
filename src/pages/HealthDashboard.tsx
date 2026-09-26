@@ -40,6 +40,7 @@ export default function HealthDashboard() {
     latest: { heartRate: number | null; systolic: number | null; diastolic: number | null; spo2: number | null; weight: number | null };
   } | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuth();
 
@@ -56,6 +57,7 @@ export default function HealthDashboard() {
         setUpcomingAppointments(appointments);
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
+        setLoadError(true);
       } finally {
         setLoading(false);
       }
@@ -168,6 +170,16 @@ export default function HealthDashboard() {
         </div>
 
         {/* AI Insights Widget */}
+        {loadError && !loading && (
+          <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <p className="text-sm font-medium text-destructive">
+              We couldn&apos;t load your health data. Check your connection and try again.
+            </p>
+            <Button variant="outline" className="min-h-[44px] shrink-0" onClick={() => window.location.reload()}>
+              Try again
+            </Button>
+          </div>
+        )}
         <AIInsightsWidget
           context="health"
           data={{
@@ -247,6 +259,10 @@ export default function HealthDashboard() {
               <Heart className="h-8 w-8 mx-auto text-primary-500 mb-3" />
               <p className="font-medium text-midnight">No health metrics yet</p>
               <p className="text-sm text-graphite-500 mt-1">Start tracking — add vitals, symptoms, or connect a device.</p>
+              <div className="flex flex-wrap justify-center gap-2 mt-4">
+                <Button variant="outline" className="min-h-[44px]" onClick={() => navigate('/iot-monitoring')}>Record vitals</Button>
+                <Button variant="outline" className="min-h-[44px]" onClick={() => navigate('/symptoms')}>Log symptoms</Button>
+              </div>
             </div>
           )}
         </div>
@@ -277,12 +293,17 @@ export default function HealthDashboard() {
                     {goal.current}/{goal.target}
                   </span>
                 </div>
-                <Progress value={(goal.current / goal.target) * 100} className="h-3" />
+                <Progress value={goal.target > 0 ? (goal.current / goal.target) * 100 : 0} className="h-3" />
               </div>
             )) : (
-              <p className="text-muted-foreground text-center py-8 text-base">
-                No health goals set yet. Create your first goal!
-              </p>
+              <div className="text-center py-8">
+                <p className="text-muted-foreground text-base">
+                  No health goals set yet. Create your first goal!
+                </p>
+                <Button className="mt-4 min-h-[44px]" onClick={() => navigate('/health-analytics')}>
+                  Set your first goal
+                </Button>
+              </div>
             )}
           </CardContent>
         </Card>
@@ -301,14 +322,14 @@ export default function HealthDashboard() {
           <CardContent className="space-y-4">
             {upcomingAppointments.length > 0 ? upcomingAppointments.map((appointment, index) => (
               <div key={index} className="flex items-center justify-between p-4 border-2 border-border/50 rounded-xl hover:border-primary/50 transition-colors">
-                <div className="flex-1">
-                  <h3 className="font-semibold text-base">{appointment.type}</h3>
-                  <p className="text-sm text-muted-foreground mt-1">{appointment.provider}</p>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-base truncate">{appointment.type}</h3>
+                  <p className="text-sm text-muted-foreground mt-1 truncate">{appointment.provider}</p>
                   <p className="text-sm text-muted-foreground">
                     {appointment.date} at {appointment.time}
                   </p>
                 </div>
-                <Button variant="outline" size="sm" onClick={() => navigate(appointment.id ? `/appointments/${appointment.id}` : '/appointments')} className="ml-4">
+                <Button variant="outline" onClick={() => navigate(appointment.id ? `/appointments/${appointment.id}` : '/appointments')} className="ml-4 h-11 shrink-0">
                   View Details
                 </Button>
               </div>
@@ -383,9 +404,22 @@ export default function HealthDashboard() {
 
 function GamificationSection() {
   const { user } = useAuth();
-  const { badges, achievements } = useGamification(user?.id);
+  const { badges, achievements, loading } = useGamification(user?.id);
 
   if (!user) return null;
+
+  if (loading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {[0, 1].map((i) => (
+          <div key={i} className="rounded-2xl border border-canvas-silk p-6 space-y-4">
+            <div className="h-6 w-40 animate-pulse rounded-lg bg-canvas dark:bg-slate-800" />
+            <div className="h-16 animate-pulse rounded-xl bg-canvas dark:bg-slate-800" />
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -428,7 +462,7 @@ function GamificationSection() {
                 <span className="font-semibold capitalize text-base">{achievement.achievement_type.replace('_', ' ')}</span>
                 <span className="text-muted-foreground font-medium">{achievement.progress}/{achievement.target}</span>
               </div>
-              <Progress value={(achievement.progress / achievement.target) * 100} className="h-3" />
+              <Progress value={achievement.target > 0 ? (achievement.progress / achievement.target) * 100 : 0} className="h-3" />
             </div>
           )) : (
             <p className="text-sm text-muted-foreground">No active achievements.</p>

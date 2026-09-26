@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useUserRoles } from '@/context/UserRolesContext';
 import { useAuth } from '@/context/AuthContext';
 import { AccountApprovalGate } from '@/components/auth/AccountApprovalGate';
@@ -45,6 +46,7 @@ const ALLIED_LIKE_ROLES = [
 ];
 
 export const RoleBasedWorkflow = () => {
+  const navigate = useNavigate();
   const { currentRole, userRole, isAdmin, isSuperAdmin, availableRoles } = useUserRoles();
   const { profile } = useAuth();
   
@@ -160,6 +162,13 @@ export const RoleBasedWorkflow = () => {
               Your user role is being determined. Please refresh the page or complete your profile setup.
             </AlertDescription>
           </Alert>
+          <button
+            type="button"
+            onClick={() => navigate('/onboarding')}
+            className="vf-btn-primary w-full mt-4 min-h-[44px]"
+          >
+            Complete profile setup
+          </button>
         </CardContent>
       </Card>
     );

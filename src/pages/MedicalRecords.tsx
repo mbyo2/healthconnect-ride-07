@@ -17,6 +17,7 @@ export default function MedicalRecords() {
   const [records, setRecords] = useState<MedicalRecord[]>([]);
   const [healthMetrics, setHealthMetrics] = useState<HealthMetric[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const navigate = useNavigate();
 
   const downloadRecord = (record: MedicalRecord) => {
@@ -62,6 +63,7 @@ export default function MedicalRecords() {
         setHealthMetrics(metricsData);
       } catch (error) {
         console.error("Error fetching medical records:", error);
+        setLoadError(true);
       } finally {
         setLoading(false);
       }
@@ -94,11 +96,34 @@ export default function MedicalRecords() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-canvas dark:bg-slate-950 flex items-center justify-center p-6 font-sans">
-        <div className="text-center font-bold text-xs text-graphite-500 dark:text-slate-400">
-          Loading Electronic Health Records...
+      <div className="min-h-screen bg-canvas dark:bg-slate-950 p-6 font-sans">
+        <div className="max-w-content mx-auto space-y-4">
+          <div className="h-10 w-64 rounded-xl bg-white dark:bg-slate-900 animate-pulse" />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div className="lg:col-span-2 h-64 rounded-2xl bg-white dark:bg-slate-900 animate-pulse" />
+            <div className="h-64 rounded-2xl bg-white dark:bg-slate-900 animate-pulse" />
+          </div>
         </div>
       </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <ProtectedRoute>
+        <div className="min-h-screen bg-canvas dark:bg-slate-950 flex items-center justify-center p-6 font-sans">
+          <div className="max-w-md w-full rounded-2xl border border-destructive/30 bg-white dark:bg-slate-900 p-8 text-center space-y-3">
+            <p className="font-extrabold text-sm">We couldn&apos;t load your health records</p>
+            <p className="text-xs text-graphite-500 dark:text-slate-400">Check your connection and try again.</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-4 py-2.5 min-h-[44px] rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-xs font-extrabold"
+            >
+              Try again
+            </button>
+          </div>
+        </div>
+      </ProtectedRoute>
     );
   }
 
@@ -114,11 +139,11 @@ export default function MedicalRecords() {
               </div>
               <div>
                 <h1 className="font-display text-2xl font-medium tracking-tight flex items-center gap-2">
-                  Patient Health Records Board
+                  My Health Records
                   <span className="w-2 h-2 rounded-full bg-success-500 animate-ping" />
                 </h1>
                 <p className="text-sm text-graphite-500 font-medium tracking-wide">
-                  Centralized electronic medical records, lab results, prescriptions, and FHIR interoperability
+                  Your visits, lab results, and prescriptions in one place
                 </p>
               </div>
             </div>
@@ -126,7 +151,7 @@ export default function MedicalRecords() {
             <div className="flex items-center gap-2 flex-wrap">
               <button
                 onClick={() => navigate('/ai-diagnostics')}
-                className="vf-btn-secondary gap-2 text-sm"
+                className="vf-btn-secondary gap-2 text-sm min-h-[44px]"
               >
                 <Bot className="h-4 w-4" />
                 <span>AI Diagnostics</span>
@@ -134,13 +159,13 @@ export default function MedicalRecords() {
               <button
                 onClick={() => navigate('/ai-diagnostics')}
                 title="Scan documents with AI"
-                className="px-3.5 py-2 rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-900 font-bold text-xs text-slate-800 dark:text-slate-200 flex items-center gap-1.5 hover:bg-canvas dark:bg-slate-950">
+                className="px-3.5 py-2.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-900 font-bold text-xs text-slate-800 dark:text-slate-200 flex items-center gap-1.5 hover:bg-canvas dark:bg-slate-950">
                 <Upload className="h-4 w-4 text-graphite-500 dark:text-slate-400" />
-                <span>Upload Document</span>
+                <span>Scan Document</span>
               </button>
               <button
                 onClick={exportAllRecords}
-                className="px-3.5 py-2 rounded-md bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs flex items-center gap-1.5 shadow-xs transition-all">
+                className="px-3.5 py-2.5 min-h-[44px] rounded-md bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs flex items-center gap-1.5 shadow-xs transition-all">
                 <Download className="h-4 w-4" />
                 <span>Export EHR Data</span>
               </button>
@@ -211,7 +236,7 @@ export default function MedicalRecords() {
                           onClick={() => downloadRecord(record)}
                           aria-label={`Download record: ${record.title}`}
                           title="Download record (JSON)"
-                          className="p-2 rounded-lg border border-graphite-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800 transition-colors"
+                          className="p-3 min-h-[44px] min-w-[44px] rounded-lg border border-graphite-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800 transition-colors flex items-center justify-center"
                         >
                           <Download className="h-3.5 w-3.5" />
                         </button>
@@ -219,8 +244,16 @@ export default function MedicalRecords() {
                     </div>
                   ))
                 ) : (
-                  <div className="text-center py-10 text-xs text-graphite-500 dark:text-slate-400 font-medium">
-                    No medical records found. Upload your first record!
+                  <div className="text-center py-10 space-y-3">
+                    <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
+                      No medical records found yet. Records from your providers appear here automatically after each visit.
+                    </p>
+                    <button
+                      onClick={() => navigate('/ai-diagnostics')}
+                      className="px-4 py-2.5 min-h-[44px] rounded-xl border border-graphite-300 dark:border-slate-700 text-xs font-extrabold hover:bg-canvas dark:hover:bg-slate-800 transition-colors"
+                    >
+                      Scan your first document
+                    </button>
                   </div>
                 )}
               </div>
@@ -255,8 +288,16 @@ export default function MedicalRecords() {
                       </div>
                     ))
                   ) : (
-                    <div className="text-center py-6 text-xs text-graphite-500 dark:text-slate-400">
-                      No health metrics recorded yet.
+                    <div className="text-center py-6 space-y-3">
+                      <p className="text-xs text-graphite-500 dark:text-slate-400">
+                        No health metrics recorded yet.
+                      </p>
+                      <button
+                        onClick={() => navigate('/iot-monitoring')}
+                        className="px-4 py-2.5 min-h-[44px] rounded-xl border border-graphite-300 dark:border-slate-700 text-xs font-extrabold hover:bg-canvas dark:hover:bg-slate-800 transition-colors"
+                      >
+                        Record vitals
+                      </button>
                     </div>
                   )}
                 </div>
@@ -284,9 +325,9 @@ export default function MedicalRecords() {
               <button
                 onClick={() => navigate('/ai-diagnostics')}
                 title="Scan documents with AI"
-                className="flex items-center gap-2 p-3 rounded-xl border border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 hover:bg-primary-50 dark:hover:bg-slate-800 dark:hover:bg-slate-800 transition-colors text-xs font-extrabold">
+                className="flex items-center gap-2 p-3 min-h-[52px] rounded-xl border border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 hover:bg-primary-50 dark:hover:bg-slate-800 transition-colors text-xs font-extrabold">
                 <Upload className="h-4 w-4 text-warning-500" />
-                <span>Upload Document</span>
+                <span>Scan Document</span>
               </button>
               <button
                 onClick={() => navigate('/health-dashboard')}

@@ -17,7 +17,7 @@ const BookingConfirmed = () => {
   const navigate = useNavigate();
   const appointmentId = searchParams.get('id');
 
-  const { data: appointment, isLoading } = useQuery({
+  const { data: appointment, isLoading, isError, refetch } = useQuery({
     queryKey: ['booking-confirmed', appointmentId],
     queryFn: async () => {
       if (!appointmentId) return null;
@@ -79,18 +79,37 @@ const BookingConfirmed = () => {
     );
   }
 
+  if (isError) {
+    return (
+      <div className="container mx-auto px-4 py-12 text-center space-y-3">
+        <p className="text-muted-foreground">We couldn&apos;t load your booking details. Check your connection and try again.</p>
+        <div className="flex flex-col sm:flex-row gap-2 justify-center">
+          <Button onClick={() => refetch()} className="min-h-[44px]">Try again</Button>
+          <Button variant="outline" onClick={() => navigate('/home')} className="min-h-[44px]">Go Home</Button>
+        </div>
+      </div>
+    );
+  }
+
   if (!appointment) {
     return (
       <div className="container mx-auto px-4 py-12 text-center">
-        <p className="text-muted-foreground">Appointment not found.</p>
-        <Button onClick={() => navigate('/home')} className="mt-4">Go Home</Button>
+        <p className="text-muted-foreground">Appointment not found. It may have been cancelled or the link is incorrect.</p>
+        <Button onClick={() => navigate('/home')} className="mt-4 min-h-[44px]">Go Home</Button>
       </div>
     );
   }
 
   const provider = appointment.provider as any;
   const isVideo = appointment.type === 'video_consultation';
-  const appointmentDate = parseISO(appointment.date);
+  const appointmentDate = (() => {
+    try {
+      const d = parseISO(appointment.date);
+      return isNaN(d.getTime()) ? null : d;
+    } catch {
+      return null;
+    }
+  })();
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-lg space-y-6">
@@ -171,7 +190,7 @@ const BookingConfirmed = () => {
               <div>
                 <p className="text-xs text-muted-foreground">Date</p>
                 <p className="font-medium text-foreground text-sm">
-                  {format(appointmentDate, 'EEE, MMM d, yyyy')}
+                  {appointmentDate ? format(appointmentDate, 'EEE, MMM d, yyyy') : 'Date to be confirmed'}
                 </p>
               </div>
             </div>

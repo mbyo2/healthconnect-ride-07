@@ -8,48 +8,56 @@ import { useNavigate } from "react-router-dom";
 const VideoDashboard: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [stats, setStats] = useState({ upcoming: 0, today: 0, active: 0, loading: true });
+  const [stats, setStats] = useState({ upcoming: 0, today: 0, active: 0, loading: true, error: false });
+
+  const loadStats = async () => {
+    if (!user) return;
+    setStats((s) => ({ ...s, loading: true, error: false }));
+    try {
+      const now = new Date();
+      const today = now.toISOString().split("T")[0];
+      const tomorrow = new Date(now.getTime() + 86_400_000).toISOString().split("T")[0];
+      const sevenDays = new Date(now.getTime() + 7 * 86_400_000).toISOString().split("T")[0];
+
+      const [upcomingRes, todayRes, activeRes] = await Promise.all([
+        (supabase as any)
+          .from("video_consultations")
+          .select("id", { count: "exact", head: true })
+          .or(`patient_id.eq.${user.id},provider_id.eq.${user.id}`)
+          .gte("scheduled_start", now.toISOString())
+          .lte("scheduled_start", `${sevenDays}T23:59:59`),
+        (supabase as any)
+          .from("video_consultations")
+          .select("id", { count: "exact", head: true })
+          .or(`patient_id.eq.${user.id},provider_id.eq.${user.id}`)
+          .gte("scheduled_start", `${today}T00:00:00`)
+          .lt("scheduled_start", `${tomorrow}T00:00:00`),
+        (supabase as any)
+          .from("video_consultations")
+          .select("id", { count: "exact", head: true })
+          .or(`patient_id.eq.${user.id},provider_id.eq.${user.id}`)
+          .eq("status", "active"),
+      ]);
+
+      if (upcomingRes.error || todayRes.error || activeRes.error) {
+        throw upcomingRes.error || todayRes.error || activeRes.error;
+      }
+
+      setStats({
+        upcoming: upcomingRes.count ?? 0,
+        today: todayRes.count ?? 0,
+        active: activeRes.count ?? 0,
+        loading: false,
+        error: false,
+      });
+    } catch (err) {
+      console.error("VideoDashboard load error:", err);
+      setStats((s) => ({ ...s, loading: false, error: true }));
+    }
+  };
 
   useEffect(() => {
-    if (!user) return;
-    (async () => {
-      try {
-        const now = new Date();
-        const today = now.toISOString().split("T")[0];
-        const tomorrow = new Date(now.getTime() + 86_400_000).toISOString().split("T")[0];
-        const sevenDays = new Date(now.getTime() + 7 * 86_400_000).toISOString().split("T")[0];
-
-        const [upcomingRes, todayRes, activeRes] = await Promise.all([
-          (supabase as any)
-            .from("video_consultations")
-            .select("id", { count: "exact", head: true })
-            .or(`patient_id.eq.${user.id},provider_id.eq.${user.id}`)
-            .gte("scheduled_start", now.toISOString())
-            .lte("scheduled_start", `${sevenDays}T23:59:59`),
-          (supabase as any)
-            .from("video_consultations")
-            .select("id", { count: "exact", head: true })
-            .or(`patient_id.eq.${user.id},provider_id.eq.${user.id}`)
-            .gte("scheduled_start", `${today}T00:00:00`)
-            .lt("scheduled_start", `${tomorrow}T00:00:00`),
-          (supabase as any)
-            .from("video_consultations")
-            .select("id", { count: "exact", head: true })
-            .or(`patient_id.eq.${user.id},provider_id.eq.${user.id}`)
-            .eq("status", "active"),
-        ]);
-
-        setStats({
-          upcoming: upcomingRes.count ?? 0,
-          today: todayRes.count ?? 0,
-          active: activeRes.count ?? 0,
-          loading: false,
-        });
-      } catch (err) {
-        console.error("VideoDashboard load error:", err);
-        setStats((s) => ({ ...s, loading: false }));
-      }
-    })();
+    loadStats();
   }, [user]);
 
   return (
@@ -63,11 +71,11 @@ const VideoDashboard: React.FC = () => {
             </div>
             <div>
               <h1 className="text-xl font-extrabold tracking-tight flex items-center gap-2">
-                Telehealth & Video Telemetry Board
+                Video Visits
                 <span className="w-2 h-2 rounded-full bg-success-500 animate-ping" />
               </h1>
               <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
-                HD Encrypted WebRTC Video Rooms, Patient Waiting Rooms, and E-Prescriptions
+                Secure video rooms, patient waiting rooms, and visit follow-ups
               </p>
             </div>
           </div>
@@ -75,14 +83,14 @@ const VideoDashboard: React.FC = () => {
           <div className="flex items-center gap-2">
             <button
               onClick={() => navigate(`/video-call/${safeCryptoUUID()}?instant=1`)}
-              className="px-4 py-2 rounded-md bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs transition-all flex items-center gap-1.5"
+              className="px-4 py-2.5 min-h-[44px] rounded-md bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs transition-all flex items-center gap-1.5"
             >
               <Phone className="h-4 w-4" />
               <span>Instant Call Room</span>
             </button>
             <button
               onClick={() => navigate("/appointments")}
-              className="px-4 py-2 rounded-md border border-graphite-300 dark:border-slate-700 bg-white text-slate-800 font-bold text-xs hover:bg-canvas-mist dark:hover:bg-slate-800 flex items-center gap-1.5"
+              className="px-4 py-2.5 min-h-[44px] rounded-md border border-graphite-300 dark:border-slate-700 bg-white text-slate-800 font-bold text-xs hover:bg-canvas-mist dark:hover:bg-slate-800 flex items-center gap-1.5"
             >
               <Calendar className="h-4 w-4 text-graphite-500 dark:text-slate-400" />
               <span>Schedule Call</span>
@@ -92,6 +100,19 @@ const VideoDashboard: React.FC = () => {
       </div>
 
       <div className="max-w-[1500px] mx-auto px-4 sm:px-6 pt-6 space-y-6">
+        {stats.error && !stats.loading && (
+          <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <p className="text-sm font-medium text-destructive">
+              We couldn&apos;t load your video visit stats. Check your connection and try again.
+            </p>
+            <button
+              onClick={loadStats}
+              className="px-4 py-2.5 min-h-[44px] rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-xs font-extrabold shrink-0"
+            >
+              Try again
+            </button>
+          </div>
+        )}
         {/* KPI Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs">

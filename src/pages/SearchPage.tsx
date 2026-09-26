@@ -87,7 +87,7 @@ const SearchPage = () => {
               </div>
               <div>
                 <h1 className="font-display text-2xl font-medium tracking-tight flex items-center gap-2">
-                  Healthcare Provider Search Board
+                  Find a Doctor
                   <span className="w-2 h-2 rounded-full bg-success-500 animate-ping" />
                 </h1>
                 <p className="text-sm text-graphite-500 font-medium tracking-wide">
@@ -105,13 +105,15 @@ const SearchPage = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={handleKeyPress}
-                className="w-full pl-11 pr-32 py-3 rounded-pill border border-canvas-silk dark:border-slate-700 bg-white dark:bg-slate-900 text-sm font-medium text-midnight placeholder:text-graphite-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 shadow-sm"
+                className="w-full pl-11 pr-28 py-3 rounded-pill border border-canvas-silk dark:border-slate-700 bg-white dark:bg-slate-900 text-sm font-medium text-midnight placeholder:text-graphite-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 shadow-sm"
+                aria-label="Search providers"
               />
               <button
                 onClick={handleSearch}
-                className="absolute right-2 top-1/2 -translate-y-1/2 vf-btn-primary text-sm"
+                disabled={!searchQuery.trim()}
+                className="absolute right-2 top-1/2 -translate-y-1/2 vf-btn-primary text-sm min-h-[40px] disabled:opacity-50"
               >
-                Search Board
+                Search
               </button>
             </div>
           </div>

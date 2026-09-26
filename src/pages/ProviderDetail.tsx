@@ -45,7 +45,7 @@ export const ProviderDetail = () => {
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
 
-  const { data: provider, isLoading, error } = useQuery({
+  const { data: provider, isLoading, error, refetch } = useQuery({
     queryKey: ["provider-detail", id],
     queryFn: async () => {
       if (!id) return null;
@@ -125,16 +125,34 @@ export const ProviderDetail = () => {
   }
 
   if (error || !provider) {
+    const isFetchError = !!error && (error as Error).message !== "Provider not found";
     return (
       <div className="min-h-screen bg-canvas p-6 flex items-center justify-center">
         <div className="max-w-md w-full p-8 rounded-2xl bg-white border border-canvas-silk text-center space-y-3">
-          <h2 className="text-lg font-extrabold">Provider Profile Not Found</h2>
-          <button
-            onClick={() => navigate("/search")}
-            className="px-4 py-2 rounded-md bg-primary-500 text-white font-bold text-xs"
-          >
-            Browse Verified Doctors
-          </button>
+          <h2 className="text-lg font-extrabold">
+            {isFetchError ? "Couldn't load this profile" : "Provider Profile Not Found"}
+          </h2>
+          <p className="text-sm text-graphite-500">
+            {isFetchError
+              ? "Check your connection and try again."
+              : "This provider may have been removed or the link is incorrect."}
+          </p>
+          <div className="flex flex-col sm:flex-row gap-2 justify-center">
+            {isFetchError && (
+              <button
+                onClick={() => refetch()}
+                className="px-4 py-2.5 min-h-[44px] rounded-md bg-primary-500 text-white font-bold text-xs"
+              >
+                Try again
+              </button>
+            )}
+            <button
+              onClick={() => navigate("/search")}
+              className="px-4 py-2.5 min-h-[44px] rounded-md border border-canvas-silk text-slate-700 font-bold text-xs"
+            >
+              Browse Verified Doctors
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -183,13 +201,13 @@ export const ProviderDetail = () => {
             <div className="flex items-center gap-2 shrink-0">
               <button
                 onClick={() => setIsWaitlistOpen(true)}
-                className="px-3 py-1.5 rounded-md border border-canvas-silk text-xs font-bold text-slate-600 hover:bg-canvas-mist dark:hover:bg-slate-800"
+                className="px-4 py-2.5 min-h-[44px] rounded-md border border-canvas-silk text-xs font-bold text-slate-600 hover:bg-canvas-mist dark:hover:bg-slate-800"
               >
                 Join Waitlist
               </button>
               <button
                 onClick={() => setIsBookingOpen(true)}
-                className="px-4 py-2 rounded-md bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs flex items-center gap-1.5"
+                className="px-4 py-2.5 min-h-[44px] rounded-md bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs flex items-center gap-1.5"
               >
                 <CalendarPlus className="h-4 w-4" /> Book Appointment
               </button>
@@ -458,14 +476,14 @@ export const ProviderDetail = () => {
               <div className="space-y-2">
                 <button
                   onClick={() => setIsBookingOpen(true)}
-                  className="w-full py-3 rounded-2xl bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-sm transition-all"
+                  className="w-full py-3.5 min-h-[48px] rounded-2xl bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-sm transition-all"
                 >
                   <CalendarPlus className="h-4 w-4 inline mr-2" />
                   Book Appointment
                 </button>
                 <button
                   onClick={() => setIsWaitlistOpen(true)}
-                  className="w-full py-2.5 rounded-2xl border border-canvas-silk dark:border-slate-700 hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-xs transition-all"
+                  className="w-full py-3 min-h-[44px] rounded-2xl border border-canvas-silk dark:border-slate-700 hover:bg-canvas-mist dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-xs transition-all"
                 >
                   Join Waitlist
                 </button>

@@ -82,7 +82,7 @@ export const MessageInput = ({ onSendMessage, onUploadComplete, loading, draftKe
         enableSQLProtection={true}
       />
       <FileUploader onUploadComplete={onUploadComplete} />
-      <Button type="submit" disabled={loading}>
+      <Button type="submit" disabled={loading} className="min-h-[44px]">
         Send
       </Button>
     </form>

@@ -1,11 +1,12 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { ChatWindow } from "./ChatWindow";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 import { providerDisplayName } from "@/utils/providerDisplay";
 
 interface ChatContact {
@@ -20,6 +21,7 @@ export const ChatList = () => {
   const [contacts, setContacts] = useState<ChatContact[]>([]);
   const [selectedContact, setSelectedContact] = useState<ChatContact | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [searchParams] = useSearchParams();
   const receiverParam = searchParams.get("receiver");
 
@@ -54,16 +56,17 @@ export const ChatList = () => {
       });
   }, [receiverParam, contacts, selectedContact, loading]);
 
-  useEffect(() => {
-    const fetchContacts = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
+  const loadContacts = useCallback(async () => {
+    try {
+      setLoading(true);
+      setLoadError(false);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
 
-        // Only people this user actually has care relationships with:
-        // message counterparts + appointment counterparts. Never the
-        // whole user directory.
-        const counterpartIds = new Set<string>();
+      // Only people this user actually has care relationships with:
+      // message counterparts + appointment counterparts. Never the
+      // whole user directory.
+      const counterpartIds = new Set<string>();
         const [msgsRes, apptsAsPatient, apptsAsProvider] = await Promise.all([
           supabase
             .from('messages')
@@ -100,68 +103,85 @@ export const ChatList = () => {
         if (error) throw error;
         setContacts(profiles || []);
       } catch (error: any) {
+        setLoadError(true);
         toast.error("Error fetching contacts: " + error.message);
       } finally {
         setLoading(false);
       }
-    };
+    }, []);
 
-    fetchContacts();
+    useEffect(() => {
+      loadContacts();
 
-    // Real-time: any new message refreshes the contact list. This both
-    // bubbles active conversations and discovers brand-new counterparts
-    // (no user-id race, no missed first messages). messages table is in the
-    // realtime publication (see 20260921 migration).
-    const channel = supabase
-      .channel('chat-list-realtime')
-      .on('postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'messages' },
-        () => {
-          fetchContacts();
-        }
-      )
-      .subscribe();
+      // Real-time: any new message refreshes the contact list. This both
+      // bubbles active conversations and discovers brand-new counterparts
+      // (no user-id race, no missed first messages). messages table is in the
+      // realtime publication (see 20260921 migration).
+      const channel = supabase
+        .channel('chat-list-realtime')
+        .on('postgres_changes',
+          { event: 'INSERT', schema: 'public', table: 'messages' },
+          () => {
+            loadContacts();
+          }
+        )
+        .subscribe();
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }, [loadContacts]);
 
-  if (loading) {
-    return (
-      <div className="grid gap-2 p-4" role="status" aria-label="Loading contacts">
-        {[...Array(4)].map((_, i) => (
-          <div key={i} className="h-16 rounded-xl bg-muted animate-pulse" aria-hidden />
-        ))}
-      </div>
-    );
-  }
+    if (loading) {
+      return (
+        <div className="grid gap-2 p-4" role="status" aria-label="Loading contacts">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="h-16 rounded-xl bg-muted animate-pulse" aria-hidden />
+          ))}
+        </div>
+      );
+    }
+
+    if (loadError && contacts.length === 0) {
+      return (
+        <div className="text-center py-12 space-y-3">
+          <p className="text-sm text-destructive font-medium">We couldn&apos;t load your conversations.</p>
+          <p className="text-xs text-muted-foreground">Check your connection and try again.</p>
+          <Button variant="outline" className="min-h-[44px]" onClick={loadContacts}>Try again</Button>
+        </div>
+      );
+    }
 
   return (
-    <div className="flex h-[calc(100vh-8rem)] gap-4">
-      <div className="w-1/3 border rounded-lg">
-        <ScrollArea className="h-full">
+    <div className="flex flex-col md:flex-row md:h-[calc(100vh-12rem)] gap-4">
+      <div className={`md:w-1/3 md:border md:rounded-lg ${selectedContact ? 'hidden md:block' : 'block'}`}>
+        <ScrollArea className="md:h-full">
           <div className="p-4 space-y-2">
             {contacts.length === 0 && (
-              <div className="text-center py-8 text-sm text-muted-foreground">
-                No conversations yet — book an appointment to message your provider.
+              <div className="text-center py-8 space-y-3">
+                <p className="text-sm text-muted-foreground">
+                  No conversations yet — book an appointment to message your provider.
+                </p>
+                <Link to="/search">
+                  <Button variant="outline" className="min-h-[44px]">Find a provider</Button>
+                </Link>
               </div>
             )}
             {contacts.map((contact) => (
               <Button
                 key={contact.id}
                 variant={selectedContact?.id === contact.id ? "default" : "ghost"}
-                className="w-full justify-start gap-2"
+                className="w-full justify-start gap-2 min-h-[52px] py-2"
                 onClick={() => setSelectedContact(contact)}
               >
-                <Avatar className="h-8 w-8">
+                <Avatar className="h-9 w-9">
                   <AvatarImage src={contact.avatar_url || ''} />
                   <AvatarFallback>
                     {contact.first_name?.[0]}{contact.last_name?.[0]}
                   </AvatarFallback>
                 </Avatar>
-                <div className="text-left">
-                  <div>{providerDisplayName({ first_name: contact.first_name, last_name: contact.last_name, role: contact.role })}</div>
+                <div className="text-left min-w-0">
+                  <div className="truncate">{providerDisplayName({ first_name: contact.first_name, last_name: contact.last_name, role: contact.role })}</div>
                   <div className="text-xs text-muted-foreground capitalize">
                     {(contact.role || 'member').replace('_', ' ')}
                   </div>
@@ -171,10 +191,24 @@ export const ChatList = () => {
           </div>
         </ScrollArea>
       </div>
-      
-      <div className="flex-1">
+
+      <div className={`flex-1 min-h-[60vh] md:min-h-0 ${selectedContact ? 'block' : 'hidden md:block'}`}>
         {selectedContact ? (
-          <ChatWindow providerId={selectedContact.id} />
+          <div className="flex flex-col h-full gap-2">
+            <button
+              onClick={() => setSelectedContact(null)}
+              className="md:hidden self-start inline-flex items-center gap-1.5 min-h-[44px] px-3 rounded-lg text-sm font-semibold text-primary"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              All conversations
+            </button>
+            <div className="flex-1 min-h-0">
+              <ChatWindow
+                providerId={selectedContact.id}
+                providerName={providerDisplayName({ first_name: selectedContact.first_name, last_name: selectedContact.last_name, role: selectedContact.role })}
+              />
+            </div>
+          </div>
         ) : (
           <div className="h-full flex items-center justify-center text-muted-foreground">
             Select a contact to start chatting

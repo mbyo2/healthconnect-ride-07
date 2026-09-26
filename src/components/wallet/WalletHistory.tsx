@@ -9,6 +9,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { ArrowDownLeft, ArrowUpRight, Clock, Search } from "lucide-react";
 import { format } from "date-fns";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 interface Transaction {
     id: string;
@@ -98,9 +99,23 @@ export const WalletHistory = () => {
             <CardContent className="p-0">
                 <ScrollArea className="h-[500px]">
                     {filteredTransactions.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+                        <div className="flex flex-col items-center justify-center py-12 text-muted-foreground text-center px-6">
                             <Clock className="h-12 w-12 opacity-20 mb-4" />
-                            <p>No transactions found</p>
+                            <p className="font-semibold text-foreground">No transactions found</p>
+                            <p className="text-xs mt-1">
+                                {searchQuery
+                                    ? 'Try clearing your search.'
+                                    : 'Top up your wallet to get started — your history will appear here.'}
+                            </p>
+                            {!searchQuery && (
+                                <Button
+                                    variant="outline"
+                                    className="mt-4 min-h-[44px]"
+                                    onClick={() => document.getElementById('wallet-topup')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                                >
+                                    Top up your wallet
+                                </Button>
+                            )}
                         </div>
                     ) : (
                         <div className="divide-y divide-border">

@@ -30,22 +30,22 @@ type TriageResponse = {
 
 const URGENCY_META: Record<TriageResponse["urgency"], { label: string; pillColor: string; icon: React.ReactNode }> = {
   emergency: {
-    label: "EMERGENCY DISPATCH",
+    label: "Emergency — call now",
     pillColor: "bg-error-500 text-white",
     icon: <Ambulance className="h-4 w-4" />,
   },
   urgent: {
-    label: "Urgent Visit Needed",
+    label: "See a doctor soon",
     pillColor: "bg-warning-500 text-white",
     icon: <AlertTriangle className="h-4 w-4" />,
   },
   routine: {
-    label: "Routine Checkup",
+    label: "Routine visit",
     pillColor: "bg-primary-500 text-white",
     icon: <Stethoscope className="h-4 w-4" />,
   },
   self_care: {
-    label: "Self-Care Guidance",
+    label: "Care at home",
     pillColor: "bg-success-500 text-white",
     icon: <ShieldCheck className="h-4 w-4" />,
   },
@@ -189,11 +189,11 @@ export default function TriageIntake() {
           </div>
           <div>
             <h1 className="text-xl font-extrabold tracking-tight flex items-center gap-2">
-              Clinical Symptom Triage & Red Flag Protocol Board
+              Symptom Check
               <span className="w-2 h-2 rounded-full bg-success-500 animate-ping" />
             </h1>
             <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
-              AI-assisted emergency detection, specialty recommendations, and automated provider booking
+              Tell us how you feel — we'll suggest the right care and help you book a visit
             </p>
           </div>
         </div>
@@ -204,16 +204,16 @@ export default function TriageIntake() {
         <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
           <div className="border-b border-canvas-silk pb-3">
             <h2 className="font-extrabold text-sm flex items-center gap-2">
-              <Stethoscope className="h-4 w-4 text-primary-500" /> Symptom Intake Form
+              <Stethoscope className="h-4 w-4 text-primary-500" /> Tell us your symptoms
             </h2>
             <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium mt-0.5">
-              All clinical inputs are encrypted and linked securely to your electronic health record.
+              Your answers are private and saved to your health record.
             </p>
           </div>
 
           <div className="space-y-3 text-xs">
             <div>
-              <label htmlFor="cc" className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Main Complaint / Symptom *</label>
+              <label htmlFor="cc" className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Main symptom or problem *</label>
               <input
                 id="cc"
                 placeholder="e.g. Sharp chest tightness for 2 hours, radiating to left shoulder"
@@ -225,7 +225,7 @@ export default function TriageIntake() {
             </div>
 
             <div>
-              <label htmlFor="sy" className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Associated Symptoms (comma separated)</label>
+              <label htmlFor="sy" className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Other symptoms (separate with commas)</label>
               <input
                 id="sy"
                 placeholder="shortness of breath, sweating, mild nausea"
@@ -237,7 +237,7 @@ export default function TriageIntake() {
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <label htmlFor="dur" className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Symptom Duration</label>
+                <label htmlFor="dur" className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">How long has this been going on?</label>
                 <input
                   id="dur"
                   placeholder="e.g. 3 hours / 2 days"
@@ -248,8 +248,8 @@ export default function TriageIntake() {
               </div>
               <div>
                 <div className="flex justify-between items-center mb-1">
-                  <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Discomfort Severity</label>
-                  <span className="font-mono font-black text-sm text-primary-500">{severity}/10</span>
+                  <label id="severity-label" className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">How bad is it?</label>
+                  <span className="font-mono font-black text-sm text-primary-500" aria-hidden="true">{severity}/10</span>
                 </div>
                 <Slider
                   value={[severity]}
@@ -257,16 +257,19 @@ export default function TriageIntake() {
                   min={0}
                   max={10}
                   step={1}
+                  aria-labelledby="severity-label"
+                  aria-label="How bad is it, from 0 to 10"
                   className="mt-2"
                 />
+                <p className="sr-only" aria-live="polite">Severity {severity} out of 10</p>
               </div>
             </div>
 
             <div>
-              <label htmlFor="notes" className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Relevant Medical Background (optional)</label>
+              <label htmlFor="notes" className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Your medical background (optional)</label>
               <textarea
                 id="notes"
-                placeholder="Current medications, known allergies, prior cardiac or chronic conditions..."
+                placeholder="Medicines you take, allergies, ongoing conditions..."
                 value={extraNotes}
                 onChange={(e) => setExtraNotes(e.target.value)}
                 maxLength={2000}
@@ -283,10 +286,10 @@ export default function TriageIntake() {
               {assessing ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  <span>Evaluating Clinical Triage Model...</span>
+                  <span>Checking your answers...</span>
                 </>
               ) : (
-                "Run AI Clinical Triage Protocol"
+                "Check my symptoms"
               )}
             </button>
           </div>
@@ -297,8 +300,8 @@ export default function TriageIntake() {
           <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
             <div className="flex items-center justify-between border-b border-canvas-silk pb-3">
               <div>
-                <h2 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">Triage Assessment Results</h2>
-                <p className="text-xs text-graphite-500 dark:text-slate-400 mt-0.5">Recommended specialty: <strong className="text-slate-900 dark:text-slate-100">{result.recommended_specialty}</strong></p>
+                <h2 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">Your result</h2>
+                <p className="text-xs text-graphite-500 dark:text-slate-400 mt-0.5">Best doctor type for you: <strong className="text-slate-900 dark:text-slate-100">{result.recommended_specialty}</strong></p>
               </div>
               <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1.5 ${meta.pillColor}`}>
                 {meta.icon} {meta.label}
@@ -309,7 +312,7 @@ export default function TriageIntake() {
               <div className="p-4 rounded-xl border border-error-500/30 bg-error-500/10 flex items-start gap-3">
                 <AlertTriangle className="h-5 w-5 text-error-500 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h3 className="font-extrabold text-sm text-error-500">Emergency Response Dispatched</h3>
+                  <h3 className="font-extrabold text-sm text-error-500">Get emergency help now</h3>
                   <p className="text-xs text-slate-700 dark:text-slate-300 mt-1">
                     {result.recommended_action} Call local emergency services (991 / 112) immediately.
                   </p>
@@ -319,7 +322,7 @@ export default function TriageIntake() {
 
             {result.red_flags.length > 0 && (
               <div className="p-3.5 rounded-xl border border-warning-500/30 bg-warning-500/5 text-xs">
-                <p className="font-extrabold text-warning-500 mb-1">Clinical Red Flags Detected:</p>
+                <p className="font-extrabold text-warning-500 mb-1">Warning signs to watch:</p>
                 <ul className="list-disc list-inside text-slate-700 dark:text-slate-300 space-y-0.5">
                   {result.red_flags.map((rf, i) => (
                     <li key={i}>{rf}</li>
@@ -329,27 +332,27 @@ export default function TriageIntake() {
             )}
 
             <div className="text-xs space-y-1">
-              <p className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Clinical Protocol Recommendation</p>
+              <p className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">What we recommend</p>
               <p className="text-slate-800 dark:text-slate-200 font-medium">{result.recommended_action}</p>
             </div>
 
             {result.reasoning && (
               <p className="text-[11px] text-graphite-500 dark:text-slate-400 italic bg-canvas dark:bg-slate-800 p-3 rounded-xl border border-canvas-silk dark:border-slate-700">
-                Reasoning: {result.reasoning}
+                Why we think this: {result.reasoning}
               </p>
             )}
 
             {result.urgency !== "emergency" && (
               <div className="pt-2 space-y-3">
                 <p className="text-xs font-extrabold text-slate-900 dark:text-slate-100 uppercase">
-                  {result.providers.length > 0 ? "Recommended Verified Specialists" : "No matching providers online"}
+                  {result.providers.length > 0 ? "Doctors we recommend for you" : "No matching doctors available right now"}
                 </p>
                 {result.providers.length === 0 && (
                   <button
                     onClick={() => navigate("/search")}
                     className="w-full py-2.5 rounded-xl border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-bold text-xs text-primary-500 hover:bg-canvas-mist dark:hover:bg-slate-800 dark:hover:bg-slate-700"
                   >
-                    Browse All Providers Index
+                    Browse all doctors
                   </button>
                 )}
                 {result.providers.map((p) => {
@@ -370,9 +373,9 @@ export default function TriageIntake() {
                       <button
                         onClick={() => bookProvider(p.id)}
                         disabled={booking === p.id}
-                        className="ml-3 px-4 py-1.5 rounded-md bg-primary-500 hover:bg-primary-600 text-white text-xs font-extrabold flex items-center gap-1 shadow-xs"
+                        className="ml-3 px-4 py-1.5 min-h-[44px] rounded-md bg-primary-500 hover:bg-primary-600 text-white text-xs font-extrabold flex items-center gap-1 shadow-xs"
                       >
-                        {booking === p.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Book Appointment"}
+                        {booking === p.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Book visit"}
                       </button>
                     </div>
                   );

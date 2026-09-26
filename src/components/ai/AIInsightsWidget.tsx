@@ -164,7 +164,7 @@ export const AIInsightsWidget = ({ context, data, compact = false }: AIInsightsW
             <Sparkles className="h-4 w-4 text-primary" />
           </div>
           {hasGenerated && (
-            <Button variant="ghost" size="sm" onClick={generateInsights} disabled={loading}>
+            <Button variant="ghost" size="icon" className="h-11 w-11" onClick={generateInsights} disabled={loading} aria-label="Refresh insights">
               <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
             </Button>
           )}
@@ -176,7 +176,7 @@ export const AIInsightsWidget = ({ context, data, compact = false }: AIInsightsW
             <p className="text-sm text-muted-foreground mb-4">
               Get AI-powered analysis and personalized health recommendations
             </p>
-            <Button onClick={generateInsights} disabled={loading} className="gap-2">
+            <Button onClick={generateInsights} disabled={loading} className="gap-2 h-11 min-h-[44px]">
               {loading ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -231,7 +231,7 @@ export const AIInsightsWidget = ({ context, data, compact = false }: AIInsightsW
         )}
 
         <div className="flex items-center justify-between pt-2 border-t">
-          <p className="text-xs text-muted-foreground">Powered by Doc 0 Clock AI</p>
+          <p className="text-xs text-muted-foreground">Powered by Doc&apos; O Clock AI</p>
           <Button variant="outline" size="sm" onClick={() => navigate('/ai-diagnostics')} className="gap-1">
             Full AI Chat
             <ArrowRight className="h-3 w-3" />

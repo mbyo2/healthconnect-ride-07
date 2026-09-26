@@ -33,6 +33,7 @@ const Medications = () => {
   const { user } = useAuth();
   const [medications, setMedications] = useState<Medication[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   // The repo migrations only create the base medications columns; the
@@ -88,6 +89,7 @@ const Medications = () => {
       setMedications(data as any || []);
     } catch (error) {
       console.error('Error fetching medications:', error);
+      setLoadError(true);
       toast.error('Failed to load medications');
     } finally {
       setLoading(false);
@@ -326,24 +328,43 @@ const Medications = () => {
       )}
 
       {/* Search */}
+      {loading ? (
+        <div className="space-y-4">
+          {[0, 1].map((i) => (
+            <div key={i} className="h-32 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 animate-pulse" />
+          ))}
+        </div>
+      ) : loadError ? (
+        <Card>
+          <CardContent className="py-12 text-center space-y-3">
+            <p className="font-medium text-foreground">We couldn&apos;t load your medications</p>
+            <p className="text-sm text-muted-foreground">Check your connection and try again.</p>
+            <Button className="h-11 min-h-[44px]" onClick={() => { setLoadError(false); setLoading(true); fetchMedications(); }}>
+              Try again
+            </Button>
+          </CardContent>
+        </Card>
+      ) : (
+        <>
       <div className="relative max-w-md">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           type="search"
           placeholder="Search medications..."
+          aria-label="Search medications"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-10"
+          className="pl-10 h-11"
         />
       </div>
 
       {/* Medication Lists */}
       <Tabs defaultValue="active">
         <TabsList className="bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 p-1">
-          <TabsTrigger value="active" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+          <TabsTrigger value="active" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white min-h-[44px] px-4">
             Active ({activeMedications.length})
           </TabsTrigger>
-          <TabsTrigger value="inactive" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white">
+          <TabsTrigger value="inactive" className="data-[state=active]:bg-primary-500 data-[state=active]:text-white min-h-[44px] px-4">
             Inactive ({inactiveMedications.length})
           </TabsTrigger>
         </TabsList>
@@ -351,9 +372,12 @@ const Medications = () => {
         <TabsContent value="active" className="space-y-4 mt-4">
           {activeMedications.length === 0 ? (
             <Card>
-              <CardContent className="flex flex-col items-center justify-center py-12 text-muted-foreground">
-                <Pill className="h-12 w-12 mb-4 opacity-50" />
+              <CardContent className="flex flex-col items-center justify-center py-12 text-muted-foreground space-y-3">
+                <Pill className="h-12 w-12 mb-1 opacity-50" />
                 <p>No active medications</p>
+                <Button className="h-11 min-h-[44px]" onClick={() => setShowAddDialog(true)}>
+                  <Plus className="h-4 w-4 mr-2" /> Add your first medication
+                </Button>
               </CardContent>
             </Card>
           ) : (
@@ -390,7 +414,7 @@ const Medications = () => {
                     {extendedSchema && (
                       <button
                         onClick={() => toggleMedicationStatus(med.id, med.is_active)}
-                        className="px-4 py-2 rounded-xl border border-canvas-silk dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold hover:bg-canvas dark:hover:bg-slate-700 transition-colors"
+                        className="px-4 py-2.5 min-h-[44px] rounded-xl border border-canvas-silk dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold hover:bg-canvas dark:hover:bg-slate-700 transition-colors"
                       >
                         Mark Inactive
                       </button>
@@ -426,7 +450,7 @@ const Medications = () => {
                   {extendedSchema && (
                   <button
                     onClick={() => toggleMedicationStatus(med.id, med.is_active)}
-                    className="px-4 py-2 rounded-xl border border-primary-500 text-primary-500 hover:bg-primary-50 dark:hover:bg-slate-800 dark:hover:bg-blue-950/30 text-xs font-bold transition-colors"
+                    className="px-4 py-2.5 min-h-[44px] rounded-xl border border-primary-500 text-primary-500 hover:bg-primary-50 dark:hover:bg-slate-800 dark:hover:bg-blue-950/30 text-xs font-bold transition-colors"
                   >
                     Reactivate
                   </button>
@@ -437,6 +461,8 @@ const Medications = () => {
           )}
         </TabsContent>
       </Tabs>
+        </>
+      )}
       </div>
     </div>
   );

@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { FlaskConical, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
@@ -19,7 +20,7 @@ interface LabResultRow {
 
 export default function PatientLabResults() {
   const { user } = useAuth();
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['patient-lab-results', user?.id],
     enabled: !!user?.id,
     queryFn: async () => {
@@ -51,6 +52,11 @@ export default function PatientLabResults() {
       <CardContent>
         {isLoading ? (
           <div className="flex justify-center py-6"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
+        ) : isError ? (
+          <div className="text-center py-6 space-y-3">
+            <p className="text-sm text-destructive">We couldn&apos;t load your lab results.</p>
+            <Button variant="outline" className="h-11 min-h-[44px]" onClick={() => refetch()}>Try again</Button>
+          </div>
         ) : !data || data.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center py-6">No lab results yet.</p>
         ) : (
@@ -66,7 +72,7 @@ export default function PatientLabResults() {
                       <h4 className="font-medium truncate">{testName}</h4>
                       {critical && <Badge variant="destructive">Critical</Badge>}
                     </div>
-                    <p className="text-sm">{r.result_value} {r.unit}</p>
+                    <p className="text-sm">{r.result_value ? `${r.result_value} ${r.unit || ''}`.trim() : 'Result pending'}</p>
                     {r.reference_range && (
                       <p className="text-xs text-muted-foreground">Ref: {r.reference_range}</p>
                     )}

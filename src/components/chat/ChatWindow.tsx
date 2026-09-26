@@ -8,9 +8,10 @@ import { MessageInput } from "./MessageInput";
 
 interface ChatWindowProps {
   providerId: string;
+  providerName?: string;
 }
 
-export const ChatWindow = ({ providerId }: ChatWindowProps) => {
+export const ChatWindow = ({ providerId, providerName }: ChatWindowProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -123,10 +124,10 @@ export const ChatWindow = ({ providerId }: ChatWindowProps) => {
   };
 
   return (
-    <div className="flex flex-col h-[500px] border rounded-lg">
-      <div className="p-4 border-b flex items-center gap-2">
-        <MessageSquare className="h-5 w-5" />
-        <h2 className="font-semibold">Chat with Provider</h2>
+    <div className="flex flex-col h-full min-h-[55vh] md:min-h-0 border rounded-lg">
+      <div className="p-4 border-b flex items-center gap-2 min-w-0">
+        <MessageSquare className="h-5 w-5 flex-shrink-0" />
+        <h2 className="font-semibold truncate">{providerName || 'Chat'}</h2>
       </div>
 
       <MessageList messages={messages} providerId={providerId} />

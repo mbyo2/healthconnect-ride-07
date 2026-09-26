@@ -198,7 +198,7 @@ export const CostEstimator = () => {
           </div>
           <button
             onClick={() => navigate("/insurance-cards")}
-            className="px-3 py-1 rounded-md bg-primary-500 text-white text-xs font-bold"
+            className="px-3 py-2 min-h-[44px] rounded-md bg-primary-500 text-white text-xs font-bold"
           >
             Add Card
           </button>
@@ -229,9 +229,9 @@ export const CostEstimator = () => {
       <button
         onClick={calculateEstimate}
         disabled={!serviceType || estimating}
-        className="w-full py-2.5 rounded-md bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs transition-all disabled:opacity-40"
+        className="w-full py-2.5 min-h-[44px] rounded-md bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs transition-all disabled:opacity-40"
       >
-        {estimating ? "Computing Insurance Formula..." : "Calculate Copay & Out-of-Pocket Cost"}
+        {estimating ? "Working out your cost..." : "Calculate What You'll Pay"}
       </button>
 
       {estimate && (
@@ -244,6 +244,9 @@ export const CostEstimator = () => {
               <span>Estimated Copay Due</span><span className="font-mono text-primary-500">K{estimate.outOfPocket.toFixed(2)}</span>
             </div>
           </div>
+          <p className="text-[11px] text-graphite-500 dark:text-slate-400">
+            Estimate only — the actual amount can change depending on the provider&apos;s confirmed fee and your plan&apos;s final decision.
+          </p>
         </div>
       )}
     </div>
