@@ -21,7 +21,7 @@ export const SupportWorkflow = () => {
     { title: "Support Dashboard", description: "Ticket queue & escalation overview", icon: <Headphones className="h-5 w-5" />, route: '/admin-dashboard' },
     { title: "User Lookup", description: "Find user accounts & history", icon: <Search className="h-5 w-5" />, route: '/search' },
     { title: "Live Chat Support", description: "Real-time user assistance", icon: <MessageSquare className="h-5 w-5" />, route: '/chat' },
-    { title: "Provider Applications", description: "Review healthcare applications", icon: <FileText className="h-5 w-5" />, route: '/healthcare-application' },
+    { title: "Provider Applications", description: "Review healthcare applications", icon: <FileText className="h-5 w-5" />, route: '/admin-dashboard?tab=providers' },
     { title: "User Accounts", description: "Account status & management", icon: <Users className="h-5 w-5" />, route: '/admin-dashboard' },
     { title: "Audit Trail", description: "View system activity logs", icon: <ClipboardList className="h-5 w-5" />, route: '/admin-dashboard' },
     { title: "Security Events", description: "Fraud alerts & suspicious activity", icon: <ShieldCheck className="h-5 w-5" />, route: '/admin-dashboard' },

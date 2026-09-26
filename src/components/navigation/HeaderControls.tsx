@@ -74,7 +74,7 @@ export const HeaderControls = ({ isMenuOpen, setIsMenuOpen, navigate }: HeaderCo
     if (isAdmin) {
       return [
         { label: "Admin Dashboard", path: "/admin-dashboard" },
-        { label: "Applications", path: "/healthcare-application" },
+        { label: "Applications", path: "/admin-dashboard?tab=providers" },
         { label: "Profile", path: "/profile" },
       ];
     }

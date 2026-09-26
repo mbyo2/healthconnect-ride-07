@@ -72,7 +72,7 @@ export const DesktopNavigation = () => {
     if (isAdmin) {
       return [
         { to: "/admin-dashboard", label: "Dashboard", icon: <Shield className="h-5 w-5 mr-2" /> },
-        { to: "/healthcare-application", label: "Applications", icon: <Users className="h-5 w-5 mr-2" /> },
+        { to: "/admin-dashboard?tab=providers", label: "Applications", icon: <Users className="h-5 w-5 mr-2" /> },
         { to: "/hospital-management", label: "Hospitals", icon: <Building2 className="h-5 w-5 mr-2" /> },
         { to: "/pharmacy-management", label: "Pharmacies", icon: <ShoppingCart className="h-5 w-5 mr-2" /> },
         { to: "/chat", label: "Messages", icon: <MessageSquare className="h-5 w-5 mr-2" /> },

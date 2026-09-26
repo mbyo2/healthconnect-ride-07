@@ -113,8 +113,8 @@ export function DesktopNav() {
     // Admin
     if (isAdmin) {
       return [
-        { to: "/admin-dashboard", label: "Dashboard", icon: <Shield className="h-4 w-4" />, active: location.pathname === "/admin-dashboard" },
-        { to: "/healthcare-application", label: "Applications", icon: <Users className="h-4 w-4" />, active: location.pathname === "/healthcare-application" },
+        { to: "/admin-dashboard", label: "Dashboard", icon: <Shield className="h-4 w-4" />, active: location.pathname === "/admin-dashboard" && !location.search.includes("tab=providers") },
+        { to: "/admin-dashboard?tab=providers", label: "Applications", icon: <Users className="h-4 w-4" />, active: location.pathname === "/admin-dashboard" && location.search.includes("tab=providers") },
         { to: "/chat", label: "Messages", icon: <MessageSquare className="h-4 w-4" />, active: location.pathname === "/chat" },
       ];
     }

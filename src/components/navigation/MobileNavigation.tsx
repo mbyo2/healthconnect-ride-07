@@ -105,7 +105,7 @@ export const MobileNavigation = ({ setIsMenuOpen, navigate }: MobileNavigationPr
     if (isAdmin) {
       return [
         { to: "/admin-dashboard", label: "Dashboard", icon: <Shield className="mr-2 h-5 w-5" /> },
-        { to: "/healthcare-application", label: "Applications", icon: <Users className="mr-2 h-5 w-5" /> },
+        { to: "/admin-dashboard?tab=providers", label: "Applications", icon: <Users className="mr-2 h-5 w-5" /> },
         { to: "/hospital-management", label: "Hospitals", icon: <Building2 className="mr-2 h-5 w-5" /> },
         { to: "/pharmacy-management", label: "Pharmacies", icon: <ShoppingCart className="mr-2 h-5 w-5" /> },
         { to: "/lab-management", label: "Labs", icon: <Activity className="mr-2 h-5 w-5" /> },

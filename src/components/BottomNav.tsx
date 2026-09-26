@@ -199,8 +199,8 @@ export function BottomNav() {
     // Admin
     if (isAdmin) {
       return [
-        { to: "/admin-dashboard", label: "Admin", icon: <Shield className="h-5 w-5" />, active: location.pathname === "/admin-dashboard", description: "Admin dashboard" },
-        { to: "/healthcare-application", label: "Apps", icon: <Users className="h-5 w-5" />, active: location.pathname === "/healthcare-application", description: "Applications" },
+        { to: "/admin-dashboard", label: "Admin", icon: <Shield className="h-5 w-5" />, active: location.pathname === "/admin-dashboard" && !location.search.includes("tab=providers"), description: "Admin dashboard" },
+        { to: "/admin-dashboard?tab=providers", label: "Apps", icon: <Users className="h-5 w-5" />, active: location.pathname === "/admin-dashboard" && location.search.includes("tab=providers"), description: "Applications" },
         { to: "/chat", label: "Chat", icon: <MessageSquare className="h-5 w-5" />, active: location.pathname === "/chat", description: "Messages" },
         { to: "/settings", label: "Settings", icon: <Settings className="h-5 w-5" />, active: location.pathname === "/settings", description: "Settings" },
       ];
@@ -239,7 +239,7 @@ export function BottomNav() {
     // Support menu
     if (availableRoles.includes('support')) {
       return [
-        { to: "/healthcare-application", label: "Applications", description: "Review provider applications", icon: <Users className="h-5 w-5" /> },
+        { to: "/admin-dashboard?tab=providers", label: "Applications", description: "Review provider applications", icon: <Users className="h-5 w-5" /> },
         { to: "/appointments", label: "Appointments", description: "View appointments for support", icon: <Calendar className="h-5 w-5" /> },
         { to: "/medical-records", label: "Patient Records", description: "View patient records", icon: <Heart className="h-5 w-5" /> },
         { to: "/profile", label: "Profile", description: "Support profile", icon: <User className="h-5 w-5" /> },
