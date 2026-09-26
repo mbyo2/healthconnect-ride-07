@@ -18,6 +18,23 @@ interface ExtendedServiceWorkerRegistration extends ServiceWorkerRegistration {
 export const registerServiceWorker = async () => {
   if ('serviceWorker' in navigator) {
     try {
+      // Retire the legacy '/service-worker.js' registration if it exists.
+      // It was superseded by '/sw.js'; leaving it registered risks two
+      // workers fighting over the same scope and stale caches surviving.
+      try {
+        const existing = await navigator.serviceWorker.getRegistrations();
+        for (const reg of existing) {
+          const scriptURL =
+            reg.active?.scriptURL || reg.waiting?.scriptURL || reg.installing?.scriptURL || '';
+          if (scriptURL.endsWith('/service-worker.js')) {
+            await reg.unregister();
+            console.info('Unregistered legacy service worker:', scriptURL);
+          }
+        }
+      } catch (e) {
+        console.warn('Legacy service worker cleanup failed:', e);
+      }
+
       // Use /sw.js as the standard path for the generated service worker
       const registration = await navigator.serviceWorker.register('/sw.js', {
         scope: '/',

@@ -32,9 +32,11 @@ const CACHEABLE_APIS = [
 ];
 
 // Install event - cache static assets
+// skipWaiting() runs unconditionally: a failed precache must never strand the
+// new worker in "waiting" while an older worker keeps serving stale content.
 self.addEventListener('install', (event) => {
   console.log('[SW] Installing service worker');
-  
+
   event.waitUntil(
     caches.open(STATIC_CACHE)
       .then((cache) => {
@@ -43,11 +45,12 @@ self.addEventListener('install', (event) => {
       })
       .then(() => {
         console.log('[SW] Static assets cached successfully');
-        return self.skipWaiting();
       })
       .catch((error) => {
         console.error('[SW] Failed to cache static assets:', error);
       })
+      .then(() => self.skipWaiting())
+  );
   );
 });
 
