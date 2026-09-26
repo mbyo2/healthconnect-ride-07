@@ -1,15 +1,20 @@
 // HealthConnect Service Worker
 // Provides offline functionality, caching, and background sync
 
+// NOTE (2026-09-26): the app shell ('/') must NEVER be precached or served
+// cache-first. Every deployment replaces the hashed JS bundles, so a cached
+// '/' HTML references pruned bundles and the app can never boot again until
+// the service worker updates. Navigation requests already use network-first
+// (handleNavigationRequest) — keep it that way.
 const CACHE_NAME = 'healthconnect-v1.1.0';
-const STATIC_CACHE = 'healthconnect-static-v2';
-const DYNAMIC_CACHE = 'healthconnect-dynamic-v2';
-const API_CACHE = 'healthconnect-api-v2';
+const STATIC_CACHE = 'healthconnect-static-v3';
+const DYNAMIC_CACHE = 'healthconnect-dynamic-v3';
+const API_CACHE = 'healthconnect-api-v3';
 const IMAGE_CACHE = 'healthconnect-images-v1';
 
 // Resources to cache immediately
+// (deliberately excludes '/' — see note above)
 const STATIC_ASSETS = [
-  '/',
   '/offline.html',
   '/manifest.json',
   '/favicon.ico',

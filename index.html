@@ -112,7 +112,7 @@
   <div class="js-error-fallback">
     <h2>Unable to load Doc' O Clock</h2>
     <p>We encountered a problem while loading the application. Please try refreshing the page.</p>
-    <button onclick="window.location.reload()">Refresh Page</button>
+    <button id="doc-refresh-btn">Refresh Page</button>
   </div>
 
   <noscript>
@@ -130,6 +130,26 @@
         if (el) el.style.display = 'block';
       }
     }, 15000);
+
+    // Self-heal for stale service-worker shells: if a previously installed
+    // service worker is serving a cached '/' from an older deployment, its
+    // hashed JS bundles no longer exist and the app can never boot. Tapping
+    // refresh unregisters service workers first so the reload fetches fresh.
+    (function () {
+      var btn = document.getElementById('doc-refresh-btn');
+      if (!btn) return;
+      btn.addEventListener('click', function () {
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.getRegistrations().then(function (regs) {
+            regs.forEach(function (r) { r.unregister(); });
+          }).catch(function () {}).then(function () {
+            window.location.reload();
+          });
+        } else {
+          window.location.reload();
+        }
+      });
+    })();
   </script>
 
   <script type="module" src="/src/main.tsx"></script>
