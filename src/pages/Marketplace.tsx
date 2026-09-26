@@ -3,8 +3,12 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { ProductCard } from "@/components/marketplace/ProductCard";
 import { Cart } from "@/components/marketplace/Cart";
 import { CheckoutModal } from "@/components/marketplace/CheckoutModal";
+import { PharmacyPayment } from "@/components/marketplace/PharmacyPayment";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useMarketplace } from "@/hooks/useMarketplace";
 import { Search, ShoppingCart, Package, Pill } from "lucide-react";
+import { toast } from "sonner";
+import type { Order } from "@/types/marketplace";
 
 const Marketplace = () => {
   const {
@@ -23,6 +27,9 @@ const Marketplace = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [showCheckout, setShowCheckout] = useState(false);
   const [activeTab, setActiveTab] = useState<"products" | "cart" | "orders">("products");
+  // Order awaiting payment — the existing PharmacyPayment step (wallet or DPO)
+  // mounts here after checkout and for any pending order from history.
+  const [pendingPaymentOrder, setPendingPaymentOrder] = useState<Order | null>(null);
 
   const filteredProducts = (products || []).filter((product) => {
     const matchesSearch =
@@ -39,8 +46,18 @@ const Marketplace = () => {
   };
 
   const handlePlaceOrder = (orderData: any) => {
-    placeOrder(orderData);
-    setShowCheckout(false);
+    placeOrder(orderData, {
+      onSuccess: (order: any) => {
+        setShowCheckout(false);
+        setPendingPaymentOrder(order);
+        setActiveTab("orders");
+      },
+    } as any);
+  };
+
+  const handlePaymentSuccess = () => {
+    setPendingPaymentOrder(null);
+    toast.success("Payment successful — the pharmacy will now prepare your order.");
   };
 
   return (
@@ -184,6 +201,16 @@ const Marketplace = () => {
                       </p>
                       <p className="text-[11px] text-graphite-500 dark:text-slate-400">Delivery address: {order.delivery_address}</p>
                     </div>
+                    <div className="flex items-center gap-2">
+                      {order.status === "pending" && (
+                        <button
+                          onClick={() => setPendingPaymentOrder(order)}
+                          className="px-4 py-2 rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-xs font-extrabold transition-all"
+                        >
+                          Pay now
+                        </button>
+                      )}
+                    </div>
                   </div>
                 ))}
 
@@ -204,6 +231,18 @@ const Marketplace = () => {
             onPlaceOrder={handlePlaceOrder}
             isLoading={isPlacingOrder}
           />
+
+          {/* Payment step for the just-created order or any pending order */}
+          <Dialog open={!!pendingPaymentOrder} onOpenChange={(open) => { if (!open) setPendingPaymentOrder(null); }}>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle>Complete payment</DialogTitle>
+              </DialogHeader>
+              {pendingPaymentOrder && (
+                <PharmacyPayment order={pendingPaymentOrder} onPaymentSuccess={handlePaymentSuccess} />
+              )}
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
     </ProtectedRoute>

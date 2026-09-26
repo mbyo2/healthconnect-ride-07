@@ -279,15 +279,23 @@ export const Prescriptions = () => {
     }
   };
 
+  // The DB CHECK on comprehensive_prescriptions.status allows only
+  // ('pending','filled','partially_filled','cancelled','expired') — the UI
+  // bucket "active" is the display label for 'filled'. Normalize so the
+  // Active/Filled filter, pill, and refill reminder actually match DB rows.
+  const bucketStatus = (s: string | null | undefined) =>
+    s === "filled" || !s ? "active" : s;
+
   const filteredPrescriptions = useMemo(() => {
     return prescriptions.filter((p: any) => {
       const matchSearch =
         p.medication_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (p.instructions || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
         (p.prescription_number || "").toLowerCase().includes(searchQuery.toLowerCase());
-      const matchStatus = statusFilter === "all" || (p.status || "active") === statusFilter;
+      const matchStatus = statusFilter === "all" || bucketStatus(p.status) === statusFilter;
       return matchSearch && matchStatus;
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prescriptions, searchQuery, statusFilter]);
 
   const getStatusPill = (status: string) => {
@@ -712,7 +720,7 @@ export const Prescriptions = () => {
             )}
 
             {/* Refill Reminder for Patients */}
-            {!isProvider && filteredPrescriptions.some((p: any) => (p.refills_remaining || 0) <= 1 && p.status === 'active') && (
+            {!isProvider && filteredPrescriptions.some((p: any) => (p.refills_remaining || 0) <= 1 && bucketStatus(p.status) === 'active') && (
               <NextStepsCard
                 title="Prescription Refills Needed"
                 steps={[
@@ -809,7 +817,7 @@ export const Prescriptions = () => {
 
                         {/* Status Badge */}
                         <td className="py-3 px-3 text-center">
-                          {getStatusPill(p.status || "active")}
+                          {getStatusPill(bucketStatus(p.status))}
                         </td>
 
                         {/* Dosage */}

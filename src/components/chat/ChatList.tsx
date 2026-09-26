@@ -24,11 +24,35 @@ export const ChatList = () => {
   const receiverParam = searchParams.get("receiver");
 
   // Deep link support: /chat?receiver=<id> preselects that conversation.
+  // If the receiver has no prior messages/appointments (e.g. a patient
+  // clicking "Chat" on a newly discovered provider), synthesize the contact
+  // from their profile so the chat opens instead of silently doing nothing.
   useEffect(() => {
-    if (!receiverParam || selectedContact || contacts.length === 0) return;
+    if (!receiverParam || selectedContact) return;
     const match = contacts.find((c) => c.id === receiverParam);
-    if (match) setSelectedContact(match);
-  }, [receiverParam, contacts, selectedContact]);
+    if (match) {
+      setSelectedContact(match);
+      return;
+    }
+    // Not in contacts yet — fetch the profile and open the conversation.
+    // Guard: only once contacts finished loading (avoid racing fetchContacts).
+    if (loading) return;
+    supabase
+      .from('profiles')
+      .select('id, first_name, last_name, avatar_url, role')
+      .eq('id', receiverParam)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data) {
+          setContacts((prev) =>
+            prev.some((c) => c.id === data.id) ? prev : [...prev, data as ChatContact]
+          );
+          setSelectedContact(data as ChatContact);
+        } else {
+          toast.error('Could not open this chat — the user was not found.');
+        }
+      });
+  }, [receiverParam, contacts, selectedContact, loading]);
 
   useEffect(() => {
     const fetchContacts = async () => {

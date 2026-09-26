@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { safeLocalGet, safeLocalSet, safeLocalRemove } from '@/utils/storage';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -92,6 +93,20 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const location = useLocation() as { state?: { symptoms?: string } };
+  const prefilledRef = useRef(false);
+
+  // Prefill from the Symptoms page "AI Differential" handoff
+  // (navigate("/ai-diagnostics", { state: { symptoms } })) — otherwise the
+  // patient's selection is silently dropped on arrival.
+  useEffect(() => {
+    if (prefilledRef.current) return;
+    const symptoms = location.state?.symptoms?.trim();
+    if (symptoms) {
+      prefilledRef.current = true;
+      setInput(`I have these symptoms: ${symptoms}. What could this be, and how urgent is it?`);
+    }
+  }, [location.state]);
 
   // Save messages to localStorage whenever they change
   useEffect(() => {
@@ -290,8 +305,13 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
       const errorMessage = error instanceof Error ? error.message : 'Failed to get response. Please try again.';
       toast.error(errorMessage);
 
-      // Remove the user message if failed
-      setMessages(prev => prev.slice(0, -1));
+      // Keep the user's message and show a retryable error instead of
+      // deleting what they typed — losing it forces a frustrating retype.
+      setMessages(prev => [...prev, {
+        role: 'assistant' as const,
+        content: `⚠️ I couldn't reach the AI service just now (${errorMessage}). Your message above is kept — tap send again to retry.`,
+        timestamp: new Date(),
+      }]);
     } finally {
       setIsLoading(false);
     }

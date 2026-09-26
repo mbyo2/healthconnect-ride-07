@@ -11,6 +11,10 @@ interface CostBreakdownProps {
   appointmentType: "physical" | "virtual";
   visitType: "new" | "returning";
   specialty?: string;
+  /** Real published fees from the provider directory (ZMW). When present they
+      replace the generic specialty table below. */
+  feeMin?: number | null;
+  feeMax?: number | null;
 }
 
 const BASE_COSTS: Record<string, number> = {
@@ -23,7 +27,7 @@ const BASE_COSTS: Record<string, number> = {
   "Psychiatry": 250,
 };
 
-export const CostBreakdown = ({ appointmentType, visitType, specialty }: CostBreakdownProps) => {
+export const CostBreakdown = ({ appointmentType, visitType, specialty, feeMin, feeMax }: CostBreakdownProps) => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [insurance, setInsurance] = useState<any>(null);
@@ -57,8 +61,10 @@ export const CostBreakdown = ({ appointmentType, visitType, specialty }: CostBre
     })();
   }, [user]);
 
-  // Compute base cost
-  const baseCost = (BASE_COSTS[specialty || ""] || 150) *
+  // Compute base cost in ZMW. Prefer the provider's real published fee range;
+  // the hardcoded specialty table is only a fallback when no fee is listed.
+  const listedFee = feeMin ?? feeMax ?? null;
+  const baseCost = (listedFee ?? BASE_COSTS[specialty || ""] ?? 150) *
     (visitType === "new" ? 1.3 : 1) *
     (appointmentType === "virtual" ? 0.7 : 1);
   const total = Math.round(baseCost);
@@ -113,7 +119,7 @@ export const CostBreakdown = ({ appointmentType, visitType, specialty }: CostBre
       <div className="space-y-1.5 text-sm">
         <div className="flex justify-between">
           <span className="text-muted-foreground">Service total</span>
-          <span className="font-medium text-foreground">${total.toFixed(2)}</span>
+          <span className="font-medium text-foreground">K{total.toFixed(2)}</span>
         </div>
         {insurance && (
           <>
@@ -122,22 +128,22 @@ export const CostBreakdown = ({ appointmentType, visitType, specialty }: CostBre
                 Insurance covers ({coveragePercent}%)
               </span>
               <span className="font-medium text-emerald-600 dark:text-emerald-400">
-                −${insuranceCovers.toFixed(2)}
+                −K{insuranceCovers.toFixed(2)}
               </span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Copay</span>
-              <span className="font-medium text-foreground">${copay.toFixed(2)}</span>
+              <span className="font-medium text-foreground">K{copay.toFixed(2)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Deductible applied</span>
-              <span className="font-medium text-foreground">${deductibleApplied.toFixed(2)}</span>
+              <span className="font-medium text-foreground">K{deductibleApplied.toFixed(2)}</span>
             </div>
           </>
         )}
         <div className="flex justify-between pt-2 mt-1 border-t border-border">
           <span className="font-semibold text-foreground">You pay</span>
-          <span className="font-bold text-lg text-primary">${outOfPocket.toFixed(2)}</span>
+          <span className="font-bold text-lg text-primary">K{outOfPocket.toFixed(2)}</span>
         </div>
       </div>
 

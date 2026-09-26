@@ -150,6 +150,12 @@ Deno.serve(async (req) => {
 
     if (insErr) {
       console.error('Insert dpo_payments failed', insErr);
+      // Fail loudly: handing out a DPO redirect without a payment record means
+      // the patient pays at DPO but verification can never find the record and
+      // the wallet is never credited.
+      return new Response(JSON.stringify({ error: 'Payment record creation failed' }), {
+        status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     return new Response(JSON.stringify({

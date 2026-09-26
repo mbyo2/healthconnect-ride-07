@@ -1,7 +1,11 @@
 import { ProfileSetup } from "@/components/auth/ProfileSetup";
 import { Sparkles, UserCheck } from "lucide-react";
+import { useFlushPendingPatientProfile } from "@/hooks/useFlushPendingPatientProfile";
 
 const Onboarding = () => {
+  // Writes registration details (emergency contact, insurance, medical
+  // history) that were stashed at signup while email confirmation was pending.
+  useFlushPendingPatientProfile();
   return (
     <div className="min-h-screen bg-canvas dark:bg-slate-950 flex items-center justify-center p-4 font-sans text-slate-900 dark:text-slate-100">
       <div className="w-full max-w-2xl rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-md p-6 sm:p-8 space-y-6">

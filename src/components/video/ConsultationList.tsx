@@ -10,8 +10,10 @@ import { useMediaQuery } from "@/hooks/use-media-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { providerDisplayName } from "@/utils/providerDisplay";
 
-/** Joinable while the visit is bookable or live — the Daily room is minted on demand. */
-const JOINABLE_STATUSES = ["scheduled", "in-progress"];
+/** Joinable while the visit is bookable or live — the Daily room is minted on demand.
+ *  DB CHECK on video_consultations.status allows only
+ *  ('scheduled','active','completed','cancelled'). */
+const JOINABLE_STATUSES = ["scheduled", "active"];
 
 export const ConsultationList = ({ onJoinMeeting }: ConsultationListProps) => {
   const isMobile = useMediaQuery('(max-width: 768px)');

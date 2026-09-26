@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -47,10 +47,52 @@ const INSURANCE_OPTIONS = [
 // ── component ─────────────────────────────────────────────────────────────────
 
 const Profile = () => {
-  const { user, profile } = useAuth();
+  const { user, profile, refreshProfile } = useAuth();
   const { showSuccess } = useSuccessFeedback();
 
   const isProvider = PROVIDER_ROLES.includes(profile?.role || "");
+  // Only claim verification when the profile is actually verified.
+  const verifiedBadge = profile?.is_verified
+    ? (isProvider ? "Verified Practitioner" : "Verified Patient")
+    : (isProvider ? "Practitioner" : "Patient");
+
+  const avatarInputRef = useRef<HTMLInputElement | null>(null);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+
+  // Reuses the same avatars-bucket flow as the patient/provider setup screens.
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please choose an image file");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image must be under 5MB");
+      return;
+    }
+    setAvatarUploading(true);
+    try {
+      const fileExt = file.name.split(".").pop();
+      const filePath = `${user.id}/${Date.now()}.${fileExt}`;
+      const { error: uploadError } = await supabase.storage.from("avatars").upload(filePath, file);
+      if (uploadError) throw uploadError;
+      const { data: { publicUrl } } = supabase.storage.from("avatars").getPublicUrl(filePath);
+      const { error: updateError } = await supabase
+        .from("profiles")
+        .update({ avatar_url: publicUrl } as any)
+        .eq("id", user.id);
+      if (updateError) throw updateError;
+      await refreshProfile();
+      toast.success("Profile photo updated");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to update profile photo");
+    } finally {
+      setAvatarUploading(false);
+      if (avatarInputRef.current) avatarInputRef.current.value = "";
+    }
+  };
 
   // — basic form —
   const [isEditing, setIsEditing] = useState(false);
@@ -221,11 +263,21 @@ const Profile = () => {
               </Avatar>
               <button
                 type="button"
-                className="absolute -bottom-1 -right-1 h-9 w-9 rounded-full bg-primary-500 text-white flex items-center justify-center shadow-button hover:bg-primary-600 transition-transform active:scale-95"
+                onClick={() => avatarInputRef.current?.click()}
+                disabled={avatarUploading}
+                className="absolute -bottom-1 -right-1 h-9 w-9 rounded-full bg-primary-500 text-white flex items-center justify-center shadow-button hover:bg-primary-600 transition-transform active:scale-95 disabled:opacity-60"
                 title="Change Photo"
               >
                 <Camera className="h-4 w-4" />
               </button>
+              <input
+                ref={avatarInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleAvatarChange}
+                aria-label="Upload profile photo"
+              />
             </div>
 
             <div className="flex-1 text-center sm:text-left space-y-2">
@@ -235,7 +287,7 @@ const Profile = () => {
                 </h1>
                 <span className="inline-flex items-center gap-1 px-3 py-1 rounded-pill text-xs font-medium bg-success-50 text-success-500 border border-success-100">
                   <ShieldCheck className="h-3.5 w-3.5" />
-                  {isProvider ? "Verified Practitioner" : "Verified Patient"}
+                  {verifiedBadge}
                 </span>
               </div>
               <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 text-sm text-graphite-500">

@@ -36,7 +36,7 @@ const VideoDashboard: React.FC = () => {
             .from("video_consultations")
             .select("id", { count: "exact", head: true })
             .or(`patient_id.eq.${user.id},provider_id.eq.${user.id}`)
-            .in("status", ["in_progress", "live"]),
+            .eq("status", "active"),
         ]);
 
         setStats({
@@ -74,7 +74,7 @@ const VideoDashboard: React.FC = () => {
 
           <div className="flex items-center gap-2">
             <button
-              onClick={() => navigate(`/video-call/${safeCryptoUUID()}`)}
+              onClick={() => navigate(`/video-call/${safeCryptoUUID()}?instant=1`)}
               className="px-4 py-2 rounded-md bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs transition-all flex items-center gap-1.5"
             >
               <Phone className="h-4 w-4" />
@@ -141,7 +141,7 @@ const VideoDashboard: React.FC = () => {
           </div>
           <div className="flex items-center gap-2 w-full md:w-auto">
             <button
-              onClick={() => navigate(`/video-call/${safeCryptoUUID()}`)}
+              onClick={() => navigate(`/video-call/${safeCryptoUUID()}?instant=1`)}
               className="w-full md:w-auto px-5 py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs transition-all flex items-center justify-center gap-2"
             >
               <Phone className="h-4 w-4" /> Start Instant Call

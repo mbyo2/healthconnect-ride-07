@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -18,6 +19,7 @@ export const SymptomCollector = ({ onSymptomSubmit }: SymptomCollectorProps) => 
   const [errors, setErrors] = useState<{ symptoms?: string }>({});
   const [aiAnalysis, setAiAnalysis] = useState<string>("");
   const { profile } = useAuth();
+  const navigate = useNavigate();
 
   const validateForm = () => {
     const newErrors: { symptoms?: string } = {};
@@ -58,7 +60,8 @@ export const SymptomCollector = ({ onSymptomSubmit }: SymptomCollectorProps) => 
 
       if (error) throw error;
 
-      const analysis = data.analysis;
+      const analysis = data?.analysis;
+      if (!analysis) throw new Error("The AI returned no analysis. Please try again.");
       setAiAnalysis(analysis);
       
       toast.success("AI analysis completed", {
@@ -152,8 +155,17 @@ export const SymptomCollector = ({ onSymptomSubmit }: SymptomCollectorProps) => 
               <p className="whitespace-pre-wrap text-xs sm:text-sm leading-relaxed">{aiAnalysis}</p>
             </div>
             <div className="mt-3 sm:mt-4 p-2.5 sm:p-3 bg-muted rounded-md text-[10px] sm:text-xs text-muted-foreground leading-relaxed">
-              ⚠️ This AI analysis is for informational purposes only and does not constitute medical advice. 
+              ⚠️ This AI analysis is for informational purposes only and does not constitute medical advice.
               Always consult with a qualified healthcare professional for medical decisions.
+            </div>
+            {/* Next steps — an analysis with nowhere to go is a dead end. */}
+            <div className="mt-4 flex flex-col sm:flex-row gap-2">
+              <Button onClick={() => navigate("/search")} className="flex-1">
+                Find a Doctor
+              </Button>
+              <Button variant="outline" onClick={() => navigate("/triage")} className="flex-1">
+                Run Full Triage
+              </Button>
             </div>
           </CardContent>
         </Card>

@@ -91,7 +91,10 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     return Math.round(6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)) * 100) / 100;
   };
 
-  const fetchProviders = async () => {
+  const fetchProviders = async (pageOverride?: number) => {
+    // Callers pass an explicit page so filter changes (setState-batched by the
+    // caller) and pagination never read a stale currentPage from the closure.
+    const page = pageOverride ?? currentPage;
     setIsLoading(true);
     try {
       // Public directory view (verified providers, directory-safe columns).
@@ -147,7 +150,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       const { data, error, count } = await withTimeout(
         query
           .order('rating', { ascending: false, nullsFirst: false })
-          .range((currentPage - 1) * 10, currentPage * 10 - 1),
+          .range((page - 1) * 10, page * 10 - 1),
         TIMEOUTS.standard,
         'provider search'
       );
@@ -190,9 +193,9 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         distance: undefined,
       }));
 
-      setProviders(mappedProviders);
+      setProviders((prev) => (page === 1 ? mappedProviders : [...prev, ...mappedProviders]));
       setTotalCount(count || mappedProviders.length);
-      setHasMore((count || 0) > currentPage * 10);
+      setHasMore((count || 0) > page * 10);
 
       // Analytics must NEVER wipe results — fire and forget.
       if (user?.id) {
@@ -227,9 +230,14 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   };
 
+  // Bumped by refreshProviders so the fetch effect re-runs even when the page
+  // is already 1 — the effect closure then reads the caller's freshly-set
+  // filter state (React 18 batches the setState calls before re-render).
+  const [refreshToken, setRefreshToken] = useState(0);
+
   const refreshProviders = () => {
     setCurrentPage(1);
-    fetchProviders();
+    setRefreshToken((t) => t + 1);
   };
 
   const loadMore = () => setCurrentPage(prev => prev + 1);
@@ -237,7 +245,8 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   useEffect(() => {
     fetchProviders();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage]);
+  }, [currentPage, refreshToken, selectedSpecialty, searchTerm, selectedType,
+      telemedicineOnly, homeVisitsOnly, selectedInsurance, selectedLanguage, feeMax]);
 
   const contextValue: SearchContextType = {
     searchQuery, setSearchQuery,

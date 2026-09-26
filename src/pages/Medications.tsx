@@ -35,6 +35,17 @@ const Medications = () => {
   const [loading, setLoading] = useState(true);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  // The repo migrations only create the base medications columns; the
+  // extended columns (is_active, start/end/refill dates, reminder fields,
+  // instructions) may not exist in every database. When the extended select
+  // fails with a missing-column error we fall back to the base columns so the
+  // page still works — the extended UI is hidden in that mode.
+  const [extendedSchema, setExtendedSchema] = useState(true);
+
+  const isMissingColumnError = (error: any) =>
+    !!error && /column .* does not exist/i.test(error.message || "");
+
+  const BASE_COLUMNS = "id,user_id,name,dosage,frequency,next_dose,remaining,total,created_at,updated_at";
   const [newMedication, setNewMedication] = useState({
     name: '',
     dosage: '',
@@ -58,7 +69,22 @@ const Medications = () => {
         .order('is_active', { ascending: false })
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        if (isMissingColumnError(error)) {
+          // Extended columns not provisioned in this database — retry on the
+          // base column set and degrade the UI accordingly.
+          const retry = await supabase
+            .from('medications' as any)
+            .select(BASE_COLUMNS)
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false });
+          if (retry.error) throw retry.error;
+          setExtendedSchema(false);
+          setMedications(((retry.data as any) || []).map((m: any) => ({ ...m, is_active: true })));
+          return;
+        }
+        throw error;
+      }
       setMedications(data as any || []);
     } catch (error) {
       console.error('Error fetching medications:', error);
@@ -79,15 +105,28 @@ const Medications = () => {
     }
 
     try {
-      const { error } = await supabase.from('medications' as any).insert({
+      const fullPayload = {
         user_id: user.id,
         ...newMedication,
         is_active: true,
-      });
+      };
+      let { error } = await supabase.from('medications' as any).insert(fullPayload);
 
-      if (error) throw error;
-
-      toast.success('Medication added successfully');
+      if (error && isMissingColumnError(error)) {
+        // Extended columns not provisioned — persist the core fields only.
+        const { error: retryError } = await supabase.from('medications' as any).insert({
+          user_id: user.id,
+          name: newMedication.name,
+          dosage: newMedication.dosage,
+          frequency: newMedication.frequency,
+        });
+        if (retryError) throw retryError;
+        setExtendedSchema(false);
+        toast.success('Medication added (dates & reminders need a database update to store)');
+      } else {
+        if (error) throw error;
+        toast.success('Medication added successfully');
+      }
       setShowAddDialog(false);
       setNewMedication({
         name: '',
@@ -217,32 +256,40 @@ const Medications = () => {
                   rows={3}
                 />
               </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-sm font-medium">Start Date</label>
-                  <Input
-                    type="date"
-                    value={newMedication.start_date}
-                    onChange={(e) => setNewMedication({ ...newMedication, start_date: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium">End Date</label>
-                  <Input
-                    type="date"
-                    value={newMedication.end_date}
-                    onChange={(e) => setNewMedication({ ...newMedication, end_date: e.target.value })}
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="text-sm font-medium">Refill Date</label>
-                <Input
-                  type="date"
-                  value={newMedication.refill_date}
-                  onChange={(e) => setNewMedication({ ...newMedication, refill_date: e.target.value })}
-                />
-              </div>
+              {extendedSchema ? (
+                <>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-sm font-medium">Start Date</label>
+                      <Input
+                        type="date"
+                        value={newMedication.start_date}
+                        onChange={(e) => setNewMedication({ ...newMedication, start_date: e.target.value })}
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium">End Date</label>
+                      <Input
+                        type="date"
+                        value={newMedication.end_date}
+                        onChange={(e) => setNewMedication({ ...newMedication, end_date: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Refill Date</label>
+                    <Input
+                      type="date"
+                      value={newMedication.refill_date}
+                      onChange={(e) => setNewMedication({ ...newMedication, refill_date: e.target.value })}
+                    />
+                  </div>
+                </>
+              ) : (
+                <p className="text-xs text-muted-foreground">
+                  Dates &amp; reminders are unavailable until the database is updated to store them.
+                </p>
+              )}
               <div className="flex gap-2 justify-end">
                 <Button variant="outline" onClick={() => setShowAddDialog(false)}>
                   Cancel
@@ -340,12 +387,14 @@ const Medications = () => {
                     )}
                   </div>
                   <div className="flex gap-2 pt-2">
-                    <button
-                      onClick={() => toggleMedicationStatus(med.id, med.is_active)}
-                      className="px-4 py-2 rounded-xl border border-canvas-silk dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold hover:bg-canvas dark:hover:bg-slate-700 transition-colors"
-                    >
-                      Mark Inactive
-                    </button>
+                    {extendedSchema && (
+                      <button
+                        onClick={() => toggleMedicationStatus(med.id, med.is_active)}
+                        className="px-4 py-2 rounded-xl border border-canvas-silk dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold hover:bg-canvas dark:hover:bg-slate-700 transition-colors"
+                      >
+                        Mark Inactive
+                      </button>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -374,12 +423,14 @@ const Medications = () => {
                   </div>
                 </CardHeader>
                 <CardContent>
+                  {extendedSchema && (
                   <button
                     onClick={() => toggleMedicationStatus(med.id, med.is_active)}
                     className="px-4 py-2 rounded-xl border border-primary-500 text-primary-500 hover:bg-primary-50 dark:hover:bg-slate-800 dark:hover:bg-blue-950/30 text-xs font-bold transition-colors"
                   >
                     Reactivate
                   </button>
+                  )}
                 </CardContent>
               </Card>
             ))

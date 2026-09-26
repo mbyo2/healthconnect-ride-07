@@ -170,11 +170,26 @@ export async function settlePayment(admin: Admin, input: SettleInput): Promise<S
 
   // Wallet top-ups: the payer funds their own wallet, no split.
   if (WALLET_TOPUP_TYPES.has(type)) {
+    // Idempotency: the guard above only covers flows that write a payments
+    // row. Top-ups credit the ledger directly, so check the ledger for this
+    // gateway reference before crediting — concurrent verifications must not
+    // double-credit. (A unique DB constraint on the reference is the complete
+    // fix; this narrows the race to true simultaneity.)
+    const refTag = `${gateway.toUpperCase()}:${externalRef}`;
+    const { data: priorCredit } = await admin
+      .from('wallet_transactions')
+      .select('id')
+      .eq('transaction_type', 'credit')
+      .ilike('description', `%${refTag}%`)
+      .limit(1);
+    if (priorCredit && priorCredit.length > 0) {
+      return { settled: true, already: true };
+    }
     const { error } = await admin.rpc('process_wallet_transaction', {
       p_user_id: payerId,
       p_transaction_type: 'credit',
       p_amount: amount,
-      p_description: description || `${gateway.toUpperCase()} wallet top-up`,
+      p_description: description ? `${description} [${refTag}]` : `${gateway.toUpperCase()} wallet top-up [${refTag}]`,
       p_payment_id: null,
     });
     if (error) {

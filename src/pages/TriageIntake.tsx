@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
@@ -64,11 +64,13 @@ export default function TriageIntake() {
   const [booking, setBooking] = useState<string | null>(null);
   const [result, setResult] = useState<TriageResponse | null>(null);
 
+  // Redirect during an effect, not during render (React anti-pattern).
+  useEffect(() => {
+    if (!authLoading && !user) navigate("/auth", { replace: true });
+  }, [authLoading, user, navigate]);
+
   if (authLoading) return <LoadingScreen />;
-  if (!user) {
-    navigate("/auth");
-    return null;
-  }
+  if (!user) return null;
 
   const runAssessment = async () => {
     if (!chiefComplaint.trim()) {

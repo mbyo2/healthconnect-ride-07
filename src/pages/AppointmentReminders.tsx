@@ -74,7 +74,12 @@ const AppointmentRemindersPage = () => {
 
   const downloadIcs = (apt: any) => {
     const title = `Medical Visit (${apt.type || "Consultation"}) — Doc' O Clock`;
-    const startDateStr = `${apt.date.replace(/[-]/g, "")}T${(apt.time || "09:00").replace(/[:]/g, "")}00`;
+    const timePart = (apt.time || "09:00").slice(0, 5).replace(":", "");
+    const startDateStr = `${apt.date.replace(/[-]/g, "")}T${timePart}00`;
+    // 30-minute default duration in Africa/Lusaka (was: zero-duration event).
+    const startMinutes = parseInt(timePart.slice(0, 2), 10) * 60 + parseInt(timePart.slice(2), 10);
+    const endMinutes = startMinutes + (apt.duration || 30);
+    const endDateStr = `${apt.date.replace(/[-]/g, "")}T${String(Math.floor(endMinutes / 60)).padStart(2, "0")}${String(endMinutes % 60).padStart(2, "0")}00`;
     const icsContent = [
       "BEGIN:VCALENDAR",
       "VERSION:2.0",
@@ -82,8 +87,8 @@ const AppointmentRemindersPage = () => {
       "BEGIN:VEVENT",
       `SUMMARY:${title}`,
       `DESCRIPTION:Your upcoming visit with Doc' O Clock. Manage at https://doc0clock.online/appointments/${apt.id}`,
-      `DTSTART:${startDateStr}`,
-      `DTEND:${startDateStr}`,
+      `DTSTART;TZID=Africa/Lusaka:${startDateStr}`,
+      `DTEND;TZID=Africa/Lusaka:${endDateStr}`,
       "STATUS:CONFIRMED",
       "END:VEVENT",
       "END:VCALENDAR",

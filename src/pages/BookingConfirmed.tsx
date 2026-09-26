@@ -191,10 +191,10 @@ const BookingConfirmed = () => {
                 <Video className="h-4 w-4 text-emerald-600" />
                 <span className="text-sm font-medium text-foreground">Video Consultation</span>
                 <button
-                  onClick={() => navigate('/video-consultations')}
+                  onClick={() => navigate(`/video-call/${appointment.id}`)}
                   className="ml-auto bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-xs font-bold px-2.5 py-1 rounded-full hover:bg-emerald-500/20 transition-colors"
                 >
-                  Join from Video Consultations →
+                  Join video visit →
                 </button>
               </>
             ) : (

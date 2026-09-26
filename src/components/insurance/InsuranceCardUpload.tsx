@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Camera, Upload, CreditCard, CheckCircle2, AlertCircle, Loader2, X, Shield, RefreshCw, Trash2 } from 'lucide-react';
+import { Camera, Upload, CreditCard, CheckCircle2, AlertCircle, Loader2, X, Shield, RefreshCw, Trash2, Eye } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -128,7 +128,13 @@ export const InsuranceCardUpload = () => {
         ocr_data: ocrPayload,
         verification_status: 'pending',
       });
-      if (error) throw error;
+      if (error) {
+        // Don't orphan sensitive ID photos in storage when the DB row fails.
+        await supabase.storage.from('insurance_cards').remove(
+          [frontPath, backPath].filter(Boolean) as string[]
+        );
+        throw error;
+      }
 
       toast.success('Insurance card uploaded and scanned successfully!');
       setFrontPreview(null);
@@ -169,6 +175,17 @@ export const InsuranceCardUpload = () => {
   };
 
   const deleteCard = async (cardId: string) => {
+    // Remove the stored ID photos first — deleting only the row would orphan
+    // sensitive images in the bucket.
+    const card = cards.find((c) => c.id === cardId);
+    const paths = [card?.front_image_url, card?.back_image_url].filter(Boolean) as string[];
+    if (paths.length > 0) {
+      const { error: storageError } = await supabase.storage.from('insurance_cards').remove(paths);
+      if (storageError) {
+        toast.error('Failed to delete card images');
+        return;
+      }
+    }
     const { error } = await (supabase as any)
       .from('insurance_cards')
       .delete()
@@ -179,6 +196,16 @@ export const InsuranceCardUpload = () => {
     }
     toast.success('Card removed. You can upload a new one.');
     queryClient.invalidateQueries({ queryKey: ['insurance-cards'] });
+  };
+
+  const viewCardImage = async (path: string | null) => {
+    if (!path) return;
+    const { data, error } = await supabase.storage.from('insurance_cards').createSignedUrl(path, 300);
+    if (error || !data?.signedUrl) {
+      toast.error('Could not open the card image');
+      return;
+    }
+    window.open(data.signedUrl, '_blank', 'noopener,noreferrer');
   };
 
   const latestCard = cards[0];
@@ -332,6 +359,17 @@ export const InsuranceCardUpload = () => {
                   </div>
                   <div className="flex items-center gap-2">
                     {statusBadge(card.verification_status)}
+                    {card.front_image_url && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        title="View card image"
+                        onClick={() => viewCardImage(card.front_image_url)}
+                        className="h-8 px-2"
+                      >
+                        <Eye className="h-3.5 w-3.5" />
+                      </Button>
+                    )}
                     {card.verification_status === 'failed' && (
                       <Button size="sm" variant="ghost" onClick={() => retryVerification(card.id)} className="h-8 px-2">
                         <RefreshCw className="h-3.5 w-3.5" />

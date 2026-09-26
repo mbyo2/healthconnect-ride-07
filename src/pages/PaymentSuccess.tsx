@@ -65,8 +65,20 @@ const PaymentSuccess = () => {
           navigate("/dashboard");
           return;
         } else if (paymentId) {
-          // Wallet payment completion (direct)
-          toast.success("Payment processed successfully!");
+          // Wallet payment completion (direct) — never claim success without
+          // verifying the payment row; a cancel return lands here too.
+          const { data: paymentRow } = await supabase
+            .from('payments')
+            .select('status')
+            .eq('id', paymentId)
+            .maybeSingle();
+          if (paymentRow?.status === 'completed') {
+            toast.success("Payment processed successfully!");
+          } else {
+            toast.info("Payment not confirmed yet — check your wallet for the updated balance.");
+            navigate("/wallet");
+            return;
+          }
         } else {
           // No valid payment parameters
           toast.error("Invalid payment session");

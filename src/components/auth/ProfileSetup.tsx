@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
+import { ALL_CLINICIAN_ROLES } from "@/config/roleConfig";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -117,7 +118,9 @@ export const ProfileSetup = () => {
     }
   };
 
-  const isProvider = ['doctor', 'nurse', 'pharmacist', 'lab_technician', 'radiologist', 'health_personnel'].includes(userRole);
+  // All 25 clinical professions get the professional profile treatment —
+  // never a hardcoded subset (a stale allowlist silently dropped 19 cadres).
+  const isProvider = (ALL_CLINICIAN_ROLES as readonly string[]).includes(userRole);
   const isBusiness = ['pharmacy', 'lab', 'institution_admin', 'institution_staff'].includes(userRole);
 
   const getTitle = () => {

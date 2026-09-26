@@ -336,6 +336,9 @@ export function BottomNav() {
     // Default: Patient
     return [
       { to: "/appointments", label: "My Appointments", description: "View and manage your appointments", icon: <Calendar className="h-5 w-5" /> },
+      { to: "/appointment-reminders", label: "Appointment Reminders", description: "Reminder preferences and calendar exports", icon: <Calendar className="h-5 w-5" /> },
+      { to: "/waitlist", label: "Waitlist", description: "Your waitlist requests", icon: <ClipboardList className="h-5 w-5" /> },
+      { to: "/insurance-cards", label: "Insurance Cards", description: "Upload and manage insurance cards", icon: <Shield className="h-5 w-5" /> },
       { to: "/emergency", label: "Emergency Help", description: "Emergency services and contacts", icon: <AlertTriangle className="h-5 w-5 text-red-600" /> },
       { to: "/marketplace", label: "Buy Medicine", description: "Order medications from pharmacies", icon: <Pill className="h-5 w-5" /> },
       { to: "/prescriptions", label: "Prescriptions", description: "View and manage your medications", icon: <Heart className="h-5 w-5" /> },

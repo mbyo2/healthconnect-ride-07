@@ -71,11 +71,16 @@ export const SearchFilters = () => {
           )}
         </Button>
 
+        {/* Location/distance controls are hidden until provider locations are
+            modeled — the directory currently publishes no coordinates, so the
+            switch and distance slider could not affect results. */}
+        {false && (
         <div className="flex items-center gap-2">
           <MapPin className="h-4 w-4 text-muted-foreground" />
           <Switch id="use-user-location" checked={useUserLocation} onCheckedChange={setUseUserLocation} />
           <Label htmlFor="use-user-location" className="text-sm">Use my location</Label>
         </div>
+        )}
       </div>
 
       {showFilters && (
@@ -196,7 +201,9 @@ export const SearchFilters = () => {
               )}
             </div>
 
-            {/* Row 4: Distance */}
+            {/* Row 4: Distance — hidden until provider locations are modeled;
+                the slider could not filter results (directory has no coords). */}
+            {false && (
             <div className="space-y-2">
               <Label>Maximum Distance: {maxDistance} km</Label>
               <Slider
@@ -209,6 +216,7 @@ export const SearchFilters = () => {
                 className="w-full"
               />
             </div>
+            )}
 
             {/* Row 5: Service toggles */}
             <div className="flex flex-wrap gap-4">

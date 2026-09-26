@@ -15,6 +15,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, ArrowRight, User, Phone, Mail, MapPin, Calendar, CreditCard, Heart, AlertTriangle, CheckCircle, Sparkles } from "lucide-react";
 import { useFeedbackSystem } from "@/hooks/use-feedback-system";
+import { flushPendingPatientProfile, type PendingPatientProfile } from "@/hooks/useFlushPendingPatientProfile";
 
 // Schema for each step
 const personalInfoSchema = z.object({
@@ -48,8 +49,8 @@ const insuranceSchema = z.object({
   groupNumber: z.string().optional(),
   coverageStartDate: z.string().optional(),
 }).refine(
-  (data) => !data.hasInsurance || (data.insuranceProvider && data.policyNumber),
-  { message: "Insurance provider and policy number required when insurance is selected", path: ["insuranceProvider"] }
+  (data) => !data.hasInsurance || (data.insuranceProvider && data.policyNumber && data.coverageStartDate),
+  { message: "Insurance provider, policy number, and coverage start date are required when insurance is selected", path: ["insuranceProvider"] }
 );
 
 const medicalHistorySchema = z.object({
@@ -121,6 +122,15 @@ export const PatientRegistration = () => {
     fetchDynamicData();
   }, []);
 
+  // This page creates a brand-new account. A signed-in visitor filling the
+  // form for a different email would otherwise get detail rows written under
+  // the wrong patient_id (or a confusing double-account state).
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) navigate("/dashboard", { replace: true });
+    });
+  }, [navigate]);
+
   const fetchDynamicData = async () => {
     try {
       const [countriesRes, gendersRes, bloodTypesRes, relationshipsRes, insuranceRes] = await Promise.all([
@@ -189,10 +199,11 @@ export const PatientRegistration = () => {
       const medicalData = medicalHistoryForm.getValues();
       const passwordData = passwordForm.getValues();
 
-      const { error: authError } = await supabase.auth.signUp({
+      const { data: signUpData, error: authError } = await supabase.auth.signUp({
         email: personalData.email,
         password: passwordData.password,
         options: {
+          emailRedirectTo: `${window.location.origin}/auth?redirect=${encodeURIComponent("/onboarding")}`,
           data: {
             first_name: personalData.firstName,
             last_name: personalData.lastName,
@@ -205,73 +216,83 @@ export const PatientRegistration = () => {
             country: contactData.country,
             zip_code: contactData.zipCode,
             role: "patient",
+            // When email confirmation is enabled there is no session yet, so
+            // the detail rows below cannot be written (RLS). Stash the values
+            // in signup metadata instead; Onboarding flushes them into the
+            // real tables after the first verified sign-in.
+            pending_patient_profile: {
+              emergency: emergencyData.emergencyName ? {
+                name: emergencyData.emergencyName,
+                phone: emergencyData.emergencyPhone,
+                email: emergencyData.emergencyEmail,
+                relationship: emergencyData.emergencyRelationship,
+              } : null,
+              insurance: insuranceData.hasInsurance && insuranceData.insuranceProvider ? {
+                provider_name: insuranceData.insuranceProvider,
+                policy_number: insuranceData.policyNumber,
+                group_number: insuranceData.groupNumber,
+                coverage_start_date: insuranceData.coverageStartDate,
+              } : null,
+              allergies: medicalData.hasAllergies && medicalData.allergies ? medicalData.allergies : null,
+              chronic_conditions: medicalData.hasChronicConditions && medicalData.chronicConditions ? medicalData.chronicConditions : null,
+            },
           },
         },
       });
 
       if (authError) throw authError;
 
-      const { data: { user } } = await supabase.auth.getUser();
+      // The signUp response carries the new user even when email confirmation
+      // is enabled (no session yet). Use it directly — a separate getUser()
+      // call returns null without a session and must never gate completion.
+      const newUser = signUpData?.user ?? null;
+      const { data: { session } } = await supabase.auth.getSession();
+      // Only write detail rows when the session belongs to the new account;
+      // otherwise the inserts would be misattributed (or blocked by RLS).
+      const activeUser = session?.user && newUser && session.user.id === newUser.id
+        ? session.user
+        : null;
 
-      if (user) {
-        // Create emergency contact
-        if (emergencyData.emergencyName) {
-          await supabase.from("emergency_contacts").insert({
-            patient_id: user.id,
+      if (activeUser) {
+        const user = activeUser;
+        // Write the same payload the Onboarding flush uses; it returns any
+        // sections that failed so they stay in metadata for a later retry
+        // instead of being silently dropped.
+        const pendingPayload: PendingPatientProfile = {
+          emergency: emergencyData.emergencyName ? {
             name: emergencyData.emergencyName,
             phone: emergencyData.emergencyPhone,
             email: emergencyData.emergencyEmail,
             relationship: emergencyData.emergencyRelationship,
-            is_primary: true,
-          });
-        }
-
-        // Create insurance information if applicable
-        if (insuranceData.hasInsurance && insuranceData.insuranceProvider) {
-          await supabase.from("insurance_information").insert({
-            patient_id: user.id,
+          } : null,
+          insurance: insuranceData.hasInsurance && insuranceData.insuranceProvider ? {
             provider_name: insuranceData.insuranceProvider,
             policy_number: insuranceData.policyNumber,
             group_number: insuranceData.groupNumber,
             coverage_start_date: insuranceData.coverageStartDate,
-          });
-        }
-
-        // Create medical records
-        if (medicalData.hasAllergies && medicalData.allergies) {
-          await supabase.from("comprehensive_medical_records").insert({
-            patient_id: user.id,
-            record_type: "allergy",
-            title: "Allergies",
-            description: medicalData.allergies,
-            visit_date: new Date().toISOString().split("T")[0],
-          });
-        }
-
-        if (medicalData.hasChronicConditions && medicalData.chronicConditions) {
-          await supabase.from("comprehensive_medical_records").insert({
-            patient_id: user.id,
-            record_type: "diagnosis",
-            title: "Chronic Conditions",
-            description: medicalData.chronicConditions,
-            visit_date: new Date().toISOString().split("T")[0],
-            status: "chronic",
-          });
-        }
-
-        // Initialize achievements
-        await supabase.from("achievements").insert({
-          user_id: user.id,
-          achievement_type: "first_login",
-          progress: 100,
-          target: 100,
-          completed: true,
-          completed_at: new Date().toISOString(),
+          } : null,
+          allergies: medicalData.hasAllergies && medicalData.allergies ? medicalData.allergies : null,
+          chronic_conditions: medicalData.hasChronicConditions && medicalData.chronicConditions ? medicalData.chronicConditions : null,
+        };
+        const remaining = await flushPendingPatientProfile(user.id, pendingPayload);
+        // Rows were written immediately, so clear the stash only when every
+        // section landed — otherwise keep the failed sections for the
+        // Onboarding flush to retry.
+        await supabase.auth.updateUser({
+          data: {
+            pending_patient_profile:
+              Object.keys(remaining).length === 0 ? null : remaining,
+          },
         });
-
-        showSuccess("Account created successfully! Please check your email to verify your account.");
-        navigate("/auth?tab=signin");
       }
+
+      // Account creation itself always succeeds at this point (authError would
+      // have thrown). The detail rows above are best-effort: without an active
+      // session (email confirmation pending) they cannot satisfy RLS, so they
+      // are skipped here and the patient completes them after first sign-in.
+      // Never leave the user without feedback or navigation.
+      showSuccess("Account created successfully! Please check your email to verify your account.");
+      navigate("/auth?tab=signin");
     } catch (error: any) {
       showError(error.message || "Failed to create account");
     } finally {

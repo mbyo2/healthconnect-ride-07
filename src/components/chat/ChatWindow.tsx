@@ -92,16 +92,30 @@ export const ChatWindow = ({ providerId }: ChatWindowProps) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("No user found");
 
-      const { error } = await supabase
+      // messages has no attachments column — the file row goes first, then
+      // the metadata lands in chat_attachments keyed by message_id.
+      const { data: msg, error: msgError } = await supabase
         .from('messages')
         .insert({
           content: `Shared file: ${fileName}`,
           sender_id: user.id,
           receiver_id: providerId,
-          attachments: [{ file_url: fileUrl, file_name: fileName }]
+        })
+        .select('id')
+        .single();
+
+      if (msgError) throw msgError;
+
+      const { error: attError } = await supabase
+        .from('chat_attachments')
+        .insert({
+          message_id: msg.id,
+          file_url: fileUrl,
+          file_name: fileName,
         });
 
-      if (error) throw error;
+      if (attError) throw attError;
+      toast.success('File sent');
     } catch (error: any) {
       toast.error('Error sending file');
       console.error('Error sending file:', error);

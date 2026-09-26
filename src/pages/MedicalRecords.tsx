@@ -5,6 +5,7 @@ import {
 } from "lucide-react";
 import { getMedicalRecords, getHealthMetrics, type MedicalRecord, type HealthMetric } from "@/services/medicalRecords";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import { ComprehensiveMedicalRecords } from "@/components/patient/ComprehensiveMedicalRecords";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { AIInsightsWidget } from "@/components/ai/AIInsightsWidget";
@@ -26,6 +27,28 @@ export default function MedicalRecords() {
     link.download = `medical-record-${record.id}.json`;
     link.click();
     URL.revokeObjectURL(url);
+  };
+
+  // Export the patient's full on-page EHR snapshot (records + health metrics)
+  // as a single JSON file — previously this button had no handler at all.
+  const exportAllRecords = () => {
+    if (records.length === 0 && healthMetrics.length === 0) {
+      toast.info("No records to export yet.");
+      return;
+    }
+    const payload = {
+      exported_at: new Date().toISOString(),
+      medical_records: records,
+      health_metrics: healthMetrics,
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `dococlock-ehr-export-${new Date().toISOString().split('T')[0]}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+    toast.success("EHR data exported");
   };
 
   useEffect(() => {
@@ -108,11 +131,16 @@ export default function MedicalRecords() {
                 <Bot className="h-4 w-4" />
                 <span>AI Diagnostics</span>
               </button>
-              <button className="px-3.5 py-2 rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-900 font-bold text-xs text-slate-800 dark:text-slate-200 flex items-center gap-1.5 hover:bg-canvas dark:bg-slate-950">
+              <button
+                onClick={() => navigate('/ai-diagnostics')}
+                title="Scan documents with AI"
+                className="px-3.5 py-2 rounded-md border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-900 font-bold text-xs text-slate-800 dark:text-slate-200 flex items-center gap-1.5 hover:bg-canvas dark:bg-slate-950">
                 <Upload className="h-4 w-4 text-graphite-500 dark:text-slate-400" />
                 <span>Upload Document</span>
               </button>
-              <button className="px-3.5 py-2 rounded-md bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs flex items-center gap-1.5 shadow-xs transition-all">
+              <button
+                onClick={exportAllRecords}
+                className="px-3.5 py-2 rounded-md bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs flex items-center gap-1.5 shadow-xs transition-all">
                 <Download className="h-4 w-4" />
                 <span>Export EHR Data</span>
               </button>
@@ -247,11 +275,16 @@ export default function MedicalRecords() {
                 <Calendar className="h-4 w-4 text-primary-500" />
                 <span>Schedule Checkup</span>
               </button>
-              <button className="flex items-center gap-2 p-3 rounded-xl border border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 hover:bg-primary-50 dark:hover:bg-slate-800 dark:hover:bg-slate-800 transition-colors text-xs font-extrabold">
+              <button
+                onClick={() => toast.info("Records from your providers appear here automatically after each visit.")}
+                className="flex items-center gap-2 p-3 rounded-xl border border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 hover:bg-primary-50 dark:hover:bg-slate-800 dark:hover:bg-slate-800 transition-colors text-xs font-extrabold">
                 <FileText className="h-4 w-4 text-purple-500" />
                 <span>Request Records</span>
               </button>
-              <button className="flex items-center gap-2 p-3 rounded-xl border border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 hover:bg-primary-50 dark:hover:bg-slate-800 dark:hover:bg-slate-800 transition-colors text-xs font-extrabold">
+              <button
+                onClick={() => navigate('/ai-diagnostics')}
+                title="Scan documents with AI"
+                className="flex items-center gap-2 p-3 rounded-xl border border-canvas-silk dark:border-slate-800 bg-canvas dark:bg-slate-950 hover:bg-primary-50 dark:hover:bg-slate-800 dark:hover:bg-slate-800 transition-colors text-xs font-extrabold">
                 <Upload className="h-4 w-4 text-warning-500" />
                 <span>Upload Document</span>
               </button>

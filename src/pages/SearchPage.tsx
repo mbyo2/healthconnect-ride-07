@@ -35,10 +35,18 @@ const SearchPage = () => {
     const urlParams = new URLSearchParams(searchString);
     const query = urlParams.get("q");
     const category = urlParams.get("category");
+    const specialtyParam = urlParams.get("specialty");
 
     if (query) {
       setSearchQuery(query);
       setSearchTerm(query);
+      refreshProviders();
+    } else if (specialtyParam) {
+      // Specialty cards on /home link /search?specialty=Cardiology — honor it
+      // directly instead of landing on an unfiltered list.
+      setSelectedSpecialty(specialtyParam as any);
+      setSearchQuery("");
+      setSearchTerm("");
       refreshProviders();
     } else if (category) {
       const categoryMap: Record<string, string> = {

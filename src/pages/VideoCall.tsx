@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { VideoRoom } from '@/components/video/VideoRoom';
 import { LoadingScreen } from '@/components/LoadingScreen';
 import { useAuth } from '@/context/AuthContext';
@@ -18,10 +18,14 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
  * Two entry modes, both ending in a real Daily room:
  *  1. Booked consultation — roomId is the video_consultations UUID. The
  *     consultation is loaded (patient or provider side), a Daily room is
- *     minted on demand when missing, and status moves scheduled → in_progress.
- *  2. Instant room — any other id. An ad-hoc consultation record is created
- *     for the current user so the call is tracked, billed and reviewable
- *     like any other visit; the link can be shared to invite the other party.
+ *     minted on demand when missing, and status moves scheduled → active.
+ *     As a fallback, roomId may also be an appointments UUID (the
+ *     Appointments "Join" buttons link that way): the appointment is
+ *     resolved and its consultation row is minted idempotently on demand.
+ *  2. Instant room — ?instant=1 (or any non-UUID id). An ad-hoc
+ *     consultation record is created for the current user so the call is
+ *     tracked, billed and reviewable like any other visit; the link can be
+ *     shared to invite the other party.
  *
  * On leave, providers close the visit (→ completed); patients simply leave
  * so they can rejoin while the visit is still live.
@@ -29,6 +33,7 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 const VideoCall = () => {
   const { roomId } = useParams<{ roomId: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { user, profile } = useAuth();
   const [loading, setLoading] = useState(true);
   const [meetingUrl, setMeetingUrl] = useState<string | null>(null);
@@ -60,8 +65,11 @@ const VideoCall = () => {
       setFatalError(null);
       try {
         let consultation: any = null;
+        // ?instant=1 forces ad-hoc mode: the instant-room buttons navigate
+        // with a UUID, which would otherwise be mistaken for a booked id.
+        const forceInstant = searchParams.get('instant') === '1';
 
-        if (UUID_RE.test(roomId)) {
+        if (!forceInstant && UUID_RE.test(roomId)) {
           // Mode 1 — booked consultation: only participants may open it.
           const { data, error } = await supabase
             .from('video_consultations')
@@ -70,16 +78,64 @@ const VideoCall = () => {
             .maybeSingle();
           if (error) throw error;
           if (!data) {
-            setFatalError('This consultation link is invalid or has been removed.');
-            setLoading(false);
-            return;
+            // Fallback — roomId is an appointments UUID. The Appointments
+            // "Join" buttons link /video-call/<appointment_id>; resolve the
+            // appointment and mint its consultation row idempotently.
+            const { data: appt, error: apptError } = await supabase
+              .from('appointments')
+              .select('id, patient_id, provider_id, status')
+              .eq('id', roomId)
+              .maybeSingle();
+            if (apptError) throw apptError;
+            if (!appt) {
+              setFatalError('This consultation link is invalid or has been removed.');
+              setLoading(false);
+              return;
+            }
+            if (appt.patient_id !== user.id && appt.provider_id !== user.id) {
+              setFatalError('You are not a participant in this consultation.');
+              setLoading(false);
+              return;
+            }
+            // Idempotency tag in notes: patient and provider joining the same
+            // appointment link must land in the SAME consultation/Daily room.
+            const noteTag = `Video visit for appointment ${appt.id}`;
+            const { data: existing, error: existingError } = await supabase
+              .from('video_consultations')
+              .select('*')
+              .eq('notes', noteTag)
+              .in('status', ['scheduled', 'active'])
+              .order('created_at', { ascending: false })
+              .limit(1)
+              .maybeSingle();
+            if (existingError) throw existingError;
+            if (existing) {
+              consultation = existing;
+            } else {
+              const now = new Date();
+              const { data: minted, error: mintError } = await supabase
+                .from('video_consultations')
+                .insert({
+                  patient_id: appt.patient_id,
+                  provider_id: appt.provider_id,
+                  scheduled_start: now.toISOString(),
+                  scheduled_end: new Date(now.getTime() + 30 * 60000).toISOString(),
+                  status: 'scheduled',
+                  notes: noteTag,
+                })
+                .select()
+                .single();
+              if (mintError) throw mintError;
+              consultation = minted;
+            }
+          } else {
+            if (data.patient_id !== user.id && data.provider_id !== user.id) {
+              setFatalError('You are not a participant in this consultation.');
+              setLoading(false);
+              return;
+            }
+            consultation = data;
           }
-          if (data.patient_id !== user.id && data.provider_id !== user.id) {
-            setFatalError('You are not a participant in this consultation.');
-            setLoading(false);
-            return;
-          }
-          consultation = data;
         } else {
           // Mode 2 — instant room: track it as an ad-hoc consultation so it
           // shows in history and can be billed like a normal visit.
@@ -119,11 +175,12 @@ const VideoCall = () => {
           setMeetingUrl(consultation.meeting_url);
         }
 
-        // Mark the visit live (idempotent).
+        // Mark the visit live (idempotent). DB CHECK allows
+        // ('scheduled','active','completed','cancelled') — never 'in_progress'.
         if (consultation.status === 'scheduled') {
           await supabase
             .from('video_consultations')
-            .update({ status: 'in_progress' })
+            .update({ status: 'active' })
             .eq('id', consultation.id);
         }
 
@@ -149,7 +206,7 @@ const VideoCall = () => {
     return () => {
       cancelled = true;
     };
-  }, [user, roomId]);
+  }, [user, roomId, searchParams]);
 
   const handleLeave = useCallback(async () => {
     logAnalyticsEvent('video_call_ended', { consultation_id: consultationId });
@@ -161,7 +218,7 @@ const VideoCall = () => {
           .from('video_consultations')
           .update({ status: 'completed' })
           .eq('id', consultationId)
-          .eq('status', 'in_progress');
+          .eq('status', 'active');
       }
     } catch (err) {
       console.error('Failed to close consultation:', err);

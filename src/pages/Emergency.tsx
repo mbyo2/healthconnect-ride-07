@@ -10,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { ZAMBIA_CONFIG } from '@/config/zambia';
+import { EmergencyContacts } from '@/components/patient/EmergencyContacts';
 
 interface EmergencyService {
   id: string;
@@ -36,6 +37,7 @@ const Emergency = () => {
   const [emergencyMessage, setEmergencyMessage] = useState('');
   const [isEmergencyActive, setIsEmergencyActive] = useState(false);
   const [emergencyServices, setEmergencyServices] = useState<EmergencyService[]>([]);
+  const [showContactManager, setShowContactManager] = useState(false);
 
   useEffect(() => {
     loadZambianEmergencyServices();
@@ -104,41 +106,43 @@ const Emergency = () => {
   };
 
   const triggerEmergency = async () => {
-    if (!user || !location) {
-      toast.error('Unable to send emergency alert. Location required.');
+    // SOS must work even when geolocation is denied — the alert is logged
+    // without coordinates and the call buttons below stay available.
+    if (!user) {
+      toast.error('Sign in so the alert can be logged — or call 991 right now.');
       return;
     }
 
     setIsEmergencyActive(true);
 
     try {
-      // Send emergency alert to contacts
-      const primaryContact = emergencyContacts.find(contact => contact.is_primary);
-
-      if (primaryContact) {
-        // Here you would integrate with SMS service
-        toast.success(`Emergency alert sent to ${primaryContact.name}`);
-      }
-
-      // Log emergency event
+      // Log emergency event (visible failure — never console-only)
       const { error } = await supabase
         .from('emergency_events')
         .insert({
           patient_id: user.id,
-          latitude: location.lat,
-          longitude: location.lng,
+          latitude: location?.lat ?? null,
+          longitude: location?.lng ?? null,
           message: emergencyMessage,
           status: 'active'
         });
 
       if (error) {
         console.error('Error logging emergency:', error);
+        toast.error('Could not log the emergency — call 991 / 999 / 993 directly.');
+      } else {
+        toast.success('Emergency logged. Call 991 now — your contacts are listed below.');
       }
 
-      toast.success('Emergency services have been notified!');
+      // There is no SMS gateway yet: never claim contacts were texted or that
+      // emergency services were notified. The tel: links are the real action.
+      const primaryContact = emergencyContacts.find(contact => contact.is_primary);
+      if (primaryContact) {
+        toast.info(`SMS alerts are coming soon — please call ${primaryContact.name} directly.`);
+      }
     } catch (error) {
       console.error('Error triggering emergency:', error);
-      toast.error('Failed to send emergency alert.');
+      toast.error('Failed to log the emergency alert — call 991 directly.');
     }
   };
 
@@ -227,7 +231,7 @@ const Emergency = () => {
                 <Button
                   onClick={triggerEmergency}
                   className="w-full bg-red-600 hover:bg-red-700 text-white text-lg py-6"
-                  disabled={isEmergencyActive || !location}
+                  disabled={isEmergencyActive}
                 >
                   {isEmergencyActive ? (
                     <>
@@ -243,7 +247,7 @@ const Emergency = () => {
                 </Button>
                 {!location && !isEmergencyActive && (
                   <p className="text-xs text-center text-muted-foreground">
-                    The alert button unlocks once your location is detected.
+                    Location not detected — the alert still works, but enabling location services helps contacts find you.
                   </p>
                 )}
 
@@ -251,11 +255,11 @@ const Emergency = () => {
                   <div className="text-center space-y-1.5">
                     <div>
                       <Badge className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
-                        Your emergency contacts have been alerted with your location
+                        Emergency logged{location ? " with your location" : ""}
                       </Badge>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      This does not replace calling 991 — if you can, call now.
+                      No SMS was sent — if you can, call 991 now. Your contacts are listed below.
                     </p>
                   </div>
                 )}
@@ -305,8 +309,15 @@ const Emergency = () => {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>Your Emergency Contacts</CardTitle>
-                <Button variant="outline" size="sm" onClick={() => navigate('/profile')}>
-                  Manage
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    if (showContactManager) loadEmergencyContacts();
+                    setShowContactManager((v) => !v);
+                  }}
+                >
+                  {showContactManager ? "Done" : "Manage"}
                 </Button>
               </CardHeader>
               <CardContent>
@@ -342,13 +353,21 @@ const Emergency = () => {
                     <p className="text-muted-foreground mb-4">
                       No emergency contacts set up yet.
                     </p>
-                    <Button variant="outline" onClick={() => navigate('/profile')}>
+                    <Button variant="outline" onClick={() => setShowContactManager(true)}>
                       Add Emergency Contacts
                     </Button>
                   </div>
                 )}
               </CardContent>
             </Card>
+
+            {showContactManager && (
+              <Card>
+                <CardContent className="pt-4">
+                  <EmergencyContacts />
+                </CardContent>
+              </Card>
+            )}
 
             {/* Zambian Emergency Safety Tips */}
             <Card>

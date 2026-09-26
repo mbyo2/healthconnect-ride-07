@@ -21,6 +21,7 @@ interface WaitlistEntry {
   created_at: string;
   notified_at: string | null;
   expires_at: string | null;
+  provider_name?: string | null;
 }
 
 const urgencyColor = (u: string) => {
@@ -55,7 +56,20 @@ const WaitlistPage = () => {
         .eq("patient_id", user!.id)
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return (data || []) as WaitlistEntry[];
+      const rows = (data || []) as WaitlistEntry[];
+      // Enrich with provider names in one batched query (no N+1).
+      const ids = [...new Set(rows.map((r) => r.provider_id).filter(Boolean))];
+      if (ids.length > 0) {
+        const { data: profiles } = await supabase
+          .from("profiles")
+          .select("id, first_name, last_name")
+          .in("id", ids);
+        const nameById = new Map(
+          ((profiles as any[]) || []).map((p) => [p.id, `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim()])
+        );
+        rows.forEach((r) => { r.provider_name = nameById.get(r.provider_id) || null; });
+      }
+      return rows;
     },
     enabled: !!user,
   });
@@ -63,7 +77,7 @@ const WaitlistPage = () => {
   const cancelEntry = async (id: string) => {
     const { error } = await (supabase as any)
       .from("appointment_waitlist")
-      .update({ status: "cancelled" })
+      .update({ status: "cancelled", cancelled_at: new Date().toISOString() })
       .eq("id", id);
     if (error) {
       toast.error("Failed to cancel waitlist entry");
@@ -116,7 +130,7 @@ const WaitlistPage = () => {
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1 min-w-0">
                         <CardTitle className="text-base flex items-center gap-2 flex-wrap">
-                          Provider waitlist
+                          {entry.provider_name ? `Waitlist · ${entry.provider_name}` : "Provider waitlist"}
                           <Badge className={urgencyColor(entry.urgency)}>
                             {entry.urgency}
                           </Badge>

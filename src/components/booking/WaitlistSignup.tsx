@@ -99,14 +99,20 @@ export const WaitlistSignup = ({ provider, isOpen, onClose, onRequestOpen }: Wai
     }
     setSubmitting(true);
     try {
+      // appointment_waitlist has preferred_date_start/end and
+      // preferred_time_start/end — the old preferred_dates/preferred_times/
+      // appointment_type keys do not exist and every join was rejected.
+      const sortedDays = [...selectedDays].sort();
+      const sortedTimes = [...selectedTimes].sort();
       const { error } = await (supabase as any).from('appointment_waitlist').insert({
         patient_id: user.id,
         provider_id: provider.id,
-        preferred_dates: selectedDays.length > 0 ? selectedDays : null,
-        preferred_times: selectedTimes,
+        preferred_date_start: sortedDays[0] ?? null,
+        preferred_date_end: sortedDays[sortedDays.length - 1] ?? null,
+        preferred_time_start: sortedTimes[0] ?? null,
+        preferred_time_end: sortedTimes[sortedTimes.length - 1] ?? null,
         urgency,
         notes: notes || null,
-        appointment_type: 'in_person',
       });
       if (error) throw error;
       toast.success("You've been added to the waitlist! We'll notify you when a slot opens.");

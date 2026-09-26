@@ -82,8 +82,14 @@ export const useMarketplace = () => {
     enabled: !!user
   });
 
-  // Add to cart
+  // Add to cart — one pharmacy per checkout: block mixing pharmacies so an
+  // order's single pharmacy_id always matches every item.
   const addToCart = (product: MarketplaceProduct, quantity: number = 1) => {
+    const cartPharmacyId = cart.items[0]?.product?.pharmacy_id;
+    if (cartPharmacyId && product.pharmacy_id && cartPharmacyId !== product.pharmacy_id) {
+      toast.error('Your cart already has items from another pharmacy — check out first, then add this item.');
+      return;
+    }
     setCart(prev => {
       const existingItemIndex = prev.items.findIndex(item => item.product.id === product.id);
       let newItems = [...prev.items];
@@ -163,6 +169,14 @@ export const useMarketplace = () => {
       if (!user) throw new Error('Not authenticated');
       if (cart.items.length === 0) throw new Error('Cart is empty');
 
+      // Defense in depth: every item must belong to the chosen pharmacy.
+      const mismatched = cart.items.find(
+        (item) => item.product.pharmacy_id && item.product.pharmacy_id !== orderData.pharmacy_id
+      );
+      if (mismatched) {
+        throw new Error('Your cart contains items from more than one pharmacy — please check out separately.');
+      }
+
       // Check if any items require prescription
       const requiresPrescription = cart.items.some(item => item.product.requires_prescription);
       if (requiresPrescription && !orderData.prescription_id) {
@@ -202,14 +216,27 @@ export const useMarketplace = () => {
         .from('order_items')
         .insert(orderItems);
 
-      if (itemsError) throw itemsError;
+      if (itemsError) {
+        // Compensating rollback: never leave an empty pending order behind.
+        await supabase.from('orders').delete().eq('id', order.id);
+        throw itemsError;
+      }
 
-      return order;
+      // Re-read the order: server triggers recalculate total_amount on the
+      // order_items insert, so the freshly returned row has the real total
+      // the payment step needs.
+      const { data: freshOrder } = await supabase
+        .from('orders')
+        .select()
+        .eq('id', order.id)
+        .single();
+
+      return (freshOrder as any) || order;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user-orders'] });
       clearCart();
-      toast.success('Order placed successfully!');
+      toast.success('Order created — complete your payment to confirm it.');
     },
     onError: (error: any) => {
       toast.error('Failed to place order: ' + error.message);

@@ -73,7 +73,9 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen }: Booki
         .lte('date', horizonStr);
 
       if (data) {
-        setBookedSlots(data.map(a => `${a.date}-${a.time}`));
+        // Postgres TIME comes back as "HH:MM:SS" while TIME_SLOTS are "HH:MM" —
+        // normalize so already-booked slots actually render as booked.
+        setBookedSlots(data.map(a => `${a.date}-${String(a.time).slice(0, 5)}`));
       }
     };
     
@@ -238,10 +240,10 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen }: Booki
                 </div>
               </div>
             </Label>
-            {provider.address && (
+            {(provider.primary_practice_location || provider.location || provider.address) && (
               <Badge variant="secondary" className="text-xs">
                 <MapPin className="h-3 w-3 mr-1" />
-                {provider.city || 'Clinic'}
+                {provider.primary_practice_location || provider.location || provider.city || 'Clinic'}
               </Badge>
             )}
           </div>
@@ -442,6 +444,8 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen }: Booki
         appointmentType={appointmentType}
         visitType={visitType}
         specialty={provider.specialty}
+        feeMin={provider.consultation_fee_min}
+        feeMax={provider.consultation_fee_max}
       />
 
       <div>

@@ -15,7 +15,6 @@ const Settings = () => {
   const [notifications, setNotifications] = useState(true);
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [smsReminders, setSmsReminders] = useState(false);
-  const [profileVisibility, setProfileVisibility] = useState(true);
   const [twoFactor, setTwoFactor] = useState(false);
 
   const [language, setLanguage] = useState("en");
@@ -58,14 +57,6 @@ const Settings = () => {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
 
-        const { data: profile } = await supabase
-          .from("profiles" as any)
-          .select("show_in_search")
-          .eq("id", user.id)
-          .maybeSingle();
-
-        if (profile) setProfileVisibility((profile as any).show_in_search ?? true);
-
         const { data: tfa } = await supabase
           .from("user_two_factor" as any)
           .select("enabled")
@@ -107,13 +98,29 @@ const Settings = () => {
     fetchSettings();
   }, [enableEasyReading, disableEasyReading]);
 
+  // Checked upserts: .update() silently no-ops for users with no row yet,
+  // so preferences use upsert on user_id and every write checks { error }.
+  const upsertNotificationSettings = async (userId: string, patch: Record<string, unknown>) => {
+    const { error } = await supabase
+      .from("notification_settings")
+      .upsert({ user_id: userId, ...patch }, { onConflict: "user_id" });
+    if (error) throw error;
+  };
+
+  const upsertUserSettings = async (userId: string, patch: Record<string, unknown>) => {
+    const { error } = await supabase
+      .from("user_settings" as any)
+      .upsert({ user_id: userId, ...patch }, { onConflict: "user_id" });
+    if (error) throw error;
+  };
+
   const handleNotificationToggle = async (checked: boolean) => {
     setNotifications(checked);
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      await supabase.from("notification_settings").update({ push_notifications: checked }).eq("user_id", user.id);
+      await upsertNotificationSettings(user.id, { push_notifications: checked });
 
       if (checked) {
         const success = await subscribeToNotifications();
@@ -133,35 +140,16 @@ const Settings = () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
-      await supabase.from("notification_settings").update({ email_notifications: checked }).eq("user_id", user.id);
+      await upsertNotificationSettings(user.id, { email_notifications: checked });
       showSuccess({ message: `Email notifications ${checked ? "enabled" : "disabled"}` });
     } catch (error) {
       toast.error("Failed to update email settings");
     }
   };
 
-  const handleSmsToggle = async (checked: boolean) => {
-    setSmsReminders(checked);
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-      await supabase.from("notification_settings").update({ appointment_reminders: checked }).eq("user_id", user.id);
-      showSuccess({ message: `SMS reminders ${checked ? "enabled" : "disabled"}` });
-    } catch (error) {
-      toast.error("Failed to update SMS settings");
-    }
-  };
-
-  const handleVisibilityToggle = async (checked: boolean) => {
-    setProfileVisibility(checked);
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-      await supabase.from("profiles" as any).update({ show_in_search: checked }).eq("id", user.id);
-      showSuccess({ message: `Profile visibility set to ${checked ? "public" : "private"}` });
-    } catch (error) {
-      toast.error("Failed to update profile visibility");
-    }
+  const handleSmsToggle = async () => {
+    // No SMS gateway exists yet — never claim the toggle works.
+    toast.info("SMS reminders are coming soon — the SMS gateway is not connected yet.");
   };
 
   const handleTwoFactorToggle = async () => {
@@ -174,7 +162,7 @@ const Settings = () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
-      await supabase.from("user_settings" as any).update({ language: value }).eq("user_id", user.id);
+      await upsertUserSettings(user.id, { language: value });
       showSuccess({ message: `Language updated to ${value === "en" ? "English" : value === "fr" ? "French" : "Spanish"}` });
     } catch (error) {
       toast.error("Failed to update language");
@@ -186,7 +174,7 @@ const Settings = () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
-      await supabase.from("user_settings" as any).update({ timezone: value }).eq("user_id", user.id);
+      await upsertUserSettings(user.id, { timezone: value });
       showSuccess({ message: `Timezone updated to ${value}` });
     } catch (error) {
       toast.error("Failed to update timezone");
@@ -198,7 +186,7 @@ const Settings = () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
-      await supabase.from("user_settings" as any).update({ date_format: value }).eq("user_id", user.id);
+      await upsertUserSettings(user.id, { date_format: value });
       showSuccess({ message: `Date format updated to ${value}` });
     } catch (error) {
       toast.error("Failed to update date format");
@@ -209,7 +197,7 @@ const Settings = () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        await supabase.from("user_settings" as any).update({ accessibility_mode: checked }).eq("user_id", user.id);
+        await upsertUserSettings(user.id, { accessibility_mode: checked });
       }
       if (checked) {
         enableEasyReading();
@@ -261,13 +249,6 @@ const Settings = () => {
                 <User className="h-4 w-4 text-primary-500" /> Account Preferences
               </h2>
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium text-sm text-midnight">Directory Profile Visibility</p>
-                  <p className="text-xs text-graphite-500">Visible to verified patient search & provider index</p>
-                </div>
-                <Switch checked={profileVisibility} onCheckedChange={handleVisibilityToggle} aria-label="Directory profile visibility" />
-              </div>
-              <div className="flex items-center justify-between pt-2 border-t border-canvas-silk">
                 <div>
                   <p className="font-medium text-sm text-midnight">Two-Factor Authentication (2FA)</p>
                   <p className="text-xs text-graphite-500">TOTP authenticator app verification</p>
@@ -341,10 +322,10 @@ const Settings = () => {
               </div>
               <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
                 <div>
-                  <p className="font-bold text-xs">SMS Reminders</p>
-                  <p className="text-[11px] text-graphite-500 dark:text-slate-400">Text reminders 1 hour prior to appointments</p>
+                  <p className="font-bold text-xs">SMS Reminders <span className="ml-1 rounded-full bg-canvas-silk px-2 py-0.5 text-[10px] font-bold text-graphite-500">Coming soon</span></p>
+                  <p className="text-[11px] text-graphite-500 dark:text-slate-400">Text reminders once the SMS gateway is connected</p>
                 </div>
-                <Switch checked={smsReminders} onCheckedChange={handleSmsToggle} aria-label="SMS reminders" />
+                <Switch checked={smsReminders} disabled onCheckedChange={handleSmsToggle} aria-label="SMS reminders (coming soon)" />
               </div>
             </div>
 

@@ -125,7 +125,12 @@ export function VideoRoom({ roomUrl, roomId, userName, videoQuality = "high", on
         });
 
         setCallFrame(daily);
-        daily.join();
+        // join() rejects if the room can't be entered — without this catch
+        // the "Joining meeting…" loader would spin forever on failure.
+        daily.join().catch((joinErr: any) => {
+          console.error("Daily join failed:", joinErr);
+          setError("Could not join the video room. Check your connection and try again.");
+        });
       } catch (err) {
         console.error("Error creating Daily.co frame:", err);
         setError("Failed to create video call. Please try again.");

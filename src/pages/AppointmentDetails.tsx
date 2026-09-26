@@ -2,40 +2,35 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { Calendar, Clock, User, MapPin, Phone, Mail, Video, FileText, X, Edit, Loader2, ArrowLeft } from "lucide-react";
+import { Calendar, Clock, User, Video, FileText, X, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { providerDisplayName } from "@/utils/providerDisplay";
 
 interface AppointmentData {
   id: string;
-  time_slot: {
-    date: string;
-    start_time: string;
-    end_time: string;
-  };
+  date: string;
+  time: string;
   patient: {
     first_name: string;
     last_name: string;
     email?: string;
     phone?: string;
-  };
+  } | null;
   provider: {
     first_name: string;
     last_name: string;
     specialty?: string;
     address?: string;
-  };
+    role?: string;
+  } | null;
   status: string;
   notes?: string;
   reason?: string;
   type: string;
   provider_id: string;
-  time_slot_id: string;
 }
 
 export const AppointmentDetails = () => {
@@ -46,66 +41,35 @@ export const AppointmentDetails = () => {
   const [loading, setLoading] = useState(true);
   const [notes, setNotes] = useState("");
   const [showCancelDialog, setShowCancelDialog] = useState(false);
-  const [cancelReason, setCancelReason] = useState("");
-  const [showRescheduleDialog, setShowRescheduleDialog] = useState(false);
-  const [availableSlots, setAvailableSlots] = useState<any[]>([]);
-  const [selectedSlotId, setSelectedSlotId] = useState<string>("");
-  const [fetchingSlots, setFetchingSlots] = useState(false);
-  const [rescheduling, setRescheduling] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
 
   useEffect(() => {
     fetchAppointment();
   }, [id]);
 
-  useEffect(() => {
-    if (showRescheduleDialog && appointment?.provider_id) {
-      fetchAvailableSlots();
-    }
-  }, [showRescheduleDialog, appointment?.provider_id]);
-
-  const fetchAvailableSlots = async () => {
-    if (!appointment?.provider_id) return;
-    setFetchingSlots(true);
-    try {
-      const today = new Date().toISOString().split("T")[0];
-      const { data, error } = await supabase
-        .from("provider_time_slots" as any)
-        .select("*")
-        .eq("provider_id", appointment.provider_id)
-        .eq("status", "available")
-        .gte("date", today)
-        .order("date", { ascending: true })
-        .order("start_time", { ascending: true });
-
-      if (error) throw error;
-      setAvailableSlots(data || []);
-    } catch (error) {
-      console.error("Error fetching slots:", error);
-      toast.error("Failed to load available time slots");
-    } finally {
-      setFetchingSlots(false);
-    }
-  };
-
+  // NOTE: there is no provider_time_slots FK from appointments and the
+  // `profiles!patient_id` / `profiles!provider_id` join hints are invalid, so
+  // the appointment row and the provider profile are fetched separately.
   const fetchAppointment = async () => {
     if (!id) return;
 
     try {
-      const { data, error } = await supabase
+      const { data: appt, error } = await supabase
         .from("appointments" as any)
-        .select(`
-          *,
-          time_slot:provider_time_slots(*),
-          patient:profiles!patient_id(first_name, last_name, email, phone),
-          provider:profiles!provider_id(first_name, last_name, specialty, address, role)
-        `)
+        .select("*")
         .eq("id", id)
         .single();
 
       if (error) throw error;
 
-      setAppointment(data as any);
-      setNotes((data as any)?.notes || "");
+      const { data: providerProfile } = await supabase
+        .from("profiles")
+        .select("first_name, last_name, specialty, role")
+        .eq("id", (appt as any).provider_id)
+        .maybeSingle();
+
+      setAppointment({ ...(appt as any), provider: providerProfile ?? null, patient: null });
+      setNotes((appt as any)?.notes || "");
     } catch (error) {
       console.error("Error fetching appointment:", error);
       toast.error("Failed to load appointment details");
@@ -134,18 +98,14 @@ export const AppointmentDetails = () => {
   };
 
   const cancelAppointment = async () => {
-    if (!id || !cancelReason) {
-      toast.error("Please provide a cancellation reason");
-      return;
-    }
-
+    if (!id) return;
+    // NOTE: appointments has no cancellation_reason column — only the status
+    // is written. (DB-side: add the column or keep reason client-side only.)
+    setCancelling(true);
     try {
       const { error } = await supabase
         .from("appointments" as any)
-        .update({
-          status: "cancelled",
-          cancellation_reason: cancelReason,
-        })
+        .update({ status: "cancelled" })
         .eq("id", id);
 
       if (error) throw error;
@@ -156,6 +116,8 @@ export const AppointmentDetails = () => {
     } catch (error) {
       console.error("Error cancelling appointment:", error);
       toast.error("Failed to cancel appointment");
+    } finally {
+      setCancelling(false);
     }
   };
 
@@ -207,12 +169,27 @@ export const AppointmentDetails = () => {
             <div>
               <h1 className="text-xl font-extrabold tracking-tight">Appointment Record #{appointment.id.slice(0, 8)}</h1>
               <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
-                {appointment.patient ? `Patient: ${appointment.patient.first_name} ${appointment.patient.last_name}` : `Provider: ${providerDisplayName({ first_name: appointment.provider.first_name, last_name: appointment.provider.last_name, role: (appointment.provider as any)?.role })}`}
+                {appointment.patient
+                  ? `Patient: ${appointment.patient.first_name} ${appointment.patient.last_name}`
+                  : appointment.provider
+                    ? `Provider: ${providerDisplayName({ first_name: appointment.provider.first_name, last_name: appointment.provider.last_name, role: appointment.provider.role })}`
+                    : "Appointment"}
               </p>
             </div>
           </div>
 
-          <div>{getStatusPill(appointment.status)}</div>
+          <div className="flex items-center gap-2">
+            {appointment.status !== "cancelled" && appointment.status !== "completed" && (
+              <button
+                onClick={() => setShowCancelDialog(true)}
+                className="px-3.5 py-1.5 rounded-md border border-error-500/40 text-error-500 font-bold text-xs hover:bg-error-500/10 transition-colors flex items-center gap-1.5"
+              >
+                <X className="h-3.5 w-3.5" />
+                Cancel appointment
+              </button>
+            )}
+            <div>{getStatusPill(appointment.status)}</div>
+          </div>
         </div>
       </div>
 
@@ -231,7 +208,7 @@ export const AppointmentDetails = () => {
                 <div>
                   <div className="font-bold text-graphite-500 dark:text-slate-400 uppercase">Date</div>
                   <div className="font-extrabold text-sm text-slate-900 dark:text-slate-100">
-                    {format(new Date(appointment.time_slot.date), "EEEE, MMMM d, yyyy")}
+                    {format(new Date(`${appointment.date}T00:00:00`), "EEEE, MMMM d, yyyy")}
                   </div>
                 </div>
               </div>
@@ -239,9 +216,9 @@ export const AppointmentDetails = () => {
               <div className="flex items-start gap-3">
                 <Clock className="h-4 w-4 text-slate-400 mt-0.5" />
                 <div>
-                  <div className="font-bold text-graphite-500 dark:text-slate-400 uppercase">Time Span</div>
+                  <div className="font-bold text-graphite-500 dark:text-slate-400 uppercase">Time</div>
                   <div className="font-mono font-bold text-slate-800 dark:text-slate-200">
-                    {appointment.time_slot.start_time} - {appointment.time_slot.end_time}
+                    {String(appointment.time).slice(0, 5)}
                   </div>
                 </div>
               </div>
@@ -271,11 +248,13 @@ export const AppointmentDetails = () => {
                 <div className="font-extrabold text-sm text-slate-900 dark:text-slate-100">
                   {appointment.patient
                     ? `${appointment.patient.first_name} ${appointment.patient.last_name}`
-                    : providerDisplayName({ first_name: appointment.provider.first_name, last_name: appointment.provider.last_name, role: (appointment.provider as any)?.role })}
+                    : appointment.provider
+                      ? providerDisplayName({ first_name: appointment.provider.first_name, last_name: appointment.provider.last_name, role: appointment.provider.role })
+                      : "Provider"}
                 </div>
               </div>
 
-              {appointment.provider.specialty && (
+              {appointment.provider?.specialty && (
                 <div>
                   <div className="font-bold text-graphite-500 dark:text-slate-400 uppercase">Clinical Specialty</div>
                   <div className="font-bold text-primary-500">{appointment.provider.specialty}</div>
@@ -306,6 +285,34 @@ export const AppointmentDetails = () => {
           </button>
         </div>
       </div>
+
+      {/* Cancel confirmation — the old cancel/reschedule dialogs were never
+          reachable; this one is wired to the header button. */}
+      <Dialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Cancel this appointment?</DialogTitle>
+            <DialogDescription>
+              This will free the slot for other patients. This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <button
+              onClick={() => setShowCancelDialog(false)}
+              className="px-4 py-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold text-xs"
+            >
+              Keep appointment
+            </button>
+            <button
+              onClick={cancelAppointment}
+              disabled={cancelling}
+              className="px-4 py-2 rounded-md bg-error-500 hover:bg-error-600 text-white font-extrabold text-xs disabled:opacity-50"
+            >
+              {cancelling ? "Cancelling…" : "Yes, cancel"}
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

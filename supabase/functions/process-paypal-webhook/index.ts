@@ -1,5 +1,4 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -118,111 +117,20 @@ serve(async (req) => {
     const webhookData = JSON.parse(bodyText);
     console.log('Verified PayPal webhook received:', webhookData.event_type);
 
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
-
     // Handle different PayPal webhook events
     if (webhookData.event_type === 'CHECKOUT.ORDER.APPROVED') {
-      const orderId = webhookData.resource.id;
-      const paymentId = webhookData.resource.custom_id; // This should be our payment ID
-
-      console.log('Processing order approval:', { orderId, paymentId });
-
-      // Validate payment ID format (UUID)
-      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-      if (!paymentId || !uuidRegex.test(paymentId)) {
-        console.error('Invalid or missing payment ID:', paymentId);
-        return new Response(
-          JSON.stringify({ error: 'Invalid payment ID' }),
-          { 
-            status: 400,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-          }
-        );
-      }
-
-      // Update payment status to completed ONLY if currently pending (idempotency guard)
-      const { data, error } = await supabaseClient
-        .from('payments')
-        .update({ 
-          status: 'completed',
-          payment_date: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', paymentId)
-        .eq('status', 'pending')
-        .select()
-        .maybeSingle();
-
-      if (error) {
-        console.error('Error updating payment:', error);
-        return new Response(
-          JSON.stringify({ error: 'Failed to update payment' }),
-          { 
-            status: 500,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-          }
-        );
-      }
-
-      if (!data) {
-        console.log('Payment already processed or not pending, skipping wallet credit:', paymentId);
-        return new Response(
-          JSON.stringify({ received: true, status: 'already_processed' }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-
-      console.log('Payment updated to completed:', data);
-
-      // Settle the payment: platform fee to the app owner wallet, the rest to
-      // the single payee (institution, provider or pharmacy). Commission rates
-      // come from commission_settings, never hardcoded here.
-      if (data) {
-        const { data: existingSplits } = await supabaseClient
-          .from('payment_splits')
-          .select('id')
-          .eq('payment_id', data.id)
-          .limit(1);
-
-        if (!existingSplits || existingSplits.length === 0) {
-          const { data: institution } = await supabaseClient
-            .from('healthcare_institutions')
-            .select('id, type')
-            .eq('id', data.provider_id)
-            .maybeSingle();
-
-          const refType = (data.metadata as any)?.reference_type ?? '';
-          const isPharmacy =
-            (institution?.type || '').toLowerCase().includes('pharmac') ||
-            refType === 'order' ||
-            refType === 'pharmacy_sale';
-
-          const { error: walletError } = await supabaseClient.rpc('process_payment_with_splits', {
-            p_payment_id: data.id,
-            p_total_amount: data.amount,
-            p_provider_id: institution ? null : data.provider_id,
-            p_institution_id: institution ? institution.id : null,
-            p_payment_type: isPharmacy ? 'pharmacy' : 'consultation'
-          });
-
-          if (walletError) {
-            console.error('Error settling payment splits:', walletError);
-            return new Response(
-              JSON.stringify({ error: 'Failed to credit wallet' }),
-              {
-                status: 500,
-                headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-              }
-            );
-          }
-        }
-
-
-        console.log('Provider wallet credited successfully');
-      }
+      // APPROVED is a pre-capture event: the payer approved the order but no
+      // money has moved yet. Settlement happens in capture-paypal-payment
+      // after the capture is confirmed. Marking the payment completed here
+      // booked settlement (including platform commission) on money that may
+      // never arrive, and for wallet top-ups it mis-settled the patient's own
+      // funds as a consultation payment. So: acknowledge only, settle nothing.
+      const orderId = webhookData.resource?.id;
+      console.log('Order approved (pre-capture, no settlement):', { orderId });
+      return new Response(
+        JSON.stringify({ received: true, status: 'acknowledged_pre_capture', orderId }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     return new Response(

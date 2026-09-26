@@ -59,15 +59,41 @@ const Symptoms = () => {
     );
   }, []);
 
-  const handleSubmit = () => {
+  const [saving, setSaving] = useState(false);
+
+  const handleSubmit = async () => {
     if (selectedSymptoms.length === 0) {
       toast.error("Please select at least one symptom");
       return;
     }
-    toast.success("Symptoms recorded successfully in your health log");
-    setSelectedSymptoms([]);
-    setSeverity("");
-    setDescription("");
+    // symptoms_diary.severity is a required column — never write null.
+    if (!/^(10|[1-9])$/.test(severity.trim())) {
+      toast.error("Please rate the severity from 1 (mild) to 10 (severe)");
+      return;
+    }
+    setSaving(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error("Please sign in to save your health log");
+        return;
+      }
+      const { error } = await supabase.from("symptoms_diary" as any).insert({
+        patient_id: user.id,
+        symptoms: selectedSymptoms.join(", "),
+        severity: severity.trim(),
+        notes: description || null,
+      });
+      if (error) throw error;
+      toast.success("Symptoms recorded successfully in your health log");
+      setSelectedSymptoms([]);
+      setSeverity("");
+      setDescription("");
+    } catch (err: any) {
+      toast.error(err?.message || "Could not save your symptoms");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleAIAnalysis = () => {
@@ -209,9 +235,10 @@ const Symptoms = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
                   <button
                     onClick={handleSubmit}
-                    className="py-3 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs transition-all"
+                    disabled={saving}
+                    className="py-3 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs transition-all disabled:opacity-60"
                   >
-                    Save to Medical Log
+                    {saving ? "Saving…" : "Save to Medical Log"}
                   </button>
                   <button
                     onClick={handleAIAnalysis}
