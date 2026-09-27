@@ -19,6 +19,7 @@ import {
   getWriteoffSummary,
   type WriteOffReason,
   type WriteOffStatus,
+  type WriteOffSummaryRow,
 } from "./pharmacyStockService";
 
 const REASON_LABELS: Record<WriteOffReason, string> = {
@@ -97,7 +98,7 @@ export function StockValuation() {
   }, [rows]);
 
   const monthlySummary = useMemo(() => {
-    const groups = new Map<string, typeof (summaryQuery.data ?? [])>();
+    const groups = new Map<string, WriteOffSummaryRow[]>();
     for (const row of summaryQuery.data ?? []) {
       const key = row.month;
       const list = groups.get(key) ?? [];
