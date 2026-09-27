@@ -11,13 +11,14 @@ import SupplierManagement from '@/components/pharmacy/SupplierManagement';
 import { PharmacyCustomers } from '@/components/pharmacy/PharmacyCustomers';
 import { PharmacySalesReport } from '@/components/pharmacy/PharmacySalesReport';
 import { PharmacyDeliveryTracking } from '@/components/pharmacy/PharmacyDeliveryTracking';
+import { InventoryControlTabs } from '@/components/pharmacy/InventoryControlTabs';
 import { useAuth } from '@/context/AuthContext';
 import { useUserRoles } from '@/context/UserRolesContext';
 import { useInstitutionContext } from '@/hooks/useInstitutionContext';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import {
-  LayoutDashboard, ShoppingCart, Package, ClipboardList, Truck,
+  LayoutDashboard, ShoppingCart, Package, Boxes, ClipboardList, Truck,
   Users, BarChart3, Building2
 } from 'lucide-react';
 
@@ -76,6 +77,9 @@ const PharmacyPortal = () => {
                 <TabsTrigger value="inventory" className="gap-1.5 text-xs font-black rounded-xl data-[state=active]:bg-primary-500 data-[state=active]:text-white py-2 px-3.5 transition-all">
                   <Package className="h-3.5 w-3.5" /> Inventory
                 </TabsTrigger>
+                <TabsTrigger value="stock-control" className="gap-1.5 text-xs font-black rounded-xl data-[state=active]:bg-primary-500 data-[state=active]:text-white py-2 px-3.5 transition-all">
+                  <Boxes className="h-3.5 w-3.5" /> Stock Control
+                </TabsTrigger>
                 {showRetailTabs && (
                   <TabsTrigger value="prescriptions" className="gap-1.5 text-xs font-black rounded-xl data-[state=active]:bg-primary-500 data-[state=active]:text-white py-2 px-3.5 transition-all">
                     <ClipboardList className="h-3.5 w-3.5" /> Rx Fulfillment
@@ -102,6 +106,7 @@ const PharmacyPortal = () => {
               <TabsContent value="dashboard"><PharmacyDashboard /></TabsContent>
               {showRetailTabs && <TabsContent value="pos"><PharmacyPOS /></TabsContent>}
               <TabsContent value="inventory"><MedicationInventory /></TabsContent>
+              <TabsContent value="stock-control"><InventoryControlTabs /></TabsContent>
               {showRetailTabs && <TabsContent value="prescriptions"><PrescriptionFulfillment /></TabsContent>}
               {showRetailTabs && (
                 <TabsContent value="deliveries">

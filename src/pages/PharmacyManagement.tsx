@@ -17,12 +17,7 @@ import {
   Trash2, ShieldAlert, Sparkles, Loader2
 } from "lucide-react";
 import { InstitutionInsuranceVerification } from "@/components/institution/InstitutionInsuranceVerification";
-import { BatchInventory } from "@/components/pharmacy/BatchInventory";
-import { ExpiryRadar } from "@/components/pharmacy/ExpiryRadar";
-import { QualityControl } from "@/components/pharmacy/QualityControl";
-import { StockAudit } from "@/components/pharmacy/StockAudit";
-import { WriteOffs } from "@/components/pharmacy/WriteOffs";
-import { StockValuation } from "@/components/pharmacy/StockValuation";
+import { InventoryControlTabs } from "@/components/pharmacy/InventoryControlTabs";
 
 const TAX_RATE = 0.16;
 
@@ -347,22 +342,9 @@ export const PharmacyManagement = () => {
         </TabsContent>
 
         <TabsContent value="inventory">
-          <Tabs defaultValue="batches" className="max-w-[1600px] mx-auto px-4 sm:px-6 pt-6">
-            <TabsList className="flex flex-wrap h-auto gap-1 w-full justify-start sm:w-auto">
-              <TabsTrigger value="batches">Batches</TabsTrigger>
-              <TabsTrigger value="expiry">Expiry Radar</TabsTrigger>
-              <TabsTrigger value="quality">Quality</TabsTrigger>
-              <TabsTrigger value="audits">Audits</TabsTrigger>
-              <TabsTrigger value="writeoffs">Write-offs</TabsTrigger>
-              <TabsTrigger value="valuation">Valuation</TabsTrigger>
-            </TabsList>
-            <TabsContent value="batches" className="pt-4"><BatchInventory /></TabsContent>
-            <TabsContent value="expiry" className="pt-4"><ExpiryRadar /></TabsContent>
-            <TabsContent value="quality" className="pt-4"><QualityControl /></TabsContent>
-            <TabsContent value="audits" className="pt-4"><StockAudit /></TabsContent>
-            <TabsContent value="writeoffs" className="pt-4"><WriteOffs /></TabsContent>
-            <TabsContent value="valuation" className="pt-4"><StockValuation /></TabsContent>
-          </Tabs>
+          <div className="max-w-[1600px] mx-auto px-4 sm:px-6 pt-6">
+            <InventoryControlTabs />
+          </div>
         </TabsContent>
       </Tabs>
     </div>
