@@ -17,6 +17,12 @@ import {
   Trash2, ShieldAlert, Sparkles, Loader2
 } from "lucide-react";
 import { InstitutionInsuranceVerification } from "@/components/institution/InstitutionInsuranceVerification";
+import { BatchInventory } from "@/components/pharmacy/BatchInventory";
+import { ExpiryRadar } from "@/components/pharmacy/ExpiryRadar";
+import { QualityControl } from "@/components/pharmacy/QualityControl";
+import { StockAudit } from "@/components/pharmacy/StockAudit";
+import { WriteOffs } from "@/components/pharmacy/WriteOffs";
+import { StockValuation } from "@/components/pharmacy/StockValuation";
 
 const TAX_RATE = 0.16;
 
@@ -36,6 +42,7 @@ export const PharmacyManagement = () => {
   const [patientSearchTerm, setPatientSearchTerm] = useState("");
 
   const [showWriteOffDialog, setShowWriteOffDialog] = useState(false);
+  const [mainTab, setMainTab] = useState("pos");
   const [writeOffForm, setWriteOffForm] = useState({
     item_id: "",
     quantity: 1,
@@ -215,6 +222,16 @@ export const PharmacyManagement = () => {
         </div>
       </div>
 
+      {/* Main Board Tabs: POS vs Inventory Control */}
+      <Tabs value={mainTab} onValueChange={setMainTab}>
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 pt-6">
+          <TabsList className="w-full sm:w-auto">
+            <TabsTrigger value="pos" className="flex-1 sm:flex-none">POS Board</TabsTrigger>
+            <TabsTrigger value="inventory" className="flex-1 sm:flex-none">Inventory Control</TabsTrigger>
+          </TabsList>
+        </div>
+
+        <TabsContent value="pos">
       {/* Main Board Content */}
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 pt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left: Inventory Product Grid */}
@@ -327,6 +344,27 @@ export const PharmacyManagement = () => {
           </div>
         </div>
       </div>
+        </TabsContent>
+
+        <TabsContent value="inventory">
+          <Tabs defaultValue="batches" className="max-w-[1600px] mx-auto px-4 sm:px-6 pt-6">
+            <TabsList className="flex flex-wrap h-auto gap-1 w-full justify-start sm:w-auto">
+              <TabsTrigger value="batches">Batches</TabsTrigger>
+              <TabsTrigger value="expiry">Expiry Radar</TabsTrigger>
+              <TabsTrigger value="quality">Quality</TabsTrigger>
+              <TabsTrigger value="audits">Audits</TabsTrigger>
+              <TabsTrigger value="writeoffs">Write-offs</TabsTrigger>
+              <TabsTrigger value="valuation">Valuation</TabsTrigger>
+            </TabsList>
+            <TabsContent value="batches" className="pt-4"><BatchInventory /></TabsContent>
+            <TabsContent value="expiry" className="pt-4"><ExpiryRadar /></TabsContent>
+            <TabsContent value="quality" className="pt-4"><QualityControl /></TabsContent>
+            <TabsContent value="audits" className="pt-4"><StockAudit /></TabsContent>
+            <TabsContent value="writeoffs" className="pt-4"><WriteOffs /></TabsContent>
+            <TabsContent value="valuation" className="pt-4"><StockValuation /></TabsContent>
+          </Tabs>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
