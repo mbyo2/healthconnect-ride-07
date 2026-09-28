@@ -82,6 +82,42 @@ function randomBackupCode(): string {
   return hex.match(/.{1,4}/g)!.join('-');
 }
 
+// --- brute-force protection: 10 failed code attempts locks verification
+// for 15 minutes. Counters live in user_two_factor (failed_attempts,
+// locked_until). Success resets the counter.
+const MAX_ATTEMPTS = 10;
+const LOCK_MS = 15 * 60 * 1000;
+
+async function isLocked(admin: any, userId: string): Promise<boolean> {
+  const { data } = await admin
+    .from('user_two_factor')
+    .select('locked_until')
+    .eq('user_id', userId)
+    .maybeSingle();
+  const until = data?.locked_until ? new Date(data.locked_until).getTime() : 0;
+  return until > Date.now();
+}
+
+async function noteFailure(admin: any, userId: string): Promise<void> {
+  const { data } = await admin
+    .from('user_two_factor')
+    .select('failed_attempts')
+    .eq('user_id', userId)
+    .maybeSingle();
+  const attempts = (data?.failed_attempts ?? 0) + 1;
+  await admin.from('user_two_factor').update({
+    failed_attempts: attempts,
+    locked_until: attempts >= MAX_ATTEMPTS ? new Date(Date.now() + LOCK_MS).toISOString() : null,
+  }).eq('user_id', userId);
+}
+
+async function noteSuccess(admin: any, userId: string): Promise<void> {
+  await admin.from('user_two_factor').update({
+    failed_attempts: 0,
+    locked_until: null,
+  }).eq('user_id', userId);
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
@@ -102,6 +138,12 @@ Deno.serve(async (req) => {
     if (!user) return json({ error: 'Unauthorized' }, 401);
 
     const admin = createClient(supabaseUrl, serviceKey);
+
+    // Brute-force gate: applies to every action since all of them either
+    // verify a code or mint new secrets.
+    if (await isLocked(admin, user.id)) {
+      return json({ ok: false, error: 'Too many failed attempts — try again in 15 minutes' }, 429);
+    }
 
     const body = await req.json().catch(() => ({}));
     const action = String(body?.action || '');
@@ -125,7 +167,11 @@ Deno.serve(async (req) => {
           (await verifyTotp(prior.secret, code)) ||
           (Array.isArray(prior.backup_codes) && prior.backup_codes.includes(code))
         );
-        if (!valid) return json({ ok: false, error: 'Current 2FA code required to reset' }, 400);
+        if (!valid) {
+          await noteFailure(admin, user.id);
+          return json({ ok: false, error: 'Current 2FA code required to reset' }, 400);
+        }
+        await noteSuccess(admin, user.id);
       }
 
       // Generate secret + backup codes; store server-side; return QR URL
@@ -172,7 +218,11 @@ Deno.serve(async (req) => {
           .eq('user_id', user.id);
       }
 
-      if (!valid) return json({ ok: false, error: 'Invalid code' }, 400);
+      if (!valid) {
+        await noteFailure(admin, user.id);
+        return json({ ok: false, error: 'Invalid code' }, 400);
+      }
+      await noteSuccess(admin, user.id);
 
       if (action === 'enable') {
         await admin
@@ -193,7 +243,11 @@ Deno.serve(async (req) => {
       if (!row) return json({ ok: true });
       const valid = (await verifyTotp(row.secret, code)) ||
         (Array.isArray(row.backup_codes) && row.backup_codes.includes(code));
-      if (!valid) return json({ ok: false, error: 'Invalid code' }, 400);
+      if (!valid) {
+        await noteFailure(admin, user.id);
+        return json({ ok: false, error: 'Invalid code' }, 400);
+      }
+      await noteSuccess(admin, user.id);
       await admin.from('user_two_factor').update({ enabled: false, disabled_at: new Date().toISOString() }).eq('user_id', user.id);
       await admin.from('user_two_factor_secrets').delete().eq('user_id', user.id);
       return json({ ok: true });
@@ -209,7 +263,11 @@ Deno.serve(async (req) => {
       if (!existing) return json({ ok: false, error: '2FA not set up' }, 400);
       const valid = (await verifyTotp(existing.secret, code)) ||
         (Array.isArray(existing.backup_codes) && existing.backup_codes.includes(code));
-      if (!valid) return json({ ok: false, error: 'Invalid code' }, 400);
+      if (!valid) {
+        await noteFailure(admin, user.id);
+        return json({ ok: false, error: 'Invalid code' }, 400);
+      }
+      await noteSuccess(admin, user.id);
       const codes = Array.from({ length: 10 }, () => randomBackupCode());
       const { error } = await admin
         .from('user_two_factor_secrets')

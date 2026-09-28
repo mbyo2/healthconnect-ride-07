@@ -66,6 +66,14 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Privileged accounts get a stronger floor than the platform default.
+    if (String(password).length < 12) {
+      return new Response(JSON.stringify({ error: 'Password must be at least 12 characters for admin accounts' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     // Only superadmins can create other superadmins
     const targetLevel = adminLevel === 'superadmin' ? 'superadmin' : 'admin';
     if (targetLevel === 'superadmin' && !isSuperAdmin) {
@@ -118,6 +126,20 @@ Deno.serve(async (req) => {
         role: targetLevel === 'superadmin' ? 'super_admin' : 'admin',
         granted_by: callerId,
       }, { onConflict: 'user_id,role' });
+
+      // Audit trail: who minted this privileged account (best-effort).
+      const { error: auditError } = await serviceClient.from('audit_logs').insert({
+        user_id: callerId,
+        action: 'admin_account_created',
+        category: 'admin',
+        outcome: 'success',
+        resource: 'user',
+        resource_id: newUser.user.id,
+        severity: 'high',
+        timestamp: new Date().toISOString(),
+        details: { email, admin_level: targetLevel },
+      });
+      if (auditError) console.error('admin creation audit failed:', auditError.message);
     }
 
     return new Response(JSON.stringify({
