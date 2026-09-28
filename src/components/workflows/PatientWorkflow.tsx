@@ -6,7 +6,6 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
 import { useProfileCompletion } from '@/hooks/useProfileCompletion';
-import { useSuccessFeedback } from '@/hooks/use-success-feedback';
 import { format } from 'date-fns';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -63,7 +62,6 @@ const SPECIALTIES_DATA = [
 export const PatientWorkflow = React.memo(() => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { showSuccess } = useSuccessFeedback();
   const [careMode, setCareMode] = useState<'online' | 'offline'>('online');
   const [selectedSpecialty, setSelectedSpecialty] = useState<string>('dentistry');
 
@@ -154,16 +152,33 @@ export const PatientWorkflow = React.memo(() => {
     enabled: !!user,
   });
 
-  const handleNavigation = useCallback((route: string, title?: string) => {
+  // Unread notification count drives the bell dot — it must reflect reality,
+  // never render unconditionally.
+  const { data: unreadCount = 0 } = useQuery({
+    queryKey: ['patient-unread-count', user?.id],
+    queryFn: async () => {
+      if (!user) return 0;
+      const { count, error } = await supabase
+        .from('notifications')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .eq('read', false);
+      if (error) return 0;
+      return count || 0;
+    },
+    enabled: !!user,
+    staleTime: 60 * 1000,
+  });
+
+  // NOTE: the optional second arg is legacy (callers still pass a title);
+  // navigation itself is the feedback — no toast spam.
+  const handleNavigation = useCallback((route: string, _title?: string) => {
     try {
       navigate(route);
-      if (title) {
-        showSuccess({ message: `Opening ${title}...` });
-      }
     } catch (error) {
       console.error('Navigation error:', error);
     }
-  }, [navigate, showSuccess]);
+  }, [navigate]);
 
 
 
@@ -288,10 +303,12 @@ export const PatientWorkflow = React.memo(() => {
           <button
             onClick={() => handleNavigation('/notifications', 'Notifications')}
             className="p-3 rounded-2xl bg-canvas-bone dark:bg-slate-800 border border-canvas-silk dark:border-slate-700 hover:border-primary-500/40 text-slate-700 dark:text-slate-300 relative transition-all active:scale-95"
-            aria-label="Notifications"
+            aria-label={unreadCount > 0 ? `Notifications, ${unreadCount} unread` : "Notifications"}
           >
             <Bell className="h-5 w-5" />
-            <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white dark:ring-slate-900" />
+            {unreadCount > 0 && (
+              <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white dark:ring-slate-900" />
+            )}
           </button>
         </div>
       </div>
@@ -301,7 +318,8 @@ export const PatientWorkflow = React.memo(() => {
         <div className="p-1 rounded-2xl bg-canvas-mist dark:bg-slate-800/80 border border-canvas-silk dark:border-slate-700 flex w-full max-w-md shadow-xs">
           <button
             onClick={() => setCareMode('online')}
-            className={`flex-1 py-3.5 rounded-xl text-xs sm:text-sm font-black transition-all flex items-center justify-center gap-1.5 ${
+            aria-pressed={careMode === 'online'}
+            className={`flex-1 py-3.5 rounded-xl text-xs sm:text-sm font-black transition-all flex items-center justify-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
               careMode === 'online'
                 ? 'bg-white dark:bg-slate-900 text-primary-500 shadow-sm border border-canvas-silk dark:border-slate-700'
                 : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
@@ -312,7 +330,8 @@ export const PatientWorkflow = React.memo(() => {
           </button>
           <button
             onClick={() => setCareMode('offline')}
-            className={`flex-1 py-3.5 rounded-xl text-xs sm:text-sm font-black transition-all flex items-center justify-center gap-1.5 ${
+            aria-pressed={careMode === 'offline'}
+            className={`flex-1 py-3.5 rounded-xl text-xs sm:text-sm font-black transition-all flex items-center justify-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
               careMode === 'offline'
                 ? 'bg-white dark:bg-slate-900 text-primary-500 shadow-sm border border-canvas-silk dark:border-slate-700'
                 : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
@@ -415,13 +434,15 @@ export const PatientWorkflow = React.memo(() => {
           {SPECIALTIES_DATA.map((spec) => {
             const isSelected = selectedSpecialty === spec.id;
             return (
-              <div
+              <button
                 key={spec.id}
+                type="button"
+                aria-pressed={isSelected}
                 onClick={() => {
                   setSelectedSpecialty(spec.id);
                   handleNavigation(spec.route, spec.name);
                 }}
-                className={`p-4 rounded-3xl bg-white dark:bg-slate-900 border transition-all cursor-pointer text-center flex flex-col items-center justify-center gap-2 group hover:shadow-md hover:-translate-y-0.5 active:scale-95 ${
+                className={`p-4 rounded-3xl bg-white dark:bg-slate-900 border transition-all text-center flex flex-col items-center justify-center gap-2 group hover:shadow-md hover:-translate-y-0.5 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
                   isSelected
                     ? 'border-primary-500/50 bg-primary-50/40 dark:bg-blue-950/40 ring-2 ring-primary-500/20'
                     : 'border-canvas-silk dark:border-slate-800 hover:border-primary-500/40'
@@ -438,7 +459,7 @@ export const PatientWorkflow = React.memo(() => {
                     {spec.sub}
                   </span>
                 </div>
-              </div>
+              </button>
             );
           })}
         </div>
@@ -454,49 +475,53 @@ export const PatientWorkflow = React.memo(() => {
       <div>
         <h2 className="text-lg sm:text-xl font-black mb-3.5 px-1 text-slate-900 dark:text-slate-100 tracking-tight">Quick Access</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-          <div
+          <button
+            type="button"
             onClick={() => handleNavigation('/emergency', 'Emergency')}
-            className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md hover:border-rose-300 transition-all cursor-pointer active:scale-95 group"
+            className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md hover:border-rose-300 transition-all active:scale-95 group text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             <div className="p-2.5 bg-rose-50 dark:bg-rose-950/40 text-rose-600 rounded-2xl w-fit mb-2 group-hover:scale-105 transition-transform">
               <AlertTriangle className="h-5 w-5" />
             </div>
             <h3 className="text-xs sm:text-sm font-black text-slate-900 dark:text-slate-100">Emergency Help</h3>
             <p className="text-[11px] text-slate-400 font-medium">24/7 hotline & dispatch</p>
-          </div>
+          </button>
 
-          <div
+          <button
+            type="button"
             onClick={() => handleNavigation('/marketplace', 'Buy Medicine')}
-            className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md hover:border-emerald-300 transition-all cursor-pointer active:scale-95 group"
+            className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md hover:border-emerald-300 transition-all active:scale-95 group text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             <div className="p-2.5 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 rounded-2xl w-fit mb-2 group-hover:scale-105 transition-transform">
               <Pill className="h-5 w-5" />
             </div>
             <h3 className="text-xs sm:text-sm font-black text-slate-900 dark:text-slate-100">Buy Medicine</h3>
             <p className="text-[11px] text-slate-400 font-medium">Online pharmacy & refill</p>
-          </div>
+          </button>
 
-          <div
+          <button
+            type="button"
             onClick={() => handleNavigation('/search', 'Find Doctor')}
-            className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md hover:border-primary-500/40 transition-all cursor-pointer active:scale-95 group"
+            className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md hover:border-primary-500/40 transition-all active:scale-95 group text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             <div className="p-2.5 bg-primary-50 dark:bg-blue-950/60 text-primary-500 rounded-2xl w-fit mb-2 group-hover:scale-105 transition-transform">
               <Users className="h-5 w-5" />
             </div>
             <h3 className="text-xs sm:text-sm font-black text-slate-900 dark:text-slate-100">Find Doctor</h3>
             <p className="text-[11px] text-slate-400 font-medium">Book clinic & video visits</p>
-          </div>
+          </button>
 
-          <div
+          <button
+            type="button"
             onClick={() => handleNavigation('/healthcare-institutions', 'Hospitals')}
-            className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md hover:border-purple-300 transition-all cursor-pointer active:scale-95 group"
+            className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md hover:border-purple-300 transition-all active:scale-95 group text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             <div className="p-2.5 bg-purple-50 dark:bg-purple-950/40 text-purple-600 rounded-2xl w-fit mb-2 group-hover:scale-105 transition-transform">
               <Building2 className="h-5 w-5" />
             </div>
             <h3 className="text-xs sm:text-sm font-black text-slate-900 dark:text-slate-100">Hospitals & Labs</h3>
             <p className="text-[11px] text-slate-400 font-medium">Find nearby facilities</p>
-          </div>
+          </button>
         </div>
       </div>
 
@@ -504,49 +529,53 @@ export const PatientWorkflow = React.memo(() => {
       <div>
         <h2 className="text-lg sm:text-xl font-black mb-3.5 px-1 text-slate-900 dark:text-slate-100 tracking-tight">Insurance & Scheduling</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-          <div
+          <button
+            type="button"
             onClick={() => handleNavigation('/insurance-cards', 'Insurance Cards')}
-            className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md transition-all cursor-pointer active:scale-95"
+            className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md transition-all active:scale-95 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             <div className="p-2 bg-teal-50 dark:bg-teal-950/40 text-teal-600 rounded-xl w-fit mb-2">
               <CreditCard className="h-4 w-4" />
             </div>
             <h4 className="text-xs font-black text-slate-900 dark:text-slate-100">Insurance Card</h4>
             <p className="text-[10px] text-slate-400">Upload & verify</p>
-          </div>
+          </button>
 
-          <div
+          <button
+            type="button"
             onClick={() => handleNavigation('/cost-estimator', 'Cost Estimator')}
-            className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md transition-all cursor-pointer active:scale-95"
+            className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md transition-all active:scale-95 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             <div className="p-2 bg-orange-50 dark:bg-orange-950/40 text-orange-600 rounded-xl w-fit mb-2">
               <Shield className="h-4 w-4" />
             </div>
             <h4 className="text-xs font-black text-slate-900 dark:text-slate-100">Cost Estimator</h4>
             <p className="text-[10px] text-slate-400">Clear pricing</p>
-          </div>
+          </button>
 
-          <div
+          <button
+            type="button"
             onClick={() => handleNavigation('/waitlist', 'Waitlist')}
-            className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md transition-all cursor-pointer active:scale-95"
+            className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md transition-all active:scale-95 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             <div className="p-2 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 rounded-xl w-fit mb-2">
               <Calendar className="h-4 w-4" />
             </div>
             <h4 className="text-xs font-black text-slate-900 dark:text-slate-100">Early Slots</h4>
             <p className="text-[10px] text-slate-400">Priority waitlist</p>
-          </div>
+          </button>
 
-          <div
+          <button
+            type="button"
             onClick={() => handleNavigation('/appointment-reminders', 'Reminders')}
-            className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md transition-all cursor-pointer active:scale-95"
+            className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-sm hover:shadow-md transition-all active:scale-95 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             <div className="p-2 bg-pink-50 dark:bg-pink-950/40 text-pink-600 rounded-xl w-fit mb-2">
               <Activity className="h-4 w-4" />
             </div>
             <h4 className="text-xs font-black text-slate-900 dark:text-slate-100">Reminders</h4>
             <p className="text-[10px] text-slate-400">Calendar alerts</p>
-          </div>
+          </button>
         </div>
       </div>
 
@@ -561,20 +590,21 @@ export const PatientWorkflow = React.memo(() => {
               Need immediate triage, symptom checks, or emergency ambulance dispatch? Our clinical emergency team is available 24/7.
             </p>
             <div className="flex flex-wrap gap-2 pt-2">
-              <button
+              <Button
                 onClick={() => handleNavigation('/emergency', 'Emergency')}
-                className="px-5 py-2.5 rounded-full bg-rose-600 hover:bg-rose-700 text-white font-extrabold text-xs flex items-center gap-1.5 shadow-sm transition-all"
+                className="rounded-full bg-rose-600 hover:bg-rose-700 font-extrabold text-xs"
               >
                 <Phone className="h-3.5 w-3.5" />
                 <span>Call Emergency (991)</span>
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="secondary"
                 onClick={() => handleNavigation('/symptoms', 'Symptoms Tracker')}
-                className="px-5 py-2.5 rounded-full bg-primary-50 text-primary-500 hover:bg-primary-100 font-extrabold text-xs flex items-center gap-1.5 transition-all"
+                className="rounded-full bg-primary-50 text-primary-500 hover:bg-primary-100 font-extrabold text-xs"
               >
                 <Heart className="h-3.5 w-3.5" />
                 <span>Check Symptoms</span>
-              </button>
+              </Button>
             </div>
           </div>
         </div>

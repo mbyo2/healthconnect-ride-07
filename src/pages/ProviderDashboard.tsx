@@ -21,7 +21,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { format, startOfWeek, endOfWeek } from "date-fns";
+import { format, startOfWeek, endOfWeek, addDays } from "date-fns";
 import { useCurrency } from "@/hooks/use-currency";
 import { useUserRoles } from "@/context/UserRolesContext";
 import { ROLE_META } from "@/config/roleConfig";
@@ -474,7 +474,8 @@ export const ProviderDashboard = () => {
       if (!user) return { total: 0, completed: 0, pending: 0, revenue: 0 };
       const weekStart = format(startOfWeek(today, { weekStartsOn: 1 }), "yyyy-MM-dd");
       const weekEnd = format(endOfWeek(today, { weekStartsOn: 1 }), "yyyy-MM-dd");
-      const [{ data }, { data: paidRows }] = await Promise.all([
+      const prevWeekStart = format(addDays(startOfWeek(today, { weekStartsOn: 1 }), -7), "yyyy-MM-dd");
+      const [{ data }, { data: paidRows }, { data: prevPaidRows }] = await Promise.all([
         supabase
           .from("appointments")
           .select("id, status")
@@ -491,13 +492,23 @@ export const ProviderDashboard = () => {
           .in("status", ["completed"])
           .gte("created_at", weekStart)
           .lte("created_at", weekEnd),
+        supabase
+          .from("payments")
+          .select("amount")
+          .eq("provider_id", user.id)
+          .in("status", ["completed"])
+          .gte("created_at", prevWeekStart)
+          .lt("created_at", weekStart),
       ]);
       const appointments = data || [];
+      const revenue = (paidRows || []).reduce((s: number, p: any) => s + (Number(p.amount) || 0), 0);
+      const prevRevenue = (prevPaidRows || []).reduce((s: number, p: any) => s + (Number(p.amount) || 0), 0);
       return {
         total: appointments.length,
         completed: appointments.filter(a => a.status === "completed").length,
         pending: appointments.filter(a => a.status === "scheduled").length,
-        revenue: (paidRows || []).reduce((s: number, p: any) => s + (Number(p.amount) || 0), 0),
+        revenue,
+        revenueDeltaPct: prevRevenue > 0 ? Math.round(((revenue - prevRevenue) / prevRevenue) * 100) : null,
       };
     },
   });
@@ -559,7 +570,11 @@ export const ProviderDashboard = () => {
           <div className="vf-card space-y-3">
             <div className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Shift Earnings (ZMW)</div>
             <div className="text-3xl font-black font-mono text-success-500 mt-1">{formatPrice(weekStats?.revenue || 0)}</div>
-            <div className="text-[11px] font-bold text-emerald-500 mt-1">+14% Shift Growth</div>
+            <div className="text-[11px] font-bold text-emerald-500 mt-1">
+              {weekStats?.revenueDeltaPct === null || weekStats?.revenueDeltaPct === undefined
+                ? "Collected this week"
+                : `${weekStats.revenueDeltaPct >= 0 ? "+" : ""}${weekStats.revenueDeltaPct}% vs last week`}
+            </div>
           </div>
         </div>
 
@@ -578,7 +593,7 @@ export const ProviderDashboard = () => {
             <button
               key={act.label}
               onClick={() => navigate(act.route)}
-              className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 hover:border-primary-500 hover:shadow-xs transition-all flex items-center gap-2.5 text-xs font-extrabold text-slate-800 dark:text-slate-200"
+              className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 hover:border-primary-500 hover:shadow-xs transition-all flex items-center gap-2.5 text-xs font-extrabold text-slate-800 dark:text-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
             >
               <div className="p-2 rounded-lg bg-primary-50 dark:bg-blue-950 text-primary-500">
                 <act.icon className="h-4 w-4" />
@@ -646,8 +661,8 @@ export const ProviderDashboard = () => {
                 {todayAppointments.length}
               </span>
             </div>
-            <button onClick={() => navigate("/appointments")} className="text-xs font-bold text-primary-500 hover:underline flex items-center gap-1">
-              View All Board Records <ArrowRight className="h-3.5 w-3.5" />
+            <button onClick={() => navigate("/appointments")} className="text-xs font-bold text-primary-500 hover:underline flex items-center gap-1 min-h-[44px]">
+              View all <ArrowRight className="h-3.5 w-3.5" />
             </button>
           </div>
 
@@ -688,9 +703,9 @@ export const ProviderDashboard = () => {
                       <td className="py-3 px-3 text-center">
                         <button
                           onClick={() => navigate("/appointments")}
-                          className="px-3 py-1 rounded-md bg-primary-500 text-white text-[11px] font-bold hover:bg-primary-600"
+                          className="px-3 py-1.5 min-h-[32px] rounded-md bg-primary-500 text-white text-[11px] font-bold hover:bg-primary-600"
                         >
-                          Open EMR Case Sheet
+                          Manage
                         </button>
                       </td>
                     </tr>
