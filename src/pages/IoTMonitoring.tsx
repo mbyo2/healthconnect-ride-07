@@ -165,7 +165,7 @@ const IoTMonitoring = () => {
                   <div className="space-y-1.5 text-xs">
                     <div className="flex items-center justify-between font-bold text-graphite-500 dark:text-slate-400">
                       <span>Battery Level</span>
-                      <span className="text-slate-900">{device.battery_level}%</span>
+                      <span className="text-slate-900 dark:text-slate-100">{device.battery_level}%</span>
                     </div>
                     <Progress value={device.battery_level || 0} className="h-1.5 bg-canvas-silk" />
                     <p className="text-[10px] text-graphite-500 dark:text-slate-400 pt-1">
@@ -270,7 +270,7 @@ const IoTMonitoring = () => {
                     {alert.severity === "low" ? <CheckCircle2 className="w-3.5 h-3.5" /> : <AlertCircle className="w-3.5 h-3.5" />}
                   </div>
                   <div className="flex-1">
-                    <p className="font-bold text-slate-900">{alert.message}</p>
+                    <p className="font-bold text-slate-900 dark:text-slate-100">{alert.message}</p>
                     <p className="text-[10px] text-graphite-500 dark:text-slate-400 mt-0.5">{new Date(alert.triggered_at).toLocaleString()}</p>
                   </div>
                 </div>

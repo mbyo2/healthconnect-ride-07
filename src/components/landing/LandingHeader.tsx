@@ -80,7 +80,7 @@ export const LandingHeader = ({ scrolled }: LandingHeaderProps) => {
             onClick={() => navigate("/auth")}
             className="hidden rounded-pill px-3.5 py-2 text-[13px] font-medium text-graphite-600 dark:text-slate-300 hover:bg-canvas-mist hover:text-midnight sm:inline-flex"
           >
-            Login
+            Sign in
           </button>
           <button
             type="button"
@@ -132,7 +132,7 @@ export const LandingHeader = ({ scrolled }: LandingHeaderProps) => {
                 }}
                 className="flex-1 vf-btn-secondary !py-2.5 text-xs"
               >
-                Login
+                Sign in
               </button>
               <button
                 type="button"

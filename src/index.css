@@ -445,3 +445,12 @@ html {
   .modern-header       { @apply doc-header; }
   .container-modern    { @apply doc-container; }
 }
+
+/* ── Dark-mode graphite text remap ──────────────────────────────────────
+   graphite-500/600 were darkened for light-mode contrast, which makes
+   them near-invisible on dark slate surfaces. Rather than touching ~100
+   call sites, remap the two steps up the scale whenever .dark is set.
+   NOTE: intentionally UNLAYERED (outside @layer) — unlayered author CSS
+   beats Tailwind's layered utilities regardless of order. */
+.dark .text-graphite-500 { color: #a8a29e; } /* graphite-400 */
+.dark .text-graphite-600 { color: #d6d3d1; } /* graphite-300 */

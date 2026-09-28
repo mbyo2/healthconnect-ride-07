@@ -237,7 +237,7 @@ const AppointmentRemindersPage = () => {
                         <Clock className="h-4 w-4" />
                       </div>
                       <div>
-                        <p className="font-extrabold text-xs text-slate-900">{apt.type || "Medical Consultation"}</p>
+                        <p className="font-extrabold text-xs text-slate-900 dark:text-slate-100">{apt.type || "Medical Consultation"}</p>
                         <p className="text-[11px] text-graphite-500 dark:text-slate-400 font-medium">
                           {new Date(apt.date).toLocaleDateString()} at {apt.time}
                         </p>

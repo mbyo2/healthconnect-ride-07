@@ -303,7 +303,7 @@ export const PharmacyManagement = () => {
                 cart.map((item) => (
                   <div key={item.id} className="flex justify-between items-center p-2.5 rounded-lg border border-canvas-silk bg-canvas text-xs">
                     <div>
-                      <div className="font-bold text-slate-900">{item.product_name}</div>
+                      <div className="font-bold text-slate-900 dark:text-slate-100">{item.product_name}</div>
                       <div className="text-[11px] text-graphite-500 dark:text-slate-400">{formatPrice(item.unit_price)} × {item.cartQuantity}</div>
                     </div>
 
@@ -323,7 +323,7 @@ export const PharmacyManagement = () => {
             <div className="space-y-1 text-xs">
               <div className="flex justify-between text-graphite-500 dark:text-slate-400"><span>Subtotal</span><span>{formatPrice(cartSubtotal)}</span></div>
               <div className="flex justify-between text-graphite-500 dark:text-slate-400"><span>Tax (16%)</span><span>{formatPrice(cartTax)}</span></div>
-              <div className="flex justify-between text-base font-extrabold text-slate-900 pt-1 border-t">
+              <div className="flex justify-between text-base font-extrabold text-slate-900 dark:text-slate-100 pt-1 border-t">
                 <span>Total Due</span><span className="text-primary-500 font-mono">{formatPrice(cartTotal)}</span>
               </div>
             </div>

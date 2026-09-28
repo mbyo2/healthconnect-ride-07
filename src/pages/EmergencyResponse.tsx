@@ -247,7 +247,7 @@ const EmergencyResponse = () => {
                 </div>
                 <div className="p-3 rounded-xl bg-canvas border border-canvas-silk dark:border-slate-800">
                   <p className="text-[10px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">Known Allergies</p>
-                  <p className="text-xs font-bold text-slate-900 mt-1">{medicalInfo.allergies.join(', ') || 'None recorded'}</p>
+                  <p className="text-xs font-bold text-slate-900 dark:text-slate-100 mt-1">{medicalInfo.allergies.join(', ') || 'None recorded'}</p>
                 </div>
               </div>
 
@@ -290,7 +290,7 @@ const EmergencyResponse = () => {
               <div key={h.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 rounded-xl border border-canvas-silk bg-canvas gap-3">
                 <div>
                   <div className="flex items-center gap-2">
-                    <h4 className="font-extrabold text-sm text-slate-900">{h.name}</h4>
+                    <h4 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">{h.name}</h4>
                     <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white bg-error-500">24/7 Emergency</span>
                   </div>
                   <p className="text-xs text-graphite-500 dark:text-slate-400 mt-0.5">{h.address || "Lusaka Medical District"}</p>

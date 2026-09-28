@@ -562,11 +562,11 @@ const LabManagement = () => {
                     )
                     .map((request) => (
                       <tr key={request.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 transition-colors">
-                        <td className="py-3 px-4 font-mono font-bold text-slate-900">{request.test_number || "LAB-SYS"}</td>
+                        <td className="py-3 px-4 font-mono font-bold text-slate-900 dark:text-slate-100">{request.test_number || "LAB-SYS"}</td>
                         <td className="py-3 px-3 font-bold text-primary-500">
                           {request.patient?.first_name} {request.patient?.last_name}
                         </td>
-                        <td className="py-3 px-3 font-bold text-slate-900">{request.test_type || request.test?.name}</td>
+                        <td className="py-3 px-3 font-bold text-slate-900 dark:text-slate-100">{request.test_type || request.test?.name}</td>
                         <td className="py-3 px-3 text-graphite-500 dark:text-slate-400">{request.provider?.last_name ? providerDisplayName({ first_name: request.provider?.first_name, last_name: request.provider?.last_name, role: (request.provider as any)?.role }) : "Staff"}</td>
                         <td className="py-3 px-3 text-center">
                           {request.priority === "urgent" || request.priority === "stat" ? (
@@ -692,7 +692,7 @@ const LabManagement = () => {
               {testCatalog.map((test) => (
                 <div key={test.id} className="p-3.5 rounded-xl border border-canvas-silk bg-canvas flex justify-between items-center gap-2">
                   <div className="min-w-0">
-                    <h4 className="font-extrabold text-xs text-slate-900">{test.name}</h4>
+                    <h4 className="font-extrabold text-xs text-slate-900 dark:text-slate-100">{test.name}</h4>
                     <p className="text-[10px] text-graphite-500 dark:text-slate-400">{test.category}{test.description ? ` • ${test.description}` : ""}</p>
                   </div>
                   <div className="flex items-center gap-1.5 shrink-0">

@@ -215,7 +215,7 @@ const Marketplace = () => {
                   <div key={order.id} className="border border-canvas-silk bg-canvas rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                     <div>
                       <div className="flex items-center gap-2">
-                        <h3 className="font-extrabold text-xs text-slate-900">Order #{order.id.slice(0, 8)}</h3>
+                        <h3 className="font-extrabold text-xs text-slate-900 dark:text-slate-100">Order #{order.id.slice(0, 8)}</h3>
                         <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white ${
                           order.status === "delivered" ? "bg-success-500" : order.status === "cancelled" ? "bg-error-500" : "bg-primary-500"
                         }`}>

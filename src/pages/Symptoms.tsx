@@ -165,7 +165,7 @@ const Symptoms = () => {
           {/* Category Symptom Selector */}
           <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-4">
             <div className="border-b border-canvas-silk pb-3">
-              <h2 className="font-extrabold text-sm text-slate-900">Select Active Symptoms</h2>
+              <h2 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">Select Active Symptoms</h2>
               <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium mt-0.5">Click any symptom tag to add it to your current case log.</p>
             </div>
 

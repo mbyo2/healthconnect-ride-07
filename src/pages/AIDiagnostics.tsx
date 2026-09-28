@@ -154,7 +154,7 @@ const AIDiagnostics = () => {
           <div className="rounded-2xl border border-warning-500/30 bg-canvas-bone p-4 flex items-start gap-3 text-xs">
             <AlertCircle className="h-5 w-5 text-warning-500 flex-shrink-0 mt-0.5" />
             <div>
-              <p className="font-extrabold text-slate-900 flex items-center gap-1.5">
+              <p className="font-extrabold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
                 <TriangleAlert className="h-4 w-4 text-warning-500" aria-hidden /> Important safety note
               </p>
               <p className="text-graphite-500 dark:text-slate-400 mt-0.5 leading-relaxed font-medium">
