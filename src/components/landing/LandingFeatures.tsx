@@ -6,6 +6,7 @@ import {
   Sparkles, Building2, Activity, CheckCircle2, MapPin
 } from "lucide-react";
 import { LANDING_PHOTOS, unsplash, unsplashSrcSet } from "./landingPhotos";
+import { LandingImg } from "./LandingImg";
 
 export const HowItWorks = () => {
   const navigate = useNavigate();
@@ -43,7 +44,7 @@ export const HowItWorks = () => {
               className="group text-left"
             >
               <span className="block overflow-hidden rounded-card border border-canvas-silk shadow-card">
-                <img
+                <LandingImg
                   src={unsplash(item.photo, 800)}
                   srcSet={unsplashSrcSet(item.photo, [400, 800, 1200])}
                   sizes="(max-width: 768px) 100vw, 33vw"
@@ -76,7 +77,7 @@ export const PlatformScale = () => (
   <section className="vf-section relative overflow-hidden border-t border-canvas-silk">
     {/* Full-bleed photographic band — the "different colour" in the Apple-like rhythm. */}
     <div className="absolute inset-0" aria-hidden>
-      <img
+      <LandingImg
         src={unsplash(LANDING_PHOTOS.scaleBand, 1600)}
         srcSet={unsplashSrcSet(LANDING_PHOTOS.scaleBand, [800, 1200, 1600, 2000])}
         sizes="100vw"
@@ -155,7 +156,7 @@ export const CareExperience = () => {
 
           <div className="rounded-card border border-canvas-silk bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-card overflow-hidden">
             <div className="rounded-2xl overflow-hidden relative">
-              <img
+              <LandingImg
                 src={unsplash("photo-1594824476967-48c8b964273f", 900)}
                 srcSet={unsplashSrcSet("photo-1594824476967-48c8b964273f", [480, 768, 1200])}
                 sizes="(max-width: 1024px) 100vw, 50vw"
@@ -413,7 +414,7 @@ export const ForProviders = () => {
 
           <div className="rounded-card border border-canvas-silk bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-card space-y-5">
             <div className="overflow-hidden rounded-2xl -mx-0">
-              <img
+              <LandingImg
                 src={unsplash(LANDING_PHOTOS.providers, 900)}
                 srcSet={unsplashSrcSet(LANDING_PHOTOS.providers, [480, 768, 1200])}
                 sizes="(max-width: 1024px) 100vw, 50vw"

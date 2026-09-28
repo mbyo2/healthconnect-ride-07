@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { AppLogo } from "@/components/ui/AppLogo";
 import { ArrowRight, Calendar, Phone, HeartPulse, ShieldCheck, Lock, Globe, CheckCircle2 } from "lucide-react";
 import { LANDING_PHOTOS, unsplash, unsplashSrcSet } from "./landingPhotos";
+import { LandingImg } from "./LandingImg";
 
 export const BrowseSpecialties = () => {
   const navigate = useNavigate();
@@ -59,7 +60,7 @@ export const CTASection = () => {
         <div className="relative overflow-hidden p-8 sm:p-14 lg:p-16 rounded-card bg-midnight">
           {/* Photographic backdrop under the midnight wash. */}
           <div className="absolute inset-0" aria-hidden>
-            <img
+            <LandingImg
               src={unsplash(LANDING_PHOTOS.ctaBand, 1600)}
               srcSet={unsplashSrcSet(LANDING_PHOTOS.ctaBand, [800, 1200, 1600, 2000])}
               sizes="100vw"

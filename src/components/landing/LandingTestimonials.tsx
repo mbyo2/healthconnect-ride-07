@@ -2,6 +2,7 @@ import { Star, Quote, ThumbsUp, Award, TrendingUp, HeartPulse, ShieldCheck } fro
 import { ZAMBIAN_TESTIMONIALS } from "@/config/zambia";
 import { usePlatformStats, formatStat } from "@/hooks/usePlatformStats";
 import { TESTIMONIAL_PHOTOS, unsplash } from "./landingPhotos";
+import { LandingImg } from "./LandingImg";
 
 // Facility segments the platform serves — not claimed partnerships.
 const ECOSYSTEM = [
@@ -101,7 +102,7 @@ export const Testimonials = () => {
                 </div>
               </div>
               <div className="pt-4 border-t border-canvas-mist flex items-center gap-3">
-                <img
+                <LandingImg
                   src={unsplash(TESTIMONIAL_PHOTOS[idx] ?? TESTIMONIAL_PHOTOS[0], 160)}
                   alt={`Illustrative portrait for ${t.name}'s community story — Doc' O Clock`}
                   className="h-10 w-10 rounded-full object-cover shrink-0"

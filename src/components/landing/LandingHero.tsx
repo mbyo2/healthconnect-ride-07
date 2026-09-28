@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import { ZAMBIAN_TESTIMONIALS } from "@/config/zambia";
 
 import { unsplash, unsplashSrcSet } from "./landingPhotos";
+import { LandingImg } from "./LandingImg";
 
 // Care topics framing the illustrative stories below — not partner endorsements.
 const STORY_TABS = [
@@ -93,7 +94,7 @@ export const LandingHero = () => {
             </span>
           </div>
           <div className="relative">
-            <img
+            <LandingImg
               src={unsplash("photo-1581594693702-fbdc51b2763b", 1600)}
               srcSet={unsplashSrcSet("photo-1581594693702-fbdc51b2763b", [640, 960, 1280, 1600, 2000])}
               sizes="100vw"

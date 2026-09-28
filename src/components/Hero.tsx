@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Shield, CheckCircle, Clock, Heart, Users, Stethoscope, Building2, Search } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { usePlatformStats, formatStat } from '@/hooks/usePlatformStats';
+import { LandingImg } from '@/components/landing/LandingImg';
 
 export const Hero = () => {
   const navigate = useNavigate();
@@ -113,25 +114,25 @@ export const Hero = () => {
             <div className="md:hidden mb-6 p-4 bg-card border border-border rounded-xl">
               <p className="text-xs font-medium text-graphite-600 mb-3">Care across Zambia</p>
               <div className="flex items-center justify-center -space-x-3">
-                <img
+                <LandingImg
                   src="https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=80&auto=format&fit=crop&q=85"
                   alt="African female doctor"
                   loading="lazy"
                   className="w-12 h-12 rounded-full border-2 border-white object-cover"
                 />
-                <img
+                <LandingImg
                   src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=80&auto=format&fit=crop&q=85"
                   alt="African clinician"
                   loading="lazy"
                   className="w-12 h-12 rounded-full border-2 border-white object-cover"
                 />
-                <img
+                <LandingImg
                   src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=80&auto=format&fit=crop&q=85"
                   alt="African male doctor"
                   loading="lazy"
                   className="w-12 h-12 rounded-full border-2 border-white object-cover"
                 />
-                <img
+                <LandingImg
                   src="https://images.unsplash.com/photo-1651008376811-b90baee60c1f?w=80&auto=format&fit=crop&q=85"
                   alt="African healthcare professional"
                   loading="lazy"
@@ -156,25 +157,25 @@ export const Hero = () => {
               <div className="mb-6">
                 <p className="text-xs font-medium text-graphite-500 mb-3">For patients and providers</p>
                 <div className="flex items-center -space-x-3 mb-2">
-                  <img
+                  <LandingImg
                     src="https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=80&auto=format&fit=crop&q=85"
                     alt="African female doctor"
                     loading="lazy"
                     className="w-10 h-10 rounded-full border-2 border-white object-cover"
                   />
-                  <img
+                  <LandingImg
                     src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=80&auto=format&fit=crop&q=85"
                     alt="African clinician"
                     loading="lazy"
                     className="w-10 h-10 rounded-full border-2 border-white object-cover"
                   />
-                  <img
+                  <LandingImg
                     src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=80&auto=format&fit=crop&q=85"
                     alt="African male doctor"
                     loading="lazy"
                     className="w-10 h-10 rounded-full border-2 border-white object-cover"
                   />
-                  <img
+                  <LandingImg
                     src="https://images.unsplash.com/photo-1651008376811-b90baee60c1f?w=80&auto=format&fit=crop&q=85"
                     alt="African healthcare professional"
                     loading="lazy"
