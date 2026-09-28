@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
-import { Loader2, Pill, DollarSign, CreditCard, Smartphone, Wallet } from "lucide-react";
+import { Loader2, Pill, CreditCard, Smartphone, Wallet, CheckCircle2 } from "lucide-react";
 import { useCurrency } from "@/hooks/use-currency";
 import { useDPOPayment } from "@/hooks/useDPOPayment";
 import { useWalletPayment } from "@/hooks/useWalletPayment";
@@ -160,6 +160,13 @@ export const PharmacyPayment = ({ order, onPaymentSuccess }: PharmacyPaymentProp
           )}
         </div>
 
+        {order.status !== 'pending' && (
+          <p className="text-xs font-medium text-emerald-600 flex items-center gap-1.5">
+            <CheckCircle2 className="h-3.5 w-3.5" aria-hidden />
+            This order is {order.status} — no further payment needed.
+          </p>
+        )}
+
         <Button
           onClick={handlePayment}
           disabled={loading || walletPaying || order.status !== 'pending'}
@@ -177,8 +184,8 @@ export const PharmacyPayment = ({ order, onPaymentSuccess }: PharmacyPaymentProp
             </>
           ) : (
             <>
-              <DollarSign className="h-4 w-4 mr-2" />
-              Pay with DPOpay
+              <CreditCard className="h-4 w-4 mr-2" />
+              Pay with DPO
             </>
           )}
         </Button>

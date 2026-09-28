@@ -26,8 +26,6 @@ const PaymentSuccess = () => {
           if (!token) {
             throw new Error('Missing PayPal order reference');
           }
-          console.log('Capturing PayPal payment:', paymentId);
-
           const { data, error } = await supabase.functions.invoke('capture-paypal-payment', {
             body: {
               paymentId: paymentId,
@@ -111,7 +109,7 @@ const PaymentSuccess = () => {
     <div className="min-h-screen flex items-center justify-center p-4 bg-background">
       <Card className="w-full max-w-md shadow-2xl border-none">
         <CardHeader className="text-center pb-2">
-          <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-green-100 animate-bounce">
+          <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-green-100 dark:bg-green-950">
             <CheckCircle2 className="h-10 w-10 text-green-600 dark:text-green-400" />
           </div>
           <CardTitle className="text-xl sm:text-2xl font-bold text-foreground">Payment Successful!</CardTitle>

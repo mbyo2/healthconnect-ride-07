@@ -12,7 +12,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Badge } from '@/components/ui/badge';
 import { useQuery } from '@tanstack/react-query';
 import { TIME_SLOTS, CONSULTATION_TYPES } from '@/config/videoConsultations';
-import { CalendarIcon, Clock, Video, User, DollarSign, Wallet, CreditCard } from 'lucide-react';
+import { CalendarIcon, Clock, Video, User, Wallet, CreditCard } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
@@ -169,11 +169,16 @@ export const VideoConsultationBooking = ({ onBookingComplete }: VideoConsultatio
         return;
       }
 
-      // Calculate end time
+      // Calculate end time — refuse slots that already started.
       const startDateTime = new Date(selectedDate);
       const [hours, minutes] = selectedTime.split(':');
       startDateTime.setHours(parseInt(hours), parseInt(minutes), 0, 0);
-      
+      if (startDateTime.getTime() <= Date.now()) {
+        toast.error('That time has already passed — pick a later slot.');
+        setIsLoading(false);
+        return;
+      }
+
       const endDateTime = new Date(startDateTime);
       endDateTime.setMinutes(endDateTime.getMinutes() + consultationData.duration);
 
@@ -338,8 +343,8 @@ export const VideoConsultationBooking = ({ onBookingComplete }: VideoConsultatio
                     <span>{type.name}</span>
                     <div className="flex items-center gap-2 ml-4">
                       <Badge variant="outline" className="flex items-center gap-1">
-                        <DollarSign className="h-3 w-3" />
-                        {type.price}
+                        <Wallet className="h-3 w-3" />
+                        {formatPrice(type.price)}
                       </Badge>
                       <Badge variant="secondary" className="flex items-center gap-1">
                         <Clock className="h-3 w-3" />

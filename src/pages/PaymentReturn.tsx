@@ -104,7 +104,7 @@ export default function PaymentReturn() {
         {(code || transToken) && (
           <div className="text-xs text-muted-foreground font-mono break-all">
             {code && <div>Code: {code}</div>}
-            {transToken && <div>Token: {transToken}</div>}
+            {transToken && <div>Ref: {transToken.slice(0, 6)}…{transToken.slice(-4)}</div>}
           </div>
         )}
         <div className="flex flex-col gap-2 pt-4">

@@ -8,7 +8,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
-import { Loader2, DollarSign, CreditCard, ShieldCheck } from "lucide-react";
+import { Loader2, CreditCard, ShieldCheck } from "lucide-react";
 import { useCurrency } from "@/hooks/use-currency";
 import { useDPOPayment } from "@/hooks/useDPOPayment";
 
@@ -44,8 +44,6 @@ export const WalletTopUp = () => {
                     setIsLoading(false);
                     return;
                 }
-                console.log('Initiating PayPal top-up for:', { amount: zmwAmount, userId: user.id });
-
                 const { data, error } = await supabase.functions.invoke('process-paypal-payment', {
                     body: {
                         amount: zmwAmount,
@@ -76,8 +74,6 @@ export const WalletTopUp = () => {
                     setIsLoading(false);
                     return;
                 }
-                console.log('Initiating DPO top-up for:', { amount: zmwAmount, displayAmount: numAmount, displayCurrency: currency, userId: user.id });
-
                 const profile = await supabase.from('profiles').select('first_name, last_name, phone').eq('id', user.id).single();
 
                 await redirectToDPOCheckout({
@@ -148,11 +144,15 @@ export const WalletTopUp = () => {
                     </div>
 
                     <div className="relative mt-4">
-                        <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                        <span aria-hidden className="absolute left-3 top-1/2 -translate-y-1/2 text-lg font-black text-gray-400">
+                            {getSymbol()}
+                        </span>
                         <Input
                             id="amount"
                             type="number"
+                            min="1"
                             placeholder="Enter custom amount"
+                            aria-label={`Top-up amount in ${currency}`}
                             className="pl-10 h-12 text-lg font-bold border-border focus:ring-primary bg-background"
                             value={amount}
                             onChange={(e) => setAmount(e.target.value)}
@@ -166,7 +166,9 @@ export const WalletTopUp = () => {
                         Secure Payment
                     </div>
                     <p className="text-xs text-muted-foreground leading-relaxed">
-                        Your payment is processed securely via DPO Pay. Supports card payments and mobile money (MTN, Airtel, etc.). Funds will be available in your wallet immediately after successful payment.
+                        {paymentMethod === 'paypal'
+                            ? 'Your payment is processed securely via PayPal. Funds will be available in your wallet immediately after successful payment.'
+                            : 'Your payment is processed securely via DPO Pay. Supports card payments and mobile money (MTN, Airtel, Zamtel). Funds will be available in your wallet immediately after successful payment.'}
                     </p>
                 </div>
 
