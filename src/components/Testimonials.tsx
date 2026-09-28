@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Star, MapPin, Quote } from 'lucide-react';
+import { MapPin, Quote } from 'lucide-react';
 import { usePlatformStats, formatStat } from '@/hooks/usePlatformStats';
 
 // Illustrative community stories for Zambian users — clearly labeled as
@@ -56,9 +55,10 @@ interface Testimonial {
 
 export const Testimonials = () => {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [paused, setPaused] = useState(false);
   const stats = usePlatformStats();
 
-  const testimonials: Testimonial[] = useMemo(() => 
+  const testimonials: Testimonial[] = useMemo(() =>
     TESTIMONIALS.map((t, i) => ({
       id: `testimonial-${i}`,
       name: t.name,
@@ -70,11 +70,13 @@ export const Testimonials = () => {
   []);
 
   useEffect(() => {
+    if (paused) return;
+    if (typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
     const interval = setInterval(() => {
       setActiveIndex((prev) => (prev + 1) % testimonials.length);
     }, 5000);
     return () => clearInterval(interval);
-  }, [testimonials.length]);
+  }, [testimonials.length, paused]);
 
   return (
     <section className="vf-section bg-canvas-bone border-t border-canvas-silk">
@@ -94,14 +96,15 @@ export const Testimonials = () => {
           </p>
         </div>
         
-        {/* Mobile: Single testimonial with dots */}
-        <div className="md:hidden">
+        {/* Mobile: Single story with dots — pause rotation on touch/focus */}
+        <div
+          className="md:hidden"
+          onMouseEnter={() => setPaused(true)}
+          onMouseLeave={() => setPaused(false)}
+          onFocus={() => setPaused(true)}
+          onBlur={() => setPaused(false)}
+        >
           <div className="vf-card">
-            <div className="flex mb-4">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} className="h-4 w-4 fill-amber-400 text-amber-400" />
-              ))}
-            </div>
             <p className="text-sm mb-4 text-graphite-600 leading-relaxed tracking-wide">
               "{testimonials[activeIndex]?.content}"
             </p>
@@ -137,15 +140,10 @@ export const Testimonials = () => {
           </div>
         </div>
         
-        {/* Desktop: Grid */}
+        {/* Desktop: Grid (no star ratings — these are illustrative stories, not verified reviews) */}
         <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-5">
           {testimonials.map((testimonial) => (
             <div key={testimonial.id} className="vf-card space-y-4 group">
-              <div className="flex">
-                {[...Array(testimonial.rating)].map((_, i) => (
-                  <Star key={i} className="h-4 w-4 fill-amber-400 text-amber-400" />
-                ))}
-              </div>
               <p className="text-sm text-graphite-600 leading-relaxed tracking-wide group-hover:text-graphite-700 transition-colors">
                 "{testimonial.content}"
               </p>
@@ -171,13 +169,13 @@ export const Testimonials = () => {
           ))}
         </div>
 
-        {/* Trust indicators — live counts only, never fabricated */}
+        {/* Trust indicators — live counts only, never fabricated; zero counts hidden */}
         <div className="mt-10 text-center">
           <div className="inline-flex items-center gap-4 md:gap-6 text-sm text-graphite-500">
-            <span>{formatStat(stats.patients)} patients across Zambia</span>
-            <span className="hidden md:inline">•</span>
-            <span className="hidden md:inline">{formatStat(stats.doctors)} verified providers</span>
-            <span>•</span>
+            {stats.patients > 0 && <span>{formatStat(stats.patients)} patients across Zambia</span>}
+            {stats.patients > 0 && stats.doctors > 0 && <span className="hidden md:inline">•</span>}
+            {stats.doctors > 0 && <span className="hidden md:inline">{formatStat(stats.doctors)} verified providers</span>}
+            {(stats.patients > 0 || stats.doctors > 0) && <span>•</span>}
             <span>Growing nationwide</span>
           </div>
         </div>

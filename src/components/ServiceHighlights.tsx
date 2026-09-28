@@ -37,23 +37,23 @@ export const ServiceHighlights = () => {
     {
       icon: <CreditCard className="h-5 w-5 text-primary-500" />,
       title: "Flexible Payments",
-      description: "Pay with mobile money, cards, or insurance",
-      stat: "5+",
-      statLabel: "methods"
+      description: "Wallet, mobile money, cards, cash, or insurance adjudication",
+      stat: "6",
+      statLabel: "payment rails"
     },
     {
       icon: <Video className="h-5 w-5 text-primary-500" />,
       title: "Video Consultations",
       description: "See a doctor from anywhere via secure video call",
-      stat: "24/7",
-      statLabel: "available"
+      stat: "Remote",
+      statLabel: "no travel needed"
     },
     {
       icon: <Shield className="h-5 w-5 text-success-500" />,
       title: "Insurance Support",
-      description: "Integrated with major insurance providers for covered services",
-      stat: "100%",
-      statLabel: "secure"
+      description: "File and track claims with TPA adjudication support",
+      stat: "Live",
+      statLabel: "claim tracking"
     },
     {
       icon: <Phone className="h-5 w-5 text-accent-500" />,
@@ -76,7 +76,9 @@ export const ServiceHighlights = () => {
             Everything You Need for Better Healthcare
           </h2>
           <p className="text-base text-graphite-500 max-w-xl mx-auto font-normal mt-4 leading-relaxed tracking-wide">
-            Connecting {formatStat(stats.patients)} users to quality healthcare providers across Zambia
+            {stats.patients > 0
+              ? <>Connecting {formatStat(stats.patients)} users to quality healthcare providers across Zambia</>
+              : <>Connecting you to quality healthcare providers across Zambia</>}
           </p>
         </div>
 

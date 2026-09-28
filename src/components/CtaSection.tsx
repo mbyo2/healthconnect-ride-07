@@ -24,7 +24,9 @@ export const CtaSection = () => {
           </h2>
 
           <p className="text-base md:text-lg mb-8 opacity-85 leading-relaxed max-w-xl mx-auto">
-            Join {formatStat(stats.patients)} users who trust Doc' O Clock for quality healthcare.
+            {stats.patients > 0
+              ? <>Join {formatStat(stats.patients)} users who trust Doc' O Clock for quality healthcare.</>
+              : <>Quality healthcare across Zambia — free to start, pay only for services you use.</>}
           </p>
 
           <div className="flex flex-wrap justify-center gap-4 md:gap-6 mb-8 text-sm">
