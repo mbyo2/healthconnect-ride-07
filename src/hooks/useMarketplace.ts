@@ -165,6 +165,7 @@ export const useMarketplace = () => {
       delivery_phone: string;
       delivery_instructions?: string;
       prescription_id?: string;
+      delivery_zone_id?: string | null;
     }) => {
       if (!user) throw new Error('Not authenticated');
       if (cart.items.length === 0) throw new Error('Cart is empty');
@@ -194,7 +195,8 @@ export const useMarketplace = () => {
           prescription_id: orderData.prescription_id,
           delivery_address: orderData.delivery_address,
           delivery_phone: orderData.delivery_phone,
-          delivery_instructions: orderData.delivery_instructions
+          delivery_instructions: orderData.delivery_instructions,
+          delivery_zone_id: orderData.delivery_zone_id ?? null
         })
         .select()
         .single();

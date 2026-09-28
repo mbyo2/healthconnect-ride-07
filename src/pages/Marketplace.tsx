@@ -5,6 +5,8 @@ import { Cart } from "@/components/marketplace/Cart";
 import { CheckoutModal } from "@/components/marketplace/CheckoutModal";
 import { PharmacyPayment } from "@/components/marketplace/PharmacyPayment";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { PatientOrderTracking } from "@/components/marketplace/PatientOrderTracking";
 import { useMarketplace } from "@/hooks/useMarketplace";
 import { Search, ShoppingCart, Package, Pill } from "lucide-react";
 import { toast } from "sonner";
@@ -212,31 +214,34 @@ const Marketplace = () => {
                   ))
                 ) : (
                   orders?.map((order) => (
-                  <div key={order.id} className="border border-canvas-silk bg-canvas rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-extrabold text-xs text-slate-900 dark:text-slate-100">Order #{order.id.slice(0, 8)}</h3>
-                        <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white ${
-                          order.status === "delivered" ? "bg-success-500" : order.status === "cancelled" ? "bg-error-500" : "bg-primary-500"
-                        }`}>
-                          {order.status.replace("_", " ")}
-                        </span>
+                  <div key={order.id} className="border border-canvas-silk bg-canvas rounded-xl p-4 gap-3">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-extrabold text-xs text-slate-900 dark:text-slate-100">Order #{order.id.slice(0, 8)}</h3>
+                          <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white ${
+                            order.status === "delivered" ? "bg-success-500" : order.status === "cancelled" ? "bg-error-500" : "bg-primary-500"
+                          }`}>
+                            {order.status.replace("_", " ")}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-graphite-500 dark:text-slate-400 mt-1 font-medium">
+                          Total: <strong>K{order.total_amount}</strong> • {new Date(order.created_at).toLocaleDateString()}
+                        </p>
+                        <p className="text-[11px] text-graphite-500 dark:text-slate-400">Delivery address: {order.delivery_address}</p>
                       </div>
-                      <p className="text-[11px] text-graphite-500 dark:text-slate-400 mt-1 font-medium">
-                        Total: <strong>K{order.total_amount}</strong> • {new Date(order.created_at).toLocaleDateString()}
-                      </p>
-                      <p className="text-[11px] text-graphite-500 dark:text-slate-400">Delivery address: {order.delivery_address}</p>
+                      <div className="flex items-center gap-2">
+                        {order.status === "pending" && (
+                          <Button
+                            onClick={() => setPendingPaymentOrder(order)}
+                            className="px-4 py-2 min-h-[44px] rounded-xl text-xs font-extrabold"
+                          >
+                            Pay now
+                          </Button>
+                        )}
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      {order.status === "pending" && (
-                        <button
-                          onClick={() => setPendingPaymentOrder(order)}
-                          className="px-4 py-2 min-h-[44px] rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-xs font-extrabold transition-all"
-                        >
-                          Pay now
-                        </button>
-                      )}
-                    </div>
+                    {order.status !== "cancelled" && <PatientOrderTracking orderId={order.id} />}
                   </div>
                 )))}
 

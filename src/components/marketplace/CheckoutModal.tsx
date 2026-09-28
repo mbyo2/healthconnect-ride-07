@@ -10,7 +10,7 @@ import { Cart } from '@/types/marketplace';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
-import { DeliveryCalculator } from './DeliveryCalculator';
+import { DeliveryCalculator, deliveryRestrictionReason, type DeliveryZoneOption } from './DeliveryCalculator';
 import { toast } from 'sonner';
 
 interface CheckoutModalProps {
@@ -23,6 +23,7 @@ interface CheckoutModalProps {
     delivery_phone: string;
     delivery_instructions?: string;
     prescription_id?: string;
+    delivery_zone_id?: string | null;
   }) => void;
   isLoading: boolean;
 }
@@ -45,6 +46,13 @@ export const CheckoutModal = ({
 
   const safeCart = cart ?? { items: [], total: 0 };
   const requiresPrescription = (safeCart.items || []).some(item => item.product?.requires_prescription);
+  // Restricted categories (controlled / injectable / narcotic / scheduled)
+  // cannot be delivered — pharmacy pickup only.
+  const restrictedItems = (safeCart.items || []).filter(
+    (item) => deliveryRestrictionReason(item.product?.category)
+  );
+  const pickupOnly = restrictedItems.length > 0;
+  const [deliveryZone, setDeliveryZone] = useState<DeliveryZoneOption | null>(null);
 
   // Get user's prescriptions
   const { data: prescriptions } = useQuery({
@@ -100,7 +108,7 @@ export const CheckoutModal = ({
       return;
     }
 
-    onPlaceOrder(formData);
+    onPlaceOrder({ ...formData, delivery_zone_id: pickupOnly ? null : deliveryZone?.id ?? null });
   };
 
   return (
@@ -185,6 +193,24 @@ export const CheckoutModal = ({
               placeholder="Special delivery instructions"
             />
           </div>
+
+          {pickupOnly ? (
+            <div className="rounded-xl border border-orange-500/30 bg-orange-500/5 p-3 text-xs">
+              <p className="font-extrabold text-orange-700 dark:text-orange-300 flex items-center gap-1.5">
+                Pharmacy pickup required
+              </p>
+              <p className="text-muted-foreground mt-1">
+                {restrictedItems.map((i) => deliveryRestrictionReason(i.product?.category)).filter(Boolean)[0]}
+                {' '}— collect this order in person. No delivery zone applies.
+              </p>
+            </div>
+          ) : formData.pharmacy_id ? (
+            <DeliveryCalculator
+              pharmacyId={formData.pharmacy_id}
+              patientPhone={formData.delivery_phone}
+              onDeliverySelect={setDeliveryZone}
+            />
+          ) : null}
 
           <div className="flex gap-2">
             <Button type="button" variant="outline" onClick={onClose} className="flex-1 min-h-[44px]">
