@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { supabase } from '@/integrations/supabase/client';
-import { Layers, Upload, X, Loader2, Image as ImageIcon } from 'lucide-react';
+import { Layers, Upload, X, Loader2, Lightbulb, Image as ImageIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
@@ -284,7 +284,7 @@ export const Imaging3DUploader = () => {
           </Button>
 
           <div className="text-xs text-muted-foreground space-y-1">
-            <p>💡 <strong>Doc' O Clock AI Volumetric Analysis</strong></p>
+            <p className="flex items-center gap-1.5"><Lightbulb className="h-4 w-4 text-amber-500" aria-hidden /> <strong>Doc' O Clock AI Volumetric Analysis</strong></p>
             <p>• Native 3D understanding across slices</p>
             <p>• Cross-sectional anatomical correlation</p>
             <p>• Pathology detection and measurement</p>

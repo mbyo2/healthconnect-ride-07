@@ -225,7 +225,7 @@ const LabManagement = () => {
         const patientId = (selectedRequest as any).patient_id;
         const orderingId = (selectedRequest as any).ordered_by;
         const testName = (selectedRequest as any).test_type || "Lab Test";
-        const title = "⚠️ Critical Lab Result";
+        const title = "Critical Lab Result";
         const message = `${testName}: ${resultSummary}. Please review immediately.`;
         if (patientId) {
           dispatchNotification({ userId: patientId, title: "New lab result available", message: `Your ${testName} result is ready. Open the app for details.`, category: "lab", link: "/medical-records" });
@@ -235,7 +235,7 @@ const LabManagement = () => {
         }
       }
 
-      toast.success(isUrgent ? "⚠️ Critical result submitted — clinicians notified" : "Results submitted & sent for pathologist review");
+      toast.success(isUrgent ? "Critical result submitted — clinicians notified" : "Results submitted & sent for pathologist review");
       setSelectedRequest(null);
       setResultSummary("");
       setIsCritical(false);

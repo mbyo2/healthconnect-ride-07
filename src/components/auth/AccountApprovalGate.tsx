@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Clock, CheckCircle2, XCircle, FileText, ArrowRight, ShieldCheck, Upload, Trash2, Loader2, AlertCircle } from 'lucide-react';
+import { Clock, CheckCircle2, XCircle, FileText, ArrowRight, ShieldCheck, Upload, Trash2, Loader2, AlertCircle, Paperclip, Hourglass, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -294,12 +294,12 @@ export const AccountApprovalGate = ({ children }: { children: React.ReactNode })
           <div className="bg-muted/50 rounded-lg p-4 space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">Application Status</span>
-              <Badge variant={isRejected ? 'destructive' : status === 'approved' ? 'default' : 'secondary'}>
-                {status === 'pending' && !hasDocuments ? '📎 Documents Needed'
-                  : status === 'pending' ? '⏳ Pending Review'
-                  : status === 'under_review' ? '🔍 Under Review'
-                  : isRejected ? '❌ Rejected'
-                  : '✅ Approved'}
+              <Badge variant={isRejected ? 'destructive' : status === 'approved' ? 'default' : 'secondary'} className="gap-1">
+                {status === 'pending' && !hasDocuments ? (<><Paperclip className="h-3 w-3" aria-hidden /> Documents Needed</>)
+                  : status === 'pending' ? (<><Hourglass className="h-3 w-3" aria-hidden /> Pending Review</>)
+                  : status === 'under_review' ? (<><Search className="h-3 w-3" aria-hidden /> Under Review</>)
+                  : isRejected ? (<><XCircle className="h-3 w-3" aria-hidden /> Rejected</>)
+                  : (<><CheckCircle2 className="h-3 w-3" aria-hidden /> Approved</>)}
               </Badge>
             </div>
             {application?.review_notes && (

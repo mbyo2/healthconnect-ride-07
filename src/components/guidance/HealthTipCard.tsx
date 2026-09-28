@@ -68,7 +68,7 @@ export const HealthTipCard = ({
         
         <div className="flex-1">
           <h4 className="font-display font-medium text-sm text-midnight mb-1">
-            💡 {title}
+            <Lightbulb className="h-4 w-4 text-amber-500" aria-hidden /> {title}
           </h4>
           <p className="text-xs text-graphite-600 mb-3">
             {tip}

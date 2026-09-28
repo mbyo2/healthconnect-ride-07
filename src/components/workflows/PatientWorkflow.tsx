@@ -28,6 +28,12 @@ import {
   Phone,
   Pill,
   Building2,
+  Smile,
+  HeartPulse,
+  Wind,
+  Baby,
+  Brain,
+  Bone,
   AlertTriangle,
   Bell,
   ChevronRight,
@@ -40,16 +46,16 @@ import { WalletCard } from "@/components/home/WalletCard";
 import { ConnectedWorkflows } from "@/components/home/ConnectedWorkflows";
 import { AvailableDoctorsRail } from "@/components/workflows/AvailableDoctorsRail";
 
-// Predefined modern specialties with clean medical iconography matching the reference
+// Predefined modern specialties with Lucide medical iconography.
 const SPECIALTIES_DATA = [
-  { id: 'dentistry', name: 'Dentistry', icon: '🦷', sub: 'Teeth & Oral', route: '/search?specialty=Dentistry' },
-  { id: 'cardiology', name: 'Cardiology', icon: '🫀', sub: 'Heart & Vascular', route: '/search?specialty=Cardiology' },
-  { id: 'pulmonology', name: 'Pulmonology', icon: '🫁', sub: 'Lungs & Breathing', route: '/search?specialty=Pulmonology' },
-  { id: 'pediatrics', name: 'Pediatrics', icon: '👶', sub: 'Child Health', route: '/search?specialty=Pediatrics' },
-  { id: 'neurology', name: 'Neurology', icon: '🧠', sub: 'Brain & Nerves', route: '/search?specialty=Neurology' },
-  { id: 'dermatology', name: 'Dermatology', icon: '🧴', sub: 'Skin & Hair', route: '/search?specialty=Dermatology' },
-  { id: 'orthopedics', name: 'Orthopedics', icon: '🦴', sub: 'Bones & Joints', route: '/search?specialty=Orthopedics' },
-  { id: 'general', name: 'General Care', icon: '🩺', sub: 'Family Medicine', route: '/search?specialty=General+Practice' },
+  { id: 'dentistry', name: 'Dentistry', icon: Smile, sub: 'Teeth & Oral', route: '/search?specialty=Dentistry' },
+  { id: 'cardiology', name: 'Cardiology', icon: HeartPulse, sub: 'Heart & Vascular', route: '/search?specialty=Cardiology' },
+  { id: 'pulmonology', name: 'Pulmonology', icon: Wind, sub: 'Lungs & Breathing', route: '/search?specialty=Pulmonology' },
+  { id: 'pediatrics', name: 'Pediatrics', icon: Baby, sub: 'Child Health', route: '/search?specialty=Pediatrics' },
+  { id: 'neurology', name: 'Neurology', icon: Brain, sub: 'Brain & Nerves', route: '/search?specialty=Neurology' },
+  { id: 'dermatology', name: 'Dermatology', icon: Sparkles, sub: 'Skin & Hair', route: '/search?specialty=Dermatology' },
+  { id: 'orthopedics', name: 'Orthopedics', icon: Bone, sub: 'Bones & Joints', route: '/search?specialty=Orthopedics' },
+  { id: 'general', name: 'General Care', icon: Stethoscope, sub: 'Family Medicine', route: '/search?specialty=General+Practice' },
 ];
 
 
@@ -421,8 +427,8 @@ export const PatientWorkflow = React.memo(() => {
                     : 'border-canvas-silk dark:border-slate-800 hover:border-primary-500/40'
                 }`}
               >
-                <div className="w-12 h-12 rounded-2xl bg-canvas-bone dark:bg-slate-800 border border-canvas-silk dark:border-slate-700 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
-                  {spec.icon}
+                <div className="w-12 h-12 rounded-2xl bg-canvas-bone dark:bg-slate-800 border border-canvas-silk dark:border-slate-700 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <spec.icon className="h-6 w-6 text-primary-500" aria-hidden />
                 </div>
                 <div>
                   <span className="text-xs sm:text-sm font-black text-slate-900 dark:text-slate-100 block group-hover:text-primary-500 transition-colors">

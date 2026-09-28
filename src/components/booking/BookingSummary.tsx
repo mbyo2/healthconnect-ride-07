@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import { MapPin, Navigation, ExternalLink } from "lucide-react";
+import { MapPin, Navigation, ExternalLink, Building2, Video } from "lucide-react";
 import { Provider } from "@/types/provider";
 import { providerDisplayName } from "@/utils/providerDisplay";
 import { Button } from "@/components/ui/button";
@@ -65,7 +65,7 @@ export const BookingSummary = ({
         <p>Date: {format(selectedDate, "MMMM d, yyyy")}</p>
         <p>Time: {selectedTime}</p>
         <p>Duration: 30 minutes</p>
-        <p>Type: {appointmentType === 'physical' ? '🏥 In-Person Visit' : '💻 Online Consultation'}</p>
+        <p className="flex items-center gap-1.5">Type: {appointmentType === 'physical' ? (<><Building2 className="h-3.5 w-3.5 text-primary" aria-hidden /> In-Person Visit</>) : (<><Video className="h-3.5 w-3.5 text-primary" aria-hidden /> Online Consultation</>)}</p>
         
         {appointmentType === 'physical' && (
           <div className="mt-3 pt-3 border-t border-border space-y-3">

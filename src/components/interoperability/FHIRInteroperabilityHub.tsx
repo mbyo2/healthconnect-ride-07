@@ -16,6 +16,16 @@ import {
   FHIRBundle,
 } from "@/utils/fhir-standard";
 import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 // LOINC mapping for the vital_signs columns we convert.
 const VITAL_DEFS: { key: string; label: string; unit: string; loinc: string }[] = [
@@ -159,45 +169,48 @@ export const FHIRInteroperabilityHub: React.FC<{ institutionId?: string }> = ({ 
         </div>
 
         <div className="flex items-center gap-2">
-          <button
+          <Button
             onClick={handleCopy}
-            className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-extrabold text-xs flex items-center gap-1.5 border border-white/20 transition-all"
+            variant="secondary"
+            size="sm"
+            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 font-extrabold text-xs"
           >
             {copied ? <CheckCircle2 className="h-4 w-4 text-emerald-400" /> : <Copy className="h-4 w-4" />}
             <span>{copied ? "Copied" : "Copy JSON"}</span>
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={handleDownload}
             disabled={!profile}
-            className="px-4 py-2 rounded-xl bg-white text-slate-900 font-extrabold text-xs flex items-center gap-1.5 shadow-sm hover:bg-slate-100 transition-all disabled:opacity-50"
+            size="sm"
+            className="bg-white text-slate-900 hover:bg-slate-100 font-extrabold text-xs"
           >
             <Download className="h-4 w-4" /> Download FHIR Bundle
-          </button>
+          </Button>
         </div>
       </div>
 
       {/* Real patient selector */}
       <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 flex flex-col sm:flex-row sm:items-center gap-3">
-        <div className="flex items-center gap-2 text-xs font-extrabold text-slate-600 dark:text-slate-300">
+        <Label className="flex items-center gap-2 text-xs font-extrabold text-slate-600 dark:text-slate-300">
           <Users className="h-4 w-4 text-primary-500" /> Source patient (admitted to this facility)
-        </div>
+        </Label>
         {loading ? (
           <p className="text-xs text-slate-500 flex items-center gap-2"><RefreshCw className="h-3.5 w-3.5 animate-spin" /> Loading roster…</p>
         ) : patients.length === 0 ? (
           <p className="text-xs text-slate-500">No admitted patients with records yet — convert output waits for real data.</p>
         ) : (
-          <select
-            value={selectedPatientId}
-            onChange={(e) => setSelectedPatientId(e.target.value)}
-            className="px-3 py-2 rounded-xl border border-canvas-silk dark:border-slate-700 bg-white dark:bg-slate-950 text-xs font-bold"
-            aria-label="Select patient for FHIR conversion"
-          >
-            {patients.map((p) => (
-              <option key={p.id} value={p.id}>
-                {(p.first_name || "") + " " + (p.last_name || "")} — {p.id.slice(0, 8)}
-              </option>
-            ))}
-          </select>
+          <Select value={selectedPatientId} onValueChange={setSelectedPatientId}>
+            <SelectTrigger className="w-full sm:w-72 text-xs font-bold" aria-label="Select patient for FHIR conversion">
+              <SelectValue placeholder="Select patient" />
+            </SelectTrigger>
+            <SelectContent>
+              {patients.map((p) => (
+                <SelectItem key={p.id} value={p.id}>
+                  {(p.first_name || "") + " " + (p.last_name || "")} — {p.id.slice(0, 8)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         )}
         {profile && (
           <span className="text-[11px] text-slate-500">
@@ -206,26 +219,14 @@ export const FHIRInteroperabilityHub: React.FC<{ institutionId?: string }> = ({ 
         )}
       </div>
 
-      {/* Resource Selector Pills */}
-      <div className="flex items-center gap-2 border-b border-canvas-silk dark:border-slate-800 pb-2 overflow-x-auto">
-        {[
-          { id: "Patient", label: "Patient Resource" },
-          { id: "Observation", label: "Observation (Vitals & Labs)" },
-          { id: "Bundle", label: "Full FHIR Collection Bundle" },
-        ].map((r) => (
-          <button
-            key={r.id}
-            onClick={() => setSelectedResourceType(r.id)}
-            className={`px-4 py-2 rounded-xl text-xs font-extrabold transition-all shrink-0 ${
-              selectedResourceType === r.id
-                ? "bg-primary-500 text-white shadow-xs"
-                : "bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-canvas-mist dark:hover:bg-slate-800"
-            }`}
-          >
-            {r.label}
-          </button>
-        ))}
-      </div>
+      {/* Resource Selector */}
+      <Tabs value={selectedResourceType} onValueChange={setSelectedResourceType}>
+        <TabsList className="w-full justify-start overflow-x-auto">
+          <TabsTrigger value="Patient" className="text-xs font-extrabold shrink-0">Patient Resource</TabsTrigger>
+          <TabsTrigger value="Observation" className="text-xs font-extrabold shrink-0">Observation (Vitals & Labs)</TabsTrigger>
+          <TabsTrigger value="Bundle" className="text-xs font-extrabold shrink-0">Full FHIR Collection Bundle</TabsTrigger>
+        </TabsList>
+      </Tabs>
 
       {/* Live FHIR JSON Display */}
       <div className="rounded-3xl border border-canvas-silk dark:border-slate-800 bg-slate-900 text-emerald-400 p-6 shadow-md overflow-hidden font-mono text-xs relative">

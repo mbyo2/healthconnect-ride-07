@@ -17,6 +17,7 @@ import {
   Sparkles,
   ArrowRight,
   ShieldCheck,
+  Smartphone,
 } from "lucide-react";
 
 type KioskMode = "menu" | "checkin" | "register" | "pay" | "success";
@@ -403,31 +404,31 @@ export const SelfServiceKiosk: React.FC = () => {
                   type="button"
                   aria-pressed={payMethod === "mtn"}
                   onClick={() => setPayMethod("mtn")}
-                  className={`p-3 rounded-2xl border-2 font-bold text-center transition-all ${
+                  className={`p-3 rounded-2xl border-2 font-bold text-center transition-all flex flex-col items-center gap-1 ${
                     payMethod === "mtn" ? "border-amber-400 bg-amber-50 dark:bg-amber-950/40 font-black" : "border-canvas-silk dark:border-slate-800"
                   }`}
                 >
-                  🟡 MTN MoMo
+                  <Smartphone className="h-5 w-5 text-amber-500" aria-hidden /> MTN MoMo
                 </button>
                 <button
                   type="button"
                   aria-pressed={payMethod === "airtel"}
                   onClick={() => setPayMethod("airtel")}
-                  className={`p-3 rounded-2xl border-2 font-bold text-center transition-all ${
+                  className={`p-3 rounded-2xl border-2 font-bold text-center transition-all flex flex-col items-center gap-1 ${
                     payMethod === "airtel" ? "border-rose-400 bg-rose-50 dark:bg-rose-950/40 font-black" : "border-canvas-silk dark:border-slate-800"
                   }`}
                 >
-                  🔴 Airtel Money
+                  <Smartphone className="h-5 w-5 text-rose-500" aria-hidden /> Airtel Money
                 </button>
                 <button
                   type="button"
                   aria-pressed={payMethod === "card"}
                   onClick={() => setPayMethod("card")}
-                  className={`p-3 rounded-2xl border-2 font-bold text-center transition-all ${
+                  className={`p-3 rounded-2xl border-2 font-bold text-center transition-all flex flex-col items-center gap-1 ${
                     payMethod === "card" ? "border-primary-500 bg-blue-50 dark:bg-blue-950/40 font-black" : "border-canvas-silk dark:border-slate-800"
                   }`}
                 >
-                  💳 Card POS
+                  <CreditCard className="h-5 w-5 text-primary-500" aria-hidden /> Card POS
                 </button>
               </div>
             </div>

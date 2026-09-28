@@ -8,7 +8,7 @@ import type { Provider } from '@/types/provider';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { MapPin, Navigation, Search, Filter } from 'lucide-react';
+import { MapPin, Navigation, Search, Filter, Video, Wallet, Clock } from 'lucide-react';
 import { toast } from 'sonner';
 import { MobileOptimizedCard } from '@/components/ui/MobileOptimizedCard';
 import { LoadingScreen } from '@/components/LoadingScreen';
@@ -260,17 +260,17 @@ const MapPage = () => {
                   <div className="flex flex-wrap gap-1.5 mt-1.5">
                     {selectedProvider.telemedicine_available && (
                       <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-primary/10 text-primary">
-                        📹 Telemedicine
+                        <Video className="h-3 w-3" aria-hidden /> Telemedicine
                       </span>
                     )}
                     {selectedProvider.consultation_fee_min && (
                       <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-700">
-                        💰 From K{selectedProvider.consultation_fee_min}
+                        <Wallet className="h-3 w-3" aria-hidden /> From K{selectedProvider.consultation_fee_min}
                       </span>
                     )}
                     {selectedProvider.typical_wait_time && (
                       <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-700">
-                        ⏱ {selectedProvider.typical_wait_time}
+                        <Clock className="h-3 w-3" aria-hidden /> {selectedProvider.typical_wait_time}
                       </span>
                     )}
                   </div>

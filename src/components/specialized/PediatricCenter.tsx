@@ -19,6 +19,18 @@ import {
   Sparkles,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface PediatricPatient {
   id: string;
@@ -256,45 +268,30 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
 
         {/* Patient Selection dropdown */}
         <div className="flex items-center gap-2">
-          <select
-            value={selectedPatientId}
-            onChange={(e) => setSelectedPatientId(e.target.value)}
-            className="px-4 py-2 rounded-xl bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-xs font-bold border border-white/30 focus:outline-none"
-          >
-            {patients.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.first_name} {p.last_name} ({p.date_of_birth ? `${calculateAgeMonths(p.date_of_birth)} mo` : "Child"})
-              </option>
-            ))}
-          </select>
+          <Select value={selectedPatientId} onValueChange={setSelectedPatientId}>
+            <SelectTrigger className="w-64 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-xs font-bold border-white/30">
+              <SelectValue placeholder="Select child patient" />
+            </SelectTrigger>
+            <SelectContent>
+              {patients.map((p) => (
+                <SelectItem key={p.id} value={p.id}>
+                  {p.first_name} {p.last_name} ({p.date_of_birth ? `${calculateAgeMonths(p.date_of_birth)} mo` : "Child"})
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
       {/* Sub Tabs */}
-      <div className="flex items-center gap-2 border-b border-canvas-silk dark:border-slate-800 pb-2 overflow-x-auto">
-        {[
-          { id: "growth", label: "WHO Growth Curves & Vitals", icon: TrendingUp },
-          { id: "immunization", label: "Vaccine & Immunization Registry", icon: ShieldCheck },
-          { id: "milestones", label: "Developmental Milestones", icon: Activity },
-          { id: "calculator", label: "Pediatric Dosage Calculator", icon: Calculator },
-        ].map((tab) => {
-          const Icon = tab.icon;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveSubTab(tab.id as any)}
-              className={`px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2 transition-all shrink-0 ${
-                activeSubTab === tab.id
-                  ? "bg-primary-500 text-white shadow-xs"
-                  : "bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-canvas-mist dark:hover:bg-slate-800"
-              }`}
-            >
-              <Icon className="h-4 w-4" />
-              <span>{tab.label}</span>
-            </button>
-          );
-        })}
-      </div>
+      <Tabs value={activeSubTab} onValueChange={(v) => setActiveSubTab(v as any)}>
+        <TabsList className="w-full justify-start overflow-x-auto">
+          <TabsTrigger value="growth" className="text-xs font-extrabold shrink-0"><TrendingUp className="h-4 w-4" />WHO Growth Curves & Vitals</TabsTrigger>
+          <TabsTrigger value="immunization" className="text-xs font-extrabold shrink-0"><ShieldCheck className="h-4 w-4" />Vaccine & Immunization Registry</TabsTrigger>
+          <TabsTrigger value="milestones" className="text-xs font-extrabold shrink-0"><Activity className="h-4 w-4" />Developmental Milestones</TabsTrigger>
+          <TabsTrigger value="calculator" className="text-xs font-extrabold shrink-0"><Calculator className="h-4 w-4" />Pediatric Dosage Calculator</TabsTrigger>
+        </TabsList>
+      </Tabs>
 
       {/* 1. Growth Curves & Measurements */}
       {activeSubTab === "growth" && (
@@ -311,52 +308,52 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
 
             <Dialog open={showGrowthModal} onOpenChange={setShowGrowthModal}>
               <DialogTrigger asChild>
-                <button className="px-4 py-2 rounded-xl bg-primary-500 text-white text-xs font-extrabold flex items-center gap-1.5 shadow-xs">
+                <Button size="sm" className="text-xs font-extrabold">
                   <Plus className="h-4 w-4" /> Log Measurement
-                </button>
+                </Button>
               </DialogTrigger>
               <DialogContent className="max-w-md bg-white dark:bg-slate-900 rounded-3xl p-6">
                 <DialogHeader>
                   <DialogTitle className="font-black text-lg">Log Pediatric Growth Vitals</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-3 py-2 text-xs">
-                  <div>
-                    <label className="font-bold text-slate-700 dark:text-slate-300">Weight (kg) *</label>
-                    <input
+                  <div className="space-y-1">
+                    <Label className="font-bold text-slate-700 dark:text-slate-300">Weight (kg) *</Label>
+                    <Input
                       type="number"
                       step="0.05"
-                      className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-medium"
+                      className="font-medium"
                       value={weightKg}
                       onChange={(e) => setWeightKg(parseFloat(e.target.value) || 0)}
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <label className="font-bold text-slate-700 dark:text-slate-300">Height / Length (cm) *</label>
-                      <input
+                    <div className="space-y-1">
+                      <Label className="font-bold text-slate-700 dark:text-slate-300">Height / Length (cm) *</Label>
+                      <Input
                         type="number"
                         step="0.1"
-                        className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-medium"
+                        className="font-medium"
                         value={heightCm}
                         onChange={(e) => setHeightCm(parseFloat(e.target.value) || 0)}
                       />
                     </div>
-                    <div>
-                      <label className="font-bold text-slate-700 dark:text-slate-300">Head Circ. (cm)</label>
-                      <input
+                    <div className="space-y-1">
+                      <Label className="font-bold text-slate-700 dark:text-slate-300">Head Circ. (cm)</Label>
+                      <Input
                         type="number"
                         step="0.1"
-                        className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-medium"
+                        className="font-medium"
                         value={headCircumferenceCm}
                         onChange={(e) => setHeadCircumferenceCm(parseFloat(e.target.value) || 0)}
                       />
                     </div>
                   </div>
-                  <div>
-                    <label className="font-bold text-slate-700 dark:text-slate-300">Clinical Notes</label>
-                    <textarea
+                  <div className="space-y-1">
+                    <Label className="font-bold text-slate-700 dark:text-slate-300">Clinical Notes</Label>
+                    <Textarea
                       rows={2}
-                      className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-medium"
+                      className="font-medium"
                       placeholder="Feeding status, appetite, nutritional observations..."
                       value={growthNotes}
                       onChange={(e) => setGrowthNotes(e.target.value)}
@@ -364,8 +361,8 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
                   </div>
                 </div>
                 <DialogFooter>
-                  <button onClick={() => setShowGrowthModal(false)} className="px-4 py-2 font-bold text-slate-500">Cancel</button>
-                  <button onClick={handleAddGrowthEntry} disabled={savingGrowth} className="px-5 py-2.5 rounded-xl bg-primary-500 text-white font-extrabold disabled:opacity-50">{savingGrowth ? "Filing…" : "Save Record"}</button>
+                  <Button variant="ghost" onClick={() => setShowGrowthModal(false)}>Cancel</Button>
+                  <Button onClick={handleAddGrowthEntry} disabled={savingGrowth}>{savingGrowth ? "Filing…" : "Save Record"}</Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
@@ -445,7 +442,9 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
                 Tracking completed doses, upcoming shots, and batch serial numbers
               </p>
             </div>
-              <button
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => {
                   const printWin = window.open("", "_blank");
                   if (!printWin) {
@@ -466,10 +465,10 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
                   printWin.document.close();
                   toast.success("Registry record sent to printer");
                 }}
-                className="px-4 py-2 rounded-xl border border-primary-500 text-primary-500 font-extrabold text-xs hover:bg-primary-500 hover:text-white transition-colors"
+                className="font-extrabold text-xs"
               >
                 Print Registry Record
-              </button>
+              </Button>
           </div>
 
           <p className="text-xs text-muted-foreground -mt-1">
@@ -509,13 +508,14 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
                       ✓ Filed in registry
                     </span>
                   ) : (
-                    <button
+                    <Button
+                      size="sm"
                       onClick={() => handleRecordDose(v.name)}
                       disabled={recordingDose === v.name}
-                      className="px-3 py-1.5 rounded-full text-[10px] font-black bg-primary-500 text-white shadow-xs hover:bg-primary-600 disabled:opacity-50"
+                      className="rounded-full text-[10px] font-black"
                     >
                       {recordingDose === v.name ? "Filing…" : "Record Dose"}
-                    </button>
+                    </Button>
                   )}
                 </div>
               </div>
@@ -550,27 +550,31 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
                 </div>
 
                 <div className="flex items-center gap-2 shrink-0">
-                  <button
+                  <Button
+                    size="sm"
+                    variant={achievedMilestones.includes(idx) ? "default" : "outline"}
                     aria-pressed={achievedMilestones.includes(idx)}
                     onClick={() => {
                       setAchievedMilestones((prev) =>
                         prev.includes(idx) ? prev.filter((i) => i !== idx) : [...prev, idx]
                       );
                     }}
-                    className={`px-3 py-1.5 rounded-xl font-extrabold text-[11px] transition-colors ${
+                    className={`rounded-xl font-extrabold text-[11px] ${
                       achievedMilestones.includes(idx)
-                        ? "bg-emerald-600 text-white"
-                        : "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-300 hover:bg-emerald-600 hover:text-white"
+                        ? "bg-emerald-600 hover:bg-emerald-700 text-white"
+                        : "text-emerald-700 dark:text-emerald-400 border-emerald-300"
                     }`}
                   >
                     {achievedMilestones.includes(idx) ? "✓ Noted (session)" : "✓ Achieved"}
-                  </button>
-                  <button
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
                     onClick={() => toast.info(`Milestone for ${m.age} marked as In Progress`)}
-                    className="px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-canvas-silk text-slate-600 dark:text-slate-300 font-bold text-[11px]"
+                    className="rounded-xl font-bold text-[11px]"
                   >
                     In Progress
-                  </button>
+                  </Button>
                 </div>
               </div>
             ))}
@@ -594,63 +598,67 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
                 <Calculator className="h-4 w-4 text-primary-500" /> Dosage Input Parameters
               </h4>
 
-              <div>
-                <label className="font-bold text-slate-700 dark:text-slate-300">Medication Preset</label>
-                <select
+              <div className="space-y-1">
+                <Label className="font-bold text-slate-700 dark:text-slate-300">Medication Preset</Label>
+                <Select
                   value={calcDrug}
-                  onChange={(e) => {
-                    setCalcDrug(e.target.value);
-                    if (e.target.value.includes("Amoxicillin")) {
+                  onValueChange={(v) => {
+                    setCalcDrug(v);
+                    if (v.includes("Amoxicillin")) {
                       setCalcMgPerKg(25);
                       setCalcConcentrationMgMl(50); // 250mg/5ml
-                    } else if (e.target.value.includes("Paracetamol")) {
+                    } else if (v.includes("Paracetamol")) {
                       setCalcMgPerKg(15);
                       setCalcConcentrationMgMl(24); // 120mg/5ml
-                    } else if (e.target.value.includes("Ibuprofen")) {
+                    } else if (v.includes("Ibuprofen")) {
                       setCalcMgPerKg(10);
                       setCalcConcentrationMgMl(20); // 100mg/5ml
                     }
                   }}
-                  className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-bold bg-white dark:bg-slate-950"
                 >
-                  <option value="Amoxicillin (50mg/kg/day in 2 divided doses)">Amoxicillin Susp (250mg/5mL)</option>
-                  <option value="Paracetamol (15mg/kg/dose every 6h)">Paracetamol Syrup (120mg/5mL)</option>
-                  <option value="Ibuprofen (10mg/kg/dose every 8h)">Ibuprofen Susp (100mg/5mL)</option>
-                  <option value="Custom Formula">Custom Drug Formulation</option>
-                </select>
+                  <SelectTrigger className="font-bold">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Amoxicillin (50mg/kg/day in 2 divided doses)">Amoxicillin Susp (250mg/5mL)</SelectItem>
+                    <SelectItem value="Paracetamol (15mg/kg/dose every 6h)">Paracetamol Syrup (120mg/5mL)</SelectItem>
+                    <SelectItem value="Ibuprofen (10mg/kg/dose every 8h)">Ibuprofen Susp (100mg/5mL)</SelectItem>
+                    <SelectItem value="Custom Formula">Custom Drug Formulation</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="font-bold text-slate-700 dark:text-slate-300">Child Weight (kg) *</label>
-                  <input
+                <div className="space-y-1">
+                  <Label className="font-bold text-slate-700 dark:text-slate-300">Child Weight (kg) *</Label>
+                  <Input
                     type="number"
                     step="0.5"
                     value={calcWeight}
                     onChange={(e) => setCalcWeight(parseFloat(e.target.value) || 1)}
-                    className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-black"
+                    className="font-black"
                   />
                 </div>
-                <div>
-                  <label className="font-bold text-slate-700 dark:text-slate-300">Dose (mg / kg / dose) *</label>
-                  <input
+                <div className="space-y-1">
+                  <Label className="font-bold text-slate-700 dark:text-slate-300">Dose (mg / kg / dose) *</Label>
+                  <Input
                     type="number"
                     step="1"
                     value={calcMgPerKg}
                     onChange={(e) => setCalcMgPerKg(parseFloat(e.target.value) || 1)}
-                    className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-black"
+                    className="font-black"
                   />
                 </div>
               </div>
 
-              <div>
-                <label className="font-bold text-slate-700 dark:text-slate-300">Liquid Concentration (mg / mL)</label>
-                <input
+              <div className="space-y-1">
+                <Label className="font-bold text-slate-700 dark:text-slate-300">Liquid Concentration (mg / mL)</Label>
+                <Input
                   type="number"
                   step="1"
                   value={calcConcentrationMgMl}
                   onChange={(e) => setCalcConcentrationMgMl(parseFloat(e.target.value) || 1)}
-                  className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-medium"
+                  className="font-medium"
                 />
                 <span className="text-[10px] text-slate-400">e.g. 250mg in 5mL = 50 mg/mL</span>
               </div>
@@ -687,7 +695,7 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
                 </div>
               </div>
 
-              <button
+              <Button
                 onClick={async () => {
                   const text = `${calcDrug}: ${singleDoseMl} mL (${singleDoseMg} mg) per dose for ${calcWeight} kg patient`;
                   try {
@@ -697,10 +705,10 @@ export const PediatricCenter: React.FC<{ institutionId?: string }> = ({ institut
                     toast.error("Copy failed — your browser blocked clipboard access");
                   }
                 }}
-                className="w-full py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs"
+                className="w-full text-xs font-extrabold"
               >
                 Copy Dosage for Prescription
-              </button>
+              </Button>
             </div>
           </div>
         </div>

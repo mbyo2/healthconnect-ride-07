@@ -91,7 +91,7 @@ export function useGamification(userId: string | undefined) {
             }
 
             // Show toast notification
-            toast.success(`🏆 Badge Earned: ${badgeInfo.name}`, {
+            toast.success(`Badge earned: ${badgeInfo.name}`, {
                 description: badgeInfo.description
             });
 

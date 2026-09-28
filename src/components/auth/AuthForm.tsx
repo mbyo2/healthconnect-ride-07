@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Smartphone } from 'lucide-react';
 
 interface AuthFormProps {
   mode?: 'login' | 'register';
@@ -219,7 +220,7 @@ export const AuthForm = ({ mode = 'login' }: AuthFormProps) => {
           </Tabs>
           <div className="mt-4 text-center">
             <Button variant="outline" className="w-full gap-2" onClick={() => setShowPhoneOTP(true)}>
-              📱 Sign in with Phone (SMS OTP)
+              <Smartphone className="h-4 w-4" aria-hidden /> Sign in with Phone (SMS OTP)
             </Button>
           </div>
         </>

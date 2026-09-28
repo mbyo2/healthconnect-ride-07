@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Cart as CartType } from '@/types/marketplace';
-import { Minus, Plus, Trash2, ShoppingCart } from 'lucide-react';
+import { Minus, Plus, Trash2, ShoppingCart, TriangleAlert } from 'lucide-react';
 
 interface CartProps {
   cart: CartType;
@@ -111,9 +111,10 @@ export const Cart = ({
         ))}
 
         {requiresPrescription && (
-          <div className="p-4 bg-orange-50 border border-orange-200 rounded-lg">
-            <p className="text-orange-800 text-sm font-medium">
-              ⚠️ This order contains prescription medications. You will need to provide a valid prescription during checkout.
+          <div className="p-4 bg-orange-50 dark:bg-orange-950/40 border border-orange-200 dark:border-orange-800 rounded-lg">
+            <p className="text-orange-800 dark:text-orange-300 text-sm font-medium flex items-start gap-2">
+              <TriangleAlert className="h-4 w-4 mt-0.5 shrink-0" aria-hidden />
+              This order contains prescription medications. You will need to provide a valid prescription during checkout.
             </p>
           </div>
         )}

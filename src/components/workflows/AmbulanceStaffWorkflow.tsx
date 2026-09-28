@@ -45,7 +45,7 @@ export const AmbulanceStaffWorkflow = () => {
                 <div className="space-y-1"><Label>Priority</Label>
                   <Select value={form.priority} onValueChange={v => setForm({...form, priority: v})}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent><SelectItem value="emergency">🔴 Emergency</SelectItem><SelectItem value="urgent">🟡 Urgent</SelectItem><SelectItem value="routine">🟢 Routine</SelectItem></SelectContent>
+                    <SelectContent><SelectItem value="emergency"><span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-destructive" aria-hidden /> Emergency</span></SelectItem><SelectItem value="urgent"><span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-amber-400" aria-hidden /> Urgent</span></SelectItem><SelectItem value="routine"><span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-emerald-500" aria-hidden /> Routine</span></SelectItem></SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-1"><Label>Unit</Label>

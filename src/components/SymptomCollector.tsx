@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Loader2, AlertCircle } from "lucide-react";
+import { Loader2, AlertCircle, Bot, TriangleAlert } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { Card, CardContent } from "@/components/ui/card";
@@ -149,14 +149,15 @@ export const SymptomCollector = ({ onSymptomSubmit }: SymptomCollectorProps) => 
         <Card className="border-primary/20 mx-3 sm:mx-0">
           <CardContent className="pt-4 sm:pt-6">
             <h3 className="font-semibold text-base sm:text-lg mb-2 sm:mb-3 flex items-center gap-2">
-              <span className="text-primary">🤖</span> Doc' O Clock AI Analysis
+              <Bot className="h-5 w-5 text-primary" aria-hidden /> Doc' O Clock AI Analysis
             </h3>
             <div className="prose prose-sm max-w-none text-foreground">
               <p className="whitespace-pre-wrap text-xs sm:text-sm leading-relaxed">{aiAnalysis}</p>
             </div>
-            <div className="mt-3 sm:mt-4 p-2.5 sm:p-3 bg-muted rounded-md text-[10px] sm:text-xs text-muted-foreground leading-relaxed">
-              ⚠️ This AI analysis is for informational purposes only and does not constitute medical advice.
-              Always consult with a qualified healthcare professional for medical decisions.
+            <div className="mt-3 sm:mt-4 p-2.5 sm:p-3 bg-muted rounded-md text-[10px] sm:text-xs text-muted-foreground leading-relaxed flex gap-2">
+              <TriangleAlert className="h-4 w-4 shrink-0 mt-0.5" aria-hidden />
+              <span>This AI analysis is for informational purposes only and does not constitute medical advice.
+              Always consult with a qualified healthcare professional for medical decisions.</span>
             </div>
             {/* Next steps — an analysis with nowhere to go is a dead end. */}
             <div className="mt-4 flex flex-col sm:flex-row gap-2">

@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
-import { FileText, Upload, X, Loader2 } from 'lucide-react';
+import { FileText, Upload, X, Loader2, Lightbulb } from 'lucide-react';
 import { toast } from 'sonner';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
@@ -185,7 +185,7 @@ export const DocumentAnalysisUploader = () => {
           </Button>
 
           <div className="text-xs text-muted-foreground space-y-1">
-            <p>💡 <strong>Powered by Doc' O Clock AI</strong></p>
+            <p className="flex items-center gap-1.5"><Lightbulb className="h-4 w-4 text-amber-500" aria-hidden /> <strong>Powered by Doc' O Clock AI</strong></p>
             <p>• Extracts test names, values, and units from lab reports</p>
             <p>• Reads prescriptions and medication details</p>
             <p>• Processes radiology and pathology reports</p>

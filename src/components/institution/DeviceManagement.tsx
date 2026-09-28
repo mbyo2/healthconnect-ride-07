@@ -129,7 +129,7 @@ export const DeviceManagement = ({ institutionId }: { institutionId: string }) =
           const newFeed = payload.new as DeviceFeed;
           setFeeds(prev => [newFeed, ...prev].slice(0, 100));
           if (newFeed.is_critical) {
-            toast.error(`⚠️ Critical alert from device: ${newFeed.data_type}`, { duration: 10000 });
+            toast.error(`Critical alert from device: ${newFeed.data_type}`, { duration: 10000 });
           }
         }
       )

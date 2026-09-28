@@ -276,9 +276,9 @@ export const TriageStaffWorkflow = () => {
       <Tabs defaultValue="all">
         <TabsList>
           <TabsTrigger value="all">All ({assessments.length})</TabsTrigger>
-          <TabsTrigger value="critical">🔴 Critical ({critical.length})</TabsTrigger>
-          <TabsTrigger value="urgent">🟠 Urgent ({urgent.length})</TabsTrigger>
-          <TabsTrigger value="standard">🟡 Standard ({standard.length})</TabsTrigger>
+          <TabsTrigger value="critical"><span className="h-2 w-2 rounded-full bg-destructive" aria-hidden /> Critical ({critical.length})</TabsTrigger>
+          <TabsTrigger value="urgent"><span className="h-2 w-2 rounded-full bg-orange-500" aria-hidden /> Urgent ({urgent.length})</TabsTrigger>
+          <TabsTrigger value="standard"><span className="h-2 w-2 rounded-full bg-amber-400" aria-hidden /> Standard ({standard.length})</TabsTrigger>
         </TabsList>
 
         {['all', 'critical', 'urgent', 'standard'].map(tab => (

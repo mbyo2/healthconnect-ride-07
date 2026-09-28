@@ -42,7 +42,7 @@ import { FacilityJourneyCard } from "@/components/hospital/FacilityJourneyCard";
 
 const MODULE_TABS: { val: HmsModule; label: string }[] = [
   { val: "dashboard", label: "Dashboard" },
-  { val: "notifications", label: "🔔 Alerts" },
+  { val: "notifications", label: "Alerts" },
   { val: "emr", label: "EMR" },
   { val: "opd", label: "OPD Queue" },
   { val: "ipd", label: "IPD / ADT" },

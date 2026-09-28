@@ -15,7 +15,7 @@ import { EmergencyProtocols } from "./EmergencyProtocols";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import { CalendarPlus, Menu, Mic, Bot, Sparkles, ArrowRight, Brain } from "lucide-react";
+import { CalendarPlus, Menu, Mic, Bot, Sparkles, ArrowRight, Brain, Pill, CalendarDays, Siren } from "lucide-react";
 import { usePerformanceMonitoring } from "@/hooks/use-performance-monitoring";
 import { safeLocalGet, safeLocalSet } from '@/utils/storage';
 import { LoadingScreen } from "../LoadingScreen";
@@ -126,7 +126,7 @@ export const PatientDashboard = () => {
               className="h-24 text-lg flex flex-col items-center justify-center"
               variant="outline"
             >
-              <span className="text-2xl mb-2">💊</span>
+              <Pill className="h-7 w-7 mb-2 text-primary" aria-hidden />
               Medications
             </Button>
             <Button 
@@ -134,7 +134,7 @@ export const PatientDashboard = () => {
               className="h-24 text-lg flex flex-col items-center justify-center"
               variant="outline"
             >
-              <span className="text-2xl mb-2">📅</span>
+              <CalendarDays className="h-7 w-7 mb-2 text-primary" aria-hidden />
               Appointments
             </Button>
             <Button 
@@ -142,7 +142,7 @@ export const PatientDashboard = () => {
               className="h-24 text-lg flex flex-col items-center justify-center border-primary/50"
               variant="outline"
             >
-              <span className="text-2xl mb-2">🤖</span>
+              <Bot className="h-7 w-7 mb-2 text-primary" aria-hidden />
               AI Assistant
             </Button>
             <Button 
@@ -150,7 +150,7 @@ export const PatientDashboard = () => {
               className="h-24 text-lg flex flex-col items-center justify-center"
               variant="outline"
             >
-              <span className="text-2xl mb-2">🚨</span>
+              <Siren className="h-7 w-7 mb-2 text-destructive" aria-hidden />
               Emergency
             </Button>
           </div>

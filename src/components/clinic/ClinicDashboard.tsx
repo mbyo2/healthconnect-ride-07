@@ -11,7 +11,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Calendar, Users, Clock, TrendingUp, Star,
-  Stethoscope, Building2, CreditCard
+  Stethoscope, Building2, CreditCard, PartyPopper
 } from "lucide-react";
 
 interface ClinicDashboardProps {
@@ -59,7 +59,7 @@ export const ClinicDashboard = ({ institutionId }: ClinicDashboardProps) => {
         <div className="p-4 rounded-lg border border-primary/20 bg-primary/5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-semibold text-primary">🎉 Free Trial Active</p>
+              <p className="text-sm font-semibold text-primary flex items-center gap-1.5"><PartyPopper className="h-4 w-4" aria-hidden /> Free Trial Active</p>
               <p className="text-xs text-muted-foreground">
                 Your trial ends on {subscription?.trial_end ? new Date(subscription.trial_end).toLocaleDateString() : 'N/A'}
               </p>

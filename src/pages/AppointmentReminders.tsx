@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
 import { Bell, Mail, MessageSquare, Smartphone, Calendar, Clock } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -181,13 +182,13 @@ const AppointmentRemindersPage = () => {
               <Switch checked={pushReminders} onCheckedChange={setPushReminders} aria-label="Push notifications" />
             </div>
 
-            <button
+            <Button
               onClick={savePreferences}
               disabled={saving}
-              className="w-full py-3.5 min-h-[48px] rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs transition-all disabled:opacity-60"
+              className="w-full py-3 rounded-xl font-extrabold text-xs"
             >
               {saving ? "Saving..." : "Save Reminder Preferences"}
-            </button>
+            </Button>
           </div>
 
           {/* Upcoming Visits & Calendar Sync */}
@@ -205,23 +206,24 @@ const AppointmentRemindersPage = () => {
             ) : upcomingError ? (
               <div className="text-center py-10 space-y-3">
                 <p className="text-xs font-medium text-destructive">We couldn&apos;t load your upcoming visits.</p>
-                <button
+                <Button
                   onClick={() => refetchUpcoming()}
-                  className="px-4 py-2.5 min-h-[44px] rounded-xl bg-primary-500 text-white text-xs font-extrabold"
+                  className="px-4 py-2.5 min-h-[44px] rounded-xl text-xs font-extrabold"
                 >
                   Try again
-                </button>
+                </Button>
               </div>
             ) : upcoming.length === 0 ? (
               <div className="text-center py-10 text-xs text-graphite-500 dark:text-slate-400">
                 <Calendar className="h-10 w-10 mx-auto mb-2 opacity-30 text-primary-500" />
                 <p className="font-bold">No upcoming appointments scheduled.</p>
-                <button
+                <Button
+                  variant="link"
                   onClick={() => navigate("/search")}
-                  className="mt-3 px-3 py-2.5 min-h-[44px] text-xs font-bold text-primary-500 hover:underline"
+                  className="mt-3 px-3 py-2.5 min-h-[44px] text-xs font-bold text-primary-500"
                 >
                   Book an appointment now
-                </button>
+                </Button>
               </div>
             ) : (
               <div className="space-y-3">
@@ -241,13 +243,14 @@ const AppointmentRemindersPage = () => {
                         </p>
                       </div>
                     </div>
-                    <button
+                    <Button
+                      variant="outline"
                       onClick={() => downloadIcs(apt)}
-                      className="px-4 py-2.5 min-h-[44px] rounded-xl bg-white border border-graphite-300 dark:border-slate-700 text-primary-500 font-extrabold text-xs flex items-center gap-1.5 hover:bg-primary-50 dark:hover:bg-slate-800"
+                      className="px-4 py-2.5 min-h-[44px] rounded-xl text-primary-500 font-extrabold text-xs"
                     >
                       <Calendar className="h-3.5 w-3.5" />
                       <span>Sync to Calendar (.ics)</span>
-                    </button>
+                    </Button>
                   </div>
                 ))}
               </div>

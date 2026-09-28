@@ -49,7 +49,7 @@ const LinkifiedText = ({ text }: { text: string }) => {
   );
 };
 
-const AI_WELCOME_MESSAGE = "Hello! I'm Doc' O Clock AI Assistant, your advanced multimodal medical assistant. I can:\n\n🖼️ Analyze single or multiple medical images\n📊 Compare scans over time (longitudinal analysis)\n📄 Extract data from lab reports and documents\n🎯 Identify anatomical features with localization\n💬 Answer medical questions\n\nHow can I assist you today?";
+const AI_WELCOME_MESSAGE = "Hello! I'm Doc' O Clock AI Assistant, your advanced multimodal medical assistant. I can:\n\n• Analyze single or multiple medical images\n• Compare scans over time (longitudinal analysis)\n• Extract data from lab reports and documents\n• Identify anatomical features with localization\n• Answer medical questions\n\nHow can I assist you today?";
 
 interface MedGemmaChatProps {
   onActionClick?: (action: ClinicalAction) => void;
@@ -309,7 +309,7 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
       // deleting what they typed — losing it forces a frustrating retype.
       setMessages(prev => [...prev, {
         role: 'assistant' as const,
-        content: `⚠️ I couldn't reach the AI service just now (${errorMessage}). Your message above is kept — tap send again to retry.`,
+        content: `I couldn't reach the AI service just now (${errorMessage}). Your message above is kept — tap send again to retry.`,
         timestamp: new Date(),
       }]);
     } finally {
@@ -408,9 +408,9 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
                     {message.analysisType && message.analysisType !== 'general' && (
                       <div className="mb-2 inline-block">
                         <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
-                          {message.analysisType === 'longitudinal' && '📊 Longitudinal Analysis'}
-                          {message.analysisType === 'anatomical_localization' && '🎯 Anatomical Localization'}
-                          {message.analysisType === 'document_understanding' && '📄 Document Analysis'}
+                          {message.analysisType === 'longitudinal' && 'Longitudinal Analysis'}
+                          {message.analysisType === 'anatomical_localization' && 'Anatomical Localization'}
+                          {message.analysisType === 'document_understanding' && 'Document Analysis'}
                         </span>
                       </div>
                     )}
@@ -587,7 +587,7 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
           <div className="mt-3 flex items-center gap-2">
             <div className="flex-1">
               <p className="text-xs text-muted-foreground leading-relaxed">
-                💡 <strong>Powered by Doc' O Clock AI</strong> • Upload up to 10 medical images for AI analysis • Supports longitudinal comparison & document extraction
+                <Lightbulb className="h-3.5 w-3.5 text-amber-500" aria-hidden /> <strong>Powered by Doc' O Clock AI</strong> • Upload up to 10 medical images for AI analysis • Supports longitudinal comparison & document extraction
               </p>
             </div>
           </div>

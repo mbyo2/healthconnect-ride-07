@@ -8,8 +8,20 @@ import {
   CheckCircle2,
   Barcode,
   Layers,
+  Plus,
+  Minus,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useAuth } from "@/context/AuthContext";
 import { useCurrency } from "@/hooks/use-currency";
 
@@ -272,13 +284,13 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
           <div className="flex items-center justify-between gap-3">
             <div className="relative flex-1">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden />
-              <input
+              <Input
                 type="search"
                 aria-label="Search dispensary stock"
                 placeholder="Search essential medicine, category, or batch number..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-graphite-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-medium placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="pl-10 py-2.5 rounded-2xl text-xs font-medium"
               />
             </div>
           </div>
@@ -330,13 +342,14 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
                       <span className="text-[10px] text-slate-400 block">{item.stock} in stock</span>
                     </div>
 
-                    <button
+                    <Button
                       onClick={() => addToCart(item)}
                       aria-label={`Dispense ${item.name}`}
-                      className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs flex items-center gap-1 shadow-xs transition-all active:scale-95"
+                      size="sm"
+                      className="bg-emerald-600 hover:bg-emerald-700 font-extrabold text-xs active:scale-95"
                     >
                       <Plus className="h-3.5 w-3.5" aria-hidden /> Dispense
-                    </button>
+                    </Button>
                   </div>
                 </div>
               ))}
@@ -357,39 +370,39 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
 
           {/* Customer info */}
           <div className="space-y-2">
-            <div>
-              <label htmlFor="dsp-customer-name" className="font-bold text-slate-700 dark:text-slate-300">Customer / Patient Name</label>
-              <input
+            <div className="space-y-1">
+              <Label htmlFor="dsp-customer-name" className="font-bold text-slate-700 dark:text-slate-300">Customer / Patient Name</Label>
+              <Input
                 id="dsp-customer-name"
-                className="w-full mt-1 px-3 py-1.5 rounded-xl border border-graphite-300 dark:border-slate-700 font-medium"
+                className="font-medium"
                 placeholder="Walk-in Customer"
                 value={customerName}
                 onChange={(e) => setCustomerName(e.target.value)}
               />
             </div>
-            <div>
-              <label htmlFor="dsp-customer-phone" className="font-bold text-slate-700 dark:text-slate-300">Customer Phone (optional)</label>
-              <input
+            <div className="space-y-1">
+              <Label htmlFor="dsp-customer-phone" className="font-bold text-slate-700 dark:text-slate-300">Customer Phone (optional)</Label>
+              <Input
                 id="dsp-customer-phone"
                 type="tel"
-                className="w-full mt-1 px-3 py-1.5 rounded-xl border border-graphite-300 dark:border-slate-700 font-medium"
+                className="font-medium"
                 placeholder="+260…"
                 value={customerPhone}
                 onChange={(e) => setCustomerPhone(e.target.value)}
               />
             </div>
-            <div>
-              <label htmlFor="dsp-pay-method" className="font-bold text-slate-700 dark:text-slate-300">Payment Method</label>
-              <select
-                id="dsp-pay-method"
-                value={paymentMethod}
-                onChange={(e) => setPaymentMethod(e.target.value as any)}
-                className="w-full mt-1 px-3 py-1.5 rounded-xl border border-graphite-300 dark:border-slate-700 font-bold bg-white dark:bg-slate-950"
-              >
-                <option value="mobile_money">Mobile Money (MTN / Airtel / Zamtel)</option>
-                <option value="cash">Cash at Counter</option>
-                <option value="card">Visa / Mastercard POS</option>
-              </select>
+            <div className="space-y-1">
+              <Label htmlFor="dsp-pay-method" className="font-bold text-slate-700 dark:text-slate-300">Payment Method</Label>
+              <Select value={paymentMethod} onValueChange={(v) => setPaymentMethod(v as any)}>
+                <SelectTrigger id="dsp-pay-method" className="font-bold">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="mobile_money">Mobile Money (MTN / Airtel / Zamtel)</SelectItem>
+                  <SelectItem value="cash">Cash at Counter</SelectItem>
+                  <SelectItem value="card">Visa / Mastercard POS</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
@@ -408,21 +421,25 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
                   </div>
 
                   <div className="flex items-center gap-1.5">
-                    <button
+                    <Button
                       onClick={() => updateCartQty(c.item.id, c.qty - 1)}
                       aria-label={`Decrease quantity of ${c.item.name}`}
-                      className="h-6 w-6 rounded-md bg-white dark:bg-slate-700 font-black border text-xs flex items-center justify-center"
+                      variant="outline"
+                      size="icon"
+                      className="h-6 w-6 font-black text-xs"
                     >
-                      -
-                    </button>
+                      <Minus className="h-3 w-3" aria-hidden />
+                    </Button>
                     <span className="font-black px-1">{c.qty}</span>
-                    <button
+                    <Button
                       onClick={() => updateCartQty(c.item.id, c.qty + 1)}
                       aria-label={`Increase quantity of ${c.item.name}`}
-                      className="h-6 w-6 rounded-md bg-white dark:bg-slate-700 font-black border text-xs flex items-center justify-center"
+                      variant="outline"
+                      size="icon"
+                      className="h-6 w-6 font-black text-xs"
                     >
-                      +
-                    </button>
+                      <Plus className="h-3 w-3" aria-hidden />
+                    </Button>
                   </div>
 
                   <div className="text-right font-black text-primary-500">
@@ -440,14 +457,14 @@ export const DispensaryOperations: React.FC<{ institutionId?: string }> = ({ ins
               <span className="text-emerald-600 text-base font-black tabular-nums">{formatPrice(subtotal)}</span>
             </div>
 
-            <button
+            <Button
               onClick={handleCompleteDispensing}
               disabled={cart.length === 0 || processing}
-              className="w-full py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-extrabold text-xs shadow-sm flex items-center justify-center gap-2 transition-all active:scale-95"
+              className="w-full py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 font-extrabold text-xs active:scale-95"
             >
               <CheckCircle2 className="h-4 w-4" aria-hidden />
               {processing ? "Recording Sale…" : "Complete Dispense & Print Slip"}
-            </button>
+            </Button>
             <p className="text-[10px] text-muted-foreground text-center flex items-center justify-center gap-1">
               <Layers className="h-3 w-3" aria-hidden /> Sale is recorded and stock decremented
             </p>

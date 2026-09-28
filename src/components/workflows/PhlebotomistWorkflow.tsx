@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { Droplets, Truck, Plus, Loader2, CheckCircle } from 'lucide-react';
+import { Droplets, Truck, Plus, Loader2, CheckCircle, Home, Building2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { useInstitutionAffiliation } from '@/hooks/useInstitutionAffiliation';
@@ -180,8 +180,12 @@ export const PhlebotomistWorkflow = () => {
                   <div key={s.id} className="flex items-center justify-between p-3 rounded-lg border">
                     <div>
                       <p className="font-medium">{s.patient_name} — {s.sample_type}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {s.barcode} • {s.collection_type === 'home_visit' ? `🏠 ${s.address}` : '🏥 In-Lab'} • {s.scheduled_time}
+                      <p className="text-sm text-muted-foreground flex items-center gap-1 flex-wrap">
+                        <span>{s.barcode}</span><span aria-hidden>•</span>
+                        {s.collection_type === 'home_visit'
+                          ? (<span className="inline-flex items-center gap-1"><Home className="h-3.5 w-3.5" aria-hidden /> {s.address}</span>)
+                          : (<span className="inline-flex items-center gap-1"><Building2 className="h-3.5 w-3.5" aria-hidden /> In-Lab</span>)}
+                        <span aria-hidden>•</span><span>{s.scheduled_time}</span>
                       </p>
                     </div>
                     <div className="flex items-center gap-2">

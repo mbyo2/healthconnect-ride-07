@@ -91,7 +91,7 @@ export const OTManagement = ({ hospital }: OTProps) => {
     }
     const recent = recentSurgeryFor(form.patientName);
     if (recent) {
-      toast.warning('⚠️ This patient had a surgery within the last 30 days. Please verify there is no medical contraindication.', { duration: 8000 });
+      toast.warning('This patient had a surgery within the last 30 days. Please verify there is no medical contraindication.', { duration: 8000 });
     }
 
     setSaving(true);

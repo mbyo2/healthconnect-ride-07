@@ -177,9 +177,9 @@ export const checkDrugAllergy = (drugName: string, allergies: Allergy[]): { bloc
     const allergenLower = allergy.allergen_name.toLowerCase();
     if (drugLower.includes(allergenLower) || allergenLower.includes(drugLower)) {
       if (allergy.severity === 'severe' || allergy.severity === 'life_threatening') {
-        return { blocked: true, warning: `⛔ BLOCKED: ${drugName} matches known allergy "${allergy.allergen_name}" (${allergy.severity}). Choose an alternative.` };
+        return { blocked: true, warning: `BLOCKED: ${drugName} matches known allergy "${allergy.allergen_name}" (${allergy.severity}). Choose an alternative.` };
       }
-      return { blocked: false, warning: `⚠️ WARNING: ${drugName} may cause reaction. Patient allergic to "${allergy.allergen_name}" (${allergy.severity}).` };
+      return { blocked: false, warning: `WARNING: ${drugName} may cause reaction. Patient allergic to "${allergy.allergen_name}" (${allergy.severity}).` };
     }
   }
   return { blocked: false, warning: null };

@@ -135,10 +135,10 @@ export const ReceptionistWorkflow = () => {
                 <Select value={formData.priority} onValueChange={v => setFormData(prev => ({ ...prev, priority: v as any }))}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="emergency">🔴 Emergency</SelectItem>
-                    <SelectItem value="urgent">🟠 Urgent</SelectItem>
-                    <SelectItem value="normal">🟢 Normal</SelectItem>
-                    <SelectItem value="low">⚪ Low</SelectItem>
+                    <SelectItem value="emergency"><span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-destructive" aria-hidden /> Emergency</span></SelectItem>
+                    <SelectItem value="urgent"><span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-orange-500" aria-hidden /> Urgent</span></SelectItem>
+                    <SelectItem value="normal"><span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-emerald-500" aria-hidden /> Normal</span></SelectItem>
+                    <SelectItem value="low"><span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-slate-300" aria-hidden /> Low</span></SelectItem>
                   </SelectContent>
                 </Select>
               </div>

@@ -4,7 +4,7 @@ import { SymptomCollector } from "@/components/SymptomCollector";
 import { AIDiagnosisHistory } from "@/components/AIDiagnosisHistory";
 import { DocumentAnalysisUploader } from "@/components/ai/DocumentAnalysisUploader";
 import { Imaging3DUploader } from "@/components/ai/Imaging3DUploader";
-import { Brain, MessageSquare, ClipboardList, Shield, History, FileText, Layers, AlertCircle } from "lucide-react";
+import { Brain, MessageSquare, ClipboardList, Shield, History, FileText, Layers, AlertCircle, TriangleAlert } from "lucide-react";
 import { useState } from "react";
 import { ClinicalAction } from "@/components/ai/ClinicalDecisionCard";
 
@@ -155,7 +155,7 @@ const AIDiagnostics = () => {
             <AlertCircle className="h-5 w-5 text-warning-500 flex-shrink-0 mt-0.5" />
             <div>
               <p className="font-extrabold text-slate-900 flex items-center gap-1.5">
-                <span aria-hidden="true">⚠️</span> Important safety note
+                <TriangleAlert className="h-4 w-4 text-warning-500" aria-hidden /> Important safety note
               </p>
               <p className="text-graphite-500 dark:text-slate-400 mt-0.5 leading-relaxed font-medium">
                 <strong className="text-slate-900 dark:text-slate-100">If this is an emergency, call 991 or 112 now.</strong>{" "}

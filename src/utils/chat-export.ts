@@ -33,7 +33,7 @@ export const exportChatAsMarkdown = (messages: ChatMessage[], conversationTitle:
 
     messages.forEach((msg, idx) => {
         const time = msg.timestamp.toLocaleString();
-        const role = msg.role === 'user' ? '👤 You' : '🤖 Doc 0 Clock';
+        const role = msg.role === 'user' ? 'You' : "Doc' O Clock";
 
         markdown += `## Message ${idx + 1} - ${role}\n`;
         markdown += `*${time}*\n\n`;

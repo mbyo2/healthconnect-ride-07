@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ChevronLeft, Loader2, ShieldCheck } from 'lucide-react';
+import { ChevronLeft, Loader2, ShieldCheck, CheckCircle2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
@@ -94,7 +94,7 @@ const CreateAdmin: React.FC = () => {
         <CardContent className="space-y-4">
           {credentials ? (
             <div className="bg-muted p-4 rounded-md space-y-1">
-              <h3 className="font-semibold text-sm">✅ Account Created</h3>
+              <h3 className="font-semibold text-sm flex items-center gap-1.5"><CheckCircle2 className="h-4 w-4 text-emerald-600" aria-hidden /> Account Created</h3>
               <p className="text-sm"><span className="font-medium">Email:</span> {credentials.email}</p>
               <p className="text-sm"><span className="font-medium">Level:</span> {credentials.adminLevel}</p>
               <p className="text-xs text-muted-foreground mt-2">The user can now log in with the credentials you set.</p>

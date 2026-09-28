@@ -18,6 +18,19 @@ import {
   FileText,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Slider } from "@/components/ui/slider";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface JointROM {
   id: string;
@@ -216,45 +229,30 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
 
         {/* Patient Selection dropdown */}
         <div className="flex items-center gap-2">
-          <select
-            value={selectedPatientId}
-            onChange={(e) => setSelectedPatientId(e.target.value)}
-            className="px-4 py-2 rounded-xl bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-xs font-bold border border-white/30 focus:outline-none"
-          >
-            {patients.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.first_name} {p.last_name}
-              </option>
-            ))}
-          </select>
+          <Select value={selectedPatientId} onValueChange={setSelectedPatientId}>
+            <SelectTrigger className="w-56 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-xs font-bold border-white/30">
+              <SelectValue placeholder="Select patient" />
+            </SelectTrigger>
+            <SelectContent>
+              {patients.map((p) => (
+                <SelectItem key={p.id} value={p.id}>
+                  {p.first_name} {p.last_name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-2 border-b border-canvas-silk dark:border-slate-800 pb-2 overflow-x-auto">
-        {[
-          { id: "rom", label: "Range of Motion (ROM Goniometry)", icon: Activity },
-          { id: "pain", label: "Pain Assessment (VAS 0-10)", icon: Flame },
-          { id: "exercises", label: "Rehabilitation Exercise Rx", icon: Dumbbell },
-          { id: "sessions", label: "Therapy Session Records", icon: ClipboardList },
-        ].map((tab) => {
-          const Icon = tab.icon;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
-              className={`px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2 transition-all shrink-0 ${
-                activeTab === tab.id
-                  ? "bg-primary-500 text-white shadow-xs"
-                  : "bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-canvas-mist dark:hover:bg-slate-800"
-              }`}
-            >
-              <Icon className="h-4 w-4" />
-              <span>{tab.label}</span>
-            </button>
-          );
-        })}
-      </div>
+      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
+        <TabsList className="w-full justify-start overflow-x-auto">
+          <TabsTrigger value="rom" className="text-xs font-extrabold shrink-0"><Activity className="h-4 w-4" />Range of Motion (ROM Goniometry)</TabsTrigger>
+          <TabsTrigger value="pain" className="text-xs font-extrabold shrink-0"><Flame className="h-4 w-4" />Pain Assessment (VAS 0-10)</TabsTrigger>
+          <TabsTrigger value="exercises" className="text-xs font-extrabold shrink-0"><Dumbbell className="h-4 w-4" />Rehabilitation Exercise Rx</TabsTrigger>
+          <TabsTrigger value="sessions" className="text-xs font-extrabold shrink-0"><ClipboardList className="h-4 w-4" />Therapy Session Records</TabsTrigger>
+        </TabsList>
+      </Tabs>
 
       {/* 1. ROM Goniometry */}
       {activeTab === "rom" && (
@@ -271,9 +269,9 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
 
             <Dialog open={showAddROM} onOpenChange={setShowAddROM}>
               <DialogTrigger asChild>
-                <button className="px-4 py-2 rounded-xl bg-primary-500 text-white text-xs font-extrabold flex items-center gap-1.5 shadow-xs">
+                <Button size="sm" className="text-xs font-extrabold">
                   <Plus className="h-4 w-4" /> Add Joint Measurement
-                </button>
+                </Button>
               </DialogTrigger>
               <DialogContent className="max-w-md bg-white dark:bg-slate-900 rounded-3xl p-6">
                 <DialogHeader>
@@ -281,18 +279,16 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
                 </DialogHeader>
                 <div className="space-y-3 py-2 text-xs">
                   <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <label className="font-bold">Joint *</label>
-                      <input
-                        className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700"
+                    <div className="space-y-1">
+                      <Label className="font-bold">Joint *</Label>
+                      <Input
                         value={newJoint.joint}
                         onChange={(e) => setNewJoint({ ...newJoint, joint: e.target.value })}
                       />
                     </div>
-                    <div>
-                      <label className="font-bold">Movement *</label>
-                      <input
-                        className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700"
+                    <div className="space-y-1">
+                      <Label className="font-bold">Movement *</Label>
+                      <Input
                         value={newJoint.movement}
                         onChange={(e) => setNewJoint({ ...newJoint, movement: e.target.value })}
                       />
@@ -300,39 +296,35 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
                   </div>
 
                   <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <label className="font-bold">Left Side (°)</label>
-                      <input
+                    <div className="space-y-1">
+                      <Label className="font-bold">Left Side (°)</Label>
+                      <Input
                         type="number"
-                        className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700"
                         value={newJoint.leftDegrees}
                         onChange={(e) => setNewJoint({ ...newJoint, leftDegrees: parseInt(e.target.value) || 0 })}
                       />
                     </div>
-                    <div>
-                      <label className="font-bold">Right Side (°)</label>
-                      <input
+                    <div className="space-y-1">
+                      <Label className="font-bold">Right Side (°)</Label>
+                      <Input
                         type="number"
-                        className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700"
                         value={newJoint.rightDegrees}
                         onChange={(e) => setNewJoint({ ...newJoint, rightDegrees: parseInt(e.target.value) || 0 })}
                       />
                     </div>
                   </div>
 
-                  <div>
-                    <label className="font-bold">Normal Range (°)</label>
-                    <input
-                      className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700"
+                  <div className="space-y-1">
+                    <Label className="font-bold">Normal Range (°)</Label>
+                    <Input
                       value={newJoint.normalRange}
                       onChange={(e) => setNewJoint({ ...newJoint, normalRange: e.target.value })}
                     />
                   </div>
 
-                  <div>
-                    <label className="font-bold">Clinical Notes</label>
-                    <input
-                      className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700"
+                  <div className="space-y-1">
+                    <Label className="font-bold">Clinical Notes</Label>
+                    <Input
                       placeholder="End-feel, pain at end range, clicking..."
                       value={newJoint.notes}
                       onChange={(e) => setNewJoint({ ...newJoint, notes: e.target.value })}
@@ -340,8 +332,8 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
                   </div>
                 </div>
                 <DialogFooter>
-                  <button onClick={() => setShowAddROM(false)} className="px-4 py-2 font-bold text-slate-500">Cancel</button>
-                  <button onClick={handleAddROM} className="px-5 py-2.5 rounded-xl bg-primary-500 text-white font-extrabold">Save ROM</button>
+                  <Button variant="ghost" onClick={() => setShowAddROM(false)}>Cancel</Button>
+                  <Button onClick={handleAddROM}>Save ROM</Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
@@ -425,7 +417,7 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
             <div className="p-5 rounded-3xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs space-y-4 text-xs">
               <div>
                 <div className="flex justify-between items-center mb-2">
-                  <label className="font-black text-sm">Visual Analog Scale (VAS): {painScore} / 10</label>
+                  <Label className="font-black text-sm">Visual Analog Scale (VAS): {painScore} / 10</Label>
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-black text-white ${
                       painScore <= 3 ? "bg-emerald-500" : painScore <= 6 ? "bg-amber-500" : "bg-rose-500"
@@ -434,13 +426,13 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
                     {painScore <= 3 ? "Mild" : painScore <= 6 ? "Moderate" : "Severe"}
                   </span>
                 </div>
-                <input
-                  type="range"
-                  min="0"
-                  max="10"
-                  value={painScore}
-                  onChange={(e) => setPainScore(parseInt(e.target.value))}
-                  className="w-full h-2.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-primary-500"
+                <Slider
+                  min={0}
+                  max={10}
+                  step={1}
+                  value={[painScore]}
+                  onValueChange={([v]) => setPainScore(v)}
+                  aria-label="Pain score 0 to 10"
                 />
                 <div className="flex justify-between text-[10px] font-bold text-slate-400 mt-1">
                   <span>0 - No Pain</span>
@@ -449,41 +441,41 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
                 </div>
               </div>
 
-              <div>
-                <label className="font-bold text-slate-700 dark:text-slate-300">Anatomical Region / Location *</label>
-                <input
-                  className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-medium"
+              <div className="space-y-1">
+                <Label className="font-bold text-slate-700 dark:text-slate-300">Anatomical Region / Location *</Label>
+                <Input
                   value={painLocation}
                   onChange={(e) => setPainLocation(e.target.value)}
+                  placeholder="e.g. Left lumbar region"
                 />
               </div>
 
-              <div>
-                <label className="font-bold text-slate-700 dark:text-slate-300">Aggravating Factors</label>
-                <textarea
+              <div className="space-y-1">
+                <Label className="font-bold text-slate-700 dark:text-slate-300">Aggravating Factors</Label>
+                <Textarea
                   rows={2}
-                  className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-medium"
                   value={aggravatingFactors}
                   onChange={(e) => setAggravatingFactors(e.target.value)}
+                  placeholder="What makes it worse…"
                 />
               </div>
 
-              <div>
-                <label className="font-bold text-slate-700 dark:text-slate-300">Relieving Factors</label>
-                <textarea
+              <div className="space-y-1">
+                <Label className="font-bold text-slate-700 dark:text-slate-300">Relieving Factors</Label>
+                <Textarea
                   rows={2}
-                  className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-medium"
                   value={relievingFactors}
                   onChange={(e) => setRelievingFactors(e.target.value)}
+                  placeholder="What eases it…"
                 />
               </div>
 
-              <button
+              <Button
                 onClick={() => toast.success(`VAS ${painScore}/10 assessed — file it with the session on the Sessions tab`)}
-                className="w-full py-2.5 rounded-xl bg-primary-500 text-white font-extrabold shadow-xs hover:bg-primary-600"
+                className="w-full"
               >
                 Log Pain Assessment
-              </button>
+              </Button>
             </div>
 
               {/* Pain Trend Summary — derived from filed sessions for this patient */}
@@ -529,7 +521,8 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
                 </div>
               </div>
 
-              <button
+              <Button
+                variant="secondary"
                 onClick={() => {
                   const lines = [
                     `PHYSIOTHERAPY SUMMARY — ${activePatientName || "no patient selected"} (filed chart sessions)`,
@@ -555,10 +548,10 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
                   printWin.document.close();
                   toast.success("Summary sent to printer");
                 }}
-                className="w-full py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-extrabold text-xs border border-white/20"
+                className="w-full bg-white/10 hover:bg-white/20 text-white font-extrabold text-xs border border-white/20"
               >
                 Print Session Summary
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -576,7 +569,8 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
                 Starter protocol templates — customize sets, reps and equipment per patient before sharing
               </p>
             </div>
-            <button
+            <Button
+              size="sm"
               onClick={async () => {
                 const text = exercises
                   .map((ex) => `• ${ex.name} (${ex.targetArea}): ${ex.sets} sets × ${ex.reps}, ${ex.frequency} — ${ex.equipment}`)
@@ -589,10 +583,10 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
                   toast.error("Copy failed — your browser blocked clipboard access");
                 }
               }}
-              className="px-4 py-2 rounded-xl bg-primary-500 text-white font-extrabold text-xs shadow-xs"
+              className="font-extrabold text-xs"
             >
               Copy Plan to Share
-            </button>
+            </Button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -646,45 +640,45 @@ export const PhysiotherapyCenter: React.FC<{ institutionId?: string }> = ({ inst
           </div>
 
           <div className="p-4 rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-            <div>
-              <label className="font-bold">Pre-treatment VAS (0–10) *</label>
-              <input
+            <div className="space-y-1">
+              <Label className="font-bold">Pre-treatment VAS (0–10) *</Label>
+              <Input
                 type="number" min={0} max={10}
-                className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-bold"
+                className="font-bold"
                 value={sessPainPre}
                 onChange={(e) => setSessPainPre(Math.min(10, Math.max(0, parseInt(e.target.value) || 0)))}
               />
             </div>
-            <div>
-              <label className="font-bold">Post-treatment VAS (0–10) *</label>
-              <input
+            <div className="space-y-1">
+              <Label className="font-bold">Post-treatment VAS (0–10) *</Label>
+              <Input
                 type="number" min={0} max={10}
-                className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-bold"
+                className="font-bold"
                 value={sessPainPost}
                 onChange={(e) => setSessPainPost(Math.min(10, Math.max(0, parseInt(e.target.value) || 0)))}
               />
             </div>
-            <div className="sm:col-span-2">
-              <label className="font-bold">Modalities &amp; interventions applied *</label>
-              <textarea
+            <div className="sm:col-span-2 space-y-1">
+              <Label className="font-bold">Modalities &amp; interventions applied *</Label>
+              <Textarea
                 rows={2}
-                className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700"
                 placeholder="e.g. Deep tissue trigger point, eccentric loading, dynamic balance training…"
                 value={sessModalities}
                 onChange={(e) => setSessModalities(e.target.value)}
               />
               {romList.length > 0 && (
-                <p className="text-[11px] text-slate-500 mt-1">{romList.length} ROM reading{romList.length === 1 ? "" : "s"} from the worksheet will attach to this session&apos;s notes.</p>
+                <p className="text-[11px] text-slate-500 mt-1">{romList.length} ROM reading{romList.length === 1 ? "" : "s"} staged — they will attach to this session&apos;s notes.</p>
               )}
             </div>
             <div className="sm:col-span-2">
-              <button
+              <Button
                 onClick={handleLogSession}
                 disabled={savingSession}
-                className="px-4 py-2 rounded-xl bg-primary-500 text-white font-extrabold text-xs shadow-xs flex items-center gap-1.5 disabled:opacity-50"
+                size="sm"
+                className="font-extrabold text-xs"
               >
                 <Plus className="h-4 w-4" /> {savingSession ? "Filing…" : "File Session to Chart"}
-              </button>
+              </Button>
             </div>
           </div>
 

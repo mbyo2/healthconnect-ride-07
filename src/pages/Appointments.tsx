@@ -27,7 +27,8 @@ import {
   ChevronDown,
   ChevronRight,
   Plus,
-  Info
+  Info,
+  Wallet
 } from "lucide-react";
 
 export const AppointmentsPage = () => {
@@ -382,19 +383,19 @@ export const AppointmentsPage = () => {
                                       <div className="flex flex-wrap gap-1 mt-1">
                                         {(person?.consultation_fee_min || person?.consultation_fee_max) && (
                                           <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-[9px] font-black bg-primary-50 text-primary-500">
-                                            💰 {person.consultation_fee_min && person.consultation_fee_max
+                                            <Wallet className="h-2.5 w-2.5" aria-hidden /> {person.consultation_fee_min && person.consultation_fee_max
                                               ? `K${person.consultation_fee_min}–K${person.consultation_fee_max}`
                                               : `From K${person.consultation_fee_min ?? person.consultation_fee_max}`}
                                           </span>
                                         )}
                                         {person?.telemedicine_available && (
                                           <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-[9px] font-black bg-emerald-50 text-emerald-700">
-                                            📹 Telemedicine
+                                            <Video className="h-2.5 w-2.5" aria-hidden /> Telemedicine
                                           </span>
                                         )}
                                         {person?.typical_wait_time && (
                                           <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-[9px] font-black bg-amber-50 text-amber-700">
-                                            ⏱ {person.typical_wait_time}
+                                            <Clock className="h-2.5 w-2.5" aria-hidden /> {person.typical_wait_time}
                                           </span>
                                         )}
                                       </div>
@@ -512,13 +513,13 @@ export const AppointmentsPage = () => {
                                   {!isProvider && (person?.consultation_fee_min || person?.telemedicine_available) && (
                                     <div className="flex flex-wrap gap-1 mt-1">
                                       {person?.consultation_fee_min && (
-                                        <span className="text-[9px] font-black px-1.5 py-0.5 rounded-md bg-primary-50 text-primary-500">
-                                          💰 From K{person.consultation_fee_min}
+                                        <span className="inline-flex items-center gap-0.5 text-[9px] font-black px-1.5 py-0.5 rounded-md bg-primary-50 text-primary-500">
+                                          <Wallet className="h-2.5 w-2.5" aria-hidden /> From K{person.consultation_fee_min}
                                         </span>
                                       )}
                                       {person?.telemedicine_available && (
-                                        <span className="text-[9px] font-black px-1.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700">
-                                          📹 Telemedicine
+                                        <span className="inline-flex items-center gap-0.5 text-[9px] font-black px-1.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700">
+                                          <Video className="h-2.5 w-2.5" aria-hidden /> Telemedicine
                                         </span>
                                       )}
                                     </div>

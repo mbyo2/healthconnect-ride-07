@@ -13,8 +13,20 @@ import {
   HeartPulse,
   Syringe,
   Sparkles,
+  RefreshCw,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface ClinicalProcedure {
   id: string;
@@ -221,88 +233,89 @@ export const ClinicalProceduresDesk: React.FC<{ institutionId?: string }> = ({ i
         <div className="flex items-center gap-2">
           <Dialog open={showNewModal} onOpenChange={setShowNewModal}>
             <DialogTrigger asChild>
-              <button className="px-4 py-2 rounded-xl bg-white text-slate-900 font-extrabold text-xs flex items-center gap-1.5 shadow-sm hover:bg-slate-100 transition-all">
+              <Button size="sm" className="bg-white text-slate-900 hover:bg-slate-100 font-extrabold text-xs">
                 <Plus className="h-4 w-4" /> Log Clinical Procedure
-              </button>
+              </Button>
             </DialogTrigger>
             <DialogContent className="max-w-lg bg-white dark:bg-slate-900 rounded-3xl p-6">
               <DialogHeader>
                 <DialogTitle className="font-black text-lg">Record Procedure &amp; Medical Codes</DialogTitle>
               </DialogHeader>
               <div className="space-y-3 py-2 text-xs">
-                <div>
-                  <label className="font-bold">Patient (admitted to this facility) *</label>
-                  <select
-                    className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-bold bg-white dark:bg-slate-950"
-                    value={selectedPatientId}
-                    onChange={(e) => setSelectedPatientId(e.target.value)}
-                  >
-                    {roster.length === 0 && <option value="">No admitted patients found</option>}
-                    {roster.map((p) => (
-                      <option key={p.id} value={p.id}>{p.name}</option>
-                    ))}
-                  </select>
+                <div className="space-y-1">
+                  <Label className="font-bold">Patient (admitted to this facility) *</Label>
+                  <Select value={selectedPatientId} onValueChange={setSelectedPatientId}>
+                    <SelectTrigger className="font-bold">
+                      <SelectValue placeholder={roster.length === 0 ? "No admitted patients found" : "Select patient"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {roster.map((p) => (
+                        <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
-                <div>
-                  <label className="font-bold">Primary Diagnosis (ICD-10 Standard) *</label>
-                  <select
-                    className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-bold bg-white dark:bg-slate-950"
-                    value={selectedIcd}
-                    onChange={(e) => setSelectedIcd(e.target.value)}
-                  >
-                    {COMMON_ICD10.map((icd) => (
-                      <option key={icd.code} value={icd.code}>
-                        {icd.code} - {icd.label}
-                      </option>
-                    ))}
-                  </select>
+                <div className="space-y-1">
+                  <Label className="font-bold">Primary Diagnosis (ICD-10 Standard) *</Label>
+                  <Select value={selectedIcd} onValueChange={setSelectedIcd}>
+                    <SelectTrigger className="font-bold">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {COMMON_ICD10.map((icd) => (
+                        <SelectItem key={icd.code} value={icd.code}>
+                          {icd.code} - {icd.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
-                <div>
-                  <label className="font-bold">Procedure (live catalog) *</label>
-                  <select
-                    className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-bold bg-white dark:bg-slate-950"
-                    value={selectedProcedureId}
-                    onChange={(e) => setSelectedProcedureId(e.target.value)}
-                  >
-                    {catalog.length === 0 && <option value="">Loading catalog…</option>}
-                    {catalog.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.procedure_code} - {c.procedure_name}
-                      </option>
-                    ))}
-                  </select>
+                <div className="space-y-1">
+                  <Label className="font-bold">Procedure (live catalog) *</Label>
+                  <Select value={selectedProcedureId} onValueChange={setSelectedProcedureId}>
+                    <SelectTrigger className="font-bold">
+                      <SelectValue placeholder={catalog.length === 0 ? "Loading catalog…" : "Select procedure"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {catalog.map((c) => (
+                        <SelectItem key={c.id} value={c.id}>
+                          {c.procedure_code} - {c.procedure_name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
-                <div>
-                  <label className="font-bold">Status *</label>
-                  <select
-                    className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700 font-bold bg-white dark:bg-slate-950"
-                    value={selectedStatus}
-                    onChange={(e) => setSelectedStatus(e.target.value as ClinicalProcedure["status"])}
-                  >
-                    {(["Scheduled", "In Progress", "Completed"] as const).map((s) => (
-                      <option key={s} value={s}>{s}</option>
-                    ))}
-                  </select>
+                <div className="space-y-1">
+                  <Label className="font-bold">Status *</Label>
+                  <Select value={selectedStatus} onValueChange={(v) => setSelectedStatus(v as ClinicalProcedure["status"])}>
+                    <SelectTrigger className="font-bold">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {(["Scheduled", "In Progress", "Completed"] as const).map((s) => (
+                        <SelectItem key={s} value={s}>{s}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
-                <label className="flex items-start gap-2 text-xs font-bold cursor-pointer">
-                  <input
-                    type="checkbox"
+                <div className="flex items-start gap-2 text-xs font-bold">
+                  <Checkbox
+                    id="proc-consent"
                     checked={consentSigned}
-                    onChange={(e) => setConsentSigned(e.target.checked)}
-                    className="mt-0.5 h-4 w-4 accent-emerald-600"
+                    onCheckedChange={(v) => setConsentSigned(v === true)}
+                    className="mt-0.5"
                   />
-                  <span>Patient (or guardian) consent confirmed and recorded *</span>
-                </label>
+                  <Label htmlFor="proc-consent" className="cursor-pointer">Patient (or guardian) consent confirmed and recorded *</Label>
+                </div>
 
-                <div>
-                  <label className="font-bold">Procedure Clinical Notes &amp; Findings</label>
-                  <textarea
+                <div className="space-y-1">
+                  <Label className="font-bold">Procedure Clinical Notes &amp; Findings</Label>
+                  <Textarea
                     rows={2}
-                    className="w-full mt-1 px-3 py-2 rounded-xl border border-graphite-300 dark:border-slate-700"
                     placeholder="Observations, anesthesia used, post-procedure recovery..."
                     value={procedureNotes}
                     onChange={(e) => setProcedureNotes(e.target.value)}
@@ -310,10 +323,10 @@ export const ClinicalProceduresDesk: React.FC<{ institutionId?: string }> = ({ i
                 </div>
               </div>
               <DialogFooter>
-                <button onClick={() => setShowNewModal(false)} className="px-4 py-2 font-bold text-slate-500">Cancel</button>
-                <button onClick={handleCreateProcedure} disabled={saving} className="px-5 py-2.5 rounded-xl bg-primary-500 text-white font-extrabold disabled:opacity-50">
+                <Button variant="ghost" onClick={() => setShowNewModal(false)}>Cancel</Button>
+                <Button onClick={handleCreateProcedure} disabled={saving}>
                   {saving ? "Saving…" : "Save Procedure"}
-                </button>
+                </Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
@@ -353,12 +366,14 @@ export const ClinicalProceduresDesk: React.FC<{ institutionId?: string }> = ({ i
         </div>
 
         <div className="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-canvas-silk dark:border-slate-800 shadow-xs flex flex-col justify-center text-center">
-          <button
+          <Button
+            variant="link"
+            size="sm"
             onClick={() => toast.info("No monitor connected — pair a Bluetooth monitor from IoT Monitoring for live vitals")}
-            className="text-[11px] font-extrabold text-primary-500 hover:underline"
+            className="text-[11px] font-extrabold text-primary-500"
           >
-            🔄 Sync IoT Vitals
-          </button>
+            <RefreshCw className="h-3.5 w-3.5" /> Sync IoT Vitals
+          </Button>
         </div>
       </div>
 
