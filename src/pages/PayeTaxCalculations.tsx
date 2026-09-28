@@ -7,6 +7,7 @@ import {
   CheckCircle, AlertTriangle, BarChart3, FileText, RefreshCw
 } from "lucide-react";
 import { LoadingScreen } from "@/components/LoadingScreen";
+import { calculatePAYE } from "@/utils/zambiaPayroll";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -167,25 +168,39 @@ export const PayeTaxCalculations = () => {
   const handleCalculatePaye = async () => {
     if (!institution) return;
 
-    // Calculate PAYE based on Zambia's current tax slabs
-    const taxableIncome = calcForm.gross_income - calcForm.tax_exempt_amount;
+    const taxableIncome = Math.max(0, calcForm.gross_income - calcForm.tax_exempt_amount);
     let totalTax = 0;
     const slabApplied: any[] = [];
+    let engine = "institution slabs";
 
-    // Zambia PAYE calculation logic (simplified - actual rates may vary)
-    // This is a placeholder for the actual Zambia PAYE calculation
     const sortedSlabs = [...taxSlabs].sort((a, b) => a.min_income - b.min_income);
-    
-    for (const slab of sortedSlabs) {
-      if (taxableIncome > slab.min_income) {
-        const taxableInSlab = Math.min(taxableIncome, slab.max_income || Infinity) - slab.min_income;
-        const slabTax = slab.fixed_amount + (taxableInSlab * slab.plus_percentage_above_min / 100);
-        totalTax += slabTax;
-        slabApplied.push({
-          slab_id: slab.id,
-          slab_name: slab.slab_name,
-          tax_calculated: slabTax,
-        });
+
+    if (sortedSlabs.length === 0) {
+      // No custom slabs configured: fall back to the verified statutory ZRA
+      // bands — never record K0 tax as a calculated result.
+      const paye = calculatePAYE(taxableIncome);
+      totalTax = paye.total;
+      engine = "zra-statutory";
+      ([
+        ["Band 1: K0–K5,100 @ 0%", paye.band1],
+        ["Band 2: K5,101–K7,100 @ 20%", paye.band2],
+        ["Band 3: K7,101–K9,200 @ 30%", paye.band3],
+        ["Band 4: Above K9,200 @ 37%", paye.band4],
+      ] as const).forEach(([slab_name, tax_calculated]) => {
+        slabApplied.push({ slab_id: null, slab_name, tax_calculated });
+      });
+    } else {
+      for (const slab of sortedSlabs) {
+        if (taxableIncome > slab.min_income) {
+          const taxableInSlab = Math.min(taxableIncome, slab.max_income || Infinity) - slab.min_income;
+          const slabTax = slab.fixed_amount + (taxableInSlab * slab.plus_percentage_above_min / 100);
+          totalTax += slabTax;
+          slabApplied.push({
+            slab_id: slab.id,
+            slab_name: slab.slab_name,
+            tax_calculated: slabTax,
+          });
+        }
       }
     }
 
@@ -199,6 +214,7 @@ export const PayeTaxCalculations = () => {
         taxable_income: taxableIncome,
         total_paye_tax: totalTax,
         slab_applied: slabApplied,
+        engine,
         calculated_by: (await supabase.auth.getUser()).data.user?.id,
       });
 
@@ -352,6 +368,11 @@ export const PayeTaxCalculations = () => {
               <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>
                   <DialogTitle className="text-lg font-extrabold">Calculate PAYE Tax</DialogTitle>
+                  <p className="text-xs text-muted-foreground">
+                    {taxSlabs.length === 0
+                      ? "No custom slabs configured — the verified ZRA 2024/25 statutory bands apply."
+                      : `Applies this institution's ${taxSlabs.length} custom slab${taxSlabs.length === 1 ? "" : "s"}.`}
+                  </p>
                 </DialogHeader>
                 <div className="space-y-4 py-4">
                   <div>
@@ -556,6 +577,7 @@ export const PayeTaxCalculations = () => {
                     <th className="text-left text-xs font-extrabold px-4 py-3">Gross Income</th>
                     <th className="text-left text-xs font-extrabold px-4 py-3">Taxable Income</th>
                     <th className="text-left text-xs font-extrabold px-4 py-3">PAYE Tax</th>
+                    <th className="text-left text-xs font-extrabold px-4 py-3">Engine</th>
                     <th className="text-left text-xs font-extrabold px-4 py-3">Calculated</th>
                     <th className="text-left text-xs font-extrabold px-4 py-3">Actions</th>
                   </tr>
@@ -579,6 +601,11 @@ export const PayeTaxCalculations = () => {
                       </td>
                       <td className="px-4 py-3 text-xs font-bold text-error-500">
                         {institution.currency || "ZMW"} {calc.total_paye_tax.toFixed(2)}
+                      </td>
+                      <td className="px-4 py-3">
+                        <Badge variant="outline" className="text-[10px]" title={(calc as any).engine === 'zra-statutory' ? 'ZRA 2024/25 statutory bands (no custom slabs configured)' : 'This institution\u2019s custom tax slabs'}>
+                          {(calc as any).engine === 'zra-statutory' ? 'ZRA statutory' : 'Custom slabs'}
+                        </Badge>
                       </td>
                       <td className="px-4 py-3 text-xs text-graphite-500 dark:text-slate-400">
                         {new Date(calc.calculated_at).toLocaleDateString()}

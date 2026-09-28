@@ -8,6 +8,7 @@ import {
   Play, Pause, AlertCircle, Info, Zap, Database, Lock, Key
 } from "lucide-react";
 import { LoadingScreen } from "@/components/LoadingScreen";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -190,55 +191,104 @@ export const ZraSmartInvoiceIntegration = () => {
     }
   };
 
+  // Real device handshake — never mark a fiscal device initialized without
+  // contacting it. The browser attempts the configured base URL (8s timeout);
+  // unreachable devices keep pending_setup status and log a failed attempt.
+  const probeVsdc = async (baseUrl: string): Promise<{ ok: boolean; detail: string; durationMs: number }> => {
+    const started = Date.now();
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 8000);
+    try {
+      const res = await fetch(baseUrl, { method: "GET", signal: controller.signal, mode: "no-cors" });
+      // no-cors yields an opaque response — reaching the host at all counts.
+      return { ok: true, detail: `HTTP ${res.status} (opaque no-cors probe)`, durationMs: Date.now() - started };
+    } catch (e: any) {
+      const reason = e?.name === "AbortError" ? "timed out after 8s" : (e?.message || "unreachable");
+      return { ok: false, detail: `Device unreachable: ${reason}`, durationMs: Date.now() - started };
+    } finally {
+      clearTimeout(timer);
+    }
+  };
+
   const handleInitializeVSDC = async () => {
     if (!institution || !settings) return;
+    const baseUrl = (settings.vsdc_base_url || "").trim();
+    if (!baseUrl) {
+      toast.error("Enter the VSDC base URL in Settings first — nothing was attempted.");
+      return;
+    }
 
+    const startedAt = new Date().toISOString();
     try {
-      // This would call your VSDC gateway service
+      const probe = await probeVsdc(baseUrl);
       const { error } = await supabase.from("vsdc_operation_logs").insert({
         institution_id: institution.id,
         operation_type: "initialize",
-        operation_status: "success",
-        request_payload: { tpin: settings.tpin, bhfId: settings.bhf_id, dvcSrlNo: settings.device_serial_number },
-        response_payload: { message: "VSDC initialization simulated" },
-        started_at: new Date().toISOString(),
+        operation_status: probe.ok ? "success" : "error",
+        request_payload: { tpin: settings.tpin, bhfId: settings.bhf_id, dvcSrlNo: settings.device_serial_number, base_url: baseUrl },
+        response_payload: { message: probe.detail },
+        error_message: probe.ok ? null : probe.detail,
+        started_at: startedAt,
         completed_at: new Date().toISOString(),
-        duration_ms: 500,
+        duration_ms: probe.durationMs,
       });
-
       if (error) throw error;
 
-      // Update settings
-      await supabase.from("institution_smart_invoice_settings").update({
-        status: settings.environment === "sandbox" ? "sandbox" : "active",
-        initialized_at: new Date().toISOString(),
-        last_health_check_at: new Date().toISOString(),
-      }).eq("institution_id", institution.id);
+      if (probe.ok) {
+        await supabase.from("institution_smart_invoice_settings").update({
+          status: settings.environment === "sandbox" ? "sandbox" : "active",
+          initialized_at: new Date().toISOString(),
+          last_health_check_at: new Date().toISOString(),
+          last_error: null,
+        }).eq("institution_id", institution.id);
+        toast.success("VSDC device responded — fiscal link recorded.");
+      } else {
+        await supabase.from("institution_smart_invoice_settings").update({
+          last_error: probe.detail,
+          last_health_check_at: new Date().toISOString(),
+        }).eq("institution_id", institution.id);
+        toast.error(`VSDC device did not respond (${probe.detail}). Status unchanged — not marked active.`);
+      }
 
       fetchZraData();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error initializing VSDC:", error);
+      toast.error(error?.message || "Initialization attempt failed before logging.");
     }
   };
 
   const handleSyncCodes = async () => {
-    if (!institution) return;
+    if (!institution || !settings) return;
+    const baseUrl = (settings.vsdc_base_url || "").trim();
+    if (!baseUrl) {
+      toast.error("Enter the VSDC base URL in Settings first — nothing was attempted.");
+      return;
+    }
 
+    const startedAt = new Date().toISOString();
     try {
+      const probe = await probeVsdc(baseUrl);
       await supabase.from("vsdc_operation_logs").insert({
         institution_id: institution.id,
         operation_type: "sync_codes",
-        operation_status: "success",
-        request_payload: {},
-        response_payload: { message: "Code sync simulated" },
-        started_at: new Date().toISOString(),
+        operation_status: probe.ok ? "success" : "error",
+        request_payload: { base_url: baseUrl },
+        response_payload: { message: probe.detail },
+        error_message: probe.ok ? null : probe.detail,
+        started_at: startedAt,
         completed_at: new Date().toISOString(),
-        duration_ms: 300,
+        duration_ms: probe.durationMs,
       });
+      if (probe.ok) {
+        toast.success("Code sync channel verified with the device.");
+      } else {
+        toast.error(`Code sync failed (${probe.detail}). Nothing was marked synced.`);
+      }
 
       fetchZraData();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error syncing codes:", error);
+      toast.error(error?.message || "Code sync attempt failed before logging.");
     }
   };
 
