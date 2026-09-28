@@ -88,9 +88,31 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen }: Booki
 
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
   const today = startOfDay(new Date());
+  const maxBookableDay = startOfDay(addDays(new Date(), 120));
 
   const handlePrevWeek = () => setWeekStart(addDays(weekStart, -7));
-  const handleNextWeek = () => setWeekStart(addDays(weekStart, 7));
+  const handleNextWeek = () => {
+    const next = addDays(weekStart, 7);
+    if (isAfter(startOfDay(next), maxBookableDay)) return;
+    setWeekStart(next);
+  };
+  const canGoNextWeek = !isAfter(startOfDay(addDays(weekStart, 7)), maxBookableDay);
+
+  // Today's slots that already started are not bookable.
+  const nowMinutes = new Date().getHours() * 60 + new Date().getMinutes();
+  const isSlotPast = (date: Date, time: string) => {
+    if (!isSameDay(date, new Date())) return false;
+    const [h, m] = time.split(":").map(Number);
+    return h * 60 + m <= nowMinutes;
+  };
+
+  const STEPS = [
+    { id: "visit", label: "Visit" },
+    { id: "type", label: "Type" },
+    { id: "datetime", label: "Time" },
+    { id: "confirm", label: "Confirm" },
+  ] as const;
+  const stepIndex = STEPS.findIndex((s) => s.id === step);
 
   // A changed selection invalidates the previous failure.
   useEffect(() => {
@@ -270,7 +292,7 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen }: Booki
               </div>
             </Label>
             <Badge variant="secondary" className="text-xs bg-emerald-500/10 text-emerald-700">
-              Available Now
+              From anywhere
             </Badge>
           </div>
         </RadioGroup>
@@ -311,7 +333,7 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen }: Booki
             <span className="text-sm text-muted-foreground min-w-[120px] text-center">
               {format(weekStart, 'MMM d')} - {format(addDays(weekStart, 6), 'MMM d')}
             </span>
-            <Button variant="outline" size="icon" className="h-11 w-11" onClick={handleNextWeek} aria-label="Next week">
+            <Button variant="outline" size="icon" className="h-11 w-11" onClick={handleNextWeek} disabled={!canGoNextWeek} aria-label="Next week">
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
@@ -327,9 +349,11 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen }: Booki
               <button
                 key={day.toISOString()}
                 disabled={isPast}
+                aria-pressed={!!isSelected}
+                aria-label={`${format(day, 'EEEE, MMM d')}${isToday ? ", today" : ""}${isPast ? ", past" : ""}`}
                 onClick={() => setSelectedDate(day)}
                 className={cn(
-                  "p-2 rounded-xl text-center transition-all min-h-[56px] flex flex-col items-center justify-center",
+                  "p-2 rounded-xl text-center transition-all min-h-[56px] flex flex-col items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
                   isPast && "opacity-40 cursor-not-allowed",
                   isSelected && "bg-primary text-primary-foreground ring-2 ring-primary ring-offset-2",
                   !isSelected && !isPast && "bg-muted hover:bg-primary/10 cursor-pointer",
@@ -351,21 +375,26 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen }: Booki
             <Clock className="h-4 w-4 text-primary" />
             Available times for {format(selectedDate, 'EEEE, MMM d')}
           </h4>
-          <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+          <div className="grid grid-cols-3 sm:grid-cols-4 gap-2" role="radiogroup" aria-label="Available times">
             {TIME_SLOTS.map((time) => {
               const isBooked = isSlotBooked(selectedDate, time);
+              const isPast = isSlotPast(selectedDate, time);
+              const unavailable = isBooked || isPast;
               const isSelected = selectedTime === time;
-              
+
               return (
                 <button
                   key={time}
-                  disabled={isBooked}
+                  role="radio"
+                  aria-checked={isSelected}
+                  aria-label={`${time}${isBooked ? ", already booked" : isPast ? ", time has passed" : ", available"}`}
+                  disabled={unavailable}
                   onClick={() => setSelectedTime(time)}
                   className={cn(
-                    "p-3 rounded-lg text-sm font-medium transition-all",
-                    isBooked && "bg-muted text-muted-foreground line-through cursor-not-allowed",
+                    "p-3 rounded-lg text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
+                    unavailable && "bg-muted text-muted-foreground line-through cursor-not-allowed",
                     isSelected && "bg-primary text-primary-foreground",
-                    !isBooked && !isSelected && "bg-muted hover:bg-primary/10 cursor-pointer"
+                    !unavailable && !isSelected && "bg-muted hover:bg-primary/10 cursor-pointer"
                   )}
                 >
                   {time}
@@ -567,13 +596,14 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen }: Booki
         <ChevronRight className="h-4 w-4 ml-2" />
       </Button>
 
-      <button
+      <Button
+        variant="link"
         onClick={() => setShowWaitlist(true)}
-        className="w-full text-center text-sm text-primary hover:underline flex items-center justify-center gap-1"
+        className="w-full text-sm"
       >
         <Bell className="h-3 w-3" />
         No available times? Join the waitlist
-      </button>
+      </Button>
     </div>
   );
 
@@ -592,6 +622,28 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen }: Booki
               {step === 'datetime' && 'Select a convenient date and time'}
               {step === 'confirm' && 'Review and confirm your appointment'}
             </DialogDescription>
+            {/* Step progress */}
+            <ol className="flex items-center gap-1.5 pt-3" aria-label="Booking progress">
+              {STEPS.map((s, i) => (
+                <li key={s.id} className="flex flex-1 items-center gap-1.5 last:flex-none">
+                  <span
+                    aria-current={i === stepIndex ? "step" : undefined}
+                    className={cn(
+                      "flex h-6 flex-1 items-center justify-center rounded-full text-[10px] font-black sm:text-[11px]",
+                      i < stepIndex && "bg-primary/15 text-primary",
+                      i === stepIndex && "bg-primary text-primary-foreground",
+                      i > stepIndex && "bg-muted text-muted-foreground"
+                    )}
+                  >
+                    <span className="hidden sm:inline">{s.label}</span>
+                    <span className="sm:hidden">{i + 1}</span>
+                  </span>
+                  {i < STEPS.length - 1 && (
+                    <span className={cn("h-px w-2 sm:w-4", i < stepIndex ? "bg-primary" : "bg-border")} aria-hidden />
+                  )}
+                </li>
+              ))}
+            </ol>
           </DialogHeader>
 
           {step === 'visit' && renderVisitTypeSelection()}

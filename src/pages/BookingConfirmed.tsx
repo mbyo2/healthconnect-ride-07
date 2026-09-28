@@ -102,6 +102,33 @@ const BookingConfirmed = () => {
 
   const provider = appointment.provider as any;
   const isVideo = appointment.type === 'video_consultation';
+
+  const downloadIcs = () => {
+    if (!appointment) return;
+    const datePart = String(appointment.date || "").replace(/[-]/g, "");
+    const timePart = String(appointment.time || "09:00").replace(/[:]/g, "");
+    const icsContent = [
+      "BEGIN:VCALENDAR",
+      "VERSION:2.0",
+      "PRODID:-//Doc O Clock Healthcare System//EN",
+      "BEGIN:VEVENT",
+      `SUMMARY:Medical Visit — Doc' O Clock`,
+      `DESCRIPTION:Appointment with ${provider?.first_name || ""} ${provider?.last_name || ""}. Booking ref ${appointment.id}. Manage at https://doc0clock.online/appointments/${appointment.id}`,
+      `DTSTART:${datePart}T${timePart}00`,
+      `DTEND:${datePart}T${timePart}00`,
+      "STATUS:CONFIRMED",
+      "END:VEVENT",
+      "END:VCALENDAR",
+    ].join("\r\n");
+    const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", `appointment-${appointment.date}.ics`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
   const appointmentDate = (() => {
     try {
       const d = parseISO(appointment.date);
@@ -122,6 +149,7 @@ const BookingConfirmed = () => {
         <p className="text-muted-foreground">
           Your appointment has been scheduled successfully.
         </p>
+        <p className="text-xs text-muted-foreground font-mono">Booking ref: {String(appointment.id).slice(0, 8)}</p>
       </div>
 
       {/* Payment Status */}
@@ -209,12 +237,14 @@ const BookingConfirmed = () => {
               <>
                 <Video className="h-4 w-4 text-emerald-600" />
                 <span className="text-sm font-medium text-foreground">Video Consultation</span>
-                <button
+                <Button
+                  size="sm"
                   onClick={() => navigate(`/video-call/${appointment.id}`)}
-                  className="ml-auto bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-xs font-bold px-2.5 py-1 rounded-full hover:bg-emerald-500/20 transition-colors"
+                  className="ml-auto rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/20 text-xs font-bold"
                 >
-                  Join video visit →
-                </button>
+                  Join video visit
+                  <ArrowRight className="h-3.5 w-3.5 ml-1" aria-hidden />
+                </Button>
               </>
             ) : (
               <>
@@ -250,7 +280,7 @@ const BookingConfirmed = () => {
         <CardContent className="space-y-3">
           <button
             onClick={() => navigate(`/intake-form?appointment=${appointmentId}`)}
-            className="w-full flex items-center gap-3 p-3 rounded-lg bg-primary/5 hover:bg-primary/10 transition-colors text-left"
+            className="w-full min-h-[44px] flex items-center gap-3 p-3 rounded-lg bg-primary/5 hover:bg-primary/10 transition-colors text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             <FileText className="h-5 w-5 text-primary flex-shrink-0" />
             <div className="flex-1">
@@ -261,8 +291,20 @@ const BookingConfirmed = () => {
           </button>
 
           <button
+            onClick={downloadIcs}
+            className="w-full min-h-[44px] flex items-center gap-3 p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+          >
+            <Calendar className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+            <div className="flex-1">
+              <p className="font-medium text-sm text-foreground">Add to Calendar</p>
+              <p className="text-xs text-muted-foreground">Download a reminder file for your phone or computer</p>
+            </div>
+            <ArrowRight className="h-4 w-4 text-muted-foreground" />
+          </button>
+
+          <button
             onClick={() => navigate('/appointments')}
-            className="w-full flex items-center gap-3 p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors text-left"
+            className="w-full min-h-[44px] flex items-center gap-3 p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             <Calendar className="h-5 w-5 text-muted-foreground flex-shrink-0" />
             <div className="flex-1">
