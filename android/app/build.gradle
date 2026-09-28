@@ -1,10 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace "app.lovable.f6b5c73f67aa4f8baaf628968ed3c903"
+    namespace "online.doc0clock.app"
     compileSdk rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "app.lovable.f6b5c73f67aa4f8baaf628968ed3c903"
+        applicationId "online.doc0clock.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 2

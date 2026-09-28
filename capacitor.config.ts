@@ -1,7 +1,9 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'app.lovable.f6b5c73f67aa4f8baaf628968ed3c903',
+  // Reverse-domain of the live site. Set BEFORE any store submission:
+  // changing appId later creates a brand-new store listing.
+  appId: 'online.doc0clock.app',
   appName: "Doc' O Clock",
   webDir: 'dist',
   plugins: {
@@ -28,7 +30,8 @@ const config: CapacitorConfig = {
     contentInset: "automatic"
   },
   android: {
-    allowMixedContent: true,
+    // allowMixedContent intentionally OFF: every API, image and video
+    // endpoint is HTTPS. Mixed content would weaken the WebView.
     backgroundColor: "#FFFFFF"
   },
   server: {

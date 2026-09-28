@@ -1,10 +1,17 @@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Capacitor } from "@capacitor/core";
 import { PushSubscriptionJSON } from "@/types/settings";
 
-// Function to request notification permission and register for push notifications
+// Function to request notification permission and register for push notifications.
+// Browser only: native shells have no Web Push — they need the FCM/APNs
+// plugin (not yet integrated), so we say so instead of failing obscurely.
 export async function subscribeToNotifications() {
   try {
+    if (Capacitor.isNativePlatform()) {
+      toast.info("App push arrives with the store release — reminders work in-app until then.");
+      return false;
+    }
     // Check if the browser supports notifications
     if (!('Notification' in window)) {
       toast.error("This browser does not support push notifications");

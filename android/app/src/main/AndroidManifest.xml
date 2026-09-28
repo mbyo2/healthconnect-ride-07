@@ -24,6 +24,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
+            <!-- Deep link for OAuth / PKCE redirects (matches the iOS scheme
+                 in capacitor.config.ts). Without this, sign-in redirects
+                 cannot return to the native app. -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="dococlockzm" />
+            </intent-filter>
+
         </activity>
 
         <provider
@@ -45,6 +55,7 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <uses-sdk tools:overrideLibrary="org.apache.cordova"/>
 </manifest>

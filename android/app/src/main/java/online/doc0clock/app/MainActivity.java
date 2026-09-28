@@ -1,4 +1,4 @@
-package app.lovable.f6b5c73f67aa4f8baaf628968ed3c903;
+package online.doc0clock.app;
 
 import com.getcapacitor.BridgeActivity;
 
