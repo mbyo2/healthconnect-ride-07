@@ -118,6 +118,7 @@ export const MobileNavigation = ({ setIsMenuOpen, navigate }: MobileNavigationPr
       return [
         { to: "/pharmacy-portal", label: "Portal", icon: <Package className="mr-2 h-5 w-5" /> },
         { to: "/pharmacy-inventory", label: "Inventory", icon: <Pill className="mr-2 h-5 w-5" /> },
+        { to: "/institution/personnel", label: "Staff", icon: <Users className="mr-2 h-5 w-5" /> },
         { to: "/prescriptions", label: "Prescriptions", icon: <Heart className="mr-2 h-5 w-5" /> },
         { to: "/marketplace", label: "Marketplace", icon: <ShoppingCart className="mr-2 h-5 w-5" /> },
         ...(!isInstitutionAffiliated ? [{ to: "/wallet", label: "Revenue", icon: <Wallet className="mr-2 h-5 w-5" /> }] : []),

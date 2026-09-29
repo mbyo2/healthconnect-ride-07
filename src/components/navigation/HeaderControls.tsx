@@ -68,6 +68,7 @@ export const HeaderControls = ({ isMenuOpen, setIsMenuOpen, navigate }: HeaderCo
       return [
         { label: "Pharmacy Portal", path: "/pharmacy-portal" },
         { label: "Inventory", path: "/pharmacy-inventory" },
+        { label: "Staff", path: "/institution/personnel" },
         { label: "Profile", path: "/profile" },
       ];
     }

@@ -296,6 +296,7 @@ export function BottomNav() {
     if (availableRoles.some(r => ['pharmacy', 'wholesale_pharmacy', 'pharmacist', 'pharmacy_technologist'].includes(r))) {
       return [
         { to: "/pharmacy-management", label: "Pharmacy Management", description: "Manage pharmacy operations", icon: <ShoppingCart className="h-5 w-5" /> },
+        { to: "/institution/personnel", label: "Staff", description: "Invite and manage staff", icon: <Users className="h-5 w-5" /> },
         ...(!isInstitutionAffiliated ? [{ to: "/wallet", label: "Revenue", description: "Track sales and revenue", icon: <Wallet className="h-5 w-5" /> }] : []),
         { to: "/profile", label: "Pharmacy Profile", description: "Business information", icon: <User className="h-5 w-5" /> },
         { to: "/settings", label: "Settings", description: "Pharmacy preferences", icon: <Settings className="h-5 w-5" /> },

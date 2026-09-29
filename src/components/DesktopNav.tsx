@@ -232,6 +232,7 @@ export function DesktopNav() {
     if (availableRoles.some(r => ['pharmacy', 'pharmacist', 'pharmacy_technologist'].includes(r))) {
       return [
         { to: "/pharmacy-management", label: "Pharmacy Management", icon: <ShoppingCart className="h-4 w-4 mr-2" /> },
+        { to: "/institution/personnel", label: "Staff", icon: <Users className="h-4 w-4 mr-2" /> },
         { to: "/wallet", label: "Revenue", icon: <Wallet className="h-4 w-4 mr-2" /> },
         { to: "/profile", label: "Pharmacy Profile", icon: <User className="h-4 w-4 mr-2" /> },
         { to: "/settings", label: "Settings", icon: <Settings className="h-4 w-4 mr-2" /> },

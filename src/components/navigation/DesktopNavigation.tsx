@@ -96,6 +96,7 @@ export const DesktopNavigation = () => {
       return [
         { to: "/pharmacy-portal", label: "Portal", icon: <Package className="h-5 w-5 mr-2" /> },
         { to: "/pharmacy-inventory", label: "Inventory", icon: <Pill className="h-5 w-5 mr-2" /> },
+        { to: "/institution/personnel", label: "Staff", icon: <Users className="h-5 w-5 mr-2" /> },
         { to: "/prescriptions", label: "Prescriptions", icon: <Heart className="h-5 w-5 mr-2" /> },
         { to: "/marketplace", label: "Marketplace", icon: <ShoppingCart className="h-5 w-5 mr-2" /> },
         ...(!isInstitutionAffiliated ? [{ to: "/wallet", label: "Revenue", icon: <Wallet className="h-5 w-5 mr-2" /> }] : []),
