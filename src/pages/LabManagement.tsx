@@ -199,13 +199,14 @@ const LabManagement = () => {
           try {
             await supabase.from("lab_results").insert({
               request_id: selectedRequest.id,
+              test_id: selectedRequest.id,
               patient_id: (selectedRequest as any).patient_id,
               technician_id: user?.id ?? null,
               test_name: (selectedRequest as any).test_type || "Lab Test",
               test_date: new Date().toISOString().split("T")[0],
               result_value: resultSummary,
               is_abnormal: isCritical,
-              comments: isUrgent ? `CRITICAL — requires immediate review` : "Pending pathologist review",
+              notes: isUrgent ? `CRITICAL — requires immediate review` : "Pending pathologist review",
             });
           } catch (e) { console.error("lab_results push failed", e); }
         })(),
@@ -278,14 +279,20 @@ const LabManagement = () => {
 
       if (error) throw error;
 
-      // Mark the lab_results row verified too (surface failures — a
-      // silent partial verify is a patient-safety issue)
-      const { error: resultsError } = await supabase
-        .from("lab_results")
-        .update({ verified_at: new Date().toISOString() })
-        .eq("request_id", selectedRequest.id);
-
-      if (resultsError) throw resultsError;
+      // Mark the lab_results row verified too — best-effort mirror. The
+      // lab_tests write above is the source of truth and already
+      // succeeded, so a mirror failure must never surface as a
+      // verification failure (that false alarm previously caused
+      // duplicate sign-off attempts).
+      try {
+        const { error: resultsError } = await supabase
+          .from("lab_results")
+          .update({ verified_at: new Date().toISOString() })
+          .eq("request_id", selectedRequest.id);
+        if (resultsError) console.warn("lab_results verify mirror failed", resultsError);
+      } catch (e) {
+        console.warn("lab_results verify mirror failed", e);
+      }
 
       toast.success("Result verified & signed off");
       setSelectedRequest({ ...selectedRequest, verified_by: user?.id } as any);

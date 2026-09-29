@@ -9,13 +9,13 @@ import { format } from 'date-fns';
 
 interface LabResultRow {
   id: string;
+  test_name: string | null;
   result_value: string | null;
   unit: string | null;
   reference_range: string | null;
-  comments: string | null;
+  notes: string | null;
   verified_at: string | null;
   created_at: string;
-  lab_tests: { name: string | null } | null;
 }
 
 export default function PatientLabResults() {
@@ -24,11 +24,11 @@ export default function PatientLabResults() {
     queryKey: ['patient-lab-results', user?.id],
     enabled: !!user?.id,
     queryFn: async () => {
-      // lab_results has no test_date column — order by created_at; the test
-      // name comes from the lab_tests FK (test_id).
+      // Live lab_results carries test_name + notes directly; verified_at
+      // exists after the 20260930 drift catch-up. Order by created_at.
       const { data, error } = await supabase
         .from('lab_results')
-        .select('id, result_value, unit, reference_range, comments, verified_at, created_at, lab_tests(name)')
+        .select('id, test_name, result_value, unit, reference_range, notes, verified_at, created_at')
         .eq('patient_id', user!.id)
         .order('created_at', { ascending: false })
         .limit(50);
@@ -62,8 +62,8 @@ export default function PatientLabResults() {
         ) : (
           <div className="space-y-3">
             {data.map(r => {
-              const critical = (r.comments || '').toLowerCase().includes('critical');
-              const testName = r.lab_tests?.name || 'Lab test';
+              const critical = (r.notes || '').toLowerCase().includes('critical');
+              const testName = r.test_name || 'Lab test';
               const resultDate = r.verified_at || r.created_at;
               return (
                 <div key={r.id} className="flex items-start justify-between gap-3 p-3 border rounded-lg">
@@ -76,7 +76,7 @@ export default function PatientLabResults() {
                     {r.reference_range && (
                       <p className="text-xs text-muted-foreground">Ref: {r.reference_range}</p>
                     )}
-                    {r.comments && <p className="text-xs text-muted-foreground mt-1">{r.comments}</p>}
+                    {r.notes && <p className="text-xs text-muted-foreground mt-1">{r.notes}</p>}
                     <p className="text-xs text-muted-foreground mt-1">
                       {resultDate ? format(new Date(resultDate), 'PPP') : 'Date not recorded'}
                     </p>
