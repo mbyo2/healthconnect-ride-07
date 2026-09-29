@@ -3,12 +3,12 @@
 --
 -- ROOT CAUSE: three auth-signup trigger functions hardcoded only a handful of
 -- professions (doctor, nurse, pharmacist, lab_technician, radiologist,
--- health_personnel, ...). The other 19 of the 25 canonical professions
+-- health_personnel, ...). The other 20 of the 26 canonical professions
 -- (specialist, medical_licentiate, clinical_officer, dentist,
 -- dental_therapist, registered_nurse, enrolled_nurse, midwife,
--- pharmacy_technologist, radiographer, pathologist, physiotherapist,
--- occupational_therapist, nutritionist, optometrist, psychologist,
--- environmental_health_officer, community_health_worker,
+-- pharmacy_technologist, radiographer, pathologist, phlebotomist,
+-- physiotherapist, occupational_therapist, nutritionist, optometrist,
+-- psychologist, environmental_health_officer, community_health_worker,
 -- traditional_practitioner) could create an auth account but got:
 --   * NO health_personnel_applications row  -> nothing for admins to approve
 --   * user_roles = 'patient'                -> stuck as patients forever
