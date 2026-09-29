@@ -65,6 +65,12 @@ export interface InstitutionAffiliation {
 
 const overrideKey = (userId: string) => `dococlock.active_institution.${userId}`;
 
+/** Fired on window whenever any hook instance switches workspace, so every
+ *  other live instance (portal header, tab panels, etc.) re-resolves too.
+ *  Without this, each useInstitutionContext() keeps independent state and a
+ *  switch in the header never reaches the tab components. */
+const INSTITUTION_SWITCH_EVENT = 'dococlock:institution-switched';
+
 /** Persisted "active institution" override, so staff with several affiliations
  *  (e.g. their own auto-provisioned pharmacy AND an employer's pharmacy they
  *  were invited to) can choose which workspace the app operates in. */
@@ -121,6 +127,10 @@ export function useInstitutionContext() {
         const stored = getActiveInstitutionOverride(user.id);
         if (stored && affils.some((a) => a.id === stored)) {
           activeId = stored;
+        } else if (stored) {
+          // Stale override (institution deleted or membership revoked) —
+          // drop it so we don't get stuck on a workspace that no longer exists.
+          clearActiveInstitutionOverride(user.id);
         }
       }
       if (!activeId) {
@@ -133,6 +143,14 @@ export function useInstitutionContext() {
       }
       const activeAffil = affils.find((a) => a.id === activeId) ?? null;
       const activeInst = (activeId && byId.get(activeId)) || fallback;
+      // Diagnostic breadcrumb for the multi-workspace rollout (safe to keep):
+      // if the switcher ever vanishes, this shows whether affiliations shrank.
+      console.debug(
+        '[useInstitutionContext]',
+        `affiliations=${affils.length}`,
+        `active=${activeId ?? 'none'}`,
+        `admin=${activeAffil?.affiliation === 'admin'}`,
+      );
       setInstitution(activeInst as InstitutionData | null);
       setAffiliations(affils);
       if (activeAffil) {
@@ -471,15 +489,24 @@ export function useInstitutionContext() {
     fetchInstitution();
   }, [fetchInstitution]);
 
+  // Re-resolve whenever ANY instance switches workspace (see
+  // INSTITUTION_SWITCH_EVENT above) — keeps every consumer in sync.
+  useEffect(() => {
+    const onSwitch = () => fetchInstitution();
+    window.addEventListener(INSTITUTION_SWITCH_EVENT, onSwitch);
+    return () => window.removeEventListener(INSTITUTION_SWITCH_EVENT, onSwitch);
+  }, [fetchInstitution]);
+
   /** Move the whole app into another affiliated institution. Persists per user. */
   const switchInstitution = useCallback(
     (institutionId: string) => {
       if (!user) return;
       setActiveInstitutionOverride(user.id, institutionId);
-      // Re-resolve from the stored override so every consumer updates.
-      fetchInstitution();
+      // Broadcast so this instance AND every other live instance re-resolve
+      // from the stored override (the event listener above picks it up here too).
+      window.dispatchEvent(new CustomEvent(INSTITUTION_SWITCH_EVENT));
     },
-    [user, fetchInstitution],
+    [user],
   );
 
   return {
