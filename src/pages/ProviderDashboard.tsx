@@ -24,7 +24,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { format, startOfWeek, endOfWeek, addDays } from "date-fns";
 import { useCurrency } from "@/hooks/use-currency";
 import { useUserRoles } from "@/context/UserRolesContext";
-import { ROLE_META } from "@/config/roleConfig";
+import { ROLE_META, ROLE_PRIORITY, type UserRole } from "@/config/roleConfig";
 import { hasRoutePermission } from "@/utils/rolePermissions";
 import { useInstitutionAffiliation } from "@/hooks/useInstitutionAffiliation";
 import { toast } from "sonner";
@@ -395,7 +395,10 @@ export const ProviderDashboard = () => {
     };
     const pickEntry = availableRoles
       .map((r) => [r, ROLE_META[r as keyof typeof ROLE_META]] as const)
-      .find(([, m]) => m && m.category !== 'patient' && m.category !== 'admin' && m.category !== 'institution');
+      .filter(([, m]) => m && m.category !== 'patient' && m.category !== 'admin' && m.category !== 'institution')
+      // Deterministic: the highest-priority profession wins regardless of
+      // the order roles were granted or returned.
+      .sort(([a], [b]) => ROLE_PRIORITY.indexOf(a as UserRole) - ROLE_PRIORITY.indexOf(b as UserRole))[0];
     if (!pickEntry) return {
       dashboardMeta: { title: "Healthcare Provider Workspace", subtitle: "Practice management, patient queue & telehealth" },
       professionCode: null as string | null,
