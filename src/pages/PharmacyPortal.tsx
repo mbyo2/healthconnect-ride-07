@@ -38,7 +38,7 @@ const PharmacyPortal = () => {
 
   return (
     <ProtectedRoute>
-      <RoleProtectedRoute allowedRoles={['pharmacy', 'pharmacist', 'pharmacy_technologist', 'wholesale_pharmacy', 'institution_admin', 'admin', 'super_admin']}>
+      <RoleProtectedRoute allowedRoles={['pharmacy', 'pharmacist', 'pharmacy_technologist', 'wholesale_pharmacy', 'institution_admin', 'institution_staff', 'inventory_manager', 'billing_staff', 'admin', 'super_admin']}>
         <div className="min-h-screen bg-canvas-bone dark:bg-slate-950 py-8 px-4 sm:px-6 font-sans">
           <div className="max-w-7xl mx-auto space-y-6">
             {/* Header Banner */}
@@ -57,7 +57,7 @@ const PharmacyPortal = () => {
                   </h1>
                   <p className="text-xs text-slate-400 font-medium">
                     {isWholesaleOnly
-                      ? 'B2B medicine supply: warehouse inventory, purchase orders & distributor invoicing'
+                      ? 'B2B medicine supply: warehouse inventory, batch traceability & supplier management'
                       : 'POS billing, medication inventory, digital Rx fulfillment & courier dispatch'}
                   </p>
                 </div>

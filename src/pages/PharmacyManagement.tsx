@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { InstitutionInsuranceVerification } from "@/components/institution/InstitutionInsuranceVerification";
 import { InventoryControlTabs } from "@/components/pharmacy/InventoryControlTabs";
+import { precheckDispenseLines, dispenseLinesFEFO } from "@/components/pharmacy/pharmacyStockService";
 
 const TAX_RATE = 0.16;
 
@@ -36,14 +37,7 @@ export const PharmacyManagement = () => {
   const [selectedVerification, setSelectedVerification] = useState<any>(null);
   const [patientSearchTerm, setPatientSearchTerm] = useState("");
 
-  const [showWriteOffDialog, setShowWriteOffDialog] = useState(false);
   const [mainTab, setMainTab] = useState("pos");
-  const [writeOffForm, setWriteOffForm] = useState({
-    item_id: "",
-    quantity: 1,
-    reason: "expired",
-    notes: "",
-  });
 
   const { data: inventory = [], refetch: refetchInventory } = useQuery({
     queryKey: ["pharmacy-inventory", pharmacy?.id],
@@ -108,25 +102,48 @@ export const PharmacyManagement = () => {
       const transactionId = `TXN-${Math.random().toString(36).substring(2, 9).toUpperCase()}`;
       const total = cartTotal;
 
-      const { error: saleError } = await supabase.from("pharmacy_sales" as any).insert({
-        pharmacy_id: pharmacy.id,
-        transaction_id: transactionId,
-        customer_id: selectedPatientId || null,
-        items: cart,
-        subtotal: cartSubtotal,
-        tax: cartTax,
-        total_amount: total,
-        payment_method: paymentMethod,
-        payment_status: "completed",
-        served_by: user?.id || null,
-        created_at: new Date().toISOString(),
-      });
+      // GAP-20 + GAP-03: one pre-check for the whole cart, then a single sale
+      // row, then FEFO dispenses against the batch ledger (the transactional
+      // path). No per-item pharmacy_inventory.quantity update loop — the batch
+      // ledger is the stock truth. Shortfalls abort before anything is
+      // written; a mid-dispense failure rolls the sale row back.
+      const lines = cart.map((item) => ({
+        inventoryTable: "pharmacy_inventory" as const,
+        inventoryItemId: item.id as string,
+        quantity: Math.max(1, Math.round(item.cartQuantity)),
+        productName: item.product_name,
+      }));
+      await precheckDispenseLines(pharmacy.id, lines);
+
+      const { data: saleRow, error: saleError } = await supabase
+        .from("pharmacy_sales" as any)
+        .insert({
+          pharmacy_id: pharmacy.id,
+          transaction_id: transactionId,
+          customer_id: selectedPatientId || null,
+          items: cart,
+          subtotal: cartSubtotal,
+          tax: cartTax,
+          total_amount: total,
+          payment_method: paymentMethod,
+          payment_status: "completed",
+          served_by: user?.id || null,
+          created_at: new Date().toISOString(),
+        })
+        .select("id")
+        .single();
 
       if (saleError) throw saleError;
 
-      for (const item of cart) {
-        const newQty = Math.max(0, item.quantity - item.cartQuantity);
-        await supabase.from("pharmacy_inventory" as any).update({ quantity: newQty }).eq("id", item.id);
+      try {
+        await dispenseLinesFEFO(pharmacy.id, lines, {
+          referenceType: "pos_sale",
+          referenceId: (saleRow as any)?.id,
+          notes: `Pharmacy sale ${transactionId}`,
+        });
+      } catch (fefoError: any) {
+        await supabase.from("pharmacy_sales" as any).delete().eq("id", (saleRow as any)?.id);
+        throw new Error(`Sale rolled back: ${fefoError?.message || "FEFO dispense failed"}`);
       }
 
       toast.success(`Sale completed! Receipt ${transactionId}`);

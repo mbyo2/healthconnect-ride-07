@@ -88,8 +88,8 @@ export const DesktopNavigation = () => {
       ];
     }
 
-    // Pharmacy / Pharmacist
-    if (availableRoles.some(r => ['pharmacy', 'pharmacist'].includes(r))) {
+    // Pharmacy (all four pharmacy roles: retail, wholesale, pharmacist, technologist)
+    if (availableRoles.some(r => ['pharmacy', 'wholesale_pharmacy', 'pharmacist', 'pharmacy_technologist'].includes(r))) {
       return [
         { to: "/pharmacy-portal", label: "Portal", icon: <Package className="h-5 w-5 mr-2" /> },
         { to: "/pharmacy-inventory", label: "Inventory", icon: <Pill className="h-5 w-5 mr-2" /> },

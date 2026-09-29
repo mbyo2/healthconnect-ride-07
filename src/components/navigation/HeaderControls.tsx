@@ -48,7 +48,7 @@ export const HeaderControls = ({ isMenuOpen, setIsMenuOpen, navigate }: HeaderCo
   const dashboardLink = useMemo(() => {
     if (availableRoles.includes('nurse') && !availableRoles.some(r => ['institution_admin', 'institution_staff'].includes(r))) return '/provider-dashboard';
     if (isHealthPersonnel || availableRoles.some(r => ['doctor', 'radiologist'].includes(r))) return '/provider-dashboard';
-    if (availableRoles.some(r => ['pharmacy', 'pharmacist'].includes(r))) return '/pharmacy-portal';
+    if (availableRoles.some(r => ['pharmacy', 'wholesale_pharmacy', 'pharmacist', 'pharmacy_technologist'].includes(r))) return '/pharmacy-portal';
     if (isAdmin) return '/admin-dashboard';
     if (availableRoles.some(r => ['institution_admin', 'institution_staff'].includes(r))) return '/institution-dashboard';
     if (availableRoles.some(r => ['lab', 'lab_technician'].includes(r))) return '/lab-management';
@@ -64,7 +64,7 @@ export const HeaderControls = ({ isMenuOpen, setIsMenuOpen, navigate }: HeaderCo
         { label: "Profile", path: "/profile" },
       ];
     }
-    if (availableRoles.some(r => ['pharmacy', 'pharmacist'].includes(r))) {
+    if (availableRoles.some(r => ['pharmacy', 'wholesale_pharmacy', 'pharmacist', 'pharmacy_technologist'].includes(r))) {
       return [
         { label: "Pharmacy Portal", path: "/pharmacy-portal" },
         { label: "Inventory", path: "/pharmacy-inventory" },

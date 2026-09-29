@@ -258,13 +258,36 @@ export async function listBatches(
   return rows;
 }
 
-/** Receive a new batch. Inserts the batch row plus a 'receipt' ledger movement
- *  (the DB trigger maintains quantity_remaining and stamps performed_by). */
+/** Receive a new batch. Inserts the batch row with quantity_remaining = 0 plus a
+ *  'receipt' ledger movement — the apply_batch_movement trigger performs the
+ *  single initialization (inserting with quantity_received here would double
+ *  it, GAP-01). Rejects duplicate batch numbers with a friendly error (GAP-09). */
 export async function receiveBatch(
   institutionId: string,
   input: ReceiveBatchInput
 ): Promise<MedicineBatch> {
   const userId = await getCurrentUserId();
+
+  // GAP-09: pre-check the UNIQUE (institution_id, inventory_table,
+  // inventory_item_id, batch_number) constraint so a re-received batch number
+  // fails with guidance instead of a raw unique-violation error.
+  const { data: existing, error: dupError } = await supabase
+    .from("medicine_batches" as any)
+    .select("id")
+    .eq("institution_id", institutionId)
+    .eq("inventory_table", input.inventory_table)
+    .eq("inventory_item_id", input.inventory_item_id)
+    .eq("batch_number", input.batch_number)
+    .limit(1);
+  if (dupError) {
+    throw new Error((dupError as { message?: string }).message || "Failed to check existing batches");
+  }
+  if (existing && (existing as unknown as any[]).length > 0) {
+    throw new Error(
+      `Batch "${input.batch_number}" was already received for this product — use a new batch number or add a PO reference.`
+    );
+  }
+
   const { data: batch, error: batchError } = await supabase
     .from("medicine_batches" as any)
     .insert({
@@ -277,7 +300,9 @@ export async function receiveBatch(
       manufacture_date: input.manufacture_date || null,
       expiry_date: input.expiry_date,
       quantity_received: input.quantity_received,
-      quantity_remaining: input.quantity_received,
+      // GAP-01: 0 here — the receipt movement below is the single
+      // initialization via the apply_batch_movement trigger.
+      quantity_remaining: 0,
       unit_cost: input.unit_cost,
       unit_price: input.unit_price ?? null,
       received_by: userId,
@@ -351,6 +376,123 @@ export async function dispenseFEFO(
   });
   throwIf(error, "FEFO dispense failed");
   return data as { allocated: DispenseAllocation[]; total: number };
+}
+
+/* ------------------------------------------------------------------ */
+/* FEFO sale / fulfillment helpers (GAP-02 + GAP-03 + GAP-04)           */
+/* ------------------------------------------------------------------ */
+
+export interface DispenseLine {
+  inventoryTable: InventoryTable;
+  inventoryItemId: string;
+  quantity: number;
+  productName?: string;
+}
+
+/** Resolve a product name to an inventory item id. Exact case-insensitive
+ *  match wins; a single contains-match is accepted as fallback; zero or
+ *  ambiguous matches return null so the caller can abort cleanly. */
+export async function resolveInventoryItem(
+  institutionId: string,
+  inventoryTable: InventoryTable,
+  productName: string
+): Promise<{ id: string; name: string } | null> {
+  const term = (productName || "").trim();
+  if (!term) return null;
+
+  const table = inventoryTable === "medication_inventory" ? "medication_inventory" : "pharmacy_inventory";
+  const idColumn = table === "medication_inventory" ? "institution_id" : "pharmacy_id";
+  const nameColumn = table === "medication_inventory" ? "medication_name" : "product_name";
+  const selectCols = table === "medication_inventory" ? "id, medication_name" : "id, product_name";
+
+  const { data, error } = await supabase
+    .from(table as any)
+    .select(selectCols)
+    .eq(idColumn, institutionId)
+    .ilike(nameColumn, `%${term}%`)
+    .limit(20);
+  if (error) return null;
+  const rows = ((data as unknown) as any[]) || [];
+  if (rows.length === 0) return null;
+
+  const exact = rows.find((r) => String(r[nameColumn]).toLowerCase() === term.toLowerCase());
+  if (exact) return { id: exact.id, name: String(exact[nameColumn]) };
+  if (rows.length === 1) return { id: rows[0].id, name: String(rows[0][nameColumn]) };
+  return null; // ambiguous — caller reports it as unresolvable
+}
+
+/** Sum of approved, unexpired, positive-balance batch stock for one item —
+ *  the quantity FEFO could actually dispense right now. */
+export async function dispensableStock(
+  institutionId: string,
+  inventoryTable: InventoryTable,
+  inventoryItemId: string
+): Promise<number> {
+  const today = new Date().toISOString().split("T")[0];
+  const { data, error } = await supabase
+    .from("medicine_batches" as any)
+    .select("quantity_remaining")
+    .eq("institution_id", institutionId)
+    .eq("inventory_table", inventoryTable)
+    .eq("inventory_item_id", inventoryItemId)
+    .eq("is_active", true)
+    .eq("qa_status", "approved")
+    .gte("expiry_date", today)
+    .gt("quantity_remaining", 0);
+  if (error) return 0;
+  return (((data as unknown) as { quantity_remaining: number }[]) || []).reduce(
+    (sum, r) => sum + (Number(r.quantity_remaining) || 0),
+    0
+  );
+}
+
+/** Pre-check every line against dispensable (approved, unexpired) batch stock.
+ *  Throws a friendly error on the first shortfall — call BEFORE writing any
+ *  sale/prescription/order rows so a failed fulfillment leaves the ledger
+ *  untouched (no partial fulfillment). */
+export async function precheckDispenseLines(
+  institutionId: string,
+  lines: DispenseLine[]
+): Promise<void> {
+  for (const line of lines) {
+    const qty = Math.max(1, Math.round(line.quantity));
+    const available = await dispensableStock(
+      institutionId,
+      line.inventoryTable,
+      line.inventoryItemId
+    );
+    if (available < qty) {
+      throw new Error(
+        `Insufficient dispensable stock for "${line.productName || line.inventoryItemId}": ` +
+          `need ${qty}, have ${available} approved, unexpired units. ` +
+          `Receive and QA-approve a batch first.`
+      );
+    }
+  }
+}
+
+/** Pre-check then FEFO-dispense each line in turn (auto-FEFO at sale time —
+ *  no per-batch UI needed). The RPC is atomic per line; the pre-check above
+ *  is what guarantees a shortfall aborts before any ledger write. */
+export async function dispenseLinesFEFO(
+  institutionId: string,
+  lines: DispenseLine[],
+  opts: { referenceType?: string; referenceId?: string; notes?: string } = {}
+): Promise<void> {
+  await precheckDispenseLines(institutionId, lines);
+  for (const line of lines) {
+    await dispenseFEFO(
+      institutionId,
+      line.inventoryTable,
+      line.inventoryItemId,
+      Math.max(1, Math.round(line.quantity)),
+      {
+        referenceType: opts.referenceType,
+        referenceId: opts.referenceId,
+        notes: opts.notes || (line.productName ? `FEFO dispense — ${line.productName}` : undefined),
+      }
+    );
+  }
 }
 
 /** Auto-quarantine every approved batch whose expiry date has passed. Returns count. */

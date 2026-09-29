@@ -46,7 +46,7 @@ export const MobileNavigation = ({ setIsMenuOpen, navigate }: MobileNavigationPr
     if (availableRoles.includes('nurse')) return 'Nurse';
     if (availableRoles.includes('radiologist')) return 'Radiologist';
     if (availableRoles.includes('health_personnel')) return 'Healthcare Provider';
-    if (availableRoles.some(r => ['pharmacy', 'pharmacist'].includes(r))) return 'Pharmacy';
+    if (availableRoles.some(r => ['pharmacy', 'wholesale_pharmacy', 'pharmacist', 'pharmacy_technologist'].includes(r))) return 'Pharmacy';
     if (isAdmin) return 'Admin';
     if (availableRoles.some(r => ['institution_admin', 'institution_staff'].includes(r))) return 'Institution';
     if (availableRoles.some(r => ['lab', 'lab_technician'].includes(r))) return 'Lab';
@@ -90,8 +90,8 @@ export const MobileNavigation = ({ setIsMenuOpen, navigate }: MobileNavigationPr
       ];
     }
 
-    // Pharmacy / Pharmacist
-    if (availableRoles.some(r => ['pharmacy', 'pharmacist'].includes(r))) {
+    // Pharmacy (all four pharmacy roles: retail, wholesale, pharmacist, technologist)
+    if (availableRoles.some(r => ['pharmacy', 'wholesale_pharmacy', 'pharmacist', 'pharmacy_technologist'].includes(r))) {
       return [
         { to: "/pharmacy-portal", label: "Portal", icon: <Package className="mr-2 h-5 w-5" /> },
         { to: "/pharmacy-inventory", label: "Inventory", icon: <Pill className="mr-2 h-5 w-5" /> },

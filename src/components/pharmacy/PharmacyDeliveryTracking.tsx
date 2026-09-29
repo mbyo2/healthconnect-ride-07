@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Loader2, Package, Truck, CheckCircle, Clock, MapPin, ArrowRight } from "lucide-react";
+import { Loader2, Package, Truck, CheckCircle, Clock, MapPin, ArrowRight, ClipboardCheck } from "lucide-react";
 import { format } from "date-fns";
-import { toast } from "sonner";
 import { markDelivered, isValidOrderTransition } from "@/utils/marketplace-workflows";
 import { useAuth } from "@/context/AuthContext";
 
@@ -34,6 +34,8 @@ export const PharmacyDeliveryTracking = ({ pharmacyId }: DeliveryTrackingProps) 
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [advancingId, setAdvancingId] = useState<string | null>(null);
+  const [fulfillingId, setFulfillingId] = useState<string | null>(null);
+
   const { data: deliveries, isLoading } = useQuery({
     queryKey: ["pharmacy-deliveries", pharmacyId],
     queryFn: async () => {
@@ -103,6 +105,27 @@ export const PharmacyDeliveryTracking = ({ pharmacyId }: DeliveryTrackingProps) 
     }
   };
 
+  // GAP-04: pharmacy-side fulfillment. The RPC resolves every order line to a
+  // medication_inventory item and FEFO-dispenses the batch ledger atomically —
+  // any shortfall or unresolvable line aborts the whole order (no partial).
+  const handleFulfill = async (delivery: any) => {
+    const orderId = delivery.order_id as string;
+    setFulfillingId(delivery.id);
+    try {
+      const { data, error } = await (supabase as any).rpc("fulfill_marketplace_order", {
+        p_order_id: orderId,
+      });
+      if (error) throw error;
+      const lines = (data as any)?.lines ?? 0;
+      toast.success(`Order fulfilled — ${lines} line${lines === 1 ? "" : "s"} dispensed via FEFO`);
+      queryClient.invalidateQueries({ queryKey: ["pharmacy-deliveries", pharmacyId] });
+    } catch (e: any) {
+      toast.error(e?.message || "Fulfillment failed");
+    } finally {
+      setFulfillingId(null);
+    }
+  };
+
   if (isLoading) {
     return (
       <Card>
@@ -146,8 +169,22 @@ export const PharmacyDeliveryTracking = ({ pharmacyId }: DeliveryTrackingProps) 
                       <MapPin className="h-3 w-3" /> {d.tracking_notes}
                     </p>
                   )}
-                  {NEXT_STATUS[d.status] && (
-                    <div className="mt-3">
+                  <div className="mt-3 flex items-center justify-end gap-2">
+                    {["assigned", "pending"].includes(d.status) && (
+                      <button
+                        onClick={() => handleFulfill(d)}
+                        disabled={fulfillingId === d.id}
+                        className="px-4 py-2 rounded-xl bg-primary-500 hover:bg-primary-600 disabled:opacity-50 text-white text-xs font-extrabold flex items-center gap-1.5 shadow-xs"
+                      >
+                        {fulfillingId === d.id ? (
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        ) : (
+                          <ClipboardCheck className="h-3.5 w-3.5" />
+                        )}
+                        {fulfillingId === d.id ? "Fulfilling…" : "Fulfill Order"}
+                      </button>
+                    )}
+                    {NEXT_STATUS[d.status] && (
                       <Button
                         size="sm"
                         variant="outline"
@@ -162,8 +199,8 @@ export const PharmacyDeliveryTracking = ({ pharmacyId }: DeliveryTrackingProps) 
                         )}
                         {NEXT_STATUS[d.status]?.label}
                       </Button>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               );
             })}

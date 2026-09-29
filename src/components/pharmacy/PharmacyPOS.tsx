@@ -7,6 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useInstitutionContext } from "@/hooks/useInstitutionContext";
 import { toast } from "sonner";
 import { useCurrency } from "@/hooks/use-currency";
+import { dispenseLinesFEFO } from "./pharmacyStockService";
 import {
   Search, Plus, Minus, Trash2, ShoppingCart, Receipt, CreditCard, Banknote,
   Smartphone, Shield, Printer, X, Package
@@ -120,6 +121,30 @@ export const PharmacyPOS = () => {
       const items = cart.map((item) => ({ sale_id: sale.id, medication_inventory_id: item.medication_inventory_id, item_name: item.item_name, quantity: item.quantity, unit_price: item.unit_price, discount: item.discount, total: item.total, batch_number: item.batch_number || null }));
       const { error: itemsError } = await (supabase as any).from("pos_sale_items").insert(items);
       if (itemsError) throw itemsError;
+      // GAP-02/GAP-03: auto-FEFO-dispense every inventoried cart line against
+      // the batch ledger (no per-batch UI). Custom items have no inventory
+      // mapping and are skipped. On failure the sale is rolled back so a
+      // recorded sale never lacks its ledger dispenses.
+      const fefoLines = cart
+        .filter((item) => item.medication_inventory_id)
+        .map((item) => ({
+          inventoryTable: "medication_inventory" as const,
+          inventoryItemId: item.medication_inventory_id as string,
+          quantity: Math.max(1, Math.round(item.quantity)),
+          productName: item.item_name,
+        }));
+      if (fefoLines.length > 0) {
+        try {
+          await dispenseLinesFEFO(pharmacyId, fefoLines, {
+            referenceType: "pos_sale",
+            referenceId: sale.id,
+            notes: `POS sale ${receiptNumber}`,
+          });
+        } catch (fefoError: any) {
+          await (supabase as any).from("pos_sales").delete().eq("id", sale.id);
+          throw new Error(`Sale rolled back: ${fefoError?.message || "FEFO dispense failed"}`);
+        }
+      }
       if (customerPhone) await (supabase as any).from("pharmacy_customers").upsert({ pharmacy_id: pharmacyId, name: customerName || "Walk-in", phone: customerPhone, total_purchases: totalAmount, visit_count: 1, last_visit_at: new Date().toISOString() }, { onConflict: "pharmacy_id,phone", ignoreDuplicates: false }).select();
       return { ...sale, items: cart };
     },

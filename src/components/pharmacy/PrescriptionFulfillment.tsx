@@ -11,6 +11,7 @@ import {
 import { useInstitutionContext } from "@/hooks/useInstitutionContext";
 import { useAuth } from "@/context/AuthContext";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
+import { resolveInventoryItem, precheckDispenseLines, dispenseFEFO } from "./pharmacyStockService";
 
 interface Prescription {
   id: string;
@@ -199,6 +200,30 @@ export function PrescriptionFulfillment() {
 
     setIsSubmitting(true);
     try {
+      if (!institutionId) {
+        toast({ title: "No pharmacy branch linked to this account", variant: "destructive" });
+        return;
+      }
+
+      // GAP-02/GAP-04: resolve every medication to an inventoried item and
+      // pre-check dispensable stock BEFORE writing anything — a shortfall or
+      // unresolvable item aborts the whole dispense (no partial fulfillment).
+      const dispenseLines = [];
+      for (const m of medicationItems) {
+        const name = m.medication_name.trim();
+        const resolved = await resolveInventoryItem(institutionId, "medication_inventory", name);
+        if (!resolved) {
+          throw new Error(`"${name}" is not in pharmacy inventory — add it to inventory before dispensing.`);
+        }
+        dispenseLines.push({
+          inventoryTable: "medication_inventory" as const,
+          inventoryItemId: resolved.id,
+          quantity: Math.max(1, Math.round(m.quantity || 1)),
+          productName: name,
+        });
+      }
+      await precheckDispenseLines(institutionId, dispenseLines);
+
       const rxNo = `RX-PHARM-${Date.now().toString(36).toUpperCase()}`;
       const prescribedDate = new Date().toISOString();
 
@@ -217,11 +242,32 @@ export function PrescriptionFulfillment() {
         notes: rxNotes || "Direct Pharmacy Dispensing",
       }));
 
-      const { error } = await (supabase as any)
+      const { data: createdRows, error } = await (supabase as any)
         .from("comprehensive_prescriptions")
-        .insert(inserts);
+        .insert(inserts)
+        .select("id");
 
       if (error) throw error;
+
+      // FEFO-dispense the batch ledger, one atomic call per line, linked to
+      // the prescription row it fulfills.
+      try {
+        const createdIds: string[] = ((createdRows as any[]) || []).map((r: any) => r.id);
+        for (let i = 0; i < dispenseLines.length; i++) {
+          const line = dispenseLines[i];
+          await dispenseFEFO(institutionId, line.inventoryTable, line.inventoryItemId, line.quantity, {
+            referenceType: "rx_dispense",
+            referenceId: createdIds[i],
+            notes: `Rx ${rxNo} — ${line.productName}`,
+          });
+        }
+      } catch (fefoError: any) {
+        // Prescription rows are already recorded; the ledger is untouched for
+        // failed lines. Surface loudly so the dispense can be retried.
+        throw new Error(
+          `Prescriptions recorded but stock dispense failed: ${fefoError?.message || "FEFO dispense failed"}. Retry from the queue.`
+        );
+      }
 
       toast({
         title: "Prescription Dispensed",
@@ -253,6 +299,29 @@ export function PrescriptionFulfillment() {
 
   const updateFulfillmentStatus = async (prescriptionId: string, newStatus: string) => {
     try {
+      // GAP-02/GAP-04: filling an Rx decrements the batch ledger via FEFO.
+      // Dispense first; on any failure the status update is skipped so the
+      // queue still shows the prescription as pending.
+      if (newStatus === "filled" && isOnline && institutionId) {
+        const rx = prescriptions.find((p) => p.id === prescriptionId);
+        if (rx) {
+          const name = (rx.medication_name || "").trim();
+          const resolved = await resolveInventoryItem(institutionId, "medication_inventory", name);
+          if (!resolved) {
+            throw new Error(`"${name}" is not in pharmacy inventory — add it to inventory before filling.`);
+          }
+          const qty = Math.max(1, Math.round(rx.quantity || 1));
+          await precheckDispenseLines(institutionId, [
+            { inventoryTable: "medication_inventory", inventoryItemId: resolved.id, quantity: qty, productName: name },
+          ]);
+          await dispenseFEFO(institutionId, "medication_inventory", resolved.id, qty, {
+            referenceType: "rx_fill",
+            referenceId: prescriptionId,
+            notes: `Rx fill — ${name}`,
+          });
+        }
+      }
+
       setPrescriptions((prev) =>
         prev.map((p) => {
           if (p.id === prescriptionId) {
@@ -283,8 +352,9 @@ export function PrescriptionFulfillment() {
       if (error) throw error;
 
       toast({ title: "Prescription Status Updated" });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error updating fulfillment status:", error);
+      toast({ title: "Could not fill prescription", description: error?.message, variant: "destructive" });
     }
   };
 

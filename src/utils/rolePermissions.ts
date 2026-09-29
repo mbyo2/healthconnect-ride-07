@@ -246,6 +246,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/wallet',
     '/medical-records',
     '/hospital-management',
+    '/pharmacy-portal',       // DB is_pharmacy_operator() includes staff
     '/pharmacy-inventory',
     '/medications',
   ]),
@@ -735,6 +736,7 @@ ROLE_PERMISSIONS[USER_ROLES.PHLEBOTOMIST] = dedupeRoutes([
 
 ROLE_PERMISSIONS[USER_ROLES.BILLING_STAFF] = dedupeRoutes([
   ...INSTITUTION_OPERATIONAL_ROUTES,
+  '/pharmacy-portal',   // DB is_pharmacy_operator() includes billing staff
   '/wallet',
   '/institution/reports',
   '/prescriptions',
@@ -742,6 +744,7 @@ ROLE_PERMISSIONS[USER_ROLES.BILLING_STAFF] = dedupeRoutes([
 
 ROLE_PERMISSIONS[USER_ROLES.INVENTORY_MANAGER] = dedupeRoutes([
   ...INSTITUTION_OPERATIONAL_ROUTES,
+  '/pharmacy-portal',   // DB is_pharmacy_operator() includes inventory managers
   '/pharmacy-inventory',
   '/institution/reports',
   '/medications',
