@@ -143,8 +143,8 @@ export const ZAMBIA_DOCUMENT_REQUIREMENTS: CountryDocumentRequirements = {
     health_personnel: [
       {
         label: 'Professional License',
-        description: 'Valid professional license or registration in healthcare field',
-        required: true,
+        description: 'Valid professional license or registration in healthcare field (if issued for your cadre)',
+        required: false,
         acceptedFormats: ['pdf', 'jpg', 'png'],
       },
       {

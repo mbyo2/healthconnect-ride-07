@@ -38,7 +38,10 @@ const providerSchema = z.object({
   phone: z.string().optional(),
   providerType: z.string().min(1, "Select your profession"),
   specialty: z.string().optional(),
-  licenseNumber: z.string().min(2, "License number required"),
+  // Licence is only required for regulated cadres — enforced at submit time
+  // via provider_types.requires_license (traditional practitioners and the
+  // generic health-personnel cadre register without one).
+  licenseNumber: z.string().optional(),
   yearsExperience: z.string().optional(),
   password: z.string().min(6, "Min 6 characters"),
   confirmPassword: z.string().min(6),
@@ -89,6 +92,7 @@ const FALLBACK_PROVIDER_TYPES: Array<{ value: string; label: string }> = [
   { value: "environmental_health_officer", label: "Environmental Health Officer" },
   { value: "community_health_worker", label: "Community Health Worker" },
   { value: "traditional_practitioner", label: "Traditional Health Practitioner" },
+  { value: "phlebotomist", label: "Phlebotomist" },
   { value: "health_personnel", label: "Other Health Professional" },
 ];
 // Facility taxonomy (MOH Zambia pyramid + private + ZAMRA) — mirrors the

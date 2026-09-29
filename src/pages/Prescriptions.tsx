@@ -6,7 +6,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useUserRoles } from "@/context/UserRolesContext";
-import { ALL_CLINICIAN_ROLES, PHARMACY_SIDE_ROLES } from "@/config/roleConfig";
+import { PHARMACY_SIDE_ROLES, PRESCRIBING_ROLES } from "@/config/roleConfig";
 import { useInstitutionContext } from "@/hooks/useInstitutionContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -86,12 +86,17 @@ export const Prescriptions = () => {
     }
   ]);
 
-  // Prescribers, dispensers and facility admins see the provider-side queue.
-  const isProvider = availableRoles.some((r) =>
-    (ALL_CLINICIAN_ROLES as readonly string[]).includes(r) ||
-    (PHARMACY_SIDE_ROLES as readonly string[]).includes(r) ||
-    r === 'institution_admin'
+  // Prescribers, dispensers and facility admins see the provider-side board.
+  // Only the five legal prescribing professions may WRITE prescriptions —
+  // nurses, allied health, lab and community cadres get the patient view.
+  const isPrescriber = availableRoles.some((r) =>
+    (PRESCRIBING_ROLES as readonly string[]).includes(r)
   );
+  const isProvider = isPrescriber ||
+    availableRoles.some((r) =>
+      (PHARMACY_SIDE_ROLES as readonly string[]).includes(r) ||
+      r === 'institution_admin'
+    );
 
   const { data: prescriptions = [], isLoading, isError, refetch } = useQuery({
     queryKey: ["prescriptions", user?.id, isProvider],
@@ -438,7 +443,7 @@ export const Prescriptions = () => {
           </div>
 
           <div className="flex items-center gap-2">
-            {isProvider && (
+            {isPrescriber && (
               <Dialog open={showNewPrescription} onOpenChange={setShowNewPrescription}>
                 <DialogTrigger asChild>
                   <button className="vf-btn-primary gap-2 text-sm active:scale-95">

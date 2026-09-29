@@ -1,11 +1,45 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Loader2, Eye, EyeOff, Upload, X, CheckCircle, AlertCircle, UserCheck } from "lucide-react";
 import { ProviderRegistrationService, type ProviderRegistrationData, type ValidationErrors } from "@/services/ProviderRegistrationService";
 import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { REGULATORY_REQUIREMENTS, getCountryRequirements, validateDocumentUpload, type DocumentRequirement } from "@/config/regulatoryRequirements";
+
+interface ProviderTypeOption { value: string; label: string; requiresLicense: boolean; }
+
+// Fallback profession list (mirrors provider_types seed) so the form works
+// even when reference rows are not readable anonymously.
+const FALLBACK_PROVIDER_TYPES: ProviderTypeOption[] = [
+  { value: "doctor", label: "Doctor (Medical Officer / GP)", requiresLicense: true },
+  { value: "specialist", label: "Specialist / Consultant", requiresLicense: true },
+  { value: "medical_licentiate", label: "Medical Licentiate Practitioner", requiresLicense: true },
+  { value: "clinical_officer", label: "Clinical Officer", requiresLicense: true },
+  { value: "dentist", label: "Dentist (Dental Surgeon)", requiresLicense: true },
+  { value: "dental_therapist", label: "Dental Therapist / Hygienist", requiresLicense: true },
+  { value: "registered_nurse", label: "Registered Nurse (RN)", requiresLicense: true },
+  { value: "enrolled_nurse", label: "Enrolled Nurse (EN)", requiresLicense: true },
+  { value: "midwife", label: "Midwife (RM / EM)", requiresLicense: true },
+  { value: "nurse", label: "Nurse (General)", requiresLicense: true },
+  { value: "pharmacist", label: "Pharmacist", requiresLicense: true },
+  { value: "pharmacy_technologist", label: "Pharmacy Technologist / Dispenser", requiresLicense: true },
+  { value: "radiologist", label: "Radiologist", requiresLicense: true },
+  { value: "radiographer", label: "Radiographer / Imaging Technologist", requiresLicense: true },
+  { value: "pathologist", label: "Pathologist", requiresLicense: true },
+  { value: "lab_technician", label: "Lab Technician / Technologist", requiresLicense: true },
+  { value: "phlebotomist", label: "Phlebotomist", requiresLicense: true },
+  { value: "physiotherapist", label: "Physiotherapist", requiresLicense: true },
+  { value: "occupational_therapist", label: "Occupational Therapist", requiresLicense: true },
+  { value: "nutritionist", label: "Nutritionist / Dietician", requiresLicense: true },
+  { value: "optometrist", label: "Optometrist / Optician", requiresLicense: true },
+  { value: "psychologist", label: "Clinical Psychologist", requiresLicense: true },
+  { value: "environmental_health_officer", label: "Environmental Health Officer", requiresLicense: true },
+  { value: "community_health_worker", label: "Community Health Worker", requiresLicense: true },
+  { value: "traditional_practitioner", label: "Traditional Health Practitioner", requiresLicense: false },
+  { value: "health_personnel", label: "Other Health Professional", requiresLicense: false },
+];
 
 export const HealthPersonnelApplicationForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -21,15 +55,53 @@ export const HealthPersonnelApplicationForm = () => {
     confirmPassword: "",
     full_name: "",
     phone_number: "",
+    profession: "",
+    requires_license: true,
     license_number: "",
     specialty: "",
     years_of_experience: 0,
     documents_url: [],
   });
+  const [providerTypes, setProviderTypes] = useState<ProviderTypeOption[]>(FALLBACK_PROVIDER_TYPES);
+  const [hasExistingAccount, setHasExistingAccount] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState<string>("ZM");
   const [uploadedDocuments, setUploadedDocuments] = useState<Record<string, string>>({});
   const [documentValidation, setDocumentValidation] = useState<{ valid: boolean; missing: string[] }>({ valid: true, missing: [] });
   const [errors, setErrors] = useState<ValidationErrors>({});
+
+  // Load the live profession taxonomy and detect an existing session (the
+  // applicant may already have an account from the Auth-page signup).
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!cancelled && user) {
+        setHasExistingAccount(true);
+        setFormData(prev => ({
+          ...prev,
+          email: prev.email || user.email || "",
+          skipCredentials: true,
+        }));
+      }
+    })();
+    (async () => {
+      const { data, error } = await supabase
+        .from("provider_types")
+        .select("code, name, requires_license")
+        .eq("is_active", true)
+        .order("display_order");
+      if (!cancelled && !error && data && data.length > 0) {
+        setProviderTypes(data.map((t: any) => ({
+          value: t.code,
+          label: t.name,
+          requiresLicense: !!t.requires_license,
+        })));
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  const selectedProfession = providerTypes.find((t) => t.value === formData.profession);
 
   const validateField = (field: keyof ProviderRegistrationData, value: any) => {
     const tempData = { ...formData, [field]: value };
@@ -41,6 +113,13 @@ export const HealthPersonnelApplicationForm = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field]) setErrors(prev => ({ ...prev, [field]: undefined }));
     setTimeout(() => validateField(field, value), 100);
+  };
+
+  const handleProfessionChange = (value: string) => {
+    const prof = providerTypes.find((t) => t.value === value);
+    setFormData(prev => ({ ...prev, profession: value, requires_license: prof?.requiresLicense ?? true }));
+    if (errors.profession) setErrors(prev => ({ ...prev, profession: undefined }));
+    if (errors.license_number) setErrors(prev => ({ ...prev, license_number: undefined }));
   };
 
   const isFormValid = () => {
@@ -138,8 +217,8 @@ export const HealthPersonnelApplicationForm = () => {
           </div>
         ))}
 
-        {/* Password fields */}
-        {[
+        {/* Password fields — skipped when the applicant already has an account */}
+        {!hasExistingAccount && [
           { id: "password", label: "Password", show: showPassword, toggle: () => setShowPassword(v => !v), field: "password" as keyof ProviderRegistrationData },
           { id: "confirmPassword", label: "Confirm Password", show: showConfirmPassword, toggle: () => setShowConfirmPassword(v => !v), field: "confirmPassword" as keyof ProviderRegistrationData },
         ].map(f => (
@@ -170,6 +249,24 @@ export const HealthPersonnelApplicationForm = () => {
           <h3 className="font-extrabold text-sm uppercase tracking-wide text-graphite-500 dark:text-slate-400">Professional Information</h3>
         </div>
 
+        {/* Profession — the exact provider role the applicant is applying for */}
+        <div>
+          <label className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Profession <span className="text-error-500">*</span></label>
+          <div className="mt-1">
+            <Select value={formData.profession} onValueChange={handleProfessionChange} disabled={isSubmitting}>
+              <SelectTrigger className={`border ${errors.profession ? "border-error-500" : "border-graphite-300 dark:border-slate-700"} text-xs font-bold`}>
+                <SelectValue placeholder="Select your profession" />
+              </SelectTrigger>
+              <SelectContent>
+                {providerTypes.map((t) => (
+                  <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          {errors.profession && <p className="text-[10px] text-error-500 font-bold mt-1">{errors.profession}</p>}
+        </div>
+
         <div>
           <label className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Country of Practice <span className="text-error-500">*</span></label>
           <div className="mt-1">
@@ -186,8 +283,25 @@ export const HealthPersonnelApplicationForm = () => {
           </div>
         </div>
 
+        {/* Licence — required only for regulated professions */}
+        {selectedProfession?.requiresLicense !== false && (
+          <div>
+            <label htmlFor="license_number" className="text-xs font-extrabold text-graphite-500 dark:text-slate-400 uppercase">License Number <span className="text-error-500">*</span></label>
+            <input
+              id="license_number" type="text" placeholder="e.g. MD123456"
+              value={formData.license_number || ""}
+              onChange={(e) => handleInputChange("license_number", e.target.value)}
+              disabled={isSubmitting} required
+              className={`mt-1 ${inputCls(errors.license_number)}`}
+            />
+            {errors.license_number && <p className="text-[10px] text-error-500 font-bold mt-1">{errors.license_number}</p>}
+          </div>
+        )}
+        {selectedProfession && !selectedProfession.requiresLicense && (
+          <p className="text-[10px] text-graphite-400">No licence number required for {selectedProfession.label} — registration is verified during application review.</p>
+        )}
+
         {[
-          { id: "license_number", label: "License Number", placeholder: "e.g. MD123456", field: "license_number" as keyof ProviderRegistrationData },
           { id: "specialty", label: "Specialty", placeholder: "e.g. Cardiology, General Practice", field: "specialty" as keyof ProviderRegistrationData },
         ].map(f => (
           <div key={f.id}>

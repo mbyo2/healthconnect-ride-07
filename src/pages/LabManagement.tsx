@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
+import { useUserRoles } from "@/context/UserRolesContext";
 import { useInstitutionContext } from "@/hooks/useInstitutionContext";
 import { useCurrency } from "@/hooks/use-currency";
 import {
@@ -18,6 +19,21 @@ import { providerDisplayName } from "@/utils/providerDisplay";
 
 const LabManagement = () => {
   const { user } = useAuth();
+  const { availableRoles } = useUserRoles();
+  // Title fits the cadre — pathologists see the pathology board, lab techs
+  // the workbench, phlebotomists the collection board.
+  const labTitle = availableRoles.includes("pathologist")
+    ? "Pathology & Diagnostics Laboratory Board"
+    : availableRoles.includes("phlebotomist")
+      ? "Sample Collection Board"
+      : availableRoles.includes("radiographer")
+        ? "Imaging Worklist"
+        : "Laboratory Workbench";
+  const labSubtitle = availableRoles.includes("pathologist")
+    ? "Specimen telemetry, pathologist review queues, and automatic critical-result alerts"
+    : availableRoles.includes("phlebotomist")
+      ? "Collection runs, specimen handover & chain of custody"
+      : "Test queue, result entry & verification";
   const { institutionId: contextInstitutionId } = useInstitutionContext();
   const { formatPrice } = useCurrency();
   const [searchTerm, setSearchTerm] = useState("");
@@ -372,11 +388,11 @@ const LabManagement = () => {
             </div>
             <div>
               <h1 className="text-xl font-extrabold tracking-tight flex items-center gap-2">
-                Pathology & Diagnostics Laboratory Board
+                {labTitle}
                 <span className="w-2 h-2 rounded-full bg-success-500 animate-ping" />
               </h1>
               <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">
-                Specimen telemetry, pathologist review queues, and automatic critical-result alerts
+                {labSubtitle}
               </p>
             </div>
           </div>

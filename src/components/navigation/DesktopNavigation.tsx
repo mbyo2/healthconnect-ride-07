@@ -4,6 +4,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { useUserRoles } from "@/context/UserRolesContext";
 import { useInstitutionAffiliation } from "@/hooks/useInstitutionAffiliation";
+import { PRESCRIBING_ROLES } from "@/config/roleConfig";
 import { useMemo, useRef, useState, useEffect } from "react";
 import { 
   Home, Search, Calendar, MessageSquare, Settings, Heart, Wallet,
@@ -48,6 +49,8 @@ export const DesktopNavigation = () => {
   const location = useLocation();
   const { isAuthenticated } = useAuth();
   const { availableRoles, isHealthPersonnel, isAdmin, isPatient } = useUserRoles();
+  // Only the five legal prescribing professions get prescription-write links.
+  const canPrescribe = availableRoles.some((r) => (PRESCRIBING_ROLES as readonly string[]).includes(r));
   const { isInstitutionAffiliated } = useInstitutionAffiliation();
   const { ref: navScrollRef, edges: navEdges } = useScrollEdges<HTMLDivElement>();
 
@@ -79,7 +82,7 @@ export const DesktopNavigation = () => {
         { to: "/provider-dashboard", label: "Dashboard", icon: <Stethoscope className="h-5 w-5 mr-2" /> },
         { to: "/appointments", label: "Appointments", icon: <Calendar className="h-5 w-5 mr-2" /> },
         { to: "/medical-records", label: "Patient Records", icon: <Heart className="h-5 w-5 mr-2" /> },
-        { to: "/prescriptions", label: "Prescriptions", icon: <Pill className="h-5 w-5 mr-2" /> },
+        ...(canPrescribe ? [{ to: "/prescriptions", label: "Prescriptions", icon: <Pill className="h-5 w-5 mr-2" /> }] : []),
         { to: "/chat", label: "Messages", icon: <MessageSquare className="h-5 w-5 mr-2" /> },
         { to: "/ai-diagnostics", label: "AI Assistant", icon: <Brain className="h-5 w-5 mr-2" /> },
         { to: "/connections", label: "My Patients", icon: <Users className="h-5 w-5 mr-2" /> },

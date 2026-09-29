@@ -233,6 +233,17 @@ export const PRESCRIBING_ROLES: UserRole[] = [
   USER_ROLES.DENTIST,
 ];
 
+/** Roles whose charter includes the live lab_orders module — clinicians who
+ * may order lab tests and receive results. */
+export const LAB_ORDERING_ROLES: UserRole[] = [
+  USER_ROLES.DOCTOR,
+  USER_ROLES.SPECIALIST,
+  USER_ROLES.MEDICAL_LICENTIATE,
+  USER_ROLES.CLINICAL_OFFICER,
+  USER_ROLES.DENTIST,
+  USER_ROLES.RADIOLOGIST,
+];
+
 /** Nursing & midwifery cadres (NMCZ). */
 export const NURSING_ROLES: UserRole[] = [
   USER_ROLES.NURSE,

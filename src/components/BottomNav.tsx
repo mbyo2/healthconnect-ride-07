@@ -6,6 +6,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useUserRoles } from "@/context/UserRolesContext";
 import { useInstitutionAffiliation } from "@/hooks/useInstitutionAffiliation";
 import { hasRoutePermission } from "@/utils/rolePermissions";
+import { PRESCRIBING_ROLES } from "@/config/roleConfig";
 import { useMemo } from "react";
 import { BottomNavItem } from "@/components/navigation/BottomNavItem";
 import { BottomNavMenu } from "@/components/navigation/BottomNavMenu";
@@ -15,6 +16,8 @@ export function BottomNav() {
   const { isDesktop } = useDeviceType();
   const { isAuthenticated, user } = useAuth();
   const { availableRoles, isHealthPersonnel, isAdmin } = useUserRoles();
+  // Only the five legal prescribing professions get prescription-write links.
+  const canPrescribe = availableRoles.some((r) => (PRESCRIBING_ROLES as readonly string[]).includes(r));
   const { isInstitutionAffiliated } = useInstitutionAffiliation();
 
   const navItems = useMemo(() => {
@@ -280,7 +283,7 @@ export function BottomNav() {
       return [
         { to: "/provider-calendar", label: "Schedule Calendar", description: "View and manage your schedule", icon: <Calendar className="h-5 w-5" /> },
         { to: "/medical-records", label: "Patient Records", description: "Access patient medical records", icon: <Heart className="h-5 w-5" /> },
-        { to: "/prescriptions", label: "Write Prescriptions", description: "Create and manage prescriptions", icon: <Pill className="h-5 w-5" /> },
+        ...(canPrescribe ? [{ to: "/prescriptions", label: "Write Prescriptions", description: "Create and manage prescriptions", icon: <Pill className="h-5 w-5" /> }] : []),
         { to: "/connections", label: "My Patients", description: "Your connected patients", icon: <Users className="h-5 w-5" /> },
         ...(!isInstitutionAffiliated ? [{ to: "/wallet", label: "Earnings", description: "View your earnings and payouts", icon: <Wallet className="h-5 w-5" /> }] : []),
         { to: "/emergency", label: "Emergency Protocols", description: "Emergency response tools", icon: <AlertTriangle className="h-5 w-5 text-red-600" /> },

@@ -9,6 +9,7 @@ import { logAnalyticsEvent } from '@/utils/analytics-service';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { VideoOff } from 'lucide-react';
+import { CONSULTABLE_PROVIDER_ROLES } from '@/config/roleConfig';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -210,10 +211,11 @@ const VideoCall = () => {
 
   const handleLeave = useCallback(async () => {
     logAnalyticsEvent('video_call_ended', { consultation_id: consultationId });
-    // Providers close the visit on leave; patients can rejoin while live.
+    // Only consultable clinicians close the visit on leave; patients can
+    // rejoin while live, and non-consultable staff never own a visit.
     const role = (profile?.role || '').toLowerCase();
     try {
-      if (consultationId && role !== '' && role !== 'patient') {
+      if (consultationId && (CONSULTABLE_PROVIDER_ROLES as string[]).includes(role)) {
         await supabase
           .from('video_consultations')
           .update({ status: 'completed' })

@@ -401,10 +401,14 @@ export const ProviderDashboard = () => {
       professionCode: null as string | null,
     };
     const [code, pick] = pickEntry;
+    // Profession-specific subtitles where the category default misleads.
+    const subtitleOverride: Record<string, string> = {
+      midwife: "Antenatal care, deliveries & postnatal visits",
+    };
     return {
       dashboardMeta: {
         title: `${pick.label} Console`,
-        subtitle: subtitleByCategory[pick.category] || "Practice management, patient queue & telehealth",
+        subtitle: subtitleOverride[code] || subtitleByCategory[pick.category] || "Practice management, patient queue & telehealth",
       },
       professionCode: code as string,
     };
@@ -441,6 +445,7 @@ export const ProviderDashboard = () => {
     billing: "/wallet",
     dispense: "/pharmacy-portal",
     test_queue: "/lab-management",
+    lab_orders: "/lab-orders",
   };
 
   // A tile is only tappable when the module is live AND this provider's roles

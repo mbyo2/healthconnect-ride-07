@@ -4,6 +4,7 @@ import { NavigateFunction } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { useUserRoles } from "@/context/UserRolesContext";
 import { useInstitutionAffiliation } from "@/hooks/useInstitutionAffiliation";
+import { PRESCRIBING_ROLES } from "@/config/roleConfig";
 import { useMemo } from "react";
 import {
   Home, Search, Calendar, MessageSquare, Settings, Building2, User,
@@ -19,6 +20,8 @@ interface MobileNavigationProps {
 export const MobileNavigation = ({ setIsMenuOpen, navigate }: MobileNavigationProps) => {
   const { isAuthenticated, user, signOut, profile } = useAuth();
   const { currentRole, availableRoles, isHealthPersonnel, isAdmin } = useUserRoles();
+  // Only the five legal prescribing professions get prescription-write links.
+  const canPrescribe = availableRoles.some((r) => (PRESCRIBING_ROLES as readonly string[]).includes(r));
   const { isInstitutionAffiliated } = useInstitutionAffiliation();
 
   const handleLogout = async () => {
@@ -43,8 +46,28 @@ export const MobileNavigation = ({ setIsMenuOpen, navigate }: MobileNavigationPr
   // Role label for display
   const roleLabel = useMemo(() => {
     if (availableRoles.includes('doctor')) return 'Doctor';
+    if (availableRoles.includes('specialist')) return 'Specialist';
+    if (availableRoles.includes('medical_licentiate')) return 'Medical Licentiate';
+    if (availableRoles.includes('clinical_officer')) return 'Clinical Officer';
+    if (availableRoles.includes('dentist')) return 'Dentist';
+    if (availableRoles.includes('dental_therapist')) return 'Dental Therapist';
     if (availableRoles.includes('nurse')) return 'Nurse';
+    if (availableRoles.includes('registered_nurse')) return 'Registered Nurse';
+    if (availableRoles.includes('enrolled_nurse')) return 'Enrolled Nurse';
+    if (availableRoles.includes('midwife')) return 'Midwife';
     if (availableRoles.includes('radiologist')) return 'Radiologist';
+    if (availableRoles.includes('radiographer')) return 'Radiographer';
+    if (availableRoles.includes('pathologist')) return 'Pathologist';
+    if (availableRoles.includes('lab_technician')) return 'Lab Technician';
+    if (availableRoles.includes('phlebotomist')) return 'Phlebotomist';
+    if (availableRoles.includes('physiotherapist')) return 'Physiotherapist';
+    if (availableRoles.includes('occupational_therapist')) return 'Occupational Therapist';
+    if (availableRoles.includes('nutritionist')) return 'Nutritionist';
+    if (availableRoles.includes('optometrist')) return 'Optometrist';
+    if (availableRoles.includes('psychologist')) return 'Psychologist';
+    if (availableRoles.includes('environmental_health_officer')) return 'Environmental Health Officer';
+    if (availableRoles.includes('community_health_worker')) return 'Community Health Worker';
+    if (availableRoles.includes('traditional_practitioner')) return 'Traditional Practitioner';
     if (availableRoles.includes('health_personnel')) return 'Healthcare Provider';
     if (availableRoles.some(r => ['pharmacy', 'wholesale_pharmacy', 'pharmacist', 'pharmacy_technologist'].includes(r))) return 'Pharmacy';
     if (isAdmin) return 'Admin';
@@ -81,7 +104,7 @@ export const MobileNavigation = ({ setIsMenuOpen, navigate }: MobileNavigationPr
         { to: "/provider-dashboard", label: "Dashboard", icon: <Stethoscope className="mr-2 h-5 w-5" /> },
         { to: "/appointments", label: "Appointments", icon: <Calendar className="mr-2 h-5 w-5" /> },
         { to: "/medical-records", label: "Patient Records", icon: <Heart className="mr-2 h-5 w-5" /> },
-        { to: "/prescriptions", label: "Prescriptions", icon: <Pill className="mr-2 h-5 w-5" /> },
+        ...(canPrescribe ? [{ to: "/prescriptions", label: "Prescriptions", icon: <Pill className="mr-2 h-5 w-5" /> }] : []),
         { to: "/chat", label: "Messages", icon: <MessageSquare className="mr-2 h-5 w-5" /> },
         { to: "/ai-diagnostics", label: "AI Assistant", icon: <Brain className="mr-2 h-5 w-5" /> },
         { to: "/connections", label: "My Patients", icon: <Users className="mr-2 h-5 w-5" /> },

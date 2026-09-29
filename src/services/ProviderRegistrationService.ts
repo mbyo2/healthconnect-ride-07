@@ -7,12 +7,23 @@ export interface ProviderRegistrationData {
   password: string;
   confirmPassword: string;
   full_name: string;
-  
+
+  // Set when the applicant already has an auth account (e.g. signed up via
+  // the Auth page and is completing their application) — credentials are
+  // not collected again in that case.
+  skipCredentials?: boolean;
+
   // Profile Fields
   phone_number?: string;
-  
+
   // Provider-Specific Fields
-  license_number: string;
+  // The exact profession (a provider_types code). Carried through signup
+  // metadata so the approval trigger grants the precise role.
+  profession: string;
+  // Whether the chosen profession requires a licence (provider_types.
+  // requires_license). Licence number is only mandatory when true.
+  requires_license: boolean;
+  license_number?: string;
   specialty: string;
   years_of_experience: number;
   documents_url?: string[];
@@ -20,6 +31,7 @@ export interface ProviderRegistrationData {
 
 export interface RegistrationTransaction {
   userId?: string;
+  isNewAccount?: boolean;
   profileCreated: boolean;
   roleAssigned: boolean;
   applicationCreated: boolean;
@@ -31,6 +43,7 @@ export interface ValidationErrors {
   password?: string;
   confirmPassword?: string;
   full_name?: string;
+  profession?: string;
   phone_number?: string;
   license_number?: string;
   specialty?: string;
@@ -54,18 +67,20 @@ export class ProviderRegistrationService {
       errors.email = "Please enter a valid email address";
     }
 
-    // Password validation
-    if (!data.password) {
-      errors.password = "Password is required";
-    } else if (data.password.length < 6) {
-      errors.password = "Password must be at least 6 characters long";
-    }
+    // Password validation (skipped when the applicant already has an account)
+    if (!data.skipCredentials) {
+      if (!data.password) {
+        errors.password = "Password is required";
+      } else if (data.password.length < 6) {
+        errors.password = "Password must be at least 6 characters long";
+      }
 
-    // Confirm password validation
-    if (!data.confirmPassword) {
-      errors.confirmPassword = "Please confirm your password";
-    } else if (data.password !== data.confirmPassword) {
-      errors.confirmPassword = "Passwords do not match";
+      // Confirm password validation
+      if (!data.confirmPassword) {
+        errors.confirmPassword = "Please confirm your password";
+      } else if (data.password !== data.confirmPassword) {
+        errors.confirmPassword = "Passwords do not match";
+      }
     }
 
     // Full name validation
@@ -73,14 +88,19 @@ export class ProviderRegistrationService {
       errors.full_name = "Full name is required";
     }
 
+    // Profession validation
+    if (!data.profession?.trim()) {
+      (errors as any).profession = "Select your profession";
+    }
+
     // Phone number validation (optional but must be valid if provided)
     if (data.phone_number && !/^\+?[\d\s\-\(\)]+$/.test(data.phone_number)) {
       errors.phone_number = "Please enter a valid phone number";
     }
 
-    // License number validation
-    if (!data.license_number.trim()) {
-      errors.license_number = "License number is required";
+    // License number validation — only for regulated professions
+    if (data.requires_license && !data.license_number?.trim()) {
+      errors.license_number = "License number is required for this profession";
     }
 
     // Specialty validation
@@ -106,7 +126,18 @@ export class ProviderRegistrationService {
   }
 
   /**
-   * Registers a new provider with complete account setup
+   * Registers a new provider with complete account setup.
+   *
+   * The exact profession is carried through signup auth metadata so the
+   * database triggers (handle_new_user / assign_default_role /
+   * auto_create_provider_application) create the profile, grant the exact
+   * role and seed the application skeleton. This service then enriches the
+   * profile and upserts the application details. The exact provider role is
+   * only granted on admin approval — nothing here bypasses the gate.
+   *
+   * If the applicant already has an auth session (e.g. they signed up on the
+   * Auth page and are completing their application), signup/signin are
+   * skipped and the existing account is used.
    */
   static async registerProvider(data: ProviderRegistrationData): Promise<{
     success: boolean;
@@ -121,34 +152,53 @@ export class ProviderRegistrationService {
     };
 
     try {
-      // Step 1: Create user account
-      const { data: authData, error: authError } = await this.retryOperation(
-        () => supabase.auth.signUp({
-          email: data.email,
-          password: data.password,
-          options: {
-            data: {
-              full_name: data.full_name,
-            }
-          }
-        }),
-        "User account creation"
-      );
+      // Step 0: reuse an existing session when the applicant already has one
+      const { data: sessionData } = await supabase.auth.getUser();
+      const existingUser = sessionData?.user ?? null;
+      const isNewAccount = !existingUser;
+      transaction.isNewAccount = isNewAccount;
 
-      if (authError || !authData.user) {
-        throw new Error(authError?.message || "Failed to create user account");
+      let userId: string;
+      if (isNewAccount) {
+        // Step 1: Create user account. The profession travels in metadata so
+        // DB triggers grant the exact pending role and seed the application.
+        const { data: authData, error: authError } = await this.retryOperation(
+          () => supabase.auth.signUp({
+            email: data.email,
+            password: data.password,
+            options: {
+              data: {
+                full_name: data.full_name,
+                role: data.profession,
+                license_number: data.license_number || '',
+                specialty: data.specialty,
+                years_experience: data.years_of_experience,
+              }
+            }
+          }),
+          "User account creation"
+        );
+
+        if (authError || !authData.user) {
+          throw new Error(authError?.message || "Failed to create user account");
+        }
+        userId = authData.user.id;
+        transaction.userId = userId;
+      } else {
+        userId = existingUser.id;
+        transaction.userId = userId;
+        transaction.authenticationComplete = true;
       }
 
-      transaction.userId = authData.user.id;
-
-      // Step 2: Create/update profile
+      // Step 2: Enrich the profile (created by handle_new_user on signup).
+      // The holding role stays 'health_personnel' until admin approval.
       const nameParts = data.full_name.trim().split(/\s+/);
       const first_name = nameParts[0] || '';
       const last_name = nameParts.slice(1).join(' ');
-      
+
       const profileData: Database['public']['Tables']['profiles']['Insert'] = {
-        id: authData.user.id,
-        email: data.email,
+        id: userId,
+        email: existingUser?.email || data.email,
         first_name,
         last_name,
         phone: data.phone_number || null,
@@ -168,25 +218,16 @@ export class ProviderRegistrationService {
 
       transaction.profileCreated = true;
 
-      // Step 3: Assign provider role
-      const { error: roleError } = await this.retryOperation(
-        async () => await supabase.from('user_roles').insert({
-          user_id: authData.user.id,
-          role: 'health_personnel'
-        }),
-        "Role assignment"
-      );
-
-      if (roleError) {
-        throw new Error(`Failed to assign provider role: ${roleError.message}`);
-      }
-
+      // Step 3: role assignment is handled by the assign_default_role DB
+      // trigger (exact profession + patient at signup); the exact provider
+      // role is only granted on admin approval. Nothing to do here.
       transaction.roleAssigned = true;
 
-      // Step 4: Create application record
+      // Step 4: Upsert the application record (the trigger seeded a skeleton
+      // row at signup; this fills in the full professional details).
       const applicationData: Database['public']['Tables']['health_personnel_applications']['Insert'] = {
-        user_id: authData.user.id,
-        license_number: data.license_number,
+        user_id: userId,
+        license_number: data.license_number || '',
         specialty: data.specialty,
         years_of_experience: data.years_of_experience,
         documents_url: data.documents_url || [],
@@ -194,7 +235,7 @@ export class ProviderRegistrationService {
       };
 
       const { error: applicationError } = await this.retryOperation(
-        async () => await supabase.from('health_personnel_applications').insert(applicationData),
+        async () => await supabase.from('health_personnel_applications').upsert(applicationData, { onConflict: 'user_id' }),
         "Application creation"
       );
 
@@ -204,17 +245,19 @@ export class ProviderRegistrationService {
 
       transaction.applicationCreated = true;
 
-      // Step 5: Sign in the user automatically
-      const { error: signInError } = await this.retryOperation(
-        () => supabase.auth.signInWithPassword({
-          email: data.email,
-          password: data.password
-        }),
-        "User authentication"
-      );
+      // Step 5: Sign in new users automatically
+      if (isNewAccount) {
+        const { error: signInError } = await this.retryOperation(
+          () => supabase.auth.signInWithPassword({
+            email: data.email,
+            password: data.password
+          }),
+          "User authentication"
+        );
 
-      if (signInError) {
-        throw new Error(`Failed to authenticate user: ${signInError.message}`);
+        if (signInError) {
+          throw new Error(`Failed to authenticate user: ${signInError.message}`);
+        }
       }
 
       transaction.authenticationComplete = true;
@@ -226,7 +269,7 @@ export class ProviderRegistrationService {
 
     } catch (error: any) {
       console.error('Registration failed:', error);
-      
+
       // Attempt rollback if we have a user ID
       if (transaction.userId) {
         await this.rollbackRegistration(transaction);
@@ -265,7 +308,8 @@ export class ProviderRegistrationService {
   }
 
   /**
-   * Attempts to rollback a failed registration
+   * Attempts to rollback a failed registration. Only cleans up rows created
+   * for a brand-new account — pre-existing accounts keep their data.
    */
   private static async rollbackRegistration(transaction: RegistrationTransaction): Promise<void> {
     if (!transaction.userId) return;
@@ -273,6 +317,10 @@ export class ProviderRegistrationService {
     console.log('Attempting to rollback registration for user:', transaction.userId);
 
     try {
+      if (!transaction.isNewAccount) {
+        console.log('Pre-existing account — skipping rollback to preserve user data');
+        return;
+      }
       // Remove application if created
       if (transaction.applicationCreated) {
         await supabase

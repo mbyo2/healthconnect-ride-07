@@ -7,6 +7,7 @@ import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useState, useCallback, useMemo, useRef, useEffect } from "react";
 import { useSearch } from "@/context/SearchContext";
+import { PRESCRIBING_ROLES } from "@/config/roleConfig";
 import {
   Home, Calendar, MessageSquare, Users, ShoppingCart, Heart, Settings, User, Brain,
   Shield, Activity, BarChart3, AlertTriangle, Zap, Package, Pill, Stethoscope,
@@ -55,6 +56,8 @@ export function DesktopNav() {
   const location = useLocation();
   const { user, signOut, profile, isAuthenticated } = useAuth();
   const { availableRoles, isHealthPersonnel, isAdmin, isPatient } = useUserRoles();
+  // Only the five legal prescribing professions get prescription-write links.
+  const canPrescribe = availableRoles.some((r) => (PRESCRIBING_ROLES as readonly string[]).includes(r));
   const { isInstitutionAffiliated } = useInstitutionAffiliation();
   const [searchTerm, setSearchTerm] = useState("");
   const { setSearchQuery } = useSearch();
@@ -216,7 +219,7 @@ export function DesktopNav() {
       return [
         { to: "/provider-calendar", label: "Schedule Calendar", icon: <Calendar className="h-4 w-4 mr-2" /> },
         { to: "/medical-records", label: "Patient Records", icon: <Heart className="h-4 w-4 mr-2" /> },
-        { to: "/prescriptions", label: "Write Prescriptions", icon: <Pill className="h-4 w-4 mr-2" /> },
+        ...(canPrescribe ? [{ to: "/prescriptions", label: "Write Prescriptions", icon: <Pill className="h-4 w-4 mr-2" /> }] : []),
         { to: "/connections", label: "My Patients", icon: <Users className="h-4 w-4 mr-2" /> },
         ...(!isInstitutionAffiliated ? [{ to: "/wallet", label: "Earnings", icon: <Wallet className="h-4 w-4 mr-2" /> }] : []),
         { to: "/emergency", label: "Emergency Protocols", icon: <AlertTriangle className="h-4 w-4 mr-2" /> },

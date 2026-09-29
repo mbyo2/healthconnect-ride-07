@@ -11,6 +11,8 @@ import { ALL_CLINICIAN_ROLES } from "@/config/roleConfig";
 import { EmptyState, LoadingSkeleton } from "@/components/shared";
 import { SuggestionBanner, HealthTipCard } from "@/components/guidance";
 import { providerDisplayName } from "@/utils/providerDisplay";
+import { createNotification } from "@/services/notifications";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import {
   Calendar,
   Clock,
@@ -36,6 +38,9 @@ export const AppointmentsPage = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [rescheduleTarget, setRescheduleTarget] = useState<any>(null);
+  const [newDate, setNewDate] = useState("");
+  const [newTime, setNewTime] = useState("");
   const { availableRoles } = useUserRoles();
 
   // Every clinical cadre sees the provider-side schedule.
@@ -158,6 +163,93 @@ export const AppointmentsPage = () => {
       toast.success("Appointment marked as completed");
       queryClient.invalidateQueries({ queryKey: ["appointments"] });
     },
+  });
+
+  // Provider availability for the reschedule dialog (day_of_week + hours).
+  const { data: providerAvailability = [] } = useQuery<any[]>({
+    queryKey: ["reschedule-availability", rescheduleTarget?.provider_id],
+    queryFn: async () => {
+      if (!rescheduleTarget?.provider_id) return [];
+      const { data, error } = await supabase
+        .from("provider_availability")
+        .select("day_of_week, start_time, end_time")
+        .eq("provider_id", rescheduleTarget.provider_id);
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!rescheduleTarget,
+  });
+
+  const openReschedule = (app: any) => {
+    setRescheduleTarget(app);
+    setNewDate(app.date || "");
+    setNewTime(app.time || "");
+  };
+
+  const rescheduleAppointment = useMutation({
+    mutationFn: async () => {
+      if (!rescheduleTarget) throw new Error("No appointment selected");
+      if (!newDate) throw new Error("Please choose a new date");
+      if (!newTime) throw new Error("Please choose a new time");
+
+      const todayStr = format(new Date(), "yyyy-MM-dd");
+      if (newDate < todayStr) throw new Error("The new date cannot be in the past");
+
+      // Validate against the provider's working hours when they are set.
+      if (providerAvailability.length > 0) {
+        const dow = parseISO(newDate).getDay();
+        const dayRows = providerAvailability.filter((r: any) => r.day_of_week === dow);
+        if (dayRows.length === 0) {
+          throw new Error("The provider does not work on that day of the week");
+        }
+        const withinHours = dayRows.some((r: any) => {
+          const start = (r.start_time || "00:00").slice(0, 5);
+          const end = (r.end_time || "23:59").slice(0, 5);
+          return newTime >= start && newTime <= end;
+        });
+        if (!withinHours) throw new Error("That time is outside the provider's working hours");
+      }
+
+      // Slot conflict check — no double-booking the provider.
+      const { data: clashes, error: clashError } = await supabase
+        .from("appointments")
+        .select("id")
+        .eq("provider_id", rescheduleTarget.provider_id)
+        .eq("date", newDate)
+        .eq("time", newTime)
+        .neq("id", rescheduleTarget.id)
+        .neq("status", "cancelled")
+        .limit(1);
+      if (clashError) throw clashError;
+      if (clashes && clashes.length > 0) {
+        throw new Error("That slot is already booked — please choose another time");
+      }
+
+      const { error } = await supabase
+        .from("appointments")
+        .update({ date: newDate, time: newTime })
+        .eq("id", rescheduleTarget.id);
+      if (error) throw error;
+
+      // Notify the patient about the new slot.
+      if (rescheduleTarget.patient_id) {
+        const person = rescheduleTarget.patient;
+        const patientName = person ? `${person.first_name || ""} ${person.last_name || ""}`.trim() : "your appointment";
+        await createNotification(
+          rescheduleTarget.patient_id,
+          "Appointment rescheduled",
+          `Your appointment on ${format(parseISO(rescheduleTarget.date), "MMM d, yyyy")} at ${rescheduleTarget.time || ""} was moved to ${format(parseISO(newDate), "MMM d, yyyy")} at ${newTime}.`,
+          "appointment"
+        ).catch(() => null);
+        void patientName;
+      }
+    },
+    onSuccess: () => {
+      toast.success("Appointment rescheduled");
+      setRescheduleTarget(null);
+      queryClient.invalidateQueries({ queryKey: ["appointments"] });
+    },
+    onError: (e: any) => toast.error(e?.message || "Could not reschedule"),
   });
 
   // Filtered Appointments
@@ -444,6 +536,14 @@ export const AppointmentsPage = () => {
                                       DONE
                                     </button>
                                   )}
+                                  {isProvider && (
+                                    <button
+                                      onClick={() => openReschedule(app)}
+                                      className="px-3 py-1.5 min-h-[40px] rounded-lg bg-white border border-primary-200 text-primary-600 text-[10px] font-black hover:bg-primary-50 transition-all active:scale-95 inline-flex items-center"
+                                    >
+                                      RESCHEDULE
+                                    </button>
+                                  )}
                                   <button
                                     onClick={() => cancelAppointment.mutate(app.id)}
                                     className="px-3 py-1.5 min-h-[40px] rounded-lg bg-white border border-slate-200 text-slate-600 text-[10px] font-black hover:bg-slate-50 transition-all active:scale-95 inline-flex items-center"
@@ -565,6 +665,76 @@ export const AppointmentsPage = () => {
           )}
         </div>
       </div>
+
+      {/* Reschedule dialog — provider moves an upcoming appointment to a new
+          slot. Validated against working hours + double-booking; the patient
+          is notified automatically. */}
+      <Dialog open={!!rescheduleTarget} onOpenChange={(open) => !open && setRescheduleTarget(null)}>
+        <DialogContent className="max-w-md bg-white border border-canvas-silk rounded-card p-6">
+          <DialogHeader>
+            <DialogTitle className="font-display text-xl font-medium text-midnight">
+              Reschedule appointment
+            </DialogTitle>
+          </DialogHeader>
+          {rescheduleTarget && (
+            <div className="space-y-4 py-2">
+              <p className="text-sm text-graphite-500">
+                Currently{" "}
+                <span className="font-semibold text-midnight">
+                  {rescheduleTarget.date ? format(parseISO(rescheduleTarget.date), "MMM d, yyyy") : ""} at {rescheduleTarget.time || "—"}
+                </span>
+                {rescheduleTarget.patient && (
+                  <> with {rescheduleTarget.patient.first_name} {rescheduleTarget.patient.last_name}</>
+                )}
+                . Choose the new slot below.
+              </p>
+              <div>
+                <label className="text-sm font-semibold text-midnight block mb-1.5">New date</label>
+                <input
+                  type="date"
+                  value={newDate}
+                  min={format(new Date(), "yyyy-MM-dd")}
+                  onChange={(e) => setNewDate(e.target.value)}
+                  className="w-full rounded-xl border border-canvas-silk px-3 py-2.5 text-sm"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-semibold text-midnight block mb-1.5">New time</label>
+                <input
+                  type="time"
+                  value={newTime}
+                  onChange={(e) => setNewTime(e.target.value)}
+                  className="w-full rounded-xl border border-canvas-silk px-3 py-2.5 text-sm"
+                />
+              </div>
+              {providerAvailability.length > 0 && (
+                <p className="text-xs text-graphite-500">
+                  Working days:{" "}
+                  {[...new Set(providerAvailability.map((r: any) => r.day_of_week))]
+                    .sort()
+                    .map((d: any) => ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][d])
+                    .join(", ")}
+                </p>
+              )}
+            </div>
+          )}
+          <DialogFooter>
+            <button
+              onClick={() => setRescheduleTarget(null)}
+              className="px-4 py-2 rounded-xl border border-canvas-silk text-sm font-semibold text-graphite-500 hover:bg-slate-50"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => rescheduleAppointment.mutate()}
+              disabled={rescheduleAppointment.isPending}
+              className="px-4 py-2 rounded-xl bg-primary-500 text-white text-sm font-bold hover:bg-primary-600 disabled:opacity-50"
+            >
+              {rescheduleAppointment.isPending ? "Moving…" : "Confirm new slot"}
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </NetworkErrorBoundary>
   );
 };

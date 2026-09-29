@@ -11,6 +11,7 @@ import { ProviderReviews } from "@/components/reviews/ProviderReviews";
 import { BookingModal } from "@/components/booking/BookingModal";
 import { WaitlistSignup } from "@/components/booking/WaitlistSignup";
 import { providerDisplayName } from "@/utils/providerDisplay";
+import { CONSULTABLE_PROVIDER_ROLES } from "@/config/roleConfig";
 import { useState } from "react";
 import { Provider } from "@/types/provider";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -164,6 +165,10 @@ export const ProviderDetail = () => {
   const rating = ratingRaw != null && Number(ratingRaw) > 0 ? Number(ratingRaw) : null;
   const reviewCount = stats?.total_reviews || 0;
 
+  // Booking is only offered for consultable cadres (individual clinicians
+  // patients can book with). Lab/pharmacy/imaging cadres are reached via
+  // their institutions, not direct appointments.
+  const canBook = (CONSULTABLE_PROVIDER_ROLES as string[]).includes(provider?.role ?? "");
   // Honorific fits the cadre — only doctoral roles are "Dr.".
   const providerName = providerDisplayName(provider);
   const providerSpecialty = provider.specialty || "Healthcare Specialist";
@@ -472,22 +477,30 @@ export const ProviderDetail = () => {
                 </Section>
               )}
 
-              {/* Book CTA */}
-              <div className="space-y-2">
-                <button
-                  onClick={() => setIsBookingOpen(true)}
-                  className="w-full py-3.5 min-h-[48px] rounded-2xl bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-sm transition-all"
-                >
-                  <CalendarPlus className="h-4 w-4 inline mr-2" />
-                  Book Appointment
-                </button>
-                <button
-                  onClick={() => setIsWaitlistOpen(true)}
-                  className="w-full py-3 min-h-[44px] rounded-2xl border border-canvas-silk dark:border-slate-700 hover:bg-canvas-mist dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-xs transition-all"
-                >
-                  Join Waitlist
-                </button>
-              </div>
+              {/* Book CTA — only for consultable cadres */}
+              {canBook ? (
+                <div className="space-y-2">
+                  <button
+                    onClick={() => setIsBookingOpen(true)}
+                    className="w-full py-3.5 min-h-[48px] rounded-2xl bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-sm transition-all"
+                  >
+                    <CalendarPlus className="h-4 w-4 inline mr-2" />
+                    Book Appointment
+                  </button>
+                  <button
+                    onClick={() => setIsWaitlistOpen(true)}
+                    className="w-full py-3 min-h-[44px] rounded-2xl border border-canvas-silk dark:border-slate-700 hover:bg-canvas-mist dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-xs transition-all"
+                  >
+                    Join Waitlist
+                  </button>
+                </div>
+              ) : (
+                <div className="p-3 rounded-2xl border border-canvas-silk dark:border-slate-700 bg-canvas-mist dark:bg-slate-800/60">
+                  <p className="text-xs text-slate-600 dark:text-slate-300 font-medium">
+                    This professional works through a health facility — appointments are arranged via the institution, not direct booking.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>

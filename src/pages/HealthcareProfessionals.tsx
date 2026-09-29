@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { ALL_CLINICIAN_ROLES } from '@/config/roleConfig';
+import { ALL_CLINICIAN_ROLES, CONSULTABLE_PROVIDER_ROLES } from '@/config/roleConfig';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -327,13 +327,22 @@ const HealthcareProfessionals = () => {
                 </div>
 
                 <div className="flex gap-2 pt-2">
-                  <Button size="sm" className="flex-1" onClick={() => navigate(`/provider/${prof.id}`)}>
-                    <Calendar className="h-4 w-4 mr-2" />
-                    Book
-                  </Button>
-                  <Button size="sm" variant="outline" onClick={() => navigate(`/provider/${prof.id}`)}>
-                    Profile
-                  </Button>
+                  {(() => {
+                    const consultable = (CONSULTABLE_PROVIDER_ROLES as string[]).includes((prof as any)?.role);
+                    return (
+                      <>
+                        <Button size="sm" className="flex-1" onClick={() => navigate(`/provider/${prof.id}`)}>
+                          <Calendar className="h-4 w-4 mr-2" />
+                          {consultable ? "Book" : "View Profile"}
+                        </Button>
+                        {consultable && (
+                          <Button size="sm" variant="outline" onClick={() => navigate(`/provider/${prof.id}`)}>
+                            Profile
+                          </Button>
+                        )}
+                      </>
+                    );
+                  })()}
                 </div>
               </CardContent>
             </Card>

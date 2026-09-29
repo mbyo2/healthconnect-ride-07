@@ -66,6 +66,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
   [USER_ROLES.DOCTOR]: dedupeRoutes([
     ...COMMON_ROUTES,
     ...PROVIDER_CORE_ROUTES,
+    '/lab-orders',          // order lab tests & receive results
     '/prescriptions',       // doctors can prescribe
     '/ai-diagnostics',      // clinical decision support
     '/telemedicine',
@@ -77,6 +78,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
   [USER_ROLES.SPECIALIST]: dedupeRoutes([
     ...COMMON_ROUTES,
     ...PROVIDER_CORE_ROUTES,
+    '/lab-orders',          // order lab tests & receive results
     '/prescriptions',       // specialists can prescribe
     '/ai-diagnostics',      // clinical decision support
     '/telemedicine',
@@ -98,6 +100,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
   [USER_ROLES.RADIOLOGIST]: dedupeRoutes([
     ...COMMON_ROUTES,
     ...PROVIDER_CORE_ROUTES,
+    '/lab-orders',          // order imaging-correlated lab tests
     '/ai-diagnostics',      // imaging AI support
     '/medications',
     '/health-analytics',    // performance analytics
@@ -107,7 +110,10 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
   [USER_ROLES.HEALTH_PERSONNEL]: dedupeRoutes([
     ...COMMON_ROUTES,
     ...PROVIDER_CORE_ROUTES,
-    '/prescriptions',
+    // NOTE: '/prescriptions' intentionally NOT granted here — only the five
+    // legal prescribing professions (PRESCRIBING_ROLES) and pharmacy dispense
+    // roles may open the prescription board. Non-prescribing clinicians must
+    // not inherit write access through this generic catch-all.
     '/ai-diagnostics',
     '/telemedicine',
     '/health-analytics',
@@ -444,6 +450,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
   [USER_ROLES.MEDICAL_LICENTIATE]: dedupeRoutes([
     ...COMMON_ROUTES,
     ...PROVIDER_CORE_ROUTES,
+    '/lab-orders',          // order lab tests & receive results
     '/prescriptions',       // licensed to prescribe
     '/ai-diagnostics',      // clinical decision support
     '/telemedicine',
@@ -455,6 +462,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
   [USER_ROLES.CLINICAL_OFFICER]: dedupeRoutes([
     ...COMMON_ROUTES,
     ...PROVIDER_CORE_ROUTES,
+    '/lab-orders',          // order lab tests & receive results
     '/prescriptions',       // licensed to prescribe
     '/ai-diagnostics',
     '/telemedicine',
@@ -466,6 +474,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
   [USER_ROLES.DENTIST]: dedupeRoutes([
     ...COMMON_ROUTES,
     ...PROVIDER_CORE_ROUTES,
+    '/lab-orders',          // order lab tests & receive results
     '/prescriptions',
     '/ai-diagnostics',
     '/telemedicine',
@@ -598,7 +607,9 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
   // ── Environmental Health Officer (HPCZ) ──────────────────────
   [USER_ROLES.ENVIRONMENTAL_HEALTH_OFFICER]: dedupeRoutes([
     ...COMMON_ROUTES,
-    ...PROVIDER_CORE_ROUTES,
+    // Field cadre: not bookable for consultations — no video-consultation
+    // routes (those live in PROVIDER_CORE_ROUTES for consultable roles).
+    ...PROVIDER_CORE_ROUTES.filter(r => !r.startsWith('/video')),
     '/telemedicine',
     '/health-analytics',
   ]),
@@ -606,7 +617,8 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
   // ── Community Health Worker / Assistant ──────────────────────
   [USER_ROLES.COMMUNITY_HEALTH_WORKER]: dedupeRoutes([
     ...COMMON_ROUTES,
-    ...PROVIDER_CORE_ROUTES,
+    // Field cadre: not bookable for consultations — no video-consultation routes.
+    ...PROVIDER_CORE_ROUTES.filter(r => !r.startsWith('/video')),
     '/symptoms',            // household screening
     '/telemedicine',
     '/health-analytics',
@@ -937,7 +949,7 @@ export const getRoleNavigation = (userRoles: UserRole[] | null) => {
     // (clinical/allied/community cadres included via spread groups below)
     { path: '/appointments', label: 'Appointments', icon: 'Calendar', roles: ['patient', 'health_personnel', 'doctor', 'specialist', 'medical_licentiate', 'clinical_officer', 'dentist', 'dental_therapist', 'nurse', 'registered_nurse', 'enrolled_nurse', 'midwife', 'radiologist', 'radiographer', 'physiotherapist', 'occupational_therapist', 'nutritionist', 'optometrist', 'psychologist', 'environmental_health_officer', 'community_health_worker', 'traditional_practitioner', 'institution_admin', 'institution_staff', 'medical_records_officer', 'super_admin'] },
     { path: '/chat', label: 'Messages', icon: 'MessageCircle', roles: ['patient', 'health_personnel', 'doctor', 'specialist', 'medical_licentiate', 'clinical_officer', 'dentist', 'nurse', 'registered_nurse', 'enrolled_nurse', 'midwife', 'radiologist', 'psychologist', 'community_health_worker', 'admin', 'institution_admin', 'institution_staff', 'medical_records_officer', 'super_admin'] },
-    { path: '/prescriptions', label: 'Prescriptions', icon: 'Pill', roles: ['patient', 'health_personnel', 'doctor', 'specialist', 'medical_licentiate', 'clinical_officer', 'dentist', 'pharmacy', 'pharmacist', 'pharmacy_technologist', 'super_admin'] },
+    { path: '/prescriptions', label: 'Prescriptions', icon: 'Pill', roles: ['patient', 'doctor', 'specialist', 'medical_licentiate', 'clinical_officer', 'dentist', 'pharmacy', 'pharmacist', 'pharmacy_technologist', 'super_admin'] },
     { path: '/map', label: 'Map', icon: 'MapPin', roles: ['patient', 'health_personnel', 'doctor', 'nurse', 'registered_nurse', 'enrolled_nurse', 'midwife', 'radiologist', 'community_health_worker', 'environmental_health_officer', 'pharmacy', 'pharmacist', 'wholesale_pharmacy', 'lab', 'lab_technician', 'admin', 'super_admin'] },
     { path: '/wallet', label: 'Wallet', icon: 'Wallet', roles: ['patient', 'health_personnel', 'doctor', 'nurse', 'registered_nurse', 'radiologist', 'pharmacy', 'pharmacist', 'wholesale_pharmacy', 'lab', 'lab_technician', 'super_admin'] },
     { path: '/emergency', label: 'Emergency', icon: 'AlertTriangle', roles: ['patient', 'health_personnel', 'doctor', 'nurse', 'registered_nurse', 'midwife', 'clinical_officer', 'community_health_worker', 'super_admin'] },
