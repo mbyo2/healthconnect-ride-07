@@ -264,6 +264,37 @@ const LabManagement = () => {
     }
   };
 
+  const verifyResult = async () => {
+    if (!selectedRequest) return;
+    setIsSubmitting(true);
+    try {
+      const { error } = await supabase
+        .from("lab_tests")
+        .update({
+          verified_by: user?.id ?? null,
+          verified_at: new Date().toISOString(),
+        })
+        .eq("id", selectedRequest.id);
+
+      if (error) throw error;
+
+      // Mark the lab_results row verified too
+      await supabase
+        .from("lab_results")
+        .update({ verified_at: new Date().toISOString() })
+        .eq("request_id", selectedRequest.id);
+
+      toast.success("Result verified & signed off");
+      setSelectedRequest({ ...selectedRequest, verified_by: user?.id } as any);
+      queryClient.invalidateQueries({ queryKey: ["lab-requests"] });
+    } catch (error) {
+      console.error("Error verifying result:", error);
+      toast.error("Failed to verify result");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const createRequest = async () => {
     if (!selectedPatientId || !selectedTestType || !user) return;
     setIsSubmitting(true);
@@ -622,7 +653,14 @@ const LabManagement = () => {
                             </button>
                           )}
                           {request.status === "completed" && (
-                            <button onClick={() => setSelectedRequest(request)} className="px-3 py-1 rounded-md border border-graphite-300 dark:border-slate-700 text-xs font-bold">
+                            <button
+                              onClick={() => {
+                                setSelectedRequest(request);
+                                setResultSummary((request as any).result_summary || "");
+                                setActiveTab("results");
+                              }}
+                              className="px-3 py-1 rounded-md border border-graphite-300 dark:border-slate-700 text-xs font-bold"
+                            >
                               View Results
                             </button>
                           )}
@@ -639,7 +677,8 @@ const LabManagement = () => {
         {activeTab === "results" && (
           <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
             <h2 className="font-extrabold text-sm mb-4 flex items-center gap-2">
-              <FileText className="h-4 w-4 text-primary-500" /> Pathologist Results Verification Entry
+              <FileText className="h-4 w-4 text-primary-500" />
+              {selectedRequest?.status === "completed" ? "Lab Results — Review & Verification" : "Pathologist Results Verification Entry"}
             </h2>
             {selectedRequest ? (
               <div className="space-y-4 text-xs">
@@ -653,6 +692,35 @@ const LabManagement = () => {
                   {getStatusPill(selectedRequest.status)}
                 </div>
 
+                {selectedRequest.status === "completed" ? (
+                  <>
+                    <div>
+                      <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Result Findings</label>
+                      <div className="w-full min-h-[140px] mt-1 p-3 rounded-xl border border-graphite-300 dark:border-slate-700 bg-canvas-silk dark:bg-slate-800 font-medium whitespace-pre-wrap">
+                        {resultSummary || (selectedRequest as any).result_summary || "No findings recorded."}
+                      </div>
+                    </div>
+                    {(selectedRequest as any).results_date && (
+                      <p className="text-graphite-500 dark:text-slate-400">
+                        Reported: <strong>{new Date((selectedRequest as any).results_date).toLocaleString()}</strong>
+                      </p>
+                    )}
+                    <div className="flex gap-2">
+                      <button onClick={() => { setSelectedRequest(null); setResultSummary(""); setActiveTab("requests"); }} className="px-4 py-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold text-xs">
+                        Back to Orders
+                      </button>
+                      <button
+                        onClick={verifyResult}
+                        disabled={isSubmitting || (selectedRequest as any).verified_by}
+                        className="px-5 py-2 rounded-md bg-success-500 text-white font-extrabold text-xs flex items-center gap-1 shadow-xs disabled:opacity-50"
+                      >
+                        {isSubmitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                        {(selectedRequest as any).verified_by ? "Verified ✓" : "Verify & Sign Off"}
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <>
                 <div>
                   <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Result Findings Summary</label>
                   <textarea
@@ -680,6 +748,8 @@ const LabManagement = () => {
                     {isSubmitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />} Submit & Release Results
                   </button>
                 </div>
+                  </>
+                )}
               </div>
             ) : (
               <div className="text-center py-12 text-xs text-graphite-500 dark:text-slate-400">
