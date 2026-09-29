@@ -16,8 +16,11 @@ export const ProfileSetup = () => {
   const { refreshProfile } = useAuth();
   const [loading, setLoading] = useState(false);
   const [userRole, setUserRole] = useState<string>('patient');
-  const [avatar, setAvatar] = useState<File | null>(null);
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  // Uploaded avatar URL — uploaded immediately on file select (not deferred
+  // to submit) so a page remount / session bounce can never silently drop it.
+  const [uploadedAvatarUrl, setUploadedAvatarUrl] = useState<string | null>(null);
+  const [avatarPreviewUrl, setAvatarPreviewUrl] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
@@ -46,32 +49,51 @@ export const ProfileSetup = () => {
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
     const file = e.target.files[0];
-    setAvatar(file);
-    setAvatarUrl(URL.createObjectURL(file));
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please choose an image file");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image must be under 5MB");
+      return;
+    }
+    // Instant local preview…
+    setAvatarPreviewUrl(URL.createObjectURL(file));
+    // …then upload immediately so the result survives remounts / session
+    // bounces. Failures surface here as a toast, never a silent skip.
+    setAvatarUploading(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("You must be signed in to upload a photo");
+      const fileExt = file.name.split('.').pop();
+      const filePath = `${user.id}/${Date.now()}.${fileExt}`;
+      const { error } = await supabase.storage.from('avatars').upload(filePath, file);
+      if (error) throw error;
+      const publicUrl = supabase.storage.from('avatars').getPublicUrl(filePath).data.publicUrl;
+      setUploadedAvatarUrl(publicUrl);
+      toast.success("Photo uploaded");
+    } catch (err: any) {
+      console.error("Avatar upload failed:", err);
+      toast.error(err?.message || "Photo upload failed — please try again");
+    } finally {
+      setAvatarUploading(false);
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const uploadAvatar = async (userId: string) => {
-    if (!avatar) return null;
-    const fileExt = avatar.name.split('.').pop();
-    const filePath = `${userId}/${Date.now()}.${fileExt}`;
-    const { error } = await supabase.storage.from('avatars').upload(filePath, avatar);
-    if (error) throw error;
-    return supabase.storage.from('avatars').getPublicUrl(filePath).data.publicUrl;
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (avatarUploading) {
+      toast.info("Please wait for your photo to finish uploading");
+      return;
+    }
     setLoading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("No user found");
-
-      let uploadedUrl: string | null = null;
-      if (avatar) uploadedUrl = await uploadAvatar(user.id);
 
       // Build payload — omit empty strings (esp. date_of_birth which is a DATE column)
       // and skip DOB/gender entirely for business accounts.
@@ -82,7 +104,7 @@ export const ProfileSetup = () => {
       };
       if (formData.phone.trim()) payload.phone = formData.phone.trim();
       if (formData.bio.trim()) payload.bio = formData.bio.trim();
-      if (uploadedUrl) payload.avatar_url = uploadedUrl;
+      if (uploadedAvatarUrl) payload.avatar_url = uploadedAvatarUrl;
       if (!isBusiness) {
         if (formData.date_of_birth) payload.date_of_birth = formData.date_of_birth;
         if (formData.gender) payload.gender = formData.gender;
@@ -136,10 +158,15 @@ export const ProfileSetup = () => {
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="flex flex-col items-center mb-6">
           <Avatar className="w-24 h-24">
-            <AvatarImage src={avatarUrl || ""} />
+            <AvatarImage src={avatarPreviewUrl || ""} />
             <AvatarFallback className="text-lg">{formData.first_name?.[0]}{formData.last_name?.[0]}</AvatarFallback>
           </Avatar>
-          <Input type="file" accept="image/*" onChange={handleFileChange} className="mt-4 max-w-xs" />
+          <Input type="file" accept="image/*" onChange={handleFileChange} className="mt-4 max-w-xs" disabled={avatarUploading} />
+          {avatarUploading && (
+            <p className="mt-2 text-xs text-graphite-500 flex items-center gap-1.5">
+              <Loader2 className="h-3.5 w-3.5 animate-spin" /> Uploading photo…
+            </p>
+          )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -184,10 +211,10 @@ export const ProfileSetup = () => {
           )}
         </div>
 
-        <Button type="submit" className="w-full" disabled={loading}>
+        <Button type="submit" className="w-full" disabled={loading || avatarUploading}>
           {loading ? (
             <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saving...</>
-          ) : "Complete Profile"}
+          ) : avatarUploading ? "Uploading photo..." : "Complete Profile"}
         </Button>
       </form>
     </div>
