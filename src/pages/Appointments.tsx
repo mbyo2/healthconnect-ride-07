@@ -141,13 +141,20 @@ export const AppointmentsPage = () => {
 
   const cancelAppointment = useMutation({
     mutationFn: async (appointmentId: string) => {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from("appointments")
         .update({ status: "cancelled" })
-        .eq("id", appointmentId);
+        .eq("id", appointmentId)
+        .select("id");
       if (error) throw error;
+      // PostgREST returns 200 with zero rows when RLS blocks the update —
+      // never let a blocked cancellation look like a silent success.
+      if (!data || data.length === 0) {
+        throw new Error("Cancellation was blocked. Please try again or contact support.");
+      }
     },
     onSuccess: () => toast.success("Appointment cancelled"),
+    onError: (e: any) => toast.error(e?.message || "Could not cancel the appointment."),
     onSettled: () => queryClient.invalidateQueries({ queryKey: ["appointments"] }),
   });
 
