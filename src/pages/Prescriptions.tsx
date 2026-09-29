@@ -437,7 +437,11 @@ export const Prescriptions = () => {
                 <span className="w-2 h-2 rounded-full bg-success-500" />
               </h1>
               <p className="text-sm text-graphite-500 font-medium tracking-wide">
-                {isProvider ? "Write single or multi-medication digital prescriptions & dispense orders" : "Track dosage instructions, active refills & digital prescriptions"}
+                {isPrescriber
+                  ? "Write single or multi-medication digital prescriptions & dispense orders"
+                  : isProvider
+                    ? "Receive and dispense prescriptions issued by clinicians"
+                    : "Track dosage instructions, active refills & digital prescriptions"}
               </p>
             </div>
           </div>

@@ -4,7 +4,7 @@ import { NavigateFunction } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { useUserRoles } from "@/context/UserRolesContext";
 import { useInstitutionAffiliation } from "@/hooks/useInstitutionAffiliation";
-import { PRESCRIBING_ROLES } from "@/config/roleConfig";
+import { PRESCRIBING_ROLES, ALL_CLINICIAN_ROLES } from "@/config/roleConfig";
 import { useMemo } from "react";
 import {
   Home, Search, Calendar, MessageSquare, Settings, Building2, User,
@@ -72,7 +72,7 @@ export const MobileNavigation = ({ setIsMenuOpen, navigate }: MobileNavigationPr
     if (availableRoles.some(r => ['pharmacy', 'wholesale_pharmacy', 'pharmacist', 'pharmacy_technologist'].includes(r))) return 'Pharmacy';
     if (isAdmin) return 'Admin';
     if (availableRoles.some(r => ['institution_admin', 'institution_staff'].includes(r))) return 'Institution';
-    if (availableRoles.some(r => ['lab', 'lab_technician'].includes(r))) return 'Lab';
+    if (availableRoles.some(r => ['lab', 'lab_technician', 'pathologist', 'phlebotomist'].includes(r))) return 'Lab';
     return 'Patient';
   }, [availableRoles, isAdmin]);
 
@@ -99,7 +99,7 @@ export const MobileNavigation = ({ setIsMenuOpen, navigate }: MobileNavigationPr
     }
 
     // Doctor / Health Personnel / Radiologist
-    if (isHealthPersonnel || availableRoles.some(r => ['doctor', 'radiologist'].includes(r))) {
+    if (isHealthPersonnel || availableRoles.some(r => (ALL_CLINICIAN_ROLES as readonly string[]).includes(r))) {
       return [
         { to: "/provider-dashboard", label: "Dashboard", icon: <Stethoscope className="mr-2 h-5 w-5" /> },
         { to: "/appointments", label: "Appointments", icon: <Calendar className="mr-2 h-5 w-5" /> },
@@ -151,7 +151,7 @@ export const MobileNavigation = ({ setIsMenuOpen, navigate }: MobileNavigationPr
     }
 
     // Lab / Lab Technician
-    if (availableRoles.some(r => ['lab', 'lab_technician'].includes(r))) {
+    if (availableRoles.some(r => ['lab', 'lab_technician', 'pathologist', 'phlebotomist'].includes(r))) {
       return [
         { to: "/lab-management", label: "Lab Dashboard", icon: <Activity className="mr-2 h-5 w-5" /> },
         { to: "/medical-records", label: "Records", icon: <Heart className="mr-2 h-5 w-5" /> },

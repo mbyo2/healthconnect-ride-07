@@ -24,7 +24,7 @@ import {
 
 const PharmacyPortal = () => {
   const { user } = useAuth();
-  const { hasRole } = useUserRoles();
+  const { hasRole, availableRoles } = useUserRoles();
   const { institutionId: pharmacyId } = useInstitutionContext();
   const [activeTab, setActiveTab] = useState('dashboard');
 
@@ -34,6 +34,12 @@ const PharmacyPortal = () => {
   const isWholesaleOnly =
     hasRole(['wholesale_pharmacy']) &&
     !hasRole(['pharmacy', 'pharmacist', 'pharmacy_technologist']);
+  // Portal title fits the visitor: individual pharmacists/technologists see
+  // their own console, wholesale distributors the B2B portal.
+  const portalTitle = isWholesaleOnly ? 'Wholesale Distribution Portal'
+    : availableRoles.includes('pharmacist') ? 'Pharmacist Console'
+    : availableRoles.includes('pharmacy_technologist') ? 'Pharmacy Technologist Console'
+    : 'Pharmacy Operations Portal';
   const showRetailTabs = !isWholesaleOnly;
 
   return (
@@ -53,7 +59,7 @@ const PharmacyPortal = () => {
                     <span className="text-[11px] font-black uppercase tracking-wider text-slate-300">Pharmacy &amp; Logistics Hub</span>
                   </div>
                   <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white mt-0.5">
-                    {isWholesaleOnly ? 'Wholesale Distribution Portal' : 'Pharmacy Operations Portal'}
+                    {portalTitle}
                   </h1>
                   <p className="text-xs text-slate-400 font-medium">
                     {isWholesaleOnly

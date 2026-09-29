@@ -51,7 +51,7 @@ export const HeaderControls = ({ isMenuOpen, setIsMenuOpen, navigate }: HeaderCo
     if (availableRoles.some(r => ['pharmacy', 'wholesale_pharmacy', 'pharmacist', 'pharmacy_technologist'].includes(r))) return '/pharmacy-portal';
     if (isAdmin) return '/admin-dashboard';
     if (availableRoles.some(r => ['institution_admin', 'institution_staff'].includes(r))) return '/institution-dashboard';
-    if (availableRoles.some(r => ['lab', 'lab_technician'].includes(r))) return '/lab-management';
+    if (availableRoles.some(r => ['lab', 'lab_technician', 'pathologist', 'phlebotomist'].includes(r))) return '/lab-management';
     return '/home';
   }, [availableRoles, isHealthPersonnel, isAdmin]);
 
@@ -85,7 +85,7 @@ export const HeaderControls = ({ isMenuOpen, setIsMenuOpen, navigate }: HeaderCo
         { label: "Profile", path: "/profile" },
       ];
     }
-    if (availableRoles.some(r => ['lab', 'lab_technician'].includes(r))) {
+    if (availableRoles.some(r => ['lab', 'lab_technician', 'pathologist', 'phlebotomist'].includes(r))) {
       return [
         { label: "Lab Dashboard", path: "/lab-management" },
         { label: "Profile", path: "/profile" },

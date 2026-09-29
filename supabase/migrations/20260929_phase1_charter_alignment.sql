@@ -21,13 +21,14 @@ VALUES ('phlebotomist', 'Phlebotomist', 'HPCZ phlebotomy cadre — blood sample 
 ON CONFLICT (code) DO NOTHING;
 
 -- ── 2. phlebotomist charter (lab console, mirrors lab_technician) ───────────
+-- Phlebotomists are not consultable: appointments/schedule are planned.
 INSERT INTO public.provider_module_charter (provider_type, module_key, module_label, module_description, status, display_order)
 VALUES
   ('phlebotomist', 'test_queue', 'Test queue & verification', 'Process and verify lab tests', 'live', 1),
-  ('phlebotomist', 'appointments', 'Appointments & day list', 'Manage bookings and the daily queue', 'live', 2),
+  ('phlebotomist', 'appointments', 'Appointments & day list', 'Manage bookings and the daily queue', 'planned', 2),
   ('phlebotomist', 'patients', 'My patients', 'Patient list and histories', 'live', 3),
   ('phlebotomist', 'billing', 'Billing & payments', 'Invoices, receipts and mobile-money', 'live', 4),
-  ('phlebotomist', 'schedule', 'Working hours & availability', 'Set availability for bookings', 'live', 5)
+  ('phlebotomist', 'schedule', 'Working hours & availability', 'Set availability for bookings', 'planned', 5)
 ON CONFLICT (provider_type, module_key) DO NOTHING;
 
 -- ── 3. telehealth tiles for consultable professions that already hold ──────
@@ -47,3 +48,26 @@ SET status = 'planned',
 WHERE module_key = 'prescriptions'
   AND provider_type IN ('optometrist', 'health_personnel')
   AND status = 'live';
+
+-- ── 5. pharmacy + non-consultable charter honesty ──────────────────────────
+-- Pharmacists dispense; they do not write prescriptions. Rewrite the false
+-- 'Write electronic prescriptions' row as a dispense tile (still live — the
+-- /prescriptions dispense board is reachable by pharmacy roles).
+UPDATE public.provider_module_charter
+SET module_label = 'E-prescriptions (dispense)',
+    module_description = 'Receive and dispense electronic prescriptions'
+WHERE provider_type = 'pharmacist'
+  AND module_key = 'prescriptions';
+
+-- Modules marked live that the role cannot open (no route permission):
+-- pharmacist appointments/telehealth/schedule, pharmacy_technologist
+-- appointments/schedule, radiographer appointments/schedule (not consultable).
+UPDATE public.provider_module_charter
+SET status = 'planned',
+    module_description = module_description || ' (planned — not yet in this role''s scope)'
+WHERE status = 'live'
+  AND (
+    (provider_type = 'pharmacist' AND module_key IN ('appointments', 'telehealth', 'schedule'))
+    OR (provider_type = 'pharmacy_technologist' AND module_key IN ('appointments', 'schedule'))
+    OR (provider_type = 'radiographer' AND module_key IN ('appointments', 'schedule'))
+  );

@@ -6,7 +6,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useUserRoles } from "@/context/UserRolesContext";
 import { useInstitutionAffiliation } from "@/hooks/useInstitutionAffiliation";
 import { hasRoutePermission } from "@/utils/rolePermissions";
-import { PRESCRIBING_ROLES } from "@/config/roleConfig";
+import { PRESCRIBING_ROLES, ALL_CLINICIAN_ROLES } from "@/config/roleConfig";
 import { useMemo } from "react";
 import { BottomNavItem } from "@/components/navigation/BottomNavItem";
 import { BottomNavMenu } from "@/components/navigation/BottomNavMenu";
@@ -172,7 +172,7 @@ export function BottomNav() {
     }
 
     // Doctor / Health Personnel / Radiologist
-    if (isHealthPersonnel || availableRoles.some(r => ['doctor', 'radiologist'].includes(r))) {
+    if (isHealthPersonnel || availableRoles.some(r => (ALL_CLINICIAN_ROLES as readonly string[]).includes(r))) {
       return [
         { to: "/provider-dashboard", label: "Dashboard", icon: <Stethoscope className="h-5 w-5" />, active: location.pathname === "/provider-dashboard", description: "Provider dashboard" },
         { to: "/appointments", label: "Appointments", icon: <Calendar className="h-5 w-5" />, active: location.pathname === "/appointments", description: "Patient appointments" },
@@ -279,7 +279,7 @@ export function BottomNav() {
     }
 
     // Doctor / Health Personnel / Radiologist
-    if (isHealthPersonnel || availableRoles.some(r => ['doctor', 'radiologist'].includes(r))) {
+    if (isHealthPersonnel || availableRoles.some(r => (ALL_CLINICIAN_ROLES as readonly string[]).includes(r))) {
       return [
         { to: "/provider-calendar", label: "Schedule Calendar", description: "View and manage your schedule", icon: <Calendar className="h-5 w-5" /> },
         { to: "/medical-records", label: "Patient Records", description: "Access patient medical records", icon: <Heart className="h-5 w-5" /> },

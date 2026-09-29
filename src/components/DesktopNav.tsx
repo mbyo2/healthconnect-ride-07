@@ -7,7 +7,7 @@ import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useState, useCallback, useMemo, useRef, useEffect } from "react";
 import { useSearch } from "@/context/SearchContext";
-import { PRESCRIBING_ROLES } from "@/config/roleConfig";
+import { PRESCRIBING_ROLES, ALL_CLINICIAN_ROLES } from "@/config/roleConfig";
 import {
   Home, Calendar, MessageSquare, Users, ShoppingCart, Heart, Settings, User, Brain,
   Shield, Activity, BarChart3, AlertTriangle, Zap, Package, Pill, Stethoscope,
@@ -118,7 +118,7 @@ export function DesktopNav() {
     }
 
     // Doctor / Health Personnel / Radiologist
-    if (isHealthPersonnel || availableRoles.some(r => ['doctor', 'radiologist'].includes(r))) {
+    if (isHealthPersonnel || availableRoles.some(r => (ALL_CLINICIAN_ROLES as readonly string[]).includes(r))) {
       return [
         { to: "/provider-dashboard", label: "Dashboard", icon: <Stethoscope className="h-4 w-4" />, active: location.pathname === "/provider-dashboard" },
         { to: "/appointments", label: "Appointments", icon: <Calendar className="h-4 w-4" />, active: location.pathname === "/appointments" },
@@ -215,7 +215,7 @@ export function DesktopNav() {
     }
 
     // Doctor / Health Personnel / Radiologist
-    if (isHealthPersonnel || availableRoles.some(r => ['doctor', 'radiologist'].includes(r))) {
+    if (isHealthPersonnel || availableRoles.some(r => (ALL_CLINICIAN_ROLES as readonly string[]).includes(r))) {
       return [
         { to: "/provider-calendar", label: "Schedule Calendar", icon: <Calendar className="h-4 w-4 mr-2" /> },
         { to: "/medical-records", label: "Patient Records", icon: <Heart className="h-4 w-4 mr-2" /> },
@@ -229,7 +229,7 @@ export function DesktopNav() {
     }
 
     // Pharmacy / Pharmacist
-    if (availableRoles.some(r => ['pharmacy', 'pharmacist'].includes(r))) {
+    if (availableRoles.some(r => ['pharmacy', 'pharmacist', 'pharmacy_technologist'].includes(r))) {
       return [
         { to: "/pharmacy-management", label: "Pharmacy Management", icon: <ShoppingCart className="h-4 w-4 mr-2" /> },
         { to: "/wallet", label: "Revenue", icon: <Wallet className="h-4 w-4 mr-2" /> },

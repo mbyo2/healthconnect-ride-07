@@ -4,7 +4,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { useUserRoles } from "@/context/UserRolesContext";
 import { useInstitutionAffiliation } from "@/hooks/useInstitutionAffiliation";
-import { PRESCRIBING_ROLES } from "@/config/roleConfig";
+import { PRESCRIBING_ROLES, ALL_CLINICIAN_ROLES } from "@/config/roleConfig";
 import { useMemo, useRef, useState, useEffect } from "react";
 import { 
   Home, Search, Calendar, MessageSquare, Settings, Heart, Wallet,
@@ -77,7 +77,7 @@ export const DesktopNavigation = () => {
     }
 
     // Health Personnel / Doctor / Radiologist
-    if (isHealthPersonnel || availableRoles.some(r => ['doctor', 'radiologist'].includes(r))) {
+    if (isHealthPersonnel || availableRoles.some(r => (ALL_CLINICIAN_ROLES as readonly string[]).includes(r))) {
       return [
         { to: "/provider-dashboard", label: "Dashboard", icon: <Stethoscope className="h-5 w-5 mr-2" /> },
         { to: "/appointments", label: "Appointments", icon: <Calendar className="h-5 w-5 mr-2" /> },
@@ -259,22 +259,8 @@ export const DesktopNavigation = () => {
       ];
     }
 
-    // Specialist (Dialysis/IVF)
-    if (availableRoles.includes('specialist')) {
-      return [
-        { to: "/provider-dashboard", label: "Dashboard", icon: <Stethoscope className="h-5 w-5 mr-2" /> },
-        { to: "/appointments", label: "Sessions", icon: <Calendar className="h-5 w-5 mr-2" /> },
-        { to: "/medical-records", label: "Records", icon: <Heart className="h-5 w-5 mr-2" /> },
-        { to: "/prescriptions", label: "Prescriptions", icon: <Pill className="h-5 w-5 mr-2" /> },
-        { to: "/ai-diagnostics", label: "AI Assistant", icon: <Brain className="h-5 w-5 mr-2" /> },
-        { to: "/chat", label: "Messages", icon: <MessageSquare className="h-5 w-5 mr-2" /> },
-        ...(!isInstitutionAffiliated ? [{ to: "/wallet", label: "Earnings", icon: <Wallet className="h-5 w-5 mr-2" /> }] : []),
-        { to: "/settings", label: "Settings", icon: <Settings className="h-5 w-5 mr-2" /> },
-      ];
-    }
-
     // Lab / Lab Technician
-    if (availableRoles.some(r => ['lab', 'lab_technician'].includes(r))) {
+    if (availableRoles.some(r => ['lab', 'lab_technician', 'pathologist', 'phlebotomist'].includes(r))) {
       return [
         { to: "/lab-management", label: "Lab", icon: <Activity className="h-5 w-5 mr-2" /> },
         { to: "/medical-records", label: "Records", icon: <Heart className="h-5 w-5 mr-2" /> },

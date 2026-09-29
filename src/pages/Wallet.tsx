@@ -9,15 +9,22 @@ import { useAuth } from "@/context/AuthContext";
 import { useUserRoles } from "@/context/UserRolesContext";
 import { useInstitutionContext } from "@/hooks/useInstitutionContext";
 import { useCurrency } from "@/hooks/use-currency";
+import { ALL_CLINICIAN_ROLES } from "@/config/roleConfig";
 import { Navigate } from "react-router-dom";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { Wallet as WalletIcon, ShieldCheck } from "lucide-react";
 
 const Wallet = () => {
     const { user, isLoading } = useAuth();
-    const { isHealthPersonnel, isAdmin } = useUserRoles();
+    const { isAdmin, availableRoles } = useUserRoles();
     const { institution, institutionId } = useInstitutionContext();
     const { currency, getSymbol } = useCurrency();
+
+    // Earnings surface for every individual clinical cadre holding their
+    // exact profession role — not just the legacy health_personnel role.
+    const isEarner = !isAdmin && availableRoles.some(
+      (r) => (ALL_CLINICIAN_ROLES as readonly string[]).includes(r)
+    );
 
     if (isLoading) {
         return <LoadingScreen />;
@@ -37,13 +44,13 @@ const Wallet = () => {
                         </div>
                         <div>
                             <h1 className="font-display text-2xl font-medium tracking-tight flex items-center gap-2">
-                                {isHealthPersonnel && !isAdmin ? "Earnings & Wallet" : "Healthcare Wallet"}
+                                {isEarner ? "Earnings & Wallet" : "Healthcare Wallet"}
                                 <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold text-white bg-success-500 dark:bg-emerald-600">
                                     <ShieldCheck className="h-3 w-3" /> {currency} · {getSymbol()} · Live FX
                                 </span>
                             </h1>
                             <p className="text-sm text-graphite-500 dark:text-slate-400 font-medium tracking-wide">
-                                {isHealthPersonnel && !isAdmin
+                                {isEarner
                                     ? "Your earnings, top-ups, and transaction history — settlement is always ZMW"
                                     : "Balances, top-ups, and transaction history — display converts at live bank rates, settlement is always ZMW"}
                             </p>
@@ -64,7 +71,7 @@ const Wallet = () => {
                     />
                 )}
 
-                {isHealthPersonnel && !isAdmin && <EarningsPanel />}
+                {isEarner && <EarningsPanel />}
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-6" id="wallet-topup">
