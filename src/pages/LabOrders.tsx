@@ -1,314 +1,340 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { useUserRoles } from "@/context/UserRolesContext";
 import { LAB_ORDERING_ROLES } from "@/config/roleConfig";
+import { dispatchNotification } from "@/hooks/useNotifications";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { format, parseISO } from "date-fns";
-import { FlaskConical, Plus, ClipboardList, AlertTriangle } from "lucide-react";
-import { EmptyState, LoadingSkeleton } from "@/components/shared";
-import { createNotification } from "@/services/notifications";
+import { FlaskConical, Plus, Loader2 } from "lucide-react";
+import { Navigate } from "react-router-dom";
 
-const PRIORITIES = ["routine", "normal", "urgent", "emergency"] as const;
-const SAMPLE_TYPES = ["blood", "urine", "stool", "sputum", "swab", "tissue", "other"] as const;
-
-const statusStyle = (status: string) => {
-  switch (status) {
-    case "completed":
-      return "bg-success-50 text-success-600 border-success-200";
-    case "cancelled":
-      return "bg-error-50 text-error-500 border-error-200";
-    case "sample_collected":
-    case "in_progress":
-      return "bg-warning-50 text-warning-600 border-warning-200";
-    default:
-      return "bg-primary-50 text-primary-600 border-primary-200";
-  }
-};
-
-export const LabOrdersPage = () => {
+/**
+ * Clinician lab ordering. The six ordering roles (doctor, specialist,
+ * medical_licentiate, clinical_officer, dentist, radiologist) place test
+ * orders against verified laboratories / diagnostic centres; lab staff
+ * fulfil them in LabManagement. Writes go to public.lab_tests (the order
+ * table — lab_id, test_type, test_number, ordered_by, …).
+ */
+const LabOrders = () => {
   const { user } = useAuth();
   const { availableRoles } = useUserRoles();
   const queryClient = useQueryClient();
-  const [tab, setTab] = useState<"new" | "mine">("new");
 
+  const canOrder = useMemo(
+    () => availableRoles.some((r) => (LAB_ORDERING_ROLES as readonly string[]).includes(r)),
+    [availableRoles]
+  );
+
+  const [patientSearch, setPatientSearch] = useState("");
   const [patientId, setPatientId] = useState("");
   const [labId, setLabId] = useState("");
-  const [testName, setTestName] = useState("");
-  const [priority, setPriority] = useState<string>("routine");
-  const [sampleType, setSampleType] = useState<string>("blood");
+  const [testType, setTestType] = useState("");
+  const [testCategory, setTestCategory] = useState("");
+  const [priority, setPriority] = useState("routine");
+  const [sampleType, setSampleType] = useState("");
   const [notes, setNotes] = useState("");
 
-  const canOrder = availableRoles.some((r) => (LAB_ORDERING_ROLES as readonly string[]).includes(r));
-
-  // Patients this clinician has appointments with (care-team readable).
-  const { data: myPatients = [] } = useQuery({
+  // Patients the clinician has an appointment relationship with.
+  const { data: patients = [] } = useQuery({
     queryKey: ["lab-order-patients", user?.id],
+    enabled: !!user?.id && canOrder,
     queryFn: async () => {
-      if (!user) return [];
-      const { data: appts } = await supabase
+      const { data, error } = await supabase
         .from("appointments")
-        .select("patient_id")
-        .eq("provider_id", user.id)
-        .neq("status", "cancelled")
-        .limit(500);
-      const ids = [...new Set((appts || []).map((a: any) => a.patient_id).filter(Boolean))];
-      if (ids.length === 0) return [];
-      const { data: profiles } = await supabase
-        .from("profiles")
-        .select("id, first_name, last_name")
-        .in("id", ids);
-      return (profiles || []).sort((a: any, b: any) =>
-        `${a.first_name} ${a.last_name}`.localeCompare(`${b.first_name} ${b.last_name}`)
+        .select("patient_id, patient:profiles!appointments_patient_id_fkey(id, first_name, last_name)")
+        .eq("provider_id", user!.id);
+      if (error) throw error;
+      const seen = new Map<string, any>();
+      for (const row of data || []) {
+        const p = (row as any).patient;
+        if (p && !seen.has(p.id)) seen.set(p.id, p);
+      }
+      return [...seen.values()].filter((p) =>
+        !patientSearch ||
+        `${p.first_name} ${p.last_name}`.toLowerCase().includes(patientSearch.toLowerCase())
       );
     },
-    enabled: !!user && canOrder,
   });
 
-  // Verified institutions that can receive lab orders.
+  // Verified laboratories / diagnostic centres that can receive orders.
   const { data: labs = [] } = useQuery({
-    queryKey: ["lab-order-labs"],
+    queryKey: ["lab-order-facilities"],
+    enabled: canOrder,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("healthcare_institutions")
-        .select("id, name, type")
+        .select("id, name, institution_type")
         .eq("is_verified", true)
-        .order("name")
-        .limit(200);
+        .in("institution_type", ["laboratory", "diagnostic_centre", "hospital", "clinic"]);
       if (error) throw error;
       return data || [];
     },
-    enabled: canOrder,
   });
 
-  // Test catalog.
+  // Test catalog for type/category/price.
   const { data: catalog = [] } = useQuery({
-    queryKey: ["lab-order-catalog"],
+    queryKey: ["lab-test-catalog"],
+    enabled: canOrder,
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("lab_test_catalog" as any)
+        .from("lab_test_catalog")
         .select("id, name, category, price")
         .order("name");
-      if (error) {
-        console.error("Catalog load failed:", error);
-        return [];
-      }
-      return (data || []) as any[];
+      if (error) throw error;
+      return data || [];
     },
-    enabled: canOrder,
   });
 
-  // My orders with patient names + results.
   const { data: myOrders = [], isLoading: ordersLoading } = useQuery({
     queryKey: ["lab-my-orders", user?.id],
+    enabled: !!user?.id && canOrder,
     queryFn: async () => {
-      if (!user) return [];
       const { data, error } = await supabase
         .from("lab_tests")
-        .select("id, test_number, test_type, test_category, priority, status, sample_type, notes, result_summary, results_date, created_at, patient_id")
-        .eq("ordered_by", user.id)
+        .select(`
+          id, test_number, test_type, test_category, priority, status,
+          sample_type, notes, price, created_at, result_summary, results_date,
+          patient:profiles!lab_tests_patient_id_fkey(first_name, last_name),
+          lab:healthcare_institutions!lab_tests_lab_id_fkey(name)
+        `)
+        .eq("ordered_by", user!.id)
         .order("created_at", { ascending: false })
-        .limit(200);
+        .limit(50);
       if (error) throw error;
-      const rows = data || [];
-      const ids = [...new Set(rows.map((r: any) => r.patient_id).filter(Boolean))];
-      let patientMap: Record<string, any> = {};
-      if (ids.length > 0) {
-        const { data: profiles } = await supabase
-          .from("profiles")
-          .select("id, first_name, last_name")
-          .in("id", ids);
-        patientMap = Object.fromEntries((profiles || []).map((p: any) => [p.id, p]));
-      }
-      return rows.map((r: any) => ({ ...r, patient: patientMap[r.patient_id] || null }));
+      return data || [];
     },
-    enabled: !!user && canOrder && tab === "mine",
   });
 
   const createOrder = useMutation({
     mutationFn: async () => {
       if (!user) throw new Error("Not signed in");
-      if (!patientId) throw new Error("Select the patient");
-      if (!labId) throw new Error("Select the receiving lab");
-      if (!testName) throw new Error("Select the test");
-      const test = catalog.find((t: any) => t.name === testName);
+      if (!patientId) throw new Error("Select a patient");
+      if (!labId) throw new Error("Select the receiving laboratory");
+      if (!testType) throw new Error("Select a test");
+      const catalogEntry = catalog.find((c: any) => c.name === testType);
+      const price = catalogEntry?.price ?? 0;
       const { error } = await supabase.from("lab_tests").insert({
-        lab_id: labId,
         patient_id: patientId,
-        test_number: `LAB-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
-        test_type: testName,
-        test_category: test?.category || null,
         ordered_by: user.id,
+        lab_id: labId,
+        test_type: testType,
+        test_category: testCategory || catalogEntry?.category || null,
+        test_number: `LAB-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
         priority,
+        sample_type: sampleType || null,
+        notes: notes || null,
+        price,
+        total_amount: price,
+        balance: price,
+        payment_status: price === 0 ? "paid" : "pending",
         status: "pending",
-        sample_type: sampleType,
-        notes: notes.trim() || null,
       });
       if (error) throw error;
-      // Notify the patient that a lab test was ordered for them.
-      await createNotification(
-        patientId,
-        "Lab test ordered",
-        `Your clinician ordered a ${testName} test. Please visit the lab for sample collection.`,
-        "appointment"
-      ).catch(() => null);
     },
-    onSuccess: () => {
-      toast.success("Lab order sent");
-      setPatientId("");
-      setLabId("");
-      setTestName("");
-      setNotes("");
-      setPriority("routine");
-      setSampleType("blood");
+    onSuccess: async () => {
+      toast.success("Lab order placed");
+      setPatientId(""); setLabId(""); setTestType(""); setTestCategory("");
+      setPriority("routine"); setSampleType(""); setNotes("");
       queryClient.invalidateQueries({ queryKey: ["lab-my-orders"] });
-      setTab("mine");
+      try {
+        await dispatchNotification({
+          userId: patientId,
+          title: "New lab test ordered",
+          message: `Your clinician ordered a ${testType} test. You will be notified when results are ready.`,
+          category: "lab",
+          link: "/medical-records",
+        });
+      } catch { /* notification is best-effort */ }
     },
-    onError: (e: any) => toast.error(e?.message || "Could not create the lab order"),
+    onError: (e: any) => toast.error(e.message || "Failed to place lab order"),
   });
 
   if (!canOrder) {
-    return (
-      <div className="min-h-screen bg-canvas p-6 flex items-center justify-center">
-        <EmptyState
-          icon={<AlertTriangle className="h-8 w-8" />}
-          title="Lab ordering is not available for your role"
-          description="Only doctors, specialists, medical licentiates, clinical officers, dentists and radiologists can order lab tests."
-        />
-      </div>
-    );
+    return <Navigate to="/provider-dashboard" replace />;
   }
 
   return (
-    <div className="min-h-screen bg-canvas text-midnight pb-16">
-      <div className="bg-white dark:bg-slate-900 border-b border-canvas-silk px-4 sm:px-6 py-5 sticky top-0 z-30">
-        <div className="max-w-content mx-auto flex items-center gap-3">
-          <div className="h-11 w-11 rounded-2xl bg-primary-500 text-white flex items-center justify-center">
+    <div className="min-h-screen bg-canvas dark:bg-slate-950 p-4 sm:p-6 font-sans">
+      <div className="max-w-5xl mx-auto space-y-6">
+        <div className="flex items-center gap-3">
+          <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center">
             <FlaskConical className="h-5 w-5" />
           </div>
           <div>
-            <h1 className="font-display text-2xl font-medium tracking-tight">Lab Orders</h1>
-            <p className="text-sm text-graphite-500 font-medium">Order tests and track results</p>
+            <h1 className="text-xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">Order Lab Tests</h1>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Place test orders for your patients at verified laboratories</p>
           </div>
         </div>
-        <div className="max-w-content mx-auto mt-4 flex gap-2">
-          <button
-            onClick={() => setTab("new")}
-            className={`px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 ${tab === "new" ? "bg-primary-500 text-white" : "bg-slate-100 text-slate-600"}`}
-          >
-            <Plus className="h-4 w-4" /> New order
-          </button>
-          <button
-            onClick={() => setTab("mine")}
-            className={`px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 ${tab === "mine" ? "bg-primary-500 text-white" : "bg-slate-100 text-slate-600"}`}
-          >
-            <ClipboardList className="h-4 w-4" /> My orders
-          </button>
-        </div>
-      </div>
 
-      <div className="max-w-content mx-auto px-4 sm:px-6 py-6">
-        {tab === "new" ? (
-          <div className="rounded-3xl border border-canvas-silk bg-white p-6 shadow-sm space-y-4 max-w-2xl">
-            <div>
-              <label className="text-sm font-semibold block mb-1.5">Patient</label>
-              <select value={patientId} onChange={(e) => setPatientId(e.target.value)} className="w-full rounded-xl border border-canvas-silk px-3 py-2.5 text-sm bg-white">
-                <option value="">Select a patient…</option>
-                {myPatients.map((p: any) => (
-                  <option key={p.id} value={p.id}>{p.first_name} {p.last_name}</option>
-                ))}
-              </select>
-              {myPatients.length === 0 && (
-                <p className="text-xs text-graphite-500 mt-1">Patients appear here once you have appointments with them.</p>
-              )}
-            </div>
-            <div>
-              <label className="text-sm font-semibold block mb-1.5">Receiving lab</label>
-              <select value={labId} onChange={(e) => setLabId(e.target.value)} className="w-full rounded-xl border border-canvas-silk px-3 py-2.5 text-sm bg-white">
-                <option value="">Select a lab…</option>
-                {labs.map((l: any) => (
-                  <option key={l.id} value={l.id}>{l.name}{l.type ? ` (${l.type})` : ""}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="text-sm font-semibold block mb-1.5">Test</label>
-              <select value={testName} onChange={(e) => setTestName(e.target.value)} className="w-full rounded-xl border border-canvas-silk px-3 py-2.5 text-sm bg-white">
-                <option value="">Select a test…</option>
-                {catalog.map((t: any) => (
-                  <option key={t.id} value={t.name}>{t.name}{t.category ? ` — ${t.category}` : ""}</option>
-                ))}
-              </select>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm flex items-center gap-2">
+              <Plus className="h-4 w-4" /> New lab order
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-semibold block mb-1.5">Priority</label>
-                <select value={priority} onChange={(e) => setPriority(e.target.value)} className="w-full rounded-xl border border-canvas-silk px-3 py-2.5 text-sm bg-white">
-                  {PRIORITIES.map((p) => <option key={p} value={p}>{p}</option>)}
-                </select>
+                <Label className="text-xs font-bold uppercase">Patient *</Label>
+                <Input
+                  placeholder="Search your patients…"
+                  value={patientSearch}
+                  onChange={(e) => setPatientSearch(e.target.value)}
+                  className="mt-1 h-9 text-xs"
+                />
+                <Select value={patientId} onValueChange={setPatientId}>
+                  <SelectTrigger className="mt-2 h-9 text-xs">
+                    <SelectValue placeholder="Select patient" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {patients.map((p: any) => (
+                      <SelectItem key={p.id} value={p.id}>
+                        {p.first_name} {p.last_name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div>
-                <label className="text-sm font-semibold block mb-1.5">Sample type</label>
-                <select value={sampleType} onChange={(e) => setSampleType(e.target.value)} className="w-full rounded-xl border border-canvas-silk px-3 py-2.5 text-sm bg-white">
-                  {SAMPLE_TYPES.map((s) => <option key={s} value={s}>{s}</option>)}
-                </select>
+                <Label className="text-xs font-bold uppercase">Receiving laboratory *</Label>
+                <Select value={labId} onValueChange={setLabId}>
+                  <SelectTrigger className="mt-1 h-9 text-xs">
+                    <SelectValue placeholder="Select lab / diagnostic centre" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {labs.map((l: any) => (
+                      <SelectItem key={l.id} value={l.id}>{l.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label className="text-xs font-bold uppercase">Test *</Label>
+                <Select
+                  value={testType}
+                  onValueChange={(v) => {
+                    setTestType(v);
+                    const entry = catalog.find((c: any) => c.name === v);
+                    if (entry?.category) setTestCategory(entry.category);
+                  }}
+                >
+                  <SelectTrigger className="mt-1 h-9 text-xs">
+                    <SelectValue placeholder="Select test" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {catalog.map((c: any) => (
+                      <SelectItem key={c.id} value={c.name}>
+                        {c.name}{c.price ? ` — K${c.price}` : ""}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label className="text-xs font-bold uppercase">Category</Label>
+                <Input
+                  placeholder="e.g. Haematology"
+                  value={testCategory}
+                  onChange={(e) => setTestCategory(e.target.value)}
+                  className="mt-1 h-9 text-xs"
+                />
+              </div>
+              <div>
+                <Label className="text-xs font-bold uppercase">Priority</Label>
+                <Select value={priority} onValueChange={setPriority}>
+                  <SelectTrigger className="mt-1 h-9 text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="routine">Routine</SelectItem>
+                    <SelectItem value="normal">Normal</SelectItem>
+                    <SelectItem value="urgent">Urgent</SelectItem>
+                    <SelectItem value="emergency">Emergency</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label className="text-xs font-bold uppercase">Sample type</Label>
+                <Input
+                  placeholder="e.g. Venous blood (EDTA)"
+                  value={sampleType}
+                  onChange={(e) => setSampleType(e.target.value)}
+                  className="mt-1 h-9 text-xs"
+                />
               </div>
             </div>
             <div>
-              <label className="text-sm font-semibold block mb-1.5">Clinical notes (optional)</label>
-              <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} placeholder="Indication, relevant history…" className="w-full rounded-xl border border-canvas-silk px-3 py-2.5 text-sm" />
+              <Label className="text-xs font-bold uppercase">Clinical notes</Label>
+              <Textarea
+                placeholder="Indication, relevant history, instructions for the lab…"
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                className="mt-1 text-xs"
+                rows={3}
+              />
             </div>
-            <button
+            <Button
               onClick={() => createOrder.mutate()}
-              disabled={createOrder.isPending}
-              className="vf-btn-primary gap-2 text-sm disabled:opacity-50"
+              disabled={createOrder.isPending || !patientId || !labId || !testType}
+              className="w-full sm:w-auto"
             >
-              {createOrder.isPending ? "Sending…" : "Send lab order"}
-            </button>
-          </div>
-        ) : ordersLoading ? (
-          <LoadingSkeleton />
-        ) : myOrders.length === 0 ? (
-          <EmptyState
-            icon={<FlaskConical className="h-8 w-8" />}
-            title="No lab orders yet"
-            description="Orders you place will appear here with their results."
-          />
-        ) : (
-          <div className="space-y-3">
-            {myOrders.map((o: any) => (
-              <div key={o.id} className="rounded-2xl border border-canvas-silk bg-white p-4 shadow-sm">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <div className="font-mono font-bold text-sm">{o.test_number}</div>
-                    <div className="font-semibold">{o.test_type}</div>
-                    <div className="text-sm text-graphite-500">
-                      {o.patient ? `${o.patient.first_name} ${o.patient.last_name}` : "Patient"} · {o.created_at ? format(parseISO(o.created_at), "MMM d, yyyy") : ""}
+              {createOrder.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Plus className="h-4 w-4 mr-2" />}
+              Place order
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm">My orders</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {ordersLoading ? (
+              <p className="text-xs text-slate-500">Loading orders…</p>
+            ) : myOrders.length === 0 ? (
+              <p className="text-xs text-slate-500">No lab orders yet.</p>
+            ) : (
+              <div className="space-y-3">
+                {myOrders.map((o: any) => (
+                  <div key={o.id} className="p-3 rounded-xl border border-slate-200 dark:border-slate-700">
+                    <div className="flex items-center justify-between gap-2 flex-wrap">
+                      <div>
+                        <p className="text-sm font-bold text-slate-900 dark:text-slate-100">
+                          {o.test_type}
+                          <span className="ml-2 font-mono text-[10px] text-slate-400">{o.test_number}</span>
+                        </p>
+                        <p className="text-xs text-slate-500">
+                          {o.patient?.first_name} {o.patient?.last_name} · {o.lab?.name} ·
+                          {" "}{new Date(o.created_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="text-[10px]">{o.priority}</Badge>
+                        <Badge className="text-[10px]">{o.status?.replace(/_/g, " ")}</Badge>
+                      </div>
                     </div>
+                    {o.result_summary && (
+                      <p className="mt-2 text-xs bg-slate-50 dark:bg-slate-800 rounded-lg p-2">
+                        <span className="font-bold">Result: </span>{o.result_summary}
+                      </p>
+                    )}
                   </div>
-                  <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border ${statusStyle(o.status)}`}>
-                    {(o.status || "pending").replace(/_/g, " ")}
-                  </span>
-                </div>
-                {o.priority && o.priority !== "routine" && (
-                  <div className="text-xs font-bold text-warning-600 mt-1 uppercase">Priority: {o.priority}</div>
-                )}
-                {o.result_summary && (
-                  <div className="mt-3 rounded-xl bg-slate-50 border border-canvas-silk p-3">
-                    <div className="text-xs font-black uppercase tracking-wider text-graphite-500 mb-1">
-                      Result{o.results_date ? ` · ${format(parseISO(o.results_date), "MMM d, yyyy")}` : ""}
-                    </div>
-                    <div className="text-sm">{o.result_summary}</div>
-                  </div>
-                )}
+                ))}
               </div>
-            ))}
-          </div>
-        )}
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
 };
 
-export default LabOrdersPage;
+export default LabOrders;
