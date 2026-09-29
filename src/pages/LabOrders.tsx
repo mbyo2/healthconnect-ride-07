@@ -71,9 +71,9 @@ const LabOrders = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("healthcare_institutions")
-        .select("id, name, institution_type")
+        .select("id, name, type")
         .eq("is_verified", true)
-        .in("institution_type", ["laboratory", "diagnostic_centre", "hospital", "clinic"]);
+        .in("type", ["laboratory", "radiology_center", "hospital", "clinic"]);
       if (error) throw error;
       return data || [];
     },
