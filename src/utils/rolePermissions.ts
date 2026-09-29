@@ -129,6 +129,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/pharmacy-portal',
     '/pharmacy-inventory',
     '/pharmacy-management',
+    '/institution/personnel', // staff invitations — needed for maker/checker QA
     '/prescriptions',
     '/wallet',
     '/marketplace',
@@ -145,6 +146,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/pharmacy-portal',
     '/pharmacy-inventory',
     '/pharmacy-management',
+    '/institution/personnel', // staff invitations — needed for maker/checker QA
     '/prescriptions',
     '/wallet',
     '/marketplace',
@@ -527,6 +529,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/pharmacy-portal',
     '/pharmacy-inventory',
     '/pharmacy-management',
+    '/institution/personnel', // staff invitations — needed for maker/checker QA
     '/prescriptions',
     '/wallet',
     '/marketplace',
@@ -544,6 +547,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/pharmacy-portal', // role landing page — must stay in its own permission set
     '/pharmacy-inventory',
     '/pharmacy-management',
+    '/institution/personnel', // staff invitations — needed for maker/checker QA
     '/institution-dashboard', // wholesale distributors are facility admins too
     '/marketplace',
     '/wallet',
