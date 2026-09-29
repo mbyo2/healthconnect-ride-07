@@ -36,15 +36,16 @@ AS $$
 $$;
 
 -- Backfill the legacy denormalized column (kept for any direct readers).
+-- NOTE: profiles.admin_level is public.admin_level ENUM, not text — literals must be cast.
 UPDATE public.profiles p
-SET admin_level = CASE
-  WHEN EXISTS (SELECT 1 FROM public.user_roles ur WHERE ur.user_id = p.id AND ur.role = 'super_admin'::public.app_role) THEN 'superadmin'
-  WHEN EXISTS (SELECT 1 FROM public.user_roles ur WHERE ur.user_id = p.id AND ur.role = 'admin'::public.app_role) THEN 'admin'
-  ELSE NULL END
+SET admin_level = (CASE
+  WHEN EXISTS (SELECT 1 FROM public.user_roles ur WHERE ur.user_id = p.id AND ur.role = 'super_admin'::public.app_role) THEN 'superadmin'::public.admin_level
+  WHEN EXISTS (SELECT 1 FROM public.user_roles ur WHERE ur.user_id = p.id AND ur.role = 'admin'::public.app_role) THEN 'admin'::public.admin_level
+  ELSE NULL END)
 WHERE p.admin_level IS DISTINCT FROM (
   CASE
-    WHEN EXISTS (SELECT 1 FROM public.user_roles ur WHERE ur.user_id = p.id AND ur.role = 'super_admin'::public.app_role) THEN 'superadmin'
-    WHEN EXISTS (SELECT 1 FROM public.user_roles ur WHERE ur.user_id = p.id AND ur.role = 'admin'::public.app_role) THEN 'admin'
+    WHEN EXISTS (SELECT 1 FROM public.user_roles ur WHERE ur.user_id = p.id AND ur.role = 'super_admin'::public.app_role) THEN 'superadmin'::public.admin_level
+    WHEN EXISTS (SELECT 1 FROM public.user_roles ur WHERE ur.user_id = p.id AND ur.role = 'admin'::public.app_role) THEN 'admin'::public.admin_level
     ELSE NULL END);
 
 -- Keep it in sync going forward (belt-and-braces behind syncAdminLevel()).
@@ -53,11 +54,11 @@ RETURNS TRIGGER
 LANGUAGE plpgsql AS $$
 DECLARE
   v_uid UUID := COALESCE(NEW.user_id, OLD.user_id);
-  v_level TEXT;
+  v_level public.admin_level;
 BEGIN
   SELECT CASE
-    WHEN EXISTS (SELECT 1 FROM public.user_roles ur WHERE ur.user_id = v_uid AND ur.role = 'super_admin'::public.app_role) THEN 'superadmin'
-    WHEN EXISTS (SELECT 1 FROM public.user_roles ur WHERE ur.user_id = v_uid AND ur.role = 'admin'::public.app_role) THEN 'admin'
+    WHEN EXISTS (SELECT 1 FROM public.user_roles ur WHERE ur.user_id = v_uid AND ur.role = 'super_admin'::public.app_role) THEN 'superadmin'::public.admin_level
+    WHEN EXISTS (SELECT 1 FROM public.user_roles ur WHERE ur.user_id = v_uid AND ur.role = 'admin'::public.app_role) THEN 'admin'::public.admin_level
     ELSE NULL END
   INTO v_level;
   UPDATE public.profiles SET admin_level = v_level, updated_at = now() WHERE id = v_uid;
