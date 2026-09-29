@@ -187,7 +187,11 @@ export function useInstitutionContext() {
 
       // 6. Auto-provisioning for institutional roles
       // (mirrors the taxonomy in roleConfig — any clinical, pharmacy, lab,
-      // community or facility-operations role gets a workspace automatically)
+      // community or facility-operations role gets a workspace automatically).
+      // NEVER auto-provision for 'support' (support agents must not own a
+      // healthcare facility). Auto-provisioned rows are NOT verified —
+      // accreditation is granted only through the institution application
+      // review workflow.
       const userRole = (profile?.role || user.user_metadata?.role || '') as string;
       const businessType = (user.user_metadata?.business_type || '') as string;
       const isInstitutionalRole = [
@@ -200,9 +204,10 @@ export function useInstitutionContext() {
         'midwife', 'radiologist', 'radiographer', 'physiotherapist',
         'occupational_therapist', 'nutritionist', 'optometrist', 'psychologist',
         'environmental_health_officer', 'community_health_worker',
-        'traditional_practitioner', 'phlebotomist', 'cxo', 'support',
+        'traditional_practitioner', 'phlebotomist', 'cxo',
         'receptionist', 'hr_manager', 'billing_staff',
         'inventory_manager', 'maintenance_manager', 'ambulance_staff', 'pathologist',
+        'ot_staff', 'triage_staff',
       ].includes(userRole) || businessType.length > 0;
 
       if (isInstitutionalRole) {
@@ -291,7 +296,9 @@ export function useInstitutionContext() {
             // (rawType is the pre-sanitizer code, e.g. teaching_hospital.)
             type_code: (rawType || '').toLowerCase().trim() || null,
             admin_id: user.id,
-            is_verified: true,
+            // Auto-provisioned rows are never pre-verified — verification is
+            // granted only through the institution accreditation workflow.
+            is_verified: false,
             email: user.email || '',
             phone: profile?.phone || user.user_metadata?.phone || '+260 97 0000000',
             city: user.user_metadata?.city || profile?.city || 'Lusaka',
@@ -330,7 +337,7 @@ export function useInstitutionContext() {
           type: determinedType,
           type_code: (rawType || '').toLowerCase().trim() || null,
           admin_id: user.id,
-          is_verified: true,
+          is_verified: false,
           email: user.email || '',
           phone: profile?.phone || user.user_metadata?.phone || '',
           city: user.user_metadata?.city || 'Lusaka',

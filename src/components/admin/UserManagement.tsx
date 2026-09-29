@@ -26,6 +26,7 @@ import {
 } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { syncAdminLevel } from '@/lib/adminLevelSync';
+import { USER_ROLES, ROLE_META, type UserRole } from '@/config/roleConfig';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -36,8 +37,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-
-type UserRole = 'patient' | 'health_personnel' | 'admin' | 'institution_admin';
 
 interface UserWithRoles {
   id: string;
@@ -59,6 +58,16 @@ export function UserManagement() {
   const [selectedRole, setSelectedRole] = useState<UserRole>('patient');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [pendingRevoke, setPendingRevoke] = useState<{ userId: string; role: UserRole; email: string } | null>(null);
+
+  // The full taxonomy is assignable — driven by roleConfig so new cadres
+  // appear here automatically (mirrors the Roles tab's RoleManagement).
+  // Privileged roles stay superadmin-only.
+  const assignableRoles: UserRole[] = isSuperAdmin
+    ? Object.values(USER_ROLES)
+    : Object.values(USER_ROLES).filter((r) => r !== USER_ROLES.ADMIN && r !== USER_ROLES.SUPER_ADMIN);
+
+  const roleLabel = (role: string): string =>
+    ROLE_META[role as UserRole]?.label || role.replace(/_/g, ' ');
 
   // Debounced server-side search — the user list stays bounded (200 rows max).
   useEffect(() => {
@@ -338,10 +347,11 @@ export function UserManagement() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="patient">Patient</SelectItem>
-                  <SelectItem value="health_personnel">Health Personnel</SelectItem>
-                  <SelectItem value="institution_admin">Institution Admin</SelectItem>
-                  {isSuperAdmin && <SelectItem value="admin">Admin</SelectItem>}
+                  {assignableRoles.map((role) => (
+                    <SelectItem key={role} value={role}>
+                      {roleLabel(role)}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>

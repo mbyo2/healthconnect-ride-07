@@ -4,8 +4,8 @@ import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { useSuccessFeedback } from '@/hooks/use-success-feedback';
 import {
-  Headphones, MessageSquare, Users, Search, FileText,
-  Settings, ShieldCheck, ClipboardList, BarChart3, CreditCard, Bell
+  Headphones, MessageSquare, Search, FileText,
+  Settings, Calendar
 } from 'lucide-react';
 
 export const SupportWorkflow = () => {
@@ -17,17 +17,15 @@ export const SupportWorkflow = () => {
     showSuccess({ message: `Opening ${title}...` });
   };
 
+  // Every card routes to a real, support-accessible destination. Cards that
+  // pointed at bare /admin-dashboard (no such tab exists) or at admin-only
+  // tabs (RLS denies support on application/security/audit tables) are gone.
   const workflowSteps = [
-    { title: "Support Dashboard", description: "Ticket queue & escalation overview", icon: <Headphones className="h-5 w-5" />, route: '/admin-dashboard' },
+    { title: "Support Dashboard", description: "Your support center home", icon: <Headphones className="h-5 w-5" />, route: '/admin-dashboard' },
     { title: "User Lookup", description: "Find user accounts & history", icon: <Search className="h-5 w-5" />, route: '/search' },
     { title: "Live Chat Support", description: "Real-time user assistance", icon: <MessageSquare className="h-5 w-5" />, route: '/chat' },
-    { title: "Provider Applications", description: "Review healthcare applications", icon: <FileText className="h-5 w-5" />, route: '/admin-dashboard?tab=providers' },
-    { title: "User Accounts", description: "Account status & management", icon: <Users className="h-5 w-5" />, route: '/admin-dashboard' },
-    { title: "Audit Trail", description: "View system activity logs", icon: <ClipboardList className="h-5 w-5" />, route: '/admin-dashboard' },
-    { title: "Security Events", description: "Fraud alerts & suspicious activity", icon: <ShieldCheck className="h-5 w-5" />, route: '/admin-dashboard' },
-    { title: "Insurance Support", description: "Help users with insurance issues", icon: <CreditCard className="h-5 w-5" />, route: '/admin-dashboard' },
-    { title: "Waitlist Issues", description: "Manage waitlist complaints & escalations", icon: <Bell className="h-5 w-5" />, route: '/admin-dashboard' },
-    { title: "Support Analytics", description: "Ticket volume & resolution metrics", icon: <BarChart3 className="h-5 w-5" />, route: '/admin-dashboard' },
+    { title: "Appointments", description: "View appointments for support", icon: <Calendar className="h-5 w-5" />, route: '/appointments' },
+    { title: "Patient Records", description: "View patient records", icon: <FileText className="h-5 w-5" />, route: '/medical-records' },
     { title: "Settings", description: "Support preferences", icon: <Settings className="h-5 w-5" />, route: '/settings' },
   ];
 

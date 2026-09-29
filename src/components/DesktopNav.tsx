@@ -147,6 +147,11 @@ export function DesktopNav() {
       return [
         { to: "/admin-dashboard", label: "Dashboard", icon: <Shield className="h-4 w-4" />, active: location.pathname === "/admin-dashboard" && !location.search.includes("tab=providers") },
         { to: "/admin-dashboard?tab=providers", label: "Applications", icon: <Users className="h-4 w-4" />, active: location.pathname === "/admin-dashboard" && location.search.includes("tab=providers") },
+        // Super admins get a discoverable entry to their own console (their
+        // login landing page). Plain admins never see it.
+        ...(availableRoles.includes('super_admin')
+          ? [{ to: "/super-admin-dashboard", label: "Super Admin", icon: <ShieldCheck className="h-4 w-4" />, active: location.pathname === "/super-admin-dashboard" }]
+          : []),
         { to: "/chat", label: "Messages", icon: <MessageSquare className="h-4 w-4" />, active: location.pathname === "/chat" },
       ];
     }
@@ -242,7 +247,11 @@ export function DesktopNav() {
       ];
 
       return availableRoles.includes('super_admin')
-        ? [...adminItems, { to: "/role-management", label: "Role Management", icon: <Shield className="h-4 w-4 mr-2" /> }]
+        ? [...adminItems,
+            // Discoverable entry to the superadmin console (also their login
+            // landing page). Plain admins never see it.
+            { to: "/super-admin-dashboard", label: "Super Admin", icon: <Shield className="h-4 w-4 mr-2" /> },
+            { to: "/role-management", label: "Role Management", icon: <Shield className="h-4 w-4 mr-2" /> }]
         : adminItems;
     }
 

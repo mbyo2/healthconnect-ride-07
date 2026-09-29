@@ -891,60 +891,26 @@ export const hasAnyRole = (userRoles: UserRole[] | null, roles: UserRole[]): boo
   return roles.some(role => userRoles.includes(role));
 };
 
-// Get the appropriate landing page based on user's primary role
+// Get the appropriate landing page based on user's primary role.
+// Single source of truth: ROLE_PRIORITY (selection order) + ROLE_META
+// (destination) in src/config/roleConfig.ts — never hardcode destinations
+// here, or they drift from the taxonomy (super_admin once landed on
+// /admin-dashboard while ROLE_META said /super-admin-dashboard).
 export const getRoleLandingPage = (userRoles: UserRole[] | null): string => {
   if (!userRoles || userRoles.length === 0) return '/auth';
 
-  // Priority order: admin > pharmacy/lab (specific portals) > institution_admin > clinical providers > patient
-  if (userRoles.includes(USER_ROLES.SUPER_ADMIN)) return '/admin-dashboard';
-  if (userRoles.includes(USER_ROLES.ADMIN)) return '/admin-dashboard';
-  if (userRoles.includes(USER_ROLES.SUPPORT)) return '/admin-dashboard';
-  if (userRoles.includes(USER_ROLES.CXO)) return '/institution-dashboard';
+  // Priority order comes from the taxonomy, not from this file.
+  for (const role of ROLE_PRIORITY) {
+    if (userRoles.includes(role)) {
+      return ROLE_META[role].landingPage;
+    }
+  }
 
-  // Specific institution portals FIRST (before generic institution_admin)
-  if (userRoles.includes(USER_ROLES.PHARMACY) || userRoles.includes(USER_ROLES.PHARMACIST) || userRoles.includes(USER_ROLES.PHARMACY_TECHNOLOGIST) || userRoles.includes(USER_ROLES.WHOLESALE_PHARMACY)) return '/pharmacy-portal';
-  if (userRoles.includes(USER_ROLES.LAB) || userRoles.includes(USER_ROLES.LAB_TECHNICIAN)) return '/lab-management';
-  if (userRoles.includes(USER_ROLES.PATHOLOGIST) || userRoles.includes(USER_ROLES.PHLEBOTOMIST)) return '/lab-management';
-
-  // Generic institution admin/staff routes — the dashboard itself handles
-  // unverified institutions inline, so no login-screen hop is needed.
-  if (userRoles.includes(USER_ROLES.INSTITUTION_ADMIN)) return '/institution-dashboard';
-  if (userRoles.includes(USER_ROLES.INSTITUTION_STAFF)) return '/institution-dashboard';
-  if (userRoles.includes(USER_ROLES.MEDICAL_RECORDS_OFFICER)) return '/institution-dashboard';
-  if (userRoles.includes(USER_ROLES.RECEPTIONIST)) return '/institution-dashboard';
-  if (userRoles.includes(USER_ROLES.HR_MANAGER)) return '/institution-dashboard';
-  if (userRoles.includes(USER_ROLES.BILLING_STAFF)) return '/institution-dashboard';
-  if (userRoles.includes(USER_ROLES.TRIAGE_STAFF)) return '/institution-dashboard';
-  if (userRoles.includes(USER_ROLES.OT_STAFF)) return '/institution-dashboard';
-  if (userRoles.includes(USER_ROLES.MAINTENANCE_MANAGER)) return '/institution-dashboard';
-  if (userRoles.includes(USER_ROLES.INVENTORY_MANAGER)) return '/institution-dashboard';
-  if (userRoles.includes(USER_ROLES.AMBULANCE_STAFF)) return '/institution-dashboard';
-
-  // Clinical providers (any consultable/allied/community cadre or legacy catch-all)
-  if (
-    userRoles.includes(USER_ROLES.HEALTH_PERSONNEL) ||
-    userRoles.includes(USER_ROLES.DOCTOR) ||
-    userRoles.includes(USER_ROLES.SPECIALIST) ||
-    userRoles.includes(USER_ROLES.MEDICAL_LICENTIATE) ||
-    userRoles.includes(USER_ROLES.CLINICAL_OFFICER) ||
-    userRoles.includes(USER_ROLES.DENTIST) ||
-    userRoles.includes(USER_ROLES.DENTAL_THERAPIST) ||
-    userRoles.includes(USER_ROLES.NURSE) ||
-    userRoles.includes(USER_ROLES.REGISTERED_NURSE) ||
-    userRoles.includes(USER_ROLES.ENROLLED_NURSE) ||
-    userRoles.includes(USER_ROLES.MIDWIFE) ||
-    userRoles.includes(USER_ROLES.RADIOLOGIST) ||
-    userRoles.includes(USER_ROLES.RADIOGRAPHER) ||
-    userRoles.includes(USER_ROLES.PHYSIOTHERAPIST) ||
-    userRoles.includes(USER_ROLES.OCCUPATIONAL_THERAPIST) ||
-    userRoles.includes(USER_ROLES.NUTRITIONIST) ||
-    userRoles.includes(USER_ROLES.OPTOMETRIST) ||
-    userRoles.includes(USER_ROLES.PSYCHOLOGIST) ||
-    userRoles.includes(USER_ROLES.ENVIRONMENTAL_HEALTH_OFFICER) ||
-    userRoles.includes(USER_ROLES.COMMUNITY_HEALTH_WORKER) ||
-    userRoles.includes(USER_ROLES.TRADITIONAL_PRACTITIONER)
-  ) return '/provider-dashboard';
-  if (userRoles.includes(USER_ROLES.PATIENT)) return '/home';
+  // Fallback: any taxonomy role not covered by the priority list.
+  for (const role of userRoles) {
+    const meta = ROLE_META[role];
+    if (meta) return meta.landingPage;
+  }
 
   return '/home';
 };

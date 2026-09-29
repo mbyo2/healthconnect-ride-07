@@ -310,7 +310,11 @@ export function BottomNav() {
       ];
 
       return availableRoles.includes('super_admin')
-        ? [...adminItems, { to: "/role-management", label: "Role Management", description: "Manage user roles", icon: <Shield className="h-5 w-5" /> }]
+        ? [...adminItems,
+            // Discoverable entry to the superadmin console (also their login
+            // landing page). Plain admins never see it.
+            { to: "/super-admin-dashboard", label: "Super Admin", description: "Super admin console", icon: <Shield className="h-5 w-5" /> },
+            { to: "/role-management", label: "Role Management", description: "Manage user roles", icon: <Shield className="h-5 w-5" /> }]
         : adminItems;
     }
 

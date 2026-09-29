@@ -33,8 +33,8 @@ describe('Role Routing', () => {
       expect(getRoleLandingPage(['admin'])).toBe('/admin-dashboard');
     });
 
-    it('routes super_admin to /admin-dashboard', () => {
-      expect(getRoleLandingPage(['super_admin'])).toBe('/admin-dashboard');
+    it('routes super_admin to /super-admin-dashboard', () => {
+      expect(getRoleLandingPage(['super_admin'])).toBe('/super-admin-dashboard');
     });
 
     it('routes institution_admin to /institution-dashboard', () => {

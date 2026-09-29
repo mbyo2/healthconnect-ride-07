@@ -1,7 +1,6 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { UserManagement } from "@/components/admin/UserManagement";
 import { SecurityAuditLogs } from "@/components/admin/SecurityAuditLogs";
-import { TestAccountSetup } from "@/components/admin/TestAccountSetup";
 import { RevenueAnalyticsDashboard } from "@/components/admin/RevenueAnalyticsDashboard";
 import { InstitutionApplications } from "@/components/admin/InstitutionApplications";
 import { ProviderApplications } from "@/components/admin/ProviderApplications";
@@ -25,6 +24,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { ALL_CLINICIAN_ROLES } from "@/config/roleConfig";
+import { useUserRoles } from "@/context/UserRolesContext";
+import { SupportWorkflow } from "@/components/workflows/SupportWorkflow";
 import { format, subMonths, startOfMonth } from "date-fns";
 
 const TABS = [
@@ -39,12 +40,24 @@ const TABS = [
   { value: "promos", label: "Promos", icon: Ticket },
   { value: "security", label: "Security", icon: Lock },
   { value: "audit", label: "Audit Logs", icon: Activity },
-  { value: "test", label: "Test Setup", icon: Shield },
 ];
 
 export const AdminDashboard = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const activeTab = searchParams.get("tab") || "overview";
+  const { isAdmin, isSuperAdmin, availableRoles } = useUserRoles();
+
+  // Support agents get a restricted support view instead of the admin tab
+  // shell: RLS on the underlying tables (applications, profiles, user_roles,
+  // audit/security logs, commissions) grants only admin/super_admin, so the
+  // full shell is error states and dead metrics for support.
+  const isSupportView = !isAdmin && availableRoles.includes('support');
+
+  // Commissions RLS is superadmin-only — plain admins would see a dead tab.
+  const visibleTabs = TABS.filter((t) => isSuperAdmin || t.value !== 'commissions');
+
+  // Unknown ?tab= values fall back to overview instead of empty content.
+  const tabParam = searchParams.get("tab") || "overview";
+  const activeTab = visibleTabs.some((t) => t.value === tabParam) ? tabParam : "overview";
   const setTab = (v: string) => setSearchParams({ tab: v });
 
   // Platform-wide overview — every number below comes from live tables.
@@ -138,6 +151,11 @@ export const AdminDashboard = () => {
     };
   }, [platform]);
 
+  // Restricted support view — no admin tabs for support agents.
+  if (isSupportView) {
+    return <SupportWorkflow />;
+  }
+
   return (
     <div className="min-h-screen bg-canvas text-midnight font-sans transition-colors pb-16">
       {/* Top Bar */}
@@ -171,7 +189,7 @@ export const AdminDashboard = () => {
         <Tabs value={activeTab} onValueChange={setTab} className="space-y-4">
           <div className="overflow-x-auto p-1 bg-white dark:bg-slate-900 rounded-xl border border-canvas-silk dark:border-slate-800">
             <TabsList className="inline-flex w-auto min-w-full flex-wrap h-auto gap-1 bg-transparent p-1">
-              {TABS.map(({ value, label, icon: Icon }) => (
+              {visibleTabs.map(({ value, label, icon: Icon }) => (
                 <TabsTrigger
                   key={value}
                   value={value}
@@ -400,17 +418,10 @@ export const AdminDashboard = () => {
             <TabsContent value="applications"><InstitutionApplications /></TabsContent>
             <TabsContent value="modules"><InstitutionModuleManager /></TabsContent>
             <TabsContent value="revenue"><RevenueAnalyticsDashboard /></TabsContent>
-            <TabsContent value="commissions"><CommissionSettings /></TabsContent>
+            {isSuperAdmin && <TabsContent value="commissions"><CommissionSettings /></TabsContent>}
             <TabsContent value="promos"><PromoCodeManager /></TabsContent>
             <TabsContent value="security"><SecurityDashboard /></TabsContent>
             <TabsContent value="audit"><SecurityAuditLogs /></TabsContent>
-            <TabsContent value="test">
-              <div className="space-y-2">
-                <h3 className="font-extrabold text-base">Test Account Diagnostics</h3>
-                <p className="text-xs text-graphite-500 dark:text-slate-400">Create test credentials for development and QA validation</p>
-                <TestAccountSetup />
-              </div>
-            </TabsContent>
           </div>
         </Tabs>
       </div>

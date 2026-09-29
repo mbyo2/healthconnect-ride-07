@@ -3,12 +3,18 @@ import { useUserRoles } from "@/context/UserRolesContext";
 import { HealthPersonnelApplicationForm } from "@/components/HealthPersonnelApplicationForm";
 
 const HealthcareApplication = () => {
-  const { isAdmin, isSuperAdmin, loading } = useUserRoles();
+  const { isAdmin, isSuperAdmin, availableRoles, loading } = useUserRoles();
 
-  // Reviewers never fill in the application form — they review the list of
-  // submitted applications. Providers see the provider form here; institutions
-  // use /institution-registration instead.
-  if (!loading && (isAdmin || isSuperAdmin)) {
+  // Nothing renders until role state resolves — no applicant-form flicker.
+  if (loading) {
+    return null;
+  }
+
+  // Reviewers never fill in the application form. Admins/superadmins go to
+  // the review list; support agents go to their restricted support view
+  // (never the PII-bearing applicant forms). Providers see the provider form
+  // here; institutions use /institution-registration instead.
+  if (isAdmin || isSuperAdmin || availableRoles.includes('support')) {
     return <Navigate to="/admin-dashboard?tab=providers" replace />;
   }
 
