@@ -42,9 +42,11 @@ import { format } from "date-fns";
 
 type QaDecision = Exclude<QaStatus, "pending">;
 
+type QaAction = QaDecision | "release";
+
 interface QaDialogState {
   batch: MedicineBatch;
-  action: QaDecision;
+  action: QaAction;
 }
 
 const DECISION_META: Record<
@@ -70,6 +72,15 @@ const DECISION_META: Record<
     badgeClass: "bg-red-100 text-red-800 border-red-200",
   },
 };
+
+const RELEASE_META = {
+  label: "Release",
+  pastTense: "released",
+};
+
+function getActionMeta(action: QaAction) {
+  return action === "release" ? RELEASE_META : DECISION_META[action];
+}
 
 function formatDate(value: string | null): string {
   if (!value) return "—";
@@ -120,11 +131,14 @@ export function QualityControl() {
   }, [historyQuery.data]);
 
   const qaMutation = useMutation({
-    mutationFn: (input: { batchId: string; status: QaStatus; notes?: string }) =>
+    mutationFn: (input: { batchId: string; status: QaStatus; notes?: string; isRelease?: boolean }) =>
       setQaStatus(input.batchId, input.status, input.notes),
     onSuccess: (_data, vars) => {
+      const pastTense = vars.isRelease ? "released" : DECISION_META[vars.status as QaDecision].pastTense;
       toast.success(
-        `Batch ${DECISION_META[vars.status as QaDecision].pastTense}.`
+        vars.isRelease
+          ? `Batch released back to pending QA.`
+          : `Batch ${pastTense}.`
       );
       queryClient.invalidateQueries({
         queryKey: ["qa-pending", institutionId],
@@ -142,7 +156,7 @@ export function QualityControl() {
     },
   });
 
-  const openDialog = (batch: MedicineBatch, action: QaDecision) => {
+  const openDialog = (batch: MedicineBatch, action: QaAction) => {
     setNotes("");
     setDialogState({ batch, action });
   };
@@ -157,10 +171,12 @@ export function QualityControl() {
 
   const handleConfirm = () => {
     if (!dialogState || confirmDisabled) return;
+    const isRelease = dialogState.action === "release";
     qaMutation.mutate({
       batchId: dialogState.batch.id,
-      status: dialogState.action,
+      status: isRelease ? "pending" : (dialogState.action as QaStatus),
       notes: notes.trim() ? notes.trim() : undefined,
+      isRelease,
     });
   };
 
@@ -299,6 +315,7 @@ export function QualityControl() {
                     <TableHead>Decision</TableHead>
                     <TableHead>Checked</TableHead>
                     <TableHead>Notes</TableHead>
+                    <TableHead className="text-right">Action</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -327,6 +344,18 @@ export function QualityControl() {
                         >
                           {batch.qa_notes ?? "—"}
                         </TableCell>
+                        <TableCell className="text-right">
+                          {decision === "quarantined" && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => openDialog(batch, "release")}
+                              className="text-blue-700 border-blue-200 hover:bg-blue-50"
+                            >
+                              Release
+                            </Button>
+                          )}
+                        </TableCell>
                       </TableRow>
                     );
                   })}
@@ -351,12 +380,14 @@ export function QualityControl() {
           <DialogHeader>
             <DialogTitle>
               {dialogState
-                ? `${DECISION_META[dialogState.action].label} batch ${dialogState.batch.batch_number}`
+                ? `${getActionMeta(dialogState.action).label} batch ${dialogState.batch.batch_number}`
                 : "QA decision"}
             </DialogTitle>
             <DialogDescription>
               {dialogState
-                ? `${dialogState.batch.product_name} — ${dialogState.batch.quantity_remaining.toLocaleString()} units received on ${formatDate(dialogState.batch.received_at)}.`
+                ? dialogState.action === "release"
+                  ? `${dialogState.batch.product_name} — ${dialogState.batch.quantity_remaining.toLocaleString()} units. Releasing returns the batch to the Pending QA queue for re-evaluation.`
+                  : `${dialogState.batch.product_name} — ${dialogState.batch.quantity_remaining.toLocaleString()} units received on ${formatDate(dialogState.batch.received_at)}.`
                 : ""}
             </DialogDescription>
           </DialogHeader>
@@ -396,7 +427,7 @@ export function QualityControl() {
               {qaMutation.isPending
                 ? "Saving…"
                 : dialogState
-                  ? `Confirm ${DECISION_META[dialogState.action].label.toLowerCase()}`
+                  ? `Confirm ${getActionMeta(dialogState.action).label.toLowerCase()}`
                   : "Confirm"}
             </Button>
           </DialogFooter>
