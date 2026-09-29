@@ -141,11 +141,8 @@ export default function TriageIntake() {
           provider_id: providerId,
           date: dateStr,
           time: timeStr,
-          appointment_date: dateStr,
-          appointment_time: timeStr,
           type: "consultation",
-          appointment_type: "consultation",
-          status: "pending",
+          status: "scheduled",
           notes: `Doc'O Clock triage (${result.urgency}). Recommended specialty: ${result.recommended_specialty}. ${result.reasoning}`,
         })
         .select("id")
@@ -166,7 +163,7 @@ export default function TriageIntake() {
         console.error('Reminder dispatch failed (non-fatal):', reminderErr);
       });
 
-      toast.success("Appointment requested", { description: "The provider has been notified." });
+      toast.success("Appointment booked", { description: "The provider has been notified." });
       navigate("/appointments");
     } catch (err: any) {
       toast.error("Booking failed", {

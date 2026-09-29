@@ -25,18 +25,18 @@ const MapPage = () => {
   const { data: providers = [], isLoading } = useQuery({
     queryKey: ['providers-map'],
     queryFn: async () => {
-      // Single source of truth — every clinical cadre appears on the map.
-      const PROVIDER_ROLES = ALL_CLINICIAN_ROLES;
-
-      const [{ data: profiles, error: profErr }, { data: institutions, error: instErr }] =
+      // Directory-safe provider pins: the public profiles policy was dropped,
+      // so `profiles` is invisible to patients. provider_directory (granted to
+      // anon/authenticated) is the source of truth here; coordinates come from
+      // provider_locations resolved separately below.
+      const [{ data: directory, error: dirErr }, { data: institutions, error: instErr }] =
         await Promise.all([
           supabase
-            .from('profiles')
+            .from('provider_directory')
             .select(`
-              id, first_name, last_name, specialty, bio, avatar_url, role,
+              id, first_name, last_name, specialty, avatar_url, role,
               telemedicine_available, consultation_fee_min, consultation_fee_max,
-              typical_wait_time, subspecialties,
-              provider_locations ( latitude, longitude )
+              typical_wait_time, subspecialties, city, state, is_verified
             `)
             .in('role', PROVIDER_ROLES as any)
             .eq('is_verified', true),
@@ -50,28 +50,42 @@ const MapPage = () => {
             .eq('is_verified', true)
             .eq('list_in_marketplace', true),   // only marketplace-listed institutions
         ]);
-      if (profErr) throw profErr;
+      if (dirErr) throw dirErr;
       if (instErr) throw instErr;
 
-      const fromProfiles: Provider[] = (profiles || []).map((p: any) => ({
+      // Resolve map coordinates separately (provider_locations has its own
+      // read path; tolerate it being unreachable so pins still render).
+      let locations: Record<string, { latitude: number; longitude: number }> = {};
+      const providerIds = (directory || []).map((d: any) => d.id);
+      if (providerIds.length > 0) {
+        const { data: locData } = await supabase
+          .from('provider_locations')
+          .select('provider_id, latitude, longitude')
+          .in('provider_id', providerIds);
+        for (const loc of locData || []) {
+          if (loc.latitude != null && loc.longitude != null) {
+            locations[loc.provider_id] = {
+              latitude: Number(loc.latitude),
+              longitude: Number(loc.longitude),
+            };
+          }
+        }
+      }
+
+      const fromProfiles: Provider[] = (directory || []).map((p: any) => ({
         id: p.id,
         first_name: p.first_name || '',
         last_name: p.last_name || '',
         role: p.role || undefined,
         specialty: p.specialty || 'General Practice',
-        bio: p.bio,
+        bio: [p.city, p.state].filter(Boolean).join(', ') || undefined,
         avatar_url: p.avatar_url,
         expertise: p.subspecialties?.length ? p.subspecialties : ['General Practice'],
         telemedicine_available: p.telemedicine_available,
         consultation_fee_min: p.consultation_fee_min,
         consultation_fee_max: p.consultation_fee_max,
         typical_wait_time: p.typical_wait_time,
-        location: p.provider_locations?.[0]
-          ? {
-              latitude: p.provider_locations[0].latitude ? Number(p.provider_locations[0].latitude) : -15.3875,
-              longitude: p.provider_locations[0].longitude ? Number(p.provider_locations[0].longitude) : 28.3228,
-            }
-          : { latitude: -15.3875, longitude: 28.3228 },
+        location: locations[p.id] ?? { latitude: -15.3875, longitude: 28.3228 },
       }));
 
       const fromInstitutions: Provider[] = (institutions || []).map((i: any) => ({

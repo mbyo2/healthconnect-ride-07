@@ -44,7 +44,7 @@ const AppointmentRemindersPage = () => {
       const today = new Date().toISOString().split("T")[0];
       const { data, error } = await supabase
         .from("appointments")
-        .select("id, date, time, type, status")
+        .select("id, date, time, type, status, duration")
         .eq("patient_id", user!.id)
         .gte("date", today)
         .neq("status", "cancelled")

@@ -84,25 +84,26 @@ export const UserMarketplace = () => {
     queryFn: async () => {
       if (!session?.user) throw new Error('Not authenticated');
 
+      // Directory-safe provider listing: `profiles` is invisible to patients
+      // after the public policy was dropped, so use provider_directory
+      // (granted to anon/authenticated). No email/phone — directory intent
+      // only. The view already enforces is_verified + show_in_search.
       let baseQuery = supabase
-        .from('profiles')
+        .from('provider_directory')
         .select(`
           id,
           first_name,
           last_name,
-          email,
-          phone,
           avatar_url,
           role,
           specialty,
-          bio,
           city,
           state
         `)
         .neq('id', session.user.id);
 
-      // Always exclude patients from the marketplace view, and only show approved accounts
-      baseQuery = baseQuery.neq('role', 'patient').eq('is_verified', true);
+      // Always exclude patients from the marketplace view
+      baseQuery = baseQuery.neq('role', 'patient');
 
       // Filter by role if specific tab is selected. The "Doctors" tab
       // covers every clinical cadre, not just the legacy role string.

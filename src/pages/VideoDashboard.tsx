@@ -86,7 +86,7 @@ const VideoDashboard: React.FC = () => {
               className="px-4 py-2.5 min-h-[44px] rounded-md bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs transition-all flex items-center gap-1.5"
             >
               <Phone className="h-4 w-4" />
-              <span>Instant Call Room</span>
+              <span>Create Room Link</span>
             </button>
             <button
               onClick={() => navigate("/appointments")}
@@ -156,8 +156,8 @@ const VideoDashboard: React.FC = () => {
               <Phone className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">Launch On-Demand Telehealth Room</h3>
-              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">Create an instant encrypted WebRTC room link and invite patients or providers.</p>
+              <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">Create a Shareable Call Room</h3>
+              <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">Create a room link to share with your provider — no provider is assigned automatically; share the link after your booking.</p>
             </div>
           </div>
           <div className="flex items-center gap-2 w-full md:w-auto">
@@ -165,7 +165,7 @@ const VideoDashboard: React.FC = () => {
               onClick={() => navigate(`/video-call/${safeCryptoUUID()}?instant=1`)}
               className="w-full md:w-auto px-5 py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-extrabold text-xs shadow-xs transition-all flex items-center justify-center gap-2"
             >
-              <Phone className="h-4 w-4" /> Start Instant Call
+              <Phone className="h-4 w-4" /> Create Room Link
             </button>
             <button
               onClick={() => navigate("/appointments")}
