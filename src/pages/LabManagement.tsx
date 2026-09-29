@@ -278,11 +278,14 @@ const LabManagement = () => {
 
       if (error) throw error;
 
-      // Mark the lab_results row verified too
-      await supabase
+      // Mark the lab_results row verified too (surface failures — a
+      // silent partial verify is a patient-safety issue)
+      const { error: resultsError } = await supabase
         .from("lab_results")
         .update({ verified_at: new Date().toISOString() })
         .eq("request_id", selectedRequest.id);
+
+      if (resultsError) throw resultsError;
 
       toast.success("Result verified & signed off");
       setSelectedRequest({ ...selectedRequest, verified_by: user?.id } as any);
