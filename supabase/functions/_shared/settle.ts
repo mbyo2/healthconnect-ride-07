@@ -16,7 +16,7 @@ type Admin = {
 };
 
 export interface SettleInput {
-  gateway: 'dpo' | 'paypal' | 'mobile_money' | 'wallet';
+  gateway: 'dpo' | 'paypal' | 'mobile_money' | 'wallet' | 'lenco';
   /** Gateway-side unique id (trans token, capture id, ...). Used for idempotency. */
   externalRef: string;
   payerId: string;
