@@ -52,20 +52,105 @@ export interface InstitutionData {
   status?: string;
 }
 
+/** One institution the user is affiliated with, either as owner/admin or staff. */
+export interface InstitutionAffiliation {
+  id: string;
+  name: string;
+  type: string;
+  /** admin = user owns the institution (admin_id); staff = active staff/member link */
+  affiliation: 'admin' | 'staff';
+  /** The staff role (e.g. pharmacist) when affiliation === 'staff'. */
+  staffRole?: string | null;
+}
+
+const overrideKey = (userId: string) => `dococlock.active_institution.${userId}`;
+
+/** Persisted "active institution" override, so staff with several affiliations
+ *  (e.g. their own auto-provisioned pharmacy AND an employer's pharmacy they
+ *  were invited to) can choose which workspace the app operates in. */
+export function getActiveInstitutionOverride(userId: string): string | null {
+  try {
+    return localStorage.getItem(overrideKey(userId));
+  } catch {
+    return null;
+  }
+}
+
+export function setActiveInstitutionOverride(userId: string, institutionId: string): void {
+  try {
+    localStorage.setItem(overrideKey(userId), institutionId);
+  } catch {
+    /* storage unavailable — override simply won't persist */
+  }
+}
+
+export function clearActiveInstitutionOverride(userId: string): void {
+  try {
+    localStorage.removeItem(overrideKey(userId));
+  } catch {
+    /* ignore */
+  }
+}
+
 /**
  * Unified, resilient hook for institution context across ALL roles.
  * Returns refreshInstitution as an alias for refetch for backward compatibility.
+ *
+ * Multi-affiliation support: when the user owns an institution AND is active
+ * staff at another (e.g. a pharmacist invited to work at someone else's
+ * pharmacy), `affiliations` lists every workspace and `switchInstitution`
+ * moves the whole app into the chosen one. The choice persists per user.
  */
 export function useInstitutionContext() {
   const { user, profile } = useAuth();
   const [institution, setInstitution] = useState<InstitutionData | null>(null);
+  const [affiliations, setAffiliations] = useState<InstitutionAffiliation[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isStaff, setIsStaff] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  const applyActive = useCallback(
+    (
+      affils: InstitutionAffiliation[],
+      byId: Map<string, InstitutionData>,
+      fallback: InstitutionData | null,
+      fallbackIsAdmin: boolean,
+    ) => {
+      let activeId: string | null = null;
+      if (user) {
+        const stored = getActiveInstitutionOverride(user.id);
+        if (stored && affils.some((a) => a.id === stored)) {
+          activeId = stored;
+        }
+      }
+      if (!activeId) {
+        // Default: newest owned institution, else first staff affiliation —
+        // preserves the historical single-workspace behaviour.
+        activeId =
+          affils.find((a) => a.affiliation === 'admin')?.id ??
+          affils.find((a) => a.affiliation === 'staff')?.id ??
+          null;
+      }
+      const activeAffil = affils.find((a) => a.id === activeId) ?? null;
+      const activeInst = (activeId && byId.get(activeId)) || fallback;
+      setInstitution(activeInst as InstitutionData | null);
+      setAffiliations(affils);
+      if (activeAffil) {
+        setIsAdmin(activeAffil.affiliation === 'admin');
+        setIsStaff(activeAffil.affiliation === 'staff');
+      } else {
+        setIsAdmin(fallbackIsAdmin);
+        setIsStaff(false);
+      }
+      setLoading(false);
+    },
+    [user],
+  );
+
   const fetchInstitution = useCallback(async () => {
     if (!user) {
       setInstitution(null);
+      setAffiliations([]);
       setIsAdmin(false);
       setIsStaff(false);
       setLoading(false);
@@ -73,97 +158,76 @@ export function useInstitutionContext() {
     }
 
     try {
-      // 1. Check if user is admin/owner. Use limit(1) ordered by newest:
-      // if duplicate rows ever exist for an admin, maybeSingle() would
-      // error on the multiples and the hook would fall through and insert
-      // ANOTHER duplicate on every login (self-amplifying). Take the
-      // newest row instead and never amplify.
-      const { data: adminInst } = await supabase
+      // 1. Institutions the user owns/admins (newest first).
+      const { data: ownedInsts } = await supabase
         .from('healthcare_institutions')
         .select('*')
         .eq('admin_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
+        .order('created_at', { ascending: false });
 
-      if (adminInst) {
-        setInstitution(adminInst as InstitutionData);
-        setIsAdmin(true);
-        setIsStaff(false);
-        setLoading(false);
-        return;
+      const byId = new Map<string, InstitutionData>();
+      const affils: InstitutionAffiliation[] = [];
+      for (const inst of (ownedInsts as InstitutionData[] | null) || []) {
+        byId.set(inst.id, inst);
+        affils.push({ id: inst.id, name: inst.name, type: inst.type, affiliation: 'admin' });
       }
 
-      // 2. institution_staff
-      const { data: staffData } = await supabase
+      // 2. Active institution_staff memberships.
+      const { data: staffRows } = await supabase
         .from('institution_staff')
-        .select('institution_id')
+        .select('institution_id, role')
         .eq('provider_id', user.id)
-        .eq('is_active', true)
-        .maybeSingle();
+        .eq('is_active', true);
 
-      if (staffData?.institution_id) {
-        const { data: staffInst } = await supabase
-          .from('healthcare_institutions')
-          .select('*')
-          .eq('id', staffData.institution_id)
-          .maybeSingle();
-
-        if (staffInst) {
-          setInstitution(staffInst as InstitutionData);
-          setIsAdmin(false);
-          setIsStaff(true);
-          setLoading(false);
-          return;
-        }
-      }
-
-      // 3. pharmacy_staff
-      const { data: pharmacyStaffData } = await (supabase as any)
+      // 3. Legacy pharmacy_staff memberships.
+      const { data: pharmacyStaffRows } = await (supabase as any)
         .from('pharmacy_staff')
         .select('pharmacy_id')
         .eq('user_id', user.id)
-        .eq('is_active', true)
-        .maybeSingle();
+        .eq('is_active', true);
 
-      if (pharmacyStaffData?.pharmacy_id) {
-        const { data: pharmInst } = await supabase
-          .from('healthcare_institutions')
-          .select('*')
-          .eq('id', pharmacyStaffData.pharmacy_id)
-          .maybeSingle();
-
-        if (pharmInst) {
-          setInstitution(pharmInst as InstitutionData);
-          setIsAdmin(false);
-          setIsStaff(true);
-          setLoading(false);
-          return;
-        }
-      }
-
-      // 4. institution_personnel
-      const { data: personnelData } = await (supabase as any)
+      // 4. Legacy institution_personnel memberships.
+      const { data: personnelRows } = await (supabase as any)
         .from('institution_personnel')
         .select('institution_id')
         .eq('user_id', user.id)
-        .eq('status', 'active')
-        .maybeSingle();
+        .eq('status', 'active');
 
-      if (personnelData?.institution_id) {
-        const { data: pInst } = await supabase
+      const staffInstIds = new Set<string>();
+      const staffRoles = new Map<string, string | null>();
+      for (const r of (staffRows as any[] | null) || []) {
+        if (r?.institution_id && !byId.has(r.institution_id)) {
+          staffInstIds.add(r.institution_id);
+          if (!staffRoles.has(r.institution_id)) staffRoles.set(r.institution_id, r.role ?? null);
+        }
+      }
+      for (const r of (pharmacyStaffRows as any[] | null) || []) {
+        if (r?.pharmacy_id && !byId.has(r.pharmacy_id)) staffInstIds.add(r.pharmacy_id);
+      }
+      for (const r of (personnelRows as any[] | null) || []) {
+        if (r?.institution_id && !byId.has(r.institution_id)) staffInstIds.add(r.institution_id);
+      }
+
+      if (staffInstIds.size > 0) {
+        const { data: staffInsts } = await supabase
           .from('healthcare_institutions')
           .select('*')
-          .eq('id', personnelData.institution_id)
-          .maybeSingle();
-
-        if (pInst) {
-          setInstitution(pInst as InstitutionData);
-          setIsAdmin(false);
-          setIsStaff(true);
-          setLoading(false);
-          return;
+          .in('id', Array.from(staffInstIds));
+        for (const inst of (staffInsts as InstitutionData[] | null) || []) {
+          byId.set(inst.id, inst);
+          affils.push({
+            id: inst.id,
+            name: inst.name,
+            type: inst.type,
+            affiliation: 'staff',
+            staffRole: staffRoles.get(inst.id) ?? null,
+          });
         }
+      }
+
+      if (affils.length > 0) {
+        applyActive(affils, byId, null, false);
+        return;
       }
 
       // 5. Email match (same multiples guard as step 1)
@@ -177,10 +241,13 @@ export function useInstitutionContext() {
           .maybeSingle();
 
         if (emailInst) {
-          setInstitution(emailInst as InstitutionData);
-          setIsAdmin(true);
-          setIsStaff(false);
-          setLoading(false);
+          const inst = emailInst as InstitutionData;
+          applyActive(
+            [{ id: inst.id, name: inst.name, type: inst.type, affiliation: 'admin' }],
+            new Map([[inst.id, inst]]),
+            null,
+            true,
+          );
           return;
         }
       }
@@ -279,10 +346,13 @@ export function useInstitutionContext() {
           .maybeSingle();
 
         if (lateInst) {
-          setInstitution(lateInst as InstitutionData);
-          setIsAdmin(true);
-          setIsStaff(false);
-          setLoading(false);
+          const inst = lateInst as InstitutionData;
+          applyActive(
+            [{ id: inst.id, name: inst.name, type: inst.type, affiliation: 'admin' }],
+            new Map([[inst.id, inst]]),
+            null,
+            true,
+          );
           return;
         }
 
@@ -308,9 +378,24 @@ export function useInstitutionContext() {
           .select()
           .maybeSingle();
 
-        if (!insertError && newInst) {
+        // Race guard: if a concurrent execution won the insert
+        // (unique index on admin_id+name), adopt its row instead of falling
+        // back to a fake in-memory institution.
+        let provisioned = (!insertError && newInst ? (newInst as InstitutionData) : null);
+        if (!provisioned && (insertError as any)?.code === '23505') {
+          const { data: raceInst } = await supabase
+            .from('healthcare_institutions')
+            .select('*')
+            .eq('admin_id', user.id)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle();
+          if (raceInst) provisioned = raceInst as InstitutionData;
+        }
+
+        if (provisioned) {
           await supabase.from('institution_staff').insert({
-            institution_id: newInst.id,
+            institution_id: provisioned.id,
             provider_id: user.id,
             role: userRole || 'admin',
             is_active: true,
@@ -321,12 +406,14 @@ export function useInstitutionContext() {
           // Pass the precise type code so department seeding matches the
           // exact facility kind chosen at signup.
           const { provisionInstitutionWorkspace } = await import('@/services/institutionProvisioning');
-          provisionInstitutionWorkspace(newInst.id, (newInst as InstitutionData).type_code || (newInst as InstitutionData).type).then(() => {}).catch(() => {});
+          provisionInstitutionWorkspace(provisioned.id, (provisioned as InstitutionData).type_code || (provisioned as InstitutionData).type).then(() => {}).catch(() => {});
 
-          setInstitution(newInst as InstitutionData);
-          setIsAdmin(true);
-          setIsStaff(false);
-          setLoading(false);
+          applyActive(
+            [{ id: provisioned.id, name: provisioned.name, type: provisioned.type, affiliation: 'admin' }],
+            new Map([[provisioned.id, provisioned]]),
+            null,
+            true,
+          );
           return;
         }
 
@@ -346,6 +433,7 @@ export function useInstitutionContext() {
         };
 
         setInstitution(fallbackInst);
+        setAffiliations([]);
         setIsAdmin(true);
         setIsStaff(false);
         setLoading(false);
@@ -353,6 +441,7 @@ export function useInstitutionContext() {
       }
 
       setInstitution(null);
+      setAffiliations([]);
       setIsAdmin(false);
       setIsStaff(false);
     } catch (error) {
@@ -367,22 +456,39 @@ export function useInstitutionContext() {
           email: user.email || '',
           currency: 'ZMW',
         });
+        setAffiliations([]);
         setIsAdmin(true);
       } else {
         setInstitution(null);
+        setAffiliations([]);
       }
     } finally {
       setLoading(false);
     }
-  }, [user, profile]);
+  }, [user, profile, applyActive]);
 
   useEffect(() => {
     fetchInstitution();
   }, [fetchInstitution]);
 
+  /** Move the whole app into another affiliated institution. Persists per user. */
+  const switchInstitution = useCallback(
+    (institutionId: string) => {
+      if (!user) return;
+      setActiveInstitutionOverride(user.id, institutionId);
+      // Re-resolve from the stored override so every consumer updates.
+      fetchInstitution();
+    },
+    [user, fetchInstitution],
+  );
+
   return {
     institution,
     institutionId: institution?.id ?? null,
+    /** Every workspace the user can operate in (owned + staff). */
+    affiliations,
+    /** Switch the active workspace; persists per user. */
+    switchInstitution,
     isAdmin,
     isStaff,
     isAffiliated: isAdmin || isStaff || !!institution,

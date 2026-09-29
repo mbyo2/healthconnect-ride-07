@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Loader2, CheckCircle2, AlertCircle, Building2, UserCheck, LogIn } from "lucide-react";
 import { toast } from "sonner";
+import { setActiveInstitutionOverride } from "@/hooks/useInstitutionContext";
 
 interface InvitationDetails {
   id: string;
@@ -83,6 +84,12 @@ const AcceptInvitation = () => {
     }
     setAccepted(true);
     toast.success("Welcome to the team!");
+    // Land the invitee inside the inviting institution's workspace: without
+    // this, staff who also own an auto-provisioned institution would keep
+    // resolving to their own empty workspace and never see the inviter's.
+    if (user && invitation?.institution_id) {
+      setActiveInstitutionOverride(user.id, invitation.institution_id);
+    }
     setTimeout(() => navigate("/dashboard"), 1500);
   };
 

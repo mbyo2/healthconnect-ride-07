@@ -15,6 +15,7 @@ import { InventoryControlTabs } from '@/components/pharmacy/InventoryControlTabs
 import { useAuth } from '@/context/AuthContext';
 import { useUserRoles } from '@/context/UserRolesContext';
 import { useInstitutionContext } from '@/hooks/useInstitutionContext';
+import { InstitutionSwitcher } from '@/components/institution/InstitutionSwitcher';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import {
@@ -25,7 +26,7 @@ import {
 const PharmacyPortal = () => {
   const { user } = useAuth();
   const { hasRole, availableRoles } = useUserRoles();
-  const { institutionId: pharmacyId } = useInstitutionContext();
+  const { institutionId: pharmacyId, affiliations, switchInstitution } = useInstitutionContext();
   const [activeTab, setActiveTab] = useState('dashboard');
 
   // Wholesale distributors (ZAMRA-licensed) are B2B-only: no retail POS,
@@ -67,6 +68,13 @@ const PharmacyPortal = () => {
                       : 'POS billing, medication inventory, digital Rx fulfillment & courier dispatch'}
                   </p>
                 </div>
+              </div>
+              <div className="shrink-0">
+                <InstitutionSwitcher
+                  affiliations={affiliations}
+                  activeId={pharmacyId}
+                  onSwitch={switchInstitution}
+                />
               </div>
             </div>
 
