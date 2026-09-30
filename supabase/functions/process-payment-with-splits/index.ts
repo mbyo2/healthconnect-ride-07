@@ -18,7 +18,11 @@ const paymentSplitsSchema = z.object({
   institutionId: z.string().uuid('Invalid institution ID').optional(),
   paymentMethod: z.enum(['paypal', 'wallet']).optional().default('wallet'),
   paymentType: z.enum(['consultation', 'pharmacy']).optional().default('consultation'),
-  redirectUrl: z.string().url().optional()
+  redirectUrl: z.string().url().optional(),
+  // Idempotency key: client-generated UUID for this payment attempt.
+  // If provided and a payment already exists with this key, returns the
+  // existing payment instead of debiting again (replay safety).
+  idempotencyKey: z.string().uuid('Invalid idempotency key').optional()
 });
 
 interface PaymentWithSplitsRequest {
@@ -31,6 +35,7 @@ interface PaymentWithSplitsRequest {
   paymentMethod?: 'paypal' | 'wallet';
   paymentType?: 'consultation' | 'pharmacy';
   redirectUrl?: string;
+  idempotencyKey?: string;
 }
 
 serve(async (req) => {
@@ -91,7 +96,7 @@ serve(async (req) => {
       );
     }
 
-    const { amount: clientAmount, currency, patientId, providerId, serviceId, institutionId, paymentMethod, paymentType } = validationResult.data;
+    const { amount: clientAmount, currency, patientId, providerId, serviceId, institutionId, paymentMethod, paymentType, idempotencyKey } = validationResult.data;
 
     // CRITICAL: Verify the authenticated user is the patient making the payment
     if (user.id !== patientId) {
@@ -108,6 +113,33 @@ serve(async (req) => {
         JSON.stringify({ success: false, error: 'Cannot process payment to yourself' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
+    }
+
+    // IDEMPOTENCY: If client provided an idempotency key and we already
+    // processed it, return the existing payment (replay safety — no double debit).
+    if (idempotencyKey) {
+      const { data: existing } = await supabase
+        .from('payments')
+        .select('id, status, amount')
+        .eq('patient_id', patientId)
+        .eq('metadata->>idempotency_key', idempotencyKey)
+        .maybeSingle();
+
+      if (existing) {
+        console.log('Idempotency key already processed, returning existing:', existing.id);
+        return new Response(
+          JSON.stringify({
+            success: true,
+            paymentId: existing.id,
+            message: 'Payment already processed (idempotent)',
+            alreadyProcessed: true
+          }),
+          {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            status: 200,
+          }
+        );
+      }
     }
 
     // Resolve the authoritative price server-side — never trust the client amount
@@ -146,6 +178,9 @@ serve(async (req) => {
     // Live payments.service_id is UUID; service codes (e.g. "video_consultation_follow-up")
     // are stored in metadata instead.
     const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(serviceId);
+    const paymentMetadata: Record<string, unknown> = {};
+    if (!isUuid) paymentMetadata.service_code = serviceId;
+    if (idempotencyKey) paymentMetadata.idempotency_key = idempotencyKey;
     const { data: payment, error: paymentError } = await supabase
       .from('payments')
       .insert({
@@ -157,7 +192,7 @@ serve(async (req) => {
         status: 'processing',
         payment_method: paymentMethod,
         payment_date: new Date().toISOString(),
-        metadata: isUuid ? null : { service_code: serviceId }
+        metadata: Object.keys(paymentMetadata).length > 0 ? paymentMetadata : null
       })
       .select()
       .single();
@@ -185,6 +220,51 @@ serve(async (req) => {
 
     if (splitsError) {
       console.error('Error processing payment splits:', splitsError);
+
+      // IDEMPOTENCY: If splits already exist (unique violation), treat as
+      // already processed — do NOT rollback, do NOT double-debit.
+      // The unique constraint uq_payment_splits_payment_recipient guarantees
+      // no duplicate splits or double-crediting.
+      const isDuplicate = splitsError.code === '23505' ||
+        splitsError.message?.includes('uq_payment_splits_payment_recipient') ||
+        splitsError.message?.includes('already exists');
+
+      if (isDuplicate) {
+        console.log('Payment splits already exist, treating as already processed:', payment.id);
+        await supabase
+          .from('payments')
+          .update({ status: 'completed' })
+          .eq('id', payment.id);
+
+        return new Response(
+          JSON.stringify({
+            success: true,
+            paymentId: payment.id,
+            message: 'Payment already processed (idempotent)',
+            alreadyProcessed: true
+          }),
+          {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            status: 200,
+          }
+        );
+      }
+
+      // ROLLBACK: Splits failed, refund the wallet debit.
+      // Without this, failed attempts would debit the wallet with no credit.
+      console.error('Rolling back wallet debit for failed splits:', payment.id);
+      await supabase.rpc('process_wallet_transaction', {
+        p_user_id: patientId,
+        p_transaction_type: 'credit',
+        p_amount: amount,
+        p_description: `Rollback for failed splits ${payment.id}`
+      });
+
+      await supabase
+        .from('payments')
+        .update({ status: 'failed' })
+        .eq('id', payment.id);
+
       throw splitsError;
     }
 
