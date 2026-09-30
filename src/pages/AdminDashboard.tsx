@@ -3,6 +3,7 @@ import { UserManagement } from "@/components/admin/UserManagement";
 import { SecurityAuditLogs } from "@/components/admin/SecurityAuditLogs";
 import { RevenueAnalyticsDashboard } from "@/components/admin/RevenueAnalyticsDashboard";
 import { InstitutionApplications } from "@/components/admin/InstitutionApplications";
+import { InstitutionManagement } from "@/components/admin/InstitutionManagement";
 import { ProviderApplications } from "@/components/admin/ProviderApplications";
 import { RoleManagement } from "@/components/admin/RoleManagement";
 import { PromoCodeManager } from "@/components/admin/PromoCodeManager";
@@ -15,7 +16,7 @@ import { QuickActions } from "@/components/shared/QuickActions";
 import { TrendChart, SimpleBarChart, DonutChart, StatsCard } from "@/components/charts";
 import { SuggestionBanner, RecommendationCard } from "@/components/guidance";
 import {
-  Shield, Users, Activity, DollarSign, Building2, Stethoscope,
+  Shield, ShieldCheck, Users, Activity, DollarSign, Building2, Stethoscope,
   UserCog, Ticket, Percent, Lock, Sparkles, RefreshCw, TrendingUp,
   AlertTriangle, CheckCircle, Clock, LayoutGrid
 } from "lucide-react";
@@ -34,6 +35,7 @@ const TABS = [
   { value: "roles", label: "Roles", icon: UserCog },
   { value: "providers", label: "Providers", icon: Stethoscope },
   { value: "applications", label: "Institutions", icon: Building2 },
+  { value: "manage-institutions", label: "Manage", icon: ShieldCheck },
   { value: "modules", label: "Modules", icon: LayoutGrid },
   { value: "revenue", label: "Revenue", icon: DollarSign },
   { value: "commissions", label: "Commissions", icon: Percent },
@@ -53,7 +55,9 @@ export const AdminDashboard = () => {
   const isSupportView = !isAdmin && availableRoles.includes('support');
 
   // Commissions RLS is superadmin-only — plain admins would see a dead tab.
-  const visibleTabs = TABS.filter((t) => isSuperAdmin || t.value !== 'commissions');
+  // manage-institutions is also superadmin-only (platform hierarchy).
+  const SUPERADMIN_ONLY_TABS = new Set(["commissions", "manage-institutions"]);
+  const visibleTabs = TABS.filter((t) => isSuperAdmin || !SUPERADMIN_ONLY_TABS.has(t.value));
 
   // Unknown ?tab= values fall back to overview instead of empty content.
   const tabParam = searchParams.get("tab") || "overview";
@@ -416,6 +420,7 @@ export const AdminDashboard = () => {
             <TabsContent value="roles"><RoleManagement /></TabsContent>
             <TabsContent value="providers"><ProviderApplications /></TabsContent>
             <TabsContent value="applications"><InstitutionApplications /></TabsContent>
+            {isSuperAdmin && <TabsContent value="manage-institutions"><InstitutionManagement /></TabsContent>}
             <TabsContent value="modules"><InstitutionModuleManager /></TabsContent>
             <TabsContent value="revenue"><RevenueAnalyticsDashboard /></TabsContent>
             {isSuperAdmin && <TabsContent value="commissions"><CommissionSettings /></TabsContent>}
