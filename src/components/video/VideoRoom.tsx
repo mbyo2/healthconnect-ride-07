@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from "react";
 import DailyIframe from '@daily-co/daily-js';
 import { VideoControls } from "./VideoControls";
 import { VideoRoomProps } from "@/types/video";
-import { useDeviceCapabilities } from "@/hooks/use-device-capabilities";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { useIsTVDevice } from "@/hooks/use-tv-detection";
 import { Button } from "@/components/ui/button";
@@ -24,7 +23,6 @@ export function VideoRoom({ roomUrl, roomId, userName, videoQuality = "high", on
   // Use roomId if passed, otherwise use roomUrl
   const actualRoomUrl = roomId || roomUrl;
   
-  const capabilities = useDeviceCapabilities();
   const isMobile = useMediaQuery('(max-width: 768px)');
   const isTV = useIsTVDevice();
   
@@ -60,23 +58,6 @@ export function VideoRoom({ roomUrl, roomId, userName, videoQuality = "high", on
   }, [reconnecting]);
 
   useEffect(() => {
-    // Adapt quality based on device type and capabilities
-    let roomQuality = videoQuality;
-    if (isTV) {
-      roomQuality = "high"; // TVs typically have good bandwidth and large screens
-    } else if (capabilities.network.connectionQuality === "poor") {
-      roomQuality = "low";
-    } else if (isMobile && !navigator.onLine) {
-      roomQuality = "low";
-    }
-
-    // Define video quality configurations as arrays for DailyIframe
-    const videoConfig = {
-      low: [{ height: 360, frameRate: 15 }],
-      medium: [{ height: 720, frameRate: 24 }],
-      high: [{ height: 1080, frameRate: 30 }]
-    };
-    
     // Create Daily callFrame
     if (!callFrame && actualRoomUrl) {
       const options = {
@@ -92,11 +73,6 @@ export function VideoRoom({ roomUrl, roomId, userName, videoQuality = "high", on
           height: isMobile ? 'calc(100% - 140px)' : '100%',
           border: 'none',
           zIndex: '20' // Using string to match DailyFactoryOptions type
-        },
-        dailyConfig: {
-          experimentalChromeVideoMute: isTV,
-          camSimulcastEncodings: videoConfig[roomQuality as keyof typeof videoConfig],
-          micQuality: roomQuality === "low" ? "speech-quality" : "speech-plus-quality"
         }
       };
       
@@ -143,7 +119,7 @@ export function VideoRoom({ roomUrl, roomId, userName, videoQuality = "high", on
     };
   }, [actualRoomUrl, userName, handleJoinedMeeting, handleError, 
       handleParticipantsChange, handleNetworkQualityChange, 
-      videoQuality, isMobile, isTV, capabilities.network.connectionQuality]);
+      handleNetworkConnection, reconnecting]);
 
   
   const handleToggleMute = () => {
