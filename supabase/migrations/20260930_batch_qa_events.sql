@@ -36,7 +36,7 @@ CREATE POLICY "Institution staff read QA events"
   ON public.batch_qa_events FOR SELECT
   USING (
     institution_id IN (
-      SELECT institution_id FROM public.institution_staff WHERE user_id = auth.uid()
+      SELECT institution_id FROM public.institution_staff WHERE provider_id = auth.uid()
     )
     OR institution_id IN (
       SELECT id FROM public.healthcare_institutions WHERE admin_id = auth.uid()
@@ -49,7 +49,7 @@ CREATE POLICY "QA reviewers append QA events"
   ON public.batch_qa_events FOR INSERT
   WITH CHECK (
     institution_id IN (
-      SELECT institution_id FROM public.institution_staff WHERE user_id = auth.uid()
+      SELECT institution_id FROM public.institution_staff WHERE provider_id = auth.uid()
     )
     OR institution_id IN (
       SELECT id FROM public.healthcare_institutions WHERE admin_id = auth.uid()
