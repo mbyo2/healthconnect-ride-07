@@ -12,7 +12,7 @@ const RESEND_API_KEY = Deno.env.get("RESEND");
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, x-cron-secret",
+    "authorization, x-client-info, apikey, content-type, x-requested-with, x-cron-secret",
 };
 
 type EmailType = "appointment_reminder" | "payment_confirmation" | "registration_confirmation" | "general_notice";

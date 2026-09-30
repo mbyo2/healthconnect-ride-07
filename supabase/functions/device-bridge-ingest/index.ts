@@ -3,7 +3,10 @@
 // device_alerts. Authenticated with a per-institution HMAC token so the
 // service-role key never leaves the server.
 import { createClient } from 'npm:@supabase/supabase-js@2'
-import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors'
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-requested-with',
+};
 import { z } from 'npm:zod@3.23.8'
 
 const BRIDGE_SECRET = Deno.env.get('DEVICE_BRIDGE_SECRET') ?? ''

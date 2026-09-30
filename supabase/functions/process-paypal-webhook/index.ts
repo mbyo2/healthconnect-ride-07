@@ -2,7 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, paypal-auth-algo, paypal-cert-id, paypal-transmission-id, paypal-transmission-time',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-requested-with, paypal-auth-algo, paypal-cert-id, paypal-transmission-id, paypal-transmission-time',
 };
 
 // Get a PayPal access token to call verification API

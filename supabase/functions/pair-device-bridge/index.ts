@@ -1,7 +1,10 @@
 // Returns the HMAC bridge token for the caller's institution. Only users with
 // institution_admin / super_admin / admin roles for that institution can fetch it.
 import { createClient } from 'npm:@supabase/supabase-js@2'
-import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors'
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-requested-with',
+};
 
 const BRIDGE_SECRET = Deno.env.get('DEVICE_BRIDGE_SECRET') ?? ''
 
