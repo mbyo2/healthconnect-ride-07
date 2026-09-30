@@ -21,30 +21,30 @@ const PLATFORM_FEE_TYPES = ["app_owner", "health_personnel", "institution", "pha
 
 const META: Record<string, { label: string; description: string; payee: string; def: number }> = {
   app_owner: {
-    label: "Consultation platform fee",
+    label: "Platform fee",
     description:
-      "Taken from each consultation / appointment payment. The rest is split between provider and institution.",
-    payee: "Platform",
-    def: 10,
-  },
-  health_personnel: {
-    label: "Provider share",
-    description:
-      "Percentage of each consultation payment paid to the healthcare provider. For independent providers (no institution), they also receive the institution share.",
-    payee: "Provider",
-    def: 75,
-  },
-  institution: {
-    label: "Institution share",
-    description:
-      "Percentage of each consultation payment paid to the institution/facility when the provider is affiliated. Inactive = provider receives this share.",
-    payee: "Institution",
+      "The platform's cut from every payment. The payee (provider, institution, or pharmacy) receives the remainder. Example: 15% fee on K30 → platform K4.50, payee K25.50.",
+    payee: "Payee receives",
     def: 15,
   },
+  health_personnel: {
+    label: "Provider platform fee",
+    description:
+      "Platform's cut from consultation payments specifically. If active, this overrides the general Platform fee for consultations. The provider receives the remainder.",
+    payee: "Provider receives",
+    def: 15,
+  },
+  institution: {
+    label: "Institution platform fee",
+    description:
+      "Platform's cut from institution service payments specifically. If active, this overrides the general Platform fee for institution services. The institution receives the remainder.",
+    payee: "Institution receives",
+    def: 10,
+  },
   pharmacy: {
-    label: "Pharmacy sale platform fee",
-    description: "Taken from each marketplace / pharmacy order. The rest is paid to the pharmacy.",
-    payee: "Pharmacy",
+    label: "Pharmacy platform fee",
+    description: "Platform's cut from pharmacy/marketplace orders specifically. If active, this overrides the general Platform fee for pharmacy sales. The pharmacy receives the remainder.",
+    payee: "Pharmacy receives",
     def: 2.5,
   },
 };
@@ -188,9 +188,10 @@ export const CommissionSettings = () => {
                   </div>
                 </div>
                 <div className="flex items-center gap-2 text-xs">
-                  <Badge variant="secondary">{meta?.payee || "Payee"}: {setting.commission_percentage.toFixed(2)}%</Badge>
+                  <Badge variant="secondary">Platform: {setting.commission_percentage.toFixed(2)}%</Badge>
+                  <Badge variant="outline">{meta?.payee || "Payee"}: {payeeShare.toFixed(2)}%</Badge>
                   {!setting.is_active && (
-                    <span className="text-muted-foreground">(Inactive — treated as 0% in splits)</span>
+                    <span className="text-muted-foreground">(Inactive — platform takes 0%, payee gets 100%)</span>
                   )}
                 </div>
               </div>
