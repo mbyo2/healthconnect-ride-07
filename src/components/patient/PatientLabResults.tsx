@@ -4,7 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { FlaskConical, Loader2 } from 'lucide-react';
+import { FlaskConical, Loader2, ShieldCheck } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface LabResultRow {
@@ -15,7 +15,16 @@ interface LabResultRow {
   reference_range: string | null;
   notes: string | null;
   verified_at: string | null;
+  test_id: string | null;
   created_at: string;
+  // From lab_tests join (source of truth for verification)
+  lab_test?: {
+    verified_by: string | null;
+    verifier?: {
+      first_name: string | null;
+      last_name: string | null;
+    } | null;
+  } | null;
 }
 
 export default function PatientLabResults() {
@@ -25,10 +34,18 @@ export default function PatientLabResults() {
     enabled: !!user?.id,
     queryFn: async () => {
       // Live lab_results carries test_name + notes directly; verified_at
-      // exists after the 20260930 drift catch-up. Order by created_at.
+      // exists after the 20260930 drift catch-up. Join lab_tests (source of
+      // truth) via test_id to get verifier info.
       const { data, error } = await supabase
         .from('lab_results')
-        .select('id, test_name, result_value, unit, reference_range, notes, verified_at, created_at')
+        .select(`
+          id, test_name, result_value, unit, reference_range, notes,
+          verified_at, test_id, created_at,
+          lab_test:lab_tests!lab_results_test_id_fkey(
+            verified_by,
+            verifier:profiles!lab_tests_verified_by_fkey(first_name, last_name)
+          )
+        `)
         .eq('patient_id', user!.id)
         .order('created_at', { ascending: false })
         .limit(50);
@@ -65,12 +82,24 @@ export default function PatientLabResults() {
               const critical = (r.notes || '').toLowerCase().includes('critical');
               const testName = r.test_name || 'Lab test';
               const resultDate = r.verified_at || r.created_at;
+              const isVerified = !!r.verified_at;
+              const verifierName = r.lab_test?.verifier
+                ? `${r.lab_test.verifier.first_name || ''} ${r.lab_test.verifier.last_name || ''}`.trim()
+                : null;
               return (
                 <div key={r.id} className="flex items-start justify-between gap-3 p-3 border rounded-lg">
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <h4 className="font-medium truncate">{testName}</h4>
                       {critical && <Badge variant="destructive">Critical</Badge>}
+                      {isVerified ? (
+                        <Badge variant="default" className="bg-success-500 hover:bg-success-600">
+                          <ShieldCheck className="h-3 w-3 mr-1" />
+                          Verified
+                        </Badge>
+                      ) : (
+                        <Badge variant="secondary">Pending verification</Badge>
+                      )}
                     </div>
                     <p className="text-sm">{r.result_value ? `${r.result_value} ${r.unit || ''}`.trim() : 'Result pending'}</p>
                     {r.reference_range && (
@@ -79,6 +108,8 @@ export default function PatientLabResults() {
                     {r.notes && <p className="text-xs text-muted-foreground mt-1">{r.notes}</p>}
                     <p className="text-xs text-muted-foreground mt-1">
                       {resultDate ? format(new Date(resultDate), 'PPP') : 'Date not recorded'}
+                      {isVerified && verifierName && ` · Verified by ${verifierName}`}
+                      {isVerified && !verifierName && ` · Verified`}
                     </p>
                   </div>
                 </div>
