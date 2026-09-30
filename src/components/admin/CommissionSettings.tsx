@@ -90,6 +90,8 @@ export const CommissionSettings = () => {
   };
 
   const invalid = settings.some((s) => s.commission_percentage < 0 || s.commission_percentage > 100);
+  const activeTotal = settings.filter((s) => s.is_active).reduce((sum, s) => sum + (s.commission_percentage || 0), 0);
+  const totalExceeds = activeTotal > 100;
 
   const saveSettings = async () => {
     setSaving(true);
@@ -202,7 +204,16 @@ export const CommissionSettings = () => {
 
         {invalid && (
           <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
-            <p className="text-sm text-destructive">Each platform fee must be between 0% and 100%.</p>
+            <p className="text-sm text-destructive">Each payment split must be between 0% and 100%.</p>
+          </div>
+        )}
+
+        {totalExceeds && !invalid && (
+          <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+            <p className="text-sm text-amber-700 dark:text-amber-400">
+              Warning: Active splits total {activeTotal.toFixed(2)}%, which exceeds 100%. 
+              This will over-allocate payments. Adjust the percentages so active splits total 100% or less.
+            </p>
           </div>
         )}
 
