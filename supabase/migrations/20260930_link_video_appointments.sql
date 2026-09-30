@@ -34,9 +34,10 @@ BEGIN
   END IF;
 
   -- Combine date + time into a timestamptz. Live schema uses `date` (date)
-  -- and `time` (time) columns; fall back gracefully if null.
+  -- and `time` (text, e.g. '14:00'); cast text to time first.
+  -- Fall back to now() if parsing fails.
   BEGIN
-    v_start := (NEW.date + NEW.time)::timestamptz;
+    v_start := (NEW.date + NEW.time::time)::timestamptz;
   EXCEPTION WHEN OTHERS THEN
     v_start := now();
   END;
@@ -67,14 +68,15 @@ CREATE TRIGGER trg_appointment_create_video_consultation
 
 -- 4. Backfill: create video_consultations rows for existing video appointments
 --    that don't have one yet.
+--    Note: appointments.time is TEXT (e.g. '14:00'), so cast to time first.
 INSERT INTO public.video_consultations (
   patient_id, provider_id, appointment_id,
   scheduled_start, scheduled_end, status
 )
 SELECT
   a.patient_id, a.provider_id, a.id,
-  COALESCE((a.date + a.time)::timestamptz, now()),
-  COALESCE((a.date + a.time)::timestamptz, now()) + interval '30 minutes',
+  COALESCE((a.date + a.time::time)::timestamptz, now()),
+  COALESCE((a.date + a.time::time)::timestamptz, now()) + interval '30 minutes',
   CASE WHEN a.status = 'cancelled' THEN 'cancelled'
        WHEN a.status = 'completed' THEN 'completed'
        ELSE 'scheduled' END
