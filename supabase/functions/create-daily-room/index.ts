@@ -99,7 +99,6 @@ serve(async (req) => {
         start_audio_off: false,
         eject_at_room_exp: true,
         enable_network_ui: true,
-        enable_network_switching: true,
       },
     };
 
