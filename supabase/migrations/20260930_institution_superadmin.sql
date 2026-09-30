@@ -30,8 +30,10 @@ LANGUAGE SQL STABLE SECURITY DEFINER SET search_path = public AS $$
 $$;
 
 -- ─── 2. Backfill: admin_id holders get the institution_admin role ───
+-- NOTE: NULL must be cast to uuid — the live executor rejected the untyped
+-- NULL literal in the SELECT list (42804). Applied live as NULL::uuid.
 INSERT INTO public.user_roles (user_id, role, granted_by)
-SELECT DISTINCT hi.admin_id, 'institution_admin'::public.app_role, NULL
+SELECT DISTINCT hi.admin_id, 'institution_admin'::public.app_role, NULL::uuid
 FROM public.healthcare_institutions hi
 WHERE hi.admin_id IS NOT NULL
 ON CONFLICT (user_id, role) DO NOTHING;
