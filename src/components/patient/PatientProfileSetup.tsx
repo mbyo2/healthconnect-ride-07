@@ -52,7 +52,10 @@ export const PatientProfileSetup = () => {
     if (!avatar) return null;
     const fileExt = avatar.name.split('.').pop();
     const filePath = `${userId}/${Date.now()}.${fileExt}`;
-    const { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, avatar);
+    const { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, avatar, {
+      contentType: avatar.type || 'image/png',
+      upsert: true,
+    });
     if (uploadError) throw uploadError;
     const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(filePath);
     return publicUrl;

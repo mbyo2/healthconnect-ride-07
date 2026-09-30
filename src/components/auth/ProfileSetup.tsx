@@ -67,7 +67,10 @@ export const ProfileSetup = () => {
       if (!user) throw new Error("You must be signed in to upload a photo");
       const fileExt = file.name.split('.').pop();
       const filePath = `${user.id}/${Date.now()}.${fileExt}`;
-      const { error } = await supabase.storage.from('avatars').upload(filePath, file);
+      const { error } = await supabase.storage.from('avatars').upload(filePath, file, {
+        contentType: file.type || 'image/png',
+        upsert: true,
+      });
       if (error) throw error;
       const publicUrl = supabase.storage.from('avatars').getPublicUrl(filePath).data.publicUrl;
       setUploadedAvatarUrl(publicUrl);
