@@ -417,6 +417,11 @@ export const InstitutionDashboard = () => {
                 <span className={`inline-block px-3 py-1 rounded-pill text-xs font-medium ${institution.is_verified ? "bg-success-50 text-success-500 border border-success-100" : "bg-warning-50 text-warning-500 border border-warning-100"}`}>
                   {institution.is_verified ? "Verified" : "Pending"}
                 </span>
+                {isAdmin && (
+                  <span className="inline-block px-3 py-1 rounded-pill text-xs font-medium bg-[#e5f0ff] text-[#0073ea] border border-[#bcd6ff]" title="You are the superadmin in charge of this institution">
+                    Super Admin
+                  </span>
+                )}
               </h1>
               <p className="text-sm text-graphite-500 dark:text-slate-400 font-medium tracking-wide">
                 {headerLabel} Dashboard{!institution.is_verified ? " — pending verification (full HMS is already set up)" : ""}
