@@ -42,6 +42,7 @@ export const AppointmentDetails = () => {
   const [notes, setNotes] = useState("");
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [cancelling, setCancelling] = useState(false);
+  const [videoConsultation, setVideoConsultation] = useState<{ id: string; meeting_url: string | null; status: string } | null>(null);
 
   useEffect(() => {
     fetchAppointment();
@@ -70,6 +71,17 @@ export const AppointmentDetails = () => {
 
       setAppointment({ ...(appt as any), provider: providerProfile ?? null, patient: null });
       setNotes((appt as any)?.notes || "");
+
+      // For video consultations, fetch the linked video_consultations row
+      // so we can show a Join Meeting button.
+      if ((appt as any).type === 'video_consultation') {
+        const { data: vc } = await supabase
+          .from('video_consultations')
+          .select('id, meeting_url, status')
+          .eq('appointment_id', (appt as any).id)
+          .maybeSingle();
+        if (vc) setVideoConsultation(vc as any);
+      }
     } catch (error) {
       console.error("Error fetching appointment:", error);
       toast.error("Failed to load appointment details");
@@ -179,6 +191,16 @@ export const AppointmentDetails = () => {
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
+            {/* Join Meeting for video consultations */}
+            {appointment.type === "video_consultation" && videoConsultation && appointment.status !== "cancelled" && (
+              <button
+                onClick={() => navigate(`/video-consultations?join=${videoConsultation.id}`)}
+                className="px-3.5 py-1.5 rounded-md bg-success-500 hover:bg-success-600 text-white font-bold text-xs transition-colors flex items-center gap-1.5"
+              >
+                <Video className="h-3.5 w-3.5" />
+                Join Meeting
+              </button>
+            )}
             {appointment.status !== "cancelled" && appointment.status !== "completed" && (
               <button
                 onClick={() => setShowCancelDialog(true)}

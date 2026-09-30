@@ -1,5 +1,6 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
 import { VideoConsultationDetails } from "@/types/video";
 import { ConsultationList } from "./ConsultationList";
 import { VideoRoom } from "./VideoRoom";
@@ -20,6 +21,7 @@ export const VideoConsultation = () => {
   const [activeConsultation, setActiveConsultation] = useState<VideoConsultationDetails | null>(null);
   const [retryCount, setRetryCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [searchParams] = useSearchParams();
   const { isOnline, connectionQuality } = useNetwork();
   const isTV = useIsTVDevice();
   const isMobile = useMediaQuery('(max-width: 768px)');
@@ -124,6 +126,29 @@ export const VideoConsultation = () => {
     setActiveConsultation(null);
     setRetryCount(0); // Reset retry counter
   }, []);
+
+  // Auto-join from ?join=<consultation_id> (e.g. from Appointment Details page).
+  useEffect(() => {
+    const joinId = searchParams.get('join');
+    if (!joinId || activeConsultation) return;
+
+    (async () => {
+      const { data, error } = await supabase
+        .from('video_consultations')
+        .select(`
+          *,
+          provider:profiles!video_consultations_provider_id_fkey(first_name, last_name, specialty),
+          patient:profiles!video_consultations_patient_id_fkey(first_name, last_name)
+        `)
+        .eq('id', joinId)
+        .maybeSingle();
+
+      if (!error && data) {
+        handleJoinMeeting(data as VideoConsultationDetails);
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
   
   // When connection is lost during a call
   useEffect(() => {
