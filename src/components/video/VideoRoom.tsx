@@ -84,7 +84,6 @@ export function VideoRoom({ roomUrl, roomId, userName, videoQuality = "high", on
         userName: userName,
         showLeaveButton: true,
         showFullscreenButton: true,
-        showUserNameLabel: true,
         iframeStyle: {
           position: 'fixed',
           top: isMobile ? '60px' : '0',
