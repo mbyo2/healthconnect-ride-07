@@ -27,12 +27,16 @@ serve(async (req) => {
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+    const token = authHeader.replace("Bearer ", "");
     const supabaseAuth = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_ANON_KEY") ?? "",
-      { global: { headers: { Authorization: authHeader } } }
+      {
+        global: { headers: { Authorization: authHeader } },
+        auth: { persistSession: false },
+      }
     );
-    const { data: { user }, error: authErr } = await supabaseAuth.auth.getUser();
+    const { data: { user }, error: authErr } = await supabaseAuth.auth.getUser(token);
     if (authErr || !user) {
       return new Response(
         JSON.stringify({ error: "Unauthorized" }),

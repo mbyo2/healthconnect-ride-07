@@ -50,13 +50,17 @@ serve(async (req) => {
     }
 
     // Create auth client to validate the user's JWT
+    const token = authHeader.replace('Bearer ', '');
     const authClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      { global: { headers: { Authorization: authHeader } } }
+      {
+        global: { headers: { Authorization: authHeader } },
+        auth: { persistSession: false },
+      }
     );
 
-    const { data: { user }, error: authError } = await authClient.auth.getUser();
+    const { data: { user }, error: authError } = await authClient.auth.getUser(token);
     if (authError || !user) {
       console.error('Authentication failed:', authError?.message);
       return new Response(
