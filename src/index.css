@@ -348,6 +348,14 @@ html {
     @apply sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-b border-[#e6e9ef] dark:border-slate-800 shadow-xs;
   }
 
+  /* ── Page-level sticky sub-header ──
+     Docks BELOW the site nav (h-16 base, lg:h-[4.25rem]) instead of behind
+     it. Use this for in-page sticky bars; plain `sticky top-0` gets covered
+     by the z-50 DesktopNav and hides actions like "Write E-Prescription". */
+  .doc-page-header {
+    @apply sticky top-16 lg:top-[4.25rem] z-30 bg-white dark:bg-slate-900 border-b border-canvas-silk dark:border-slate-800;
+  }
+
   /* ── Section heading styles ── */
   .doc-badge {
     @apply inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#e5f0ff] dark:bg-blue-950/50 text-[#0073ea] dark:text-blue-400 text-xs font-black;

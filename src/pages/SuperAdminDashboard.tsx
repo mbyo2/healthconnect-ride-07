@@ -212,7 +212,7 @@ const SuperAdminDashboard = () => {
   return (
     <div className="min-h-screen bg-canvas text-midnight font-sans pb-16">
       {/* Top Bar */}
-      <div className="bg-white dark:bg-slate-900 border-b border-canvas-silk dark:border-slate-800 px-4 sm:px-6 py-5 sticky top-0 z-30 shadow-sm">
+      <div className="doc-page-header px-4 sm:px-6 py-5 shadow-sm">
         <div className="max-w-content mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-xl bg-accent-500 text-white flex items-center justify-center shadow-button">

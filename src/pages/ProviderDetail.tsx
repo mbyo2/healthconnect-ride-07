@@ -197,7 +197,7 @@ export const ProviderDetail = () => {
 
       <div className="min-h-screen bg-canvas dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pb-16">
         {/* Sticky top bar */}
-        <div className="bg-white dark:bg-slate-900 border-b border-canvas-silk dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-xs">
+        <div className="doc-page-header px-4 sm:px-6 py-4 shadow-xs">
           <div className="max-w-5xl mx-auto flex items-center justify-between gap-4">
             <div className="min-w-0">
               <h1 className="text-base font-extrabold tracking-tight truncate">{providerName}</h1>

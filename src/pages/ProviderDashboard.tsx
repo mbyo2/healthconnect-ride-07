@@ -24,7 +24,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { format, startOfWeek, endOfWeek, addDays } from "date-fns";
 import { useCurrency } from "@/hooks/use-currency";
 import { useUserRoles } from "@/context/UserRolesContext";
-import { ROLE_META, ROLE_PRIORITY, type UserRole } from "@/config/roleConfig";
+import { ROLE_META, ROLE_PRIORITY, PRESCRIBING_ROLES, type UserRole } from "@/config/roleConfig";
 import { hasRoutePermission } from "@/utils/rolePermissions";
 import { useInstitutionAffiliation } from "@/hooks/useInstitutionAffiliation";
 import { toast } from "sonner";
@@ -380,6 +380,13 @@ export const ProviderDashboard = () => {
   const { availableRoles, isHealthPersonnel } = useUserRoles();
   const { isInstitutionAffiliated } = useInstitutionAffiliation();
 
+  // Only the five legal prescribing professions may see write-prescription
+  // shortcuts. Nurses, allied health, lab and community cadres are
+  // correctly blocked from writing — the UI must not tease them with it.
+  const canPrescribe = availableRoles.some((r) =>
+    (PRESCRIBING_ROLES as readonly string[]).includes(r)
+  );
+
   // Dashboard identity follows the taxonomy — every cadre gets a named
   // console derived from its role metadata, never a hardcoded trio.
   // professionCode is the exact profession chosen at signup; it drives the
@@ -527,7 +534,7 @@ export const ProviderDashboard = () => {
   return (
     <div className="min-h-screen bg-canvas text-midnight font-sans transition-colors pb-16">
       {/* Top Bar */}
-      <div className="bg-white dark:bg-slate-900 border-b border-canvas-silk dark:border-slate-800 px-4 sm:px-6 py-5 sticky top-0 z-30 shadow-sm">
+      <div className="doc-page-header px-4 sm:px-6 py-5 shadow-sm">
         <div className="max-w-content mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-button">
@@ -586,17 +593,20 @@ export const ProviderDashboard = () => {
           </div>
         </div>
 
-        {/* Quick action pills — only show actions this provider's roles may open */}
+        {/* Quick action pills — only show actions this provider's roles may open.
+            "Write Rx" is gated on the five legal prescribing professions, not
+            just route access: nurses/allied cadres must never see a write
+            shortcut that drops them on the patient-style prescription view. */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
           {[
             { label: "Calendar", route: "/provider-calendar", icon: Calendar },
             { label: "Patient Queue", route: "/appointments", icon: ClipboardList },
-            { label: "Write Rx", route: "/prescriptions", icon: FileText },
+            { label: "Write Rx", route: "/prescriptions", icon: FileText, requiresPrescribe: true },
             { label: "Telehealth", route: "/video-dashboard", icon: Video },
             { label: "Medical EMR", route: "/medical-records", icon: Stethoscope },
             { label: "Chat Console", route: "/chat", icon: MessageSquare },
           ]
-            .filter(act => hasRoutePermission(availableRoles, act.route))
+            .filter(act => hasRoutePermission(availableRoles, act.route) && (!act.requiresPrescribe || canPrescribe))
             .map(act => (
             <button
               key={act.label}

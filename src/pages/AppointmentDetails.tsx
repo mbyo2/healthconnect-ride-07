@@ -156,7 +156,7 @@ export const AppointmentDetails = () => {
   return (
     <div className="min-h-screen bg-canvas dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors pb-16">
       {/* Sticky Header */}
-      <div className="bg-white dark:bg-slate-900 border-b border-canvas-silk dark:border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-2xs">
+      <div className="doc-page-header px-4 sm:px-6 py-4 shadow-2xs">
         <div className="max-w-[1400px] mx-auto flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
             <button
