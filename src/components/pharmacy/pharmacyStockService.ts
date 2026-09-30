@@ -334,6 +334,26 @@ export async function setQaStatus(
   notes?: string
 ): Promise<void> {
   const userId = await getCurrentUserId();
+  if (!userId) throw new Error("Not signed in");
+
+  // Load the current batch row (for separation-of-duties + audit).
+  const { data: batch, error: fetchError } = await supabase
+    .from("medicine_batches" as any)
+    .select("id, institution_id, qa_status, qa_checked_by")
+    .eq("id", batchId)
+    .single();
+  throwIf(fetchError, "Failed to load batch");
+  const prev = (batch as any) ?? {};
+
+  // Release separation of duties: the user releasing a quarantined batch
+  // must differ from the user who quarantined it.
+  const isRelease = prev.qa_status === "quarantined" && status === "approved";
+  if (isRelease && prev.qa_checked_by && prev.qa_checked_by === userId) {
+    throw new Error(
+      "Separation of duties: the user who quarantined this batch cannot release it. Ask a second pharmacist to release."
+    );
+  }
+
   const { error } = await supabase
     .from("medicine_batches" as any)
     .update({
@@ -344,6 +364,22 @@ export async function setQaStatus(
     })
     .eq("id", batchId);
   throwIf(error, "Failed to update QA status");
+
+  // Append the immutable QA event (append-only audit log).
+  const action = isRelease ? "released" : status;
+  const { error: eventError } = await supabase
+    .from("batch_qa_events" as any)
+    .insert({
+      batch_id: batchId,
+      institution_id: prev.institution_id,
+      action,
+      previous_status: prev.qa_status ?? null,
+      new_status: status,
+      decided_by: userId,
+      notes: notes || null,
+    });
+  // The audit event must not be silently lost.
+  throwIf(eventError, "QA status saved but audit event failed — contact support");
 }
 
 export async function getBatchMovements(batchId: string): Promise<BatchStockMovement[]> {

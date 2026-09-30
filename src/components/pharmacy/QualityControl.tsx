@@ -146,6 +146,20 @@ export function QualityControl() {
       queryClient.invalidateQueries({
         queryKey: ["qa-history", institutionId],
       });
+      // QA decisions change available stock — refresh inventory lists,
+      // batch views, and dashboard summary cards.
+      queryClient.invalidateQueries({
+        queryKey: ["batches", institutionId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["pharmacy-stock", institutionId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["pharmacy-summary", institutionId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["inventory", institutionId],
+      });
       setDialogState(null);
       setNotes("");
     },
