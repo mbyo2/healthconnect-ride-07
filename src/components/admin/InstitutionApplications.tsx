@@ -202,11 +202,40 @@ export const InstitutionApplications = () => {
       if (appErr) throw appErr;
 
       if (status === "approved") {
-        const { error: instErr } = await supabase
+        // Provisioning: ensure the institution exists. The application may
+        // reference an institution_name without a linked institution row.
+        const { data: existingInst } = await supabase
           .from("healthcare_institutions")
-          .update({ is_verified: true })
-          .eq("admin_id", selected.applicant_id);
-        if (instErr) throw instErr;
+          .select("id")
+          .eq("admin_id", selected.applicant_id)
+          .maybeSingle();
+
+        if (!existingInst) {
+          // Create the institution from the application data
+          const { error: createErr } = await supabase
+            .from("healthcare_institutions")
+            .insert({
+              name: selected.institution_name,
+              type: selected.institution_type,
+              admin_id: selected.applicant_id,
+              is_verified: true,
+              country: selected.institution?.country || selected.applicant?.country || "ZM",
+              address: selected.institution?.address || null,
+              city: selected.institution?.city || null,
+              phone: selected.institution?.phone || null,
+              email: selected.institution?.email || selected.applicant?.email || null,
+              website: selected.institution?.website || null,
+              license_number: selected.institution?.license_number || null,
+            });
+          if (createErr) throw createErr;
+        } else {
+          const { error: instErr } = await supabase
+            .from("healthcare_institutions")
+            .update({ is_verified: true })
+            .eq("admin_id", selected.applicant_id);
+          if (instErr) throw instErr;
+        }
+
         const { error: profErr } = await supabase
           .from("profiles")
           .update({ is_verified: true })
