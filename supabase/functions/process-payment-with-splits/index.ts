@@ -143,17 +143,21 @@ serve(async (req) => {
     }
 
     // Create payment record (currency is ZMW by default — canonical platform currency)
+    // Live payments.service_id is UUID; service codes (e.g. "video_consultation_follow-up")
+    // are stored in metadata instead.
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(serviceId);
     const { data: payment, error: paymentError } = await supabase
       .from('payments')
       .insert({
         patient_id: patientId,
         provider_id: providerId,
-        service_id: serviceId,
+        service_id: isUuid ? serviceId : null,
         amount: amount,
         currency: currency || 'ZMW',
         status: 'processing',
         payment_method: paymentMethod,
-        payment_date: new Date().toISOString()
+        payment_date: new Date().toISOString(),
+        metadata: isUuid ? null : { service_code: serviceId }
       })
       .select()
       .single();
