@@ -7,6 +7,7 @@ import { useHospitalModule } from "@/hooks/useHospitalModule";
 import { usePatientNames } from "@/hooks/usePatientNames";
 import { useHospitalPatients } from "@/hooks/useHospitalPatients";
 import { HospitalPatientSelect } from "@/components/hospital/HospitalPatientSelect";
+import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -27,6 +28,7 @@ const getStatusPill = (status: string) => {
 };
 
 export const HospitalLab = ({ hospital }: { hospital: any }) => {
+  const { user } = useAuth();
   const [filter, setFilter] = useState("all");
   const [showOrderDialog, setShowOrderDialog] = useState(false);
   const [showResultDialog, setShowResultDialog] = useState<any>(null);
@@ -70,6 +72,7 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
       const { error: err } = await (supabase.from("lab_tests" as any) as any).insert({
         lab_id: hospital.id,
         patient_id: orderForm.patient_id,
+        ordered_by: user?.id,
         test_number: testNum,
         test_type: orderForm.test_type,
         test_category: orderForm.test_category,
