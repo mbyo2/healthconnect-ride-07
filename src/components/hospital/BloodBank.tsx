@@ -105,6 +105,7 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
         toast.success(`Blood issued for request ${row.request_number || ""} — inventory decremented`);
         refreshRequests();
         refresh();
+        refreshAudit();
       } catch (e: any) { toast.error(e?.message || "Failed to issue blood"); }
       finally { setIsSubmitting(false); }
       return;
@@ -312,7 +313,7 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
                     <td className="py-3 px-3 text-center">
                       <div className="flex gap-1 justify-center">
                         {r.status === "pending" && (
-                          <button onClick={() => updateRequest(r, "crossmatch_done")} className="px-2 py-1 rounded text-[10px] font-bold bg-primary-400 text-white">Crossmatch</button>
+                          <button onClick={() => setShowCompatTest(true)} className="px-2 py-1 rounded text-[10px] font-bold bg-primary-400 text-white">Crossmatch</button>
                         )}
                         {r.status !== "issued" && (
                           <button onClick={() => updateRequest(r, "issued")} className="px-2 py-1 rounded text-[10px] font-bold bg-success-500 text-white">Issue</button>
