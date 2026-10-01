@@ -166,6 +166,15 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen }: Booki
     setIsSubmitting(true);
     setSubmitError(null);
     try {
+      // Capture the provider's configured consultation fee at booking time.
+      // Providers set consultation_fee_min/max on their profile; the booking
+      // persists the agreed fee so payments and earnings validate against it.
+      const consultationFee =
+        provider.consultation_fee_min ??
+        provider.consultation_fee_max ??
+        provider.consultation_fee ??
+        null;
+
       const { data: booked, error } = await supabase.from('appointments').insert({
         patient_id: user.id,
         provider_id: provider.id,
@@ -175,7 +184,8 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen }: Booki
         status: 'scheduled',
         notes: reason || null,
         duration: visitType === 'new' ? 45 : 30,
-        patient_visit_type: visitType
+        patient_visit_type: visitType,
+        consultation_fee: consultationFee
       }).select('id').single();
 
       if (error) throw error;
