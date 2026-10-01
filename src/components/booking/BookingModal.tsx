@@ -169,11 +169,16 @@ export const BookingModal = ({ provider, isOpen, onClose, onRequestOpen }: Booki
       // Capture the provider's configured consultation fee at booking time.
       // Providers set consultation_fee_min/max on their profile; the booking
       // persists the agreed fee so payments and earnings validate against it.
-      const consultationFee =
+      // The fee matches the CostBreakdown display: base fee × visit-type
+      // multiplier (new=1.3x) × appointment-type multiplier (virtual=0.7x).
+      const baseFee =
         provider.consultation_fee_min ??
         provider.consultation_fee_max ??
         provider.consultation_fee ??
         null;
+      const consultationFee = baseFee !== null
+        ? Math.round(baseFee * (visitType === "new" ? 1.3 : 1) * (appointmentType === "virtual" ? 0.7 : 1))
+        : null;
 
       const { data: booked, error } = await supabase.from('appointments').insert({
         patient_id: user.id,
