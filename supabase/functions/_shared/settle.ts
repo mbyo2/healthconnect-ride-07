@@ -239,6 +239,20 @@ export async function settlePayment(admin: Admin, input: SettleInput): Promise<S
       .select('id')
       .single();
     if (insErr || !created) {
+      // Unique violation on external_payment_id means a concurrent settlement
+      // already created the row — treat as idempotent success.
+      const isUniqueViolation = (insErr as any)?.code === '23505' ||
+        String((insErr as any)?.message || '').includes('uq_payments_external_payment_id');
+      if (isUniqueViolation) {
+        const { data: raced } = await admin
+          .from('payments')
+          .select('id, status')
+          .eq('external_payment_id', externalRef)
+          .maybeSingle();
+        if (raced) {
+          return { settled: true, already: true, paymentId: raced.id };
+        }
+      }
       console.error('settlePayment could not create payment row', insErr);
       return { settled: false, reason: 'payment_row_failed' };
     }
