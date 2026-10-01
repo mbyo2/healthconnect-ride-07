@@ -67,6 +67,7 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
 
   const handleAddStock = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!stockForm.units_available || Number(stockForm.units_available) < 1) { toast.error("Units available must be at least 1"); return; }
     setIsSubmitting(true);
     try {
       const { error: err } = await (supabase.from("blood_bank_inventory" as any) as any).insert({ hospital_id: hospital.id, ...stockForm, units_available: Number(stockForm.units_available), expiry_date: stockForm.expiry_date || null });
@@ -81,6 +82,7 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
   const handleNewRequest = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!reqForm.patient_id) { toast.error("Select a patient for this transfusion request"); return; }
+    if (!reqForm.units_required || Number(reqForm.units_required) < 1) { toast.error("Units required must be at least 1"); return; }
     setIsSubmitting(true);
     try {
       const reqNum = `BBR-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
