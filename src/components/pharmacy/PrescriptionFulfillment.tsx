@@ -347,7 +347,7 @@ export function PrescriptionFulfillment() {
 
       const { error } = await (supabase as any)
         .from("comprehensive_prescriptions")
-        .update({ status: newStatus })
+        .update({ fulfillment_status: newStatus, status: newStatus === 'filled' ? 'dispensed' : newStatus })
         .eq("id", prescriptionId);
       if (error) throw error;
 
