@@ -23,7 +23,7 @@ const getRequestPill = (urgency: string) => {
 };
 
 export const BloodBank = ({ hospital }: { hospital: any }) => {
-  const [activeTab, setActiveTab] = useState<"inventory" | "requests" | "donors" | "donations" | "compatibility">("inventory");
+  const [activeTab, setActiveTab] = useState<"inventory" | "requests" | "donors" | "donations" | "compatibility" | "audit">("inventory");
   const [showAddStock, setShowAddStock] = useState(false);
   const [showNewRequest, setShowNewRequest] = useState(false);
   const [showAddDonor, setShowAddDonor] = useState(false);
@@ -31,17 +31,29 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
   const [showCompatTest, setShowCompatTest] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [stockForm, setStockForm] = useState({ blood_type: "O+", component_type: "whole_blood", units_available: 1, expiry_date: "" });
-  const [reqForm, setReqForm] = useState({ blood_type: "O+", component_type: "prbc", units_required: 1, urgency: "routine" });
+  const [reqForm, setReqForm] = useState({ patient_id: "", blood_type: "O+", component_type: "prbc", units_required: 1, urgency: "routine" });
   const [donorForm, setDonorForm] = useState({ full_name: "", blood_type: "O+", phone: "", email: "", date_of_birth: "", gender: "", address: "", notes: "" });
   const [donationForm, setDonationForm] = useState({ donor_id: "", blood_type: "O+", component_type: "whole_blood", units_collected: 1, expiry_date: "", screening_status: "pending", screening_notes: "" });
   const [compatForm, setCompatForm] = useState({ request_id: "", donor_blood_type: "O+", recipient_blood_type: "O+", test_type: "crossmatch", result: "pending", notes: "" });
+  const [patients, setPatients] = useState<any[]>([]);
 
   const { data: inventory, loading, error, refresh } = useHospitalModule<any>("blood_bank_inventory", "hospital_id", hospital?.id, { orderBy: "blood_type", ascending: true });
   const { data: requests, loading: reqLoading, refresh: refreshRequests } = useHospitalModule<any>("blood_bank_requests", "hospital_id", hospital?.id, { orderBy: "request_date", ascending: false });
   const { data: donors, loading: donorsLoading, refresh: refreshDonors } = useHospitalModule<any>("blood_donors", "hospital_id", hospital?.id, { orderBy: "full_name", ascending: true });
   const { data: donations, loading: donationsLoading, refresh: refreshDonations } = useHospitalModule<any>("blood_donations", "hospital_id", hospital?.id, { orderBy: "donation_date", ascending: false });
   const { data: compatTests, loading: compatLoading, refresh: refreshCompat } = useHospitalModule<any>("blood_compatibility_tests", "hospital_id", hospital?.id, { orderBy: "created_at", ascending: false });
+  const { data: auditLog, loading: auditLoading, refresh: refreshAudit } = useHospitalModule<any>("blood_bank_audit", "hospital_id", hospital?.id, { orderBy: "issued_at", ascending: false });
   const { nameFor } = usePatientNames(requests.map((r) => r.patient_id));
+
+  // Load patient list for the request form.
+  React.useEffect(() => {
+    (async () => {
+      try {
+        const { data } = await supabase.from("profiles").select("id, first_name, last_name").eq("role", "patient").order("last_name").limit(200);
+        setPatients(data || []);
+      } catch { /* non-fatal */ }
+    })();
+  }, []);
 
   const byType = BLOOD_TYPES.map((type) => {
     const rows = inventory.filter((i) => i.blood_type === type);
@@ -68,21 +80,37 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
 
   const handleNewRequest = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!reqForm.patient_id) { toast.error("Select a patient for this transfusion request"); return; }
     setIsSubmitting(true);
     try {
       const reqNum = `BBR-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
-      const { error: err } = await (supabase.from("blood_bank_requests" as any) as any).insert({ hospital_id: hospital.id, request_number: reqNum, ...reqForm, units_required: Number(reqForm.units_required), status: "pending", request_date: new Date().toISOString() });
+      const { error: err } = await (supabase.from("blood_bank_requests" as any) as any).insert({ hospital_id: hospital.id, request_number: reqNum, patient_id: reqForm.patient_id, requested_by: (await supabase.auth.getUser()).data.user?.id || null, ...reqForm, units_required: Number(reqForm.units_required), status: "pending", request_date: new Date().toISOString() });
       if (err) throw err;
       toast.success(`Blood request ${reqNum} created`);
       setShowNewRequest(false);
+      setReqForm({ patient_id: "", blood_type: "O+", component_type: "prbc", units_required: 1, urgency: "routine" });
       refreshRequests();
     } catch (e: any) { toast.error(e?.message || "Failed to create request"); }
     finally { setIsSubmitting(false); }
   };
 
   const updateRequest = async (row: any, status: string) => {
+    // Issuance goes through the atomic RPC: stock check + inventory decrement
+    // + request update + audit record in ONE transaction.
+    if (status === "issued") {
+      setIsSubmitting(true);
+      try {
+        const { data, error: err } = await (supabase.rpc as any)("issue_blood", { p_request_id: row.id });
+        if (err) throw err;
+        toast.success(`Blood issued for request ${row.request_number || ""} — inventory decremented`);
+        refreshRequests();
+        refresh();
+      } catch (e: any) { toast.error(e?.message || "Failed to issue blood"); }
+      finally { setIsSubmitting(false); }
+      return;
+    }
     try {
-      const { error: err } = await (supabase.from("blood_bank_requests" as any) as any).update({ status, ...(status === "issued" ? { issued_date: new Date().toISOString() } : {}) }).eq("id", row.id);
+      const { error: err } = await (supabase.from("blood_bank_requests" as any) as any).update({ status }).eq("id", row.id);
       if (err) throw err;
       toast.success(`Request ${row.request_number || ""} ${status}`);
       refreshRequests();
@@ -168,7 +196,7 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
           <p className="text-xs text-graphite-500 dark:text-slate-400 font-medium">Live blood component inventory and transfusion request tracking</p>
         </div>
         <div className="flex gap-2 flex-wrap">
-          <button onClick={() => { refresh(); refreshRequests(); refreshDonors(); refreshDonations(); refreshCompat(); }} className="px-3 py-1.5 rounded-md bg-canvas-mist dark:bg-slate-800 font-bold text-xs flex items-center gap-1">
+          <button onClick={() => { refresh(); refreshRequests(); refreshDonors(); refreshDonations(); refreshCompat(); refreshAudit(); }} className="px-3 py-1.5 rounded-md bg-canvas-mist dark:bg-slate-800 font-bold text-xs flex items-center gap-1">
             <RefreshCw className="h-3.5 w-3.5" /> Refresh
           </button>
           <button onClick={() => setShowAddDonor(true)} className="px-3 py-1.5 rounded-md border border-graphite-300 dark:border-slate-700 font-bold text-xs flex items-center gap-1">
@@ -203,6 +231,7 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
           { key: "donors", label: `Donors (${donors.length})` },
           { key: "donations", label: `Donations (${donations.length})` },
           { key: "compatibility", label: `Compatibility (${compatTests.length})` },
+          { key: "audit", label: `Audit (${auditLog.length})` },
         ] as const).map((tab) => (
           <button
             key={tab.key}
@@ -400,6 +429,38 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
         )
       )}
 
+      {activeTab === "audit" && (
+        auditLoading ? <ListSkeleton count={3} variant="row" /> :
+        auditLog.length === 0 ? <EmptyState icon={Droplets} title="No audit records" description="Blood issuance events will appear here with full traceability." /> : (
+          <div className="w-full overflow-x-auto rounded-xl border border-canvas-silk bg-white dark:bg-slate-900 shadow-xs">
+            <table className="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr className="border-b border-canvas-silk bg-canvas text-[11px] font-extrabold uppercase text-graphite-500 dark:text-slate-400">
+                  <th className="py-2.5 px-4">Issued At</th>
+                  <th className="py-2.5 px-3">Patient</th>
+                  <th className="py-2.5 px-3">Blood</th>
+                  <th className="py-2.5 px-3">Component</th>
+                  <th className="py-2.5 px-3 text-center">Units</th>
+                  <th className="py-2.5 px-3">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-canvas-silk">
+                {auditLog.map((a) => (
+                  <tr key={a.id} className="hover:bg-canvas-mist dark:hover:bg-slate-800 transition-colors">
+                    <td className="py-3 px-4">{new Date(a.issued_at).toLocaleString()}</td>
+                    <td className="py-3 px-3 font-bold">{nameFor(a.patient_id) || "—"}</td>
+                    <td className="py-3 px-3 font-mono font-bold">{a.blood_type}</td>
+                    <td className="py-3 px-3 capitalize">{(a.component_type || "").replace("_", " ")}</td>
+                    <td className="py-3 px-3 text-center font-bold">{a.units_issued}</td>
+                    <td className="py-3 px-3"><span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold text-white bg-success-500">{a.action}</span></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )
+      )}
+
       {/* Add Stock Dialog */}
       <Dialog open={showAddStock} onOpenChange={setShowAddStock}>
         <DialogContent className="sm:max-w-[380px] bg-white border border-canvas-silk dark:border-slate-800">
@@ -445,6 +506,13 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
         <DialogContent className="sm:max-w-[380px] bg-white border border-canvas-silk dark:border-slate-800">
           <DialogHeader><DialogTitle className="font-extrabold text-base">New Blood Transfusion Request</DialogTitle></DialogHeader>
           <form onSubmit={handleNewRequest} className="space-y-3 py-2 text-xs">
+            <div>
+              <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Patient *</label>
+              <select required className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold" value={reqForm.patient_id} onChange={(e) => setReqForm({ ...reqForm, patient_id: e.target.value })}>
+                <option value="">— Select patient —</option>
+                {patients.map((p) => <option key={p.id} value={p.id}>{p.first_name} {p.last_name}</option>)}
+              </select>
+            </div>
             <div className="grid grid-cols-2 gap-2">
               <div>
                 <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Blood Type</label>
