@@ -1,0 +1,4 @@
+-- Simplified with balanced parentheses (applied live 2026-10-01)
+DROP POLICY IF EXISTS "Pharmacies can update assigned prescription status" ON public.comprehensive_prescriptions;
+
+CREATE POLICY "Pharmacies can update assigned prescription status" ON public.comprehensive_prescriptions FOR UPDATE USING (pharmacy_id IS NOT NULL AND status IN ('pending','assigned','processing','ready') AND (EXISTS (SELECT 1 FROM healthcare_institutions hi WHERE hi.id = pharmacy_id AND hi.admin_id = auth.uid()) OR EXISTS (SELECT 1 FROM institution_staff s WHERE s.provider_id = auth.uid() AND s.institution_id = pharmacy_id))) WITH CHECK (pharmacy_id IS NOT NULL AND (EXISTS (SELECT 1 FROM healthcare_institutions hi WHERE hi.id = pharmacy_id AND hi.admin_id = auth.uid()) OR EXISTS (SELECT 1 FROM institution_staff s WHERE s.provider_id = auth.uid() AND s.institution_id = pharmacy_id)));
