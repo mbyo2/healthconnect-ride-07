@@ -27,7 +27,11 @@ import { InventoryManagerWorkflow } from './InventoryManagerWorkflow';
 import { TriageStaffWorkflow } from './TriageStaffWorkflow';
 import { MaintenanceManagerWorkflow } from './MaintenanceManagerWorkflow';
 import { SpecialistWorkflow } from './SpecialistWorkflow';
-import { AmbulanceStaffWorkflow } from './AmbulanceStaffWorkflow';
+import { DentistWorkflow } from './DentistWorkflow';
+import { OptometristWorkflow } from './OptometristWorkflow';
+import { MidwifeWorkflow } from './MidwifeWorkflow';
+import { NutritionistWorkflow } from './NutritionistWorkflow';
+import { PsychologistWorkflow } from './PsychologistWorkflow';
 import { PathologistWorkflow } from './PathologistWorkflow';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -36,12 +40,11 @@ import { NURSING_ROLES, COMMUNITY_ROLES } from '@/config/roleConfig';
 
 // Prescribing clinicians share the doctor console.
 const DOCTOR_LIKE_ROLES = [
-  'doctor', 'specialist', 'medical_licentiate', 'clinical_officer', 'dentist',
+  'doctor', 'specialist', 'medical_licentiate', 'clinical_officer',
 ];
 // Allied & community cadres share the generic clinical console.
 const ALLIED_LIKE_ROLES = [
   'dental_therapist', 'radiographer', 'physiotherapist', 'occupational_therapist',
-  'nutritionist', 'optometrist', 'psychologist',
   ...COMMUNITY_ROLES,
 ];
 
@@ -89,6 +92,16 @@ export const RoleBasedWorkflow = () => {
         return <PharmacistWorkflow />;
       case 'doctor':
         return <DoctorWorkflow />;
+      case 'dentist':
+        return <DentistWorkflow />;
+      case 'optometrist':
+        return <OptometristWorkflow />;
+      case 'midwife':
+        return <MidwifeWorkflow />;
+      case 'nutritionist':
+        return <NutritionistWorkflow />;
+      case 'psychologist':
+        return <PsychologistWorkflow />;
       case 'nurse':
         return <NurseWorkflow />;
       case 'radiologist':
