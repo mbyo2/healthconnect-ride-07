@@ -10,6 +10,7 @@ import {
   HeartPulse,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { StaffPatientRegistrationDialog } from "./StaffPatientRegistrationDialog";
 
 interface HubPatient {
   id: string;
@@ -30,9 +31,8 @@ interface HubAllergy {
 
 /**
  * Central patient directory for a facility — everyone listed comes from
- * real admissions and appointments. Allergies load per selected patient
- * from patient_allergies. Registration happens on the Patient Registration
- * page, never as local-only rows.
+ * real admissions, appointments, and staff registrations. Registration
+ * happens via the staff dialog, never as local-only rows.
  */
 export const UnifiedPatientHub: React.FC<{ institutionId?: string }> = ({ institutionId }) => {
   const navigate = useNavigate();
@@ -41,46 +41,50 @@ export const UnifiedPatientHub: React.FC<{ institutionId?: string }> = ({ instit
   const [allergies, setAllergies] = useState<HubAllergy[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [registerOpen, setRegisterOpen] = useState(false);
 
-  useEffect(() => {
+  const loadPatients = async () => {
     if (!institutionId) {
       setLoading(false);
       return;
     }
-    (async () => {
-      try {
-        const [admRes, personnelRes] = await Promise.all([
-          supabase
-            .from("hospital_admissions")
-            .select("patient_id, status, admission_date, diagnosis")
-            .eq("hospital_id", institutionId),
-          supabase
-            .from("institution_personnel")
-            .select("user_id")
-            .eq("institution_id", institutionId),
-        ]);
-        if (admRes.error) throw admRes.error;
+    setLoading(true);
+    try {
+      const [admRes, personnelRes, registryRes] = await Promise.all([
+        supabase
+          .from("hospital_admissions")
+          .select("patient_id, status, admission_date, diagnosis")
+          .eq("hospital_id", institutionId),
+        supabase
+          .from("institution_personnel")
+          .select("user_id")
+          .eq("institution_id", institutionId),
+        supabase
+          .from("institution_patient_registry" as any)
+          .select("id, first_name, last_name, phone, email, created_at, allergies")
+          .eq("institution_id", institutionId)
+          .order("created_at", { ascending: false }),
+      ]);
+      if (admRes.error) throw admRes.error;
 
-        const providerIds = (personnelRes.data || []).map((p: any) => p.user_id).filter(Boolean);
-        let appointments: any[] = [];
-        if (providerIds.length > 0) {
-          const { data, error } = await supabase
-            .from("appointments")
-            .select("patient_id, date, status, type")
-            .in("provider_id", providerIds);
-          if (error) throw error;
-          appointments = data || [];
-        }
+      const providerIds = (personnelRes.data || []).map((p: any) => p.user_id).filter(Boolean);
+      let appointments: any[] = [];
+      if (providerIds.length > 0) {
+        const { data, error } = await supabase
+          .from("appointments")
+          .select("patient_id, date, status, type")
+          .in("provider_id", providerIds);
+        if (error) throw error;
+        appointments = data || [];
+      }
 
-        const patientIds = new Set<string>([
-          ...((admRes.data as any[]) || []).map((a) => a.patient_id).filter(Boolean),
-          ...appointments.map((a) => a.patient_id).filter(Boolean),
-        ]);
-        if (patientIds.size === 0) {
-          setPatients([]);
-          return;
-        }
+      const patientIds = new Set<string>([
+        ...((admRes.data as any[]) || []).map((a) => a.patient_id).filter(Boolean),
+        ...appointments.map((a) => a.patient_id).filter(Boolean),
+      ]);
 
+      let profilePatients: HubPatient[] = [];
+      if (patientIds.size > 0) {
         const { data: profiles, error: profErr } = await supabase
           .from("profiles")
           .select("id, first_name, last_name, email, phone")
@@ -88,36 +92,52 @@ export const UnifiedPatientHub: React.FC<{ institutionId?: string }> = ({ instit
         if (profErr) throw profErr;
 
         const admissions = ((admRes.data as any[]) || []);
-        setPatients(
-          ((profiles as any[]) || []).map((profile: any) => {
-            const admission = admissions.find((a) => a.patient_id === profile.id);
-            const patientAppts = appointments.filter((a) => a.patient_id === profile.id);
-            const lastAppt = [...patientAppts].sort(
-              (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-            )[0];
-            return {
-              id: profile.id,
-              name:
-                `${profile.first_name || ""} ${profile.last_name || ""}`.trim() ||
-                profile.email ||
-                "Patient",
-              email: profile.email,
-              phone: profile.phone,
-              status: admission?.status === "admitted" ? "Admitted" : "Outpatient",
-              admissionStatus: admission?.status,
-              lastVisit: admission ? admission.admission_date : lastAppt?.date,
-              condition: admission?.diagnosis || lastAppt?.type || "—",
-              allergies: [],
-            };
-          })
-        );
-      } catch (error) {
-        console.error("Error fetching facility patients:", error);
-        toast.error("Failed to load patients");
-      } finally {
-        setLoading(false);
+        profilePatients = ((profiles as any[]) || []).map((profile: any) => {
+          const admission = admissions.find((a) => a.patient_id === profile.id);
+          const patientAppts = appointments.filter((a) => a.patient_id === profile.id);
+          const lastAppt = [...patientAppts].sort(
+            (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+          )[0];
+          return {
+            id: profile.id,
+            name:
+              `${profile.first_name || ""} ${profile.last_name || ""}`.trim() ||
+              profile.email ||
+              "Patient",
+            email: profile.email,
+            phone: profile.phone,
+            status: admission?.status === "admitted" ? "Admitted" : "Outpatient",
+            admissionStatus: admission?.status,
+            lastVisit: admission ? admission.admission_date : lastAppt?.date,
+            condition: admission?.diagnosis || lastAppt?.type || "—",
+            allergies: [],
+          };
+        });
       }
-    })();
+
+      // Staff-registered patients (no auth account yet)
+      const registryPatients: HubPatient[] = ((registryRes.data as any[]) || []).map((r: any) => ({
+        id: `registry:${r.id}`,
+        name: `${r.first_name || ""} ${r.last_name || ""}`.trim() || "Patient",
+        email: r.email,
+        phone: r.phone,
+        status: "Registered",
+        lastVisit: r.created_at,
+        condition: "—",
+        allergies: r.allergies ? [r.allergies] : [],
+      }));
+
+      setPatients([...profilePatients, ...registryPatients]);
+    } catch (error) {
+      console.error("Error fetching facility patients:", error);
+      toast.error("Failed to load patients");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadPatients();
   }, [institutionId]);
 
   // Load documented allergies for the selected patient only.
@@ -177,7 +197,7 @@ export const UnifiedPatientHub: React.FC<{ institutionId?: string }> = ({ instit
         </div>
 
         <button
-          onClick={() => navigate("/patient-registration")}
+          onClick={() => setRegisterOpen(true)}
           className="px-4 py-2 rounded-xl bg-white text-slate-900 font-extrabold text-xs flex items-center gap-1.5 shadow-sm hover:bg-slate-100 transition-all"
         >
           <UserPlus className="h-4 w-4" /> Register New Patient
@@ -324,6 +344,13 @@ export const UnifiedPatientHub: React.FC<{ institutionId?: string }> = ({ instit
           )}
         </div>
       </div>
+
+      <StaffPatientRegistrationDialog
+        institutionId={institutionId!}
+        open={registerOpen}
+        onOpenChange={setRegisterOpen}
+        onRegistered={loadPatients}
+      />
     </div>
   );
 };
