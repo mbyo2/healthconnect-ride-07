@@ -352,10 +352,12 @@ const TYPE_TO_ARCHETYPE: Record<string, FacilityArchetype> = {
   university_hospital: 'general_hospital',
   referral_hospital: 'general_hospital',
   central_hospital: 'general_hospital',
+  large_hospital: 'general_hospital',
   hospital: 'general_hospital',
 
   // Specialised hospitals (4th level / focused)
   specialty_clinic: 'specialty_hospital',
+  specialized_clinic: 'specialty_hospital',
   specialty_hospital: 'specialty_hospital',
   specialized_hospital: 'specialty_hospital',
   maternity_hospital: 'specialty_hospital',
