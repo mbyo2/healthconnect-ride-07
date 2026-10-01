@@ -5,6 +5,8 @@ import { ListSkeleton } from "@/components/ui/list-skeleton";
 import { EmptyState } from "@/components/ui/empty-state";
 import { useHospitalModule } from "@/hooks/useHospitalModule";
 import { usePatientNames } from "@/hooks/usePatientNames";
+import { useHospitalPatients } from "@/hooks/useHospitalPatients";
+import { HospitalPatientSelect } from "@/components/hospital/HospitalPatientSelect";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -32,6 +34,7 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [orderForm, setOrderForm] = useState({
+    patient_id: "",
     patient_name: "",
     test_type: "Complete Blood Count (CBC)",
     test_category: "Hematology",
@@ -43,6 +46,7 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
     "lab_tests", "lab_id", hospital?.id, { orderBy: "created_at", ascending: false }
   );
   const { nameFor } = usePatientNames(labOrders.map((o) => o.patient_id));
+  const { patients, loading: patientsLoading } = useHospitalPatients(hospital?.id);
 
   const filtered = filter === "all" ? labOrders : labOrders.filter((o) => o.status === filter);
 
@@ -56,11 +60,16 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
   const handleOrderLab = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!orderForm.test_type) return;
+    if (!orderForm.patient_id) {
+      toast.error("Please select a patient for this lab order");
+      return;
+    }
     setIsSubmitting(true);
     try {
       const testNum = `LAB-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
       const { error: err } = await (supabase.from("lab_tests" as any) as any).insert({
         lab_id: hospital.id,
+        patient_id: orderForm.patient_id,
         test_number: testNum,
         test_type: orderForm.test_type,
         test_category: orderForm.test_category,
@@ -269,6 +278,13 @@ export const HospitalLab = ({ hospital }: { hospital: any }) => {
             <DialogTitle className="font-extrabold text-base">Order Laboratory Test</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleOrderLab} className="space-y-3 py-2 text-xs">
+            <HospitalPatientSelect
+              patients={patients}
+              loading={patientsLoading}
+              value={orderForm.patient_id}
+              onChange={(id) => setOrderForm({ ...orderForm, patient_id: id })}
+              label="Patient *"
+            />
             <div>
               <label className="font-extrabold text-graphite-500 dark:text-slate-400 uppercase">Test Name *</label>
               <input
