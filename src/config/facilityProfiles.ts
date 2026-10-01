@@ -38,6 +38,7 @@ export const HMS_MODULES = [
   'lab',
   'radiology',
   'pharmacy',
+  'bloodbank',
   'beds',
   'billing',
   'tariffs',

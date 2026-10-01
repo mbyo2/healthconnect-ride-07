@@ -51,6 +51,7 @@ const MODULE_TABS: { val: HmsModule; label: string }[] = [
   { val: "lab", label: "Lab LIMS" },
   { val: "radiology", label: "Radiology" },
   { val: "pharmacy", label: "Pharmacy POS" },
+  { val: "bloodbank", label: "Blood Bank" },
   { val: "beds", label: "Bed Wards" },
   { val: "billing", label: "Billing" },
   { val: "tariffs", label: "Tariff Rates" },
@@ -290,6 +291,7 @@ export const HospitalManagement = () => {
             <TabsContent value="lab">{mod("lab", <HospitalLab hospital={hospital} />)}</TabsContent>
             <TabsContent value="radiology">{mod("radiology", <RadiologyImaging hospital={hospital} />)}</TabsContent>
             <TabsContent value="pharmacy">{mod("pharmacy", <HospitalPharmacy hospital={hospital} />)}</TabsContent>
+            <TabsContent value="bloodbank">{mod("bloodbank", <BloodBank hospital={hospital} />)}</TabsContent>
             <TabsContent value="beds">{mod("beds", <BedWardManagement hospital={hospital} departments={departments} beds={beds} onRefresh={refreshAll} />)}</TabsContent>
             <TabsContent value="billing">{mod("billing", <HospitalBilling hospital={hospital} admissions={admissions} invoices={invoices} onRefresh={refreshAll} />)}</TabsContent>
             <TabsContent value="tariffs">{mod("tariffs", <TariffAndPriceManager />)}</TabsContent>
