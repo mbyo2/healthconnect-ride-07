@@ -63,9 +63,10 @@ export const CostBreakdown = ({ appointmentType, visitType, specialty, feeMin, f
 
   // Compute base cost in ZMW. Prefer the provider's real published fee range;
   // the hardcoded specialty table is only a fallback when no fee is listed.
+  // Per CEO pricing model: bookings must reflect the provider's set price
+  // exactly — no new-visit markup. The listed fee is the price.
   const listedFee = feeMin ?? feeMax ?? null;
   const baseCost = (listedFee ?? BASE_COSTS[specialty || ""] ?? 150) *
-    (visitType === "new" ? 1.3 : 1) *
     (appointmentType === "virtual" ? 0.7 : 1);
   const total = Math.round(baseCost);
 
