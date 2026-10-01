@@ -111,33 +111,18 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      // Record the donation
-      const { data: donation, error: err } = await (supabase.from("blood_donations" as any) as any).insert({
-        hospital_id: hospital.id,
-        donor_id: donationForm.donor_id || null,
-        blood_type: donationForm.blood_type,
-        component_type: donationForm.component_type,
-        units_collected: Number(donationForm.units_collected),
-        expiry_date: donationForm.expiry_date || null,
-        screening_status: donationForm.screening_status,
-        screening_notes: donationForm.screening_notes || null,
-      }).select().single();
+      // Atomic: donation + inventory in one transaction via RPC.
+      const { error: err } = await (supabase.rpc as any)("record_blood_donation", {
+        p_hospital_id: hospital.id,
+        p_donor_id: donationForm.donor_id || null,
+        p_blood_type: donationForm.blood_type,
+        p_component_type: donationForm.component_type,
+        p_units_collected: Number(donationForm.units_collected),
+        p_screening_status: donationForm.screening_status,
+        p_screening_notes: donationForm.screening_notes || null,
+        p_expiry_date: donationForm.expiry_date || null,
+      });
       if (err) throw err;
-
-      // If screening passed, add to inventory
-      if (donationForm.screening_status === 'passed' && donation) {
-        const { data: inv, error: invErr } = await (supabase.from("blood_bank_inventory" as any) as any).insert({
-          hospital_id: hospital.id,
-          blood_type: donationForm.blood_type,
-          component_type: donationForm.component_type,
-          units_available: Number(donationForm.units_collected),
-          expiry_date: donationForm.expiry_date || null,
-        }).select().single();
-        if (!invErr && inv) {
-          // Link donation to inventory
-          await (supabase.from("blood_donations" as any) as any).update({ inventory_id: (inv as any).id }).eq("id", (donation as any).id);
-        }
-      }
 
       toast.success("Donation recorded" + (donationForm.screening_status === 'passed' ? " and added to inventory" : ""));
       setShowAddDonation(false);
