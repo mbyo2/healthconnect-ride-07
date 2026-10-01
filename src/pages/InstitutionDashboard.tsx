@@ -7,7 +7,7 @@ import {
   Package, ShoppingCart, BarChart3, Truck, ClipboardList, Activity,
   Baby, Dumbbell, Ticket, Share2, Layers, Tv,
   DollarSign, Wrench, FileCode, Clock, CreditCard, Network,
-  BookOpen, FileText, Calculator, CheckCircle2, Hourglass
+  BookOpen, FileText, Calculator, CheckCircle2, Hourglass, Droplet
 } from "lucide-react";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { QuickActions } from "@/components/institution/QuickActions";
@@ -32,6 +32,7 @@ import { FHIRInteroperabilityHub } from "@/components/interoperability/FHIRInter
 import { CentralizedQueueDesk } from "@/components/scheduling/CentralizedQueueDesk";
 import { ClinicalProceduresDesk } from "@/components/clinical/ClinicalProceduresDesk";
 import { LISRadiologySuite } from "@/components/laboratory/LISRadiologySuite";
+import { BloodBank } from "@/components/hospital/BloodBank";
 import { CareManagementSuite } from "@/components/clinical/CareManagementSuite";
 import { UnifiedPatientHub } from "@/components/patient/UnifiedPatientHub";
 import AdvancedRevenueCycle from "@/components/rcm/AdvancedRevenueCycle";
@@ -468,6 +469,7 @@ export const InstitutionDashboard = () => {
             { id: "erp_admin", label: "ERP Admin & Finance", icon: DollarSign },
             { id: "procedures", label: "Clinical Coding (ICD/CPT)", icon: Stethoscope },
             { id: "lis_ris", label: "LIS & RIS Imaging", icon: FlaskConical },
+            { id: "bloodbank", label: "Blood Bank", icon: Droplet },
             { id: "fhir", label: "HL7 FHIR Interoperability", icon: Share2 },
             { id: "rcm", label: "Revenue Cycle & Insurance", icon: CreditCard },
             { id: "governance", label: "Multi-Center Governance", icon: Network },
@@ -734,6 +736,9 @@ export const InstitutionDashboard = () => {
 
         {/* 11. LIS & RIS Imaging */}
         {activeTab === "lis_ris" && <LISRadiologySuite institutionId={institution.id} />}
+
+        {/* 11b. Blood Bank */}
+        {activeTab === "bloodbank" && <BloodBank hospital={institution} />}
 
         {/* 12. HL7 FHIR Interoperability */}
         {activeTab === "fhir" && <FHIRInteroperabilityHub institutionId={institution.id} />}
