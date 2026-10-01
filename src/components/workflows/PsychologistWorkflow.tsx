@@ -31,6 +31,11 @@ export const PsychologistWorkflow = () => {
   const [showAssessment, setShowAssessment] = useState(false);
   const [scores, setScores] = useState<number[]>(new Array(9).fill(0));
   const [notes, setNotes] = useState('');
+  const [showCrisisAlert, setShowCrisisAlert] = useState(false);
+
+  // Safety-critical: Question 9 (index 8) screens for self-harm/suicidal ideation.
+  // Any score > 0 requires immediate crisis resource display.
+  const selfHarmRisk = scores[8] > 0;
 
   const handleNavigation = (route: string, title: string) => {
     navigate(route);
@@ -107,11 +112,86 @@ export const PsychologistWorkflow = () => {
               <Label className="text-[11px]">Clinical Notes</Label>
               <Textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Assessment notes, treatment plan..." rows={3} className="mt-1" />
             </div>
-            <Button onClick={() => { showSuccess({ message: `PHQ-9 saved: ${totalScore} (${severity})` }); setShowAssessment(false); }} className="w-full">
-              Save Assessment (Score: {totalScore})
+            {selfHarmRisk && (
+              <div className="p-3 bg-red-50 border-2 border-red-500 rounded-lg">
+                <div className="flex items-center gap-2 text-red-700 font-semibold text-sm">
+                  <AlertTriangle className="h-4 w-4" />
+                  Self-harm risk detected (Q9 &gt; 0)
+                </div>
+                <p className="text-xs text-red-600 mt-1">
+                  Saving will trigger crisis resources. Ensure the patient is safe.
+                </p>
+              </div>
+            )}
+            <Button onClick={() => {
+              if (selfHarmRisk) {
+                setShowCrisisAlert(true);
+              } else {
+                showSuccess({ message: `PHQ-9 saved: ${totalScore} (${severity})` });
+                setShowAssessment(false);
+              }
+            }} className="w-full" variant={selfHarmRisk ? "destructive" : "default"}>
+              {selfHarmRisk ? "Save & Show Crisis Resources" : `Save Assessment (Score: ${totalScore})`}
             </Button>
           </CardContent>
         </Card>
+      )}
+
+      {/* Safety-critical: Crisis resources for self-harm risk (PHQ-9 Q9 > 0) */}
+      {showCrisisAlert && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60">
+          <Card className="max-w-md w-full border-4 border-red-600">
+            <CardHeader className="bg-red-600 text-white">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <AlertTriangle className="h-6 w-6" />
+                Crisis Support Needed
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-6 space-y-4">
+              <p className="font-semibold text-red-700">
+                This assessment indicates the patient may be at risk of self-harm.
+              </p>
+              <p className="text-sm">
+                If you or someone you know is in crisis, please reach out immediately:
+              </p>
+              <div className="space-y-2 text-sm bg-slate-50 p-4 rounded-lg">
+                <div className="font-semibold">Zambia Crisis Lines:</div>
+                <div>• Lifeline Zambia: <span className="font-mono font-bold">116</span> (toll-free)</div>
+                <div>• Emergency: <span className="font-mono font-bold">991</span></div>
+                <div>• Police: <span className="font-mono font-bold">999</span></div>
+              </div>
+              <div className="text-xs text-slate-600">
+                <p className="font-semibold mb-1">Immediate actions:</p>
+                <ul className="list-disc list-inside space-y-1">
+                  <li>Do not leave the patient alone</li>
+                  <li>Contact emergency services if imminent risk</li>
+                  <li>Arrange urgent psychiatric referral</li>
+                  <li>Document safety plan in clinical notes</li>
+                </ul>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => {
+                    showSuccess({ message: `PHQ-9 saved with SELF-HARM RISK FLAG: ${totalScore} (${severity})` });
+                    setShowCrisisAlert(false);
+                    setShowAssessment(false);
+                  }}
+                  className="flex-1"
+                  variant="destructive"
+                >
+                  Acknowledge & Save
+                </Button>
+                <Button
+                  onClick={() => setShowCrisisAlert(false)}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  Back to Assessment
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       )}
 
       <div className="grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
