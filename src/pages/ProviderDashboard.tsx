@@ -24,6 +24,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { format, startOfWeek, endOfWeek, addDays } from "date-fns";
 import { useCurrency } from "@/hooks/use-currency";
 import { useUserRoles } from "@/context/UserRolesContext";
+import { DentistWorkflow } from "@/components/workflows/DentistWorkflow";
+import { OptometristWorkflow } from "@/components/workflows/OptometristWorkflow";
+import { MidwifeWorkflow } from "@/components/workflows/MidwifeWorkflow";
+import { NutritionistWorkflow } from "@/components/workflows/NutritionistWorkflow";
+import { PsychologistWorkflow } from "@/components/workflows/PsychologistWorkflow";
 import { ROLE_META, ROLE_PRIORITY, PRESCRIBING_ROLES, type UserRole } from "@/config/roleConfig";
 import { hasRoutePermission } from "@/utils/rolePermissions";
 import { useInstitutionAffiliation } from "@/hooks/useInstitutionAffiliation";
@@ -377,8 +382,22 @@ export const ProviderDashboard = () => {
   const navigate = useNavigate();
   const today = new Date();
   const { formatPrice } = useCurrency();
-  const { availableRoles, isHealthPersonnel } = useUserRoles();
+  const { availableRoles, isHealthPersonnel, currentRole } = useUserRoles();
   const { isInstitutionAffiliated } = useInstitutionAffiliation();
+
+  // Specialty workflows for professions with dedicated clinical tools
+  const SpecialtyTools = () => {
+    const role = currentRole || availableRoles[0];
+    switch (role) {
+      case 'dentist': return <DentistWorkflow />;
+      case 'optometrist': return <OptometristWorkflow />;
+      case 'midwife': return <MidwifeWorkflow />;
+      case 'nutritionist': return <NutritionistWorkflow />;
+      case 'psychologist': return <PsychologistWorkflow />;
+      default: return null;
+    }
+  };
+  const hasSpecialtyTools = ['dentist', 'optometrist', 'midwife', 'nutritionist', 'psychologist'].includes(currentRole || availableRoles[0] || '');
 
   // Only the five legal prescribing professions may see write-prescription
   // shortcuts. Nurses, allied health, lab and community cadres are
@@ -744,6 +763,7 @@ export const ProviderDashboard = () => {
                 { value: "patients", label: "Patient Directory" },
                 { value: "waitlist", label: "Waitlist Triage" },
                 { value: "analytics", label: "Analytics" },
+                ...(hasSpecialtyTools ? [{ value: "specialty", label: "Specialty Tools" }] : []),
                 { value: "my_practice", label: "My Practice" },
               ].map(tab => (
                 <TabsTrigger
@@ -763,6 +783,7 @@ export const ProviderDashboard = () => {
             <TabsContent value="patients"><PatientRecords /></TabsContent>
             <TabsContent value="waitlist"><WaitlistManager /></TabsContent>
             <TabsContent value="analytics"><ProviderAnalyticsDashboard /></TabsContent>
+            {hasSpecialtyTools && <TabsContent value="specialty"><SpecialtyTools /></TabsContent>}
             <TabsContent value="my_practice">
               <div className="mb-4">
                 <h2 className="font-extrabold text-base text-slate-900 dark:text-slate-100 flex items-center gap-2">
