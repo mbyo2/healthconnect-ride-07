@@ -290,6 +290,16 @@ const LabManagement = () => {
           .update({ verified_at: new Date().toISOString() })
           .eq("request_id", selectedRequest.id);
         if (resultsError) console.warn("lab_results verify mirror failed", resultsError);
+        // Clear the "Pending pathologist review" placeholder notes on verify —
+        // leaving it would show a stale "Pending" message next to the Verified
+        // badge on the patient card. Only clears the exact placeholder, never
+        // real clinical notes.
+        const { error: notesError } = await supabase
+          .from("lab_results")
+          .update({ notes: null })
+          .eq("request_id", selectedRequest.id)
+          .eq("notes", "Pending pathologist review");
+        if (notesError) console.warn("lab_results notes clear failed", notesError);
       } catch (e) {
         console.warn("lab_results verify mirror failed", e);
       }

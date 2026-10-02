@@ -105,7 +105,9 @@ export default function PatientLabResults() {
                     {r.reference_range && (
                       <p className="text-xs text-muted-foreground">Ref: {r.reference_range}</p>
                     )}
-                    {r.notes && <p className="text-xs text-muted-foreground mt-1">{r.notes}</p>}
+                    {r.notes && !(isVerified && r.notes.trim() === "Pending pathologist review") && (
+                      <p className="text-xs text-muted-foreground mt-1">{r.notes}</p>
+                    )}
                     <p className="text-xs text-muted-foreground mt-1">
                       {resultDate ? format(new Date(resultDate), 'PPP') : 'Date not recorded'}
                       {isVerified && verifierName && ` · Verified by ${verifierName}`}
