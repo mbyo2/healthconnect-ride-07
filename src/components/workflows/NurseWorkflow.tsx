@@ -91,6 +91,11 @@ export const NurseWorkflow = () => {
     showSuccess({ message: `Opening ${title}...` });
   };
 
+  const handleStepClick = (step: { route?: string; action?: () => void; title: string }) => {
+    if (step.action) { step.action(); return; }
+    if (step.route) handleNavigation(step.route, step.title);
+  };
+
   const workflowSteps = [
     { title: "My Schedule", description: "Appointments, home visits & shift calendar", icon: <Calendar className="h-5 w-5" />, route: '/provider-calendar' },
     { title: "Patient Appointments", description: "Today's consultations and upcoming visits", icon: <ClipboardList className="h-5 w-5" />, route: '/appointments' },
@@ -222,7 +227,7 @@ export const NurseWorkflow = () => {
       <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {workflowSteps.map((step, index) => (
           <Card key={index} className="cursor-pointer hover:shadow-md transition-all active:scale-95 touch-manipulation bg-card border-border"
-            onClick={() => handleNavigation(step.route, step.title)}>
+            onClick={() => handleStepClick(step)}>
             <CardContent className="p-4">
               <div className="flex items-center gap-3 mb-2">
                 <div className="p-2 bg-primary/10 dark:bg-primary/20 rounded-lg shrink-0">
@@ -234,7 +239,7 @@ export const NurseWorkflow = () => {
                 </div>
               </div>
               <Button 
-                onClick={(e) => { e.stopPropagation(); handleNavigation(step.route, step.title); }}
+                onClick={(e) => { e.stopPropagation(); handleStepClick(step); }}
                 size="sm" className="w-full text-xs mt-2">Open</Button>
             </CardContent>
           </Card>
