@@ -29,7 +29,8 @@ import { OptometristWorkflow } from "@/components/workflows/OptometristWorkflow"
 import { MidwifeWorkflow } from "@/components/workflows/MidwifeWorkflow";
 import { NutritionistWorkflow } from "@/components/workflows/NutritionistWorkflow";
 import { PsychologistWorkflow } from "@/components/workflows/PsychologistWorkflow";
-import { ROLE_META, ROLE_PRIORITY, PRESCRIBING_ROLES, type UserRole } from "@/config/roleConfig";
+import { NurseWorkflow } from "@/components/workflows/NurseWorkflow";
+import { ROLE_META, ROLE_PRIORITY, PRESCRIBING_ROLES, NURSING_ROLES, type UserRole } from "@/config/roleConfig";
 import { hasRoutePermission } from "@/utils/rolePermissions";
 import { useInstitutionAffiliation } from "@/hooks/useInstitutionAffiliation";
 import { toast } from "sonner";
@@ -394,10 +395,15 @@ export const ProviderDashboard = () => {
       case 'midwife': return <MidwifeWorkflow />;
       case 'nutritionist': return <NutritionistWorkflow />;
       case 'psychologist': return <PsychologistWorkflow />;
+      case 'nurse':
+      case 'registered_nurse':
+      case 'enrolled_nurse': return <NurseWorkflow />;
       default: return null;
     }
   };
-  const hasSpecialtyTools = ['dentist', 'optometrist', 'midwife', 'nutritionist', 'psychologist'].includes(currentRole || availableRoles[0] || '');
+  const _role = currentRole || availableRoles[0] || '';
+  const hasSpecialtyTools = ['dentist', 'optometrist', 'midwife', 'nutritionist', 'psychologist'].includes(_role)
+    || (NURSING_ROLES as readonly string[]).includes(_role);
 
   // Only the five legal prescribing professions may see write-prescription
   // shortcuts. Nurses, allied health, lab and community cadres are
