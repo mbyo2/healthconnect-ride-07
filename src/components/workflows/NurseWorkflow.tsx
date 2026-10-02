@@ -1,10 +1,15 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { ApplicationStatusBanner, ProfileCompleteBanner } from '@/components/dashboard/StatusBanners';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { useNavigate } from 'react-router-dom';
 import { useSuccessFeedback } from '@/hooks/use-success-feedback';
 import { useInstitutionAffiliation } from '@/hooks/useInstitutionAffiliation';
+import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 import { 
   Heart, Calendar, Users, FileText, Settings,
   ClipboardList, MessageSquare, Wallet, AlertTriangle,
@@ -16,6 +21,70 @@ export const NurseWorkflow = () => {
   const navigate = useNavigate();
   const { showSuccess } = useSuccessFeedback();
   const { isInstitutionAffiliated } = useInstitutionAffiliation();
+  const { user } = useAuth();
+
+  // Structured vitals entry (previously "coming soon").
+  const [showVitals, setShowVitals] = useState(false);
+  const [vitalsPatientId, setVitalsPatientId] = useState('');
+  const [vitalsPatients, setVitalsPatients] = useState<{ id: string; first_name: string | null; last_name: string | null }[]>([]);
+  const [vitals, setVitals] = useState({ sys: '', dia: '', hr: '', temp: '', spo2: '', rr: '', glucose: '', weight: '' });
+  const [vitalsNotes, setVitalsNotes] = useState('');
+  const [savingVitals, setSavingVitals] = useState(false);
+
+  useEffect(() => {
+    if (!showVitals) return;
+    (async () => {
+      const { data } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name')
+        .eq('role', 'patient')
+        .order('last_name')
+        .limit(200);
+      setVitalsPatients(data ?? []);
+    })();
+  }, [showVitals]);
+
+  const numOrNull = (v: string) => {
+    const n = Number(v);
+    return v.trim() !== '' && Number.isFinite(n) ? n : null;
+  };
+
+  const saveVitals = async () => {
+    if (!vitalsPatientId) { toast.error('Select a patient'); return; }
+    if (!user) { toast.error('You must be signed in'); return; }
+    const payload = {
+      user_id: vitalsPatientId,
+      blood_pressure_systolic: numOrNull(vitals.sys),
+      blood_pressure_diastolic: numOrNull(vitals.dia),
+      heart_rate: numOrNull(vitals.hr),
+      temperature: numOrNull(vitals.temp),
+      oxygen_saturation: numOrNull(vitals.spo2),
+      respiratory_rate: numOrNull(vitals.rr),
+      blood_glucose: numOrNull(vitals.glucose),
+      weight: numOrNull(vitals.weight),
+      recorded_at: new Date().toISOString(),
+      metadata: { recorded_by: user.id, notes: vitalsNotes || null },
+    };
+    const hasAny = [payload.blood_pressure_systolic, payload.blood_pressure_diastolic,
+      payload.heart_rate, payload.temperature, payload.oxygen_saturation,
+      payload.respiratory_rate, payload.blood_glucose, payload.weight]
+      .some(v => v !== null);
+    if (!hasAny) { toast.error('Enter at least one vital sign'); return; }
+    setSavingVitals(true);
+    try {
+      const { error } = await supabase.from('vital_signs').insert(payload);
+      if (error) throw error;
+      showSuccess({ message: 'Vitals recorded successfully' });
+      setShowVitals(false);
+      setVitals({ sys: '', dia: '', hr: '', temp: '', spo2: '', rr: '', glucose: '', weight: '' });
+      setVitalsNotes('');
+      setVitalsPatientId('');
+    } catch (e: any) {
+      toast.error(e?.message || 'Failed to record vitals');
+    } finally {
+      setSavingVitals(false);
+    }
+  };
   
   const handleNavigation = (route: string, title: string) => {
     navigate(route);
@@ -25,7 +94,7 @@ export const NurseWorkflow = () => {
   const workflowSteps = [
     { title: "My Schedule", description: "Appointments, home visits & shift calendar", icon: <Calendar className="h-5 w-5" />, route: '/provider-calendar' },
     { title: "Patient Appointments", description: "Today's consultations and upcoming visits", icon: <ClipboardList className="h-5 w-5" />, route: '/appointments' },
-    { title: "Patient Vitals", description: "Record BP, temperature, pulse & vitals", icon: <Thermometer className="h-5 w-5" />, route: '/medical-records' },
+    { title: "Patient Vitals", description: "Record BP, temperature, pulse & vitals", icon: <Thermometer className="h-5 w-5" />, action: () => setShowVitals(!showVitals) },
     { title: "Care Plans", description: "Create and manage patient care plans", icon: <Heart className="h-5 w-5" />, route: '/medical-records' },
     { title: "Allergy Alerts", description: "Patient allergy checks before administration", icon: <Shield className="h-5 w-5" />, route: '/medical-records' },
     { title: "Infection Control", description: "Infection tracking & preventive protocols", icon: <Bug className="h-5 w-5" />, route: '/medical-records' },
@@ -58,6 +127,97 @@ export const NurseWorkflow = () => {
           Manage your nursing practice, patient care, and home visits
         </p>
       </div>
+
+      {showVitals && (
+        <Card className="border-primary-200">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Thermometer className="h-5 w-5 text-primary-500" />
+              Record Patient Vitals
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label className="text-[11px]">Patient *</Label>
+              <select
+                value={vitalsPatientId}
+                onChange={e => setVitalsPatientId(e.target.value)}
+                className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold text-sm"
+              >
+                <option value="">Select patient…</option>
+                {vitalsPatients.map(p => (
+                  <option key={p.id} value={p.id}>
+                    {[p.first_name, p.last_name].filter(Boolean).join(' ') || p.id.slice(0, 8)}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div>
+                <Label className="text-[11px]">BP Systolic (mmHg)</Label>
+                <input type="number" min={50} max={300} value={vitals.sys}
+                  onChange={e => setVitals({ ...vitals, sys: e.target.value })}
+                  placeholder="120" className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold" />
+              </div>
+              <div>
+                <Label className="text-[11px]">BP Diastolic (mmHg)</Label>
+                <input type="number" min={30} max={200} value={vitals.dia}
+                  onChange={e => setVitals({ ...vitals, dia: e.target.value })}
+                  placeholder="80" className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold" />
+              </div>
+              <div>
+                <Label className="text-[11px]">Heart Rate (bpm)</Label>
+                <input type="number" min={20} max={250} value={vitals.hr}
+                  onChange={e => setVitals({ ...vitals, hr: e.target.value })}
+                  placeholder="72" className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold" />
+              </div>
+              <div>
+                <Label className="text-[11px]">Temperature (°C)</Label>
+                <input type="number" step="0.1" min={30} max={45} value={vitals.temp}
+                  onChange={e => setVitals({ ...vitals, temp: e.target.value })}
+                  placeholder="36.6" className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold" />
+              </div>
+              <div>
+                <Label className="text-[11px]">SpO₂ (%)</Label>
+                <input type="number" min={50} max={100} value={vitals.spo2}
+                  onChange={e => setVitals({ ...vitals, spo2: e.target.value })}
+                  placeholder="98" className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold" />
+              </div>
+              <div>
+                <Label className="text-[11px]">Resp. Rate (/min)</Label>
+                <input type="number" min={5} max={60} value={vitals.rr}
+                  onChange={e => setVitals({ ...vitals, rr: e.target.value })}
+                  placeholder="16" className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold" />
+              </div>
+              <div>
+                <Label className="text-[11px]">Glucose (mmol/L)</Label>
+                <input type="number" step="0.1" min={1} max={40} value={vitals.glucose}
+                  onChange={e => setVitals({ ...vitals, glucose: e.target.value })}
+                  placeholder="5.5" className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold" />
+              </div>
+              <div>
+                <Label className="text-[11px]">Weight (kg)</Label>
+                <input type="number" step="0.1" min={1} max={400} value={vitals.weight}
+                  onChange={e => setVitals({ ...vitals, weight: e.target.value })}
+                  placeholder="70" className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold" />
+              </div>
+            </div>
+            <div>
+              <Label className="text-[11px]">Notes</Label>
+              <Textarea value={vitalsNotes} onChange={e => setVitalsNotes(e.target.value)}
+                placeholder="Observation notes…" rows={2} className="mt-1" />
+            </div>
+            <div className="flex gap-2">
+              <Button onClick={saveVitals} className="flex-1" disabled={savingVitals}>
+                {savingVitals ? 'Saving…' : 'Save Vitals'}
+              </Button>
+              <Button onClick={() => setShowVitals(false)} variant="outline" className="flex-1">
+                Cancel
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {workflowSteps.map((step, index) => (
