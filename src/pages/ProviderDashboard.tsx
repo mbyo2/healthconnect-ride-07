@@ -386,10 +386,14 @@ export const ProviderDashboard = () => {
   const { availableRoles, isHealthPersonnel, currentRole } = useUserRoles();
   const { isInstitutionAffiliated } = useInstitutionAffiliation();
 
-  // Specialty workflows for professions with dedicated clinical tools
+  // Specialty workflows for professions with dedicated clinical tools.
+  // For multi-role users, prefer the specialty profession over the priority
+  // admin role (mirrors hasSpecialtyTools logic below).
   const SpecialtyTools = () => {
-    const role = currentRole || availableRoles[0];
-    switch (role) {
+    const specialtyRole = ['dentist', 'optometrist', 'midwife', 'nutritionist', 'psychologist'].find(r => (availableRoles as string[]).includes(r))
+      || (NURSING_ROLES as readonly string[]).find(r => (availableRoles as string[]).includes(r))
+      || currentRole || availableRoles[0];
+    switch (specialtyRole) {
       case 'dentist': return <DentistWorkflow />;
       case 'optometrist': return <OptometristWorkflow />;
       case 'midwife': return <MidwifeWorkflow />;
@@ -402,8 +406,14 @@ export const ProviderDashboard = () => {
     }
   };
   const _role = currentRole || availableRoles[0] || '';
-  const hasSpecialtyTools = ['dentist', 'optometrist', 'midwife', 'nutritionist', 'psychologist'].includes(_role)
-    || (NURSING_ROLES as readonly string[]).includes(_role);
+  // Show specialty tools if the user HOLDS a specialty profession in any of
+  // their roles — not just the priority "current" role. A nurse who also does
+  // admin duties must still see their nursing tools. (dashboardMeta picks the
+  // display role by filtering out admin/institution categories; the tab logic
+  // must not use a different role resolution or multi-role users lose tools.)
+  const _roles = new Set([_role, ...availableRoles]);
+  const hasSpecialtyTools = ['dentist', 'optometrist', 'midwife', 'nutritionist', 'psychologist'].some(r => _roles.has(r))
+    || (NURSING_ROLES as readonly string[]).some(r => _roles.has(r));
 
   // Only the five legal prescribing professions may see write-prescription
   // shortcuts. Nurses, allied health, lab and community cadres are
