@@ -99,7 +99,7 @@ export const NurseWorkflow = () => {
           recorded_by: user.id,
           is_patient_entered: false,
           notes: vitalsNotes || null,
-          status: 'Normal',
+          status: 'normal',
         }));
         if (mirrorRows.length > 0) {
           const { error: mirrorError } = await supabase.from('comprehensive_health_metrics').insert(mirrorRows);
