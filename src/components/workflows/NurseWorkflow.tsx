@@ -74,6 +74,40 @@ export const NurseWorkflow = () => {
     try {
       const { error } = await supabase.from('vital_signs').insert(payload);
       if (error) throw error;
+      // Mirror into comprehensive_health_metrics so the patient can see
+      // provider-recorded vitals in their own app (MedicalRecords reads that
+      // table, not vital_signs). Best-effort: a mirror failure must not roll
+      // back the clinical record.
+      try {
+        const recordedAt = payload.recorded_at as string;
+        const mirrorRows = [
+          { name: 'Blood Pressure (Systolic)', value: payload.blood_pressure_systolic, unit: 'mmHg' },
+          { name: 'Blood Pressure (Diastolic)', value: payload.blood_pressure_diastolic, unit: 'mmHg' },
+          { name: 'Heart Rate', value: payload.heart_rate, unit: 'bpm' },
+          { name: 'Temperature', value: payload.temperature, unit: '°C' },
+          { name: 'Oxygen Saturation', value: payload.oxygen_saturation, unit: '%' },
+          { name: 'Respiratory Rate', value: payload.respiratory_rate, unit: '/min' },
+          { name: 'Blood Glucose', value: payload.blood_glucose, unit: 'mmol/L' },
+          { name: 'Weight', value: payload.weight, unit: 'kg' },
+        ].filter(r => r.value !== null).map(r => ({
+          user_id: vitalsPatientId,
+          metric_category: 'vital_signs',
+          metric_name: r.name,
+          value: r.value,
+          unit: r.unit,
+          recorded_at: recordedAt,
+          recorded_by: user.id,
+          is_patient_entered: false,
+          notes: vitalsNotes || null,
+          status: 'Normal',
+        }));
+        if (mirrorRows.length > 0) {
+          const { error: mirrorError } = await supabase.from('comprehensive_health_metrics').insert(mirrorRows);
+          if (mirrorError) console.warn('Vitals metrics mirror failed:', mirrorError.message);
+        }
+      } catch (mirrorErr) {
+        console.warn('Vitals metrics mirror failed:', mirrorErr);
+      }
       showSuccess({ message: 'Vitals recorded successfully' });
       setShowVitals(false);
       setVitals({ sys: '', dia: '', hr: '', temp: '', spo2: '', rr: '', glucose: '', weight: '' });
