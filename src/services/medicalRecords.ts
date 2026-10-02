@@ -61,14 +61,21 @@ export const getHealthMetrics = async (): Promise<HealthMetric[]> => {
       .select('*')
       .eq('user_id', user.id)
       .order('recorded_at', { ascending: false })
-      .limit(4);
+      .limit(50);
 
-    return metrics?.map(metric => ({
+    // Dedupe to the latest reading per metric name (a vitals recording saves
+    // ~8 rows at once; without this only an arbitrary subset was shown).
+    const latest = new Map<string, (typeof metrics)[number]>();
+    for (const m of metrics ?? []) {
+      if (!latest.has(m.metric_name)) latest.set(m.metric_name, m);
+    }
+
+    return [...latest.values()].map(metric => ({
       label: metric.metric_name,
       value: `${metric.value} ${metric.unit}`,
       date: new Date(metric.recorded_at).toLocaleDateString(),
       status: metric.status || 'Normal'
-    })) || [];
+    }));
   } catch (error) {
     console.error('Error fetching health metrics:', error);
     return [];
