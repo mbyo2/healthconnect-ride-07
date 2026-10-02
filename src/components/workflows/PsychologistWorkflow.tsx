@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ApplicationStatusBanner, ProfileCompleteBanner } from '@/components/dashboard/StatusBanners';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,6 +7,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { useNavigate } from 'react-router-dom';
 import { useSuccessFeedback } from '@/hooks/use-success-feedback';
 import { useInstitutionAffiliation } from '@/hooks/useInstitutionAffiliation';
+import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 import {
   Calendar, Users, FileText, Settings, ClipboardList, MessageSquare,
   Brain, Wallet, AlertTriangle, Video, Activity, HeartHandshake
@@ -27,15 +30,72 @@ const PHQ9_QUESTIONS = [
 export const PsychologistWorkflow = () => {
   const navigate = useNavigate();
   const { showSuccess } = useSuccessFeedback();
-  const { isInstitutionAffiliated } = useInstitutionAffiliation();
+  const { isInstitutionAffiliated, institutionId } = useInstitutionAffiliation();
+  const { user } = useAuth();
   const [showAssessment, setShowAssessment] = useState(false);
   const [scores, setScores] = useState<number[]>(new Array(9).fill(0));
   const [notes, setNotes] = useState('');
   const [showCrisisAlert, setShowCrisisAlert] = useState(false);
+  const [patientId, setPatientId] = useState('');
+  const [patients, setPatients] = useState<{ id: string; first_name: string | null; last_name: string | null }[]>([]);
+  const [saving, setSaving] = useState(false);
 
   // Safety-critical: Question 9 (index 8) screens for self-harm/suicidal ideation.
   // Any score > 0 requires immediate crisis resource display.
   const selfHarmRisk = scores[8] > 0;
+
+  // Load patient list when the assessment form opens.
+  useEffect(() => {
+    if (!showAssessment) return;
+    (async () => {
+      const { data } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name')
+        .eq('role', 'patient')
+        .order('last_name')
+        .limit(200);
+      setPatients(data ?? []);
+    })();
+  }, [showAssessment]);
+
+  // Persist the PHQ-9 assessment. crisisAck=true only when the clinician
+  // acknowledged the crisis modal for a Q9 > 0 self-harm signal.
+  const saveAssessment = async (crisisAck: boolean) => {
+    if (!patientId) { toast.error('Select a patient for this assessment'); return; }
+    if (!user) { toast.error('You must be signed in to save'); return; }
+    if (selfHarmRisk && !crisisAck) { toast.error('Acknowledge the crisis resources first'); return; }
+    setSaving(true);
+    try {
+      const { error } = await supabase.from('phq9_assessments').insert({
+        institution_id: institutionId,
+        patient_id: patientId,
+        clinician_id: user.id,
+        q1: scores[0], q2: scores[1], q3: scores[2],
+        q4: scores[3], q5: scores[4], q6: scores[5],
+        q7: scores[6], q8: scores[7], q9: scores[8],
+        severity,
+        self_harm_risk: selfHarmRisk,
+        crisis_acknowledged: crisisAck,
+        crisis_acknowledged_at: crisisAck ? new Date().toISOString() : null,
+        notes: notes || null,
+      });
+      if (error) throw error;
+      showSuccess({
+        message: selfHarmRisk
+          ? `PHQ-9 saved with SELF-HARM RISK FLAG: ${totalScore} (${severity})`
+          : `PHQ-9 saved: ${totalScore} (${severity})`,
+      });
+      setShowCrisisAlert(false);
+      setShowAssessment(false);
+      setScores(new Array(9).fill(0));
+      setNotes('');
+      setPatientId('');
+    } catch (e: any) {
+      toast.error(e?.message || 'Failed to save PHQ-9 assessment');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const handleNavigation = (route: string, title: string) => {
     navigate(route);
@@ -90,6 +150,22 @@ export const PsychologistWorkflow = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
+            <div>
+              <Label className="text-[11px]">Patient *</Label>
+              <select
+                required
+                value={patientId}
+                onChange={e => setPatientId(e.target.value)}
+                className="w-full mt-1 p-2 rounded-md border border-graphite-300 dark:border-slate-700 font-bold text-sm"
+              >
+                <option value="">Select patient…</option>
+                {patients.map(p => (
+                  <option key={p.id} value={p.id}>
+                    {[p.first_name, p.last_name].filter(Boolean).join(' ') || p.id.slice(0, 8)}
+                  </option>
+                ))}
+              </select>
+            </div>
             {PHQ9_QUESTIONS.map((q, i) => (
               <div key={i} className="p-3 bg-slate-50 rounded-lg">
                 <div className="text-xs font-medium mb-2">{i + 1}. {q}</div>
@@ -125,13 +201,13 @@ export const PsychologistWorkflow = () => {
             )}
             <Button onClick={() => {
               if (selfHarmRisk) {
+                if (!patientId) { toast.error('Select a patient for this assessment'); return; }
                 setShowCrisisAlert(true);
               } else {
-                showSuccess({ message: `PHQ-9 saved: ${totalScore} (${severity})` });
-                setShowAssessment(false);
+                saveAssessment(false);
               }
-            }} className="w-full" variant={selfHarmRisk ? "destructive" : "default"}>
-              {selfHarmRisk ? "Save & Show Crisis Resources" : `Save Assessment (Score: ${totalScore})`}
+            }} className="w-full" variant={selfHarmRisk ? "destructive" : "default"} disabled={saving}>
+              {saving ? "Saving…" : selfHarmRisk ? "Save & Show Crisis Resources" : `Save Assessment (Score: ${totalScore})`}
             </Button>
           </CardContent>
         </Card>
@@ -155,10 +231,13 @@ export const PsychologistWorkflow = () => {
                 If you or someone you know is in crisis, please reach out immediately:
               </p>
               <div className="space-y-2 text-sm bg-slate-50 p-4 rounded-lg">
-                <div className="font-semibold">Zambia Crisis Lines:</div>
-                <div>• Lifeline Zambia: <span className="font-mono font-bold">116</span> (toll-free)</div>
-                <div>• Emergency: <span className="font-mono font-bold">991</span></div>
+                <div className="font-semibold">Zambia Crisis Lines (verified):</div>
+                <div>• Lifeline/Childline Zambia: <span className="font-mono font-bold">116</span> (toll-free, 24/7)</div>
+                <div>• Lifeline/Childline Zambia: <span className="font-mono font-bold">933</span> (toll-free, 24/7)</div>
+                <div>• Suicide crisis line: <span className="font-mono font-bold">096 026 4040</span></div>
                 <div>• Police: <span className="font-mono font-bold">999</span></div>
+                <div>• Ambulance: <span className="font-mono font-bold">992</span></div>
+                <div>• Mobile emergency: <span className="font-mono font-bold">112</span></div>
               </div>
               <div className="text-xs text-slate-600">
                 <p className="font-semibold mb-1">Immediate actions:</p>
@@ -171,15 +250,12 @@ export const PsychologistWorkflow = () => {
               </div>
               <div className="flex gap-2">
                 <Button
-                  onClick={() => {
-                    showSuccess({ message: `PHQ-9 saved with SELF-HARM RISK FLAG: ${totalScore} (${severity})` });
-                    setShowCrisisAlert(false);
-                    setShowAssessment(false);
-                  }}
+                  onClick={() => saveAssessment(true)}
                   className="flex-1"
                   variant="destructive"
+                  disabled={saving}
                 >
-                  Acknowledge & Save
+                  {saving ? "Saving…" : "Acknowledge & Save"}
                 </Button>
                 <Button
                   onClick={() => setShowCrisisAlert(false)}
