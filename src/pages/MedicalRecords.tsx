@@ -12,6 +12,7 @@ import { AIInsightsWidget } from "@/components/ai/AIInsightsWidget";
 import { FHIRExportPanel } from "@/components/medical/FHIRExportPanel";
 import PatientLabResults from "@/components/patient/PatientLabResults";
 import PatientMAR from "@/components/patient/PatientMAR";
+import PatientPHQ9History from "@/components/patient/PatientPHQ9History";
 
 export default function MedicalRecords() {
   const [records, setRecords] = useState<MedicalRecord[]>([]);
@@ -198,6 +199,7 @@ export default function MedicalRecords() {
             </div>
             <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
               <PatientMAR />
+              <PatientPHQ9History />
             </div>
           </div>
 

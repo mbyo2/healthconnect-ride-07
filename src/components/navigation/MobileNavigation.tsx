@@ -177,9 +177,7 @@ export const MobileNavigation = ({ setIsMenuOpen, navigate }: MobileNavigationPr
   }, [isAuthenticated, isHealthPersonnel, isAdmin, availableRoles, isInstitutionAffiliated]);
 
   return (
-    {/* top-full (not a hardcoded top-16): the header height varies with its
-        content (logo / role switcher), so a fixed 64px offset either overlaps
-        the header or leaves a gap. inset-x-0 keeps full-width alignment. */}
+    // top-full (not top-16): header height varies, so a fixed offset overlaps or gaps.
     <div className="absolute top-full inset-x-0 bg-background/95 backdrop-blur-md border-b shadow-lg animate-in slide-in-from-top duration-300 md:hidden z-50">
       <nav className="container mx-auto px-4 py-3 space-y-1 max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain">
         {isAuthenticated && (
