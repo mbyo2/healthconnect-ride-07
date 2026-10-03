@@ -168,6 +168,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "accounts_receivable_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "accounts_receivable_institution_id_fkey"
             columns: ["institution_id"]
             isOneToOne: false
@@ -636,6 +643,8 @@ export type Database = {
           appointment_date: string | null
           appointment_time: string | null
           appointment_type: string | null
+          cancelled_at: string | null
+          consultation_fee: number | null
           created_at: string
           date: string
           duration: number | null
@@ -643,7 +652,9 @@ export type Database = {
           institution_id: string | null
           notes: string | null
           patient_id: string
+          patient_visit_type: string | null
           provider_id: string
+          reminder_sent_at: string | null
           status: string
           time: string
           type: string
@@ -653,6 +664,8 @@ export type Database = {
           appointment_date?: string | null
           appointment_time?: string | null
           appointment_type?: string | null
+          cancelled_at?: string | null
+          consultation_fee?: number | null
           created_at?: string
           date: string
           duration?: number | null
@@ -660,7 +673,9 @@ export type Database = {
           institution_id?: string | null
           notes?: string | null
           patient_id: string
+          patient_visit_type?: string | null
           provider_id: string
+          reminder_sent_at?: string | null
           status?: string
           time: string
           type: string
@@ -670,6 +685,8 @@ export type Database = {
           appointment_date?: string | null
           appointment_time?: string | null
           appointment_type?: string | null
+          cancelled_at?: string | null
+          consultation_fee?: number | null
           created_at?: string
           date?: string
           duration?: number | null
@@ -677,7 +694,9 @@ export type Database = {
           institution_id?: string | null
           notes?: string | null
           patient_id?: string
+          patient_visit_type?: string | null
           provider_id?: string
+          reminder_sent_at?: string | null
           status?: string
           time?: string
           type?: string
@@ -713,10 +732,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "appointments_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "appointments_provider_id_fkey"
             columns: ["provider_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
             referencedColumns: ["id"]
           },
         ]
@@ -794,6 +827,13 @@ export type Database = {
             columns: ["assigned_to"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "asset_records_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
             referencedColumns: ["id"]
           },
           {
@@ -1011,6 +1051,13 @@ export type Database = {
             columns: ["staff_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "attendance_records_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
             referencedColumns: ["id"]
           },
         ]
@@ -1328,6 +1375,145 @@ export type Database = {
           },
         ]
       }
+      batch_qa_events: {
+        Row: {
+          action: string
+          batch_id: string
+          created_at: string
+          decided_by: string
+          id: string
+          institution_id: string
+          new_status: string
+          notes: string | null
+          previous_status: string | null
+        }
+        Insert: {
+          action: string
+          batch_id: string
+          created_at?: string
+          decided_by: string
+          id?: string
+          institution_id: string
+          new_status: string
+          notes?: string | null
+          previous_status?: string | null
+        }
+        Update: {
+          action?: string
+          batch_id?: string
+          created_at?: string
+          decided_by?: string
+          id?: string
+          institution_id?: string
+          new_status?: string
+          notes?: string | null
+          previous_status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "batch_qa_events_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "medicine_batches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "batch_qa_events_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "batch_qa_events_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "institution_comprehensive_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "batch_qa_events_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "revenue_leakage_summary_view"
+            referencedColumns: ["institution_id"]
+          },
+        ]
+      }
+      batch_stock_movements: {
+        Row: {
+          batch_id: string
+          created_at: string
+          id: string
+          institution_id: string
+          movement_type: string
+          notes: string | null
+          performed_by: string | null
+          quantity_after: number
+          quantity_change: number
+          reference_id: string | null
+          reference_type: string | null
+          unit_cost: number
+        }
+        Insert: {
+          batch_id: string
+          created_at?: string
+          id?: string
+          institution_id: string
+          movement_type: string
+          notes?: string | null
+          performed_by?: string | null
+          quantity_after: number
+          quantity_change: number
+          reference_id?: string | null
+          reference_type?: string | null
+          unit_cost?: number
+        }
+        Update: {
+          batch_id?: string
+          created_at?: string
+          id?: string
+          institution_id?: string
+          movement_type?: string
+          notes?: string | null
+          performed_by?: string | null
+          quantity_after?: number
+          quantity_change?: number
+          reference_id?: string | null
+          reference_type?: string | null
+          unit_cost?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "batch_stock_movements_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "medicine_batches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "batch_stock_movements_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "batch_stock_movements_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "institution_comprehensive_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "batch_stock_movements_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "revenue_leakage_summary_view"
+            referencedColumns: ["institution_id"]
+          },
+        ]
+      }
       benefits: {
         Row: {
           benefit_code: string
@@ -1510,6 +1696,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "billing_invoices_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
         ]
       }
       billing_payments: {
@@ -1625,6 +1818,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "billing_records_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
         ]
       }
       biometric_devices: {
@@ -1693,6 +1893,51 @@ export type Database = {
             referencedColumns: ["institution_id"]
           },
         ]
+      }
+      blood_bank_audit: {
+        Row: {
+          action: string
+          blood_type: string
+          component_type: string
+          created_at: string
+          hospital_id: string
+          id: string
+          issued_at: string
+          issued_by: string
+          notes: string | null
+          patient_id: string | null
+          request_id: string | null
+          units_issued: number
+        }
+        Insert: {
+          action?: string
+          blood_type: string
+          component_type: string
+          created_at?: string
+          hospital_id: string
+          id?: string
+          issued_at?: string
+          issued_by: string
+          notes?: string | null
+          patient_id?: string | null
+          request_id?: string | null
+          units_issued: number
+        }
+        Update: {
+          action?: string
+          blood_type?: string
+          component_type?: string
+          created_at?: string
+          hospital_id?: string
+          id?: string
+          issued_at?: string
+          issued_by?: string
+          notes?: string | null
+          patient_id?: string | null
+          request_id?: string | null
+          units_issued?: number
+        }
+        Relationships: []
       }
       blood_bank_inventory: {
         Row: {
@@ -1833,6 +2078,279 @@ export type Database = {
           },
           {
             foreignKeyName: "blood_bank_requests_hospital_id_fkey"
+            columns: ["hospital_id"]
+            isOneToOne: false
+            referencedRelation: "revenue_leakage_summary_view"
+            referencedColumns: ["institution_id"]
+          },
+        ]
+      }
+      blood_compatibility_tests: {
+        Row: {
+          created_at: string | null
+          donor_blood_type: string
+          hospital_id: string | null
+          id: string
+          notes: string | null
+          patient_id: string | null
+          performed_at: string | null
+          performed_by: string | null
+          recipient_blood_type: string
+          request_id: string | null
+          result: string | null
+          test_type: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          donor_blood_type: string
+          hospital_id?: string | null
+          id?: string
+          notes?: string | null
+          patient_id?: string | null
+          performed_at?: string | null
+          performed_by?: string | null
+          recipient_blood_type: string
+          request_id?: string | null
+          result?: string | null
+          test_type?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          donor_blood_type?: string
+          hospital_id?: string | null
+          id?: string
+          notes?: string | null
+          patient_id?: string | null
+          performed_at?: string | null
+          performed_by?: string | null
+          recipient_blood_type?: string
+          request_id?: string | null
+          result?: string | null
+          test_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blood_compatibility_tests_hospital_id_fkey"
+            columns: ["hospital_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "blood_compatibility_tests_hospital_id_fkey"
+            columns: ["hospital_id"]
+            isOneToOne: false
+            referencedRelation: "institution_comprehensive_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "blood_compatibility_tests_hospital_id_fkey"
+            columns: ["hospital_id"]
+            isOneToOne: false
+            referencedRelation: "revenue_leakage_summary_view"
+            referencedColumns: ["institution_id"]
+          },
+          {
+            foreignKeyName: "blood_compatibility_tests_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "blood_compatibility_tests_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "blood_compatibility_tests_performed_by_fkey"
+            columns: ["performed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "blood_compatibility_tests_performed_by_fkey"
+            columns: ["performed_by"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "blood_compatibility_tests_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "blood_bank_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      blood_donations: {
+        Row: {
+          blood_type: string
+          collected_by: string | null
+          component_type: string
+          created_at: string | null
+          donation_date: string | null
+          donor_id: string | null
+          expiry_date: string | null
+          hospital_id: string | null
+          id: string
+          inventory_id: string | null
+          screening_notes: string | null
+          screening_status: string | null
+          units_collected: number | null
+        }
+        Insert: {
+          blood_type: string
+          collected_by?: string | null
+          component_type?: string
+          created_at?: string | null
+          donation_date?: string | null
+          donor_id?: string | null
+          expiry_date?: string | null
+          hospital_id?: string | null
+          id?: string
+          inventory_id?: string | null
+          screening_notes?: string | null
+          screening_status?: string | null
+          units_collected?: number | null
+        }
+        Update: {
+          blood_type?: string
+          collected_by?: string | null
+          component_type?: string
+          created_at?: string | null
+          donation_date?: string | null
+          donor_id?: string | null
+          expiry_date?: string | null
+          hospital_id?: string | null
+          id?: string
+          inventory_id?: string | null
+          screening_notes?: string | null
+          screening_status?: string | null
+          units_collected?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blood_donations_collected_by_fkey"
+            columns: ["collected_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "blood_donations_collected_by_fkey"
+            columns: ["collected_by"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "blood_donations_donor_id_fkey"
+            columns: ["donor_id"]
+            isOneToOne: false
+            referencedRelation: "blood_donors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "blood_donations_hospital_id_fkey"
+            columns: ["hospital_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "blood_donations_hospital_id_fkey"
+            columns: ["hospital_id"]
+            isOneToOne: false
+            referencedRelation: "institution_comprehensive_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "blood_donations_hospital_id_fkey"
+            columns: ["hospital_id"]
+            isOneToOne: false
+            referencedRelation: "revenue_leakage_summary_view"
+            referencedColumns: ["institution_id"]
+          },
+          {
+            foreignKeyName: "blood_donations_inventory_id_fkey"
+            columns: ["inventory_id"]
+            isOneToOne: false
+            referencedRelation: "blood_bank_inventory"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      blood_donors: {
+        Row: {
+          address: string | null
+          blood_type: string
+          created_at: string | null
+          date_of_birth: string | null
+          email: string | null
+          full_name: string
+          gender: string | null
+          hospital_id: string | null
+          id: string
+          is_active: boolean | null
+          last_donation_date: string | null
+          notes: string | null
+          phone: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          address?: string | null
+          blood_type: string
+          created_at?: string | null
+          date_of_birth?: string | null
+          email?: string | null
+          full_name: string
+          gender?: string | null
+          hospital_id?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_donation_date?: string | null
+          notes?: string | null
+          phone?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          address?: string | null
+          blood_type?: string
+          created_at?: string | null
+          date_of_birth?: string | null
+          email?: string | null
+          full_name?: string
+          gender?: string | null
+          hospital_id?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_donation_date?: string | null
+          notes?: string | null
+          phone?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blood_donors_hospital_id_fkey"
+            columns: ["hospital_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "blood_donors_hospital_id_fkey"
+            columns: ["hospital_id"]
+            isOneToOne: false
+            referencedRelation: "institution_comprehensive_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "blood_donors_hospital_id_fkey"
             columns: ["hospital_id"]
             isOneToOne: false
             referencedRelation: "revenue_leakage_summary_view"
@@ -2012,6 +2530,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "budgets_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "budgets_institution_id_fkey"
             columns: ["institution_id"]
             isOneToOne: false
@@ -2114,6 +2639,13 @@ export type Database = {
             columns: ["staff_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "care_team_assignments_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
             referencedColumns: ["id"]
           },
         ]
@@ -2420,6 +2952,13 @@ export type Database = {
             columns: ["assigned_to"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "clinical_tasks_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
             referencedColumns: ["id"]
           },
           {
@@ -2753,6 +3292,7 @@ export type Database = {
           dosage: string
           duration_days: number | null
           expiry_date: string | null
+          fulfillment_status: string | null
           generic_name: string | null
           id: string
           indication: string | null
@@ -2777,6 +3317,7 @@ export type Database = {
           dosage: string
           duration_days?: number | null
           expiry_date?: string | null
+          fulfillment_status?: string | null
           generic_name?: string | null
           id?: string
           indication?: string | null
@@ -2801,6 +3342,7 @@ export type Database = {
           dosage?: string
           duration_days?: number | null
           expiry_date?: string | null
+          fulfillment_status?: string | null
           generic_name?: string | null
           id?: string
           indication?: string | null
@@ -3881,10 +4423,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "diagnostic_orders_ordering_provider_id_fkey"
+            columns: ["ordering_provider_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "diagnostic_orders_reviewed_by_fkey"
             columns: ["reviewed_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "diagnostic_orders_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
             referencedColumns: ["id"]
           },
           {
@@ -4056,6 +4612,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "digital_signatures_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
         ]
       }
       discharge_checklists: {
@@ -4219,6 +4782,13 @@ export type Database = {
             columns: ["reported_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "disciplinary_records_reported_by_fkey"
+            columns: ["reported_by"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
             referencedColumns: ["id"]
           },
         ]
@@ -4459,6 +5029,13 @@ export type Database = {
             columns: ["patient_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "emergency_contacts_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
             referencedColumns: ["id"]
           },
         ]
@@ -4727,6 +5304,13 @@ export type Database = {
             columns: ["employee_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employee_payroll_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
             referencedColumns: ["id"]
           },
           {
@@ -5068,6 +5652,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "expenses_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "expenses_category_id_fkey"
             columns: ["category_id"]
             isOneToOne: false
@@ -5102,7 +5693,47 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "expenses_paid_by_fkey"
+            columns: ["paid_by"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
         ]
+      }
+      facility_module_charter: {
+        Row: {
+          created_at: string
+          description: string | null
+          display_order: number
+          id: string
+          module_key: string
+          module_name: string
+          status: string
+          tier: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          id?: string
+          module_key: string
+          module_name: string
+          status?: string
+          tier: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          id?: string
+          module_key?: string
+          module_name?: string
+          status?: string
+          tier?: string
+        }
+        Relationships: []
       }
       family_members: {
         Row: {
@@ -5138,10 +5769,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "family_members_member_profile_id_fkey"
+            columns: ["member_profile_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "family_members_primary_user_id_fkey"
             columns: ["primary_user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "family_members_primary_user_id_fkey"
+            columns: ["primary_user_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
             referencedColumns: ["id"]
           },
         ]
@@ -5283,6 +5928,13 @@ export type Database = {
             columns: ["generated_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "financial_reports_generated_by_fkey"
+            columns: ["generated_by"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
             referencedColumns: ["id"]
           },
           {
@@ -5806,6 +6458,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "health_articles_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
         ]
       }
       health_personnel_applications: {
@@ -5863,10 +6522,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "health_personnel_applications_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "health_personnel_applications_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: true
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "health_personnel_applications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "provider_directory"
             referencedColumns: ["id"]
           },
         ]
@@ -5967,6 +6640,7 @@ export type Database = {
           swift_code: string | null
           tax_id: string | null
           type: Database["public"]["Enums"]["healthcare_provider_type"]
+          type_code: string | null
           updated_at: string | null
           verified: boolean | null
           website: string | null
@@ -6012,6 +6686,7 @@ export type Database = {
           swift_code?: string | null
           tax_id?: string | null
           type: Database["public"]["Enums"]["healthcare_provider_type"]
+          type_code?: string | null
           updated_at?: string | null
           verified?: boolean | null
           website?: string | null
@@ -6057,6 +6732,7 @@ export type Database = {
           swift_code?: string | null
           tax_id?: string | null
           type?: Database["public"]["Enums"]["healthcare_provider_type"]
+          type_code?: string | null
           updated_at?: string | null
           verified?: boolean | null
           website?: string | null
@@ -6106,6 +6782,13 @@ export type Database = {
             columns: ["provider_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "healthcare_services_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
             referencedColumns: ["id"]
           },
         ]
@@ -6174,6 +6857,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "hospital_admissions_admitting_doctor_id_fkey"
+            columns: ["admitting_doctor_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "hospital_admissions_bed_id_fkey"
             columns: ["bed_id"]
             isOneToOne: false
@@ -6213,6 +6903,13 @@ export type Database = {
             columns: ["patient_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hospital_admissions_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
             referencedColumns: ["id"]
           },
         ]
@@ -6263,6 +6960,13 @@ export type Database = {
             columns: ["current_patient_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hospital_beds_current_patient_id_fkey"
+            columns: ["current_patient_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
             referencedColumns: ["id"]
           },
           {
@@ -6392,6 +7096,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "hospital_billing_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
         ]
       }
       hospital_billing_items: {
@@ -6481,6 +7192,13 @@ export type Database = {
             columns: ["head_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hospital_departments_head_id_fkey"
+            columns: ["head_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
             referencedColumns: ["id"]
           },
           {
@@ -7149,6 +7867,94 @@ export type Database = {
           },
         ]
       }
+      institution_module_entitlements: {
+        Row: {
+          created_at: string
+          granted_at: string
+          granted_by: string | null
+          id: string
+          institution_id: string
+          is_enabled: boolean
+          module_key: string
+          module_name: string
+          note: string | null
+        }
+        Insert: {
+          created_at?: string
+          granted_at?: string
+          granted_by?: string | null
+          id?: string
+          institution_id: string
+          is_enabled?: boolean
+          module_key: string
+          module_name?: string
+          note?: string | null
+        }
+        Update: {
+          created_at?: string
+          granted_at?: string
+          granted_by?: string | null
+          id?: string
+          institution_id?: string
+          is_enabled?: boolean
+          module_key?: string
+          module_name?: string
+          note?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "institution_module_entitlements_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "institution_module_entitlements_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "institution_comprehensive_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "institution_module_entitlements_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "revenue_leakage_summary_view"
+            referencedColumns: ["institution_id"]
+          },
+        ]
+      }
+      institution_module_pricing: {
+        Row: {
+          currency: string
+          is_billable: boolean
+          module_key: string
+          module_name: string
+          price_monthly: number | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          currency?: string
+          is_billable?: boolean
+          module_key: string
+          module_name?: string
+          price_monthly?: number | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          currency?: string
+          is_billable?: boolean
+          module_key?: string
+          module_name?: string
+          price_monthly?: number | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       institution_network_members: {
         Row: {
           billing_code: string | null
@@ -7272,6 +8078,105 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "revenue_leakage_summary_view"
             referencedColumns: ["institution_id"]
+          },
+        ]
+      }
+      institution_patient_registry: {
+        Row: {
+          address: string | null
+          allergies: string | null
+          blood_type: string | null
+          chronic_conditions: string | null
+          created_at: string | null
+          date_of_birth: string | null
+          email: string | null
+          emergency_contact_name: string | null
+          emergency_contact_phone: string | null
+          first_name: string
+          gender: string | null
+          id: string
+          institution_id: string
+          last_name: string
+          linked_patient_id: string | null
+          phone: string | null
+          registered_by: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          address?: string | null
+          allergies?: string | null
+          blood_type?: string | null
+          chronic_conditions?: string | null
+          created_at?: string | null
+          date_of_birth?: string | null
+          email?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          first_name: string
+          gender?: string | null
+          id?: string
+          institution_id: string
+          last_name: string
+          linked_patient_id?: string | null
+          phone?: string | null
+          registered_by?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          address?: string | null
+          allergies?: string | null
+          blood_type?: string | null
+          chronic_conditions?: string | null
+          created_at?: string | null
+          date_of_birth?: string | null
+          email?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          first_name?: string
+          gender?: string | null
+          id?: string
+          institution_id?: string
+          last_name?: string
+          linked_patient_id?: string | null
+          phone?: string | null
+          registered_by?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "institution_patient_registry_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "institution_patient_registry_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "institution_comprehensive_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "institution_patient_registry_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "revenue_leakage_summary_view"
+            referencedColumns: ["institution_id"]
+          },
+          {
+            foreignKeyName: "institution_patient_registry_linked_patient_id_fkey"
+            columns: ["linked_patient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "institution_patient_registry_linked_patient_id_fkey"
+            columns: ["linked_patient_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -7703,6 +8608,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "institution_staff_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "institution_staff_specialty_id_fkey"
             columns: ["specialty_id"]
             isOneToOne: false
@@ -7771,6 +8683,7 @@ export type Database = {
           id: string
           is_active: boolean
           name: string
+          tier: string | null
         }
         Insert: {
           code: string
@@ -7782,6 +8695,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           name: string
+          tier?: string | null
         }
         Update: {
           code?: string
@@ -7793,6 +8707,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           name?: string
+          tier?: string | null
         }
         Relationships: []
       }
@@ -8077,6 +8992,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "insurance_claims_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
         ]
       }
       insurance_information: {
@@ -8119,6 +9041,13 @@ export type Database = {
             columns: ["patient_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "insurance_information_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
             referencedColumns: ["id"]
           },
         ]
@@ -8369,10 +9298,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "intake_forms_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "intake_forms_reviewed_by_fkey"
             columns: ["reviewed_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "intake_forms_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
             referencedColumns: ["id"]
           },
         ]
@@ -8681,6 +9624,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "job_applications_applicant_id_fkey"
+            columns: ["applicant_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "job_applications_job_posting_id_fkey"
             columns: ["job_posting_id"]
             isOneToOne: false
@@ -8692,6 +9642,13 @@ export type Database = {
             columns: ["reviewed_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_applications_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
             referencedColumns: ["id"]
           },
         ]
@@ -8772,6 +9729,13 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_postings_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
             referencedColumns: ["id"]
           },
           {
@@ -8865,10 +9829,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "journal_entries_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "journal_entries_created_by_fkey"
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "journal_entries_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
             referencedColumns: ["id"]
           },
           {
@@ -9049,37 +10027,52 @@ export type Database = {
           created_at: string | null
           document_url: string | null
           id: string
+          is_abnormal: boolean | null
           notes: string | null
           patient_id: string
           reference_range: string | null
+          request_id: string | null
           result_value: string
+          technician_id: string | null
           test_date: string
+          test_id: string | null
           test_name: string
           unit: string | null
+          verified_at: string | null
         }
         Insert: {
           created_at?: string | null
           document_url?: string | null
           id?: string
+          is_abnormal?: boolean | null
           notes?: string | null
           patient_id: string
           reference_range?: string | null
+          request_id?: string | null
           result_value: string
+          technician_id?: string | null
           test_date: string
+          test_id?: string | null
           test_name: string
           unit?: string | null
+          verified_at?: string | null
         }
         Update: {
           created_at?: string | null
           document_url?: string | null
           id?: string
+          is_abnormal?: boolean | null
           notes?: string | null
           patient_id?: string
           reference_range?: string | null
+          request_id?: string | null
           result_value?: string
+          technician_id?: string | null
           test_date?: string
+          test_id?: string | null
           test_name?: string
           unit?: string | null
+          verified_at?: string | null
         }
         Relationships: [
           {
@@ -9087,6 +10080,20 @@ export type Database = {
             columns: ["patient_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lab_results_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lab_results_test_id_fkey"
+            columns: ["test_id"]
+            isOneToOne: false
+            referencedRelation: "lab_tests"
             referencedColumns: ["id"]
           },
         ]
@@ -9212,6 +10219,7 @@ export type Database = {
           test_type: string
           total_amount: number | null
           updated_at: string | null
+          verified_at: string | null
           verified_by: string | null
         }
         Insert: {
@@ -9239,6 +10247,7 @@ export type Database = {
           test_type: string
           total_amount?: number | null
           updated_at?: string | null
+          verified_at?: string | null
           verified_by?: string | null
         }
         Update: {
@@ -9266,6 +10275,7 @@ export type Database = {
           test_type?: string
           total_amount?: number | null
           updated_at?: string | null
+          verified_at?: string | null
           verified_by?: string | null
         }
         Relationships: [
@@ -9312,10 +10322,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "lab_tests_ordered_by_fkey"
+            columns: ["ordered_by"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "lab_tests_patient_id_fkey"
             columns: ["patient_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lab_tests_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
             referencedColumns: ["id"]
           },
           {
@@ -9326,10 +10350,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "lab_tests_performed_by_fkey"
+            columns: ["performed_by"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "lab_tests_verified_by_fkey"
             columns: ["verified_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lab_tests_verified_by_fkey"
+            columns: ["verified_by"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
             referencedColumns: ["id"]
           },
         ]
@@ -9427,6 +10465,13 @@ export type Database = {
             columns: ["approved_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leave_history_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
             referencedColumns: ["id"]
           },
           {
@@ -9584,6 +10629,66 @@ export type Database = {
             referencedColumns: ["institution_id"]
           },
         ]
+      }
+      lenco_payments: {
+        Row: {
+          amount: number
+          country: string
+          created_at: string
+          currency: string
+          id: string
+          lenco_collection_id: string | null
+          lenco_lenco_reference: string | null
+          lenco_reference: string
+          metadata: Json | null
+          operator: string | null
+          phone: string | null
+          reference_id: string | null
+          reference_type: string
+          result_message: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          country?: string
+          created_at?: string
+          currency?: string
+          id?: string
+          lenco_collection_id?: string | null
+          lenco_lenco_reference?: string | null
+          lenco_reference: string
+          metadata?: Json | null
+          operator?: string | null
+          phone?: string | null
+          reference_id?: string | null
+          reference_type: string
+          result_message?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          country?: string
+          created_at?: string
+          currency?: string
+          id?: string
+          lenco_collection_id?: string | null
+          lenco_lenco_reference?: string | null
+          lenco_reference?: string
+          metadata?: Json | null
+          operator?: string | null
+          phone?: string | null
+          reference_id?: string | null
+          reference_type?: string
+          result_message?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       location_updates: {
         Row: {
@@ -10168,6 +11273,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "medication_administration_records_administered_by_fkey"
+            columns: ["administered_by"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "medication_administration_records_admission_id_fkey"
             columns: ["admission_id"]
             isOneToOne: false
@@ -10203,6 +11315,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "medication_administration_records_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "medication_administration_records_prescription_id_fkey"
             columns: ["prescription_id"]
             isOneToOne: false
@@ -10214,6 +11333,13 @@ export type Database = {
             columns: ["verified_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "medication_administration_records_verified_by_fkey"
+            columns: ["verified_by"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
             referencedColumns: ["id"]
           },
         ]
@@ -10441,17 +11567,31 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "medication_reminders_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
         ]
       }
       medications: {
         Row: {
           created_at: string
           dosage: string
+          end_date: string | null
           frequency: string
           id: string
+          instructions: string | null
+          is_active: boolean | null
           name: string
           next_dose: string | null
+          refill_date: string | null
           remaining: number | null
+          reminder_enabled: boolean | null
+          reminder_times: string[] | null
+          start_date: string | null
           total: number | null
           updated_at: string
           user_id: string
@@ -10459,11 +11599,18 @@ export type Database = {
         Insert: {
           created_at?: string
           dosage: string
+          end_date?: string | null
           frequency: string
           id?: string
+          instructions?: string | null
+          is_active?: boolean | null
           name: string
           next_dose?: string | null
+          refill_date?: string | null
           remaining?: number | null
+          reminder_enabled?: boolean | null
+          reminder_times?: string[] | null
+          start_date?: string | null
           total?: number | null
           updated_at?: string
           user_id: string
@@ -10471,16 +11618,123 @@ export type Database = {
         Update: {
           created_at?: string
           dosage?: string
+          end_date?: string | null
           frequency?: string
           id?: string
+          instructions?: string | null
+          is_active?: boolean | null
           name?: string
           next_dose?: string | null
+          refill_date?: string | null
           remaining?: number | null
+          reminder_enabled?: boolean | null
+          reminder_times?: string[] | null
+          start_date?: string | null
           total?: number | null
           updated_at?: string
           user_id?: string
         }
         Relationships: []
+      }
+      medicine_batches: {
+        Row: {
+          batch_number: string
+          created_at: string
+          expiry_date: string
+          id: string
+          institution_id: string
+          inventory_item_id: string
+          inventory_table: string
+          is_active: boolean
+          manufacture_date: string | null
+          manufacturer: string | null
+          product_name: string
+          qa_checked_at: string | null
+          qa_checked_by: string | null
+          qa_notes: string | null
+          qa_status: string
+          quantity_received: number
+          quantity_remaining: number
+          received_at: string
+          received_by: string | null
+          supplier_id: string | null
+          unit_cost: number
+          unit_price: number | null
+          updated_at: string
+        }
+        Insert: {
+          batch_number: string
+          created_at?: string
+          expiry_date: string
+          id?: string
+          institution_id: string
+          inventory_item_id: string
+          inventory_table: string
+          is_active?: boolean
+          manufacture_date?: string | null
+          manufacturer?: string | null
+          product_name: string
+          qa_checked_at?: string | null
+          qa_checked_by?: string | null
+          qa_notes?: string | null
+          qa_status?: string
+          quantity_received?: number
+          quantity_remaining?: number
+          received_at?: string
+          received_by?: string | null
+          supplier_id?: string | null
+          unit_cost?: number
+          unit_price?: number | null
+          updated_at?: string
+        }
+        Update: {
+          batch_number?: string
+          created_at?: string
+          expiry_date?: string
+          id?: string
+          institution_id?: string
+          inventory_item_id?: string
+          inventory_table?: string
+          is_active?: boolean
+          manufacture_date?: string | null
+          manufacturer?: string | null
+          product_name?: string
+          qa_checked_at?: string | null
+          qa_checked_by?: string | null
+          qa_notes?: string | null
+          qa_status?: string
+          quantity_received?: number
+          quantity_remaining?: number
+          received_at?: string
+          received_by?: string | null
+          supplier_id?: string | null
+          unit_cost?: number
+          unit_price?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medicine_batches_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "medicine_batches_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "institution_comprehensive_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "medicine_batches_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "revenue_leakage_summary_view"
+            referencedColumns: ["institution_id"]
+          },
+        ]
       }
       messages: {
         Row: {
@@ -10519,10 +11773,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "messages_receiver_id_fkey"
+            columns: ["receiver_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "messages_sender_id_fkey"
             columns: ["sender_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
             referencedColumns: ["id"]
           },
         ]
@@ -10747,6 +12015,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
         ]
       }
       order_items: {
@@ -10801,6 +12076,7 @@ export type Database = {
           delivery_address: string
           delivery_instructions: string | null
           delivery_phone: string
+          delivery_zone_id: string | null
           estimated_delivery_time: string | null
           id: string
           patient_id: string
@@ -10816,6 +12092,7 @@ export type Database = {
           delivery_address: string
           delivery_instructions?: string | null
           delivery_phone: string
+          delivery_zone_id?: string | null
           estimated_delivery_time?: string | null
           id?: string
           patient_id: string
@@ -10831,6 +12108,7 @@ export type Database = {
           delivery_address?: string
           delivery_instructions?: string | null
           delivery_phone?: string
+          delivery_zone_id?: string | null
           estimated_delivery_time?: string | null
           id?: string
           patient_id?: string
@@ -11068,10 +12346,102 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "ot_surgeries_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "ot_surgeries_surgeon_id_fkey"
             columns: ["surgeon_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ot_surgeries_surgeon_id_fkey"
+            columns: ["surgeon_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      package_redemptions: {
+        Row: {
+          amount_paid: number
+          expires_at: string | null
+          id: string
+          institution_id: string
+          package_id: string | null
+          patient_id: string
+          purchased_at: string
+          status: string
+          surgery_package_id: string | null
+          visits_total: number
+          visits_used: number
+        }
+        Insert: {
+          amount_paid: number
+          expires_at?: string | null
+          id?: string
+          institution_id: string
+          package_id?: string | null
+          patient_id: string
+          purchased_at?: string
+          status?: string
+          surgery_package_id?: string | null
+          visits_total?: number
+          visits_used?: number
+        }
+        Update: {
+          amount_paid?: number
+          expires_at?: string | null
+          id?: string
+          institution_id?: string
+          package_id?: string | null
+          patient_id?: string
+          purchased_at?: string
+          status?: string
+          surgery_package_id?: string | null
+          visits_total?: number
+          visits_used?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "package_redemptions_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "package_redemptions_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "institution_comprehensive_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "package_redemptions_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "revenue_leakage_summary_view"
+            referencedColumns: ["institution_id"]
+          },
+          {
+            foreignKeyName: "package_redemptions_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "visit_packages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "package_redemptions_surgery_package_id_fkey"
+            columns: ["surgery_package_id"]
+            isOneToOne: false
+            referencedRelation: "surgery_packages"
             referencedColumns: ["id"]
           },
         ]
@@ -11813,10 +13183,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "patient_queue_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "patient_queue_provider_id_fkey"
             columns: ["provider_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "patient_queue_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
             referencedColumns: ["id"]
           },
         ]
@@ -11904,6 +13288,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "patient_triage_sessions_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
         ]
       }
       paye_calculations: {
@@ -11913,6 +13304,7 @@ export type Database = {
           calculation_month: string
           created_at: string | null
           employee_id: string
+          engine: string
           gross_income: number
           id: string
           institution_id: string
@@ -11927,6 +13319,7 @@ export type Database = {
           calculation_month: string
           created_at?: string | null
           employee_id: string
+          engine?: string
           gross_income: number
           id?: string
           institution_id: string
@@ -11941,6 +13334,7 @@ export type Database = {
           calculation_month?: string
           created_at?: string | null
           employee_id?: string
+          engine?: string
           gross_income?: number
           id?: string
           institution_id?: string
@@ -11955,6 +13349,13 @@ export type Database = {
             columns: ["employee_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "paye_calculations_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
             referencedColumns: ["id"]
           },
           {
@@ -12156,10 +13557,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "payment_transactions_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "payment_transactions_created_by_fkey"
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_transactions_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
             referencedColumns: ["id"]
           },
           {
@@ -12208,6 +13623,7 @@ export type Database = {
           external_payment_id: string | null
           failed_at: string | null
           id: string
+          idempotency_key: string | null
           invoice_number: string | null
           metadata: Json | null
           patient_id: string
@@ -12230,6 +13646,7 @@ export type Database = {
           external_payment_id?: string | null
           failed_at?: string | null
           id?: string
+          idempotency_key?: string | null
           invoice_number?: string | null
           metadata?: Json | null
           patient_id: string
@@ -12252,6 +13669,7 @@ export type Database = {
           external_payment_id?: string | null
           failed_at?: string | null
           id?: string
+          idempotency_key?: string | null
           invoice_number?: string | null
           metadata?: Json | null
           patient_id?: string
@@ -12275,10 +13693,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "payments_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "payments_provider_id_fkey"
             columns: ["provider_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
             referencedColumns: ["id"]
           },
           {
@@ -12406,6 +13838,13 @@ export type Database = {
             columns: ["processed_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payroll_processed_by_fkey"
+            columns: ["processed_by"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
             referencedColumns: ["id"]
           },
         ]
@@ -12734,6 +14173,13 @@ export type Database = {
             columns: ["reviewer_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_reviews_reviewer_id_fkey"
+            columns: ["reviewer_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
             referencedColumns: ["id"]
           },
         ]
@@ -13182,8 +14628,29 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "pharmacy_prescriptions_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "pharmacy_prescriptions_filled_by_fkey"
             columns: ["filled_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pharmacy_prescriptions_filled_by_fkey"
+            columns: ["filled_by"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pharmacy_prescriptions_patient_id_fkey"
+            columns: ["patient_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -13192,7 +14659,7 @@ export type Database = {
             foreignKeyName: "pharmacy_prescriptions_patient_id_fkey"
             columns: ["patient_id"]
             isOneToOne: false
-            referencedRelation: "profiles"
+            referencedRelation: "provider_directory"
             referencedColumns: ["id"]
           },
           {
@@ -13333,6 +14800,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "pharmacy_sales_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "pharmacy_sales_insurance_claim_id_fkey"
             columns: ["insurance_claim_id"]
             isOneToOne: false
@@ -13372,6 +14846,13 @@ export type Database = {
             columns: ["served_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pharmacy_sales_served_by_fkey"
+            columns: ["served_by"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
             referencedColumns: ["id"]
           },
         ]
@@ -13466,6 +14947,78 @@ export type Database = {
             referencedColumns: ["institution_id"]
           },
         ]
+      }
+      phq9_assessments: {
+        Row: {
+          assessed_at: string
+          clinician_id: string
+          created_at: string
+          crisis_acknowledged: boolean
+          crisis_acknowledged_at: string | null
+          id: string
+          institution_id: string | null
+          notes: string | null
+          patient_id: string
+          q1: number
+          q2: number
+          q3: number
+          q4: number
+          q5: number
+          q6: number
+          q7: number
+          q8: number
+          q9: number
+          self_harm_risk: boolean
+          severity: string
+          total_score: number | null
+        }
+        Insert: {
+          assessed_at?: string
+          clinician_id: string
+          created_at?: string
+          crisis_acknowledged?: boolean
+          crisis_acknowledged_at?: string | null
+          id?: string
+          institution_id?: string | null
+          notes?: string | null
+          patient_id: string
+          q1?: number
+          q2?: number
+          q3?: number
+          q4?: number
+          q5?: number
+          q6?: number
+          q7?: number
+          q8?: number
+          q9?: number
+          self_harm_risk?: boolean
+          severity?: string
+          total_score?: number | null
+        }
+        Update: {
+          assessed_at?: string
+          clinician_id?: string
+          created_at?: string
+          crisis_acknowledged?: boolean
+          crisis_acknowledged_at?: string | null
+          id?: string
+          institution_id?: string | null
+          notes?: string | null
+          patient_id?: string
+          q1?: number
+          q2?: number
+          q3?: number
+          q4?: number
+          q5?: number
+          q6?: number
+          q7?: number
+          q8?: number
+          q9?: number
+          self_harm_risk?: boolean
+          severity?: string
+          total_score?: number | null
+        }
+        Relationships: []
       }
       pos_register_sessions: {
         Row: {
@@ -13933,6 +15486,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "procedure_executions_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
         ]
       }
       procedure_inventory_mapping: {
@@ -14304,6 +15864,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "promotions_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
         ]
       }
       provider_availability: {
@@ -14349,6 +15916,13 @@ export type Database = {
             columns: ["provider_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "provider_availability_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
             referencedColumns: ["id"]
           },
         ]
@@ -14416,7 +15990,47 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "provider_locations_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: true
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
         ]
+      }
+      provider_module_charter: {
+        Row: {
+          created_at: string
+          description: string | null
+          display_order: number
+          id: string
+          module_key: string
+          module_name: string
+          provider_type: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          id?: string
+          module_key: string
+          module_name: string
+          provider_type: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          id?: string
+          module_key?: string
+          module_name?: string
+          provider_type?: string
+          status?: string
+        }
+        Relationships: []
       }
       provider_reviews: {
         Row: {
@@ -14483,10 +16097,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "provider_reviews_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "provider_reviews_provider_id_fkey"
             columns: ["provider_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "provider_reviews_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
             referencedColumns: ["id"]
           },
         ]
@@ -14537,6 +16165,13 @@ export type Database = {
             columns: ["provider_id"]
             isOneToOne: true
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "provider_statistics_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: true
+            referencedRelation: "provider_directory"
             referencedColumns: ["id"]
           },
         ]
@@ -14934,6 +16569,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "queue_tokens_assigned_doctor_id_fkey"
+            columns: ["assigned_doctor_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "queue_tokens_institution_id_fkey"
             columns: ["institution_id"]
             isOneToOne: false
@@ -14959,6 +16601,13 @@ export type Database = {
             columns: ["patient_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "queue_tokens_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
             referencedColumns: ["id"]
           },
         ]
@@ -15137,6 +16786,13 @@ export type Database = {
             columns: ["reconciled_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reconciliations_reconciled_by_fkey"
+            columns: ["reconciled_by"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
             referencedColumns: ["id"]
           },
         ]
@@ -15502,6 +17158,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "resignations_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
         ]
       }
       revenue: {
@@ -15600,6 +17263,13 @@ export type Database = {
             columns: ["received_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "revenue_received_by_fkey"
+            columns: ["received_by"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
             referencedColumns: ["id"]
           },
         ]
@@ -15810,10 +17480,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "reviews_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "reviews_reviewer_id_fkey"
             columns: ["reviewer_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_reviewer_id_fkey"
+            columns: ["reviewer_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
             referencedColumns: ["id"]
           },
         ]
@@ -15897,6 +17581,13 @@ export type Database = {
             columns: ["patient_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sample_collections_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
             referencedColumns: ["id"]
           },
         ]
@@ -16039,6 +17730,76 @@ export type Database = {
         }
         Relationships: []
       }
+      service_tariffs: {
+        Row: {
+          base_price: number
+          category: string
+          code: string
+          cost_price: number
+          created_at: string
+          currency: string
+          department: string | null
+          id: string
+          institution_id: string
+          insurance_price: number | null
+          is_active: boolean
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          base_price?: number
+          category?: string
+          code: string
+          cost_price?: number
+          created_at?: string
+          currency?: string
+          department?: string | null
+          id?: string
+          institution_id: string
+          insurance_price?: number | null
+          is_active?: boolean
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          base_price?: number
+          category?: string
+          code?: string
+          cost_price?: number
+          created_at?: string
+          currency?: string
+          department?: string | null
+          id?: string
+          institution_id?: string
+          insurance_price?: number | null
+          is_active?: boolean
+          name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_tariffs_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_tariffs_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "institution_comprehensive_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_tariffs_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "revenue_leakage_summary_view"
+            referencedColumns: ["institution_id"]
+          },
+        ]
+      }
       severity_levels_config: {
         Row: {
           color_class: string
@@ -16146,6 +17907,13 @@ export type Database = {
             columns: ["staff_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shift_assignments_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
             referencedColumns: ["id"]
           },
         ]
@@ -16930,6 +18698,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "staff_schedules_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
         ]
       }
       staff_shifts: {
@@ -17053,10 +18828,141 @@ export type Database = {
         }
         Relationships: []
       }
+      stock_audit_lines: {
+        Row: {
+          batch_id: string
+          book_quantity: number
+          counted_at: string | null
+          counted_by: string | null
+          counted_quantity: number | null
+          created_at: string
+          id: string
+          notes: string | null
+          session_id: string
+          variance: number | null
+          variance_value: number | null
+        }
+        Insert: {
+          batch_id: string
+          book_quantity: number
+          counted_at?: string | null
+          counted_by?: string | null
+          counted_quantity?: number | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          session_id: string
+          variance?: number | null
+          variance_value?: number | null
+        }
+        Update: {
+          batch_id?: string
+          book_quantity?: number
+          counted_at?: string | null
+          counted_by?: string | null
+          counted_quantity?: number | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          session_id?: string
+          variance?: number | null
+          variance_value?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stock_audit_lines_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "medicine_batches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_audit_lines_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "stock_audit_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      stock_audit_sessions: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          created_at: string
+          id: string
+          institution_id: string
+          notes: string | null
+          scope: string
+          started_at: string
+          started_by: string | null
+          status: string
+          submitted_at: string | null
+          submitted_by: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          id?: string
+          institution_id: string
+          notes?: string | null
+          scope?: string
+          started_at?: string
+          started_by?: string | null
+          status?: string
+          submitted_at?: string | null
+          submitted_by?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          id?: string
+          institution_id?: string
+          notes?: string | null
+          scope?: string
+          started_at?: string
+          started_by?: string | null
+          status?: string
+          submitted_at?: string | null
+          submitted_by?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stock_audit_sessions_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_audit_sessions_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "institution_comprehensive_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_audit_sessions_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "revenue_leakage_summary_view"
+            referencedColumns: ["institution_id"]
+          },
+        ]
+      }
       stock_writeoffs: {
         Row: {
           approved_at: string | null
           approved_by: string | null
+          batch_id: string | null
           batch_number: string | null
           cost_per_unit: number
           created_at: string
@@ -17068,6 +18974,8 @@ export type Database = {
           product_name: string
           quantity_written_off: number
           reason: string
+          rejection_reason: string | null
+          status: string
           total_loss: number | null
           written_off_at: string
           written_off_by: string | null
@@ -17075,6 +18983,7 @@ export type Database = {
         Insert: {
           approved_at?: string | null
           approved_by?: string | null
+          batch_id?: string | null
           batch_number?: string | null
           cost_per_unit?: number
           created_at?: string
@@ -17086,6 +18995,8 @@ export type Database = {
           product_name: string
           quantity_written_off: number
           reason: string
+          rejection_reason?: string | null
+          status?: string
           total_loss?: number | null
           written_off_at?: string
           written_off_by?: string | null
@@ -17093,6 +19004,7 @@ export type Database = {
         Update: {
           approved_at?: string | null
           approved_by?: string | null
+          batch_id?: string | null
           batch_number?: string | null
           cost_per_unit?: number
           created_at?: string
@@ -17104,11 +19016,20 @@ export type Database = {
           product_name?: string
           quantity_written_off?: number
           reason?: string
+          rejection_reason?: string | null
+          status?: string
           total_loss?: number | null
           written_off_at?: string
           written_off_by?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "stock_writeoffs_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "medicine_batches"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "stock_writeoffs_institution_id_fkey"
             columns: ["institution_id"]
@@ -17421,6 +19342,79 @@ export type Database = {
           },
         ]
       }
+      surgery_packages: {
+        Row: {
+          code: string
+          components: Json
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          institution_id: string
+          is_available: boolean
+          margin: number
+          margin_percent: number
+          name: string
+          package_price: number
+          total_cost: number
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          components?: Json
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          institution_id: string
+          is_available?: boolean
+          margin?: number
+          margin_percent?: number
+          name: string
+          package_price: number
+          total_cost?: number
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          components?: Json
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          institution_id?: string
+          is_available?: boolean
+          margin?: number
+          margin_percent?: number
+          name?: string
+          package_price?: number
+          total_cost?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "surgery_packages_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "surgery_packages_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "institution_comprehensive_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "surgery_packages_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "revenue_leakage_summary_view"
+            referencedColumns: ["institution_id"]
+          },
+        ]
+      }
       symptom_categories: {
         Row: {
           created_at: string | null
@@ -17479,6 +19473,13 @@ export type Database = {
             columns: ["patient_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "symptoms_diary_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
             referencedColumns: ["id"]
           },
         ]
@@ -17732,10 +19733,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "timesheets_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "timesheets_submitted_by_fkey"
             columns: ["submitted_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "timesheets_submitted_by_fkey"
+            columns: ["submitted_by"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
             referencedColumns: ["id"]
           },
         ]
@@ -18004,6 +20019,13 @@ export type Database = {
             columns: ["patient_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "triage_assessments_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
             referencedColumns: ["id"]
           },
           {
@@ -18346,7 +20368,9 @@ export type Database = {
           backup_codes_remaining: number
           created_at: string | null
           enabled: boolean | null
+          failed_attempts: number
           id: string
+          locked_until: string | null
           updated_at: string | null
           user_id: string
           verified_at: string | null
@@ -18355,7 +20379,9 @@ export type Database = {
           backup_codes_remaining?: number
           created_at?: string | null
           enabled?: boolean | null
+          failed_attempts?: number
           id?: string
+          locked_until?: string | null
           updated_at?: string | null
           user_id: string
           verified_at?: string | null
@@ -18364,7 +20390,9 @@ export type Database = {
           backup_codes_remaining?: number
           created_at?: string | null
           enabled?: boolean | null
+          failed_attempts?: number
           id?: string
+          locked_until?: string | null
           updated_at?: string | null
           user_id?: string
           verified_at?: string | null
@@ -18467,46 +20495,72 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "vaccination_records_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
         ]
       }
       video_consultations: {
         Row: {
+          appointment_id: string | null
           created_at: string | null
           id: string
           meeting_url: string | null
+          network_optimized: boolean
           notes: string | null
           patient_id: string
           provider_id: string
+          recording_enabled: boolean
           scheduled_end: string
           scheduled_start: string
           service_code: string | null
           status: string
+          tv_mode: boolean
         }
         Insert: {
+          appointment_id?: string | null
           created_at?: string | null
           id?: string
           meeting_url?: string | null
+          network_optimized?: boolean
           notes?: string | null
           patient_id: string
           provider_id: string
+          recording_enabled?: boolean
           scheduled_end: string
           scheduled_start: string
           service_code?: string | null
           status: string
+          tv_mode?: boolean
         }
         Update: {
+          appointment_id?: string | null
           created_at?: string | null
           id?: string
           meeting_url?: string | null
+          network_optimized?: boolean
           notes?: string | null
           patient_id?: string
           provider_id?: string
+          recording_enabled?: boolean
           scheduled_end?: string
           scheduled_start?: string
           service_code?: string | null
           status?: string
+          tv_mode?: boolean
         }
         Relationships: [
+          {
+            foreignKeyName: "video_consultations_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "video_consultations_patient_id_fkey"
             columns: ["patient_id"]
@@ -18515,11 +20569,98 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "video_consultations_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "video_consultations_provider_id_fkey"
             columns: ["provider_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "video_consultations_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      visit_packages: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          institution_id: string
+          is_available: boolean
+          name: string
+          package_price: number
+          service_type: string
+          single_visit_price: number | null
+          total_visits: number
+          updated_at: string
+          validity_days: number | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          institution_id: string
+          is_available?: boolean
+          name: string
+          package_price: number
+          service_type: string
+          single_visit_price?: number | null
+          total_visits: number
+          updated_at?: string
+          validity_days?: number | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          institution_id?: string
+          is_available?: boolean
+          name?: string
+          package_price?: number
+          service_type?: string
+          single_visit_price?: number | null
+          total_visits?: number
+          updated_at?: string
+          validity_days?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "visit_packages_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "visit_packages_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "institution_comprehensive_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "visit_packages_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "revenue_leakage_summary_view"
+            referencedColumns: ["institution_id"]
           },
         ]
       }
@@ -19335,6 +21476,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "institution_staff_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "provider_directory"
+            referencedColumns: ["id"]
+          },
         ]
       }
       inventory_status_enhanced_view: {
@@ -19392,6 +21540,191 @@ export type Database = {
         }
         Relationships: []
       }
+      pharmacy_stock_valuation: {
+        Row: {
+          batch_count: number | null
+          earliest_expiry: string | null
+          institution_id: string | null
+          inventory_item_id: string | null
+          inventory_table: string | null
+          product_name: string | null
+          stock_value: number | null
+          total_units: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medicine_batches_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "medicine_batches_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "institution_comprehensive_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "medicine_batches_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "revenue_leakage_summary_view"
+            referencedColumns: ["institution_id"]
+          },
+        ]
+      }
+      pharmacy_writeoff_summary: {
+        Row: {
+          institution_id: string | null
+          month: string | null
+          reason: string | null
+          status: string | null
+          total_loss: number | null
+          writeoff_count: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stock_writeoffs_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_institutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_writeoffs_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "institution_comprehensive_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_writeoffs_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "revenue_leakage_summary_view"
+            referencedColumns: ["institution_id"]
+          },
+        ]
+      }
+      provider_directory: {
+        Row: {
+          accepted_insurances: string[] | null
+          accepting_patients: boolean | null
+          accepts_insurance: boolean | null
+          affiliated_hospitals: string[] | null
+          appointment_types: string[] | null
+          availability_schedule: Json | null
+          avatar_url: string | null
+          board_certifications: string[] | null
+          city: string | null
+          consultation_fee_max: number | null
+          consultation_fee_min: number | null
+          email: string | null
+          first_name: string | null
+          graduation_year: number | null
+          home_visits_available: boolean | null
+          id: string | null
+          insurance_providers_accepted: string[] | null
+          is_verified: boolean | null
+          languages_spoken: string[] | null
+          last_name: string | null
+          location: string | null
+          medical_school: string | null
+          phone: string | null
+          primary_practice_location: string | null
+          provider_type:
+            | Database["public"]["Enums"]["healthcare_provider_type"]
+            | null
+          rating: number | null
+          reviews_count: number | null
+          role: Database["public"]["Enums"]["user_role"] | null
+          specialty: string | null
+          state: string | null
+          subspecialties: string[] | null
+          telemedicine_available: boolean | null
+          typical_wait_time: string | null
+          years_experience: number | null
+        }
+        Insert: {
+          accepted_insurances?: string[] | null
+          accepting_patients?: boolean | null
+          accepts_insurance?: boolean | null
+          affiliated_hospitals?: string[] | null
+          appointment_types?: string[] | null
+          availability_schedule?: Json | null
+          avatar_url?: string | null
+          board_certifications?: string[] | null
+          city?: string | null
+          consultation_fee_max?: number | null
+          consultation_fee_min?: number | null
+          email?: string | null
+          first_name?: string | null
+          graduation_year?: number | null
+          home_visits_available?: boolean | null
+          id?: string | null
+          insurance_providers_accepted?: string[] | null
+          is_verified?: boolean | null
+          languages_spoken?: string[] | null
+          last_name?: string | null
+          location?: string | null
+          medical_school?: string | null
+          phone?: string | null
+          primary_practice_location?: string | null
+          provider_type?:
+            | Database["public"]["Enums"]["healthcare_provider_type"]
+            | null
+          rating?: number | null
+          reviews_count?: number | null
+          role?: Database["public"]["Enums"]["user_role"] | null
+          specialty?: string | null
+          state?: string | null
+          subspecialties?: string[] | null
+          telemedicine_available?: boolean | null
+          typical_wait_time?: string | null
+          years_experience?: number | null
+        }
+        Update: {
+          accepted_insurances?: string[] | null
+          accepting_patients?: boolean | null
+          accepts_insurance?: boolean | null
+          affiliated_hospitals?: string[] | null
+          appointment_types?: string[] | null
+          availability_schedule?: Json | null
+          avatar_url?: string | null
+          board_certifications?: string[] | null
+          city?: string | null
+          consultation_fee_max?: number | null
+          consultation_fee_min?: number | null
+          email?: string | null
+          first_name?: string | null
+          graduation_year?: number | null
+          home_visits_available?: boolean | null
+          id?: string | null
+          insurance_providers_accepted?: string[] | null
+          is_verified?: boolean | null
+          languages_spoken?: string[] | null
+          last_name?: string | null
+          location?: string | null
+          medical_school?: string | null
+          phone?: string | null
+          primary_practice_location?: string | null
+          provider_type?:
+            | Database["public"]["Enums"]["healthcare_provider_type"]
+            | null
+          rating?: number | null
+          reviews_count?: number | null
+          role?: Database["public"]["Enums"]["user_role"] | null
+          specialty?: string | null
+          state?: string | null
+          subspecialties?: string[] | null
+          telemedicine_available?: boolean | null
+          typical_wait_time?: string | null
+          years_experience?: number | null
+        }
+        Relationships: []
+      }
       revenue_leakage_summary_view: {
         Row: {
           flagged_transactions: number | null
@@ -19429,6 +21762,18 @@ export type Database = {
     }
     Functions: {
       accept_staff_invitation: { Args: { _token: string }; Returns: Json }
+      approve_stock_audit_session: {
+        Args: { p_session_id: string }
+        Returns: Json
+      }
+      can_access_institution_blood_bank: {
+        Args: { p_institution_id: string }
+        Returns: boolean
+      }
+      can_approve_pharmacy_adjustments: {
+        Args: { p_institution_id: string }
+        Returns: boolean
+      }
       can_perform_service: {
         Args: { provider_id: string; service_category_id: string }
         Returns: boolean
@@ -19459,6 +21804,19 @@ export type Database = {
       }
       cleanup_old_form_data: { Args: never; Returns: undefined }
       delete_user: { Args: never; Returns: undefined }
+      dispense_medicine_batches: {
+        Args: {
+          p_institution_id: string
+          p_inventory_item_id: string
+          p_inventory_table: string
+          p_notes?: string
+          p_quantity: number
+          p_reference_id?: string
+          p_reference_type?: string
+        }
+        Returns: Json
+      }
+      fulfill_marketplace_order: { Args: { p_order_id: string }; Returns: Json }
       generate_receipt_number: {
         Args: { p_pharmacy_id: string }
         Returns: string
@@ -19581,6 +21939,7 @@ export type Database = {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"][]
       }
+      has_admin_scope: { Args: { p_uid?: string }; Returns: boolean }
       has_care_relationship: {
         Args: { _patient: string; _provider: string }
         Returns: boolean
@@ -19609,11 +21968,42 @@ export type Database = {
         Args: { institution_id: string }
         Returns: boolean
       }
+      is_institution_super_admin: {
+        Args: { p_institution_id: string; p_uid: string }
+        Returns: boolean
+      }
+      is_pharmacy_operator: {
+        Args: { p_institution_id: string }
+        Returns: boolean
+      }
       is_service_role: { Args: never; Returns: boolean }
       is_super_admin: { Args: never; Returns: boolean }
+      is_superadmin: { Args: never; Returns: boolean }
+      issue_blood: {
+        Args: { p_issued_by?: string; p_notes?: string; p_request_id: string }
+        Returns: string
+      }
       map_staff_role_to_app_role: {
         Args: { _staff_role: string }
         Returns: Database["public"]["Enums"]["app_role"]
+      }
+      post_stock_writeoff: {
+        Args: { p_writeoff_id: string }
+        Returns: undefined
+      }
+      process_full_payment: {
+        Args: {
+          p_currency?: string
+          p_idempotency_key?: string
+          p_institution_id?: string
+          p_patient_id: string
+          p_payment_method?: string
+          p_payment_type?: string
+          p_provider_id: string
+          p_service_id?: string
+          p_total_amount: number
+        }
+        Returns: Json
       }
       process_payment_with_splits:
         | {
@@ -19654,6 +22044,24 @@ export type Database = {
         }
         Returns: Json
       }
+      quarantine_expired_batches: {
+        Args: { p_institution_id?: string }
+        Returns: number
+      }
+      record_blood_donation: {
+        Args: {
+          p_blood_type: string
+          p_collected_by?: string
+          p_component_type?: string
+          p_donor_id: string
+          p_expiry_date?: string
+          p_hospital_id: string
+          p_screening_notes?: string
+          p_screening_status?: string
+          p_units_collected?: number
+        }
+        Returns: string
+      }
       redeem_promo_code: {
         Args: { p_code: string; p_context?: string }
         Returns: Json
@@ -19663,6 +22071,31 @@ export type Database = {
         Returns: number
       }
       resolve_service_price: { Args: { _service_id: string }; Returns: number }
+      set_institution_suspended: {
+        Args: { p_institution_id: string; p_suspended: boolean }
+        Returns: undefined
+      }
+      shares_institution_with_provider: {
+        Args: { p_provider_id: string }
+        Returns: boolean
+      }
+      transfer_institution_superadmin: {
+        Args: { p_institution_id: string; p_new_admin_id: string }
+        Returns: undefined
+      }
+      user_can_verify_for_lab: {
+        Args: { p_lab_institution_id: string; p_user_id: string }
+        Returns: boolean
+      }
+      user_can_view_lab_profile: {
+        Args: { profile_id: string; viewer_id: string }
+        Returns: boolean
+      }
+      user_manages_institution: { Args: { inst_id: string }; Returns: boolean }
+      user_shares_appointment_with: {
+        Args: { other_id: string; viewer_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       admin_level: "admin" | "institution_admin" | "superadmin"
@@ -19730,6 +22163,54 @@ export type Database = {
         | "skin_clinic"
         | "dental_clinic"
         | "specialty_clinic"
+        | "laboratory"
+        | "wholesale_pharmacy"
+        | "health_post"
+        | "rural_health_centre"
+        | "urban_health_centre"
+        | "mini_hospital"
+        | "district_hospital"
+        | "provincial_hospital"
+        | "tertiary_hospital"
+        | "maternity_hospital"
+        | "children_hospital"
+        | "mental_hospital"
+        | "cancer_hospital"
+        | "cardiac_hospital"
+        | "eye_hospital"
+        | "orthopaedic_hospital"
+        | "dialysis_centre"
+        | "physiotherapy_centre"
+        | "retail_pharmacy"
+        | "hospital_pharmacy"
+        | "health_shop"
+        | "imaging_centre"
+        | "diagnostic_centre"
+        | "blood_bank"
+        | "hospice"
+        | "home_care"
+        | "rehabilitation_centre"
+        | "private_practice"
+        | "central_hospital"
+        | "childrens_hospital"
+        | "community_pharmacy"
+        | "day_surgery_centre"
+        | "diagnostic_center"
+        | "diagnostic_laboratory"
+        | "fertility_clinic"
+        | "general_hospital"
+        | "health_screening_centre"
+        | "large_hospital"
+        | "pathology_lab"
+        | "psychiatric_hospital"
+        | "radiology_centre"
+        | "specialized_clinic"
+        | "specialized_hospital"
+        | "surgical_centre"
+        | "teaching_hospital"
+        | "trauma_centre"
+        | "university_hospital"
+        | "vaccination_centre"
       invoice_status:
         | "draft"
         | "sent"
@@ -19976,6 +22457,25 @@ export const Constants = {
         "specialist",
         "ambulance_staff",
         "pathologist",
+        "medical_licentiate",
+        "clinical_officer",
+        "dentist",
+        "dental_therapist",
+        "registered_nurse",
+        "enrolled_nurse",
+        "midwife",
+        "pharmacy_technologist",
+        "wholesale_pharmacy",
+        "radiographer",
+        "physiotherapist",
+        "occupational_therapist",
+        "nutritionist",
+        "optometrist",
+        "psychologist",
+        "environmental_health_officer",
+        "community_health_worker",
+        "traditional_practitioner",
+        "medical_records_officer",
       ],
       attendance_status: ["present", "absent", "late", "half_day", "on_leave"],
       experience_level: ["entry", "intermediate", "expert"],
@@ -19995,6 +22495,54 @@ export const Constants = {
         "skin_clinic",
         "dental_clinic",
         "specialty_clinic",
+        "laboratory",
+        "wholesale_pharmacy",
+        "health_post",
+        "rural_health_centre",
+        "urban_health_centre",
+        "mini_hospital",
+        "district_hospital",
+        "provincial_hospital",
+        "tertiary_hospital",
+        "maternity_hospital",
+        "children_hospital",
+        "mental_hospital",
+        "cancer_hospital",
+        "cardiac_hospital",
+        "eye_hospital",
+        "orthopaedic_hospital",
+        "dialysis_centre",
+        "physiotherapy_centre",
+        "retail_pharmacy",
+        "hospital_pharmacy",
+        "health_shop",
+        "imaging_centre",
+        "diagnostic_centre",
+        "blood_bank",
+        "hospice",
+        "home_care",
+        "rehabilitation_centre",
+        "private_practice",
+        "central_hospital",
+        "childrens_hospital",
+        "community_pharmacy",
+        "day_surgery_centre",
+        "diagnostic_center",
+        "diagnostic_laboratory",
+        "fertility_clinic",
+        "general_hospital",
+        "health_screening_centre",
+        "large_hospital",
+        "pathology_lab",
+        "psychiatric_hospital",
+        "radiology_centre",
+        "specialized_clinic",
+        "specialized_hospital",
+        "surgical_centre",
+        "teaching_hospital",
+        "trauma_centre",
+        "university_hospital",
+        "vaccination_centre",
       ],
       invoice_status: [
         "draft",
@@ -20040,7 +22588,53 @@ export const Constants = {
       queue_status: ["waiting", "serving", "completed", "cancelled", "no_show"],
       triage_level: ["critical", "urgent", "standard", "non_urgent"],
       triage_urgency: ["emergency", "urgent", "routine", "self_care"],
-      user_role: ["admin", "health_personnel", "patient"],
+      user_role: [
+        "admin",
+        "health_personnel",
+        "patient",
+        "institution_admin",
+        "institution_staff",
+        "medical_records_officer",
+        "pharmacy",
+        "wholesale_pharmacy",
+        "pharmacist",
+        "pharmacy_technologist",
+        "lab",
+        "lab_technician",
+        "doctor",
+        "specialist",
+        "medical_licentiate",
+        "clinical_officer",
+        "dentist",
+        "dental_therapist",
+        "nurse",
+        "registered_nurse",
+        "enrolled_nurse",
+        "midwife",
+        "radiologist",
+        "radiographer",
+        "pathologist",
+        "physiotherapist",
+        "occupational_therapist",
+        "nutritionist",
+        "optometrist",
+        "psychologist",
+        "environmental_health_officer",
+        "community_health_worker",
+        "traditional_practitioner",
+        "support",
+        "super_admin",
+        "cxo",
+        "receptionist",
+        "hr_manager",
+        "ot_staff",
+        "phlebotomist",
+        "billing_staff",
+        "inventory_manager",
+        "triage_staff",
+        "maintenance_manager",
+        "ambulance_staff",
+      ],
     },
   },
 } as const
