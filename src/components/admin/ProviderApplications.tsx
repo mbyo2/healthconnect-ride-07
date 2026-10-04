@@ -29,6 +29,9 @@ interface ProviderApp {
     email: string | null;
     phone: string | null;
     country: string | null;
+    is_suspended?: boolean | null;
+    suspension_reason?: string | null;
+    suspended_at?: string | null;
     // new enhancement fields
     medical_school: string | null;
     graduation_year: number | null;
@@ -63,7 +66,7 @@ const BoolBadge = ({ value, trueLabel = "Yes", falseLabel = "No" }: { value: boo
 export const ProviderApplications = () => {
   const [apps, setApps] = useState<ProviderApp[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<"pending" | "approved" | "rejected">("pending");
+  const [filter, setFilter] = useState<"pending" | "approved" | "rejected" | "suspended">("pending");
   const [selected, setSelected] = useState<ProviderApp | null>(null);
   const [notes, setNotes] = useState("");
   const [processing, setProcessing] = useState(false);
@@ -75,12 +78,20 @@ export const ProviderApplications = () => {
   const fetchApps = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from("health_personnel_applications")
         .select("*")
-        .eq("status", filter)
         .order("created_at", { ascending: false })
         .limit(500);
+
+      if (filter === "suspended") {
+        // Suspended = approved applications where profile is suspended
+        query = query.eq("status", "approved");
+      } else {
+        query = query.eq("status", filter);
+      }
+
+      const { data, error } = await query;
       if (error) throw error;
 
       const userIds = (data || []).map((a: any) => a.user_id);
@@ -93,7 +104,7 @@ export const ProviderApplications = () => {
               "primary_practice_location, affiliated_hospitals, " +
               "consultation_fee_min, consultation_fee_max, accepts_insurance, " +
               "insurance_providers_accepted, telemedicine_available, home_visits_available, " +
-              "languages_spoken, typical_wait_time"
+              "languages_spoken, typical_wait_time, is_suspended, suspension_reason, suspended_at"
             )
             .in("id", userIds)
         : { data: [] as any[], error: null };
@@ -105,7 +116,12 @@ export const ProviderApplications = () => {
         ...a,
         profile: (profiles || []).find((p: any) => p.id === a.user_id) || null,
       }));
-      setApps(merged as ProviderApp[]);
+
+      // For suspended filter, only show approved apps where profile is suspended
+      const filtered = filter === "suspended"
+        ? merged.filter((a: any) => a.profile?.is_suspended === true)
+        : merged;
+      setApps(filtered as ProviderApp[]);
     } catch (e: any) {
       toast.error(e.message || "Failed to load applications");
     } finally {
@@ -188,6 +204,31 @@ export const ProviderApplications = () => {
     }
   };
 
+  const toggleSuspension = async (suspend: boolean) => {
+    if (!selected || !canReview) return;
+    if (suspend && !notes.trim()) {
+      toast.error("Please provide a suspension reason (Terms & Conditions violation).");
+      return;
+    }
+    setProcessing(true);
+    try {
+      const { error } = await supabase.rpc("set_provider_suspended", {
+        p_user_id: selected.user_id,
+        p_suspended: suspend,
+        p_reason: suspend ? notes.trim() : null,
+      });
+      if (error) throw error;
+      toast.success(suspend ? "Provider suspended" : "Provider suspension lifted");
+      setSelected(null);
+      setNotes("");
+      fetchApps();
+    } catch (e: any) {
+      toast.error(e.message || "Failed to update suspension");
+    } finally {
+      setProcessing(false);
+    }
+  };
+
   const statusPill = (st: string) => {
     if (st === "approved") return <span className="px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-success-500">Approved</span>;
     if (st === "rejected") return <span className="px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-error-500">Rejected</span>;
@@ -205,7 +246,7 @@ export const ProviderApplications = () => {
           Practitioner Accreditation Applications
         </h2>
         <div className="flex items-center gap-1.5">
-          {(["pending", "approved", "rejected"] as const).map(f => (
+          {(["pending", "approved", "rejected", "suspended"] as const).map(f => (
             <button
               key={f}
               onClick={() => setFilter(f)}
@@ -254,7 +295,16 @@ export const ProviderApplications = () => {
                   <td className="py-3 px-3 text-slate-600 dark:text-slate-300">{app.profile?.medical_school || "—"}</td>
                   <td className="py-3 px-3 font-mono">{app.license_number || "—"}</td>
                   <td className="py-3 px-3 font-bold">{app.years_of_experience} yrs</td>
-                  <td className="py-3 px-3 text-center">{statusPill(app.status)}</td>
+                  <td className="py-3 px-3 text-center">
+                    <div className="flex flex-col items-center gap-1">
+                      {statusPill(app.status)}
+                      {app.profile?.is_suspended && (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold text-white bg-amber-600" title={app.profile.suspension_reason || "Suspended"}>
+                          Suspended
+                        </span>
+                      )}
+                    </div>
+                  </td>
                   <td className="py-3 px-3 text-center">
                     <button
                       onClick={() => openReview(app)}
@@ -467,10 +517,32 @@ export const ProviderApplications = () => {
             </div>
           )}
 
-          <DialogFooter className="gap-2 pt-2">
+          <DialogFooter className="gap-2 pt-2 flex-wrap">
             <button onClick={() => setSelected(null)} className="px-3 py-1.5 text-xs font-bold text-slate-500">
               Cancel
             </button>
+            {selected?.status === "approved" && (
+              selected.profile?.is_suspended ? (
+                <button
+                  onClick={() => toggleSuspension(false)}
+                  disabled={processing}
+                  className="px-4 py-1.5 rounded-md bg-success-500 text-white text-xs font-bold disabled:opacity-40 flex items-center gap-1"
+                >
+                  {processing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
+                  Lift Suspension
+                </button>
+              ) : (
+                <button
+                  onClick={() => toggleSuspension(true)}
+                  disabled={processing || !notes.trim()}
+                  title="Suspend for Terms & Conditions violation (reason required)"
+                  className="px-4 py-1.5 rounded-md bg-amber-500 text-white text-xs font-bold disabled:opacity-40 flex items-center gap-1"
+                >
+                  {processing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <X className="h-3.5 w-3.5" />}
+                  Suspend (T&C Violation)
+                </button>
+              )
+            )}
             <button
               onClick={() => decide("rejected")}
               disabled={processing || !notes.trim()}
