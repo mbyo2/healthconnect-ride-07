@@ -115,7 +115,7 @@ export const PatientRegistration = () => {
 
   const passwordForm = useForm<z.infer<typeof passwordSchema>>({
     resolver: zodResolver(passwordSchema),
-    defaultValues: { termsAccepted: false },
+    defaultValues: { password: "", confirmPassword: "", termsAccepted: false },
   });
 
   useEffect(() => {
