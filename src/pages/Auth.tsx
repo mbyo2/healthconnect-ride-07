@@ -93,6 +93,7 @@ const FALLBACK_PROVIDER_TYPES: Array<{ value: string; label: string }> = [
   { value: "community_health_worker", label: "Community Health Worker" },
   { value: "traditional_practitioner", label: "Traditional Health Practitioner" },
   { value: "phlebotomist", label: "Phlebotomist" },
+  { value: "medical_records_officer", label: "Medical Records Officer" },
   { value: "health_personnel", label: "Other Health Professional" },
 ];
 // Facility taxonomy (MOH Zambia pyramid + private + ZAMRA) — mirrors the
