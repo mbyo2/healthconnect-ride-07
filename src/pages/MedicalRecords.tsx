@@ -199,8 +199,12 @@ export default function MedicalRecords() {
             </div>
             <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
               <PatientMAR />
-              <PatientPHQ9History />
             </div>
+          </div>
+
+          {/* Mood screening history (PHQ-9) — standalone section */}
+          <div className="rounded-2xl border border-canvas-silk dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
+            <PatientPHQ9History />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

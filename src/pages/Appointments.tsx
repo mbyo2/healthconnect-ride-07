@@ -203,8 +203,9 @@ export const AppointmentsPage = () => {
       if (newDate < todayStr) throw new Error("The new date cannot be in the past");
 
       // Validate against the provider's working hours when they are set.
+      // day_of_week is Monday-first (0=Mon..6=Sun); shift JS Sunday-first getDay().
       if (providerAvailability.length > 0) {
-        const dow = parseISO(newDate).getDay();
+        const dow = (parseISO(newDate).getDay() + 6) % 7;
         const dayRows = providerAvailability.filter((r: any) => r.day_of_week === dow);
         if (dayRows.length === 0) {
           throw new Error("The provider does not work on that day of the week");

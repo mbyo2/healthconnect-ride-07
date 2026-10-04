@@ -39,7 +39,10 @@ export const DateSelector = ({ date, onDateSelect, providerId }: DateSelectorPro
         onSelect={onDateSelect}
         className="rounded-md border"
         disabled={(date) => {
-          const day = date.getDay();
+          // provider_availability.day_of_week is Monday-first (0=Mon..6=Sun),
+          // matching the DB trigger's (EXTRACT(DOW)+6)%7. JS getDay() is
+          // Sunday-first, so shift it before comparing.
+          const day = (date.getDay() + 6) % 7;
           return (
             date < new Date() || 
             (availableDays && !availableDays.includes(day))
