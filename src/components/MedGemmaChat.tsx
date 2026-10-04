@@ -414,7 +414,7 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
                         </span>
                       </div>
                     )}
-                    <p className="text-sm sm:text-base whitespace-pre-wrap leading-relaxed break-words overflow-hidden" style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                    <p className="text-sm sm:text-base whitespace-pre-wrap leading-relaxed [overflow-wrap:anywhere] min-w-0" style={{ overflowWrap: 'anywhere' }}>
                       <LinkifiedText text={message.content} />
                     </p>
                     <span className="text-xs opacity-60 mt-2 block">
