@@ -170,17 +170,15 @@ export async function settlePayment(admin: Admin, input: SettleInput): Promise<S
 
   // Wallet top-ups: the payer funds their own wallet, no split.
   if (WALLET_TOPUP_TYPES.has(type)) {
-    // Idempotency: the guard above only covers flows that write a payments
-    // row. Top-ups credit the ledger directly, so check the ledger for this
-    // gateway reference before crediting — concurrent verifications must not
-    // double-credit. (A unique DB constraint on the reference is the complete
-    // fix; this narrows the race to true simultaneity.)
+    // Idempotency: the gateway reference is stored in wallet_transactions.gateway_ref
+    // with a partial unique index. The pre-check below is a fast path; the unique
+    // constraint is the real guard — a 23505 from a concurrent settlement is treated
+    // as idempotent success (same pattern as the payments path above).
     const refTag = `${gateway.toUpperCase()}:${externalRef}`;
     const { data: priorCredit } = await admin
       .from('wallet_transactions')
       .select('id')
-      .eq('transaction_type', 'credit')
-      .ilike('description', `%${refTag}%`)
+      .eq('gateway_ref', refTag)
       .limit(1);
     if (priorCredit && priorCredit.length > 0) {
       return { settled: true, already: true };
@@ -191,8 +189,16 @@ export async function settlePayment(admin: Admin, input: SettleInput): Promise<S
       p_amount: amount,
       p_description: description ? `${description} [${refTag}]` : `${gateway.toUpperCase()} wallet top-up [${refTag}]`,
       p_payment_id: null,
+      p_gateway_ref: refTag,
     });
     if (error) {
+      // Unique violation on gateway_ref means a concurrent settlement already
+      // credited this reference — treat as idempotent success.
+      const isUniqueViolation = (error as any)?.code === '23505' ||
+        String((error as any)?.message || '').includes('uq_wallet_transactions_gateway_ref');
+      if (isUniqueViolation) {
+        return { settled: true, already: true };
+      }
       console.error('settlePayment wallet credit failed', error);
       return { settled: false, reason: 'wallet_credit_failed' };
     }
