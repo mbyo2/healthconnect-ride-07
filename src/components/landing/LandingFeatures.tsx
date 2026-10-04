@@ -276,7 +276,7 @@ export const Features = () => {
       icon: HeartPulse,
       title: "24/7 emergency ambulance & bed finder",
       desc: "In emergencies every second counts. Find the nearest open ICU hospital, track ambulance ETA, and alert physicians before you arrive.",
-      metrics: ["991 Emergency Dispatch", "Real-Time Bed Occupancy", "Trauma Ready"],
+      metrics: ["116 Emergency Dispatch", "Real-Time Bed Occupancy", "Trauma Ready"],
       badge: "24/7 Emergency",
       preview: (
         <div className="space-y-2.5">

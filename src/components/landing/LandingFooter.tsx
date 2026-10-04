@@ -167,7 +167,7 @@ const FOOTER_SECTIONS = [
   },
 ];
 
-const EMERGENCY_TEL = `tel:${import.meta.env.VITE_EMERGENCY_NUMBER || '991'}`;
+const EMERGENCY_TEL = `tel:${import.meta.env.VITE_EMERGENCY_NUMBER || '116'}`;
 
 export const LandingFooter = () => {
   return (

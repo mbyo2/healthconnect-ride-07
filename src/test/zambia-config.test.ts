@@ -31,7 +31,7 @@ describe('Zambia Configuration', () => {
 
   it('should have emergency numbers', () => {
     expect(ZAMBIA_CONFIG.emergencyNumbers.police).toBe('999');
-    expect(ZAMBIA_CONFIG.emergencyNumbers.ambulance).toBe('991');
+    expect(ZAMBIA_CONFIG.emergencyNumbers.ambulance).toBe('116');
     expect(ZAMBIA_CONFIG.emergencyNumbers.generalEmergency).toBe('112');
   });
 

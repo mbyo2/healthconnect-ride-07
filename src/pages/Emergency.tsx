@@ -128,7 +128,7 @@ const Emergency = () => {
   const startAlertCountdown = () => {
     if (isEmergencyActive || sendCountdown !== null) return;
     if (!user) {
-      toast.error('Sign in so the alert can be logged — or call 991 right now.');
+      toast.error('Sign in so the alert can be logged — or call 116 right now.');
       return;
     }
     setSendCountdown(5);
@@ -143,7 +143,7 @@ const Emergency = () => {
     // SOS must work even when geolocation is denied — the alert is logged
     // without coordinates and the call buttons below stay available.
     if (!user) {
-      toast.error('Sign in so the alert can be logged — or call 991 right now.');
+      toast.error('Sign in so the alert can be logged — or call 116 right now.');
       return;
     }
 
@@ -163,9 +163,9 @@ const Emergency = () => {
 
       if (error) {
         console.error('Error logging emergency:', error);
-        toast.error('Could not log the emergency — call 991 / 999 / 993 directly.');
+        toast.error('Could not log the emergency — call 116 / 999 / 993 directly.');
       } else {
-        toast.success('Emergency logged. Call 991 now — your contacts are listed below.');
+        toast.success('Emergency logged. Call 116 now — your contacts are listed below.');
       }
 
       // There is no SMS gateway yet: never claim contacts were texted or that
@@ -176,7 +176,7 @@ const Emergency = () => {
       }
     } catch (error) {
       console.error('Error triggering emergency:', error);
-      toast.error('Failed to log the emergency alert — call 991 directly.');
+      toast.error('Failed to log the emergency alert — call 116 directly.');
     }
   };
 
@@ -193,10 +193,10 @@ const Emergency = () => {
   return (
     <>
       <Helmet>
-        <title>Emergency Help in Zambia — Ambulance 991 | Doc' O Clock</title>
+        <title>Emergency Help in Zambia — Ambulance 116 | Doc' O Clock</title>
         <meta
           name="description"
-          content="Emergency help across Zambia: call 991 or 112, alert your contacts, share your location, and find 24h hospitals, ambulances, and pharmacies."
+          content="Emergency help across Zambia: call 116 or 112, alert your contacts, share your location, and find 24h hospitals, ambulances, and pharmacies."
         />
         <link rel="canonical" href="https://doc0clock.online/emergency" />
       </Helmet>
@@ -317,7 +317,7 @@ const Emergency = () => {
                       </Badge>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      No SMS was sent — if you can, call 991 now. Your contacts are listed below.
+                      No SMS was sent — if you can, call 116 now. Your contacts are listed below.
                     </p>
                     <p className="text-xs text-muted-foreground">
                       Pressed by mistake? The alert was only logged in the app — no emergency

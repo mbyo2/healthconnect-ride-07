@@ -158,7 +158,7 @@ const AIDiagnostics = () => {
                 <TriangleAlert className="h-4 w-4 text-warning-500" aria-hidden /> Important safety note
               </p>
               <p className="text-graphite-500 dark:text-slate-400 mt-0.5 leading-relaxed font-medium">
-                <strong className="text-slate-900 dark:text-slate-100">If this is an emergency, call 991 or 112 now.</strong>{" "}
+                <strong className="text-slate-900 dark:text-slate-100">If this is an emergency, call 116 or 112 now.</strong>{" "}
                 This AI assistant gives information only — it is not a doctor and cannot diagnose you.
                 Always confirm important health decisions with a qualified clinician.
               </p>

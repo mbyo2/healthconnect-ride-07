@@ -59,7 +59,7 @@ export const MobileLayout = ({ children, isLoading }: MobileLayoutProps) => {
         id="main-content"
         role="main"
         className={cn(
-          "flex-1 pt-14 overflow-y-auto overflow-x-hidden",
+          "flex-1 pt-16 overflow-y-auto overflow-x-hidden",
           isAuthenticated ? "pb-24" : "pb-6",
           "min-h-0"
         )}

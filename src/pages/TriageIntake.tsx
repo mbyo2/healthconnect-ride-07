@@ -311,7 +311,7 @@ export default function TriageIntake() {
                 <div>
                   <h3 className="font-extrabold text-sm text-error-500">Get emergency help now</h3>
                   <p className="text-xs text-slate-700 dark:text-slate-300 mt-1">
-                    {result.recommended_action} Call local emergency services (991 / 112) immediately.
+                    {result.recommended_action} Call local emergency services (116 / 112) immediately.
                   </p>
                 </div>
               </div>

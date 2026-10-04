@@ -595,7 +595,7 @@ export const PatientWorkflow = React.memo(() => {
                 className="rounded-full bg-rose-600 hover:bg-rose-700 font-extrabold text-xs"
               >
                 <Phone className="h-3.5 w-3.5" />
-                <span>Call Emergency (991)</span>
+                <span>Call Emergency (116)</span>
               </Button>
               <Button
                 variant="secondary"

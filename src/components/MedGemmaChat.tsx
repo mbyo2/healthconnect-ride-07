@@ -117,10 +117,14 @@ export const MedGemmaChat = ({ onActionClick, roleOverride }: MedGemmaChatProps)
     }
   }, [messages]);
 
-  // Auto-scroll to bottom
+  // Auto-scroll to bottom — the ref sits on the Radix ScrollArea *Root*
+  // (overflow-hidden, never scrolls); the real scroller is the inner viewport.
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    const root = scrollRef.current;
+    if (!root) return;
+    const viewport = root.querySelector('[data-radix-scroll-area-viewport]');
+    if (viewport) {
+      viewport.scrollTo({ top: viewport.scrollHeight, behavior: 'smooth' });
     }
   }, [messages]);
 

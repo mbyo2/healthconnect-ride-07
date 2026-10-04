@@ -18,8 +18,8 @@ export const ZAMBIA_CONFIG = {
   emergencyNumbers: {
     police: '999',
     fire: '993',
-    ambulance: '991',
-    trafficAccidents: '991',
+    ambulance: '116',
+    trafficAccidents: '116',
     generalEmergency: '112',
   },
 
@@ -131,7 +131,7 @@ export const ZAMBIA_CONFIG = {
     {
       id: 'ems-zambia',
       name: 'Emergency Medical Services Zambia',
-      phone: '991',
+      phone: '116',
       description: 'National ambulance emergency line',
       available24h: true,
     },

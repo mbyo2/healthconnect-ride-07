@@ -104,7 +104,7 @@ const EmergencyResponse = () => {
       toast.error("We could not save the emergency event, but you can still place the call.");
     }
 
-    const phoneNumber = (import.meta.env.VITE_EMERGENCY_NUMBER || "991").replace(/[^\d+]/g, "");
+    const phoneNumber = (import.meta.env.VITE_EMERGENCY_NUMBER || "116").replace(/[^\d+]/g, "");
     window.location.assign(`tel:${phoneNumber}`);
   };
 

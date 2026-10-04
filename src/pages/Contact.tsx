@@ -9,7 +9,7 @@ import { MapPin, Mail, Clock, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 
 const SUPPORT_EMAIL = "support@doc0clock.online";
-const EMERGENCY_NUMBER = import.meta.env.VITE_EMERGENCY_NUMBER || "991";
+const EMERGENCY_NUMBER = import.meta.env.VITE_EMERGENCY_NUMBER || "116";
 
 const Contact = () => {
   const [form, setForm] = useState({ firstName: "", lastName: "", email: "", subject: "", message: "" });
