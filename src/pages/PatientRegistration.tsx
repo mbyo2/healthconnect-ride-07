@@ -177,6 +177,8 @@ export const PatientRegistration = () => {
 
     if (isValid && currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
+    } else if (!isValid) {
+      showError("Please fix the highlighted fields before continuing.");
     }
   };
 
@@ -187,7 +189,17 @@ export const PatientRegistration = () => {
   };
 
   const handleSubmit = async () => {
-    if (!(await passwordForm.trigger())) return;
+    const passwordValid = await passwordForm.trigger();
+    if (!passwordValid) {
+      const errors = passwordForm.formState.errors;
+      const firstError =
+        errors.password?.message ||
+        errors.confirmPassword?.message ||
+        errors.termsAccepted?.message ||
+        "Please fix the highlighted fields before completing registration.";
+      showError(String(firstError));
+      return;
+    }
 
     setLoading(true);
 
