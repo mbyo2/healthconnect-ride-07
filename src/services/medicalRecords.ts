@@ -67,9 +67,9 @@ export const getHealthMetrics = async (): Promise<HealthMetric[]> => {
       // so patients see clinician-recorded vitals in their records.
       supabase
         .from('vital_signs')
-        .select('blood_pressure_systolic, blood_pressure_diastolic, heart_rate, temperature, respiratory_rate, oxygen_saturation, recorded_at, created_at')
+        .select('blood_pressure_systolic, blood_pressure_diastolic, heart_rate, temperature, respiratory_rate, oxygen_saturation, recorded_at')
         .eq('user_id', user.id)
-        .order('recorded_at', { ascending: false, nullsFirst: false })
+        .order('recorded_at', { ascending: false })
         .limit(10),
     ]);
 
@@ -90,7 +90,7 @@ export const getHealthMetrics = async (): Promise<HealthMetric[]> => {
     // Merge the latest clinician-recorded vitals (if any) that aren't already covered.
     const v = (vitals ?? [])[0] as any;
     if (v) {
-      const vDate = new Date(v.recorded_at || v.created_at).toLocaleDateString();
+      const vDate = new Date(v.recorded_at).toLocaleDateString();
       const has = (label: string) => result.some(r => r.label.toLowerCase().includes(label));
       if (v.blood_pressure_systolic && v.blood_pressure_diastolic && !has('blood pressure')) {
         result.push({ label: 'Blood Pressure', value: `${v.blood_pressure_systolic}/${v.blood_pressure_diastolic} mmHg`, date: vDate, status: 'Normal' });
