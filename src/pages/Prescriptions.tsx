@@ -2,7 +2,7 @@ import React, { useState, useMemo } from "react";
 import {
   Pill, Calendar, User, Clock, Download, Plus, FileText, Search,
   ExternalLink, Filter, CheckCircle2, AlertTriangle, Trash2, ShieldAlert,
-  Printer, ArrowRight, Sparkles, Info
+  Printer, ArrowRight, Sparkles, Info, CheckCircle
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useUserRoles } from "@/context/UserRolesContext";
@@ -68,6 +68,10 @@ export const Prescriptions = () => {
   const [searchPatient, setSearchPatient] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
+  const isPharmacistUser = availableRoles.some((r) =>
+    (PHARMACY_SIDE_ROLES as readonly string[]).includes(r)
+  );
+
   const [selectedPatient, setSelectedPatient] = useState<{ id: string; name: string; email: string } | null>(null);
   const [rxNotes, setRxNotes] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -112,7 +116,7 @@ export const Prescriptions = () => {
         .select(
           "id, medication_name, dosage, duration_days, prescribed_date, status, " +
           "refills_remaining, instructions, quantity, generic_name, strength, " +
-          "prescription_number, notes, patient_id, provider_id"
+          "prescription_number, notes, patient_id, provider_id, pharmacy_id"
         )
         .order("prescribed_date", { ascending: false });
 
@@ -895,6 +899,33 @@ export const Prescriptions = () => {
                         {/* Actions */}
                         <td className="py-3 px-3 text-center">
                           <div className="flex items-center justify-center gap-1.5">
+                            {!p.pharmacy_id && isPharmacistUser && (
+                              <button
+                                onClick={async () => {
+                                  if (!institutionId) {
+                                    toast.error("No pharmacy linked to your account.");
+                                    return;
+                                  }
+                                  if (!confirm(`Claim this prescription for your pharmacy?`)) return;
+                                  try {
+                                    const { error } = await (supabase as any)
+                                      .from("comprehensive_prescriptions")
+                                      .update({ pharmacy_id: institutionId, status: "assigned" })
+                                      .eq("id", p.id);
+                                    if (error) throw error;
+                                    toast.success("Prescription claimed.");
+                                    refetch();
+                                  } catch (e: any) {
+                                    toast.error(e.message || "Failed to claim prescription.");
+                                  }
+                                }}
+                                className="px-3 py-2.5 min-h-[44px] rounded-xl bg-success-500 hover:bg-success-600 text-white text-[11px] font-black transition-all active:scale-95 flex items-center gap-1"
+                                title="Claim this prescription for your pharmacy"
+                              >
+                                <CheckCircle className="h-3.5 w-3.5" />
+                                <span>Claim</span>
+                              </button>
+                            )}
                             <button
                               onClick={() => {
                                 // Find all medications in this prescription batch if part of a group
