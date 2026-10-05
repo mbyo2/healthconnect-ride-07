@@ -8,7 +8,9 @@ ON public.comprehensive_prescriptions
 FOR SELECT
 USING (
   pharmacy_id IS NULL
-  AND status IN ('pending', 'assigned')
+  -- Include dispensed statuses: PostgREST re-reads the row after UPDATE,
+  -- and a 'filled' row must remain visible or the UPDATE reports RLS violation.
+  AND status IN ('pending', 'assigned', 'processing', 'ready', 'filled', 'partially_filled', 'cancelled')
   AND NOT public.is_provider_suspended(auth.uid())
   AND EXISTS (
     SELECT 1 FROM public.user_roles
