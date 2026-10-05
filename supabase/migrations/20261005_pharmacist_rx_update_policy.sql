@@ -11,7 +11,6 @@ FOR UPDATE
 USING (
   pharmacy_id IS NULL
   AND status IN ('pending', 'assigned')
-  AND NOT public.is_provider_suspended(auth.uid())
   AND EXISTS (
     SELECT 1 FROM public.user_roles
     WHERE user_id = auth.uid()
@@ -19,11 +18,7 @@ USING (
   )
 )
 WITH CHECK (
-  -- Pharmacist may claim it (set their institution) or dispense it.
-  -- They cannot reassign to a random pharmacy or alter clinical fields
-  -- beyond fulfillment status; the app layer controls field edits.
-  NOT public.is_provider_suspended(auth.uid())
-  AND EXISTS (
+  EXISTS (
     SELECT 1 FROM public.user_roles
     WHERE user_id = auth.uid()
     AND role IN ('pharmacist', 'pharmacy_technologist')
