@@ -13,6 +13,8 @@ interface InstitutionRow {
   status: string | null;
   admin_id: string | null;
   created_at: string | null;
+  is_suspended: boolean | null;
+  suspension_reason: string | null;
   admin_email?: string | null;
   admin_name?: string | null;
 }
@@ -39,7 +41,7 @@ export const InstitutionManagement = () => {
     try {
       const { data, error } = await supabase
         .from("healthcare_institutions")
-        .select("id, name, type, city, is_verified, status, admin_id, created_at")
+        .select("id, name, type, city, is_verified, status, admin_id, created_at, is_suspended, suspension_reason")
         .order("created_at", { ascending: false })
         .limit(500);
       if (error) throw error;
@@ -90,12 +92,26 @@ export const InstitutionManagement = () => {
   const setSuspended = async (inst: InstitutionRow, suspended: boolean) => {
     setProcessing(inst.id);
     try {
+      // Reason required for suspension (write-block). Prompt if not provided.
+      let reason: string | null = null;
+      if (suspended) {
+        reason = window.prompt(
+          `Suspend "${inst.name}"? This will block all writes (staff can still view records for patient safety).\n\nEnter suspension reason:`
+        );
+        if (!reason || !reason.trim()) {
+          toast.error("A suspension reason is required.");
+          setProcessing(null);
+          return;
+        }
+        reason = reason.trim();
+      }
       const { error } = await (supabase as any).rpc("set_institution_suspended", {
         p_institution_id: inst.id,
         p_suspended: suspended,
+        p_reason: reason,
       });
       if (error) throw error;
-      toast.success(`Institution ${suspended ? "suspended" : "unsuspended"}`);
+      toast.success(`Institution ${suspended ? "suspended (write-blocked)" : "unsuspended"}`);
       fetchInstitutions();
     } catch (e: any) {
       toast.error("Failed: " + (e.message || "unknown error"));
@@ -186,7 +202,7 @@ export const InstitutionManagement = () => {
             </thead>
             <tbody>
               {filtered.map((inst) => {
-                const suspended = inst.status === "suspended";
+                const suspended = !!inst.is_suspended;
                 return (
                   <tr key={inst.id} className="border-t border-canvas-silk">
                     <td className="px-4 py-3">
@@ -194,6 +210,11 @@ export const InstitutionManagement = () => {
                       <div className="text-xs text-graphite-500 capitalize">
                         {inst.type?.replace(/_/g, " ")} {inst.city ? `· ${inst.city}` : ""}
                       </div>
+                      {suspended && inst.suspension_reason && (
+                        <div className="text-xs text-danger-500 mt-1">
+                          Reason: {inst.suspension_reason}
+                        </div>
+                      )}
                     </td>
                     <td className="px-4 py-3">
                       <div className="text-xs">
