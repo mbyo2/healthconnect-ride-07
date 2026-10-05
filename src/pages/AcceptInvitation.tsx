@@ -41,9 +41,7 @@ const AcceptInvitation = () => {
     }
     (async () => {
       const { data, error: invErr } = await (supabase as any)
-        .from("staff_invitations")
-        .select("id, email, staff_role, department_name, specialty, status, expires_at, institution_id")
-        .eq("token", token)
+        .rpc("get_invitation_by_token", { p_token: token })
         .maybeSingle();
 
       if (invErr || !data) {
@@ -53,12 +51,17 @@ const AcceptInvitation = () => {
       }
       setInvitation(data);
 
-      const { data: inst } = await supabase
-        .from("healthcare_institutions")
-        .select("name")
-        .eq("id", data.institution_id)
-        .maybeSingle();
-      if (inst?.name) setInstitutionName(inst.name);
+      // institution_name comes from the RPC; fall back to lookup if missing
+      if (data.institution_name) {
+        setInstitutionName(data.institution_name);
+      } else {
+        const { data: inst } = await supabase
+          .from("healthcare_institutions")
+          .select("name")
+          .eq("id", data.institution_id)
+          .maybeSingle();
+        if (inst) setInstitutionName((inst as any).name);
+      }
       setLoading(false);
     })();
   }, [token]);
