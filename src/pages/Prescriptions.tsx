@@ -117,7 +117,22 @@ export const Prescriptions = () => {
         .order("prescribed_date", { ascending: false });
 
       if (isProvider) {
-        query.or(`provider_id.eq.${user.id}${institutionId ? `,pharmacy_id.eq.${institutionId}` : ''}`);
+        // Providers see their own written prescriptions.
+        // Pharmacists ALSO see unassigned prescriptions (pharmacy_id IS NULL)
+        // so they can claim them — RLS policy "Pharmacists can view unassigned
+        // prescriptions" allows this.
+        const isPharmacist = availableRoles.some((r) =>
+          (PHARMACY_SIDE_ROLES as readonly string[]).includes(r)
+        );
+        if (isPharmacist) {
+          query.or(
+            `provider_id.eq.${user.id}` +
+            `${institutionId ? `,pharmacy_id.eq.${institutionId}` : ''}` +
+            `,and(pharmacy_id.is.null,status.in.(pending,assigned))`
+          );
+        } else {
+          query.or(`provider_id.eq.${user.id}${institutionId ? `,pharmacy_id.eq.${institutionId}` : ''}`);
+        }
       } else {
         query.eq("patient_id", user.id);
       }
