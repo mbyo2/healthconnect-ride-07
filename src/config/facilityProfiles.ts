@@ -420,8 +420,19 @@ const TYPE_TO_ARCHETYPE: Record<string, FacilityArchetype> = {
 
 export function getFacilityArchetype(type?: string | null): FacilityArchetype {
   if (!type) return 'clinic';
-  const key = String(type).toLowerCase().trim().replace(/[\s-]+/g, '_');
-  return TYPE_TO_ARCHETYPE[key] ?? 'clinic';
+  // Normalize: lowercase, trim, replace slashes/spaces/dashes with underscore,
+  // collapse multiple underscores. Handles display names like
+  // "Blood Bank / Transfusion Service" -> "blood_bank_transfusion_service".
+  const key = String(type).toLowerCase().trim().replace(/[\s\/-]+/g, '_').replace(/_+/g, '_');
+  // Direct match first.
+  if (TYPE_TO_ARCHETYPE[key]) return TYPE_TO_ARCHETYPE[key];
+  // Fallback: try matching by prefix (e.g. "blood_bank_transfusion_service"
+  // should match "blood_bank"). Check longest keys first.
+  const sortedKeys = Object.keys(TYPE_TO_ARCHETYPE).sort((a, b) => b.length - a.length);
+  for (const k of sortedKeys) {
+    if (key.startsWith(k + '_') || key === k) return TYPE_TO_ARCHETYPE[k];
+  }
+  return 'clinic';
 }
 
 export function getFacilityProfile(type?: string | null): FacilityProfile {
