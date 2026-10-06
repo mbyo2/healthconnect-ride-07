@@ -258,6 +258,35 @@ const InstitutionSettings = () => {
       // table (drives marketplace + staffing), not a text array.
       await saveInstitutionSpecialties(institution.id, selectedSpecialtyIds, primarySpecialtyId);
 
+      // Update local institution state with saved values immediately.
+      // This prevents the context-refresh effect from reverting the form
+      // to stale data if refreshInstitution returns cached values.
+      setInstitution((prev: any) => prev ? {
+        ...prev,
+        name: formData.name,
+        address: formData.address,
+        phone: formData.phone,
+        email: formData.email,
+        website: formData.website,
+        currency: formData.currency,
+        city: formData.city,
+        country: formData.country,
+        operating_hours: formData.operating_hours,
+        accepted_insurance_providers: formData.accepted_insurance_providers,
+        list_in_marketplace: formData.list_in_marketplace,
+        services_offered: formData.services_offered,
+        equipment_available: formData.equipment_available,
+        languages_spoken: formData.languages_spoken,
+        number_of_beds: formData.number_of_beds ? parseInt(formData.number_of_beds, 10) : null,
+        number_of_staff: formData.number_of_staff ? parseInt(formData.number_of_staff, 10) : null,
+        emergency_services: formData.emergency_services,
+        ambulance_services: formData.ambulance_services,
+        is_24_7: formData.is_24_7,
+        accreditation_body: formData.accreditation_body || null,
+        accreditation_number: formData.accreditation_number || null,
+        accreditation_expiry_date: formData.accreditation_expiry_date || null,
+      } : prev);
+
       await refreshInstitution?.();
       toast.success("Settings saved successfully");
     } catch (error: any) {
