@@ -7,7 +7,8 @@ import {
   Package, ShoppingCart, BarChart3, Truck, ClipboardList, Activity,
   Baby, Dumbbell, Ticket, Share2, Layers, Tv,
   DollarSign, Wrench, FileCode, Clock, CreditCard, Network,
-  BookOpen, FileText, Calculator, CheckCircle2, Hourglass, Droplet
+  BookOpen, FileText, Calculator, CheckCircle2, Hourglass, Droplet,
+  Siren, BedDouble
 } from "lucide-react";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { QuickActions } from "@/components/institution/QuickActions";
@@ -159,6 +160,47 @@ const TYPE_CONFIG: Record<string, ArchetypeConfig> = {
       { label: "Staff", path: "/institution/personnel", icon: <Users className="h-4 w-4" /> },
       { label: "Appointments", path: "/institution/appointments", icon: <Calendar className="h-4 w-4" /> },
       { label: "Reports", path: "/institution/reports", icon: <BarChart3 className="h-4 w-4" /> },
+      { label: "Settings", path: "/institution/settings", icon: <Settings className="h-4 w-4" /> },
+    ],
+  },
+  dialysis_centre: {
+    label: "Dialysis Centre", color: "#0ea5e9", icon: <Activity className="h-5 w-5" />,
+    primaryAction: { label: "Dialysis Schedule", path: "/institution/appointments", icon: <Calendar className="h-3.5 w-3.5" /> },
+    quickLinks: [
+      { label: "Dialysis Schedule", path: "/institution/appointments", icon: <Calendar className="h-4 w-4" /> },
+      { label: "Patients", path: "/institution/patients", icon: <UserRound className="h-4 w-4" /> },
+      { label: "Lab Results", path: "/lab-management", icon: <FlaskConical className="h-4 w-4" /> },
+      { label: "Prescriptions", path: "/prescriptions", icon: <Pill className="h-4 w-4" /> },
+      { label: "Queue Desk", path: "/institution-dashboard?tab=queue", icon: <Ticket className="h-4 w-4" /> },
+      { label: "Personnel", path: "/institution/personnel", icon: <Users className="h-4 w-4" /> },
+      { label: "Settings", path: "/institution/settings", icon: <Settings className="h-4 w-4" /> },
+    ],
+  },
+  dental_clinic: {
+    label: "Dental Clinic", color: "#38bdf8", icon: <Stethoscope className="h-5 w-5" />,
+    primaryAction: { label: "Day List", path: "/institution/appointments", icon: <Calendar className="h-3.5 w-3.5" /> },
+    quickLinks: [
+      { label: "Day List", path: "/institution/appointments", icon: <Calendar className="h-4 w-4" /> },
+      { label: "Queue Desk", path: "/institution-dashboard?tab=queue", icon: <Ticket className="h-4 w-4" /> },
+      { label: "Patients", path: "/institution/patients", icon: <UserRound className="h-4 w-4" /> },
+      { label: "Prescriptions", path: "/prescriptions", icon: <Pill className="h-4 w-4" /> },
+      { label: "Imaging", path: "/institution-dashboard?tab=lis_ris", icon: <Activity className="h-4 w-4" /> },
+      { label: "Billing", path: "/wallet", icon: <DollarSign className="h-4 w-4" /> },
+      { label: "Settings", path: "/institution/settings", icon: <Settings className="h-4 w-4" /> },
+    ],
+  },
+  trauma_centre: {
+    label: "Trauma & Emergency", color: "#ef4444", icon: <Siren className="h-5 w-5" />,
+    primaryAction: { label: "Emergency Triage", path: "/institution-dashboard?tab=emergency", icon: <Siren className="h-3.5 w-3.5" /> },
+    quickLinks: [
+      { label: "Emergency Triage", path: "/institution-dashboard?tab=emergency", icon: <Siren className="h-4 w-4" /> },
+      { label: "Ambulance Dispatch", path: "/institution-dashboard?tab=ambulance", icon: <Truck className="h-4 w-4" /> },
+      { label: "Operating Theatre", path: "/institution-dashboard?tab=theatre", icon: <Activity className="h-4 w-4" /> },
+      { label: "IPD / Beds", path: "/institution-dashboard?tab=ipd", icon: <BedDouble className="h-4 w-4" /> },
+      { label: "Imaging", path: "/institution-dashboard?tab=lis_ris", icon: <FlaskConical className="h-4 w-4" /> },
+      { label: "Blood Bank", path: "/institution-dashboard?tab=blood_bank", icon: <Droplet className="h-4 w-4" /> },
+      { label: "Patients", path: "/institution/patients", icon: <UserRound className="h-4 w-4" /> },
+      { label: "Personnel", path: "/institution/personnel", icon: <Users className="h-4 w-4" /> },
       { label: "Settings", path: "/institution/settings", icon: <Settings className="h-4 w-4" /> },
     ],
   },

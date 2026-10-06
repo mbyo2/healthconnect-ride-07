@@ -24,7 +24,10 @@ export type FacilityArchetype =
   | 'general_hospital'
   | 'pharmacy'
   | 'diagnostics'
-  | 'long_term_care';
+  | 'long_term_care'
+  | 'dialysis_centre'
+  | 'dental_clinic'
+  | 'trauma_centre';
 
 /** HMS module keys — these match the tab values in HospitalManagement. */
 export const HMS_MODULES = [
@@ -290,6 +293,90 @@ export const FACILITY_PROFILES: Record<FacilityArchetype, FacilityProfile> = {
       lab: 'optional',
     }),
   },
+
+  dialysis_centre: {
+    archetype: 'dialysis_centre',
+    label: 'Dialysis / Renal Centre',
+    summary:
+      'Scheduled haemodialysis sessions: patient scheduling, machine allocation, session monitoring, and nephrology reviews.',
+    journey: [
+      'Patient referred and assessed by nephrologist',
+      'Dialysis schedule created (e.g. 3x weekly)',
+      'Pre-dialysis vitals and weight recorded',
+      'Dialysis session run with machine monitoring',
+      'Post-dialysis assessment and next appointment',
+    ],
+    staffRoles: ['doctor', 'nurse', 'nephrologist', 'dialysis_technician', 'receptionist', 'billing_clerk'],
+    modules: modules('atypical', {
+      emr: 'core',
+      opd: 'core',
+      appointments: 'core',
+      billing: 'core',
+      staff: 'core',
+      lab: 'core',
+      pharmacy: 'optional',
+      insurance: 'optional',
+      mis: 'optional',
+    }),
+  },
+
+  dental_clinic: {
+    archetype: 'dental_clinic',
+    label: 'Dental Clinic',
+    summary:
+      'Outpatient dental care: consultations, procedures (fillings, extractions, cleanings), and treatment plans.',
+    journey: [
+      'Patient books or walks in',
+      'Dental examination and X-rays if needed',
+      'Treatment plan discussed and consented',
+      'Procedure performed and recorded',
+      'Prescription and follow-up appointment',
+    ],
+    staffRoles: ['dentist', 'dental_assistant', 'receptionist', 'billing_clerk'],
+    modules: modules('atypical', {
+      emr: 'core',
+      opd: 'core',
+      appointments: 'core',
+      billing: 'core',
+      radiology: 'optional',
+      pharmacy: 'optional',
+      lab: 'optional',
+      insurance: 'optional',
+      mis: 'optional',
+    }),
+  },
+
+  trauma_centre: {
+    archetype: 'trauma_centre',
+    label: 'Trauma & Emergency Centre',
+    summary:
+      '24/7 emergency and trauma care: triage, resuscitation, emergency surgery, and inpatient stabilization.',
+    journey: [
+      'Patient arrives via ambulance or walk-in',
+      'Emergency triage and resuscitation',
+      'Investigations (imaging, labs) and specialist review',
+      'Emergency procedure or surgery if needed',
+      'Admission to ward/ICU or discharge with follow-up',
+    ],
+    staffRoles: ['doctor', 'nurse', 'emergency_physician', 'surgeon', 'paramedic', 'radiologist', 'lab_technician', 'pharmacist', 'billing_clerk'],
+    modules: modules('atypical', {
+      emr: 'core',
+      emergency: 'core',
+      opd: 'core',
+      ipd: 'core',
+      beds: 'core',
+      billing: 'core',
+      staff: 'core',
+      lab: 'core',
+      radiology: 'core',
+      pharmacy: 'core',
+      theatre: 'core',
+      ambulance: 'core',
+      blood_bank: 'optional',
+      insurance: 'optional',
+      mis: 'optional',
+    }),
+  },
 };
 
 /** Maps a stored institution/provider type onto a facility archetype.
@@ -320,7 +407,7 @@ const TYPE_TO_ARCHETYPE: Record<string, FacilityArchetype> = {
 
   // Clinics (private & specialised outpatient)
   clinic: 'clinic',
-  dental_clinic: 'clinic',
+  dental_clinic: 'dental_clinic',
   eye_clinic: 'clinic',
   skin_clinic: 'clinic',
   dermatology_clinic: 'clinic',
@@ -374,12 +461,13 @@ const TYPE_TO_ARCHETYPE: Record<string, FacilityArchetype> = {
   childrens_hospital: 'specialty_hospital',
   paediatric_hospital: 'specialty_hospital',
   orthopaedic_hospital: 'specialty_hospital',
-  dialysis_centre: 'specialty_hospital',
-  dialysis_center: 'specialty_hospital',
+  dialysis_centre: 'dialysis_centre',
+  dialysis_center: 'dialysis_centre',
   surgical_centre: 'specialty_hospital',
   day_surgery: 'specialty_hospital',
   day_surgery_centre: 'specialty_hospital',
-  trauma_centre: 'general_hospital',
+  trauma_centre: 'trauma_centre',
+  trauma_center: 'trauma_centre',
   fertility_clinic: 'clinic',
   vaccination_centre: 'clinic',
   health_screening_centre: 'clinic',
