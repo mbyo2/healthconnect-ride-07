@@ -44,11 +44,8 @@ export const PrescriptionWriter = () => {
     queryKey: ["writer-patients", patientSearch],
     queryFn: async () => {
       if (!patientSearch || patientSearch.length < 2) return [];
-      const { data } = await supabase
-        .from("profiles")
-        .select("id, first_name, last_name, email")
-        .or(`first_name.ilike.%${patientSearch}%,last_name.ilike.%${patientSearch}%,email.ilike.%${patientSearch}%`)
-        .limit(8);
+      const { data } = await (supabase as any)
+        .rpc("search_patients_for_provider", { p_search: patientSearch });
       return data || [];
     },
     enabled: patientSearch.length >= 2,
@@ -376,4 +373,4 @@ export const PrescriptionWriter = () => {
       </form>
     </Card>
   );
-};
+};
