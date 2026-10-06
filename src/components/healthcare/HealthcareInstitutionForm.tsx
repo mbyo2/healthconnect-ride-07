@@ -266,6 +266,7 @@ export const HealthcareInstitutionForm = () => {
       const institution = {
         ...formData,
         type: formData.type as any,
+        type_code: formData.type, // Preserve exact type for dashboard routing
         admin_id: user.id,
         is_verified: false,
         operating_hours: {},
