@@ -288,7 +288,7 @@ export const HealthcareInstitutionForm = () => {
           .insert({
             institution_id: (institutionData as any).id,
             user_id: user.id,
-            role: 'institution_admin',
+            role: 'admin',
             status: 'active',
           });
       }

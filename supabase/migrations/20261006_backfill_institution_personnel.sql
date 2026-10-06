@@ -5,7 +5,7 @@
 -- ============================================================
 
 INSERT INTO public.institution_personnel (institution_id, user_id, role, status)
-SELECT hi.id, hi.admin_id, 'institution_admin', 'active'
+SELECT hi.id, hi.admin_id, 'admin', 'active'
 FROM public.healthcare_institutions hi
 WHERE hi.name LIKE 'QAX%'
   AND hi.admin_id IS NOT NULL
