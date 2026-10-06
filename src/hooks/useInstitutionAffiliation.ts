@@ -23,6 +23,21 @@ export function useInstitutionAffiliation() {
 
     const check = async () => {
       try {
+        // 1. Check if user is institution admin/owner
+        const { data: owned } = await supabase
+          .from('healthcare_institutions')
+          .select('id')
+          .eq('admin_id', user.id)
+          .limit(1)
+          .maybeSingle();
+
+        if (owned?.id) {
+          setIsInstitutionAffiliated(true);
+          setInstitutionId(owned.id);
+          return;
+        }
+
+        // 2. Check institution_staff
         const { data, error } = await supabase
           .from('institution_staff')
           .select('institution_id')
@@ -33,6 +48,21 @@ export function useInstitutionAffiliation() {
         if (!error && data?.institution_id) {
           setIsInstitutionAffiliated(true);
           setInstitutionId(data.institution_id);
+          return;
+        }
+
+        // 3. Check institution_personnel (legacy + signup-created)
+        const { data: personnel } = await supabase
+          .from('institution_personnel')
+          .select('institution_id')
+          .eq('user_id', user.id)
+          .eq('status', 'active')
+          .limit(1)
+          .maybeSingle();
+
+        if (personnel?.institution_id) {
+          setIsInstitutionAffiliated(true);
+          setInstitutionId(personnel.institution_id);
         } else {
           setIsInstitutionAffiliated(false);
           setInstitutionId(null);
