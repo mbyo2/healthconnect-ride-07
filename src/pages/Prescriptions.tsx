@@ -60,7 +60,7 @@ const COMMON_DRUGS = [
 export const Prescriptions = () => {
   const { user } = useAuth();
   const { availableRoles } = useUserRoles();
-  const { institutionId } = useInstitutionContext();
+  const { institutionId, affiliations } = useInstitutionContext();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [showNewPrescription, setShowNewPrescription] = useState(false);
@@ -71,6 +71,22 @@ export const Prescriptions = () => {
   const isPharmacistUser = availableRoles.some((r) =>
     (PHARMACY_SIDE_ROLES as readonly string[]).includes(r)
   );
+
+  // The dispense queue spans ALL of the pharmacist's pharmacy affiliations
+  // (owned + staff) — not just the active workspace. The institution hook
+  // defaults the active workspace to the admin affiliation, so a pharmacist
+  // who was auto-provisioned a personal pharmacy AND is employed at another
+  // pharmacy would otherwise never see prescriptions assigned to the
+  // employer's pharmacy.
+  const pharmacyAffiliationIds = useMemo(() => {
+    const ids = affiliations
+      .filter((a) => (a.type || "").toLowerCase().includes("pharm"))
+      .map((a) => a.id);
+    if (ids.length === 0 && institutionId && !ids.includes(institutionId)) {
+      return [institutionId]; // safe fallback while affiliations resolve
+    }
+    return ids;
+  }, [affiliations, institutionId]);
 
   const [selectedPatient, setSelectedPatient] = useState<{ id: string; name: string; email: string } | null>(null);
   const [rxNotes, setRxNotes] = useState("");
@@ -103,7 +119,7 @@ export const Prescriptions = () => {
     );
 
   const { data: prescriptions = [], isLoading, isError, refetch } = useQuery({
-    queryKey: ["prescriptions", user?.id, isProvider],
+    queryKey: ["prescriptions", user?.id, isProvider, institutionId, pharmacyAffiliationIds.join(",")],
     queryFn: async () => {
       if (!user) return [];
       // NOTE: comprehensive_prescriptions.(patient_id|provider_id) FK at
@@ -129,9 +145,11 @@ export const Prescriptions = () => {
           (PHARMACY_SIDE_ROLES as readonly string[]).includes(r)
         );
         if (isPharmacist) {
+          const pharmacyFilter = pharmacyAffiliationIds.length > 0
+            ? `,pharmacy_id.in.(${pharmacyAffiliationIds.join(",")})`
+            : "";
           query.or(
-            `provider_id.eq.${user.id}` +
-            `${institutionId ? `,pharmacy_id.eq.${institutionId}` : ''}` +
+            `provider_id.eq.${user.id}${pharmacyFilter}` +
             `,and(pharmacy_id.is.null,status.in.(pending,assigned))`
           );
         } else {
