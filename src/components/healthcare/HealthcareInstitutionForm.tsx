@@ -280,6 +280,19 @@ export const HealthcareInstitutionForm = () => {
 
       if (institutionError) throw institutionError;
 
+      // Add the creator as institution admin in personnel table
+      // (required for queue tokens, staff checks, and other institution-scoped features)
+      if (institutionData) {
+        await supabase
+          .from("institution_personnel" as any)
+          .insert({
+            institution_id: (institutionData as any).id,
+            user_id: user.id,
+            role: 'institution_admin',
+            status: 'active',
+          });
+      }
+
       // Provision the HMS workspace immediately (departments per facility
       // type) — identical for marketplace-listed and HMS-only facilities.
       if (institutionData) {
