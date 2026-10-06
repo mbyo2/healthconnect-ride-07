@@ -152,10 +152,7 @@ export function PrescriptionFulfillment() {
       return;
     }
     const { data } = await supabase
-      .from("profiles")
-      .select("id, first_name, last_name, email")
-      .or(`first_name.ilike.%${query}%,last_name.ilike.%${query}%,email.ilike.%${query}%`)
-      .limit(8);
+      .rpc("search_patients_for_provider", { p_search: query });
     setPatientList(data || []);
   };
 

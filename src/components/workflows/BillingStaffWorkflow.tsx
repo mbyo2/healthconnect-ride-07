@@ -61,10 +61,7 @@ export const BillingStaffWorkflow = () => {
     setLoadingCharges(true);
     try {
       const { data: profiles } = await supabase
-        .from("profiles")
-        .select("id, first_name, last_name")
-        .or(`first_name.ilike.%${patientName}%,last_name.ilike.%${patientName}%`)
-        .limit(1);
+        .rpc("search_patients_for_provider", { p_search: patientName.trim() });
 
       if (profiles && profiles.length > 0) {
         const patientId = profiles[0].id;
