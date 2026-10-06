@@ -256,7 +256,7 @@ export default function StaffDashboard() {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-gray-800 border-b sticky top-16 z-40">
+      <div className="bg-white dark:bg-gray-800 border-b sticky top-[64px] z-40 scroll-mt-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex gap-1 overflow-x-auto">
             {config.tabs.map((tab) => (

@@ -11,6 +11,14 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Prevent sticky header from obscuring tab/anchor targets.
+   The main header is sticky top-0 z-50 (~64px tall). */
+section[id],
+div[id],
+main {
+  scroll-margin-top: 80px;
+}
+
 /* Google-grade interaction defaults: visible keyboard focus everywhere,
    calm motion for users who request it, tabular figures for money/data. */
 :focus-visible {
