@@ -157,9 +157,8 @@ const LabOrders = () => {
     onError: (e: any) => toast.error(e.message || "Failed to place lab order"),
   });
 
-  if (!canOrder) {
-    return <Navigate to="/provider-dashboard" replace />;
-  }
+  // Access control is handled by RouteGuard requireRoles in App.tsx.
+  // The canOrder check here is redundant and causes issues with role loading timing.
 
   return (
     <div className="min-h-screen bg-canvas dark:bg-slate-950 p-4 sm:p-6 font-sans">
