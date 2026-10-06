@@ -147,12 +147,18 @@ const LabManagement = () => {
   const { data: patients } = useQuery({
     queryKey: ["lab-patients"],
     queryFn: async () => {
+      // Only fetch patients who have lab orders (not all patients)
+      // This prevents patient enumeration by lab staff
+      const { data: labOrders } = await supabase
+        .from("lab_tests")
+        .select("patient_id")
+        .limit(200);
+      const patientIds = [...new Set((labOrders || []).map((o: any) => o.patient_id).filter(Boolean))];
+      if (patientIds.length === 0) return [];
       const { data } = await supabase
         .from("profiles")
         .select("id, first_name, last_name, email")
-        .eq("role", "patient")
-        .order("created_at", { ascending: false })
-        .limit(200);
+        .in("id", patientIds);
       return data || [];
     },
   });

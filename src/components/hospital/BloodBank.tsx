@@ -45,11 +45,14 @@ export const BloodBank = ({ hospital }: { hospital: any }) => {
   const { data: auditLog, loading: auditLoading, refresh: refreshAudit } = useHospitalModule<any>("blood_bank_audit", "hospital_id", hospital?.id, { orderBy: "issued_at", ascending: false });
   const { nameFor } = usePatientNames(requests.map((r) => r.patient_id));
 
-  // Load patient list for the request form.
+  // Load patient list for the request form - only patients with transfusion requests
   React.useEffect(() => {
     (async () => {
       try {
-        const { data } = await supabase.from("profiles").select("id, first_name, last_name").eq("role", "patient").order("last_name").limit(200);
+        const { data: requests } = await supabase.from("blood_requests").select("patient_id").limit(200);
+        const patientIds = [...new Set((requests || []).map((r: any) => r.patient_id).filter(Boolean))];
+        if (patientIds.length === 0) { setPatients([]); return; }
+        const { data } = await supabase.from("profiles").select("id, first_name, last_name").in("id", patientIds);
         setPatients(data || []);
       } catch { /* non-fatal */ }
     })();
