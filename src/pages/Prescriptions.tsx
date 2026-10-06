@@ -177,10 +177,7 @@ export const Prescriptions = () => {
     queryFn: async () => {
       if (!searchPatient || searchPatient.length < 2) return [];
       const { data } = await supabase
-        .from("profiles")
-        .select("id, first_name, last_name, email")
-        .or(`first_name.ilike.%${searchPatient}%,last_name.ilike.%${searchPatient}%,email.ilike.%${searchPatient}%`)
-        .limit(10);
+        .rpc("search_patients_for_provider", { p_search: searchPatient });
       return data || [];
     },
     enabled: isProvider && searchPatient.length >= 2,
