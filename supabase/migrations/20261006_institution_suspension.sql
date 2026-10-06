@@ -65,6 +65,10 @@ BEGIN
       USING ERRCODE = '42501';
   END IF;
 
+  -- BEFORE DELETE triggers must return OLD (NEW is NULL for deletes).
+  IF TG_OP = 'DELETE' THEN
+    RETURN OLD;
+  END IF;
   RETURN NEW;
 END;
 $function$;
