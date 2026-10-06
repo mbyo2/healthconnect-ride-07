@@ -44,8 +44,12 @@ export const PrescriptionWriter = () => {
     queryKey: ["writer-patients", patientSearch],
     queryFn: async () => {
       if (!patientSearch || patientSearch.length < 2) return [];
-      const { data } = await (supabase as any)
+      const { data, error } = await (supabase as any)
         .rpc("search_patients_for_provider", { p_search: patientSearch });
+      if (error) {
+        console.error("Patient search failed:", error);
+        return [];
+      }
       return data || [];
     },
     enabled: patientSearch.length >= 2,
