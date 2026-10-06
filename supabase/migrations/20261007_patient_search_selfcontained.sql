@@ -1,14 +1,20 @@
--- Self-contained relationship-gated patient search.
--- Inlines all relationship checks so the function has ZERO dependencies
--- on other custom functions or tables. Previous version depended on
--- public.has_patient_relationship(); if that helper was missing or broken
--- live, every search raised "function does not exist" and the UI showed
--- empty results. This version cannot fail that way.
+-- Self-contained relationship-gated patient search (v2).
+--
+-- v2 fix: caller classification. The signup trigger grants EVERY new auth
+-- user a 'patient' row in user_roles, so testing "caller HAS patient role"
+-- misclassifies doctors (and all clinical staff) as patients — they fell
+-- into the patient-only branch and could only see themselves. Verified live
+-- 2026-10-06: a doctor searching "QAX39" got their OWN profile back instead
+-- of their linked patient.
+--
+-- Correct rule: a caller is clinical/staff iff they hold ANY non-patient
+-- role. Only callers with no non-patient role get the patient-only branch.
 --
 -- Access rules (per CEO patient-privacy boundary):
---  - patient-role callers: only their own row (no enumeration)
+--  - patient-only callers: only their own row (no enumeration)
 --  - clinical/staff callers: only patients with a legitimate relationship
---    (appointment, prescription, lab order, referral, or platform admin/support)
+--    (appointment, prescription, lab order, referral, check-in,
+--     or platform admin/support)
 
 CREATE OR REPLACE FUNCTION public.search_patients_for_provider(p_search text)
 RETURNS TABLE(id uuid, first_name text, last_name text, email text)
@@ -16,19 +22,20 @@ LANGUAGE plpgsql SECURITY DEFINER SET search_path TO 'public'
 AS $function$
 DECLARE
   v_caller uuid;
-  v_is_patient boolean;
+  v_is_clinical boolean;
 BEGIN
   v_caller := auth.uid();
   IF v_caller IS NULL THEN
     RETURN; -- unauthenticated: no results
   END IF;
 
-  -- Is the caller a patient-role user? (explicit patient role only;
-  -- clinical users may also carry a patient row from signup triggers)
+  -- Clinical/staff = holds ANY role other than 'patient'.
+  -- (Signup triggers give everyone a patient role, so the mere presence
+  -- of a patient role proves nothing.)
   SELECT EXISTS (
     SELECT 1 FROM public.user_roles ur
-    WHERE ur.user_id = v_caller AND ur.role = 'patient'
-  ) INTO v_is_patient;
+    WHERE ur.user_id = v_caller AND ur.role <> 'patient'
+  ) INTO v_is_clinical;
 
   -- Best-effort audit: only if the audit table exists, never block search
   BEGIN
@@ -49,8 +56,8 @@ BEGIN
     NULL; -- audit must never break search
   END;
 
-  -- Patient users: only themselves, no enumeration of other patients
-  IF v_is_patient THEN
+  -- Patient-only callers: themselves only, no enumeration of other patients
+  IF NOT v_is_clinical THEN
     RETURN QUERY
     SELECT p.id, p.first_name, p.last_name, p.email
     FROM public.profiles p
@@ -62,7 +69,7 @@ BEGIN
     RETURN;
   END IF;
 
-  -- Clinical / staff / admin users: only patients with a real relationship
+  -- Clinical / staff / admin callers: only patients with a real relationship
   RETURN QUERY
   SELECT p.id, p.first_name, p.last_name, p.email
   FROM public.profiles p
@@ -118,4 +125,4 @@ END;
 $function$;
 
 COMMENT ON FUNCTION public.search_patients_for_provider(text) IS
-  'Relationship-gated patient search (self-contained, no helper dependencies): clinical/staff users only see patients they have a legitimate relationship with (appointment, prescription, lab order, referral, check-in). Patient users can only see themselves. Audit is best-effort.';
+  'Relationship-gated patient search (self-contained v2): clinical/staff = any non-patient role (signup triggers grant everyone a patient role). Clinical callers only see patients with a legitimate relationship. Patient-only callers see just themselves. Audit is best-effort.';
