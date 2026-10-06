@@ -925,7 +925,7 @@ export const Prescriptions = () => {
                                   try {
                                     const { error } = await (supabase as any)
                                       .from("comprehensive_prescriptions")
-                                      .update({ pharmacy_id: institutionId, status: "assigned" })
+                                      .update({ pharmacy_id: institutionId, status: "pending" })
                                       .eq("id", p.id);
                                     if (error) throw error;
                                     toast.success("Prescription claimed.");
