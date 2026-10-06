@@ -983,6 +983,9 @@ export const getRoleNavigation = (userRoles: UserRole[] | null) => {
     // ── Hospital/Clinic/Nursing Home routes ──
     { path: '/hospital-management', label: 'Hospital Management', icon: 'Building', roles: ['admin', 'institution_admin', 'institution_staff', 'super_admin'] },
 
+    // ── Staff role dashboards (dedicated per-role UX) ──
+    { path: '/staff-dashboard', label: 'Dashboard', icon: 'LayoutDashboard', roles: ['receptionist', 'billing_staff', 'hr_manager', 'cxo', 'support', 'ambulance_staff', 'triage_staff', 'ot_staff', 'maintenance_manager', 'inventory_manager', 'super_admin'] },
+
     // ── General Institution routes ──
     { path: '/institution-dashboard', label: 'Institution Dashboard', icon: 'LayoutDashboard', roles: ['institution_admin', 'institution_staff', 'medical_records_officer', 'cxo', 'receptionist', 'hr_manager', 'billing_staff', 'triage_staff', 'ot_staff', 'maintenance_manager', 'inventory_manager', 'ambulance_staff', 'super_admin'] },
     { path: '/institution/personnel', label: 'Personnel', icon: 'Users', roles: ['institution_admin', 'institution_staff', 'hr_manager', 'super_admin'] },

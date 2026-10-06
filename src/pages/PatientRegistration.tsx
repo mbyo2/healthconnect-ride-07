@@ -739,7 +739,7 @@ export const PatientRegistration = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-xs font-extrabold">Password</FormLabel>
-                  <FormControl><Input {...field} type="password" className="h-9 text-xs" /></FormControl>
+                  <FormControl><Input {...field} type="password" autoComplete="new-password" className="h-9 text-xs" /></FormControl>
                   <FormMessage className="text-[10px]" />
                 </FormItem>
               )}
@@ -750,7 +750,7 @@ export const PatientRegistration = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-xs font-extrabold">Confirm Password</FormLabel>
-                  <FormControl><Input {...field} type="password" className="h-9 text-xs" /></FormControl>
+                  <FormControl><Input {...field} type="password" autoComplete="new-password" className="h-9 text-xs" /></FormControl>
                   <FormMessage className="text-[10px]" />
                 </FormItem>
               )}

@@ -120,19 +120,19 @@ export const ROLE_META: Record<UserRole, RoleMeta> = {
   // ── Facility operations ──
   [USER_ROLES.INSTITUTION_ADMIN]:   { label: 'Institution Admin',   icon: 'Building',        category: 'institution', landingPage: '/institution-dashboard' },
   [USER_ROLES.INSTITUTION_STAFF]:   { label: 'Institution Staff',   icon: 'Building',        category: 'institution', landingPage: '/institution-dashboard' },
-  [USER_ROLES.RECEPTIONIST]:        { label: 'Receptionist',        icon: 'Phone',           category: 'institution', landingPage: '/institution-dashboard' },
-  [USER_ROLES.HR_MANAGER]:          { label: 'HR Manager',          icon: 'Users',           category: 'institution', landingPage: '/institution-dashboard' },
-  [USER_ROLES.CXO]:                 { label: 'CXO',                 icon: 'Crown',           category: 'institution', landingPage: '/institution-dashboard' },
-  [USER_ROLES.OT_STAFF]:            { label: 'OT Staff',            icon: 'Scissors',        category: 'institution', landingPage: '/institution-dashboard' },
-  [USER_ROLES.BILLING_STAFF]:       { label: 'Billing Staff',       icon: 'Receipt',         category: 'institution', landingPage: '/institution-dashboard' },
-  [USER_ROLES.INVENTORY_MANAGER]:   { label: 'Inventory Manager',   icon: 'Package',         category: 'institution', landingPage: '/institution-dashboard' },
-  [USER_ROLES.TRIAGE_STAFF]:        { label: 'Triage Staff',        icon: 'AlertTriangle',   category: 'institution', landingPage: '/institution-dashboard' },
-  [USER_ROLES.MAINTENANCE_MANAGER]: { label: 'Maintenance Manager', icon: 'Wrench',          category: 'institution', landingPage: '/institution-dashboard' },
-  [USER_ROLES.AMBULANCE_STAFF]:     { label: 'Ambulance Staff',     icon: 'Truck',           category: 'institution', landingPage: '/institution-dashboard' },
+  [USER_ROLES.RECEPTIONIST]:        { label: 'Receptionist',        icon: 'Phone',           category: 'institution', landingPage: '/staff-dashboard' },
+  [USER_ROLES.HR_MANAGER]:          { label: 'HR Manager',          icon: 'Users',           category: 'institution', landingPage: '/staff-dashboard' },
+  [USER_ROLES.CXO]:                 { label: 'CXO',                 icon: 'Crown',           category: 'institution', landingPage: '/staff-dashboard' },
+  [USER_ROLES.OT_STAFF]:            { label: 'OT Staff',            icon: 'Scissors',        category: 'institution', landingPage: '/staff-dashboard' },
+  [USER_ROLES.BILLING_STAFF]:       { label: 'Billing Staff',       icon: 'Receipt',         category: 'institution', landingPage: '/staff-dashboard' },
+  [USER_ROLES.INVENTORY_MANAGER]:   { label: 'Inventory Manager',   icon: 'Package',         category: 'institution', landingPage: '/staff-dashboard' },
+  [USER_ROLES.TRIAGE_STAFF]:        { label: 'Triage Staff',        icon: 'AlertTriangle',   category: 'institution', landingPage: '/staff-dashboard' },
+  [USER_ROLES.MAINTENANCE_MANAGER]: { label: 'Maintenance Manager', icon: 'Wrench',          category: 'institution', landingPage: '/staff-dashboard' },
+  [USER_ROLES.AMBULANCE_STAFF]:     { label: 'Ambulance Staff',     icon: 'Truck',           category: 'institution', landingPage: '/staff-dashboard' },
   // ── Platform administration ──
   [USER_ROLES.ADMIN]:               { label: 'Admin',               icon: 'Shield',          category: 'admin',       landingPage: '/admin-dashboard' },
   [USER_ROLES.SUPER_ADMIN]:         { label: 'Super Admin',         icon: 'ShieldCheck',     category: 'admin',       landingPage: '/super-admin-dashboard' },
-  [USER_ROLES.SUPPORT]:             { label: 'Support',             icon: 'Headphones',      category: 'admin',       landingPage: '/admin-dashboard' },
+  [USER_ROLES.SUPPORT]:             { label: 'Support',             icon: 'Headphones',      category: 'admin',       landingPage: '/staff-dashboard' },
 };
 
 // ─── Role priority (lower = higher priority for landing page selection) ─

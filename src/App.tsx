@@ -100,6 +100,7 @@ const InstitutionPortal = lazyWithRetry(() => import('@/pages/InstitutionPortal'
 const InstitutionRegistration = lazyWithRetry(() => import('@/pages/InstitutionRegistration'));
 const InstitutionStatus = lazyWithRetry(() => import('@/pages/InstitutionStatus'));
 const InstitutionDashboard = lazyWithRetry(() => import('@/pages/InstitutionDashboard'));
+const StaffDashboard = lazyWithRetry(() => import('@/pages/StaffDashboard'));
 const InstitutionPersonnel = lazyWithRetry(() => import('@/pages/InstitutionPersonnel'));
 const InstitutionPatients = lazyWithRetry(() => import('@/pages/InstitutionPatients'));
 const InstitutionReports = lazyWithRetry(() => import('@/pages/InstitutionReports'));
@@ -312,6 +313,7 @@ const AppContent = () => {
             <Route path="/institution-registration" element={<RouteGuard><InstitutionRegistration /></RouteGuard>} />
             <Route path="/institution-status" element={<RouteGuard><InstitutionStatus /></RouteGuard>} />
             <Route path="/institution-dashboard" element={<RouteGuard><InstitutionDashboard /></RouteGuard>} />
+            <Route path="/staff-dashboard" element={<RouteGuard><StaffDashboard /></RouteGuard>} />
             <Route path="/institution/personnel" element={<RouteGuard><InstitutionPersonnel /></RouteGuard>} />
             <Route path="/institution/patients" element={<RouteGuard><InstitutionPatients /></RouteGuard>} />
             <Route path="/institution/reports" element={<RouteGuard><InstitutionReports /></RouteGuard>} />
