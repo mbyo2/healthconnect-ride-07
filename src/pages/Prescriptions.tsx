@@ -921,7 +921,6 @@ export const Prescriptions = () => {
                                     toast.error("No pharmacy linked to your account.");
                                     return;
                                   }
-                                  if (!confirm(`Claim this prescription for your pharmacy?`)) return;
                                   try {
                                     const { error } = await (supabase as any)
                                       .from("comprehensive_prescriptions")
