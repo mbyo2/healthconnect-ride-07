@@ -440,6 +440,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
   // ── Support ──────────────────────────────────────────────
   [USER_ROLES.SUPPORT]: dedupeRoutes([
     ...COMMON_ROUTES,
+    '/staff-dashboard',
     '/admin-dashboard',
     '/chat',
     '/search',
@@ -701,12 +702,14 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
 // New role permissions (INSTITUTION_OPERATIONAL_ROUTES imported from config)
 
 ROLE_PERMISSIONS[USER_ROLES.RECEPTIONIST] = dedupeRoutes([
+  '/staff-dashboard',
   ...INSTITUTION_OPERATIONAL_ROUTES,
   '/appointments',
   '/appointments/:id',
 ]);
 
 ROLE_PERMISSIONS[USER_ROLES.HR_MANAGER] = dedupeRoutes([
+  '/staff-dashboard',
   ...INSTITUTION_OPERATIONAL_ROUTES,
   '/institution/personnel',
   '/institution/reports',
@@ -716,6 +719,7 @@ ROLE_PERMISSIONS[USER_ROLES.HR_MANAGER] = dedupeRoutes([
 ]);
 
 ROLE_PERMISSIONS[USER_ROLES.CXO] = dedupeRoutes([
+  '/staff-dashboard',
   ...INSTITUTION_OPERATIONAL_ROUTES,
   ...INSTITUTION_MANAGEMENT_ROUTES, // network admin surface (multi-center, finance, ZRA…)
   '/institution/reports',
@@ -731,6 +735,7 @@ ROLE_PERMISSIONS[USER_ROLES.CXO] = dedupeRoutes([
 ]);
 
 ROLE_PERMISSIONS[USER_ROLES.OT_STAFF] = dedupeRoutes([
+  '/staff-dashboard',
   ...COMMON_ROUTES,
   '/institution-dashboard',
   '/appointments',
@@ -751,6 +756,7 @@ ROLE_PERMISSIONS[USER_ROLES.PHLEBOTOMIST] = dedupeRoutes([
 ]);
 
 ROLE_PERMISSIONS[USER_ROLES.BILLING_STAFF] = dedupeRoutes([
+  '/staff-dashboard',
   ...INSTITUTION_OPERATIONAL_ROUTES,
   '/pharmacy-portal',   // DB is_pharmacy_operator() includes billing staff
   '/wallet',
@@ -759,6 +765,7 @@ ROLE_PERMISSIONS[USER_ROLES.BILLING_STAFF] = dedupeRoutes([
 ]);
 
 ROLE_PERMISSIONS[USER_ROLES.INVENTORY_MANAGER] = dedupeRoutes([
+  '/staff-dashboard',
   ...INSTITUTION_OPERATIONAL_ROUTES,
   '/pharmacy-portal',   // DB is_pharmacy_operator() includes inventory managers
   '/pharmacy-inventory',
@@ -767,6 +774,7 @@ ROLE_PERMISSIONS[USER_ROLES.INVENTORY_MANAGER] = dedupeRoutes([
 ]);
 
 ROLE_PERMISSIONS[USER_ROLES.TRIAGE_STAFF] = dedupeRoutes([
+  '/staff-dashboard',
   ...COMMON_ROUTES,
   '/institution-dashboard',
   '/appointments',
@@ -778,6 +786,7 @@ ROLE_PERMISSIONS[USER_ROLES.TRIAGE_STAFF] = dedupeRoutes([
 ]);
 
 ROLE_PERMISSIONS[USER_ROLES.MAINTENANCE_MANAGER] = dedupeRoutes([
+  '/staff-dashboard',
   ...INSTITUTION_OPERATIONAL_ROUTES,
   '/institution/devices',
   '/institution/reports',
@@ -795,6 +804,7 @@ ROLE_PERMISSIONS[USER_ROLES.SPECIALIST] = dedupeRoutes([
 ]);
 
 ROLE_PERMISSIONS[USER_ROLES.AMBULANCE_STAFF] = dedupeRoutes([
+  '/staff-dashboard',
   ...COMMON_ROUTES,
   '/institution-dashboard',
   '/emergency',
@@ -829,7 +839,7 @@ export const ROLE_LANDING_PAGES: Record<string, string> = {
   [USER_ROLES.INSTITUTION_ADMIN]: '/institution-dashboard',
   [USER_ROLES.INSTITUTION_STAFF]: '/institution-dashboard',
   [USER_ROLES.SUPER_ADMIN]: '/super-admin-dashboard',
-  [USER_ROLES.SUPPORT]: '/admin-dashboard',
+  [USER_ROLES.SUPPORT]: '/staff-dashboard',
   [USER_ROLES.DOCTOR]: '/provider-dashboard',
   [USER_ROLES.SPECIALIST]: '/provider-dashboard',
   [USER_ROLES.MEDICAL_LICENTIATE]: '/provider-dashboard',
