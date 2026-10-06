@@ -739,7 +739,18 @@ export const PatientRegistration = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-xs font-extrabold">Password</FormLabel>
-                  <FormControl><Input {...field} type="password" autoComplete="new-password" className="h-9 text-xs" /></FormControl>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      autoComplete="new-password"
+                      className="h-9 text-xs"
+                      name={field.name}
+                      value={field.value ?? ""}
+                      onChange={field.onChange}
+                      onBlur={field.onBlur}
+                      ref={field.ref}
+                    />
+                  </FormControl>
                   <FormMessage className="text-[10px]" />
                 </FormItem>
               )}
@@ -750,7 +761,18 @@ export const PatientRegistration = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-xs font-extrabold">Confirm Password</FormLabel>
-                  <FormControl><Input {...field} type="password" autoComplete="new-password" className="h-9 text-xs" /></FormControl>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      autoComplete="new-password"
+                      className="h-9 text-xs"
+                      name={field.name}
+                      value={field.value ?? ""}
+                      onChange={field.onChange}
+                      onBlur={field.onBlur}
+                      ref={field.ref}
+                    />
+                  </FormControl>
                   <FormMessage className="text-[10px]" />
                 </FormItem>
               )}
