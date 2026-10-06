@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
+import { useUserRoles } from "@/context/UserRolesContext";
 import {
   Users, Calendar, Clock, Phone, Ticket, CreditCard, FileText,
   BarChart3, Settings, Wrench, Package, Truck, Siren, Heart,
@@ -257,12 +258,14 @@ const ROLE_CONFIGS: Record<string, RoleConfig> = {
 
 export const StaffDashboard = () => {
   const { user, profile } = useAuth();
+  const { availableRoles } = useUserRoles();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
   const [metrics, setMetrics] = useState<Record<string, number | string>>({});
 
-  const userRole = (profile?.role || user?.user_metadata?.role || "").toLowerCase();
+  // Get role from user_roles (authoritative) or profile fallback
+  const userRole = (availableRoles[0] || profile?.role || user?.user_metadata?.role || "").toLowerCase();
   const config = ROLE_CONFIGS[userRole] || ROLE_CONFIGS["receptionist"];
 
   useEffect(() => {
