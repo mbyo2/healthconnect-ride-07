@@ -161,12 +161,12 @@ const AppointmentRemindersPage = () => {
                 <div>
                   <p className="font-extrabold text-xs flex items-center gap-2">
                     SMS Text Reminders
-                    <span className="px-1.5 py-0.5 rounded bg-warning-500/15 text-warning-600 text-[10px] font-bold">Coming soon</span>
+                    <span className="px-1.5 py-0.5 rounded bg-success-500/15 text-success-600 text-[10px] font-bold">Live</span>
                   </p>
-                  <p className="text-[11px] text-graphite-500 dark:text-slate-400">No SMS gateway is connected yet — enable it to be first in line when live delivery lands</p>
+                  <p className="text-[11px] text-graphite-500 dark:text-slate-400">Delivered via Africa's Talking SMS gateway</p>
                 </div>
               </div>
-              <Switch checked={smsReminders} disabled aria-label="SMS text reminders (coming soon — no live gateway yet)" />
+              <Switch checked={smsReminders} onCheckedChange={setSmsReminders} aria-label="SMS text reminders" />
             </div>
 
             <div className="flex items-center justify-between p-3.5 rounded-xl border border-canvas-silk bg-canvas dark:bg-slate-950">
