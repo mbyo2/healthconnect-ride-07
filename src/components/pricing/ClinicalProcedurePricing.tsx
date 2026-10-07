@@ -9,6 +9,7 @@ interface ProcedurePrice {
   default_price: number;
   custom_price: number | null;
   is_active: boolean;
+  is_custom?: boolean;
 }
 
 /**
@@ -20,6 +21,10 @@ export function ClinicalProcedurePricing({ institutionId }: { institutionId: str
   const [procedures, setProcedures] = useState<ProcedurePrice[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState<string | null>(null);
+  const [showAdd, setShowAdd] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [newPrice, setNewPrice] = useState("");
+  const [adding, setAdding] = useState(false);
 
   useEffect(() => {
     if (!institutionId) return;
@@ -27,7 +32,7 @@ export function ClinicalProcedurePricing({ institutionId }: { institutionId: str
       setLoading(true);
       try {
         const [{ data: catalog, error: catErr }, { data: pricing, error: priceErr }] = await Promise.all([
-          supabase.from("clinical_procedures").select("id, procedure_name, default_price").order("procedure_name"),
+          supabase.from("clinical_procedures").select("id, procedure_name, default_price, institution_id").order("procedure_name"),
           supabase.from("institution_procedure_pricing").select("procedure_id, price, is_active").eq("institution_id", institutionId),
         ]);
         if (catErr) throw catErr;
@@ -40,6 +45,7 @@ export function ClinicalProcedurePricing({ institutionId }: { institutionId: str
             default_price: Number(c.default_price) || 0,
             custom_price: priceMap.has(c.id) ? Number((priceMap.get(c.id) as any).price) : null,
             is_active: priceMap.has(c.id) ? (priceMap.get(c.id) as any).is_active !== false : true,
+            is_custom: !!c.institution_id,
           }))
         );
       } catch (e) {
@@ -50,6 +56,50 @@ export function ClinicalProcedurePricing({ institutionId }: { institutionId: str
       }
     })();
   }, [institutionId]);
+
+  const addCustomProcedure = async () => {
+    const name = newName.trim();
+    const price = Math.max(0, Number(newPrice) || 0);
+    if (!name) {
+      toast.error("Enter a procedure name");
+      return;
+    }
+    setAdding(true);
+    try {
+      const { data, error } = await supabase
+        .from("clinical_procedures")
+        .insert({
+          procedure_name: name,
+          default_price: price,
+          institution_id: institutionId,
+        } as any)
+        .select("id, procedure_name, default_price")
+        .single();
+      if (error) throw error;
+      setProcedures((prev) =>
+        [
+          ...prev,
+          {
+            procedure_id: (data as any).id,
+            procedure_name: (data as any).procedure_name,
+            default_price: Number((data as any).default_price) || 0,
+            custom_price: null,
+            is_active: true,
+            is_custom: true,
+          },
+        ].sort((a, b) => a.procedure_name.localeCompare(b.procedure_name))
+      );
+      setNewName("");
+      setNewPrice("");
+      setShowAdd(false);
+      toast.success(`"${name}" added at K${price.toLocaleString()}`);
+    } catch (e: any) {
+      console.error("Failed to add procedure:", e);
+      toast.error(`Failed to add procedure: ${e?.message || "unknown error"}`);
+    } finally {
+      setAdding(false);
+    }
+  };
 
   const savePrice = async (proc: ProcedurePrice, newPrice: number | null) => {
     setSaving(proc.procedure_id);
@@ -130,10 +180,50 @@ export function ClinicalProcedurePricing({ institutionId }: { institutionId: str
 
   return (
     <div className="space-y-3">
-      <p className="text-xs text-slate-500">
-        Set your institution's prices for each clinical procedure. Leave blank to use the system default.
-        These prices appear on patient bills.
-      </p>
+      <div className="flex items-start justify-between gap-3">
+        <p className="text-xs text-slate-500">
+          Set your institution's prices for each clinical procedure. Leave blank to use the system default.
+          These prices appear on patient bills.
+        </p>
+        <button
+          onClick={() => setShowAdd(!showAdd)}
+          className="shrink-0 px-3 py-1.5 rounded-lg bg-primary-500 text-white text-xs font-bold hover:bg-primary-600"
+        >
+          {showAdd ? "Cancel" : "+ Add Custom Procedure"}
+        </button>
+      </div>
+      {showAdd && (
+        <div className="p-3 rounded-xl border border-primary-500/20 bg-primary-50 dark:bg-primary-950/20 flex flex-col sm:flex-row gap-2 items-end">
+          <div className="flex-1 w-full">
+            <label className="text-xs font-bold text-slate-500">Procedure name</label>
+            <input
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
+              placeholder="e.g. Wound Dressing"
+              className="w-full mt-1 px-2 py-1.5 rounded-md border text-sm"
+            />
+          </div>
+          <div className="w-full sm:w-32">
+            <label className="text-xs font-bold text-slate-500">Price (K)</label>
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              value={newPrice}
+              onChange={(e) => setNewPrice(e.target.value)}
+              placeholder="0.00"
+              className="w-full mt-1 px-2 py-1.5 rounded-md border text-sm text-right font-bold"
+            />
+          </div>
+          <button
+            onClick={addCustomProcedure}
+            disabled={adding || !newName.trim()}
+            className="px-4 py-1.5 rounded-lg bg-primary-500 text-white text-xs font-bold hover:bg-primary-600 disabled:opacity-50"
+          >
+            {adding ? "Adding..." : "Add"}
+          </button>
+        </div>
+      )}
       <div className="rounded-xl border overflow-hidden">
         <table className="w-full text-sm">
           <thead>
@@ -149,7 +239,14 @@ export function ClinicalProcedurePricing({ institutionId }: { institutionId: str
               const effective = p.custom_price ?? p.default_price;
               return (
                 <tr key={p.procedure_id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                  <td className="py-2 px-3 font-medium">{p.procedure_name}</td>
+                  <td className="py-2 px-3 font-medium">
+                    {p.procedure_name}
+                    {p.is_custom && (
+                      <span className="ml-2 text-[10px] font-bold px-1.5 py-0.5 rounded bg-primary-100 text-primary-600 dark:bg-primary-900">
+                        CUSTOM
+                      </span>
+                    )}
+                  </td>
                   <td className="py-2 px-3 text-right text-slate-500">K{p.default_price.toLocaleString()}</td>
                   <td className="py-2 px-3">
                     <input
