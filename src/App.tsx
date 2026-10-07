@@ -97,6 +97,8 @@ const ICUPage = lazyWithRetry(() => import('@/pages/ICU'));
 const MaternalChildPage = lazyWithRetry(() => import('@/pages/MaternalChildPage'));
 const IPDWards = lazyWithRetry(() => import('@/pages/IPDWards'));
 const ImagingPage = lazyWithRetry(() => import('@/pages/Imaging'));
+const TeachingResearchPage = lazyWithRetry(() => import('@/pages/TeachingResearchPage'));
+const ProcurementPage = lazyWithRetry(() => import('@/pages/Procurement'));
 const Map = lazyWithRetry(() => import('@/pages/Map'));
 const NotificationsPage = lazyWithRetry(() => import('@/pages/NotificationsPage'));
 const PrivacySecurityPage = lazyWithRetry(() => import('@/pages/PrivacySecurityPage'));
@@ -314,6 +316,8 @@ const AppContent = () => {
             <Route path="/maternal-child" element={<RouteGuard requireRoles={['doctor', 'midwife', 'nurse', 'clinical_officer']}><MaternalChildPage /></RouteGuard>} />
             <Route path="/ipd-wards" element={<RouteGuard requireRoles={['doctor', 'nurse', 'clinical_officer', 'receptionist']}><IPDWards /></RouteGuard>} />
             <Route path="/imaging" element={<RouteGuard requireRoles={['doctor', 'specialist', 'medical_licentiate', 'clinical_officer', 'dentist', 'radiologist']}><ImagingPage /></RouteGuard>} />
+            <Route path="/teaching-research" element={<RouteGuard requireRoles={['doctor', 'specialist', 'institution_admin']}><TeachingResearchPage /></RouteGuard>} />
+            <Route path="/procurement" element={<RouteGuard requireRoles={['institution_admin', 'inventory_manager', 'cxo']}><ProcurementPage /></RouteGuard>} />
 
             {/* Additional User Pages */}
             <Route path="/notifications" element={<RouteGuard><NotificationsPage /></RouteGuard>} />

@@ -72,6 +72,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/icu',                 // ICU bed & observation management
     '/ipd-wards',           // inpatient ward & bed management
     '/theatre',             // operating theatre schedule & OT booking
+    '/teaching-research',    // teaching hospital: rotations, research, case discussions
     '/opd',                 // outpatient queue, triage & check-in
     '/prescriptions',       // doctors can prescribe
     '/ai-diagnostics',      // clinical decision support
@@ -90,6 +91,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/referrals',           // refer patients to facilities & specialists
     '/icu',                 // ICU bed & observation management
     '/theatre',             // operating theatre schedule & OT booking
+    '/teaching-research',    // teaching hospital: rotations, research, case discussions
     '/opd',                 // outpatient queue, triage & check-in
     '/prescriptions',       // specialists can prescribe
     '/ai-diagnostics',      // clinical decision support
@@ -237,6 +239,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     ...COMMON_ROUTES,
     '/institution-portal',
     '/institution-dashboard',
+    '/teaching-research',    // teaching hospital: rotations, research, case discussions
     '/institution-registration',
     '/institution-status',
     '/institution/personnel',
@@ -253,6 +256,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/search',
     '/healthcare-institutions',
     '/hospital-management',
+    '/procurement',            // purchase orders & supplier management
     '/pharmacy-inventory',     // medical supplies inventory
     '/medications',
     ...INSTITUTION_MANAGEMENT_ROUTES, // network admin surface (multi-center, finance, ZRA…)
@@ -332,6 +336,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/wallet',
     '/medical-records',
     '/hospital-management',
+    '/procurement',            // purchase orders & supplier management
     '/pharmacy-inventory',
     '/medications',
   ]),
@@ -383,6 +388,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/wallet',
     '/medical-records',
     '/hospital-management',
+    '/procurement',            // purchase orders & supplier management
     '/pharmacy-inventory',
     '/medications',
   ]),
