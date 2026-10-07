@@ -91,6 +91,10 @@ const HospitalManagement = lazyWithRetry(() => import('@/pages/HospitalManagemen
 const LabManagement = lazyWithRetry(() => import('@/pages/LabManagement'));
 const LabOrders = lazyWithRetry(() => import('@/pages/LabOrders'));
 const Referrals = lazyWithRetry(() => import('@/pages/Referrals'));
+const ICUPage = lazyWithRetry(() => import('@/pages/ICU'));
+const MaternalChildPage = lazyWithRetry(() => import('@/pages/MaternalChildPage'));
+const IPDWards = lazyWithRetry(() => import('@/pages/IPDWards'));
+const ImagingPage = lazyWithRetry(() => import('@/pages/Imaging'));
 const Map = lazyWithRetry(() => import('@/pages/Map'));
 const NotificationsPage = lazyWithRetry(() => import('@/pages/NotificationsPage'));
 const PrivacySecurityPage = lazyWithRetry(() => import('@/pages/PrivacySecurityPage'));
@@ -302,6 +306,10 @@ const AppContent = () => {
             <Route path="/lab-management" element={<RouteGuard><LabManagement /></RouteGuard>} />
             <Route path="/lab-orders" element={<RouteGuard requireRoles={['doctor', 'specialist', 'medical_licentiate', 'clinical_officer', 'dentist', 'radiologist']}><LabOrders /></RouteGuard>} />
             <Route path="/referrals" element={<RouteGuard requireRoles={['doctor', 'specialist', 'medical_licentiate', 'clinical_officer', 'dentist', 'radiologist']}><Referrals /></RouteGuard>} />
+            <Route path="/icu" element={<RouteGuard requireRoles={['doctor', 'specialist', 'medical_licentiate', 'clinical_officer', 'nurse', 'registered_nurse', 'enrolled_nurse']}><ICUPage /></RouteGuard>} />
+            <Route path="/maternal-child" element={<RouteGuard requireRoles={['doctor', 'midwife', 'nurse', 'clinical_officer']}><MaternalChildPage /></RouteGuard>} />
+            <Route path="/ipd-wards" element={<RouteGuard requireRoles={['doctor', 'nurse', 'clinical_officer', 'receptionist']}><IPDWards /></RouteGuard>} />
+            <Route path="/imaging" element={<RouteGuard requireRoles={['doctor', 'specialist', 'medical_licentiate', 'clinical_officer', 'dentist', 'radiologist']}><ImagingPage /></RouteGuard>} />
 
             {/* Additional User Pages */}
             <Route path="/notifications" element={<RouteGuard><NotificationsPage /></RouteGuard>} />

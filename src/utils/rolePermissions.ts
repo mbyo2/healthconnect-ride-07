@@ -68,18 +68,21 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     ...PROVIDER_CORE_ROUTES,
     '/lab-orders',          // order lab tests & receive results
     '/referrals',           // refer patients to facilities & specialists
+    '/ipd-wards',           // inpatient ward & bed management
     '/prescriptions',       // doctors can prescribe
     '/ai-diagnostics',      // clinical decision support
     '/telemedicine',
     '/medications',
     '/health-analytics',    // patient trends & outcomes
-  ]),
+      '/maternal-child',     // ANC/delivery/immunization registers
+]),
 
   // ── Specialist (same scope as Doctor) ────────────────────
   [USER_ROLES.SPECIALIST]: dedupeRoutes([
     ...COMMON_ROUTES,
     ...PROVIDER_CORE_ROUTES,
     '/lab-orders',          // order lab tests & receive results
+    '/imaging',             // order imaging & receive radiology reports
     '/referrals',           // refer patients to facilities & specialists
     '/prescriptions',       // specialists can prescribe
     '/ai-diagnostics',      // clinical decision support
@@ -93,16 +96,19 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     ...COMMON_ROUTES,
     ...PROVIDER_CORE_ROUTES,
     '/medications',         // medication administration
+    '/ipd-wards',           // inpatient ward & bed management
     '/iot-monitoring',      // vitals monitoring
     '/health-analytics',    // patient health trends
     '/telemedicine',
-  ]),
+      '/maternal-child',     // ANC/delivery/immunization registers
+]),
 
   // ── Radiologist ──────────────────────────────────────────
   [USER_ROLES.RADIOLOGIST]: dedupeRoutes([
     ...COMMON_ROUTES,
     ...PROVIDER_CORE_ROUTES,
     '/lab-orders',          // order imaging-correlated lab tests
+    '/imaging',             // imaging orders & radiology reporting
     '/referrals',           // refer patients to facilities & specialists
     '/ai-diagnostics',      // imaging AI support
     '/medications',
@@ -279,6 +285,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/wallet',
     '/medical-records',
     '/hospital-management',
+    '/ipd-wards',           // inpatient ward & bed management
     '/pharmacy-inventory',
     '/medications',
   ]),
@@ -471,12 +478,14 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     ...PROVIDER_CORE_ROUTES,
     '/lab-orders',          // order lab tests & receive results
     '/referrals',           // refer patients to facilities & specialists
+    '/ipd-wards',           // inpatient ward & bed management
     '/prescriptions',       // licensed to prescribe
     '/ai-diagnostics',
     '/telemedicine',
     '/medications',
     '/health-analytics',
-  ]),
+      '/maternal-child',     // ANC/delivery/immunization registers
+]),
 
   // ── Dentist / Dental Surgeon (HPCZ) ──────────────────────────
   [USER_ROLES.DENTIST]: dedupeRoutes([
@@ -528,7 +537,8 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/iot-monitoring',
     '/health-analytics',
     '/telemedicine',
-  ]),
+      '/maternal-child',     // ANC/delivery/immunization registers
+]),
 
   // ── Pharmacy Technologist / Dispenser (HPCZ) ─────────────────
   [USER_ROLES.PHARMACY_TECHNOLOGIST]: dedupeRoutes([
