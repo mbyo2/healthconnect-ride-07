@@ -70,7 +70,7 @@ export function ClinicalProcedurePricing({ institutionId }: { institutionId: str
             price: newPrice,
             currency: "ZMW",
             is_active: true,
-            effective_from: new Date().toISOString(),
+            effective_from: new Date().toISOString().split("T")[0],
           } as any,
           { onConflict: "institution_id,procedure_id" }
         );
