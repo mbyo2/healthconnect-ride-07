@@ -55,6 +55,7 @@ export const ReferralManagement = ({ hospital }: { hospital: any }) => {
   const [patientSearch, setPatientSearch] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [searching, setSearching] = useState(false);
+  const [selectedPatientName, setSelectedPatientName] = useState("");
   // Fallback patient search via relationship-gated RPC (for providers
   // without facility-registered patients, e.g. standalone /referrals page)
   const searchPatients = async (query: string) => {
@@ -165,12 +166,14 @@ export const ReferralManagement = ({ hospital }: { hospital: any }) => {
   );
 
   const ReferralRow = ({ item: r, actions }: { item: any; actions?: React.ReactNode }) => {
-    // Patient name lookup: facility list → search results → fallback to raw id
+    // Patient name lookup: facility list → search results → selected name → fallback to raw id
     const nameFor = (patientId: string) => {
       const p = (patients || []).find((x: any) => x.id === patientId)
         || searchResults.find((x: any) => x.id === patientId);
-      return p ? `${p.first_name || ""} ${p.last_name || ""}`.trim() || p.full_name || patientId
-               : (patientId || "Patient");
+      if (p) return `${p.first_name || ""} ${p.last_name || ""}`.trim() || p.full_name || patientId;
+      // For the just-created referral, use the name captured at selection time
+      if (form.patient_id === patientId && selectedPatientName) return selectedPatientName;
+      return patientId || "Patient";
     };
     return (
     <Card key={r.id}>
@@ -259,9 +262,11 @@ export const ReferralManagement = ({ hospital }: { hospital: any }) => {
                       <button
                         key={p.id}
                         onClick={() => {
+                          const name = `${p.first_name || ""} ${p.last_name || ""}`.trim();
                           setForm({ ...form, patient_id: p.id });
                           setSearchResults([]);
-                          setPatientSearch(`${p.first_name || ""} ${p.last_name || ""}`.trim());
+                          setPatientSearch(name);
+                          setSelectedPatientName(name);
                         }}
                         className="w-full text-left px-3 py-2 hover:bg-slate-50 text-sm"
                       >
