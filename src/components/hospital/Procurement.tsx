@@ -221,8 +221,31 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-lg font-extrabold">Procurement Test</h2>
-      <p>Orders: {orders.length}, Suppliers: {suppliers.length}</p>
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <div className="flex items-center gap-2">
+          <div className="p-2.5 rounded-xl bg-primary-500/10 text-primary-600">
+            <ShoppingCart className="h-5 w-5" />
+          </div>
+          <div>
+            <h2 className="text-lg font-extrabold">Procurement</h2>
+            <p className="text-xs text-graphite-500">
+              {orders.length} purchase orders · {suppliers.filter((s) => s.is_active).length} active suppliers
+            </p>
+          </div>
+        </div>
+      </div>
+      <div className="flex gap-2">
+        {(["orders", "suppliers"] as const).map((t) => (
+          <button
+            key={t}
+            onClick={() => setActiveTab(t)}
+            className="px-4 py-2 rounded-xl text-xs font-extrabold"
+          >
+            {t === "orders" ? `Purchase Orders (${orders.length})` : `Suppliers (${suppliers.length})`}
+          </button>
+        ))}
+      </div>
+      <p className="text-xs">Tabs render OK. Active: {activeTab}</p>
     </div>
   );
 };
