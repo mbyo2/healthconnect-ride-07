@@ -6,8 +6,9 @@ import { safeCryptoUUID } from "@/utils/storage";
 import { providerDisplayName } from "@/utils/providerDisplay";
 import {
   Pill, AlertTriangle, CheckCircle, Package, Plus, Trash2,
-  Printer, Search, User, FileText, CheckCircle2
+  Printer, Search, User, FileText, CheckCircle2, Receipt
 } from "lucide-react";
+import { downloadReceiptPdf } from "@/utils/receiptPdf";
 import { useInstitutionContext } from "@/hooks/useInstitutionContext";
 import { useAuth } from "@/context/AuthContext";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
@@ -40,7 +41,7 @@ interface MedicationItem {
 
 export function PrescriptionFulfillment() {
   const { user } = useAuth();
-  const { institutionId, loading: institutionLoading } = useInstitutionContext();
+  const { institution, institutionId, loading: institutionLoading } = useInstitutionContext();
   const [prescriptions, setPrescriptions] = useState<Prescription[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
@@ -669,6 +670,32 @@ export function PrescriptionFulfillment() {
                       title="Print Dispensing Slip"
                     >
                       <Printer className="h-3.5 w-3.5" />
+                    </button>
+                    <button
+                      onClick={() =>
+                        downloadReceiptPdf({
+                          title: "Prescription Dispensing",
+                          receiptNumber: p.prescription_number || p.id.slice(0, 8).toUpperCase(),
+                          date: p.dispensed_date || p.prescribed_date || new Date().toISOString(),
+                          issuerName: institution?.name || "Doc'O Clock Pharmacy",
+                          customerName: p.patient_name || "Patient",
+                          items: [
+                            {
+                              description: p.medication_name || "Medication",
+                              quantity: p.quantity || 1,
+                              unitPrice: p.unit_price || 0,
+                              note: p.dosage ? `Dosage: ${p.dosage}` : undefined,
+                            },
+                          ],
+                          paymentMethod: p.payment_method || undefined,
+                          notes: p.prescription_number ? `Rx: ${p.prescription_number}` : undefined,
+                          servedBy: p.dispensed_by || undefined,
+                        })
+                      }
+                      className="p-1.5 rounded-lg border border-canvas-silk hover:bg-primary-500 hover:text-white transition-colors"
+                      title="Download PDF Receipt"
+                    >
+                      <Receipt className="h-3.5 w-3.5" />
                     </button>
                   </div>
                 </td>

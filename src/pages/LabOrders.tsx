@@ -13,7 +13,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { FlaskConical, Plus, Loader2 } from "lucide-react";
+import { FlaskConical, Plus, Loader2, Receipt } from "lucide-react";
+import { downloadReceiptPdf } from "@/utils/receiptPdf";
 import { Navigate } from "react-router-dom";
 
 /**
@@ -318,6 +319,32 @@ const LabOrders = () => {
                       <div className="flex items-center gap-2">
                         <Badge variant="outline" className="text-[10px]">{o.priority}</Badge>
                         <Badge className="text-[10px]">{o.status?.replace(/_/g, " ")}</Badge>
+                        <button
+                          onClick={() =>
+                            downloadReceiptPdf({
+                              title: "Lab Order",
+                              receiptNumber: o.test_number || o.id.slice(0, 8).toUpperCase(),
+                              date: o.created_at,
+                              issuerName: o.lab?.name || "Doc'O Clock Laboratory",
+                              customerName: `${o.patient?.first_name || ""} ${o.patient?.last_name || ""}`.trim() || "Patient",
+                              items: [
+                                {
+                                  description: o.test_type || "Lab test",
+                                  quantity: 1,
+                                  unitPrice: o.price || o.total_amount || 0,
+                                  note: o.test_category ? `Category: ${o.test_category}` : undefined,
+                                },
+                              ],
+                              amountPaid: o.payment_status === "paid" ? o.total_amount || o.price || 0 : 0,
+                              paymentMethod: o.payment_method || undefined,
+                              notes: o.sample_type ? `Sample: ${o.sample_type}` : undefined,
+                            })
+                          }
+                          className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-primary-500 hover:text-white transition-colors"
+                          title="Download PDF Receipt"
+                        >
+                          <Receipt className="h-3.5 w-3.5" />
+                        </button>
                       </div>
                     </div>
                     {o.result_summary && (

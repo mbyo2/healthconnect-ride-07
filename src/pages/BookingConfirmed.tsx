@@ -8,8 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   CheckCircle, Calendar, Clock, MapPin, Video,
-  FileText, ArrowRight, Home, CreditCard, Loader2, XCircle
+  FileText, ArrowRight, Home, CreditCard, Loader2, XCircle, Receipt
 } from "lucide-react";
+import { downloadReceiptPdf } from "@/utils/receiptPdf";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const BookingConfirmed = () => {
@@ -298,6 +299,38 @@ const BookingConfirmed = () => {
             <div className="flex-1">
               <p className="font-medium text-sm text-foreground">Add to Calendar</p>
               <p className="text-xs text-muted-foreground">Download a reminder file for your phone or computer</p>
+            </div>
+            <ArrowRight className="h-4 w-4 text-muted-foreground" />
+          </button>
+
+          <button
+            onClick={() =>
+              downloadReceiptPdf({
+                title: "Appointment Booking",
+                receiptNumber: String(appointment.id).slice(0, 8).toUpperCase(),
+                date: appointment.created_at || new Date().toISOString(),
+                issuerName: "Doc'O Clock",
+                customerName: appointment.patient_name || "Patient",
+                items: [
+                  {
+                    description: isVideo ? "Video Consultation" : "In-Person Visit",
+                    quantity: 1,
+                    unitPrice: Number(payment?.amount) || Number(appointment.consultation_fee) || 0,
+                    note: provider ? `Provider: ${provider.first_name || ""} ${provider.last_name || ""}${provider.specialty ? ` (${provider.specialty})` : ""}` : undefined,
+                  },
+                ],
+                amountPaid: payment?.status === "paid" ? Number(payment.amount) : 0,
+                paymentMethod: payment?.payment_method || undefined,
+                paymentReference: payment?.trans_ref || undefined,
+                notes: `Date: ${appointment.date || ""} ${appointment.time || ""}`,
+              })
+            }
+            className="w-full min-h-[44px] flex items-center gap-3 p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+          >
+            <Receipt className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+            <div className="flex-1">
+              <p className="font-medium text-sm text-foreground">Download PDF Receipt</p>
+              <p className="text-xs text-muted-foreground">Get a formatted receipt for this booking</p>
             </div>
             <ArrowRight className="h-4 w-4 text-muted-foreground" />
           </button>

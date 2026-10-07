@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useCurrency } from "@/hooks/use-currency";
 import { fetchInstitutionTariffs, resolveTariffPrice } from "@/components/pricing/TariffAndPriceManager";
 import { InstitutionInsuranceVerification } from "@/components/institution/InstitutionInsuranceVerification";
+import { downloadReceiptPdf } from "@/utils/receiptPdf";
 
 interface BillingProps {
   hospital: any;
@@ -178,6 +179,7 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
                 <th className="py-2.5 px-3 text-right">Total</th>
                 <th className="py-2.5 px-3 text-right">Balance Due</th>
                 <th className="py-2.5 px-3 text-center">Status</th>
+                <th className="py-2.5 px-3 text-center">Receipt</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-canvas-silk">
@@ -191,6 +193,34 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
                     {inv.balance > 0 ? <span className="font-bold text-error-500">{formatPrice(inv.balance)}</span> : <span className="text-success-500 font-bold">—</span>}
                   </td>
                   <td className="py-3 px-3 text-center">{getPaymentPill(inv.payment_status)}</td>
+                  <td className="py-3 px-3 text-center">
+                    <button
+                      onClick={() =>
+                        downloadReceiptPdf({
+                          title: "Invoice Receipt",
+                          receiptNumber: inv.invoice_number,
+                          date: inv.created_at,
+                          issuerName: hospital?.name || "Doc'O Clock",
+                          customerName: `${inv.patient?.first_name || ""} ${inv.patient?.last_name || ""}`.trim() || "Patient",
+                          items: (inv.items || []).map((it: any) => ({
+                            description: it.description || it.service_name || "Service",
+                            quantity: it.quantity || 1,
+                            unitPrice: it.unit_price || it.amount || 0,
+                          })),
+                          tax: inv.tax_amount || 0,
+                          discount: inv.discount_amount || 0,
+                          amountPaid: (inv.total_amount || 0) - (inv.balance || 0),
+                          paymentMethod: inv.payment_method || undefined,
+                          paymentReference: inv.payment_reference || undefined,
+                          notes: inv.notes || undefined,
+                        })
+                      }
+                      className="p-1.5 rounded-lg border border-canvas-silk hover:bg-primary-500 hover:text-white transition-colors"
+                      title="Download PDF Receipt"
+                    >
+                      <Receipt className="h-3.5 w-3.5" />
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>

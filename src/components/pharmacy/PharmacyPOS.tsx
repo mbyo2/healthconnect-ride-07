@@ -8,6 +8,7 @@ import { useInstitutionContext } from "@/hooks/useInstitutionContext";
 import { toast } from "sonner";
 import { useCurrency } from "@/hooks/use-currency";
 import { dispenseLinesFEFO } from "./pharmacyStockService";
+import { downloadReceiptPdf } from "@/utils/receiptPdf";
 import {
   Search, Plus, Minus, Trash2, ShoppingCart, Receipt, CreditCard, Banknote,
   Smartphone, Shield, Printer, X, Package
@@ -440,6 +441,33 @@ export const PharmacyPOS = () => {
             <button onClick={() => window.print()} className="px-3 py-1.5 text-xs font-bold border border-graphite-300 dark:border-slate-700 rounded-md flex items-center gap-1">
               <Printer className="h-3.5 w-3.5" /> Print
             </button>
+            {lastSale && (
+              <button
+                onClick={() =>
+                  downloadReceiptPdf({
+                    title: "Pharmacy Sale",
+                    receiptNumber: lastSale.receipt_number,
+                    date: lastSale.created_at,
+                    issuerName: "Doc'O Clock Pharmacy",
+                    customerName: lastSale.customer_name || "Walk-in Customer",
+                    customerPhone: lastSale.customer_phone || undefined,
+                    items: (lastSale.items || []).map((item: CartItem) => ({
+                      description: item.item_name,
+                      quantity: item.quantity,
+                      unitPrice: item.unit_price || (item.total / Math.max(1, item.quantity)),
+                    })),
+                    discount: lastSale.discount_amount || 0,
+                    tax: lastSale.tax_amount || 0,
+                    amountPaid: lastSale.total_amount,
+                    paymentMethod: lastSale.payment_method?.replace("_", " "),
+                    paymentReference: lastSale.payment_reference || undefined,
+                  })
+                }
+                className="px-3 py-1.5 text-xs font-bold border border-primary-500 text-primary-500 rounded-md flex items-center gap-1"
+              >
+                <Receipt className="h-3.5 w-3.5" /> PDF Receipt
+              </button>
+            )}
             <button onClick={() => setShowReceipt(false)} className="px-4 py-1.5 rounded-md bg-primary-500 text-white text-xs font-bold">Done</button>
           </DialogFooter>
         </DialogContent>

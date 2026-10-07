@@ -6,10 +6,11 @@ import { useCurrency } from "@/hooks/use-currency";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ArrowDownLeft, ArrowUpRight, Clock, Search } from "lucide-react";
+import { ArrowDownLeft, ArrowUpRight, Clock, Search, Receipt } from "lucide-react";
 import { format } from "date-fns";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { downloadReceiptPdf } from "@/utils/receiptPdf";
 
 interface Transaction {
     id: string;
@@ -154,6 +155,30 @@ export const WalletHistory = () => {
                                         <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider tnum">
                                             Balance: {formatPrice(transaction.balance_after)}
                                         </p>
+                                        <button
+                                            onClick={() =>
+                                                downloadReceiptPdf({
+                                                    title: transaction.transaction_type === 'credit' ? 'Wallet Top-Up' : transaction.transaction_type === 'refund' ? 'Wallet Refund' : 'Wallet Payment',
+                                                    receiptNumber: transaction.id.slice(0, 8).toUpperCase(),
+                                                    date: transaction.created_at,
+                                                    issuerName: "Doc'O Clock",
+                                                    customerName: user?.email || "Wallet Holder",
+                                                    items: [
+                                                        {
+                                                            description: transaction.description || (transaction.transaction_type === 'credit' ? 'Wallet Top-Up' : 'Wallet Payment'),
+                                                            quantity: 1,
+                                                            unitPrice: Math.abs(transaction.amount),
+                                                        },
+                                                    ],
+                                                    amountPaid: transaction.transaction_type === 'credit' ? Math.abs(transaction.amount) : 0,
+                                                    notes: `Balance after: ${formatPrice(transaction.balance_after)}`,
+                                                })
+                                            }
+                                            className="mt-1 inline-flex items-center gap-1 text-[10px] font-bold text-primary-500 hover:underline"
+                                            title="Download PDF Receipt"
+                                        >
+                                            <Receipt className="h-3 w-3" /> PDF
+                                        </button>
                                     </div>
                                 </div>
                             ))}
