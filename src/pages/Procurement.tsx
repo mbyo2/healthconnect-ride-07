@@ -1,4 +1,5 @@
 import { Procurement } from "@/components/hospital/Procurement";
+import { ProcurementErrorBoundary } from "@/components/hospital/ProcurementErrorBoundary";
 import { useInstitutionContext } from "@/hooks/useInstitutionContext";
 import { Loader2 } from "lucide-react";
 
@@ -20,7 +21,9 @@ export default function ProcurementPage() {
 
   return (
     <div className="container mx-auto px-4 py-6 max-w-5xl">
-      <Procurement hospital={hospital} />
+      <ProcurementErrorBoundary>
+        <Procurement hospital={hospital} />
+      </ProcurementErrorBoundary>
     </div>
   );
 }
