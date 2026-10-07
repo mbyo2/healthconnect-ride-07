@@ -23,50 +23,32 @@ const InstitutionAppointments = () => {
         if (!institutionId) { setLoading(false); return; }
         setLoading(true);
         try {
-            // 1. Get Personnel & Staff
-            const [personnelRes, staffRes] = await Promise.all([
-                supabase.from('institution_personnel').select('user_id').eq('institution_id', institutionId),
-                supabase.from('institution_staff').select('provider_id').eq('institution_id', institutionId).eq('is_active', true),
-            ]);
-
-            const providerIds = [
-                ...(personnelRes.data?.map(p => p.user_id) || []),
-                ...(staffRes.data?.map(s => s.provider_id) || []),
-            ].filter((v, i, a) => a.indexOf(v) === i);
-
-            if (providerIds.length === 0) {
-                // No staff providers — still check direct institution linkage
-                const { data: appts, error: apptsError } = await supabase
-                    .from('appointments')
-                    .select(`
-                        *,
-                        patient:profiles!patient_id(first_name, last_name, email),
-                        provider:profiles!provider_id(first_name, last_name)
-                    `)
-                    .eq('institution_id', institutionId)
-                    .order('date', { ascending: false });
-                if (apptsError) throw apptsError;
-                setAppointments(appts || []);
-                return;
-            }
-
-            // 2. Get Appointments with Patient and Provider details
-            // Match appointments by provider affiliation (institution staff/personnel)
-            // OR by direct institution linkage (institution_id set at booking time
-            // via trg_set_appointment_institution). This covers both legacy
-            // bookings and newly-linked ones.
+            // Use the SECURITY DEFINER RPC so patient/provider names resolve
+            // without tripping profiles RLS recursion. The function enforces
+            // institution staff/admin authorization internally and matches
+            // appointments by provider affiliation OR direct institution_id
+            // linkage (set at booking time via trg_set_appointment_institution).
             const { data: appts, error: apptsError } = await supabase
-                .from('appointments')
-                .select(`
-                    *,
-                    patient:profiles!patient_id(first_name, last_name, email),
-                    provider:profiles!provider_id(first_name, last_name)
-                `)
-                .or(`provider_id.in.(${providerIds.join(',')}),institution_id.eq.${institutionId}`)
-                .order('date', { ascending: false });
+                .rpc('get_institution_appointments', { p_institution_id: institutionId });
 
             if (apptsError) throw apptsError;
-            setAppointments(appts || []);
+            // Normalize RPC shape to what the table renderer expects
+            const normalized = (appts || []).map((a: any) => ({
+                ...a,
+                date: a.appointment_date,
+                time: a.appointment_time,
+                type: a.appointment_type,
+                patient: {
+                    first_name: a.patient_first_name,
+                    last_name: a.patient_last_name,
+                    email: a.patient_email,
+                },
+                provider: {
+                    first_name: a.provider_first_name,
+                    last_name: a.provider_last_name,
+                },
+            }));
+            setAppointments(normalized);
 
         } catch (error) {
             console.error("Error fetching appointments:", error);
