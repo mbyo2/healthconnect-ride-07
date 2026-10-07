@@ -65,11 +65,23 @@ BEGIN
     END IF;
   END IF;
 
-  -- Rule 3: clinical fields are immutable for pharmacists
+  -- Rule 3: clinical fields are immutable for pharmacists.
+  -- NOTE: column names must match comprehensive_prescriptions exactly:
+  -- medication_name (not medications), indication (not diagnosis).
   IF OLD.patient_id IS DISTINCT FROM NEW.patient_id
      OR OLD.provider_id IS DISTINCT FROM NEW.provider_id
-     OR OLD.medications IS DISTINCT FROM NEW.medications
-     OR OLD.diagnosis IS DISTINCT FROM NEW.diagnosis
+     OR OLD.medication_name IS DISTINCT FROM NEW.medication_name
+     OR OLD.generic_name IS DISTINCT FROM NEW.generic_name
+     OR OLD.strength IS DISTINCT FROM NEW.strength
+     OR OLD.dosage IS DISTINCT FROM NEW.dosage
+     OR OLD.instructions IS DISTINCT FROM NEW.instructions
+     OR OLD.quantity IS DISTINCT FROM NEW.quantity
+     OR OLD.duration_days IS DISTINCT FROM NEW.duration_days
+     OR OLD.indication IS DISTINCT FROM NEW.indication
+     OR OLD.refills_remaining IS DISTINCT FROM NEW.refills_remaining
+     OR OLD.is_controlled_substance IS DISTINCT FROM NEW.is_controlled_substance
+     OR OLD.prescribed_date IS DISTINCT FROM NEW.prescribed_date
+     OR OLD.expiry_date IS DISTINCT FROM NEW.expiry_date
      OR OLD.notes IS DISTINCT FROM NEW.notes THEN
     RAISE EXCEPTION 'Pharmacists cannot modify clinical prescription details.'
       USING ERRCODE = '42501';
