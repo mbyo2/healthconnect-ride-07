@@ -61,7 +61,10 @@ export function ClinicalProcedurePricing({ institutionId }: { institutionId: str
           .delete()
           .eq("institution_id", institutionId)
           .eq("procedure_id", proc.procedure_id);
-        if (error) throw error;
+      if (error) {
+        console.error("Price save failed:", error);
+        throw error;
+      }
       } else {
         const { error } = await supabase.from("institution_procedure_pricing").upsert(
           {
@@ -84,9 +87,9 @@ export function ClinicalProcedurePricing({ institutionId }: { institutionId: str
           ? `${proc.procedure_name} reverted to default price`
           : `${proc.procedure_name} price set to K${newPrice.toLocaleString()}`
       );
-    } catch (e) {
+    } catch (e: any) {
       console.error("Failed to save price:", e);
-      toast.error("Failed to save price");
+      toast.error(`Failed to save price: ${e?.message || e?.details || "unknown error"}`);
     } finally {
       setSaving(null);
     }
