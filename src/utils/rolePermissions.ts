@@ -72,6 +72,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/icu',                 // ICU bed & observation management
     '/ipd-wards',           // inpatient ward & bed management
     '/theatre',             // operating theatre schedule & OT booking
+    '/drug-stock',         // institutional drug inventory
     '/teaching-research',    // teaching hospital: rotations, research, case discussions
     '/opd',                 // outpatient queue, triage & check-in
     '/prescriptions',       // doctors can prescribe
@@ -150,6 +151,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/pharmacy-portal',
     '/pharmacy-inventory',
     '/pharmacy-management',
+    '/drug-stock',          // institutional drug inventory
     '/institution/personnel', // staff invitations — needed for maker/checker QA
     '/prescriptions',
     '/wallet',
@@ -247,6 +249,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/institution/reports',
     '/institution/appointments',
     '/institution/settings',
+    '/drug-stock',          // institutional drug inventory
     '/institution/devices',
     '/appointments',
     '/appointments/:id',
@@ -388,6 +391,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/wallet',
     '/medical-records',
     '/hospital-management',
+    '/drug-stock',            // institutional drug inventory
     '/procurement',            // purchase orders & supplier management
     '/pharmacy-inventory',
     '/medications',
