@@ -301,7 +301,7 @@ const AppContent = () => {
             <Route path="/hospital-management" element={<RouteGuard><HospitalManagement /></RouteGuard>} />
             <Route path="/lab-management" element={<RouteGuard><LabManagement /></RouteGuard>} />
             <Route path="/lab-orders" element={<RouteGuard requireRoles={['doctor', 'specialist', 'medical_licentiate', 'clinical_officer', 'dentist', 'radiologist']}><LabOrders /></RouteGuard>} />
-            <Route path="/referrals" element={<RouteGuard requireRoles={['doctor', 'specialist', 'medical_licentiate', 'clinical_officer', 'dentist', 'radiologist', 'nurse', 'midwife']}><Referrals /></RouteGuard>} />
+            <Route path="/referrals" element={<RouteGuard requireRoles={['doctor', 'specialist', 'medical_licentiate', 'clinical_officer', 'dentist', 'radiologist']}><Referrals /></RouteGuard>} />
 
             {/* Additional User Pages */}
             <Route path="/notifications" element={<RouteGuard><NotificationsPage /></RouteGuard>} />
