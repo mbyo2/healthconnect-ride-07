@@ -91,6 +91,7 @@ const HospitalManagement = lazyWithRetry(() => import('@/pages/HospitalManagemen
 const LabManagement = lazyWithRetry(() => import('@/pages/LabManagement'));
 const LabOrders = lazyWithRetry(() => import('@/pages/LabOrders'));
 const Referrals = lazyWithRetry(() => import('@/pages/Referrals'));
+const TheatrePage = lazyWithRetry(() => import('@/components/hospital/Theatre'));
 const ICUPage = lazyWithRetry(() => import('@/pages/ICU'));
 const MaternalChildPage = lazyWithRetry(() => import('@/pages/MaternalChildPage'));
 const IPDWards = lazyWithRetry(() => import('@/pages/IPDWards'));

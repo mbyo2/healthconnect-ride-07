@@ -67,6 +67,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     ...COMMON_ROUTES,
     ...PROVIDER_CORE_ROUTES,
     '/lab-orders',          // order lab tests & receive results
+    '/imaging',             // order imaging & receive radiology reports
     '/referrals',           // refer patients to facilities & specialists
     '/ipd-wards',           // inpatient ward & bed management
     '/prescriptions',       // doctors can prescribe
@@ -477,6 +478,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     ...COMMON_ROUTES,
     ...PROVIDER_CORE_ROUTES,
     '/lab-orders',          // order lab tests & receive results
+    '/imaging',             // order imaging & receive radiology reports
     '/referrals',           // refer patients to facilities & specialists
     '/ipd-wards',           // inpatient ward & bed management
     '/prescriptions',       // licensed to prescribe
