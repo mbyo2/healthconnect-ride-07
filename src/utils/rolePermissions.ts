@@ -67,6 +67,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     ...COMMON_ROUTES,
     ...PROVIDER_CORE_ROUTES,
     '/lab-orders',          // order lab tests & receive results
+    '/referrals',           // refer patients to facilities & specialists
     '/prescriptions',       // doctors can prescribe
     '/ai-diagnostics',      // clinical decision support
     '/telemedicine',
@@ -79,6 +80,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     ...COMMON_ROUTES,
     ...PROVIDER_CORE_ROUTES,
     '/lab-orders',          // order lab tests & receive results
+    '/referrals',           // refer patients to facilities & specialists
     '/prescriptions',       // specialists can prescribe
     '/ai-diagnostics',      // clinical decision support
     '/telemedicine',
@@ -101,6 +103,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     ...COMMON_ROUTES,
     ...PROVIDER_CORE_ROUTES,
     '/lab-orders',          // order imaging-correlated lab tests
+    '/referrals',           // refer patients to facilities & specialists
     '/ai-diagnostics',      // imaging AI support
     '/medications',
     '/health-analytics',    // performance analytics
@@ -454,6 +457,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     ...COMMON_ROUTES,
     ...PROVIDER_CORE_ROUTES,
     '/lab-orders',          // order lab tests & receive results
+    '/referrals',           // refer patients to facilities & specialists
     '/prescriptions',       // licensed to prescribe
     '/ai-diagnostics',      // clinical decision support
     '/telemedicine',
@@ -466,6 +470,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     ...COMMON_ROUTES,
     ...PROVIDER_CORE_ROUTES,
     '/lab-orders',          // order lab tests & receive results
+    '/referrals',           // refer patients to facilities & specialists
     '/prescriptions',       // licensed to prescribe
     '/ai-diagnostics',
     '/telemedicine',
@@ -478,6 +483,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     ...COMMON_ROUTES,
     ...PROVIDER_CORE_ROUTES,
     '/lab-orders',          // order lab tests & receive results
+    '/referrals',           // refer patients to facilities & specialists
     '/prescriptions',
     '/ai-diagnostics',
     '/telemedicine',
