@@ -72,6 +72,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/icu',                 // ICU bed & observation management
     '/ipd-wards',           // inpatient ward & bed management
     '/theatre',             // operating theatre schedule & OT booking
+    '/opd',                 // outpatient queue, triage & check-in
     '/prescriptions',       // doctors can prescribe
     '/ai-diagnostics',      // clinical decision support
     '/telemedicine',
@@ -89,6 +90,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/referrals',           // refer patients to facilities & specialists
     '/icu',                 // ICU bed & observation management
     '/theatre',             // operating theatre schedule & OT booking
+    '/opd',                 // outpatient queue, triage & check-in
     '/prescriptions',       // specialists can prescribe
     '/ai-diagnostics',      // clinical decision support
     '/telemedicine',
@@ -104,6 +106,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/ipd-wards',           // inpatient ward & bed management
     '/icu',                 // ICU bed & observation management
     '/theatre',             // operating theatre schedule & OT booking
+    '/opd',                 // outpatient queue, triage & check-in
     '/iot-monitoring',      // vitals monitoring
     '/health-analytics',    // patient health trends
     '/telemedicine',
@@ -282,6 +285,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     ...COMMON_ROUTES,
     '/institution-portal',
     '/institution-dashboard',
+    '/opd',                 // outpatient queue, triage & check-in
     '/institution/patients',
     '/institution/personnel',
     '/institution/reports',
@@ -300,6 +304,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     ...COMMON_ROUTES,
     '/institution-portal',
     '/institution-dashboard',
+    '/opd',                 // outpatient queue, triage & check-in
     '/institution/patients',
     '/institution/personnel',
     '/institution/reports',
@@ -489,6 +494,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/referrals',           // refer patients to facilities & specialists
     '/icu',                 // ICU bed & observation management
     '/theatre',             // operating theatre schedule & OT booking
+    '/opd',                 // outpatient queue, triage & check-in
     '/ipd-wards',           // inpatient ward & bed management
     '/prescriptions',       // licensed to prescribe
     '/ai-diagnostics',
@@ -766,6 +772,7 @@ ROLE_PERMISSIONS[USER_ROLES.OT_STAFF] = dedupeRoutes([
   ...COMMON_ROUTES,
   '/institution-dashboard',
   '/theatre',             // operating theatre schedule & OT booking
+    '/opd',                 // outpatient queue, triage & check-in
   '/appointments',
   '/appointments/:id',
   '/medical-records',
