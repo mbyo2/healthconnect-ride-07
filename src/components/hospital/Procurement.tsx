@@ -108,7 +108,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
       const { data: po, error: poErr } = await (supabase.from("purchase_orders" as any) as any)
         .insert({
           institution_id: hospital?.id,
-          po_number: poNumber,
+          order_number: poNumber,
           supplier_id: poForm.supplier_id,
           expected_delivery_date: poForm.expected_delivery_date || null,
           notes: poForm.notes || null,
@@ -121,9 +121,9 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
       if (poErr) throw poErr;
       const { error: itemsErr } = await (supabase.from("purchase_order_items" as any) as any).insert(
         validItems.map((i) => ({
-          po_id: po.id,
+          purchase_order_id: po.id,
           item_name: i.item_name.trim(),
-          quantity: Number(i.quantity),
+          quantity_ordered: Number(i.quantity),
           unit: i.unit || "units",
           unit_price: Number(i.unit_price),
           total_price: Number(i.quantity) * Number(i.unit_price),
@@ -144,7 +144,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
         .update({ status })
         .eq("id", po.id);
       if (err) throw err;
-      toast.success(`PO ${po.po_number} → ${status.replace(/_/g, " ")}`);
+      toast.success(`PO ${po.order_number} → ${status.replace(/_/g, " ")}`);
       refreshOrders();
       if (viewingPO?.id === po.id) setViewingPO({ ...viewingPO, status });
     } catch (e: any) { toast.error(e?.message || "Failed to update status"); }
@@ -152,13 +152,13 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
 
   const deletePO = async (po: any) => {
     if (po.status !== "draft") { toast.error("Only draft orders can be deleted"); return; }
-    if (!window.confirm(`Delete PO ${po.po_number}?`)) return;
+    if (!window.confirm(`Delete PO ${po.order_number}?`)) return;
     try {
       const { error: err } = await (supabase.from("purchase_orders" as any) as any)
         .delete()
         .eq("id", po.id);
       if (err) throw err;
-      toast.success(`PO ${po.po_number} deleted`);
+      toast.success(`PO ${po.order_number} deleted`);
       refreshOrders();
     } catch (e: any) { toast.error(e?.message || "Failed to delete"); }
   };
@@ -217,7 +217,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
     } catch (e: any) { toast.error(e?.message || "Failed to update supplier"); }
   };
 
-  const viewingItems = viewingPO ? poItems.filter((i) => i.po_id === viewingPO.id) : [];
+  const viewingItems = viewingPO ? poItems.filter((i) => i.purchase_order_id === viewingPO.id) : [];
 
   return (
     <div className="space-y-4">
@@ -317,7 +317,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
                 <tbody>
                   {filteredOrders.map((o) => (
                     <tr key={o.id} className="border-t border-canvas-silk hover:bg-canvas-mist/50">
-                      <td className="px-4 py-2.5 font-bold">{o.po_number}</td>
+                      <td className="px-4 py-2.5 font-bold">{o.order_number}</td>
                       <td className="px-4 py-2.5">{supplierName(o.supplier_id)}</td>
                       <td className="px-4 py-2.5 text-xs">{o.order_date}</td>
                       <td className="px-4 py-2.5 text-xs">{o.expected_delivery_date || "—"}</td>
@@ -645,7 +645,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
       <Dialog open={!!viewingPO} onOpenChange={(o) => { if (!o) setViewingPO(null); }}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>PO {viewingPO?.po_number}</DialogTitle>
+            <DialogTitle>PO {viewingPO?.order_number}</DialogTitle>
           </DialogHeader>
           {viewingPO && (
             <div className="space-y-3 text-sm">
@@ -692,7 +692,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
                         {viewingItems.map((i) => (
                           <tr key={i.id} className="border-t border-canvas-silk">
                             <td className="px-3 py-2 font-bold">{i.item_name}</td>
-                            <td className="px-3 py-2 text-right">{i.quantity} {i.unit}</td>
+                            <td className="px-3 py-2 text-right">{i.quantity_ordered} {i.unit}</td>
                             <td className="px-3 py-2 text-right">{fmtMoney(i.unit_price)}</td>
                             <td className="px-3 py-2 text-right font-bold">{fmtMoney(i.total_price)}</td>
                           </tr>
