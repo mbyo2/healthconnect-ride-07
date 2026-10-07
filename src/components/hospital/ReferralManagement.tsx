@@ -8,7 +8,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowRightLeft, Plus, ArrowRight, ArrowLeft, Inbox } from 'lucide-react';
+import { ArrowRightLeft, Plus, ArrowRight, ArrowLeft, Inbox, Receipt } from 'lucide-react';
+import { downloadReceiptPdf } from '@/utils/receiptPdf';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useHospitalModule } from '@/hooks/useHospitalModule';
@@ -155,6 +156,34 @@ export const ReferralManagement = ({ hospital }: { hospital: any }) => {
         <div className="flex items-center gap-2">
           <Badge variant={r.priority === 'urgent' ? 'destructive' : 'outline'} className="capitalize">{r.priority || 'routine'}</Badge>
           <Badge variant={r.status === 'accepted' || r.status === 'completed' ? 'default' : 'secondary'} className="capitalize">{r.status || 'pending'}</Badge>
+          <button
+            onClick={() =>
+              downloadReceiptPdf({
+                title: "Referral Letter",
+                receiptNumber: r.referral_number || r.id.slice(0, 8).toUpperCase(),
+                date: r.referral_date || r.created_at || new Date(),
+                issuerName: hospital?.name || "Doc'O Clock",
+                customerName: nameFor(r.patient_id),
+                items: [
+                  {
+                    description: `Referral to ${r.referred_to_doctor || r.referred_to_department || "Specialist"}`,
+                    quantity: 1,
+                    unitPrice: 0,
+                    note: r.reason_for_referral,
+                  },
+                ],
+                notes: [
+                  r.diagnosis ? `Diagnosis: ${r.diagnosis}` : null,
+                  r.priority ? `Priority: ${r.priority}` : null,
+                  r.notes || null,
+                ].filter(Boolean).join(" · ") || undefined,
+              })
+            }
+            className="p-1.5 rounded-lg border hover:bg-primary-500 hover:text-white transition-colors"
+            title="Download referral letter (PDF)"
+          >
+            <Receipt className="h-3.5 w-3.5" />
+          </button>
           {actions}
         </div>
       </CardContent>
