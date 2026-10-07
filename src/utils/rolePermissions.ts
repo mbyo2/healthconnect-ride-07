@@ -71,6 +71,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/referrals',           // refer patients to facilities & specialists
     '/icu',                 // ICU bed & observation management
     '/ipd-wards',           // inpatient ward & bed management
+    '/theatre',             // operating theatre schedule & OT booking
     '/prescriptions',       // doctors can prescribe
     '/ai-diagnostics',      // clinical decision support
     '/telemedicine',
@@ -87,6 +88,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/imaging',             // order imaging & receive radiology reports
     '/referrals',           // refer patients to facilities & specialists
     '/icu',                 // ICU bed & observation management
+    '/theatre',             // operating theatre schedule & OT booking
     '/prescriptions',       // specialists can prescribe
     '/ai-diagnostics',      // clinical decision support
     '/telemedicine',
@@ -101,6 +103,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/medications',         // medication administration
     '/ipd-wards',           // inpatient ward & bed management
     '/icu',                 // ICU bed & observation management
+    '/theatre',             // operating theatre schedule & OT booking
     '/iot-monitoring',      // vitals monitoring
     '/health-analytics',    // patient health trends
     '/telemedicine',
@@ -469,6 +472,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     ...PROVIDER_CORE_ROUTES,
     '/lab-orders',          // order lab tests & receive results
     '/referrals',           // refer patients to facilities & specialists
+    '/icu',                 // ICU bed & observation management
     '/prescriptions',       // licensed to prescribe
     '/ai-diagnostics',      // clinical decision support
     '/telemedicine',
@@ -483,6 +487,8 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/lab-orders',          // order lab tests & receive results
     '/imaging',             // order imaging & receive radiology reports
     '/referrals',           // refer patients to facilities & specialists
+    '/icu',                 // ICU bed & observation management
+    '/theatre',             // operating theatre schedule & OT booking
     '/ipd-wards',           // inpatient ward & bed management
     '/prescriptions',       // licensed to prescribe
     '/ai-diagnostics',
@@ -759,6 +765,7 @@ ROLE_PERMISSIONS[USER_ROLES.OT_STAFF] = dedupeRoutes([
   '/staff-dashboard',
   ...COMMON_ROUTES,
   '/institution-dashboard',
+  '/theatre',             // operating theatre schedule & OT booking
   '/appointments',
   '/appointments/:id',
   '/medical-records',
