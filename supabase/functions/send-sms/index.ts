@@ -99,65 +99,50 @@ serve(async (req) => {
 
     const formattedPhone = formatZambianPhone(phone);
 
-    // Real SMS via Africa's Talking when configured; otherwise honest simulation.
-    const smsProviders: Record<string, { priority: string; retries: number; provider: string }> = {
-      'emergency': { priority: 'high', retries: 3, provider: 'priority_gateway' },
-      'appointment': { priority: 'medium', retries: 1, provider: 'standard_gateway' },
-      'prescription': { priority: 'medium', retries: 2, provider: 'standard_gateway' },
-      'order': { priority: 'low', retries: 1, provider: 'bulk_gateway' },
-      'general': { priority: 'low', retries: 1, provider: 'standard_gateway' }
+    // In a real implementation, integrate with Zambian SMS providers like:
+    // - Vodacom Zambia SMS API
+    // - MTN Zambia SMS API  
+    // - Zamtel SMS API
+    // - Africa's Talking SMS API (supports Zambia)
+
+    // For demo purposes, we'll simulate SMS sending
+    const smsProviders = {
+      'emergency': {
+        priority: 'high',
+        retries: 3,
+        provider: 'priority_gateway'
+      },
+      'appointment': {
+        priority: 'medium', 
+        retries: 1,
+        provider: 'standard_gateway'
+      },
+      'prescription': {
+        priority: 'medium',
+        retries: 2,
+        provider: 'standard_gateway'
+      },
+      'order': {
+        priority: 'low',
+        retries: 1,
+        provider: 'bulk_gateway'
+      },
+      'general': {
+        priority: 'low',
+        retries: 1,
+        provider: 'standard_gateway'
+      }
     };
+
     const smsConfig = smsProviders[type] || smsProviders['appointment'];
 
-    const atApiKey = Deno.env.get('AT_API_KEY');
-    const atUsername = Deno.env.get('AT_USERNAME') || 'dococlock';
-    const atSenderId = Deno.env.get('AT_SENDER_ID') || '';
-
-    let smsResponse: any;
-    let isSimulated = false;
-
-    if (atApiKey) {
-      // Live delivery via Africa's Talking
-      try {
-        const formData = new URLSearchParams();
-        formData.append('username', atUsername);
-        formData.append('to', formattedPhone);
-        formData.append('message', message);
-        if (atSenderId) formData.append('from', atSenderId);
-
-        const atResp = await fetch('https://api.africastalking.com/version1/messaging', {
-          method: 'POST',
-          headers: {
-            'apiKey': atApiKey,
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Accept': 'application/json',
-          },
-          body: formData.toString(),
-        });
-        const atData = await atResp.json().catch(() => ({}));
-        const recipients = atData?.SMSMessageData?.Recipients || [];
-        const firstStatus = String(recipients[0]?.status || '').toLowerCase();
-        const delivered = atResp.ok && (firstStatus.includes('sent') || firstStatus.includes('success'));
-
-        smsResponse = {
-          success: delivered,
-          messageId: recipients[0]?.messageId || `AT-${Date.now()}`,
-          phone: formattedPhone,
-          provider: 'africas_talking',
-          gatewayResponse: atData,
-          timestamp: new Date().toISOString(),
-        };
-        if (!delivered) smsResponse.error = `Africa's Talking: ${recipients[0]?.status || atResp.status}`;
-      } catch (e) {
-        smsResponse = { success: false, error: String(e), provider: 'africas_talking' };
-      }
-    } else {
-      // No gateway configured — honest simulation
-      isSimulated = true;
-      smsResponse = await simulateZambianSMS(formattedPhone, message, smsConfig);
-    }
+    // Simulate SMS API call (replace with actual provider)
+    const smsResponse = await simulateZambianSMS(formattedPhone, message, smsConfig);
 
     // Log SMS attempt in database with sender info.
+    // NOTE: no live SMS provider is connected yet, so successful calls are
+    // recorded as 'simulated' — never 'sent' — until a real gateway
+    // (Africa's Talking / MTN / Vodacom / Zamtel) is wired below.
     const { error: logError } = await supabaseClient
       .from('sms_logs')
       .insert({
@@ -165,9 +150,9 @@ serve(async (req) => {
         message: message,
         type: type,
         patient_id: patientId,
-        sender_id: user.id,
-        status: smsResponse.success ? (isSimulated ? 'simulated' : 'sent') : 'failed',
-        provider: smsResponse.provider || smsConfig.provider,
+        sender_id: user.id, // Track who sent the SMS
+        status: smsResponse.success ? 'simulated' : 'failed',
+        provider: smsConfig.provider,
         response_data: smsResponse,
         created_at: new Date().toISOString()
       });
@@ -185,12 +170,10 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({
         success: true,
-        simulated: isSimulated,
+        simulated: true,
         messageId: smsResponse.messageId,
         phone: formattedPhone,
-        message: isSimulated
-          ? 'SMS simulated — set AT_API_KEY in Supabase secrets for live delivery'
-          : 'SMS sent via Africa\'s Talking'
+        message: 'SMS simulated — connect a live provider for real delivery'
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

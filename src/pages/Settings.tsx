@@ -148,21 +148,8 @@ const Settings = () => {
   };
 
   const handleSmsToggle = async () => {
-    // SMS gateway is live via Africa's Talking when AT_API_KEY is set in Supabase secrets.
-    // Toggle enables/disables SMS reminders; actual delivery depends on gateway config.
-    const newValue = !smsReminders;
-    setSmsReminders(newValue);
-    try {
-      const { error } = await supabase
-        .from("profiles")
-        .update({ sms_reminders_enabled: newValue })
-        .eq("id", user?.id);
-      if (error) throw error;
-      toast.success(newValue ? "SMS reminders enabled" : "SMS reminders disabled");
-    } catch {
-      setSmsReminders(!newValue);
-      toast.error("Failed to update SMS settings");
-    }
+    // No SMS gateway exists yet — never claim the toggle works.
+    toast.info("SMS reminders are coming soon — the SMS gateway is not connected yet.");
   };
 
   const handleTwoFactorToggle = async () => {
@@ -340,10 +327,10 @@ const Settings = () => {
               </div>
               <div className="flex items-center justify-between pt-2 border-t border-canvas-silk dark:border-slate-800">
                 <div>
-                  <p className="font-bold text-xs">SMS Reminders <span className="ml-1 rounded-full bg-success-500/15 px-2 py-0.5 text-[10px] font-bold text-success-600">Live</span></p>
-                  <p className="text-xs text-graphite-600 dark:text-slate-300">Text reminders via Africa's Talking SMS gateway</p>
+                  <p className="font-bold text-xs">SMS Reminders <span className="ml-1 rounded-full bg-canvas-silk px-2 py-0.5 text-[10px] font-bold text-graphite-500">Coming soon</span></p>
+                  <p className="text-xs text-graphite-600 dark:text-slate-300">Text reminders once the SMS gateway is connected</p>
                 </div>
-                <Switch checked={smsReminders} onCheckedChange={handleSmsToggle} aria-label="SMS reminders"  className="scale-125" />
+                <Switch checked={smsReminders} disabled onCheckedChange={handleSmsToggle} aria-label="SMS reminders (coming soon)"  className="scale-125" />
               </div>
             </div>
 

@@ -168,22 +168,11 @@ const Emergency = () => {
         toast.success('Emergency logged. Call 116 now — your contacts are listed below.');
       }
 
-      // Send SMS alerts to emergency contacts via the live gateway.
+      // There is no SMS gateway yet: never claim contacts were texted or that
+      // emergency services were notified. The tel: links are the real action.
       const primaryContact = emergencyContacts.find(contact => contact.is_primary);
-      if (primaryContact?.phone) {
-        try {
-          const { error: smsError } = await supabase.functions.invoke('send-sms', {
-            body: {
-              phone: primaryContact.phone,
-              message: `EMERGENCY ALERT from Doc'O Clock: ${user?.user_metadata?.full_name || 'A user'} triggered an emergency alert. Please call them immediately.`,
-              type: 'emergency',
-            },
-          });
-          if (smsError) throw smsError;
-          toast.success(`SMS alert sent to ${primaryContact.name}.`);
-        } catch {
-          toast.info(`Could not text ${primaryContact.name} — please call them directly.`);
-        }
+      if (primaryContact) {
+        toast.info(`SMS alerts are coming soon — please call ${primaryContact.name} directly.`);
       }
     } catch (error) {
       console.error('Error triggering emergency:', error);
