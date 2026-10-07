@@ -164,7 +164,15 @@ export const ReferralManagement = ({ hospital }: { hospital: any }) => {
     </div>
   );
 
-  const ReferralRow = ({ item: r, actions }: { item: any; actions?: React.ReactNode }) => (
+  const ReferralRow = ({ item: r, actions }: { item: any; actions?: React.ReactNode }) => {
+    // Patient name lookup: facility list → search results → fallback to raw id
+    const nameFor = (patientId: string) => {
+      const p = (patients || []).find((x: any) => x.id === patientId)
+        || searchResults.find((x: any) => x.id === patientId);
+      return p ? `${p.first_name || ""} ${p.last_name || ""}`.trim() || p.full_name || patientId
+               : (patientId || "Patient");
+    };
+    return (
     <Card key={r.id}>
       <CardContent className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
@@ -210,7 +218,8 @@ export const ReferralManagement = ({ hospital }: { hospital: any }) => {
         </div>
       </CardContent>
     </Card>
-  );
+    );
+  };
 
   return (
     <div className="space-y-4">
