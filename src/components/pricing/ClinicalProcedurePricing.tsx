@@ -66,18 +66,43 @@ export function ClinicalProcedurePricing({ institutionId }: { institutionId: str
         throw error;
       }
       } else {
-        const { error } = await supabase.from("institution_procedure_pricing").upsert(
-          {
+        // Explicit insert-or-update: PostgREST onConflict is unreliable here
+        // ("no unique constraint matching the ON CONFLICT specification").
+        const { data: existing } = await supabase
+          .from("institution_procedure_pricing")
+          .select("id")
+          .eq("institution_id", institutionId)
+          .eq("procedure_id", proc.procedure_id)
+          .maybeSingle();
+        if (existing) {
+          const { error } = await supabase
+            .from("institution_procedure_pricing")
+            .update({
+              price: newPrice,
+              currency: "ZMW",
+              is_active: true,
+              effective_from: new Date().toISOString().split("T")[0],
+              updated_at: new Date().toISOString(),
+            } as any)
+            .eq("id", (existing as any).id);
+          if (error) {
+            console.error("Price update failed:", error);
+            throw error;
+          }
+        } else {
+          const { error } = await supabase.from("institution_procedure_pricing").insert({
             institution_id: institutionId,
             procedure_id: proc.procedure_id,
             price: newPrice,
             currency: "ZMW",
             is_active: true,
             effective_from: new Date().toISOString().split("T")[0],
-          } as any,
-          { onConflict: "institution_id,procedure_id" }
-        );
-        if (error) throw error;
+          } as any);
+          if (error) {
+            console.error("Price insert failed:", error);
+            throw error;
+          }
+        }
       }
       setProcedures((prev) =>
         prev.map((p) => (p.procedure_id === proc.procedure_id ? { ...p, custom_price: newPrice } : p))
