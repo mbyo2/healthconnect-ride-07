@@ -52,6 +52,28 @@ export const ReferralManagement = ({ hospital }: { hospital: any }) => {
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [facilities, setFacilities] = useState<any[]>([]);
+  const [patientSearch, setPatientSearch] = useState("");
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [searching, setSearching] = useState(false);
+  // Fallback patient search via relationship-gated RPC (for providers
+  // without facility-registered patients, e.g. standalone /referrals page)
+  const searchPatients = async (query: string) => {
+    setPatientSearch(query);
+    if (query.trim().length < 2) {
+      setSearchResults([]);
+      return;
+    }
+    setSearching(true);
+    try {
+      const { data } = await supabase.rpc("search_patients_for_provider", { p_search: query.trim() });
+      setSearchResults(data || []);
+    } catch (e) {
+      console.error("Patient search failed:", e);
+    } finally {
+      setSearching(false);
+    }
+  };
+
   const [form, setForm] = useState({
     patient_id: '',
     referred_to_hospital_id: '',
@@ -213,6 +235,35 @@ export const ReferralManagement = ({ hospital }: { hospital: any }) => {
               onChange={(id) => setForm({ ...form, patient_id: id })}
               emptyHint="No patients registered at this facility yet. Register a patient in OPD Management or admit one in IPD before creating a referral."
             />
+            {(!patients || patients.length === 0) && (
+              <div className="space-y-1.5">
+                <Label>Or search your patients</Label>
+                <Input
+                  value={patientSearch}
+                  onChange={(e) => searchPatients(e.target.value)}
+                  placeholder="Type patient name..."
+                />
+                {searching && <p className="text-xs text-slate-500">Searching...</p>}
+                {searchResults.length > 0 && (
+                  <div className="rounded-lg border max-h-40 overflow-y-auto">
+                    {searchResults.map((p: any) => (
+                      <button
+                        key={p.id}
+                        onClick={() => {
+                          setForm({ ...form, patient_id: p.id });
+                          setSearchResults([]);
+                          setPatientSearch(`${p.first_name || ""} ${p.last_name || ""}`.trim());
+                        }}
+                        className="w-full text-left px-3 py-2 hover:bg-slate-50 text-sm"
+                      >
+                        {p.first_name} {p.last_name}
+                        {form.patient_id === p.id && <span className="ml-2 text-primary-500">✓</span>}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
             <div className="space-y-1.5">
               <Label>Destination facility (network referral)</Label>
               <Select value={form.referred_to_hospital_id} onValueChange={(v) => setForm({ ...form, referred_to_hospital_id: v === 'none' ? '' : v })}>
