@@ -90,6 +90,7 @@ const PharmacyManagement = lazyWithRetry(() => import('@/pages/PharmacyManagemen
 const HospitalManagement = lazyWithRetry(() => import('@/pages/HospitalManagement'));
 const LabManagement = lazyWithRetry(() => import('@/pages/LabManagement'));
 const LabOrders = lazyWithRetry(() => import('@/pages/LabOrders'));
+const Referrals = lazyWithRetry(() => import('@/pages/Referrals'));
 const Map = lazyWithRetry(() => import('@/pages/Map'));
 const NotificationsPage = lazyWithRetry(() => import('@/pages/NotificationsPage'));
 const PrivacySecurityPage = lazyWithRetry(() => import('@/pages/PrivacySecurityPage'));
@@ -300,6 +301,7 @@ const AppContent = () => {
             <Route path="/hospital-management" element={<RouteGuard><HospitalManagement /></RouteGuard>} />
             <Route path="/lab-management" element={<RouteGuard><LabManagement /></RouteGuard>} />
             <Route path="/lab-orders" element={<RouteGuard requireRoles={['doctor', 'specialist', 'medical_licentiate', 'clinical_officer', 'dentist', 'radiologist']}><LabOrders /></RouteGuard>} />
+            <Route path="/referrals" element={<RouteGuard requireRoles={['doctor', 'specialist', 'medical_licentiate', 'clinical_officer', 'dentist', 'radiologist', 'nurse', 'midwife']}><Referrals /></RouteGuard>} />
 
             {/* Additional User Pages */}
             <Route path="/notifications" element={<RouteGuard><NotificationsPage /></RouteGuard>} />
