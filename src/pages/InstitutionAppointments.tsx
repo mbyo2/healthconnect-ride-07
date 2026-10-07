@@ -35,11 +35,26 @@ const InstitutionAppointments = () => {
             ].filter((v, i, a) => a.indexOf(v) === i);
 
             if (providerIds.length === 0) {
-                setAppointments([]);
+                // No staff providers — still check direct institution linkage
+                const { data: appts, error: apptsError } = await supabase
+                    .from('appointments')
+                    .select(`
+                        *,
+                        patient:profiles!patient_id(first_name, last_name, email),
+                        provider:profiles!provider_id(first_name, last_name)
+                    `)
+                    .eq('institution_id', institutionId)
+                    .order('date', { ascending: false });
+                if (apptsError) throw apptsError;
+                setAppointments(appts || []);
                 return;
             }
 
             // 2. Get Appointments with Patient and Provider details
+            // Match appointments by provider affiliation (institution staff/personnel)
+            // OR by direct institution linkage (institution_id set at booking time
+            // via trg_set_appointment_institution). This covers both legacy
+            // bookings and newly-linked ones.
             const { data: appts, error: apptsError } = await supabase
                 .from('appointments')
                 .select(`
@@ -47,7 +62,7 @@ const InstitutionAppointments = () => {
                     patient:profiles!patient_id(first_name, last_name, email),
                     provider:profiles!provider_id(first_name, last_name)
                 `)
-                .in('provider_id', providerIds)
+                .or(`provider_id.in.(${providerIds.join(',')}),institution_id.eq.${institutionId}`)
                 .order('date', { ascending: false });
 
             if (apptsError) throw apptsError;
