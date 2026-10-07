@@ -109,19 +109,20 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
     setIsSubmitting(true);
     try {
       const total = Number(amount);
-      let balance = total;
       let insuranceClaimId = null;
+      let paymentStatus: string = "pending";
       if (selectedVerification) {
         const coverage = selectedVerification.coverage_percentage || 0;
-        balance = total - (total * coverage) / 100;
+        if (coverage >= 100) paymentStatus = "paid";
         insuranceClaimId = selectedVerification.id;
       }
       const invoiceNumber = `INV-${Date.now().toString(36).toUpperCase()}`;
+      // NOTE: balance is a GENERATED column — do not insert it explicitly (error 428C9)
       const { error } = await supabase.from("hospital_billing" as any).insert({
         hospital_id: hospital.id, patient_id: selectedPatientId, invoice_number: invoiceNumber,
-        total_amount: total, subtotal: total, balance, insurance_claim_id: insuranceClaimId,
+        total_amount: total, subtotal: total, insurance_claim_id: insuranceClaimId,
         items: [{ description: description || "Hospital services", amount: total }],
-        payment_status: balance === 0 ? "paid" : "pending",
+        payment_status: paymentStatus,
         due_date: new Date(Date.now() + 7 * 86400000).toISOString(),
       });
       if (error) throw error;
