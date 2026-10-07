@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useCurrency } from "@/hooks/use-currency";
 import { fetchInstitutionTariffs, resolveTariffPrice } from "@/components/pricing/TariffAndPriceManager";
 import { InstitutionInsuranceVerification } from "@/components/institution/InstitutionInsuranceVerification";
-import { downloadReceiptPdf } from "@/utils/receiptPdf";
+import { downloadReceiptPdf, downloadConsolidatedReceiptPdf } from "@/utils/receiptPdf";
 
 interface BillingProps {
   hospital: any;
@@ -62,25 +62,25 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
       (apptsRes.data || []).forEach((a: any) => {
         const fee = resolveTariffPrice(tariffs, 'opd', a.type, 150);
         calculatedTotal += fee;
-        charges.push({ description: `Consultation (${a.type?.replace("_", " ") || "General"}) - ${a.date}`, amount: fee });
+        charges.push({ category: "Consultations", description: `Consultation (${a.type?.replace("_", " ") || "General"}) - ${a.date}`, amount: fee });
       });
       (labsRes.data || []).forEach((l: any) => {
         const fee = l.price || l.total_amount || resolveTariffPrice(tariffs, 'lab', l.test_type, 200);
         calculatedTotal += fee;
-        charges.push({ description: `Lab Test: ${l.test_type}`, amount: fee });
+        charges.push({ category: "Laboratory", description: `Lab Test: ${l.test_type}`, amount: fee });
       });
       (rxsRes.data || []).forEach((r: any) => {
         const unit = resolveTariffPrice(tariffs, 'pharmacy', r.medication_name, 50);
         const fee = unit * (r.quantity || 1);
         calculatedTotal += fee;
-        charges.push({ description: `Rx: ${r.medication_name}`, amount: fee });
+        charges.push({ category: "Pharmacy", description: `Rx: ${r.medication_name}`, amount: fee });
       });
       ((procRes.data || []) as any[]).forEach((p: any) => {
         const procName = p.procedure?.procedure_name || 'Procedure';
         const fee = procPrices.get(p.procedure_id) || resolveTariffPrice(tariffs, 'surgery', procName, 0);
         if (fee > 0) {
           calculatedTotal += fee;
-          charges.push({ description: `Procedure: ${procName} - ${p.execution_date || ''}`.trim(), amount: fee });
+          charges.push({ category: "Clinical Procedures", description: `Procedure: ${procName} - ${p.execution_date || ''}`.trim(), amount: fee });
         }
       });
       if (charges.length > 0) {
@@ -297,6 +297,38 @@ export const HospitalBilling = ({ hospital, admissions, invoices, onRefresh }: B
           </div>
           <DialogFooter>
             <button onClick={() => setShowDialog(false)} className="px-3 py-1.5 text-xs font-bold text-slate-500">Cancel</button>
+            {pendingPatientCharges.length > 0 && (
+              <button
+                onClick={() => {
+                  // Group charges by category for the consolidated bill
+                  const byCat = new Map<string, any[]>();
+                  pendingPatientCharges.forEach((c: any) => {
+                    const cat = c.category || "Services";
+                    if (!byCat.has(cat)) byCat.set(cat, []);
+                    byCat.get(cat)!.push({
+                      description: c.description,
+                      quantity: 1,
+                      unitPrice: c.amount,
+                    });
+                  });
+                  downloadConsolidatedReceiptPdf({
+                    title: "Consolidated Bill",
+                    receiptNumber: `BILL-${Date.now().toString(36).toUpperCase()}`,
+                    date: new Date(),
+                    issuerName: hospital?.name || "Doc'O Clock",
+                    customerName: (() => {
+                      const adm = (admissions || []).find((a: any) => a.patient_id === selectedPatientId);
+                      return adm?.patient ? `${adm.patient.first_name || ""} ${adm.patient.last_name || ""}`.trim() : "Patient";
+                    })(),
+                    sections: Array.from(byCat.entries()).map(([title, items]) => ({ title, items })),
+                    notes: "This consolidated bill covers all services rendered. Present at payment.",
+                  });
+                }}
+                className="px-4 py-1.5 rounded-md border border-primary-500 text-primary-500 text-xs font-bold flex items-center gap-1"
+              >
+                <Receipt className="h-3.5 w-3.5" /> Consolidated Bill PDF
+              </button>
+            )}
             <button onClick={generateInvoice} disabled={!selectedPatientId || !amount || isSubmitting} className="px-4 py-1.5 rounded-md bg-primary-500 text-white text-xs font-bold flex items-center gap-1">
               {isSubmitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />} Generate Invoice
             </button>
