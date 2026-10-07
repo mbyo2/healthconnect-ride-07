@@ -69,6 +69,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/lab-orders',          // order lab tests & receive results
     '/imaging',             // order imaging & receive radiology reports
     '/referrals',           // refer patients to facilities & specialists
+    '/icu',                 // ICU bed & observation management
     '/ipd-wards',           // inpatient ward & bed management
     '/prescriptions',       // doctors can prescribe
     '/ai-diagnostics',      // clinical decision support
@@ -85,6 +86,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/lab-orders',          // order lab tests & receive results
     '/imaging',             // order imaging & receive radiology reports
     '/referrals',           // refer patients to facilities & specialists
+    '/icu',                 // ICU bed & observation management
     '/prescriptions',       // specialists can prescribe
     '/ai-diagnostics',      // clinical decision support
     '/telemedicine',
@@ -98,6 +100,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     ...PROVIDER_CORE_ROUTES,
     '/medications',         // medication administration
     '/ipd-wards',           // inpatient ward & bed management
+    '/icu',                 // ICU bed & observation management
     '/iot-monitoring',      // vitals monitoring
     '/health-analytics',    // patient health trends
     '/telemedicine',
