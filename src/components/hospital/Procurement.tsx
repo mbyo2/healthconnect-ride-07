@@ -126,7 +126,7 @@ export const Procurement = ({ hospital }: { hospital: any }) => {
           quantity_ordered: Number(i.quantity),
           unit: i.unit || "units",
           unit_price: Number(i.unit_price),
-          total_price: Number(i.quantity) * Number(i.unit_price),
+          // total_price is a GENERATED column live — do not insert it
         }))
       );
       if (itemsErr) throw itemsErr;
