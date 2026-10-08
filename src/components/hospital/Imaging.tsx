@@ -366,8 +366,8 @@ function HospitalPatientSelectLink({ hospitalId, value, onChange }: { hospitalId
       if (!hospitalId) return;
       try {
         const { data } = await (supabase.from("institution_patient_registry" as any) as any)
-          .select("patient_id").eq("institution_id", hospitalId).limit(200);
-        const ids = [...new Set((data || []).map((r: any) => r.patient_id).filter(Boolean))];
+          .select("linked_patient_id").eq("institution_id", hospitalId).limit(200);
+        const ids = [...new Set((data || []).map((r: any) => r.linked_patient_id).filter(Boolean))];
         if (ids.length === 0) { setPatients([]); return; }
         const { data: profs } = await supabase.from("profiles").select("id, first_name, last_name").in("id", ids);
         setPatients(profs || []);
