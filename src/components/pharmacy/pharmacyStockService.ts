@@ -441,6 +441,7 @@ export async function resolveInventoryItem(
   const nameColumn = table === "medication_inventory" ? "medication_name" : "product_name";
   const selectCols = table === "medication_inventory" ? "id, medication_name" : "id, product_name";
 
+  // Try exact/contains match first (prescription name in inventory)
   const { data, error } = await supabase
     .from(table as any)
     .select(selectCols)
@@ -448,7 +449,23 @@ export async function resolveInventoryItem(
     .ilike(nameColumn, `%${term}%`)
     .limit(20);
   if (error) return null;
-  const rows = ((data as unknown) as any[]) || [];
+  let rows = ((data as unknown) as any[]) || [];
+
+  // If no match, try reverse: inventory name contained in prescription term
+  // (e.g., prescription "Amoxicillin 500mg" vs inventory "Amoxicillin").
+  // Fetch candidates and match in JS for bidirectional containment.
+  if (rows.length === 0) {
+    const baseTerm = term.split(/\s+/)[0]; // first word, e.g., "Amoxicillin"
+    if (baseTerm && baseTerm.length >= 3) {
+      const { data: revData } = await supabase
+        .from(table as any)
+        .select(selectCols)
+        .eq(idColumn, institutionId)
+        .ilike(nameColumn, `%${baseTerm}%`)
+        .limit(20);
+      rows = ((revData as unknown) as any[]) || [];
+    }
+  }
   if (rows.length === 0) return null;
 
   const exact = rows.find((r) => String(r[nameColumn]).toLowerCase() === term.toLowerCase());
