@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useNavigate } from 'react-router-dom';
 import { useSuccessFeedback } from '@/hooks/use-success-feedback';
 import { useInstitutionAffiliation } from '@/hooks/useInstitutionAffiliation';
+import { useHospitalPatients } from '@/hooks/useHospitalPatients';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -26,23 +27,10 @@ export const NurseWorkflow = () => {
   // Structured vitals entry (previously "coming soon").
   const [showVitals, setShowVitals] = useState(false);
   const [vitalsPatientId, setVitalsPatientId] = useState('');
-  const [vitalsPatients, setVitalsPatients] = useState<{ id: string; first_name: string | null; last_name: string | null }[]>([]);
+  const { patients: vitalsPatients } = useHospitalPatients();
   const [vitals, setVitals] = useState({ sys: '', dia: '', hr: '', temp: '', spo2: '', rr: '', glucose: '', weight: '' });
   const [vitalsNotes, setVitalsNotes] = useState('');
   const [savingVitals, setSavingVitals] = useState(false);
-
-  useEffect(() => {
-    if (!showVitals) return;
-    (async () => {
-      const { data } = await supabase
-        .from('profiles')
-        .select('id, first_name, last_name')
-        .eq('role', 'patient')
-        .order('last_name')
-        .limit(200);
-      setVitalsPatients(data ?? []);
-    })();
-  }, [showVitals]);
 
   const numOrNull = (v: string) => {
     const n = Number(v);
