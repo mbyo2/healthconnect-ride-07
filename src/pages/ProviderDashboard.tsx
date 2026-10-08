@@ -487,7 +487,7 @@ export const ProviderDashboard = () => {
     prescriptions: "/prescriptions",
     patients: "/appointments",
     schedule: "/provider-calendar",
-    billing: "/wallet",
+    billing: "/billing",
     dispense: "/pharmacy-portal",
     test_queue: "/lab-management",
     lab_orders: "/lab-orders",
