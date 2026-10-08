@@ -766,11 +766,8 @@ export const PatientRegistration = () => {
                       type="password"
                       autoComplete="new-password"
                       className="h-9 text-xs"
-                      name={field.name}
+                      {...field}
                       value={field.value ?? ""}
-                      onChange={field.onChange}
-                      onBlur={field.onBlur}
-                      ref={field.ref}
                     />
                   </FormControl>
                   <FormMessage className="text-[10px]" />
