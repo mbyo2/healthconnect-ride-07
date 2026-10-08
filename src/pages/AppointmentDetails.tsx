@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { Calendar, Clock, User, Video, FileText, X, ArrowLeft } from "lucide-react";
+import { Calendar, Clock, User, Video, FileText, X, ArrowLeft, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -69,7 +69,13 @@ export const AppointmentDetails = () => {
         .eq("id", (appt as any).provider_id)
         .maybeSingle();
 
-      setAppointment({ ...(appt as any), provider: providerProfile ?? null, patient: null });
+      const { data: patientProfile } = await supabase
+        .from("profiles")
+        .select("first_name, last_name")
+        .eq("id", (appt as any).patient_id)
+        .maybeSingle();
+
+      setAppointment({ ...(appt as any), provider: providerProfile ?? null, patient: patientProfile ?? null });
       setNotes((appt as any)?.notes || "");
 
       // For video consultations, fetch the linked video_consultations row
@@ -202,13 +208,35 @@ export const AppointmentDetails = () => {
               </button>
             )}
             {appointment.status !== "cancelled" && appointment.status !== "completed" && (
-              <button
-                onClick={() => setShowCancelDialog(true)}
-                className="px-3.5 py-1.5 rounded-md border border-error-500/40 text-error-500 font-bold text-xs hover:bg-error-500/10 transition-colors flex items-center gap-1.5"
-              >
-                <X className="h-3.5 w-3.5" />
-                Cancel appointment
-              </button>
+              <>
+                <button
+                  onClick={async () => {
+                    try {
+                      const { error } = await supabase
+                        .from("appointments" as any)
+                        .update({ status: "completed" })
+                        .eq("id", id);
+                      if (error) throw error;
+                      toast.success("Appointment marked as completed");
+                      setAppointment({ ...appointment, status: "completed" });
+                    } catch (error) {
+                      console.error("Error completing appointment:", error);
+                      toast.error("Failed to mark as completed");
+                    }
+                  }}
+                  className="px-3.5 py-1.5 rounded-md bg-green-600 text-white font-bold text-xs hover:bg-green-700 transition-colors flex items-center gap-1.5"
+                >
+                  <CheckCircle className="h-3.5 w-3.5" />
+                  Mark Complete
+                </button>
+                <button
+                  onClick={() => setShowCancelDialog(true)}
+                  className="px-3.5 py-1.5 rounded-md border border-error-500/40 text-error-500 font-bold text-xs hover:bg-error-500/10 transition-colors flex items-center gap-1.5"
+                >
+                  <X className="h-3.5 w-3.5" />
+                  Cancel appointment
+                </button>
+              </>
             )}
             <div>{getStatusPill(appointment.status)}</div>
           </div>

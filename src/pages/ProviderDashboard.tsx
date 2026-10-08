@@ -485,7 +485,7 @@ export const ProviderDashboard = () => {
     telehealth: "/video-dashboard",
     consultations: "/medical-records",
     prescriptions: "/prescriptions",
-    patients: "/appointments",
+    patients: "/institution/patients",
     schedule: "/provider-calendar",
     billing: "/billing",
     dispense: "/pharmacy-portal",
