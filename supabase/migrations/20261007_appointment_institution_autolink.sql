@@ -31,7 +31,7 @@ BEGIN
     IF v_institution_id IS NULL THEN
       SELECT institution_id INTO v_institution_id
       FROM public.institution_staff
-      WHERE user_id = NEW.provider_id
+      WHERE provider_id = NEW.provider_id
       ORDER BY created_at ASC
       LIMIT 1;
     END IF;
