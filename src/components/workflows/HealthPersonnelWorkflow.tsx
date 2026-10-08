@@ -24,11 +24,11 @@ export const HealthPersonnelWorkflow = () => {
   const workflowSteps = [
     { title: "My Schedule", description: "View and manage your availability & appointments", icon: <Calendar className="h-5 w-5" />, route: '/provider-calendar' },
     { title: "Patient Appointments", description: "Today's queue, upcoming & past consultations", icon: <ClipboardList className="h-5 w-5" />, route: '/appointments' },
-    { title: "Patient Records", description: "Access and update patient medical records", icon: <Stethoscope className="h-5 w-5" />, route: '/medical-records' },
+    { title: "Patient Records", description: "Access and update patient medical records", icon: <Stethoscope className="h-5 w-5" />, route: '/institution/patients' },
     { title: "Write Prescriptions", description: "Digital Rx with allergy & interaction safety", icon: <FileText className="h-5 w-5" />, route: '/prescriptions' },
     { title: "Allergy & Drug Safety", description: "Check patient allergies & drug interactions", icon: <Shield className="h-5 w-5" />, route: '/prescriptions' },
     { title: "AI Clinical Assistant", description: "AI-powered CDSS & diagnostic support", icon: <Brain className="h-5 w-5" />, route: '/ai-diagnostics' },
-    { title: "Infection Management", description: "Track HAI cases & antibiotic stewardship", icon: <Bug className="h-5 w-5" />, route: '/medical-records' },
+    { title: "Infection Management", description: "Track HAI cases & antibiotic stewardship", icon: <Bug className="h-5 w-5" />, route: '/institution/patients' },
     { title: "Video Consultations", description: "Telemedicine & remote patient care", icon: <Video className="h-5 w-5" />, route: '/video-consultations' },
     { title: "My Patients", description: "Your connected patient network", icon: <Users className="h-5 w-5" />, route: '/connections' },
     { title: "Patient Chat", description: "Secure messaging with patients", icon: <MessageSquare className="h-5 w-5" />, route: '/chat' },

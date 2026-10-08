@@ -27,7 +27,7 @@ export const LabTechnicianWorkflow = () => {
     { title: "Test Processing", description: "Run tests & enter results", icon: <Beaker className="h-5 w-5" />, route: '/lab-management' },
     { title: "Pending Samples Alert", description: "Samples pending >1hr flagged", icon: <Timer className="h-5 w-5" />, route: '/lab-management' },
     { title: "Critical Results", description: "Abnormal values & reflex test triggers", icon: <AlertTriangle className="h-5 w-5" />, route: '/lab-management' },
-    { title: "Reports & Sign-off", description: "Generate & validate lab reports", icon: <FileText className="h-5 w-5" />, route: '/medical-records' },
+    { title: "Reports & Sign-off", description: "Generate & validate lab reports", icon: <FileText className="h-5 w-5" />, route: '/institution/patients' },
     { title: "Patient Lookup", description: "Search patient test history", icon: <Search className="h-5 w-5" />, route: '/search' },
     { title: "Quality Control", description: "QC logs, calibration & NABL compliance", icon: <ClipboardList className="h-5 w-5" />, route: '/lab-management' },
     { title: "TAT Analytics", description: "Turnaround time & performance metrics", icon: <BarChart3 className="h-5 w-5" />, route: '/lab-management' },

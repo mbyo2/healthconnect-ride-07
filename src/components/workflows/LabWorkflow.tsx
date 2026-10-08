@@ -26,7 +26,7 @@ export const LabWorkflow = () => {
     { title: "Sample Tracking", description: "Track sample collection and processing", icon: <TestTube className="h-5 w-5" />, route: '/lab-management' },
     { title: "Pending Sample Alerts", description: "Samples pending >1hr flagged for action", icon: <Timer className="h-5 w-5" />, route: '/lab-management' },
     { title: "Critical Results", description: "Abnormal values & reflex test triggers", icon: <AlertTriangle className="h-5 w-5" />, route: '/lab-management' },
-    { title: "Results & Reports", description: "Enter results and generate reports", icon: <FileText className="h-5 w-5" />, route: '/medical-records' },
+    { title: "Results & Reports", description: "Enter results and generate reports", icon: <FileText className="h-5 w-5" />, route: '/institution/patients' },
     { title: "Quality Control", description: "QC logs, calibration & NABL compliance", icon: <ClipboardList className="h-5 w-5" />, route: '/lab-management' },
     { title: "Patient Lookup", description: "Search patient records and history", icon: <Search className="h-5 w-5" />, route: '/search' },
     { title: "Staff", description: "Lab technician management", icon: <Users className="h-5 w-5" />, route: '/lab-management' },
