@@ -33,7 +33,7 @@ interface Invoice {
 
 export const Billing = () => {
   const { user } = useAuth();
-  const { institutionId } = useInstitutionContext();
+  const { institutionId, institution } = useInstitutionContext();
   const { formatPrice } = useCurrency();
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
@@ -164,18 +164,23 @@ export const Billing = () => {
   const handleDownloadReceipt = async (invoice: Invoice) => {
     try {
       await downloadReceiptPdf({
-        invoiceNumber: invoice.invoice_number,
-        patientName: invoice.patient_name,
-        items: invoice.items,
-        subtotal: invoice.subtotal,
-        tax: invoice.tax,
+        title: "INVOICE RECEIPT",
+        receiptNumber: invoice.invoice_number,
+        date: new Date(invoice.created_at),
+        issuerName: institution?.name || "Doc'O Clock",
+        issuerAddress: institution?.address,
+        issuerPhone: institution?.phone,
+        customerName: invoice.patient_name,
+        items: invoice.items.map((item: any) => ({
+          description: item.description,
+          quantity: item.quantity,
+          unitPrice: item.unit_price,
+          total: item.quantity * item.unit_price,
+        })),
         discount: invoice.discount,
-        total: invoice.total_amount,
-        paid: invoice.paid_amount,
-        balance: invoice.balance,
-        status: invoice.status,
-        date: new Date(invoice.created_at).toLocaleDateString(),
-        notes: invoice.notes,
+        tax: invoice.tax,
+        amountPaid: invoice.paid_amount,
+        currency: "ZMW",
       });
       toast.success("Receipt downloaded");
     } catch (err) {
@@ -373,43 +378,114 @@ export const Billing = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Receipt Dialog */}
+      {/* Receipt Dialog - Doc'O Clock branded */}
       <Dialog open={!!showReceipt} onOpenChange={() => setShowReceipt(null)}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>Receipt</DialogTitle>
           </DialogHeader>
           {showReceipt && (
-            <div className="space-y-4">
-              <div className="text-center border-b pb-4">
-                <h2 className="text-xl font-bold">Doc'O Clock</h2>
-                <p className="text-sm text-muted-foreground">Healthcare Services</p>
-                <p className="text-sm font-mono mt-2">{showReceipt.invoice_number}</p>
-              </div>
-              <div>
-                <p className="text-sm"><strong>Patient:</strong> {showReceipt.patient_name}</p>
-                <p className="text-sm"><strong>Date:</strong> {new Date(showReceipt.created_at).toLocaleDateString()}</p>
-                <p className="text-sm"><strong>Status:</strong> {showReceipt.status.toUpperCase()}</p>
-              </div>
-              <div className="border-t pt-4">
-                {showReceipt.items.map((item: any, idx: number) => (
-                  <div key={idx} className="flex justify-between text-sm py-1">
-                    <span>{item.description} × {item.quantity}</span>
-                    <span>{formatPrice(item.quantity * item.unit_price)}</span>
+            <div className="bg-white rounded-lg overflow-hidden">
+              {/* Header with Doc'O Clock branding */}
+              <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-2xl font-bold flex items-center gap-2">
+                      <span className="bg-white text-blue-600 rounded-full w-8 h-8 flex items-center justify-center text-lg font-bold">D</span>
+                      Doc'O Clock
+                    </h2>
+                    <p className="text-blue-100 text-sm mt-1">Healthcare Services • doc0clock.online</p>
                   </div>
-                ))}
+                  <div className="text-right">
+                    <p className="text-xs text-blue-200">RECEIPT</p>
+                    <p className="font-mono font-bold">{showReceipt.invoice_number}</p>
+                  </div>
+                </div>
               </div>
-              <div className="border-t pt-4 space-y-1">
-                <div className="flex justify-between text-sm"><span>Subtotal:</span><span>{formatPrice(showReceipt.subtotal)}</span></div>
-                <div className="flex justify-between text-sm"><span>Tax:</span><span>{formatPrice(showReceipt.tax)}</span></div>
-                <div className="flex justify-between text-sm"><span>Discount:</span><span>-{formatPrice(showReceipt.discount)}</span></div>
-                <div className="flex justify-between font-bold"><span>Total:</span><span>{formatPrice(showReceipt.total_amount)}</span></div>
-                <div className="flex justify-between text-sm text-green-600"><span>Paid:</span><span>{formatPrice(showReceipt.paid_amount)}</span></div>
-                <div className="flex justify-between text-sm"><span>Balance:</span><span>{formatPrice(showReceipt.balance)}</span></div>
-              </div>
-              {showReceipt.notes && (
-                <p className="text-sm text-muted-foreground italic">{showReceipt.notes}</p>
+
+              {/* Institution info */}
+              {institution && (
+                <div className="bg-blue-50 px-6 py-4 border-b">
+                  <p className="font-semibold text-gray-900">{institution.name}</p>
+                  {institution.address && <p className="text-sm text-gray-600">{institution.address}</p>}
+                  {(institution.city || institution.phone) && (
+                    <p className="text-sm text-gray-600">
+                      {[institution.city, institution.phone].filter(Boolean).join(" • ")}
+                    </p>
+                  )}
+                </div>
               )}
+
+              <div className="p-6 space-y-4">
+                {/* Patient and invoice info */}
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <p className="text-gray-500 text-xs uppercase tracking-wide">Billed To</p>
+                    <p className="font-semibold">{showReceipt.patient_name}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-gray-500 text-xs uppercase tracking-wide">Date</p>
+                    <p className="font-semibold">{new Date(showReceipt.created_at).toLocaleDateString()}</p>
+                    {showReceipt.due_date && (
+                      <>
+                        <p className="text-gray-500 text-xs uppercase tracking-wide mt-2">Due Date</p>
+                        <p className="font-semibold">{new Date(showReceipt.due_date).toLocaleDateString()}</p>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {/* Status badge */}
+                <div className="flex justify-center">
+                  {getStatusBadge(showReceipt.status)}
+                </div>
+
+                {/* Items table */}
+                <div className="border rounded-lg overflow-hidden">
+                  <table className="w-full text-sm">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="text-left px-4 py-2 font-medium text-gray-600">Description</th>
+                        <th className="text-center px-4 py-2 font-medium text-gray-600">Qty</th>
+                        <th className="text-right px-4 py-2 font-medium text-gray-600">Amount</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {showReceipt.items.map((item: any, idx: number) => (
+                        <tr key={idx} className="border-t">
+                          <td className="px-4 py-2">{item.description}</td>
+                          <td className="text-center px-4 py-2">{item.quantity}</td>
+                          <td className="text-right px-4 py-2">{formatPrice(item.quantity * item.unit_price)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Totals */}
+                <div className="space-y-1 text-sm">
+                  <div className="flex justify-between"><span className="text-gray-600">Subtotal:</span><span>{formatPrice(showReceipt.subtotal)}</span></div>
+                  <div className="flex justify-between"><span className="text-gray-600">Tax:</span><span>{formatPrice(showReceipt.tax)}</span></div>
+                  <div className="flex justify-between"><span className="text-gray-600">Discount:</span><span>-{formatPrice(showReceipt.discount)}</span></div>
+                  <div className="flex justify-between font-bold text-base pt-2 border-t">
+                    <span>Total:</span><span>{formatPrice(showReceipt.total_amount)}</span>
+                  </div>
+                  <div className="flex justify-between text-green-600 font-medium"><span>Paid:</span><span>{formatPrice(showReceipt.paid_amount)}</span></div>
+                  <div className="flex justify-between font-medium"><span>Balance Due:</span><span className={showReceipt.balance > 0 ? "text-red-600" : "text-green-600"}>{formatPrice(showReceipt.balance)}</span></div>
+                </div>
+
+                {showReceipt.notes && (
+                  <div className="bg-gray-50 p-3 rounded text-sm text-gray-600 italic">
+                    {showReceipt.notes}
+                  </div>
+                )}
+
+                {/* Footer */}
+                <div className="text-center text-xs text-gray-500 pt-4 border-t">
+                  <p>Thank you for choosing Doc'O Clock</p>
+                  <p className="mt-1">Powered by Doc'O Clock • doc0clock.online</p>
+                </div>
+              </div>
             </div>
           )}
           <DialogFooter>
