@@ -5,6 +5,7 @@ import { ListSkeleton } from "@/components/ui/list-skeleton";
 import { EmptyState } from "@/components/ui/empty-state";
 import { useHospitalModule } from "@/hooks/useHospitalModule";
 import { usePatientNames } from "@/hooks/usePatientNames";
+import { useHospitalPatients } from "@/hooks/useHospitalPatients";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -47,6 +48,7 @@ export const Imaging = ({ hospital }: { hospital: any }) => {
 
   const { data: orders, loading, error, refresh } = useHospitalModule<any>("imaging_orders", "institution_id", hospital?.id, { orderBy: "ordered_at", ascending: false });
   const { nameFor } = usePatientNames(orders.map((o) => o.patient_id));
+  const { patients: hospitalPatients } = useHospitalPatients(hospital?.id);
 
   // Results are scoped to this institution's orders
   const [resultsAll, setResultsAll] = useState<any[]>([]);
@@ -286,7 +288,12 @@ export const Imaging = ({ hospital }: { hospital: any }) => {
           <form onSubmit={handleNewOrder} className="space-y-3">
             <div>
               <label className="text-sm font-semibold">Patient</label>
-              <HospitalPatientSelectLink hospitalId={hospital?.id} value={orderForm.patient_id} onChange={(v: string) => setOrderForm({ ...orderForm, patient_id: v })} />
+              <select className="input w-full" value={orderForm.patient_id} onChange={(e) => setOrderForm({ ...orderForm, patient_id: e.target.value })}>
+                <option value="">Select patient…</option>
+                {hospitalPatients.map((p) => (
+                  <option key={p.id} value={p.id}>{p.name}</option>
+                ))}
+              </select>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
@@ -354,32 +361,4 @@ export const Imaging = ({ hospital }: { hospital: any }) => {
   );
 };
 
-/**
- * Lightweight patient picker that reuses the hospital patient list endpoint.
- * HospitalPatientSelect is a full component; this inline fallback loads the
- * institution's patient registry so the order form works in any institution.
- */
-function HospitalPatientSelectLink({ hospitalId, value, onChange }: { hospitalId?: string; value: string; onChange: (v: string) => void }) {
-  const [patients, setPatients] = React.useState<any[]>([]);
-  React.useEffect(() => {
-    (async () => {
-      if (!hospitalId) return;
-      try {
-        const { data } = await (supabase.from("institution_patient_registry" as any) as any)
-          .select("linked_patient_id").eq("institution_id", hospitalId).limit(200);
-        const ids = [...new Set((data || []).map((r: any) => r.linked_patient_id).filter(Boolean))];
-        if (ids.length === 0) { setPatients([]); return; }
-        const { data: profs } = await supabase.from("profiles").select("id, first_name, last_name").in("id", ids);
-        setPatients(profs || []);
-      } catch { /* non-fatal */ }
-    })();
-  }, [hospitalId]);
-  return (
-    <select className="input w-full" value={value} onChange={(e) => onChange(e.target.value)}>
-      <option value="">Select patient…</option>
-      {patients.map((p: any) => (
-        <option key={p.id} value={p.id}>{`${p.first_name || ""} ${p.last_name || ""}`.trim() || p.id.slice(0, 8)}</option>
-      ))}
-    </select>
-  );
-}
+
