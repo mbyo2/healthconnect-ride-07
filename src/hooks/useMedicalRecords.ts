@@ -26,15 +26,23 @@ export function useMedicalRecords(userId: string | undefined) {
 
     const fetchRecords = async () => {
         try {
-            const { data, error } = await supabase
-                .from('comprehensive_medical_records')
-                .select('*')
-                .eq('patient_id', userId)
-                .order('visit_date', { ascending: false });
+            // Fetch from comprehensive_medical_records plus completed imaging orders
+            const [recordsRes, imagingRes] = await Promise.all([
+                supabase
+                    .from('comprehensive_medical_records')
+                    .select('*')
+                    .eq('patient_id', userId)
+                    .order('visit_date', { ascending: false }),
+                (supabase.from('imaging_orders' as any) as any)
+                    .select('id, order_number, modality, body_part, status, created_at, completed_at')
+                    .eq('patient_id', userId)
+                    .eq('status', 'completed')
+                    .order('created_at', { ascending: false }),
+            ]);
 
-            if (error) throw error;
+            if (recordsRes.error) throw recordsRes.error;
 
-            const mappedData = (data || []).map((record: any) => ({
+            const mappedData = (recordsRes.data || []).map((record: any) => ({
                 id: record.id,
                 title: record.title || record.record_type,
                 provider: 'Healthcare Provider', // Placeholder as provider name isn't directly on the record
@@ -46,7 +54,20 @@ export function useMedicalRecords(userId: string | undefined) {
                 created_at: record.created_at
             }));
 
-            setRecords(mappedData);
+            // Add completed imaging orders as medical records
+            const imagingRecords = (imagingRes.data || []).map((img: any) => ({
+                id: `imaging-${img.id}`,
+                title: `Imaging: ${img.modality} - ${img.body_part} (${img.order_number})`,
+                provider: 'Radiology',
+                date: img.completed_at || img.created_at,
+                category: 'Imaging',
+                hash: generateMockRecordHash(),
+                verified: true,
+                shared_with: [],
+                created_at: img.created_at
+            }));
+
+            setRecords([...mappedData, ...imagingRecords]);
         } catch (error) {
             console.error('Error fetching medical records:', error);
             toast.error('Failed to load medical records');
