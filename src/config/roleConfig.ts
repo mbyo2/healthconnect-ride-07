@@ -302,6 +302,7 @@ export const PROVIDER_CORE_ROUTES = [
   '/medical-records',
   '/provider-calendar',
   '/wallet',
+  '/billing',
   '/emergency',
   '/video-consultations',
   '/video-dashboard',
