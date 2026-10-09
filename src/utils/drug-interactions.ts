@@ -92,7 +92,7 @@ export async function getPatientAllergies(patientId: string): Promise<string[]> 
   try {
     const { data } = await (supabase.from('institution_patient_registry' as any) as any)
       .select('allergies')
-      .eq('patient_id', patientId)
+      .eq('linked_patient_id', patientId)
       .limit(1)
       .maybeSingle();
     const raw = (data as any)?.allergies as string | null;
