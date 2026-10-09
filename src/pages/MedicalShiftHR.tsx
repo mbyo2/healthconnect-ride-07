@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import {
   Clock, Users, Calendar, Plus, Search, Filter, Download, Settings,
   Eye, Edit, CheckCircle, AlertTriangle, Building2, MapPin, UserRound,
@@ -173,7 +174,10 @@ export const MedicalShiftHR = () => {
   };
 
   const handleCreateShift = async () => {
-    if (!institution) return;
+    if (!institution) {
+      toast.error("No institution selected");
+      return;
+    }
 
     try {
       const { error } = await supabase.from("medical_shifts").insert({
@@ -183,10 +187,14 @@ export const MedicalShiftHR = () => {
       });
 
       if (error) throw error;
+      toast.success("Shift created successfully");
       setShowShiftDialog(false);
       fetchShiftData();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error creating shift:", error);
+      toast.error("Failed to create shift", {
+        description: error?.message || "Please try again.",
+      });
     }
   };
 
