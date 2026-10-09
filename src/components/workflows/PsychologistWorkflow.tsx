@@ -109,7 +109,7 @@ export const PsychologistWorkflow = () => {
     { title: "PHQ-9 Assessment", description: "Depression screening tool", icon: <HeartHandshake className="h-5 w-5" />, action: () => setShowAssessment(!showAssessment) },
     { title: "My Schedule", description: "Availability & calendar", icon: <Calendar className="h-5 w-5" />, route: '/provider-calendar' },
     { title: "Patient Queue", description: "Today's sessions", icon: <ClipboardList className="h-5 w-5" />, route: '/appointments' },
-    { title: "Patient Records", description: "Therapy notes & history", icon: <FileText className="h-5 w-5" />, route: '/medical-records' },
+    { title: "Patient Records", description: "Therapy notes & history", icon: <FileText className="h-5 w-5" />, route: '/institution/patients' },
     { title: "AI Assistant", description: "AI-powered support", icon: <Brain className="h-5 w-5" />, route: '/ai-diagnostics' },
     { title: "Video Sessions", description: "Teletherapy", icon: <Video className="h-5 w-5" />, route: '/video-consultations' },
     { title: "My Patients", description: "Connected clients", icon: <Users className="h-5 w-5" />, route: '/connections' },

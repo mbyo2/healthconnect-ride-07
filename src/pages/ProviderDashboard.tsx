@@ -483,7 +483,7 @@ export const ProviderDashboard = () => {
   const PROVIDER_MODULE_PATHS: Record<string, string> = {
     appointments: "/appointments",
     telehealth: "/video-dashboard",
-    consultations: "/medical-records",
+    consultations: "/institution/patients",
     prescriptions: "/prescriptions",
     patients: "/institution/patients",
     schedule: "/provider-calendar",

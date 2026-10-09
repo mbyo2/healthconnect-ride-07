@@ -25,7 +25,7 @@ export const SupportWorkflow = () => {
     { title: "User Lookup", description: "Find user accounts & history", icon: <Search className="h-5 w-5" />, route: '/search' },
     { title: "Live Chat Support", description: "Real-time user assistance", icon: <MessageSquare className="h-5 w-5" />, route: '/chat' },
     { title: "Appointments", description: "View appointments for support", icon: <Calendar className="h-5 w-5" />, route: '/appointments' },
-    { title: "Patient Records", description: "View patient records", icon: <FileText className="h-5 w-5" />, route: '/medical-records' },
+    { title: "Patient Records", description: "View patient records", icon: <FileText className="h-5 w-5" />, route: '/institution/patients' },
     { title: "Settings", description: "Support preferences", icon: <Settings className="h-5 w-5" />, route: '/settings' },
   ];
 

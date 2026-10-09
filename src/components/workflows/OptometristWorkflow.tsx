@@ -120,7 +120,7 @@ export const OptometristWorkflow = () => {
     { title: "Eye Examination", description: "Visual acuity, refraction & IOP", icon: <Eye className="h-5 w-5" />, action: () => setShowExam(!showExam) },
     { title: "My Schedule", description: "Availability, appointments & calendar", icon: <Calendar className="h-5 w-5" />, route: '/provider-calendar' },
     { title: "Patient Queue", description: "Today's consultations & upcoming visits", icon: <ClipboardList className="h-5 w-5" />, route: '/appointments' },
-    { title: "Patient Records (EMR)", description: "Access case sheets & history", icon: <FileText className="h-5 w-5" />, route: '/medical-records' },
+    { title: "Patient Records (EMR)", description: "Access case sheets & history", icon: <FileText className="h-5 w-5" />, route: '/institution/patients' },
     { title: "Write Prescriptions", description: "Digital Rx including eyewear", icon: <Glasses className="h-5 w-5" />, route: '/prescriptions' },
     { title: "AI Clinical Assistant", description: "AI-powered diagnostic support", icon: <Brain className="h-5 w-5" />, route: '/ai-diagnostics' },
     { title: "Video Consultations", description: "Telemedicine & remote care", icon: <Video className="h-5 w-5" />, route: '/video-consultations' },
