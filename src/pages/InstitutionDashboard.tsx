@@ -497,7 +497,7 @@ export const InstitutionDashboard = () => {
       </div>
 
         {/* Main Suite Tab Navigation */}
-        <div className="max-w-content mx-auto px-4 sm:px-6 pt-4">
+        <div className="max-w-content mx-auto px-4 sm:px-6 pt-4 sticky top-[7.5rem] lg:top-[8.5rem] z-20 bg-canvas dark:bg-slate-950">
           <div className="flex items-center gap-1.5 overflow-x-auto pb-2 border-b border-canvas-silk scrollbar-none" role="tablist" aria-label="Institution modules">
           {[
             { id: "overview", label: "Dashboard Overview", icon: Building2 },
