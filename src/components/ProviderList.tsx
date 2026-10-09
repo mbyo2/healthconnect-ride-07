@@ -7,6 +7,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { useSearch } from "@/context/SearchContext";
+import { useBookedSlots, NextAvailableChip } from "@/components/search/NextAvailableChip";
 
 interface ProviderListProps {
   providers: Provider[];
@@ -34,6 +35,9 @@ export const ProviderList = ({ providers, onProviderSelect, selectedProvider }: 
     setSelectedLanguage(null);
     setFeeMax(null);
   };
+
+  // Batched next-availability: one query for all visible providers.
+  const bookedByProvider = useBookedSlots(providers.map((p) => p.id));
 
   if (providers.length === 0) {
     return (
@@ -222,13 +226,14 @@ export const ProviderList = ({ providers, onProviderSelect, selectedProvider }: 
 
                 {/* Actions footer */}
                 <div className="flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-canvas-silk dark:border-slate-800">
-                  <div className="flex items-center gap-1 text-xs font-bold text-success-500">
-                    <Clock className="h-3.5 w-3.5" />
-                    <span>
-                      {provider.typical_wait_time
-                        ? `Avg. wait: ${provider.typical_wait_time}`
-                        : "Check availability"}
-                    </span>
+                  <div className="flex items-center gap-2">
+                    <NextAvailableChip provider={provider} booked={bookedByProvider.get(provider.id)} />
+                    {provider.typical_wait_time && (
+                      <span className="inline-flex items-center gap-1 text-xs font-bold text-graphite-500 dark:text-slate-400">
+                        <Clock className="h-3.5 w-3.5 text-primary-500" aria-hidden />
+                        Avg. wait: {provider.typical_wait_time}
+                      </span>
+                    )}
                   </div>
 
                   <div className="flex items-center gap-2">
